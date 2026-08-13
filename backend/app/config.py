@@ -39,10 +39,19 @@ class Settings(BaseSettings):
     # Licensing -- see docs/LICENSE_KEY_LIFECYCLE.md. The staging keypair is
     # generated fresh per local setup (scripts/generate_staging_keypair.py),
     # never committed, and is cryptographically unrelated to any future
-    # production key. Production key material is never read from here by
-    # design -- see licensing.py's key-selection comment.
+    # production key.
+    #
+    # Two ways to supply the signing key, chosen at Jack's direction
+    # (Railway deploy, 2026-08-13): a hosted environment like Railway has no
+    # guaranteed-persistent filesystem across redeploys unless a Volume is
+    # attached, so production reads the key straight from an env var
+    # (licensing_private_key_base64) instead -- same pattern already used
+    # for session_secret/admin_api_key. The file-path fields remain the
+    # local/staging mechanism only; _validate_production_config below never
+    # accepts a file path as sufficient for a real production environment.
     licensing_private_key_path: str = "./staging_keys/licensing_signing_key.private"
     licensing_public_key_path: str = "./staging_keys/licensing_signing_key.public"
+    licensing_private_key_base64: str = ""
     offline_grace_period_seconds: int = 14 * 24 * 60 * 60  # unchanged from the dev server -- Section 22
     default_max_activations: int = 3  # unchanged from the dev server -- Phase 3 Section 23
 
@@ -100,9 +109,10 @@ def _validate_production_config(s: Settings) -> None:
         problems.append("session_secret is still the dev default")
     if not s.admin_api_key:
         problems.append("admin_api_key is empty -- admin endpoints would be entirely unreachable")
-    if "staging_keys" in s.licensing_private_key_path:
+    if not s.licensing_private_key_base64:
         problems.append(
-            f"licensing_private_key_path={s.licensing_private_key_path!r} still points at the staging keypair"
+            "licensing_private_key_base64 is empty -- production reads the signing key from this "
+            "env var, never from a file path (see config.py's licensing key comment)"
         )
     if "nitedsp_staging" in s.database_url or "nitedsp_test" in s.database_url:
         problems.append(f"database_url still points at a local staging/test database: {s.database_url!r}")

@@ -33,6 +33,12 @@ router = APIRouter(prefix="/v1", tags=["licensing"])
 
 
 def _load_signing_key() -> SigningKey:
+    # Production (Railway or any host without a guaranteed-persistent
+    # filesystem) supplies the key via env var; local/staging keeps reading
+    # the generated keypair file. See config.py's licensing key comment.
+    if settings.licensing_private_key_base64:
+        return SigningKey(base64.b64decode(settings.licensing_private_key_base64.strip()))
+
     private_path = Path(settings.licensing_private_key_path)
     if not private_path.exists():
         raise RuntimeError(
