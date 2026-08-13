@@ -3,21 +3,25 @@ import Link from "next/link";
 const FEATURES = [
   {
     title: "Find Similar",
+    experimental: false,
     description:
       "Select a sound. Instantly surface acoustically similar samples from your entire library -- by how they sound, not what they're named.",
   },
   {
     title: "Visual map",
+    experimental: false,
     description:
       "See your whole library laid out by sonic similarity. Nearby sounds are related -- explore by ear, not by folder.",
   },
   {
-    title: "Ableton workflow (experimental)",
+    title: "Ableton workflow",
+    experimental: true,
     description:
       "Tags and organization can write straight into Ableton's own sample browser via XMP metadata -- no separate catalog to maintain. Marked experimental in the current build.",
   },
   {
     title: "Fully offline",
+    experimental: false,
     description:
       "Every scan and every match happens on your machine. Nothing about your library ever leaves your drive.",
   },
@@ -26,10 +30,23 @@ const FEATURES = [
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
-      <section className="section">
+      {/* Company beat -- NITE DSP is the company, Smart Sample Manager is
+          the current product. Kept brief and restrained rather than a
+          full separate section, per the brand direction (no overblown
+          founder-mythology copy). */}
+      <section className="pt-16 sm:pt-20">
         <div className="mx-auto px-6 text-center" style={{ maxWidth: "var(--content-width)" }}>
           <span className="eyebrow">NITE DSP</span>
+          <p className="mt-3 text-sm" style={{ color: "var(--muted-dim)" }}>
+            Audio software built around real production workflows.
+          </p>
+        </div>
+      </section>
+
+      {/* Product hero */}
+      <section className="section !pt-8">
+        <div className="mx-auto px-6 text-center" style={{ maxWidth: "var(--content-width)" }}>
+          <span className="eyebrow">Smart Sample Manager</span>
           <h1 className="mt-4 text-4xl sm:text-6xl font-semibold tracking-tight text-balance">
             Your samples. Actually organised.
           </h1>
@@ -78,7 +95,10 @@ export default function HomePage() {
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {FEATURES.map((feature) => (
               <div key={feature.title} className="surface-card p-6">
-                <h3 className="font-medium">{feature.title}</h3>
+                <h3 className="font-medium">
+                  {feature.title}
+                  {feature.experimental && <span className="badge-experimental ml-2">Experimental</span>}
+                </h3>
                 <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
                   {feature.description}
                 </p>

@@ -41,12 +41,26 @@ export const metadata: Metadata = {
   },
 };
 
+const ORGANIZATION_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "NITE DSP",
+  url: "https://www.nitedsp.co.uk",
+  email: "nitedsp@outlook.com",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col" style={{ background: "var(--background)", color: "var(--foreground)" }}>
         <a href="#main" className="skip-link">
           Skip to content

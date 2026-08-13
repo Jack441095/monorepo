@@ -12,18 +12,22 @@ export const metadata: Metadata = {
 const WORKFLOWS = [
   {
     title: "Find Similar",
+    experimental: false,
     body: "Select a sound. Smart Sample Manager surfaces acoustically similar samples from your whole library -- by how they sound, not by filename or folder. This compares audio content directly; it isn't a text search, so there's no \"type a description and find a sound\" mode.",
   },
   {
     title: "Visual map",
+    experimental: false,
     body: "Your library laid out as a 2D map, positioned by sonic similarity. Sounds near each other on the map tend to sound alike -- a different way to browse than scrolling a folder tree.",
   },
   {
-    title: "Ableton workflow (experimental)",
+    title: "Ableton workflow",
+    experimental: true,
     body: "Tags and reorganization can write into standard XMP metadata that Ableton Live's own sample browser reads directly, so your library stays organized inside Ableton too. This feature is marked experimental in the current build while we finish validating it against a range of libraries -- it's not an official Ableton partnership or integration.",
   },
   {
     title: "Fully offline",
+    experimental: false,
     body: "Every scan, every embedding, every similarity match runs locally. No sample audio, filename, or library path is ever uploaded during ordinary use.",
   },
 ];
@@ -47,9 +51,25 @@ const FAQ = [
   },
 ];
 
+const SOFTWARE_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Smart Sample Manager",
+  applicationCategory: "MultimediaApplication",
+  operatingSystem: "macOS",
+  description:
+    "An acoustic-similarity sample browser and organizer for VST3, AU, and Standalone hosts.",
+  // Deliberately no "offers"/price field -- pricing is not yet human-approved
+  // (see app/pricing/page.tsx). Do not add one until it is.
+};
+
 export default function SmartSampleManagerPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SOFTWARE_JSON_LD) }}
+      />
       <section className="section">
         <div className="mx-auto px-6" style={{ maxWidth: "var(--content-width)" }}>
           <span className="eyebrow">Product</span>
@@ -99,7 +119,10 @@ export default function SmartSampleManagerPage() {
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
             {WORKFLOWS.map((item) => (
               <div key={item.title} className="surface-card p-6">
-                <h3 className="font-medium">{item.title}</h3>
+                <h3 className="font-medium">
+                  {item.title}
+                  {item.experimental && <span className="badge-experimental ml-2">Experimental</span>}
+                </h3>
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
                   {item.body}
                 </p>

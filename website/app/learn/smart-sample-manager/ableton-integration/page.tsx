@@ -10,11 +10,7 @@ export const metadata: Metadata = {
 export default function AbletonIntegrationPage() {
   return (
     <LearnLayout slug="ableton-integration" title="Ableton Integration (Experimental)">
-      <div
-        role="note"
-        className="rounded-md border px-4 py-3 text-sm"
-        style={{ borderColor: "#7c5a1a", background: "rgba(124,90,26,0.12)", color: "#e3b34d" }}
-      >
+      <div role="note" className="callout-warning">
         <strong>Experimental.</strong> This feature is still being validated against a range of
         real libraries. It is not an official Ableton partnership or integration.
       </div>
