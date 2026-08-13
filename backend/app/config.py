@@ -63,6 +63,27 @@ class Settings(BaseSettings):
     paddle_api_key: str = ""
     paddle_webhook_secret: str = ""
 
+    # sandbox-api.paddle.com in every environment until a human explicitly
+    # flips this to api.paddle.com for a real production deploy -- this is
+    # the one line that draws the sandbox/live line for API calls, so it's
+    # never inferred from `environment` (see docs/PADDLE_INTEGRATION_AUDIT.md).
+    paddle_api_base_url: str = "https://sandbox-api.paddle.com"
+
+    # Product/price ID mapping (docs/PADDLE_INTEGRATION_AUDIT.md Section 12) --
+    # empty until a real Paddle sandbox product exists. commerce.py's webhook
+    # handler refuses to issue an entitlement for any price_id/product_id
+    # combination not represented in this mapping; it never infers a mapping
+    # from event payload alone.
+    paddle_product_id: str = ""
+    paddle_intro_price_id: str = ""
+    paddle_regular_price_id: str = ""
+
+    # Which of the two price IDs above is currently offered at checkout.
+    # Section 18/67: an explicit owner-controlled switch, not a code change
+    # and not an unverified clock -- flipping this is a deliberate, reviewable
+    # action (env var change + deploy), never automatic based on a launch date.
+    paddle_active_price_id: str = ""
+
     # Email -- Section 63/64. "console" logs the email instead of sending it,
     # used for local/staging until a real transactional email provider is
     # configured. Never silently falls through to a real send in an

@@ -72,6 +72,10 @@ class Purchase(Base):
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     product_id: Mapped[str] = mapped_column(ForeignKey("products.id"), nullable=False)
+    # Which specific Paddle price (intro vs regular) was actually charged --
+    # distinct from product_id. Nullable: purchases recorded before this
+    # column existed have no value to backfill.
+    price_id: Mapped[str | None] = mapped_column(String, nullable=True)
     provider: Mapped[str] = mapped_column(String, nullable=False)
     provider_order_id: Mapped[str] = mapped_column(String, nullable=False)
     amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)

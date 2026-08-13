@@ -208,3 +208,42 @@ def failed_webhooks(db: Session = Depends(get_db), actor: str = Depends(require_
         }
         for e in events
     ]
+
+
+@router.get("/purchases/search")
+def search_purchase(
+    provider_order_id: str, db: Session = Depends(get_db), actor: str = Depends(require_admin)
+) -> dict:
+    """Look up a purchase by Paddle transaction ID -- e.g. after a refund
+    webhook records purchase.status="refunded" (commerce.py's
+    _handle_adjustment_created), an admin uses this to find the associated
+    entitlement and decide whether to revoke it via the existing
+    POST /admin/entitlements/{id}/revoke, per this repo's policy that
+    refund-driven revocation is a manual decision, not automatic."""
+    purchase = (
+        db.query(models.Purchase)
+        .filter(models.Purchase.provider_order_id == provider_order_id)
+        .one_or_none()
+    )
+    if purchase is None:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    entitlements = (
+        db.query(models.Entitlement).filter(models.Entitlement.purchase_id == purchase.id).all()
+    )
+    return {
+        "purchase": {
+            "id": purchase.id,
+            "user_id": purchase.user_id,
+            "product_id": purchase.product_id,
+            "price_id": purchase.price_id,
+            "provider_order_id": purchase.provider_order_id,
+            "amount_cents": purchase.amount_cents,
+            "currency": purchase.currency,
+            "status": purchase.status,
+            "purchased_at": purchase.purchased_at,
+            "refunded_at": purchase.refunded_at,
+        },
+        "entitlements": [
+            {"id": e.id, "license_key": e.license_key, "status": e.status} for e in entitlements
+        ],
+    }

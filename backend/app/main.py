@@ -53,6 +53,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(licensing.router)
 app.include_router(commerce.router)
+app.include_router(commerce.checkout_router)
 app.include_router(downloads.router)
 app.include_router(admin.router)
 
