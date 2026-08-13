@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { consumeBuyIntent, startCheckout } from "@/lib/checkout";
 
 type User = { id: string; email: string; created_at: string };
 type Entitlement = {
@@ -73,12 +75,23 @@ function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
   );
 }
 
-export default function AccountPage() {
+function AccountPageInner() {
+  const searchParams = useSearchParams();
+  const purchasePending = searchParams.get("purchase") === "pending";
+
   const [user, setUser] = useState<User | null>(null);
   const [entitlements, setEntitlements] = useState<Entitlement[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [linkSent, setLinkSent] = useState(false);
+  // Only meaningful when purchasePending and no entitlement exists yet:
+  // "waiting" while polling for the webhook-created entitlement,
+  // "timed-out" if it hasn't shown up after a reasonable wait. Once an
+  // entitlement exists this state stops being rendered at all (see the
+  // `entitlements.length === 0` guard below) -- the webhook remains the
+  // source of truth either way, this is UX only
+  // (docs/PADDLE_INTEGRATION_AUDIT.md).
+  const [pendingState, setPendingState] = useState<"waiting" | "timed-out">("waiting");
 
   useEffect(() => {
     apiFetch("/auth/me")
@@ -96,6 +109,42 @@ export default function AccountPage() {
       .then((res) => (res.ok ? res.json() : []))
       .then(setEntitlements);
   }, [user]);
+
+  // Resume a Buy click that happened while signed out (see BuyCard.tsx /
+  // lib/checkout.ts) -- runs once, the moment we know who's signed in.
+  useEffect(() => {
+    if (!user) return;
+    if (consumeBuyIntent()) {
+      startCheckout("active");
+    }
+  }, [user]);
+
+  // After a successful Paddle checkout (successUrl=/account?purchase=pending),
+  // poll briefly for the webhook-created entitlement to appear. Never treats
+  // frontend "payment succeeded" as ownership by itself -- only an actual
+  // entitlement record (created server-side by the real webhook) counts.
+  useEffect(() => {
+    if (!user || !purchasePending || entitlements.length > 0) return;
+    let cancelled = false;
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts += 1;
+      const res = await apiFetch("/auth/entitlements");
+      const data = res.ok ? await res.json() : [];
+      if (cancelled) return;
+      if (data.length > 0) {
+        setEntitlements(data);
+        clearInterval(poll);
+      } else if (attempts >= 10) {
+        setPendingState("timed-out");
+        clearInterval(poll);
+      }
+    }, 3000);
+    return () => {
+      cancelled = true;
+      clearInterval(poll);
+    };
+  }, [user, purchasePending, entitlements.length]);
 
   async function requestLink(e: React.FormEvent) {
     e.preventDefault();
@@ -178,14 +227,39 @@ export default function AccountPage() {
           {user.email}
         </p>
 
+        {purchasePending && entitlements.length === 0 && (
+          <div className="mt-10 surface-card p-5">
+            {pendingState === "timed-out" ? (
+              <p className="text-sm" style={{ color: "var(--muted)" }}>
+                Still confirming your purchase -- this can take a little longer than usual.
+                Refresh this page in a moment, or{" "}
+                <a href="mailto:nitedsp@outlook.com" className="underline">
+                  contact support
+                </a>{" "}
+                if it doesn&apos;t appear soon.
+              </p>
+            ) : (
+              <p className="text-sm" style={{ color: "var(--muted)" }}>
+                Payment received. We&apos;re confirming your purchase…
+              </p>
+            )}
+          </div>
+        )}
+
         <h2 className="mt-10 eyebrow">Your products</h2>
         {entitlements.length === 0 ? (
           <p className="mt-4 text-sm" style={{ color: "var(--muted-dim)" }}>
-            No products yet. See{" "}
-            <a href="/pricing" className="underline">
-              pricing
-            </a>
-            .
+            {purchasePending ? (
+              "Your product will appear here as soon as it's confirmed."
+            ) : (
+              <>
+                No products yet. See{" "}
+                <a href="/pricing" className="underline">
+                  pricing
+                </a>
+                .
+              </>
+            )}
           </p>
         ) : (
           <div className="mt-4 space-y-3">
@@ -204,5 +278,19 @@ export default function AccountPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="section text-center" style={{ color: "var(--muted-dim)" }}>
+          Loading…
+        </div>
+      }
+    >
+      <AccountPageInner />
+    </Suspense>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { BuyCard } from "./BuyCard";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -40,13 +40,7 @@ export default function PricingPage() {
             <li>Free updates within the 1.x version line</li>
           </ul>
 
-          <Link href="/account" className="btn-primary mt-6 w-full">
-            Sign in
-          </Link>
-          <p className="mt-4 text-xs" style={{ color: "var(--muted-dim)" }}>
-            Checkout is not yet live -- real checkout requires a live Merchant of Record account,
-            which does not exist yet.
-          </p>
+          <BuyCard />
         </div>
 
         <p className="mt-6 text-xs" style={{ color: "var(--muted-dim)" }}>
