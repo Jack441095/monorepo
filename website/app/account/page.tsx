@@ -131,8 +131,7 @@ export default function AccountPage() {
           </p>
           {linkSent ? (
             <p className="mt-6 text-sm" style={{ color: "var(--muted)" }}>
-              Check your email for a sign-in link. (Local staging: the link is printed to the
-              backend console, since no real email account is configured yet.)
+              Check your email for a sign-in link.
             </p>
           ) : (
             <form onSubmit={requestLink} className="mt-6 flex gap-2">

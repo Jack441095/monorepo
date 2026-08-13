@@ -58,7 +58,7 @@ export default function HomePage() {
               Your best sounds are buried in a library you stopped trusting years ago.
             </h2>
             <p className="mt-4" style={{ color: "var(--muted)" }}>
-              Folders full of "kick_final_v3.wav." Duplicate one-shots scattered across three
+              Folders full of &ldquo;kick_final_v3.wav.&rdquo; Duplicate one-shots scattered across three
               drives. A sound you know you have somewhere, but can&apos;t find by name because you
               never named it right in the first place.
             </p>

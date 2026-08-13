@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://nitedsp.co.uk";
+// www, not the bare apex -- see sitemap.ts's comment.
+const BASE_URL = "https://www.nitedsp.co.uk";
 
 export default function robots(): MetadataRoute.Robots {
   return {

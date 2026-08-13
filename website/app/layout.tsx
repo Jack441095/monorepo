@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,8 +20,13 @@ const geistMono = Geist_Mono({
 // environment), metadataBase/canonical/OG URLs are pure metadata about the
 // site's real-world identity, safe to state directly regardless of which
 // environment is currently serving the page.
+//
+// Uses the "www" host, not the bare apex: Railway's real custom domain (and
+// this deployment's actual HTTPS target) is www.nitedsp.co.uk -- the apex
+// only redirects to it at the DNS/registrar level and doesn't itself serve
+// HTTPS yet (docs/IONOS_DNS_SETUP.md). Update if/when that changes.
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nitedsp.co.uk"),
+  metadataBase: new URL("https://www.nitedsp.co.uk"),
   title: {
     default: "NITE DSP",
     template: "%s | NITE DSP",
@@ -29,17 +35,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "NITE DSP",
     description: "Audio production tools by NITE DSP.",
-    url: "https://nitedsp.co.uk",
+    url: "https://www.nitedsp.co.uk",
     siteName: "NITE DSP",
     type: "website",
   },
 };
-
-const NAV_LINKS = [
-  { href: "/products/smart-sample-manager", label: "Smart Sample Manager" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/support", label: "Support" },
-];
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -51,27 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#main" className="skip-link">
           Skip to content
         </a>
-        <header className="border-b sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--background)]/80" style={{ borderColor: "var(--border)", background: "var(--background)" }}>
-          <nav
-            className="mx-auto flex items-center justify-between px-6 py-4"
-            style={{ maxWidth: "var(--content-width)" }}
-            aria-label="Primary"
-          >
-            <Link href="/" className="font-semibold tracking-tight text-lg">
-              NITE DSP
-            </Link>
-            <div className="hidden sm:flex items-center gap-8 text-sm" style={{ color: "var(--muted)" }}>
-              {NAV_LINKS.map((link) => (
-                <Link key={link.href} href={link.href} className="hover:text-[color:var(--foreground)] transition-colors">
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-            <Link href="/account" className="btn-secondary">
-              Account
-            </Link>
-          </nav>
-        </header>
+        <SiteHeader />
 
         <main id="main" className="flex-1">
           {children}
@@ -93,6 +73,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <span className="eyebrow">Product</span>
               <Link href="/products/smart-sample-manager" className="hover:text-[color:var(--foreground)] transition-colors">
                 Smart Sample Manager
+              </Link>
+              <Link href="/learn" className="hover:text-[color:var(--foreground)] transition-colors">
+                Learn
               </Link>
               <Link href="/pricing" className="hover:text-[color:var(--foreground)] transition-colors">
                 Pricing

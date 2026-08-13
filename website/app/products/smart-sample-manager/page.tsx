@@ -133,6 +133,40 @@ export default function SmartSampleManagerPage() {
       </section>
 
       <section className="section border-t" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto px-6" style={{ maxWidth: "var(--content-width)" }}>
+          <span className="eyebrow">Compatibility</span>
+          <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">
+            Where it&apos;s been tested.
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm" style={{ color: "var(--muted)" }}>
+            We&apos;d rather tell you exactly what&apos;s been verified than list every major DAW as
+            supported before we&apos;ve confirmed it.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="surface-card p-6">
+              <h3 className="font-medium" style={{ color: "var(--foreground)" }}>
+                Verified
+              </h3>
+              <ul className="mt-3 space-y-1.5 text-sm" style={{ color: "var(--muted)" }}>
+                <li>Standalone app</li>
+                <li>Audio Unit (AU) -- passes Apple&apos;s own AU validation</li>
+              </ul>
+            </div>
+            <div className="surface-card p-6">
+              <h3 className="font-medium" style={{ color: "var(--foreground)" }}>
+                In progress
+              </h3>
+              <ul className="mt-3 space-y-1.5 text-sm" style={{ color: "var(--muted)" }}>
+                <li>VST3 in individual DAWs</li>
+                <li>Ableton Live</li>
+                <li>Logic Pro</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section border-t" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto px-6" style={{ maxWidth: "42rem" }}>
           <span className="eyebrow">FAQ</span>
           <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">Questions</h2>

@@ -7,14 +7,11 @@ import { apiFetch } from "@/lib/api";
 function VerifyInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<"pending" | "error">("pending");
+  const token = searchParams.get("token");
+  const [status, setStatus] = useState<"pending" | "error">(token ? "pending" : "error");
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    if (!token) {
-      setStatus("error");
-      return;
-    }
+    if (!token) return;
     apiFetch("/auth/verify", { method: "POST", body: JSON.stringify({ token }) }).then((res) => {
       if (res.ok) {
         router.replace("/account");
@@ -22,7 +19,7 @@ function VerifyInner() {
         setStatus("error");
       }
     });
-  }, [searchParams, router]);
+  }, [token, router]);
 
   if (status === "error") {
     return <p className="text-sm" style={{ color: "#e88" }}>This sign-in link is invalid or has expired.</p>;
