@@ -88,9 +88,10 @@ class Settings(BaseSettings):
     # used for local/staging until a real transactional email provider is
     # configured. Never silently falls through to a real send in an
     # unconfigured environment.
-    email_provider: str = "console"  # "console" | future: "postmark"/"ses"/etc.
+    email_provider: str = "console"  # "console" | "resend"
     email_from_name: str = "NITE DSP"
     email_from_address: str = "noreply@localhost.invalid"
+    resend_api_key: str = ""
 
     # Downloads -- Section 51/52. Stands in for real object storage (S3-alike)
     # during staging; releases.storage_key is a path relative to this dir.
@@ -137,6 +138,10 @@ def _validate_production_config(s: Settings) -> None:
         )
     if "nitedsp_staging" in s.database_url or "nitedsp_test" in s.database_url:
         problems.append(f"database_url still points at a local staging/test database: {s.database_url!r}")
+    if s.email_provider == "resend" and not s.resend_api_key:
+        problems.append("email_provider is 'resend' but resend_api_key is empty")
+    if s.email_provider not in ("console", "resend"):
+        problems.append(f"email_provider={s.email_provider!r} is not a valid provider")
 
     if problems:
         raise RuntimeError(

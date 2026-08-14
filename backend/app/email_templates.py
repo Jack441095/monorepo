@@ -96,8 +96,7 @@ def license_ready(product_name: str, license_key: str) -> tuple[str, str]:
 
 def refund_confirmation(product_name: str, amount_display: str) -> tuple[str, str]:
     body = (
-        f"Your refund for {product_name} ({amount_display}) has been processed. "
-        "The associated license has been deactivated.\n\n"
+        f"Your refund for {product_name} ({amount_display}) has been processed.\n\n"
         "If you didn't request this refund, please reply to this email right away."
         + _SIGNOFF
     )
