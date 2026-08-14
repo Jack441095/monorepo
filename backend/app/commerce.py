@@ -203,12 +203,17 @@ def _handle_transaction_completed(db: Session, payload: dict) -> None:
     amount_cents = int(data.get("details", {}).get("totals", {}).get("total", "0"))
     currency = data.get("currency_code", "GBP")
     price = data["items"][0]["price"]
-    product_id = price["product_id"]
+    paddle_product_id = price["product_id"]
     price_id = price.get("id")
 
-    product = db.get(models.Product, product_id)
+    # products.id is our own internal slug (e.g. "smart-sample-manager"),
+    # never Paddle's product_id -- resolve via the paddle_product_id column,
+    # not by treating Paddle's id as our primary key (see models.py's
+    # comment on Product.id: a real webhook's raw product_id can never
+    # match our slug directly).
+    product = db.query(models.Product).filter(models.Product.paddle_product_id == paddle_product_id).one_or_none()
     if product is None or not product.purchasable:
-        raise UnknownCatalogItemError(f"Unknown or non-purchasable product_id {product_id!r}")
+        raise UnknownCatalogItemError(f"Unknown or non-purchasable paddle_product_id {paddle_product_id!r}")
 
     # price_id is only present once real Paddle price IDs exist in the
     # payload; a configured mapping (paddle_intro/regular_price_id set)
@@ -216,9 +221,9 @@ def _handle_transaction_completed(db: Session, payload: dict) -> None:
     # price can never slip through once the catalog is actually wired up.
     mapping = _price_to_product()
     if price_id is not None and mapping:
-        if mapping.get(price_id) != product_id:
+        if mapping.get(price_id) != paddle_product_id:
             raise UnknownCatalogItemError(
-                f"price_id {price_id!r} does not map to product_id {product_id!r}"
+                f"price_id {price_id!r} does not map to paddle_product_id {paddle_product_id!r}"
             )
 
     user = db.query(models.User).filter(models.User.email == email).one_or_none()
@@ -229,7 +234,7 @@ def _handle_transaction_completed(db: Session, payload: dict) -> None:
 
     purchase = models.Purchase(
         user_id=user.id,
-        product_id=product_id,
+        product_id=product.id,
         price_id=price_id,
         provider="paddle",
         provider_order_id=provider_order_id,
@@ -243,7 +248,7 @@ def _handle_transaction_completed(db: Session, payload: dict) -> None:
     license_key = _generate_license_key()
     entitlement = models.Entitlement(
         user_id=user.id,
-        product_id=product_id,
+        product_id=product.id,
         purchase_id=purchase.id,
         license_key=license_key,
         license_type="perpetual",

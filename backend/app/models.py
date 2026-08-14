@@ -50,7 +50,13 @@ class Product(Base):
     __tablename__ = "products"
 
     # Stable slug primary key (Section 15) -- e.g. "smart-sample-manager".
-    # Never mutable marketing copy.
+    # Never mutable marketing copy. Deliberately NOT a Paddle id: Paddle's
+    # own product_id is a separate, real, external reference stored below
+    # (paddle_product_id) -- conflating the two meant a real webhook's
+    # product_id could never match this table at all until an admin backfills
+    # the mapping (found via a real sandbox purchase, 2026-08-14: Paddle sent
+    # product_id="pro_01kzyq7zeefn42h5f6kewcr70k", which no query against
+    # this column could ever match).
     id: Mapped[str] = mapped_column(String, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False, default="active")
@@ -59,6 +65,10 @@ class Product(Base):
     description: Mapped[str | None] = mapped_column(Text)
     current_version: Mapped[str | None] = mapped_column(String)
     platforms: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=list)
+    # Paddle's real product_id (e.g. "pro_..."), set once a real Paddle
+    # catalog exists. Nullable because this row can exist (and be edited)
+    # before commerce is wired up at all -- see docs/PADDLE_INTEGRATION_AUDIT.md.
+    paddle_product_id: Mapped[str | None] = mapped_column(String, unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
 
     __table_args__ = (

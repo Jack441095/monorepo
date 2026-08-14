@@ -94,6 +94,7 @@ def test_concurrent_duplicate_webhook_never_double_processes(client, db_session)
             public=True,
             purchasable=True,
             platforms=["macos"],
+            paddle_product_id="smart-sample-manager",
         )
     )
     db_session.commit()

@@ -63,6 +63,13 @@ def _seed_product(db_session, product_id: str = "smart-sample-manager") -> None:
             public=True,
             purchasable=True,
             platforms=["macos"],
+            # Simulated webhook payloads in this test file re-use product_id
+            # as Paddle's product_id too (see _completed_payload) -- real
+            # Paddle events never do this (see commerce.py's
+            # _handle_transaction_completed), but keeping the two equal here
+            # is the least invasive way to keep every existing simulated
+            # payload resolving correctly.
+            paddle_product_id=product_id,
         )
     )
     db_session.commit()

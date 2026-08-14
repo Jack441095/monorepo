@@ -54,6 +54,7 @@ def test_non_purchasable_product_rejected(client, db_session):
             public=True,
             purchasable=False,  # e.g. private beta, not yet on sale
             platforms=["macos"],
+            paddle_product_id="smart-sample-manager",  # found, but rejected on purchasable=False
         )
     )
     db_session.commit()
@@ -264,6 +265,7 @@ def test_transaction_completed_resolves_email_via_customer_id(client, db_session
             public=True,
             purchasable=True,
             platforms=["macos"],
+            paddle_product_id="smart-sample-manager",
         )
     )
     db_session.commit()
@@ -330,6 +332,7 @@ def test_failed_first_delivery_is_not_poisoned_by_retry(client, db_session):
             public=True,
             purchasable=True,
             platforms=["macos"],
+            paddle_product_id="smart-sample-manager",
         )
     )
     db_session.commit()
@@ -382,6 +385,80 @@ def test_failed_first_delivery_is_not_poisoned_by_retry(client, db_session):
     assert third_resp.json()["status"] == "already_processed"
     assert db_session.query(models.Purchase).count() == 1
     assert db_session.query(models.Entitlement).count() == 1
+
+
+def test_admin_can_create_and_list_products(client, db_session):
+    create_resp = client.put(
+        "/admin/products/smart-sample-manager",
+        json={
+            "id": "smart-sample-manager",
+            "name": "Smart Sample Manager",
+            "purchasable": True,
+            "public": True,
+            "platforms": ["macos"],
+            "paddle_product_id": "pro_real_catalog_item",
+        },
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert create_resp.status_code == 200
+    assert create_resp.json() == {"id": "smart-sample-manager", "paddle_product_id": "pro_real_catalog_item"}
+
+    list_resp = client.get("/admin/products", headers={"X-Admin-Key": "test-admin-key"})
+    assert list_resp.status_code == 200
+    products = list_resp.json()
+    assert len(products) == 1
+    assert products[0]["paddle_product_id"] == "pro_real_catalog_item"
+
+    # Updating (same path id) doesn't create a second row.
+    update_resp = client.put(
+        "/admin/products/smart-sample-manager",
+        json={
+            "id": "smart-sample-manager",
+            "name": "Smart Sample Manager",
+            "purchasable": False,
+            "paddle_product_id": "pro_real_catalog_item",
+        },
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert update_resp.status_code == 200
+    assert db_session.query(models.Product).count() == 1
+    db_session.expire_all()
+    assert db_session.get(models.Product, "smart-sample-manager").purchasable is False
+
+
+def test_admin_products_requires_admin_key(client):
+    resp = client.get("/admin/products", headers={"X-Admin-Key": "wrong"})
+    assert resp.status_code == 401
+
+
+def test_webhook_resolves_product_via_paddle_product_id_not_internal_slug(client, db_session):
+    """The real bug this whole model exists to fix: a real Paddle
+    transaction.completed event's product_id is Paddle's own id
+    (pro_...), which is never equal to our internal slug. Seeding the
+    Product with a *different* internal id than the Paddle product_id
+    confirms resolution goes through paddle_product_id, not Product.id."""
+    db_session.add(
+        models.Product(
+            id="smart-sample-manager",
+            name="Smart Sample Manager",
+            status="active",
+            public=True,
+            purchasable=True,
+            platforms=["macos"],
+            paddle_product_id="pro_01realcatalogitem",
+        )
+    )
+    db_session.commit()
+
+    payload = _completed_payload(
+        "evt_real_product_shape", "txn_real_product_shape", product_id="pro_01realcatalogitem"
+    )
+    resp = _post_webhook(client, payload)
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "processed"
+
+    purchase = db_session.query(models.Purchase).one()
+    assert purchase.product_id == "smart-sample-manager"  # our internal slug, not Paddle's id
 
 
 def _login_and_get_token(client, email, db_session):

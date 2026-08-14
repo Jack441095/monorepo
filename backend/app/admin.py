@@ -189,6 +189,73 @@ def reset_activation(
     return {"status": "reset"}
 
 
+@router.get("/products")
+def list_products(db: Session = Depends(get_db), actor: str = Depends(require_admin)) -> list[dict]:
+    """No public catalog-listing endpoint exists (the website hardcodes its
+    own pricing copy) -- this is the only way to see what's actually in the
+    products table, which otherwise has no seed script or creation UI at
+    all (found while debugging a real webhook rejecting every purchase
+    as an unknown product, 2026-08-14)."""
+    products = db.query(models.Product).order_by(models.Product.id).all()
+    return [
+        {
+            "id": p.id,
+            "name": p.name,
+            "status": p.status,
+            "public": p.public,
+            "purchasable": p.purchasable,
+            "paddle_product_id": p.paddle_product_id,
+            "platforms": p.platforms,
+        }
+        for p in products
+    ]
+
+
+class UpsertProductRequest(BaseModel):
+    id: str
+    name: str
+    status: str = "active"
+    public: bool = True
+    purchasable: bool = True
+    description: str | None = None
+    current_version: str | None = None
+    platforms: list[str] = []
+    paddle_product_id: str | None = None
+
+
+@router.put("/products/{product_id}")
+def upsert_product(
+    product_id: str,
+    req: UpsertProductRequest,
+    db: Session = Depends(get_db),
+    actor: str = Depends(require_admin),
+) -> dict:
+    """Create or update a Product row -- id is the path param (our stable
+    internal slug), req.id must match it so the route and body can't
+    silently disagree about which row is being written."""
+    if req.id != product_id:
+        raise HTTPException(status_code=400, detail="Path product_id and body id must match")
+
+    product = db.get(models.Product, product_id)
+    is_new = product is None
+    if product is None:
+        product = models.Product(id=product_id)
+        db.add(product)
+
+    product.name = req.name
+    product.status = req.status
+    product.public = req.public
+    product.purchasable = req.purchasable
+    product.description = req.description
+    product.current_version = req.current_version
+    product.platforms = req.platforms
+    product.paddle_product_id = req.paddle_product_id
+
+    _audit(db, actor, "product.created" if is_new else "product.updated", product_id)
+    db.commit()
+    return {"id": product.id, "paddle_product_id": product.paddle_product_id}
+
+
 @router.get("/webhooks/failed")
 def failed_webhooks(db: Session = Depends(get_db), actor: str = Depends(require_admin)) -> list[dict]:
     events = (
