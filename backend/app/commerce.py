@@ -352,8 +352,61 @@ async def paddle_webhook(
     try:
         db.commit()
     except IntegrityError:
+        # A row already exists for this event_id -- but that alone doesn't
+        # mean it was ever *successfully* processed. It could be a
+        # genuinely concurrent in-flight duplicate (the SELECT ... FOR
+        # UPDATE below blocks until that request finishes and commits), or
+        # it could be a previous delivery that raised and was never
+        # retried: Paddle marks a notification "delivered" on any 2xx --
+        # including the already_processed short-circuit that used to live
+        # here unconditionally -- so treating "row exists" as "handled"
+        # permanently loses the event once Paddle's own retry budget is
+        # exhausted. Real incident: a KeyError on the very first live
+        # transaction.completed webhook (2026-08-14, txn_01kzzqmywn6h2waqzycw10f0me)
+        # was retried automatically by Paddle, got treated as
+        # already_processed on the retry, and the Purchase/Entitlement
+        # were never created despite Paddle showing "delivered".
         db.rollback()
-        return {"status": "already_processed"}
+        event = (
+            db.query(models.WebhookEvent)
+            .filter(
+                models.WebhookEvent.provider == "paddle",
+                models.WebhookEvent.provider_event_id == provider_event_id,
+            )
+            .with_for_update()
+            .populate_existing()
+            .one()
+        )
+        if event.processed_at is not None:
+            return {"status": "already_processed"}
+        # Fall through and (re)attempt processing below using the existing
+        # row -- we're still holding its row lock, so any other concurrent
+        # duplicate blocks on the same SELECT until we commit.
+    else:
+        # We won the claim. Re-select with a row lock so a concurrent
+        # duplicate delivery (which will hit IntegrityError above) blocks
+        # on that SELECT until we finish, instead of racing us into
+        # _handle_transaction_completed. Winning the INSERT does NOT
+        # guarantee we're first to actually process: a concurrent loser can
+        # still acquire this row's FOR UPDATE lock before we do (lock
+        # acquisition order is independent of insert order), process the
+        # event itself, and release -- so this check is required here too,
+        # not just in the IntegrityError branch above. populate_existing()
+        # is required, not optional: without it, this query can return the
+        # identity-mapped `event` object from our own INSERT above without
+        # actually refreshing processed_at from the row we just locked,
+        # even under expire_on_commit -- confirmed by direct reproduction
+        # (10-20% of concurrent-delivery trials double-processed without
+        # this call; 0/600 with it).
+        event = (
+            db.query(models.WebhookEvent)
+            .filter(models.WebhookEvent.id == event.id)
+            .with_for_update()
+            .populate_existing()
+            .one()
+        )
+        if event.processed_at is not None:
+            return {"status": "already_processed"}
 
     try:
         if event_type == "transaction.completed":
@@ -361,6 +414,7 @@ async def paddle_webhook(
         elif event_type in ("adjustment.created", "adjustment.updated"):
             _handle_adjustment_event(db, payload)
         event.processed_at = datetime.now(timezone.utc)
+        event.processing_error = None  # clear a stale error from a prior failed attempt on retry
     except UnknownCatalogItemError as exc:
         # Fail safely without issuing an entitlement, but don't ask Paddle
         # to keep retrying an event that will never map to anything real --

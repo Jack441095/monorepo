@@ -308,6 +308,82 @@ def test_transaction_completed_resolves_email_via_customer_id(client, db_session
     assert db_session.query(models.Entitlement).count() == 1
 
 
+def test_failed_first_delivery_is_not_poisoned_by_retry(client, db_session):
+    """A delivery that raises on its first attempt must still be
+    processable on a later retry of the same event_id. Before this fix,
+    the insert-and-commit idempotency claim ran before processing, so a
+    first-attempt failure left a WebhookEvent row with processed_at=None
+    permanently in place -- every retry (including Paddle's own automatic
+    one) matched that row and short-circuited to already_processed without
+    ever calling _handle_transaction_completed. Paddle marks the
+    notification "delivered" on that 200, so the event was lost forever.
+    Real incident: txn_01kzzqmywn6h2waqzycw10f0me, 2026-08-14."""
+    # No Product row seeded -- first delivery raises UnknownCatalogItemError,
+    # which IS treated as a terminal rejection (by design, see paddle_webhook),
+    # so instead simulate a genuinely transient failure: seed the product
+    # but make the first delivery's price_id mapping momentarily wrong.
+    db_session.add(
+        models.Product(
+            id="smart-sample-manager",
+            name="Smart Sample Manager",
+            status="active",
+            public=True,
+            purchasable=True,
+            platforms=["macos"],
+        )
+    )
+    db_session.commit()
+
+    payload = _completed_payload("evt_retry_test", "txn_retry_test", email="retry-buyer@example.com")
+
+    import app.commerce as commerce_module
+
+    original_handler = commerce_module._handle_transaction_completed
+    call_count = {"n": 0}
+
+    def _flaky_handler(db, payload):
+        call_count["n"] += 1
+        if call_count["n"] == 1:
+            raise RuntimeError("simulated transient failure on first delivery")
+        return original_handler(db, payload)
+
+    import unittest.mock as mock
+
+    with mock.patch.object(commerce_module, "_handle_transaction_completed", side_effect=_flaky_handler):
+        first_resp = _post_webhook(client, payload)
+        assert first_resp.status_code == 500
+
+        assert db_session.query(models.Purchase).count() == 0
+        events = db_session.query(models.WebhookEvent).filter(
+            models.WebhookEvent.provider_event_id == "evt_retry_test"
+        ).all()
+        assert len(events) == 1
+        assert events[0].processed_at is None
+        assert events[0].processing_error == "simulated transient failure on first delivery"
+
+        # Paddle retries the identical event_id.
+        retry_resp = _post_webhook(client, payload)
+        assert retry_resp.status_code == 200
+        assert retry_resp.json()["status"] == "processed"
+
+    assert call_count["n"] == 2
+    db_session.expire_all()  # the app processed this in a separate session/transaction
+    assert db_session.query(models.Purchase).count() == 1
+    assert db_session.query(models.Entitlement).count() == 1
+    event = db_session.query(models.WebhookEvent).filter(
+        models.WebhookEvent.provider_event_id == "evt_retry_test"
+    ).one()
+    assert event.processed_at is not None
+    assert event.processing_error is None
+
+    # A third, now-truly-duplicate delivery must not double-process.
+    third_resp = _post_webhook(client, payload)
+    assert third_resp.status_code == 200
+    assert third_resp.json()["status"] == "already_processed"
+    assert db_session.query(models.Purchase).count() == 1
+    assert db_session.query(models.Entitlement).count() == 1
+
+
 def _login_and_get_token(client, email, db_session):
     from datetime import datetime, timedelta, timezone
 
