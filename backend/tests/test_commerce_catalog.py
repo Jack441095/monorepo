@@ -249,6 +249,65 @@ def test_checkout_creates_url_when_configured(client, db_session, monkeypatch):
     assert resp.json()["checkout_url"] == "https://sandbox-checkout.paddle.com/fake"
 
 
+def test_transaction_completed_resolves_email_via_customer_id(client, db_session, monkeypatch):
+    """A real Paddle Billing transaction.completed event carries only
+    customer_id on data, never an embedded customer object (see
+    commerce.py's _fetch_customer_email docstring -- found via a real
+    sandbox webhook returning KeyError: 'customer', 2026-08-14). The
+    handler must look the email up via the Customers API instead of
+    assuming an embedded customer.email."""
+    db_session.add(
+        models.Product(
+            id="smart-sample-manager",
+            name="Smart Sample Manager",
+            status="active",
+            public=True,
+            purchasable=True,
+            platforms=["macos"],
+        )
+    )
+    db_session.commit()
+
+    from app.commerce import settings as commerce_settings
+
+    monkeypatch.setattr(commerce_settings, "paddle_api_key", "sandbox-key-for-test")
+
+    class _FakeResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"data": {"email": "real-customer@example.com"}}
+
+    def _fake_get(url, headers=None, timeout=None):
+        assert url.endswith("/customers/ctm_real_customer")
+        return _FakeResponse()
+
+    import app.commerce as commerce_module
+
+    monkeypatch.setattr(commerce_module.httpx, "get", _fake_get)
+
+    payload = {
+        "event_id": "evt_real_shape",
+        "event_type": "transaction.completed",
+        "data": {
+            "id": "txn_real_shape",
+            "customer_id": "ctm_real_customer",
+            "currency_code": "GBP",
+            "details": {"totals": {"total": "500"}},
+            "items": [{"price": {"product_id": "smart-sample-manager"}}],
+        },
+    }
+    resp = _post_webhook(client, payload)
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "processed"
+
+    purchase = db_session.query(models.Purchase).one()
+    user = db_session.get(models.User, purchase.user_id)
+    assert user.email == "real-customer@example.com"
+    assert db_session.query(models.Entitlement).count() == 1
+
+
 def _login_and_get_token(client, email, db_session):
     from datetime import datetime, timedelta, timezone
 

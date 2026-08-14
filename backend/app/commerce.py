@@ -170,11 +170,35 @@ def _generate_license_key() -> str:
     return "-".join(secrets.token_hex(4).upper() for _ in range(4))
 
 
+def _fetch_customer_email(customer_id: str) -> str:
+    """A real Paddle Billing transaction.completed event carries only
+    `customer_id` (a reference) on `data`, never an embedded customer
+    object -- confirmed against a real sandbox event (KeyError: 'customer'
+    was the first real webhook to hit this code, 2026-08-14). The email has
+    to be looked up via the Customers API instead."""
+    try:
+        response = httpx.get(
+            f"{settings.paddle_api_base_url}/customers/{customer_id}",
+            headers={"Authorization": f"Bearer {settings.paddle_api_key}"},
+            timeout=15.0,
+        )
+        response.raise_for_status()
+    except httpx.HTTPError as exc:
+        logger.error("Paddle customer lookup failed for customer_id=%s: %s", customer_id, exc)
+        raise RuntimeError("Could not resolve Paddle customer email") from exc
+    return response.json()["data"]["email"]
+
+
 def _handle_transaction_completed(db: Session, payload: dict) -> None:
-    """Simulated-payload shape, matching Paddle Billing's documented
-    transaction.completed event: {data: {customer: {email}, items: [{price: {product_id, id}}], id}}"""
+    """Real Paddle Billing transaction.completed shape:
+    {data: {customer_id, items: [{price: {product_id, id}}], id}}. Also
+    accepts an embedded {customer: {email}} for tests that simulate a
+    payload directly, without a real customer_id to look up."""
     data = payload["data"]
-    email = data["customer"]["email"]
+    if isinstance(data.get("customer"), dict) and "email" in data["customer"]:
+        email = data["customer"]["email"]
+    else:
+        email = _fetch_customer_email(data["customer_id"])
     provider_order_id = data["id"]
     amount_cents = int(data.get("details", {}).get("totals", {}).get("total", "0"))
     currency = data.get("currency_code", "GBP")
