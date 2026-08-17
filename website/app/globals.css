@@ -82,6 +82,16 @@ body {
 .cta-panel { display: flex; align-items: end; justify-content: space-between; gap: 2rem; padding: clamp(2rem, 5vw, 4rem); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: linear-gradient(110deg, var(--surface), var(--surface-raised)); }
 .text-link { display: inline-flex; gap: .5rem; align-items: center; color: var(--foreground); font-size: .9rem; font-weight: 600; }
 .text-link:hover { color: var(--accent-signal); }
+.product-hero, .pricing-hero, .support-hero { background: radial-gradient(55% 80% at 87% 10%, rgba(167, 215, 184, .09), transparent 70%); }
+.pricing-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, .82fr); gap: clamp(2.5rem, 9vw, 9rem); align-items: start; }
+.pricing-notes { padding-top: 1rem; }
+.feature-list { border-top: 1px solid var(--border); }
+.feature-list li { padding: 1rem 0 1rem 1.75rem; border-bottom: 1px solid var(--border); color: var(--muted); position: relative; }
+.feature-list li::before { content: "↗"; position: absolute; left: .1rem; color: var(--accent-signal); }
+.purchase-panel { padding: clamp(1.75rem, 4vw, 2.75rem); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--surface-raised), var(--surface)); box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+.support-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
+.support-card { min-height: 15rem; padding: clamp(1.5rem, 4vw, 2.5rem); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: background 150ms ease; }
+.support-card:hover { background: var(--surface); }
 
 /* Focus states -- Section 41 accessibility pass. Visible on keyboard
    navigation, not on mouse click, matching modern browser defaults. */
@@ -201,5 +211,6 @@ body {
   .product-frame--hero { transform: none; }
   .product-frame--detail { display: none; }
   .capability-grid { grid-template-columns: 1fr; }
+  .pricing-layout, .support-grid { grid-template-columns: 1fr; }
   .cta-panel { align-items: flex-start; flex-direction: column; }
 }

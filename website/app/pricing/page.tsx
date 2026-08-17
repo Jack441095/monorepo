@@ -9,44 +9,48 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return (
-    <div className="section">
-      <div className="mx-auto px-6 text-center" style={{ maxWidth: "40rem" }}>
-        <span className="eyebrow">Pricing</span>
-        <h1 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">
-          One price. Yours to keep.
-        </h1>
-        <p className="mt-4" style={{ color: "var(--muted)" }}>
-          A single purchase, a perpetual license, free updates within the version. No subscription.
-        </p>
-
-        <div className="mt-10 surface-card p-8 mx-auto" style={{ maxWidth: "26rem" }}>
-          <span className="badge-experimental" style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}>
-            Introductory launch price
-          </span>
-          <h2 className="mt-3 text-lg font-medium">Smart Sample Manager</h2>
-          <div className="mt-4 flex items-baseline justify-center gap-2">
-            <span className="text-4xl font-semibold">£5</span>
-            <span className="text-sm" style={{ color: "var(--muted-dim)" }}>one-time</span>
-          </div>
-          <p className="mt-1 text-xs" style={{ color: "var(--muted-dim)" }}>
-            £10 one-time after the introductory launch period.
+    <>
+      <section className="section pricing-hero">
+        <div className="site-container">
+          <span className="eyebrow">Pricing</span>
+          <h1 className="section-title mt-4">One price. Yours to keep.</h1>
+          <p className="body-large mt-6">
+            A single purchase for Smart Sample Manager. A perpetual licence, with no subscription
+            and free updates within the version.
           </p>
-
-          <ul className="mt-6 space-y-2 text-sm text-left" style={{ color: "var(--muted)" }}>
-            <li>Perpetual license -- yours after one purchase</li>
-            <li>No subscription, ever</li>
-            <li>Up to 3 active machine activations</li>
-            <li>macOS -- VST3, AU, Standalone</li>
-            <li>Free updates within the 1.x version line</li>
-          </ul>
-
-          <BuyCard />
         </div>
+      </section>
 
-        <p className="mt-6 text-xs" style={{ color: "var(--muted-dim)" }}>
-          A 14-day full-featured trial is planned but not yet available.
-        </p>
-      </div>
-    </div>
+      <section className="section-rule">
+        <div className="site-container pricing-layout py-12 sm:py-20">
+          <div className="pricing-notes">
+            <span className="eyebrow">What is included</span>
+            <h2 className="mt-4 text-2xl font-semibold tracking-tight">The complete current toolset.</h2>
+            <ul className="feature-list mt-7">
+              <li>Perpetual license after one purchase</li>
+              <li>Up to three active machine activations</li>
+              <li>macOS formats: VST3, AU, and Standalone</li>
+              <li>Free updates within the 1.x version line</li>
+            </ul>
+            <p className="mt-8 text-sm" style={{ color: "var(--muted-dim)" }}>
+              A 14-day full-featured trial is planned but not yet available.
+            </p>
+          </div>
+
+          <div className="purchase-panel">
+            <span className="eyebrow" style={{ color: "var(--accent-signal)" }}>Introductory launch price</span>
+            <h2 className="mt-5 text-xl font-semibold">Smart Sample Manager</h2>
+            <div className="mt-7 flex items-baseline gap-3">
+              <span className="text-5xl font-semibold tracking-tight">£5</span>
+              <span className="text-sm" style={{ color: "var(--muted-dim)" }}>one-time</span>
+            </div>
+            <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+              £10 one-time after the introductory launch period.
+            </p>
+            <BuyCard />
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

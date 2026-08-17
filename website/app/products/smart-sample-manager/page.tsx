@@ -70,13 +70,11 @@ export default function SmartSampleManagerPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(SOFTWARE_JSON_LD) }}
       />
-      <section className="section">
-        <div className="mx-auto px-6" style={{ maxWidth: "var(--content-width)" }}>
+      <section className="section product-hero">
+        <div className="site-container">
           <span className="eyebrow">Product</span>
-          <h1 className="mt-3 text-3xl sm:text-5xl font-semibold tracking-tight text-balance">
-            Smart Sample Manager
-          </h1>
-          <p className="mt-5 text-lg max-w-2xl" style={{ color: "var(--muted)" }}>
+          <h1 className="section-title mt-4">Smart Sample Manager</h1>
+          <p className="body-large mt-6">
             An acoustic-similarity sample browser and organizer for VST3, AU, and Standalone
             hosts. It listens to your library the way you do, groups what sounds alike, and gets
             out of the way.
@@ -93,8 +91,9 @@ export default function SmartSampleManagerPage() {
       </section>
 
       <section className="border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto px-6 py-12" style={{ maxWidth: "var(--content-width)" }}>
-          <div className="surface-card overflow-hidden">
+        <div className="site-container py-12 sm:py-20">
+          <div className="product-frame product-frame--hero">
+            <div className="product-frame__bar"><span>SMART SAMPLE MANAGER</span><span>ACTUAL APP</span></div>
             <Image
               src="/screenshots/main-browser.png"
               alt="Smart Sample Manager's main window, showing the sample browser, search field, colour-coded slots, and the sample metadata panel"
@@ -104,7 +103,7 @@ export default function SmartSampleManagerPage() {
               priority
             />
           </div>
-          <p className="mt-3 text-xs text-center" style={{ color: "var(--muted-dim)" }}>
+          <p className="mt-4 text-xs" style={{ color: "var(--muted-dim)" }}>
             The actual Smart Sample Manager window, shown before a library has been scanned.
           </p>
         </div>

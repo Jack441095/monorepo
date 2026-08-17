@@ -33,24 +33,24 @@ const LINKS = [
 export default function SupportPage() {
   return (
     <>
-      <section className="section">
-        <div className="mx-auto px-6" style={{ maxWidth: "var(--content-width)" }}>
+      <section className="section support-hero">
+        <div className="site-container">
           <span className="eyebrow">Support</span>
-          <h1 className="mt-3 text-3xl sm:text-5xl font-semibold tracking-tight text-balance">
-            How can we help?
-          </h1>
-          <p className="mt-5 text-lg max-w-2xl" style={{ color: "var(--muted)" }}>
+          <h1 className="section-title mt-4">Get back to making music.</h1>
+          <p className="body-large mt-6">
             Guides for installing, activating, and using Smart Sample Manager -- and a direct
             line to NITE DSP if you&apos;re still stuck.
           </p>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          <div className="support-grid mt-12">
             {LINKS.map((item) => (
-              <Link key={item.href} href={item.href} className="surface-card p-6 block">
-                <h2 className="font-medium">{item.title}</h2>
-                <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+              <Link key={item.href} href={item.href} className="support-card">
+                <span className="text-xs font-mono" style={{ color: "var(--accent-signal)" }}>OPEN GUIDE</span>
+                <h2 className="mt-5 font-semibold">{item.title}</h2>
+                <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
                   {item.body}
                 </p>
+                <span className="text-link mt-7">Read guide <span aria-hidden="true">→</span></span>
               </Link>
             ))}
           </div>
@@ -58,7 +58,7 @@ export default function SupportPage() {
       </section>
 
       <section className="section border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto px-6 text-center" style={{ maxWidth: "42rem" }}>
+        <div className="site-container text-center" style={{ maxWidth: "42rem" }}>
           <h2 className="text-xl font-semibold tracking-tight">Still stuck?</h2>
           <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
             Email us directly with your Smart Sample Manager version, macOS version, DAW (if
