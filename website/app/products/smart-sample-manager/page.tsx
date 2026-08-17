@@ -5,7 +5,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Smart Sample Manager",
   description:
-    "Find acoustically similar samples in your library, explore it visually, and stay organized inside Ableton Live -- fully offline.",
+    "Find acoustically similar samples in your library, explore it visually, and stay organized inside Ableton Live — fully offline.",
   alternates: { canonical: "/products/smart-sample-manager" },
 };
 
@@ -13,17 +13,17 @@ const WORKFLOWS = [
   {
     title: "Find Similar",
     experimental: false,
-    body: "Select a sound. Smart Sample Manager surfaces acoustically similar samples from your whole library -- by how they sound, not by filename or folder. This compares audio content directly; it isn't a text search, so there's no \"type a description and find a sound\" mode.",
+    body: "Select a sound. Smart Sample Manager surfaces acoustically similar samples from your whole library — by how they sound, not by filename or folder. This compares audio content directly; it isn't a text search, so there's no \"type a description and find a sound\" mode.",
   },
   {
     title: "Visual map",
     experimental: false,
-    body: "Your library laid out as a 2D map, positioned by sonic similarity. Sounds near each other on the map tend to sound alike -- a different way to browse than scrolling a folder tree.",
+    body: "Your library laid out as a 2D map, positioned by sonic similarity. Sounds near each other on the map tend to sound alike — a different way to browse than scrolling a folder tree.",
   },
   {
     title: "Ableton workflow",
     experimental: true,
-    body: "Tags and reorganization can write into standard XMP metadata that Ableton Live's own sample browser reads directly, so your library stays organized inside Ableton too. This feature is marked experimental in the current build while we finish validating it against a range of libraries -- it's not an official Ableton partnership or integration.",
+    body: "Tags and reorganization can write into standard XMP metadata that Ableton Live's own sample browser reads directly, so your library stays organized inside Ableton too. This feature is marked experimental in the current build while we finish validating it against a range of libraries — it's not an official Ableton partnership or integration.",
   },
   {
     title: "Fully offline",
@@ -39,7 +39,7 @@ const FAQ = [
   },
   {
     q: "Can I type a description and find a sound?",
-    a: "No -- similarity is based on the audio itself (acoustic similarity), not natural-language text search. Select a sample you already have, and it finds sounds like it.",
+    a: "No — similarity is based on the audio itself (acoustic similarity), not natural-language text search. Select a sample you already have, and it finds sounds like it.",
   },
   {
     q: "Does anything get uploaded?",
@@ -59,7 +59,7 @@ const SOFTWARE_JSON_LD = {
   operatingSystem: "macOS",
   description:
     "An acoustic-similarity sample browser and organizer for VST3, AU, and Standalone hosts.",
-  // Deliberately no "offers"/price field -- pricing is not yet human-approved
+  // Deliberately no "offers"/price field — pricing is not yet human-approved
   // (see app/pricing/page.tsx). Do not add one until it is.
 };
 
@@ -171,7 +171,7 @@ export default function SmartSampleManagerPage() {
               </h3>
               <ul className="mt-3 space-y-1.5 text-sm" style={{ color: "var(--muted)" }}>
                 <li>Standalone app</li>
-                <li>Audio Unit (AU) -- passes Apple&apos;s own AU validation</li>
+                <li>Audio Unit (AU) — passes Apple&apos;s own AU validation</li>
               </ul>
             </div>
             <div className="surface-card p-6">

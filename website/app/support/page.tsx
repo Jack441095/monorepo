@@ -20,7 +20,7 @@ const LINKS = [
   },
   {
     title: "Troubleshooting",
-    body: "Fixes for the most common issues -- plugin not appearing, activation, scanning, previews.",
+    body: "Fixes for the most common issues — plugin not appearing, activation, scanning, previews.",
     href: "/learn/smart-sample-manager/troubleshooting",
   },
   {
@@ -38,7 +38,7 @@ export default function SupportPage() {
           <span className="eyebrow">Support</span>
           <h1 className="section-title mt-4">Get back to making music.</h1>
           <p className="body-large mt-6">
-            Guides for installing, activating, and using Smart Sample Manager -- and a direct
+            Guides for installing, activating, and using Smart Sample Manager — and a direct
             line to NITE DSP if you&apos;re still stuck.
           </p>
 
@@ -62,7 +62,7 @@ export default function SupportPage() {
           <h2 className="text-xl font-semibold tracking-tight">Still stuck?</h2>
           <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
             Email us directly with your Smart Sample Manager version, macOS version, DAW (if
-            relevant), and what you were trying to do -- we&apos;ll help you sort it out.
+            relevant), and what you were trying to do — we&apos;ll help you sort it out.
           </p>
           <a href="mailto:nitedsp@outlook.com" className="btn-primary mt-6 inline-block">
             nitedsp@outlook.com

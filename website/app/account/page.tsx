@@ -68,7 +68,7 @@ function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
       </div>
       {downloadState === "error" && (
         <p className="mt-2 text-xs" style={{ color: "#e3b34d" }}>
-          No release available for this product yet -- check back soon.
+          No release available for this product yet — check back soon.
         </p>
       )}
     </div>
@@ -88,7 +88,7 @@ function AccountPageInner() {
   // "waiting" while polling for the webhook-created entitlement,
   // "timed-out" if it hasn't shown up after a reasonable wait. Once an
   // entitlement exists this state stops being rendered at all (see the
-  // `entitlements.length === 0` guard below) -- the webhook remains the
+  // `entitlements.length === 0` guard below) — the webhook remains the
   // source of truth either way, this is UX only
   // (docs/PADDLE_INTEGRATION_AUDIT.md).
   const [pendingState, setPendingState] = useState<"waiting" | "timed-out">("waiting");
@@ -111,7 +111,7 @@ function AccountPageInner() {
   }, [user]);
 
   // Resume a Buy click that happened while signed out (see BuyCard.tsx /
-  // lib/checkout.ts) -- runs once, the moment we know who's signed in.
+  // lib/checkout.ts) — runs once, the moment we know who's signed in.
   useEffect(() => {
     if (!user) return;
     if (consumeBuyIntent()) {
@@ -121,7 +121,7 @@ function AccountPageInner() {
 
   // After a successful Paddle checkout (successUrl=/account?purchase=pending),
   // poll briefly for the webhook-created entitlement to appear. Never treats
-  // frontend "payment succeeded" as ownership by itself -- only an actual
+  // frontend "payment succeeded" as ownership by itself — only an actual
   // entitlement record (created server-side by the real webhook) counts.
   useEffect(() => {
     if (!user || !purchasePending || entitlements.length > 0) return;
@@ -176,7 +176,7 @@ function AccountPageInner() {
           <span className="eyebrow">Account</span>
           <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Sign in</h1>
           <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-            We&apos;ll email you a sign-in link -- no password needed.
+            We&apos;ll email you a sign-in link — no password needed.
           </p>
           {linkSent ? (
             <p className="mt-6 text-sm" style={{ color: "var(--muted)" }}>
@@ -231,7 +231,7 @@ function AccountPageInner() {
           <div className="mt-10 surface-card p-5">
             {pendingState === "timed-out" ? (
               <p className="text-sm" style={{ color: "var(--muted)" }}>
-                Still confirming your purchase -- this can take a little longer than usual.
+                Still confirming your purchase — this can take a little longer than usual.
                 Refresh this page in a moment, or{" "}
                 <a href="mailto:nitedsp@outlook.com" className="underline">
                   contact support

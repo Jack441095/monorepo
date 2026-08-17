@@ -15,14 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 // Phase 5.6: nitedsp.co.uk is the approved production domain (Jack, Phase
-// 5.6). Hardcoded here deliberately -- unlike NEXT_PUBLIC_NITE_DSP_API_URL
+// 5.6). Hardcoded here deliberately — unlike NEXT_PUBLIC_NITE_DSP_API_URL
 // (a functional fetch target that must never point at the wrong
 // environment), metadataBase/canonical/OG URLs are pure metadata about the
 // site's real-world identity, safe to state directly regardless of which
 // environment is currently serving the page.
 //
 // Uses the "www" host, not the bare apex: Railway's real custom domain (and
-// this deployment's actual HTTPS target) is www.nitedsp.co.uk -- the apex
+// this deployment's actual HTTPS target) is www.nitedsp.co.uk — the apex
 // only redirects to it at the DNS/registrar level and doesn't itself serve
 // HTTPS yet (docs/IONOS_DNS_SETUP.md). Update if/when that changes.
 export const metadata: Metadata = {

@@ -10,7 +10,7 @@ export default function PrivacyPage() {
       </p>
       <p>
         We do not sell customer data. Audio files and sample libraries
-        processed by our plugins are never uploaded -- all analysis runs
+        processed by our plugins are never uploaded — all analysis runs
         locally on your machine.
       </p>
       <p>

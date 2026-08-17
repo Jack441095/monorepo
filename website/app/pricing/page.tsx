@@ -3,7 +3,7 @@ import { BuyCard } from "./BuyCard";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Smart Sample Manager pricing -- one-time purchase, perpetual license.",
+  description: "Smart Sample Manager pricing — one-time purchase, perpetual license.",
   alternates: { canonical: "/pricing" },
 };
 

@@ -1,6 +1,6 @@
 import { apiFetch } from "@/lib/api";
 
-// Session-only, cleared the moment it's consumed -- carries "the user
+// Session-only, cleared the moment it's consumed — carries "the user
 // clicked Buy while signed out" across the sign-in redirect. Not used for
 // anything else; never touches payment/entitlement state itself, which
 // stays server/webhook-authoritative (see docs/PADDLE_INTEGRATION_AUDIT.md).
@@ -22,7 +22,7 @@ export type CheckoutPrice = "active" | "intro" | "regular";
 export type StartCheckoutResult = { ok: true } | { ok: false; status: number; error: string };
 
 // Calls the existing backend checkout endpoint and navigates to the real
-// Paddle-returned URL -- the server resolves `price` to an actual Paddle
+// Paddle-returned URL — the server resolves `price` to an actual Paddle
 // price ID; this function never sees or sends one itself (see
 // commerce.py's CheckoutRequest / docs/PADDLE_INTEGRATION_AUDIT.md).
 export async function startCheckout(price: CheckoutPrice = "active"): Promise<StartCheckoutResult> {

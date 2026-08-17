@@ -36,7 +36,7 @@ export default function GettingStartedPage() {
             nitedsp.co.uk/account
           </a>{" "}
           to see your entitlement and license key. Activation inside the app itself uses that
-          license key and works offline after the first successful check -- you don&apos;t need
+          license key and works offline after the first successful check — you don&apos;t need
           to be online every time you open the app.
         </p>
       </section>
@@ -59,7 +59,7 @@ export default function GettingStartedPage() {
       <section>
         <LearnH2>4. Preview a sound</LearnH2>
         <p className="mt-2">
-          Select a sample -- either from the grid or a point on the visual map -- and use{" "}
+          Select a sample — either from the grid or a point on the visual map — and use{" "}
           <strong>PLAY</strong> / <strong>STOP</strong> to audition it before committing to
           anything.
         </p>
@@ -69,7 +69,7 @@ export default function GettingStartedPage() {
         <LearnH2>5. Find a similar sound</LearnH2>
         <p className="mt-2">
           With a sample selected, click <strong>FIND SIMILAR</strong>. Smart Sample Manager
-          compares the actual audio -- not the filename -- and lists other samples in your
+          compares the actual audio — not the filename — and lists other samples in your
           library that sound like it. See{" "}
           <a href="/learn/smart-sample-manager/find-similar" className="underline">
             Find Similar
@@ -102,7 +102,7 @@ export default function GettingStartedPage() {
         <LearnH2>One thing to know: reopening your library</LearnH2>
         <p className="mt-2">
           Smart Sample Manager doesn&apos;t automatically reload your last library when you
-          reopen the app -- you&apos;ll need to click <strong>SCAN FOLDER</strong> and choose the
+          reopen the app — you&apos;ll need to click <strong>SCAN FOLDER</strong> and choose the
           same folder again. Thanks to caching, this is quick (already-analysed files aren&apos;t
           re-processed), but it isn&apos;t automatic today.
         </p>

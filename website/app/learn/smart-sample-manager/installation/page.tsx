@@ -31,7 +31,7 @@ export default function InstallationPage() {
         </ul>
         <p className="mt-2">
           You don&apos;t need to move anything manually, and nothing else needs to be installed
-          separately -- every dependency Smart Sample Manager needs is bundled inside the app
+          separately — every dependency Smart Sample Manager needs is bundled inside the app
           itself.
         </p>
       </section>
@@ -40,7 +40,7 @@ export default function InstallationPage() {
         <LearnH2>First launch</LearnH2>
         <p className="mt-2">
           If macOS shows a Gatekeeper prompt on first launch, that&apos;s the normal first-run
-          check for any downloaded application -- follow the on-screen option to open it. You
+          check for any downloaded application — follow the on-screen option to open it. You
           won&apos;t be asked to install Homebrew, a package manager, or any other developer
           tooling to run Smart Sample Manager; if anything ever asks you to, that&apos;s not
           expected behaviour and worth reporting to support.
@@ -60,7 +60,7 @@ export default function InstallationPage() {
         <LearnH2>Uninstalling</LearnH2>
         <p className="mt-2">
           Remove the app from <code>/Applications</code>, and the plugin files from the two
-          Plug-Ins folders above. Your sample library itself is untouched -- Smart Sample Manager
+          Plug-Ins folders above. Your sample library itself is untouched — Smart Sample Manager
           only reads your audio files, it never moves or renames them.
         </p>
       </section>

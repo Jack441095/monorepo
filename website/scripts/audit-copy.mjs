@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const roots = ["app", "components"];
 const checks = [
-  ["em dash", /—/g],
+  ["double hyphen", / -- /g],
   ["placeholder", /lorem ipsum|TODO customer copy/gi],
   ["generic marketing", /revolutionary|cutting-edge|game-changing|supercharge|unlock|unleash|seamless|next-generation/gi],
 ];
