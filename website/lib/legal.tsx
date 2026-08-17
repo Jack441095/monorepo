@@ -9,9 +9,8 @@ export function LegalPage({
     <div className="section">
       <div className="mx-auto px-6" style={{ maxWidth: "42rem" }}>
         <div role="note" className="callout-warning mb-8">
-          <strong>PROFESSIONAL REVIEW REQUIRED.</strong> This page is an AI-drafted structural
-          placeholder, not legal advice, and has not been reviewed by a lawyer. It is not final
-          and must not be relied on for a real purchase or dispute.
+          <strong>PRE-LAUNCH DRAFT.</strong> This page has not yet received professional legal
+          review. It is provided for product review only and must be finalised before paid public launch.
         </div>
         <span className="eyebrow">Legal</span>
         <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">{title}</h1>
