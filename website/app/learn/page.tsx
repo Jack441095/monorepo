@@ -10,40 +10,44 @@ export const metadata: Metadata = {
 
 export default function LearnHomePage() {
   return (
-    <div className="section">
-      <div className="mx-auto px-6" style={{ maxWidth: "var(--content-width)" }}>
+    <>
+      <section className="section support-hero">
+      <div className="site-container">
         <span className="eyebrow">Learn</span>
-        <h1 className="mt-3 text-3xl sm:text-5xl font-semibold tracking-tight text-balance">
-          Documentation
-        </h1>
-        <p className="mt-5 text-lg max-w-2xl" style={{ color: "var(--muted)" }}>
-          Guides for getting the most out of NITE DSP products.
+        <h1 className="section-title mt-4">Less setup. More sound.</h1>
+        <p className="body-large mt-6">
+          Straight answers for installing, activating, scanning, and finding your way around
+          Smart Sample Manager.
         </p>
-
-        <div className="mt-12 surface-card p-6 max-w-xl">
-          <h2 className="font-medium text-lg">Smart Sample Manager</h2>
-          <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-            Installation, activation, and every workflow -- from your first library scan to
-            Find Similar and the visual map.
-          </p>
-          <ul className="mt-4 space-y-1 text-sm">
-            {LEARN_PAGES.map((p) => (
-              <li key={p.slug}>
-                <Link
-                  href={`/learn/smart-sample-manager/${p.slug}`}
-                  className="hover:text-[color:var(--foreground)] transition-colors"
-                  style={{ color: "var(--muted)" }}
-                >
-                  {p.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <Link href="/learn/smart-sample-manager/getting-started" className="btn-primary mt-6 inline-block">
-            Start with Getting Started
-          </Link>
-        </div>
       </div>
-    </div>
+      </section>
+
+      <section className="section-rule">
+        <div className="site-container py-12 sm:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <span className="eyebrow">Smart Sample Manager</span>
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight">Start with the essentials.</h2>
+            </div>
+            <Link href="/learn/smart-sample-manager/getting-started" className="btn-primary">
+              Start with Getting Started
+            </Link>
+          </div>
+          <div className="learn-index mt-10">
+            {LEARN_PAGES.map((p) => (
+              <Link key={p.slug} href={`/learn/smart-sample-manager/${p.slug}`} className="learn-index__item">
+                <span className="font-mono text-xs" style={{ color: "var(--accent-signal)" }}>GUIDE</span>
+                <span className="font-medium">{p.title}</span>
+                <span aria-hidden="true" style={{ color: "var(--muted-dim)" }}>→</span>
+              </Link>
+            ))}
+          </div>
+          <p className="mt-8 max-w-xl text-sm" style={{ color: "var(--muted)" }}>
+            The guides describe the current macOS build and label experimental workflows where
+            appropriate.
+          </p>
+        </div>
+      </section>
+    </>
   );
 }

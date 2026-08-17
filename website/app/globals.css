@@ -92,6 +92,9 @@ body {
 .support-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
 .support-card { min-height: 15rem; padding: clamp(1.5rem, 4vw, 2.5rem); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: background 150ms ease; }
 .support-card:hover { background: var(--surface); }
+.learn-index { border-top: 1px solid var(--border); }
+.learn-index__item { display: grid; grid-template-columns: 5rem minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 1.1rem 0; border-bottom: 1px solid var(--border); color: var(--foreground); }
+.learn-index__item:hover { color: var(--accent-signal); }
 
 /* Focus states -- Section 41 accessibility pass. Visible on keyboard
    navigation, not on mouse click, matching modern browser defaults. */
