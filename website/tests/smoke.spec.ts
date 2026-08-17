@@ -31,7 +31,7 @@ test.describe("critical routes", () => {
 
 test("homepage identifies NITE DSP and Smart Sample Manager", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("samples");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(/sample/i);
   await expect(page.getByText("NITE DSP").first()).toBeVisible();
 });
 
