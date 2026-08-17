@@ -49,7 +49,16 @@ export function BuyCard() {
     setBuyState("checking");
     setError(null);
 
-    const meRes = await apiFetch("/auth/me");
+    let meRes: Response;
+    try {
+      meRes = await apiFetch("/auth/me");
+    } catch {
+      // An unavailable auth endpoint must not leave a prospective buyer on
+      // the pricing page with a disabled button and no next step.
+      setBuyIntent();
+      router.push("/account");
+      return;
+    }
     if (!meRes.ok) {
       setBuyIntent();
       router.push("/account");
