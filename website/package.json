@@ -11,6 +11,7 @@
     "build:production": "node scripts/check-production-config.mjs && next build",
     "start": "next start",
     "lint": "eslint",
+    "audit:copy": "node scripts/audit-copy.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {
