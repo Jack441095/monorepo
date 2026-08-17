@@ -7,6 +7,7 @@
   --background: #09090b;
   --surface: #111114;
   --surface-raised: #17171b;
+  --surface-hover: #202027;
   --border: #26262b;
   --border-strong: #34343a;
   --foreground: #f4f4f5;
@@ -17,6 +18,7 @@
      clears AA on the stricter (--surface) case: 4.59:1 / 4.85:1. */
   --muted-dim: #7d7d80;
   --accent: #f4f4f5;
+  --accent-signal: #a7d7b8;
   --accent-contrast: #09090b;
   --warning-border: #7c5a1a;
   --warning-bg: rgba(124, 90, 26, 0.12);
@@ -25,6 +27,7 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --content-width: 72rem;
+  --grid-gutter: clamp(1.25rem, 4vw, 2.5rem);
 }
 
 @theme inline {
@@ -57,6 +60,28 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+.site-container { width: min(100% - (var(--grid-gutter) * 2), var(--content-width)); margin-inline: auto; }
+.hero-grid { background: radial-gradient(70% 75% at 85% 15%, rgba(167, 215, 184, .10), transparent 65%), var(--background); border-bottom: 1px solid var(--border); }
+.hero-title { max-width: 12ch; font-size: clamp(2.8rem, 5.5vw, 5.8rem); font-weight: 560; letter-spacing: -.065em; line-height: .94; text-wrap: balance; }
+.hero-copy { max-width: 38rem; color: var(--muted); font-size: clamp(1.08rem, 1.5vw, 1.25rem); line-height: 1.58; }
+.section-rule { border-top: 1px solid var(--border); }
+.section-title { max-width: 20ch; font-size: clamp(2rem, 3.5vw, 3.5rem); font-weight: 550; letter-spacing: -.045em; line-height: 1.03; text-wrap: balance; }
+.body-large { max-width: 43rem; color: var(--muted); font-size: clamp(1.1rem, 1.5vw, 1.32rem); line-height: 1.65; }
+.product-frame { overflow: hidden; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: var(--surface); box-shadow: 0 32px 80px rgba(0,0,0,.35); }
+.product-frame--hero { transform: perspective(1600px) rotateY(-2deg) rotateX(1deg); transform-origin: left center; }
+.product-frame__bar { display: flex; justify-content: space-between; padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted-dim); font-size: .68rem; font-weight: 650; letter-spacing: .08em; }
+.workflow-list { border-top: 1px solid var(--border); }
+.workflow-item { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 1.25rem; padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.workflow-number { color: var(--accent-signal); font-family: var(--font-geist-mono); font-size: .8rem; padding-top: .25rem; }
+.workflow-item h3, .capability h3 { font-size: 1.08rem; font-weight: 600; }
+.workflow-item p, .capability p { max-width: 42rem; margin-top: .45rem; color: var(--muted); line-height: 1.6; }
+.capability-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
+.capability { min-height: 11rem; padding: clamp(1.25rem, 3vw, 2.25rem); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.capability:hover { background: var(--surface); }
+.cta-panel { display: flex; align-items: end; justify-content: space-between; gap: 2rem; padding: clamp(2rem, 5vw, 4rem); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: linear-gradient(110deg, var(--surface), var(--surface-raised)); }
+.text-link { display: inline-flex; gap: .5rem; align-items: center; color: var(--foreground); font-size: .9rem; font-weight: 600; }
+.text-link:hover { color: var(--accent-signal); }
 
 /* Focus states -- Section 41 accessibility pass. Visible on keyboard
    navigation, not on mouse click, matching modern browser defaults. */
@@ -109,7 +134,7 @@ body {
 }
 
 .btn-primary:hover {
-  opacity: 0.85;
+  background: var(--accent-signal);
 }
 
 .btn-secondary {
@@ -126,7 +151,7 @@ body {
 }
 
 .btn-secondary:hover {
-  background: var(--surface);
+  background: var(--surface-hover);
 }
 
 /* Shared warning/experimental callout -- previously duplicated as
@@ -173,4 +198,8 @@ body {
     padding-top: 3rem;
     padding-bottom: 3rem;
   }
+  .product-frame--hero { transform: none; }
+  .product-frame--detail { display: none; }
+  .capability-grid { grid-template-columns: 1fr; }
+  .cta-panel { align-items: flex-start; flex-direction: column; }
 }
