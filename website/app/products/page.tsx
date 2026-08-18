@@ -24,7 +24,7 @@ export default function ProductsPage() {
       <section className="section-rule">
         <div className="site-container py-12 sm:py-20">
           <Link href="/products/smart-sample-manager" className="support-card block max-w-3xl">
-            <span className="eyebrow" style={{ color: "var(--accent-signal)" }}>Available now</span>
+            <span className="eyebrow" style={{ color: "var(--accent-product)" }}>Available now</span>
             <h2 className="mt-5 text-3xl font-semibold tracking-tight">SLO</h2>
             <p className="mt-2 text-sm" style={{ color: "var(--muted-dim)" }}>Smart Sample Manager</p>
             <p className="mt-6 max-w-xl leading-relaxed" style={{ color: "var(--muted)" }}>
