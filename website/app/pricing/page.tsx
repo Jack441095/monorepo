@@ -33,19 +33,21 @@ export default function PricingPage() {
               <li>Free updates within the 1.x version line</li>
             </ul>
             <p className="mt-8 text-sm" style={{ color: "var(--muted-dim)" }}>
-              A 14-day full-featured trial is planned but not yet available.
+              A separate £5 introductory catalog price exists for controlled testing, but it is
+              not the active offer and does not transition automatically.
             </p>
           </div>
 
           <div className="purchase-panel">
-            <span className="eyebrow" style={{ color: "var(--accent-signal)" }}>Introductory launch price</span>
+            <span className="eyebrow" style={{ color: "var(--accent-signal)" }}>Current one-time price</span>
             <h2 className="mt-5 text-xl font-semibold">Smart Sample Manager</h2>
             <div className="mt-7 flex items-baseline gap-3">
-              <span className="text-5xl font-semibold tracking-tight">£5</span>
+              <span className="text-5xl font-semibold tracking-tight">£10</span>
               <span className="text-sm" style={{ color: "var(--muted-dim)" }}>one-time</span>
             </div>
             <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-              £10 one-time after the introductory launch period.
+              The active offer is a single £10 purchase. There is no automatic recurring charge or
+              automatic £5-to-£10 transition.
             </p>
             <BuyCard />
           </div>

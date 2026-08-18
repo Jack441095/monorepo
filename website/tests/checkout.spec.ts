@@ -13,8 +13,7 @@ import { expect, test } from "@playwright/test";
 test("pricing page renders normally with no checkout-related errors", async ({ page }) => {
   const response = await page.goto("/pricing");
   expect(response?.status()).toBe(200);
-  await expect(page.getByText("£5")).toBeVisible();
-  await expect(page.getByText("£10", { exact: false })).toBeVisible();
+  await expect(page.getByText("£10", { exact: true })).toBeVisible();
   // No leaked error state on an ordinary visit.
   await expect(page.getByText(/something went wrong/i)).not.toBeVisible();
 });
