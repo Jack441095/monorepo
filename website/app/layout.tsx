@@ -77,7 +77,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             style={{ maxWidth: "var(--content-width)", color: "var(--muted)" }}
           >
             <div>
-              <div className="font-semibold text-[color:var(--foreground)]">NITE DSP</div>
+              <div className="brand-mark text-lg text-[color:var(--foreground)]">NITE DSP</div>
               <p className="mt-2 text-xs" style={{ color: "var(--muted-dim)" }}>
                 Audio production tools for producers who want their tools to disappear into the
                 workflow.

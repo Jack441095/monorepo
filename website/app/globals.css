@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Sansation Brand";
+  src: url("/fonts/Sansation_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Design tokens -- Phase 6, Section 24. Dark-first, restrained, technical.
    Single source of truth for color/spacing/radius so sections stay
    visually consistent without re-deriving values per component. */
@@ -60,6 +68,8 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+.brand-mark { font-family: "Sansation Brand", var(--font-geist-sans), sans-serif; font-weight: 700; letter-spacing: .035em; }
 
 .site-container { width: min(100% - (var(--grid-gutter) * 2), var(--content-width)); margin-inline: auto; }
 .hero-grid { background: radial-gradient(70% 75% at 85% 15%, rgba(167, 215, 184, .10), transparent 65%), var(--background); border-bottom: 1px solid var(--border); }

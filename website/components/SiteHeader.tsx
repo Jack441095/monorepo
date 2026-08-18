@@ -23,7 +23,7 @@ export function SiteHeader() {
         style={{ maxWidth: "var(--content-width)" }}
         aria-label="Primary"
       >
-        <Link href="/" className="font-semibold tracking-tight text-lg">
+        <Link href="/" className="brand-mark text-xl leading-none" aria-label="NITE DSP home">
           NITE DSP
         </Link>
         <div className="hidden sm:flex items-center gap-8 text-sm" style={{ color: "var(--muted)" }}>
