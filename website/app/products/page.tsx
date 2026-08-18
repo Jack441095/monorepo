@@ -24,7 +24,7 @@ export default function ProductsPage() {
       <section className="section-rule">
         <div className="site-container py-12 sm:py-20">
           <Link href="/products/smart-sample-manager" className="support-card block max-w-3xl">
-            <span className="eyebrow" style={{ color: "var(--accent-product)" }}>Available now</span>
+            <span className="eyebrow" style={{ color: "var(--accent-product)" }}>Coming soon</span>
             <h2 className="mt-5 text-3xl font-semibold tracking-tight">SLO</h2>
             <p className="mt-2 text-sm" style={{ color: "var(--muted-dim)" }}>Smart Sample Manager</p>
             <p className="mt-6 max-w-xl leading-relaxed" style={{ color: "var(--muted)" }}>
@@ -33,13 +33,6 @@ export default function ProductsPage() {
             </p>
             <span className="text-link mt-8">Explore SLO <span aria-hidden="true">→</span></span>
           </Link>
-          <article className="support-card mt-5 max-w-3xl" aria-label="Future NITE DSP product">
-            <span className="eyebrow" style={{ color: "var(--accent-product)" }}>Not yet</span>
-            <h2 className="mt-5 text-xl font-semibold tracking-tight">More NITE DSP tools</h2>
-            <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
-              The next product is in development. Details will appear here when it is ready to share.
-            </p>
-          </article>
         </div>
       </section>
     </>
