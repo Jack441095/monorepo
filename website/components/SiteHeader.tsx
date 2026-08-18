@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 const NAV_LINKS = [
-  { href: "/products/smart-sample-manager", label: "Smart Sample Manager" },
+  { href: "/products", label: "Products" },
   { href: "/learn", label: "Learn" },
   { href: "/pricing", label: "Pricing" },
   { href: "/support", label: "Support" },

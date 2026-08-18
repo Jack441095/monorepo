@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 const CRITICAL_ROUTES = [
   "/",
+  "/products",
   "/products/smart-sample-manager",
   "/pricing",
   "/support",

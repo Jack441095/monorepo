@@ -84,9 +84,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </p>
             </div>
             <div className="flex flex-col gap-2">
-              <span className="eyebrow">Product</span>
+              <span className="eyebrow">Products</span>
+              <Link href="/products" className="hover:text-[color:var(--foreground)] transition-colors">
+                All products
+              </Link>
               <Link href="/products/smart-sample-manager" className="hover:text-[color:var(--foreground)] transition-colors">
-                Smart Sample Manager
+                SLO
               </Link>
               <Link href="/learn" className="hover:text-[color:var(--foreground)] transition-colors">
                 Learn
