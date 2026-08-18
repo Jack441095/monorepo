@@ -8,19 +8,32 @@ substitute for the real schema.
 from __future__ import annotations
 
 import os
+import atexit
+import base64
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
+
+from nacl.signing import SigningKey
 
 os.environ["DATABASE_URL"] = "postgresql+psycopg2://localhost/nitedsp_test"
 os.environ["PADDLE_WEBHOOK_SECRET"] = "test-webhook-secret"
 os.environ["ADMIN_API_KEY"] = "test-admin-key"
 os.environ["SESSION_SECRET"] = "test-session-secret"
-os.environ["LICENSING_PRIVATE_KEY_PATH"] = str(
-    Path(__file__).parent.parent / "staging_keys" / "licensing_signing_key.private"
-)
-os.environ["LICENSING_PUBLIC_KEY_PATH"] = str(
-    Path(__file__).parent.parent / "staging_keys" / "licensing_signing_key.public"
-)
+# Test signing keys must be a matched pair, but must never be committed or
+# borrowed from staging. Create them in an OS temporary directory before any
+# application module imports Settings/licensing.py, then remove them on exit.
+TEST_KEY_DIR = Path(tempfile.mkdtemp(prefix="nitedsp-test-keys-"))
+test_signing_key = SigningKey.generate()
+test_private_key = TEST_KEY_DIR / "licensing_signing_key.private"
+test_public_key = TEST_KEY_DIR / "licensing_signing_key.public"
+test_private_key.write_text(base64.b64encode(bytes(test_signing_key)).decode("ascii"))
+test_private_key.chmod(0o600)
+test_public_key.write_text(base64.b64encode(bytes(test_signing_key.verify_key)).decode("ascii"))
+atexit.register(shutil.rmtree, TEST_KEY_DIR, ignore_errors=True)
+os.environ["LICENSING_PRIVATE_KEY_PATH"] = str(test_private_key)
+os.environ["LICENSING_PUBLIC_KEY_PATH"] = str(test_public_key)
 os.environ["MOCK_STORAGE_DIR"] = str(Path(__file__).parent / "fixtures" / "mock_storage")
 
 import pytest  # noqa: E402
