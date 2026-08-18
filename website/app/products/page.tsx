@@ -33,6 +33,9 @@ export default function ProductsPage() {
             </p>
             <span className="text-link mt-8">Explore SLO <span aria-hidden="true">→</span></span>
           </Link>
+          <p className="mt-6 text-sm" style={{ color: "var(--muted-dim)" }}>
+            More NITE DSP products are in development. Coming soon.
+          </p>
         </div>
       </section>
     </>
