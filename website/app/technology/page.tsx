@@ -59,6 +59,85 @@ export default function TechnologyPage() {
             </div>
           </Reveal>
 
+          {/* Schematic Signal Flow */}
+          <div className="product-frame my-12 p-6 bg-surface-raised flex items-center justify-center border border-border-strong/40 rounded-lg">
+            <div className="w-full overflow-x-auto">
+              <svg className="mx-auto block min-w-[800px]" width="820" height="150" viewBox="0 0 820 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="flow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="var(--brand-blue)" />
+                    <stop offset="50%" stopColor="var(--brand-violet)" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="var(--brand-blue-bright)" />
+                  </linearGradient>
+                  <filter id="glow" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="4" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+
+                {/* Connecting Lines */}
+                <path d="M 125 75 L 205 75" stroke="url(#flow-grad)" strokeWidth="2" strokeDasharray="4 4" />
+                <path d="M 295 75 L 375 75" stroke="url(#flow-grad)" strokeWidth="2" />
+                <path d="M 465 75 L 545 75" stroke="url(#flow-grad)" strokeWidth="2" strokeDasharray="4 4" />
+                <path d="M 635 75 L 715 75" stroke="url(#flow-grad)" strokeWidth="2" />
+
+                {/* Node 1: RAW PCM */}
+                <g transform="translate(15, 30)">
+                  <rect width="110" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)" strokeWidth="1" />
+                  <path d="M 20 45 Q 35 15 50 45 T 80 45 T 90 45" stroke="var(--brand-blue)" strokeWidth="1.5" fill="none" />
+                  <circle cx="50" cy="45" r="3" fill="var(--brand-blue-bright)" filter="url(#glow)" />
+                  <text x="55" y="76" textAnchor="middle" fill="var(--foreground)" className="font-mono text-[9px] uppercase tracking-wider font-semibold">01 / RAW PCM</text>
+                </g>
+
+                {/* Node 2: FFT WINDOW */}
+                <g transform="translate(185, 30)">
+                  <rect width="110" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)" strokeWidth="1" />
+                  {/* FFT bins */}
+                  <line x1="30" y1="55" x2="30" y2="35" stroke="var(--brand-violet)" strokeWidth="2" />
+                  <line x1="42" y1="55" x2="42" y2="25" stroke="var(--brand-violet)" strokeWidth="2" />
+                  <line x1="54" y1="55" x2="54" y2="15" stroke="var(--brand-violet)" strokeWidth="2" />
+                  <line x1="66" y1="55" x2="66" y2="30" stroke="var(--brand-violet)" strokeWidth="2" />
+                  <line x1="78" y1="55" x2="78" y2="40" stroke="var(--brand-violet)" strokeWidth="2" />
+                  <text x="55" y="76" textAnchor="middle" fill="var(--foreground)" className="font-mono text-[9px] uppercase tracking-wider font-semibold">02 / FFT BINS</text>
+                </g>
+
+                {/* Node 3: MEL SPACING */}
+                <g transform="translate(355, 30)">
+                  <rect width="110" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)" strokeWidth="1" />
+                  {/* Mel Curve */}
+                  <path d="M 25 50 C 45 48 70 30 85 20" stroke="var(--brand-blue-bright)" strokeWidth="1.5" fill="none" />
+                  <line x1="35" y1="50" x2="35" y2="47" stroke="var(--muted-dim)" strokeWidth="1" />
+                  <line x1="50" y1="50" x2="50" y2="42" stroke="var(--muted-dim)" strokeWidth="1" />
+                  <line x1="65" y1="50" x2="65" y2="32" stroke="var(--muted-dim)" strokeWidth="1" />
+                  <line x1="80" y1="50" x2="80" y2="23" stroke="var(--muted-dim)" strokeWidth="1" />
+                  <text x="55" y="76" textAnchor="middle" fill="var(--foreground)" className="font-mono text-[9px] uppercase tracking-wider font-semibold">03 / MEL SCALE</text>
+                </g>
+
+                {/* Node 4: MFCC VECTOR */}
+                <g transform="translate(525, 30)">
+                  <rect width="110" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)" strokeWidth="1" />
+                  {/* Matrix vector */}
+                  <rect x="25" y="20" width="60" height="6" rx="2" fill="var(--brand-blue)" opacity="0.3" />
+                  <rect x="25" y="30" width="45" height="6" rx="2" fill="var(--brand-blue)" opacity="0.6" />
+                  <rect x="25" y="40" width="55" height="6" rx="2" fill="var(--brand-blue)" />
+                  <text x="55" y="76" textAnchor="middle" fill="var(--foreground)" className="font-mono text-[9px] uppercase tracking-wider font-semibold">04 / MFCC VECTOR</text>
+                </g>
+
+                {/* Node 5: 2D MAP */}
+                <g transform="translate(695, 30)">
+                  <rect width="110" height="90" rx="8" fill="var(--surface)" stroke="var(--border-strong)" strokeWidth="1" />
+                  {/* Scatter plot */}
+                  <circle cx="35" cy="25" r="2.5" fill="var(--brand-blue-bright)" />
+                  <circle cx="45" cy="40" r="3.5" fill="var(--brand-violet)" filter="url(#glow)" />
+                  <circle cx="75" cy="30" r="2" fill="var(--brand-blue-bright)" />
+                  <circle cx="65" cy="45" r="2.5" fill="var(--brand-blue)" />
+                  <circle cx="80" cy="50" r="3" fill="var(--brand-violet)" />
+                  <text x="55" y="76" textAnchor="middle" fill="var(--foreground)" className="font-mono text-[9px] uppercase tracking-wider font-semibold">05 / similarity MAP</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {PIPELINE_STEPS.map((p) => (
               <div key={p.step} className="surface-card p-6 border border-border/40 rounded-lg flex flex-col justify-between min-h-[14rem]">
