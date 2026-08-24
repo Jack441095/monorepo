@@ -248,15 +248,16 @@ body {
   overflow: hidden;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: 0 38px 90px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 0 1px rgba(57, 123, 255, 0.08);
+  background: linear-gradient(135deg, var(--surface-raised) 0%, var(--surface) 100%);
+  box-shadow: 0 45px 100px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(86, 168, 255, 0.06);
 }
 
 .product-frame__bar {
+  position: relative;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding: .75rem 1.25rem;
+  padding: .75rem 2.5rem;
   border-bottom: 1px solid var(--border);
   background: linear-gradient(to bottom, var(--surface-raised), var(--surface));
   color: var(--muted);
@@ -264,6 +265,52 @@ body {
   font-weight: 650;
   letter-spacing: .08em;
   font-family: var(--font-mono);
+}
+
+.product-frame__bar::before,
+.product-frame__bar::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: 
+    linear-gradient(45deg, transparent 40%, rgba(21, 24, 28, 0.95) 40%, rgba(21, 24, 28, 0.95) 60%, transparent 60%), 
+    radial-gradient(circle at 30% 30%, #7d8492 0%, #3a3f4d 70%, #1c1f26 100%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.6);
+  opacity: 0.85;
+}
+
+.product-frame__bar::before {
+  left: 0.85rem;
+}
+
+.product-frame__bar::after {
+  right: 0.85rem;
+}
+
+.product-frame__bar span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-frame__bar span:first-child::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brand-blue-bright);
+  box-shadow: 0 0 8px var(--brand-blue-bright);
+  animation: pulse-led 3s infinite ease-in-out;
+}
+
+@keyframes pulse-led {
+  0%, 100% { opacity: 0.8; filter: brightness(1); }
+  50% { opacity: 0.4; filter: brightness(0.6); }
 }
 
 .workflow-list { border-top: 1px solid var(--border); }
@@ -501,6 +548,15 @@ body {
   }
   .capability-grid { grid-template-columns: 1fr; }
   .cta-panel { align-items: flex-start; flex-direction: column; }
+  .product-frame__bar {
+    padding: .75rem 1.25rem;
+    flex-wrap: wrap;
+    row-gap: .35rem;
+  }
+  .product-frame__bar::before,
+  .product-frame__bar::after {
+    display: none;
+  }
 }
 
 /* Two-column layouts that need more room than 640px to breathe collapse at
