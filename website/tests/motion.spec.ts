@@ -30,7 +30,7 @@ test("reduced motion: reveals never hide content and CTA still works", async ({ 
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
-  const revealedHeading = page.getByRole("heading", { name: /See how SLO listens/i });
+  const revealedHeading = page.getByRole("heading", { name: /Real-time timbral signature extraction/i });
   await revealedHeading.scrollIntoViewIfNeeded();
   await expect(revealedHeading).toBeVisible();
   const opacity = await revealedHeading.evaluate((el) => getComputedStyle(el).opacity);

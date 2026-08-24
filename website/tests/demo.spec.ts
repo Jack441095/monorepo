@@ -22,7 +22,8 @@ test.describe("interactive demonstration layer", () => {
     await expect(demo.getByText("KICK", { exact: true })).toBeVisible({ timeout: 5000 });
     await expect(demo.getByText("SIMILARITY — ACOUSTIC MATCHES")).toBeVisible();
     await expect(demo.getByText("Kick_012.wav")).toBeVisible();
-    await expect(demo.getByText("Detected", { exact: true })).toBeVisible();
+    await expect(demo.getByText("SPECTRAL CENTROID", { exact: true })).toBeVisible();
+    await expect(demo.getByText("82 Hz", { exact: true })).toBeVisible();
     await expect(demo.getByText("SIMULATION", { exact: true })).toBeVisible();
     await expect(demo.getByText(/Illustrative workflow simulation/i)).toBeVisible();
   });
