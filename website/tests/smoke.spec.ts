@@ -32,8 +32,9 @@ test.describe("critical routes", () => {
 
 test("homepage identifies NITE DSP and Smart Sample Manager", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(/sample/i);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByText("NITE DSP").first()).toBeVisible();
+  await expect(page.getByText(/Sample Library Optimiser/i).first()).toBeVisible();
 });
 
 test("desktop nav has no visible menu button, mobile nav does", async ({ page }) => {
