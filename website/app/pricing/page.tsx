@@ -39,7 +39,8 @@ export default function PricingPage() {
           </div>
 
           <div className="purchase-panel">
-            <span className="eyebrow" style={{ color: "var(--accent-signal)" }}>Current one-time price</span>
+            {/* Copper here marks commercial intent (the buy decision), not status. */}
+            <span className="eyebrow" style={{ color: "var(--accent)" }}>Current one-time price</span>
             <h2 className="mt-5 text-xl font-semibold">Smart Sample Manager</h2>
             <div className="mt-7 flex items-baseline gap-3">
               <span className="text-5xl font-semibold tracking-tight">£10</span>

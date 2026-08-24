@@ -22,7 +22,7 @@ function VerifyInner() {
   }, [token, router]);
 
   if (status === "error") {
-    return <p className="text-sm" style={{ color: "#e88" }}>This sign-in link is invalid or has expired.</p>;
+    return <p className="text-sm" style={{ color: "var(--state-error)" }}>This sign-in link is invalid or has expired.</p>;
   }
   return <p className="text-sm" style={{ color: "var(--muted-dim)" }}>Signing you in…</p>;
 }
