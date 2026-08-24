@@ -17,20 +17,21 @@ export default function OpengraphImage() {
           // EMBER surface.base / text.primary / text.secondary — mirrors
           // globals.css tokens. Literal hexes required: ImageResponse renders
           // outside the CSS layer.
-          background: "#0c0b09",
-          color: "#ede8e0",
+          // Palette B background & typography tokens
+          background: "#070A12",
+          color: "#F5F7FB",
           fontFamily: "system-ui, sans-serif",
           padding: "80px",
         }}
       >
-        <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, color: "#a39b8f" }}>
+        <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, color: "#A7B0C0" }}>
           NITE DSP
         </div>
         <div style={{ display: "flex", fontSize: 72, fontWeight: 700, marginTop: 24 }}>
-          Smart Sample Manager
+          SLO
         </div>
-        <div style={{ display: "flex", fontSize: 32, color: "#e89b3c", marginTop: 24 }}>
-          Your samples. Actually organised.
+        <div style={{ display: "flex", fontSize: 32, color: "#397BFF", marginTop: 24 }}>
+          Sample Library Optimiser
         </div>
       </div>
     ),

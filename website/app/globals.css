@@ -9,85 +9,152 @@
 }
 
 /* ============================================================================
-   NITE DSP — EMBER web token layer (Design System 1.0, frozen)
+   NITE DSP V2.1 Design Tokens & Theming System
 
-   Web-specific aliases over the FROZEN global EMBER namespace
-   (NITE_DSP_DESIGN_LANGUAGE_V1.md §9.3 / §20a / §23). The global semantics do
-   not change here; this file only binds them to CSS custom properties and a
-   handful of web-only derived values (documented inline).
-
-   Global token            →  web alias              Value
-   ────────────────────────────────────────────────────────────────────────
-   surface.base            →  --background           #0C0B09
-   surface.inset           →  --background-inset     #080706
-   surface.raised          →  --surface              #14120F
-   surface.overlay         →  --surface-raised       #1C1915
-   (web-derived hover)     →  --surface-hover        #191612
-   hairline @55%           →  --border               rgba(42,38,31,.55)
-   hairline @90%           →  --border-strong        rgba(42,38,31,.90)
-   text.primary            →  --foreground           #EDE8E0
-   text.secondary          →  --muted                #A39B8F
-   text.tertiary           →  --muted-dim            #8A8378 *
-   action.primary          →  --accent               #E89B3C
-   action.hover/focus      →  --accent-bright        #F7B955
-   action.dim (large fill) →  --accent-dim           #8A5F28
-   accent.ink              →  --accent-ink           #1A1207
-   state.success/playing   →  --state-success        #7FB069
-   state.warning           →  --state-warning        #E5B84B
-   state.error             →  --state-error          #E5484D
-   info.neutral            →  --info                 #8FA6BF
-
-   * Web derivation: frozen tertiary #6E675E computes 3.53:1 on surface.base,
-     below WCAG AA for normal text. #8A8378 is the nearest warm step that
-     clears AA on every surface (4.67:1 minimum). Same hue family, same role.
-
-   Semantic rules carried over unchanged:
-   - Copper is INTERACTION ONLY (CTAs, link hover, focus). Never status.
-   - Green is playback/success ONLY. It appears nowhere decorative.
-   - Red never decorates; warning/gold marks attention or favourites.
-   - Every state pairs colour with glyph or text.
+   Provides three visually tested palette configurations:
+   - Palette A (Blue Dominant): Precise, technical, minimal, high trust.
+   - Palette B (Balanced Energy): Expressive, recognizable, flagship brand balance.
+   - Palette C (Minimal Premium): Luxury, restrained, dark graphite/navy.
    ========================================================================== */
-:root {
-  /* Surfaces — warm graphite ramp, depth via luminance steps */
-  --background: #0c0b09;
-  --background-inset: #080706;
-  --surface: #14120f;
-  --surface-raised: #1c1915;
-  --surface-hover: #191612;
 
-  /* Hairlines — warm, low-contrast structure */
-  --border: rgba(42, 38, 31, 0.55);
-  --border-strong: rgba(42, 38, 31, 0.9);
+:root, :root[data-theme="b"] {
+  /* Palette B: Balanced Energy (Default Flagship Theme) */
+  --background: #070A12;
+  --background-inset: #04060a;
+  --surface: #0D1322;
+  --surface-raised: #121B2D;
+  --surface-hover: #17223b;
 
-  /* Text — off-white, warm */
-  --foreground: #ede8e0;
-  --muted: #a39b8f;
-  --muted-dim: #8a8378;
+  /* Structure & Borders */
+  --border: rgba(57, 123, 255, 0.15);
+  --border-strong: rgba(57, 123, 255, 0.3);
 
-  /* Action — copper interaction light (interaction only) */
-  --accent: #e89b3c;
-  --accent-bright: #f7b955;
-  --accent-dim: #8a5f28;
-  --accent-ink: #1a1207;
+  /* Typography */
+  --foreground: #F5F7FB;
+  --muted: #A7B0C0;
+  --muted-dim: #737D8F;
 
-  /* States — semantic only, never decorative */
-  --state-success: #7fb069;
-  --state-warning: #e5b84b;
-  --state-warning-border: rgba(229, 184, 75, 0.32);
-  --state-warning-bg: rgba(229, 184, 75, 0.07);
-  --state-error: #e5484d;
-  --info: #8fa6bf;
+  /* Accent Color (Interactive CTA, Links, Focus) */
+  --accent: #397BFF;
+  --accent-bright: #56A8FF;
+  --accent-dim: #1d4db7;
+  --accent-ink: #070A12;
 
-  /* Motion — frozen timing tokens (§23), ease-out-quart */
+  /* Brand Accents */
+  --brand-blue: #397BFF;
+  --brand-blue-bright: #56A8FF;
+  --brand-red: #F0445A;
+  --brand-red-bright: #FF5C69;
+  --brand-violet: #7148E8;
+
+  /* Semantic status colors (distinct from brand accents) */
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-warning-border: rgba(245, 158, 11, 0.32);
+  --state-warning-bg: rgba(245, 158, 11, 0.07);
+  --state-error: #EF4444;
+  --info: #3B82F6;
+
+  /* Motion & Timing */
   --motion-fast: 120ms;
   --motion-standard: 180ms;
   --motion-slow: 300ms;
   --motion-easing: cubic-bezier(0.25, 1, 0.5, 1);
 
-  /* Radius — frozen small scale: 3 controls / 6 cards / 8 frames */
-  --radius-sm: 3px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  /* Radius & Spacing */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --content-width: 72rem;
+  --grid-gutter: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+:root[data-theme="a"] {
+  /* Palette A: Blue Dominant */
+  --background: #05070d;
+  --background-inset: #020306;
+  --surface: #0a0e1a;
+  --surface-raised: #101628;
+  --surface-hover: #151d34;
+
+  --border: rgba(57, 123, 255, 0.12);
+  --border-strong: rgba(57, 123, 255, 0.25);
+
+  --foreground: #F0F4F8;
+  --muted: #9BB0C5;
+  --muted-dim: #6B8296;
+
+  --accent: #397BFF;
+  --accent-bright: #56A8FF;
+  --accent-dim: #1f4cb8;
+  --accent-ink: #05070d;
+
+  --brand-blue: #397BFF;
+  --brand-blue-bright: #56A8FF;
+  --brand-red: #E03C50;
+  --brand-red-bright: #F55367;
+  --brand-violet: #6236E2;
+
+  --state-success: #059669;
+  --state-warning: #D97706;
+  --state-warning-border: rgba(217, 119, 6, 0.32);
+  --state-warning-bg: rgba(217, 119, 6, 0.07);
+  --state-error: #DC2626;
+  --info: #2563EB;
+
+  --motion-fast: 120ms;
+  --motion-standard: 180ms;
+  --motion-slow: 300ms;
+  --motion-easing: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --content-width: 72rem;
+  --grid-gutter: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+:root[data-theme="c"] {
+  /* Palette C: Minimal Premium */
+  --background: #090B10;
+  --background-inset: #05060a;
+  --surface: #11141b;
+  --surface-raised: #171b24;
+  --surface-hover: #1d222e;
+
+  --border: rgba(245, 247, 251, 0.08);
+  --border-strong: rgba(245, 247, 251, 0.15);
+
+  --foreground: #F5F7FB;
+  --muted: #9098A6;
+  --muted-dim: #626975;
+
+  --accent: #A7B0C0;
+  --accent-bright: #F5F7FB;
+  --accent-dim: #545c6b;
+  --accent-ink: #090B10;
+
+  --brand-blue: #397BFF;
+  --brand-blue-bright: #56A8FF;
+  --brand-red: #F0445A;
+  --brand-red-bright: #FF5C69;
+  --brand-violet: #7148E8;
+
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-warning-border: rgba(245, 158, 11, 0.32);
+  --state-warning-bg: rgba(245, 158, 11, 0.07);
+  --state-error: #EF4444;
+  --info: #3B82F6;
+
+  --motion-fast: 120ms;
+  --motion-standard: 180ms;
+  --motion-slow: 300ms;
+  --motion-easing: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --content-width: 72rem;
   --grid-gutter: clamp(1.25rem, 4vw, 2.5rem);
 }
@@ -127,13 +194,22 @@ body {
 
 .site-container { width: min(100% - (var(--grid-gutter) * 2), var(--content-width)); margin-inline: auto; }
 
-/* A single, barely-there warm wash behind the hero — atmosphere, not glow.
-   Sits far under the visibility line where it reads as lamplight, not neon. */
-.hero-grid { background: radial-gradient(60% 70% at 82% 12%, rgba(232, 155, 60, .05), transparent 62%), var(--background); border-bottom: 1px solid var(--border); }
-.product-hero, .pricing-hero, .support-hero { background: radial-gradient(50% 70% at 85% 8%, rgba(232, 155, 60, .04), transparent 65%); }
+/* A gorgeous, ambient blended studio lighting gradient (Blue -> Violet -> Red)
+   that sits subtly behind the content like actual audio studio hardware lighting. */
+.hero-grid {
+  background: 
+    radial-gradient(ellipse at 85% 15%, rgba(57, 123, 255, 0.12) 0%, rgba(113, 72, 232, 0.06) 25%, rgba(240, 68, 90, 0.03) 55%, transparent 80%),
+    var(--background);
+  border-bottom: 1px solid var(--border);
+}
+.product-hero, .pricing-hero, .support-hero {
+  background: 
+    radial-gradient(ellipse at 85% 10%, rgba(57, 123, 255, 0.1) 0%, rgba(113, 72, 232, 0.05) 30%, rgba(240, 68, 90, 0.02) 60%, transparent 80%),
+    var(--background);
+}
 
-.hero-title { max-width: 12ch; font-size: clamp(2.8rem, 5.5vw, 5.8rem); font-weight: 600; letter-spacing: -.03em; line-height: .96; text-wrap: balance; }
-.hero-copy { max-width: 38rem; color: var(--muted); font-size: clamp(1.08rem, 1.5vw, 1.25rem); line-height: 1.58; }
+.hero-title { max-width: 14ch; font-size: clamp(2.8rem, 5.5vw, 5.8rem); font-weight: 600; letter-spacing: -.03em; line-height: 0.94; text-wrap: balance; }
+.hero-copy { max-width: 38rem; color: var(--muted); font-size: clamp(1.08rem, 1.5vw, 1.25rem); line-height: 1.6; }
 .section-rule { border-top: 1px solid var(--border); }
 .section-title { max-width: 20ch; font-size: clamp(2rem, 3.5vw, 3.5rem); font-weight: 600; letter-spacing: -.02em; line-height: 1.05; text-wrap: balance; }
 .body-large { max-width: 43rem; color: var(--muted); font-size: clamp(1.1rem, 1.5vw, 1.32rem); line-height: 1.65; }
@@ -142,43 +218,119 @@ body {
    license keys, counts). Frozen rule §10. */
 .tnum { font-variant-numeric: tabular-nums; }
 
-.product-frame { overflow: hidden; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: var(--surface); box-shadow: 0 32px 80px rgba(0,0,0,.35); }
-/* Static perspective tilt removed: flat frames render screenshots crisply at
-   every DPI and keep the site's quiet-instrument posture. */
-.product-frame__bar { display: flex; justify-content: space-between; gap: 1rem; padding: .75rem 1rem; border-bottom: 1px solid var(--border); background: var(--surface-raised); color: var(--muted-dim); font-size: .68rem; font-weight: 650; letter-spacing: .08em; }
+/* Premium Studio Hardware panels */
+.product-frame {
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.product-frame__bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--muted);
+  font-size: .68rem;
+  font-weight: 650;
+  letter-spacing: .08em;
+  font-family: var(--font-mono);
+}
 
 .workflow-list { border-top: 1px solid var(--border); }
-.workflow-item { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 1.25rem; padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
-/* Step numbers are technical readouts, not interaction: tertiary mono ink. */
-.workflow-number { color: var(--muted-dim); font-family: var(--font-geist-mono); font-size: .8rem; padding-top: .25rem; }
-.workflow-item h3, .capability h3 { font-size: 1.08rem; font-weight: 600; }
-.workflow-item p, .capability p { max-width: 42rem; margin-top: .45rem; color: var(--muted); line-height: 1.6; }
+.workflow-item { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 1.25rem; padding: 1.75rem 0; border-bottom: 1px solid var(--border); }
+.workflow-number { color: var(--brand-blue); font-family: var(--font-mono); font-size: .9rem; font-weight: 600; padding-top: .15rem; }
+.workflow-item h3, .capability h3 { font-size: 1.1rem; font-weight: 600; }
+.workflow-item p, .capability p { max-width: 42rem; margin-top: 0.5rem; color: var(--muted); line-height: 1.6; }
+
 .capability-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
-.capability { min-height: 11rem; padding: clamp(1.25rem, 3vw, 2.25rem); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.capability { min-height: 11rem; padding: clamp(1.25rem, 3vw, 2.25rem); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: background var(--motion-fast) var(--motion-easing); }
 .capability:hover { background: var(--surface-hover); }
-.cta-panel { display: flex; align-items: end; justify-content: space-between; gap: 2rem; padding: clamp(2rem, 5vw, 4rem); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: linear-gradient(110deg, var(--surface), var(--surface-raised)); }
-.text-link { display: inline-flex; gap: .5rem; align-items: center; color: var(--foreground); font-size: .9rem; font-weight: 600; transition: color var(--motion-fast) var(--motion-easing); }
-.text-link:hover { color: var(--accent-bright); }
+
+/* CTA Panel with ambient border glow */
+.cta-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(2rem, 5vw, 4rem);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-raised) 100%);
+  position: relative;
+}
+.cta-panel::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius-lg);
+  padding: 1px;
+  background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-violet) 50%, var(--brand-red) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.15;
+  transition: opacity var(--motion-standard) var(--motion-easing);
+}
+.cta-panel:hover::after {
+  opacity: 0.35;
+}
+
+.text-link {
+  display: inline-flex;
+  gap: .5rem;
+  align-items: center;
+  color: var(--brand-blue-bright);
+  font-size: .9rem;
+  font-weight: 600;
+  transition: color var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
+}
+.text-link:hover {
+  color: var(--foreground);
+  transform: translateX(2px);
+}
 
 .pricing-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, .82fr); gap: clamp(2.5rem, 9vw, 9rem); align-items: start; }
 .pricing-notes { padding-top: 1rem; }
 .feature-list { border-top: 1px solid var(--border); }
-.feature-list li { padding: 1rem 0 1rem 1.75rem; border-bottom: 1px solid var(--border); color: var(--muted); position: relative; }
-.feature-list li::before { content: "↗"; position: absolute; left: .1rem; color: var(--accent); }
-.purchase-panel { padding: clamp(1.75rem, 4vw, 2.75rem); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--surface-raised), var(--surface)); box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+.feature-list li { padding: 1.1rem 0 1.1rem 1.75rem; border-bottom: 1px solid var(--border); color: var(--muted); position: relative; }
+.feature-list li::before {
+  content: "→";
+  position: absolute;
+  left: .1rem;
+  color: var(--brand-blue);
+  font-weight: 600;
+}
+
+.purchase-panel {
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--surface-raised), var(--surface));
+  box-shadow: 0 24px 60px rgba(0,0,0,.45);
+  position: relative;
+}
 
 .support-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
 .support-card { min-height: 15rem; padding: clamp(1.5rem, 4vw, 2.5rem); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: background var(--motion-fast) var(--motion-easing); }
 .support-card:hover { background: var(--surface-hover); }
-.learn-index { border-top: 1px solid var(--border); }
-/* Label column sizes to content so longer/CJK labels wrap instead of clip. */
-.learn-index__item { display: grid; grid-template-columns: minmax(4.5rem, auto) minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 1.1rem 0; border-bottom: 1px solid var(--border); color: var(--foreground); transition: color var(--motion-fast) var(--motion-easing); }
-.learn-index__item:hover { color: var(--accent-bright); }
 
-/* Focus states — visible keyboard focus in accent.bright (frozen §16).
-   Mouse clicks do not trigger :focus-visible, matching platform defaults. */
+.learn-index { border-top: 1px solid var(--border); }
+.learn-index__item { display: grid; grid-template-columns: minmax(4.5rem, auto) minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 1.25rem 0; border-bottom: 1px solid var(--border); color: var(--foreground); transition: color var(--motion-fast) var(--motion-easing), padding-left var(--motion-fast) var(--motion-easing); }
+.learn-index__item:hover {
+  color: var(--brand-blue-bright);
+  padding-left: 0.25rem;
+}
+
+/* Focus states — visible keyboard focus in brand-blue-bright. */
 :focus-visible {
-  outline: 2px solid var(--accent-bright);
+  outline: 2px solid var(--brand-blue-bright);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -188,7 +340,7 @@ body {
   left: -9999px;
   top: 0;
   z-index: 100;
-  background: var(--accent);
+  background: var(--brand-blue);
   color: var(--accent-ink);
   padding: 0.75rem 1.25rem;
   border-radius: var(--radius-sm);
@@ -206,27 +358,36 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: border-color var(--motion-fast) var(--motion-easing), background var(--motion-fast) var(--motion-easing);
 }
 
 .surface-card:hover {
   border-color: var(--border-strong);
+  background: var(--surface-hover);
 }
 
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: var(--brand-blue);
+  color: var(--foreground);
   border-radius: var(--radius-sm);
-  padding: 0.65rem 1.4rem;
+  padding: 0.65rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  transition: background var(--motion-fast) var(--motion-easing);
+  border: 1px solid transparent;
+  transition: background var(--motion-fast) var(--motion-easing), border-color var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
+  cursor: pointer;
 }
 
 .btn-primary:hover {
-  background: var(--accent-bright);
+  background: var(--brand-blue-bright);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
@@ -236,25 +397,31 @@ body {
   border: 1px solid var(--border-strong);
   color: var(--foreground);
   border-radius: var(--radius-sm);
-  padding: 0.65rem 1.4rem;
+  padding: 0.65rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  transition: border-color var(--motion-fast) var(--motion-easing), background var(--motion-fast) var(--motion-easing);
+  background: transparent;
+  transition: border-color var(--motion-fast) var(--motion-easing), background var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
+  cursor: pointer;
 }
 
 .btn-secondary:hover {
   background: var(--surface-hover);
-  border-color: var(--muted-dim);
+  border-color: var(--brand-blue);
+  transform: translateY(-1px);
+}
+.btn-secondary:active {
+  transform: translateY(0);
 }
 
-/* Warning/experimental callout — semantic attention state (gold + glyph),
+/* Warning/experimental callout — semantic attention state (gold/warning),
    one definition shared by legal pages and Learn content. */
 .callout-warning {
   border-radius: var(--radius-md);
   border: 1px solid var(--state-warning-border);
   background: var(--state-warning-bg);
   color: var(--state-warning);
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
   font-size: 0.875rem;
 }
 
@@ -294,18 +461,18 @@ body {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted-dim);
+  color: var(--brand-blue-bright);
 }
 
 .section {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
+  padding-top: 6rem;
+  padding-bottom: 6rem;
 }
 
 @media (max-width: 640px) {
   .section {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
   }
   .capability-grid { grid-template-columns: 1fr; }
   .cta-panel { align-items: flex-start; flex-direction: column; }
@@ -315,6 +482,6 @@ body {
    the lg breakpoint instead — between 640–1023px a forced two-column pricing
    grid gets cramped, which is worse than a single honest column. */
 @media (max-width: 1023px) {
-  .pricing-layout { grid-template-columns: 1fr; gap: 3rem; }
+  .pricing-layout { grid-template-columns: 1fr; gap: 3.5rem; }
   .support-grid { grid-template-columns: 1fr; }
 }

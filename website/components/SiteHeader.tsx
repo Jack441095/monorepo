@@ -15,8 +15,8 @@ export function SiteHeader() {
 
   return (
     <header
-      className="border-b sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--background)]/80"
-      style={{ borderColor: "var(--border)", background: "var(--background)" }}
+      className="border-b sticky top-0 z-40"
+      style={{ borderColor: "var(--border)", backgroundColor: "rgba(7, 10, 18, 0.75)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
     >
       <nav
         className="mx-auto flex items-center justify-between px-6 py-4"

@@ -89,7 +89,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 All products
               </Link>
               <Link href="/products/smart-sample-manager" className="hover:text-[color:var(--foreground)] transition-colors">
-                SLO
+                SLO (Sample Library Optimiser)
               </Link>
               <Link href="/learn" className="hover:text-[color:var(--foreground)] transition-colors">
                 Learn
