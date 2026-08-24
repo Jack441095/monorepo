@@ -1,34 +1,180 @@
 import Image from "next/image";
 import Link from "next/link";
+import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
 
 const WORKFLOWS = [
-  ["01", "Scan the library you already own", "SLO reads your local sample folders and builds a searchable view of the sounds, keys, tempos and categories already on your drives."],
-  ["02", "Find a sound by its character", "Start from a sample you trust. Find Similar surfaces nearby timbres, transients and spectral balance instead of relying on filenames alone."],
-  ["03", "Audition, compare, then drag", "Use the browser, map or split view to make a fast decision. Keep the sample path clear from library to your DAW."],
+  [
+    "01",
+    "Scan your local sample drives",
+    "SLO indexes your existing directories, extracting features directly from the audio signal. It caches results locally, making subsequent rescans instantaneous."
+  ],
+  [
+    "02",
+    "Bypass cryptically named folders",
+    "Search by sonic timbre, spectral balance, and transients instead of folder tags or cryptic names. Discover forgotten gems buried deep in old directories."
+  ],
+  [
+    "03",
+    "Compare and drag to timeline",
+    "Audition samples side-by-side inside the precision browser, map, or split view. Drag your selected sound straight into Ableton Live or any other DAW timeline."
+  ],
 ] as const;
 
 const CAPABILITIES = [
-  ["Precision Browser", "A dense, readable view of sample name, type, key, BPM and duration."],
-  ["Visual Map", "A spatial view of sonic relationships across the scanned library."],
-  ["Find Similar", "Choose a reference sample and explore related sounds by audio characteristics."],
-  ["Local analysis", "Scanning and matching run on your Mac. Your sample library stays on your drive."],
+  ["Precision Browser", "A dense, structured layout highlighting name, category, key, BPM, and length."],
+  ["Visual Map", "Browse visually. Sounds are plotted based on acoustic similarity—close clusters share similar timbres."],
+  ["Find Similar", "Select a reference sample and immediately view all acoustically matching sounds in your library."],
+  ["100% Offline Engine", "All scans and DSP calculations run locally on your Mac. No internet required, no audio uploads."],
 ] as const;
 
 export default function HomePage() {
-  return <>
-    <section className="hero-grid overflow-hidden"><div className="site-container grid items-center gap-12 py-16 lg:grid-cols-[0.84fr_1.16fr] lg:py-24">
-      <div className="relative z-10"><span className="eyebrow">NITE DSP / SLO</span><h1 className="hero-title mt-5">Your sample library, organised by sound.</h1><p className="hero-copy mt-6">SLO is a macOS sample browser for producers who know the sound they want but not the filename that contains it. Search, audition and compare your own library in one place.</p><div className="mt-9 flex flex-wrap gap-3"><Link href="/products/smart-sample-manager" className="btn-primary">View SLO</Link><Link href="/pricing" className="btn-secondary">See pricing</Link></div><p className="mt-6 text-xs" style={{ color: "var(--muted-dim)" }}>macOS · AU · VST3 · Standalone</p></div>
-      <div className="product-frame product-frame--hero"><div className="product-frame__bar"><span>SMART SAMPLE MANAGER</span><span>LIST / MAP / SPLIT</span></div><Image src="/screenshots/main-browser.png" alt="SLO showing a searchable sample browser and selected sample detail panel" width={1599} height={1057} priority sizes="(max-width: 1024px) 100vw, 58vw" className="h-auto w-full" /></div>
-    </div></section>
+  return (
+    <>
+      {/* Homepage Hero */}
+      <section className="hero-grid overflow-hidden">
+        <div className="site-container grid items-center gap-12 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:py-24">
+          <div className="relative z-10">
+            <span className="eyebrow">NITE DSP // FLAGSHIP</span>
+            <h1 className="hero-title mt-5">Your sample library, organised by sound.</h1>
+            <p className="hero-copy mt-6">
+              SLO (Sample Library Optimiser) is a professional macOS sample browser that analyses actual audio signals rather than relying on folder structures or filenames.
+            </p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link href="/products/smart-sample-manager" className="btn-primary">
+                Explore SLO
+              </Link>
+              <Link href="/pricing" className="btn-secondary">
+                View pricing
+              </Link>
+            </div>
+            <p className="mt-6 text-xs" style={{ color: "var(--muted-dim)" }}>
+              macOS &middot; VST3 &middot; AU &middot; Standalone &middot; Native Apple Silicon
+            </p>
+          </div>
+          
+          <div className="product-frame product-frame--hero">
+            <div className="product-frame__bar">
+              <span>SLO // SAMPLE LIBRARY OPTIMISER</span>
+              <span>SPLIT VIEW</span>
+            </div>
+            <Image
+              src="/screenshots/main-browser.png"
+              alt="SLO flagship interface showing a searchable sample browser and selected sample details panel"
+              width={1599}
+              height={1057}
+              priority
+              sizes="(max-width: 1024px) 100vw, 58vw"
+              className="h-auto w-full"
+            />
+          </div>
+        </div>
+      </section>
 
-    <section className="section section-rule"><div className="site-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start"><div><span className="eyebrow">The library problem</span><h2 className="section-title mt-4">Folders are good at storage. They are not good at recall.</h2></div><p className="body-large">A good library gathers years of purchases, resamples, edits and half-forgotten packs. SLO gives those sounds a view based on what they contain, so a useful kick, texture or transient is not lost behind a name you would never think to search for.</p></div></section>
+      {/* The Core Problem & Audio-First Positioning */}
+      <section className="section section-rule">
+        <div className="site-container grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+          <div>
+            <span className="eyebrow">The Signal vs The Filename</span>
+            <h2 className="section-title mt-4">Folders are for storage. Not for discovery.</h2>
+          </div>
+          <div>
+            <p className="body-large">
+              A sample&apos;s filename is often meaningless (e.g. <code>XK29_0047.wav</code>). Standard folder trees hide your best sounds in nested archives. 
+            </p>
+            <p className="mt-6 text-base leading-relaxed" style={{ color: "var(--muted)" }}>
+              SLO bypasses metadata dependencies entirely. By analysing the spectral and transient characteristics of the audio itself, it automatically categorises your library (e.g. identifying a kick, snare, or synth pad) and places similar timbres close together.
+            </p>
+          </div>
+        </div>
+      </section>
 
-    <section className="section section-rule"><div className="site-container"><div className="max-w-2xl"><span className="eyebrow">A working route to the right sound</span><h2 className="section-title mt-4">Less folder archaeology. More listening.</h2></div><ol className="workflow-list mt-12">{WORKFLOWS.map(([number, title, body]) => <li key={number} className="workflow-item"><span className="workflow-number">{number}</span><div><h3>{title}</h3><p>{body}</p></div></li>)}</ol></div></section>
+      {/* Interactive Audio-First Demo Section */}
+      <section className="section section-rule bg-[#0D1322]/30">
+        <div className="site-container grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+          <div>
+            <span className="eyebrow">Interactive Demo</span>
+            <h2 className="section-title mt-4">See how SLO listens to your files.</h2>
+            <p className="mt-6 leading-relaxed" style={{ color: "var(--muted)" }}>
+              Click any cryptic filename to see how the local DSP engine scans the waveform, identifies key transient structures, and classifies the sound into its true instrument category.
+            </p>
+            <div className="mt-8 flex flex-col gap-4 border-l-2 border-brand-violet pl-5">
+              <div>
+                <h4 className="font-semibold text-foreground text-sm">Audio analysis, not text guesses</h4>
+                <p className="text-xs text-muted mt-1">We don&apos;t match words or tag descriptions. SLO compares timbral character directly.</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-foreground text-sm">Fully local metadata</h4>
+                <p className="text-xs text-muted mt-1">Scanning takes place entirely on your processor. Your filenames and audio files never leave your system.</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <AudioAnalysisDemo />
+          </div>
+        </div>
+      </section>
 
-    <section className="section section-rule"><div className="site-container grid gap-12 lg:grid-cols-[1.12fr_0.88fr] lg:items-center"><div className="product-frame product-frame--detail"><div className="product-frame__bar"><span>DISCOVERY VIEW</span><span>500 SAMPLES</span></div><Image src="/screenshots/main-browser.png" alt="SLO visual map and browser used together in split view" width={1599} height={1057} sizes="(max-width: 1024px) 100vw, 55vw" className="h-auto w-full" /></div><div><span className="eyebrow">Built for decisions, not dashboards</span><h2 className="section-title mt-4">The browser is detailed. The map is intuitive. Split view keeps both in reach.</h2><p className="mt-5 leading-relaxed" style={{ color: "var(--muted)" }}>Move between a precise list and a broad view of the library without abandoning the selected sound. SLO is designed around auditioning and comparison, not admin work.</p><Link href="/products/smart-sample-manager" className="text-link mt-7">Explore the SLO workflow <span aria-hidden="true">→</span></Link></div></div></section>
+      {/* Workflow Steps */}
+      <section className="section section-rule">
+        <div className="site-container">
+          <div className="max-w-2xl">
+            <span className="eyebrow">Precision Engineering</span>
+            <h2 className="section-title mt-4">Streamline your sample library workflow.</h2>
+          </div>
+          <ol className="workflow-list mt-12">
+            {WORKFLOWS.map(([number, title, body]) => (
+              <li key={number} className="workflow-item">
+                <span className="workflow-number">{number}</span>
+                <div>
+                  <h3 className="text-foreground">{title}</h3>
+                  <p>{body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
 
-    <section className="section section-rule"><div className="site-container"><div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end"><div className="max-w-2xl"><span className="eyebrow">What is in the product</span><h2 className="section-title mt-4">A focused set of tools for sample discovery.</h2></div><Link href="/products/smart-sample-manager" className="text-link">Product details <span aria-hidden="true">→</span></Link></div><div className="capability-grid mt-10">{CAPABILITIES.map(([title, body]) => <article key={title} className="capability"><h3>{title}</h3><p>{body}</p></article>)}</div></div></section>
+      {/* Key Capabilities */}
+      <section className="section section-rule">
+        <div className="site-container">
+          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div className="max-w-2xl">
+              <span className="eyebrow">System Capabilities</span>
+              <h2 className="section-title mt-4">An instrument built for audio producers.</h2>
+            </div>
+            <Link href="/products/smart-sample-manager" className="text-link">
+              Read SLO specifications <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+          <div className="capability-grid mt-10">
+            {CAPABILITIES.map(([title, body]) => (
+              <article key={title} className="capability">
+                <h3 className="text-foreground">{title}</h3>
+                <p>{body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    <section className="section section-rule"><div className="site-container cta-panel"><div><span className="eyebrow">SLO for macOS</span><h2 className="section-title mt-4">Find the sound. Keep making the track.</h2></div><div className="flex flex-wrap gap-3"><Link href="/pricing" className="btn-primary">See pricing</Link><Link href="/learn" className="btn-secondary">Read the docs</Link></div></div></section>
-  </>;
+      {/* Bottom CTA Panel */}
+      <section className="section section-rule">
+        <div className="site-container cta-panel">
+          <div>
+            <span className="eyebrow">Get Started</span>
+            <h2 className="section-title mt-4 text-foreground">Find the sound. Finish the track.</h2>
+          </div>
+          <div className="flex flex-wrap gap-3 relative z-10">
+            <Link href="/pricing" className="btn-primary">
+              See pricing
+            </Link>
+            <Link href="/learn" className="btn-secondary">
+              Read guides
+            </Link>
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }
