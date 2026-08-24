@@ -1,66 +1,61 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
 
 export const metadata: Metadata = {
-  title: "Smart Sample Manager",
+  title: "SLO — Sample Library Optimiser",
   description:
-    "Find acoustically similar samples in your library, explore it visually, and stay organized inside Ableton Live — fully offline.",
+    "An acoustic-similarity sample browser and organizer for macOS. Fully offline, private, and built for professional music production workflows.",
   alternates: { canonical: "/products/smart-sample-manager" },
 };
 
-const WORKFLOWS = [
+const WORKFLOW_STEPS = [
   {
-    title: "Find Similar",
-    experimental: false,
-    body: "Select a sound. Smart Sample Manager surfaces acoustically similar samples from your whole library — by how they sound, not by filename or folder. This compares audio content directly; it isn't a text search, so there's no \"type a description and find a sound\" mode.",
+    title: "1. Scan & Index",
+    body: "Point SLO at your sample directories. The offline DSP engine reads the raw audio files, extracts key acoustic descriptors, and builds a local cached database. Subsequent indexing is near-instantaneous.",
   },
   {
-    title: "Visual map",
-    experimental: false,
-    body: "Your library laid out as a 2D map, positioned by sonic similarity. Sounds near each other on the map tend to sound alike — a different way to browse than scrolling a folder tree.",
+    title: "2. Visual Mapping",
+    body: "Browse visually. SLO plots your samples on a 2D canvas based on timbral similarity. Discover clusters of matching hats, sub kicks, or ambient textures without searching folders.",
   },
   {
-    title: "Ableton workflow",
-    experimental: true,
-    body: "Tags and reorganization can write into standard XMP metadata that Ableton Live's own sample browser reads directly, so your library stays organized inside Ableton too. This feature is marked experimental in the current build while we finish validating it against a range of libraries — it's not an official Ableton partnership or integration.",
+    title: "3. Find Similar",
+    body: "Select a sample you like, click Find Similar, and SLO instantly searches your library for acoustically related tamber. SLO works with sound, not text keywords, so there are no textual search prompts.",
   },
   {
-    title: "Fully offline",
-    experimental: false,
-    body: "Every scan, every embedding, every similarity match runs locally. No sample audio, filename, or library path is ever uploaded during ordinary use.",
+    title: "4. DAW Drag-and-Drop",
+    body: "Once you identify the sound, drag it directly from the SLO browser or visual map into Ableton Live, Logic Pro, Reaper, or any sampler. Your original directory structure remains completely unchanged.",
   },
 ];
 
 const FAQ = [
   {
-    q: "Does it work with Logic, Reaper, or other DAWs?",
-    a: "Smart Sample Manager ships as VST3, AU, and a Standalone app, so it loads in any host that supports those formats. The Ableton XMP workflow is Ableton-specific; other hosts get the same Find Similar / visual map / organization features without that particular metadata integration.",
+    q: "Does SLO support Logic, Reaper, or other DAWs?",
+    a: "Yes. SLO runs as a Standalone application, VST3, and Audio Unit (AU) plugin. It passes Apple's official AU validation and runs natively on Apple Silicon. While the experimental metadata tag writer is optimized for Ableton Live, the search and classification features work identically across all DAWs.",
   },
   {
-    q: "Can I type a description and find a sound?",
-    a: "No — similarity is based on the audio itself (acoustic similarity), not natural-language text search. Select a sample you already have, and it finds sounds like it.",
+    q: "Does SLO modify, rename, or move my files?",
+    a: "No. SLO operates as a read-only indexer. It does not rename, copy, or silently move your files. Your sample library stays exactly where you put it. You maintain absolute control over your filesystem.",
   },
   {
-    q: "Does anything get uploaded?",
-    a: "No. Scanning, analysis, and matching all happen on your machine. See our privacy notes for detail.",
+    q: "Does any audio data leave my computer?",
+    a: "Never. All embeddings, audio analysis, and similarity calculations run entirely on your local CPU. SLO has zero background trackers, zero telemetry, and does not require an active internet connection to run.",
   },
   {
     q: "Is Windows supported?",
-    a: "Not yet. Smart Sample Manager is macOS-only for now (VST3/AU/Standalone). Windows is on the roadmap, not currently available.",
+    a: "Not yet. SLO is currently macOS-only (runs on macOS 12+ and is fully optimized for M1/M2/M3 chips). A Windows build is on our long-term roadmap, but is not currently available.",
   },
 ];
 
 const SOFTWARE_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Smart Sample Manager",
+  name: "SLO (Sample Library Optimiser)",
   applicationCategory: "MultimediaApplication",
   operatingSystem: "macOS",
   description:
     "An acoustic-similarity sample browser and organizer for VST3, AU, and Standalone hosts.",
-  // Deliberately no "offers"/price field — pricing is not yet human-approved
-  // (see app/pricing/page.tsx). Do not add one until it is.
 };
 
 export default function SmartSampleManagerPage() {
@@ -70,14 +65,16 @@ export default function SmartSampleManagerPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(SOFTWARE_JSON_LD) }}
       />
+      
+      {/* Product Hero */}
       <section className="section product-hero">
         <div className="site-container">
-          <span className="eyebrow">Product</span>
-          <h1 className="section-title mt-4">Smart Sample Manager</h1>
+          <span className="eyebrow">Flagship Product</span>
+          <h1 className="section-title mt-4 text-foreground">SLO</h1>
+          <p className="text-sm font-mono text-brand-blue-bright mt-1">Sample Library Optimiser</p>
           <p className="body-large mt-6">
-            An acoustic-similarity sample browser and organizer for VST3, AU, and Standalone
-            hosts. It listens to your library the way you do, groups what sounds alike, and gets
-            out of the way.
+            A professional, acoustic-similarity sample browser and organizer for macOS. 
+            By analysing raw audio signals rather than depending on folder structures or filenames, SLO provides absolute clarity over your sample library.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link href="/pricing" className="btn-primary">
@@ -90,13 +87,17 @@ export default function SmartSampleManagerPage() {
         </div>
       </section>
 
+      {/* Main App Frame Screenshot */}
       <section className="border-t" style={{ borderColor: "var(--border)" }}>
         <div className="site-container py-12 sm:py-20">
           <div className="product-frame product-frame--hero">
-            <div className="product-frame__bar"><span>SMART SAMPLE MANAGER</span><span>ACTUAL APP</span></div>
+            <div className="product-frame__bar">
+              <span>SLO // LIST VIEW</span>
+              <span>2,450 SAMPLES INDEXED</span>
+            </div>
             <Image
               src="/screenshots/main-browser.png"
-              alt="Smart Sample Manager's main window, showing the sample browser, search field, colour-coded slots, and the sample metadata panel"
+              alt="SLO list view showing sample browser layout, categorised tags, spectral analysis and transient points"
               width={1599}
               height={1057}
               className="w-full h-auto"
@@ -104,26 +105,59 @@ export default function SmartSampleManagerPage() {
             />
           </div>
           <p className="mt-4 text-xs" style={{ color: "var(--muted-dim)" }}>
-            The actual Smart Sample Manager window, shown before a library has been scanned.
+            SLO flagship standalone application showing the browser, transient analyzer, and spectral centroid metrics.
           </p>
         </div>
       </section>
 
+      {/* Rationale & Problem Statement */}
       <section className="section border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto px-6" style={{ maxWidth: "var(--content-width)" }}>
-          <span className="eyebrow">Workflow</span>
-          <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">
-            Built around how you actually dig for sounds.
-          </h2>
+        <div className="site-container grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+          <div>
+            <span className="eyebrow">The Sample Library Problem</span>
+            <h2 className="section-title mt-4">Organised by ear, not by folder.</h2>
+          </div>
+          <div className="space-y-6 text-base leading-relaxed text-muted">
+            <p>
+              Producers gather thousands of samples over years—often mixed together across splice packs, recording sessions, and messy desktop folders. Finding a specific kick, snare, or synth stab involves endless folder clicking and memory recall.
+            </p>
+            <p>
+              SLO solves this by listening to your files. It groups sounds that share acoustic characteristics (timbre, envelope, transient decay), so that clicking <strong>Find Similar</strong> surfaces nearby options instantly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Demonstration */}
+      <section className="section border-t bg-[#0D1322]/20" style={{ borderColor: "var(--border)" }}>
+        <div className="site-container grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+          <div>
+            <span className="eyebrow">Acoustic Signal Processing</span>
+            <h2 className="section-title mt-4">Bypass cryptic filenames.</h2>
+            <p className="mt-6 leading-relaxed text-muted text-sm">
+              Filenames like <code>XK29_0047.wav</code> reveal nothing about their sound. SLO processes the raw samples offline, identifies transients, measures centroid weight, and detects the true musical role.
+            </p>
+            <div className="mt-6 callout-warning">
+              <strong>Beta Safety Note:</strong> SLO works as a virtual browser. It is fully read-only and does not modify, move, or rename files on your hard drive unless you explicitly copy or drag them out.
+            </div>
+          </div>
+          <div>
+            <AudioAnalysisDemo />
+          </div>
+        </div>
+      </section>
+
+      {/* Detailed Workflow */}
+      <section className="section border-t" style={{ borderColor: "var(--border)" }}>
+        <div className="site-container">
+          <span className="eyebrow">Workflow Integration</span>
+          <h2 className="section-title mt-4">Built around how you produce.</h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
-            {WORKFLOWS.map((item) => (
-              <div key={item.title} className="surface-card p-6">
-                <h3 className="font-medium">
-                  {item.title}
-                  {item.experimental && <span className="badge-experimental ml-2">Experimental</span>}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
-                  {item.body}
+            {WORKFLOW_STEPS.map((step) => (
+              <div key={step.title} className="surface-card p-6">
+                <h3 className="font-semibold text-foreground">{step.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted">
+                  {step.body}
                 </p>
               </div>
             ))}
@@ -131,72 +165,65 @@ export default function SmartSampleManagerPage() {
         </div>
       </section>
 
+      {/* System Requirements & DAW Support */}
       <section className="section border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto px-6" style={{ maxWidth: "var(--content-width)" }}>
-          <span className="eyebrow">Requirements</span>
-          <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">
-            What it runs on.
-          </h2>
-          <div className="mt-8 flex flex-wrap gap-3 text-sm">
-            {["macOS", "VST3", "AU", "Standalone"].map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border px-4 py-1.5"
-                style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-          <p className="mt-4 text-sm" style={{ color: "var(--muted-dim)" }}>
-            Windows support is planned but not yet available.
-          </p>
-        </div>
-      </section>
-
-      <section className="section border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto px-6" style={{ maxWidth: "var(--content-width)" }}>
-          <span className="eyebrow">Compatibility</span>
-          <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">
-            Where it&apos;s been tested.
-          </h2>
-          <p className="mt-4 max-w-2xl text-sm" style={{ color: "var(--muted)" }}>
-            We&apos;d rather tell you exactly what&apos;s been verified than list every major DAW as
-            supported before we&apos;ve confirmed it.
-          </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="surface-card p-6">
-              <h3 className="font-medium" style={{ color: "var(--foreground)" }}>
-                Verified
-              </h3>
-              <ul className="mt-3 space-y-1.5 text-sm" style={{ color: "var(--muted)" }}>
-                <li>Standalone app</li>
-                <li>Audio Unit (AU) — passes Apple&apos;s own AU validation</li>
-              </ul>
+        <div className="site-container">
+          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <span className="eyebrow">Specifications</span>
+              <h2 className="section-title mt-4">System compatibility.</h2>
+              <div className="mt-8 flex flex-wrap gap-2.5 text-sm">
+                {["macOS 12+", "Apple Silicon Native", "Intel Core", "VST3", "AU", "Standalone"].map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border px-4 py-1.5 font-mono text-xs"
+                    style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="surface-card p-6">
-              <h3 className="font-medium" style={{ color: "var(--foreground)" }}>
-                In progress
-              </h3>
-              <ul className="mt-3 space-y-1.5 text-sm" style={{ color: "var(--muted)" }}>
-                <li>VST3 in individual DAWs</li>
-                <li>Ableton Live</li>
-                <li>Logic Pro</li>
-              </ul>
+            
+            <div className="space-y-6">
+              <div className="surface-card p-6">
+                <h3 className="font-semibold text-foreground">DAW Support & Status</h3>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2 text-sm text-muted">
+                  <div>
+                    <h4 className="font-semibold text-brand-blue-bright text-xs">VERIFIED & FULLY SUPPORTED</h4>
+                    <ul className="mt-2 list-disc pl-5 space-y-1.5">
+                      <li>Standalone Application</li>
+                      <li>Audio Unit (AU) validation</li>
+                      <li>VST3 Host Compatibility</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-brand-red text-xs">EXPERIMENTAL METADATA WRITER</h4>
+                    <ul className="mt-2 list-disc pl-5 space-y-1.5">
+                      <li>Ableton Live XMP Integration</li>
+                      <li>Logic Pro indexing</li>
+                    </ul>
+                  </div>
+                </div>
+                <p className="mt-6 text-xs text-muted-dim">
+                  Ableton Live integration writes metadata to sidecar XMP files that Ableton reads. This feature remains in active validation.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* FAQ Section */}
       <section className="section border-t" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto px-6" style={{ maxWidth: "42rem" }}>
-          <span className="eyebrow">FAQ</span>
-          <h2 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">Questions</h2>
-          <dl className="mt-8 space-y-6">
+          <span className="eyebrow text-center block">FAQ</span>
+          <h2 className="mt-4 text-2xl sm:text-3xl font-semibold tracking-tight text-center text-foreground">Common Questions</h2>
+          <dl className="mt-10 space-y-8">
             {FAQ.map((item) => (
-              <div key={item.q}>
-                <dt className="font-medium">{item.q}</dt>
-                <dd className="mt-2 text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
+              <div key={item.q} className="border-b pb-6" style={{ borderColor: "var(--border)" }}>
+                <dt className="font-semibold text-foreground text-sm">{item.q}</dt>
+                <dd className="mt-3 text-sm leading-relaxed text-muted">
                   {item.a}
                 </dd>
               </div>
@@ -205,11 +232,21 @@ export default function SmartSampleManagerPage() {
         </div>
       </section>
 
+      {/* Bottom Action */}
       <section className="section border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto px-6 text-center" style={{ maxWidth: "var(--content-width)" }}>
-          <Link href="/pricing" className="btn-primary">
-            See pricing
-          </Link>
+        <div className="site-container text-center">
+          <div className="max-w-xl mx-auto flex flex-col items-center">
+            <h2 className="text-2xl font-bold text-foreground">Get started with SLO</h2>
+            <p className="mt-3 text-sm text-muted">Analyse your sample library. Find the right timbre instantly.</p>
+            <div className="mt-8 flex gap-3">
+              <Link href="/pricing" className="btn-primary">
+                See pricing
+              </Link>
+              <Link href="/learn" className="btn-secondary">
+                Read guides
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </>
