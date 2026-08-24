@@ -22,8 +22,10 @@ const SAMPLES = [
     waveform: [20, 60, 90, 80, 50, 30, 15, 10, 5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     transientIdx: 2,
     color: "var(--brand-red)",
-    range: "45Hz – 12kHz",
-    character: "Punchy / Electronic",
+    centroid: "82 Hz",
+    riseTime: "0.8 ms",
+    tonalPitch: "G#1",
+    decayTime: "240 ms",
     matches: ["Kick_012.wav", "Punch_205.wav", "Thump_77.wav"],
   },
   {
@@ -32,8 +34,10 @@ const SAMPLES = [
     waveform: [0, 5, 80, 95, 70, 85, 60, 75, 50, 40, 30, 25, 20, 15, 12, 10, 8, 5, 2, 0, 0, 0, 0, 0],
     transientIdx: 3,
     color: "var(--brand-red)",
-    range: "120Hz – 16kHz",
-    character: "Sharp / Snappy",
+    centroid: "1.4 kHz",
+    riseTime: "1.6 ms",
+    tonalPitch: "A3",
+    decayTime: "180 ms",
     matches: ["Snare_04.wav", "Rim_11.wav", "Clap_302.wav"],
   },
   {
@@ -42,21 +46,13 @@ const SAMPLES = [
     waveform: [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35],
     transientIdx: 14,
     color: "var(--brand-blue-bright)",
-    range: "80Hz – 9kHz",
-    character: "Warm / Sustained",
+    centroid: "850 Hz",
+    riseTime: "25.0 ms",
+    tonalPitch: "F#2",
+    decayTime: "1.8 s",
     matches: ["Pad_51.wav", "Warm_220.wav", "Drone_8.wav"],
   },
 ] as const;
-
-/* Pseudo-analysis scramble shown only while scanning; derived from progress
-   so it costs no extra state updates. */
-function scramble(progress: number, seed: number): string {
-  const digits = "0123456789";
-  const a = digits[(Math.floor(progress * 7) + seed) % 10];
-  const b = digits[(Math.floor(progress * 3) + seed * 3) % 10];
-  const c = digits[(Math.floor(progress * 11) + seed * 7) % 10];
-  return `${a}${b}.${c}`;
-}
 
 const SCAN_TICKS = 20;
 const SCAN_TICK_MS = 40;
@@ -195,57 +191,79 @@ export function AudioAnalysisDemo() {
           )}
 
           <div className="w-full flex items-end justify-between h-20 relative">
-            {sample.waveform.map((val, barIdx) => {
-              const hasTransient = barIdx === sample.transientIdx;
-              const isPassedByScanner = (barIdx / sample.waveform.length) * 100 <= scanProgress;
+            <svg viewBox="0 0 400 100" className="w-full h-full overflow-visible" preserveAspectRatio="none" aria-hidden="true">
+              {/* Audio Frequency Grid Overlay */}
+              <line x1="0" y1="25" x2="400" y2="25" stroke="var(--border)" strokeWidth="0.5" strokeDasharray="3,6" />
+              <line x1="0" y1="50" x2="400" y2="50" stroke="var(--border)" strokeWidth="0.5" strokeDasharray="3,6" />
+              <line x1="0" y1="75" x2="400" y2="75" stroke="var(--border)" strokeWidth="0.5" strokeDasharray="3,6" />
+              
+              <text x="5" y="18" fill="var(--muted-dim)" fontSize="7" className="font-mono">0 dB</text>
+              <text x="5" y="44" fill="var(--muted-dim)" fontSize="7" className="font-mono">-12 dB</text>
+              <text x="5" y="69" fill="var(--muted-dim)" fontSize="7" className="font-mono">-36 dB</text>
+              <text x="5" y="94" fill="var(--muted-dim)" fontSize="7" className="font-mono">-Infinity</text>
 
-              let barColor = "var(--border-strong)";
-              if (scanning || phase === "analysis") {
-                if (isPassedByScanner) barColor = "var(--brand-violet)";
-              } else if (revealed) {
-                barColor = hasTransient ? sample.color : "var(--brand-blue)";
-              }
+              {/* Main signal envelope path */}
+              <path
+                d={sample.waveform.reduce((acc, val, idx) => {
+                  const x = (idx / (sample.waveform.length - 1)) * 400;
+                  const y = 90 - (val / 100) * 75;
+                  return `${acc} ${idx === 0 ? "M" : "L"} ${x} ${y}`;
+                }, "")}
+                fill="none"
+                stroke={revealed ? "var(--brand-blue)" : "var(--border-strong)"}
+                strokeWidth="1.5"
+                className="transition-all duration-300"
+              />
 
-              return (
-                <div key={barIdx} className="flex-1 mx-[2px] flex flex-col items-center h-full justify-end">
-                  {hasTransient && revealed && (
-                    <span
-                      className="w-1.5 h-1.5 rounded-full mb-1 animate-ping absolute"
-                      style={{ backgroundColor: sample.color, bottom: `${val + 10}%` }}
-                    />
-                  )}
-                  <div
-                    className="w-full rounded-sm transition-all duration-300"
-                    style={{
-                      height: `${val}%`,
-                      backgroundColor: barColor,
-                      boxShadow: hasTransient && revealed ? `0 0 12px ${sample.color}` : "none",
-                    }}
+              {/* Scanning analysis sweep */}
+              {(scanning || phase === "analysis") && (
+                <>
+                  <path
+                    d={sample.waveform.reduce((acc, val, idx) => {
+                      const pct = (idx / (sample.waveform.length - 1)) * 100;
+                      if (pct > scanProgress) return acc;
+                      const x = (idx / (sample.waveform.length - 1)) * 400;
+                      const y = 90 - (val / 100) * 75;
+                      return `${acc} ${idx === 0 ? "M" : "L"} ${x} ${y}`;
+                    }, "")}
+                    fill="none"
+                    stroke="var(--brand-violet)"
+                    strokeWidth="2"
                   />
-                </div>
-              );
-            })}
+                  <line
+                    x1={`${scanProgress}%`}
+                    y1="0"
+                    x2={`${scanProgress}%`}
+                    y2="100"
+                    stroke="var(--brand-blue-bright)"
+                    strokeWidth="1.5"
+                    style={{ filter: "drop-shadow(0 0 4px var(--brand-blue-bright))" }}
+                  />
+                </>
+              )}
 
-            {(scanning || phase === "analysis") && (
-              <>
-                <div
-                  aria-hidden="true"
-                  className="absolute top-0 bottom-0 left-0 pointer-events-none"
-                  style={{
-                    width: `${scanProgress}%`,
-                    background:
-                      "linear-gradient(to right, transparent 55%, rgba(113,72,232,0.16) 92%, rgba(86,168,255,0.22) 100%)",
-                  }}
-                />
-                <div
-                  className="absolute top-0 bottom-0 w-[2px] bg-brand-blue-bright"
-                  style={{
-                    left: `${scanProgress}%`,
-                    boxShadow: "0 0 10px var(--brand-blue-bright)",
-                  }}
-                />
-              </>
-            )}
+              {/* Transient detection coordinate node */}
+              {revealed && (
+                <>
+                  <line
+                    x1={(sample.transientIdx / (sample.waveform.length - 1)) * 400}
+                    y1="0"
+                    x2={(sample.transientIdx / (sample.waveform.length - 1)) * 400}
+                    y2="100"
+                    stroke={sample.color}
+                    strokeWidth="0.75"
+                    strokeDasharray="2,2"
+                  />
+                  <circle
+                    cx={(sample.transientIdx / (sample.waveform.length - 1)) * 400}
+                    cy={90 - (sample.waveform[sample.transientIdx] / 100) * 75}
+                    r="4"
+                    fill={sample.color}
+                    className="animate-pulse"
+                  />
+                </>
+              )}
+            </svg>
           </div>
         </div>
 
@@ -253,20 +271,19 @@ export function AudioAnalysisDemo() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 font-mono tnum">
           <ReadoutPanel ariaLabel="Acoustic analysis">
             <ReadoutRow
-              label="TRANSIENT"
-              tone={revealed ? "review" : scanning ? "pending" : "muted"}
-              glyph={revealed ? "!" : undefined}
+              label="SPECTRAL CENTROID"
+              tone={revealed ? "info" : scanning ? "pending" : "muted"}
             >
-              {scanning ? "DETECTING…" : phase === "analysis" ? "CORRELATING…" : revealed ? "Detected" : "Waiting"}
+              {scanning ? "CALCULATING…" : phase === "analysis" ? "MEASURING…" : revealed ? sample.centroid : "—"}
             </ReadoutRow>
-            <ReadoutRow label="FREQUENCY RANGE" tone={revealed ? "info" : "muted"}>
-              {scanning ? `${scramble(scanProgress, 9)}Hz…` : phase === "analysis" ? "MEASURING…" : revealed ? sample.range : "—"}
+            <ReadoutRow label="TRANSIENT RISE TIME" tone={revealed ? "info" : "muted"}>
+              {scanning ? "DETECTING…" : phase === "analysis" ? "CORRELATING…" : revealed ? sample.riseTime : "—"}
             </ReadoutRow>
-            <ReadoutRow label="RMS POWER" tone={revealed ? "info" : "muted"}>
-              {scanning ? `-${scramble(scanProgress, 4)} dB` : revealed ? "-14.2 dB" : "—"}
+            <ReadoutRow label="TONAL PITCH CENTER" tone={revealed ? "info" : "muted"}>
+              {scanning ? "TRACKING…" : phase === "analysis" ? "DETECTING…" : revealed ? sample.tonalPitch : "—"}
             </ReadoutRow>
-            <ReadoutRow label="CHARACTER" tone={revealed ? "info" : "muted"}>
-              {scanning ? "FORMING…" : revealed ? sample.character : "—"}
+            <ReadoutRow label="DECAY ENVELOPE" tone={revealed ? "info" : "muted"}>
+              {scanning ? "MEASURING…" : phase === "analysis" ? "CALCULATING…" : revealed ? sample.decayTime : "—"}
             </ReadoutRow>
           </ReadoutPanel>
 

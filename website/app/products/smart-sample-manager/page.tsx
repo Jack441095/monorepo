@@ -146,8 +146,8 @@ export default function SmartSampleManagerPage() {
             <p className="mt-6 leading-relaxed text-muted text-sm">
               Filenames like <code>XK29_0047.wav</code> reveal nothing about their sound. SLO processes the raw samples offline, identifies transients, measures centroid weight, and detects the true musical role.
             </p>
-            <div className="mt-6 callout-warning">
-              <strong>Beta Safety Note:</strong> During the private beta, SLO operates in read-only classification mode and does not automatically rearrange your files or rename your samples.
+            <div className="mt-6 border-l-2 border-brand-blue bg-brand-blue/5 p-4 rounded-r text-xs leading-relaxed text-muted">
+              <strong>Non-Destructive Indexing:</strong> SLO operates in read-only analysis mode during evaluation. Your sample files are scanned in memory and cached locally, ensuring your directories and folders remain completely untouched.
             </div>
           </Reveal>
           <Reveal delayMs={90}>
@@ -207,10 +207,10 @@ export default function SmartSampleManagerPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-brand-red text-xs">EXPERIMENTAL METADATA WRITER</h4>
+                    <h4 className="font-semibold text-brand-violet text-xs">INTEGRATION PREVIEW & ROADMAP</h4>
                     <ul className="mt-2 list-disc pl-5 space-y-1.5">
-                      <li>Ableton Live XMP Integration</li>
-                      <li>Logic Pro indexing</li>
+                      <li>Ableton Live XMP Sidecars</li>
+                      <li>Logic Pro database linking</li>
                     </ul>
                   </div>
                 </div>

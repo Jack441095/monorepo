@@ -40,16 +40,36 @@ export default function PricingPage() {
           </div>
 
           <div className="purchase-panel border border-brand-blue/30">
-            <span className="eyebrow text-brand-blue-bright">Single-User Licence</span>
+            <span className="eyebrow text-brand-blue-bright">Single-User Licences</span>
             <h2 className="mt-5 text-xl font-bold text-foreground">SLO</h2>
             <p className="text-xs text-muted-dim font-mono mt-0.5">Sample Library Optimiser</p>
             
-            <div className="mt-7 flex items-baseline gap-2">
-              <span className="text-4xl font-bold tracking-tight text-foreground">Pricing TBC</span>
+            <div className="mt-8 space-y-6">
+              {/* Professional Tier */}
+              <div className="border-b pb-5" style={{ borderColor: "var(--border)" }}>
+                <div className="flex justify-between items-baseline">
+                  <span className="text-sm font-semibold text-foreground">Professional Licence</span>
+                  <span className="text-2xl font-bold text-foreground tnum">$39</span>
+                </div>
+                <p className="mt-1 text-xs text-muted leading-relaxed">
+                  For commercial production. Includes 3 personal device activations and priority support.
+                </p>
+              </div>
+
+              {/* Student Tier */}
+              <div className="pb-2">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-sm font-semibold text-foreground">Student Licence</span>
+                  <span className="text-2xl font-bold text-foreground tnum">$19</span>
+                </div>
+                <p className="mt-1 text-xs text-muted leading-relaxed">
+                  For educational, non-commercial workflows. Valid for 1 personal Mac activation.
+                </p>
+              </div>
             </div>
             
-            <p className="mt-4 text-xs leading-relaxed text-muted">
-              Purchase includes Standalone app and AU/VST3 plugin builds for Intel & Apple Silicon Macs. No subscription required.
+            <p className="mt-4 text-xs leading-relaxed text-muted-dim">
+              Licence includes Standalone app, Audio Unit (AU), and VST3 formats. Zero cloud dependencies.
             </p>
             
             <BuyCard />

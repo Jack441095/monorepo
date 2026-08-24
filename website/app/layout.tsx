@@ -46,7 +46,7 @@ const ORGANIZATION_JSON_LD = {
   "@type": "Organization",
   name: "NITE DSP",
   url: "https://www.nitedsp.co.uk",
-  email: "nitedsp@outlook.com",
+  email: "support@nitedsp.co.uk",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -90,12 +90,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </p>
             </div>
             <div className="flex flex-col gap-2">
-              <span className="eyebrow">Products</span>
+              <span className="eyebrow">Products & Research</span>
               <Link href="/products" className="hover:text-[color:var(--foreground)] transition-colors">
                 All products
               </Link>
               <Link href="/products/smart-sample-manager" className="hover:text-[color:var(--foreground)] transition-colors">
                 SLO (Sample Library Optimiser)
+              </Link>
+              <Link href="/products/submit" className="hover:text-[color:var(--foreground)] transition-colors">
+                Submit (Document Prep)
+              </Link>
+              <Link href="/technology" className="hover:text-[color:var(--foreground)] transition-colors">
+                Technology
               </Link>
               <Link href="/learn" className="hover:text-[color:var(--foreground)] transition-colors">
                 Learn
@@ -128,8 +134,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             style={{ maxWidth: "var(--content-width)", borderColor: "var(--border)", color: "var(--muted-dim)" }}
           >
             <span>&copy; {new Date().getFullYear()} NITE DSP</span>
-            <a href="mailto:nitedsp@outlook.com" className="hover:text-[color:var(--foreground)] transition-colors">
-              nitedsp@outlook.com
+            <a href="mailto:support@nitedsp.co.uk" className="hover:text-[color:var(--foreground)] transition-colors">
+              support@nitedsp.co.uk
             </a>
           </div>
         </footer>
