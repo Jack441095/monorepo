@@ -27,10 +27,10 @@ const WORKFLOWS = [
 ] as const;
 
 const CAPABILITIES = [
-  ["Precision Browser", "A dense, structured layout highlighting name, category, key, BPM, and length."],
-  ["Visual Map", "Browse visually. Sounds are plotted based on acoustic similarity—close clusters share similar timbres."],
-  ["Find Similar", "Select a reference sample and immediately view all acoustically matching sounds in your library."],
-  ["Local Analysis", "Sample analysis runs locally on your Mac. Your audio is not uploaded for classification."],
+  ["Precision Browser", "A structured, spreadsheet-like interface highlighting timbral attributes, transient decay, musical key, and true category."],
+  ["Acoustic Similarity Map", "Browse visually. High-dimensional acoustic vectors are plotted on a 2D coordinate plane—close clusters share similar timbres."],
+  ["Find Similar", "Select any reference sound and instantly query all acoustically matching files in your local database."],
+  ["100% Offline Inference", "All mathematical models and feature extractions execute locally. Your audio files never leave your machine."],
 ] as const;
 
 export default function HomePage() {
@@ -42,9 +42,9 @@ export default function HomePage() {
         <div className="site-container relative grid items-center gap-12 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:py-24">
           <div className="relative z-10">
             <span className="eyebrow">NITE DSP // FLAGSHIP</span>
-            <h1 className="hero-title mt-5">Your sample library, organised by sound.</h1>
+            <h1 className="hero-title mt-5">Acoustic intelligence for creative workflows.</h1>
             <p className="hero-copy mt-6">
-              SLO (Sample Library Optimiser) is a professional macOS sample browser that analyses actual audio signals rather than relying on folder structures or filenames.
+              SLO (Sample Library Optimiser) is a zero-latency desktop utility that extracts timbral feature vectors from raw audio signals, bypassing folder trees and broken metadata.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/products/smart-sample-manager" className="btn-primary">
@@ -89,7 +89,7 @@ export default function HomePage() {
         <div className="site-container grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <Reveal>
             <span className="eyebrow">The Signal vs The Filename</span>
-            <h2 className="section-title mt-4">Folders are for storage. Not for discovery.</h2>
+            <h2 className="section-title mt-4">Bypass folder structures. Rely on mathematical similarity.</h2>
           </Reveal>
           <Reveal delayMs={90}>
             <p className="body-large">
@@ -107,18 +107,18 @@ export default function HomePage() {
         <div className="site-container grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
           <Reveal>
             <span className="eyebrow">Interactive Demo</span>
-            <h2 className="section-title mt-4">See how SLO listens to your files.</h2>
+            <h2 className="section-title mt-4">Real-time timbral signature extraction.</h2>
             <p className="mt-6 leading-relaxed" style={{ color: "var(--muted)" }}>
               Click any cryptic filename to see how the local DSP engine scans the waveform, identifies key transient structures, and classifies the sound into its true instrument category.
             </p>
             <div className="mt-8 flex flex-col gap-4 border-l-2 border-brand-violet pl-5">
               <div>
-                <h4 className="font-semibold text-foreground text-sm">Audio analysis, not text guesses</h4>
-                <p className="text-xs text-muted mt-1">We don&apos;t match words or tag descriptions. SLO compares timbral character directly.</p>
+                <h4 className="font-semibold text-foreground text-sm">Acoustic feature extraction</h4>
+                <p className="text-xs text-muted mt-1">We measure spectral centroid, transient rise time, and tonal stability directly from the raw waveform.</p>
               </div>
               <div>
-                <h4 className="font-semibold text-foreground text-sm">Fully local metadata</h4>
-                <p className="text-xs text-muted mt-1">Scanning takes place locally on your Mac. Your audio files are never uploaded for classification.</p>
+                <h4 className="font-semibold text-foreground text-sm">100% Local Inference</h4>
+                <p className="text-xs text-muted mt-1">Signal analysis and similarity calculations run entirely in memory. Your intellectual property never leaves your machine.</p>
               </div>
             </div>
           </Reveal>

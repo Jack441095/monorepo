@@ -87,7 +87,7 @@ export function LearnLayout({
 
             <p className="mt-8 text-sm" style={{ color: "var(--muted-dim)" }}>
               Still stuck?{" "}
-              <a href="mailto:nitedsp@outlook.com" className="underline">
+              <a href="mailto:support@nitedsp.co.uk" className="underline">
                 Contact NITE DSP support
               </a>
               .

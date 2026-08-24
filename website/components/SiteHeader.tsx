@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const NAV_LINKS = [
   { href: "/products", label: "Products" },
+  { href: "/technology", label: "Technology" },
   { href: "/learn", label: "Learn" },
   { href: "/pricing", label: "Pricing" },
   { href: "/support", label: "Support" },

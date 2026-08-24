@@ -249,7 +249,7 @@ body {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   background: var(--surface);
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow: 0 38px 90px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 0 1px rgba(57, 123, 255, 0.08);
 }
 
 .product-frame__bar {
@@ -258,7 +258,7 @@ body {
   gap: 1rem;
   padding: .75rem 1.25rem;
   border-bottom: 1px solid var(--border);
-  background: var(--surface-raised);
+  background: linear-gradient(to bottom, var(--surface-raised), var(--surface));
   color: var(--muted);
   font-size: .68rem;
   font-weight: 650;
@@ -949,4 +949,160 @@ html.js .reveal.is-revealed {
   border-radius: inherit;
   transform-origin: left;
   transition: transform 900ms var(--motion-ease-premium);
+}
+
+/* ============================================================================
+   NITE DSP Product Design System V1 (Website V2.3)
+
+   Formalises the brand into tokens + roles. Palette B is untouched; these
+   are semantic layers on top. New surfaces (product pages, intelligence UI)
+   consume these; legacy surfaces migrate opportunistically.
+   ========================================================================== */
+
+:root {
+  /* --- Type roles (Geist Sans for UI, Geist Mono for machine voice) ------ */
+  --text-display: clamp(2.6rem, 5vw, 5.2rem);
+  --text-title-xl: clamp(1.9rem, 3.2vw, 3.2rem);
+  --text-title: 1.35rem;
+  --text-body-lg: clamp(1.05rem, 1.4vw, 1.25rem);
+  --text-body: 0.95rem;
+  --text-label: 0.75rem;
+  --text-meta: 0.6875rem;
+
+  --tracking-label: 0.14em;
+  --leading-display: 0.96;
+  --leading-body: 1.6;
+
+  /* --- Structure: precise 1px hardware edges ----------------------------- */
+  --edge: var(--border);
+  --edge-strong: var(--border-strong);
+  --edge-hairline: rgba(245, 247, 251, 0.06);
+
+  /* --- Intelligence semantics (never colour-only; pair with glyphs) ------ */
+  --confidence-high: var(--state-success);
+  --confidence-medium: var(--brand-blue-bright);
+  --confidence-low: var(--state-warning);
+  --confidence-unknown: var(--muted-dim);
+
+  --agent-idle: var(--muted-dim);
+  --agent-running: var(--brand-blue-bright);
+  --agent-approval: var(--state-warning);
+  --agent-done: var(--state-success);
+  --agent-failed: var(--state-error);
+}
+
+/* --- Typography role utilities -------------------------------------------- */
+.u-display {
+  font-size: var(--text-display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: var(--leading-display);
+  text-wrap: balance;
+}
+.u-title-xl {
+  font-size: var(--text-title-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.u-title {
+  font-size: var(--text-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.u-body-lg {
+  font-size: var(--text-body-lg);
+  line-height: var(--leading-body);
+  color: var(--muted);
+}
+.u-body {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--muted);
+}
+/* Machine voice: tracked caps, mono, small — eyebrows, kickers, statuses. */
+.u-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+/* Metadata: mono, quiet — filenames, timestamps, footnotes. */
+.u-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  color: var(--muted-dim);
+}
+/* Numerical data: mono + tabular — readouts, prices, counts. */
+.u-data {
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* --- Hardware panel (the core surface) ------------------------------------- */
+.panel {
+  position: relative;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--surface-raised), var(--surface));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+.panel--flat {
+  box-shadow: none;
+  background: var(--surface);
+}
+.panel__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--edge);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* --- Status chip (single canonical pattern) -------------------------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--edge-strong);
+  border-radius: 999px;
+  padding: 0.1875rem 0.625rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.chip--blue { border-color: rgba(86, 168, 255, 0.4); color: var(--brand-blue-bright); }
+.chip--violet { border-color: rgba(113, 72, 232, 0.45); color: var(--brand-violet); }
+.chip--warn { border-color: var(--state-warning-border); color: var(--state-warning); }
+.chip--success { border-color: rgba(16, 185, 129, 0.4); color: var(--state-success); }
+
+/* --- Keyboard affordance (Linear/Raycast rule) ------------------------------ */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--edge-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--surface-raised);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
 }

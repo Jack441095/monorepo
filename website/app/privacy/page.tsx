@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       </p>
       <p>
         We do not sell customer data. For privacy questions, contact
-        {" "}<a href="mailto:nitedsp@outlook.com" className="underline">nitedsp@outlook.com</a>.
+        {" "}<a href="mailto:support@nitedsp.co.uk" className="underline">support@nitedsp.co.uk</a>.
       </p>
     </LegalPage>
   );
