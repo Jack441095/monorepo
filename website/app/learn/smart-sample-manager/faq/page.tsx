@@ -14,11 +14,11 @@ const FAQ = [
   },
   {
     q: "Does it upload my samples?",
-    a: "No. Scanning, analysis, and matching all happen on your machine. No sample audio, filename, or library path is uploaded during ordinary use.",
+    a: "No. Scanning, analysis, and matching all happen locally on your Mac. No sample audio is uploaded. Account authentication and licensing check-ins communicate with our platform services.",
   },
   {
     q: "Does it modify my samples?",
-    a: "No — your original audio files are never moved, renamed, or altered. The optional Ableton integration writes tags to a separate sidecar folder alongside your samples, not into the audio files themselves.",
+    a: "No — during the private beta, SLO operates in read-only classification mode and does not automatically move, rename, or delete your samples. The optional Ableton integration writes tags to a separate sidecar folder alongside your samples, not into the audio files themselves.",
   },
   {
     q: "What is Find Similar?",

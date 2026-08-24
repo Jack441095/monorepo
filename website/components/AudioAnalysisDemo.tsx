@@ -197,6 +197,9 @@ export function AudioAnalysisDemo() {
             </div>
           </div>
         </div>
+        <div className="text-[10px] text-muted-dim font-mono text-center pt-2 border-t border-border/30">
+          * Illustrative workflow simulation. Visual scans and values represent interface behavior, not live test benchmarks.
+        </div>
       </div>
     </div>
   );

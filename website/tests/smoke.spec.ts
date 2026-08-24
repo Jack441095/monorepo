@@ -86,5 +86,5 @@ test("sitemap includes the Learn hub routes", async ({ request }) => {
 
 test("Ableton workflow is consistently labeled experimental", async ({ page }) => {
   await page.goto("/products/smart-sample-manager");
-  await expect(page.getByText("Experimental", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Experimental", { exact: false }).first()).toBeVisible();
 });

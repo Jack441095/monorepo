@@ -24,7 +24,7 @@ const CAPABILITIES = [
   ["Precision Browser", "A dense, structured layout highlighting name, category, key, BPM, and length."],
   ["Visual Map", "Browse visually. Sounds are plotted based on acoustic similarity—close clusters share similar timbres."],
   ["Find Similar", "Select a reference sample and immediately view all acoustically matching sounds in your library."],
-  ["100% Offline Engine", "All scans and DSP calculations run locally on your Mac. No internet required, no audio uploads."],
+  ["Local Analysis", "Sample analysis runs locally on your Mac. Your audio is not uploaded for classification."],
 ] as const;
 
 export default function HomePage() {
@@ -104,7 +104,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h4 className="font-semibold text-foreground text-sm">Fully local metadata</h4>
-                <p className="text-xs text-muted mt-1">Scanning takes place entirely on your processor. Your filenames and audio files never leave your system.</p>
+                <p className="text-xs text-muted mt-1">Scanning takes place locally on your Mac. Your audio files are never uploaded for classification.</p>
               </div>
             </div>
           </div>

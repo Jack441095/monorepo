@@ -32,10 +32,10 @@ export default function PricingPage() {
               <li>Up to three active personal activations</li>
               <li>macOS formats: AU, VST3, and Standalone</li>
               <li>Free updates within the 1.x version line</li>
-              <li>100% private: no data uploads or network requirements</li>
+              <li>Local analysis: your audio files are never uploaded</li>
             </ul>
             <p className="mt-8 text-xs text-muted-dim">
-              An introductory catalog price of £5 exists for controlled alpha testers but is not currently the active commercial offer.
+              Introductory pricing will be announced at launch. Private beta participants will be notified.
             </p>
           </div>
 
@@ -45,8 +45,7 @@ export default function PricingPage() {
             <p className="text-xs text-muted-dim font-mono mt-0.5">Sample Library Optimiser</p>
             
             <div className="mt-7 flex items-baseline gap-2">
-              <span className="text-5xl font-bold tracking-tight text-foreground">£10</span>
-              <span className="text-sm text-muted-dim font-mono">one-time</span>
+              <span className="text-4xl font-bold tracking-tight text-foreground">Pricing TBC</span>
             </div>
             
             <p className="mt-4 text-xs leading-relaxed text-muted">

@@ -39,7 +39,8 @@ export default function AbletonIntegrationPage() {
         <p className="mt-2">
           This writes to a separate <code>Ableton Folder Info</code> sidecar folder placed
           alongside your samples — the exact mechanism Ableton&apos;s own tagging uses. Your
-          original audio files themselves are never modified, renamed, or moved.
+          original audio files are not modified, and since SLO operates in read-only mode during
+          the private beta, your sample directory structure is not automatically rearranged.
         </p>
       </section>
 

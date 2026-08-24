@@ -84,11 +84,11 @@ export function BuyCard() {
           disabled={buyState === "checking"}
           className="btn-primary mt-6 w-full"
         >
-          {buyState === "checking" ? "Starting checkout…" : "Buy SLO"}
+          {buyState === "checking" ? "Starting checkout…" : "Test Checkout (Sandbox)"}
         </button>
       ) : (
         <Link href="/account" className="btn-primary mt-6 w-full">
-          Sign in
+          Register Interest (Sign In)
         </Link>
       )}
 
@@ -100,12 +100,11 @@ export function BuyCard() {
 
       {paddleConfigured ? (
         <p className="mt-4 text-xs" style={{ color: "var(--muted-dim)" }}>
-          Sandbox / test mode — no real payment is processed yet.
+          Sandbox / test mode — simulated checkout for integration testing. No real funds are charged.
         </p>
       ) : (
         <p className="mt-4 text-xs" style={{ color: "var(--muted-dim)" }}>
-          Checkout is not yet live — real checkout requires a live Merchant of Record account,
-          which does not exist yet.
+          Private beta is currently in preparation. Pricing will be finalized and purchases enabled upon launch.
         </p>
       )}
     </>

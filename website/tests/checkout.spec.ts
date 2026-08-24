@@ -13,15 +13,15 @@ import { expect, test } from "@playwright/test";
 test("pricing page renders normally with no checkout-related errors", async ({ page }) => {
   const response = await page.goto("/pricing");
   expect(response?.status()).toBe(200);
-  await expect(page.getByText("£10", { exact: true })).toBeVisible();
+  await expect(page.getByText("Pricing TBC", { exact: true })).toBeVisible();
   // No leaked error state on an ordinary visit.
   await expect(page.getByText(/something went wrong/i)).not.toBeVisible();
 });
 
 test("pricing page has exactly one primary action, Buy or Sign in", async ({ page }) => {
   await page.goto("/pricing");
-  const buyButton = page.getByRole("button", { name: /buy smart sample manager/i });
-  const signInLink = page.getByRole("link", { name: /^sign in$/i });
+  const buyButton = page.getByRole("button", { name: /test checkout/i });
+  const signInLink = page.getByRole("link", { name: /register interest/i });
   // Exactly one of the two states is live at any given environment
   // configuration -- Buy once a Paddle client token exists, Sign in (the
   // "checkout is not yet live" fallback) until it does.
@@ -32,8 +32,8 @@ test("pricing page has exactly one primary action, Buy or Sign in", async ({ pag
 
 test("unauthenticated visitor is routed toward sign-in, not a dead end", async ({ page }) => {
   await page.goto("/pricing");
-  const buyButton = page.getByRole("button", { name: /buy smart sample manager/i });
-  const signInLink = page.getByRole("link", { name: /^sign in$/i });
+  const buyButton = page.getByRole("button", { name: /test checkout/i });
+  const signInLink = page.getByRole("link", { name: /register interest/i });
 
   if (await signInLink.isVisible().catch(() => false)) {
     await signInLink.click();

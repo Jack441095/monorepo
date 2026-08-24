@@ -32,15 +32,15 @@ const WORKFLOW_STEPS = [
 const FAQ = [
   {
     q: "Does SLO support Logic, Reaper, or other DAWs?",
-    a: "Yes. SLO runs as a Standalone application, VST3, and Audio Unit (AU) plugin. It passes Apple's official AU validation and runs natively on Apple Silicon. While the experimental metadata tag writer is optimized for Ableton Live, the search and classification features work identically across all DAWs.",
+    a: "SLO is compiled as a Standalone application, Audio Unit (AU) plugin, and VST3 plugin (with AU validated on our current test systems, and VST3 qualification in progress). While the experimental metadata sidecar writer is designed for Ableton Live workflows, the core search and classification features work as a companion tool alongside any DAW.",
   },
   {
     q: "Does SLO modify, rename, or move my files?",
-    a: "No. SLO operates as a read-only indexer. It does not rename, copy, or silently move your files. Your sample library stays exactly where you put it. You maintain absolute control over your filesystem.",
+    a: "During the private beta, SLO operates in read-only classification mode and does not automatically move, rename, or delete your samples. Your files remain untouched, serving as a virtual browser for your library.",
   },
   {
     q: "Does any audio data leave my computer?",
-    a: "Never. All embeddings, audio analysis, and similarity calculations run entirely on your local CPU. SLO has zero background trackers, zero telemetry, and does not require an active internet connection to run.",
+    a: "Sample analysis and similarity calculations run locally on your Mac. While user activation and licensing check-ins require a network connection to our platform services, your audio files are never uploaded for classification.",
   },
   {
     q: "Is Windows supported?",
@@ -138,7 +138,7 @@ export default function SmartSampleManagerPage() {
               Filenames like <code>XK29_0047.wav</code> reveal nothing about their sound. SLO processes the raw samples offline, identifies transients, measures centroid weight, and detects the true musical role.
             </p>
             <div className="mt-6 callout-warning">
-              <strong>Beta Safety Note:</strong> SLO works as a virtual browser. It is fully read-only and does not modify, move, or rename files on your hard drive unless you explicitly copy or drag them out.
+              <strong>Beta Safety Note:</strong> During the private beta, SLO operates in read-only classification mode and does not automatically rearrange your files or rename your samples.
             </div>
           </div>
           <div>

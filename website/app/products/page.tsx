@@ -98,7 +98,7 @@ export default function ProductsPage() {
               </div>
               <div>
                 <span className="text-muted-dim block uppercase">DATA PRIVACY</span>
-                <span className="text-foreground font-semibold mt-1 block">100% Offline / Zero Telemetry</span>
+                <span className="text-foreground font-semibold mt-1 block">Local Scan / No Audio Uploads</span>
               </div>
             </div>
           </div>

@@ -61,7 +61,8 @@ export default function InstallationPage() {
         <p className="mt-2">
           Remove the app from <code>/Applications</code>, and the plugin files from the two
           Plug-Ins folders above. Your sample library itself is untouched — SLO
-          only reads your audio files, it never moves or renames them.
+          only reads your audio files; during the private beta, it does not
+          automatically move, rename, or delete your samples.
         </p>
       </section>
 
