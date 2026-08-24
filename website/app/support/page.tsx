@@ -45,7 +45,8 @@ export default function SupportPage() {
           <div className="support-grid mt-12">
             {LINKS.map((item) => (
               <Link key={item.href} href={item.href} className="support-card">
-                <span className="text-xs font-mono" style={{ color: "var(--accent-signal)" }}>OPEN GUIDE</span>
+                {/* Copper = the card is an interactive affordance (§20a action.primary). */}
+                <span className="text-xs font-mono" style={{ color: "var(--accent)" }}>OPEN GUIDE</span>
                 <h2 className="mt-5 font-semibold">{item.title}</h2>
                 <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
                   {item.body}

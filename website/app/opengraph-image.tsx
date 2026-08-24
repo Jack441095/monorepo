@@ -14,19 +14,22 @@ export default function OpengraphImage() {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
-          background: "#09090b",
-          color: "#f4f4f5",
+          // EMBER surface.base / text.primary / text.secondary — mirrors
+          // globals.css tokens. Literal hexes required: ImageResponse renders
+          // outside the CSS layer.
+          background: "#0c0b09",
+          color: "#ede8e0",
           fontFamily: "system-ui, sans-serif",
           padding: "80px",
         }}
       >
-        <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, color: "#a1a1aa" }}>
+        <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, color: "#a39b8f" }}>
           NITE DSP
         </div>
         <div style={{ display: "flex", fontSize: 72, fontWeight: 700, marginTop: 24 }}>
           Smart Sample Manager
         </div>
-        <div style={{ display: "flex", fontSize: 32, color: "#a1a1aa", marginTop: 24 }}>
+        <div style={{ display: "flex", fontSize: 32, color: "#e89b3c", marginTop: 24 }}>
           Your samples. Actually organised.
         </div>
       </div>

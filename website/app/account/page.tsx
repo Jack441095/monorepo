@@ -42,22 +42,28 @@ function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
     <div className="surface-card p-5">
       <div className="flex items-center justify-between gap-3">
         <span className="font-medium">{productName}</span>
+        {/* Beta = attention (semantic gold); ordinary status = neutral.
+            Colour never carries the meaning alone — the label names the state. */}
         <span
           className="text-xs uppercase tracking-wide rounded-full px-2.5 py-1"
-          style={{
-            background: isBeta ? "rgba(124,90,26,0.15)" : "var(--surface-raised)",
-            color: isBeta ? "#e3b34d" : "var(--muted)",
-            border: `1px solid ${isBeta ? "#7c5a1a" : "var(--border-strong)"}`,
+          style={isBeta ? {
+            background: "var(--state-warning-bg)",
+            color: "var(--state-warning)",
+            border: "1px solid var(--state-warning-border)",
+          } : {
+            background: "var(--surface-raised)",
+            color: "var(--muted)",
+            border: "1px solid var(--border-strong)",
           }}
         >
           {isBeta ? "Beta" : entitlement.status}
         </span>
       </div>
-      <p className="mt-1 text-xs font-mono" style={{ color: "var(--muted-dim)" }}>
+      <p className="mt-1 text-xs font-mono tnum" style={{ color: "var(--muted-dim)" }}>
         {entitlement.license_key}
       </p>
       {entitlement.expires_at && (
-        <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
+        <p className="mt-2 text-xs tnum" style={{ color: "var(--muted)" }}>
           {isBeta ? "Beta access" : "Access"} expires {new Date(entitlement.expires_at).toLocaleDateString()}
         </p>
       )}
@@ -67,7 +73,8 @@ function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
         </button>
       </div>
       {downloadState === "error" && (
-        <p className="mt-2 text-xs" style={{ color: "#e3b34d" }}>
+        // Informational absence, not a failure — info.neutral ink + text.
+        <p className="mt-2 text-xs" style={{ color: "var(--info)" }} role="status">
           No release available for this product yet — check back soon.
         </p>
       )}
@@ -179,7 +186,8 @@ function AccountPageInner() {
             We&apos;ll email you a sign-in link — no password needed.
           </p>
           {linkSent ? (
-            <p className="mt-6 text-sm" style={{ color: "var(--muted)" }}>
+            // Announced to screen readers without stealing focus.
+            <p className="mt-6 text-sm" style={{ color: "var(--muted)" }} role="status">
               Check your email for a sign-in link.
             </p>
           ) : (

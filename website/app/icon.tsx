@@ -13,9 +13,11 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#09090b",
+          // EMBER surface.base / text.primary — mirrors globals.css tokens.
+          // Literal hexes required: ImageResponse renders outside the CSS layer.
+          background: "#0c0b09",
           borderRadius: 6,
-          color: "#f4f4f5",
+          color: "#ede8e0",
           fontSize: 20,
           fontWeight: 700,
           fontFamily: "system-ui, sans-serif",

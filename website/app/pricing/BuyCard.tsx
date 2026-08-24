@@ -93,7 +93,7 @@ export function BuyCard() {
       )}
 
       {error && (
-        <p className="mt-3 text-xs" style={{ color: "#e3b34d" }}>
+        <p className="mt-3 text-xs" style={{ color: "var(--state-error)" }} role="alert">
           {error}
         </p>
       )}

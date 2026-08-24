@@ -36,7 +36,8 @@ export default function LearnHomePage() {
           <div className="learn-index mt-10">
             {LEARN_PAGES.map((p) => (
               <Link key={p.slug} href={`/learn/smart-sample-manager/${p.slug}`} className="learn-index__item">
-                <span className="font-mono text-xs" style={{ color: "var(--accent-signal)" }}>GUIDE</span>
+                {/* Static tag = tertiary ink; the row's copper shows on hover only. */}
+                <span className="font-mono text-xs" style={{ color: "var(--muted-dim)" }}>GUIDE</span>
                 <span className="font-medium">{p.title}</span>
                 <span aria-hidden="true" style={{ color: "var(--muted-dim)" }}>→</span>
               </Link>
