@@ -32,7 +32,7 @@ export function LearnLayout({
           <Link href="/learn" className="hover:text-[color:var(--foreground)] transition-colors">
             Learn
           </Link>{" "}
-          / <span style={{ color: "var(--muted)" }}>Smart Sample Manager</span> /{" "}
+          / <span style={{ color: "var(--muted)" }}>SLO</span> /{" "}
           <span style={{ color: "var(--foreground)" }}>{title}</span>
         </nav>
 

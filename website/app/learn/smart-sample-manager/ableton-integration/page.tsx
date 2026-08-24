@@ -3,7 +3,7 @@ import { LearnLayout, LearnH2 } from "@/lib/learn";
 
 export const metadata: Metadata = {
   title: "Ableton Integration (Experimental)",
-  description: "How Smart Sample Manager's experimental Ableton Live tag integration works.",
+  description: "How SLO's experimental Ableton Live tag integration works.",
   alternates: { canonical: "/learn/smart-sample-manager/ableton-integration" },
 };
 
@@ -18,7 +18,7 @@ export default function AbletonIntegrationPage() {
       <section>
         <LearnH2>What it does</LearnH2>
         <p className="mt-2">
-          Smart Sample Manager can write your tags into the same metadata format Ableton Live&apos;s
+          SLO can write your tags into the same metadata format Ableton Live&apos;s
           own sample browser reads, so your organisation shows up inside Ableton too --
           without maintaining a second, separate catalog.
         </p>
@@ -28,7 +28,7 @@ export default function AbletonIntegrationPage() {
         <LearnH2>How to use it</LearnH2>
         <p className="mt-2">
           After tagging a sample (or a folder of samples), click{" "}
-          <strong>WRITE TO ABLETON (EXPERIMENTAL)</strong>. Smart Sample Manager writes the tag
+          <strong>WRITE TO ABLETON (EXPERIMENTAL)</strong>. SLO writes the tag
           metadata in the same sidecar location and format Ableton itself uses, so Live&apos;s
           browser picks it up the next time it reads that folder.
         </p>

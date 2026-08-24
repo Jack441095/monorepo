@@ -3,7 +3,7 @@ import { LearnLayout, LearnH2 } from "@/lib/learn";
 
 export const metadata: Metadata = {
   title: "Installation",
-  description: "How to install Smart Sample Manager as VST3, Audio Unit, or Standalone on macOS.",
+  description: "How to install SLO as VST3, Audio Unit, or Standalone on macOS.",
   alternates: { canonical: "/learn/smart-sample-manager/installation" },
 };
 
@@ -11,7 +11,7 @@ export default function InstallationPage() {
   return (
     <LearnLayout slug="installation" title="Installation">
       <p>
-        Smart Sample Manager currently runs on macOS as a VST3 plugin, an Audio Unit, and a
+        SLO currently runs on macOS as a VST3 plugin, an Audio Unit, and a
         Standalone application. Windows support is planned but not yet available.
       </p>
 
@@ -31,7 +31,7 @@ export default function InstallationPage() {
         </ul>
         <p className="mt-2">
           You don&apos;t need to move anything manually, and nothing else needs to be installed
-          separately — every dependency Smart Sample Manager needs is bundled inside the app
+          separately — every dependency SLO needs is bundled inside the app
           itself.
         </p>
       </section>
@@ -42,7 +42,7 @@ export default function InstallationPage() {
           If macOS shows a Gatekeeper prompt on first launch, that&apos;s the normal first-run
           check for any downloaded application — follow the on-screen option to open it. You
           won&apos;t be asked to install Homebrew, a package manager, or any other developer
-          tooling to run Smart Sample Manager; if anything ever asks you to, that&apos;s not
+          tooling to run SLO; if anything ever asks you to, that&apos;s not
           expected behaviour and worth reporting to support.
         </p>
       </section>
@@ -51,8 +51,8 @@ export default function InstallationPage() {
         <LearnH2>Loading the plugin in your DAW</LearnH2>
         <p className="mt-2">
           After installing, rescan plugins in your DAW if it doesn&apos;t pick up the new VST3/AU
-          automatically (most DAWs do this on the next launch). Smart Sample Manager will appear
-          as <strong>Smart Sample Manager</strong> under NITE DSP / NDSP in your plugin browser.
+          automatically (most DAWs do this on the next launch). SLO will appear
+          as <strong>SLO</strong> under NITE DSP in your plugin browser.
         </p>
       </section>
 
@@ -60,7 +60,7 @@ export default function InstallationPage() {
         <LearnH2>Uninstalling</LearnH2>
         <p className="mt-2">
           Remove the app from <code>/Applications</code>, and the plugin files from the two
-          Plug-Ins folders above. Your sample library itself is untouched — Smart Sample Manager
+          Plug-Ins folders above. Your sample library itself is untouched — SLO
           only reads your audio files, it never moves or renames them.
         </p>
       </section>

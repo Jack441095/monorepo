@@ -3,13 +3,13 @@ import { LearnLayout } from "@/lib/learn";
 
 export const metadata: Metadata = {
   title: "FAQ",
-  description: "Frequently asked questions about Smart Sample Manager.",
+  description: "Frequently asked questions about SLO.",
   alternates: { canonical: "/learn/smart-sample-manager/faq" },
 };
 
 const FAQ = [
   {
-    q: "What is Smart Sample Manager?",
+    q: "What is SLO?",
     a: "An acoustic-similarity sample browser and organizer for VST3, AU, and Standalone hosts. It indexes your sample library locally, lets you audition and browse it, and helps you find sounds by how they actually sound.",
   },
   {
@@ -30,7 +30,7 @@ const FAQ = [
   },
   {
     q: "Which DAWs are supported?",
-    a: "Smart Sample Manager ships as VST3, AU, and a Standalone app, so it loads in any host that supports those formats. Ableton Live also gets an experimental tag-integration feature.",
+    a: "SLO ships as VST3, AU, and a Standalone app, so it loads in any host that supports those formats. Ableton Live also gets an experimental tag-integration feature.",
   },
   {
     q: "Does it work offline?",
@@ -42,7 +42,7 @@ const FAQ = [
   },
   {
     q: "Can I use samples on an external drive?",
-    a: "Yes — point Smart Sample Manager at any folder your Mac can see. If the drive is disconnected later, rescan once it's reconnected to pick up any changes.",
+    a: "Yes — point SLO at any folder your Mac can see. If the drive is disconnected later, rescan once it's reconnected to pick up any changes.",
   },
   {
     q: "What happens if I reinstall macOS or get a new Mac?",
@@ -50,7 +50,7 @@ const FAQ = [
   },
   {
     q: "What happens to my library when I reopen the app?",
-    a: "Smart Sample Manager doesn't automatically reload your last library on launch — you'll need to rescan the same folder. Thanks to caching, this is fast, since already-analysed files are skipped.",
+    a: "SLO doesn't automatically reload your last library on launch — you'll need to rescan the same folder. Thanks to caching, this is fast, since already-analysed files are skipped.",
   },
   {
     q: "How do updates work?",
@@ -62,7 +62,7 @@ const FAQ = [
   },
   {
     q: "Is Windows supported?",
-    a: "Not yet. Smart Sample Manager is macOS-only for now. Windows is on the roadmap, not currently available.",
+    a: "Not yet. SLO is macOS-only for now. Windows is on the roadmap, not currently available.",
   },
 ];
 

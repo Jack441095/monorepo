@@ -22,16 +22,28 @@ function VerifyInner() {
   }, [token, router]);
 
   if (status === "error") {
-    return <p className="text-sm" style={{ color: "var(--state-error)" }}>This sign-in link is invalid or has expired.</p>;
+    return (
+      <div className="p-6 border border-brand-red bg-[rgba(239,68,68,0.05)] rounded-md text-sm text-brand-red font-mono">
+        This sign-in link is invalid or has expired.
+      </div>
+    );
   }
-  return <p className="text-sm" style={{ color: "var(--muted-dim)" }}>Signing you in…</p>;
+  return (
+    <div className="p-6 border border-border bg-[#0D1322] rounded-md text-sm text-brand-blue-bright font-mono animate-pulse">
+      Signing you in…
+    </div>
+  );
 }
 
 export default function VerifyPage() {
   return (
-    <div className="section text-center">
-      <div className="mx-auto px-6" style={{ maxWidth: "26rem" }}>
-        <Suspense fallback={<p className="text-sm" style={{ color: "var(--muted-dim)" }}>Signing you in…</p>}>
+    <div className="section">
+      <div className="mx-auto px-6 max-w-[28rem] text-center">
+        <Suspense fallback={
+          <div className="p-6 border border-border bg-[#0D1322] rounded-md text-sm text-muted-dim font-mono">
+            Loading verification…
+          </div>
+        }>
           <VerifyInner />
         </Suspense>
       </div>

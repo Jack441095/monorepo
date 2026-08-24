@@ -13,7 +13,7 @@ export default function VisualMapPage() {
       <section>
         <LearnH2>What it is</LearnH2>
         <p className="mt-2">
-          As Smart Sample Manager indexes your library, every sample is plotted as a point on a
+          As SLO indexes your library, every sample is plotted as a point on a
           2D map. Points that end up near each other tend to sound alike. It&apos;s a different
           way to browse than scrolling a folder tree — explore by ear, moving through clusters
           of related sounds.
@@ -41,7 +41,7 @@ export default function VisualMapPage() {
       <section>
         <LearnH2>Interpreting the layout</LearnH2>
         <p className="mt-2">
-          Proximity on the map reflects sonic similarity as analysed by Smart Sample Manager --
+          Proximity on the map reflects sonic similarity as analysed by SLO --
           treat it as a exploration tool for discovering related sounds, not as a precise
           scientific measurement of any single audio characteristic. With a very small library
           (a handful of samples), the map uses a simple layout rather than a full similarity

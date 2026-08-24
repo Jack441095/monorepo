@@ -4,7 +4,7 @@ export default function RefundPolicyPage() {
   return (
     <LegalPage title="Refund Policy">
       <p>
-        If Smart Sample Manager doesn&apos;t work for you, contact support
+        If SLO doesn&apos;t work for you, contact support
         within 14 days of purchase for a full refund, no questions asked.
       </p>
       <p>

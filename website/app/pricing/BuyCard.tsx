@@ -84,7 +84,7 @@ export function BuyCard() {
           disabled={buyState === "checking"}
           className="btn-primary mt-6 w-full"
         >
-          {buyState === "checking" ? "Starting checkout…" : "Buy Smart Sample Manager"}
+          {buyState === "checking" ? "Starting checkout…" : "Buy SLO"}
         </button>
       ) : (
         <Link href="/account" className="btn-primary mt-6 w-full">

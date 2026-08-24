@@ -3,7 +3,7 @@ import { LearnLayout, LearnH2 } from "@/lib/learn";
 
 export const metadata: Metadata = {
   title: "Getting Started",
-  description: "Install Smart Sample Manager, activate it, and index your first sample library.",
+  description: "Install SLO, activate it, and index your first sample library.",
   alternates: { canonical: "/learn/smart-sample-manager/getting-started" },
 };
 
@@ -11,13 +11,13 @@ export default function GettingStartedPage() {
   return (
     <LearnLayout slug="getting-started" title="Getting Started">
       <p>
-        This walks through everything from opening Smart Sample Manager for the first time to
+        This walks through everything from opening SLO for the first time to
         finding a similar-sounding sample and dragging it into your DAW. It should take a few
         minutes.
       </p>
 
       <section>
-        <LearnH2>1. Open Smart Sample Manager</LearnH2>
+        <LearnH2>1. Open SLO</LearnH2>
         <p className="mt-2">
           Launch it as a Standalone application, or load it as a VST3 or Audio Unit plugin in
           your DAW. All three run the same interface. For plugin-specific install locations, see{" "}
@@ -45,7 +45,7 @@ export default function GettingStartedPage() {
         <LearnH2>3. Add your first sample library</LearnH2>
         <p className="mt-2">
           Click <strong>SCAN FOLDER</strong> and choose the folder containing your samples.
-          Smart Sample Manager analyses every audio file it finds, entirely on your machine --
+          SLO analyses every audio file it finds, entirely on your machine --
           nothing is uploaded. You&apos;ll see the sample count in the top-right corner climb as
           it works, and points begin appearing on the visual map as each sample is processed.
         </p>
@@ -68,7 +68,7 @@ export default function GettingStartedPage() {
       <section>
         <LearnH2>5. Find a similar sound</LearnH2>
         <p className="mt-2">
-          With a sample selected, click <strong>FIND SIMILAR</strong>. Smart Sample Manager
+          With a sample selected, click <strong>FIND SIMILAR</strong>. SLO
           compares the actual audio — not the filename — and lists other samples in your
           library that sound like it. See{" "}
           <a href="/learn/smart-sample-manager/find-similar" className="underline">
@@ -94,14 +94,14 @@ export default function GettingStartedPage() {
         <LearnH2>7. Use the sound</LearnH2>
         <p className="mt-2">
           Drag the sample straight into your DAW&apos;s timeline or sampler from wherever it
-          appears in Smart Sample Manager.
+          appears in SLO.
         </p>
       </section>
 
       <section>
         <LearnH2>One thing to know: reopening your library</LearnH2>
         <p className="mt-2">
-          Smart Sample Manager doesn&apos;t automatically reload your last library when you
+          SLO doesn&apos;t automatically reload your last library when you
           reopen the app — you&apos;ll need to click <strong>SCAN FOLDER</strong> and choose the
           same folder again. Thanks to caching, this is quick (already-analysed files aren&apos;t
           re-processed), but it isn&apos;t automatic today.

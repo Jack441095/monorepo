@@ -16,7 +16,7 @@ type Entitlement = {
 };
 
 const PRODUCT_NAMES: Record<string, string> = {
-  "smart-sample-manager": "Smart Sample Manager",
+  "smart-sample-manager": "SLO (Sample Library Optimiser)",
 };
 
 function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
@@ -39,43 +39,55 @@ function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
   }
 
   return (
-    <div className="surface-card p-5">
-      <div className="flex items-center justify-between gap-3">
-        <span className="font-medium">{productName}</span>
-        {/* Beta = attention (semantic gold); ordinary status = neutral.
-            Colour never carries the meaning alone — the label names the state. */}
+    <div className="surface-card p-6 border border-border">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <span className="font-semibold text-foreground text-base block">{productName}</span>
+          <span className="text-xs font-mono text-muted-dim block mt-0.5 uppercase tracking-wider">{isBeta ? "Beta Access" : entitlement.status}</span>
+        </div>
         <span
-          className="text-xs uppercase tracking-wide rounded-full px-2.5 py-1"
+          className="text-[10px] uppercase font-mono tracking-wider rounded border px-3 py-1"
           style={isBeta ? {
             background: "var(--state-warning-bg)",
             color: "var(--state-warning)",
-            border: "1px solid var(--state-warning-border)",
+            borderColor: "var(--state-warning-border)",
           } : {
             background: "var(--surface-raised)",
             color: "var(--muted)",
-            border: "1px solid var(--border-strong)",
+            borderColor: "var(--border-strong)",
           }}
         >
           {isBeta ? "Beta" : entitlement.status}
         </span>
       </div>
-      <p className="mt-1 text-xs font-mono tnum" style={{ color: "var(--muted-dim)" }}>
-        {entitlement.license_key}
-      </p>
+      
+      <div className="mt-4 p-3 bg-background-inset rounded border border-border/40 flex items-center justify-between">
+        <code className="text-xs font-mono tnum text-brand-blue-bright select-all">
+          {entitlement.license_key}
+        </code>
+        <span className="text-[9px] font-mono text-muted-dim uppercase">LICENSE KEY</span>
+      </div>
+
       {entitlement.expires_at && (
-        <p className="mt-2 text-xs tnum" style={{ color: "var(--muted)" }}>
-          {isBeta ? "Beta access" : "Access"} expires {new Date(entitlement.expires_at).toLocaleDateString()}
+        <p className="mt-3 text-xs text-muted-dim tnum">
+          Access expires: {new Date(entitlement.expires_at).toLocaleDateString()}
         </p>
       )}
-      <div className="mt-4 flex flex-wrap gap-3">
-        <button onClick={handleDownload} className="btn-secondary text-xs px-4 py-2" disabled={downloadState === "loading"}>
+
+      <div className="mt-6">
+        <button 
+          type="button"
+          onClick={handleDownload} 
+          className="btn-primary text-xs px-4 py-2" 
+          disabled={downloadState === "loading"}
+        >
           {downloadState === "loading" ? "Preparing download…" : "Download for macOS"}
         </button>
       </div>
+
       {downloadState === "error" && (
-        // Informational absence, not a failure — info.neutral ink + text.
-        <p className="mt-2 text-xs" style={{ color: "var(--info)" }} role="status">
-          No release available for this product yet — check back soon.
+        <p className="mt-3 text-xs text-muted" role="status">
+          No release available for this product yet &mdash; check back soon.
         </p>
       )}
     </div>
@@ -91,13 +103,6 @@ function AccountPageInner() {
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [linkSent, setLinkSent] = useState(false);
-  // Only meaningful when purchasePending and no entitlement exists yet:
-  // "waiting" while polling for the webhook-created entitlement,
-  // "timed-out" if it hasn't shown up after a reasonable wait. Once an
-  // entitlement exists this state stops being rendered at all (see the
-  // `entitlements.length === 0` guard below) — the webhook remains the
-  // source of truth either way, this is UX only
-  // (docs/PADDLE_INTEGRATION_AUDIT.md).
   const [pendingState, setPendingState] = useState<"waiting" | "timed-out">("waiting");
 
   useEffect(() => {
@@ -117,8 +122,6 @@ function AccountPageInner() {
       .then(setEntitlements);
   }, [user]);
 
-  // Resume a Buy click that happened while signed out (see BuyCard.tsx /
-  // lib/checkout.ts) — runs once, the moment we know who's signed in.
   useEffect(() => {
     if (!user) return;
     if (consumeBuyIntent()) {
@@ -126,10 +129,6 @@ function AccountPageInner() {
     }
   }, [user]);
 
-  // After a successful Paddle checkout (successUrl=/account?purchase=pending),
-  // poll briefly for the webhook-created entitlement to appear. Never treats
-  // frontend "payment succeeded" as ownership by itself — only an actual
-  // entitlement record (created server-side by the real webhook) counts.
   useEffect(() => {
     if (!user || !purchasePending || entitlements.length > 0) return;
     let cancelled = false;
@@ -170,8 +169,8 @@ function AccountPageInner() {
 
   if (loading) {
     return (
-      <div className="section text-center" style={{ color: "var(--muted-dim)" }}>
-        Loading…
+      <div className="section text-center text-muted font-mono text-xs">
+        Loading session...
       </div>
     );
   }
@@ -179,34 +178,35 @@ function AccountPageInner() {
   if (!user) {
     return (
       <div className="section">
-        <div className="mx-auto px-6" style={{ maxWidth: "26rem" }}>
-          <span className="eyebrow">Account</span>
-          <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">Sign in</h1>
-          <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-            We&apos;ll email you a sign-in link — no password needed.
+        <div className="mx-auto px-6 max-w-[28rem] surface-card p-8 border border-border">
+          <span className="eyebrow">Account Portal</span>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Sign in</h1>
+          <p className="mt-2 text-xs text-muted leading-relaxed">
+            Enter your email to request a secure passwordless sign-in link.
           </p>
           {linkSent ? (
-            // Announced to screen readers without stealing focus.
-            <p className="mt-6 text-sm" style={{ color: "var(--muted)" }} role="status">
-              Check your email for a sign-in link.
+            <p className="mt-6 text-sm text-brand-blue-bright font-mono" role="status">
+              Check your email &mdash; a sign-in link has been sent.
             </p>
           ) : (
-            <form onSubmit={requestLink} className="mt-6 flex gap-2">
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="flex-1 rounded-md border px-3 py-2 text-sm"
-                style={{ borderColor: "var(--border-strong)", background: "var(--surface)", color: "var(--foreground)" }}
-              />
-              <button type="submit" className="btn-primary">
-                Send link
+            <form onSubmit={requestLink} className="mt-6 flex flex-col gap-3">
+              <div>
+                <label htmlFor="email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full rounded border px-3.5 py-2.5 text-sm font-mono focus:border-brand-blue outline-none"
+                  style={{ borderColor: "var(--border-strong)", background: "var(--background-inset)", color: "var(--foreground)" }}
+                />
+              </div>
+              <button type="submit" className="btn-primary w-full">
+                Send sign-in link
               </button>
             </form>
           )}
@@ -218,68 +218,65 @@ function AccountPageInner() {
   return (
     <div className="section">
       <div className="mx-auto px-6" style={{ maxWidth: "42rem" }}>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-b pb-6" style={{ borderColor: "var(--border)" }}>
           <div>
-            <span className="eyebrow">Account</span>
-            <h1 className="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight">Your account</h1>
+            <span className="eyebrow">User Dashboard</span>
+            <h1 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Your Account</h1>
+            <p className="mt-1 text-xs text-muted-dim font-mono">{user.email}</p>
           </div>
           <button
             onClick={signOut}
-            className="text-sm transition-colors"
-            style={{ color: "var(--muted)" }}
+            className="text-xs transition-colors hover:text-brand-red font-mono cursor-pointer"
+            style={{ color: "var(--muted-dim)" }}
           >
             Sign out
           </button>
         </div>
-        <p className="mt-1 text-sm" style={{ color: "var(--muted-dim)" }}>
-          {user.email}
-        </p>
 
         {purchasePending && entitlements.length === 0 && (
-          <div className="mt-10 surface-card p-5">
+          <div className="mt-8 callout-warning">
             {pendingState === "timed-out" ? (
-              <p className="text-sm" style={{ color: "var(--muted)" }}>
-                Still confirming your purchase — this can take a little longer than usual.
-                Refresh this page in a moment, or{" "}
-                <a href="mailto:nitedsp@outlook.com" className="underline">
+              <p className="text-sm">
+                Confirming your purchase is taking longer than usual. Please refresh in a moment, or{" "}
+                <a href="mailto:nitedsp@outlook.com" className="underline font-semibold">
                   contact support
                 </a>{" "}
-                if it doesn&apos;t appear soon.
+                if it does not appear soon.
               </p>
             ) : (
-              <p className="text-sm" style={{ color: "var(--muted)" }}>
-                Payment received. We&apos;re confirming your purchase…
+              <p className="text-sm">
+                Payment received. We are waiting for the server webhook to generate your licence key...
               </p>
             )}
           </div>
         )}
 
-        <h2 className="mt-10 eyebrow">Your products</h2>
+        <h2 className="mt-10 eyebrow text-xs">Licences & Downloads</h2>
         {entitlements.length === 0 ? (
-          <p className="mt-4 text-sm" style={{ color: "var(--muted-dim)" }}>
+          <p className="mt-4 text-sm text-muted" style={{ color: "var(--muted-dim)" }}>
             {purchasePending ? (
-              "Your product will appear here as soon as it's confirmed."
+              "Your product will appear here as soon as the purchase webhook clears."
             ) : (
               <>
-                No products yet. See{" "}
-                <a href="/pricing" className="underline">
-                  pricing
+                No active licences. View{" "}
+                <a href="/pricing" className="underline text-brand-blue-bright">
+                  pricing plans
                 </a>
                 .
               </>
             )}
           </p>
         ) : (
-          <div className="mt-4 space-y-3">
+          <div className="mt-4 space-y-4">
             {entitlements.map((e) => (
               <EntitlementCard key={e.id} entitlement={e} />
             ))}
           </div>
         )}
 
-        <p className="mt-10 text-sm" style={{ color: "var(--muted-dim)" }}>
-          Need help? Contact{" "}
-          <a href="mailto:nitedsp@outlook.com" className="underline">
+        <p className="mt-12 text-xs" style={{ color: "var(--muted-dim)" }}>
+          Having account issues? Contact us at{" "}
+          <a href="mailto:nitedsp@outlook.com" className="underline hover:text-foreground font-mono">
             nitedsp@outlook.com
           </a>
           .
@@ -293,8 +290,8 @@ export default function AccountPage() {
   return (
     <Suspense
       fallback={
-        <div className="section text-center" style={{ color: "var(--muted-dim)" }}>
-          Loading…
+        <div className="section text-center text-muted font-mono text-xs">
+          Loading dashboard...
         </div>
       }
     >

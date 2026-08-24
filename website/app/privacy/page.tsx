@@ -9,7 +9,7 @@ export default function PrivacyPage() {
         device identifiers used to manage activations.
       </p>
       <p>
-        Smart Sample Manager analyses samples locally on your computer. Website account, payment,
+        SLO analyses samples locally on your computer. Website account, payment,
         licensing, and download requests are separate from that local analysis. This product review
         found no website feature that uploads sample audio or library contents.
       </p>

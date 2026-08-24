@@ -3,13 +3,13 @@ import { LearnLayout } from "@/lib/learn";
 
 export const metadata: Metadata = {
   title: "Troubleshooting",
-  description: "Fixes for common Smart Sample Manager problems.",
+  description: "Fixes for common SLO problems.",
   alternates: { canonical: "/learn/smart-sample-manager/troubleshooting" },
 };
 
 const ITEMS = [
   {
-    q: "Smart Sample Manager doesn't appear in my DAW",
+    q: "SLO doesn't appear in my DAW",
     a: "Rescan your plugin folders in your DAW's preferences/settings (most DAWs do this automatically on the next launch, but not all). Confirm you're looking for the format you installed — VST3 or Audio Unit — and that your DAW supports it.",
   },
   {
@@ -38,7 +38,7 @@ const ITEMS = [
   },
   {
     q: "A drive with my samples is disconnected/offline",
-    a: "Smart Sample Manager only reads files that exist at scan time. If a drive is disconnected, those samples won't be reachable until it's reconnected — reconnect it and rescan.",
+    a: "SLO only reads files that exist at scan time. If a drive is disconnected, those samples won't be reachable until it's reconnected — reconnect it and rescan.",
   },
   {
     q: "Problem downloading the installer",
@@ -46,7 +46,7 @@ const ITEMS = [
   },
   {
     q: "Offline license question",
-    a: "Once activated, Smart Sample Manager keeps working offline for a grace period before it needs to re-check in — see the FAQ for the exact window. If you're past that window and can't get online, contact support.",
+    a: "Once activated, SLO keeps working offline for a grace period before it needs to re-check in — see the FAQ for the exact window. If you're past that window and can't get online, contact support.",
   },
   {
     q: "Update problem",
