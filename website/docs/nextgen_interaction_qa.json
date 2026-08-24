@@ -1,0 +1,65 @@
+{
+  "programme": "NITE_DSP_NEXTGEN_INTERACTION_V1 / NITE_DSP_WEBSITE_MOTION_V1",
+  "generated": "2026-08-24",
+  "gates": {
+    "npmCi": "PASS",
+    "lint": "PASS (0 problems)",
+    "typecheck": "PASS",
+    "productionBuild": "PASS (26 static routes)",
+    "playwright": { "before": "29/29 PASS", "after": "35/35 PASS", "added": 6 }
+  },
+  "playwright": {
+    "runner": "chromium (Desktop Chrome), production webServer on :3100",
+    "newCoverage": [
+      "magnetic CTA click-while-engaged navigation",
+      "demo illustrative scan + disclosure + SIMULATION label",
+      "reduced-motion content visibility + CTA navigation",
+      "touch/mobile horizontal overflow on /, /products, SLO, /pricing at 390px",
+      "nav indicator alignment with aria-current link (+/-8px)",
+      "zero console/page errors on high-interaction routes"
+    ],
+    "brittleCoordinateAssertions": false
+  },
+  "manualMatrix": {
+    "routes": ["/", "/products/smart-sample-manager", "/products", "/pricing", "/support", "/learn", "/account"],
+    "inputModes": ["mouse", "trackpad", "keyboard", "touch-emulation", "reduced-motion"],
+    "result": "PASS all cells; utility routes minimal by design"
+  },
+  "viewportsVerified": [1440, 1280, 1024, 768, 390],
+  "visualAssets": {
+    "screenshots": "docs/motion-review/{home,slo,products}-{1440,768,390}.jpg",
+    "utilitySpotChecks": "docs/motion-review/utility/*.jpg",
+    "motionRecordings": "docs/motion-review/video/{1-hero-pointer-lighting,2-magnetic-cta,3-product-frame-parallax,4-slo-waveform-response,5-signal-flow-storytelling}.webm",
+    "uploadedExternally": false
+  },
+  "incidents": [
+    {
+      "issue": "one flaky full-suite run (7 failures)",
+      "rootCause": "stale manually-started server reused against a swapped .next build",
+      "resolution": "killed stale server; suite green on fresh webServer; repeated x3 stable",
+      "codeChangeRequired": false
+    }
+  ],
+  "claimSafety": {
+    "copyChanged": false,
+    "disclosurePreserved": "Illustrative workflow simulation footer verbatim",
+    "simulationChipAdded": true,
+    "pricingTbcPreserved": true,
+    "abletonExperimentalWordingPreserved": true
+  },
+  "boundaries": {
+    "backendModified": false,
+    "sloSourceModified": false,
+    "submitSourceModified": false,
+    "kennSourceModified": false,
+    "paddleModified": false,
+    "authModified": false,
+    "databaseModified": false,
+    "deployed": false,
+    "merged": false
+  },
+  "decision": "B — STRONG PASS / MINOR POLISH REMAINS (V1 scale); B — PASS WITH MINOR LIMITATIONS (V2.1 scale)",
+  "readyForOwnerVisualReview": true,
+  "readyToMerge": "YES_WITH_LIMITATIONS",
+  "readyToDeploy": false
+}

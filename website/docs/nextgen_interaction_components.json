@@ -1,0 +1,181 @@
+{
+  "programme": "NITE_DSP_NEXTGEN_INTERACTION_V1 / NITE_DSP_WEBSITE_MOTION_V1",
+  "generated": "2026-08-24",
+  "branch": "design/website-nextgen-interaction-v1",
+  "intensity": "B_PREMIUM_BALANCED",
+  "components": [
+    {
+      "name": "PointerEngine",
+      "file": "lib/motion.ts",
+      "routes": ["global"],
+      "purpose": "Single shared pointermove listener + rAF loop broadcasting pointer frames",
+      "trigger": "pointermove (passive)",
+      "maxMovement": "n/a",
+      "reducedMotion": "subscribers gated off individually; loop parks",
+      "touchBehavior": "gated via (hover:hover) and (pointer:fine)",
+      "performanceStrategy": "one listener, one rAF; parks at zero subscribers and document.hidden; no React state"
+    },
+    {
+      "name": "LightField",
+      "file": "components/motion/LightField.tsx",
+      "routes": ["/", "/products/smart-sample-manager"],
+      "purpose": "Ambient cursor-reactive studio lighting (DEPTH 1)",
+      "trigger": "shared pointer signal",
+      "maxMovement": "26-42px blob drift",
+      "reducedMotion": "static authored composition",
+      "touchBehavior": "static",
+      "performanceStrategy": "transform writes to refs; offscreen skip; no blur filters"
+    },
+    {
+      "name": "Magnetic",
+      "file": "components/motion/Magnetic.tsx",
+      "routes": ["/", "/products/smart-sample-manager"],
+      "purpose": "Restrained magnetic CTA content (DEPTH 3)",
+      "trigger": "element pointer enter/move/leave",
+      "maxMovement": "3px x / 2.1px y",
+      "reducedMotion": "inert",
+      "touchBehavior": "inert; hit target always stationary",
+      "performanceStrategy": "CSS-transition smoothing; no JS loops"
+    },
+    {
+      "name": "TiltSurface",
+      "file": "components/motion/TiltSurface.tsx",
+      "routes": ["/", "/products/smart-sample-manager", "/products"],
+      "purpose": "Micro-3D hardware frame with border bloom, sheen, layer parallax (DEPTH 2)",
+      "trigger": "element pointer enter/move/leave",
+      "maxMovement": "1.6deg tilt; layers 1.5/3px",
+      "reducedMotion": "static frame",
+      "touchBehavior": "static frame",
+      "performanceStrategy": "CSS custom properties + transitions; event-driven writes"
+    },
+    {
+      "name": "Reveal",
+      "file": "components/motion/Reveal.tsx",
+      "routes": ["/", "/products/smart-sample-manager"],
+      "purpose": "One-shot scroll entrance (opacity + 14px rise)",
+      "trigger": "IntersectionObserver 0.12 / -48px",
+      "maxMovement": "14px translate",
+      "reducedMotion": "instant visible",
+      "touchBehavior": "same as desktop",
+      "performanceStrategy": "observer disconnects after reveal; html.js scoping keeps no-JS visible"
+    },
+    {
+      "name": "WorkflowFlow",
+      "file": "components/motion/WorkflowFlow.tsx",
+      "routes": ["/"],
+      "purpose": "Signal-flow storytelling: scroll-driven processing trace + stage activation",
+      "trigger": "scroll (passive, rAF-throttled)",
+      "maxMovement": "trace height <= list height; colour states",
+      "reducedMotion": "static full trace; activation states kept",
+      "touchBehavior": "trace hidden <640px; states kept",
+      "performanceStrategy": "one passive scroll listener + rAF flag; cleanup on unmount"
+    },
+    {
+      "name": "NavIndicator",
+      "file": "components/SiteHeader.tsx",
+      "routes": ["global"],
+      "purpose": "Morphing active-route indicator",
+      "trigger": "pathname change / resize / fonts.ready",
+      "maxMovement": "position+width morph, 300ms",
+      "reducedMotion": "instant jump (state clarity kept)",
+      "touchBehavior": "hidden <640px",
+      "performanceStrategy": "rAF-deferred measurement; aria-hidden decoration; aria-current carries meaning"
+    },
+    {
+      "name": "DemoExaminationBand",
+      "file": "components/AudioAnalysisDemo.tsx",
+      "routes": ["/", "/products/smart-sample-manager"],
+      "purpose": "Pointer-responsive waveform illumination",
+      "trigger": "waveform pointermove/leave",
+      "maxMovement": "opacity-only band, 160ms trail",
+      "reducedMotion": "not rendered",
+      "touchBehavior": "not rendered",
+      "performanceStrategy": "event-driven transform writes; parked on leave"
+    },
+    {
+      "name": "DemoTransientPulse",
+      "file": "components/AudioAnalysisDemo.tsx",
+      "routes": ["/", "/products/smart-sample-manager"],
+      "purpose": "Red peak-event feedback on selection / classification resolve",
+      "trigger": "explicit user action",
+      "maxMovement": "one ring, 220ms, scale 1.06",
+      "reducedMotion": "suppressed (matchMedia check)",
+      "touchBehavior": "active (tap feedback)",
+      "performanceStrategy": "timeout cleanup; never auto-repeats"
+    },
+    {
+      "name": "StatusDot",
+      "file": "components/motion/StatusDot.tsx",
+      "routes": ["/products"],
+      "purpose": "Shape-first status energy cue",
+      "trigger": "hover/focus of owning card (live tone only)",
+      "maxMovement": "5px breathing shadow ring",
+      "reducedMotion": "off",
+      "touchBehavior": "off (static dot)",
+      "performanceStrategy": "box-shadow keyframes, attention-only"
+    },
+    {
+      "name": "SpotlightGroup",
+      "file": "app/globals.css",
+      "routes": ["/", "/products"],
+      "purpose": "Attentional hierarchy in dense card grids",
+      "trigger": ":hover / :focus-within",
+      "maxMovement": "sibling opacity 0.82",
+      "reducedMotion": "off",
+      "touchBehavior": "off",
+      "performanceStrategy": "pure CSS opacity transition"
+    },
+    {
+      "name": "Grain",
+      "file": "app/globals.css + app/layout.tsx",
+      "routes": ["global"],
+      "purpose": "Anti-flat texture for dark fields",
+      "trigger": "time (steps)",
+      "maxMovement": "0.6% translate",
+      "reducedMotion": "static tile",
+      "touchBehavior": "active",
+      "performanceStrategy": "composited transform steps on fixed pseudo-element; opacity 0.032"
+    },
+    {
+      "name": "HoverDepth",
+      "file": "app/globals.css",
+      "routes": ["/products", "/"],
+      "purpose": "Depth response without scale",
+      "trigger": "CSS :hover",
+      "maxMovement": "1px translateY + shadow/border",
+      "reducedMotion": "off (media gated)",
+      "touchBehavior": "off",
+      "performanceStrategy": "transform/shadow transitions"
+    },
+    {
+      "name": "DemoScanTrail",
+      "file": "components/AudioAnalysisDemo.tsx",
+      "routes": ["/", "/products/smart-sample-manager"],
+      "purpose": "Processing visualisation behind the analysis scanner",
+      "trigger": "scan state (user-initiated)",
+      "maxMovement": "trail width <= panel",
+      "reducedMotion": "transitions killed globally; scan is functional content",
+      "touchBehavior": "active (functional)",
+      "performanceStrategy": "reuses existing 40ms scan progress ticks"
+    },
+    {
+      "name": "EnergySeam (reserved)",
+      "file": "app/globals.css",
+      "routes": [],
+      "purpose": "Section energy continuity gradient (reserved, not applied)",
+      "trigger": "static",
+      "maxMovement": "none",
+      "reducedMotion": "static",
+      "touchBehavior": "static",
+      "performanceStrategy": "pure CSS"
+    }
+  ],
+  "rejectedExperiments": [
+    "full-page ambient background field (occluded by section backgrounds)",
+    "applied energy seams (visually redundant; CSS reserved)",
+    "rAF-lerped magnetic/band loops (strict react-hooks lint correctly rejected; replaced with CSS-transition smoothing)",
+    "icon micro-parallax (no standalone icons to justify it)",
+    "custom cursor (out of scope by default)",
+    "third-party motion libraries / WebGL (prohibited or unjustified)"
+  ]
+}

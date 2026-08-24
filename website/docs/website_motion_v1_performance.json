@@ -1,0 +1,30 @@
+{
+  "programme": "NITE_DSP_NEXTGEN_INTERACTION_V1 / NITE_DSP_WEBSITE_MOTION_V1",
+  "generated": "2026-08-24",
+  "dependenciesAdded": 0,
+  "dependenciesConsideredRejected": ["framer-motion", "gsap", "lenis", "three"],
+  "bundle": {
+    "measurement": ".next/static raw bytes, production build (Turbopack, Next 16.3.0)",
+    "js": { "before": 621523, "after": 660707, "deltaBytes": 39184, "deltaPercent": 6.3 },
+    "css": { "before": 34931, "after": 45829, "deltaBytes": 10898, "deltaPercent": 31.2 },
+    "notes": "Raw pre-compression; estimated transfer impact ~12KB JS + ~3KB CSS with gzip/brotli"
+  },
+  "routes": { "staticPrerendered": 26, "serverRendered": 0 },
+  "runtime": {
+    "pointerListeners": "1 shared (window, passive)",
+    "rafLoops": "1 shared; parks at zero subscribers and document.hidden",
+    "reactStatePerFrame": false,
+    "layoutPropertiesMutatedOnPointer": false,
+    "animatedProperties": ["transform", "opacity", "CSS custom properties"],
+    "offscreenSkipping": "light fields ±80px viewport guard",
+    "cleanup": "all listeners/RAFs/observers removed on unmount"
+  },
+  "hydrationWarnings": 0,
+  "consoleErrorsHighRoutes": 0,
+  "longTasks": { "observed": false, "telemetryCaptured": false },
+  "frameRateClaim": "compositor-path by construction; no 60fps claim without device telemetry",
+  "environmentNotes": [
+    "local Node v26.7.0 is x86-64 under Rosetta 2 (pre-existing; Next warns at startup)",
+    "production deploys unaffected (Railway linux/x64)"
+  ]
+}
