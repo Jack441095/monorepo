@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
+import { SignalJourney } from "@/components/SignalJourney";
 import { LightField } from "@/components/motion/LightField";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
@@ -79,6 +80,9 @@ export default function HomePage() {
           </TiltSurface>
         </div>
       </section>
+
+      {/* The NITE Signal Journey — company-level signal flow */}
+      <SignalJourney />
 
       {/* The Core Problem & Audio-First Positioning */}
       <section className="section section-rule">

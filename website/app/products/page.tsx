@@ -3,6 +3,8 @@ import Link from "next/link";
 import { StatusDot } from "@/components/motion/StatusDot";
 import { Reveal } from "@/components/motion/Reveal";
 import { TiltSurface } from "@/components/motion/TiltSurface";
+import { SubmitPrepDemo } from "@/components/demo/SubmitPrepDemo";
+import { KennMixDemo } from "@/components/demo/KennMixDemo";
 
 export const metadata: Metadata = {
   title: "Products & Research",
@@ -22,11 +24,11 @@ const PRODUCTS = [
   },
   {
     name: "NITE Submit",
-    fullName: "Autonomous Version Management",
+    fullName: "Submission Preparation Intelligence",
     slug: null,
-    status: "Parked / In Development",
+    status: "In Development",
     statusColor: "var(--muted-dim)",
-    description: "An autonomous developer tools interface mapping and submitting builds to release streams. Currently parked while focusing on the core audio engine.",
+    description: "Local document intelligence and safe submission preparation. Submit helps users prepare important files correctly before submission — reviewing what is there, flagging what needs attention, and leaving the actual submission in the user's hands.",
     primary: false,
   },
   {
@@ -108,6 +110,46 @@ export default function ProductsPage() {
               </div>
             </div>
           </TiltSurface>
+        </div>
+      </section>
+
+      {/* Interactive Demonstrations — experience the intelligence */}
+      <section className="section section-rule bg-surface/10">
+        <div className="site-container">
+          <Reveal>
+            <div className="max-w-2xl">
+              <span className="eyebrow block">Interactive Demonstrations</span>
+              <h2 className="section-title mt-4">Experience the intelligence before it ships.</h2>
+              <p className="mt-4 text-sm max-w-2xl text-muted">
+                Simulated walkthroughs of how NITE DSP products think. Every
+                demonstration runs entirely in your browser with illustrative
+                data — nothing is uploaded, nothing is processed externally.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2 items-start">
+            <Reveal>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-foreground">Submit — prepare files safely</h3>
+                <p className="text-xs text-muted mt-1 max-w-md">
+                  Document intelligence that reviews important files and
+                  flags what needs attention before you submit.
+                </p>
+              </div>
+              <SubmitPrepDemo />
+            </Reveal>
+            <Reveal delayMs={90}>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-foreground">KENN — mix review, explained</h3>
+                <p className="text-xs text-muted mt-1 max-w-md">
+                  An AI audio engineering assistant concept: analyse a mix,
+                  understand the reasoning, make better creative decisions.
+                </p>
+              </div>
+              <KennMixDemo />
+            </Reveal>
+          </div>
         </div>
       </section>
 

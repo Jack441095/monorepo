@@ -846,3 +846,107 @@ html.js .reveal.is-revealed {
     transition: none;
   }
 }
+
+/* ============================================================================
+   NITE DSP Interactive Demonstration Layer V1 (Website V2.2)
+
+   Shared Signal Demonstration Framework + product demos. Every demo walks
+   INPUT → ANALYSIS → INTELLIGENCE → RECOMMENDATION → ACTION and must carry
+   an honest label (SIMULATION / CONCEPT DEMO). Motion communicates product
+   behaviour only.
+   ========================================================================== */
+
+/* --- NITE Signal Journey (homepage) ---------------------------------------- */
+.journey__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.25rem;
+  position: relative;
+}
+.journey__track,
+.journey__fill {
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  border-radius: 999px;
+}
+.journey__track { background: var(--border); }
+.journey__fill {
+  background: linear-gradient(to bottom, var(--brand-blue), var(--brand-violet) 60%, var(--brand-red));
+  box-shadow: 0 0 10px rgba(57, 123, 255, 0.35);
+  transform: scaleY(var(--flow, 0.06));
+  transform-origin: top;
+  transition: transform 200ms linear;
+}
+.journey__node { display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 1.1rem; }
+.journey__marker {
+  width: 12px;
+  height: 12px;
+  margin-top: 1px;
+  border-radius: 999px;
+  border: 2px solid var(--border-strong);
+  background: var(--background);
+  transition: border-color var(--motion-slow) var(--motion-easing), box-shadow var(--motion-slow) var(--motion-easing);
+}
+.journey__node.is-active .journey__marker { border-color: var(--brand-blue-bright); box-shadow: 0 0 10px rgba(86, 168, 255, 0.45); }
+.journey__node:nth-child(3).is-active .journey__marker { border-color: var(--brand-violet); box-shadow: 0 0 10px rgba(113, 72, 232, 0.4); }
+.journey__node:nth-child(4).is-active .journey__marker { border-color: var(--brand-red-bright); box-shadow: 0 0 10px rgba(240, 68, 90, 0.35); }
+.journey__stage { font-family: var(--font-mono); font-size: .7rem; font-weight: 650; letter-spacing: .14em; color: var(--muted-dim); transition: color var(--motion-slow) var(--motion-easing); }
+.journey__node.is-active .journey__stage { color: var(--brand-blue-bright); }
+.journey__node h3 { font-size: 1.05rem; font-weight: 600; margin-top: .3rem; }
+.journey__node p { margin-top: .4rem; color: var(--muted); font-size: .9rem; line-height: 1.55; max-width: 26rem; }
+
+@media (min-width: 640px) {
+  .journey__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; }
+  .journey__track, .journey__fill {
+    left: 6px;
+    right: 6px;
+    top: 5px;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+  }
+  .journey__fill {
+    transform: scaleX(var(--flow, 0.06));
+    transform-origin: left;
+    background: linear-gradient(to right, var(--brand-blue), var(--brand-violet) 60%, var(--brand-red));
+  }
+  .journey__node { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 1.5rem; position: relative; }
+  .journey__marker { position: absolute; top: 0; left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey__fill { transition: none; }
+}
+
+/* --- Demo shared micro-elements --------------------------------------------- */
+.demo-filechip {
+  position: relative;
+  overflow: hidden;
+}
+.demo-filechip::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  transform: scaleX(var(--scan, 0));
+  transform-origin: left;
+  background: linear-gradient(90deg, transparent, rgba(86, 168, 255, 0.16) 70%, rgba(113, 72, 232, 0.22));
+  pointer-events: none;
+}
+.demo-meter {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.demo-meter__fill {
+  height: 100%;
+  border-radius: inherit;
+  transform-origin: left;
+  transition: transform 900ms var(--motion-ease-premium);
+}
