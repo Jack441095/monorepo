@@ -60,6 +60,11 @@
   --motion-standard: 180ms;
   --motion-slow: 300ms;
   --motion-easing: cubic-bezier(0.25, 1, 0.5, 1);
+  --motion-ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-spring: cubic-bezier(0.34, 1.28, 0.48, 1);
+  --motion-magnetic-max: 4px;
+  --motion-parallax-small: 2px;
+  --motion-parallax-medium: 4px;
 
   /* Radius & Spacing */
   --radius-sm: 4px;
@@ -162,6 +167,26 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* Map every brand/semantic token into Tailwind's color namespace so
+     utilities like bg-brand-blue / text-muted-dim / border-brand-violet
+     actually generate. Previously these class names silently produced no
+     CSS (Tailwind v4 only emits utilities for @theme tokens). */
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-muted: var(--muted);
+  --color-muted-dim: var(--muted-dim);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-bright: var(--brand-blue-bright);
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-bright: var(--brand-red-bright);
+  --color-brand-violet: var(--brand-violet);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -484,4 +509,340 @@ body {
 @media (max-width: 1023px) {
   .pricing-layout { grid-template-columns: 1fr; gap: 3.5rem; }
   .support-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================================
+   NITE DSP Interaction Layer V1 — signal-energy system
+
+   Motion hierarchy (restraint over spectacle):
+     DEPTH 1  ambient light        slow cursor-reactive field, 10–30 px drift
+     DEPTH 2  visual depth         frames/screenshots, 1–4 px, <= 2 deg tilt
+     DEPTH 3  interactive controls magnetic content, 2–4 px max
+   All pointer-reactive behaviour is gated behind (hover:hover) and
+   (pointer:fine) plus prefers-reduced-motion, via lib/motion.ts.
+   ========================================================================== */
+
+/* --- Film grain -----------------------------------------------------------
+   Extremely fine static noise layer preventing flat digital blacks.
+   Animated with composited transform steps only; static under reduced
+   motion. Opacity low enough to never affect readability. */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -12%;
+  z-index: 80;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  opacity: 0.032;
+  mix-blend-mode: overlay;
+  animation: grain-shift 1.4s steps(5) infinite;
+}
+@keyframes grain-shift {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-0.6%, 0.4%, 0); }
+  40% { transform: translate3d(0.5%, -0.5%, 0); }
+  60% { transform: translate3d(-0.4%, -0.4%, 0); }
+  80% { transform: translate3d(0.6%, 0.3%, 0); }
+  100% { transform: translate3d(-0.3%, 0.5%, 0); }
+}
+
+/* --- Ambient cursor-reactive light field (DEPTH 1) ------------------------ */
+.light-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Falls back to a tasteful static composition when JS/touch/reduced-motion
+     disables tracking: the blobs sit at their authored resting positions. */
+}
+.light-field__blob {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  transform: translate3d(var(--rest-x, 0), var(--rest-y, 0), 0);
+}
+.light-field__blob--blue {
+  width: 55%;
+  aspect-ratio: 1.15;
+  top: -22%;
+  right: -8%;
+  background: radial-gradient(closest-side, rgba(57, 123, 255, 0.16), rgba(57, 123, 255, 0.05) 45%, transparent 72%);
+  --rest-x: 0%;
+  --rest-y: 0%;
+}
+.light-field__blob--violet {
+  width: 46%;
+  aspect-ratio: 1;
+  bottom: -26%;
+  left: -12%;
+  background: radial-gradient(closest-side, rgba(113, 72, 232, 0.13), rgba(113, 72, 232, 0.04) 48%, transparent 74%);
+  --rest-x: 0%;
+  --rest-y: 0%;
+}
+.light-field__blob--red {
+  width: 30%;
+  aspect-ratio: 1;
+  top: 34%;
+  right: 16%;
+  background: radial-gradient(closest-side, rgba(240, 68, 90, 0.07), transparent 70%);
+  opacity: 0.7;
+}
+
+/* --- Micro-3D product frame (DEPTH 2) ------------------------------------- */
+.tilt-surface {
+  perspective: 1200px;
+}
+.tilt-surface__inner {
+  position: relative;
+  transform:
+    rotateX(var(--tilt-x, 0deg))
+    rotateY(var(--tilt-y, 0deg))
+    translateZ(0);
+  transition: transform 420ms var(--motion-ease-premium);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.tilt-surface__inner.is-engaged {
+  transition: transform 90ms linear;
+}
+.tilt-surface__layer {
+  transform: translate3d(
+    calc(var(--par-x, 0) * var(--layer-depth, 0) * 1px),
+    calc(var(--par-y, 0) * var(--layer-depth, 0) * 1px),
+    0);
+  transition: transform 260ms var(--motion-ease-premium);
+  will-change: transform;
+}
+/* Pointer-proximity edge bloom: blue energy ring masked to the border,
+   positioned via --glow-x/--glow-y set from the pointer engine. */
+.tilt-surface__bloom {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    220px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(86, 168, 255, 0.85),
+    rgba(113, 72, 232, 0.35) 45%,
+    transparent 70%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--motion-slow) var(--motion-easing);
+  pointer-events: none;
+}
+.tilt-surface__inner.is-engaged .tilt-surface__bloom {
+  opacity: 0.55;
+}
+/* Interior sheen that shifts with the pointer — anodised-aluminium hint. */
+.tilt-surface__sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    340px circle at var(--glow-x, 50%) var(--glow-y, 20%),
+    rgba(245, 247, 251, 0.05),
+    transparent 65%);
+  opacity: 0;
+  transition: opacity var(--motion-slow) var(--motion-easing);
+  pointer-events: none;
+}
+.tilt-surface__inner.is-engaged .tilt-surface__sheen {
+  opacity: 1;
+}
+
+/* Hover depth without scale: rise 1px + deepen shadow + brighten border. */
+.depth-hover {
+  transition:
+    transform var(--motion-standard) var(--motion-ease-premium),
+    box-shadow var(--motion-standard) var(--motion-easing),
+    border-color var(--motion-standard) var(--motion-easing);
+}
+@media (hover: hover) and (pointer: fine) {
+  .depth-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    border-color: var(--border-strong);
+  }
+}
+
+/* --- Magnetic control (DEPTH 3) --------------------------------------------
+   Outer element stays stationary (stable hit target); inner content is
+   translated toward the pointer by lib/motion.ts. */
+.magnetic__content {
+  display: inline-flex;
+  transform: translate3d(var(--mag-x, 0px), var(--mag-y, 0px), 0);
+  will-change: transform;
+}
+.magnetic--engaged .magnetic__content {
+  transition: transform 100ms linear;
+}
+.magnetic:not(.magnetic--engaged) .magnetic__content {
+  transition: transform 380ms var(--motion-ease-spring);
+}
+
+/* --- Transient micro-pulse --------------------------------------------------
+   Red peak-meter impulse for completed analysis / activation states.
+   ~200 ms, shape-based, never screen-filling. */
+.transient-pulse {
+  position: relative;
+}
+.transient-pulse.is-pulsing::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 1px solid var(--brand-red-bright);
+  opacity: 0.9;
+  animation: transient-ring 220ms var(--motion-easing) forwards;
+  pointer-events: none;
+}
+@keyframes transient-ring {
+  0% { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.06); }
+}
+
+/* --- Status energy system ---------------------------------------------------
+   Shape-first status cue: dot carries the meaning, colour assists, motion
+   only as a hover/attention response — maturity labels stay still. */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.status-chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  flex: none;
+  box-shadow: 0 0 0 0 transparent;
+}
+@media (hover: hover) and (pointer: fine) {
+  .spotlight-group:hover .status-chip__dot--live,
+  .status-chip__dot--live:hover,
+  :focus-visible .status-chip__dot--live {
+    animation: status-breathe 1.6s var(--motion-easing) infinite;
+  }
+}
+@keyframes status-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(86, 168, 255, 0.45); }
+  50% { box-shadow: 0 0 0 5px rgba(86, 168, 255, 0); }
+}
+
+/* --- Focus spotlighting (attentional hierarchy) -----------------------------
+   Engaging one card in a dense group quiets its siblings very slightly.
+   Pure CSS, hover AND focus-within equivalent, opacity-only. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .spotlight-group > * {
+    transition: opacity var(--motion-slow) var(--motion-easing);
+  }
+  .spotlight-group:hover > :not(:hover),
+  .spotlight-group:focus-within > :not(:focus-within) {
+    opacity: 0.82;
+  }
+}
+
+/* --- Signal-flow storytelling ------------------------------------------------
+   Workflow connector energises as the reader progresses; stage numbers
+   activate when they cross the viewport reading line. */
+.signal-track {
+  position: relative;
+}
+.signal-track::before {
+  content: "";
+  position: absolute;
+  left: calc(2rem - 1px);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+  pointer-events: none;
+}
+.signal-track::after {
+  content: "";
+  position: absolute;
+  left: calc(2rem - 1px);
+  top: 0;
+  height: calc(var(--flow, 1) * 100%);
+  width: 2px;
+  background: linear-gradient(to bottom, var(--brand-blue), var(--brand-violet));
+  box-shadow: 0 0 8px rgba(57, 123, 255, 0.4);
+  transition: height 240ms linear;
+  pointer-events: none;
+}
+.workflow-item .workflow-number {
+  color: var(--muted-dim);
+  transition: color var(--motion-slow) var(--motion-easing);
+}
+.workflow-item.is-active .workflow-number {
+  color: var(--brand-blue-bright);
+}
+@media (max-width: 640px) {
+  .signal-track::before, .signal-track::after { display: none; }
+}
+
+/* --- Navigation active indicator -------------------------------------------- */
+.nav-indicator {
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand-blue), var(--brand-blue-bright));
+  box-shadow: 0 0 8px rgba(86, 168, 255, 0.5);
+  transition:
+    transform var(--motion-slow) var(--motion-ease-spring),
+    width var(--motion-slow) var(--motion-ease-spring),
+    opacity var(--motion-fast) var(--motion-easing);
+  pointer-events: none;
+}
+
+/* --- Section energy continuity -----------------------------------------------
+   Thin signal rule bridging sections: a faint gradient seam instead of a
+   hard monochrome line, carrying blue->violet energy down the page. */
+.section-rule {
+  position: relative;
+}
+.energy-seam {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(57, 123, 255, 0.28) 18%,
+    rgba(113, 72, 232, 0.22) 55%,
+    rgba(240, 68, 90, 0.10) 82%,
+    transparent 100%);
+}
+
+/* --- Scroll reveal -------------------------------------------------------------
+   Applied only when JS is present (html.js), so no-JS users always see all
+   content. Short rise, no stagger chains. */
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 640ms var(--motion-ease-premium),
+    transform 640ms var(--motion-ease-premium);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+html.js .reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Reduced motion: keep state clarity, drop environmental motion --------- */
+@media (prefers-reduced-motion: reduce) {
+  .grain::after { animation: none; }
+  .light-field__blob { transform: none !important; }
+  .tilt-surface__inner { transform: none !important; }
+  .tilt-surface__layer { transform: none !important; }
+  .magnetic__content { transform: none !important; }
+  html.js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
