@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
+import { LightField } from "@/components/motion/LightField";
+import { Magnetic } from "@/components/motion/Magnetic";
+import { Reveal } from "@/components/motion/Reveal";
+import { TiltSurface } from "@/components/motion/TiltSurface";
+import { WorkflowFlow } from "@/components/motion/WorkflowFlow";
 
 const WORKFLOWS = [
   [
@@ -31,8 +36,9 @@ export default function HomePage() {
   return (
     <>
       {/* Homepage Hero */}
-      <section className="hero-grid overflow-hidden">
-        <div className="site-container grid items-center gap-12 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:py-24">
+      <section className="hero-grid overflow-hidden relative">
+        <LightField />
+        <div className="site-container relative grid items-center gap-12 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:py-24">
           <div className="relative z-10">
             <span className="eyebrow">NITE DSP // FLAGSHIP</span>
             <h1 className="hero-title mt-5">Your sample library, organised by sound.</h1>
@@ -41,7 +47,7 @@ export default function HomePage() {
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/products/smart-sample-manager" className="btn-primary">
-                Explore SLO
+                <Magnetic>Explore SLO</Magnetic>
               </Link>
               <Link href="/pricing" className="btn-secondary">
                 View pricing
@@ -51,47 +57,51 @@ export default function HomePage() {
               macOS &middot; VST3 &middot; AU &middot; Standalone &middot; Native Apple Silicon
             </p>
           </div>
-          
-          <div className="product-frame product-frame--hero">
-            <div className="product-frame__bar">
-              <span>SLO // SAMPLE LIBRARY OPTIMISER</span>
-              <span>SPLIT VIEW</span>
+
+          <TiltSurface className="relative z-10 product-frame--hero">
+            <div className="product-frame">
+              <div className="product-frame__bar" data-depth="1.5">
+                <span>SLO // SAMPLE LIBRARY OPTIMISER</span>
+                <span>SPLIT VIEW</span>
+              </div>
+              <div data-depth="3">
+                <Image
+                  src="/screenshots/main-browser.png"
+                  alt="SLO flagship interface showing a searchable sample browser and selected sample details panel"
+                  width={1599}
+                  height={1057}
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 58vw"
+                  className="h-auto w-full block"
+                />
+              </div>
             </div>
-            <Image
-              src="/screenshots/main-browser.png"
-              alt="SLO flagship interface showing a searchable sample browser and selected sample details panel"
-              width={1599}
-              height={1057}
-              priority
-              sizes="(max-width: 1024px) 100vw, 58vw"
-              className="h-auto w-full"
-            />
-          </div>
+          </TiltSurface>
         </div>
       </section>
 
       {/* The Core Problem & Audio-First Positioning */}
       <section className="section section-rule">
         <div className="site-container grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <div>
+          <Reveal>
             <span className="eyebrow">The Signal vs The Filename</span>
             <h2 className="section-title mt-4">Folders are for storage. Not for discovery.</h2>
-          </div>
-          <div>
+          </Reveal>
+          <Reveal delayMs={90}>
             <p className="body-large">
-              A sample&apos;s filename is often meaningless (e.g. <code>XK29_0047.wav</code>). Standard folder trees hide your best sounds in nested archives. 
+              A sample&apos;s filename is often meaningless (e.g. <code>XK29_0047.wav</code>). Standard folder trees hide your best sounds in nested archives.
             </p>
             <p className="mt-6 text-base leading-relaxed" style={{ color: "var(--muted)" }}>
               SLO bypasses metadata dependencies entirely. By analysing the spectral and transient characteristics of the audio itself, it automatically categorises your library (e.g. identifying a kick, snare, or synth pad) and places similar timbres close together.
             </p>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* Interactive Audio-First Demo Section */}
-      <section className="section section-rule bg-[#0D1322]/30">
+      <section className="section section-rule bg-surface/30">
         <div className="site-container grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-          <div>
+          <Reveal>
             <span className="eyebrow">Interactive Demo</span>
             <h2 className="section-title mt-4">See how SLO listens to your files.</h2>
             <p className="mt-6 leading-relaxed" style={{ color: "var(--muted)" }}>
@@ -107,31 +117,23 @@ export default function HomePage() {
                 <p className="text-xs text-muted mt-1">Scanning takes place locally on your Mac. Your audio files are never uploaded for classification.</p>
               </div>
             </div>
-          </div>
-          <div>
+          </Reveal>
+          <Reveal delayMs={90}>
             <AudioAnalysisDemo />
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* Workflow Steps */}
+      {/* Workflow Steps — the connector traces signal progress as you read */}
       <section className="section section-rule">
         <div className="site-container">
-          <div className="max-w-2xl">
-            <span className="eyebrow">Precision Engineering</span>
-            <h2 className="section-title mt-4">Streamline your sample library workflow.</h2>
-          </div>
-          <ol className="workflow-list mt-12">
-            {WORKFLOWS.map(([number, title, body]) => (
-              <li key={number} className="workflow-item">
-                <span className="workflow-number">{number}</span>
-                <div>
-                  <h3 className="text-foreground">{title}</h3>
-                  <p>{body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <Reveal>
+            <div className="max-w-2xl">
+              <span className="eyebrow">Precision Engineering</span>
+              <h2 className="section-title mt-4">Streamline your sample library workflow.</h2>
+            </div>
+          </Reveal>
+          <WorkflowFlow steps={WORKFLOWS} />
         </div>
       </section>
 
@@ -139,15 +141,17 @@ export default function HomePage() {
       <section className="section section-rule">
         <div className="site-container">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-            <div className="max-w-2xl">
-              <span className="eyebrow">System Capabilities</span>
-              <h2 className="section-title mt-4">An instrument built for audio producers.</h2>
-            </div>
+            <Reveal>
+              <div className="max-w-2xl">
+                <span className="eyebrow">System Capabilities</span>
+                <h2 className="section-title mt-4">An instrument built for audio producers.</h2>
+              </div>
+            </Reveal>
             <Link href="/products/smart-sample-manager" className="text-link">
               Read SLO specifications <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
-          <div className="capability-grid mt-10">
+          <div className="capability-grid spotlight-group mt-10">
             {CAPABILITIES.map(([title, body]) => (
               <article key={title} className="capability">
                 <h3 className="text-foreground">{title}</h3>
@@ -160,14 +164,14 @@ export default function HomePage() {
 
       {/* Bottom CTA Panel */}
       <section className="section section-rule">
-        <div className="site-container cta-panel">
+        <div className="site-container cta-panel depth-hover">
           <div>
             <span className="eyebrow">Get Started</span>
             <h2 className="section-title mt-4 text-foreground">Find the sound. Finish the track.</h2>
           </div>
           <div className="flex flex-wrap gap-3 relative z-10">
             <Link href="/pricing" className="btn-primary">
-              See pricing
+              <Magnetic>See pricing</Magnetic>
             </Link>
             <Link href="/learn" className="btn-secondary">
               Read guides

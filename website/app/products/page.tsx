@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { StatusDot } from "@/components/motion/StatusDot";
+import { Reveal } from "@/components/motion/Reveal";
+import { TiltSurface } from "@/components/motion/TiltSurface";
 
 export const metadata: Metadata = {
   title: "Products & Research",
@@ -64,65 +67,76 @@ export default function ProductsPage() {
       </section>
 
       {/* Flagship Highlight Section */}
-      <section className="section-rule bg-[#0D1322]/10">
+      <section className="section-rule bg-surface/10">
         <div className="site-container py-12 sm:py-20">
           <span className="eyebrow block mb-6">Flagship Experience</span>
-          <div className="surface-card p-8 sm:p-12 relative overflow-hidden border border-brand-blue/30 rounded-lg">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-brand-blue/10 via-brand-violet/5 to-transparent pointer-events-none rounded-full blur-3xl" />
-            
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <span className="chip-neutral font-mono text-[10px] border-brand-blue-bright text-brand-blue-bright">
-                  {flagship.status}
-                </span>
-                <h2 className="mt-5 text-4xl font-bold text-foreground tracking-tight">{flagship.name}</h2>
-                <p className="text-sm font-mono text-muted-dim mt-1.5">{flagship.fullName}</p>
-              </div>
-              <Link href={`/products/${flagship.slug}`} className="btn-primary">
-                Explore SLO Flagship
-              </Link>
-            </div>
+          <TiltSurface maxTiltDeg={1.2}>
+            <div className="surface-card p-8 sm:p-12 relative overflow-hidden border border-brand-blue/30 rounded-lg">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-brand-blue/10 via-brand-violet/5 to-transparent pointer-events-none rounded-full blur-3xl" />
 
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
-              {flagship.description}
-            </p>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <span className="chip-neutral status-chip font-mono text-[10px] border-brand-blue-bright text-brand-blue-bright">
+                    <StatusDot tone="live" live />
+                    {flagship.status}
+                  </span>
+                  <h2 className="mt-5 text-4xl font-bold text-foreground tracking-tight">{flagship.name}</h2>
+                  <p className="text-sm font-mono text-muted-dim mt-1.5">{flagship.fullName}</p>
+                </div>
+                <Link href={`/products/${flagship.slug}`} className="btn-primary">
+                  Explore SLO Flagship
+                </Link>
+              </div>
 
-            <div className="mt-10 pt-8 border-t border-border/50 grid gap-6 sm:grid-cols-3 text-xs font-mono">
-              <div>
-                <span className="text-muted-dim block uppercase">PLATFORM</span>
-                <span className="text-foreground font-semibold mt-1 block">macOS 12+ (Apple Silicon Native)</span>
-              </div>
-              <div>
-                <span className="text-muted-dim block uppercase">FORMATS</span>
-                <span className="text-foreground font-semibold mt-1 block">AU &middot; VST3 &middot; Standalone</span>
-              </div>
-              <div>
-                <span className="text-muted-dim block uppercase">DATA PRIVACY</span>
-                <span className="text-foreground font-semibold mt-1 block">Local Scan / No Audio Uploads</span>
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">
+                {flagship.description}
+              </p>
+
+              <div className="mt-10 pt-8 border-t border-border/50 grid gap-6 sm:grid-cols-3 text-xs font-mono tnum">
+                <div>
+                  <span className="text-muted-dim block uppercase">PLATFORM</span>
+                  <span className="text-foreground font-semibold mt-1 block">macOS 12+ (Apple Silicon Native)</span>
+                </div>
+                <div>
+                  <span className="text-muted-dim block uppercase">FORMATS</span>
+                  <span className="text-foreground font-semibold mt-1 block">AU &middot; VST3 &middot; Standalone</span>
+                </div>
+                <div>
+                  <span className="text-muted-dim block uppercase">DATA PRIVACY</span>
+                  <span className="text-foreground font-semibold mt-1 block">Local Scan / No Audio Uploads</span>
+                </div>
               </div>
             </div>
-          </div>
+          </TiltSurface>
         </div>
       </section>
 
       {/* Research and Prototypes Grid */}
       <section className="section section-rule">
         <div className="site-container">
-          <span className="eyebrow block">Research & R&D Labs</span>
-          <h2 className="section-title mt-4">Active prototypes and parked projects.</h2>
-          <p className="mt-4 text-sm max-w-2xl text-muted">
-            We actively document our technology stack and prototypes. These are not commercial releases, but represent our core technical engineering estate.
-          </p>
+          <Reveal>
+            <span className="eyebrow block">Research & R&D Labs</span>
+            <h2 className="section-title mt-4">Active prototypes and parked projects.</h2>
+            <p className="mt-4 text-sm max-w-2xl text-muted">
+              We actively document our technology stack and prototypes. These are not commercial releases, but represent our core technical engineering estate.
+            </p>
+          </Reveal>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="spotlight-group mt-10 grid gap-6 md:grid-cols-3">
             {standardProducts.map((p) => (
-              <div key={p.name} className="surface-card p-6 flex flex-col justify-between min-h-[16rem]">
+              <div
+                key={p.name}
+                className="surface-card depth-hover p-6 flex flex-col justify-between min-h-[16rem]"
+              >
                 <div>
                   <div className="flex justify-between items-center gap-2">
-                    <span 
-                      className="text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border"
+                    <span
+                      className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border"
                       style={{ borderColor: p.statusColor, color: p.statusColor }}
                     >
+                      <StatusDot
+                        tone={p.status === "Prototype / R&D" || p.status === "Research" ? "warning" : "muted"}
+                      />
                       {p.status}
                     </span>
                   </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const NAV_LINKS = [
   { href: "/products", label: "Products" },
@@ -12,6 +13,45 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const [indicator, setIndicator] = useState({ x: 0, w: 0, ready: false });
+
+  const measure = useCallback(() => {
+    const container = navRef.current;
+    if (!container) return;
+    const activeIndex = NAV_LINKS.findIndex(
+      (link) => pathname === link.href || pathname.startsWith(`${link.href}/`),
+    );
+    if (activeIndex === -1) {
+      setIndicator((prev) => ({ ...prev, ready: false }));
+      return;
+    }
+    const link = linkRefs.current[activeIndex];
+    if (!link) return;
+    // The indicator lives inside .nav-links (position:relative), so offsets
+    // are measured relative to that container, not the viewport.
+    const linkLeft = link.offsetLeft;
+    setIndicator({ x: linkLeft, w: link.offsetWidth, ready: true });
+  }, [pathname]);
+
+  useEffect(() => {
+    // Defer to rAF: keeps the effect body free of synchronous state updates
+    // and lets the first paint land before the indicator positions itself.
+    let raf = requestAnimationFrame(measure);
+    const onFontsReady = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
+    document.fonts?.ready.then(onFontsReady).catch(() => {});
+    window.addEventListener("resize", measure);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", measure);
+    };
+  }, [measure]);
 
   return (
     <header
@@ -26,12 +66,39 @@ export function SiteHeader() {
         <Link href="/" className="brand-mark text-xl leading-none" aria-label="NITE DSP home">
           NITE DSP
         </Link>
-        <div className="hidden sm:flex items-center gap-8 text-sm" style={{ color: "var(--muted)" }}>
-          {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-[color:var(--foreground)] transition-colors">
+        <div
+          ref={navRef}
+          className="nav-links relative hidden sm:flex items-center gap-8 text-sm"
+          style={{ color: "var(--muted)" }}
+        >
+          {NAV_LINKS.map((link, i) => (
+            <Link
+              key={link.href}
+              ref={(el) => {
+                linkRefs.current[i] = el;
+              }}
+              href={link.href}
+              aria-current={
+                pathname === link.href || pathname.startsWith(`${link.href}/`)
+                  ? "page"
+                  : undefined
+              }
+              className="hover:text-[color:var(--foreground)] transition-colors"
+            >
               {link.label}
             </Link>
           ))}
+          {/* Morphing active indicator — purely decorative; state is also
+              conveyed via aria-current. Labels never move. */}
+          <span
+            aria-hidden="true"
+            className="nav-indicator"
+            style={{
+              width: `${indicator.w}px`,
+              transform: `translateX(${indicator.x}px)`,
+              opacity: indicator.ready ? 1 : 0,
+            }}
+          />
         </div>
         <div className="flex items-center gap-3">
           <Link href="/account" className="hidden sm:inline-flex btn-secondary">

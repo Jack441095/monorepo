@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { clamp, useReactivePointer } from "@/lib/motion";
 
 const SAMPLES = [
   {
@@ -26,13 +27,63 @@ const SAMPLES = [
   },
 ] as const;
 
+/* Pseudo-analysis scramble shown only while the illustrative scan runs.
+   Derived from scan progress so it costs no extra state updates. */
+function scramble(progress: number, seed: number): string {
+  const digits = "0123456789";
+  const a = digits[(Math.floor(progress * 7) + seed) % 10];
+  const b = digits[(Math.floor(progress * 3) + seed * 3) % 10];
+  const c = digits[(Math.floor(progress * 11) + seed * 7) % 10];
+  return `${a}${b}.${c}`;
+}
+
 export function AudioAnalysisDemo() {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(100);
   const [revealed, setRevealed] = useState(true);
+  const [pulsing, setPulsing] = useState(false);
+  const [chipPulseIdx, setChipPulseIdx] = useState(-1);
 
   const sample = SAMPLES[selectedIdx];
+  const reactivePointer = useReactivePointer();
+
+  /* Pointer-responsive waveform: a soft blue examination band follows the
+     cursor across the display with a short CSS-eased trail — local amplitude
+     emphasis, not a hard scanner. Event-driven transform writes only; no
+     animation loop runs. */
+  const bandRef = useRef<HTMLDivElement>(null);
+
+  const onWaveMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!reactivePointer) return;
+      const bounds = event.currentTarget.getBoundingClientRect();
+      const x = clamp(event.clientX - bounds.left, 0, bounds.width);
+      if (bandRef.current) {
+        bandRef.current.style.transform = `translate3d(${x.toFixed(1)}px, -50%, 0)`;
+        bandRef.current.style.opacity = "1";
+      }
+    },
+    [reactivePointer],
+  );
+
+  const onWaveLeave = useCallback(() => {
+    if (bandRef.current) {
+      bandRef.current.style.opacity = "0";
+    }
+  }, []);
+
+  /* Transient micro-pulse: one short red impulse when analysis resolves. */
+  const fireTransient = useCallback((target: "badge" | number) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (target === "badge") {
+      setPulsing(true);
+      window.setTimeout(() => setPulsing(false), 240);
+    } else {
+      setChipPulseIdx(target);
+      window.setTimeout(() => setChipPulseIdx(-1), 240);
+    }
+  }, []);
 
   const triggerScan = (idx: number) => {
     if (isScanning) return;
@@ -40,6 +91,7 @@ export function AudioAnalysisDemo() {
     setIsScanning(true);
     setScanProgress(0);
     setRevealed(false);
+    fireTransient(idx);
   };
 
   useEffect(() => {
@@ -51,6 +103,7 @@ export function AudioAnalysisDemo() {
           clearInterval(interval);
           setIsScanning(false);
           setRevealed(true);
+          fireTransient("badge");
           return 100;
         }
         return prev + 5;
@@ -58,7 +111,7 @@ export function AudioAnalysisDemo() {
     }, 40);
 
     return () => clearInterval(interval);
-  }, [isScanning]);
+  }, [isScanning, fireTransient]);
 
   return (
     <div className="product-frame w-full max-w-2xl mx-auto">
@@ -68,11 +121,14 @@ export function AudioAnalysisDemo() {
           <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
           DSP SIGNAL CLASSIFIER
         </span>
-        <span className="text-[10px] text-muted-dim font-mono">BETA 2.1 // OFFLINE ENGINE</span>
+        <span className="flex items-center gap-2">
+          <span className="chip-neutral text-[9px]">SIMULATION</span>
+          <span className="text-[10px] text-muted-dim font-mono">BETA 2.1 // OFFLINE ENGINE</span>
+        </span>
       </div>
 
       {/* Demo Panel Area */}
-      <div className="p-6 bg-[#0D1322] flex flex-col gap-6">
+      <div className="p-6 bg-surface flex flex-col gap-6">
         {/* Sample Selection List */}
         <div className="grid grid-cols-3 gap-2">
           {SAMPLES.map((s, idx) => {
@@ -82,9 +138,9 @@ export function AudioAnalysisDemo() {
                 key={s.filename}
                 type="button"
                 onClick={() => triggerScan(idx)}
-                className={`py-3 px-3 text-[11px] font-mono text-center rounded border transition-all cursor-pointer ${
+                className={`transient-pulse ${chipPulseIdx === idx ? "is-pulsing" : ""} py-3 px-3 text-[11px] font-mono text-center rounded border transition-all cursor-pointer ${
                   active
-                    ? "border-brand-blue bg-[rgba(57,123,255,0.06)] text-foreground"
+                    ? "border-brand-blue bg-brand-blue/6 text-foreground"
                     : "border-border hover:border-border-strong text-muted"
                 }`}
                 disabled={isScanning}
@@ -96,7 +152,11 @@ export function AudioAnalysisDemo() {
         </div>
 
         {/* Waveform View & Scanning Line */}
-        <div className="relative h-32 border border-border bg-[#070A12] rounded-md overflow-hidden flex items-center px-6">
+        <div
+          className="relative h-32 border border-border bg-background rounded-md overflow-hidden flex items-center px-6"
+          onPointerMove={onWaveMove}
+          onPointerLeave={onWaveLeave}
+        >
           {/* Grid lines in background */}
           <div className="absolute inset-0 grid grid-cols-12 grid-rows-4 opacity-[0.03] pointer-events-none">
             {Array.from({ length: 48 }).map((_, i) => (
@@ -104,12 +164,29 @@ export function AudioAnalysisDemo() {
             ))}
           </div>
 
+          {/* Pointer examination band — soft local waveform illumination */}
+          {reactivePointer && (
+            <div
+              ref={bandRef}
+              aria-hidden="true"
+              className="absolute top-1/2 left-0 h-full w-24 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(closest-side, rgba(86,168,255,0.14), transparent 75%)",
+                transform: "translate3d(-200px, -50%, 0)",
+                opacity: 0,
+                transition:
+                  "transform 160ms var(--motion-easing), opacity var(--motion-slow) var(--motion-easing)",
+              }}
+            />
+          )}
+
           {/* Simulated Waveform bars */}
           <div className="w-full flex items-end justify-between h-20 relative">
             {sample.waveform.map((val, barIdx) => {
               const hasTransient = barIdx === sample.transientIdx;
               const isPassedByScanner = (barIdx / sample.waveform.length) * 100 <= scanProgress;
-              
+
               let barColor = "var(--border-strong)";
               if (isScanning) {
                 if (isPassedByScanner) {
@@ -122,7 +199,7 @@ export function AudioAnalysisDemo() {
               return (
                 <div key={barIdx} className="flex-1 mx-[2px] flex flex-col items-center h-full justify-end">
                   {hasTransient && revealed && !isScanning && (
-                    <span 
+                    <span
                       className="w-1.5 h-1.5 rounded-full mb-1 animate-ping absolute"
                       style={{ backgroundColor: sample.color, bottom: `${val + 10}%` }}
                     />
@@ -132,7 +209,7 @@ export function AudioAnalysisDemo() {
                     style={{
                       height: `${val}%`,
                       backgroundColor: barColor,
-                      boxShadow: hasTransient && revealed && !isScanning 
+                      boxShadow: hasTransient && revealed && !isScanning
                         ? `0 0 12px ${sample.color}`
                         : "none",
                     }}
@@ -141,30 +218,45 @@ export function AudioAnalysisDemo() {
               );
             })}
 
-            {/* Scan overlay cursor */}
+            {/* Scan overlay cursor with violet processing trail */}
             {isScanning && (
-              <div
-                className="absolute top-0 bottom-0 w-[2px] bg-brand-blue-bright"
-                style={{
-                  left: `${scanProgress}%`,
-                  boxShadow: "0 0 10px var(--brand-blue-bright)",
-                }}
-              />
+              <>
+                <div
+                  aria-hidden="true"
+                  className="absolute top-0 bottom-0 left-0 pointer-events-none"
+                  style={{
+                    width: `${scanProgress}%`,
+                    background:
+                      "linear-gradient(to right, transparent 55%, rgba(113,72,232,0.16) 92%, rgba(86,168,255,0.22) 100%)",
+                  }}
+                />
+                <div
+                  className="absolute top-0 bottom-0 w-[2px] bg-brand-blue-bright"
+                  style={{
+                    left: `${scanProgress}%`,
+                    boxShadow: "0 0 10px var(--brand-blue-bright)",
+                  }}
+                />
+              </>
             )}
           </div>
         </div>
 
         {/* Analysis Readout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 font-mono">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 font-mono tnum">
           {/* Signal analysis data */}
-          <div className="border border-border p-4 rounded bg-[#121B2D]/40 text-[11px] leading-relaxed text-muted">
+          <div className="border border-border p-4 rounded bg-surface-raised/40 text-[11px] leading-relaxed text-muted">
             <div className="flex justify-between">
               <span>RMS POWER</span>
-              <span className="text-foreground font-semibold">{isScanning ? "ANALYSING..." : "-14.2 dB"}</span>
+              <span className="text-foreground font-semibold">
+                {isScanning ? `-${scramble(scanProgress, 4)} dB` : "-14.2 dB"}
+              </span>
             </div>
             <div className="flex justify-between mt-1.5">
               <span>SPECTRAL CENTROID</span>
-              <span className="text-foreground font-semibold">{isScanning ? "SCANNING..." : "1.85 kHz"}</span>
+              <span className="text-foreground font-semibold">
+                {isScanning ? `${scramble(scanProgress, 9)} kHz` : "1.85 kHz"}
+              </span>
             </div>
             <div className="flex justify-between mt-1.5">
               <span>TRANSIENT DETECTED</span>
@@ -175,7 +267,7 @@ export function AudioAnalysisDemo() {
           </div>
 
           {/* Classification Output */}
-          <div className="border border-border p-4 rounded bg-[#121B2D] flex flex-col justify-center items-center text-center">
+          <div className="border border-border p-4 rounded bg-surface-raised flex flex-col justify-center items-center text-center">
             <span className="text-[10px] text-muted-dim tracking-wider uppercase">SLO CLASSIFIED AS:</span>
             <div className="h-10 flex items-center justify-center mt-1">
               {isScanning ? (
@@ -185,8 +277,8 @@ export function AudioAnalysisDemo() {
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-violet animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               ) : revealed ? (
-                <span 
-                  className="text-sm font-bold tracking-widest text-foreground bg-[rgba(57,123,255,0.1)] px-4 py-1.5 rounded border border-[rgba(57,123,255,0.2)]"
+                <span
+                  className={`transient-pulse ${pulsing ? "is-pulsing" : ""} text-sm font-bold tracking-widest text-foreground bg-brand-blue/10 px-4 py-1.5 rounded border border-brand-blue/20`}
                   style={{ textShadow: "0 0 10px rgba(57,123,255,0.3)" }}
                 >
                   {sample.category}

@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
+import { LightField } from "@/components/motion/LightField";
+import { Magnetic } from "@/components/motion/Magnetic";
+import { Reveal } from "@/components/motion/Reveal";
+import { TiltSurface } from "@/components/motion/TiltSurface";
 
 export const metadata: Metadata = {
   title: "SLO — Sample Library Optimiser",
@@ -67,18 +71,19 @@ export default function SmartSampleManagerPage() {
       />
       
       {/* Product Hero */}
-      <section className="section product-hero">
-        <div className="site-container">
+      <section className="section product-hero relative overflow-hidden">
+        <LightField />
+        <div className="site-container relative">
           <span className="eyebrow">Flagship Product</span>
           <h1 className="section-title mt-4 text-foreground">SLO</h1>
           <p className="text-sm font-mono text-brand-blue-bright mt-1">Sample Library Optimiser</p>
           <p className="body-large mt-6">
-            A professional, acoustic-similarity sample browser and organizer for macOS. 
+            A professional, acoustic-similarity sample browser and organizer for macOS.
             By analysing raw audio signals rather than depending on folder structures or filenames, SLO provides absolute clarity over your sample library.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link href="/pricing" className="btn-primary">
-              See pricing
+              <Magnetic>See pricing</Magnetic>
             </Link>
             <Link href="/account" className="btn-secondary">
               Sign in to download
@@ -90,20 +95,24 @@ export default function SmartSampleManagerPage() {
       {/* Main App Frame Screenshot */}
       <section className="border-t" style={{ borderColor: "var(--border)" }}>
         <div className="site-container py-12 sm:py-20">
-          <div className="product-frame product-frame--hero">
-            <div className="product-frame__bar">
-              <span>SLO // LIST VIEW</span>
-              <span>2,450 SAMPLES INDEXED</span>
+          <TiltSurface>
+            <div className="product-frame">
+              <div className="product-frame__bar" data-depth="1.5">
+                <span>SLO // LIST VIEW</span>
+                <span>2,450 SAMPLES INDEXED</span>
+              </div>
+              <div data-depth="3">
+                <Image
+                  src="/screenshots/main-browser.png"
+                  alt="SLO list view showing sample browser layout, categorised tags, spectral analysis and transient points"
+                  width={1599}
+                  height={1057}
+                  className="w-full h-auto block"
+                  priority
+                />
+              </div>
             </div>
-            <Image
-              src="/screenshots/main-browser.png"
-              alt="SLO list view showing sample browser layout, categorised tags, spectral analysis and transient points"
-              width={1599}
-              height={1057}
-              className="w-full h-auto"
-              priority
-            />
-          </div>
+          </TiltSurface>
           <p className="mt-4 text-xs" style={{ color: "var(--muted-dim)" }}>
             SLO flagship standalone application showing the browser, transient analyzer, and spectral centroid metrics.
           </p>
@@ -129,9 +138,9 @@ export default function SmartSampleManagerPage() {
       </section>
 
       {/* Interactive Demonstration */}
-      <section className="section border-t bg-[#0D1322]/20" style={{ borderColor: "var(--border)" }}>
+      <section className="section border-t bg-surface/20" style={{ borderColor: "var(--border)" }}>
         <div className="site-container grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-          <div>
+          <Reveal>
             <span className="eyebrow">Acoustic Signal Processing</span>
             <h2 className="section-title mt-4">Bypass cryptic filenames.</h2>
             <p className="mt-6 leading-relaxed text-muted text-sm">
@@ -140,10 +149,10 @@ export default function SmartSampleManagerPage() {
             <div className="mt-6 callout-warning">
               <strong>Beta Safety Note:</strong> During the private beta, SLO operates in read-only classification mode and does not automatically rearrange your files or rename your samples.
             </div>
-          </div>
-          <div>
+          </Reveal>
+          <Reveal delayMs={90}>
             <AudioAnalysisDemo />
-          </div>
+          </Reveal>
         </div>
       </section>
 
