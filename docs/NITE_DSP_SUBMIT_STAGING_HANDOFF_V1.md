@@ -94,7 +94,10 @@ staging variables were configured with fresh staging secrets. The first direct
 deployment was accepted but stopped during Railway's build scheduling phase,
 before any build or runtime logs were emitted. The connected GitHub deployment
 retry also failed because this workspace has no GitHub installation for
-`Jack441095/NITE_DSP`.
+`Jack441095/NITE_DSP`. The staging-only GitHub source was then disconnected,
+and two further direct uploads reproduced the same scheduling-only failure.
+The public Railway domain currently returns 404 for both `/health` and `/ready`,
+confirming that no backend instance is serving.
 
 Next operational action: enable the repository's GitHub integration in Railway
 or retry the direct Railway builder when the workspace permits it. Only after a
