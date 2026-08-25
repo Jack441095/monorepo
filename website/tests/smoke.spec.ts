@@ -58,12 +58,21 @@ test("desktop nav has no visible menu button, mobile nav does", async ({ page })
   await expect(mobileNav.getByRole("link", { name: "Support" })).toBeVisible();
 });
 
-test("public product count is exactly one, and no WIP products are named", async ({ page }) => {
+test("public pages name WIP products only with status labels, never capability claims", async ({ page }) => {
+  // Updated for WEBSITE COMMERCIAL EXPERIENCE V1: the approved architecture
+  // (docs/NITE_DSP_WEBSITE_COMMERCIAL_ARCHITECTURE_V1.md §2) intentionally
+  // presents the full four-product ecosystem with honest status chips.
+  // What remains forbidden is capability overclaiming for unreleased products.
   await page.goto("/");
   const bodyText = await page.textContent("body");
-  for (const wip of ["KENN", "AutoMix", "AudioGen", "Thursday", "MIDI Generator"]) {
-    expect(bodyText).not.toContain(wip);
+  for (const forbidden of ["AutoMix", "AudioGen", "MIDI Generator", "AI mixes your song"]) {
+    expect(bodyText).not.toContain(forbidden);
   }
+  // WIP products may appear, but always alongside their true status.
+  expect(bodyText).toContain("KENN");
+  expect(bodyText).toContain("In Development");
+  expect(bodyText).toContain("Thursday");
+  expect(bodyText).toContain("Internal");
 });
 
 test("no production page links to localhost or a Railway subdomain", async ({ page }) => {

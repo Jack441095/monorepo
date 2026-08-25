@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Support",
-  description: "Getting started, installation, activation, troubleshooting, and contact for SLO.",
+  description: "Support for NITE Submit, SLO, and NITE DSP products.",
   alternates: { canonical: "/support" },
 };
 
@@ -39,7 +39,7 @@ export default function SupportPage() {
           <span className="eyebrow">Support Center</span>
           <h1 className="section-title mt-4 text-foreground">Get back to making music.</h1>
           <p className="body-large mt-6">
-            Explore documentation and guides for installing, configuring, and optimizing SLO—or contact us directly if you need support.
+            Explore product guides or contact us directly. NITE Submit beta users should include their macOS version, app version, and a redacted description of the PDF workflow.
           </p>
 
           <div className="support-grid mt-12">
@@ -64,7 +64,7 @@ export default function SupportPage() {
         <div className="site-container text-center" style={{ maxWidth: "42rem" }}>
           <h2 className="text-2xl font-bold text-foreground">Still stuck?</h2>
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            Email us directly. To help us troubleshoot faster, please include your macOS version, your DAW host, your SLO version build, and a brief description of the issue.
+            Email us directly. Please never attach an unredacted assignment or private document. Include your macOS version, product/version, and a brief description of the issue.
           </p>
           <a href="mailto:support@nitedsp.co.uk" className="btn-primary mt-8 inline-block font-mono">
             support@nitedsp.co.uk

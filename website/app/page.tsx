@@ -1,12 +1,59 @@
-import Image from "next/image";
 import Link from "next/link";
 import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
+import { CtaButton } from "@/components/CtaButton";
+import { SubmitPrepDemo } from "@/components/demo/SubmitPrepDemo";
 import { SignalJourney } from "@/components/SignalJourney";
 import { LightField } from "@/components/motion/LightField";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
+import { StatusDot } from "@/components/motion/StatusDot";
 import { TiltSurface } from "@/components/motion/TiltSurface";
 import { WorkflowFlow } from "@/components/motion/WorkflowFlow";
+
+const ECOSYSTEM = [
+  {
+    name: "Submit",
+    family: "WORKFLOW INTELLIGENCE",
+    line: "Prepare the right submission.",
+    body: "Local macOS document-preparation assistant. Drop in a file, review detected fields, and save a safe copy. Local check, zero uploads.",
+    href: "/products/submit",
+    status: "Private Beta",
+    tone: "success" as const,
+  },
+  {
+    name: "SLO",
+    family: "AUDIO INTELLIGENCE",
+    line: "Find sounds by how they sound.",
+    body: "Search your sample library by acoustic timbre rather than cryptic folder names. Audition matches and drag straight to DAW.",
+    href: "/products/smart-sample-manager",
+    status: "Private Beta / Research",
+    tone: "warning" as const,
+  },
+  {
+    name: "KENN",
+    family: "AUDIO INTELLIGENCE",
+    line: "Understand the mix.",
+    body: "Explainable mix review assistant. Observes acoustic dimensions, explains reasoning, and suggests tweaks. Every decision stays yours.",
+    href: "/products/kenn",
+    status: "In Development",
+    tone: "warning" as const,
+  },
+  {
+    name: "Thursday",
+    family: "INTERNAL SYSTEMS",
+    line: "Operational infrastructure.",
+    body: "Internal operational layer coordinating workflows across NITE DSP tools. Internal infrastructure, not a public commercial chatbot.",
+    href: "/thursday",
+    status: "Internal",
+    tone: "muted" as const,
+  },
+];
+
+const STATUS_STYLE = {
+  success: { borderColor: "rgba(16,185,129,0.4)", color: "var(--state-success)" },
+  warning: { borderColor: "var(--state-warning-border)", color: "var(--state-warning)" },
+  muted: { borderColor: "var(--border-strong)", color: "var(--muted)" },
+} as const;
 
 const WORKFLOWS = [
   [
@@ -36,53 +83,112 @@ const CAPABILITIES = [
 export default function HomePage() {
   return (
     <>
-      {/* Homepage Hero */}
+      {/* Homepage Hero — unified company proposition */}
       <section className="hero-grid overflow-hidden relative">
         <LightField />
-        <div className="site-container relative grid items-center gap-12 py-16 lg:grid-cols-[0.85fr_1.15fr] lg:py-24">
-          <div className="relative z-10">
-            <span className="eyebrow">NITE DSP // FLAGSHIP</span>
-            <h1 className="hero-title mt-5">Acoustic intelligence for creative workflows.</h1>
-            <p className="hero-copy mt-6">
-              SLO (Sample Library Optimiser) is a zero-latency desktop utility that extracts timbral feature vectors from raw audio signals, bypassing folder trees and broken metadata.
-            </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/products/smart-sample-manager" className="btn-primary">
-                <Magnetic>Explore SLO</Magnetic>
-              </Link>
-              <Link href="/pricing" className="btn-secondary">
-                View pricing
-              </Link>
-            </div>
-            <p className="mt-6 text-xs" style={{ color: "var(--muted-dim)" }}>
-              macOS &middot; VST3 &middot; AU &middot; Standalone &middot; Native Apple Silicon
-            </p>
+        <div className="site-container relative py-16 lg:py-24 text-center" style={{ maxWidth: "56rem" }}>
+          <span className="eyebrow">NITE DSP // INTELLIGENT CREATIVE TOOLS</span>
+          <h1 className="hero-title mt-5">
+            NITE DSP creates intelligent tools that simplify complex creative workflows.
+          </h1>
+          <p className="hero-copy mt-6 mx-auto">
+            From document preparation to sample discovery to mix understanding — local-first
+            software for creative professionals. Your work stays on your machine.
+          </p>
+          <div className="mt-9 flex flex-wrap justify-center gap-3">
+            <Link href="/products" className="btn-primary">
+              <Magnetic>Explore the products</Magnetic>
+            </Link>
+            <CtaButton state="BETA_REQUEST" label="Request beta access" secondary />
           </div>
+          <p className="mt-6 text-xs" style={{ color: "var(--muted-dim)" }}>
+            macOS 13+ &middot; Apple Silicon &middot; Local processing &middot; No uploads
+          </p>
+        </div>
+      </section>
 
-          <TiltSurface className="relative z-10 product-frame--hero">
-            <div className="product-frame">
-              <div className="product-frame__bar" data-depth="1.5">
-                <span>SLO // SAMPLE LIBRARY OPTIMISER</span>
-                <span>SPLIT VIEW</span>
-              </div>
-              <div data-depth="3">
-                <Image
-                  src="/screenshots/main-browser.png"
-                  alt="SLO flagship interface showing a searchable sample browser and selected sample details panel"
-                  width={1599}
-                  height={1057}
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 58vw"
-                  className="h-auto w-full block"
-                />
-              </div>
+      {/* Product Ecosystem */}
+      <section className="section section-rule">
+        <div className="site-container">
+          <Reveal>
+            <div className="max-w-2xl">
+              <span className="eyebrow">Product Architecture</span>
+              <h2 className="section-title mt-4">Focused tools for creative workflows.</h2>
+              <p className="mt-4 text-sm text-muted leading-relaxed font-sans">
+                NITE DSP builds local-first software starting with document preparation, then extending into audio intelligence for sample discovery and mix understanding.
+              </p>
             </div>
-          </TiltSurface>
+          </Reveal>
+          <div className="spotlight-group mt-10 grid gap-6 sm:grid-cols-2">
+            {ECOSYSTEM.map((p) => (
+              <Reveal key={p.name}>
+                <Link
+                  href={p.href}
+                  className="surface-card depth-hover p-6 rounded-lg border border-border/40 flex flex-col min-h-[15rem]"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-brand-blue-bright">
+                      {p.family}
+                    </span>
+                    <span
+                      className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border"
+                      style={STATUS_STYLE[p.tone]}
+                    >
+                      <StatusDot tone={p.tone === "success" ? "live" : p.tone === "muted" ? "muted" : "warning"} />
+                      {p.status}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mt-3">{p.name}</h3>
+                  <p className="mt-1 text-sm font-medium" style={{ color: "var(--brand-blue-bright)" }}>
+                    {p.line}
+                  </p>
+                  <p className="mt-3 text-xs leading-relaxed text-muted font-sans">{p.body}</p>
+                  <span className="text-link mt-auto pt-4 text-xs font-sans">Learn more <span aria-hidden="true">&rarr;</span></span>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* The NITE Signal Journey — company-level signal flow */}
       <SignalJourney />
+
+      {/* Interactive Demonstrations */}
+      <section className="section section-rule bg-surface/10">
+        <div className="site-container">
+          <Reveal>
+            <span className="eyebrow">Product Demonstrations</span>
+            <h2 className="section-title mt-4">See how the tools think.</h2>
+            <p className="mt-4 text-sm max-w-2xl text-muted">
+              Simulated walkthroughs running entirely in your browser with illustrative data —
+              nothing is uploaded, nothing is processed externally.
+            </p>
+          </Reveal>
+
+          <div className="mt-12 grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-8 items-center">
+            <Reveal>
+              <TiltSurface className="product-frame--hero">
+                <SubmitPrepDemo />
+              </TiltSurface>
+            </Reveal>
+            <Reveal delayMs={90}>
+              <span className="u-label" style={{ color: "var(--brand-blue-bright)" }}>SUBMIT</span>
+              <h3 className="mt-2 text-lg font-semibold text-foreground">
+                Drop &rarr; Understand &rarr; Review &rarr; Prepare &rarr; Verify &rarr; Receipt
+              </h3>
+              <p className="mt-3 text-xs leading-relaxed text-muted">
+                Submit reviews document structure locally, flags uncertain fields for your approval,
+                and saves a safely named copy. It never submits work for you and never modifies your
+                original file.
+              </p>
+              <Link href="/products/submit" className="text-link mt-4 inline-block text-xs">
+                Explore Submit <span aria-hidden="true">&rarr;</span>
+              </Link>
+            </Reveal>
+          </div>
+        </div>
+      </section>
 
       {/* The Core Problem & Audio-First Positioning */}
       <section className="section section-rule">
@@ -174,11 +280,9 @@ export default function HomePage() {
             <h2 className="section-title mt-4 text-foreground">Find the sound. Finish the track.</h2>
           </div>
           <div className="flex flex-wrap gap-3 relative z-10">
-            <Link href="/pricing" className="btn-primary">
-              <Magnetic>See pricing</Magnetic>
-            </Link>
-            <Link href="/learn" className="btn-secondary">
-              Read guides
+            <CtaButton state="BETA_REQUEST" />
+            <Link href="/pricing" className="btn-secondary">
+              View pricing
             </Link>
           </div>
         </div>
