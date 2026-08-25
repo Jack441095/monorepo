@@ -74,7 +74,7 @@ class CommerceProvider(ABC):
     def verify_webhook_signature(self, raw_body: bytes, signature_header: str) -> bool: ...
 
     @abstractmethod
-    def create_checkout_url(self, price_id: str, customer_email: str) -> str: ...
+    def create_checkout_url(self, price_id: str) -> str: ...
 
 
 class PaddleProvider(CommerceProvider):
@@ -107,7 +107,7 @@ class PaddleProvider(CommerceProvider):
         ).hexdigest()
         return hmac.compare_digest(expected, h1)
 
-    def create_checkout_url(self, price_id: str, customer_email: str) -> str:
+    def create_checkout_url(self, price_id: str) -> str:
         if not self.configured:
             raise RuntimeError(
                 "Paddle is not configured (no sandbox account yet -- "
@@ -116,7 +116,10 @@ class PaddleProvider(CommerceProvider):
         # Paddle Billing's Transactions API: creating a transaction with
         # collection_mode=automatic and no existing payment returns a
         # checkout.url the client can redirect to -- this is the real
-        # server-prepared-checkout shape, not a mocked URL. See
+        # server-prepared-checkout shape, not a mocked URL. The transaction is
+        # intentionally a draft with no customer object: Paddle Checkout
+        # captures customer/address details and the completed webhook carries
+        # the resulting customer_id. See
         # https://developer.paddle.com/api-reference/transactions/create-transaction
         # (verify the exact response shape against current docs before
         # relying on this in a real sandbox test -- untested against a live
@@ -130,7 +133,6 @@ class PaddleProvider(CommerceProvider):
                 },
                 json={
                     "items": [{"price_id": price_id, "quantity": 1}],
-                    "customer": {"email": customer_email},
                     "collection_mode": "automatic",
                 },
                 timeout=15.0,
@@ -258,7 +260,7 @@ def _handle_transaction_completed(db: Session, payload: dict) -> None:
     db.add(entitlement)
 
     amount_display = f"{currency} {amount_cents / 100:.2f}"
-    subject, body = email_templates.purchase_confirmation("Smart Sample Manager", amount_display, license_key)
+    subject, body = email_templates.purchase_confirmation(product.name, amount_display, license_key)
     send_email(to=email, subject=subject, body=body)
 
 
@@ -468,7 +470,7 @@ def create_checkout(
         raise HTTPException(status_code=400, detail="Unknown or unconfigured price")
 
     try:
-        checkout_url = provider.create_checkout_url(price_id, user.email)
+        checkout_url = provider.create_checkout_url(price_id)
     except RuntimeError as exc:
         logger.error("Checkout creation failed for user=%s: %s", user.id, exc)
         raise HTTPException(status_code=502, detail="Could not create checkout") from exc

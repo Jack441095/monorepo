@@ -41,44 +41,48 @@ test.describe("interactive demonstration layer", () => {
 
   test("Submit simulation runs to preparation result with honest framing", async ({ page }) => {
     await page.goto("/products");
-    const demo = page.getByRole("region", { name: /Submit document preparation demonstration/ });
+    const demo = page.getByRole("region", { name: /Submit document preparation console demonstration/ });
     await demo.scrollIntoViewIfNeeded();
     await demo.getByRole("button", { name: /Assignment_Final\.pdf/ }).click();
-    await expect(demo.getByText("Preparation ready")).toBeVisible({ timeout: 5000 });
-    await expect(demo.getByText("Review required — remove “Final”")).toBeVisible();
+    await expect(demo.getByText("PREPARED", { exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(demo.getByText("Remove redundant 'Final' tag from filename")).toBeVisible();
     await expect(demo.getByText("SIMULATION", { exact: true })).toBeVisible();
-    await expect(demo.getByText(/does not submit automatically/i)).toBeVisible();
-    await expect(demo.getByText(/No documents are processed or uploaded/i)).toBeVisible();
+    await expect(demo.getByText("LOCAL CHECK ONLY", { exact: true })).toBeVisible();
+    await expect(demo.getByText("0 BYTES UPLOADED", { exact: true })).toBeVisible();
+    await expect(demo.getByText(/never submits automatically/i)).toBeVisible();
   });
 
   test("Submit simulation flags a second document differently", async ({ page }) => {
     await page.goto("/products");
-    const demo = page.getByRole("region", { name: /Submit document preparation demonstration/ });
+    const demo = page.getByRole("region", { name: /Submit document preparation console demonstration/ });
     await demo.scrollIntoViewIfNeeded();
     await demo.getByRole("button", { name: /Thesis_Chapter2\.docx/ }).click();
-    await expect(demo.getByText("Review required before submission")).toBeVisible({ timeout: 5000 });
+    // This demo runs the same 1.9s scan/analysis state machine as the other
+    // fixtures; allow extra headroom when the full Chromium suite is under
+    // parallel worker load on Rosetta.
+    await expect(demo.getByText("Student name header missing")).toBeVisible({ timeout: 10000 });
+    await expect(demo.getByText("Resolve name header before export")).toBeVisible();
   });
 
   test("KENN concept demo produces explainable suggestions", async ({ page }) => {
     await page.goto("/products");
     const demo = page.getByRole("region", { name: /KENN mix analysis concept demonstration/ });
     await demo.scrollIntoViewIfNeeded();
-    await demo.getByRole("button", { name: "Run mix analysis" }).click();
-    await expect(demo.getByText("Review recommended — energy builds below 80Hz")).toBeVisible({ timeout: 5000 });
-    await expect(demo.getByText("Suggested — gentle glue compression on the chorus")).toBeVisible();
-    await expect(demo.getByText("Healthy — balanced correlation across the field")).toBeVisible();
+    await demo.getByRole("button", { name: /Run mix review/i }).click();
+    await expect(demo.getByText("REVIEW RECOMMENDED", { exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(demo.getByText("Apply a 24dB/oct high-pass filter at 30Hz or reduce low shelf by 1.8dB")).toBeVisible();
+    await expect(demo.getByText("EXPLAINABLE SUGGESTION", { exact: true })).toBeVisible();
     await expect(demo.getByText("CONCEPT DEMO", { exact: true })).toBeVisible();
-    await expect(demo.getByText(/KENN assists engineers/i)).toBeVisible();
-    await expect(demo.getByText(/active research/i)).toBeVisible();
+    await expect(demo.getByText(/offers evidence-based observations/i)).toBeVisible();
   });
 
   test("demos are keyboard operable", async ({ page }) => {
     await page.goto("/products");
-    const demo = page.getByRole("region", { name: /Submit document preparation demonstration/ });
+    const demo = page.getByRole("region", { name: /Submit document preparation console demonstration/ });
     await demo.scrollIntoViewIfNeeded();
     await demo.getByRole("button", { name: /Assignment_Final\.pdf/ }).focus();
     await page.keyboard.press("Enter");
-    await expect(demo.getByText("Preparation ready")).toBeVisible({ timeout: 5000 });
+    await expect(demo.getByText("PREPARED", { exact: true })).toBeVisible({ timeout: 5000 });
   });
 
   test("reduced motion: demos still reach their results", async ({ page }) => {
@@ -86,13 +90,13 @@ test.describe("interactive demonstration layer", () => {
     await page.goto("/products");
     const kenn = page.getByRole("region", { name: /KENN mix analysis concept demonstration/ });
     await kenn.scrollIntoViewIfNeeded();
-    await kenn.getByRole("button", { name: "Run mix analysis" }).click();
-    await expect(kenn.getByText("Review recommended — energy builds below 80Hz")).toBeVisible({ timeout: 5000 });
+    await kenn.getByRole("button", { name: /Run mix review/i }).click();
+    await expect(kenn.getByText("REVIEW RECOMMENDED", { exact: true })).toBeVisible({ timeout: 5000 });
 
-    const submit = page.getByRole("region", { name: /Submit document preparation demonstration/ });
+    const submit = page.getByRole("region", { name: /Submit document preparation console demonstration/ });
     await submit.scrollIntoViewIfNeeded();
     await submit.getByRole("button", { name: /Assignment_Final\.pdf/ }).click();
-    await expect(submit.getByText("Preparation ready")).toBeVisible({ timeout: 5000 });
+    await expect(submit.getByText("PREPARED", { exact: true })).toBeVisible({ timeout: 5000 });
   });
 
   test("demos introduce no horizontal overflow on mobile", async ({ browser }) => {

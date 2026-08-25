@@ -15,6 +15,7 @@ reason) -- never logs secrets.
 from __future__ import annotations
 
 import hmac
+import re
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -27,6 +28,7 @@ from .config import settings
 from .database import get_db
 from .email import send_email
 from .rate_limit import rate_limit
+from .storage import StorageError, StorageNotFound, get_storage
 
 # Phase 5, Section 23: a beta tester must not be unexpectedly disabled
 # mid-testing-cycle. 90 days is long enough to span a typical private-beta
@@ -145,7 +147,8 @@ def issue_entitlement(
     db.commit()
 
     expires_at_iso = expires_at.date().isoformat() if expires_at else None
-    product_display_name = "Smart Sample Manager"  # only commercial product -- Section 14
+    product = db.get(models.Product, req.product_id)
+    product_display_name = product.name if product else req.product_id
     if req.license_type == "beta":
         subject, body = email_templates.beta_invite(license_key, product_display_name, expires_at_iso)
     else:
@@ -254,6 +257,110 @@ def upsert_product(
     _audit(db, actor, "product.created" if is_new else "product.updated", product_id)
     db.commit()
     return {"id": product.id, "paddle_product_id": product.paddle_product_id}
+
+
+class UpsertReleaseRequest(BaseModel):
+    product_id: str
+    version: str
+    platform: str
+    architecture: str
+    channel: str = "stable"
+    checksum_sha256: str
+    storage_key: str
+    signature: str | None = None
+    release_notes: str | None = None
+
+
+@router.put("/releases/{product_id}/{version}/{platform}/{architecture}")
+def upsert_release(
+    product_id: str,
+    version: str,
+    platform: str,
+    architecture: str,
+    req: UpsertReleaseRequest,
+    db: Session = Depends(get_db),
+    actor: str = Depends(require_admin),
+) -> dict:
+    """Register an already-uploaded artifact after verifying its checksum.
+
+    This endpoint never accepts file contents or arbitrary filesystem paths;
+    deployment/storage is a separate operation. The storage adapter verifies
+    that the supplied checksum matches the bytes already present in the
+    configured local directory or private object bucket.
+    """
+    if (req.product_id, req.version, req.platform, req.architecture) != (
+        product_id,
+        version,
+        platform,
+        architecture,
+    ):
+        raise HTTPException(status_code=400, detail="Path and body release identity must match")
+    if platform not in {"macos", "windows", "linux"}:
+        raise HTTPException(status_code=400, detail="Unsupported release platform")
+    if req.channel not in {"dev", "beta", "private-beta", "stable"}:
+        raise HTTPException(status_code=400, detail="Invalid release channel")
+    if re.fullmatch(r"[0-9a-fA-F]{64}", req.checksum_sha256) is None:
+        raise HTTPException(status_code=400, detail="checksum_sha256 must be a 64-character SHA-256 hex digest")
+
+    product = db.get(models.Product, product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    try:
+        storage = get_storage()
+        if not storage.exists(req.storage_key):
+            raise HTTPException(status_code=404, detail="Release artifact missing from storage")
+        actual_checksum = storage.sha256(req.storage_key)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="storage_key must remain inside configured release storage") from exc
+    except StorageNotFound as exc:
+        raise HTTPException(status_code=404, detail="Release artifact missing from storage") from exc
+    except StorageError as exc:
+        raise HTTPException(status_code=503, detail="Release storage is unavailable") from exc
+    if actual_checksum != req.checksum_sha256.lower():
+        raise HTTPException(status_code=409, detail="Release checksum does not match artifact bytes")
+
+    release = (
+        db.query(models.Release)
+        .filter(
+            models.Release.product_id == product_id,
+            models.Release.version == version,
+            models.Release.platform == platform,
+            models.Release.architecture == architecture,
+        )
+        .one_or_none()
+    )
+    is_new = release is None
+    if release is None:
+        release = models.Release(
+            product_id=product_id,
+            version=version,
+            platform=platform,
+            architecture=architecture,
+        )
+        db.add(release)
+
+    release.channel = req.channel
+    release.checksum_sha256 = actual_checksum
+    release.signature = req.signature
+    release.storage_key = req.storage_key
+    release.release_notes = req.release_notes
+    release.published_at = datetime.now(timezone.utc)
+    _audit(
+        db,
+        actor,
+        "release.created" if is_new else "release.updated",
+        f"{product_id}:{version}:{platform}:{architecture}",
+    )
+    db.commit()
+    return {
+        "product_id": release.product_id,
+        "version": release.version,
+        "platform": release.platform,
+        "architecture": release.architecture,
+        "checksum_sha256": release.checksum_sha256,
+        "storage_key": release.storage_key,
+    }
 
 
 @router.get("/webhooks/failed")

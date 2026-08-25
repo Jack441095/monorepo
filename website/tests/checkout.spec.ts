@@ -24,10 +24,13 @@ test("pricing page offers a primary action that matches commercial maturity", as
   await expect(betaLink).toBeVisible();
 });
 
-test("pricing page exposes Buy now only when the checkout gate is enabled", async ({ page }) => {
+test("pricing page exposes the correctly labelled checkout action only when enabled", async ({ page }) => {
   await page.goto("/pricing");
   if (process.env.NEXT_PUBLIC_CHECKOUT_LIVE === "1") {
-    await expect(page.getByRole("button", { name: "Buy now" })).toBeVisible();
+    const expectedLabel = process.env.NEXT_PUBLIC_PADDLE_ENV === "sandbox"
+      ? "Test Checkout (Sandbox)"
+      : "Buy now";
+    await expect(page.getByRole("button", { name: expectedLabel })).toBeVisible();
   } else {
     await expect(page.getByRole("link", { name: /request beta access/i })).toBeVisible();
   }
