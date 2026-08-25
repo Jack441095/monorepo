@@ -64,6 +64,22 @@ def _clean_db():
         )
 
 
+@pytest.fixture(autouse=True)
+def _reset_rate_limit_state():
+    """Keep in-process request limits isolated between test cases.
+
+    Production rate limiting remains unchanged. Without this test-only reset,
+    the shared TestClient IP accumulates authentication calls across the
+    suite and later tests can receive a limiter response instead of exercising
+    their intended endpoint behavior.
+    """
+    from app.rate_limit import reset_all
+
+    reset_all()
+    yield
+    reset_all()
+
+
 @pytest.fixture
 def client():
     from app.main import app

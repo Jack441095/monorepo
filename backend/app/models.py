@@ -183,7 +183,7 @@ class Release(Base):
         UniqueConstraint(
             "product_id", "version", "platform", "architecture", name="uq_releases_product_version_platform_arch"
         ),
-        CheckConstraint("channel IN ('dev','beta','stable')", name="ck_releases_channel"),
+        CheckConstraint("channel IN ('dev','beta','private-beta','stable')", name="ck_releases_channel"),
     )
 
 

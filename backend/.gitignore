@@ -1,0 +1,18 @@
+# Secrets must never be committed (SECURITY REVIEW V1 §3).
+# Private signing keys stay in the deployment environment only.
+staging_keys/*.private
+*.key
+*.pem
+.env
+.env.*
+!.env.example
+
+# Python artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# OS noise
+.DS_Store
