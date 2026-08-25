@@ -1,0 +1,61 @@
+name: backend
+
+# Manual validation only. This workflow never deploys, contacts Paddle, uploads
+# release artifacts, or requires provider credentials. Website hosting remains
+# controlled by its hosting provider, not by this workflow.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+      - name: Create isolated test database
+        working-directory: .
+        env:
+          PGPASSWORD: postgres
+        run: psql -h 127.0.0.1 -U postgres -d postgres -c "CREATE DATABASE nitedsp_test"
+
+      - name: Compile backend modules and tools
+        run: python -m compileall -q app tests scripts
+
+      - name: Run backend tests
+        run: python -m pytest -q
+
+      - name: Check release upload CLI contract
+        run: python scripts/upload_release.py --help >/dev/null
