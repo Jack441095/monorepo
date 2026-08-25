@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
+import { SloMapDemo } from "@/components/demo/SloMapDemo";
 import { LightField } from "@/components/motion/LightField";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
@@ -74,10 +75,10 @@ export default function SmartSampleManagerPage() {
       <section className="section product-hero relative overflow-hidden">
         <LightField />
         <div className="site-container relative">
-          <span className="eyebrow">Flagship Product</span>
+          <span className="eyebrow text-brand-violet">Audio Intelligence Family</span>
           <h1 className="section-title mt-4 text-foreground">SLO</h1>
-          <p className="text-sm font-mono text-brand-blue-bright mt-1">Sample Library Optimiser</p>
-          <p className="body-large mt-6">
+          <p className="text-sm font-mono text-amber-400 mt-1">Sample Library Optimiser</p>
+          <p className="body-large mt-6 font-sans">
             A professional, acoustic-similarity sample browser and organizer for macOS.
             By analysing raw audio signals rather than depending on folder structures or filenames, SLO provides absolute clarity over your sample library.
           </p>
@@ -137,21 +138,37 @@ export default function SmartSampleManagerPage() {
         </div>
       </section>
 
-      {/* Interactive Demonstration */}
-      <section className="section border-t bg-surface/20" style={{ borderColor: "var(--border)" }}>
+      {/* Interactive 2D Acoustic Similarity Map Demo */}
+      <section className="section border-t bg-surface/30" style={{ borderColor: "var(--border)" }}>
         <div className="site-container grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
           <Reveal>
-            <span className="eyebrow">Acoustic Signal Processing</span>
-            <h2 className="section-title mt-4">Bypass cryptic filenames.</h2>
+            <span className="eyebrow text-brand-blue-bright">TIMBRAL DISCOVERY MAP</span>
+            <h2 className="section-title mt-4 text-foreground">Explore sounds by acoustic similarity.</h2>
             <p className="mt-6 leading-relaxed text-muted text-sm">
-              Filenames like <code>XK29_0047.wav</code> reveal nothing about their sound. SLO processes the raw samples offline, identifies transients, measures centroid weight, and detects the true musical role.
+              Filenames like <code>XK29_0047.wav</code> reveal nothing about how a sample sounds. SLO extracts raw acoustic descriptors offline and plots your entire library on an intuitive 2D map.
             </p>
-            <div className="mt-6 border-l-2 border-brand-blue bg-brand-blue/5 p-4 rounded-r text-xs leading-relaxed text-muted">
-              <strong>Non-Destructive Indexing:</strong> SLO operates in read-only analysis mode during evaluation. Your sample files are scanned in memory and cached locally, ensuring your directories and folders remain completely untouched.
+            <div className="mt-6 border-l-2 border-[#F0A23A] bg-[#F0A23A]/10 p-4 rounded-r text-xs leading-relaxed text-muted">
+              <strong>Non-Destructive Local Indexing:</strong> SLO operates in 100% read-only mode. Your sample files are scanned locally on your Mac and cached in memory—your original directories and filenames are never altered.
             </div>
           </Reveal>
           <Reveal delayMs={90}>
+            <SloMapDemo />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Acoustic Signal Processing Demo */}
+      <section className="section border-t bg-surface/10" style={{ borderColor: "var(--border)" }}>
+        <div className="site-container grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          <Reveal delayMs={90} className="order-2 lg:order-1">
             <AudioAnalysisDemo />
+          </Reveal>
+          <Reveal className="order-1 lg:order-2">
+            <span className="eyebrow">Acoustic Descriptor Engine</span>
+            <h2 className="section-title mt-4 text-foreground">Bypass cryptic metadata.</h2>
+            <p className="mt-6 leading-relaxed text-muted text-sm">
+              SLO processes raw PCM audio frames offline, detects precise transient decay curves, calculates spectral centroid brightness, and automatically classifies the true musical role.
+            </p>
           </Reveal>
         </div>
       </section>

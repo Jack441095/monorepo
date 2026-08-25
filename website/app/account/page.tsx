@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { consumeBuyIntent, startCheckout } from "@/lib/checkout";
@@ -15,81 +15,197 @@ type Entitlement = {
   expires_at: string | null;
 };
 
+type PlatformId = "macos" | "windows" | "linux";
+
+type PlatformOption = {
+  id: PlatformId;
+  label: string;
+  architecture: string;
+  description: string;
+};
+
+type DownloadInfo = {
+  version: string;
+  checksum_sha256: string;
+  release_notes: string | null;
+  download_url: string;
+};
+
+const PLATFORM_OPTIONS: PlatformOption[] = [
+  { id: "macos", label: "macOS", architecture: "universal", description: "Universal Mac ZIP" },
+  { id: "windows", label: "Windows", architecture: "x64", description: "64-bit Windows ZIP" },
+  { id: "linux", label: "Linux", architecture: "x64", description: "64-bit Linux ZIP" },
+];
+
+// Release rows carry the authoritative architecture. SLO currently uses the
+// existing universal macOS contract; the staged NITE Submit candidate is an
+// Apple-Silicon arm64 build, so its account request must match that row rather
+// than pretending the archive is universal.
+function platformOptionsFor(productId: string): PlatformOption[] {
+  if (productId !== "nite-submit") return PLATFORM_OPTIONS;
+  return PLATFORM_OPTIONS.map((option) =>
+    option.id === "macos"
+      ? { ...option, architecture: "arm64", description: "Apple Silicon Mac ZIP" }
+      : option,
+  );
+}
+
+function detectRecommendedPlatform(): PlatformId | null {
+  if (typeof navigator === "undefined") return null;
+  const userAgent = navigator.userAgent.toLowerCase();
+  if (userAgent.includes("mac")) return "macos";
+  if (userAgent.includes("windows")) return "windows";
+  if (userAgent.includes("linux")) return "linux";
+  return null;
+}
+
+const noPlatformSubscription = () => () => {};
+const noServerPlatform = (): PlatformId | null => null;
+
 const PRODUCT_NAMES: Record<string, string> = {
   "smart-sample-manager": "SLO (Sample Library Optimiser)",
+  "nite-submit": "NITE Submit",
 };
 
 function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
-  const [downloadState, setDownloadState] = useState<"idle" | "loading" | "error">("idle");
+  const [downloadState, setDownloadState] = useState<Record<PlatformId, "idle" | "loading" | "error">>({
+    macos: "idle",
+    windows: "idle",
+    linux: "idle",
+  });
+  const [downloadInfo, setDownloadInfo] = useState<Partial<Record<PlatformId, DownloadInfo>>>({});
+  const recommendedPlatform = useSyncExternalStore(
+    noPlatformSubscription,
+    detectRecommendedPlatform,
+    noServerPlatform,
+  );
   const isBeta = entitlement.license_type === "beta";
   const productName = PRODUCT_NAMES[entitlement.product_id] ?? entitlement.product_id;
+  const platformOptions = platformOptionsFor(entitlement.product_id);
 
-  async function handleDownload() {
-    setDownloadState("loading");
+  async function prepareDownload(option: PlatformOption) {
+    setDownloadState((current) => ({ ...current, [option.id]: "loading" }));
     const res = await apiFetch(
-      `/downloads/latest?product_id=${encodeURIComponent(entitlement.product_id)}&platform=macos&architecture=universal`
+      `/downloads/latest?product_id=${encodeURIComponent(entitlement.product_id)}&platform=${option.id}&architecture=${option.architecture}`
     );
     if (!res.ok) {
-      setDownloadState("error");
+      setDownloadState((current) => ({ ...current, [option.id]: "error" }));
       return;
     }
     const data = await res.json();
-    setDownloadState("idle");
-    window.location.href = data.download_url;
+    setDownloadInfo((current) => ({ ...current, [option.id]: data }));
+    setDownloadState((current) => ({ ...current, [option.id]: "idle" }));
   }
 
   return (
-    <div className="surface-card p-6 border border-border">
+    <div className="dsp-rack-panel p-6 border border-border-strong/60 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <span className="font-semibold text-foreground text-base block">{productName}</span>
-          <span className="text-xs font-mono text-muted-dim block mt-0.5 uppercase tracking-wider">{isBeta ? "Beta Access" : entitlement.status}</span>
+          <div className="flex items-center gap-2">
+            <span className="dsp-led dsp-led--live" />
+            <span className="font-semibold text-foreground text-base block">{productName}</span>
+          </div>
+          <span className="text-[10px] font-mono text-muted-dim block mt-1 uppercase tracking-wider">
+            {isBeta ? "BETA ACCESS LICENCE" : `STATUS // ${entitlement.status}`}
+          </span>
         </div>
         <span
-          className="text-[10px] uppercase font-mono tracking-wider rounded border px-3 py-1"
+          className="dsp-pill text-[10px] uppercase font-mono tracking-wider px-3 py-1"
           style={isBeta ? {
-            background: "var(--state-warning-bg)",
+            background: "rgba(245, 158, 11, 0.12)",
             color: "var(--state-warning)",
             borderColor: "var(--state-warning-border)",
           } : {
             background: "var(--surface-raised)",
-            color: "var(--muted)",
+            color: "var(--brand-blue-bright)",
             borderColor: "var(--border-strong)",
           }}
         >
-          {isBeta ? "Beta" : entitlement.status}
+          {isBeta ? "Closed Beta" : entitlement.status}
         </span>
       </div>
       
-      <div className="mt-4 p-3 bg-background-inset rounded border border-border/40 flex items-center justify-between">
-        <code className="text-xs font-mono tnum text-brand-blue-bright select-all">
+      {/* LCD License Key Container */}
+      <div className="mt-5 p-3.5 dsp-lcd-box rounded-lg flex items-center justify-between gap-3">
+        <code className="text-xs font-mono tnum text-brand-blue-bright select-all tracking-wider font-bold">
           {entitlement.license_key}
         </code>
-        <span className="text-[9px] font-mono text-muted-dim uppercase">LICENSE KEY</span>
+        <span className="text-[9px] font-mono text-muted-dim uppercase tracking-widest flex-none">LICENSE KEY</span>
       </div>
 
       {entitlement.expires_at && (
-        <p className="mt-3 text-xs text-muted-dim tnum">
+        <p className="mt-3 text-xs text-muted-dim tnum font-mono">
           Access expires: {new Date(entitlement.expires_at).toLocaleDateString()}
         </p>
       )}
 
-      <div className="mt-6">
-        <button 
-          type="button"
-          onClick={handleDownload} 
-          className="btn-primary text-xs px-4 py-2" 
-          disabled={downloadState === "loading"}
-        >
-          {downloadState === "loading" ? "Preparing download…" : "Download for macOS"}
-        </button>
-      </div>
+      {/* Multi-Platform Download Modules (macOS, Windows, Linux) */}
+      <div className="mt-6 space-y-3">
+        <div className="flex items-center justify-between border-b border-border/40 pb-2">
+          <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-brand-blue-bright">
+            PLATFORM BUILDS & EXECUTABLES
+          </p>
+          <span className="text-[10px] font-mono text-muted-dim">Select Target OS</span>
+        </div>
+        
+        {platformOptions.map((option) => {
+          const state = downloadState[option.id];
+          const info = downloadInfo[option.id];
+          const isRecommended = recommendedPlatform === option.id;
+          return (
+            <div key={option.id} className="rounded-lg border border-border/50 bg-surface/60 p-4 transition-all hover:border-border-strong">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-foreground text-sm font-mono">{option.label}</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-surface-raised border border-border/40 text-muted-dim">
+                    {option.architecture}
+                  </span>
+                  <span className="text-xs text-muted-dim font-mono">{option.description}</span>
+                </div>
+                {isRecommended && (
+                  <span className="text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-brand-blue/15 text-brand-blue-bright border border-brand-blue/30 font-bold">
+                    RECOMMENDED FOR THIS DEVICE
+                  </span>
+                )}
+              </div>
 
-      {downloadState === "error" && (
-        <p className="mt-3 text-xs text-muted" role="status">
-          No release available for this product yet &mdash; check back soon.
-        </p>
-      )}
+              <button
+                type="button"
+                onClick={() => prepareDownload(option)}
+                className="btn-primary mt-3 text-xs px-4 py-2 font-mono font-semibold"
+                disabled={state === "loading"}
+              >
+                {state === "loading" ? "PREPARING DOWNLOAD…" : `PREPARE ${option.label.toUpperCase()} ZIP`}
+              </button>
+
+              {state === "error" && (
+                <div className="mt-3 p-2.5 rounded bg-surface-raised border border-border text-xs text-muted font-mono" role="status">
+                  <span className="text-state-warning font-bold">STATUS // UNPUBLISHED</span> &mdash; No {option.label} release is published for this channel yet. Check back soon.
+                </div>
+              )}
+
+              {info && (
+                <div className="mt-3 space-y-2 text-xs text-muted font-mono p-3 dsp-lcd-box rounded" role="status">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-foreground font-bold">Version {info.version}</span>
+                    <span className="text-[10px] text-muted-dim uppercase">SHA-256 Checksum</span>
+                  </div>
+                  <code className="block break-all p-2 rounded bg-[#020408] border border-border/40 text-[10px] text-brand-emerald select-all tnum">
+                    {info.checksum_sha256}
+                  </code>
+                  <a
+                    href={info.download_url}
+                    download
+                    className="inline-block mt-2 px-3 py-1.5 rounded bg-brand-blue text-accent-ink font-bold text-xs hover:bg-brand-blue-bright transition-all shadow-[0_0_10px_rgba(0,240,255,0.3)]"
+                  >
+                    DOWNLOAD {option.label.toUpperCase()} ZIP &rarr;
+                  </a>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

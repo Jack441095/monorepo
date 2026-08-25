@@ -7,13 +7,13 @@ import { expect, test } from "@playwright/test";
 
 test("magnetic CTA retains normal click navigation while engaged", async ({ page }) => {
   await page.goto("/");
-  const cta = page.getByRole("link", { name: "Explore SLO" });
+  const cta = page.getByRole("link", { name: "Explore the products" });
   await cta.hover();
   // Drift across the control while magnetically engaged; the hit area must
   // remain stationary, so the click still lands.
   await page.mouse.move(700, 400);
   await cta.click();
-  await expect(page).toHaveURL(/\/products\/smart-sample-manager/);
+  await expect(page).toHaveURL(/\/products/);
 });
 
 test("demo completes an illustrative scan and keeps its disclosure", async ({ page }) => {
@@ -22,7 +22,10 @@ test("demo completes an illustrative scan and keeps its disclosure", async ({ pa
   await page.getByRole("button", { name: "take_new_001.wav" }).click();
   await expect(page.getByText("SNARE", { exact: true })).toBeVisible({ timeout: 5000 });
   await expect(page.getByText(/Illustrative workflow simulation/i)).toBeVisible();
-  await expect(page.getByText("SIMULATION", { exact: true })).toBeVisible();
+  // Scoped to the SLO demo: the homepage now shows two demos (Submit + SLO),
+  // each with its own honest SIMULATION chip.
+  const sloDemo = page.getByLabel("SLO sample analysis");
+  await expect(sloDemo.getByText("SIMULATION", { exact: true })).toBeVisible();
 });
 
 test("reduced motion: reveals never hide content and CTA still works", async ({ page }) => {
@@ -36,9 +39,9 @@ test("reduced motion: reveals never hide content and CTA still works", async ({ 
   const opacity = await revealedHeading.evaluate((el) => getComputedStyle(el).opacity);
   expect(Number(opacity)).toBeGreaterThan(0.9);
 
-  const cta = page.getByRole("link", { name: "Explore SLO" });
+  const cta = page.getByRole("link", { name: "Explore the products" });
   await cta.click();
-  await expect(page).toHaveURL(/smart-sample-manager/);
+  await expect(page).toHaveURL(/\/products/);
 });
 
 test("touch/mobile viewport has no horizontal overflow on key routes", async ({ browser }) => {

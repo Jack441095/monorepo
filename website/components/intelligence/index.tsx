@@ -109,11 +109,11 @@ export function ApprovalGate({
       </div>
       {state === "approved" ? (
         <span className="chip chip--success flex-none">
-          <span aria-hidden="true">✓</span> Approved
+          <span aria-hidden="true" className="dsp-led dsp-led--green" /> Approved
         </span>
       ) : (
         <span className="chip chip--warn flex-none">
-          <span aria-hidden="true">⏸</span> Awaiting your approval
+          <span aria-hidden="true" className="dsp-led dsp-led--amber" /> Awaiting approval
         </span>
       )}
     </div>
@@ -124,24 +124,24 @@ export function ApprovalGate({
    never "thinking" unless it is actually running; approval is explicit. */
 export type AgentState = "queued" | "running" | "awaiting-approval" | "done" | "failed";
 
-const AGENT_META: Record<AgentState, { label: string; glyph: string; color: string; pulse: boolean }> = {
-  queued: { label: "Queued", glyph: "○", color: "var(--agent-idle)", pulse: false },
-  running: { label: "Running", glyph: "◐", color: "var(--agent-running)", pulse: true },
-  "awaiting-approval": { label: "Awaiting approval", glyph: "⏸", color: "var(--agent-approval)", pulse: false },
-  done: { label: "Done", glyph: "✓", color: "var(--agent-done)", pulse: false },
-  failed: { label: "Needs attention", glyph: "!", color: "var(--agent-failed)", pulse: false },
+const AGENT_META: Record<AgentState, { label: string; ledClass: string; color: string; pulse: boolean }> = {
+  queued: { label: "Queued", ledClass: "dsp-led", color: "var(--agent-idle)", pulse: false },
+  running: { label: "Running", ledClass: "dsp-led dsp-led--live", color: "var(--agent-running)", pulse: true },
+  "awaiting-approval": { label: "Awaiting approval", ledClass: "dsp-led dsp-led--amber", color: "var(--agent-approval)", pulse: false },
+  done: { label: "Done", ledClass: "dsp-led dsp-led--green", color: "var(--agent-done)", pulse: false },
+  failed: { label: "Needs attention", ledClass: "dsp-led dsp-led--red", color: "var(--agent-failed)", pulse: false },
 };
 
 export function AgentStatus({ state, label }: { state: AgentState; label: string }) {
   const meta = AGENT_META[state];
   return (
-    <div className="flex items-center justify-between gap-3 py-2 border-b border-edge last:border-b-0">
+    <div className="flex items-center justify-between gap-3 py-2 border-b border-edge last:border-b-0 font-sans">
       <span className="u-body text-[13px] text-foreground min-w-0">{label}</span>
       <span
-        className={`chip ${meta.pulse ? "animate-pulse" : ""} flex-none`}
+        className={`chip flex-none`}
         style={{ borderColor: meta.color, color: meta.color }}
       >
-        <span aria-hidden="true">{meta.glyph}</span>
+        <span aria-hidden="true" className={meta.ledClass} />
         {meta.label}
       </span>
     </div>

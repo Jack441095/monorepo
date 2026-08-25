@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CtaButton } from "@/components/CtaButton";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
 
@@ -35,20 +36,50 @@ export default function SubmitProductPage() {
       <section className="section product-hero relative overflow-hidden">
         <LightField />
         <div className="site-container relative">
-          <span className="eyebrow">Product Releases</span>
+          <span className="eyebrow text-brand-blue-bright">Workflow Intelligence Family</span>
           <h1 className="section-title mt-4 text-foreground">NITE Submit</h1>
           <p className="text-sm font-mono text-brand-blue-bright mt-1">Submission Preparation Intelligence</p>
-          <p className="body-large mt-6">
-            The safest way to prepare important files before submission. Drop in a document, review structural metadata, correct errors, and save a clean copy. Fully offline, private, and optimized for macOS.
+          <p className="body-large mt-6 font-sans">
+            The safest way to prepare important files before submission. Drop in a document, review structural metadata, correct errors, and save a clean copy. Fully offline, local-first, and optimized for macOS.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <Link href="/pricing" className="btn-primary">
-              View Licensing
-            </Link>
-            <Link href="/account" className="btn-secondary">
-              Sign in to download
+            <CtaButton state="BETA_REQUEST" />
+            <Link href="/pricing" className="btn-secondary">
+              View pricing
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Workflow — six steps */}
+      <section className="section section-rule">
+        <div className="site-container">
+          <Reveal>
+            <div className="max-w-2xl">
+              <span className="eyebrow">The Submit Workflow</span>
+              <h2 className="section-title mt-4">Six steps. Zero guesswork.</h2>
+              <p className="mt-4 text-sm text-muted leading-relaxed">
+                Every stage is visible and under your control. Submit never submits work for you —
+                it prepares a verified copy so you can submit with confidence.
+              </p>
+            </div>
+          </Reveal>
+          <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["01", "Drop", "Add a PDF from your Mac. Nothing is uploaded — the file is read in memory."],
+              ["02", "Understand", "Submit reads structure and metadata locally: names, dates, course codes, templates."],
+              ["03", "Review", "Flagged fields and uncertainties are shown for your approval. Nothing changes silently."],
+              ["04", "Prepare", "Confirm corrections before anything is written. You approve every change."],
+              ["05", "Verify", "Naming and format checks run against your chosen pattern before export."],
+              ["06", "Receipt", "A safely named copy is saved alongside your untouched original draft."],
+            ].map(([n, title, body]) => (
+              <li key={n} className="surface-card p-6 rounded-lg border border-border/40">
+                <span className="u-data" style={{ color: "var(--brand-blue-bright)" }}>{n}</span>
+                <h3 className="mt-3 text-sm font-semibold text-foreground">{title}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-muted">{body}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 

@@ -9,7 +9,15 @@ const BASE_URL = "https://www.nitedsp.co.uk";
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "",
+    "/products",
+    "/products/submit",
     "/products/smart-sample-manager",
+    "/products/slo",
+    "/products/kenn",
+    "/thursday",
+    "/download",
+    "/beta",
+    "/trust",
     "/pricing",
     "/support",
     "/learn",
