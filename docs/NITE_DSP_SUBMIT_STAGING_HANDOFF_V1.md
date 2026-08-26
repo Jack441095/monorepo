@@ -105,3 +105,15 @@ successful `/health` and `/ready` check should the exact ZIP be registered and
 the remote seven-step proof be run. This staging setup uses local release
 storage for the cost-conscious proof environment; durable S3-compatible
 storage remains required before any paid launch.
+
+Once GitHub access is enabled, reconnect the already-created staging service;
+do not use `railway add`, which would attempt to create a sixth project service:
+
+```sh
+railway service source connect \
+  --project 5ccd564d-370e-46db-812f-4cfa12f1d7a6 \
+  --environment 6a62728e-f728-4bb5-bff7-2f21583c3ba6 \
+  --service 06c57125-002b-490b-bafa-96d96d795686 \
+  --repo Jack441095/NITE_DSP \
+  --branch engineering/submit-staging-rails-v1
+```
