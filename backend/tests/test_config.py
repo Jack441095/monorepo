@@ -72,6 +72,34 @@ def test_staging_configuration_rejects_incomplete_s3_storage():
         raise AssertionError("incomplete S3 storage configuration was accepted")
 
 
+def test_staging_customer_rehearsal_rejects_local_storage_and_console_email():
+    settings = _staging_settings(staging_customer_rehearsal=True)
+
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        message = str(exc)
+        assert "storage_backend='s3'" in message
+        assert "email_provider='resend'" in message
+    else:
+        raise AssertionError("customer rehearsal accepted non-durable staging")
+
+
+def test_staging_customer_rehearsal_accepts_durable_storage_and_resend():
+    _validate_staging_config(
+        _staging_settings(
+            staging_customer_rehearsal=True,
+            email_provider="resend",
+            resend_api_key="resend-staging-key",
+            storage_backend="s3",
+            storage_bucket="nitedsp-staging-releases",
+            storage_endpoint="https://account.r2.cloudflarestorage.com",
+            storage_access_key_id="access-key",
+            storage_secret_access_key="secret-key",
+        )
+    )
+
+
 def test_production_configuration_rejects_local_release_storage():
     settings = Settings(
         environment="production",

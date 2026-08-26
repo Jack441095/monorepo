@@ -87,19 +87,27 @@ def ready(response: Response) -> dict:
     except (StorageError, OSError):
         storage_ok = False
 
-    ready_ok = db_ok and storage_ok
-    if not ready_ok:
-        response.status_code = 503
     email_provider_configured = settings.email_provider in ("console", "resend") and (
         settings.email_provider == "console" or bool(settings.resend_api_key)
     )
+    storage_durable = settings.storage_backend == "s3"
+    email_deliverable = settings.email_provider == "resend" and bool(settings.resend_api_key)
+    customer_rehearsal_ready = (
+        not settings.staging_customer_rehearsal
+        or (storage_durable and email_deliverable)
+    )
+    ready_ok = db_ok and storage_ok and customer_rehearsal_ready
+    if not ready_ok:
+        response.status_code = 503
     return {
         "status": "ok" if ready_ok else "unavailable",
         "database": db_ok,
         "storage": storage_ok,
         "storage_backend": settings.storage_backend,
-        "storage_durable": settings.storage_backend == "s3",
+        "storage_durable": storage_durable,
         "email_provider": settings.email_provider,
         "email_provider_configured": email_provider_configured,
-        "email_deliverable": settings.email_provider == "resend" and bool(settings.resend_api_key),
+        "email_deliverable": email_deliverable,
+        "staging_customer_rehearsal": settings.staging_customer_rehearsal,
+        "staging_customer_rehearsal_ready": customer_rehearsal_ready,
     }

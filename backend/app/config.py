@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     # accidentally behave like production because of a missing env var.
     environment: str = "development"  # "development" | "staging" | "production"
 
+    # Optional staging gate. Keep lightweight local/console staging available
+    # for development, but require this flag for a staging deployment that is
+    # allowed to claim a customer checkout/download rehearsal is ready.
+    staging_customer_rehearsal: bool = False
+
     database_url: str = "postgresql+psycopg2://localhost/nitedsp_staging"
 
     # Public-facing URLs -- Phase 4 Section 6. Defaulting to localhost is
@@ -251,17 +256,24 @@ def _validate_staging_config(s: Settings) -> None:
         if parsed.scheme != "https" or not parsed.hostname or parsed.hostname in {"localhost", "127.0.0.1"}:
             problems.append(f"{field_name} must be a public HTTPS URL in staging; got {value!r}")
 
+    storage_problems = _storage_configuration_problems(s)
+    if storage_problems:
+        problems.extend(storage_problems)
+
+    if s.staging_customer_rehearsal:
+        if s.storage_backend != "s3":
+            problems.append(
+                "staging_customer_rehearsal requires storage_backend='s3'"
+            )
+        if s.email_provider != "resend" or not s.resend_api_key:
+            problems.append(
+                "staging_customer_rehearsal requires email_provider='resend' and a resend_api_key"
+            )
+
     if problems:
         raise RuntimeError(
             "Refusing to start with environment=staging and invalid configuration:\n"
             + "\n".join(f"  - {p}" for p in problems)
-        )
-
-    storage_problems = _storage_configuration_problems(s)
-    if storage_problems:
-        raise RuntimeError(
-            "Refusing to start with invalid release storage configuration:\n"
-            + "\n".join(f"  - {p}" for p in storage_problems)
         )
 
 
