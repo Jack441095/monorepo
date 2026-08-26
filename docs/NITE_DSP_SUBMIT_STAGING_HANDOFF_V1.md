@@ -107,6 +107,14 @@ replacement deployment, so re-upload and re-registration are required after
 any staging redeploy. Durable S3-compatible storage remains a paid-launch
 requirement.
 
+The backend validation suite was rerun in an isolated environment with the
+repository requirements installed: **53 passed**, with one existing
+Starlette/httpx deprecation warning. Python bytecode compilation for `app/` and
+`migrations/` also passed. The test suite exercises the staging configuration
+guards, S3/R2 adapter, checksum-bound uploads, authenticated downloads,
+entitlement/licence flow, webhook idempotency, email modes, and migration
+behavior.
+
 Do not send the beta handoff until the owner has reviewed the tester cohort,
 the ad-hoc macOS signing limitation, and the local-storage caveat. The remote
 proof now passes, but it is not evidence of production readiness.
