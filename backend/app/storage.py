@@ -228,6 +228,21 @@ class S3CompatibleStorage:
         except Exception as exc:  # noqa: BLE001 - provider SDK exception types vary
             raise StorageError("S3 upload failed") from exc
 
+    def delete_rehearsal_object(self, storage_key: str) -> None:
+        """Delete only a synthetic operator-rehearsal object.
+
+        Release artifacts are immutable and have no application delete path.
+        This narrow helper exists for the guarded storage rehearsal script and
+        refuses to delete anything outside its disposable namespace.
+        """
+        key = self._key(storage_key)
+        if not key.startswith("rehearsals/"):
+            raise StorageError("only rehearsal objects may be deleted")
+        try:
+            self.client.delete_object(Bucket=self.bucket, Key=key)
+        except Exception as exc:  # noqa: BLE001 - provider SDK exception types vary
+            raise StorageError("S3 rehearsal cleanup failed") from exc
+
     def local_path(self, storage_key: str) -> None:
         return None
 

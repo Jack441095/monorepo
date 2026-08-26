@@ -79,6 +79,7 @@ def test_s3_presigned_url_is_bounded_to_download_token_ttl(monkeypatch):
 
 def test_s3_storage_upload_and_checksum_are_immutable(monkeypatch, tmp_path: Path):
     objects: dict[str, bytes] = {}
+    deleted: list[str] = []
 
     class MissingObject(Exception):
         response = {"Error": {"Code": "404"}}
@@ -96,6 +97,10 @@ def test_s3_storage_upload_and_checksum_are_immutable(monkeypatch, tmp_path: Pat
             if Key not in objects:
                 raise MissingObject()
             return {"Body": io.BytesIO(objects[Key])}
+
+        def delete_object(self, Bucket, Key):
+            deleted.append(Key)
+            objects.pop(Key, None)
 
     fake_boto3 = SimpleNamespace(client=lambda *args, **kwargs: FakeClient())
     monkeypatch.setitem(sys.modules, "boto3", fake_boto3)
@@ -116,3 +121,8 @@ def test_s3_storage_upload_and_checksum_are_immutable(monkeypatch, tmp_path: Pat
     assert storage.sha256("releases/0.2.0/Submit.zip") == checksum
     with pytest.raises(RuntimeError, match="immutable release key"):
         storage.put_file(source, "releases/0.2.0/Submit.zip", "0" * 64)
+
+    storage.delete_rehearsal_object("rehearsals/storage-check.bin")
+    assert deleted == ["rehearsals/storage-check.bin"]
+    with pytest.raises(RuntimeError, match="only rehearsal objects"):
+        storage.delete_rehearsal_object("releases/0.2.0/Submit.zip")
