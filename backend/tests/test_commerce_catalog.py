@@ -8,7 +8,10 @@ simulates webhook payloads instead of receiving real ones.
 """
 from __future__ import annotations
 
+import hashlib
+
 from app import models
+from app.config import settings as app_settings
 from tests.test_e2e import _seed_product, _sign_paddle_payload
 
 
@@ -659,6 +662,40 @@ def test_admin_can_create_and_list_products(client, db_session):
 def test_admin_products_requires_admin_key(client):
     resp = client.get("/admin/products", headers={"X-Admin-Key": "wrong"})
     assert resp.status_code == 401
+
+
+def test_staging_release_upload_is_checksum_bound(client, db_session, monkeypatch, tmp_path):
+    monkeypatch.setattr(app_settings, "environment", "staging")
+    monkeypatch.setattr(app_settings, "mock_storage_dir", str(tmp_path))
+    db_session.add(
+        models.Product(
+            id="nite-submit",
+            name="NITE Submit",
+            status="active",
+            public=False,
+            purchasable=False,
+            platforms=["macos"],
+        )
+    )
+    db_session.commit()
+
+    payload = b"staging release bytes"
+    checksum = hashlib.sha256(payload).hexdigest()
+    resp = client.post(
+        "/admin/releases/upload",
+        data={
+            "product_id": "nite-submit",
+            "version": "0.2.0",
+            "platform": "macos",
+            "architecture": "arm64",
+        },
+        files={"artifact": ("Submit-0.2.0-macOS.zip", payload, "application/zip")},
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["checksum_sha256"] == checksum
+    assert (tmp_path / "releases" / "nite-submit" / "0.2.0" / "Submit-0.2.0-macOS.zip").read_bytes() == payload
 
 
 def test_admin_release_upsert_verifies_artifact_checksum(client, db_session):

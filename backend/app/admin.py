@@ -15,11 +15,14 @@ reason) -- never logs secrets.
 from __future__ import annotations
 
 import hmac
+import hashlib
 import re
 import secrets
+import tempfile
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -28,7 +31,7 @@ from .config import settings
 from .database import get_db
 from .email import send_email
 from .rate_limit import rate_limit
-from .storage import StorageError, StorageNotFound, get_storage
+from .storage import StorageError, StorageNotFound, get_storage, object_storage_key
 
 # Phase 5, Section 23: a beta tester must not be unexpectedly disabled
 # mid-testing-cycle. 90 days is long enough to span a typical private-beta
@@ -269,6 +272,81 @@ class UpsertReleaseRequest(BaseModel):
     storage_key: str
     signature: str | None = None
     release_notes: str | None = None
+
+
+MAX_STAGING_RELEASE_UPLOAD_BYTES = 250 * 1024 * 1024
+
+
+@router.post("/releases/upload")
+def upload_release_artifact(
+    product_id: str = Form(...),
+    version: str = Form(...),
+    platform: str = Form(...),
+    architecture: str = Form(...),
+    artifact: UploadFile = File(...),
+    actor: str = Depends(require_admin),
+) -> dict:
+    """Upload one release artifact into staging storage.
+
+    This is deliberately a staging-only bridge for the private Railway proof
+    environment, where local storage is inside the running service and cannot
+    be populated from the operator's workstation. Production release uploads
+    remain an out-of-band S3/R2 operation followed by the authenticated
+    registration endpoint below.
+    """
+    if settings.environment != "staging":
+        raise HTTPException(status_code=404, detail="Staging release upload is unavailable")
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", product_id):
+        raise HTTPException(status_code=400, detail="Invalid product_id")
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", version):
+        raise HTTPException(status_code=400, detail="Invalid version")
+    if platform not in {"macos", "windows", "linux"}:
+        raise HTTPException(status_code=400, detail="Unsupported release platform")
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,31}", architecture):
+        raise HTTPException(status_code=400, detail="Invalid architecture")
+
+    filename = Path(artifact.filename or "").name
+    if not filename or filename in {".", ".."}:
+        raise HTTPException(status_code=400, detail="A release filename is required")
+    try:
+        storage_key = object_storage_key(f"releases/{product_id}/{version}/{filename}")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Invalid release filename") from exc
+
+    temporary_path: Path | None = None
+    checksum = hashlib.sha256()
+    size = 0
+    try:
+        with tempfile.NamedTemporaryFile(prefix="nite-release-", suffix=".upload", delete=False) as temporary:
+            temporary_path = Path(temporary.name)
+            while chunk := artifact.file.read(1024 * 1024):
+                size += len(chunk)
+                if size > MAX_STAGING_RELEASE_UPLOAD_BYTES:
+                    raise HTTPException(status_code=413, detail="Release artifact is too large")
+                checksum.update(chunk)
+                temporary.write(chunk)
+
+        digest = checksum.hexdigest()
+        get_storage().put_file(temporary_path, storage_key, digest)
+    except HTTPException:
+        raise
+    except (StorageError, ValueError) as exc:
+        raise HTTPException(status_code=503, detail="Release storage is unavailable") from exc
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
+
+    return {
+        "status": "uploaded",
+        "product_id": product_id,
+        "version": version,
+        "platform": platform,
+        "architecture": architecture,
+        "filename": filename,
+        "size_bytes": size,
+        "checksum_sha256": digest,
+        "storage_key": storage_key,
+    }
 
 
 @router.put("/releases/{product_id}/{version}/{platform}/{architecture}")
