@@ -19,8 +19,8 @@ export function LegalPage({
         </div>
         <p className="mt-10 text-sm" style={{ color: "var(--muted-dim)" }}>
           Questions about this page? Contact{" "}
-          <a href="mailto:support@nitedsp.co.uk" className="underline">
-            support@nitedsp.co.uk
+          <a href="mailto:nitedsp@outlook.com" className="underline">
+            nitedsp@outlook.com
           </a>
           .
         </p>

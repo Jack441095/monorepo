@@ -46,7 +46,7 @@ const ORGANIZATION_JSON_LD = {
   "@type": "Organization",
   name: "NITE DSP",
   url: "https://www.nitedsp.co.uk",
-  email: "support@nitedsp.co.uk",
+  email: "nitedsp@outlook.com",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -135,8 +135,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             style={{ maxWidth: "var(--content-width)", borderColor: "var(--border)", color: "var(--muted-dim)" }}
           >
             <span>&copy; {new Date().getFullYear()} NITE DSP</span>
-            <a href="mailto:support@nitedsp.co.uk" className="hover:text-[color:var(--foreground)] transition-colors">
-              support@nitedsp.co.uk
+            <a href="mailto:nitedsp@outlook.com" className="hover:text-[color:var(--foreground)] transition-colors">
+              nitedsp@outlook.com
             </a>
           </div>
         </footer>

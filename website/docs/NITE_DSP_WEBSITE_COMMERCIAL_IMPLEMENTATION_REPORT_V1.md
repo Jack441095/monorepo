@@ -19,7 +19,7 @@ State recorded in `NITE_DSP_WEBSITE_IMPLEMENTATION_START_RECEIPT.md`. Superproje
 
 ### Phase 4 — Commercial UX ✅
 - `components/CtaButton.tsx`: BUY_LIVE (wraps existing `startCheckout()`; 401 → `setBuyIntent()` + account redirect), BETA_REQUEST, NOTIFY_ME states.
-- `app/beta/page.tsx` + `components/BetaRequestForm.tsx`: request journey (Visitor → explanation → Beta request → Feedback → Future purchase). Form composes an email to the existing support@nitedsp.co.uk — no invented backend, nothing uploaded.
+- `app/beta/page.tsx` + `components/BetaRequestForm.tsx`: request journey (Visitor → explanation → Beta request → Feedback → Future purchase). Form composes an email to the owner-confirmed nitedsp@outlook.com mailbox — no invented backend, nothing uploaded.
 - Submit product page CTAs replaced: "View Licensing"/"Sign in to download" → "Request beta access" / "View pricing".
 
 ### Phase 5 — Trust & Education ✅

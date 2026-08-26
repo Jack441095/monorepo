@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const STEPS = [
   ["01", "Request", "Tell us who you are and what you'd like to do. Requests go to our team by email — nothing is uploaded."],
   ["02", "Invitation", "We review requests manually and send an invitation with download instructions for the signed macOS build."],
-  ["03", "Feedback", "Beta users talk directly to support@nitedsp.co.uk. Your feedback shapes what ships."],
+  ["03", "Feedback", "Beta users talk directly to nitedsp@outlook.com. Your feedback shapes what ships."],
   ["04", "Future purchase", "When the £2.99 perpetual licence experiment opens, beta participants hear first."],
 ];
 

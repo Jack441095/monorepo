@@ -5,7 +5,7 @@ import { useState } from "react";
 /**
  * Beta / notify request capture. There is intentionally no new backend
  * endpoint: requests are composed into an email to the existing support
- * address (support@nitedsp.co.uk). Nothing is uploaded anywhere by this form.
+ * address (nitedsp@outlook.com). Nothing is uploaded anywhere by this form.
  */
 export function BetaRequestForm({ intent }: { intent?: string }) {
   const [name, setName] = useState("");
@@ -23,11 +23,11 @@ export function BetaRequestForm({ intent }: { intent?: string }) {
         <h2 className="text-lg font-semibold text-foreground">Your email app should be opening.</h2>
         <p className="mt-3 text-sm text-muted leading-relaxed">
           We review requests manually and reply from{" "}
-          <span className="font-mono text-xs">support@nitedsp.co.uk</span>. If your mail client
+          <span className="font-mono text-xs">nitedsp@outlook.com</span>. If your mail client
           didn&apos;t open, send the details to that address directly.
         </p>
         <a
-          href={`mailto:support@nitedsp.co.uk?subject=${encodeURIComponent(subject)}&body=${body}`}
+          href={`mailto:nitedsp@outlook.com?subject=${encodeURIComponent(subject)}&body=${body}`}
           className="btn-primary mt-6 inline-block"
         >
           Open email again
