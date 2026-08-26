@@ -8,7 +8,7 @@ Authority: `NITE_DSP_WEBSITE_AUDIT_V1.md`, `NITE_DSP_WEBSITE_COMMERCIAL_ARCHITEC
 - Demos: `SubmitPrepDemo`, `KennMixDemo`, `AudioAnalysisDemo` (browser-local, labelled simulated).
 - Commerce: `BuyCard.tsx` (Paddle.js init + buy-intent), `lib/checkout.ts` (`startCheckout`, server-resolved prices), backend `/commerce/checkout`, webhook entitlements.
 - Routes: home, products (+submit, smart-sample-manager), pricing, learn hub, technology, support, account, auth/verify, legal set.
-- Support contact: support@nitedsp.co.uk (existing).
+- Support contact: nitedsp@outlook.com (owner-confirmed mailbox).
 
 ## Required Changes (this programme)
 | # | Change | Files |

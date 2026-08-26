@@ -355,7 +355,7 @@ function AccountPageInner() {
             {pendingState === "timed-out" ? (
               <p className="text-sm">
                 Confirming your purchase is taking longer than usual. Please refresh in a moment, or{" "}
-                <a href="mailto:support@nitedsp.co.uk" className="underline font-semibold">
+                <a href="mailto:nitedsp@outlook.com" className="underline font-semibold">
                   contact support
                 </a>{" "}
                 if it does not appear soon.
@@ -393,8 +393,8 @@ function AccountPageInner() {
 
         <p className="mt-12 text-xs" style={{ color: "var(--muted-dim)" }}>
           Having account issues? Contact us at{" "}
-          <a href="mailto:support@nitedsp.co.uk" className="underline hover:text-foreground font-mono">
-            support@nitedsp.co.uk
+          <a href="mailto:nitedsp@outlook.com" className="underline hover:text-foreground font-mono">
+            nitedsp@outlook.com
           </a>
           .
         </p>

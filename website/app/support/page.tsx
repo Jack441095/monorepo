@@ -66,8 +66,8 @@ export default function SupportPage() {
           <p className="mt-4 text-sm text-muted leading-relaxed">
             Email us directly. Please never attach an unredacted assignment or private document. Include your macOS version, product/version, and a brief description of the issue.
           </p>
-          <a href="mailto:support@nitedsp.co.uk" className="btn-primary mt-8 inline-block font-mono">
-            support@nitedsp.co.uk
+          <a href="mailto:nitedsp@outlook.com" className="btn-primary mt-8 inline-block font-mono">
+            nitedsp@outlook.com
           </a>
         </div>
       </section>
