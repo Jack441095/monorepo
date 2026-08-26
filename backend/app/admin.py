@@ -309,7 +309,13 @@ def upload_release_artifact(
     if not filename or filename in {".", ".."}:
         raise HTTPException(status_code=400, detail="A release filename is required")
     try:
-        storage_key = object_storage_key(f"releases/{product_id}/{version}/{filename}")
+        # Platform and architecture are part of release identity. Keep them
+        # in the immutable object key as well as in the database uniqueness
+        # constraint, so a same-named macOS and Windows artifact can never
+        # collide in shared S3/R2 or local staging storage.
+        storage_key = object_storage_key(
+            f"releases/{product_id}/{version}/{platform}/{architecture}/{filename}"
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid release filename") from exc
 

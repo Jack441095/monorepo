@@ -56,7 +56,7 @@ Paddle URLs, incomplete HTTPS URLs, and incomplete durable-storage settings.
 3. Configure the Submit Sandbox catalog values and register the Paddle Sandbox
    webhook at the staging API endpoint.
 4. Upload the exact ZIP to the private release bucket. The object key should be
-   `releases/nite-submit/0.2.0/Submit-0.2.0-macOS.zip`.
+   `releases/nite-submit/0.2.0/macos/arm64/Submit-0.2.0-macOS.zip`.
 5. From a controlled operator machine, register it with:
 
    ```sh

@@ -695,7 +695,42 @@ def test_staging_release_upload_is_checksum_bound(client, db_session, monkeypatc
 
     assert resp.status_code == 200
     assert resp.json()["checksum_sha256"] == checksum
-    assert (tmp_path / "releases" / "nite-submit" / "0.2.0" / "Submit-0.2.0-macOS.zip").read_bytes() == payload
+    macos_path = (
+        tmp_path
+        / "releases"
+        / "nite-submit"
+        / "0.2.0"
+        / "macos"
+        / "arm64"
+        / "Submit-0.2.0-macOS.zip"
+    )
+    assert macos_path.read_bytes() == payload
+
+    # A same-named artifact for another platform/architecture gets a distinct
+    # immutable object key rather than colliding with the macOS release.
+    windows_resp = client.post(
+        "/admin/releases/upload",
+        data={
+            "product_id": "nite-submit",
+            "version": "0.2.0",
+            "platform": "windows",
+            "architecture": "x64",
+        },
+        files={"artifact": ("Submit-0.2.0-macOS.zip", payload, "application/zip")},
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert windows_resp.status_code == 200
+    windows_path = (
+        tmp_path
+        / "releases"
+        / "nite-submit"
+        / "0.2.0"
+        / "windows"
+        / "x64"
+        / "Submit-0.2.0-macOS.zip"
+    )
+    assert windows_path.read_bytes() == payload
+    assert windows_path != macos_path
 
 
 def test_admin_release_upsert_verifies_artifact_checksum(client, db_session):
