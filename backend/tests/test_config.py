@@ -83,6 +83,12 @@ def test_production_configuration_rejects_local_release_storage():
         licensing_private_key_base64="production-key",
         database_url="postgresql+psycopg2://db.example/nitedsp",
         email_from_address="noreply@nite.example",
+        paddle_api_base_url="https://api.paddle.com",
+        paddle_api_key="live-api-key",
+        paddle_webhook_secret="live-webhook-secret",
+        paddle_product_id="pro_submit_live",
+        paddle_regular_price_id="pri_submit_live",
+        paddle_active_price_id="pri_submit_live",
         storage_backend="local",
     )
 
@@ -107,6 +113,12 @@ def test_production_configuration_accepts_complete_s3_release_storage():
         email_from_address="noreply@nite.example",
         email_provider="resend",
         resend_api_key="resend-production-key",
+        paddle_api_base_url="https://api.paddle.com",
+        paddle_api_key="live-api-key",
+        paddle_webhook_secret="live-webhook-secret",
+        paddle_product_id="pro_submit_live",
+        paddle_regular_price_id="pri_submit_live",
+        paddle_active_price_id="pri_submit_live",
         storage_backend="s3",
         storage_bucket="nitedsp-releases",
         storage_endpoint="https://account.r2.cloudflarestorage.com",
@@ -115,6 +127,39 @@ def test_production_configuration_accepts_complete_s3_release_storage():
     )
 
     _validate_production_config(settings)
+
+
+def test_production_configuration_rejects_sandbox_paddle():
+    settings = Settings(
+        environment="production",
+        nite_dsp_public_url="https://www.nite.example",
+        nite_dsp_api_url="https://api.nite.example",
+        nite_dsp_support_email="support@nite.example",
+        session_secret="production-session-secret",
+        admin_api_key="production-admin-key",
+        licensing_private_key_base64="production-key",
+        database_url="postgresql+psycopg2://db.example/nitedsp",
+        email_from_address="noreply@nite.example",
+        email_provider="resend",
+        resend_api_key="resend-production-key",
+        paddle_api_key="sandbox-api-key",
+        paddle_webhook_secret="sandbox-webhook-secret",
+        paddle_product_id="pro_submit_sandbox",
+        paddle_regular_price_id="pri_submit_sandbox",
+        paddle_active_price_id="pri_submit_sandbox",
+        storage_backend="s3",
+        storage_bucket="nitedsp-releases",
+        storage_endpoint="https://account.r2.cloudflarestorage.com",
+        storage_access_key_id="access-key",
+        storage_secret_access_key="secret-key",
+    )
+
+    try:
+        _validate_production_config(settings)
+    except RuntimeError as exc:
+        assert "paddle_api_base_url must use api.paddle.com" in str(exc)
+    else:
+        raise AssertionError("production accepted the sandbox Paddle endpoint")
 
 
 def test_production_configuration_rejects_console_email():

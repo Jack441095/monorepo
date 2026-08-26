@@ -169,6 +169,27 @@ def _validate_production_config(s: Settings) -> None:
         )
     if "nitedsp_staging" in s.database_url or "nitedsp_test" in s.database_url:
         problems.append(f"database_url still points at a local staging/test database: {s.database_url!r}")
+    paddle_host = urlparse(s.paddle_api_base_url).hostname
+    if paddle_host != "api.paddle.com":
+        problems.append(
+            "paddle_api_base_url must use api.paddle.com in production; "
+            f"got {s.paddle_api_base_url!r}"
+        )
+    for field_name, value in (
+        ("paddle_api_key", s.paddle_api_key),
+        ("paddle_webhook_secret", s.paddle_webhook_secret),
+        ("paddle_product_id", s.paddle_product_id),
+        ("paddle_active_price_id", s.paddle_active_price_id),
+    ):
+        if not value:
+            problems.append(f"{field_name} is required for production checkout")
+    configured_price_ids = {
+        value for value in (s.paddle_intro_price_id, s.paddle_regular_price_id) if value
+    }
+    if not configured_price_ids:
+        problems.append("at least one of paddle_intro_price_id or paddle_regular_price_id is required")
+    elif s.paddle_active_price_id and s.paddle_active_price_id not in configured_price_ids:
+        problems.append("paddle_active_price_id must match an intro or regular configured price ID")
     if s.email_provider not in ("console", "resend"):
         problems.append(f"email_provider={s.email_provider!r} is not a valid provider")
     elif s.email_provider != "resend":
