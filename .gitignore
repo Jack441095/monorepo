@@ -1,0 +1,3 @@
+# OS-generated metadata must not appear as source changes.
+.DS_Store
+._*
