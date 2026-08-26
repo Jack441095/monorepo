@@ -90,10 +90,16 @@ def ready(response: Response) -> dict:
     ready_ok = db_ok and storage_ok
     if not ready_ok:
         response.status_code = 503
+    email_provider_configured = settings.email_provider in ("console", "resend") and (
+        settings.email_provider == "console" or bool(settings.resend_api_key)
+    )
     return {
         "status": "ok" if ready_ok else "unavailable",
         "database": db_ok,
         "storage": storage_ok,
         "storage_backend": settings.storage_backend,
         "storage_durable": settings.storage_backend == "s3",
+        "email_provider": settings.email_provider,
+        "email_provider_configured": email_provider_configured,
+        "email_deliverable": settings.email_provider == "resend" and bool(settings.resend_api_key),
     }
