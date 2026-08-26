@@ -63,3 +63,23 @@ def test_ready_returns_503_when_storage_is_unavailable(monkeypatch):
     assert result["database"] is True
     assert result["storage"] is False
     assert result["email_provider_configured"] is True
+
+
+def test_ready_returns_503_when_customer_rehearsal_gate_is_not_ready(monkeypatch):
+    monkeypatch.setattr(main, "engine", _HealthyEngine())
+    monkeypatch.setattr(main, "get_storage", lambda: _HealthyStorage())
+    monkeypatch.setattr(main.settings, "staging_customer_rehearsal", True)
+    monkeypatch.setattr(main.settings, "storage_backend", "local")
+    monkeypatch.setattr(main.settings, "email_provider", "console")
+    monkeypatch.setattr(main.settings, "resend_api_key", "")
+    response = Response()
+
+    result = main.ready(response)
+
+    assert response.status_code == 503
+    assert result["status"] == "unavailable"
+    assert result["storage"] is True
+    assert result["storage_durable"] is False
+    assert result["email_deliverable"] is False
+    assert result["staging_customer_rehearsal"] is True
+    assert result["staging_customer_rehearsal_ready"] is False
