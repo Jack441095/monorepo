@@ -26,7 +26,7 @@ were filtered out.
 
 Railway Production Website and Backend are deployed from this repository's
 `main` branch. The Submit-staging Backend is also connected to `/backend` and
-uses the same source branch. The current verified platform pin is `9945f72`;
+uses the same source branch. The current verified platform pin is `f4c40f0`;
 the root workspace's launch and recovery runbooks hold the dated deployment
 receipts and live readiness evidence.
 
