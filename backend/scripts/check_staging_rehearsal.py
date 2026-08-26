@@ -18,11 +18,24 @@ from __future__ import annotations
 
 import argparse
 import json
+import ssl
 import sys
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+
+import certifi
+
+
+def _tls_context() -> ssl.SSLContext:
+    """Use the packaged CA bundle for macOS/Python installations.
+
+    Some macOS Python installations do not automatically expose the system
+    keychain to ``urllib``. Using certifi keeps the HTTPS gate verified while
+    avoiding the unsafe alternative of disabling certificate validation.
+    """
+    return ssl.create_default_context(cafile=certifi.where())
 
 
 def validate_health(status_code: int, payload: Any) -> list[str]:
@@ -93,7 +106,7 @@ def _request_json(url: str, timeout: float) -> tuple[int | None, Any, str | None
         },
     )
     try:
-        with urlopen(request, timeout=timeout) as response:
+        with urlopen(request, timeout=timeout, context=_tls_context()) as response:
             status_code = response.status
             raw_body = response.read()
     except HTTPError as error:
@@ -117,7 +130,7 @@ def _request_status(url: str, timeout: float) -> tuple[int | None, str | None]:
         headers={"Accept": "application/json", "User-Agent": "nite-dsp-staging-rehearsal-gate/1"},
     )
     try:
-        with urlopen(request, timeout=timeout) as response:
+        with urlopen(request, timeout=timeout, context=_tls_context()) as response:
             return response.status, None
     except HTTPError as error:
         return error.code, None
