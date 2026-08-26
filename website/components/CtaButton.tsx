@@ -7,6 +7,8 @@ import { Magnetic } from "@/components/motion/Magnetic";
 import { CHECKOUT_LIVE } from "@/lib/commerce-config";
 import { setBuyIntent, startCheckout } from "@/lib/checkout";
 
+const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV;
+
 /**
  * Single CTA state machine for every commercial surface (see
  * docs/NITE_DSP_CONVERSION_COMMERCIAL_UX_V1.md §1).
@@ -64,7 +66,11 @@ export function CtaButton({
           onClick={buy}
           disabled={busy}
         >
-          <Magnetic>{busy ? "Opening checkout…" : (label ?? "Buy now")}</Magnetic>
+          <Magnetic>
+            {busy
+              ? "Opening checkout…"
+              : (label ?? (PADDLE_ENV === "sandbox" ? "Test Checkout (Sandbox)" : "Buy now"))}
+          </Magnetic>
         </button>
         {error && (
           <span role="alert" className="text-xs" style={{ color: "var(--state-error)" }}>
@@ -72,6 +78,11 @@ export function CtaButton({
             <Link href="/support" className="text-link">
               Contact support
             </Link>
+          </span>
+        )}
+        {PADDLE_ENV === "sandbox" && (
+          <span className="text-xs text-muted-dim">
+            Sandbox / test mode — simulated checkout for integration testing. No real funds are charged.
           </span>
         )}
       </span>

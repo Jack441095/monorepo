@@ -10,6 +10,7 @@ from sqlalchemy import text
 from . import admin, auth, commerce, downloads, licensing
 from .config import settings
 from .database import engine
+from .storage import StorageError, get_storage
 
 # uvicorn attaches handlers to its own "uvicorn" logger tree, not the root
 # logger, so INFO messages from our "nitedsp" logger would otherwise never
@@ -68,8 +69,8 @@ def health() -> dict:
 
 @app.get("/ready")
 def ready(response: Response) -> dict:
-    """Readiness -- confirms critical dependencies (currently: the
-    database) are actually reachable, not just that the process started.
+    """Readiness -- confirms critical dependencies are reachable, not just
+    that the process started.
     Returns 503 rather than raising, so a load balancer's readiness probe
     gets a clean signal instead of a stack trace. Never includes secrets or
     connection strings in the response."""
@@ -80,6 +81,25 @@ def ready(response: Response) -> dict:
     except Exception:
         db_ok = False
 
-    if not db_ok:
+    try:
+        get_storage().readiness()
+        storage_ok = True
+    except (StorageError, OSError):
+        storage_ok = False
+
+    ready_ok = db_ok and storage_ok
+    if not ready_ok:
         response.status_code = 503
-    return {"status": "ok" if db_ok else "unavailable", "database": db_ok}
+    email_provider_configured = settings.email_provider in ("console", "resend") and (
+        settings.email_provider == "console" or bool(settings.resend_api_key)
+    )
+    return {
+        "status": "ok" if ready_ok else "unavailable",
+        "database": db_ok,
+        "storage": storage_ok,
+        "storage_backend": settings.storage_backend,
+        "storage_durable": settings.storage_backend == "s3",
+        "email_provider": settings.email_provider,
+        "email_provider_configured": email_provider_configured,
+        "email_deliverable": settings.email_provider == "resend" and bool(settings.resend_api_key),
+    }
