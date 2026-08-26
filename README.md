@@ -19,14 +19,22 @@ source branch `web/nitedsp-world-class-v3` in `Nite_DSP_01`
 Original commit authorship and messages are retained; only unrelated paths
 were filtered out.
 
-## Railway target (future)
+## Railway deployment (current)
 
 - Website service root: `/website`
 - Backend service root: `/backend`
 
-Production Railway has **not** been repointed at this repository yet — the
-existing deployment continues to serve from its current source until a
-separate, explicit cutover.
+Railway Production Website and Backend are deployed from this repository's
+`main` branch. The Submit-staging Backend is also connected to `/backend` and
+uses the same source branch. The current verified platform pin is `9945f72`;
+the root workspace's launch and recovery runbooks hold the dated deployment
+receipts and live readiness evidence.
+
+Production checkout remains explicitly disabled until the owner completes the
+live Paddle catalog/key gate. Submit staging is Sandbox-only, uses an isolated
+database, and currently uses local release storage; it is not a durable paid-
+launch environment. A separate staging Website service has not been
+provisioned because of the current Railway project capacity limit.
 
 ## Local dev
 
