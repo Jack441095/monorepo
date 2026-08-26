@@ -12,6 +12,7 @@ import atexit
 import base64
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -45,7 +46,9 @@ BACKEND_DIR = Path(__file__).parent.parent
 
 @pytest.fixture(scope="session", autouse=True)
 def _migrate_test_db():
-    subprocess.run(["alembic", "upgrade", "head"], cwd=BACKEND_DIR, check=True)
+    # Use the interpreter running pytest so a fresh virtualenv does not need
+    # its Scripts/bin directory separately added to PATH.
+    subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], cwd=BACKEND_DIR, check=True)
     yield
 
 
