@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import shutil
+import tempfile
 from pathlib import Path
 from typing import Protocol
 
@@ -26,6 +27,8 @@ class StorageNotFound(StorageError):
 
 
 class ReleaseStorage(Protocol):
+    def readiness(self) -> None: ...
+
     def exists(self, storage_key: str) -> bool: ...
 
     def sha256(self, storage_key: str) -> str: ...
@@ -83,6 +86,24 @@ class LocalDirStorage:
 
     def _path(self, storage_key: str) -> Path:
         return local_release_path(str(self.root), storage_key)
+
+    def readiness(self) -> None:
+        """Confirm the configured local release directory is usable.
+
+        Local storage is deliberately allowed only for development and
+        isolated staging proofs. The probe verifies that the process can
+        create the directory and write to it, without leaving a marker behind
+        or treating local storage as durable.
+        """
+        self.root.mkdir(parents=True, exist_ok=True)
+        try:
+            with tempfile.NamedTemporaryFile(
+                prefix=".nitedsp-readiness-", dir=self.root, delete=True
+            ) as probe:
+                probe.write(b"ok")
+                probe.flush()
+        except Exception as exc:  # noqa: BLE001 - filesystem errors vary by OS
+            raise StorageError("local release storage is not writable") from exc
 
     def exists(self, storage_key: str) -> bool:
         return self._path(storage_key).is_file()
@@ -146,6 +167,13 @@ class S3CompatibleStorage:
             return object_storage_key(storage_key)
         except ValueError as exc:
             raise StorageError(str(exc)) from exc
+
+    def readiness(self) -> None:
+        """Confirm that the configured bucket is reachable with its credentials."""
+        try:
+            self.client.head_bucket(Bucket=self.bucket)
+        except Exception as exc:  # noqa: BLE001 - provider SDK exception types vary
+            raise StorageError("S3 release storage is not reachable") from exc
 
     @staticmethod
     def _provider_error(exc: Exception, not_found_message: str) -> StorageError:
