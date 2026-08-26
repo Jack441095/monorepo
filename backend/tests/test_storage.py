@@ -28,6 +28,15 @@ def test_local_storage_upload_is_checksum_bound_and_immutable(tmp_path: Path):
         storage.put_file(source, "releases/0.1.0/release.zip", "0" * 64)
 
 
+def test_local_storage_readiness_creates_no_marker(tmp_path: Path):
+    storage = LocalDirStorage(str(tmp_path / "storage"))
+
+    storage.readiness()
+
+    assert (tmp_path / "storage").is_dir()
+    assert list((tmp_path / "storage").iterdir()) == []
+
+
 def test_object_storage_key_rejects_absolute_and_parent_paths():
     assert object_storage_key("releases/0.1.0/release.zip") == "releases/0.1.0/release.zip"
     with pytest.raises(ValueError):
@@ -40,6 +49,9 @@ def test_s3_presigned_url_is_bounded_to_download_token_ttl(monkeypatch):
     calls: dict = {}
 
     class FakeClient:
+        def head_bucket(self, Bucket):
+            calls["bucket"] = Bucket
+
         def generate_presigned_url(self, operation, Params, ExpiresIn):
             calls.update(operation=operation, params=Params, expires=ExpiresIn)
             return "https://objects.example/signed"
@@ -59,6 +71,8 @@ def test_s3_presigned_url_is_bounded_to_download_token_ttl(monkeypatch):
     assert url == "https://objects.example/signed"
     assert calls["operation"] == "get_object"
     assert calls["expires"] == 15 * 60
+    storage.readiness()
+    assert calls["bucket"] == "releases"
     assert calls["params"]["Bucket"] == "releases"
     assert calls["params"]["Key"] == "releases/0.1.0/Submit.zip"
 
