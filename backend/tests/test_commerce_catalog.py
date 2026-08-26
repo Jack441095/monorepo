@@ -756,7 +756,7 @@ def test_admin_release_upsert_verifies_artifact_checksum(client, db_session):
             "architecture": "arm64",
             "channel": "private-beta",
             "checksum_sha256": checksum,
-            "storage_key": "releases/test-release.txt",
+            "storage_key": "releases/nite-submit/0.2.0/macos/arm64/test-release.txt",
             "signature": "ad_hoc;notarised=false",
         },
         headers={"X-Admin-Key": "test-admin-key"},
@@ -767,7 +767,38 @@ def test_admin_release_upsert_verifies_artifact_checksum(client, db_session):
     release = db_session.query(models.Release).filter(models.Release.product_id == "nite-submit").one()
     assert release.architecture == "arm64"
     assert release.channel == "private-beta"
-    assert release.storage_key == "releases/test-release.txt"
+    assert release.storage_key == "releases/nite-submit/0.2.0/macos/arm64/test-release.txt"
+
+
+def test_admin_release_upsert_rejects_storage_key_for_other_release_identity(client, db_session):
+    db_session.add(
+        models.Product(
+            id="nite-submit",
+            name="NITE Submit",
+            status="active",
+            public=False,
+            purchasable=False,
+            platforms=["macos"],
+        )
+    )
+    db_session.commit()
+
+    resp = client.put(
+        "/admin/releases/nite-submit/0.2.0/macos/arm64",
+        json={
+            "product_id": "nite-submit",
+            "version": "0.2.0",
+            "platform": "macos",
+            "architecture": "arm64",
+            "channel": "private-beta",
+            "checksum_sha256": "7e63a26d7a94559c3f69273bcf850d352984d2e503b437f69c2876ed232ea3ea",
+            "storage_key": "releases/nite-submit/0.2.0/windows/x64/test-release.txt",
+        },
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert resp.status_code == 400
+    assert "canonical" in resp.json()["detail"]
+    assert db_session.query(models.Release).count() == 0
 
 
 def test_admin_release_upsert_rejects_checksum_mismatch(client, db_session):
@@ -791,7 +822,7 @@ def test_admin_release_upsert_rejects_checksum_mismatch(client, db_session):
             "platform": "macos",
             "architecture": "arm64",
             "checksum_sha256": "0" * 64,
-            "storage_key": "releases/test-release.txt",
+            "storage_key": "releases/nite-submit/0.2.0/macos/arm64/test-release.txt",
         },
         headers={"X-Admin-Key": "test-admin-key"},
     )

@@ -131,7 +131,7 @@ def test_full_purchase_to_activation_flow(client, db_session):
             architecture="universal",
             channel="stable",
             checksum_sha256=checksum,
-            storage_key="releases/test-release.txt",
+                storage_key="releases/smart-sample-manager/0.1.0/macos/universal/test-release.txt",
         )
     )
     db_session.commit()
