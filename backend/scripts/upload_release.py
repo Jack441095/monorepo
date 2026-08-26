@@ -33,8 +33,20 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _default_storage_key(product: str, version: str, source: Path) -> str:
-    return object_storage_key(f"releases/{product}/{version}/{source.name}")
+def _canonical_storage_key(
+    product: str,
+    version: str,
+    platform: str,
+    architecture: str,
+    source: Path,
+) -> str:
+    """Build the same immutable key shape enforced by the admin API."""
+    filename = Path(source.name).name
+    if not filename or filename in {".", ".."}:
+        raise ValueError("artifact filename is required")
+    return object_storage_key(
+        f"releases/{product}/{version}/{platform}/{architecture}/{filename}"
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -63,7 +75,18 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
-        storage_key = object_storage_key(args.storage_key or _default_storage_key(args.product, args.version, source))
+        canonical_key = _canonical_storage_key(
+            args.product,
+            args.version,
+            args.platform,
+            args.architecture,
+            source,
+        )
+        storage_key = object_storage_key(args.storage_key) if args.storage_key else canonical_key
+        if storage_key != canonical_key:
+            raise ValueError(
+                "storage key must match the canonical product/version/platform/architecture path"
+            )
     except ValueError as exc:
         print(f"invalid storage key: {exc}", file=sys.stderr)
         return 2
