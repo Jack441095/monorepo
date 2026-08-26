@@ -48,8 +48,8 @@ Paddle URLs, incomplete HTTPS URLs, and incomplete durable-storage settings.
 
 ## Deployment sequence
 
-1. Deploy the platform branch containing commits `04caa4a`, `c0dbf59`, and
-   `9b2c00d` to the isolated staging target.
+1. Deploy the platform branch at `f049e00` (including the staging rails,
+   handoff, and explicit backend Dockerfile) to the isolated staging target.
 2. Run database migrations with `alembic upgrade head` and verify `/health` and
    `/ready`.
 3. Configure the Submit Sandbox catalog values and register the Paddle Sandbox
