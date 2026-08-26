@@ -8,7 +8,10 @@ simulates webhook payloads instead of receiving real ones.
 """
 from __future__ import annotations
 
+import hashlib
+
 from app import models
+from app.config import settings as app_settings
 from tests.test_e2e import _seed_product, _sign_paddle_payload
 
 
@@ -98,6 +101,41 @@ def test_known_price_id_accepted_when_mapping_configured(client, db_session, mon
     assert resp.json()["status"] == "processed"
     purchase = db_session.query(models.Purchase).filter(models.Purchase.provider_order_id == "txn_right_price").one()
     assert purchase.price_id == "pri_intro_real"
+
+
+def test_purchase_confirmation_uses_catalog_product_name(client, db_session, monkeypatch):
+    db_session.add(
+        models.Product(
+            id="nite-submit",
+            name="NITE Submit",
+            status="active",
+            public=False,
+            purchasable=True,
+            platforms=["macos"],
+            paddle_product_id="pro_nite_submit_sandbox",
+        )
+    )
+    db_session.commit()
+
+    import app.commerce as commerce_module
+
+    sent = []
+    monkeypatch.setattr(commerce_module, "send_email", lambda **kwargs: sent.append(kwargs))
+
+    resp = _post_webhook(
+        client,
+        _completed_payload(
+            "evt_nite_submit_confirmation",
+            "txn_nite_submit_confirmation",
+            product_id="pro_nite_submit_sandbox",
+            email="nite-submit-buyer@example.com",
+        ),
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "processed"
+    assert sent[0]["subject"] == "Your NITE Submit purchase is complete"
+    assert "Thanks for purchasing NITE Submit!" in sent[0]["body"]
 
 
 def _adjustment_payload(event_id, transaction_id, status, action="refund"):
@@ -211,7 +249,13 @@ def test_checkout_requires_auth(client):
     assert resp.status_code == 401
 
 
-def test_checkout_unconfigured_paddle_returns_503(client, db_session):
+def test_checkout_unconfigured_paddle_returns_503(client, db_session, monkeypatch):
+    # The developer's local .env may contain sandbox credentials. Keep this
+    # regression deterministic: it is specifically testing the fail-closed
+    # behavior when the provider is not configured.
+    from app.commerce import settings as commerce_settings
+
+    monkeypatch.setattr(commerce_settings, "paddle_api_key", "")
     raw_token = _login_and_get_token(client, "checkout-buyer@example.com", db_session)
     verify_resp = client.post("/auth/verify", json={"token": raw_token})
     assert verify_resp.status_code == 200
@@ -239,6 +283,7 @@ def test_checkout_creates_url_when_configured(client, db_session, monkeypatch):
 
     def _fake_post(url, headers=None, json=None, timeout=None):
         assert json["items"][0]["price_id"] == "pri_active_real"
+        assert "customer" not in json
         return _FakeResponse()
 
     import app.commerce as commerce_module
@@ -248,6 +293,194 @@ def test_checkout_creates_url_when_configured(client, db_session, monkeypatch):
     resp = client.post("/commerce/checkout", json={"price": "active"})
     assert resp.status_code == 200
     assert resp.json()["checkout_url"] == "https://sandbox-checkout.paddle.com/fake"
+
+
+def test_download_rejects_unsupported_platform(client, db_session):
+    _seed_product(db_session)
+    raw_token = _login_and_get_token(client, "unsupported-platform@example.com", db_session)
+    assert client.post("/auth/verify", json={"token": raw_token}).status_code == 200
+
+    resp = client.get(
+        "/downloads/latest",
+        params={"product_id": "smart-sample-manager", "platform": "solaris", "architecture": "x64"},
+    )
+    assert resp.status_code == 400
+    assert "Unsupported platform" in resp.json()["detail"]
+
+
+def test_download_requires_active_entitlement(client, db_session):
+    _seed_product(db_session)
+    raw_token = _login_and_get_token(client, "no-entitlement@example.com", db_session)
+    assert client.post("/auth/verify", json={"token": raw_token}).status_code == 200
+
+    resp = client.get(
+        "/downloads/latest",
+        params={"product_id": "smart-sample-manager", "platform": "macos", "architecture": "universal"},
+    )
+    assert resp.status_code == 403
+    assert resp.json()["detail"] == "No active entitlement for this product"
+
+
+def test_download_reports_missing_release(client, db_session):
+    _seed_product(db_session)
+    user = models.User(email="missing-release@example.com")
+    db_session.add(user)
+    db_session.flush()
+    db_session.add(
+        models.Entitlement(
+            user_id=user.id,
+            product_id="smart-sample-manager",
+            license_key="MISSING-RELEASE-0001-0001",
+            license_type="perpetual",
+            max_activations=3,
+            status="active",
+        )
+    )
+    db_session.commit()
+
+    raw_token = _login_and_get_token(client, "missing-release@example.com", db_session)
+    assert client.post("/auth/verify", json={"token": raw_token}).status_code == 200
+    resp = client.get(
+        "/downloads/latest",
+        params={"product_id": "smart-sample-manager", "platform": "linux", "architecture": "x64"},
+    )
+    assert resp.status_code == 404
+    assert resp.json()["detail"] == "No matching release found"
+
+
+def test_download_returns_latest_platform_specific_release_and_checksum(client, db_session):
+    import hashlib
+
+    _seed_product(db_session)
+    user = models.User(email="platform-download@example.com")
+    db_session.add(user)
+    db_session.flush()
+    db_session.add(
+        models.Entitlement(
+            user_id=user.id,
+            product_id="smart-sample-manager",
+            license_key="PLATFORM-TEST-0001-0001",
+            license_type="perpetual",
+            max_activations=3,
+            status="active",
+        )
+    )
+    db_session.add(
+        models.Release(
+            product_id="smart-sample-manager",
+            version="1.2.3",
+            platform="windows",
+            architecture="x64",
+            channel="stable",
+            checksum_sha256=hashlib.sha256(b"windows zip").hexdigest(),
+            storage_key="releases/windows-1.2.3.zip",
+        )
+    )
+    db_session.commit()
+
+    raw_token = _login_and_get_token(client, "platform-download@example.com", db_session)
+    assert client.post("/auth/verify", json={"token": raw_token}).status_code == 200
+    resp = client.get(
+        "/downloads/latest",
+        params={"product_id": "smart-sample-manager", "platform": "windows", "architecture": "x64"},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["version"] == "1.2.3"
+    assert resp.json()["checksum_sha256"] == hashlib.sha256(b"windows zip").hexdigest()
+    assert "token=" in resp.json()["download_url"]
+
+
+def test_s3_download_validates_token_records_download_and_redirects(client, db_session, monkeypatch):
+    import hashlib
+    from urllib.parse import urlsplit
+
+    _seed_product(db_session)
+    user = models.User(email="s3-download@example.com")
+    db_session.add(user)
+    db_session.flush()
+    db_session.add(
+        models.Entitlement(
+            user_id=user.id,
+            product_id="smart-sample-manager",
+            license_key="S3-DOWNLOAD-0001-0001",
+            license_type="perpetual",
+            max_activations=3,
+            status="active",
+        )
+    )
+    db_session.add(
+        models.Release(
+            product_id="smart-sample-manager",
+            version="2.0.0",
+            platform="linux",
+            architecture="x64",
+            channel="stable",
+            checksum_sha256=hashlib.sha256(b"linux zip").hexdigest(),
+            storage_key="releases/linux-2.0.0.zip",
+        )
+    )
+    db_session.commit()
+
+    raw_token = _login_and_get_token(client, "s3-download@example.com", db_session)
+    assert client.post("/auth/verify", json={"token": raw_token}).status_code == 200
+    latest = client.get(
+        "/downloads/latest",
+        params={"product_id": "smart-sample-manager", "platform": "linux", "architecture": "x64"},
+    )
+    assert latest.status_code == 200
+
+    class FakeStorage:
+        def exists(self, storage_key):
+            assert storage_key == "releases/linux-2.0.0.zip"
+            return True
+
+        def local_path(self, storage_key):
+            return None
+
+        def presigned_get_url(self, storage_key, expires_in, filename):
+            assert expires_in == 15 * 60
+            assert filename == "linux-2.0.0.zip"
+            return "https://objects.example/signed-linux.zip"
+
+    import app.downloads as downloads_module
+
+    monkeypatch.setattr(downloads_module, "get_storage", lambda: FakeStorage())
+    parsed = urlsplit(latest.json()["download_url"])
+    fetched = client.get(f"{parsed.path}?{parsed.query}", follow_redirects=False)
+
+    assert fetched.status_code == 307
+    assert fetched.headers["location"] == "https://objects.example/signed-linux.zip"
+    assert db_session.query(models.Download).count() == 1
+
+
+def test_download_rejects_expired_entitlement(client, db_session):
+    from datetime import datetime, timedelta, timezone
+
+    _seed_product(db_session)
+    user = models.User(email="expired-download@example.com")
+    db_session.add(user)
+    db_session.flush()
+    db_session.add(
+        models.Entitlement(
+            user_id=user.id,
+            product_id="smart-sample-manager",
+            license_key="EXPIRED-DL-0001-0001",
+            license_type="subscription",
+            max_activations=3,
+            status="active",
+            expires_at=datetime.now(timezone.utc) - timedelta(minutes=1),
+        )
+    )
+    db_session.commit()
+
+    raw_token = _login_and_get_token(client, "expired-download@example.com", db_session)
+    assert client.post("/auth/verify", json={"token": raw_token}).status_code == 200
+    resp = client.get(
+        "/downloads/latest",
+        params={"product_id": "smart-sample-manager", "platform": "macos", "architecture": "universal"},
+    )
+    assert resp.status_code == 403
 
 
 def test_transaction_completed_resolves_email_via_customer_id(client, db_session, monkeypatch):
@@ -429,6 +662,172 @@ def test_admin_can_create_and_list_products(client, db_session):
 def test_admin_products_requires_admin_key(client):
     resp = client.get("/admin/products", headers={"X-Admin-Key": "wrong"})
     assert resp.status_code == 401
+
+
+def test_staging_release_upload_is_checksum_bound(client, db_session, monkeypatch, tmp_path):
+    monkeypatch.setattr(app_settings, "environment", "staging")
+    monkeypatch.setattr(app_settings, "mock_storage_dir", str(tmp_path))
+    db_session.add(
+        models.Product(
+            id="nite-submit",
+            name="NITE Submit",
+            status="active",
+            public=False,
+            purchasable=False,
+            platforms=["macos"],
+        )
+    )
+    db_session.commit()
+
+    payload = b"staging release bytes"
+    checksum = hashlib.sha256(payload).hexdigest()
+    resp = client.post(
+        "/admin/releases/upload",
+        data={
+            "product_id": "nite-submit",
+            "version": "0.2.0",
+            "platform": "macos",
+            "architecture": "arm64",
+        },
+        files={"artifact": ("Submit-0.2.0-macOS.zip", payload, "application/zip")},
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json()["checksum_sha256"] == checksum
+    macos_path = (
+        tmp_path
+        / "releases"
+        / "nite-submit"
+        / "0.2.0"
+        / "macos"
+        / "arm64"
+        / "Submit-0.2.0-macOS.zip"
+    )
+    assert macos_path.read_bytes() == payload
+
+    # A same-named artifact for another platform/architecture gets a distinct
+    # immutable object key rather than colliding with the macOS release.
+    windows_resp = client.post(
+        "/admin/releases/upload",
+        data={
+            "product_id": "nite-submit",
+            "version": "0.2.0",
+            "platform": "windows",
+            "architecture": "x64",
+        },
+        files={"artifact": ("Submit-0.2.0-macOS.zip", payload, "application/zip")},
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert windows_resp.status_code == 200
+    windows_path = (
+        tmp_path
+        / "releases"
+        / "nite-submit"
+        / "0.2.0"
+        / "windows"
+        / "x64"
+        / "Submit-0.2.0-macOS.zip"
+    )
+    assert windows_path.read_bytes() == payload
+    assert windows_path != macos_path
+
+
+def test_admin_release_upsert_verifies_artifact_checksum(client, db_session):
+    db_session.add(
+        models.Product(
+            id="nite-submit",
+            name="NITE Submit",
+            status="active",
+            public=False,
+            purchasable=False,
+            platforms=["macos"],
+        )
+    )
+    db_session.commit()
+
+    checksum = "7e63a26d7a94559c3f69273bcf850d352984d2e503b437f69c2876ed232ea3ea"
+    resp = client.put(
+        "/admin/releases/nite-submit/0.2.0/macos/arm64",
+        json={
+            "product_id": "nite-submit",
+            "version": "0.2.0",
+            "platform": "macos",
+            "architecture": "arm64",
+            "channel": "private-beta",
+            "checksum_sha256": checksum,
+            "storage_key": "releases/nite-submit/0.2.0/macos/arm64/test-release.txt",
+            "signature": "ad_hoc;notarised=false",
+        },
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["checksum_sha256"] == checksum
+
+    release = db_session.query(models.Release).filter(models.Release.product_id == "nite-submit").one()
+    assert release.architecture == "arm64"
+    assert release.channel == "private-beta"
+    assert release.storage_key == "releases/nite-submit/0.2.0/macos/arm64/test-release.txt"
+
+
+def test_admin_release_upsert_rejects_storage_key_for_other_release_identity(client, db_session):
+    db_session.add(
+        models.Product(
+            id="nite-submit",
+            name="NITE Submit",
+            status="active",
+            public=False,
+            purchasable=False,
+            platforms=["macos"],
+        )
+    )
+    db_session.commit()
+
+    resp = client.put(
+        "/admin/releases/nite-submit/0.2.0/macos/arm64",
+        json={
+            "product_id": "nite-submit",
+            "version": "0.2.0",
+            "platform": "macos",
+            "architecture": "arm64",
+            "channel": "private-beta",
+            "checksum_sha256": "7e63a26d7a94559c3f69273bcf850d352984d2e503b437f69c2876ed232ea3ea",
+            "storage_key": "releases/nite-submit/0.2.0/windows/x64/test-release.txt",
+        },
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert resp.status_code == 400
+    assert "canonical" in resp.json()["detail"]
+    assert db_session.query(models.Release).count() == 0
+
+
+def test_admin_release_upsert_rejects_checksum_mismatch(client, db_session):
+    db_session.add(
+        models.Product(
+            id="nite-submit",
+            name="NITE Submit",
+            status="active",
+            public=False,
+            purchasable=False,
+            platforms=["macos"],
+        )
+    )
+    db_session.commit()
+
+    resp = client.put(
+        "/admin/releases/nite-submit/0.2.0/macos/arm64",
+        json={
+            "product_id": "nite-submit",
+            "version": "0.2.0",
+            "platform": "macos",
+            "architecture": "arm64",
+            "checksum_sha256": "0" * 64,
+            "storage_key": "releases/nite-submit/0.2.0/macos/arm64/test-release.txt",
+        },
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+    assert resp.status_code == 409
+    assert db_session.query(models.Release).count() == 0
 
 
 def test_webhook_resolves_product_via_paddle_product_id_not_internal_slug(client, db_session):

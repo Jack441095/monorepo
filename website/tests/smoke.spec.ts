@@ -37,6 +37,16 @@ test("homepage identifies NITE DSP and Smart Sample Manager", async ({ page }) =
   await expect(page.getByText(/Sample Library Optimiser/i).first()).toBeVisible();
 });
 
+test("public pages send baseline browser security headers", async ({ page }) => {
+  const response = await page.goto("/");
+  const headers = response?.headers() ?? {};
+  expect(headers["strict-transport-security"]).toContain("max-age=31536000");
+  expect(headers["x-content-type-options"]).toBe("nosniff");
+  expect(headers["x-frame-options"]).toBe("SAMEORIGIN");
+  expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+  expect(headers["permissions-policy"]).toBe("camera=(), microphone=(), geolocation=()");
+});
+
 test("desktop nav has no visible menu button, mobile nav does", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");

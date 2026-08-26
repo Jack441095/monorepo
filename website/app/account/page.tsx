@@ -85,8 +85,9 @@ function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
 
   async function prepareDownload(option: PlatformOption) {
     setDownloadState((current) => ({ ...current, [option.id]: "loading" }));
+    const channel = entitlement.license_type === "beta" ? "private-beta" : "stable";
     const res = await apiFetch(
-      `/downloads/latest?product_id=${encodeURIComponent(entitlement.product_id)}&platform=${option.id}&architecture=${option.architecture}`
+      `/downloads/latest?product_id=${encodeURIComponent(entitlement.product_id)}&platform=${option.id}&architecture=${option.architecture}&channel=${channel}`
     );
     if (!res.ok) {
       setDownloadState((current) => ({ ...current, [option.id]: "error" }));

@@ -11,6 +11,8 @@ documented shape.
 """
 from __future__ import annotations
 
+from urllib.parse import urlparse
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -93,8 +95,15 @@ class Settings(BaseSettings):
     email_from_address: str = "noreply@localhost.invalid"
     resend_api_key: str = ""
 
-    # Downloads -- Section 51/52. Stands in for real object storage (S3-alike)
-    # during staging; releases.storage_key is a path relative to this dir.
+    # Downloads -- Section 51/52. Local storage is development/test-only; a
+    # private S3-compatible bucket (including Cloudflare R2) is the durable
+    # deployment adapter. Release keys are immutable object/path keys.
+    storage_backend: str = "local"  # "local" | "s3"
+    storage_bucket: str = ""
+    storage_endpoint: str = ""
+    storage_region: str = "auto"
+    storage_access_key_id: str = ""
+    storage_secret_access_key: str = ""
     mock_storage_dir: str = "./mock_storage"
 
     # Admin -- Section 73. Deliberately fail-closed: empty (the default)
@@ -103,6 +112,28 @@ class Settings(BaseSettings):
     # the dev licensing_server (POST /v1/admin/licenses has zero auth) --
     # that mistake must never be repeated here.
     admin_api_key: str = ""
+
+
+def _storage_configuration_problems(s: Settings) -> list[str]:
+    problems = []
+    if s.storage_backend not in ("local", "s3"):
+        problems.append(
+            f"storage_backend={s.storage_backend!r} is unsupported; expected 'local' or 's3'"
+        )
+    if s.storage_backend == "s3":
+        for field_name, value in (
+            ("storage_bucket", s.storage_bucket),
+            ("storage_endpoint", s.storage_endpoint),
+            ("storage_access_key_id", s.storage_access_key_id),
+            ("storage_secret_access_key", s.storage_secret_access_key),
+        ):
+            if not value:
+                problems.append(f"{field_name} is required when storage_backend=s3")
+        if s.storage_endpoint:
+            parsed_endpoint = urlparse(s.storage_endpoint)
+            if parsed_endpoint.scheme != "https" or not parsed_endpoint.hostname:
+                problems.append("storage_endpoint must be a public HTTPS URL when storage_backend=s3")
+    return problems
 
 
 def _validate_production_config(s: Settings) -> None:
@@ -138,10 +169,36 @@ def _validate_production_config(s: Settings) -> None:
         )
     if "nitedsp_staging" in s.database_url or "nitedsp_test" in s.database_url:
         problems.append(f"database_url still points at a local staging/test database: {s.database_url!r}")
-    if s.email_provider == "resend" and not s.resend_api_key:
-        problems.append("email_provider is 'resend' but resend_api_key is empty")
+    paddle_host = urlparse(s.paddle_api_base_url).hostname
+    if paddle_host != "api.paddle.com":
+        problems.append(
+            "paddle_api_base_url must use api.paddle.com in production; "
+            f"got {s.paddle_api_base_url!r}"
+        )
+    for field_name, value in (
+        ("paddle_api_key", s.paddle_api_key),
+        ("paddle_webhook_secret", s.paddle_webhook_secret),
+        ("paddle_product_id", s.paddle_product_id),
+        ("paddle_active_price_id", s.paddle_active_price_id),
+    ):
+        if not value:
+            problems.append(f"{field_name} is required for production checkout")
+    configured_price_ids = {
+        value for value in (s.paddle_intro_price_id, s.paddle_regular_price_id) if value
+    }
+    if not configured_price_ids:
+        problems.append("at least one of paddle_intro_price_id or paddle_regular_price_id is required")
+    elif s.paddle_active_price_id and s.paddle_active_price_id not in configured_price_ids:
+        problems.append("paddle_active_price_id must match an intro or regular configured price ID")
     if s.email_provider not in ("console", "resend"):
         problems.append(f"email_provider={s.email_provider!r} is not a valid provider")
+    elif s.email_provider != "resend":
+        problems.append("email_provider must be 'resend' in production; console email is not deliverable")
+    elif not s.resend_api_key:
+        problems.append("email_provider is 'resend' but resend_api_key is empty")
+    if s.storage_backend != "s3":
+        problems.append("storage_backend must be 's3' in production; local storage is not durable")
+    problems.extend(_storage_configuration_problems(s))
 
     if problems:
         raise RuntimeError(
@@ -150,5 +207,64 @@ def _validate_production_config(s: Settings) -> None:
         )
 
 
+def _validate_staging_config(s: Settings) -> None:
+    """Keep a staging deployment pointed at Paddle Sandbox and HTTPS.
+
+    Staging is the only environment currently intended to exercise checkout.
+    Fail loudly when it is half-configured or pointed at the live Paddle API;
+    local development remains intentionally permissive so simulated webhook
+    tests can run without credentials.
+    """
+    if s.environment != "staging":
+        return
+
+    problems = []
+    paddle_host = urlparse(s.paddle_api_base_url).hostname
+    if paddle_host != "sandbox-api.paddle.com":
+        problems.append(
+            "paddle_api_base_url must use sandbox-api.paddle.com in staging; "
+            f"got {s.paddle_api_base_url!r}"
+        )
+
+    for field_name, value in (
+        ("paddle_api_key", s.paddle_api_key),
+        ("paddle_webhook_secret", s.paddle_webhook_secret),
+        ("paddle_product_id", s.paddle_product_id),
+        ("paddle_active_price_id", s.paddle_active_price_id),
+    ):
+        if not value:
+            problems.append(f"{field_name} is required for staging checkout")
+
+    configured_price_ids = {
+        value for value in (s.paddle_intro_price_id, s.paddle_regular_price_id) if value
+    }
+    if not configured_price_ids:
+        problems.append("at least one of paddle_intro_price_id or paddle_regular_price_id is required")
+    elif s.paddle_active_price_id and s.paddle_active_price_id not in configured_price_ids:
+        problems.append("paddle_active_price_id must match an intro or regular configured price ID")
+
+    for field_name, value in (
+        ("nite_dsp_public_url", s.nite_dsp_public_url),
+        ("nite_dsp_api_url", s.nite_dsp_api_url),
+    ):
+        parsed = urlparse(value)
+        if parsed.scheme != "https" or not parsed.hostname or parsed.hostname in {"localhost", "127.0.0.1"}:
+            problems.append(f"{field_name} must be a public HTTPS URL in staging; got {value!r}")
+
+    if problems:
+        raise RuntimeError(
+            "Refusing to start with environment=staging and invalid configuration:\n"
+            + "\n".join(f"  - {p}" for p in problems)
+        )
+
+    storage_problems = _storage_configuration_problems(s)
+    if storage_problems:
+        raise RuntimeError(
+            "Refusing to start with invalid release storage configuration:\n"
+            + "\n".join(f"  - {p}" for p in storage_problems)
+        )
+
+
 settings = Settings()
 _validate_production_config(settings)
+_validate_staging_config(settings)
