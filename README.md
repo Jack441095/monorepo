@@ -36,6 +36,20 @@ database, and currently uses local release storage; it is not a durable paid-
 launch environment. A separate staging Website service has not been
 provisioned because of the current Railway project capacity limit.
 
+To run the read-only durable-staging gate after owner-approved S3/Resend
+configuration is installed, use:
+
+```
+cd backend
+python scripts/check_staging_rehearsal.py \
+  --base-url https://<submit-staging-api> --require-checkout
+```
+
+The command checks `/health`, the durable `/ready` contract, and that the
+unauthenticated download route returns `401`. It does not upload artifacts,
+send email, call Paddle, or mutate provider state. It intentionally fails
+against the current local-storage/console-email staging posture.
+
 ## Local dev
 
 ```
