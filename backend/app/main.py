@@ -108,6 +108,7 @@ def ready(response: Response) -> dict:
         "email_provider": settings.email_provider,
         "email_provider_configured": email_provider_configured,
         "email_deliverable": email_deliverable,
+        "checkout_enabled": settings.paddle_checkout_enabled,
         "staging_customer_rehearsal": settings.staging_customer_rehearsal,
         "staging_customer_rehearsal_ready": customer_rehearsal_ready,
     }
