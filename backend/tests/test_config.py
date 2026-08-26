@@ -13,6 +13,7 @@ def _staging_settings(**overrides):
         "paddle_active_price_id": "pri_submit_regular_sandbox",
         "nite_dsp_public_url": "https://staging.nite.example",
         "nite_dsp_api_url": "https://api-staging.nite.example",
+        "nite_dsp_support_email": "support@nite.example",
     }
     values.update(overrides)
     return Settings(**values)
@@ -44,6 +45,18 @@ def test_staging_configuration_rejects_missing_catalog_or_https_values():
         assert "nite_dsp_public_url" in message
     else:
         raise AssertionError("incomplete staging configuration was accepted")
+
+
+def test_staging_configuration_rejects_placeholder_support_email():
+    settings = _staging_settings(nite_dsp_support_email="support@localhost.invalid")
+
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        assert "nite_dsp_support_email" in str(exc)
+        assert "dev placeholder" in str(exc)
+    else:
+        raise AssertionError("staging accepted the development support-email placeholder")
 
 
 def test_staging_configuration_accepts_complete_s3_storage():

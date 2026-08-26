@@ -256,6 +256,11 @@ def _validate_staging_config(s: Settings) -> None:
         if parsed.scheme != "https" or not parsed.hostname or parsed.hostname in {"localhost", "127.0.0.1"}:
             problems.append(f"{field_name} must be a public HTTPS URL in staging; got {value!r}")
 
+    if s.nite_dsp_support_email.endswith("@localhost.invalid"):
+        problems.append(
+            f"nite_dsp_support_email={s.nite_dsp_support_email!r} is still the dev placeholder"
+        )
+
     storage_problems = _storage_configuration_problems(s)
     if storage_problems:
         problems.extend(storage_problems)
