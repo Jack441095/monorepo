@@ -277,6 +277,43 @@ class UpsertReleaseRequest(BaseModel):
 MAX_STAGING_RELEASE_UPLOAD_BYTES = 250 * 1024 * 1024
 
 
+def _canonical_release_storage_key(
+    product_id: str,
+    version: str,
+    platform: str,
+    architecture: str,
+    filename: str,
+) -> str:
+    """Return the only storage-key shape accepted for a release identity."""
+    safe_filename = Path(filename).name
+    if not safe_filename or safe_filename in {".", ".."} or "/" in safe_filename:
+        raise ValueError("Invalid release filename")
+    return object_storage_key(
+        f"releases/{product_id}/{version}/{platform}/{architecture}/{safe_filename}"
+    )
+
+
+def _validate_canonical_release_storage_key(
+    product_id: str,
+    version: str,
+    platform: str,
+    architecture: str,
+    storage_key: str,
+) -> str:
+    """Reject registrations that point a release at another identity's key."""
+    normalized = object_storage_key(storage_key)
+    prefix = f"releases/{product_id}/{version}/{platform}/{architecture}/"
+    if not normalized.startswith(prefix):
+        raise ValueError("storage_key must include the release platform and architecture")
+    filename = normalized[len(prefix):]
+    if not filename or "/" in filename:
+        raise ValueError("storage_key must contain one release filename")
+    expected = _canonical_release_storage_key(product_id, version, platform, architecture, filename)
+    if normalized != expected:
+        raise ValueError("storage_key is not canonical for the release identity")
+    return normalized
+
+
 @router.post("/releases/upload")
 def upload_release_artifact(
     product_id: str = Form(...),
@@ -313,9 +350,7 @@ def upload_release_artifact(
         # in the immutable object key as well as in the database uniqueness
         # constraint, so a same-named macOS and Windows artifact can never
         # collide in shared S3/R2 or local staging storage.
-        storage_key = object_storage_key(
-            f"releases/{product_id}/{version}/{platform}/{architecture}/{filename}"
-        )
+        storage_key = _canonical_release_storage_key(product_id, version, platform, architecture, filename)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid release filename") from exc
 
@@ -391,12 +426,18 @@ def upsert_release(
         raise HTTPException(status_code=404, detail="Product not found")
 
     try:
+        storage_key = _validate_canonical_release_storage_key(
+            product_id, version, platform, architecture, req.storage_key
+        )
         storage = get_storage()
-        if not storage.exists(req.storage_key):
+        if not storage.exists(storage_key):
             raise HTTPException(status_code=404, detail="Release artifact missing from storage")
-        actual_checksum = storage.sha256(req.storage_key)
+        actual_checksum = storage.sha256(storage_key)
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail="storage_key must remain inside configured release storage") from exc
+        raise HTTPException(
+            status_code=400,
+            detail="storage_key must be canonical for this release identity and remain inside configured storage",
+        ) from exc
     except StorageNotFound as exc:
         raise HTTPException(status_code=404, detail="Release artifact missing from storage") from exc
     except StorageError as exc:
@@ -427,7 +468,7 @@ def upsert_release(
     release.channel = req.channel
     release.checksum_sha256 = actual_checksum
     release.signature = req.signature
-    release.storage_key = req.storage_key
+    release.storage_key = storage_key
     release.release_notes = req.release_notes
     release.published_at = datetime.now(timezone.utc)
     _audit(
