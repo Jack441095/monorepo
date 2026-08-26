@@ -169,10 +169,12 @@ def _validate_production_config(s: Settings) -> None:
         )
     if "nitedsp_staging" in s.database_url or "nitedsp_test" in s.database_url:
         problems.append(f"database_url still points at a local staging/test database: {s.database_url!r}")
-    if s.email_provider == "resend" and not s.resend_api_key:
-        problems.append("email_provider is 'resend' but resend_api_key is empty")
     if s.email_provider not in ("console", "resend"):
         problems.append(f"email_provider={s.email_provider!r} is not a valid provider")
+    elif s.email_provider != "resend":
+        problems.append("email_provider must be 'resend' in production; console email is not deliverable")
+    elif not s.resend_api_key:
+        problems.append("email_provider is 'resend' but resend_api_key is empty")
     if s.storage_backend != "s3":
         problems.append("storage_backend must be 's3' in production; local storage is not durable")
     problems.extend(_storage_configuration_problems(s))
