@@ -15,8 +15,9 @@ The Submit integration candidate is:
 - SHA-256: `64c503ebbbc975a8c839cb731ec158b9e0ef14029e84df23ff2e91dc5f0096a9`
 
 The artifact was locally registered and fetched through the authenticated
-download path; the downloaded bytes matched this checksum. Remote staging has
-not yet been registered.
+download path; the downloaded bytes matched this checksum. It was also uploaded
+to the isolated staging service and registered after the service recomputed the
+same checksum.
 
 ## Required staging boundary
 
@@ -48,7 +49,7 @@ Paddle URLs, incomplete HTTPS URLs, and incomplete durable-storage settings.
 
 ## Deployment sequence
 
-1. Deploy the platform branch at `0096258` (including the staging rails,
+1. Deploy the platform branch at `f0ae606` (including the staging rails,
    handoff, and explicit backend Dockerfile) to the isolated staging target.
 2. Run database migrations with `alembic upgrade head` and verify `/health` and
    `/ready`.
@@ -83,10 +84,34 @@ Record one fresh, independent run of:
 7. SHA-256 of the downloaded ZIP equals
    `64c503ebbbc975a8c839cb731ec158b9e0ef14029e84df23ff2e91dc5f0096a9`.
 
-Do not send the beta handoff until all seven steps are recorded. The local
-proof and the code-path test suite are not substitutes for this remote proof.
+## Remote proof result
 
-## Current external blocker
+The isolated Railway staging journey passed on 2026-08-26 against deployment
+`ecda1ee6-2118-48a8-823a-197e317168bf`:
+
+| Step | Result | Evidence |
+|---|---|---|
+| Public liveness | PASS | `GET /health` returned `200` with `environment=staging`. |
+| Public readiness | PASS | `GET /ready` returned `200` with `database=true`. |
+| Artifact upload | PASS | Authenticated staging upload returned `200`; 562,974 bytes stored. |
+| Product/release registration | PASS | Authenticated product and `private-beta` release registration returned `200`. |
+| Magic-link request and verification | PASS | Console email link was requested and verified through the public API. |
+| Entitlement and licence | PASS | Private-beta entitlement was visible to the account and licence activation returned `200`. |
+| `/downloads/latest` | PASS | Authenticated request returned version `0.2.0` and the candidate checksum. |
+| Signed download | PASS | Download returned `200`, 562,974 bytes, and SHA-256 `64c503ebbbc975a8c839cb731ec158b9e0ef14029e84df23ff2e91dc5f0096a9`. |
+
+The staging deployment is therefore **PASS for the private-beta code path**.
+The artifact is stored in Railway's configured local release directory for
+this cost-conscious proof environment. That storage is not durable across a
+replacement deployment, so re-upload and re-registration are required after
+any staging redeploy. Durable S3-compatible storage remains a paid-launch
+requirement.
+
+Do not send the beta handoff until the owner has reviewed the tester cohort,
+the ad-hoc macOS signing limitation, and the local-storage caveat. The remote
+proof now passes, but it is not evidence of production readiness.
+
+## Historical deployment failures and resolution
 
 The isolated Railway environment and Postgres service are present. The Backend
 service was attached to it without copying production variables, and staging
@@ -108,15 +133,17 @@ active public maintenance notice. This is therefore a Railway builder
 assignment/metadata failure, not an application start or database migration
 failure.
 
-The public Railway domain currently returns 404 for both `/health` and
-`/ready`, confirming that no backend instance is serving. Do not repeat blind
-deploy attempts or create another service. The next operational action is a
-Railway support/builder investigation, or a fresh retry after Railway repairs
-the builder assignment. Only after a successful `/health` and `/ready` check
-should the exact ZIP be registered and the remote seven-step proof be run.
-This staging setup uses local release storage for the cost-conscious proof
-environment; durable S3-compatible storage remains required before any paid
-launch.
+The builder and startup issues are now resolved. The migration command runs as
+a pre-deploy command, concurrent migration attempts are serialized with a
+PostgreSQL transaction-scoped advisory lock, and the runtime start command
+explicitly expands Railway's `PORT`. The staging Backend is healthy and the
+remote proof result above is current. There is no active Railway deployment
+blocker for this staging path.
+
+The staging upload bridge is restricted to `environment=staging`, requires the
+authenticated admin key, accepts release artifacts only, and enforces a 250 MB
+size limit. Production release uploads remain an out-of-band S3/R2 operation;
+the staging bridge must not be treated as a production distribution API.
 
 Once GitHub access is enabled, reconnect the already-created staging service;
 do not use `railway add`, which would attempt to create a sixth project service:
