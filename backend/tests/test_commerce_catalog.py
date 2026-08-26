@@ -264,6 +264,19 @@ def test_checkout_unconfigured_paddle_returns_503(client, db_session, monkeypatc
     assert resp.status_code == 503
 
 
+def test_checkout_disabled_returns_503_even_when_paddle_is_configured(client, db_session, monkeypatch):
+    from app.commerce import settings as commerce_settings
+
+    monkeypatch.setattr(commerce_settings, "paddle_api_key", "sandbox-key-for-test")
+    monkeypatch.setattr(commerce_settings, "paddle_active_price_id", "pri_active_real")
+    monkeypatch.setattr(commerce_settings, "paddle_checkout_enabled", False)
+    raw_token = _login_and_get_token(client, "checkout-disabled@example.com", db_session)
+    assert client.post("/auth/verify", json={"token": raw_token}).status_code == 200
+
+    resp = client.post("/commerce/checkout", json={"price": "active"})
+    assert resp.status_code == 503
+
+
 def test_checkout_creates_url_when_configured(client, db_session, monkeypatch):
     raw_token = _login_and_get_token(client, "checkout-buyer-2@example.com", db_session)
     verify_resp = client.post("/auth/verify", json={"token": raw_token})
@@ -273,6 +286,7 @@ def test_checkout_creates_url_when_configured(client, db_session, monkeypatch):
 
     monkeypatch.setattr(commerce_settings, "paddle_api_key", "sandbox-key-for-test")
     monkeypatch.setattr(commerce_settings, "paddle_active_price_id", "pri_active_real")
+    monkeypatch.setattr(commerce_settings, "paddle_checkout_enabled", True)
 
     class _FakeResponse:
         def raise_for_status(self):

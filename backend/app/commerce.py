@@ -457,6 +457,8 @@ def create_checkout(
     user: models.User = Depends(get_current_user),
     provider: CommerceProvider = Depends(get_provider),
 ) -> dict:
+    if not settings.paddle_checkout_enabled:
+        raise HTTPException(status_code=503, detail="Checkout is not available yet")
     if not provider.configured:
         raise HTTPException(status_code=503, detail="Checkout is not available yet")
 
