@@ -40,6 +40,9 @@ def test_ready_reports_database_and_storage(monkeypatch):
     assert result["storage"] is True
     assert result["storage_backend"] == main.settings.storage_backend
     assert result["storage_durable"] is (main.settings.storage_backend == "s3")
+    assert result["email_provider"] == main.settings.email_provider
+    assert result["email_provider_configured"] is True
+    assert result["email_deliverable"] is (main.settings.email_provider == "resend")
 
 
 def test_ready_returns_503_when_storage_is_unavailable(monkeypatch):
@@ -57,3 +60,4 @@ def test_ready_returns_503_when_storage_is_unavailable(monkeypatch):
     assert result["status"] == "unavailable"
     assert result["database"] is True
     assert result["storage"] is False
+    assert result["email_provider_configured"] is True
