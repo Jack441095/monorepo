@@ -13,4 +13,7 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Railway runs migrations through deploy.preDeployCommand. Keep the web
+# container focused on serving the already-migrated application so an ordinary
+# restart cannot implicitly execute schema changes.
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
