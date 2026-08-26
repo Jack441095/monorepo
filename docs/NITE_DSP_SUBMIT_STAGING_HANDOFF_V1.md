@@ -48,7 +48,7 @@ Paddle URLs, incomplete HTTPS URLs, and incomplete durable-storage settings.
 
 ## Deployment sequence
 
-1. Deploy the platform branch at `f049e00` (including the staging rails,
+1. Deploy the platform branch at `0096258` (including the staging rails,
    handoff, and explicit backend Dockerfile) to the isolated staging target.
 2. Run database migrations with `alembic upgrade head` and verify `/health` and
    `/ready`.
@@ -88,24 +88,35 @@ proof and the code-path test suite are not substitutes for this remote proof.
 
 ## Current external blocker
 
-The isolated Railway environment and Postgres service are now present. The
-Backend service was attached to it without copying production variables, and
-staging variables were configured with fresh staging secrets. The first direct
-deployment was accepted but stopped during Railway's build scheduling phase,
-before any build or runtime logs were emitted. The connected GitHub deployment
-retry also failed because this workspace has no GitHub installation for
-`Jack441095/NITE_DSP`. The staging-only GitHub source was then disconnected,
-and three further direct uploads—including the explicit Dockerfile build—
-reproduced the same scheduling-only failure.
-The public Railway domain currently returns 404 for both `/health` and `/ready`,
-confirming that no backend instance is serving.
+The isolated Railway environment and Postgres service are present. The Backend
+service was attached to it without copying production variables, and staging
+variables were configured with fresh staging secrets. The screenshot evidence
+shows the original GitHub deployment could not be applied because Railway had
+no GitHub App installation for `Jack441095/NITE_DSP`; that explains the
+GitHub-source failure, but it is not the only current failure.
 
-Next operational action: enable the repository's GitHub integration in Railway
-or retry the direct Railway builder when the workspace permits it. Only after a
-successful `/health` and `/ready` check should the exact ZIP be registered and
-the remote seven-step proof be run. This staging setup uses local release
-storage for the cost-conscious proof environment; durable S3-compatible
-storage remains required before any paid launch.
+The GitHub source was disconnected from this staging-only service so the
+repository-installation problem could not mask a direct builder test. Three
+direct uploads, including the explicit Dockerfile build, reproduced the same
+failure. The latest deployment is
+`9cda6210-ef99-493e-900e-cafbd6eaf1e0`. Railway's current service config is
+explicitly `DOCKERFILE` with `/backend/Dockerfile`, but the deployment metadata
+still reports the legacy `RAILPACK`/NIXPACKS path. The event sequence reaches
+`SNAPSHOT_CODE` and then fails at `BUILD_IMAGE`; no Docker build output and no
+deploy logs are emitted. The Railway agent also found no plan quota breach or
+active public maintenance notice. This is therefore a Railway builder
+assignment/metadata failure, not an application start or database migration
+failure.
+
+The public Railway domain currently returns 404 for both `/health` and
+`/ready`, confirming that no backend instance is serving. Do not repeat blind
+deploy attempts or create another service. The next operational action is a
+Railway support/builder investigation, or a fresh retry after Railway repairs
+the builder assignment. Only after a successful `/health` and `/ready` check
+should the exact ZIP be registered and the remote seven-step proof be run.
+This staging setup uses local release storage for the cost-conscious proof
+environment; durable S3-compatible storage remains required before any paid
+launch.
 
 Once GitHub access is enabled, reconnect the already-created staging service;
 do not use `railway add`, which would attempt to create a sixth project service:
