@@ -61,6 +61,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--release-notes", default=None)
     parser.add_argument("--api-url", default=os.getenv("NITE_DSP_API_URL", "http://localhost:8000"))
     parser.add_argument("--admin-key", default=os.getenv("ADMIN_API_KEY", ""))
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="validate the artifact and print its canonical key/checksum without uploading",
+    )
     return parser
 
 
@@ -70,10 +75,6 @@ def main(argv: list[str] | None = None) -> int:
     if not source.is_file():
         print(f"artifact not found: {source}", file=sys.stderr)
         return 2
-    if not args.admin_key:
-        print("ADMIN_API_KEY or --admin-key is required; no upload attempted", file=sys.stderr)
-        return 2
-
     try:
         canonical_key = _canonical_storage_key(
             args.product,
@@ -92,6 +93,30 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     checksum = sha256_file(source)
+    if args.dry_run:
+        print(
+            json.dumps(
+                {
+                    "status": "dry-run",
+                    "product_id": args.product,
+                    "version": args.version,
+                    "platform": args.platform,
+                    "architecture": args.architecture,
+                    "channel": args.channel,
+                    "size_bytes": source.stat().st_size,
+                    "checksum_sha256": checksum,
+                    "storage_key": storage_key,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if not args.admin_key:
+        print("ADMIN_API_KEY or --admin-key is required; no upload attempted", file=sys.stderr)
+        return 2
+
     try:
         get_storage().put_file(source, storage_key, checksum)
     except StorageError as exc:
