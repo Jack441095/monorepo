@@ -91,6 +91,11 @@ class Settings(BaseSettings):
     # action (env var change + deploy), never automatic based on a launch date.
     paddle_active_price_id: str = ""
 
+    # Backend checkout request gate. Keep disabled until the owner has
+    # explicitly approved the environment's Paddle checkout path; credentials
+    # and catalog IDs alone must never expose a checkout endpoint.
+    paddle_checkout_enabled: bool = False
+
     # Email -- Section 63/64. "console" logs the email instead of sending it,
     # used for local/staging until a real transactional email provider is
     # configured. Never silently falls through to a real send in an
