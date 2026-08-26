@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
+from sqlalchemy import engine_from_config, text
 from sqlalchemy import pool
 
 from alembic import context
@@ -73,6 +73,15 @@ def run_migrations_online() -> None:
         )
 
         with context.begin_transaction():
+            # Railway can briefly run two containers for the same commit while
+            # replacing a service. Serialise migrations at the database level
+            # so both containers cannot race while Alembic creates or updates
+            # its version table. The transaction-scoped lock is released when
+            # this migration transaction commits or rolls back.
+            connection.execute(
+                text("SELECT pg_advisory_xact_lock(hashtext(:lock_key))"),
+                {"lock_key": "nite-dsp-alembic-migrations"},
+            )
             context.run_migrations()
 
 
