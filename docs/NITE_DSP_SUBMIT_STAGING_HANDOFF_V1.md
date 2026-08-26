@@ -107,6 +107,25 @@ replacement deployment, so re-upload and re-registration are required after
 any staging redeploy. Durable S3-compatible storage remains a paid-launch
 requirement.
 
+### Synthetic durable-storage rehearsal
+
+After a separate staging S3-compatible bucket/namespace has been provisioned,
+run the guarded rehearsal from the platform repository:
+
+```sh
+PYTHONPATH=backend python3 backend/scripts/rehearse_s3_release_storage.py
+PYTHONPATH=backend python3 backend/scripts/rehearse_s3_release_storage.py \
+  --execute --confirm-bucket <exact-staging-bucket-name>
+```
+
+The first command is the required no-write check. The second generates its own
+non-customer payload, verifies upload, existence, and SHA-256, then deletes only
+the generated object under `rehearsals/`. It refuses local storage, requires an
+exact bucket confirmation, and requires `--allow-production` for a production
+run. A pass proves object round-trip behavior and cleanup only; it is not proof
+of provider backup, PITR, or disaster recovery. Record the output in the
+current recovery report before treating staging storage as durable.
+
 The backend validation suite was rerun in an isolated environment with the
 repository requirements installed: **53 passed**, with one existing
 Starlette/httpx deprecation warning. Python bytecode compilation for `app/` and
