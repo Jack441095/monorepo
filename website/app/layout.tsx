@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
@@ -49,7 +50,11 @@ const ORGANIZATION_JSON_LD = {
   email: "nitedsp@outlook.com",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+type RootLayoutProps = Readonly<{
+  children: ReactNode;
+}>;
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
