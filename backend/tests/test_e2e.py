@@ -315,3 +315,13 @@ def test_admin_endpoints_reject_bad_key(client, db_session):
         "/admin/users/search", params={"email": "x@example.com"}, headers={"X-Admin-Key": "wrong"}
     )
     assert resp.status_code == 401
+
+
+def test_admin_entitlement_issue_rejects_malformed_email(client):
+    resp = client.post(
+        "/admin/entitlements/issue",
+        json={"email": "not-an-email", "product_id": "nite-submit"},
+        headers={"X-Admin-Key": "test-admin-key"},
+    )
+
+    assert resp.status_code == 422
