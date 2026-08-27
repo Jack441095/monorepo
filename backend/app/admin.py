@@ -23,7 +23,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Request, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
 from . import email_templates, models
@@ -105,7 +105,7 @@ def list_activations(
 
 
 class IssueEntitlementRequest(BaseModel):
-    email: str
+    email: EmailStr
     product_id: str
     license_type: str = "beta"
     max_activations: int = 3
