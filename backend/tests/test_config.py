@@ -92,6 +92,21 @@ def test_staging_configuration_accepts_configured_resend_sender():
     )
 
 
+def test_staging_configuration_rejects_unusable_resend_sender():
+    settings = _staging_settings(
+        email_provider="resend",
+        resend_api_key="resend-staging-key",
+        email_from_address="noreply@localhost",
+    )
+
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        assert "usable public address" in str(exc)
+    else:
+        raise AssertionError("staging accepted an unusable Resend sender")
+
+
 def test_staging_configuration_rejects_unknown_email_provider():
     settings = _staging_settings(email_provider="smtp")
 
@@ -272,3 +287,37 @@ def test_production_configuration_rejects_console_email():
         assert "email_provider must be 'resend'" in str(exc)
     else:
         raise AssertionError("production accepted console-only email delivery")
+
+
+def test_production_configuration_rejects_unusable_resend_sender():
+    settings = Settings(
+        environment="production",
+        nite_dsp_public_url="https://www.nite.example",
+        nite_dsp_api_url="https://api.nite.example",
+        nite_dsp_support_email="support@nite.example",
+        session_secret="production-session-secret",
+        admin_api_key="production-admin-key",
+        licensing_private_key_base64="production-key",
+        database_url="postgresql+psycopg2://db.example/nitedsp",
+        email_provider="resend",
+        email_from_address="noreply@localhost",
+        resend_api_key="resend-production-key",
+        paddle_api_base_url="https://api.paddle.com",
+        paddle_api_key="live-api-key",
+        paddle_webhook_secret="live-webhook-secret",
+        paddle_product_id="pro_submit_live",
+        paddle_regular_price_id="pri_submit_live",
+        paddle_active_price_id="pri_submit_live",
+        storage_backend="s3",
+        storage_bucket="nitedsp-releases",
+        storage_endpoint="https://account.r2.cloudflarestorage.com",
+        storage_access_key_id="access-key",
+        storage_secret_access_key="secret-key",
+    )
+
+    try:
+        _validate_production_config(settings)
+    except RuntimeError as exc:
+        assert "usable public address" in str(exc)
+    else:
+        raise AssertionError("production accepted an unusable Resend sender")

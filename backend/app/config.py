@@ -146,6 +146,25 @@ def _storage_configuration_problems(s: Settings) -> list[str]:
     return problems
 
 
+def _usable_sender_address(address: str) -> bool:
+    """Return whether an environment sender looks usable for a real provider.
+
+    Domain ownership is verified by the email provider, not by this process;
+    this only rejects empty, malformed, local-only, and ``.invalid`` values
+    before the application advertises deliverable email.
+    """
+    if not address or address != address.strip() or any(char.isspace() for char in address):
+        return False
+    local_part, separator, domain = address.rpartition("@")
+    return bool(
+        separator
+        and local_part
+        and domain
+        and "." in domain
+        and not domain.lower().endswith(".invalid")
+    )
+
+
 def _validate_production_config(s: Settings) -> None:
     """Phase 5.5, Section 23: production startup must fail loudly if
     required configuration is missing, never silently fall back to a
@@ -206,6 +225,10 @@ def _validate_production_config(s: Settings) -> None:
         problems.append("email_provider must be 'resend' in production; console email is not deliverable")
     elif not s.resend_api_key:
         problems.append("email_provider is 'resend' but resend_api_key is empty")
+    elif not _usable_sender_address(s.email_from_address):
+        problems.append(
+            "email_from_address must be a usable public address when email_provider='resend'"
+        )
     if s.storage_backend != "s3":
         problems.append("storage_backend must be 's3' in production; local storage is not durable")
     problems.extend(_storage_configuration_problems(s))
@@ -278,6 +301,10 @@ def _validate_staging_config(s: Settings) -> None:
         if not s.email_from_address or s.email_from_address.endswith("@localhost.invalid"):
             problems.append(
                 f"email_from_address={s.email_from_address!r} is still the dev placeholder"
+            )
+        elif not _usable_sender_address(s.email_from_address):
+            problems.append(
+                "email_from_address must be a usable public address when email_provider='resend'"
             )
 
     storage_problems = _storage_configuration_problems(s)
