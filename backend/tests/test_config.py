@@ -4,7 +4,7 @@ from app.config import Settings, _validate_production_config, _validate_staging_
 def _staging_settings(**overrides):
     values = {
         "environment": "staging",
-        "paddle_api_key": "sandbox-api-key",
+        "paddle_api_key": "pdl_sdbx_apikey_test",
         "paddle_webhook_secret": "sandbox-webhook-secret",
         "paddle_api_base_url": "https://sandbox-api.paddle.com",
         "paddle_product_id": "pro_submit_sandbox",
@@ -34,6 +34,17 @@ def test_staging_configuration_rejects_live_paddle_endpoint():
         raise AssertionError("live Paddle endpoint was accepted for staging")
 
 
+def test_staging_configuration_rejects_live_paddle_key():
+    settings = _staging_settings(paddle_api_key="pdl_live_apikey_test")
+
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        assert "paddle_api_key must be a Paddle Sandbox API key" in str(exc)
+    else:
+        raise AssertionError("staging accepted a live Paddle API key")
+
+
 def test_staging_configuration_rejects_missing_catalog_or_https_values():
     settings = _staging_settings(paddle_product_id="", nite_dsp_public_url="http://localhost:3000")
 
@@ -57,6 +68,39 @@ def test_staging_configuration_rejects_placeholder_support_email():
         assert "dev placeholder" in str(exc)
     else:
         raise AssertionError("staging accepted the development support-email placeholder")
+
+
+def test_staging_configuration_rejects_resend_placeholder_sender():
+    settings = _staging_settings(email_provider="resend", resend_api_key="resend-staging-key")
+
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        assert "email_from_address" in str(exc)
+        assert "dev placeholder" in str(exc)
+    else:
+        raise AssertionError("staging accepted a placeholder Resend sender")
+
+
+def test_staging_configuration_accepts_configured_resend_sender():
+    _validate_staging_config(
+        _staging_settings(
+            email_provider="resend",
+            resend_api_key="resend-staging-key",
+            email_from_address="auth@staging.nite.example",
+        )
+    )
+
+
+def test_staging_configuration_rejects_unknown_email_provider():
+    settings = _staging_settings(email_provider="smtp")
+
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        assert "email_provider='smtp' is not a valid provider" in str(exc)
+    else:
+        raise AssertionError("staging accepted an unknown email provider")
 
 
 def test_staging_configuration_accepts_complete_s3_storage():
@@ -104,6 +148,7 @@ def test_staging_customer_rehearsal_accepts_durable_storage_and_resend():
             staging_customer_rehearsal=True,
             email_provider="resend",
             resend_api_key="resend-staging-key",
+            email_from_address="auth@staging.nite.example",
             storage_backend="s3",
             storage_bucket="nitedsp-staging-releases",
             storage_endpoint="https://account.r2.cloudflarestorage.com",

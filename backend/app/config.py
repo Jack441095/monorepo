@@ -235,6 +235,10 @@ def _validate_staging_config(s: Settings) -> None:
             "paddle_api_base_url must use sandbox-api.paddle.com in staging; "
             f"got {s.paddle_api_base_url!r}"
         )
+    if s.paddle_api_key and not s.paddle_api_key.startswith("pdl_sdbx_"):
+        problems.append(
+            "paddle_api_key must be a Paddle Sandbox API key (pdl_sdbx_...) in staging"
+        )
 
     for field_name, value in (
         ("paddle_api_key", s.paddle_api_key),
@@ -265,6 +269,16 @@ def _validate_staging_config(s: Settings) -> None:
         problems.append(
             f"nite_dsp_support_email={s.nite_dsp_support_email!r} is still the dev placeholder"
         )
+
+    if s.email_provider not in ("console", "resend"):
+        problems.append(f"email_provider={s.email_provider!r} is not a valid provider")
+    elif s.email_provider == "resend":
+        if not s.resend_api_key:
+            problems.append("email_provider is 'resend' but resend_api_key is empty")
+        if not s.email_from_address or s.email_from_address.endswith("@localhost.invalid"):
+            problems.append(
+                f"email_from_address={s.email_from_address!r} is still the dev placeholder"
+            )
 
     storage_problems = _storage_configuration_problems(s)
     if storage_problems:
