@@ -6,7 +6,7 @@ import { DemoShell } from "@/components/demo/DemoShell";
 import { ReadoutPanel, ReadoutRow } from "@/components/demo/Readout";
 import { useSignalDemo } from "@/components/demo/useSignalDemo";
 
-/* Submit preparation demonstration — SIMULATION.
+/* Submit preparation demonstration, SIMULATION.
 
    The message is deliberate and claim-safe: Submit helps users PREPARE
    important files safely; it never submits automatically. All findings are
@@ -20,11 +20,25 @@ const FILES = [
     modified: "2026-08-24 14:32",
     outputPreview: "2026_MOD402_1048291_Assignment.pdf",
     findings: [
-      { label: "DOCUMENT TYPE", tone: "ok" as const, status: "VERIFIED", value: "Assignment brief — PDF/A-1b" },
+      { label: "DOCUMENT TYPE", tone: "ok" as const, status: "VERIFIED", value: "Assignment brief, PDF/A-1b" },
       { label: "STUDENT IDENTITY", tone: "ok" as const, status: "VERIFIED", value: "Name & ID header verified (ID: 1048291)" },
       { label: "MODULE CODE", tone: "ok" as const, status: "VERIFIED", value: "MOD402 found on page 1" },
       { label: "FILENAME SANITIZER", tone: "review" as const, status: "REVIEW NEEDED", value: "Remove redundant 'Final' tag from filename" },
       { label: "LOCAL READINESS", tone: "ok" as const, status: "VERIFIED", value: "Ready for user verification & approval" },
+    ],
+  },
+  {
+    name: "MOD402_Submission_Folder",
+    kind: "Folder (WAV, MP4, PDF) · 128 MB",
+    path: "~/Documents/Uni/MOD402/Submission_Assets/",
+    modified: "2026-08-25 11:20",
+    outputPreview: "2026_MOD402_1048291_Submission.7z",
+    findings: [
+      { label: "BATCH ASSETS", tone: "ok" as const, status: "VERIFIED", value: "1 Audio Stem (.wav), 1 Video Demo (.mp4), 1 PDF Report" },
+      { label: "STUDENT IDENTITY", tone: "ok" as const, status: "VERIFIED", value: "Student ID 1048291 found across media tags & PDF" },
+      { label: "7Z COMPRESSION", tone: "ok" as const, status: "LZMA2", value: "7z LZMA2 Ultra Compression (128 MB -> 42 MB)" },
+      { label: "ENCRYPTION STATUS", tone: "info" as const, status: "AES-256", value: "Header & Content password protected" },
+      { label: "LOCAL READINESS", tone: "ok" as const, status: "VERIFIED", value: "Ready to package 7z submission archive" },
     ],
   },
   {
@@ -34,7 +48,7 @@ const FILES = [
     modified: "2026-08-25 09:15",
     outputPreview: "2026_THES701_1048291_Chapter2.pdf",
     findings: [
-      { label: "DOCUMENT TYPE", tone: "ok" as const, status: "VERIFIED", value: "Chapter draft — DOCX" },
+      { label: "DOCUMENT TYPE", tone: "ok" as const, status: "VERIFIED", value: "Chapter draft, DOCX" },
       { label: "STUDENT IDENTITY", tone: "review" as const, status: "REVIEW NEEDED", value: "Student name header missing" },
       { label: "MODULE CODE", tone: "ok" as const, status: "VERIFIED", value: "THES701 cover page verified" },
       { label: "EMBEDDED COMMENTS", tone: "info" as const, status: "SUGGESTED", value: "2 unresolved reviewer comments" },
@@ -48,9 +62,9 @@ const FILES = [
     modified: "2026-08-23 18:40",
     outputPreview: "2026_PORT800_1048291_Portfolio.zip",
     findings: [
-      { label: "ARCHIVE TYPE", tone: "ok" as const, status: "VERIFIED", value: "ZIP Archive — 14 files" },
+      { label: "ARCHIVE TYPE", tone: "ok" as const, status: "VERIFIED", value: "ZIP Archive, 14 files" },
       { label: "FILE FORMATS", tone: "review" as const, status: "REVIEW NEEDED", value: "Contains unsupported .pages & .cad files" },
-      { label: "TOTAL SIZE", tone: "info" as const, status: "VERIFIED", value: "14.2 MB — Within 50MB portal limit" },
+      { label: "TOTAL SIZE", tone: "info" as const, status: "VERIFIED", value: "14.2 MB, Within 50MB portal limit" },
       { label: "LOCAL READINESS", tone: "review" as const, status: "REVIEW NEEDED", value: "Convert unsupported files before export" },
     ],
   },
@@ -59,6 +73,7 @@ const FILES = [
 export function SubmitPrepDemo() {
   const { phase, start, reset } = useSignalDemo({ scanMs: 1200, analysisMs: 700 });
   const [fileIdx, setFileIdx] = useState(0);
+  const [archiveFormat, setArchiveFormat] = useState<"7z" | "zip" | "tar.gz">("7z");
   const file = FILES[fileIdx];
   const scanning = phase === "scanning";
   const analysing = phase === "analysis";
@@ -84,16 +99,34 @@ export function SubmitPrepDemo() {
             <span className="text-foreground font-bold uppercase tracking-wider">LOCAL CHECK ONLY</span>
           </div>
           <div className="flex items-center gap-3 text-muted-dim">
-            <span className="text-brand-emerald font-bold">0 BYTES UPLOADED</span>
-            <span>USER APPROVES EXPORT</span>
+            <span className="text-brand-emerald font-bold">7Z / ZIP / TAR.GZ ENGINE</span>
+            <span>0 BYTES UPLOADED</span>
           </div>
         </div>
 
-        {/* Input — Document Selection Rack */}
+        {/* Input, Document Selection Rack */}
         <div className="flex flex-col gap-2.5" role="group" aria-label="Choose a document to check">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-blue-bright">
-            SELECT LOCAL INPUT FILE
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-blue-bright">
+              SELECT LOCAL INPUT FILE / FOLDER
+            </span>
+            <div className="flex items-center gap-1.5">
+              {(["7z", "zip", "tar.gz"] as const).map((fmt) => (
+                <button
+                  key={fmt}
+                  type="button"
+                  onClick={() => setArchiveFormat(fmt)}
+                  className={`text-[9px] font-mono px-2 py-0.5 rounded uppercase font-bold border transition-colors cursor-pointer ${
+                    archiveFormat === fmt
+                      ? "bg-brand-blue/20 text-brand-blue-bright border-brand-blue/60"
+                      : "bg-surface-raised text-muted-dim border-border/40 hover:border-border"
+                  }`}
+                >
+                  .{fmt}
+                </button>
+              ))}
+            </div>
+          </div>
           {FILES.map((f, idx) => {
             const active = fileIdx === idx;
             return (
@@ -138,7 +171,7 @@ export function SubmitPrepDemo() {
         {!started ? (
           <div className="dsp-lcd-box p-6 text-center">
             <p className="text-[11px] font-mono text-muted-dim leading-relaxed">
-              Select a file above to inspect detected metadata, identity headers, and export readiness.
+              Select a file or folder above to inspect detected metadata, identity headers, and 7z/ZIP export readiness.
             </p>
           </div>
         ) : (
@@ -187,11 +220,11 @@ export function SubmitPrepDemo() {
             {ready && (
               <div className="mt-2 p-3.5 dsp-lcd-box rounded-lg flex flex-col gap-1.5">
                 <span className="text-[9px] font-mono text-muted-dim uppercase tracking-wider">
-                  MODULE 02 // SANITIZED OUTPUT FILENAME PREVIEW
+                  MODULE 02 // SANITIZED OUTPUT FILENAME & ARCHIVE PREVIEW
                 </span>
                 <div className="flex items-center justify-between gap-2">
                   <code className="text-xs font-mono tnum text-brand-emerald font-bold select-all tracking-wide">
-                    {file.outputPreview}
+                    {file.outputPreview.replace(/\.(7z|zip)$/, `.${archiveFormat}`)}
                   </code>
                   <span className="text-[9px] font-mono text-muted-dim px-2 py-0.5 rounded bg-surface border border-border/40">
                     PREPARED
@@ -204,7 +237,7 @@ export function SubmitPrepDemo() {
 
         {/* Claim-Safe Product Positioning Message */}
         <p className="text-[11px] font-mono text-muted-dim leading-relaxed border-t border-border/30 pt-3">
-          Submit helps you prepare safely on local hardware. Submit never submits automatically—you check the details and execute the export when ready.
+          Submit helps you prepare safely on local hardware. Submit never submits automatically, you check the details and execute the export when ready.
         </p>
       </div>
     </DemoShell>

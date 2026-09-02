@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /* ============================================================================
-   Intelligence UI — the explainable-intelligence component vocabulary.
+   Intelligence UI, the explainable-intelligence component vocabulary.
 
    Rule: intelligence is never magic. Every intelligent claim is paired with
    evidence, a confidence level (glyph + text, never colour-only), and an
@@ -32,7 +32,7 @@ export function ConfidenceBadge({ level, hint }: { level: Confidence; hint?: str
   );
 }
 
-/* EvidenceCard — one machine finding: what was detected, the signal that
+/* EvidenceCard, one machine finding: what was detected, the signal that
    produced it, and how confident the system is. */
 export function EvidenceCard({
   finding,
@@ -59,7 +59,7 @@ export function EvidenceCard({
   );
 }
 
-/* ReasoningPanel — "we detected this because these signals were found."
+/* ReasoningPanel, "we detected this because these signals were found."
    The canonical anti-magic component. */
 export function ReasoningPanel({
   title = "Why this result",
@@ -79,7 +79,7 @@ export function ReasoningPanel({
             </span>
             <span className="min-w-0">
               <span className="u-data text-foreground">{r.signal}</span>
-              <span className="u-body text-[13px]"> — {r.explanation}</span>
+              <span className="u-body text-[13px]">, {r.explanation}</span>
             </span>
           </li>
         ))}
@@ -88,7 +88,7 @@ export function ReasoningPanel({
   );
 }
 
-/* ApprovalGate — non-destructive by default: the human decides. */
+/* ApprovalGate, non-destructive by default: the human decides. */
 export function ApprovalGate({
   action,
   note,
@@ -120,7 +120,7 @@ export function ApprovalGate({
   );
 }
 
-/* AgentStatus — for orchestration surfaces. States are honest: an agent is
+/* AgentStatus, for orchestration surfaces. States are honest: an agent is
    never "thinking" unless it is actually running; approval is explicit. */
 export type AgentState = "queued" | "running" | "awaiting-approval" | "done" | "failed";
 

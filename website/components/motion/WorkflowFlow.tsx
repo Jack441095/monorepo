@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { clamp } from "@/lib/motion";
 
-/* Signal-flow storytelling — the workflow list behaves like a processing
+/* Signal-flow storytelling, the workflow list behaves like a processing
    chain: a blue→violet energy trace travels down the connector as the reader
    progresses, and each stage number activates when it crosses the reading
    line. Scroll-linked but rAF-throttled, passive, and static (full trace)

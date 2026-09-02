@@ -5,11 +5,11 @@ import { DemoPipeline } from "@/components/demo/DemoPipeline";
 import { DemoShell } from "@/components/demo/DemoShell";
 import { useSignalDemo } from "@/components/demo/useSignalDemo";
 
-/* KENN mix analysis demonstration — CONCEPT DEMO.
+/* KENN mix analysis demonstration, CONCEPT DEMO.
 
    KENN is in active research. This demonstration communicates the product
-   idea — an assistant that reviews a mix and offers explainable
-   suggestions — without implying shipped capability or live analysis.
+   idea, an assistant that reviews a mix and offers explainable
+   suggestions, without implying shipped capability or live analysis.
    Confidence language only: Detected / Suggested / Review required. */
 
 const DIMENSIONS = [
@@ -30,7 +30,7 @@ const DIMENSIONS = [
     status: "BALANCED FIELD",
     observation: "Phase coherence sits at +0.82 across the mid frequency spectrum",
     whyItMatters: "Mono compatibility is preserved across mobile and club sound systems",
-    suggestion: "No adjustment needed — stereo width is stable",
+    suggestion: "No adjustment needed, stereo width is stable",
     meter: "var(--state-success)",
   },
   {
@@ -62,7 +62,7 @@ export function KennMixDemo() {
       phase={phase}
       onReset={reset}
       ariaLabel="KENN mix analysis concept demonstration"
-      footerNote="Concept demonstration — KENN provides explainable mix feedback with acoustic reasoning. KENN does not replace the mix engineer."
+      footerNote="Concept demonstration, KENN provides explainable mix feedback with acoustic reasoning. KENN does not replace the mix engineer."
     >
       <div className="p-5 sm:p-6 bg-surface flex flex-col gap-5">
         <DemoPipeline phase={phase} />
@@ -94,7 +94,7 @@ export function KennMixDemo() {
         <div className="dsp-lcd-box p-4 rounded-lg flex flex-col gap-2">
           <div className="flex items-center justify-between text-[10px] font-mono text-muted-dim">
             <span className="font-bold text-brand-violet">FREQUENCY RESPONSE CURVE</span>
-            <span className="tnum">20 Hz — 20 kHz</span>
+            <span className="tnum">20 Hz, 20 kHz</span>
           </div>
 
           <div className="relative w-full h-24 rounded bg-[#030509] border border-border/40 overflow-hidden">
@@ -207,9 +207,9 @@ export function KennMixDemo() {
           </div>
         )}
 
-        {/* Positioning Disclaimer — Assistive tool, never auto-mix */}
+        {/* Positioning Disclaimer, Assistive tool, never auto-mix */}
         <p className="text-[11px] font-sans text-muted-dim leading-relaxed border-t border-border/30 pt-3">
-          KENN offers evidence-based observations with clear acoustic explanations. KENN does not replace the mix engineer—every decision remains yours.
+          KENN offers evidence-based observations with clear acoustic explanations. KENN does not replace the mix engineer, every decision remains yours.
         </p>
       </div>
     </DemoShell>

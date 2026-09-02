@@ -14,7 +14,7 @@ const PILLARS = [
   },
   {
     title: "What is not uploaded",
-    body: "Your documents, your audio files, and your sample library are never uploaded by the apps. The beta request form composes an email in your own mail client — details stay on your machine until you send them.",
+    body: "Your documents, your audio files, and your sample library are never uploaded by the apps. The beta request form composes an email in your own mail client, details stay on your machine until you send them.",
   },
   {
     title: "Honest boundaries",
@@ -29,7 +29,7 @@ const FAQ = [
   ],
   [
     "Will Submit automatically submit my work?",
-    "No. Submit helps you prepare, verify, and package a safely named copy. You always submit through your institution's own system, and a final manual check is recommended — Submit cannot know every department's specific rules.",
+    "No. Submit helps you prepare, verify, and package a safely named copy. You always submit through your institution's own system, and a final manual check is recommended, Submit cannot know every department's specific rules.",
   ],
   [
     "How does verification work?",
@@ -53,8 +53,8 @@ export default function TrustPage() {
           <span className="eyebrow">Trust & Privacy</span>
           <h1 className="section-title mt-4 text-foreground">Your work stays yours.</h1>
           <p className="body-large mt-6">
-            NITE DSP products are built so that the sensitive parts of creative work — documents,
-            recordings, sample libraries — stay on your machine.
+            NITE DSP products are built so that the sensitive parts of creative work, documents,
+            recordings, sample libraries, stay on your machine.
           </p>
         </div>
       </section>

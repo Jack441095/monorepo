@@ -3,7 +3,7 @@ import { LearnLayout, LearnH2 } from "@/lib/learn";
 
 export const metadata: Metadata = {
   title: "Find Similar",
-  description: "How Find Similar works in SLO — acoustic similarity, not text search.",
+  description: "How Find Similar works in SLO, acoustic similarity, not text search.",
   alternates: { canonical: "/learn/smart-sample-manager/find-similar" },
 };
 
@@ -14,7 +14,7 @@ export default function FindSimilarPage() {
         <LearnH2>What it does</LearnH2>
         <p className="mt-2">
           Select a sample you already have, and Find Similar surfaces other samples in your
-          library that sound like it — based on the actual audio content, not the filename or
+          library that sound like it, based on the actual audio content, not the filename or
           folder it&apos;s in.
         </p>
       </section>
@@ -43,7 +43,7 @@ export default function FindSimilarPage() {
         <p className="mt-3">
           If nothing is selected yet, SLO will ask you to select a sample
           first. If your library is still being indexed, or it&apos;s the only sample in the
-          library, you may see a message that no similar samples were found yet — give the
+          library, you may see a message that no similar samples were found yet, give the
           initial scan time to finish and try again.
         </p>
       </section>

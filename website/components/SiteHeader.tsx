@@ -89,7 +89,7 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
-          {/* Morphing active indicator — purely decorative; state is also
+          {/* Morphing active indicator, purely decorative; state is also
               conveyed via aria-current. Labels never move. */}
           <span
             aria-hidden="true"

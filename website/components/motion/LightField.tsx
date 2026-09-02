@@ -3,7 +3,7 @@
 import { useCallback, useRef } from "react";
 import { clamp, lerp, usePointerSignal, useReactivePointer } from "@/lib/motion";
 
-/* DEPTH 1 — Ambient cursor-reactive studio lighting.
+/* DEPTH 1, Ambient cursor-reactive studio lighting.
    Two diffuse energy fields (blue input, violet processing) drift 10–30 px
    around their authored resting positions with delayed inertia; a very dim
    red transient field trails furthest behind. This reads as moving studio

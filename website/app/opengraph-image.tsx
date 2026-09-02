@@ -14,7 +14,7 @@ export default function OpengraphImage() {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
-          // EMBER surface.base / text.primary / text.secondary — mirrors
+          // EMBER surface.base / text.primary / text.secondary, mirrors
           // globals.css tokens. Literal hexes required: ImageResponse renders
           // outside the CSS layer.
           // Palette B background & typography tokens

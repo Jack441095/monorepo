@@ -7,11 +7,11 @@ import { DemoShell } from "@/components/demo/DemoShell";
 import { ReadoutPanel, ReadoutRow } from "@/components/demo/Readout";
 import { useSignalDemo } from "@/components/demo/useSignalDemo";
 
-/* SLO intelligence demonstration — SIMULATION.
+/* SLO intelligence demonstration, SIMULATION.
 
    Walks the shared signal path: a cryptic filename (INPUT) is scanned
    (ANALYSIS), described acoustically (INTELLIGENCE), classified with
-   acoustic matches (RECOMMENDATION) — and the visitor understands the
+   acoustic matches (RECOMMENDATION), and the visitor understands the
    action SLO enables: finding sounds by sound. All values are illustrative
    and disclosed as such; similarity is qualitative (no fabricated metrics). */
 
@@ -308,11 +308,11 @@ export function AudioAnalysisDemo() {
               )}
             </div>
 
-            {/* Similarity — qualitative matches, no fabricated metrics */}
+            {/* Similarity, qualitative matches, no fabricated metrics */}
             {revealed && (
               <div className="mt-3 pt-3 border-t border-border/50 w-full" aria-label="Acoustically similar samples">
                 <span className="text-[9px] text-muted-dim tracking-wider uppercase block mb-2">
-                  SIMILARITY — ACOUSTIC MATCHES
+                  SIMILARITY, ACOUSTIC MATCHES
                 </span>
                 <div className="flex flex-wrap justify-center gap-1.5">
                   {sample.matches.map((m) => (

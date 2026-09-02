@@ -5,7 +5,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { StatusDot } from "@/components/motion/StatusDot";
 
 export const metadata: Metadata = {
-  title: "Thursday — The NITE DSP Intelligence Layer",
+  title: "Thursday: The NITE DSP Intelligence Layer",
   description:
     "Thursday is the internal intelligence layer coordinating workflows and specialised agents across NITE DSP products. Infrastructure, not a chatbot.",
   alternates: { canonical: "/thursday" },
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const PILLARS = [
   {
     title: "Orchestration",
-    body: "Thursday routes work between NITE DSP tools — handing a prepared document to the right verifier, or analysis output to the right reviewer — without you gluing steps together.",
+    body: "Thursday routes work between NITE DSP tools, handing a prepared document to the right verifier, or analysis output to the right reviewer, without you gluing steps together.",
   },
   {
     title: "Workflows",
@@ -31,7 +31,7 @@ const PILLARS = [
 ];
 
 const NOTS = [
-  ["Not a chatbot", "You don't converse with Thursday. It is infrastructure — it coordinates, it doesn't chat."],
+  ["Not a chatbot", "You don't converse with Thursday. It is infrastructure, it coordinates, it doesn't chat."],
   ["Not a cloud brain", "Thursday coordinates local tools. Your creative material stays on your machine."],
   ["Not a product (yet)", "Thursday is internal. It powers how NITE DSP products work together as the ecosystem grows."],
 ];
@@ -48,7 +48,7 @@ export default function ThursdayPage() {
             Orchestration &middot; Planning &middot; Verification
           </p>
           <p className="body-large mt-6 font-sans">
-            Every NITE DSP product does one job well. Thursday is the internal infrastructure layer that coordinates workflows between specialized components, plans multi-step jobs, and verifies results at every handoff. Thursday is internal infrastructure—not a public commercial product or consumer chatbot.
+            Every NITE DSP product does one job well. Thursday is the internal infrastructure layer that coordinates workflows between specialized components, plans multi-step jobs, and verifies results at every handoff. Thursday is internal infrastructure, not a public commercial product or consumer chatbot.
           </p>
           <div className="mt-8 flex flex-wrap gap-4 items-center">
             <span
@@ -108,7 +108,7 @@ export default function ThursdayPage() {
             <span className="eyebrow">The Ecosystem</span>
             <h2 className="section-title mt-4 text-foreground">One layer behind every tool.</h2>
             <p className="mt-2 text-sm text-muted max-w-xl">
-              As Submit, SLO, and KENN mature, Thursday is what lets them hand work to each other —
+              As Submit, SLO, and KENN mature, Thursday is what lets them hand work to each other, 
               safely, verifiably, locally.
             </p>
           </div>

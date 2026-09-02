@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import { clamp, useReactivePointer } from "@/lib/motion";
 
-/* DEPTH 2 — Micro-3D hardware frame.
+/* DEPTH 2, Micro-3D hardware frame.
    Wraps a premium surface (screenshot frame, flagship card) in a perspective
    container. Pointer movement produces <= 1.6deg tilt, a pointer-tracking
    border bloom, an interior sheen shift, and optional per-layer parallax for
    children marked data-depth="n" (px, sign controls direction). The result
-   should feel like looking at a physical studio device — never like a
+   should feel like looking at a physical studio device, never like a
    floating 3D card demo. Static and fully readable when disabled. */
 
 type TiltSurfaceProps = {
