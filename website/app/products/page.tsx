@@ -7,7 +7,7 @@ import { SubmitPrepDemo } from "@/components/demo/SubmitPrepDemo";
 import { KennMixDemo } from "@/components/demo/KennMixDemo";
 
 export const metadata: Metadata = {
-  title: "Product Families — NITE DSP",
+  title: "Product Families | NITE DSP",
   description: "Focused tools for creative workflows by NITE DSP: document preparation intelligence, audio intelligence, and internal orchestration.",
   alternates: { canonical: "/products" },
 };
@@ -74,6 +74,26 @@ export default function ProductsPage() {
               </div>
             </div>
           </TiltSurface>
+
+          {/* NITE Files Product Card */}
+          <div className="mt-8 surface-card p-8 rounded-lg border border-brand-emerald/30 bg-surface-raised/40">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <span className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border border-brand-emerald/40 text-brand-emerald">
+                  <StatusDot tone="live" live />
+                  C++17 Engine v0.1.0
+                </span>
+                <h3 className="mt-4 text-2xl font-bold text-foreground">NITE Files</h3>
+                <p className="text-xs font-mono text-muted-dim mt-1">General-Purpose Library Folder Cleaner & Metadata Organizer</p>
+              </div>
+              <Link href="/products/files" className="btn-secondary text-xs">
+                Explore NITE Files &rarr;
+              </Link>
+            </div>
+            <p className="mt-4 text-sm text-muted leading-relaxed max-w-2xl font-sans">
+              A general-purpose library organizer powered by a local C++17 engine. Sort photos by EXIF date, music by ID3 tag, and documents by category with non-destructive dry-run previews and transactional undo history.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -125,7 +145,7 @@ export default function ProductsPage() {
                 <h3 className="mt-5 text-2xl font-bold text-foreground">KENN</h3>
                 <p className="text-xs font-mono text-muted-dim mt-1">Mix Understanding Assistant</p>
                 <p className="mt-4 text-sm leading-relaxed text-muted font-sans">
-                  Explainable mix analysis that observes acoustic dimensions, explains reasoning, and suggests tweaks. KENN assists engineers—every final decision remains yours.
+                  Explainable mix analysis that observes acoustic dimensions, explains reasoning, and suggests tweaks. KENN assists engineers, every final decision remains yours.
                 </p>
               </div>
               <div className="mt-8 pt-4 border-t border-border/40 flex items-center justify-between">
@@ -178,7 +198,7 @@ export default function ProductsPage() {
               <span className="eyebrow block">Interactive Demonstrations</span>
               <h2 className="section-title mt-4">Experience the intelligence before it ships.</h2>
               <p className="mt-4 text-sm max-w-2xl text-muted font-sans">
-                Simulated walkthroughs of how NITE DSP products think. Every demonstration runs entirely in your browser with illustrative data — nothing is uploaded, nothing is processed externally.
+                Simulated walkthroughs of how NITE DSP products think. Every demonstration runs entirely in your browser with illustrative data, nothing is uploaded, nothing is processed externally.
               </p>
             </div>
           </Reveal>
@@ -187,7 +207,7 @@ export default function ProductsPage() {
             <Reveal>
               <div className="mb-4">
                 <span className="text-[10px] font-mono font-bold text-brand-blue-bright uppercase block mb-1">WORKFLOW INTELLIGENCE</span>
-                <h3 className="text-lg font-semibold text-foreground">Submit — prepare files safely</h3>
+                <h3 className="text-lg font-semibold text-foreground">Submit, prepare files safely</h3>
                 <p className="text-xs text-muted mt-1 max-w-md font-sans">
                   Document intelligence that reviews important files locally and flags what needs attention before you submit.
                 </p>
@@ -197,7 +217,7 @@ export default function ProductsPage() {
             <Reveal delayMs={90}>
               <div className="mb-4">
                 <span className="text-[10px] font-mono font-bold text-brand-violet uppercase block mb-1">AUDIO INTELLIGENCE</span>
-                <h3 className="text-lg font-semibold text-foreground">KENN — mix review, explained</h3>
+                <h3 className="text-lg font-semibold text-foreground">KENN, mix review, explained</h3>
                 <p className="text-xs text-muted mt-1 max-w-md font-sans">
                   An AI audio engineering assistant concept: analyse a mix, understand the acoustic reasoning, make better creative decisions.
                 </p>

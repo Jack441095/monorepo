@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CtaButton } from "@/components/CtaButton";
+import { KennChatWidget } from "@/components/KennChatWidget";
 import { KennMixDemo } from "@/components/demo/KennMixDemo";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
@@ -8,9 +9,9 @@ import { StatusDot } from "@/components/motion/StatusDot";
 import { TiltSurface } from "@/components/motion/TiltSurface";
 
 export const metadata: Metadata = {
-  title: "KENN — Understand Your Mix",
+  title: "KENN: Understand Your Mix",
   description:
-    "KENN analyses your mix locally and explains what it hears — so you make the changes. In development at NITE DSP.",
+    "KENN analyses your mix locally and explains what it hears, so you make the changes. In development at NITE DSP.",
   alternates: { canonical: "/products/kenn" },
 };
 
@@ -21,7 +22,7 @@ const STAGES = [
   },
   {
     title: "Detect",
-    body: "Patterns worth attention are identified — a masked vocal range, low-mid buildup, transients that disappear in the chorus — based on measurable characteristics, not taste.",
+    body: "Patterns worth attention are identified, a masked vocal range, low-mid buildup, transients that disappear in the chorus, based on measurable characteristics, not taste.",
   },
   {
     title: "Explain",
@@ -29,14 +30,14 @@ const STAGES = [
   },
   {
     title: "Recommend",
-    body: "You get suggested areas to address — with the evidence behind them. You make every creative decision. KENN never renders audio on its own.",
+    body: "You get suggested areas to address, with the evidence behind them. You make every creative decision. KENN never renders audio on its own.",
   },
 ];
 // __PART2__
 
 const BOUNDARIES = [
   ["KENN does not mix your song", "It never processes or renders your audio into a finished mix. It reads analysis data and explains it."],
-  ["No black-box verdicts", "Findings are tied to measurements you can inspect — not an opaque score."],
+  ["No black-box verdicts", "Findings are tied to measurements you can inspect, not an opaque score."],
   ["Your stems stay local", "Analysis runs on your machine. Audio files are never uploaded."],
 ];
 
@@ -55,7 +56,7 @@ export default function KennPage() {
           <p className="body-large mt-6 font-sans">
             KENN listens to your mix the way an engineer would ask questions of it: what is the
             spectral balance doing, where are elements fighting, what deserves attention. Then it
-            explains — clearly, with evidence — so you decide what to change.
+            explains, clearly, with evidence, so you decide what to change.
           </p>
           <div className="mt-8 flex flex-wrap gap-4 items-center">
             <CtaButton state="NOTIFY_ME" label="Notify me at launch" />
@@ -104,7 +105,7 @@ export default function KennPage() {
               its measurement and plain-language reasoning.
             </p>
             <p className="mt-3 text-xs" style={{ color: "var(--muted-dim)" }}>
-              Simulated demonstration with illustrative data. Runs entirely in your browser — no
+              Simulated demonstration with illustrative data. Runs entirely in your browser, no
               audio is processed or uploaded.
             </p>
           </Reveal>
@@ -113,6 +114,23 @@ export default function KennPage() {
               <KennMixDemo />
             </TiltSurface>
           </Reveal>
+        </div>
+      </section>
+
+      {/* Live text-only mix advice surface */}
+      <section className="section section-rule">
+        <div className="site-container">
+          <div className="max-w-2xl">
+            <span className="eyebrow">Tested text Q&amp;A</span>
+            <h2 className="section-title mt-4">Ask KENN about the mix.</h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted">
+              This is a small retrieval-only advice demo: source-backed mix-engineering guidance,
+              with an explicit abstention boundary when the approved knowledge is not enough.
+            </p>
+          </div>
+          <div className="mt-8">
+            <KennChatWidget />
+          </div>
         </div>
       </section>
 
@@ -151,4 +169,3 @@ export default function KennPage() {
     </>
   );
 }
-

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { PHASE_LABEL, type DemoPhase } from "./useSignalDemo";
 
-/* NITE Signal Demonstration Framework — shared demo chrome.
+/* NITE Signal Demonstration Framework, shared demo chrome.
 
    Every demonstration is framed as a piece of NITE DSP hardware with an
    honest label (SIMULATION / CONCEPT DEMO), a live phase readout, an

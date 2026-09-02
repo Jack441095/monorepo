@@ -9,7 +9,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { TiltSurface } from "@/components/motion/TiltSurface";
 
 export const metadata: Metadata = {
-  title: "SLO — Sample Library Optimiser",
+  title: "SLO: Sample Library Optimiser",
   description:
     "An acoustic-similarity sample browser and organizer for macOS. Fully offline, private, and built for professional music production workflows.",
   alternates: { canonical: "/products/smart-sample-manager" },
@@ -129,7 +129,7 @@ export default function SmartSampleManagerPage() {
           </div>
           <div className="space-y-6 text-base leading-relaxed text-muted">
             <p>
-              Producers gather thousands of samples over years—often mixed together across splice packs, recording sessions, and messy desktop folders. Finding a specific kick, snare, or synth stab involves endless folder clicking and memory recall.
+              Producers gather thousands of samples over years, often mixed together across splice packs, recording sessions, and messy desktop folders. Finding a specific kick, snare, or synth stab involves endless folder clicking and memory recall.
             </p>
             <p>
               SLO solves this by listening to your files. It groups sounds that share acoustic characteristics (timbre, envelope, transient decay), so that clicking <strong>Find Similar</strong> surfaces nearby options instantly.
@@ -148,7 +148,7 @@ export default function SmartSampleManagerPage() {
               Filenames like <code>XK29_0047.wav</code> reveal nothing about how a sample sounds. SLO extracts raw acoustic descriptors offline and plots your entire library on an intuitive 2D map.
             </p>
             <div className="mt-6 border-l-2 border-[#F0A23A] bg-[#F0A23A]/10 p-4 rounded-r text-xs leading-relaxed text-muted">
-              <strong>Non-Destructive Local Indexing:</strong> SLO operates in 100% read-only mode. Your sample files are scanned locally on your Mac and cached in memory—your original directories and filenames are never altered.
+              <strong>Non-Destructive Local Indexing:</strong> SLO operates in 100% read-only mode. Your sample files are scanned locally on your Mac and cached in memory, your original directories and filenames are never altered.
             </div>
           </Reveal>
           <Reveal delayMs={90}>

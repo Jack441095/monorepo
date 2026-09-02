@@ -15,7 +15,7 @@ export default function VisualMapPage() {
         <p className="mt-2">
           As SLO indexes your library, every sample is plotted as a point on a
           2D map. Points that end up near each other tend to sound alike. It&apos;s a different
-          way to browse than scrolling a folder tree — explore by ear, moving through clusters
+          way to browse than scrolling a folder tree, explore by ear, moving through clusters
           of related sounds.
         </p>
       </section>
@@ -23,13 +23,13 @@ export default function VisualMapPage() {
       <section>
         <LearnH2>Using it</LearnH2>
         <ul className="mt-2 list-disc pl-5 space-y-1">
-          <li>Click a point to select that sample — its details appear in the metadata panel.</li>
+          <li>Click a point to select that sample, its details appear in the metadata panel.</li>
           <li>
             Use <strong>PLAY</strong> / <strong>STOP</strong> to audition it.
           </li>
           <li>
             Use <strong>FIND SIMILAR</strong> on a selected point to list other closely-related
-            samples — see{" "}
+            samples, see{" "}
             <a href="/learn/smart-sample-manager/find-similar" className="underline">
               Find Similar
             </a>

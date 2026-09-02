@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { clamp } from "@/lib/motion";
 
-/* The NITE Signal Journey — homepage company-level signal flow.
+/* The NITE Signal Journey, homepage company-level signal flow.
 
    DISCOVER → ANALYSE → UNDERSTAND → CREATE
 
@@ -16,12 +16,12 @@ const STAGES = [
   {
     stage: "DISCOVER",
     title: "Signal enters the system.",
-    body: "Raw material — sample libraries, documents, mixes — stays exactly where it is. Nothing is uploaded to understand it.",
+    body: "Raw material, sample libraries, documents, mixes, stays exactly where it is. Nothing is uploaded to understand it.",
   },
   {
     stage: "ANALYSE",
     title: "Local DSP reads the signal.",
-    body: "NITE DSP tools analyse the content itself: transients, spectra, structure — on your machine, in real time.",
+    body: "NITE DSP tools analyse the content itself: transients, spectra, structure, on your machine, in real time.",
   },
   {
     stage: "UNDERSTAND",
@@ -31,7 +31,7 @@ const STAGES = [
   {
     stage: "CREATE",
     title: "You act with confidence.",
-    body: "Intelligence stays assistive. Recommendations come to you — the creative decisions remain yours.",
+    body: "Intelligence stays assistive. Recommendations come to you, the creative decisions remain yours.",
   },
 ] as const;
 
@@ -84,7 +84,7 @@ export function SignalJourney() {
           <span className="eyebrow">The NITE Signal Journey</span>
           <h2 className="section-title mt-4">From raw signal to creative confidence.</h2>
           <p className="mt-5 text-base leading-relaxed" style={{ color: "var(--muted)" }}>
-            Every NITE DSP tool walks the same path — and your material never
+            Every NITE DSP tool walks the same path, and your material never
             has to leave your machine to walk it.
           </p>
         </div>

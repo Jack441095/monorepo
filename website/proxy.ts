@@ -23,7 +23,7 @@ function unauthorized(): NextResponse {
   });
 }
 
-export function middleware(request: NextRequest): NextResponse {
+export function proxy(request: NextRequest): NextResponse {
   const configuredPassword = process.env.PORTFOLIO_PASSWORD;
 
   // No password configured anywhere in this environment — fail closed,
@@ -58,6 +58,10 @@ export function middleware(request: NextRequest): NextResponse {
   return NextResponse.next();
 }
 
+export default proxy;
+export const middleware = proxy;
+
 export const config = {
   matcher: ["/portfolio", "/portfolio/:path*"],
 };
+

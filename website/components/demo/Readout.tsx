@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
-/* NITE Signal Demonstration Framework — readout rows.
+/* NITE Signal Demonstration Framework, readout rows.
 
    Confidence language is a hard rule: demos may say Detected / Suggested /
-   Review required / Unknown — never Perfect / Guaranteed / Fully automatic.
+   Review required / Unknown, never Perfect / Guaranteed / Fully automatic.
    Meaning is carried by the glyph (✓ / ! / ·) as well as colour, so it
    survives colour-blindness and monochrome rendering. */
 

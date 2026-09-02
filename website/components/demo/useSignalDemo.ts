@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /* ============================================================================
-   NITE Signal Demonstration Framework — state machine
+   NITE Signal Demonstration Framework, state machine
 
    Every product demonstration walks the same path:
 

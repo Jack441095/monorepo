@@ -13,7 +13,7 @@ const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV;
  * Single CTA state machine for every commercial surface (see
  * docs/NITE_DSP_CONVERSION_COMMERCIAL_UX_V1.md §1).
  *
- * States map 1:1 to commercial maturity — the label always states what
+ * States map 1:1 to commercial maturity, the label always states what
  * happens next, so a closed checkout never presents a dead Buy button:
  *   BUY_LIVE      checkout enabled  → server-resolved Paddle checkout
  *   BETA_REQUEST  closed beta       → /beta request journey
@@ -82,7 +82,7 @@ export function CtaButton({
         )}
         {PADDLE_ENV === "sandbox" && (
           <span className="text-xs text-muted-dim">
-            Sandbox / test mode — simulated checkout for integration testing. No real funds are charged.
+            Sandbox / test mode, simulated checkout for integration testing. No real funds are charged.
           </span>
         )}
       </span>

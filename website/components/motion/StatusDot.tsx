@@ -1,4 +1,4 @@
-/* Status energy system — shape-first status cue.
+/* Status energy system, shape-first status cue.
    The dot carries the state (shape/motion), colour assists, and text always
    states it outright. Maturity labels stay still; the "live" dot only
    breathes on pointer attention of an owning spotlight-group card. */

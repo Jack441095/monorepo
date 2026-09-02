@@ -5,7 +5,7 @@ import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
-  title: "NITE Submit — Document Prep Intelligence",
+  title: "NITE Submit: Document Prep Intelligence",
   description: "The safest way to verify and prepare files before submission. Fully local document validation for macOS.",
   alternates: { canonical: "/products/submit" },
 };
@@ -16,16 +16,16 @@ const FEATURES = [
     body: "Ensure your file conforms precisely to department naming conventions, project patterns, and required templates before submitting.",
   },
   {
-    title: "Evidence-Based Review",
-    body: "Submit scans document structures locally, highlights verified entries, and flags uncertain fields for your approval before writing copies.",
+    title: "7z, ZIP & TAR Batch Packaging",
+    body: "Compress multi-asset submissions (PDF, WAV audio stems, MP4 videos, DOCX) into clean .7z (LZMA2), .zip, or .tar.gz archives with SHA-256 receipts.",
+  },
+  {
+    title: "AES-256 Archive Encryption",
+    body: "Optionally protect your submission packages with AES-256 header and content encryption directly on-device before uploading to portal systems.",
   },
   {
     title: "Zero-Upload Validation",
     body: "Files are processed entirely in memory on your Mac. No document contents are uploaded, maintaining complete intellectual privacy.",
-  },
-  {
-    title: "Correct Naming Exports",
-    body: "Create named, verified duplicates of your project documents with a single click, leaving your original draft files untouched.",
   },
 ];
 
@@ -51,7 +51,7 @@ export default function SubmitProductPage() {
         </div>
       </section>
 
-      {/* Workflow — six steps */}
+      {/* Workflow, six steps */}
       <section className="section section-rule">
         <div className="site-container">
           <Reveal>
@@ -59,14 +59,14 @@ export default function SubmitProductPage() {
               <span className="eyebrow">The Submit Workflow</span>
               <h2 className="section-title mt-4">Six steps. Zero guesswork.</h2>
               <p className="mt-4 text-sm text-muted leading-relaxed">
-                Every stage is visible and under your control. Submit never submits work for you —
+                Every stage is visible and under your control. Submit never submits work for you, 
                 it prepares a verified copy so you can submit with confidence.
               </p>
             </div>
           </Reveal>
           <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              ["01", "Drop", "Add a PDF from your Mac. Nothing is uploaded — the file is read in memory."],
+              ["01", "Drop", "Add a PDF from your Mac. Nothing is uploaded, the file is read in memory."],
               ["02", "Understand", "Submit reads structure and metadata locally: names, dates, course codes, templates."],
               ["03", "Review", "Flagged fields and uncertainties are shown for your approval. Nothing changes silently."],
               ["04", "Prepare", "Confirm corrections before anything is written. You approve every change."],

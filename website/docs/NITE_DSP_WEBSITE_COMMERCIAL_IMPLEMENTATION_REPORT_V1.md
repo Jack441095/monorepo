@@ -90,3 +90,121 @@ Manual visual/responsive review across palettes; reduced-motion manual pass (cov
 A new visitor now learns within one screen what NITE DSP is, what the four products are, why they're trustworthy (local-first, honest boundaries), and how to try them (single clear beta CTA across all surfaces). Purchase readiness awaits checkout activation — the plumbing and UX for both states are in place.
 
 **Claims check:** no automatic submission, acceptance-guarantee, automatic-mixing, or chatbot claims introduced anywhere. All copy matches audited product reality.
+
+## Current live deployment addendum — 2026-08-25
+
+This addendum is authoritative for the current deployed state; the sections
+above retain the historical implementation receipt and its original branch and
+test references.
+
+- Website: `https://www.nitedsp.co.uk`
+- API: `https://api.nitedsp.co.uk`
+- Website public route smoke: **PASS** for eight routes, including pricing,
+  download, account, legal pages, and sitemap.
+- API health: **PASS** — `status: ok`, environment `production`.
+- Signed-out API boundary: `/auth/me` and `/downloads/latest` return 401;
+  checkout and webhook routes reject GET with 405. No payment or webhook
+  mutation was attempted.
+- No unauthenticated product/catalog endpoint is exposed; `/downloads/fetch`
+  rejects a missing token with 422 and `/downloads/latest` remains protected.
+- Pricing gate at the initial website deployment: **closed beta**. The
+  subsequent Sandbox rehearsal is recorded below.
+- Deployed browser smoke: **PASS** — Submit and KENN demos, pricing gate, and
+  mobile overflow checks.
+- Clean isolated website suite: **47/47 passed** after updating stale demo
+  assertions to the current privacy-safe labels and evidence wording.
+- Backend validation: **52 passed** in an isolated environment; lint,
+  TypeScript, copy audit, and production build checks passed.
+- Added baseline browser security headers to the next website build, with a
+  passing regression test. The live site’s pre-change headers remain in place
+  until this source change is deployed; CSP is intentionally deferred pending
+  a separate Paddle/Next asset audit.
+
+### Website-only Railway deployment receipt — 2026-08-25
+
+- Project: `ample-liberation`
+- Environment: `production`
+- Service: existing `Website` only
+- Deployment: `82874d4a-8287-4bcf-b5c0-d1400582eb6f`
+- Build: `npm run build:production` passed; 34 static routes generated.
+- Live verification: `https://www.nitedsp.co.uk/` returned 200 with the
+  configured HSTS, content-type, frame, referrer, and permissions headers.
+- Live route smoke: eight public routes returned 200.
+- Deployed browser smoke: PASS for pricing gate, Submit demo, KENN demo, and
+  mobile overflow.
+- UX scope: no visual or interaction redesign was introduced by this deploy;
+  the existing product-family UX remains in place. The change deployed here
+  was the previously validated baseline security-header configuration.
+- Backend, Postgres, live-payment mode, public downloads, production
+  licensing, and Apple Developer signing/notarisation were not changed.
+
+### Paddle Sandbox checkout enablement receipt — 2026-08-25
+
+- Website production variable `NEXT_PUBLIC_CHECKOUT_LIVE=1` is enabled.
+- Website `NEXT_PUBLIC_PADDLE_ENV` is `sandbox`; a client token is present.
+- Backend has the sandbox Paddle credential, webhook secret, product/price
+  mapping, database, and public URL configuration present in Railway’s secret
+  store. Secret values are intentionally not recorded here.
+- Deployment: `25eecc48-6099-4cd6-832f-3e6aed76d5a0`.
+- The pricing CTA is explicitly labelled **Test Checkout (Sandbox)** and shows
+  “No real funds are charged.”
+- Signed-out browser click stops at `/account` before checkout creation;
+  no payment or webhook mutation was attempted.
+- Full deployed browser smoke: **PASS** — eight routes, sandbox pricing
+  surface, Submit demo, KENN demo, and mobile overflow.
+- The Website service root was restored to `/nitedsp/website`; Backend and
+  Postgres were not redeployed.
+
+The remaining owner action is one authenticated Paddle Sandbox rehearsal using
+the provider’s current test-payment details, followed by verification of the
+`transaction.completed` webhook, purchase/entitlement creation, and the
+entitlement-gated download. Live payment mode remains disabled.
+
+### Backend Sandbox catalog correction receipt — 2026-08-25
+
+Before the rehearsal, a read-only comparison showed that Railway Backend was
+still mapped to the SLO Paddle product and £5 price, despite the Website being
+labelled for NITE Submit Sandbox checkout. The mismatch was corrected before
+any new payment attempt:
+
+- Backend Sandbox product/price variables now resolve to NITE Submit and the
+  active £2.99 GBP one-time price; secret values are not recorded.
+- Backend redeployment `85370e4b-ee98-471e-b5db-201dae96be44` completed
+  successfully.
+- The production Backend catalog now contains a purchasable `nite-submit`
+  product row mapped to the verified Paddle product, with macOS as the only
+  registered platform.
+- Windows/Linux artifacts were not invented, and live payments, public
+  downloads, production licensing, and Apple signing/notarisation were not
+  changed.
+
+The authenticated Sandbox checkout, webhook, Submit entitlement, and gated
+macOS download still require one manual owner rehearsal.
+
+### Webhook replay verification receipt — 2026-08-25
+
+The earlier completed NITE Submit Sandbox notification was safely replayed
+after the catalog correction. This resent an existing event and did not create
+a new charge:
+
+- Paddle notification replay: **delivered**.
+- `POST /webhooks/paddle`: **200**.
+- Backend purchase: **completed**, product `nite-submit`, GBP.
+- Entitlements created: **1**.
+
+This verifies the Paddle-to-purchase-to-entitlement path. A new authenticated
+Website CTA checkout has not yet been observed.
+
+### Download readiness gate
+
+Railway Backend currently has no durable `STORAGE_BACKEND`/bucket/endpoint
+configuration. The private NITE Submit macOS ZIP therefore remains a local
+preview artifact and is not registered as a durable production download.
+The account entitlement can exist before the gated download is ready; the
+next download step requires private object storage, an upload, and checksum-
+verified macOS release registration. No Windows/Linux artifact was invented.
+
+Public download enablement, production licensing, and Apple Developer
+signing/notarisation remain out of scope. Persistent staging storage and the
+Sandbox webhook/download receipt remain incomplete until that authenticated
+rehearsal is recorded.

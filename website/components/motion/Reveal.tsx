@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
-/* Scroll reveal — short opacity + 14px rise, once, never blocking content.
+/* Scroll reveal, short opacity + 14px rise, once, never blocking content.
    Hidden state is scoped under html.js (set by a tiny inline script in the
    root layout), so users without JavaScript always see every word. */
 
 type RevealProps = {
   children: ReactNode;
-  /** Stagger delay in ms — use sparingly (<=120ms). */
+  /** Stagger delay in ms, use sparingly (<=120ms). */
   delayMs?: number;
   className?: string;
 };

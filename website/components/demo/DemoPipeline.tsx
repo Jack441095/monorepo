@@ -1,6 +1,6 @@
 import { type DemoPhase } from "./useSignalDemo";
 
-/* NITE Signal Demonstration Framework — the shared pipeline strip.
+/* NITE Signal Demonstration Framework, the shared pipeline strip.
 
    INPUT → ANALYSIS → INTELLIGENCE → RECOMMENDATION → ACTION
 

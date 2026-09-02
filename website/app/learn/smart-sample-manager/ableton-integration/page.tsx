@@ -96,7 +96,7 @@ export default function AbletonIntegrationPage() {
         <LearnH2>Source-file safety</LearnH2>
         <p className="mt-2">
           This writes to a separate <code>Ableton Folder Info</code> sidecar folder placed
-          alongside your samples — the exact mechanism Ableton&apos;s own tagging uses. Your
+          alongside your samples, the exact mechanism Ableton&apos;s own tagging uses. Your
           original audio files are not modified, and since SLO operates in read-only mode during
           the private beta, your sample directory structure is not automatically rearranged.
         </p>
@@ -105,7 +105,7 @@ export default function AbletonIntegrationPage() {
       <section>
         <LearnH2>Limitations</LearnH2>
         <ul className="mt-2 list-disc pl-5 space-y-1">
-          <li>This is specific to Ableton Live&apos;s sample browser — other DAWs don&apos;t read this format.</li>
+          <li>This is specific to Ableton Live&apos;s sample browser, other DAWs don&apos;t read this format.</li>
           <li>It has not been validated against every possible library structure or Ableton version yet.</li>
           <li>It is not an official Ableton feature, partnership, or integration.</li>
         </ul>

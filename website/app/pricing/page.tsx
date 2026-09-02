@@ -43,7 +43,7 @@ export default function PricingPage() {
               <tbody style={{ color: "var(--muted)" }}>
                 {[
                   ["Purpose", "Prepare the right submission", "Find the right sound", "Understand the mix"],
-                  ["Status", "Closed Beta — free", "Private Beta / Research", "In development"],
+                  ["Status", "Closed Beta, free", "Private Beta / Research", "In development"],
                   ["Local processing", "Documents never leave your Mac", "Audio analysis runs on your machine", "Planned: local analysis"],
                   ["Account required", "No", "Activation check-in only", "—"],
                   ["Price model", "£2.99 perpetual planned · no subscription", "Pricing announced at launch", "Pricing announced at launch"],
@@ -94,7 +94,7 @@ export default function PricingPage() {
               {/* Planned paid experiment */}
               <div className="border-b pb-5" style={{ borderColor: "var(--border)" }}>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-sm font-semibold text-foreground">Perpetual Licence — planned</span>
+                  <span className="text-sm font-semibold text-foreground">Perpetual Licence, planned</span>
                   <span className="text-2xl font-bold text-foreground tnum">£2.99</span>
                 </div>
                 <p className="mt-1 text-xs text-muted leading-relaxed">

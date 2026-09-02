@@ -75,7 +75,7 @@ const WORKFLOWS = [
 
 const CAPABILITIES = [
   ["Precision Browser", "A structured, spreadsheet-like interface highlighting timbral attributes, transient decay, musical key, and true category."],
-  ["Acoustic Similarity Map", "Browse visually. High-dimensional acoustic vectors are plotted on a 2D coordinate plane—close clusters share similar timbres."],
+  ["Acoustic Similarity Map", "Browse visually. High-dimensional acoustic vectors are plotted on a 2D coordinate plane, and close clusters share similar timbres."],
   ["Find Similar", "Select any reference sound and instantly query all acoustically matching files in your local database."],
   ["100% Offline Inference", "All mathematical models and feature extractions execute locally. Your audio files never leave your machine."],
 ] as const;
@@ -83,7 +83,7 @@ const CAPABILITIES = [
 export default function HomePage() {
   return (
     <>
-      {/* Homepage Hero — unified company proposition */}
+      {/* Homepage Hero, unified company proposition */}
       <section className="hero-grid overflow-hidden relative">
         <LightField />
         <div className="site-container relative py-16 lg:py-24 text-center" style={{ maxWidth: "56rem" }}>
@@ -92,7 +92,7 @@ export default function HomePage() {
             NITE DSP creates intelligent tools that simplify complex creative workflows.
           </h1>
           <p className="hero-copy mt-6 mx-auto">
-            From document preparation to sample discovery to mix understanding — local-first
+            From document preparation to sample discovery to mix understanding, local-first
             software for creative professionals. Your work stays on your machine.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
@@ -151,7 +151,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* The NITE Signal Journey — company-level signal flow */}
+      {/* The NITE Signal Journey, company-level signal flow */}
       <SignalJourney />
 
       {/* Interactive Demonstrations */}
@@ -161,7 +161,7 @@ export default function HomePage() {
             <span className="eyebrow">Product Demonstrations</span>
             <h2 className="section-title mt-4">See how the tools think.</h2>
             <p className="mt-4 text-sm max-w-2xl text-muted">
-              Simulated walkthroughs running entirely in your browser with illustrative data —
+              Simulated walkthroughs running entirely in your browser with illustrative data:
               nothing is uploaded, nothing is processed externally.
             </p>
           </Reveal>
@@ -234,7 +234,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Workflow Steps — the connector traces signal progress as you read */}
+      {/* Workflow Steps, the connector traces signal progress as you read */}
       <section className="section section-rule">
         <div className="site-container">
           <Reveal>

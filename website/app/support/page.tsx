@@ -20,7 +20,7 @@ const LINKS = [
   },
   {
     title: "Troubleshooting",
-    body: "Fixes for common problems—indexing issues, plugin loading, or license errors.",
+    body: "Fixes for common problems, indexing issues, plugin loading, or license errors.",
     href: "/learn/smart-sample-manager/troubleshooting",
   },
   {

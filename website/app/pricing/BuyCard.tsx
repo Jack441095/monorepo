@@ -17,7 +17,7 @@ export function BuyCard() {
   // Initialize Paddle.js once, so that if this page loads with Paddle's
   // `_ptxn` query param present (the redirect target of a checkout URL
   // POST /commerce/checkout just returned), Paddle.js auto-opens the
-  // checkout for that transaction on its own — no manual detection code
+  // checkout for that transaction on its own, no manual detection code
   // needed, per Paddle's documented default-payment-link behavior. This
   // effect does nothing if the client token isn't configured yet.
   useEffect(() => {
@@ -100,7 +100,7 @@ export function BuyCard() {
 
       {paddleConfigured ? (
         <p className="mt-4 text-xs" style={{ color: "var(--muted-dim)" }}>
-          Sandbox / test mode — simulated checkout for integration testing. No real funds are charged.
+          Sandbox / test mode, simulated checkout for integration testing. No real funds are charged.
         </p>
       ) : (
         <p className="mt-4 text-xs" style={{ color: "var(--muted-dim)" }}>

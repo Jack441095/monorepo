@@ -18,7 +18,7 @@ const FAQ = [
   },
   {
     q: "Does it modify my samples?",
-    a: "No — during the private beta, SLO operates in read-only classification mode and does not automatically move, rename, or delete your samples. The optional Ableton integration writes tags to a separate sidecar folder alongside your samples, not into the audio files themselves.",
+    a: "No, during the private beta, SLO operates in read-only classification mode and does not automatically move, rename, or delete your samples. The optional Ableton integration writes tags to a separate sidecar folder alongside your samples, not into the audio files themselves.",
   },
   {
     q: "What is Find Similar?",
@@ -26,7 +26,7 @@ const FAQ = [
   },
   {
     q: "Can I search with a typed description, like \"dark punchy kick\"?",
-    a: "Not currently. Find Similar compares real audio you select — it isn't a natural-language text search.",
+    a: "Not currently. Find Similar compares real audio you select, it isn't a natural-language text search.",
   },
   {
     q: "Which DAWs are supported?",
@@ -42,7 +42,7 @@ const FAQ = [
   },
   {
     q: "Can I use samples on an external drive?",
-    a: "Yes — point SLO at any folder your Mac can see. If the drive is disconnected later, rescan once it's reconnected to pick up any changes.",
+    a: "Yes, point SLO at any folder your Mac can see. If the drive is disconnected later, rescan once it's reconnected to pick up any changes.",
   },
   {
     q: "What happens if I reinstall macOS or get a new Mac?",
@@ -50,7 +50,7 @@ const FAQ = [
   },
   {
     q: "What happens to my library when I reopen the app?",
-    a: "SLO doesn't automatically reload your last library on launch — you'll need to rescan the same folder. Thanks to caching, this is fast, since already-analysed files are skipped.",
+    a: "SLO doesn't automatically reload your last library on launch, you'll need to rescan the same folder. Thanks to caching, this is fast, since already-analysed files are skipped.",
   },
   {
     q: "How do updates work?",
@@ -58,7 +58,7 @@ const FAQ = [
   },
   {
     q: "Is the Ableton integration an official Ableton feature?",
-    a: "No — it's an experimental NITE DSP feature that writes to the same metadata format Ableton's own browser reads. It isn't an official Ableton partnership or integration.",
+    a: "No, it's an experimental NITE DSP feature that writes to the same metadata format Ableton's own browser reads. It isn't an official Ableton partnership or integration.",
   },
   {
     q: "Is Windows supported?",
