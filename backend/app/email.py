@@ -36,6 +36,10 @@ def send_email(to: str, subject: str, body: str) -> None:
             "html": html_body,
             "text": body,
         }
+        # The From address is a verified sending domain, not a monitored
+        # inbox -- replies must land on the actual support mailbox instead.
+        if settings.nite_dsp_support_email and not settings.nite_dsp_support_email.endswith("@localhost.invalid"):
+            payload["reply_to"] = [settings.nite_dsp_support_email]
 
         try:
             response = httpx.post(

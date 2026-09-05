@@ -55,3 +55,31 @@ def test_send_email_resend_success(monkeypatch):
     assert json_data["subject"] == "My Subject"
     assert json_data["html"] == "Line 1<br/>Line 2"
     assert json_data["text"] == "Line 1\nLine 2"
+    assert "reply_to" not in json_data
+
+
+def test_send_email_resend_reply_to_support_address(monkeypatch):
+    settings.email_provider = "resend"
+    settings.resend_api_key = "re_test_key"
+    settings.email_from_name = "NITE DSP"
+    settings.email_from_address = "auth@nitedsp.co.uk"
+    settings.nite_dsp_support_email = "nitedsp@outlook.com"
+
+    calls = []
+
+    def mock_post(url, json, headers, timeout):
+        calls.append(json)
+
+        class MockResponse:
+            def raise_for_status(self):
+                pass
+
+        return MockResponse()
+
+    monkeypatch.setattr(httpx, "post", mock_post)
+
+    try:
+        send_email("test@example.com", "Subject", "Body")
+        assert calls[0]["reply_to"] == ["nitedsp@outlook.com"]
+    finally:
+        settings.nite_dsp_support_email = "support@localhost.invalid"
