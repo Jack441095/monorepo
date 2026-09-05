@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CtaButton } from "@/components/CtaButton";
 import { CHECKOUT_LIVE } from "@/lib/commerce-config";
+import { PaddleCheckoutOverlay } from "./PaddleCheckoutOverlay";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -122,6 +123,7 @@ export default function PricingPage() {
                 Read guides
               </Link>
             </div>
+            <PaddleCheckoutOverlay />
 
             <p className="mt-4 text-xs leading-relaxed text-muted-dim">
               NITE Submit is a local macOS app. It does not submit work for the user and cannot guarantee that generic presets match a department&apos;s rules.
