@@ -1,6 +1,9 @@
 {
   "name": "nite-dsp-platform-root",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "build": "npm --prefix website ci && npm --prefix website run build:production",
     "start": "npm --prefix website run start"
