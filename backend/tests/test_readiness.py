@@ -27,6 +27,18 @@ class _HealthyStorage:
         return None
 
 
+def test_health_response_has_server_generated_request_id(client):
+    first = client.get("/health", headers={"X-Request-ID": "caller-value"})
+    second = client.get("/health")
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert first.headers["X-Request-ID"] != "caller-value"
+    assert len(first.headers["X-Request-ID"]) == 32
+    assert len(second.headers["X-Request-ID"]) == 32
+    assert first.headers["X-Request-ID"] != second.headers["X-Request-ID"]
+
+
 def test_ready_reports_database_and_storage(monkeypatch):
     monkeypatch.setattr(main, "engine", _HealthyEngine())
     monkeypatch.setattr(main, "get_storage", lambda: _HealthyStorage())
