@@ -19,7 +19,7 @@ export default function PricingPage() {
           <span className="eyebrow">Pricing</span>
           <h1 className="section-title mt-4 text-foreground">One price. Yours to keep.</h1>
           <p className="body-large mt-6">
-            NITE Submit is currently in a free closed beta. The first paid experiment will be a simple £2.99 perpetual licence with no subscription.
+            NITE Submit is currently in a free closed beta. The first paid experiment will be a simple £3 perpetual licence with no subscription.
           </p>
         </div>
       </section>
@@ -47,7 +47,7 @@ export default function PricingPage() {
                   ["Status", "Closed Beta, free", "Private Beta / Research", "In development"],
                   ["Local processing", "Documents never leave your Mac", "Audio analysis runs on your machine", "Planned: local analysis"],
                   ["Account required", "No", "Activation check-in only", "—"],
-                  ["Price model", "£2.99 perpetual planned · no subscription", "Pricing announced at launch", "Pricing announced at launch"],
+                  ["Price model", "£3 perpetual planned · no subscription", "Pricing announced at launch", "Pricing announced at launch"],
                 ].map(([label, ...cells]) => (
                   <tr key={label} style={{ borderTop: "1px solid var(--border)" }}>
                     <th scope="row" className="py-4 pr-4 text-left text-xs font-semibold text-foreground">{label}</th>
@@ -76,7 +76,7 @@ export default function PricingPage() {
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">What is included.</h2>
             <ul className="feature-list mt-7">
               <li>Free invitation-only closed beta</li>
-              <li>Planned £2.99 perpetual licence experiment</li>
+              <li>Planned £3 perpetual licence experiment</li>
               <li>macOS 13+ Apple Silicon application</li>
               <li>No recurring subscription for V1</li>
               <li>Local PDF processing with no document upload</li>
@@ -96,7 +96,7 @@ export default function PricingPage() {
               <div className="border-b pb-5" style={{ borderColor: "var(--border)" }}>
                 <div className="flex justify-between items-baseline">
                   <span className="text-sm font-semibold text-foreground">Perpetual Licence, planned</span>
-                  <span className="text-2xl font-bold text-foreground tnum">£2.99</span>
+                  <span className="text-2xl font-bold text-foreground tnum">£3</span>
                 </div>
                 <p className="mt-1 text-xs text-muted leading-relaxed">
                   A low-friction paid experiment after the free closed beta. Final availability follows validation, signing, and legal gates.
