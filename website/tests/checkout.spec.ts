@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 // Updated for WEBSITE COMMERCIAL EXPERIENCE V1 to match the live pricing
-// model (£2.99 perpetual planned, free closed beta, checkout not yet open).
+// model (£3 perpetual planned, free closed beta, checkout not yet open).
 // Frontend-only boundary tests. Deliberately do NOT attempt to drive a real
 // magic-link sign-in or Paddle's third-party checkout iframe here -- that's
 // exactly the kind of third-party-dependent flow that makes e2e suites
@@ -11,7 +11,7 @@ test("pricing page renders normally with no checkout-related errors", async ({ p
   const response = await page.goto("/pricing");
   expect(response?.status()).toBe(200);
   await expect(page.getByText("Perpetual Licence — planned")).toBeVisible();
-  await expect(page.getByText("£2.99", { exact: true })).toBeVisible();
+  await expect(page.getByText("£3", { exact: true })).toBeVisible();
   // No leaked error state on an ordinary visit.
   await expect(page.getByText(/something went wrong/i)).not.toBeVisible();
 });

@@ -10,16 +10,16 @@ Single CTA state machine used everywhere (`CtaButton`):
 
 | State | Condition | Label | Action |
 |---|---|---|---|
-| `buy-live` | checkout enabled | "Buy now — £2.99" | `startCheckout()`; if 401, persist via `setBuyIntent()` then sign-in redirect |
+| `buy-live` | checkout enabled | "Buy now — £3" | `startCheckout()`; if 401, persist via `setBuyIntent()` then sign-in redirect |
 | `beta-request` | current closed beta | "Request beta access" | → `/beta` form |
 | `notify-me` | product pre-beta (KENN, Thursday, SLO public) | "Notify me" | email capture |
 
 Rules: exactly one primary CTA per viewport; secondary is always "View pricing" or "Read the docs"; CTA labels state what happens next (never "View Licensing").
 
 ## 2. Pricing Page Design
-- **Hero**: "One price. Yours to keep." Retain £2.99 perpetual positioning and closed-beta truth.
+- **Hero**: "One price. Yours to keep." Retain £3 perpetual positioning and closed-beta truth.
 - **Comparison table** (`ComparisonTable`): rows = Platform, Local processing, Account required, Price model, Status; columns = Submit / SLO / KENN.
-- **Plan card**: Closed Beta (Free, invitation-only, current) vs Perpetual Licence (£2.99, planned). Explicit: no subscription for V1.
+- **Plan card**: Closed Beta (Free, invitation-only, current) vs Perpetual Licence (£3, planned). Explicit: no subscription for V1.
 - **FAQ accordion**: Is it a subscription? (No.) Does Submit upload my documents? (No — local processing.) Will Submit submit my work? (No — you submit; we help you prepare.) What macOS version? (13+, Apple Silicon.) Refunds? (Link to `/refund-policy`.)
 - **Boundary line retained verbatim** from current page.
 
