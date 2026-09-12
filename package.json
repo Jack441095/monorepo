@@ -2,7 +2,7 @@
   "name": "nite-dsp-platform-root",
   "private": true,
   "scripts": {
-    "build": "npm --prefix website run build:production",
+    "build": "npm --prefix website ci && npm --prefix website run build:production",
     "start": "npm --prefix website run start"
   }
 }
