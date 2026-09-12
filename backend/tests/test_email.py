@@ -14,8 +14,11 @@ def test_send_email_console(caplog):
     with caplog.at_level(logging.INFO):
         send_email("test@example.com", "Test Subject", "Test Body")
 
-    assert "EMAIL to=test@example.com" in caplog.text
-    assert "subject='Test Subject'" in caplog.text
+    assert "EMAIL console from_configured=True" in caplog.text
+    assert "subject_chars=12" in caplog.text
+    assert "body_bytes=9" in caplog.text
+    assert "test@example.com" not in caplog.text
+    assert "Test Body" not in caplog.text
 
 
 def test_send_email_resend_missing_key():
