@@ -17,7 +17,16 @@ logger = logging.getLogger("nitedsp.email")
 
 def send_email(to: str, subject: str, body: str) -> None:
     if settings.email_provider == "console":
-        logger.info("EMAIL to=%s from=%s subject=%r\n%s", to, settings.email_from_address, subject, body)
+        # Console mode is useful for local development, but email bodies can
+        # contain magic links, licence keys, or other account data. Keep the
+        # operational signal without writing recipient or message content to
+        # logs.
+        logger.info(
+            "EMAIL console from_configured=%s subject_chars=%d body_bytes=%d",
+            bool(settings.email_from_address),
+            len(subject),
+            len(body.encode("utf-8")),
+        )
         return
     elif settings.email_provider == "resend":
         if not settings.resend_api_key:
@@ -49,9 +58,9 @@ def send_email(to: str, subject: str, body: str) -> None:
                 timeout=10.0,
             )
             response.raise_for_status()
-            logger.info("Email sent to %s via Resend", to)
+            logger.info("Email sent via Resend")
         except Exception as e:
-            logger.error("Failed to send email to %s via Resend: %s", to, e)
+            logger.error("Email delivery failed via Resend (%s)", type(e).__name__)
             raise RuntimeError(f"Email delivery failed: {e}") from e
         return
     raise NotImplementedError(
