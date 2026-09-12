@@ -1,9 +1,31 @@
 from __future__ import annotations
 
+import json
+import logging
+
 from fastapi import Response
 
 from app import main
 from app.storage import StorageError
+
+
+def test_json_log_formatter_is_structured_and_omits_exception_text():
+    record = logging.LogRecord(
+        name="nitedsp",
+        level=logging.ERROR,
+        pathname=__file__,
+        lineno=1,
+        msg="request request_id=%s method=%s status=500 duration_ms=%d",
+        args=("a" * 32, "GET", 12),
+        exc_info=(RuntimeError, RuntimeError("secret-like exception detail"), None),
+    )
+    payload = json.loads(main._JsonFormatter().format(record))
+
+    assert payload["logger"] == "nitedsp"
+    assert payload["level"] == "ERROR"
+    assert payload["message"].startswith("request request_id=")
+    assert payload["exception_type"] == "RuntimeError"
+    assert "secret-like exception detail" not in json.dumps(payload)
 
 
 class _Connection:
