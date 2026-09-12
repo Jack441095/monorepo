@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import logging
+from datetime import datetime, timezone
 from time import monotonic
 from urllib.parse import urlparse
 from uuid import uuid4
@@ -20,9 +22,26 @@ from .storage import StorageError, get_storage
 # regardless of level). Attach our own handler directly.
 _nitedsp_logger = logging.getLogger("nitedsp")
 _nitedsp_logger.setLevel(logging.INFO)
+
+
+class _JsonFormatter(logging.Formatter):
+    """Emit a safe structured envelope without copying exception text."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        if record.exc_info:
+            payload["exception_type"] = record.exc_info[0].__name__
+        return json.dumps(payload, sort_keys=True)
+
+
 if not _nitedsp_logger.handlers:
     _handler = logging.StreamHandler()
-    _handler.setFormatter(logging.Formatter("%(levelname)s [%(name)s] %(message)s"))
+    _handler.setFormatter(_JsonFormatter())
     _nitedsp_logger.addHandler(_handler)
     _nitedsp_logger.propagate = False
 
