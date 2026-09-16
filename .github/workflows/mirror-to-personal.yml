@@ -11,10 +11,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
-          submodules: false
 
       - name: Push mirror to Jack441095/monorepo
+        env:
+          TOKEN: ${{ secrets.PERSONAL_MIRROR_TOKEN }}
         run: |
-          git remote add personal https://Jack441095:${{ secrets.PERSONAL_MIRROR_TOKEN }}@github.com/Jack441095/monorepo.git
+          git config --unset-all http.https://github.com/.extraheader || true
+          git remote add personal "https://Jack441095:${TOKEN}@github.com/Jack441095/monorepo.git"
           git push personal main --force
