@@ -1,3 +1,99 @@
 # OS-generated metadata must not appear as source changes.
 .DS_Store
 ._*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+.next/
+.vercel/
+out/
+
+# Environment / secrets — never commit real values
+.env
+.env.local
+.env.production
+.env.production.local
+.env.staging
+.env.*.local
+*.pem
+*.key
+secret.key
+
+# Audio and large media — use asset storage instead
+*.wav
+*.mp3
+*.aiff
+*.aif
+*.flac
+*.ogg
+*.m4a
+*.opus
+
+# Release archives and build artifacts
+*.tar.gz
+*.zip
+*.tar
+*.tgz
+artifacts/release/
+dist/
+
+# Model / ML artifacts
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.bin
+training_data/
+tmp/
+
+# Worktrees — managed by git, not source
+workspace/worktrees/
+
+# Fixtures / test audio (large binary blobs)
+fixtures/blind_test_audio/
+fixtures/cache/
+fixtures/cache_kick_length/
+fixtures/cache_readonly_safety/
+fixtures/cache_rt_stress/
+fixtures/real_samples_test/
+fixtures/test_reese/
+fixtures/test_suburban/
+fixtures/test_suburban_clean/
+
+# Swift build outputs
+.build/
+*.o
+*.dmg
+*.pkg
+*.app/
+
+# Databases and runtime state
+*.db
+*.sqlite
+*.sqlite3
+.runtime/
+
+# Toolchain downloads
+**/toolchain/node-*/
+**/*.tar.xz
+
+# Misc
+*.log
+crash_recovery_results.json
+*.jsonl
