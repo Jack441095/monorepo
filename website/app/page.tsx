@@ -89,11 +89,11 @@ export default function HomePage() {
         <div className="site-container relative py-16 lg:py-24 text-center" style={{ maxWidth: "56rem" }}>
           <span className="eyebrow">NITE DSP // INTELLIGENT CREATIVE TOOLS</span>
           <h1 className="hero-title mt-5">
-            NITE DSP creates intelligent tools that simplify complex creative workflows.
+            Tools built for the way you actually work.
           </h1>
           <p className="hero-copy mt-6 mx-auto">
-            From document preparation to sample discovery to mix understanding, local-first
-            software for creative professionals. Your work stays on your machine.
+            Document prep, sample discovery, mix feedback — local-first macOS software
+            that runs on your machine and stays out of your way.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
             <Link href="/products" className="btn-primary">
@@ -112,10 +112,10 @@ export default function HomePage() {
         <div className="site-container">
           <Reveal>
             <div className="max-w-2xl">
-              <span className="eyebrow">Product Architecture</span>
-              <h2 className="section-title mt-4">Focused tools for creative workflows.</h2>
+              <span className="eyebrow">The Products</span>
+              <h2 className="section-title mt-4">Three tools, one direction.</h2>
               <p className="mt-4 text-sm text-muted leading-relaxed font-sans">
-                NITE DSP builds local-first software starting with document preparation, then extending into audio intelligence for sample discovery and mix understanding.
+                Document preparation, sample search, and mix feedback. Each one solves a real problem, runs offline, and doesn&apos;t phone home.
               </p>
             </div>
           </Reveal>
@@ -213,9 +213,9 @@ export default function HomePage() {
         <div className="site-container grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
           <Reveal>
             <span className="eyebrow">Interactive Demo</span>
-            <h2 className="section-title mt-4">Real-time timbral signature extraction.</h2>
+            <h2 className="section-title mt-4">Hear the difference between your samples, not just the names.</h2>
             <p className="mt-6 leading-relaxed" style={{ color: "var(--muted)" }}>
-              Click any cryptic filename to see how the local DSP engine scans the waveform, identifies key transient structures, and classifies the sound into its true instrument category.
+              Click any filename to see how SLO scans the waveform, picks out the transient shape, and works out what kind of sound it actually is.
             </p>
             <div className="mt-8 flex flex-col gap-4 border-l-2 border-brand-violet pl-5">
               <div>
@@ -224,7 +224,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h4 className="font-semibold text-foreground text-sm">100% Local Inference</h4>
-                <p className="text-xs text-muted mt-1">Signal analysis and similarity calculations run entirely in memory. Your intellectual property never leaves your machine.</p>
+                <p className="text-xs text-muted mt-1">Signal analysis and similarity calculations run entirely on your machine. Your audio never leaves.</p>
               </div>
             </div>
           </Reveal>
@@ -239,8 +239,8 @@ export default function HomePage() {
         <div className="site-container">
           <Reveal>
             <div className="max-w-2xl">
-              <span className="eyebrow">Precision Engineering</span>
-              <h2 className="section-title mt-4">Streamline your sample library workflow.</h2>
+              <span className="eyebrow">How It Works</span>
+              <h2 className="section-title mt-4">From raw drives to instant results.</h2>
             </div>
           </Reveal>
           <WorkflowFlow steps={WORKFLOWS} />
@@ -253,8 +253,8 @@ export default function HomePage() {
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <Reveal>
               <div className="max-w-2xl">
-                <span className="eyebrow">System Capabilities</span>
-                <h2 className="section-title mt-4">An instrument built for audio producers.</h2>
+                <span className="eyebrow">Features</span>
+                <h2 className="section-title mt-4">Built for the way producers actually work.</h2>
               </div>
             </Reveal>
             <Link href="/products/smart-sample-manager" className="text-link">
