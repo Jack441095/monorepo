@@ -1,0 +1,18 @@
+name: Mirror to personal account
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push mirror to Jack441095/monorepo
+        run: |
+          git remote add personal https://x-access-token:${{ secrets.PERSONAL_MIRROR_TOKEN }}@github.com/Jack441095/monorepo.git
+          git push personal main --force
