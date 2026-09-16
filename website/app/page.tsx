@@ -92,7 +92,7 @@ export default function HomePage() {
             Tools built for the way you actually work.
           </h1>
           <p className="hero-copy mt-6 mx-auto">
-            Document prep, sample discovery, mix feedback — local-first macOS software
+            Document prep, sample discovery, mix feedback. Local-first macOS software
             that runs on your machine and stays out of your way.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
