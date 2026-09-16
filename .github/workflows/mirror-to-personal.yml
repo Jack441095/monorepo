@@ -12,6 +12,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          submodules: false
 
       - name: Push mirror to Jack441095/monorepo
         run: |
