@@ -14,5 +14,5 @@ jobs:
 
       - name: Push mirror to Jack441095/monorepo
         run: |
-          git remote add personal https://x-access-token:${{ secrets.PERSONAL_MIRROR_TOKEN }}@github.com/Jack441095/monorepo.git
+          git remote add personal https://Jack441095:${{ secrets.PERSONAL_MIRROR_TOKEN }}@github.com/Jack441095/monorepo.git
           git push personal main --force
