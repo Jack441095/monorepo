@@ -89,7 +89,7 @@ export function KennChatWidget() {
     <div className="surface-card rounded-lg border border-border/50 p-5 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <span className="eyebrow text-brand-violet">Retrieval demo</span>
+          <span className="eyebrow text-brand-violet-text">Retrieval demo</span>
           <h3 className="mt-3 text-xl font-semibold text-foreground">Ask a mix question.</h3>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
             KENN answers from its approved local knowledge and shows the provenance metadata it used.

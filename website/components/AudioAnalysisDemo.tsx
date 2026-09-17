@@ -312,7 +312,7 @@ export function AudioAnalysisDemo() {
             {revealed && (
               <div className="mt-3 pt-3 border-t border-border/50 w-full" aria-label="Acoustically similar samples">
                 <span className="text-[9px] text-muted-dim tracking-wider uppercase block mb-2">
-                  SIMILARITY, ACOUSTIC MATCHES
+                  SIMILARITY — ACOUSTIC MATCHES
                 </span>
                 <div className="flex flex-wrap justify-center gap-1.5">
                   {sample.matches.map((m) => (

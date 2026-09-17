@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { BetaRequestForm } from "@/components/BetaRequestForm";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Beta Access",
   description: "Request access to the NITE Submit closed beta, or ask to be notified when SLO and KENN open up.",
-  alternates: { canonical: "/beta" },
-};
+  path: "/beta",
+});
 
 const STEPS = [
   ["01", "Request", "Tell us who you are and what you'd like to do. Requests go to our team by email, nothing is uploaded."],

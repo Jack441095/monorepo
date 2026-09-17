@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { FilesOrganizerDemo } from "@/components/demo/FilesOrganizerDemo";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "NITE Files: C++ Library Folder Cleaner",
   description: "General-purpose library folder cleaner powered by a high-performance C++17 core engine. Sort photos by EXIF date, music by ID3 tag, and documents by category with 100% local safety.",
-  alternates: { canonical: "/products/files" },
-};
+  path: "/products/files",
+});
 
 const FEATURES = [
   {

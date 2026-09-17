@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
 import { SloMapDemo } from "@/components/demo/SloMapDemo";
+import { WaitlistForm } from "@/components/WaitlistForm";
 import { LightField } from "@/components/motion/LightField";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
 import { TiltSurface } from "@/components/motion/TiltSurface";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "SLO: Sample Library Optimiser",
-  description:
-    "An acoustic-similarity sample browser and organizer for macOS. Fully offline, private, and built for professional music production workflows.",
-  alternates: { canonical: "/products/smart-sample-manager" },
-};
+  description: "An acoustic-similarity sample browser and organizer for macOS. Fully offline, private, and built for professional music production workflows.",
+  path: "/products/smart-sample-manager",
+});
 
 const WORKFLOW_STEPS = [
   {
@@ -75,19 +76,22 @@ export default function SmartSampleManagerPage() {
       <section className="section product-hero relative overflow-hidden">
         <LightField />
         <div className="site-container relative">
-          <span className="eyebrow text-brand-violet">Audio Intelligence Family</span>
+          <span className="eyebrow text-brand-violet-text">Audio Intelligence Family</span>
           <h1 className="section-title mt-4 text-foreground">SLO</h1>
           <p className="text-sm font-mono text-amber-400 mt-1">Sample Library Optimiser</p>
           <p className="body-large mt-6 font-sans">
             A professional, acoustic-similarity sample browser and organizer for macOS.
             By analysing raw audio signals rather than depending on folder structures or filenames, SLO provides absolute clarity over your sample library.
           </p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link href="/pricing" className="btn-primary">
-              <Magnetic>See pricing</Magnetic>
-            </Link>
-            <Link href="/account" className="btn-secondary">
-              Sign in to download
+          <p className="mt-4 text-sm font-semibold" style={{ color: "var(--brand-blue-bright)" }}>
+            Accepting the first 50 beta testers.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-4">
+            <a href="#join-waitlist" className="btn-primary">
+              <Magnetic>Claim your spot</Magnetic>
+            </a>
+            <Link href="/learn" className="btn-secondary">
+              Read how it works
             </Link>
           </div>
         </div>
@@ -103,12 +107,16 @@ export default function SmartSampleManagerPage() {
                 <span>2,450 SAMPLES INDEXED</span>
               </div>
               <div data-depth="3">
+                {/* sizes matters here: without it Next assumes 100vw and ships
+                    the 3840px variant for a slot never wider than the 72rem
+                    content column. priority keeps this LCP image eager. */}
                 <Image
                   src="/screenshots/main-browser.png"
                   alt="SLO list view showing sample browser layout, categorised tags, spectral analysis and transient points"
                   width={1599}
                   height={1057}
                   className="w-full h-auto block"
+                  sizes="(max-width: 1200px) 100vw, 1152px"
                   priority
                 />
               </div>
@@ -224,7 +232,7 @@ export default function SmartSampleManagerPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-brand-violet text-xs">INTEGRATION PREVIEW & ROADMAP</h4>
+                    <h4 className="font-semibold text-brand-violet-text text-xs">INTEGRATION PREVIEW & ROADMAP</h4>
                     <ul className="mt-2 list-disc pl-5 space-y-1.5">
                       <li>Ableton Live XMP Sidecars</li>
                       <li>Logic Pro database linking</li>
@@ -258,20 +266,33 @@ export default function SmartSampleManagerPage() {
         </div>
       </section>
 
-      {/* Bottom Action */}
-      <section className="section border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="site-container text-center">
-          <div className="max-w-xl mx-auto flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-foreground">Get started with SLO</h2>
-            <p className="mt-3 text-sm text-muted">Analyse your sample library. Find the right timbre instantly.</p>
-            <div className="mt-8 flex gap-3">
-              <Link href="/pricing" className="btn-primary">
-                See pricing
-              </Link>
-              <Link href="/learn" className="btn-secondary">
-                Read guides
-              </Link>
+      {/* Waitlist */}
+      <section id="join-waitlist" className="section border-t" style={{ borderColor: "var(--border)" }}>
+        <div className="site-container">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
+            <div>
+              <span className="eyebrow text-brand-blue-bright">Limited Beta</span>
+              <h2 className="section-title mt-4 text-foreground">Join the first 50.</h2>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                SLO is opening to a small group of producers to shape the product before wider release.
+                Claim your spot and you&apos;ll be the first to get access when the beta opens.
+              </p>
+              <ul className="mt-6 space-y-3 text-sm text-muted">
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-blue-bright font-bold">01</span>
+                  <span>Join the waitlist. Your place is held</span>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-blue-bright font-bold">02</span>
+                  <span>We&apos;ll email you when your beta access is ready</span>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-blue-bright font-bold">03</span>
+                  <span>Test SLO with your own sample library and shape what ships</span>
+                </li>
+              </ul>
             </div>
+            <WaitlistForm productId="smart-sample-manager" capacity={50} />
           </div>
         </div>
       </section>

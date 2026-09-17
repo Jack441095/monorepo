@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LearnLayout, LearnH2 } from "@/lib/learn";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Installation",
   description: "How to install SLO as VST3, Audio Unit, or Standalone on macOS.",
-  alternates: { canonical: "/learn/smart-sample-manager/installation" },
-};
+  path: "/learn/smart-sample-manager/installation",
+});
 
 export default function InstallationPage() {
   return (
@@ -20,13 +21,13 @@ export default function InstallationPage() {
         <p className="mt-2">The installer places each format in its standard macOS location:</p>
         <ul className="mt-2 list-disc pl-5 space-y-1">
           <li>
-            <strong>VST3</strong> &mdash; <code>~/Library/Audio/Plug-Ins/VST3/</code>
+            <strong>VST3</strong>: <code>~/Library/Audio/Plug-Ins/VST3/</code>
           </li>
           <li>
-            <strong>Audio Unit</strong> &mdash; <code>~/Library/Audio/Plug-Ins/Components/</code>
+            <strong>Audio Unit</strong>: <code>~/Library/Audio/Plug-Ins/Components/</code>
           </li>
           <li>
-            <strong>Standalone</strong> &mdash; <code>/Applications/</code>
+            <strong>Standalone</strong>: <code>/Applications/</code>
           </li>
         </ul>
         <p className="mt-2">
