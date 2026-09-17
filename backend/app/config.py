@@ -95,6 +95,8 @@ class Settings(BaseSettings):
     # explicitly approved the environment's Paddle checkout path; credentials
     # and catalog IDs alone must never expose a checkout endpoint.
     paddle_checkout_enabled: bool = False
+    legal_review_approved: bool = False
+    release_ready: bool = False
 
     # Email -- Section 63/64. "console" logs the email instead of sending it,
     # used for local/staging until a real transactional email provider is
@@ -122,6 +124,45 @@ class Settings(BaseSettings):
     # the dev licensing_server (POST /v1/admin/licenses has zero auth) --
     # that mistake must never be repeated here.
     admin_api_key: str = ""
+
+    # Paraphrase product (products/nite-paraphrase) -- Phase 2. Off by
+    # default (the estate norm: a feature never exposes itself before the
+    # staging gate flips it on). The engine is a separate deployable
+    # service that wraps Ollama -- see products/nite-paraphrase/engine/
+    # -- so this backend only needs its URL and an optional shared token,
+    # never Ollama credentials.
+    paraphrase_enabled: bool = False
+    paraphrase_engine_url: str = "http://localhost:8687"
+    paraphrase_service_token: str = ""
+    paraphrase_free_daily_limit: int = 3
+    # Phase 4 placeholder: an unlock token the webhook path will issue to
+    # paid users. Until then it lets staging/tests simulate an unlocked
+    # session without touching Paddle. Empty means no one bypasses the
+    # free tier.
+    paraphrase_unlock_token: str = ""
+
+    # Stripe -- payment processor for live sales (Paraphrase tips + SLO).
+    # stripe_webhook_secret is the endpoint signing secret from the Stripe
+    # dashboard (whsec_...). Empty by default: stripe_commerce.py refuses to
+    # process any webhook without it, fail-closed.
+    # Product routing uses session.metadata["product_id"] (our internal slug)
+    # set at payment-link creation time -- no price-ID mapping needed here.
+    stripe_webhook_secret: str = ""
+
+    # Paraphrase PWYW tiers (products/nite-paraphrase Phase 4). One Paddle
+    # sandbox price per tier is mapped to a tier name exactly like the
+    # main product's intro/regular mapping. Empty until the owner creates
+    # them in Paddle: checkout 400s for any unconfigured tier, and the
+    # webhook refuses an unconfigured product -- fail-closed like every
+    # other catalog mapping in this codebase.
+    paraphrase_product_id: str = ""
+    paraphrase_price_gbp_1: str = ""
+    paraphrase_price_gbp_3: str = ""
+    paraphrase_price_gbp_10: str = ""
+
+    # How long a redeemed paraphrase unlock stays valid (an anonymous
+    # session token, deliberately not a perpetual licence).
+    paraphrase_unlock_days: int = 7
 
 
 def _storage_configuration_problems(s: Settings) -> list[str]:
@@ -176,6 +217,10 @@ def _validate_production_config(s: Settings) -> None:
         return
 
     problems = []
+    if s.paddle_checkout_enabled and not s.legal_review_approved:
+        problems.append("legal_review_approved must be true before production checkout")
+    if s.paddle_checkout_enabled and not s.release_ready:
+        problems.append("release_ready must be true before production checkout")
     for field_name, value in (
         ("nite_dsp_public_url", s.nite_dsp_public_url),
         ("nite_dsp_api_url", s.nite_dsp_api_url),
