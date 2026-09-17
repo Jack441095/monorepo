@@ -11,7 +11,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from . import admin, auth, commerce, downloads, licensing
+from . import admin, auth, commerce, contact, downloads, licensing, paraphrase, stripe_commerce, waitlist
 from .config import settings
 from .database import engine
 from .storage import StorageError, get_storage
@@ -107,8 +107,12 @@ app.include_router(auth.router)
 app.include_router(licensing.router)
 app.include_router(commerce.router)
 app.include_router(commerce.checkout_router)
+app.include_router(stripe_commerce.router)
 app.include_router(downloads.router)
 app.include_router(admin.router)
+app.include_router(waitlist.router)
+app.include_router(contact.router)
+app.include_router(paraphrase.router)
 
 
 @app.get("/health")
@@ -148,6 +152,7 @@ def ready(response: Response) -> dict:
         not settings.staging_customer_rehearsal
         or (storage_durable and email_deliverable)
     )
+    commercial_gates_ready = settings.legal_review_approved and settings.release_ready
     ready_ok = db_ok and storage_ok and customer_rehearsal_ready
     if not ready_ok:
         response.status_code = 503
@@ -161,6 +166,9 @@ def ready(response: Response) -> dict:
         "email_provider_configured": email_provider_configured,
         "email_deliverable": email_deliverable,
         "checkout_enabled": settings.paddle_checkout_enabled,
+        "legal_review_approved": settings.legal_review_approved,
+        "release_ready": settings.release_ready,
+        "commercial_gates_ready": commercial_gates_ready,
         "staging_customer_rehearsal": settings.staging_customer_rehearsal,
         "staging_customer_rehearsal_ready": customer_rehearsal_ready,
     }
