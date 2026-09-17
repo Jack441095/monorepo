@@ -64,7 +64,6 @@ export function DemoPipeline({ phase }: { phase: DemoPhase }) {
                   : reached
                     ? "var(--muted)"
                     : "var(--muted-dim)",
-                opacity: reached ? 1 : 0.55,
               }}
             >
               {stage}

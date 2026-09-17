@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Trust & Privacy",
   description: "How NITE DSP software handles your files: local processing, data boundaries, and honest product limits.",
-  alternates: { canonical: "/trust" },
-};
+  path: "/trust",
+});
 
 const PILLARS = [
   {

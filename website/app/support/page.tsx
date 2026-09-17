@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Support",
   description: "Support for NITE Submit, SLO, and NITE DSP products.",
-  alternates: { canonical: "/support" },
-};
+  path: "/support",
+});
 
 const LINKS = [
   {

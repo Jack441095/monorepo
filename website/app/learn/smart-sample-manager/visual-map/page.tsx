@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LearnLayout, LearnH2 } from "@/lib/learn";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Visual Map",
   description: "Browse your sample library laid out by sonic similarity.",
-  alternates: { canonical: "/learn/smart-sample-manager/visual-map" },
-};
+  path: "/learn/smart-sample-manager/visual-map",
+});
 
 export default function VisualMapPage() {
   return (
