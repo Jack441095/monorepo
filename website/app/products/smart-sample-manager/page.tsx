@@ -173,7 +173,7 @@ export default function SmartSampleManagerPage() {
           </Reveal>
           <Reveal className="order-1 lg:order-2">
             <span className="eyebrow">Acoustic Descriptor Engine</span>
-            <h2 className="section-title mt-4 text-foreground">Bypass cryptic metadata.</h2>
+            <h2 className="section-title mt-4 text-foreground">Stop searching by folder name. Start searching by sound.</h2>
             <p className="mt-6 leading-relaxed text-muted text-sm">
               SLO processes raw PCM audio frames offline, detects precise transient decay curves, calculates spectral centroid brightness, and automatically classifies the true musical role.
             </p>

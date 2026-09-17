@@ -30,6 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/learn/guides/submission-checklist",
     "/learn/guides/submission-scorecard",
     "/services",
+    "/paraphrase",
     "/privacy",
     "/terms",
     "/eula",
