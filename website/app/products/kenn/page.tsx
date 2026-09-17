@@ -1,42 +1,40 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
-import { CtaButton } from "@/components/CtaButton";
 import { KennChatWidget } from "@/components/KennChatWidget";
 import { KennMixDemo } from "@/components/demo/KennMixDemo";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
-import { StatusDot } from "@/components/motion/StatusDot";
 import { TiltSurface } from "@/components/motion/TiltSurface";
+import { WaitlistForm } from "@/components/WaitlistForm";
 
-export const metadata: Metadata = {
-  title: "KENN: Understand Your Mix",
-  description:
-    "KENN analyses your mix locally and explains what it hears, so you make the changes. In development at NITE DSP.",
-  alternates: { canonical: "/products/kenn" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "KENN: AI Audio Assistant for Ableton Live",
+  description: "KENN is an AI-powered audio assistant that lives inside Ableton Live. It listens, explains, and helps you make better mixing decisions. In development at NITE DSP.",
+  path: "/products/kenn",
+});
 
 const STAGES = [
   {
-    title: "Analyse",
-    body: "KENN measures your mix locally: spectral balance across bands, transient behaviour, stereo energy distribution, and loudness relationships between elements.",
+    title: "Listen",
+    body: "KENN analyses your session locally: spectral balance, transient behaviour, stereo energy, and how elements interact across your mix.",
   },
   {
-    title: "Detect",
-    body: "Patterns worth attention are identified, a masked vocal range, low-mid buildup, transients that disappear in the chorus, based on measurable characteristics, not taste.",
+    title: "Understand",
+    body: "It identifies patterns worth your attention. A masked vocal, low-mid buildup, transients that disappear in the chorus. Based on measurements, not taste.",
   },
   {
     title: "Explain",
-    body: "Every finding comes with reasoning: what was measured, how it compares to common mixing practice, and why it might matter for your track.",
+    body: "Every finding comes with reasoning. What was measured, how it compares to common practice, and why it might matter for your track.",
   },
   {
-    title: "Recommend",
-    body: "You get suggested areas to address, with the evidence behind them. You make every creative decision. KENN never renders audio on its own.",
+    title: "Assist",
+    body: "Ask KENN questions about your mix and get clear, evidence-backed answers. It helps you think through decisions without making them for you.",
   },
 ];
-// __PART2__
 
 const BOUNDARIES = [
-  ["KENN does not mix your song", "It never processes or renders your audio into a finished mix. It reads analysis data and explains it."],
+  ["KENN does not mix your song", "It never processes or renders your audio. It reads analysis data and explains what it finds."],
   ["No black-box verdicts", "Findings are tied to measurements you can inspect, not an opaque score."],
   ["Your stems stay local", "Analysis runs on your machine. Audio files are never uploaded."],
 ];
@@ -48,30 +46,30 @@ export default function KennPage() {
       <section className="section product-hero relative overflow-hidden">
         <LightField />
         <div className="site-container relative">
-          <span className="eyebrow text-brand-violet">Audio Intelligence Family</span>
-          <h1 className="section-title mt-4 text-foreground">Understand your mix.</h1>
-          <p className="text-sm font-mono text-brand-violet mt-1">
-            Audio Engineering Intelligence Assistant
+          <span className="eyebrow text-brand-violet-text">Audio Intelligence Family</span>
+          <h1 className="section-title mt-4 text-foreground">Your AI audio assistant for Ableton.</h1>
+          <p className="text-sm font-mono text-brand-violet-text mt-1">
+            AI Audio Assistant
           </p>
           <p className="body-large mt-6 font-sans">
-            KENN listens to your mix the way an engineer would ask questions of it: what is the
-            spectral balance doing, where are elements fighting, what deserves attention. Then it
-            explains, clearly, with evidence, so you decide what to change.
+            KENN lives inside Ableton Live and helps you understand what&apos;s happening in your mix.
+            It listens, explains what it hears with real evidence, and answers your questions so you
+            can make better decisions faster.
           </p>
-          <div className="mt-8 flex flex-wrap gap-4 items-center">
-            <CtaButton state="NOTIFY_ME" label="Notify me at launch" />
-            <span
-              className="status-chip text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border inline-flex items-center gap-1"
-              style={{ borderColor: "var(--state-warning-border)", color: "var(--state-warning)" }}
-            >
-              <StatusDot tone="warning" />
-              In Development
+          <div className="mt-4">
+            <span className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border border-brand-violet/40 text-brand-violet-text">
+              Closed Beta &mdash; not for sale yet
             </span>
+          </div>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link href="#join-waitlist" className="btn-primary">
+              Request beta access
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Workflow: Analyse → Detect → Explain → Recommend */}
+      {/* Workflow */}
       <section className="section section-rule">
         <div className="site-container">
           <Reveal>
@@ -101,12 +99,11 @@ export default function KennPage() {
             <span className="eyebrow">Concept Demonstration</span>
             <h2 className="section-title mt-4">Mix review, explained.</h2>
             <p className="mt-4 text-sm leading-relaxed text-muted">
-              A simulated walkthrough of how KENN will present findings: each observation shown with
+              A simulated walkthrough of how KENN presents findings. Each observation is shown with
               its measurement and plain-language reasoning.
             </p>
             <p className="mt-3 text-xs" style={{ color: "var(--muted-dim)" }}>
-              Simulated demonstration with illustrative data. Runs entirely in your browser, no
-              audio is processed or uploaded.
+              Simulated demonstration with illustrative data. Runs entirely in your browser.
             </p>
           </Reveal>
           <Reveal delayMs={90}>
@@ -117,15 +114,15 @@ export default function KennPage() {
         </div>
       </section>
 
-      {/* Live text-only mix advice surface */}
+      {/* Live text Q&A */}
       <section className="section section-rule">
         <div className="site-container">
           <div className="max-w-2xl">
-            <span className="eyebrow">Tested text Q&amp;A</span>
+            <span className="eyebrow">Try it now</span>
             <h2 className="section-title mt-4">Ask KENN about the mix.</h2>
             <p className="mt-4 text-sm leading-relaxed text-muted">
-              This is a small retrieval-only advice demo: source-backed mix-engineering guidance,
-              with an explicit abstention boundary when the approved knowledge is not enough.
+              A small retrieval-only advice demo. Source-backed mix-engineering guidance,
+              with an explicit boundary when the approved knowledge isn&apos;t enough.
             </p>
           </div>
           <div className="mt-8">
@@ -134,7 +131,7 @@ export default function KennPage() {
         </div>
       </section>
 
-      {/* Boundaries + CTA */}
+      {/* Boundaries */}
       <section className="section section-rule">
         <div className="site-container">
           <Reveal>
@@ -149,20 +146,36 @@ export default function KennPage() {
               </article>
             ))}
           </div>
-          <div className="cta-panel depth-hover mt-14">
+        </div>
+      </section>
+
+      {/* Waitlist */}
+      <section id="join-waitlist" className="section section-rule">
+        <div className="site-container">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
             <div>
-              <h2 className="section-title mt-4 text-foreground">Be first to know.</h2>
-              <p className="mt-2 text-sm text-muted">
-                KENN is in active development. Join the notify list and we&apos;ll email you when
-                beta access opens.
+              <span className="eyebrow text-brand-violet-text">Early Access</span>
+              <h2 className="section-title mt-4 text-foreground">Join the first 50.</h2>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                KENN is in active development. We&apos;re opening early access to a small group
+                of producers and engineers who want to help shape the product.
               </p>
+              <ul className="mt-6 space-y-3 text-sm text-muted">
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-violet-text font-bold">01</span>
+                  <span>Join the waitlist. Your place is held</span>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-violet-text font-bold">02</span>
+                  <span>We&apos;ll email you when your beta access is ready</span>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-violet-text font-bold">03</span>
+                  <span>Test KENN inside Ableton Live and shape what ships</span>
+                </li>
+              </ul>
             </div>
-            <div className="flex flex-wrap gap-3 relative z-10">
-              <CtaButton state="NOTIFY_ME" />
-              <Link href="/trust" className="btn-secondary">
-                How we handle your data
-              </Link>
-            </div>
+            <WaitlistForm productId="kenn" capacity={50} />
           </div>
         </div>
       </section>

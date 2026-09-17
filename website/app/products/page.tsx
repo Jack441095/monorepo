@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { StatusDot } from "@/components/motion/StatusDot";
 import { Reveal } from "@/components/motion/Reveal";
@@ -6,11 +7,11 @@ import { TiltSurface } from "@/components/motion/TiltSurface";
 import { SubmitPrepDemo } from "@/components/demo/SubmitPrepDemo";
 import { KennMixDemo } from "@/components/demo/KennMixDemo";
 
-export const metadata: Metadata = {
-  title: "Product Families | NITE DSP",
+export const metadata: Metadata = pageMetadata({
+  title: "Product Families",
   description: "Focused tools for creative workflows by NITE DSP: document preparation intelligence, audio intelligence, and internal orchestration.",
-  alternates: { canonical: "/products" },
-};
+  path: "/products",
+});
 
 export default function ProductsPage() {
   return (
@@ -31,7 +32,7 @@ export default function ProductsPage() {
         <div className="site-container py-12 sm:py-16">
           <div className="flex items-center gap-3 mb-6">
             <span className="dsp-pill text-brand-blue-bright border-brand-blue/30 font-mono text-[10px] font-bold uppercase tracking-wider">
-              FAMILY 01 // WORKFLOW INTELLIGENCE
+              Family 1 - General
             </span>
             <span className="text-xs text-muted-dim font-sans font-medium">Document Safety & Submission Readiness</span>
           </div>
@@ -101,8 +102,8 @@ export default function ProductsPage() {
       <section className="section section-rule bg-surface/20">
         <div className="site-container py-12 sm:py-16">
           <div className="flex items-center gap-3 mb-6">
-            <span className="dsp-pill text-brand-violet border-brand-violet/30 font-mono text-[10px] font-bold uppercase tracking-wider">
-              FAMILY 02 // AUDIO INTELLIGENCE
+            <span className="dsp-pill text-brand-violet-text border-brand-violet/30 font-mono text-[10px] font-bold uppercase tracking-wider">
+              Family 2 - Audio
             </span>
             <span className="text-xs text-muted-dim font-sans font-medium">Sample Discovery & Mix Understanding</span>
           </div>
@@ -136,9 +137,9 @@ export default function ProductsPage() {
             <div className="surface-card depth-hover p-8 rounded-lg border border-brand-violet/30 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border border-brand-violet/40 text-brand-violet">
+                  <span className="status-chip text-[9px] uppercase font-mono tracking-wider px-2 py-0.5 rounded border border-brand-violet/40 text-brand-violet-text">
                     <StatusDot tone="warning" />
-                    In Development / Concept
+                    Closed Beta
                   </span>
                   <span className="text-[10px] font-mono text-muted-dim">AI AUDIO ASSISTANT</span>
                 </div>
@@ -164,7 +165,7 @@ export default function ProductsPage() {
         <div className="site-container py-12 sm:py-16">
           <div className="flex items-center gap-3 mb-6">
             <span className="dsp-pill text-muted-dim border-border-strong font-mono text-[10px] font-bold uppercase tracking-wider">
-              FAMILY 03 // INTERNAL SYSTEMS
+              Family 3 - Internal
             </span>
             <span className="text-xs text-muted-dim font-sans font-medium">Orchestration & Operational Infrastructure</span>
           </div>
@@ -216,7 +217,7 @@ export default function ProductsPage() {
             </Reveal>
             <Reveal delayMs={90}>
               <div className="mb-4">
-                <span className="text-[10px] font-mono font-bold text-brand-violet uppercase block mb-1">AUDIO INTELLIGENCE</span>
+                <span className="text-[10px] font-mono font-bold text-brand-violet-text uppercase block mb-1">AUDIO INTELLIGENCE</span>
                 <h3 className="text-lg font-semibold text-foreground">KENN, mix review, explained</h3>
                 <p className="text-xs text-muted mt-1 max-w-md font-sans">
                   An AI audio engineering assistant concept: analyse a mix, understand the acoustic reasoning, make better creative decisions.

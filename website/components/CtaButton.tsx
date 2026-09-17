@@ -4,10 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Magnetic } from "@/components/motion/Magnetic";
-import { CHECKOUT_LIVE } from "@/lib/commerce-config";
+import { CHECKOUT_LIVE, PADDLE_ENV } from "@/lib/commerce-config";
 import { setBuyIntent, startCheckout } from "@/lib/checkout";
-
-const PADDLE_ENV = process.env.NEXT_PUBLIC_PADDLE_ENV;
 
 /**
  * Single CTA state machine for every commercial surface (see

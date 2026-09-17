@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { CtaButton } from "@/components/CtaButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { StatusDot } from "@/components/motion/StatusDot";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Thursday: The NITE DSP Intelligence Layer",
-  description:
-    "Thursday is the internal intelligence layer coordinating workflows and specialised agents across NITE DSP products. Infrastructure, not a chatbot.",
-  alternates: { canonical: "/thursday" },
-};
+  description: "Thursday is the internal intelligence layer coordinating workflows and specialised agents across NITE DSP products. Infrastructure, not a chatbot.",
+  path: "/thursday",
+});
 
 const PILLARS = [
   {

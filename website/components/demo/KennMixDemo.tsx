@@ -93,7 +93,7 @@ export function KennMixDemo() {
         {/* SVG Multi-Band Frequency Spectrum Visualizer */}
         <div className="dsp-lcd-box p-4 rounded-lg flex flex-col gap-2">
           <div className="flex items-center justify-between text-[10px] font-mono text-muted-dim">
-            <span className="font-bold text-brand-violet">FREQUENCY RESPONSE CURVE</span>
+            <span className="font-bold text-brand-violet-text">FREQUENCY RESPONSE CURVE</span>
             <span className="tnum">20 Hz, 20 kHz</span>
           </div>
 
@@ -184,7 +184,7 @@ export function KennMixDemo() {
         {ready && (
           <div className="dsp-rack-panel p-4 rounded-lg flex flex-col gap-2.5 border-brand-violet/40">
             <div className="flex items-center justify-between border-b border-border/40 pb-2">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-violet">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-brand-violet-text">
                 EVIDENCE-BASED MIX OBSERVATION
               </span>
               <span className="text-[10px] font-mono text-muted-dim">EXPLAINABLE ADVICE</span>
@@ -200,7 +200,7 @@ export function KennMixDemo() {
                 <span className="text-muted block mt-0.5 leading-relaxed">{activeDim.whyItMatters}</span>
               </div>
               <div className="p-2.5 dsp-lcd-box rounded border-brand-violet/30">
-                <span className="text-[9px] font-mono text-brand-violet font-bold uppercase block">EXPLAINABLE SUGGESTION</span>
+                <span className="text-[9px] font-mono text-brand-violet-text font-bold uppercase block">EXPLAINABLE SUGGESTION</span>
                 <span className="text-brand-blue-bright font-semibold block mt-0.5">{activeDim.suggestion}</span>
               </div>
             </div>

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LearnLayout, LearnH2 } from "@/lib/learn";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Ableton Integration (Experimental)",
   description: "How SLO's experimental Ableton Live tag integration works.",
-  alternates: { canonical: "/learn/smart-sample-manager/ableton-integration" },
-};
+  path: "/learn/smart-sample-manager/ableton-integration",
+});
 
 export default function AbletonIntegrationPage() {
   return (

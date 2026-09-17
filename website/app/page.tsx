@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
 import { CtaButton } from "@/components/CtaButton";
@@ -9,38 +10,61 @@ import { Reveal } from "@/components/motion/Reveal";
 import { StatusDot } from "@/components/motion/StatusDot";
 import { TiltSurface } from "@/components/motion/TiltSurface";
 import { WorkflowFlow } from "@/components/motion/WorkflowFlow";
+import { WaitlistCounter } from "@/components/WaitlistForm";
+
+// The homepage previously inherited the layout default ("NITE DSP", no
+// canonical), which it shared verbatim with every page that lacked its own
+// metadata. `absolute` keeps the brand first here rather than running it
+// through the "%s | NITE DSP" template.
+export const metadata: Metadata = {
+  title: { absolute: "NITE DSP | Intelligent tools for creative workflows" },
+  description:
+    "NITE DSP builds local-first macOS tools for producers and students: Submit for document preparation, SLO for acoustic sample search, and KENN for mix review.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "NITE DSP | Intelligent tools for creative workflows",
+    description:
+      "Local-first macOS tools for producers and students: Submit, SLO, and KENN.",
+    url: "/",
+    siteName: "NITE DSP",
+    type: "website",
+  },
+};
 
 const ECOSYSTEM = [
   {
     name: "Submit",
-    family: "WORKFLOW INTELLIGENCE",
+    family: "Family 1 - General",
     line: "Prepare the right submission.",
     body: "Local macOS document-preparation assistant. Drop in a file, review detected fields, and save a safe copy. Local check, zero uploads.",
     href: "/products/submit",
-    status: "Private Beta",
+    status: "Waitlist Open",
     tone: "success" as const,
+    waitlistId: "submit",
   },
   {
     name: "SLO",
-    family: "AUDIO INTELLIGENCE",
+    family: "Family 2 - Audio",
     line: "Find sounds by how they sound.",
-    body: "Search your sample library by acoustic timbre rather than cryptic folder names. Audition matches and drag straight to DAW.",
+    body: "Search your sample library by acoustic timbre rather than cryptic folder names. Audition matches and drag straight to your DAW. First 50 beta spots are open now.",
     href: "/products/smart-sample-manager",
-    status: "Private Beta / Research",
-    tone: "warning" as const,
+    status: "Waitlist Open",
+    tone: "success" as const,
+    waitlistId: "smart-sample-manager",
   },
   {
     name: "KENN",
-    family: "AUDIO INTELLIGENCE",
-    line: "Understand the mix.",
-    body: "Explainable mix review assistant. Observes acoustic dimensions, explains reasoning, and suggests tweaks. Every decision stays yours.",
+    family: "Family 2 - Audio",
+    line: "Your AI audio assistant for Ableton.",
+    body: "Lives inside Ableton Live. Listens to your mix, explains what it hears, and helps you make better decisions. Closed beta, not for sale yet.",
     href: "/products/kenn",
-    status: "In Development",
+    status: "Closed Beta",
     tone: "warning" as const,
+    waitlistId: "kenn",
   },
   {
     name: "Thursday",
-    family: "INTERNAL SYSTEMS",
+    family: "Family 3 - Internal",
     line: "Operational infrastructure.",
     body: "Internal operational layer coordinating workflows across NITE DSP tools. Internal infrastructure, not a public commercial chatbot.",
     href: "/thursday",
@@ -143,6 +167,11 @@ export default function HomePage() {
                     {p.line}
                   </p>
                   <p className="mt-3 text-xs leading-relaxed text-muted font-sans">{p.body}</p>
+                  {"waitlistId" in p && p.waitlistId && (
+                    <div className="mt-3">
+                      <WaitlistCounter productId={p.waitlistId} />
+                    </div>
+                  )}
                   <span className="text-link mt-auto pt-4 text-xs font-sans">Learn more <span aria-hidden="true">&rarr;</span></span>
                 </Link>
               </Reveal>
@@ -219,11 +248,11 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-col gap-4 border-l-2 border-brand-violet pl-5">
               <div>
-                <h4 className="font-semibold text-foreground text-sm">Acoustic feature extraction</h4>
+                <h3 className="font-semibold text-foreground text-sm">Acoustic feature extraction</h3>
                 <p className="text-xs text-muted mt-1">We measure spectral centroid, transient rise time, and tonal stability directly from the raw waveform.</p>
               </div>
               <div>
-                <h4 className="font-semibold text-foreground text-sm">100% Local Inference</h4>
+                <h3 className="font-semibold text-foreground text-sm">100% Local Inference</h3>
                 <p className="text-xs text-muted mt-1">Signal analysis and similarity calculations run entirely on your machine. Your audio never leaves.</p>
               </div>
             </div>
@@ -278,11 +307,14 @@ export default function HomePage() {
           <div>
             <span className="eyebrow">Get Started</span>
             <h2 className="section-title mt-4 text-foreground">Find the sound. Finish the track.</h2>
+            <p className="mt-2 text-sm text-muted">Both waitlists are open. First 50 spots each.</p>
           </div>
           <div className="flex flex-wrap gap-3 relative z-10">
-            <CtaButton state="BETA_REQUEST" />
-            <Link href="/pricing" className="btn-secondary">
-              View pricing
+            <Link href="/products/submit#join-waitlist" className="btn-primary">
+              Join Submit waitlist
+            </Link>
+            <Link href="/products/smart-sample-manager#join-waitlist" className="btn-secondary">
+              Join SLO waitlist
             </Link>
           </div>
         </div>
