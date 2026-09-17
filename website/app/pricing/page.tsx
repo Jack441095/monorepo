@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { CtaButton } from "@/components/CtaButton";
-import { CHECKOUT_LIVE } from "@/lib/commerce-config";
+import { CHECKOUT_LIVE, PUBLIC_CHECKOUT_LIVE, PADDLE_ENV } from "@/lib/commerce-config";
 import { PaddleCheckoutOverlay } from "./PaddleCheckoutOverlay";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Pricing",
   description: "NITE Submit beta and planned perpetual pricing.",
-  alternates: { canonical: "/pricing" },
-};
+  path: "/pricing",
+});
 
 export default function PricingPage() {
   return (
@@ -19,7 +20,9 @@ export default function PricingPage() {
           <span className="eyebrow">Pricing</span>
           <h1 className="section-title mt-4 text-foreground">One price. Yours to keep.</h1>
           <p className="body-large mt-6">
-            NITE Submit is currently in a free closed beta. The first paid experiment will be a simple £3 perpetual licence with no subscription.
+            {PUBLIC_CHECKOUT_LIVE
+              ? "NITE Submit is available as a £3 perpetual licence with no subscription."
+              : "NITE Submit is currently in a free closed beta. The first paid experiment will be a simple £3 perpetual licence with no subscription."}
           </p>
         </div>
       </section>
@@ -44,10 +47,10 @@ export default function PricingPage() {
               <tbody style={{ color: "var(--muted)" }}>
                 {[
                   ["Purpose", "Prepare the right submission", "Find the right sound", "Understand the mix"],
-                  ["Status", "Closed Beta, free", "Private Beta / Research", "In development"],
+                  ["Status", PUBLIC_CHECKOUT_LIVE ? "Available for macOS" : "Closed Beta, free", "Private Beta / Research", "In development"],
                   ["Local processing", "Documents never leave your Mac", "Audio analysis runs on your machine", "Planned: local analysis"],
                   ["Account required", "No", "Activation check-in only", "—"],
-                  ["Price model", "£3 perpetual planned · no subscription", "Pricing announced at launch", "Pricing announced at launch"],
+                  ["Price model", PUBLIC_CHECKOUT_LIVE ? "£3 perpetual · no subscription" : "£3 perpetual planned · no subscription", "Pricing announced at launch", "Pricing announced at launch"],
                 ].map(([label, ...cells]) => (
                   <tr key={label} style={{ borderTop: "1px solid var(--border)" }}>
                     <th scope="row" className="py-4 pr-4 text-left text-xs font-semibold text-foreground">{label}</th>
@@ -75,8 +78,8 @@ export default function PricingPage() {
             <span className="eyebrow">License Terms</span>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">What is included.</h2>
             <ul className="feature-list mt-7">
-              <li>Free invitation-only closed beta</li>
-              <li>Planned £3 perpetual licence experiment</li>
+              <li>{PUBLIC_CHECKOUT_LIVE ? "£3 perpetual single-user licence" : "Free invitation-only closed beta"}</li>
+              <li>{PUBLIC_CHECKOUT_LIVE ? "No recurring subscription" : "Planned £3 perpetual licence experiment"}</li>
               <li>macOS 13+ Apple Silicon application</li>
               <li>No recurring subscription for V1</li>
               <li>Local PDF processing with no document upload</li>
@@ -95,16 +98,17 @@ export default function PricingPage() {
               {/* Planned paid experiment */}
               <div className="border-b pb-5" style={{ borderColor: "var(--border)" }}>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-sm font-semibold text-foreground">Perpetual Licence, planned</span>
+                  <span className="text-sm font-semibold text-foreground">Perpetual Licence{PUBLIC_CHECKOUT_LIVE ? "" : " (planned)"}</span>
                   <span className="text-2xl font-bold text-foreground tnum">£3</span>
                 </div>
                 <p className="mt-1 text-xs text-muted leading-relaxed">
-                  A low-friction paid experiment after the free closed beta. Final availability follows validation, signing, and legal gates.
+                  {PUBLIC_CHECKOUT_LIVE
+                    ? "One payment for the current macOS release. No recurring subscription."
+                    : "A low-friction paid experiment after the free closed beta. Final availability follows validation, signing, and legal gates."}
                 </p>
               </div>
 
-              {/* Current beta */}
-              <div className="pb-2">
+              {!PUBLIC_CHECKOUT_LIVE && <div className="pb-2">
                 <div className="flex justify-between items-baseline">
                   <span className="text-sm font-semibold text-foreground">Closed Beta</span>
                   <span className="text-2xl font-bold text-foreground tnum">Free</span>
@@ -112,7 +116,7 @@ export default function PricingPage() {
                 <p className="mt-1 text-xs text-muted leading-relaxed">
                   Invitation-only while real-document review, notarised distribution, and support workflows are completed.
                 </p>
-              </div>
+              </div>}
             </div>
             
             <div className="mt-8 flex flex-wrap gap-3">
@@ -130,8 +134,10 @@ export default function PricingPage() {
             </p>
             
             <p className="mt-6 text-xs text-muted-dim">
-              {CHECKOUT_LIVE
-                ? "Sandbox checkout is enabled for authorised integration testing only; this is not a public launch."
+              {PUBLIC_CHECKOUT_LIVE
+                ? "Secure checkout is processed by Paddle. Your download appears in your account after payment confirmation."
+                : CHECKOUT_LIVE && PADDLE_ENV === "sandbox"
+                  ? "Sandbox checkout is enabled for authorised integration testing only; this is not a public launch."
                 : "Checkout is not open yet. Join the beta or contact support when the paid experiment is announced."}
             </p>
           </div>

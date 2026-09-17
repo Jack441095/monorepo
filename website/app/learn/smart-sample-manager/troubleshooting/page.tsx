@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LearnLayout } from "@/lib/learn";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Troubleshooting",
   description: "Fixes for common SLO problems.",
-  alternates: { canonical: "/learn/smart-sample-manager/troubleshooting" },
-};
+  path: "/learn/smart-sample-manager/troubleshooting",
+});
 
 const ITEMS = [
   {

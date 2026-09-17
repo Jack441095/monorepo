@@ -10,12 +10,15 @@ const NAV_LINKS = [
   { href: "/learn", label: "Learn" },
   { href: "/pricing", label: "Pricing" },
   { href: "/support", label: "Support" },
+  { href: "/about", label: "About" },
+  { href: "/services", label: "Services" },
 ];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<Array<HTMLAnchorElement | null>>([]);
   const [indicator, setIndicator] = useState({ x: 0, w: 0, ready: false });
@@ -38,6 +41,19 @@ export function SiteHeader() {
     setIndicator({ x: linkLeft, w: link.offsetWidth, ready: true });
   }, [pathname]);
 
+  // Escape closes the mobile menu and hands focus back to the toggle, so a
+  // keyboard user is never stranded inside an open menu (WCAG 2.1.2).
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      menuButtonRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   useEffect(() => {
     // Defer to rAF: keeps the effect body free of synchronous state updates
     // and lets the first paint land before the indicator positions itself.
@@ -57,7 +73,7 @@ export function SiteHeader() {
   return (
     <header
       className="border-b sticky top-0 z-40"
-      style={{ borderColor: "var(--border)", backgroundColor: "rgba(7, 10, 18, 0.75)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+      style={{ borderColor: "var(--border)", backgroundColor: "color-mix(in srgb, var(--background) 75%, transparent)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
     >
       <nav
         className="mx-auto flex items-center justify-between px-6 py-4"
@@ -102,10 +118,18 @@ export function SiteHeader() {
           />
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/account" className="hidden sm:inline-flex btn-secondary">
-            Account
-          </Link>
+          {/* The hide-below-sm has to live on a wrapper, not on the Link:
+              .btn-secondary sets `display` from unlayered CSS, which outranks
+              Tailwind's layered `hidden` utility, so `hidden sm:inline-flex`
+              on the Link itself left the Account button showing on phones
+              next to the hamburger (and again inside the open menu). */}
+          <span className="hidden sm:flex">
+            <Link href="/account" className="btn-secondary">
+              Account
+            </Link>
+          </span>
           <button
+            ref={menuButtonRef}
             type="button"
             className="sm:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border"
             style={{ borderColor: "var(--border-strong)" }}

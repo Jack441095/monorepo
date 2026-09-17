@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>NITE Submit Software Releases</title>
+    <link>https://www.nitedsp.co.uk/submit/appcast.xml</link>
+    <description>Official update notices for NITE Submit on macOS.</description>
+    <language>en</language>
+    <item>
+      <title>NITE Submit 1.0.0</title>
+      <sparkle:releaseNotesLink>https://www.nitedsp.co.uk/products/submit</sparkle:releaseNotesLink>
+      <pubDate>Sun, 06 Sep 2026 12:00:00 +0000</pubDate>
+      <enclosure url="https://www.nitedsp.co.uk/download"
+                 sparkle:version="1.0.0"
+                 type="text/html" />
+      <description>NITE Submit 1.0.0 release information. Sign in to the secure download page for the latest entitled build.</description>
+    </item>
+  </channel>
+</rss>

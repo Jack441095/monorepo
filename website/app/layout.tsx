@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -42,6 +42,14 @@ export const metadata: Metadata = {
   },
 };
 
+// themeColor belongs on the viewport export, not metadata (deprecated there
+// since Next 14). Matches the Palette C --background the site ships with, so
+// mobile browser chrome blends into the page instead of defaulting to white.
+export const viewport: Viewport = {
+  themeColor: "#090B10",
+  colorScheme: "dark",
+};
+
 const ORGANIZATION_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -66,6 +74,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
+        />
+        {/* Plausible Analytics: privacy-friendly, no cookies, no banner needed */}
+        <script
+          defer
+          data-domain="nitedsp.co.uk"
+          src="https://plausible.io/js/script.js"
         />
         {/* Marks JS availability before first paint so scroll-reveal hidden
             states only ever apply when they can actually be removed. */}

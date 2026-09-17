@@ -20,12 +20,13 @@ import { SloMapDemo } from "@/components/demo/SloMapDemo";
    CTA appears anywhere on this page, even for Submit and SLO which are real
    commercial products elsewhere on this site.
 
-   No password gate yet, that's a separate follow-up phase (audit §10,
-   Phase 5). Until then this page is unlisted-but-reachable by anyone with
-   the URL. */
+   Phase 5 added the access gate this comment used to say was still
+   outstanding: proxy.ts puts the route behind HTTP Basic Auth on a single
+   shared password (PORTFOLIO_PASSWORD), and fails closed when it is
+   unset. */
 
 export const metadata: Metadata = {
-  title: "Jack Gandy | NITE DSP",
+  title: { absolute: "Jack Gandy | NITE DSP" },
   description:
     "Portfolio of work behind NITE DSP: a native macOS product in private beta, a JUCE ML plugin, an AI mix-review system with a self-auditing evaluation harness, and the commercial infrastructure behind all of it.",
   robots: { index: false, follow: false },
@@ -247,7 +248,7 @@ export default function PortfolioPage() {
             {EVIDENCE_STRIP.map((s) => (
               <div key={s.label}>
                 <div className="font-mono tnum text-2xl sm:text-3xl font-semibold text-foreground">{s.value}</div>
-                <div className="mt-1 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted-dim)" }}>
+                <div className="mt-1 text-[11px] uppercase tracking-wide break-words" style={{ color: "var(--muted-dim)" }}>
                   {s.label}
                 </div>
               </div>
@@ -439,6 +440,11 @@ export default function PortfolioPage() {
                         <span>NITEDSP.CO.UK // PRODUCTION BUILD</span>
                         <span>DESKTOP VIEWPORT</span>
                       </div>
+                      {/* unoptimized on purpose: /portfolio/* sits behind the
+                          Basic-Auth proxy, and Next's image optimizer refetches
+                          the source server-side without the visitor's
+                          credentials -- it got a 401 and served a 400, so this
+                          image never rendered at all. */}
                       <div className="relative w-full overflow-hidden" style={{ maxHeight: "22rem" }}>
                         <Image
                           src="/portfolio/website-home-1440.jpg"
@@ -447,6 +453,7 @@ export default function PortfolioPage() {
                           height={5071}
                           className="w-full h-auto block"
                           style={{ objectFit: "cover", objectPosition: "top" }}
+                          unoptimized
                         />
                       </div>
                     </div>
@@ -512,11 +519,13 @@ export default function PortfolioPage() {
                             width={1599}
                             height={1057}
                             className="w-full h-auto block"
+                            sizes="(max-width: 1024px) 100vw, 560px"
                           />
                         </div>
                         <p className="mt-2 text-[11px]" style={{ color: "var(--muted-dim)" }}>
-                          Early build, pre-population, this is the only screenshot in the repo, and it
-                          shows zero scanned samples. A populated re-capture is a pending TODO.
+                          Early build, captured before population: this is the only screenshot in
+                          the repo, and it shows the browser in its empty, pre-scan state rather
+                          than a full library.
                         </p>
                       </div>
                     )}
@@ -539,7 +548,14 @@ export default function PortfolioPage() {
                                   {t.kind} · {t.bars} bars · {t.createdAt}
                                 </span>
                               </div>
-                              <audio controls preload="none" src={t.src} className="mt-2 w-full" style={{ height: "2rem" }} />
+                              <audio
+                                controls
+                                preload="none"
+                                src={t.src}
+                                aria-label={`${t.title}, ${t.kind}, ${t.bars} bars`}
+                                className="mt-2 w-full"
+                                style={{ height: "2rem" }}
+                              />
                             </div>
                           ))}
                         </div>

@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
-import { CtaButton } from "@/components/CtaButton";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
+import { WaitlistForm } from "@/components/WaitlistForm";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "NITE Submit: Document Prep Intelligence",
   description: "The safest way to verify and prepare files before submission. Fully local document validation for macOS.",
-  alternates: { canonical: "/products/submit" },
-};
+  path: "/products/submit",
+});
 
 const FEATURES = [
   {
     title: "Metadata & Naming Check",
-    body: "Ensure your file conforms precisely to department naming conventions, project patterns, and required templates before submitting.",
+    body: "Apply the naming pattern supplied by your department, review every detected field, and prepare a safe copy before submitting.",
   },
   {
     title: "7z, ZIP & TAR Batch Packaging",
@@ -25,7 +26,7 @@ const FEATURES = [
   },
   {
     title: "Zero-Upload Validation",
-    body: "Files are processed entirely in memory on your Mac. No document contents are uploaded, maintaining complete intellectual privacy.",
+    body: "Files are processed locally on your Mac. Document contents are not uploaded; only an optional user-initiated update check uses the network.",
   },
 ];
 
@@ -43,7 +44,9 @@ export default function SubmitProductPage() {
             The safest way to prepare important files before submission. Drop in a document, review structural metadata, correct errors, and save a clean copy. Fully offline, local-first, and optimized for macOS.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <CtaButton state="BETA_REQUEST" />
+            <Link href="#join-waitlist" className="btn-primary">
+              Join the waitlist
+            </Link>
             <Link href="/pricing" className="btn-secondary">
               View pricing
             </Link>
@@ -98,6 +101,37 @@ export default function SubmitProductPage() {
                 <p className="mt-3 text-xs leading-relaxed text-muted">{f.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Waitlist */}
+      <section id="join-waitlist" className="section section-rule">
+        <div className="site-container">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
+            <div>
+              <span className="eyebrow text-brand-blue-bright">Private Beta</span>
+              <h2 className="section-title mt-4 text-foreground">Join the first 50.</h2>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                Submit is opening to a small group of professionals to shape the product before wider release.
+                Claim your spot and you&apos;ll be the first to get access when the beta opens.
+              </p>
+              <ul className="mt-6 space-y-3 text-sm text-muted">
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-blue-bright font-bold">01</span>
+                  <span>Join the waitlist. Your place is held</span>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-blue-bright font-bold">02</span>
+                  <span>We&apos;ll email you when your beta access is ready</span>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <span className="text-brand-blue-bright font-bold">03</span>
+                  <span>Test Submit with your own documents and shape what ships</span>
+                </li>
+              </ul>
+            </div>
+            <WaitlistForm productId="submit" capacity={50} />
           </div>
         </div>
       </section>

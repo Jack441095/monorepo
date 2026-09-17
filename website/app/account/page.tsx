@@ -181,7 +181,7 @@ function EntitlementCard({ entitlement }: { entitlement: Entitlement }) {
 
               {state === "error" && (
                 <div className="mt-3 p-2.5 rounded bg-surface-raised border border-border text-xs text-muted font-mono" role="status">
-                  <span className="text-state-warning font-bold">STATUS // UNPUBLISHED</span> &mdash; No {option.label} release is published for this channel yet. Check back soon.
+                  <span className="text-state-warning font-bold">STATUS // UNPUBLISHED</span> No {option.label} release is published for this channel yet. Check back soon.
                 </div>
               )}
 
@@ -228,6 +228,11 @@ function AccountPageInner() {
         if (!res.ok) return null;
         return res.json();
       })
+      // An unreachable or erroring API must land on the signed-out view, not
+      // an uncaught rejection: without this a network failure threw
+      // "TypeError: Failed to fetch" into the console and left the page
+      // stuck on its loading state.
+      .catch(() => null)
       .then((data) => setUser(data))
       .finally(() => setLoading(false));
   }, []);
@@ -236,6 +241,7 @@ function AccountPageInner() {
     if (!user) return;
     apiFetch("/auth/entitlements")
       .then((res) => (res.ok ? res.json() : []))
+      .catch(() => [])
       .then(setEntitlements);
   }, [user]);
 
@@ -303,7 +309,7 @@ function AccountPageInner() {
           </p>
           {linkSent ? (
             <p className="mt-6 text-sm text-brand-blue-bright font-mono" role="status">
-              Check your email &mdash; a sign-in link has been sent.
+              Check your email. A sign-in link has been sent.
             </p>
           ) : (
             <form onSubmit={requestLink} className="mt-6 flex flex-col gap-3">

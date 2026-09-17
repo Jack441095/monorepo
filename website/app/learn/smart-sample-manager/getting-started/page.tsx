@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LearnLayout, LearnH2 } from "@/lib/learn";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Getting Started",
   description: "Install SLO, activate it, and index your first sample library.",
-  alternates: { canonical: "/learn/smart-sample-manager/getting-started" },
-};
+  path: "/learn/smart-sample-manager/getting-started",
+});
 
 export default function GettingStartedPage() {
   return (

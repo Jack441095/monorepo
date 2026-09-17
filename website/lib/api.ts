@@ -3,7 +3,7 @@
 // deployment fails loudly (obviously-broken links) rather than silently
 // pointing at a guessed production domain that isn't owned yet.
 export const API_URL =
-  process.env.NEXT_PUBLIC_NITE_DSP_API_URL ?? "http://localhost:8420";
+  process.env.NEXT_PUBLIC_NITE_DSP_API_URL ?? "/api";
 
 export async function apiFetch(path: string, init?: RequestInit) {
   return fetch(`${API_URL}${path}`, {

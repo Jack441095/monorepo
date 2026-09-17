@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Technology & DSP Architecture",
   description: "Acoustic signal processing, local dimension reduction, and vectorised search engines by NITE DSP.",
-  alternates: { canonical: "/technology" },
-};
+  path: "/technology",
+});
 
 const PIPELINE_STEPS = [
   {

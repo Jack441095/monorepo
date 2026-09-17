@@ -14,13 +14,16 @@ type SampleNode = {
   similarCount: number;
 };
 
+/* Scatter positions are illustrative, but they are also touch targets: at
+   mobile width the map is ~308x224, so coordinates this close translate to
+   overlapping hit areas. Keep any pair at least ~8% apart on one axis. */
 const SAMPLE_NODES: SampleNode[] = [
   { id: "1", name: "Analog_Kick_808.wav", category: "Kick", x: 22, y: 78, frequency: "54.2 Hz", centroid: "120 Hz", similarCount: 14 },
-  { id: "2", name: "Sub_Drop_Clean.wav", category: "Kick", x: 18, y: 84, frequency: "42.0 Hz", centroid: "95 Hz", similarCount: 9 },
+  { id: "2", name: "Sub_Drop_Clean.wav", category: "Kick", x: 15, y: 87, frequency: "42.0 Hz", centroid: "95 Hz", similarCount: 9 },
   { id: "3", name: "Snare_Tight_707.wav", category: "Snare", x: 74, y: 35, frequency: "240.5 Hz", centroid: "2.4 kHz", similarCount: 18 },
   { id: "4", name: "Clap_Layer_Wide.wav", category: "Snare", x: 82, y: 28, frequency: "310.0 Hz", centroid: "3.1 kHz", similarCount: 12 },
-  { id: "5", name: "Hat_Closed_Crisp.wav", category: "Hi-Hat", x: 88, y: 75, frequency: "8.4 kHz", centroid: "10.2 kHz", similarCount: 22 },
-  { id: "6", name: "Hat_Open_Bright.wav", category: "Hi-Hat", x: 92, y: 82, frequency: "7.8 kHz", centroid: "9.5 kHz", similarCount: 15 },
+  { id: "5", name: "Hat_Closed_Crisp.wav", category: "Hi-Hat", x: 86, y: 73, frequency: "8.4 kHz", centroid: "10.2 kHz", similarCount: 22 },
+  { id: "6", name: "Hat_Open_Bright.wav", category: "Hi-Hat", x: 93, y: 86, frequency: "7.8 kHz", centroid: "9.5 kHz", similarCount: 15 },
   { id: "7", name: "FM_Bass_Stab.wav", category: "Synth", x: 38, y: 52, frequency: "110.0 Hz", centroid: "850 Hz", similarCount: 11 },
   { id: "8", name: "Pluck_Warm_C3.wav", category: "Synth", x: 45, y: 40, frequency: "261.6 Hz", centroid: "1.2 kHz", similarCount: 16 },
   { id: "9", name: "Vocal_Chop_Air.wav", category: "FX", x: 62, y: 65, frequency: "440.0 Hz", centroid: "4.5 kHz", similarCount: 8 },
@@ -83,17 +86,20 @@ export function SloMapDemo() {
           {SAMPLE_NODES.map((node) => {
             const isSelected = selectedNode.id === node.id;
             return (
+              /* w-7 h-7 gives each dot an invisible 28px hit area: the dot
+                 itself is only 10-14px, well under the 24x24 WCAG 2.2 AA
+                 2.5.8 minimum. */
               <button
                 key={node.id}
                 type="button"
                 onClick={() => setSelectedNode(node)}
                 aria-label={`Select sample ${node.name}`}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 group focus:outline-none"
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 group focus:outline-none w-7 h-7 flex items-center justify-center"
                 style={{ left: `${node.x}%`, top: `${node.y}%` }}
               >
                 {/* Halo for selected node */}
                 {isSelected && (
-                  <span className="absolute inset-0 rounded-full animate-ping bg-[#F0A23A]/40 w-6 h-6 -left-1.5 -top-1.5" />
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full animate-ping bg-[#F0A23A]/40 w-6 h-6" />
                 )}
                 
                 {/* Node Dot */}

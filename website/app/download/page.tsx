@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { DownloadRouter } from "@/components/DownloadRouter";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Download",
   description: "Download your NITE DSP software. Sign in to reach your licences and builds.",
-  alternates: { canonical: "/download" },
-};
+  path: "/download",
+});
 
 export default function DownloadPage() {
   return (

@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LegalPage } from "@/lib/legal";
+
+export const metadata: Metadata = pageMetadata({
+  title: "End User License Agreement",
+  description:
+    "Licence terms for NITE DSP software: what a perpetual licence grants, device limits, and restrictions.",
+  path: "/eula",
+});
 
 export default function EulaPage() {
   return (

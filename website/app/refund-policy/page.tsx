@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LegalPage } from "@/lib/legal";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Refund Policy",
+  description:
+    "Refund terms for NITE DSP purchases, including the 14-day window and how refunds are processed.",
+  path: "/refund-policy",
+});
 
 export default function RefundPolicyPage() {
   return (

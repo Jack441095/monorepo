@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LearnLayout, LearnH2 } from "@/lib/learn";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Find Similar",
   description: "How Find Similar works in SLO, acoustic similarity, not text search.",
-  alternates: { canonical: "/learn/smart-sample-manager/find-similar" },
-};
+  path: "/learn/smart-sample-manager/find-similar",
+});
 
 export default function FindSimilarPage() {
   return (

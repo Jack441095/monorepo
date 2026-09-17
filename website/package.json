@@ -12,11 +12,13 @@
     "start": "next start",
     "lint": "eslint",
     "audit:copy": "node scripts/audit-copy.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:unit": "playwright test --config=playwright.unit.config.ts"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@paddle/paddle-js": "^1.6.4",
-    "next": "16.3.0",
+    "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
@@ -27,7 +29,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.0",
+    "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -33,7 +33,7 @@
   /* Typography */
   --foreground: #F5F7FB;
   --muted: #A7B0C0;
-  --muted-dim: #737D8F;
+  --muted-dim: #848E9F;
 
   /* Accent Color (Interactive CTA, Links, Focus) */
   --accent: #397BFF;
@@ -44,6 +44,13 @@
   /* Brand Accents */
   --brand-blue: #397BFF;
   --brand-blue-bright: #56A8FF;
+  /* CTA fill is a darker step of --brand-blue so 14px --foreground text on
+     it clears WCAG AA 4.5:1 (#397BFF only reached 3.59:1). Hue preserved. */
+  --cta-bg: #2563D6;
+  --cta-bg-hover: #2A66E0;
+  /* --brand-violet is an AA fail as small text (3.33:1); this lighter step
+     is the text-only variant. Borders/fills keep --brand-violet. */
+  --brand-violet-text: #9277F2;
   --brand-red: #F0445A;
   --brand-red-bright: #FF5C69;
   --brand-violet: #7148E8;
@@ -88,7 +95,7 @@
 
   --foreground: #F0F4F8;
   --muted: #9BB0C5;
-  --muted-dim: #6B8296;
+  --muted-dim: #7E93A6;
 
   --accent: #397BFF;
   --accent-bright: #56A8FF;
@@ -97,6 +104,13 @@
 
   --brand-blue: #397BFF;
   --brand-blue-bright: #56A8FF;
+  /* CTA fill is a darker step of --brand-blue so 14px --foreground text on
+     it clears WCAG AA 4.5:1 (#397BFF only reached 3.59:1). Hue preserved. */
+  --cta-bg: #2563D6;
+  --cta-bg-hover: #2A66E0;
+  /* --brand-violet is an AA fail as small text (3.33:1); this lighter step
+     is the text-only variant. Borders/fills keep --brand-violet. */
+  --brand-violet-text: #9277F2;
   --brand-red: #E03C50;
   --brand-red-bright: #F55367;
   --brand-violet: #6236E2;
@@ -133,7 +147,7 @@
 
   --foreground: #F5F7FB;
   --muted: #9098A6;
-  --muted-dim: #626975;
+  --muted-dim: #868E9B;
 
   --accent: #A7B0C0;
   --accent-bright: #F5F7FB;
@@ -142,6 +156,13 @@
 
   --brand-blue: #397BFF;
   --brand-blue-bright: #56A8FF;
+  /* CTA fill is a darker step of --brand-blue so 14px --foreground text on
+     it clears WCAG AA 4.5:1 (#397BFF only reached 3.59:1). Hue preserved. */
+  --cta-bg: #2563D6;
+  --cta-bg-hover: #2A66E0;
+  /* --brand-violet is an AA fail as small text (3.33:1); this lighter step
+     is the text-only variant. Borders/fills keep --brand-violet. */
+  --brand-violet-text: #9277F2;
   --brand-red: #F0445A;
   --brand-red-bright: #FF5C69;
   --brand-violet: #7148E8;
@@ -187,6 +208,14 @@
   --color-brand-red: var(--brand-red);
   --color-brand-red-bright: var(--brand-red-bright);
   --color-brand-violet: var(--brand-violet);
+  --color-brand-violet-text: var(--brand-violet-text);
+  /* brand-emerald and accent-ink were used by text-/border-/bg- utilities
+     across the Files + account surfaces but never mapped here, so those
+     classes silently emitted nothing: the text fell back to whatever it
+     inherited and the borders to the global * { border-color }. Mapped onto
+     the semantic tokens that already carry the intended colours. */
+  --color-brand-emerald: var(--state-success);
+  --color-accent-ink: var(--accent-ink);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -268,6 +297,7 @@ body {
 
 .hero-title {
   max-width: 14ch;
+  margin-inline: auto;
   font-size: clamp(2.8rem, 5.5vw, 5.8rem);
   font-weight: 600;
   letter-spacing: -.03em;
@@ -302,6 +332,34 @@ body {
   line-height: 1.65;
 }
 
+.prose-custom {
+  color: var(--muted);
+  font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+  line-height: 1.75;
+}
+.prose-custom h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: -0.01em;
+}
+.prose-custom p { margin-bottom: 1rem; }
+.prose-custom ul {
+  margin-bottom: 1rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.prose-custom li { margin-bottom: 0.5rem; }
+.prose-custom code {
+  font-size: 0.85em;
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  background: var(--surface);
+}
+.prose-custom strong { color: var(--foreground); }
+
 /* Tabular numerals — mandatory wherever figures align (prices, dates,
    license keys, counts). Frozen rule §10. */
 .tnum {
@@ -310,6 +368,7 @@ body {
 
 /* Premium Studio Hardware panels */
 .product-frame {
+  min-width: 0;
   overflow: hidden;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
@@ -319,6 +378,7 @@ body {
 
 .product-frame__bar {
   position: relative;
+  min-width: 0;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
@@ -360,6 +420,22 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  /* 2.5rem each side is 80px of padding on a 320px screen — enough on its
+     own to force horizontal scroll. The status LEDs move in to match. */
+  .product-frame__bar {
+    padding-inline: 1.25rem;
+  }
+
+  .product-frame__bar::before {
+    left: 0.5rem;
+  }
+
+  .product-frame__bar::after {
+    right: 0.5rem;
+  }
 }
 
 .product-frame__bar span:first-child::before {
@@ -605,53 +681,60 @@ body {
   background: var(--surface-hover);
 }
 
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--brand-blue);
-  color: var(--foreground);
-  border-radius: var(--radius-sm);
-  padding: 0.65rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: 1px solid transparent;
-  transition: background var(--motion-fast) var(--motion-easing), border-color var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
-  cursor: pointer;
-}
+/* In @layer components so Tailwind's utilities outrank these, the same
+   reason .eyebrow is layered above. Unlayered, `display`, `font-size` and
+   `padding` here beat every utility written beside them, so compact
+   variants like `btn-secondary text-[11px] px-3 py-1.5` on the demo
+   toolbars silently rendered at full size. */
+@layer components {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cta-bg);
+    color: var(--foreground);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: background var(--motion-fast) var(--motion-easing), border-color var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
+    cursor: pointer;
+  }
 
-.btn-primary:hover {
-  background: var(--brand-blue-bright);
-  transform: translateY(-1px);
-}
+  .btn-primary:hover {
+    background: var(--cta-bg-hover);
+    transform: translateY(-1px);
+  }
 
-.btn-primary:active {
-  transform: translateY(0);
-}
+  .btn-primary:active {
+    transform: translateY(0);
+  }
 
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-strong);
-  color: var(--foreground);
-  border-radius: var(--radius-sm);
-  padding: 0.65rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  background: transparent;
-  transition: border-color var(--motion-fast) var(--motion-easing), background var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
-  cursor: pointer;
-}
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-strong);
+    color: var(--foreground);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: transparent;
+    transition: border-color var(--motion-fast) var(--motion-easing), background var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
+    cursor: pointer;
+  }
 
-.btn-secondary:hover {
-  background: var(--surface-hover);
-  border-color: var(--brand-blue);
-  transform: translateY(-1px);
-}
+  .btn-secondary:hover {
+    background: var(--surface-hover);
+    border-color: var(--brand-blue);
+    transform: translateY(-1px);
+  }
 
-.btn-secondary:active {
-  transform: translateY(0);
+  .btn-secondary:active {
+    transform: translateY(0);
+  }
 }
 
 /* Warning/experimental callout — semantic attention state (gold/warning),
@@ -696,12 +779,19 @@ body {
   vertical-align: middle;
 }
 
-.eyebrow {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--brand-blue-bright);
+/* In @layer components so Tailwind's utilities outrank it. Unlayered, the
+   `color` here beat every `text-*` class written alongside it, so the five
+   eyebrows that name a product-family accent (emerald for Workflow
+   Intelligence, violet for Audio Intelligence, muted for Internal Systems)
+   all silently rendered in the default blue instead. */
+@layer components {
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-blue-bright);
+  }
 }
 
 .section {
@@ -1117,6 +1207,10 @@ body {
 /* --- Scroll reveal -------------------------------------------------------------
    Applied only when JS is present (html.js), so no-JS users always see all
    content. Short rise, no stagger chains. */
+.reveal {
+  min-width: 0;
+}
+
 html.js .reveal {
   opacity: 0;
   transform: translateY(14px);
