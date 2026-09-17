@@ -1,14 +1,10 @@
 "use client";
 
-// Stripe Payment Link with ?prefilled_amount=<pence> for one-click tier selection.
-// Replace STRIPE_PAYMENT_LINK with the URL from your Stripe dashboard
-// (Payment Links → your "pay what you like" link).
-const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_7sYbJ22OKbOofSt73d38400";
-
+// TODO: swap test_ URLs for live payment links before launch
 const TIERS = [
-  { label: "£1", pence: 100, subtitle: "Just because" },
-  { label: "£3", pence: 300, subtitle: "Fair trade" },
-  { label: "£10", pence: 1000, subtitle: "Thanks a lot" },
+  { label: "£1", subtitle: "Just because", url: "https://buy.stripe.com/test_7sY3cwgGFdAk6kN6X75sA04" },
+  { label: "£3", subtitle: "Fair trade",   url: "https://buy.stripe.com/test_cNiaEYdutbsc38B3KV5sA05" },
+  { label: "£10", subtitle: "Thanks a lot", url: "https://buy.stripe.com/test_28E00k1LL7bWbF7bdn5sA06" },
 ];
 
 export function ParaphraseDonate() {
@@ -16,8 +12,8 @@ export function ParaphraseDonate() {
     <div className="flex flex-wrap gap-3">
       {TIERS.map((tier) => (
         <a
-          key={tier.pence}
-          href={`${STRIPE_PAYMENT_LINK}?prefilled_amount=${tier.pence}`}
+          key={tier.label}
+          href={tier.url}
           target="_blank"
           rel="noopener noreferrer"
           className="flex flex-col items-center gap-0.5 rounded-md border border-border-strong/60 px-5 py-3 transition hover:border-brand-violet hover:bg-brand-violet/5 no-underline"
