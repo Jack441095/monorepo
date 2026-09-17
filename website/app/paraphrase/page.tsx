@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/seo";
 import { ParaphraseBox } from "@/components/ParaphraseBox";
+import { ParaphraseDonate } from "@/components/ParaphraseDonate";
 import { Reveal } from "@/components/motion/Reveal";
 
 export const metadata: Metadata = pageMetadata({
   title: "Paraphrase: Make AI text read natural",
   description:
-    "A free writing aid that rewrites pasted text so it reads like a person wrote it. Three voices, pay what you like, no account needed.",
+    "A free writing aid that rewrites pasted text so it reads like a person wrote it. Four voices, pay what you like, no account needed.",
   path: "/paraphrase",
 });
 
@@ -17,8 +18,8 @@ const HOW = [
     body: "The rewrite engine is held to a meaning-preservation tripwire: citations, numbers, names and claims must survive. If overlap drops, you're told, not silently changed.",
   },
   {
-    title: "Three voices",
-    body: "Essay, email or report. Each gets its own rewrite instructions. Formality and sentence rhythm differ, the meaning does not.",
+    title: "Four voices",
+    body: "Essay, email, report or casual. Each gets its own rewrite instructions. Formality and sentence rhythm differ, the meaning does not.",
   },
   {
     title: "Anonymous",
@@ -40,7 +41,7 @@ export default function ParaphrasePage() {
           <span className="eyebrow text-muted-dim">University Writing Aids</span>
           <h1 className="section-title mt-4 text-foreground">Make AI text read like you wrote it.</h1>
           <p className="text-sm font-mono text-muted-dim mt-1">
-            Essay &middot; Email &middot; Report
+            Essay &middot; Email &middot; Report &middot; Casual
           </p>
           <p className="body-large mt-6 font-sans">
             Paste the draft, pick a voice, and get a version that sounds natural instead of
@@ -89,6 +90,24 @@ export default function ParaphrasePage() {
                 <p>{body}</p>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section section-rule">
+        <div className="site-container">
+          <Reveal>
+            <div className="max-w-2xl">
+              <span className="eyebrow">Support the tool</span>
+              <h2 className="section-title mt-4">Pay what you like.</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                Free rewrites reset every day. If you use it regularly, throwing something
+                in keeps it running. Any amount, no account, one-time charge.
+              </p>
+            </div>
+          </Reveal>
+          <div className="mt-8">
+            <ParaphraseDonate />
           </div>
         </div>
       </section>
