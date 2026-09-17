@@ -1,10 +1,9 @@
 "use client";
 
-// TODO: swap test_ URLs for live payment links before launch
 const TIERS = [
-  { label: "£1", subtitle: "Just because", url: "https://buy.stripe.com/test_7sY3cwgGFdAk6kN6X75sA04" },
-  { label: "£3", subtitle: "Fair trade",   url: "https://buy.stripe.com/test_cNiaEYdutbsc38B3KV5sA05" },
-  { label: "£10", subtitle: "Thanks a lot", url: "https://buy.stripe.com/test_28E00k1LL7bWbF7bdn5sA06" },
+  { label: "£1", subtitle: "Just because", url: "https://buy.stripe.com/5kQcN6fCB0NyaB3epz5sA01" },
+  { label: "£3", subtitle: "Fair trade",   url: "https://buy.stripe.com/5kQeVefCBgMweRj3KV5sA02" },
+  { label: "£10", subtitle: "Thanks a lot", url: "https://buy.stripe.com/3cIbJ26212VGgZrepz5sA03" },
 ];
 
 export function ParaphraseDonate() {
