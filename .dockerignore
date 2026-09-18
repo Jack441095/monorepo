@@ -1,0 +1,33 @@
+# Only the backend directory is needed in the Docker build context
+# Excluding everything else cuts the context from 54 GB to ~30 MB
+
+# Large media / data directories
+products/
+Audio_Too/
+archive/
+audio-technology/
+autonomous-systems/
+client-work/
+research/
+testing-assets/
+validation/
+scripts/
+
+# Website (not deployed in this image)
+website/
+website/.next/
+website/node_modules/
+
+# Platform config (fly.toml etc — not needed in image)
+platform/
+
+# Shared / other
+shared/
+.git/
+*.DS_Store
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.mypy_cache/
+**/node_modules/
+**/.env
