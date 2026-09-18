@@ -1,3 +1,7 @@
+// Stripe direct payment links (created 2026-09-18 via API with product_id metadata)
+export const STRIPE_SLO_LINK = "https://buy.stripe.com/7sY3cwgGFdAk6kN6X75sA04";
+export const STRIPE_SUBMIT_LINK = "https://buy.stripe.com/cNiaEYdutbsc38B3KV5sA05";
+
 // Central commercial-maturity switch (docs/NITE_DSP_CONVERSION_COMMERCIAL_UX_V1.md §1).
 // Launch procedure: set NEXT_PUBLIC_CHECKOUT_LIVE=1 at build time once Paddle
 // prices are approved and the backend reports 200 from /commerce/checkout.

@@ -9,6 +9,7 @@ import { LightField } from "@/components/motion/LightField";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
 import { TiltSurface } from "@/components/motion/TiltSurface";
+import { STRIPE_SLO_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
   title: "SLO: Sample Library Optimiser",
@@ -87,8 +88,8 @@ export default function SmartSampleManagerPage() {
             Accepting the first 50 beta testers.
           </p>
           <div className="mt-6 flex flex-wrap gap-4">
-            <a href="#join-waitlist" className="btn-primary">
-              <Magnetic>Claim your spot</Magnetic>
+            <a href={STRIPE_SLO_LINK} className="btn-primary">
+              <Magnetic>Buy now — £9</Magnetic>
             </a>
             <Link href="/learn" className="btn-secondary">
               Read how it works

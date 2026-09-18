@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
-import { CtaButton } from "@/components/CtaButton";
-import { CHECKOUT_LIVE, PUBLIC_CHECKOUT_LIVE, PADDLE_ENV } from "@/lib/commerce-config";
-import { PaddleCheckoutOverlay } from "./PaddleCheckoutOverlay";
+import { PUBLIC_CHECKOUT_LIVE, STRIPE_SUBMIT_LINK, STRIPE_SLO_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
   title: "Pricing",
@@ -119,26 +117,29 @@ export default function PricingPage() {
               </div>}
             </div>
             
-            <div className="mt-8 flex flex-wrap gap-3">
-              {/* BUY_LIVE is fail-closed: without NEXT_PUBLIC_CHECKOUT_LIVE=1
-                  this remains the honest beta-request journey. */}
-              <CtaButton state="BUY_LIVE" />
-              <Link href="/learn" className="btn-secondary">
-                Read guides
-              </Link>
+            <div className="mt-8 flex flex-col gap-4">
+              <div>
+                <p className="text-xs font-semibold text-foreground mb-2">NITE Submit — £2</p>
+                <div className="flex flex-wrap gap-3">
+                  <a href={STRIPE_SUBMIT_LINK} className="btn-primary">Buy now — £2</a>
+                  <Link href="/products/submit" className="btn-secondary">Learn more</Link>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-foreground mb-2">SLO — £9</p>
+                <div className="flex flex-wrap gap-3">
+                  <a href={STRIPE_SLO_LINK} className="btn-primary">Buy now — £9</a>
+                  <Link href="/products/smart-sample-manager" className="btn-secondary">Learn more</Link>
+                </div>
+              </div>
             </div>
-            <PaddleCheckoutOverlay />
 
             <p className="mt-4 text-xs leading-relaxed text-muted-dim">
               NITE Submit is a local macOS app. It does not submit work for the user and cannot guarantee that generic presets match a department&apos;s rules.
             </p>
-            
+
             <p className="mt-6 text-xs text-muted-dim">
-              {PUBLIC_CHECKOUT_LIVE
-                ? "Secure checkout is processed by Paddle. Your download appears in your account after payment confirmation."
-                : CHECKOUT_LIVE && PADDLE_ENV === "sandbox"
-                  ? "Sandbox checkout is enabled for authorised integration testing only; this is not a public launch."
-                : "Checkout is not open yet. Join the beta or contact support when the paid experiment is announced."}
+              Secure checkout processed by Stripe. Your licence key is delivered by email after payment.
             </p>
           </div>
         </div>

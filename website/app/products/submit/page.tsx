@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { STRIPE_SUBMIT_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
   title: "NITE Submit: Document Prep Intelligence",
@@ -44,9 +45,9 @@ export default function SubmitProductPage() {
             The safest way to prepare important files before submission. Drop in a document, review structural metadata, correct errors, and save a clean copy. Fully offline, local-first, and optimized for macOS.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <Link href="#join-waitlist" className="btn-primary">
-              Join the waitlist
-            </Link>
+            <a href={STRIPE_SUBMIT_LINK} className="btn-primary">
+              Buy now — £2
+            </a>
             <Link href="/pricing" className="btn-secondary">
               View pricing
             </Link>
