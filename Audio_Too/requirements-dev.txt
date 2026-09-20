@@ -1,0 +1,7 @@
+# Dev-only tooling -- not needed to run the app, only to test/lint it.
+# Kept separate from requirements.txt so a customer install (and the
+# release_package.py bundles, which list requirements.txt but not this
+# file) doesn't pull test/lint tooling it will never use. Install alongside
+# requirements.txt for local development: see scripts/setup/setup_venv.sh.
+pytest>=8.0.0,<9
+ruff>=0.8.0,<1

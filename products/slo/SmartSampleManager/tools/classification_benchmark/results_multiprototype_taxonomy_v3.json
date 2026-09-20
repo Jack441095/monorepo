@@ -1,0 +1,65 @@
+{
+  "generated": "2026-09-11T14:54:58",
+  "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_v3.npz",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 8,
+    "splits": 5,
+    "standardize_then_l2": true
+  },
+  "n_files": 1283,
+  "n_classes": 25,
+  "results": {
+    "k1": {
+      "k": 1,
+      "accuracy_mean": 57.01,
+      "accuracy_sd": 0.27,
+      "macro_f1": 49.37,
+      "per_seed_accuracy": [
+        56.82,
+        57.6,
+        57.05,
+        56.9,
+        57.29,
+        56.74,
+        56.82,
+        56.9
+      ],
+      "delta_vs_k1": 0.0
+    },
+    "k2": {
+      "k": 2,
+      "accuracy_mean": 55.53,
+      "accuracy_sd": 0.67,
+      "macro_f1": 48.31,
+      "per_seed_accuracy": [
+        55.65,
+        55.88,
+        56.9,
+        54.72,
+        55.57,
+        54.56,
+        55.57,
+        55.42
+      ],
+      "delta_vs_k1": -1.48
+    },
+    "k3": {
+      "k": 3,
+      "accuracy_mean": 54.68,
+      "accuracy_sd": 0.83,
+      "macro_f1": 47.63,
+      "per_seed_accuracy": [
+        56.04,
+        55.03,
+        53.86,
+        53.39,
+        54.48,
+        55.57,
+        54.95,
+        54.09
+      ],
+      "delta_vs_k1": -2.33
+    }
+  }
+}

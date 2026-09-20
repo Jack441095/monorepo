@@ -1,0 +1,126 @@
+{
+  "record_type": "slo_end_state_readiness_snapshot",
+  "schema_version": "1.0.0",
+  "method_version": "end_state_readiness_snapshot_v1",
+  "generated_from": {
+    "plan": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/full_taxonomy_breadth_candidate_suggest_plan_testing_v3_similarity_gate.jsonl",
+    "collections": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/review_collections_breadth_candidate_v4_evidence.json",
+    "identity": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_content_identity_testing_v1.json",
+    "content_index": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_content_addressed_embedding_index_testing_v1.json",
+    "duplicate_guard": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_full_taxonomy_breadth_candidate_duplicate_guard_v3_similarity_gate.json",
+    "approval_gate": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_full_taxonomy_breadth_candidate_approval_gate_v3_similarity_gate.json",
+    "labellers": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_local_labeller_audit_current_main_v1.json",
+    "class_gate_queue": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_class_conditional_gate_testing_review_v1.json",
+    "validation_labeller": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_class_conditional_gate_labeller_audit_live_v1.json",
+    "class_gate_fusion": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_class_gate_fusion_review_packet_v1.json",
+    "label_integrity": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_class_conditional_gate_validation_label_integrity_v1.json"
+  },
+  "corpus": {
+    "n_files": 7315,
+    "n_content_ids": 6980,
+    "n_alias_paths": 335,
+    "embedding_dimensions": 2048
+  },
+  "review_queues": {
+    "auto_rename": 0,
+    "suggest": 388,
+    "review": 6923,
+    "never_act": 4
+  },
+  "duplicate_safety": {
+    "flagged_paths": 772,
+    "flag_counts": {
+      "acoustic_near_duplicate": 510,
+      "exact_duplicate_canonical": 235,
+      "exact_duplicate_alias": 335
+    }
+  },
+  "approval": {
+    "qualified_classes": [],
+    "candidate_rows": 388,
+    "counts": {
+      "blocked": 388,
+      "suggestion_requires_explicit_approval": 388,
+      "acoustic_near_duplicate": 50,
+      "exact_duplicate_canonical": 14,
+      "exact_duplicate_alias": 18
+    },
+    "auto_rows_in_plan": 0,
+    "ready_for_explicit_approval": 0
+  },
+  "labellers": {
+    "n_servers": 5,
+    "n_reachable": 5,
+    "total_queued": 1651,
+    "total_done": 53
+  },
+  "class_gate_review": {
+    "enabled": true,
+    "n_candidates": 408,
+    "candidate_classes": {
+      "Clap": 0.7504013776779175,
+      "Kick": 0.7983547449111938,
+      "Snare": 0.6603232026100159
+    },
+    "exact_duplicate_candidates": 35,
+    "near_duplicate_candidates": 51,
+    "auto_approved": false
+  },
+  "validation_labeller": {
+    "n_servers": 1,
+    "n_reachable": 1,
+    "total_queued": 120,
+    "total_done": 120,
+    "complete": true,
+    "integrity_complete": true,
+    "receipts_consistent": true
+  },
+  "class_gate_fusion_review": {
+    "enabled": true,
+    "n_candidates": 408,
+    "fusion_states": {
+      "audio_name_agree": 385,
+      "audio_name_conflict": 3,
+      "audio_name_family_or_risk_only": 2,
+      "audio_only_no_name_token": 18
+    },
+    "decision": "review-only; name evidence never overrides audio or gate evidence",
+    "auto_approved": false
+  },
+  "label_integrity": {
+    "enabled": true,
+    "n_files": 1,
+    "n_rows": 120,
+    "all_integrity_ok": true,
+    "all_complete": true,
+    "labels_promoted_to_gold": false
+  },
+  "readiness": {
+    "mode": "review_only",
+    "ready_to_apply": false,
+    "labels_required_for_new_qualification": true,
+    "labelling_handoff_ready": true,
+    "class_gate_review_available": true,
+    "validation_labels_complete": true,
+    "completed_label_integrity_ok": true,
+    "source_audio_modified": false,
+    "rename_actions_applied": false,
+    "gpu_1_touched": false
+  },
+  "errors": [],
+  "input_sha256": {
+    "plan": "0560cdba556f6dcfaaa393b33f2e03e08ecbbacd2c13e235fda7b710af07d88e",
+    "collections": "7e92e1001e65de587aa95e1bc4b69468c5e716710dfdf8925e115cc1136b3c3f",
+    "identity": "d37d8876a79c48df48da6bb7b1f59d389b45325e5397f6393a5007c6a1d9d0e6",
+    "content_index": "f8f2736bb3d456656b035de854dde75c74dc6215b27755819722c754e8b284a6",
+    "duplicate_guard": "e862c4af9e17d6e1f5c2560f86fcf2ad2b62e4a4faf76ad769df7e6458ccf26f",
+    "approval_gate": "9bbf67b80ada90171dead5e96095d2e6b87f8ec04bce1445e8f62abeb874bc60"
+  },
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "plans_modified": false,
+    "approval_granted": false,
+    "rename_actions": false
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "record_type": "slo_granularity_label_effect",
+  "schema_version": "1.0.0",
+  "safety": "research-only; identical rows/features; source audio read-only",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "same_folds": true,
+    "seeds": 8,
+    "splits": 5,
+    "estimator": "standardized L2 cosine nearest centroid",
+    "shared_classes": [
+      "Bass Hit",
+      "Bass Loop",
+      "Bass Reese",
+      "Chord Loop",
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Foley",
+      "Foley Loop",
+      "Hi-Hat",
+      "Hi-Hat Loop",
+      "Impact",
+      "Kick",
+      "Kick Loop",
+      "Other/none",
+      "Pad",
+      "Percussion",
+      "Percussion Loop",
+      "Rimshot",
+      "SFX",
+      "Snare",
+      "Synth Loop",
+      "Synth One-Shot",
+      "Top Loop",
+      "Vocal Loop",
+      "Vocal One-Shot",
+      "Weather/Nature Atmos"
+    ],
+    "n_rows_scored": 1523
+  },
+  "per_seed": [
+    {
+      "seed": 0,
+      "old_accuracy": 0.5661411663942724,
+      "new_accuracy": 0.5843818366903373,
+      "delta_pp": 1.824067029606491
+    },
+    {
+      "seed": 1,
+      "old_accuracy": 0.5590017206537767,
+      "new_accuracy": 0.5822731853775795,
+      "delta_pp": 2.3271464723802815
+    },
+    {
+      "seed": 2,
+      "old_accuracy": 0.5622234926825131,
+      "new_accuracy": 0.5860194474323394,
+      "delta_pp": 2.379595474982621
+    },
+    {
+      "seed": 3,
+      "old_accuracy": 0.5562259681294608,
+      "new_accuracy": 0.577630878938389,
+      "delta_pp": 2.1404910808928257
+    },
+    {
+      "seed": 4,
+      "old_accuracy": 0.5298419767130669,
+      "new_accuracy": 0.5473442337716302,
+      "delta_pp": 1.7502257058563342
+    },
+    {
+      "seed": 5,
+      "old_accuracy": 0.5663723003043175,
+      "new_accuracy": 0.5888550243949403,
+      "delta_pp": 2.2482724090622797
+    },
+    {
+      "seed": 6,
+      "old_accuracy": 0.5518012754858775,
+      "new_accuracy": 0.5730071731640571,
+      "delta_pp": 2.1205897678179597
+    },
+    {
+      "seed": 7,
+      "old_accuracy": 0.5745837676338903,
+      "new_accuracy": 0.6064801920902275,
+      "delta_pp": 3.1896424456337225
+    }
+  ],
+  "summary": {
+    "old_accuracy_mean": 0.5582739584996469,
+    "new_accuracy_mean": 0.5807489964824375,
+    "delta_pp_mean": 2.247503798279064,
+    "delta_pp_sd": 0.44167862901045396,
+    "positive_seed_count": 8,
+    "seed_count": 8
+  }
+}

@@ -1,0 +1,11 @@
+DEPRECATED — Thursday duplicate (archived 2026-09-18)
+
+This copy is NOT canonical.
+Canonical source of truth:
+  Nite-DSP-Operations/monorepo/autonomous-systems/thursday/thursday/
+
+Backup of this folder:
+  Nite-DSP-Operations/products-archive/thursday-duplicates_2026-09-18/Audio_Too-thursday-20260918.tar.gz
+
+Do not develop here. Cherry-pick only, then delete.
+See /tmp/thursday-merge/B-to-A-*.patch for diff (A is ahead: ThreadingHTTPServer, /speak, llm_provider, grounded specialists, training_export plan_id).

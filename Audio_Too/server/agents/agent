@@ -1,0 +1,849 @@
+#!/usr/bin/env python3
+"""Friendly launcher for the Audio_Too local agents.
+
+Supports both legacy subprocess dispatch (``run_agent``) and the new
+in-process SubagentRuntime dispatch (``run_agent_inprocess``).
+Set ``AUDIO_TOO_INPROCESS_AGENTS=1`` to prefer in-process execution.
+"""
+
+from __future__ import annotations
+
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+LAUNCHER = Path(__file__).resolve()
+ROOT = LAUNCHER.parent
+BUSINESS_ROOT = ROOT.parent
+REPO_ROOT = BUSINESS_ROOT.parent
+WEBSITE_ROOT = BUSINESS_ROOT / "app"
+
+# Ensure every level the transitive Shared.* imports below need is importable
+# *before* those imports run (this used to add only `ROOT.parent`, business/,
+# too late and one level short of the real repo root — see
+# docs/CODEBASE_AUDIT_2026-07-06.md):
+#   - REPO_ROOT: `audio_too`, the top-level package (event_store, artifact_store,
+#     automix_jobs all do `from audio_too import ...`).
+#   - BUSINESS_ROOT: `app` as a namespace package (draft_sender does
+#     `from app.draft_service import ...`, `from app.api_schemas import ...`).
+#   - WEBSITE_ROOT (business/app — was stale "Website" before that directory
+#     was renamed): bare top-level imports like `from invoice_pdf import ...`.
+for path in (REPO_ROOT, BUSINESS_ROOT, WEBSITE_ROOT):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
+
+from Shared.activity_log import log_event
+from Shared.backup import run_backup
+from Shared.agent_router import normalize_args, route_request
+from Shared.data_store import (
+    add_record,
+    export_json_snapshots,
+    export_multi_sheet_xlsx,
+    format_table,
+    list_records,
+    update_record,
+)
+from Shared.due_work import collect_due_items
+from Shared.cascade import sequence_status
+from Shared.templater import create_template, list_templates, show_template, delete_template
+from Shared.maintenance import cron_daily, cron_weekly
+from Shared.mix_review_cli import cmd_compare, cmd_help as mr_help, cmd_plan, cmd_progress
+from Shared.search import search_all
+from Shared.sessions import cancel_session, list_sessions, schedule_session, show_session
+from Shared.snapshot import create_snapshot, list_snapshots
+# Prefer in-process KENN client; fall back to legacy subprocess bridge
+try:
+    from Shared.kenn_client import ask_kenn
+except ImportError:
+    from Shared.kenn_bridge import ask_kenn
+
+from Shared.expenses import add_expense, expenses_by_category, list_expenses, profit_report
+from Shared.client_history import client_summary, client_timeline
+from Shared.draft_sender import pending_since as pending_drafts, send_all_approved, send_draft
+from Shared.reminders import (
+    collect_reminders,
+    find_stale_leads,
+    find_stale_projects,
+    format_reminders,
+    format_stale_leads,
+    format_stale_projects,
+    schedule_reminder,
+)
+from Shared.workflow import (
+    convert_lead_to_client_and_project,
+    convert_enquiry_to_client_and_project,
+    pipeline_summary,
+)
+from Shared.reports import (
+    invoice_aging_report,
+    lead_source_report,
+    monthly_report,
+    service_demand_report,
+    week_ahead_report,
+)
+
+from invoice_pdf import write_invoice_pdf
+PYTHON = ROOT / ".venv" / "bin" / "python"
+
+from Shared.agent_router import python_cmd as router_python_cmd, should_log_agent_command
+
+# ── SubagentRuntime setup ───────────────────────────────────────────────
+
+_RUNTIME = None  # Lazy-initialized SubagentRuntime singleton
+_INPROCESS = os.environ.get("AUDIO_TOO_INPROCESS_AGENTS", "").strip() == "1"
+
+
+def _ensure_runtime():
+    """Lazy-init the SubagentRuntime and register agent entry points."""
+    global _RUNTIME
+    if _RUNTIME is not None:
+        return _RUNTIME
+
+    from thursday.subagent_runtime import SubagentRuntime, register_agent
+
+    # Register Admin
+    try:
+        admin_path = ROOT / "Admin"
+        if str(admin_path) not in sys.path:
+            sys.path.insert(0, str(admin_path))
+        from local_agent import execute as admin_execute
+        register_agent("Admin", admin_execute)
+    except ImportError:
+        pass
+
+    # Register Marketing
+    try:
+        mkt_path = ROOT / "Marketing"
+        if str(mkt_path) not in sys.path:
+            sys.path.insert(0, str(mkt_path))
+        from Marketing.main import execute as marketing_execute
+        register_agent("Marketing", marketing_execute)
+    except ImportError:
+        pass
+
+    # Register Research
+    try:
+        from Research.main import execute as research_execute
+        register_agent("Research", research_execute)
+    except ImportError:
+        pass
+
+    _RUNTIME = SubagentRuntime(
+        max_workers=4,
+        default_timeout=120.0,
+        repo_root=REPO_ROOT,
+    )
+    return _RUNTIME
+
+
+def python_cmd() -> str:
+    if PYTHON.exists():
+        return str(PYTHON)
+    return router_python_cmd()
+
+
+def print_help() -> None:
+    print(
+        "Audio_Too agent launcher\n\n"
+        "Usage:\n"
+        "  ./agent admin <command> [details]\n"
+        "  ./agent marketing <command> [details]\n"
+        "  ./agent research <command> [details]\n"
+        "  ./agent ask <plain English request>\n"
+        "  ./agent weekly\n"
+        "  ./agent dashboard\n"
+        "  ./agent drafts\n"
+        "  ./agent approve-draft <id>\n"
+        "  ./agent reject-draft <id>\n"
+        "  ./agent due\n"
+        "  ./agent overdue\n"
+        "  ./agent invoice-pdf <id>\n"
+        "  ./agent invoice-pdfs\n"
+        "  ./agent export-workbook\n"
+        "  ./agent export-json\n"
+        "  ./agent backup\n"
+        "  ./agent reminders\n"
+        "  ./agent remind \"<text>\"\n"
+        "  ./agent stale-leads\n"
+        "  ./agent stale-projects\n"
+        "  ./agent enquiries\n"
+        "  ./agent enquiry <id>\n"
+        "  ./agent convert-enquiry <id>\n"
+        "  ./agent convert-lead <id>\n"
+        "  ./agent sequence-status <lead-name>\n"
+        "  ./agent templates\n"
+        "  ./agent template show <name>\n"
+        "  ./agent template create <name> <content> [--agent Admin|Marketing]\n"
+        "  ./agent template delete <name> [--agent Admin|Marketing]\n"
+        "  ./agent mix-review plan <report.json>\n"
+        "  ./agent mix-review progress <plan.json> <step-id> <status>\n"
+        "  ./agent mix-review compare <v1.json> <v2.json>\n"
+        "  ./agent mix-review help\n"
+        "  ./agent cron-daily\n"
+        "  ./agent cron-weekly\n"
+        "  ./agent search <query> [--type leads|clients|projects|invoices]\n"
+        "  ./agent schedule \"<session details>\"\n"
+        "  ./agent sessions\n"
+        "  ./agent session <id> | ./agent session cancel <id>\n"
+        "  ./agent ask-kenn \"<question>\"\n"
+        "  ./agent snapshot\n"
+        "  ./agent snapshots\n"
+        "  ./agent expense add \"<description>\"\n"
+        "  ./agent expense list [--category <cat>]\n"
+        "  ./agent expense categories\n"
+        "  ./agent profit [--year 2026]\n"
+        "  ./agent client <name>\n"
+        "  ./agent client history <name>\n"
+        "  ./agent send-draft <id> [--email]\n"
+        "  ./agent send-draft approved\n"
+        "  ./agent send-draft pending\n"
+        "  ./agent thursday \"<your request>\"\n"
+        "  ./agent t \"<your request>\"\n"
+        "  ./agent pipeline-summary\n"
+        "  ./agent report monthly|lead-source|service-demand|invoice-aging\n"
+        "  ./agent week-ahead\n"
+        "  ./agent status\n"
+        "  ./agent torch train|ask <request>\n"
+        "  ./agent\n\n"
+        "Admin examples:\n"
+        "  ./agent admin email \"Ask a client to send stems for a mix.\"\n"
+        "  ./agent admin invoice \"Client: Jordan 4 hour vocal session at 45 per hour.\"\n"
+        "  ./agent admin new-project \"Client: Sarah Project: Demo Master Service: Mastering Deadline: Friday\"\n"
+        "  ./agent admin new-client \"Client: Sarah Contact: sarah@example.com\"\n"
+        "  ./agent admin save-invoice \"Client: Jordan 4 hour vocal session at 45 per hour.\"\n"
+        "  ./agent admin projects\n"
+        "  ./agent admin clients\n"
+        "  ./agent admin invoices\n"
+        "  ./agent admin export-invoices\n"
+        "  ./agent admin export-invoices-xlsx\n"
+        "  ./agent admin update-invoice \"id: <id> status: Paid\"\n"
+        "  ./agent admin followups\n\n"
+        "Marketing examples:\n"
+        "  ./agent marketing outreach \"Lead: Jordan Service: Mixing artist with new single\"\n"
+        "  ./agent marketing post \"Service: Mastering for artists\"\n"
+        "  ./agent marketing new-lead \"Lead: Jordan Contact: instagram.com/jordan Service: Mixing Source: Instagram\"\n"
+        "  ./agent marketing leads\n"
+        "  ./agent marketing pipeline\n"
+        "  ./agent marketing export-leads\n"
+        "  ./agent marketing export-leads-xlsx\n"
+        "  ./agent marketing update-lead \"lead: Jordan status: Warm follow up: Friday\"\n"
+        "  ./agent marketing score-leads\n"
+        "  ./agent marketing sequence \"Lead: Jordan Service: Mixing\"\n"
+        "  ./agent marketing followups\n\n"
+        "Research examples (Ableton training sources — no auto-scrape):\n"
+        "  ./agent research plan \"client stem handoff\"\n"
+        "  ./agent research suggest \"mix bus glue compression\"\n"
+        "  ./agent research pdfs\n\n"
+        "Plain English routing:\n"
+        "  ./agent ask \"draft an invoice for 4 hours at 45 per hour\"\n"
+        "  ./agent ask \"write outreach to an artist for mixing work\"\n\n"
+        "Optional Torch routing:\n"
+        "  ./agent torch train\n"
+        "  ./agent torch ask \"draft an invoice for 4 hours at 45 per hour\"\n"
+    )
+
+
+def run_agent(folder: str, args: list[str]) -> int:
+    """Dispatch an agent task via subprocess (legacy) or in-process."""
+    args = normalize_args(folder, args)
+
+    command_name = args[0].lower()
+    detail = " ".join(args[1:]).strip()
+    if len(detail) > 180:
+        detail = detail[:177] + "..."
+
+    # ── In-process path ──
+    if _INPROCESS:
+        return run_agent_inprocess(folder, args)
+
+    # ── Legacy subprocess path ──
+    command = [python_cmd(), str(ROOT / folder / "main.py"), *args]
+    completed = subprocess.run(command, cwd=ROOT, check=False)
+    if completed.returncode == 0 and should_log_agent_command(command_name):
+        actor = folder.lower()
+        summary = command_name if not detail else f"{command_name}: {detail}"
+        log_event(f"{actor}_command", summary, actor=actor)
+    return completed.returncode
+
+
+def run_agent_inprocess(folder: str, args: list[str]) -> int:
+    """Dispatch an agent task via the SubagentRuntime (in-process)."""
+    runtime = _ensure_runtime()
+    result = runtime.dispatch(folder, args)
+
+    if result.output:
+        print(result.output)
+    if result.error:
+        print(result.error, file=sys.stderr)
+
+    command_name = args[0].lower() if args else "unknown"
+    detail = " ".join(args[1:]).strip()
+    if len(detail) > 180:
+        detail = detail[:177] + "..."
+
+    if result.ok and should_log_agent_command(command_name):
+        actor = folder.lower()
+        summary = command_name if not detail else f"{command_name}: {detail}"
+        log_event(f"{actor}_command", summary, actor=actor)
+    return result.exit_code
+
+
+def dashboard() -> str:
+    clients = list_records("clients")
+    projects = list_records("projects")
+    invoices = list_records("invoices")
+    leads = list_records("leads")
+    campaigns = list_records("campaigns")
+    draft_invoices = [item for item in invoices if item.get("status") == "Draft"]
+    active_projects = [item for item in projects if item.get("status", "Open") not in {"Closed", "Complete", "Completed"}]
+    active_leads = [item for item in leads if item.get("status", "New") not in {"Closed", "Not interested"}]
+    total_draft_value = sum(float(item.get("total") or 0) for item in draft_invoices)
+
+    # Reminder summary
+    all_reminders = collect_reminders(list_records)
+    overdue_count = len(all_reminders.get("overdue", []))
+    stale_count = len(all_reminders.get("stale", []))
+    today_count = len(all_reminders.get("today", []))
+    reminder_summary = f"  \U0001f534 Overdue: {overdue_count} | \U0001f7e1 Today: {today_count} | \u274c Stale: {stale_count}"
+
+    return (
+        "Audio_Too Dashboard\n\n"
+        f"Clients: {len(clients)}\n"
+        f"Active projects: {len(active_projects)}\n"
+        f"Draft invoices: {len(draft_invoices)} | value: \u00a3{total_draft_value:.2f}\n"
+        f"Active leads: {len(active_leads)}\n"
+        f"Campaigns: {len(campaigns)}\n"
+        f"{reminder_summary}\n\n"
+        "Useful next commands:\n"
+        "- ./agent weekly\n"
+        "- ./agent reminders\n"
+        "- ./agent drafts\n"
+        "- ./agent due\n"
+        "- ./agent admin invoices\n"
+        "- ./agent marketing pipeline\n"
+        "- ./agent export-workbook"
+    )
+
+
+
+def drafts_view() -> str:
+    drafts = [item for item in list_records("drafts") if item.get("status", "Pending") == "Pending"]
+    return "Pending Drafts\n\n" + format_table(
+        drafts,
+        ["id", "type", "recipient", "subject", "source", "created_at"],
+        "No pending drafts.",
+    )
+
+
+def set_draft_status(draft_id: str, status: str) -> str:
+    record = update_record("drafts", draft_id, {"status": status}, ["recipient", "subject"])
+    if not record:
+        return f"Draft not found: {draft_id}"
+    label = record.get("subject") or record.get("recipient") or "Untitled"
+    return f"{status} draft {record.get('id')}: {label}"
+
+
+def due_items(overdue_only: bool = False) -> str:
+    title = "Overdue Work" if overdue_only else "Due Work"
+    items = collect_due_items(list_records, overdue_only=overdue_only)
+    return title + "\n\n" + format_table(items, ["type", "id", "name", "due", "next_action"], "No matching due items.")
+
+
+def invoice_export_dir() -> Path:
+    return ROOT / "Shared" / "exports" / "invoices"
+
+
+def find_invoice(identifier: str) -> dict | None:
+    needle = identifier.strip().lower()
+    for invoice in list_records("invoices"):
+        values = [str(invoice.get("id", "")), str(invoice.get("client", "")), str(invoice.get("service", ""))]
+        if any(value.lower() == needle for value in values):
+            return invoice
+    return None
+
+
+def export_invoice_pdf(identifier: str) -> str:
+    invoice = find_invoice(identifier)
+    if not invoice:
+        return f"Invoice not found: {identifier}"
+    path = write_invoice_pdf(invoice, invoice_export_dir())
+    return f"Exported invoice PDF: {path}"
+
+
+def export_invoice_pdfs() -> str:
+    invoices = list_records("invoices")
+    if not invoices:
+        return "No invoices found."
+    paths = [write_invoice_pdf(invoice, invoice_export_dir()) for invoice in invoices]
+    return "Exported invoice PDFs:\n" + "\n".join(f"- {path}" for path in paths)
+
+
+def export_workbook() -> str:
+    path = export_multi_sheet_xlsx(
+        {
+            "Clients": (["id", "name", "contact", "status", "notes"], list_records("clients")),
+            "Projects": (["id", "project", "client", "service", "status", "deadline", "waiting_on", "follow_up"], list_records("projects")),
+            "Invoices": (["id", "date", "client", "service", "hours", "rate", "total", "status", "notes"], list_records("invoices")),
+            "Leads": (["id", "lead", "contact", "service_fit", "status", "score", "source", "next_action", "follow_up"], list_records("leads")),
+            "Campaigns": (["id", "campaign", "audience", "service", "platforms", "status"], list_records("campaigns")),
+        },
+        "audio_too_agent_records.xlsx",
+    )
+    return f"Exported workbook: {path}"
+
+
+def interactive() -> int:
+    print("Audio_Too local agents")
+    print("Choose: admin, marketing, ask, or quit")
+
+    while True:
+        choice = input("\nAgent> ").strip().lower()
+        if choice in {"q", "quit", "exit"}:
+            return 0
+        if choice in {"help", "h", "?"}:
+            print_help()
+            continue
+        if choice not in {"admin", "marketing", "ask"}:
+            print("Choose admin, marketing, ask, or quit.")
+            continue
+
+        task = input("Task> ").strip()
+        if not task:
+            print("No task provided.")
+            continue
+
+        if choice == "ask":
+            folder, routed_args = route_request(task)
+            print(f"\nRouting to {folder}...\n")
+            run_agent(folder, routed_args)
+        elif choice == "admin":
+            run_agent("Admin", task.split())
+        else:
+            run_agent("Marketing", task.split())
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    if not args:
+        return interactive()
+
+    command = args[0].lower()
+    rest = args[1:]
+
+    if command in {"help", "-h", "--help"}:
+        print_help()
+        return 0
+    if command in {"admin", "a"}:
+        return run_agent("Admin", rest)
+    if command in {"marketing", "market", "m"}:
+        return run_agent("Marketing", rest)
+    if command in {"research", "r"}:
+        return run_agent("Research", rest)
+    if command == "ask":
+        if not rest:
+            print("No request provided.")
+            return 1
+        folder, routed_args = route_request(" ".join(rest))
+        return run_agent(folder, routed_args)
+    if command == "weekly":
+        admin_code = run_agent("Admin", ["weekly"])
+        print()
+        marketing_code = run_agent("Marketing", ["weekly"])
+        return admin_code or marketing_code
+    if command == "dashboard":
+        print(dashboard())
+        return 0
+    if command == "drafts":
+        print(drafts_view())
+        return 0
+    if command == "approve-draft":
+        if not rest:
+            print("Use: ./agent approve-draft <id>")
+            return 1
+        message = set_draft_status(rest[0], "Approved")
+        log_event("draft_approved", rest[0], actor="agent")
+        print(message)
+        return 0
+    if command == "reject-draft":
+        if not rest:
+            print("Use: ./agent reject-draft <id>")
+            return 1
+        message = set_draft_status(rest[0], "Rejected")
+        log_event("draft_rejected", rest[0], actor="agent")
+        print(message)
+        return 0
+    if command == "backup":
+        path = run_backup()
+        log_event("backup_created", str(path), actor="agent")
+        print(f"Backup created: {path}")
+        return 0
+    if command == "due":
+        print(due_items())
+        return 0
+    if command == "overdue":
+        print(due_items(overdue_only=True))
+        return 0
+    if command == "invoice-pdf":
+        if not rest:
+            print("Use: ./agent invoice-pdf <id>")
+            return 1
+        message = export_invoice_pdf(rest[0])
+        log_event("invoice_exported", rest[0], actor="agent")
+        print(message)
+        return 0
+    if command == "invoice-pdfs":
+        message = export_invoice_pdfs()
+        log_event("invoice_exported", "all invoices", actor="agent")
+        print(message)
+        return 0
+    if command == "export-workbook":
+        message = export_workbook()
+        log_event("workbook_exported", message, actor="agent")
+        print(message)
+        return 0
+    if command == "reminders" or command == "reminder":
+        all_reminders = collect_reminders(list_records)
+        print(format_reminders(all_reminders))
+        return 0
+    if command == "remind":
+        if not rest:
+            print("Use: ./agent remind \"Check in with Jordan in 3 days\"")
+            return 1
+        record = schedule_reminder(add_record, " ".join(rest))
+        print(f"Reminder created: {record.get('id')} — {record.get('subject')} (due: {record.get('due')})")
+        return 0
+    if command == "templates" or command == "template":
+        if not rest:
+            print(list_templates())
+            return 0
+        sub = rest[0].lower()
+        if sub == "show" and len(rest) >= 2:
+            print(show_template(" ".join(rest[1:])))
+        elif sub == "create" and len(rest) >= 3:
+            # Figure out if there's an --agent flag
+            agent = "Admin"
+            content_parts = rest[2:]
+            for i, part in enumerate(content_parts):
+                if part.startswith("--agent="):
+                    agent = part.split("=", 1)[1]
+                    content_parts.pop(i)
+                    break
+                if part == "--agent" and i + 1 < len(content_parts):
+                    agent = content_parts[i + 1]
+                    content_parts.pop(i)
+                    content_parts.pop(i)
+                    break
+            print(create_template(rest[1], " ".join(content_parts), agent))
+        elif sub == "delete" and len(rest) >= 2:
+            agent_filter = None
+            name_parts = rest[1:]
+            for i, part in enumerate(name_parts):
+                if part.startswith("--agent="):
+                    agent_filter = part.split("=", 1)[1]
+                    name_parts.pop(i)
+                    break
+                if part == "--agent" and i + 1 < len(name_parts):
+                    agent_filter = name_parts[i + 1]
+                    name_parts.pop(i)
+                    name_parts.pop(i)
+                    break
+            print(delete_template(" ".join(name_parts), agent_filter))
+        else:
+            print("Usage:\n  ./agent templates\n  ./agent template show <name>\n  ./agent template create <name> <content> [--agent Admin|Marketing]\n  ./agent template delete <name> [--agent Admin|Marketing]")
+        return 0
+    if command == "stale-leads" or command == "stale-lead":
+        leads = find_stale_leads(list_records)
+        print(format_stale_leads(leads))
+        return 0
+    if command == "stale-projects" or command == "stale-project":
+        projects = find_stale_projects(list_records)
+        print(format_stale_projects(projects))
+        return 0
+    if command == "convert-lead":
+        if not rest:
+            print("Use: ./agent convert-lead <id>")
+            return 1
+        result = convert_lead_to_client_and_project(list_records, add_record, rest[0])
+        print(result.get("message", "Conversion failed."))
+        return 0 if result.get("ok") else 1
+    if command == "convert-enquiry":
+        if not rest:
+            print("Use: ./agent convert-enquiry <id>")
+            return 1
+        result = convert_enquiry_to_client_and_project(list_records, add_record, rest[0])
+        print(result.get("message", "Conversion failed."))
+        return 0 if result.get("ok") else 1
+    if command == "enquiries" or command == "enquiry":
+        all_enquiries = list_records("enquiries")
+        if not rest:
+            # List all enquiries
+            new = [e for e in all_enquiries if (e.get("status") or "New").lower() != "converted"]
+            if not new:
+                print("No pending enquiries.")
+                return 0
+            print("Enquiries:\n")
+            print(format_table(
+                new,
+                ["id", "name", "email", "service", "status", "created_at"],
+                "No enquiries found.",
+            ))
+            return 0
+        # Show single enquiry details
+        needle = rest[0].strip().lower()
+        target = next(
+            (e for e in all_enquiries
+             if e.get("id", "").lower() == needle or e.get("name", "").lower() == needle),
+            None,
+        )
+        if not target:
+            print(f"Enquiry not found: {rest[0]}")
+            return 1
+        print(
+            f"Enquiry: {target.get('id')}\n"
+            f"  Name: {target.get('name')}\n"
+            f"  Email: {target.get('email')}\n"
+            f"  Service: {target.get('service')}\n"
+            f"  Status: {target.get('status')}\n"
+            f"  Deadline: {target.get('deadline') or 'Not specified'}\n"
+            f"  Created: {target.get('created_at')}\n"
+            f"  Message: {target.get('message')}\n"
+        )
+        return 0
+    if command in ("sequence-status", "sequencestatus"):
+        if not rest:
+            print("Use: ./agent sequence-status <lead-name>")
+            return 1
+        print(sequence_status(list_records, " ".join(rest)))
+        return 0
+    if command == "pipeline-summary":
+        print(pipeline_summary(list_records))
+        return 0
+    if command == "report":
+        if not rest:
+            print("Use: ./agent report monthly | lead-source | service-demand | invoice-aging")
+            return 1
+        sub = rest[0].lower()
+        if sub == "monthly":
+            print(monthly_report(list_records))
+        elif sub == "lead-source" or sub == "leadsource":
+            print(lead_source_report(list_records))
+        elif sub == "service-demand" or sub == "servicedemand":
+            print(service_demand_report(list_records))
+        elif sub == "invoice-aging" or sub == "invoiceaging" or sub == "aging":
+            print(invoice_aging_report(list_records))
+        else:
+            print(f"Unknown report: {sub}\nUse: monthly | lead-source | service-demand | invoice-aging")
+            return 1
+        return 0
+    if command == "week-ahead" or command == "weekahead":
+        print(week_ahead_report(list_records))
+        return 0
+    if command == "status":
+        all_reminders = collect_reminders(list_records)
+        overdue_count = len(all_reminders.get("overdue", []))
+        stale_count = len(all_reminders.get("stale", []))
+        today_count = len(all_reminders.get("today", []))
+        this_week_count = len(all_reminders.get("this_week", []))
+        clients = list_records("clients")
+        projects = list_records("projects")
+        invoices = list_records("invoices")
+        leads = list_records("leads")
+        campaigns = list_records("campaigns")
+        active_projects = [p for p in projects if p.get("status", "Open") not in {"Closed", "Complete", "Completed"}]
+        active_leads = [
+            lead for lead in leads
+            if lead.get("status", "New") not in {"Closed", "Not interested"}
+        ]
+        total_outstanding = sum(float(i.get("total") or 0) for i in invoices if i.get("status") in {"Draft", "Sent"})
+        status_emoji = "\U0001f7e2" if (overdue_count == 0 and stale_count == 0) else "\U0001f7e0" if overdue_count < 3 else "\U0001f534"
+        print(
+            f"{status_emoji} Audio_Too Status\n"
+            f"  Clients: {len(clients)} | Active projects: {len(active_projects)}\n"
+            f"  Outstanding invoices: \u00a3{total_outstanding:.2f} ({len(invoices)} total)\n"
+            f"  Active leads: {len(active_leads)}\n"
+            f"  Campaigns: {len(campaigns)}\n"
+            f"  \U0001f534 Overdue: {overdue_count} | \U0001f7e1 Today: {today_count} | \U0001f535 This week: {this_week_count} | \u274c Stale: {stale_count}"
+        )
+        return 0
+    if command == "mix-review" or command == "mixreview":
+        if not rest:
+            print(mr_help())
+            return 0
+        sub = rest[0].lower()
+        if sub == "plan" and len(rest) >= 2:
+            print(cmd_plan(rest[1]))
+        elif sub == "progress" and len(rest) >= 4:
+            print(cmd_progress(rest[1], rest[2], rest[3]))
+        elif sub == "compare" and len(rest) >= 3:
+            print(cmd_compare(rest[1], rest[2]))
+        elif sub == "help":
+            print(mr_help())
+        else:
+            print(mr_help())
+        return 0
+    if command == "export-json":
+        paths = export_json_snapshots()
+        print("Exported JSON snapshots from SQLite:")
+        for path in paths:
+            print(f"- {path}")
+        return 0
+    if command == "cron-daily":
+        print(cron_daily(list_records, add_record))
+        return 0
+    if command == "cron-weekly":
+        print(cron_weekly(list_records, add_record))
+        return 0
+    if command == "search":
+        if not rest:
+            print("Use: ./agent search <query> [--type leads|clients|projects|invoices|enquiries|drafts|followups]")
+            return 1
+        filter_type = None
+        query_parts = list(rest)
+        for i, part in enumerate(query_parts):
+            if part.startswith("--type="):
+                filter_type = part.split("=", 1)[1]
+                query_parts.pop(i)
+                break
+            if part == "--type" and i + 1 < len(query_parts):
+                filter_type = query_parts[i + 1]
+                query_parts.pop(i)
+                query_parts.pop(i)
+                break
+        print(search_all(list_records, " ".join(query_parts), filter_type))
+        return 0
+    if command == "schedule":
+        if not rest:
+            print("Use: ./agent schedule \"Mix session with Jordan Friday 2pm 3 hours\"")
+            return 1
+        print(schedule_session(list_records, add_record, " ".join(rest)))
+        return 0
+    if command == "sessions":
+        print(list_sessions(list_records))
+        return 0
+    if command == "session":
+        if not rest:
+            print("Use: ./agent session <id>    OR    ./agent session <client-name>")
+            return 1
+        if rest[0].lower() == "cancel" and len(rest) >= 2:
+            print(cancel_session(list_records, update_record, rest[1]))
+        else:
+            print(show_session(list_records, " ".join(rest)))
+        return 0
+    if command == "expense":
+        if not rest:
+            print("Use: ./agent expense add \"<description>\"")
+            print("      ./agent expense list [--category <cat>]")
+            print("      ./agent expense categories")
+            return 1
+        sub = rest[0].lower()
+        if sub == "add" and len(rest) >= 2:
+            print(add_expense(list_records, add_record, " ".join(rest[1:])))
+        elif sub == "list":
+            cat = None
+            for i, part in enumerate(rest):
+                if part.startswith("--category="):
+                    cat = part.split("=", 1)[1]
+                elif part == "--category" and i + 1 < len(rest):
+                    cat = rest[i + 1]
+            print(list_expenses(list_records, cat))
+        elif sub == "categories":
+            print(expenses_by_category(list_records))
+        else:
+            print(add_expense(list_records, add_record, " ".join(rest)))
+        return 0
+    if command == "profit" or command == "profits":
+        year = None
+        for i, part in enumerate(rest or []):
+            if part.startswith("--year="):
+                try:
+                    year = int(part.split("=", 1)[1])
+                except ValueError:
+                    pass
+            elif part == "--year" and i + 1 < len(rest):
+                try:
+                    year = int(rest[i + 1])
+                except ValueError:
+                    pass
+        print(profit_report(list_records, year))
+        return 0
+    if command == "client":
+        if not rest:
+            print("Use: ./agent client <name>")
+            return 1
+        if rest[0].lower() == "history" and len(rest) >= 2:
+            print(client_timeline(list_records, " ".join(rest[1:])))
+        elif rest[0].lower() == "timeline" and len(rest) >= 2:
+            print(client_timeline(list_records, " ".join(rest[1:])))
+        else:
+            print(client_summary(list_records, " ".join(rest)))
+        return 0
+    if command in ("send-draft", "send"):
+        if not rest:
+            print("Use: ./agent send-draft <id> [--email]")
+            print("      ./agent send-draft approved")
+            print("      ./agent send-draft pending")
+            return 1
+        if rest[0].lower() == "approved":
+            print(send_all_approved(list_records, add_record, update_record))
+        elif rest[0].lower() == "pending":
+            print(pending_drafts(list_records))
+        else:
+            use_email = "--email" in rest or "-e" in rest
+            clean_args = [a for a in rest if a not in ("--email", "-e")]
+            print(send_draft(list_records, add_record, update_record, clean_args[0], use_email=use_email))
+        return 0
+    if command in ("ask-kenn", "askkenn", "kenn"):
+        if not rest:
+            print("Use: ./agent ask-kenn \"<question>\"")
+            return 1
+        print(ask_kenn(" ".join(rest)))
+        return 0
+    if command == "snapshot":
+        print(create_snapshot(list_records))
+        return 0
+    if command == "snapshots":
+        print(list_snapshots())
+        return 0
+    if command in {"thursday", "t"}:
+        thurs_path = LAUNCHER.parent.parent.parent / "thursday" / "main.py"
+        if not thurs_path.exists():
+            print("Error: Thursday not found at", thurs_path, file=sys.stderr)
+            return 1
+        text = " ".join(rest)
+        runner = subprocess.run(
+            [python_cmd(), str(thurs_path), text],
+            capture_output=True, text=True, timeout=120,
+            cwd=str(LAUNCHER.parent.parent.parent),
+        )
+        out = runner.stdout or ""
+        err = runner.stderr or ""
+        print(out if not err else f"{out}\n{err}")
+        return runner.returncode
+    if command == "torch":
+        if not rest:
+            print("Use: ./agent torch train OR ./agent torch ask <request>")
+            return 1
+        torch_command = rest[0].lower()
+        if torch_command == "train":
+            completed = subprocess.run(
+                [python_cmd(), str(ROOT / "Admin" / "torch_classifier.py"), "train"],
+                cwd=ROOT,
+                check=False,
+            )
+            return completed.returncode
+        if torch_command == "ask":
+            if len(rest) == 1:
+                print("No request provided.")
+                return 1
+            return run_agent("Admin", ["auto", " ".join(rest[1:]), "--torch"])
+        print("Use: ./agent torch train OR ./agent torch ask <request>")
+        return 1
+
+    print(f"Unknown command: {command}\n")
+    print_help()
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

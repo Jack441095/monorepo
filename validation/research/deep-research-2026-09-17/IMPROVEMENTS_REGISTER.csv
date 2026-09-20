@@ -1,0 +1,18 @@
+i-id,tier,product,problem,finding_ref,effort_weeks,rice,definition_of_done
+I-T1-01,1,estate,canonical-repo chaos; wrong-checkout fixes,F-01,1-2,120,decision log + deletions + drift CI green
+I-T1-02,1,estate,env/keys sprawl,F-02,0.5,100,ls-files shows only .example + public key
+I-T1-03,1,estate,suites unrun/broken (nacl missing; no CTest),F-05,2,110,three receipts: backend collect+run; SLO CTest; KENN subset
+I-T1-04,1,SLO/platform,unpinned brew deps + Python/Node drift,F-03,1-2,90,clean-checkout build receipt
+I-T1-05,1,KENN/DiskSweep,cloud fallback in local products,F-11/F-15,0.5-1,95,default ollama + fail-closed test + privacy doc line
+I-T1-06,1,Files/Paraphrase/Windows,orphaned/empty scaffolds,F-07/F-08,0.3,80,archived + redirected; sale surface clean
+I-T2-01,2,Submit,unsigned RC; appcast unsigned,F-05/F-16,1,96,signed + notarised + parity receipt
+I-T2-02,2,Platform,Paddle idempotency/PII unaudited,F-18,2,100,sandbox live-fire receipt
+I-T2-03,2,SLO,beta NO-GO (licensing + R-01 + DAW),F-02,6-8,70,beta gate receipt
+I-T2-04,2,KENN,5 failing tests; pilot unqualified,F-03,3-4,65,kappa>=0.6 receipt + pilot label
+I-T2-05,2,DiskSweep,helper unreviewed; no DMG,F-14,2-3,75,5k fuzz receipt + DMG
+I-T2-06,2,estate,no per-product CI gates,F-06/F-10,2,90,4 product gates green; main protected
+I-T3-01,3,cross-product,no shared safety lib,,3,60,adopted in 2 products
+I-T3-02,3,Submit-DiskSweep,no shared licensing client,,2,64,offline-verify fail <0.1%
+I-T3-03,3,all,no unified update channel,,8,47,2 products on channel
+I-T3-04,3,backend,paraphrase demand unproven,,2,40,paid pilot or deletion (kill: zero pilots 90d)
+I-T3-05,3,bundle,bundle WTP unknown,,8,38,decision (kill: WTP <£30)

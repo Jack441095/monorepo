@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thursday Agentic Business Orchestrator — Audio Too</title>
+  <meta name="description" content="Central agentic command hub for Thursday autonomous audio production, mixing, and business dispatching.">
+  <style>
+    :root {
+      --bg-gradient: #0b0b0b;
+      --card-bg: #111111;
+      --card-border: #2a2a2a;
+      --accent-blue: #60a5fa;
+      --accent-purple: #a78bfa;
+      --accent-green: #22c55e;
+      --text-main: #e4e4e7;
+      --text-muted: #71717a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(11, 11, 11, 0.9);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav {
+      display: flex;
+      gap: 16px;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--accent-blue);
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 32px auto;
+      padding: 0 20px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    .command-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"], select {
+      padding: 12px 16px;
+      background: #18181b;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    .input-prompt {
+      flex: 1;
+    }
+
+    .btn-dispatch {
+      padding: 12px 24px;
+      background: var(--accent-blue);
+      color: #0b0b0b;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-dispatch:hover {
+      background: #3b82f6;
+    }
+
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .stage-card {
+      background: #18181b;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .stage-card.completed {
+      border-color: var(--accent-green);
+      background: rgba(34, 197, 94, 0.06);
+    }
+
+    .stage-num {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .stage-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .stage-details {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .manifest-box {
+      background: #18181b;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 0.88rem;
+      white-space: pre-wrap;
+      color: var(--accent-purple);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/dashboard.html" class="brand">🤖 Thursday Orchestrator</a>
+    <nav>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/automix.html">AutoMix</a>
+      <a href="/listening_benchmark.html">Listening Benchmark</a>
+      <a href="/thursday_hub.html" class="active">Thursday Hub</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Jarvis Studio Voice Assistant Card -->
+    <div class="card" style="border-color: var(--accent-purple); background: linear-gradient(185deg, #111111 0%, #171026 100%);">
+      <h1 style="color: var(--accent-purple);">
+        <span style="font-size: 2rem;">⚡</span> Thursday — Jarvis Studio Assistant
+      </h1>
+      <p class="subtitle">Powered by KENN. Speak or type studio mixing commands, Ableton track audits, and audio engineering questions.</p>
+
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin: 24px 0;">
+        <!-- Glowing Arc Reactor Waveform Visualizer -->
+        <div id="arcReactor" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent-blue); box-shadow: 0 0 30px rgba(96, 165, 250, 0.5), inset 0 0 20px rgba(167, 139, 250, 0.4); display: flex; justify-content: center; align-items: center; font-size: 36px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+          🎙️
+        </div>
+        <span id="speechStatus" style="font-size: 0.85rem; color: var(--text-muted);">Click microphone or type below to speak with Thursday</span>
+      </div>
+
+      <div class="command-box">
+        <input type="text" id="jarvisInput" class="input-prompt" placeholder="Ask Thursday anything (e.g. 'How does Chris Lord-Alge mix vocals?' or 'Clean up YouTube video')">
+        <button type="button" id="btnJarvisAsk" class="btn-dispatch" style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%); color: white;">
+          🗣️ Ask Thursday
+        </button>
+      </div>
+
+      <!-- Jarvis Output Console -->
+      <div id="jarvisResponseCard" style="display: none; background: rgba(7, 10, 19, 0.85); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; margin-top: 16px;">
+        <div style="font-weight: 600; color: var(--accent-blue); margin-bottom: 8px;">🤖 Thursday Studio Diagnosis:</div>
+        <div id="jarvisResponseText" style="font-size: 0.95rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h1>🤖 Thursday Main Agentic Business Command Hub</h1>
+
+      <p class="subtitle">Central orchestrator for autonomous music production, stem mixing, LTAS compliance, invoice generation, and commercial delivery.</p>
+
+      <form id="dispatchForm" onsubmit="executeCommercialDispatch(event)">
+        <div class="command-box">
+          <input type="text" id="clientName" placeholder="Client Name (e.g. Apex Records)" value="Apex Records">
+          <input type="text" id="projectTitle" class="input-prompt" placeholder="Project Title (e.g. Summer Anthem)" value="Summer Anthem Single">
+          <select id="genreSelect">
+            <option value="pop" selected>Pop (120 BPM)</option>
+            <option value="lofi">Lo-Fi (90 BPM)</option>
+            <option value="hiphop">Hip-Hop (95 BPM)</option>
+            <option value="edm">EDM (128 BPM)</option>
+          </select>
+          <button type="submit" class="btn-dispatch">🚀 Dispatch Commercial Job</button>
+        </div>
+      </form>
+
+      <div id="statusText" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:16px;">
+        System Status: <strong style="color:var(--accent-green);">100% Operational</strong> | Thursday Agent Mode: <strong style="color:var(--accent-blue);">Autonomous Commercial Orchestrator</strong>
+      </div>
+
+      <div id="pipelineContainer" style="display:none;">
+        <h3 style="font-size:1.1rem; margin-bottom:12px;">Autonomous Pipeline Trajectory</h3>
+        <div id="pipelineGrid" class="pipeline-grid"></div>
+        <div id="manifestBox" class="manifest-box"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/thursday_hub.js"></script>
+</body>
+</html>

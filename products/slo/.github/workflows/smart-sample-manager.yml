@@ -1,0 +1,316 @@
+# Canonical CI for Smart Sample Manager.
+#
+# This is the first CI this repository has ever had. Until now the only
+# workflow building this plugin lived in a different repository (Audio_Too)
+# and built a stale fork of the source tree -- an authority inversion where
+# the non-authoritative copy was the only one under automated verification,
+# and where none of the Phase-1 cache/scanner hardening, legacy-cache
+# migration, false-quarantine prevention, user-state salvage, or
+# Classification V3 / AcousticClassifier work was covered at all.
+#
+# This workflow builds the canonical tree and depends on nothing in Audio_Too.
+#
+# SCOPE: unsigned build + test qualification only. There is deliberately no
+# codesigning, notarization, packaging, release, or deploy step here, and no
+# repository secret is read by any step. Signing/notarization requires Apple
+# credentials that are intentionally not available to CI; adding them is a
+# separate, deliberate decision -- do not bolt them on to this workflow
+# without review. See docs/MACOS_RELEASE_PIPELINE.md.
+
+name: Smart Sample Manager
+
+on:
+  workflow_dispatch:
+
+# This repository is also a code backup. Automatic macOS runs are disabled;
+# invoke the workflow manually when a deliberate qualification run is needed.
+
+# Least privilege: this workflow only reads source. It publishes nothing,
+# comments on nothing, and uploads nothing outside the run. It must not gain
+# write scope without a deliberate review.
+permissions:
+  contents: read
+
+# A superseded push on the same branch has nothing useful left to prove, and
+# these runs are long (see the cold-configure note below).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    # macos-14 is Apple Silicon (arm64) with Homebrew at /opt/homebrew. That
+    # matches CMakeLists.txt, which pins CMAKE_OSX_ARCHITECTURES=arm64 and
+    # lists /opt/homebrew FIRST in every find_path/find_library PATHS, then
+    # verifies each resolved dylib's architecture via ssm_verify_dylib_arch().
+    # This pairing was validated the hard way locally: on a machine whose
+    # PATH Homebrew was the x86_64 /usr/local install, those dylibs are
+    # x86_64-only and would have tripped the arch guard -- the build resolved
+    # correctly only because /opt/homebrew was also present and searched
+    # first. An Intel runner here would fail that guard rather than silently
+    # emit a wrong-architecture product, which is the desired behaviour but
+    # is also why the runner label is not an arbitrary choice.
+    runs-on: macos-14
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: SmartSampleManager
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # The ONNX embedding model ships as ordinary committed git blobs --
+      # Models/panns_cnn10_embedding.onnx (~84KB) plus its external-weights
+      # sidecar panns_cnn10_embedding.onnx.data (~24MB) -- and NOT via Git
+      # LFS. So a plain checkout retrieves both, with no extra fetch step, no
+      # credential, and no external download that could rot. A prior audit
+      # flagged model availability in CI as unverified; this step makes the
+      # assumption explicit and fails loudly if it ever stops holding (e.g.
+      # if the sidecar were later moved to LFS or an external host).
+      #
+      # ONNX Runtime resolves the .data sidecar relative to the .onnx file,
+      # so the two must always travel together. CMake copies BOTH into every
+      # bundle's Contents/Resources/, and SampleManagerEngine::init() looks in
+      # exactly that location.
+      - name: Verify embedding model is present after checkout
+        run: |
+          ls -l Models/panns_cnn10_embedding.onnx Models/panns_cnn10_embedding.onnx.data
+          test -s Models/panns_cnn10_embedding.onnx
+          test -s Models/panns_cnn10_embedding.onnx.data
+
+      - name: Install C++ dependencies
+        run: brew install taglib onnxruntime libsodium
+
+      # Cold configure is dominated by CMake FetchContent, not by compilation:
+      # JUCE (a full framework checkout), Eigen, and in particular dr_libs,
+      # whose --recursive submodule clone pulls >230MB of test data. Measured
+      # locally at well over 20 minutes before a single translation unit is
+      # compiled. Caching _deps is what makes this workflow practical rather
+      # than merely possible. Keyed on CMakeLists.txt because that file pins
+      # every FetchContent GIT_TAG, so the key changes exactly when the
+      # dependency set does.
+      - name: Cache CMake FetchContent dependencies
+        uses: actions/cache@v4
+        with:
+          path: SmartSampleManager/build/_deps
+          key: ssm-fetchcontent-${{ runner.os }}-${{ hashFiles('SmartSampleManager/CMakeLists.txt') }}
+          restore-keys: |
+            ssm-fetchcontent-${{ runner.os }}-
+
+      # TestLicensing verifies a real Ed25519-signed activation token against
+      # the public key compiled into Source/Licensing/LicensePublicKey.h. The
+      # matching PRIVATE key is deliberately never committed to this
+      # repository (it is gitignored; see licensing_server/README.md) and must
+      # never be placed in CI as a secret either. So CI mints a throwaway
+      # keypair per run and patches only the PUBLIC half into the source
+      # before building. Both halves are destroyed with the runner, and no
+      # repository secret is involved at any point.
+      - name: Generate ephemeral CI licensing keypair
+        working-directory: SmartSampleManager/licensing_server
+        run: |
+          python3 -m venv .venv
+          ./.venv/bin/pip install -q --upgrade pip
+          ./.venv/bin/pip install -q -r requirements.txt
+          ./.venv/bin/python generate_keypair.py
+          CI_PUBLIC_KEY=$(cat keys/signing_key.public)
+          sed -i '' "s|kServerPublicKeyBase64 = \".*\"|kServerPublicKeyBase64 = \"${CI_PUBLIC_KEY}\"|" \
+            ../Source/Licensing/LicensePublicKey.h
+
+      # Release, not Debug. The stale Audio_Too workflow qualified a Debug
+      # build, which is not the configuration that ever reaches a customer:
+      # Release additionally enables JUCE's recommended LTO flags, so it is
+      # the configuration where link-time and optimiser-sensitive problems
+      # actually surface.
+      # The build directory MUST stay inside SmartSampleManager/ (i.e. "build",
+      # not an out-of-tree path). TestAcousticClassifierParity locates its
+      # fixtures by walking UP from the test executable looking for a directory
+      # literally named "SmartSampleManager":
+      #
+      #   while (projectDir.exists() && projectDir.getFileName() != "SmartSampleManager")
+      #       projectDir = projectDir.getParentDirectory();
+      #
+      # With an out-of-tree build directory no ancestor ever matches, and at
+      # "/" getParentDirectory() returns "/" forever -- so the loop SPINS
+      # indefinitely at 100% CPU rather than failing with a clear error.
+      # Confirmed the hard way locally: an out-of-tree build left that test
+      # burning a core for 19 minutes with no output before it was killed. In
+      # an in-tree layout the walk resolves on the first parent and the test
+      # passes (10 parity cases, max logit error ~3.2e-06).
+      #
+      # This is a test-harness portability limitation, not a product defect,
+      # and is deliberately NOT worked around by changing product source. It
+      # is reported for follow-up -- the loop should terminate at the
+      # filesystem root instead of hanging.
+      - name: Configure (Release)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      # Every test target listed here is one the canonical tree actually
+      # defines. TestLicensing is built here (and only here) because a CI
+      # runner is disposable; see the licensing test step below for why it is
+      # unsafe to run on a developer machine.
+      - name: Build plugins and tests
+        run: |
+          cmake --build build -j$(sysctl -n hw.ncpu) --target \
+            SmartSampleManager_Standalone SmartSampleManager_VST3 SmartSampleManager_AU \
+            TestSampleEngine TestPathTraversal TestDuplicateDetection TestPruneMissing \
+            TestResilience TestCacheIntegrity TestMalformedAudio TestMultiInstance \
+            TestSortLibraryAsync TestEmbeddingQuality TestFindSimilar TestTaxonomy \
+            TestXmpWriter TestFavorites TestHistory TestAudioFeatures TestSmartCollections \
+            TestSafetyRegression TestAcousticClassifierParity TestCachedReclassification \
+            TestFindSimilarWeighted TestTimbreRefinement TestReferenceSearch \
+            TestNearDuplicates TestAutoTagging TestMapClusters TestCacheVersionEnforcement \
+            TestPersistedCacheHydration TestLicensing
+
+      # BUNDLE_ID / PLUGIN_MANUFACTURER_CODE / PLUGIN_CODE become permanently
+      # load-bearing the moment a real DAW session references them; a silent
+      # change orphans every existing session's plugin state. Fails on any
+      # unreviewed drift from docs/APPROVED_IDENTITY_MANIFEST.json.
+      - name: Verify plugin identity has not drifted
+        run: python3 scripts/verify_identity_manifest.py
+
+      # Fails if any unexpected file -- in particular a sibling-plugin
+      # artifact -- ends up inside a built bundle.
+      - name: Verify release manifest (no unexpected/sibling-plugin artifacts)
+        run: |
+          python3 scripts/verify_release_manifest.py \
+            "build/SmartSampleManager_artefacts/Release/VST3/Smart Sample Manager.vst3" --format vst3
+          python3 scripts/verify_release_manifest.py \
+            "build/SmartSampleManager_artefacts/Release/AU/Smart Sample Manager.component" --format au
+          python3 scripts/verify_release_manifest.py \
+            "build/SmartSampleManager_artefacts/Release/Standalone/Smart Sample Manager.app" --format standalone
+
+      # Catches a bundled dependency (or one of ITS transitive dependencies)
+      # still pointing at the build machine's Homebrew install rather than the
+      # bundled copy. This guard previously caught a real gap where ONNX
+      # Runtime's ~85 transitive dependencies shipped unbundled -- a defect
+      # that is invisible on the build machine and only fails on a customer
+      # machine that has no Homebrew.
+      - name: Verify no Homebrew/dev-machine dependency paths
+        run: |
+          python3 scripts/check_homebrew_dependencies.py \
+            "build/SmartSampleManager_artefacts/Release/VST3/Smart Sample Manager.vst3"
+          python3 scripts/check_homebrew_dependencies.py \
+            "build/SmartSampleManager_artefacts/Release/AU/Smart Sample Manager.component"
+          python3 scripts/check_homebrew_dependencies.py \
+            "build/SmartSampleManager_artefacts/Release/Standalone/Smart Sample Manager.app"
+
+      # An arm64 main executable whose bundled ONNX Runtime / abseil /
+      # protobuf / re2 dylibs are still x86_64-only is not an arm64 product --
+      # it fails at first launch on a customer machine, not at build time.
+      # This inspects every Mach-O in each bundle, not just the executable.
+      - name: Verify bundle architecture (arm64)
+        run: |
+          python3 scripts/verify_architecture.py \
+            --bundle "build/SmartSampleManager_artefacts/Release/VST3/Smart Sample Manager.vst3" --require arm64
+          python3 scripts/verify_architecture.py \
+            --bundle "build/SmartSampleManager_artefacts/Release/AU/Smart Sample Manager.component" --require arm64
+          python3 scripts/verify_architecture.py \
+            --bundle "build/SmartSampleManager_artefacts/Release/Standalone/Smart Sample Manager.app" --require arm64
+
+      # Cache isolation, and why this is safe to run unattended:
+      #
+      # Every one of these binaries constructs a ScopedIsolatedCacheDb at the
+      # top of main() (Source/TestCacheDbIsolation.h), which points
+      # SampleManagerEngine::getCacheDbFile() at a per-process, UUID-named
+      # temp directory and deletes it on exit. Independently, every Test*/
+      # Benchmark* target is compiled with SSM_TEST_BINARY=1, and
+      # openCacheDb() aborts before ever calling sqlite3_open if the resolved
+      # path is the real production cache. So a test that FORGOT isolation
+      # fails loudly instead of quietly mutating a real cache -- which is
+      # exactly the incident that guard was written for.
+      #
+      # SSM_CACHE_DB_DIR is exported here as a third, belt-and-braces layer
+      # for anything that shells out to a non-test binary. Note that the
+      # legacy-cache migration path deliberately refuses to run for any
+      # env-var-derived path, so this can never adopt or copy a real cache.
+      # TestSafetyRegression MUST run without SSM_CACHE_DB_DIR set.
+      #
+      # It is the one target deliberately NOT compiled with SSM_TEST_BINARY,
+      # because its whole job is to resolve the real production path the way
+      # a non-test binary would and assert that isKnownProductionCacheDbPath()
+      # classifies it correctly. Setting the env var redirects that lookup and
+      # the assertion fails -- verified locally, where exporting it turned this
+      # into a spurious "FAIL: getCacheDbFile() result is recognised as the
+      # production cache path" that looks alarmingly like a real regression.
+      #
+      # It never constructs a SampleManagerEngine, so it never opens the DB;
+      # it only classifies paths and asserts the production DB's existence,
+      # size, and mtime are unchanged.
+      - name: Run cache-safety regression guard (no cache env override)
+        run: ./build/TestSafetyRegression
+
+      - name: Run native test suite
+        env:
+          SSM_CACHE_DB_DIR: ${{ runner.temp }}/ssm-ci-cache
+        run: |
+          mkdir -p "$SSM_CACHE_DB_DIR"
+          set -e
+          for t in TestSampleEngine TestPathTraversal \
+                   TestDuplicateDetection TestPruneMissing TestResilience \
+                   TestCacheIntegrity TestMalformedAudio TestMultiInstance \
+                   TestSortLibraryAsync TestEmbeddingQuality TestFindSimilar \
+                   TestTaxonomy TestXmpWriter TestFavorites TestHistory \
+                   TestAudioFeatures TestSmartCollections \
+                   TestAcousticClassifierParity TestCachedReclassification \
+                   TestFindSimilarWeighted TestTimbreRefinement \
+                   TestReferenceSearch TestNearDuplicates TestAutoTagging \
+                   TestMapClusters TestCacheVersionEnforcement \
+                   TestPersistedCacheHydration; do
+            echo "::group::$t"
+            ./build/"$t"
+            echo "::endgroup::"
+          done
+
+      # Run against a throwaway local server and the ephemeral keypair minted
+      # above. This test is CI-only by design: unlike the suite above it has
+      # no isolation override, and activate() writes to the real
+      # ~/Library/Application Support/SmartSampleManager/license.json. On a
+      # disposable runner that is fine; on a developer machine it would
+      # clobber the developer's own activation state, so it is deliberately
+      # not part of the local qualification loop.
+      - name: Run licensing integration test
+        run: |
+          ./licensing_server/.venv/bin/uvicorn server:app --app-dir licensing_server --port 8420 &
+          SERVER_PID=$!
+          sleep 3
+          LICENSE_KEY=$(curl -sf -X POST localhost:8420/v1/admin/licenses \
+            -H "Content-Type: application/json" \
+            -d '{"customer_email":"ci@example.com","max_activations":2}' \
+            | python3 -c "import json,sys;print(json.load(sys.stdin)['license_key'])")
+          ./build/TestLicensing "$LICENSE_KEY"
+          TEST_EXIT=$?
+          kill $SERVER_PID 2>/dev/null || true
+          exit $TEST_EXIT
+
+      # A plugin that builds, passes its unit tests, and then dies on startup
+      # is still broken. This is the cheapest check that the whole assembled
+      # bundle -- including the bundled dylibs and the ONNX model resolved out
+      # of Contents/Resources/ -- actually initialises.
+      #
+      # CI-ONLY, and not verified during local qualification. Launching the
+      # Standalone writes AppSettings to ~/Library/Application Support/
+      # SmartSampleManager/SmartSampleManager.settings, which is real developer
+      # state and is NOT redirected by SSM_CACHE_DB_DIR (that variable covers
+      # the cache DB only). On a disposable runner rewriting it is harmless;
+      # on a developer machine it is not, so this step was deliberately not
+      # exercised locally and is unproven until the first real CI run.
+      #
+      # SSM_CACHE_DB_DIR is still set here because the Standalone is a NON-test
+      # binary with no SSM_TEST_BINARY backstop: without it the app resolves the
+      # production cache path and, if that cache is empty while a populated one
+      # exists at the legacy ~/Library/SmartSampleManager location, it would
+      # trigger migrateLegacyCacheIfNeeded() and adopt it. Setting the env var
+      # disables that migration path outright.
+      - name: Launch smoke test (Standalone starts and stays up)
+        env:
+          SSM_CACHE_DB_DIR: ${{ runner.temp }}/ssm-ci-smoke-cache
+        run: |
+          mkdir -p "$SSM_CACHE_DB_DIR"
+          "build/SmartSampleManager_artefacts/Release/Standalone/Smart Sample Manager.app/Contents/MacOS/Smart Sample Manager" &
+          APP_PID=$!
+          sleep 8
+          if ! kill -0 $APP_PID 2>/dev/null; then
+            echo "App exited or crashed within 8 seconds of launch"
+            exit 1
+          fi
+          kill $APP_PID

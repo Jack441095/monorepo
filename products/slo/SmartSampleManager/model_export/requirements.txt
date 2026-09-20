@@ -1,0 +1,6 @@
+torch
+torchlibrosa
+onnx
+onnxscript
+onnxruntime
+numpy

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audio Developer Studio Co-Pilot — Audio Too</title>
+  <meta name="description" content="Grounded AI Co-pilot for C++/JUCE, Faust DSP, Max for Live, and Python audio system engineering.">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-purple: #bc8cff;
+      --accent-orange: #d29922;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 17, 23, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav {
+      display: flex;
+      gap: 16px;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--accent-blue);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 20px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .studio-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    select, button {
+      padding: 10px 16px;
+      background: #21262d;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-run {
+      background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+      color: white;
+      border: none;
+    }
+
+    .btn-run:hover {
+      opacity: 0.9;
+    }
+
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 850px) {
+      .editor-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    textarea {
+      width: 100%;
+      height: 420px;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      color: #79c0ff;
+      font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .output-box {
+      width: 100%;
+      height: 420px;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .warning-tag {
+      background: rgba(210, 153, 34, 0.15);
+      border: 1px solid var(--accent-orange);
+      color: var(--accent-orange);
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/dashboard.html" class="brand">🎧 Audio Developer Studio</a>
+    <nav>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/automix.html">AutoMix</a>
+      <a href="/thursday_hub.html">Thursday Hub</a>
+      <a href="/audio_dev_hub.html" class="active">Audio Dev Studio</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="studio-card">
+      <h1 style="font-size: 1.6rem; color: var(--accent-blue); margin-bottom: 6px;">
+        💻 Audio Developer Co-Pilot Studio
+      </h1>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+        Grounded real-time safety linter, DSP snippet generator, and AI co-pilot for C++/JUCE, Faust, Max for Live, and Python DSP.
+      </p>
+
+      <div class="controls-row">
+        <select id="languageSelect">
+          <option value="juce" selected>C++ (JUCE / VST3)</option>
+          <option value="faust">Faust DSP</option>
+          <option value="m4l">Max for Live (M4L JS)</option>
+          <option value="python">Python DSP (NumPy / SciPy)</option>
+        </select>
+
+        <select id="boilerplateSelect">
+          <option value="">🧩 Insert Top-Tier DSP Algorithm...</option>
+          <option value="juce_processor">JUCE AudioProcessor Loop</option>
+          <option value="juce_dynamic_eq">C++ FabFilter Dynamic Peaking EQ</option>
+          <option value="simd_fft_windowing">C++ SIMD Blackman-Harris Windowing</option>
+          <option value="faust_stereo_reverb">Faust Stereo Freeverb</option>
+          <option value="faust_multiband_limiter">Faust 3-Band Crossover Limiter</option>
+          <option value="m4l_observer">M4L Parameter Observer</option>
+          <option value="m4l_canvas_scope">M4L JSUI Waveform Scope Display</option>
+          <option value="python_spectral_eq">Python STFT Spectral Matcher</option>
+          <option value="python_numba_pitchshift">Python Numba Phase Vocoder</option>
+        </select>
+
+        <button type="button" id="btnAuditCode" class="btn-run">
+          ⚡ Run Real-Time Safety Audit
+        </button>
+      </div>
+
+      <!-- Real-Time Safety Score Meter -->
+      <div id="safetyScoreCard" style="display: none; background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-top: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-weight: 700; color: var(--accent-blue);">🛡️ Real-Time Thread Safety Score:</span>
+          <span id="scoreBadge" style="font-size: 1.2rem; font-weight: 800; color: var(--accent-green);">100 / 100</span>
+        </div>
+        <div style="width: 100%; height: 10px; background: #21262d; border-radius: 5px; overflow: hidden;">
+          <div id="scoreBar" style="width: 100%; height: 100%; background: var(--accent-green); transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <div class="editor-layout">
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
+            Input Audio Source Code:
+          </div>
+          <textarea id="codeEditor" placeholder="// Paste your audio C++/JUCE, Faust, M4L, or Python DSP code here..."></textarea>
+        </div>
+
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 8px;">
+            🤖 KENN Audio Dev Co-Pilot Advice & Safety Audit:
+          </div>
+          <div id="outputConsole" class="output-box">Ready. Click 'Run Real-Time Safety Audit' or select a boilerplate above.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/audio_dev_hub.js"></script>
+</body>
+</html>

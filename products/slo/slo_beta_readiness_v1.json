@@ -1,0 +1,8 @@
+{
+  "external_private_beta_ready": false,
+  "controlled_internal_read_only_pilot": true,
+  "decision": "E_BLOCKED_BY_EXTERNAL_CREDENTIAL_DISTRIBUTION_DEPENDENCY",
+  "allowed_scope": ["tester_owned_or_synthetic_audio", "read_only_classification", "visible_unknown_ood", "explicit_sort_confirmation"],
+  "disallowed_claims": ["general_population_accuracy", "audio_only_accuracy_without_leakage_control", "ableton_supported", "distribution_ready"],
+  "required_exit_gates": ["developer_id_and_notarization", "clean_mac_install", "production_https_licensing", "ableton_matrix", "blind_al002_review", "cross_vendor_metrics", "memory_and_rt_gates"]
+}

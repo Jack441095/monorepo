@@ -1,0 +1,10 @@
+{
+  "benchmark": "THURSDAY_EXECUTION_V1",
+  "cases": [
+    "sandbox_creation",
+    "command_filtering",
+    "heartbeat_robustness",
+    "sandbox_escape_containment",
+    "duplicate_execution_prevention"
+  ]
+}

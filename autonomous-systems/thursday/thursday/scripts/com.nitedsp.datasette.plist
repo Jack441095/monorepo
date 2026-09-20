@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Datasette: read-only browser for Audio_Too's business database
+      (leads, clients, invoices, projects, etc.) -- a companion to
+      Thursday's ops modules, not a replacement. Runs
+      thursday/scripts/run_datasette.sh, which resolves this machine's
+      current Tailscale IPv4 address at every start and binds only to
+      that address -- never 0.0.0.0, same security model as
+      com.nitedsp.thursday-server. Additionally password-protected
+      (datasette-auth-passwords; username "jack", hash in Audio_Too/.env)
+      since Datasette has no auth by default and this exposes real
+      business data. --immutable (read-only) and default_allow_sql off.
+
+      Kill switch: `launchctl unload ~/Library/LaunchAgents/com.nitedsp.datasette.plist`
+      or remove this file. Serves data read-only -- nothing to unwind.
+
+      Added 2026-09-02.
+    -->
+    <key>Label</key>
+    <string>com.nitedsp.datasette</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/zsh</string>
+        <string>/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/autonomous-systems/thursday/thursday/scripts/run_datasette.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/autonomous-systems/thursday</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>15</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/Ganders4/Library/Logs/Thursday/datasette.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/Ganders4/Library/Logs/Thursday/datasette.err.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/Audio_Too/.venv/bin</string>
+    </dict>
+</dict>
+</plist>

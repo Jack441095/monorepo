@@ -1,0 +1,24 @@
+{
+  "schema": "kenn.session_outcome.v1",
+  "session_bucket": "sha256:replace-with-release-scoped-64-hex-session-bucket",
+  "project_bucket": "sha256:replace-with-release-scoped-64-hex-project-bucket",
+  "tester_bucket": "sha256:replace-with-release-scoped-64-hex-tester-bucket",
+  "intent_class": "advice",
+  "context_freshness": "fresh",
+  "evidence_classes": ["live_snapshot", "retrieval", "curated_kenn_guidance"],
+  "lifecycle_outcome": "completed",
+  "user_verdict": "keep",
+  "reason_codes": [],
+  "root_cause": null,
+  "latency_ms": {
+    "context": 0,
+    "retrieval": 0,
+    "planning": 0,
+    "proposal": 0,
+    "apply": 0,
+    "readback": 0,
+    "undo": 0
+  },
+  "contains_raw_prompt": false,
+  "contains_audio": false
+}

@@ -1,0 +1,131 @@
+{
+  "gate_pp": 2.0,
+  "seeds": 8,
+  "family_map": {
+    "Kick": "Kick",
+    "Snare": "Snare",
+    "Clap": "Clap",
+    "Hi-Hat": "Hi-Hat",
+    "Crash": "Crash",
+    "Percussion": "Percussion",
+    "Percussion Loop": "Percussion",
+    "Drum Loop": "Drum",
+    "Foley": "Foley",
+    "Other/none": "Rejection"
+  },
+  "form_map": {
+    "Kick": "One-Shot",
+    "Snare": "One-Shot",
+    "Clap": "One-Shot",
+    "Hi-Hat": "One-Shot",
+    "Crash": "One-Shot",
+    "Percussion": "One-Shot",
+    "Foley": "One-Shot",
+    "Drum Loop": "Loop",
+    "Percussion Loop": "Loop",
+    "Other/none": "Rejection"
+  },
+  "results": {
+    "flat": {
+      "exact": 68.6,
+      "sd": 0.46,
+      "per_seed": [
+        68.72,
+        68.46,
+        68.46,
+        68.19,
+        68.72,
+        67.8,
+        69.24,
+        69.24
+      ],
+      "family": 69.0,
+      "form": 88.83,
+      "subtype_given_family": 99.43,
+      "macro_f1": 63.95,
+      "invalid_combination_rate": 0.0,
+      "delta_vs_flat": 0.0
+    },
+    "independent": {
+      "exact": 66.7,
+      "sd": 0.63,
+      "per_seed": [
+        66.75,
+        66.62,
+        66.49,
+        67.15,
+        66.49,
+        65.31,
+        67.41,
+        67.41
+      ],
+      "family": 66.95,
+      "form": 87.48,
+      "subtype_given_family": 99.63,
+      "macro_f1": 60.15,
+      "invalid_combination_rate": 0.0,
+      "delta_vs_flat": -1.9
+    },
+    "hierarchical": {
+      "exact": 64.38,
+      "sd": 0.34,
+      "per_seed": [
+        64.4,
+        64.14,
+        63.87,
+        64.4,
+        64.79,
+        64.01,
+        64.53,
+        64.92
+      ],
+      "family": 64.94,
+      "form": 83.23,
+      "subtype_given_family": 99.14,
+      "macro_f1": 57.15,
+      "invalid_combination_rate": 0.0,
+      "delta_vs_flat": -4.22
+    },
+    "form_gated": {
+      "exact": 67.57,
+      "sd": 0.45,
+      "per_seed": [
+        67.15,
+        67.8,
+        67.41,
+        67.41,
+        67.8,
+        66.75,
+        68.06,
+        68.19
+      ],
+      "family": 67.96,
+      "form": 87.68,
+      "subtype_given_family": 99.42,
+      "macro_f1": 62.59,
+      "invalid_combination_rate": 0.0,
+      "delta_vs_flat": -1.03
+    },
+    "soft_parent": {
+      "exact": 68.49,
+      "sd": 0.34,
+      "per_seed": [
+        68.72,
+        68.46,
+        68.32,
+        68.46,
+        68.32,
+        67.8,
+        68.98,
+        68.85
+      ],
+      "family": 68.85,
+      "form": 88.84,
+      "subtype_given_family": 99.48,
+      "macro_f1": 63.15,
+      "invalid_combination_rate": 0.0,
+      "delta_vs_flat": -0.11
+    }
+  },
+  "promoted": []
+}

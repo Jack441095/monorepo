@@ -1,0 +1,19 @@
+{
+  "version": "px-local-ipc-v1",
+  "environment": "Existing nite_ai.LocalRuntime; temporary SQLite store; macOS Unix socket",
+  "repeats": 100,
+  "handshake": {
+    "status": "success",
+    "capability_count": 9
+  },
+  "socket_mode": "0o600",
+  "roundtrip_ms": {
+    "median": 0.5481,
+    "p95": 16.3472,
+    "max": 131.4537
+  },
+  "limitations": [
+    "The payload is a small company.brief.daily request, not an audio model call.",
+    "Does not measure cold-start, concurrent clients, or model inference."
+  ]
+}

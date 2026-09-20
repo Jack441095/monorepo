@@ -1,0 +1,7 @@
+# Use repo root: pip install -r requirements.txt
+-r ../../requirements.txt
+httpx>=0.27.0,<1
+# Semantic search uses the torch-free ONNX embedder (onnxruntime + tokenizers,
+# pinned in the root requirements.txt) — do not add sentence-transformers/torch
+# back here, it was removed for NumPy 2.x ABI compatibility.
+

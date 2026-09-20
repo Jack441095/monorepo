@@ -1,0 +1,15 @@
+{
+  "record_type": "slo_physical_tag_export",
+  "schema_version": "1.0.0",
+  "source_cards": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_physical_definition_cards_testing_7315_w8_v1.json",
+  "source_cards_sha256": "03178942a5baf8fd884c4da8236b9aedc76362de23fc54ddec115b00918e51c7",
+  "n_rows": 7314,
+  "csv": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/physical_tags_testing_7315_v1.csv",
+  "csv_sha256": "3b3e1c15aec088b8ec359ce09e3b0b6300410336aa416226c0bc5a73c9658ae2",
+  "safety": {
+    "read_only": true,
+    "semantic_labels_created": false,
+    "rename_actions": false,
+    "source_audio_modified": false
+  }
+}

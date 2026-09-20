@@ -1,0 +1,1122 @@
+{
+  "record_type": "slo_rename_approval_gate_audit",
+  "schema_version": "1.0.0",
+  "method_version": "rename_approval_gate_v1",
+  "source_plan": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/rename_plan_breadth_candidate_dryrun_500_v1.jsonl",
+  "source_plan_sha256": "8ccce6de833d18a706697f9e9ebfd2b0fafcc0dcc1c16a306fd5d3dbcf2aad7a",
+  "duplicate_guard": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_rename_duplicate_guard_breadth_candidate_500_v1.json",
+  "qualified_classes": [
+    "Clap",
+    "Kick",
+    "Snare"
+  ],
+  "n_candidate_rows": 121,
+  "counts": {
+    "blocked": 121,
+    "suggestion_requires_explicit_approval": 121
+  },
+  "qualification_summary": {
+    "suggestion_rows": 121,
+    "duplicate_blocked_rows": 0,
+    "suggestion_rows_without_duplicate_flags": 121,
+    "ready_for_explicit_approval": 0
+  },
+  "rows": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Shaker_Loop_1_Percussion_Bendji_Allonce_120_loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_01.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_04.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_05.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_06.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_07.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_13.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_14.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_16.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_04.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_07.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_11.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_12.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_13.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_14.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_15.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_16.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_05.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_07.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_08.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_10.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_11.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_06.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_10.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_11.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_14.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_15.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_16.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_02.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_08.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_10.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_11.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_12.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_13.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_14.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_15.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_01.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_04.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_06.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_09.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_11.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_12.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_15.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_01.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_02.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_04.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_06.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_08.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_13.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_16.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_01.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_07.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_09.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_02.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_05.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_08.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_09.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_10.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_11.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_12.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_13.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_14.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_16.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_02.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_06.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_14.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_15.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_01.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_10.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_12.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_13.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_15.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_16.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_06.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_09.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_10.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_11.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_13.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_16.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_01.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_04.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_18.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C03.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C06.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C13.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C22.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C23.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C24.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Arp_Loop_Gm.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Bass_Loop_Gm.wav",
+      "action": "suggest",
+      "label": "Kick Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Full_Drum_Loop_Gm.wav",
+      "action": "suggest",
+      "label": "Drum Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Full_Drum_Loop_01_118bpm.wav",
+      "action": "suggest",
+      "label": "Drum Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Perc_Loop_01_118bpm.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Chh_01.wav",
+      "action": "suggest",
+      "label": "Hi-Hat",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Chh_02.wav",
+      "action": "suggest",
+      "label": "Hi-Hat",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Chh_03.wav",
+      "action": "suggest",
+      "label": "Hi-Hat",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_01.wav",
+      "action": "suggest",
+      "label": "Hi-Hat",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_02.wav",
+      "action": "suggest",
+      "label": "Hi-Hat",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_03.wav",
+      "action": "suggest",
+      "label": "Hi-Hat",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_04.wav",
+      "action": "suggest",
+      "label": "Hi-Hat",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_01.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_02.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_03.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Barry White - Im Gonna Love You Just A Little More Baby (Break).wav",
+      "action": "suggest",
+      "label": "Drum Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Skull Snaps - Turn My Back On Love (Break).wav",
+      "action": "suggest",
+      "label": "Drum Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 1.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 2.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 2_2.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 2_3.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 3.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 SNARE 1.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 SNARE 2.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "plan_modified": false,
+    "approval_granted": false,
+    "source_audio_modified": false,
+    "rename_actions": false
+  }
+}

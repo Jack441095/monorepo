@@ -1,0 +1,989 @@
+{
+  "manifest_version": "V1",
+  "created": "2026-08-23",
+  "purpose": "NITE Submit real-world validation corpus - provenance manifest (metadata + first-pass detections only; no extracted body text; no PDFs committed to git)",
+  "policy": {
+    "qualification_rule": "UNKNOWN licence_status must NOT enter qualification set.",
+    "unknown_licence_in_qualification_set": 0,
+    "pdfs_committed_to_git": false,
+    "gitignore_entry": "real_validation_corpus/**/*.pdf"
+  },
+  "summary": {
+    "documents_downloaded": 21,
+    "institutions_represented": [
+      "American International University-Bangladesh",
+      "Ashesi University",
+      "Berklee College of Music (Valencia)",
+      "Edge Hill University",
+      "King's College London",
+      "London School of Economics",
+      "Massachusetts Institute of Technology",
+      "Rutgers University",
+      "Sheffield Hallam University",
+      "Universiti Tunku Abdul Rahman",
+      "University of Cambridge",
+      "University of Oxford",
+      "University of Sheffield",
+      "University of Southampton",
+      "University of St Andrews",
+      "University of Washington Tacoma",
+      "University of York"
+    ],
+    "institution_count": 17,
+    "document_types": {
+      "COVER_SHEET": 2,
+      "ASSESSMENT_BRIEF": 4,
+      "ASSIGNMENT_TEMPLATE": 2,
+      "OTHER_ACADEMIC": 1,
+      "THESIS": 5,
+      "DISSERTATION": 3,
+      "CAPSTONE": 2,
+      "PROJECT_REPORT": 1,
+      "PORTFOLIO_REPORT": 1
+    },
+    "licence_categories": {
+      "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT": 6,
+      "TEMPLATE_FOR_PUBLIC_USE": 3,
+      "PUBLIC_REPOSITORY_RESEARCH_DOCUMENT": 7,
+      "OPEN_LICENSE": 5
+    },
+    "image_only_count": 0,
+    "sha256_duplicates": {},
+    "generator_classes": {
+      "WORD": 10,
+      "WORD_ACROBAT": 2,
+      "LATEX": 3,
+      "WORD_PRINT": 2,
+      "PRINT_QUARTZ": 1,
+      "WPS_WRITER": 1,
+      "PRINT_TO_PDF": 1,
+      "PAGES": 1
+    }
+  },
+  "documents": [
+    {
+      "document_id": "cambridge_cover_sheet_written_work",
+      "source_url": "https://www.undergraduate.study.cam.ac.uk/sites/default/files/publications/cover_sheet_for_submitted_written_work.pdf",
+      "source_domain": "www.undergraduate.study.cam.ac.uk",
+      "institution": "University of Cambridge",
+      "document_type": "COVER_SHEET",
+      "publicly_accessible": true,
+      "licence_status": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "licence_text_or_reference": "Official University of Cambridge admissions cover sheet published for applicants on undergraduate.study.cam.ac.uk",
+      "download_date": "2026-08-23",
+      "sha256": "b870ab8818980caaf8ca256353c32a014e6c045ea94727efad20a798454df7ce",
+      "local_filename": "university_templates/cambridge_cover_sheet_written_work.pdf",
+      "generator_producer": "Microsoft Word for Microsoft 365",
+      "generator_class": "WORD",
+      "notes": "Official applicant cover sheet; blank fields incl. 'Title of written work'; synthetic naming example Smith_John_1234567890.",
+      "contains_public_author_name": false,
+      "contains_module_code": false,
+      "contains_project_title": false,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Cover Sheet for Submitted Written Work [MEDIUM]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "I certify that this is my own work, that it has not been re-written or corrected for Cambridge application, [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "shu_research_thesis_guidelines_2024_25",
+      "source_url": "https://www.shu.ac.uk/-/media/home/myhallam/university-life/rules-and-regs/research-regulations/research-degrees-thesis-guidelines-2024-25-vdec24.pdf",
+      "source_domain": "www.shu.ac.uk",
+      "institution": "Sheffield Hallam University",
+      "document_type": "ASSESSMENT_BRIEF",
+      "publicly_accessible": true,
+      "licence_status": "TEMPLATE_FOR_PUBLIC_USE",
+      "licence_text_or_reference": "Published research-degree regulations/guidance on shu.ac.uk",
+      "download_date": "2026-08-23",
+      "sha256": "e64194de9290f103aaad336bc4181934983979dcbef7a8094fbacd9d2996a882",
+      "local_filename": "university_templates/shu_research_thesis_guidelines_2024_25.pdf",
+      "generator_producer": "Microsoft Word for Microsoft 365",
+      "generator_class": "WORD",
+      "notes": "Contains worked EXAMPLE title page with synthetic author 'Andrea Other' and full submission statement - strong template-style title-page case.",
+      "contains_public_author_name": false,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Sheffield Hallam University [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "carried out (for example, experimental details); a record and critical appraisal/discussion of results [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "lse_mc499_dissertation_handbook",
+      "source_url": "https://www.lse.ac.uk/media-and-communications/assets/documents/study/current-students/Dissertation-Handbook.pdf",
+      "source_domain": "www.lse.ac.uk",
+      "institution": "London School of Economics",
+      "document_type": "ASSESSMENT_BRIEF",
+      "publicly_accessible": true,
+      "licence_status": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "licence_text_or_reference": "LSE Media & Communications student handbook published on lse.ac.uk",
+      "download_date": "2026-08-23",
+      "sha256": "77939292d742a8bcf6c35413d74a5e29704e45524ce75bab4ce7a51fba6ab09e",
+      "local_filename": "university_templates/lse_mc499_dissertation_handbook.pdf",
+      "generator_producer": "Microsoft Word for Microsoft 365",
+      "generator_class": "WORD",
+      "notes": "Module code MC499.1 throughout; candidate-number anonymisation rules; supervisor field examples; extractor misfired 'Fudan University' from a reference - good adversarial case.",
+      "contains_public_author_name": true,
+      "contains_module_code": true,
+      "contains_project_title": false,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Fudan University [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "MSc Media and Communications (Media and Communication Governance) [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "soton_producing_your_thesis_guide",
+      "source_url": "https://www.southampton.ac.uk/~assets/doc/quality-handbook/Producing%20your%20thesis%20-%20a%20guide%20for%20research%20students.pdf",
+      "source_domain": "www.southampton.ac.uk",
+      "institution": "University of Southampton",
+      "document_type": "ASSESSMENT_BRIEF",
+      "publicly_accessible": true,
+      "licence_status": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "licence_text_or_reference": "Southampton Quality Handbook PDF published on southampton.ac.uk",
+      "download_date": "2026-08-23",
+      "sha256": "d21342dc1b0ea87bc14907dda8dc5f0f15f36aca194fba782b780c32dd869eb1",
+      "local_filename": "university_templates/soton_producing_your_thesis_guide.pdf",
+      "generator_producer": "Acrobat PDFMaker 23 for Word",
+      "generator_class": "WORD_ACROBAT",
+      "notes": "Title-page field-order specification; references Word AND LaTeX templates.",
+      "contains_public_author_name": false,
+      "contains_module_code": false,
+      "contains_project_title": false,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Producing your thesis \u2013 a guide for [MEDIUM]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "1.3 It is your responsibility to follow the specifications laid out in this [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "oxford_maths_dissertation_guidenotes_2025_26",
+      "source_url": "https://www.maths.ox.ac.uk/system/files/attachments/Dissertation_Guidenotes_2025-26.pdf",
+      "source_domain": "www.maths.ox.ac.uk",
+      "institution": "University of Oxford",
+      "document_type": "ASSESSMENT_BRIEF",
+      "publicly_accessible": true,
+      "licence_status": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "licence_text_or_reference": "Mathematical Institute guidance notes published on maths.ox.ac.uk",
+      "download_date": "2026-08-23",
+      "sha256": "ebd490254a5dd7552b28b8f71c8207f487c8099249dc8b8500f4a714dbb5dca6",
+      "local_filename": "university_templates/oxford_maths_dissertation_guidenotes_2025_26.pdf",
+      "generator_producer": "MiKTeX pdfTeX-1.40.27 / LaTeX",
+      "generator_class": "LATEX",
+      "notes": "LaTeX-generated institutional doc; exam-number anonymisation (no names); supervisor/project-title BLOCK CAPITALS form fields.",
+      "contains_public_author_name": false,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Mathematical and Statistical Dissertations in [MEDIUM]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "A Guidance on giving an Oral Presentation 19 [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "rutgers_ece_capstone_report_guidelines",
+      "source_url": "https://ece.rutgers.edu/sites/default/files/2024-03/Capstone-Project-Report-Guidelines.pdf",
+      "source_domain": "ece.rutgers.edu",
+      "institution": "Rutgers University",
+      "document_type": "ASSIGNMENT_TEMPLATE",
+      "publicly_accessible": true,
+      "licence_status": "TEMPLATE_FOR_PUBLIC_USE",
+      "licence_text_or_reference": "Rutgers ECE capstone report guidelines/template published on ece.rutgers.edu",
+      "download_date": "2026-08-23",
+      "sha256": "7001f1c826f31fc0dd0db0cba87e2fb53744301c06a3e889fb68106ab109c9e2",
+      "local_filename": "university_templates/rutgers_ece_capstone_report_guidelines.pdf",
+      "generator_producer": "Microsoft Word 2016",
+      "generator_class": "WORD",
+      "notes": "US senior-design title-page template incl. 'Submitted in partial fulfillment...' phrasing variant.",
+      "contains_public_author_name": false,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Rutgers University [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "TEMPLATE 3 [HIGH]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "uw_tacoma_mscss_capstone_guidelines",
+      "source_url": "https://www.tacoma.uw.edu/sites/default/files/2022-02/mscss-capstone-project-guidelines4997.pdf",
+      "source_domain": "www.tacoma.uw.edu",
+      "institution": "University of Washington Tacoma",
+      "document_type": "ASSIGNMENT_TEMPLATE",
+      "publicly_accessible": true,
+      "licence_status": "TEMPLATE_FOR_PUBLIC_USE",
+      "licence_text_or_reference": "UW Tacoma MS CSS capstone guidelines published on tacoma.uw.edu",
+      "download_date": "2026-08-23",
+      "sha256": "8861f3e1a9ead2a02be4967b76ff57465fdea86016c5856d4f7f299084487851",
+      "local_filename": "university_templates/uw_tacoma_mscss_capstone_guidelines.pdf",
+      "generator_producer": "Microsoft Word 2013",
+      "generator_class": "WORD",
+      "notes": "Contains verbatim Cover Sheet Template text ('[Title of Your Report] [Your Full Name...]') - bracketed-placeholder stress case; mentions Word and LaTeX templates.",
+      "contains_public_author_name": false,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "University of Washington Word [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": ", from initial research and conception to design (and design choices) to final delivery, [HIGH]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "edge_hill_hea3183_assignment_header",
+      "source_url": "https://eshare.edgehill.ac.uk/15288/1/HEA3183_Header%281%29%20%285%29.pdf",
+      "source_domain": "eshare.edgehill.ac.uk",
+      "institution": "Edge Hill University",
+      "document_type": "COVER_SHEET",
+      "publicly_accessible": true,
+      "licence_status": "PUBLIC_REPOSITORY_RESEARCH_DOCUMENT",
+      "licence_text_or_reference": "Edge Hill University eShare institutional repository item (public download)",
+      "download_date": "2026-08-23",
+      "sha256": "87ce3ac91b428f99478cc8d9e784b440fd422a5eedd6dfe2f7aa1f74945eae70",
+      "local_filename": "university_templates/edge_hill_hea3183_assignment_header.pdf",
+      "generator_producer": "Word -> macOS Quartz PDFContext",
+      "generator_class": "WORD_PRINT",
+      "notes": "Assignment header template with BLANK NAME:/STUDENT NO:/MODULE NO: HEA3183 fields + submission checklist - ideal blank-cover-sheet case; module code HEA3183 detected correctly.",
+      "contains_public_author_name": false,
+      "contains_module_code": true,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Edge Hill University [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "HEA3183 [HIGH]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "submission checklist [HIGH]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "st_andrews_dissertation_formatting_word",
+      "source_url": "https://www.st-andrews.ac.uk/media/ceed/ittraining/diss_format.pdf",
+      "source_domain": "www.st-andrews.ac.uk",
+      "institution": "University of St Andrews",
+      "document_type": "OTHER_ACADEMIC",
+      "publicly_accessible": true,
+      "licence_status": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "licence_text_or_reference": "St Andrews CEED IT training guide published on st-andrews.ac.uk",
+      "download_date": "2026-08-23",
+      "sha256": "8cf216491ac97866ceb81ed0fbe98d2cccec9ed22a4fc96aa892c3c0ab73096d",
+      "local_filename": "university_templates/st_andrews_dissertation_formatting_word.pdf",
+      "generator_producer": "Microsoft Word for Microsoft 365",
+      "generator_class": "WORD",
+      "notes": "Word-formatting guide; institution banner + section-heading-heavy layout (title-candidate noise).",
+      "contains_public_author_name": false,
+      "contains_module_code": false,
+      "contains_project_title": false,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "University of St Andrews [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "built-in styles ready to use and is an efficient and consistent method to format text. Start with a blank [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "whiterose_30585_stacey_phd_sheffield",
+      "source_url": "https://etheses.whiterose.ac.uk/id/eprint/30585/1/STACEY_JESSICA_170131999_Data_Mining_For_Lead_Optimisation_FINAL.pdf",
+      "source_domain": "etheses.whiterose.ac.uk",
+      "institution": "University of Sheffield",
+      "document_type": "THESIS",
+      "publicly_accessible": true,
+      "licence_status": "OPEN_LICENSE",
+      "licence_text_or_reference": "CC BY-NC-ND 4.0 (stated on WREO record https://etheses.whiterose.ac.uk/id/eprint/30585/)",
+      "download_date": "2026-08-23",
+      "sha256": "ea4fa89d2850585fb67b8ad7ed7c1c0bdc3912b1f9f4de0ed5442b180193c312",
+      "local_filename": "dissertations/whiterose_30585_stacey_phd_sheffield.pdf",
+      "generator_producer": "Microsoft Word 2016",
+      "generator_class": "WORD",
+      "notes": "382pp Word PhD thesis, long technical title; supervisors listed on repository record page; public author Jessica Stacey.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "The University [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "A thesis submitted in partial fulfilment of the requirements for the degree of Doctor of Philosophy [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "whiterose_37689_junaid_phd_york",
+      "source_url": "https://etheses.whiterose.ac.uk/id/eprint/37689/7/Junaid_Nadia_CorrectedThesis.pdf",
+      "source_domain": "etheses.whiterose.ac.uk",
+      "institution": "University of York",
+      "document_type": "THESIS",
+      "publicly_accessible": true,
+      "licence_status": "OPEN_LICENSE",
+      "licence_text_or_reference": "CC BY-NC-ND 4.0 (WREO record 37689)",
+      "download_date": "2026-08-23",
+      "sha256": "2b96e60de0621b5cbdd0d06dad14f12999fa79516938212e6f5b9837e6cf34f4",
+      "local_filename": "dissertations/whiterose_37689_junaid_phd_york.pdf",
+      "generator_producer": "macOS Quartz PDFContext",
+      "generator_class": "PRINT_QUARTZ",
+      "notes": "272pp PhD thesis; macOS Quartz-printed PDF; public author Nadia Junaid.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "University of York [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "skills has gained increasing attention, particularly when used alongside traditional teacher feedback. This [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "whiterose_34471_newcomb_phd_sheffield",
+      "source_url": "https://etheses.whiterose.ac.uk/id/eprint/34471/1/Thesis%20Final.Newcomb.Molly.2023.Final.pdf",
+      "source_domain": "etheses.whiterose.ac.uk",
+      "institution": "University of Sheffield",
+      "document_type": "THESIS",
+      "publicly_accessible": true,
+      "licence_status": "OPEN_LICENSE",
+      "licence_text_or_reference": "CC BY-NC-ND 4.0 (WREO record 34471)",
+      "download_date": "2026-08-23",
+      "sha256": "f3c5a8b3b01ed05a4512bb78fbbaad0d06f060327d1df1bfc38fd9c4d4d1668c",
+      "local_filename": "dissertations/whiterose_34471_newcomb_phd_sheffield.pdf",
+      "generator_producer": "Microsoft Word 2016",
+      "generator_class": "WORD",
+      "notes": "563pp humanities PhD thesis; very long multi-clause colon title - extreme title-length case; public author Molly Alyssa Newcomb.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "University of Sheffield [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "local studies libraries enjoyable during a period where procedures and accessibility processes [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "whiterose_18613_long_phd_sheffield",
+      "source_url": "https://etheses.whiterose.ac.uk/id/eprint/18613/1/thesis.pdf",
+      "source_domain": "etheses.whiterose.ac.uk",
+      "institution": "University of Sheffield",
+      "document_type": "THESIS",
+      "publicly_accessible": true,
+      "licence_status": "OPEN_LICENSE",
+      "licence_text_or_reference": "CC BY-NC-ND 2.5 (WREO record 18613)",
+      "download_date": "2026-08-23",
+      "sha256": "3d9318b40aa95783d49129471d5585bde38416326bb4d5e7180b083498340527",
+      "local_filename": "dissertations/whiterose_18613_long_phd_sheffield.pdf",
+      "generator_producer": "pdfTeX-1.40.18 / LaTeX hyperref",
+      "generator_class": "LATEX",
+      "notes": "150pp LaTeX (pdfTeX) engineering PhD thesis - LaTeX-generated title page case; generic filename 'thesis.pdf'.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "University of Sheffield [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "Electronic and Electrical Engineering [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "utar_3904_meow_fyp_2019",
+      "source_url": "http://eprints.utar.edu.my/3904/1/fyp_EE_2019_MMZY.pdf",
+      "source_domain": "eprints.utar.edu.my",
+      "institution": "Universiti Tunku Abdul Rahman",
+      "document_type": "DISSERTATION",
+      "publicly_accessible": true,
+      "licence_status": "PUBLIC_REPOSITORY_RESEARCH_DOCUMENT",
+      "licence_text_or_reference": "UTAR Institutional Repository (EPrints) public item; embedded FMP submission form grants library/public softcopy access",
+      "download_date": "2026-08-23",
+      "sha256": "1dfa36ece78b978fa6972873f801abe019d8ce39c5b1bce691391cdab29dda41",
+      "local_filename": "dissertations/utar_3904_meow_fyp_2019.pdf",
+      "generator_producer": "Microsoft Word 2016",
+      "generator_class": "WORD",
+      "notes": "92pp Word FYP report; Malaysian institutional title-page style; ALL-CAPS title; public author Meow Mervyn Zi Yang.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "EXPLORING ARTIFICIAL INTELLIGENCE(AI) [MEDIUM]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "and quotations which have been duly acknowledged. I also declare that it has not been [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "utar_4719_lau_fyp_2022",
+      "source_url": "http://eprints.utar.edu.my/4719/1/fyp_IA_2022_LWQ.pdf",
+      "source_domain": "eprints.utar.edu.my",
+      "institution": "Universiti Tunku Abdul Rahman",
+      "document_type": "DISSERTATION",
+      "publicly_accessible": true,
+      "licence_status": "PUBLIC_REPOSITORY_RESEARCH_DOCUMENT",
+      "licence_text_or_reference": "UTAR Institutional Repository (EPrints) public item; embedded FM-IAD-004 submission sheet",
+      "download_date": "2026-08-23",
+      "sha256": "9c931c5f0e38780351bbbcf5b77440d75c31c2bc02814cf11089a7300ef99482",
+      "local_filename": "dissertations/utar_4719_lau_fyp_2022.pdf",
+      "generator_producer": "WPS Writer",
+      "generator_class": "WPS_WRITER",
+      "notes": "100pp WPS Writer-generated FYP (unusual generator). PRIVACY FLAG: author name+ID No appear on institutional submission form already intentionally public; see report privacy observations.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": true,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Smart phone usage Parental Monitoring & Control [MEDIUM]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "LAU WEI QING [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "utar_5904_wong_fyp_2023",
+      "source_url": "http://eprints.utar.edu.my/5904/1/ME_1804878__WEN_KANG_WONG.pdf",
+      "source_domain": "eprints.utar.edu.my",
+      "institution": "Universiti Tunku Abdul Rahman",
+      "document_type": "DISSERTATION",
+      "publicly_accessible": true,
+      "licence_status": "PUBLIC_REPOSITORY_RESEARCH_DOCUMENT",
+      "licence_text_or_reference": "UTAR Institutional Repository (EPrints) public item",
+      "download_date": "2026-08-23",
+      "sha256": "b727158d80b15a9def1508d393c86c73309b50afd6399aff4347309b8b9101b6",
+      "local_filename": "dissertations/utar_5904_wong_fyp_2023.pdf",
+      "generator_producer": "Acrobat PDFMaker 19 for Word",
+      "generator_class": "WORD_ACROBAT",
+      "notes": "131pp Acrobat-PDFMaker Word FYP; two-line stacked title; PRIVACY FLAG: repository filename embeds ID-style number ME_1804878.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": true,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "DEVELOPMENT OF A [MEDIUM]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "THERMOELECTRIC GENERATOR SYSTEM [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "kcl_sarkadi_phd_deception_2020",
+      "source_url": "https://core.ac.uk/download/587001065.pdf (mirror of KCL Research Portal / kclpure.kcl.ac.uk record)",
+      "source_domain": "core.ac.uk",
+      "institution": "King's College London",
+      "document_type": "THESIS",
+      "publicly_accessible": true,
+      "licence_status": "OPEN_LICENSE",
+      "licence_text_or_reference": "Embedded End User Licence Agreement: CC BY-NC-ND 4.0 unless otherwise stated",
+      "download_date": "2026-08-23",
+      "sha256": "c8e1678a1f75d91670d0c25a8606eb7f723c2bc6c2bd11788e48be84bf79430b",
+      "local_filename": "dissertations/kcl_sarkadi_phd_deception_2020.pdf",
+      "generator_producer": "pdfTeX-1.40.19 / LaTeX hyperref",
+      "generator_class": "LATEX",
+      "notes": "327pp LaTeX (pdfTeX) single-word-title PhD thesis; KCL portal cover sheets precede title page - multi-banner front matter case.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "King's College [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "Deception [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "mit_scm_capstone_zaunick_paredes_2025",
+      "source_url": "https://ctl.mit.edu/sites/default/files/documents/zaunicknastasja_170045_5333547_scm15_zaunick_paredes_capstonereport.pdf",
+      "source_domain": "ctl.mit.edu",
+      "institution": "Massachusetts Institute of Technology",
+      "document_type": "CAPSTONE",
+      "publicly_accessible": true,
+      "licence_status": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "licence_text_or_reference": "MIT Center for Transportation & Logistics publishes SCM capstone reports publicly on ctl.mit.edu",
+      "download_date": "2026-08-23",
+      "sha256": "18655901008e6a614bd79c3e3afeb6cc506c73e505e8d6f10c3efd5e69d4b838",
+      "local_filename": "project_reports/mit_scm_capstone_zaunick_paredes_2025.pdf",
+      "generator_producer": "Microsoft Word M365 -> macOS Quartz",
+      "generator_class": "WORD_PRINT",
+      "notes": "TWO co-authors on title page - multi-name case; Word-for-M365 printed via Quartz.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "AI-powered RFx Intelligence for Strategic Supplier Excellence [MEDIUM]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "my dreams. Finally, I extend my heartfelt appreciation to my siblings, extended family, colleagues, [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "aiub_capstone_smart_water_metering_2023",
+      "source_url": "https://dspace.aiub.edu/jspui/bitstream/123456789/871/1/Capstone%20Project%20Book%202022.2.25.pdf",
+      "source_domain": "dspace.aiub.edu",
+      "institution": "American International University-Bangladesh",
+      "document_type": "CAPSTONE",
+      "publicly_accessible": true,
+      "licence_status": "PUBLIC_REPOSITORY_RESEARCH_DOCUMENT",
+      "licence_text_or_reference": "AIUB DSpace institutional repository public item",
+      "download_date": "2026-08-23",
+      "sha256": "47203f9da9e625a98a4fb58a108269a0d1500ec173e1c5220350fe97b69ade98",
+      "local_filename": "project_reports/aiub_capstone_smart_water_metering_2023.pdf",
+      "generator_producer": "Microsoft Print To PDF",
+      "generator_class": "PRINT_TO_PDF",
+      "notes": "GROUP capstone: multiple student authors on examiner page (institutionally published); Microsoft Print To PDF generator; South Asian title-page layout.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "American International University [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "SMART WATER METERING AND QUALITY MONITORING [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "ashesi_waweru_applied_project_2019",
+      "source_url": "https://core.ac.uk/download/270093281.pdf (mirror of Ashesi institutional repository item)",
+      "source_domain": "core.ac.uk",
+      "institution": "Ashesi University",
+      "document_type": "PROJECT_REPORT",
+      "publicly_accessible": true,
+      "licence_status": "PUBLIC_REPOSITORY_RESEARCH_DOCUMENT",
+      "licence_text_or_reference": "CORE aggregate of Ashesi University open institutional repository",
+      "download_date": "2026-08-23",
+      "sha256": "f0834b0eb4f6cc1e18cbf73a9ac87fc428eaa6fa83df9cb6974260062c274826",
+      "local_filename": "project_reports/ashesi_waweru_applied_project_2019.pdf",
+      "generator_producer": "Microsoft Word 2013",
+      "generator_class": "WORD",
+      "notes": "58pp Word applied project; Ghanaian university; extractor mistook author line for project_title - useful wrong-field case.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Ashesi University College [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "Alex Waweru [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    },
+    {
+      "document_id": "berklee_gomez_final_paper_2020",
+      "source_url": "https://core.ac.uk/download/591076209.pdf (CORE record of Berklee Valencia master final paper)",
+      "source_domain": "core.ac.uk",
+      "institution": "Berklee College of Music (Valencia)",
+      "document_type": "PORTFOLIO_REPORT",
+      "publicly_accessible": true,
+      "licence_status": "PUBLIC_REPOSITORY_RESEARCH_DOCUMENT",
+      "licence_text_or_reference": "Recognised open repository (CORE) record of institutionally submitted final paper",
+      "download_date": "2026-08-23",
+      "sha256": "8aefbadc85fd554316868b65af0bb1343408b927486cc822d2b16a563e7c23a9",
+      "local_filename": "public_examples/berklee_gomez_final_paper_2020.pdf",
+      "generator_producer": "Apple Pages -> macOS Quartz",
+      "generator_class": "PAGES",
+      "notes": "27pp Apple PAGES->Quartz generated final paper - rare generator; arts/portfolio format; two supervisors listed.",
+      "contains_public_author_name": true,
+      "contains_module_code": false,
+      "contains_project_title": true,
+      "contains_public_student_id": false,
+      "image_only": false,
+      "first_pass_detected": {
+        "student_name": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "student_id": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "university": {
+          "value": "Berklee College [HIGH]",
+          "confidence": ""
+        },
+        "module_code": {
+          "value": "MISSING [MISSING]",
+          "confidence": ""
+        },
+        "project_title": {
+          "value": "Master of Music in Production, Technology, and Innovation [MEDIUM]",
+          "confidence": ""
+        }
+      },
+      "qualification_eligible": true
+    }
+  ]
+}

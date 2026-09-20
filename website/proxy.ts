@@ -16,6 +16,17 @@ import type { NextRequest } from "next/server";
 // service variables (not committed anywhere) to unlock the page.
 const REALM = "NITE DSP Portfolio";
 
+function timingSafeEqual(a: string, b: string): boolean {
+  const aCodes = Array.from(a, (ch) => ch.codePointAt(0) ?? 0);
+  const bCodes = Array.from(b, (ch) => ch.codePointAt(0) ?? 0);
+  const longest = Math.max(aCodes.length, bCodes.length);
+  let diff = aCodes.length ^ bCodes.length;
+  for (let i = 0; i < longest; i++) {
+    diff |= (aCodes[i] ?? 0) ^ (bCodes[i] ?? 0);
+  }
+  return diff === 0;
+}
+
 function unauthorized(): NextResponse {
   return new NextResponse("Authentication required.", {
     status: 401,
@@ -51,7 +62,10 @@ export function proxy(request: NextRequest): NextResponse {
   const separatorIndex = decoded.indexOf(":");
   const suppliedPassword = separatorIndex === -1 ? decoded : decoded.slice(separatorIndex + 1);
 
-  if (suppliedPassword !== configuredPassword) {
+  // Constant-time compare (pure JS so it runs in the edge runtime, where
+  // node's crypto.timingSafeEqual isn't available). Early-exit !== would
+  // leak how many leading characters matched via timing.
+  if (!timingSafeEqual(suppliedPassword, configuredPassword)) {
     return unauthorized();
   }
 

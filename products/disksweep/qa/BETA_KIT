@@ -1,0 +1,25 @@
+DiskSweep beta kit (10 testers)
+
+RECRUIT: 1 Ableton/plugin user, 1 Xcode user, 1 Docker user, 1 Ollama/HF user,
+1 photographer (large media), 5 general Mac users. macOS 14+.
+
+GIVE EACH TESTER:
+1. The DMG + its .sha256 (verify before opening).
+2. This instruction: run DiskSweep, press Dry Run, screenshot the table,
+   do NOT press Move to Trash on REVIEW rows on first run.
+
+ASK FOR (paste into reply):
+- macOS version / chip (arm64 or Intel):
+- Dry-run SAFE total / REVIEW total:
+- False SAFE (should have been REVIEW/BLOCKED — path + why):
+- False REVIEW (obviously safe — path + why):
+- Missing (big folder you expected listed but wasn't):
+- Crash / hang / permission loop (what + where):
+- Undo test: trash one SAFE cache dir, restore via Undo — worked?
+
+EXIT CRITERIA: zero data-loss reports, zero BLOCKED bypasses, uninstall
+(drag to Trash) leaves no daemon/helper (check /Library/LaunchDaemons for
+com.nitedsp.* — must be absent).
+
+Every valid false-SAFE/false-BLOCKED report becomes one new policy test
+in tests/test_policy.py before the fix lands.

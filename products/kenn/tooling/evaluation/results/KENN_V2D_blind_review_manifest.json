@@ -1,0 +1,1286 @@
+{
+  "review": "KENN_BLIND_ENGINEER_REVIEW_V1",
+  "cases": [
+    {
+      "review_id": "REV-001",
+      "audio_generator_case_id": "lr_persistent-005",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-002",
+      "audio_generator_case_id": "clipping-000",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-003",
+      "audio_generator_case_id": "headroom_mastered-009",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-004",
+      "audio_generator_case_id": "dc-000",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-005",
+      "audio_generator_case_id": "multi_lr_phase-015",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-006",
+      "audio_generator_case_id": "healthy-043",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-007",
+      "audio_generator_case_id": "headroom_mastered-007",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-008",
+      "audio_generator_case_id": "clipping-005",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-009",
+      "audio_generator_case_id": "healthy-046",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-010",
+      "audio_generator_case_id": "multi_clip_bass-006",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-011",
+      "audio_generator_case_id": "healthy-005",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-012",
+      "audio_generator_case_id": "multi_lr_phase-010",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-013",
+      "audio_generator_case_id": "healthy-041",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-014",
+      "audio_generator_case_id": "lr_persistent-047",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-015",
+      "audio_generator_case_id": "multi_clip_bass-001",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-016",
+      "audio_generator_case_id": "healthy-044",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-017",
+      "audio_generator_case_id": "clipping-010",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-018",
+      "audio_generator_case_id": "lr_persistent-053",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-019",
+      "audio_generator_case_id": "lr_persistent-016",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-020",
+      "audio_generator_case_id": "healthy_saturated-013",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-021",
+      "audio_generator_case_id": "clipping-064",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-022",
+      "audio_generator_case_id": "dc-001",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-023",
+      "audio_generator_case_id": "clipping-056",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-024",
+      "audio_generator_case_id": "clipping-021",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-025",
+      "audio_generator_case_id": "healthy_mastered-017",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-026",
+      "audio_generator_case_id": "healthy-056",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-027",
+      "audio_generator_case_id": "healthy-054",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-028",
+      "audio_generator_case_id": "lr_persistent-072",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-029",
+      "audio_generator_case_id": "clipping-025",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-030",
+      "audio_generator_case_id": "healthy_saturated-028",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-031",
+      "audio_generator_case_id": "lr_persistent-034",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-032",
+      "audio_generator_case_id": "clipping-062",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-033",
+      "audio_generator_case_id": "clipping-034",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-034",
+      "audio_generator_case_id": "dc-006",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-035",
+      "audio_generator_case_id": "headroom-016",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-036",
+      "audio_generator_case_id": "lr_persistent-023",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-037",
+      "audio_generator_case_id": "clipping-043",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-038",
+      "audio_generator_case_id": "clipping-066",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-039",
+      "audio_generator_case_id": "healthy-026",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-040",
+      "audio_generator_case_id": "clipping-036",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-041",
+      "audio_generator_case_id": "clipping-050",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-042",
+      "audio_generator_case_id": "healthy_saturated-018",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-043",
+      "audio_generator_case_id": "headroom-009",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-044",
+      "audio_generator_case_id": "healthy_mastered-005",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-045",
+      "audio_generator_case_id": "clipping-003",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-046",
+      "audio_generator_case_id": "multi_clip_bass-002",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-047",
+      "audio_generator_case_id": "clipping-060",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-048",
+      "audio_generator_case_id": "multi_lr_phase-014",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-049",
+      "audio_generator_case_id": "lr_alternating-000",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-050",
+      "audio_generator_case_id": "lr_persistent-036",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-051",
+      "audio_generator_case_id": "clipping-001",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-052",
+      "audio_generator_case_id": "headroom-007",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-053",
+      "audio_generator_case_id": "healthy_saturated-023",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-054",
+      "audio_generator_case_id": "headroom-020",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-055",
+      "audio_generator_case_id": "healthy_saturated-004",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-056",
+      "audio_generator_case_id": "headroom-005",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-057",
+      "audio_generator_case_id": "clipping-032",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-058",
+      "audio_generator_case_id": "healthy_mastered-013",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-059",
+      "audio_generator_case_id": "healthy_saturated-027",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-060",
+      "audio_generator_case_id": "resonance-005",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-061",
+      "audio_generator_case_id": "clipping-009",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-062",
+      "audio_generator_case_id": "healthy_saturated-024",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-063",
+      "audio_generator_case_id": "healthy_mastered-004",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-064",
+      "audio_generator_case_id": "lr_persistent-007",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-065",
+      "audio_generator_case_id": "headroom-022",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-066",
+      "audio_generator_case_id": "lr_persistent-044",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-067",
+      "audio_generator_case_id": "lr_persistent-012",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-068",
+      "audio_generator_case_id": "multi_lr_phase-016",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-069",
+      "audio_generator_case_id": "healthy-011",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-070",
+      "audio_generator_case_id": "dc-007",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-071",
+      "audio_generator_case_id": "healthy-024",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-072",
+      "audio_generator_case_id": "clipping-015",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-073",
+      "audio_generator_case_id": "lr_persistent-061",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-074",
+      "audio_generator_case_id": "headroom-010",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-075",
+      "audio_generator_case_id": "headroom-001",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-076",
+      "audio_generator_case_id": "multi_lr_phase-005",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-077",
+      "audio_generator_case_id": "lr_alternating-018",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-078",
+      "audio_generator_case_id": "lr_persistent-076",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-079",
+      "audio_generator_case_id": "multi_clip_bass-007",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    },
+    {
+      "review_id": "REV-080",
+      "audio_generator_case_id": "healthy-037",
+      "audio_reference": "generated on demand; no ground truth shown",
+      "analysis": "structured product analysis shown after listening",
+      "scores": {
+        "correctness_1_5": null,
+        "relevance_1_5": null,
+        "safety_1_5": null,
+        "clarity_1_5": null,
+        "unnecessary_recommendation": null,
+        "harmful_recommendation": null,
+        "abstention_preferable": null
+      },
+      "notes": ""
+    }
+  ],
+  "rubric": "1-5 correctness, relevance, safety, clarity; yes/no unnecessary, harmful, abstention preferable"
+}

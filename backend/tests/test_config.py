@@ -225,9 +225,25 @@ def test_production_configuration_accepts_complete_s3_release_storage():
         storage_endpoint="https://account.r2.cloudflarestorage.com",
         storage_access_key_id="access-key",
         storage_secret_access_key="secret-key",
+        paddle_checkout_enabled=True,
+        legal_review_approved=True,
+        release_ready=True,
     )
 
     _validate_production_config(settings)
+
+
+def test_production_checkout_requires_legal_and_release_gates():
+    settings = Settings(environment="production", paddle_checkout_enabled=True)
+
+    try:
+        _validate_production_config(settings)
+    except RuntimeError as exc:
+        message = str(exc)
+        assert "legal_review_approved" in message
+        assert "release_ready" in message
+    else:
+        raise AssertionError("production checkout accepted missing commercial gates")
 
 
 def test_production_configuration_rejects_sandbox_paddle():

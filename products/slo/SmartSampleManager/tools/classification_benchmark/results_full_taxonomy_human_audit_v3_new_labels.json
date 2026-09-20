@@ -1,0 +1,539 @@
+{
+  "generated": "2026-09-11T14:32:59",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 8,
+    "splits": 5,
+    "human_sources": [
+      "verified_drums.csv",
+      "verified_drums_expanded.csv"
+    ],
+    "training_corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_v3.npz",
+    "evaluation_path_set": null,
+    "evaluation_manifest": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/human_label_embedding_manifest_v1.jsonl",
+    "conflicting_rows_excluded": true,
+    "trusted_name_precision": {
+      "Kick": 0.97,
+      "Hi-Hat": 0.94,
+      "Snare": 0.92,
+      "Clap": 0.9,
+      "Crash": 0.89,
+      "Percussion Loop": 1.0,
+      "Drum Loop": 0.78
+    }
+  },
+  "n_rows": 256,
+  "n_collections": 79,
+  "classes": [
+    "Bass Hit",
+    "Bass Loop",
+    "Bass Reese",
+    "Chord Loop",
+    "Clap",
+    "Crash",
+    "Drum Loop",
+    "Foley",
+    "Foley Loop",
+    "Hi-Hat",
+    "Hi-Hat Loop",
+    "Kick",
+    "Kick Loop",
+    "Other/none",
+    "Pad",
+    "Percussion",
+    "Percussion Loop",
+    "Rimshot",
+    "SFX",
+    "Snare",
+    "Synth Loop",
+    "Synth One-Shot",
+    "Vocal Loop",
+    "Vocal One-Shot",
+    "Weather/Nature Atmos"
+  ],
+  "trusted_name_override_by_class": {
+    "Crash": {
+      "support": 34,
+      "correct": 34,
+      "precision": 1.0
+    },
+    "Percussion Loop": {
+      "support": 34,
+      "correct": 34,
+      "precision": 1.0
+    }
+  },
+  "results": {
+    "audio": {
+      "accuracy_mean": 59.18,
+      "accuracy_sd": 1.94,
+      "macro_f1": 19.58,
+      "override_precision": null,
+      "override_rate": 0.0,
+      "per_seed_accuracy": [
+        60.94,
+        60.55,
+        60.16,
+        54.69,
+        58.98,
+        58.2,
+        58.98,
+        60.94
+      ],
+      "per_class": {
+        "Bass Loop": {
+          "precision": 0.9198,
+          "recall": 0.7386,
+          "f1": 0.8193,
+          "n": 264
+        },
+        "Chord Loop": {
+          "precision": 0.5537,
+          "recall": 0.4786,
+          "f1": 0.5134,
+          "n": 280
+        },
+        "Crash": {
+          "precision": 0.8561,
+          "recall": 0.875,
+          "f1": 0.8655,
+          "n": 272
+        },
+        "Foley": {
+          "precision": 0.776,
+          "recall": 0.3464,
+          "f1": 0.479,
+          "n": 280
+        },
+        "Foley Loop": {
+          "precision": 0.1789,
+          "recall": 0.1375,
+          "f1": 0.1555,
+          "n": 160
+        },
+        "Hi-Hat Loop": {
+          "precision": 0.7157,
+          "recall": 0.8359,
+          "f1": 0.7712,
+          "n": 256
+        },
+        "Percussion Loop": {
+          "precision": 0.8308,
+          "recall": 0.3971,
+          "f1": 0.5373,
+          "n": 272
+        },
+        "Rimshot": {
+          "precision": 0.7365,
+          "recall": 0.7727,
+          "f1": 0.7542,
+          "n": 264
+        }
+      },
+      "suggestion_operating_points": {
+        "0.400": {
+          "Bass Loop": {
+            "selected": 15,
+            "precision": 0.7333333333333333,
+            "coverage": 0.00732421875
+          },
+          "Crash": {
+            "selected": 215,
+            "precision": 1.0,
+            "coverage": 0.10498046875
+          },
+          "Hi-Hat Loop": {
+            "selected": 247,
+            "precision": 0.7732793522267206,
+            "coverage": 0.12060546875
+          },
+          "Percussion Loop": {
+            "selected": 50,
+            "precision": 1.0,
+            "coverage": 0.0244140625
+          }
+        },
+        "0.500": {
+          "Bass Loop": {
+            "selected": 2,
+            "precision": 1.0,
+            "coverage": 0.0009765625
+          },
+          "Crash": {
+            "selected": 201,
+            "precision": 1.0,
+            "coverage": 0.09814453125
+          },
+          "Hi-Hat Loop": {
+            "selected": 200,
+            "precision": 0.81,
+            "coverage": 0.09765625
+          },
+          "Percussion Loop": {
+            "selected": 33,
+            "precision": 1.0,
+            "coverage": 0.01611328125
+          }
+        },
+        "0.600": {
+          "Bass Loop": {
+            "selected": 0,
+            "precision": null,
+            "coverage": 0.0
+          },
+          "Crash": {
+            "selected": 183,
+            "precision": 1.0,
+            "coverage": 0.08935546875
+          },
+          "Hi-Hat Loop": {
+            "selected": 154,
+            "precision": 0.8376623376623377,
+            "coverage": 0.0751953125
+          },
+          "Percussion Loop": {
+            "selected": 1,
+            "precision": 1.0,
+            "coverage": 0.00048828125
+          }
+        },
+        "0.685": {
+          "Bass Loop": {
+            "selected": 0,
+            "precision": null,
+            "coverage": 0.0
+          },
+          "Crash": {
+            "selected": 160,
+            "precision": 1.0,
+            "coverage": 0.078125
+          },
+          "Hi-Hat Loop": {
+            "selected": 95,
+            "precision": 0.8315789473684211,
+            "coverage": 0.04638671875
+          },
+          "Percussion Loop": {
+            "selected": 0,
+            "precision": null,
+            "coverage": 0.0
+          }
+        }
+      }
+    },
+    "name_if_audio_conf_below_0.70": {
+      "accuracy_mean": 67.63,
+      "accuracy_sd": 1.94,
+      "macro_f1": 22.03,
+      "override_precision": 100.0,
+      "override_rate": 17.77,
+      "per_seed_accuracy": [
+        69.14,
+        69.53,
+        68.75,
+        63.28,
+        67.19,
+        66.41,
+        67.58,
+        69.14
+      ],
+      "per_class": {
+        "Bass Loop": {
+          "precision": 0.9466,
+          "recall": 0.7386,
+          "f1": 0.8298,
+          "n": 264
+        },
+        "Chord Loop": {
+          "precision": 0.5726,
+          "recall": 0.4786,
+          "f1": 0.5214,
+          "n": 280
+        },
+        "Crash": {
+          "precision": 0.8874,
+          "recall": 0.9559,
+          "f1": 0.9204,
+          "n": 272
+        },
+        "Foley": {
+          "precision": 0.7823,
+          "recall": 0.3464,
+          "f1": 0.4802,
+          "n": 280
+        },
+        "Foley Loop": {
+          "precision": 0.2268,
+          "recall": 0.1375,
+          "f1": 0.1712,
+          "n": 160
+        },
+        "Hi-Hat Loop": {
+          "precision": 0.9345,
+          "recall": 0.8359,
+          "f1": 0.8825,
+          "n": 256
+        },
+        "Percussion Loop": {
+          "precision": 0.925,
+          "recall": 0.9522,
+          "f1": 0.9384,
+          "n": 272
+        },
+        "Rimshot": {
+          "precision": 0.7556,
+          "recall": 0.7727,
+          "f1": 0.764,
+          "n": 264
+        }
+      },
+      "suggestion_operating_points": {
+        "0.400": {
+          "Bass Loop": {
+            "selected": 11,
+            "precision": 1.0,
+            "coverage": 0.00537109375
+          },
+          "Crash": {
+            "selected": 260,
+            "precision": 1.0,
+            "coverage": 0.126953125
+          },
+          "Hi-Hat Loop": {
+            "selected": 204,
+            "precision": 0.9362745098039216,
+            "coverage": 0.099609375
+          },
+          "Percussion Loop": {
+            "selected": 259,
+            "precision": 1.0,
+            "coverage": 0.12646484375
+          }
+        },
+        "0.500": {
+          "Bass Loop": {
+            "selected": 2,
+            "precision": 1.0,
+            "coverage": 0.0009765625
+          },
+          "Crash": {
+            "selected": 260,
+            "precision": 1.0,
+            "coverage": 0.126953125
+          },
+          "Hi-Hat Loop": {
+            "selected": 175,
+            "precision": 0.9257142857142857,
+            "coverage": 0.08544921875
+          },
+          "Percussion Loop": {
+            "selected": 259,
+            "precision": 1.0,
+            "coverage": 0.12646484375
+          }
+        },
+        "0.600": {
+          "Bass Loop": {
+            "selected": 0,
+            "precision": null,
+            "coverage": 0.0
+          },
+          "Crash": {
+            "selected": 260,
+            "precision": 1.0,
+            "coverage": 0.126953125
+          },
+          "Hi-Hat Loop": {
+            "selected": 142,
+            "precision": 0.9084507042253521,
+            "coverage": 0.0693359375
+          },
+          "Percussion Loop": {
+            "selected": 259,
+            "precision": 1.0,
+            "coverage": 0.12646484375
+          }
+        },
+        "0.685": {
+          "Bass Loop": {
+            "selected": 0,
+            "precision": null,
+            "coverage": 0.0
+          },
+          "Crash": {
+            "selected": 260,
+            "precision": 1.0,
+            "coverage": 0.126953125
+          },
+          "Hi-Hat Loop": {
+            "selected": 92,
+            "precision": 0.8586956521739131,
+            "coverage": 0.044921875
+          },
+          "Percussion Loop": {
+            "selected": 259,
+            "precision": 1.0,
+            "coverage": 0.12646484375
+          }
+        }
+      }
+    },
+    "name_always": {
+      "accuracy_mean": 68.85,
+      "accuracy_sd": 2.2,
+      "macro_f1": 22.32,
+      "override_precision": 100.0,
+      "override_rate": 26.56,
+      "per_seed_accuracy": [
+        71.09,
+        70.31,
+        69.53,
+        63.67,
+        68.75,
+        67.58,
+        69.53,
+        70.31
+      ],
+      "per_class": {
+        "Bass Loop": {
+          "precision": 0.9466,
+          "recall": 0.7386,
+          "f1": 0.8298,
+          "n": 264
+        },
+        "Chord Loop": {
+          "precision": 0.5726,
+          "recall": 0.4786,
+          "f1": 0.5214,
+          "n": 280
+        },
+        "Crash": {
+          "precision": 0.8918,
+          "recall": 1.0,
+          "f1": 0.9428,
+          "n": 272
+        },
+        "Foley": {
+          "precision": 0.7823,
+          "recall": 0.3464,
+          "f1": 0.4802,
+          "n": 280
+        },
+        "Foley Loop": {
+          "precision": 0.2268,
+          "recall": 0.1375,
+          "f1": 0.1712,
+          "n": 160
+        },
+        "Hi-Hat Loop": {
+          "precision": 0.9907,
+          "recall": 0.8359,
+          "f1": 0.9068,
+          "n": 256
+        },
+        "Percussion Loop": {
+          "precision": 0.9283,
+          "recall": 1.0,
+          "f1": 0.9628,
+          "n": 272
+        },
+        "Rimshot": {
+          "precision": 0.7556,
+          "recall": 0.7727,
+          "f1": 0.764,
+          "n": 264
+        }
+      },
+      "suggestion_operating_points": {
+        "0.400": {
+          "Bass Loop": {
+            "selected": 11,
+            "precision": 1.0,
+            "coverage": 0.00537109375
+          },
+          "Crash": {
+            "selected": 272,
+            "precision": 1.0,
+            "coverage": 0.1328125
+          },
+          "Hi-Hat Loop": {
+            "selected": 191,
+            "precision": 1.0,
+            "coverage": 0.09326171875
+          },
+          "Percussion Loop": {
+            "selected": 272,
+            "precision": 1.0,
+            "coverage": 0.1328125
+          }
+        },
+        "0.500": {
+          "Bass Loop": {
+            "selected": 2,
+            "precision": 1.0,
+            "coverage": 0.0009765625
+          },
+          "Crash": {
+            "selected": 272,
+            "precision": 1.0,
+            "coverage": 0.1328125
+          },
+          "Hi-Hat Loop": {
+            "selected": 162,
+            "precision": 1.0,
+            "coverage": 0.0791015625
+          },
+          "Percussion Loop": {
+            "selected": 272,
+            "precision": 1.0,
+            "coverage": 0.1328125
+          }
+        },
+        "0.600": {
+          "Bass Loop": {
+            "selected": 0,
+            "precision": null,
+            "coverage": 0.0
+          },
+          "Crash": {
+            "selected": 272,
+            "precision": 1.0,
+            "coverage": 0.1328125
+          },
+          "Hi-Hat Loop": {
+            "selected": 129,
+            "precision": 1.0,
+            "coverage": 0.06298828125
+          },
+          "Percussion Loop": {
+            "selected": 272,
+            "precision": 1.0,
+            "coverage": 0.1328125
+          }
+        },
+        "0.685": {
+          "Bass Loop": {
+            "selected": 0,
+            "precision": null,
+            "coverage": 0.0
+          },
+          "Crash": {
+            "selected": 272,
+            "precision": 1.0,
+            "coverage": 0.1328125
+          },
+          "Hi-Hat Loop": {
+            "selected": 79,
+            "precision": 1.0,
+            "coverage": 0.03857421875
+          },
+          "Percussion Loop": {
+            "selected": 272,
+            "precision": 1.0,
+            "coverage": 0.1328125
+          }
+        }
+      }
+    }
+  }
+}

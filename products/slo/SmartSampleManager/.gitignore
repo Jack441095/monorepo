@@ -1,0 +1,26 @@
+tools/classification_benchmark/clap_input_features.npy
+tools/classification_benchmark/clap_input_features_paths.json
+tools/classification_benchmark/lora_oof_*.npy
+tools/classification_benchmark/.inventory_cache.json
+tools/classification_benchmark/_dg_groups.npz
+tools/classification_benchmark/sample_library_inventory_v1.json
+tools/classification_benchmark/label_manifest_domain_coverage.json
+tools/classification_benchmark/dasheng_emb.npz
+tools/classification_benchmark/aug_cache/
+tools/classification_benchmark/corpus_v2.npz
+
+# SLO Ground Truth V1 is a versioned ASSET and must be tracked.
+# It contains file paths and labels -- metadata, never audio.
+!tools/classification_benchmark/ground_truth/
+!tools/classification_benchmark/ground_truth/**
+
+# By-ear label CSVs are PRODUCT-CRITICAL GROUND TRUTH. They contain file paths
+# and labels -- metadata, never audio -- so tracking them distributes no
+# licensed content, and losing them costs owner time that cannot be recovered.
+# The blanket verified_*.csv ignore stays for scratch files; these four are
+# explicitly un-ignored.
+!tools/classification_benchmark/verified_drums.csv
+!tools/classification_benchmark/verified_domain_coverage.csv
+!tools/classification_benchmark/verified_percussion_subtype.csv
+!tools/classification_benchmark/verified_percussion_corrections.csv
+!tools/classification_benchmark/verified_bass.csv

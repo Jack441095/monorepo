@@ -1,0 +1,1606 @@
+{
+  "product_holdout": [
+    {
+      "case_id": "healthy-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-034",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-039",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-044",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-049",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-054",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy-059",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_mastered-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_mastered-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_mastered-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_mastered-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_mastered-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_mastered-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_saturated-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_saturated-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_saturated-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_saturated-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_saturated-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "healthy_saturated-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-034",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-039",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-044",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-049",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-054",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-059",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-064",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-069",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-074",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "clipping-079",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-034",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-039",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-044",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-049",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-054",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom-059",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom_mastered-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom_mastered-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom_mastered-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "headroom_mastered-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-034",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-039",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-044",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-049",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-054",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-059",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-064",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-069",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-074",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_persistent-079",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_alternating-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_alternating-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_alternating-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "lr_alternating-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "multi_clip_bass-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "multi_clip_bass-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "multi_clip_bass-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "multi_clip_bass-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "multi_lr_phase-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "multi_lr_phase-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "multi_lr_phase-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "multi_lr_phase-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "dc-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "dc-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "resonance-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "resonance-009",
+      "decoder": "wave",
+      "exact": true
+    }
+  ],
+  "realistic": [
+    {
+      "case_id": "realistic-healthy-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-001",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-002",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-003",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-006",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-007",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-008",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-011",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-012",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-013",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-016",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-017",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-018",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-020",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-021",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-022",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-023",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-025",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-026",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-027",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-028",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-030",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-031",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-032",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-033",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-034",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-035",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-036",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-037",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-038",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-039",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-040",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-041",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-042",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-043",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-044",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-045",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-046",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-047",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-048",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-049",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-050",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-051",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-052",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-053",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-054",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-055",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-056",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-057",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-058",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy-059",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-001",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-002",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-003",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-006",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-007",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-008",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-011",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-012",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-013",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-016",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-017",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-018",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-020",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-021",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-022",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-023",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-025",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-026",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-027",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-028",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_mastered-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-001",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-002",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-003",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-006",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-007",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-008",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-011",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-012",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-013",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-016",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-017",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-018",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-020",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-021",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-022",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-023",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-024",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-025",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-026",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-027",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-028",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-healthy_saturated-029",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-020",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-025",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-030",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-035",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-040",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-045",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-050",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-055",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-060",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-065",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-070",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-clipping-075",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-020",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-025",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-030",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-035",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-040",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-045",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-050",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom-055",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom_mastered-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom_mastered-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom_mastered-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-headroom_mastered-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-020",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-025",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-030",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-035",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-040",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-045",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-050",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-055",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-060",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-065",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-070",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_persistent-075",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-001",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-002",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-003",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-006",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-007",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-008",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-011",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-012",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-013",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-016",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-017",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-018",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-lr_alternating-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-001",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-002",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-003",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-006",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-007",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-008",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-011",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-012",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-013",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-016",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-017",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-018",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_clip_bass-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-001",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-002",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-003",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-004",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-006",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-007",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-008",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-009",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-010",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-011",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-012",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-013",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-014",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-015",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-016",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-017",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-018",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-019",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-dc-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-dc-005",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-resonance-000",
+      "decoder": "wave",
+      "exact": true
+    },
+    {
+      "case_id": "realistic-resonance-005",
+      "decoder": "wave",
+      "exact": true
+    }
+  ]
+}

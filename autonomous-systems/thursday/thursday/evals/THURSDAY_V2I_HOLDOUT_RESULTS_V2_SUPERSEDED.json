@@ -1,0 +1,77 @@
+{
+  "holdout": "THURSDAY_LONG_HORIZON_HOLDOUT_V2",
+  "frozen_digest_sha256": "4b91cd2cfa6f49c43dc05ad8fbde53c926b561d2778a905a7129f6cded950f16",
+  "run_count": 1,
+  "contamination": "NO",
+  "executed_at_epoch": 1787526549.310261,
+  "elapsed_seconds": 0.49,
+  "total": 12,
+  "passed": 12,
+  "failed": 0,
+  "qualified": true,
+  "results": [
+    {
+      "case": "H-01 seeded 21-day integrity-clean run",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-02 seeded 45-day integrity-clean run with crashes",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-03 approval replay refused on drifted target",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-04 multi-day TOCTOU drift refuses execution",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-05 restart preserves waiting approvals and credentials",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-06 compaction leaves critical provenance intact",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-07 brief quality holds across 14 days",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-08 rejected work not re-asked without new evidence",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-09 priority order stable across quiet week",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-10 expired owner decision inert",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-11 candidate identity collision resisted",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-12 simulated clock refuses rewind",
+      "pass": true,
+      "error": ""
+    }
+  ],
+  "status": "SUPERSEDED",
+  "superseded_by": "THURSDAY_LONG_HORIZON_HOLDOUT_V3",
+  "justification": "V2 executed 12/12 cleanly against the then-current code. Afterward a defect was found and fixed in the daily-brief composition path (previous-brief delta map was captured after mutations, so 'changed since last brief' was always empty). Because the fix alters run_day behaviour, the V2 artifact no longer describes the shipping system. Per freeze discipline V2 is preserved unmodified, declared superseded for traceability, and replaced by V3 (fresh digest, single execution). No case content was tuned against observed outcomes."
+}

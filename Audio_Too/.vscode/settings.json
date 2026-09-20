@@ -1,0 +1,15 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.extraPaths": [
+    "scripts",
+    "business",
+    "business/app",
+    "business/agents",
+    "studio",
+    "studio/kenn",
+    "studio/audio_analysis",
+    "studio/audiogen/audiogen",
+    "thursday"
+  ]
+}

@@ -1,0 +1,1198 @@
+{
+  "record_type": "slo_audio_definition_cards",
+  "schema_version": "1.0.0",
+  "feature_version": "definition_card_v1",
+  "generated": "2026-09-11T17:20:04",
+  "safety": {
+    "read_only": true,
+    "source_files_modified": false,
+    "semantic_labels_created": false,
+    "rename_actions": false
+  },
+  "n_requested": 20,
+  "n_cards": 20,
+  "n_errors": 0,
+  "cards": [
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Cajon_Loop_83_Percussion_Bendji_Allonce_115_loop.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 2.087,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -20.672500015910046,
+        "peak_dbfs": -1.1261773484451798,
+        "crest_factor": 9.491090911871941,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.0025,
+        "trailing_silence_seconds": 0.002
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 2224.7281988651575,
+        "spectral_rolloff_hz": 5095.170454545455,
+        "spectral_flatness": 0.07228656858205795,
+        "zero_crossing_rate": 0.10768081202651515,
+        "low_band_energy_ratio": 0.9214637840121754,
+        "high_band_energy_ratio": 0.04779781338560899,
+        "harmonic_energy_ratio": 0.4127825200557709
+      },
+      "temporal": {
+        "onset_count": 14,
+        "onset_density_per_second": 6.70819357930043,
+        "estimated_tempo_bpm": 117.1875,
+        "periodicity_seconds": 0.256,
+        "periodicity_strength": 0.2635877187834638,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 75.22735771546394,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.9406184917645825
+      },
+      "heuristic_tags": [
+        "low_end_heavy",
+        "transient_dense"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 8.0,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -19.387450836062758,
+        "peak_dbfs": -3.738804184414545,
+        "crest_factor": 6.059437810788446,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.00175,
+        "trailing_silence_seconds": 0.0033125
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 2518.8101142318837,
+        "spectral_rolloff_hz": 4745.642430278885,
+        "spectral_flatness": 0.0809837132692337,
+        "zero_crossing_rate": 0.18044618401394422,
+        "low_band_energy_ratio": 0.8835337284537508,
+        "high_band_energy_ratio": 0.05312698811987921,
+        "harmonic_energy_ratio": 0.44007736444473267
+      },
+      "temporal": {
+        "onset_count": 64,
+        "onset_density_per_second": 8.0,
+        "estimated_tempo_bpm": 156.25,
+        "periodicity_seconds": 1.984,
+        "periodicity_strength": 0.42136250761819455,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 190.54853245469437,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.7696099041285399
+      },
+      "heuristic_tags": [
+        "low_end_heavy",
+        "transient_dense"
+      ],
+      "uncertainty_reasons": []
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Djembe_Loop_25_Percussion_Bendji_Allonce_120_loop.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 8.0,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -18.79458566507266,
+        "peak_dbfs": -1.0195064122819073,
+        "crest_factor": 7.74023172445208,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.0025,
+        "trailing_silence_seconds": 0.00075
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1673.1976963707802,
+        "spectral_rolloff_hz": 3727.434013944223,
+        "spectral_flatness": 0.021812358871102333,
+        "zero_crossing_rate": 0.06888461777888447,
+        "low_band_energy_ratio": 0.8040659003279078,
+        "high_band_energy_ratio": 0.02407741788621866,
+        "harmonic_energy_ratio": 0.6150822043418884
+      },
+      "temporal": {
+        "onset_count": 59,
+        "onset_density_per_second": 7.375,
+        "estimated_tempo_bpm": 98.6842105263158,
+        "periodicity_seconds": 2.016,
+        "periodicity_strength": 0.46679250955542434,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 67.78408231035188,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.9420102042220202
+      },
+      "heuristic_tags": [
+        "low_end_heavy",
+        "tonal_or_harmonic",
+        "transient_dense"
+      ],
+      "uncertainty_reasons": []
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Djembe_Loop_44_Percussion_Bendji_Allonce_110_loop.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 4.3636875,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -19.803430946113945,
+        "peak_dbfs": -2.310335049282996,
+        "crest_factor": 7.492983820650358,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.0026875,
+        "trailing_silence_seconds": 0.0043125
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1720.8504403175536,
+        "spectral_rolloff_hz": 3796.361770072993,
+        "spectral_flatness": 0.025896767154335976,
+        "zero_crossing_rate": 0.08037750912408759,
+        "low_band_energy_ratio": 0.6336655701185017,
+        "high_band_energy_ratio": 0.04377054565287108,
+        "harmonic_energy_ratio": 0.4879305362701416
+      },
+      "temporal": {
+        "onset_count": 30,
+        "onset_density_per_second": 6.874919434537876,
+        "estimated_tempo_bpm": 144.23076923076923,
+        "periodicity_seconds": 0.288,
+        "periodicity_strength": 0.32816517571155157,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 68.44040523492632,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.9269429331811936
+      },
+      "heuristic_tags": [
+        "low_end_heavy",
+        "transient_dense"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Shaker_Loop_1_Percussion_Bendji_Allonce_120_loop.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 8.0,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -33.91824047660886,
+        "peak_dbfs": -7.095063950513105,
+        "crest_factor": 21.936070150712688,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.0020625,
+        "trailing_silence_seconds": 0.0034375
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 5189.228408625898,
+        "spectral_rolloff_hz": 6830.397161354582,
+        "spectral_flatness": 0.09366247802972794,
+        "zero_crossing_rate": 0.6555574576693227,
+        "low_band_energy_ratio": 0.00019880875357523636,
+        "high_band_energy_ratio": 0.9968012667195381,
+        "harmonic_energy_ratio": 0.06943443417549133
+      },
+      "temporal": {
+        "onset_count": 75,
+        "onset_density_per_second": 9.375,
+        "estimated_tempo_bpm": 117.1875,
+        "periodicity_seconds": 1.504,
+        "periodicity_strength": 0.5914497222899361,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7865798889159745
+      },
+      "pitch": {
+        "median_f0_hz": 3082.2625610626137,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.739828388124435
+      },
+      "heuristic_tags": [
+        "bright",
+        "noisy_or_inharmonic",
+        "transient_dense"
+      ],
+      "uncertainty_reasons": []
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/one_shot/Percussion/RT_Bendji_Allonce_Conga_Riff_15_Percussion_Bendji_Allonce_one_shot.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 0.523,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -23.89800837730369,
+        "peak_dbfs": -4.106058901441582,
+        "crest_factor": 9.763318874326144,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.0014375,
+        "trailing_silence_seconds": 0.0155
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1623.1767294418573,
+        "spectral_rolloff_hz": 3660.386029411765,
+        "spectral_flatness": 0.03521759435534477,
+        "zero_crossing_rate": 0.08608111213235294,
+        "low_band_energy_ratio": 0.43626710168130617,
+        "high_band_energy_ratio": 0.040915638125562606,
+        "harmonic_energy_ratio": 0.03605391085147858
+      },
+      "temporal": {
+        "onset_count": 3,
+        "onset_density_per_second": 5.736137667304015,
+        "estimated_tempo_bpm": 312.5,
+        "periodicity_seconds": 0.448,
+        "periodicity_strength": 0.0705808219421308,
+        "form_hint": "possibly_one_shot",
+        "form_hint_confidence": 0.68
+      },
+      "pitch": {
+        "median_f0_hz": 179.91248322512592,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.8466990524547185
+      },
+      "heuristic_tags": [
+        "noisy_or_inharmonic",
+        "transient_dense"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 1.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 1.45,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -15.336330996417207,
+        "peak_dbfs": -3.4884473125868487,
+        "crest_factor": 3.9119580069520956,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.2124375,
+        "trailing_silence_seconds": 0.0648125
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1466.1182520408645,
+        "spectral_rolloff_hz": 2707.540760869565,
+        "spectral_flatness": 0.0974670797586441,
+        "zero_crossing_rate": 0.08882472826086957,
+        "low_band_energy_ratio": 0.00018985826145693962,
+        "high_band_energy_ratio": 0.0017701429801964409,
+        "harmonic_energy_ratio": 0.7085704803466797
+      },
+      "temporal": {
+        "onset_count": 3,
+        "onset_density_per_second": 2.0689655172413794,
+        "estimated_tempo_bpm": 110.29411764705883,
+        "periodicity_seconds": 0.544,
+        "periodicity_strength": 0.0942441069748682,
+        "form_hint": "possibly_one_shot",
+        "form_hint_confidence": 0.68
+      },
+      "pitch": {
+        "median_f0_hz": 513.7541837102665,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "tonal_or_harmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 10.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 3.885,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -18.900427235240244,
+        "peak_dbfs": -7.871570864389864,
+        "crest_factor": 3.5599411492388815,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.000375,
+        "trailing_silence_seconds": 0.170125
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1231.9432026096213,
+        "spectral_rolloff_hz": 2197.80993852459,
+        "spectral_flatness": 0.00647026626393199,
+        "zero_crossing_rate": 0.09453845414959017,
+        "low_band_energy_ratio": 0.3238054377698456,
+        "high_band_energy_ratio": 0.000860220073914062,
+        "harmonic_energy_ratio": 0.7450895309448242
+      },
+      "temporal": {
+        "onset_count": 20,
+        "onset_density_per_second": 5.148005148005148,
+        "estimated_tempo_bpm": 170.45454545454547,
+        "periodicity_seconds": 2.528,
+        "periodicity_strength": 0.2433284417324312,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 264.24286440118226,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "tonal_or_harmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 2.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 2.592,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -15.79206879207695,
+        "peak_dbfs": -3.0274834494997007,
+        "crest_factor": 4.347396657488907,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.1513125,
+        "trailing_silence_seconds": 1.2114375
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 986.5157575056642,
+        "spectral_rolloff_hz": 1665.0152439024391,
+        "spectral_flatness": 0.3997056484222412,
+        "zero_crossing_rate": 0.06823432736280488,
+        "low_band_energy_ratio": 7.115381892082719e-05,
+        "high_band_energy_ratio": 0.0006496844648635342,
+        "harmonic_energy_ratio": 0.672131359577179
+      },
+      "temporal": {
+        "onset_count": 4,
+        "onset_density_per_second": 1.5432098765432098,
+        "estimated_tempo_bpm": 98.6842105263158,
+        "periodicity_seconds": 0.608,
+        "periodicity_strength": 0.1718395591879386,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 577.1053109780012,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "dark",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 3.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 5.295,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -18.529089385374107,
+        "peak_dbfs": -5.540619324839686,
+        "crest_factor": 4.4609104283159775,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.4328125,
+        "trailing_silence_seconds": 0.655625
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1286.6670875103976,
+        "spectral_rolloff_hz": 2288.4036144578313,
+        "spectral_flatness": 0.17410121858119965,
+        "zero_crossing_rate": 0.08548451618975904,
+        "low_band_energy_ratio": 0.0006028179865101138,
+        "high_band_energy_ratio": 0.001748774689177845,
+        "harmonic_energy_ratio": 0.7868457436561584
+      },
+      "temporal": {
+        "onset_count": 9,
+        "onset_density_per_second": 1.6997167138810199,
+        "estimated_tempo_bpm": 117.1875,
+        "periodicity_seconds": 3.008,
+        "periodicity_strength": 0.26178006362820533,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 426.9059892138523,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "tonal_or_harmonic",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 4.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 5.3694375,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -20.384182183311005,
+        "peak_dbfs": -6.571938765727046,
+        "crest_factor": 4.904696864128864,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.406125,
+        "trailing_silence_seconds": 0.6889375
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1400.1192053133384,
+        "spectral_rolloff_hz": 2780.087425595238,
+        "spectral_flatness": 0.15538661181926727,
+        "zero_crossing_rate": 0.09376162574404762,
+        "low_band_energy_ratio": 0.0005555368671513715,
+        "high_band_energy_ratio": 0.0032511492750073112,
+        "harmonic_energy_ratio": 0.7906543612480164
+      },
+      "temporal": {
+        "onset_count": 9,
+        "onset_density_per_second": 1.6761532283409575,
+        "estimated_tempo_bpm": 125.0,
+        "periodicity_seconds": 3.04,
+        "periodicity_strength": 0.25275509831640947,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 428.69152504089607,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "tonal_or_harmonic",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 5.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 5.115,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -18.22948723423963,
+        "peak_dbfs": -5.3544305330630095,
+        "crest_factor": 4.4030420700096125,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.00025,
+        "trailing_silence_seconds": 0.7145625
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1202.8176073708557,
+        "spectral_rolloff_hz": 2247.55859375,
+        "spectral_flatness": 0.10082407295703888,
+        "zero_crossing_rate": 0.0678314208984375,
+        "low_band_energy_ratio": 0.0025989834102280477,
+        "high_band_energy_ratio": 0.0028104679726200536,
+        "harmonic_energy_ratio": 0.5541775226593018
+      },
+      "temporal": {
+        "onset_count": 13,
+        "onset_density_per_second": 2.541544477028348,
+        "estimated_tempo_bpm": 66.96428571428571,
+        "periodicity_seconds": 0.896,
+        "periodicity_strength": 0.31690833310817346,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 399.32683512143103,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "tonal_or_harmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 6.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 5.2044375,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -19.75532346950682,
+        "peak_dbfs": -6.528567506502033,
+        "crest_factor": 4.5849837221134715,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.19525,
+        "trailing_silence_seconds": 0.6344375
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1100.028098665358,
+        "spectral_rolloff_hz": 2066.8615797546013,
+        "spectral_flatness": 0.14077429473400116,
+        "zero_crossing_rate": 0.05865965299079755,
+        "low_band_energy_ratio": 0.003555829349006479,
+        "high_band_energy_ratio": 0.002756587907516998,
+        "harmonic_energy_ratio": 0.5652591586112976
+      },
+      "temporal": {
+        "onset_count": 12,
+        "onset_density_per_second": 2.3057246820621824,
+        "estimated_tempo_bpm": 66.96428571428571,
+        "periodicity_seconds": 0.896,
+        "periodicity_strength": 0.2958248514485383,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 399.1827100990547,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "dark",
+        "tonal_or_harmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 7.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 3.2394375,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -18.82735100321504,
+        "peak_dbfs": -6.129473963265345,
+        "crest_factor": 4.314136200634717,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.109625,
+        "trailing_silence_seconds": 0.601625
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1478.912885575741,
+        "spectral_rolloff_hz": 2885.3400735294117,
+        "spectral_flatness": 0.039988622069358826,
+        "zero_crossing_rate": 0.09970990349264706,
+        "low_band_energy_ratio": 0.00029295078311551275,
+        "high_band_energy_ratio": 0.0019437547137613816,
+        "harmonic_energy_ratio": 0.857021689414978
+      },
+      "temporal": {
+        "onset_count": 9,
+        "onset_density_per_second": 2.7782601146032295,
+        "estimated_tempo_bpm": 104.16666666666667,
+        "periodicity_seconds": 1.728,
+        "periodicity_strength": 0.4382110431978584,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 377.76041124364724,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "tonal_or_harmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": []
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 8.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 3.315,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -19.47903670192472,
+        "peak_dbfs": -7.243078055547427,
+        "crest_factor": 4.090702840285987,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.0023125,
+        "trailing_silence_seconds": 0.5749375
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1530.9037696536268,
+        "spectral_rolloff_hz": 2903.771033653846,
+        "spectral_flatness": 0.015938369557261467,
+        "zero_crossing_rate": 0.1225726787860577,
+        "low_band_energy_ratio": 0.0003451935299712154,
+        "high_band_energy_ratio": 0.0015253544526394592,
+        "harmonic_energy_ratio": 0.8438792824745178
+      },
+      "temporal": {
+        "onset_count": 9,
+        "onset_density_per_second": 2.7149321266968327,
+        "estimated_tempo_bpm": 110.29411764705883,
+        "periodicity_seconds": 1.76,
+        "periodicity_strength": 0.42502664724895484,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 378.9066948619233,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.9999999999999999
+      },
+      "heuristic_tags": [
+        "tonal_or_harmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": []
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 9.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 3.99,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -18.521987205239554,
+        "peak_dbfs": -7.271519759601553,
+        "crest_factor": 3.651937802383914,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.2645625,
+        "trailing_silence_seconds": 0.1261875
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1254.5719295326314,
+        "spectral_rolloff_hz": 2231.25,
+        "spectral_flatness": 0.039490994065999985,
+        "zero_crossing_rate": 0.0877890625,
+        "low_band_energy_ratio": 0.4069887750679778,
+        "high_band_energy_ratio": 0.0015770909478996767,
+        "harmonic_energy_ratio": 0.812066376209259
+      },
+      "temporal": {
+        "onset_count": 11,
+        "onset_density_per_second": 2.756892230576441,
+        "estimated_tempo_bpm": 187.5,
+        "periodicity_seconds": 1.28,
+        "periodicity_strength": 0.48677686149108934,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 263.0564245227213,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "tonal_or_harmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": []
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 1.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 3.16,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -43.783656339476344,
+        "peak_dbfs": -23.548733086877817,
+        "crest_factor": 10.27415616517029,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.48375,
+        "trailing_silence_seconds": 0.386875
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1621.7769299401452,
+        "spectral_rolloff_hz": 3293.3238636363635,
+        "spectral_flatness": 0.09395802766084671,
+        "zero_crossing_rate": 0.15873086332070707,
+        "low_band_energy_ratio": 0.13457163796620256,
+        "high_band_energy_ratio": 0.0627550060215755,
+        "harmonic_energy_ratio": 0.004347759764641523
+      },
+      "temporal": {
+        "onset_count": 9,
+        "onset_density_per_second": 2.848101265822785,
+        "estimated_tempo_bpm": 69.44444444444444,
+        "periodicity_seconds": 0.864,
+        "periodicity_strength": 0.5966384902186401,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.788655396087456
+      },
+      "pitch": {
+        "median_f0_hz": 183.38874156658946,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "noisy_or_inharmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": []
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 10.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 1.17,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -35.84956854956779,
+        "peak_dbfs": -16.862260275323393,
+        "crest_factor": 8.899496031119451,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.1208125,
+        "trailing_silence_seconds": 0.473375
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1400.0060056271154,
+        "spectral_rolloff_hz": 3040.962837837838,
+        "spectral_flatness": 0.18396233022212982,
+        "zero_crossing_rate": 0.09196843327702703,
+        "low_band_energy_ratio": 0.3170672080500308,
+        "high_band_energy_ratio": 0.07416005198471144,
+        "harmonic_energy_ratio": 0.0046771555207669735
+      },
+      "temporal": {
+        "onset_count": 2,
+        "onset_density_per_second": 1.7094017094017095,
+        "estimated_tempo_bpm": 81.52173913043478,
+        "periodicity_seconds": 1.024,
+        "periodicity_strength": 0.011484674517924124,
+        "form_hint": "possibly_one_shot",
+        "form_hint_confidence": 0.68
+      },
+      "pitch": {
+        "median_f0_hz": 181.59701861888556,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 1.0
+      },
+      "heuristic_tags": [
+        "noisy_or_inharmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 2.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 1.1,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -38.092505395678025,
+        "peak_dbfs": -20.29235013542268,
+        "crest_factor": 7.76260992167953,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.2471875,
+        "trailing_silence_seconds": 0.0
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1417.8348549253715,
+        "spectral_rolloff_hz": 3046.4285714285716,
+        "spectral_flatness": 0.021975010633468628,
+        "zero_crossing_rate": 0.09624720982142858,
+        "low_band_energy_ratio": 0.21016272892820342,
+        "high_band_energy_ratio": 0.0980809807500435,
+        "harmonic_energy_ratio": 0.14525873959064484
+      },
+      "temporal": {
+        "onset_count": 3,
+        "onset_density_per_second": 2.727272727272727,
+        "estimated_tempo_bpm": 267.85714285714283,
+        "periodicity_seconds": 0.832,
+        "periodicity_strength": 0.029702941908855335,
+        "form_hint": "possibly_one_shot",
+        "form_hint_confidence": 0.68
+      },
+      "pitch": {
+        "median_f0_hz": 853.682327988623,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.9999999999999999
+      },
+      "heuristic_tags": [
+        "noisy_or_inharmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    },
+    {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 3.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 0.55,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -34.92037662769232,
+        "peak_dbfs": -19.713164349084646,
+        "crest_factor": 5.759179490160078,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.061,
+        "trailing_silence_seconds": 0.0048125
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 1672.3018088284737,
+        "spectral_rolloff_hz": 3620.2256944444443,
+        "spectral_flatness": 0.02422487735748291,
+        "zero_crossing_rate": 0.134033203125,
+        "low_band_energy_ratio": 0.2642267773671722,
+        "high_band_energy_ratio": 0.07253658886196548,
+        "harmonic_energy_ratio": 0.033681806176900864
+      },
+      "temporal": {
+        "onset_count": 3,
+        "onset_density_per_second": 5.454545454545454,
+        "estimated_tempo_bpm": 312.5,
+        "periodicity_seconds": 0.48,
+        "periodicity_strength": 0.05870349302957484,
+        "form_hint": "possibly_one_shot",
+        "form_hint_confidence": 0.68
+      },
+      "pitch": {
+        "median_f0_hz": 101.27731677869623,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.9999999999999998
+      },
+      "heuristic_tags": [
+        "noisy_or_inharmonic",
+        "transient_dense",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    }
+  ],
+  "errors": []
+}

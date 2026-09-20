@@ -1,0 +1,105 @@
+{
+  "record_type": "slo_aspect_similarity_search",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T12:57:57",
+  "query_path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/SIIK Sounds - Eclipse (Full Pack)/SIIK Sounds Eclipse (Construction Kits & FLPs)/Kit 04 - Emin (174BPM)/ECLIPSE Construction Kit 04 - Emin 174BPM (FLP)/ECLIPSE Kick 23.wav",
+  "weights": {
+    "spectrum": 1.0,
+    "timbre": 1.0,
+    "pitch": 0.5,
+    "amplitude": 1.5
+  },
+  "n_results": 10,
+  "results": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Chest_Kicks/KSHMR_Chest_Kick_05.wav",
+      "overall": 0.8392676068469882,
+      "spectrum": 0.9423774480819702,
+      "timbre": 0.9704330563545227,
+      "pitch": 0.05135854333639145,
+      "amplitude": 0.9457204341888428
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Kick AR60sLate V127 1.wav",
+      "overall": 0.8197593614459038,
+      "spectrum": 0.8331382870674133,
+      "timbre": 0.9014256596565247,
+      "pitch": 0.9999999403953552,
+      "amplitude": 0.6963157057762146
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_15_G#.wav",
+      "overall": 0.801251552067697,
+      "spectrum": 0.9324992299079895,
+      "timbre": 0.9451333284378052,
+      "pitch": -0.11551899462938309,
+      "amplitude": 0.92342209815979
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_21_F#.wav",
+      "overall": 0.7963570004794747,
+      "spectrum": 0.873447597026825,
+      "timbre": 0.9599868059158325,
+      "pitch": -0.022354288026690483,
+      "amplitude": 0.9087805151939392
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Sounds of KSHMR Vol.3/KSHMR_Synths/KSHMR_Bass_PsyTrance/KSHMR_Psy_Bass_One_Shots/KSHMR_Psy_Bass_02_A.wav",
+      "overall": 0.7917861118912697,
+      "spectrum": 0.8578860759735107,
+      "timbre": 0.9491764903068542,
+      "pitch": 0.1382116675376892,
+      "amplitude": 0.8606507182121277
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/1 - Kick/Kick - Deep Chunk 2.wav",
+      "overall": 0.7915911003947258,
+      "spectrum": 0.7625547051429749,
+      "timbre": 0.8068110346794128,
+      "pitch": 0.9999999403953552,
+      "amplitude": 0.7313324809074402
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Household Percussion April 2016/HOUSEHOLD_419.wav",
+      "overall": 0.7724524065852165,
+      "spectrum": 0.8546532392501831,
+      "timbre": 0.6799222230911255,
+      "pitch": 0.7609977126121521,
+      "amplitude": 0.7831568717956543
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 1.wav",
+      "overall": 0.7631599381566048,
+      "spectrum": 0.9657489061355591,
+      "timbre": 0.8245111107826233,
+      "pitch": 0.16536515951156616,
+      "amplitude": 0.7864647507667542
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B16.wav",
+      "overall": 0.7529453411698341,
+      "spectrum": 0.9150426387786865,
+      "timbre": 0.595166802406311,
+      "pitch": 0.9813981652259827,
+      "amplitude": 0.6739152073860168
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 15.1.wav",
+      "overall": 0.7470796257257462,
+      "spectrum": 0.673148512840271,
+      "timbre": 0.8508524894714355,
+      "pitch": 0.6247080564498901,
+      "amplitude": 0.7679756283760071
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "semantic_label_created": false,
+    "rename_actions": false
+  },
+  "index": {
+    "version": "physics_v1_1",
+    "cache_sha256": "0735a59286a2799b547c89467cfb8e7b449fd2803aaa4674c807e59099443452"
+  }
+}

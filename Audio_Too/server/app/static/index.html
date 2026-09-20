@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Audio_Too</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/studio-theme.css">
+    <script src="/app-shell.js" data-page="Home" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav>
+          <a class="brand" href="/hub">Audio_Too</a>
+        <div>
+          <a href="/hub">Hub</a>
+          <a href="/tips">Studio tips</a>
+          <a href="#services">Services</a>
+          <a href="#ask">Ask</a>
+          <a href="#enquiry">Enquiry</a>
+          <a href="/dashboard">Business dashboard</a>
+        </div>
+      </nav>
+      <section class="hero" id="top">
+        <div>
+          <p class="eyebrow">Recording • Mixing • Mastering • Audio cleanup</p>
+          <h1>Audio engineering support for artists, podcasters, and creators.</h1>
+          <p class="hero-copy">Send the project details, deadline, and files needed. Audio_Too can help prepare a clear next step.</p>
+          <a class="button" href="#enquiry">Start an enquiry</a>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section id="services" class="section">
+        <h2>Services</h2>
+        <div class="service-grid">
+          <article><h3>Mixing</h3><p>Balance, clarity, and polish for tracks that need a finished sound.</p></article>
+          <article><h3>Mastering</h3><p>Final preparation for release, sequencing, loudness, and delivery formats.</p></article>
+          <article><h3>Recording</h3><p>Vocal and audio recording support with clean session preparation.</p></article>
+          <article><h3>Podcast editing</h3><p>Cleanup, edits, leveling, and preparation for publishing.</p></article>
+        </div>
+      </section>
+
+      <section id="ask" class="section split">
+        <div>
+          <h2>Ask about services</h2>
+          <p class="section-intro">Indicative answers from Audio_Too’s service guide — not a binding quote. For production tips (mixing workflow, Ableton, stems), use your local <strong>Audio Engineering LM</strong> via <code>./audio-too ableton ask</code> or the dashboard.</p>
+          <p id="business-ask-disclaimer" class="compact-disclaimer"></p>
+        </div>
+        <div class="business-ask-panel">
+          <form id="business-ask-form" class="enquiry-form">
+            <label class="hp-field" aria-hidden="true">Company website<input type="text" name="company_website" tabindex="-1" autocomplete="off"></label>
+            <label>Your question
+              <input id="business-ask-input" name="question" required minlength="3" maxlength="500" placeholder="e.g. How much does mixing cost?">
+            </label>
+            <div id="business-suggest-row" class="chip-row"></div>
+            <button type="submit">Get answer</button>
+            <p id="business-ask-status" class="status"></p>
+            <pre id="business-ask-answer" class="business-answer" aria-live="polite"></pre>
+          </form>
+          <p class="compact-disclaimer"><a href="#enquiry">Send a project enquiry</a> for a confirmed quote and deadline.</p>
+        </div>
+      </section>
+
+      <section id="enquiry" class="section split">
+        <div>
+          <h2>Project enquiry</h2>
+          <p>Submissions are saved to your enquiries list in the business database. Convert to a client from the dashboard when you are ready.</p>
+        </div>
+        <form id="enquiry-form" class="enquiry-form">
+          <label class="hp-field" aria-hidden="true">Company website<input type="text" name="company_website" tabindex="-1" autocomplete="off"></label>
+          <label>Name<input name="name" required maxlength="100"></label>
+          <label>Email<input name="email" type="email" required maxlength="254"></label>
+          <label>Service
+            <select name="service">
+              <option>Mixing</option>
+              <option>Mastering</option>
+              <option>Vocal recording</option>
+              <option>Podcast editing</option>
+              <option>Audio cleanup</option>
+              <option>Consultation</option>
+            </select>
+          </label>
+          <label>Deadline<input name="deadline" maxlength="120" placeholder="e.g. Friday, 2026-06-20"></label>
+          <label>Project details<textarea name="message" rows="5" required minlength="20" maxlength="5000"></textarea></label>
+          <button type="submit">Send enquiry</button>
+          <p id="form-status" class="status"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <span>Audio_Too</span>
+      <a href="mailto:audio_too@outlook.com">audio_too@outlook.com</a>
+    </footer>
+
+    <script src="/business-ask.js"></script>
+    <script src="/enquiry.js"></script>
+  </body>
+</html>

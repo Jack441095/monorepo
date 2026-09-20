@@ -1,0 +1,91 @@
+{
+  "schema": "audio-too.kenn-advisor-producer-cases/v1",
+  "description": "Synthetic anonymized decision-contract cases; not listening evidence.",
+  "cases": [
+    {
+      "id": "pop-vocal-gain-drift", "genre": "pop",
+      "profiles": [
+        {"name": "kick-01", "instrument": "kick", "classification_confidence": 0.96, "peak_dbfs": -8, "rms_dbfs": -20, "crest_factor_db": 12},
+        {"name": "vocal-01", "instrument": "vocal", "classification_confidence": 0.95, "peak_dbfs": -10, "rms_dbfs": -24, "crest_factor_db": 14}
+      ],
+      "mutations": [{"stem_id": "vocal-01", "gain_offset_db": 1.25}],
+      "expected_status": "valid",
+      "expected_operations": [{"stem_id": "vocal-01", "operation": "gain_delta", "value": -1.25, "evidence_source_prefix": "automix-gain-staging"}]
+    },
+    {
+      "id": "pop-vocal-ratio-drift", "genre": "pop",
+      "profiles": [
+        {"name": "kick-01", "instrument": "kick", "classification_confidence": 0.96, "peak_dbfs": -8, "rms_dbfs": -20, "crest_factor_db": 12},
+        {"name": "vocal-01", "instrument": "vocal", "classification_confidence": 0.95, "peak_dbfs": -10, "rms_dbfs": -24, "crest_factor_db": 14}
+      ],
+      "mutations": [{"stem_id": "vocal-01", "compressor_ratio": 5}],
+      "expected_status": "valid",
+      "expected_operations": [{"stem_id": "vocal-01", "operation": "compressor_ratio", "value": 3.5, "evidence_source_prefix": "automix-compression-ratios"}]
+    },
+    {
+      "id": "hip-hop-kick-ratio", "genre": "hip_hop",
+      "profiles": [{"name": "kick-01", "instrument": "kick", "classification_confidence": 0.97, "peak_dbfs": -9, "rms_dbfs": -22, "crest_factor_db": 13}],
+      "mutations": [{"stem_id": "kick-01", "compressor_ratio": 3}],
+      "expected_status": "valid",
+      "expected_operations": [{"stem_id": "kick-01", "operation": "compressor_ratio", "value": 5, "evidence_source_prefix": "automix-compression-ratios"}]
+    },
+    {
+      "id": "rock-snare-gain", "genre": "rock",
+      "profiles": [
+        {"name": "kick-01", "instrument": "kick", "classification_confidence": 0.96, "peak_dbfs": -7, "rms_dbfs": -19, "crest_factor_db": 12},
+        {"name": "snare-01", "instrument": "snare", "classification_confidence": 0.94, "peak_dbfs": -9, "rms_dbfs": -23, "crest_factor_db": 15}
+      ],
+      "mutations": [{"stem_id": "snare-01", "gain_offset_db": -1.2}],
+      "expected_status": "valid",
+      "expected_operations": [{"stem_id": "snare-01", "operation": "gain_delta", "value": 1.2, "evidence_source_prefix": "automix-gain-staging"}]
+    },
+    {
+      "id": "acoustic-vocal-ratio", "genre": "acoustic",
+      "profiles": [{"name": "vocal-01", "instrument": "vocal", "classification_confidence": 0.95, "peak_dbfs": -12, "rms_dbfs": -25, "crest_factor_db": 14}],
+      "mutations": [{"stem_id": "vocal-01", "compressor_ratio": 4}],
+      "expected_status": "valid",
+      "expected_operations": [{"stem_id": "vocal-01", "operation": "compressor_ratio", "value": 2, "evidence_source_prefix": "automix-compression-ratios"}]
+    },
+    {
+      "id": "podcast-vocal-gain", "genre": "podcast", "target_lufs": -16,
+      "profiles": [{"name": "voice-01", "instrument": "vocal", "classification_confidence": 0.98, "peak_dbfs": -9, "rms_dbfs": -22, "crest_factor_db": 11}],
+      "mutations": [{"stem_id": "voice-01", "gain_offset_db": 2}],
+      "expected_status": "valid",
+      "expected_operations": [{"stem_id": "voice-01", "operation": "gain_delta", "value": -2, "evidence_source_prefix": "automix-gain-staging"}]
+    },
+    {
+      "id": "canonical-abstention", "genre": "pop",
+      "profiles": [{"name": "kick-01", "instrument": "kick", "classification_confidence": 0.96, "peak_dbfs": -8, "rms_dbfs": -20, "crest_factor_db": 12}],
+      "mutations": [], "expected_status": "no_proposal", "expected_operations": []
+    },
+    {
+      "id": "weak-classification-abstention", "genre": "pop",
+      "profiles": [{"name": "kick-01", "instrument": "kick", "classification_confidence": 0.69, "peak_dbfs": -8, "rms_dbfs": -20, "crest_factor_db": 12}],
+      "mutations": [{"stem_id": "kick-01", "gain_offset_db": 1}], "expected_status": "no_proposal", "expected_operations": []
+    },
+    {
+      "id": "tiny-drift-abstention", "genre": "pop",
+      "profiles": [{"name": "kick-01", "instrument": "kick", "classification_confidence": 0.96, "peak_dbfs": -8, "rms_dbfs": -20, "crest_factor_db": 12}],
+      "mutations": [{"stem_id": "kick-01", "gain_offset_db": 0.25}], "expected_status": "no_proposal", "expected_operations": []
+    },
+    {
+      "id": "unbounded-drift-abstention", "genre": "pop",
+      "profiles": [{"name": "kick-01", "instrument": "kick", "classification_confidence": 0.96, "peak_dbfs": -8, "rms_dbfs": -20, "crest_factor_db": 12}],
+      "mutations": [{"stem_id": "kick-01", "gain_offset_db": 4}], "expected_status": "no_proposal", "expected_operations": []
+    },
+    {
+      "id": "multi-stem-multi-operation", "genre": "pop",
+      "profiles": [
+        {"name": "kick-01", "instrument": "kick", "classification_confidence": 0.96, "peak_dbfs": -8, "rms_dbfs": -20, "crest_factor_db": 12},
+        {"name": "vocal-01", "instrument": "vocal", "classification_confidence": 0.95, "peak_dbfs": -10, "rms_dbfs": -24, "crest_factor_db": 14}
+      ],
+      "mutations": [{"stem_id": "kick-01", "gain_offset_db": -1}, {"stem_id": "vocal-01", "gain_offset_db": 1}, {"stem_id": "vocal-01", "compressor_ratio": 5}],
+      "expected_status": "valid",
+      "expected_operations": [
+        {"stem_id": "kick-01", "operation": "gain_delta", "value": 1, "evidence_source_prefix": "automix-gain-staging"},
+        {"stem_id": "vocal-01", "operation": "gain_delta", "value": -1, "evidence_source_prefix": "automix-gain-staging"},
+        {"stem_id": "vocal-01", "operation": "compressor_ratio", "value": 3.5, "evidence_source_prefix": "automix-compression-ratios"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "evidence_status": "REPOSITORY_HELD_HISTORICAL_NOT_FRESH_CURRENT_RUN",
+  "dataset_size_clean": 1272,
+  "ood_size": 250,
+  "overall_accuracy": 0.9654088050314465,
+  "overall_macro_f1": 0.9644909858654127,
+  "fusion_adversarial_accuracy": 0.8828616352201258,
+  "golden_set_audio_only_accuracy": 0.059,
+  "golden_set_full_evidence_accuracy": 0.588,
+  "golden_set_filename_only_accuracy": 0.588,
+  "golden_set_folder_only_accuracy": 0.588,
+  "golden_set_adversarial_accuracy": 0.0,
+  "al001": "HARD_DIAGNOSTIC_NOT_RERUN",
+  "al002": "WAITING_FOR_BLIND_REVIEW",
+  "known_limitations": ["filename_folder_evidence", "single_vendor", "thin_holdout", "not_general_population_accuracy"]
+}

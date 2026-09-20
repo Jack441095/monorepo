@@ -1,0 +1,57 @@
+{
+  "120": {
+    "concentrated": 60.12,
+    "broad": 64.54,
+    "delta": 4.41,
+    "colls_concentrated": 1.0,
+    "colls_broad": 70.0,
+    "paired_t": 2.12,
+    "wins": 13,
+    "n_runs": 14,
+    "significant": true
+  },
+  "180": {
+    "concentrated": 60.75,
+    "broad": 66.79,
+    "delta": 6.04,
+    "colls_concentrated": 2.0,
+    "colls_broad": 70.0,
+    "paired_t": 3.95,
+    "wins": 12,
+    "n_runs": 14,
+    "significant": true
+  },
+  "240": {
+    "concentrated": 62.77,
+    "broad": 67.35,
+    "delta": 4.58,
+    "colls_concentrated": 3.0,
+    "colls_broad": 70.0,
+    "paired_t": 4.01,
+    "wins": 12,
+    "n_runs": 14,
+    "significant": true
+  },
+  "300": {
+    "concentrated": 63.14,
+    "broad": 67.31,
+    "delta": 4.17,
+    "colls_concentrated": 3.0,
+    "colls_broad": 70.0,
+    "paired_t": 4.11,
+    "wins": 12,
+    "n_runs": 14,
+    "significant": true
+  },
+  "360": {
+    "concentrated": 64.31,
+    "broad": 66.84,
+    "delta": 2.53,
+    "colls_concentrated": 4.0,
+    "colls_broad": 70.0,
+    "paired_t": 2.31,
+    "wins": 8,
+    "n_runs": 14,
+    "significant": true
+  }
+}

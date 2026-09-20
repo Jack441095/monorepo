@@ -1,0 +1,139 @@
+{
+  "target": 0.9,
+  "seeds": 8,
+  "ten_class": {
+    "acc": 69.52,
+    "sd": 0.86,
+    "macro_f1": 64.87,
+    "coverage": 41.9,
+    "precision": 77.1,
+    "per_class": {
+      "Clap": {
+        "precision": 83.3,
+        "n_acted": 54
+      },
+      "Crash": {
+        "precision": 91.7,
+        "n_acted": 12
+      },
+      "Drum Loop": {
+        "precision": 77.1,
+        "n_acted": 48
+      },
+      "Foley": {
+        "precision": 87.5,
+        "n_acted": 8
+      },
+      "Hi-Hat": {
+        "precision": 86.2,
+        "n_acted": 29
+      },
+      "Kick": {
+        "precision": 90.7,
+        "n_acted": 75
+      },
+      "Other/none": {
+        "precision": 90.0,
+        "n_acted": 50
+      },
+      "Percussion": {
+        "precision": 100.0,
+        "n_acted": 1
+      },
+      "Percussion Loop": {
+        "precision": 85.7,
+        "n_acted": 14
+      },
+      "Snare": {
+        "precision": 89.6,
+        "n_acted": 48
+      }
+    }
+  },
+  "expanded": {
+    "acc": 59.18,
+    "sd": 0.71,
+    "macro_f1": 53.98,
+    "coverage": 24.7,
+    "precision": 79.8,
+    "per_class": {
+      "Bass Reese": {
+        "precision": 83.3,
+        "n_acted": 30
+      },
+      "Clap": {
+        "precision": 88.9,
+        "n_acted": 36
+      },
+      "Crash": {
+        "precision": 76.5,
+        "n_acted": 17
+      },
+      "Drum Loop": {
+        "precision": 79.1,
+        "n_acted": 43
+      },
+      "Foley": {
+        "precision": 0.0,
+        "n_acted": 0
+      },
+      "Foley Loop": {
+        "precision": 100.0,
+        "n_acted": 1
+      },
+      "Hi-Hat": {
+        "precision": 100.0,
+        "n_acted": 17
+      },
+      "Kick": {
+        "precision": 93.9,
+        "n_acted": 66
+      },
+      "Other/none": {
+        "precision": 0.0,
+        "n_acted": 0
+      },
+      "Percussion": {
+        "precision": 0.0,
+        "n_acted": 0
+      },
+      "Percussion Loop": {
+        "precision": 100.0,
+        "n_acted": 1
+      },
+      "Rimshot": {
+        "precision": 0.0,
+        "n_acted": 0
+      },
+      "SFX": {
+        "precision": 0.0,
+        "n_acted": 0
+      },
+      "Snare": {
+        "precision": 96.2,
+        "n_acted": 26
+      },
+      "Synth Loop": {
+        "precision": 0.0,
+        "n_acted": 0
+      },
+      "Synth One-Shot": {
+        "precision": 100.0,
+        "n_acted": 1
+      },
+      "Vocal Loop": {
+        "precision": 100.0,
+        "n_acted": 4
+      }
+    }
+  },
+  "extra_classes": [
+    "Synth One-Shot",
+    "SFX",
+    "Synth Loop",
+    "Bass Reese",
+    "Foley Loop",
+    "Vocal Loop",
+    "Rimshot"
+  ]
+}

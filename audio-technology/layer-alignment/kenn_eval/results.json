@@ -1,0 +1,147 @@
+{
+  "benchmark": "KENN_MIX_EVAL_0.1",
+  "seed": 20260822,
+  "environment": {
+    "python": "3.12.13",
+    "numpy": "1.26.4",
+    "platform": "macOS-26.5.2-x86_64-i386-64bit"
+  },
+  "fixture_count": 5,
+  "metrics": {
+    "detection_accuracy": 1.0,
+    "evidence_accuracy": 1.0,
+    "diagnosis_accuracy": 1.0,
+    "severity_mae": 0.0,
+    "recommendation_safety": 1.0,
+    "unnecessary_processing_rate": 0.0,
+    "unsupported_claim_rate": 0.0,
+    "false_positive_mix_problem_rate": 0.0
+  },
+  "rows": [
+    {
+      "case_id": "healthy_reference",
+      "expected_problem": null,
+      "predicted_problem": null,
+      "expected_severity": 0,
+      "predicted_severity": 0,
+      "detection": true,
+      "evidence": "no material measured issue detected",
+      "evidence_ok": true,
+      "diagnosis_ok": true,
+      "recommendation": "no corrective processing recommended",
+      "recommendation_safe": true,
+      "unnecessary_processing": false,
+      "unsupported_claim": false,
+      "measures": {
+        "peak_db": -4.725871384143829,
+        "crest_db": 6.737620649071257,
+        "low_rms": 0.21103573664286632,
+        "high_rms": 0.02787237153807119,
+        "clipped_ratio": 0.0,
+        "correlation": 0.9999999999999987,
+        "mono_loss_db": -0.3545751841988856
+      }
+    },
+    {
+      "case_id": "resonance_3200",
+      "expected_problem": "harshness",
+      "predicted_problem": "harshness",
+      "expected_severity": 3,
+      "predicted_severity": 3,
+      "detection": true,
+      "evidence": "narrow upper-mid energy exceeds the fixture baseline",
+      "evidence_ok": true,
+      "diagnosis_ok": true,
+      "recommendation": "confirm audibility, then use a narrow dynamic cut",
+      "recommendation_safe": true,
+      "unnecessary_processing": false,
+      "unsupported_claim": false,
+      "measures": {
+        "peak_db": -0.19866116734635697,
+        "crest_db": 8.049927042714378,
+        "low_rms": 0.2198355109373911,
+        "high_rms": 0.27024056735871926,
+        "clipped_ratio": 0.056791666666666664,
+        "correlation": 1.0,
+        "mono_loss_db": 0.0
+      }
+    },
+    {
+      "case_id": "low_end_excess",
+      "expected_problem": "sub excess",
+      "predicted_problem": "sub excess",
+      "expected_severity": 2,
+      "predicted_severity": 2,
+      "detection": true,
+      "evidence": "low-band energy is materially elevated",
+      "evidence_ok": true,
+      "diagnosis_ok": true,
+      "recommendation": "verify arrangement, then apply a narrow, evidence-led low-frequency correction",
+      "recommendation_safe": true,
+      "unnecessary_processing": false,
+      "unsupported_claim": false,
+      "measures": {
+        "peak_db": 1.4825678665773405,
+        "crest_db": 6.397973174781935,
+        "low_rms": 0.5398314421882471,
+        "high_rms": 0.02903426946074752,
+        "clipped_ratio": 0.24876041666666668,
+        "correlation": 1.0,
+        "mono_loss_db": 0.0
+      }
+    },
+    {
+      "case_id": "hard_clipping",
+      "expected_problem": "clipping",
+      "predicted_problem": "clipping",
+      "expected_severity": 4,
+      "predicted_severity": 4,
+      "detection": true,
+      "evidence": "repeated ceiling hits and crest-factor collapse",
+      "evidence_ok": true,
+      "diagnosis_ok": true,
+      "recommendation": "repair or re-render before further dynamics",
+      "recommendation_safe": true,
+      "unnecessary_processing": false,
+      "unsupported_claim": false,
+      "measures": {
+        "peak_db": -2.85334974527359,
+        "crest_db": 1.6931859164123981,
+        "low_rms": 0.47627108321051337,
+        "high_rms": 0.07071130620564706,
+        "clipped_ratio": 0.52021875,
+        "correlation": 1.0,
+        "mono_loss_db": 0.0
+      }
+    },
+    {
+      "case_id": "mono_cancellation",
+      "expected_problem": "mono incompatibility",
+      "predicted_problem": "mono incompatibility",
+      "expected_severity": 4,
+      "predicted_severity": 4,
+      "detection": true,
+      "evidence": "negative inter-channel correlation and severe mono loss",
+      "evidence_ok": true,
+      "diagnosis_ok": true,
+      "recommendation": "check polarity/phase relationships and reduce width",
+      "recommendation_safe": true,
+      "unnecessary_processing": false,
+      "unsupported_claim": false,
+      "measures": {
+        "peak_db": -240.0,
+        "crest_db": 0.0,
+        "low_rms": 0.0,
+        "high_rms": 0.0,
+        "clipped_ratio": 0.0,
+        "correlation": -1.0,
+        "mono_loss_db": -229.03089935518386
+      }
+    }
+  ],
+  "observed": "The deterministic detector found all five injected issue cases and made no intervention on the healthy stereo fixture.",
+  "limitations": [
+    "Synthetic fixtures are controlled and do not establish real-mix generalisation.",
+    "Thresholds are benchmark-local and are not KENN production thresholds."
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "product": "SLO",
+  "formerly_known_as": "Smart Sample Manager",
+  "receipt_version": 1,
+  "generated": "2026-08-28",
+  "repo_path": "products/slo",
+  "branch": "main",
+  "build_status": "clean",
+  "build_evidence": "ssm_qual_full verified multiple times this session, zero duplicate-symbol occurrences, all plugin formats (VST3/AU/Standalone) build",
+  "overall_gate": "READY_ONLY_AFTER_SPECIFIC_BLOCKERS",
+  "verdicts": {
+    "engineering": {
+      "status": "PASS",
+      "evidence": "Clean full qualification build; ~30+ Test targets passing across fast_regression/cache/classification/intelligence/ui groups"
+    },
+    "safety": {
+      "status": "PASS",
+      "evidence": "TestReadOnlySafetyQualification: real SHA-256 checksums, before/after, 4 fixture files, byte-identical, real production scan path exercised. See SLO_READ_ONLY_SAFETY_QUALIFICATION_V1.md."
+    },
+    "classification": {
+      "status": "PARTIAL",
+      "evidence": "Real cross-vendor accuracy measured and honestly reported: 62.9% full-evidence / 30.2% audio-only. One real fine-grained subtype shipped (808/Reese bass, 92.9% leakage-free holdout accuracy). Most of the requested taxonomy breadth (subtypes, attributes) is still design/plan stage. See SLO_PRODUCER_TAXONOMY_REQUIREMENTS_V1.md."
+    },
+    "packaging": {
+      "status": "NOT_READY",
+      "evidence": "No frozen build SHA, no version scheme for SLO, no signing (blocked on Apple Developer ID enrollment, owner action)."
+    },
+    "ux": {
+      "status": "UNVERIFIED",
+      "evidence": "No live-GUI-driving capability available this session. App builds and bundles in all 3 formats; specific UI logic verified by code review (Unknown-state fix, Sort Library dialog text) but no live click-through performed."
+    },
+    "infrastructure": {
+      "status": "PASS_FOR_BETA_SCOPE",
+      "evidence": "Local-first confirmed (zero network-call code paths found in scan/classify pipeline, verified by direct search). Entitlement/signed-downloads/update-channel/telemetry explicitly deferred past beta, not needed for this scope."
+    },
+    "performance": {
+      "status": "PASS",
+      "evidence": "100/1k/10k-file scale receipts, 30-iteration soak (no leak), 0/2000 RT deadline misses, 0 allocations in tracked audio callbacks. Preview latency, app-restart index reload, and crash recovery NOT measured (needs a live app session)."
+    }
+  },
+  "blockers": {
+    "closed_with_evidence": ["B-006", "B-007", "B-009", "B-010", "B-012", "B-013"],
+    "closed_with_stated_residual_gap": ["B-008", "B-011"],
+    "blocked_on_owner": ["B-001", "B-002", "B-003", "B-004", "B-005"],
+    "in_progress": ["B-014"]
+  },
+  "owner_approval_required_for": [
+    "Naming the private-beta tester cohort",
+    "SLO / Smart Sample Manager rename decision (cosmetic, not blocking, but affects build artifact naming going forward)",
+    "Apple Developer ID enrollment start (B-001, long lead time)",
+    "Whether to authorize reopening the spec-frozen per-class OOD threshold recalibration -- the single highest-leverage remaining accuracy lever, deliberately not touched without sign-off",
+    "Priority ranking for which fine-grained taxonomy subtypes/attributes matter most for the beta (open/closed hi-hat recommended as next, per SLO_PRODUCER_TAXONOMY_REQUIREMENTS_V1.md, but this is a product call)"
+  ],
+  "not_touched_this_session": [
+    "Submit product, code, or docs",
+    "Platform payment rails, Railway staging, Paddle, licensing",
+    "Any public launch claim or paid-claim copy for SLO",
+    "Any destructive test against a real owner sample library",
+    "The spec-frozen per-class OOD threshold values"
+  ],
+  "safety_rules_confirmed": {
+    "submit_modified": false,
+    "platform_payment_rails_modified": false,
+    "deployed": false,
+    "destructive_file_ops_added": false,
+    "destructive_tests_against_real_libraries": false,
+    "public_launch_claims_made": false,
+    "beta_marked_ready_without_evidence": false
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "generated": "2026-09-11T14:05:40",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 8,
+    "splits": 5,
+    "min_examples": 5,
+    "min_collections": 5,
+    "trusted_name_precision": {
+      "Kick": 0.97,
+      "Hi-Hat": 0.94,
+      "Snare": 0.92,
+      "Clap": 0.9,
+      "Crash": 0.89,
+      "Percussion Loop": 1.0,
+      "Drum Loop": 0.78
+    }
+  },
+  "n_files": 1024,
+  "n_classes": 23,
+  "classes": [
+    "Bass Hit",
+    "Bass Reese",
+    "Clap",
+    "Crash",
+    "Drum Loop",
+    "Foley",
+    "Foley Loop",
+    "Hi-Hat",
+    "Hi-Hat Loop",
+    "Kick",
+    "Kick Loop",
+    "Other/none",
+    "Pad",
+    "Percussion",
+    "Percussion Loop",
+    "Rimshot",
+    "SFX",
+    "Snare",
+    "Synth Loop",
+    "Synth One-Shot",
+    "Vocal Loop",
+    "Vocal One-Shot",
+    "Weather/Nature Atmos"
+  ],
+  "results": {
+    "audio": {
+      "accuracy_mean": 56.57,
+      "accuracy_sd": 0.79,
+      "macro_f1": 46.98,
+      "coverage_at_90_precision": 27.1,
+      "coverage_at_95_precision": 11.6,
+      "override_rate": 0.0,
+      "override_precision": null,
+      "per_seed_accuracy": [
+        57.32,
+        55.57,
+        57.23,
+        57.81,
+        55.47,
+        56.64,
+        56.45,
+        56.05
+      ]
+    },
+    "name_if_audio_conf_below_0.40": {
+      "accuracy_mean": 60.19,
+      "accuracy_sd": 0.8,
+      "macro_f1": 49.29,
+      "coverage_at_90_precision": 11.3,
+      "coverage_at_95_precision": 0.7,
+      "override_rate": 8.5,
+      "override_precision": 76.91,
+      "per_seed_accuracy": [
+        60.64,
+        58.89,
+        60.64,
+        61.23,
+        58.98,
+        60.84,
+        60.25,
+        60.06
+      ]
+    },
+    "name_if_audio_conf_below_0.50": {
+      "accuracy_mean": 61.25,
+      "accuracy_sd": 0.75,
+      "macro_f1": 49.24,
+      "coverage_at_90_precision": 3.6,
+      "coverage_at_95_precision": 0.2,
+      "override_rate": 12.6,
+      "override_precision": 79.9,
+      "per_seed_accuracy": [
+        61.52,
+        60.45,
+        61.43,
+        62.5,
+        59.96,
+        61.91,
+        61.04,
+        61.23
+      ]
+    },
+    "name_if_audio_conf_below_0.60": {
+      "accuracy_mean": 62.3,
+      "accuracy_sd": 0.7,
+      "macro_f1": 49.82,
+      "coverage_at_90_precision": 27.8,
+      "coverage_at_95_precision": 0.3,
+      "override_rate": 17.6,
+      "override_precision": 84.11,
+      "per_seed_accuracy": [
+        62.79,
+        61.23,
+        62.6,
+        63.57,
+        61.52,
+        62.6,
+        62.21,
+        61.91
+      ]
+    },
+    "name_if_audio_conf_below_0.70": {
+      "accuracy_mean": 63.0,
+      "accuracy_sd": 0.71,
+      "macro_f1": 50.18,
+      "coverage_at_90_precision": 39.2,
+      "coverage_at_95_precision": 1.7,
+      "override_rate": 23.1,
+      "override_precision": 86.55,
+      "per_seed_accuracy": [
+        63.38,
+        62.11,
+        63.09,
+        64.45,
+        62.21,
+        63.38,
+        62.79,
+        62.6
+      ]
+    },
+    "name_always": {
+      "accuracy_mean": 63.4,
+      "accuracy_sd": 0.71,
+      "macro_f1": 50.46,
+      "coverage_at_90_precision": 46.9,
+      "coverage_at_95_precision": 1.8,
+      "override_rate": 40.7,
+      "override_precision": 91.13,
+      "per_seed_accuracy": [
+        63.87,
+        62.7,
+        63.87,
+        64.65,
+        62.4,
+        63.77,
+        63.18,
+        62.79
+      ]
+    }
+  },
+  "interpretation": "Filename overrides are admissible only if they improve the grouped incumbent; otherwise retain filename evidence for explanation/review."
+}

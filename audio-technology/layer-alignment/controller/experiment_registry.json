@@ -1,0 +1,45 @@
+{
+  "registry_version": "RND_REGISTRY_0.1",
+  "sprint_start": "2026-08-22",
+  "experiments": [
+    {
+      "experiment_id": "KENN_MIX_EVAL_0.1",
+      "track": "R&D-C",
+      "hypothesis": "Evidence-led synthetic fixtures can qualify detection, diagnosis, safe recommendations, and abstention separately.",
+      "baseline": "No prior versioned KENN fixture benchmark",
+      "method": "Five deterministic numpy/scipy fixtures with controlled ground truth",
+      "dataset": "kenn_eval/run_kenn_eval.py synthetic fixtures",
+      "metrics": ["detection_accuracy", "evidence_accuracy", "diagnosis_accuracy", "severity_mae", "recommendation_safety", "unnecessary_processing_rate", "unsupported_claim_rate", "false_positive_mix_problem_rate"],
+      "result": "1.0 detection/evidence/diagnosis/safety; 0.0 severity MAE, unnecessary processing, unsupported claims, and healthy false positives",
+      "status": "PASS",
+      "artifact": "kenn_eval/results.json, kenn_eval/results.csv",
+      "conclusion": "Harness is useful; coverage must expand before product claims."
+    },
+    {
+      "experiment_id": "SAMPLER_RECON_EVAL_0.1",
+      "track": "R&D-E",
+      "hypothesis": "A simple phase-vocoder reconstruction can preserve duration while improving timbre proxies over resampling.",
+      "baseline": "scipy polyphase resampling",
+      "method": "resampling baseline versus duration-restored phase-vocoder prototype",
+      "dataset": "five deterministic synthetic signals",
+      "metrics": ["pitch_error_hz", "duration_error_seconds", "spectral_centroid_drift_hz", "modulation_rate_hz"],
+      "result": "PV duration error 0.0 s versus 0.5 s baseline, but pitch error 32.3 Hz versus 18.1 Hz and no material centroid-drift improvement",
+      "status": "FAIL",
+      "artifact": "reconstruction_sampler/results.json, reconstruction_sampler/results.csv",
+      "conclusion": "Duration preservation alone is not a quality win; do not promote prototype."
+    },
+    {
+      "experiment_id": "MARKETING_CONTRACT_0.1",
+      "track": "R&D-F",
+      "hypothesis": "Typed evidence and plan objects can support useful launch research without external side effects.",
+      "baseline": "Unstructured marketing agent behavior",
+      "method": "Dataclass planner with evidence-kind separation and external-write assertion",
+      "dataset": "Synthetic SLO four-week launch scenario",
+      "metrics": ["typed_plan_emitted", "external_writes_count", "evidence_kinds_present"],
+      "result": "Plan emitted; 0 external writes; all five evidence kinds represented",
+      "status": "PASS",
+      "artifact": "marketing_agent/plan.json",
+      "conclusion": "Design/prototype ready; schema and provenance are next."
+    }
+  ]
+}

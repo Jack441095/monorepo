@@ -1,0 +1,66 @@
+{
+  "date": "2026-09-18",
+  "commit": "a4d8ccd (HEAD -> slo/eval-feat-ai-perf-v1)",
+  "evidence_status": "GRADE_A_FRESH_PERF_BASELINE_RECORDED_2026_09_18_EVENING_PLUS_NULL_RESULT_PROBE",
+  "accuracy": {
+    "overall_synthetic_historical": 0.9654,
+    "overall_macro_f1_synthetic_historical": 0.9645,
+    "cross_vendor_full_evidence_measured": 0.629,
+    "cross_vendor_audio_only_measured": 0.302,
+    "v2_benchmark_5157_full_evidence": 0.715,
+    "v2_benchmark_5157_audio_only": 0.390,
+    "unknown_rate_ood_false_known_single_vendor": 0.416,
+    "unknown_rate_ood_false_known_cross_vendor": 0.72,
+    "staleness_flag": "accuracy numbers remain historical (not re-run this session); perf numbers below are fresh Grade A"
+  },
+  "perf_fresh_2026_09_18": {
+    "build": "Release LTO ON, ninja, preset-equivalent flags; branch slo/eval-feat-ai-perf-v1 @ a4d8ccd",
+    "fixture": "500 synthetic mono WAVs (generate_benchmark_fixtures.py)",
+    "harness": "BenchmarkScan (isolated cache DB)",
+    "default_batch32": {
+      "full_scan_ms_per_file": [38.51, 25.85, 26.58],
+      "median_ms_per_file": 26.58,
+      "rss_peak_mb": [1636, 1335.47, 1406.44],
+      "median_rss_peak_mb": 1406.44,
+      "incremental_rescan_ms": [28.51, 14.94, 15.46],
+      "search_p99_ms": [0.41, 0.09, 0.14]
+    },
+    "batch16_env": {
+      "full_scan_ms_per_file": [39.11, 43.63, 48.07],
+      "median_ms_per_file": 43.63,
+      "rss_peak_mb": [958.45, 650.3, 769.58],
+      "median_rss_peak_mb": 769.58,
+      "tradeoff": "-45% RSS peak, +64% scan time (medians)"
+    },
+    "arena_off_probe": {
+      "full_scan_ms_per_file": [25.01, 26.04, 25.62],
+      "rss_peak_mb": [1522.75, 1862.17, 1545.84],
+      "verdict": "NULL RESULT - no RSS improvement (median worse), speed unchanged; code reverted per R4"
+    },
+    "first_run_caveat": "run-1 of each config pays CoreML subgraph conversion (model cache cold); medians unchanged by including or excluding run-1",
+    "historical_validation": "default runs 2-3 (25.85/26.58 ms/file) match docs/BATCH_SIZE_SWEEP_REPORT.md 25.5-28.6 at N=500 Release",
+    "gates_during_probes": "TestReadOnlySafetyQualification + TestPathTraversal + TestMalformedAudio + TestDuplicateDetection all green",
+    "receipts_dir": "tools/classification_benchmark/receipts/perf_baseline_20260918/ (11 files)"
+  },
+  "perf_historical": {
+    "source": "docs/SCALE_TIER_RESULTS.md (Release, CoreML EP, batches 16/32)",
+    "cold_scan_ms_per_file_10000": 29.3,
+    "cold_scan_total_s_10000": 292.9,
+    "rescan_us_per_file_10000": 29,
+    "search_p99_ms_10000": 0.114,
+    "peak_rss_mb_10000": 2226,
+    "rss_fixed_estimate_mb": 1400,
+    "rss_marginal_kb_per_file": "70-90",
+    "rt_deadline_misses": "0/2000, 0 allocations, max 0.127ms",
+    "model_size": {"onnx_kb": 82, "onnx_data_mb": 23}
+  },
+  "tests": {
+    "pass_note": "R6 gate set re-run green on the fresh build during probes; full suite not run this session"
+  },
+  "scorecard": {
+    "discovery": 6, "classification": 5, "search": 8, "ux": 6,
+    "safety": 9, "perf": 7, "code_health": 7, "docs": 8, "overall": 6.8
+  },
+  "verdict": "NEEDS_WORK",
+  "notes": "Perf score now backed by fresh Grade-A evidence. P-01 batch posture is a DECIDE for Jack (env knob exists, no code change needed). Arena route falsified and closed."
+}

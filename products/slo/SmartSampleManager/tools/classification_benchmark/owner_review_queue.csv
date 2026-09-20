@@ -1,0 +1,51 @@
+sample_id,relative_path,proposed_class,proposed_temporal_class,winning_evidence,confidence,ambiguity_reason,duplicate_group,source_family,review_priority
+33,fixtures/scan_subset/0032_KSHMR_Hardstyle_Kick_10_D.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.27165836027587154,Acoustic category conflict,None,0032_KSHMR_Hardstyle,HIGH
+201,fixtures/scan_subset/0223_KSHMR_Clap_FX_14_Sub_Clap.wav,Synth,One-Shot,ACOUSTIC_CLASSIFIER,0.313033728580563,Acoustic category conflict,None,0223_KSHMR_Clap,HIGH
+598,fixtures/scan_subset/0673_KSHMR_Synth_Shot_01_A.wav,Synth,One-Shot,ACOUSTIC_CLASSIFIER,0.3254492168487976,Low classification margin or package classification mismatch,None,0673_KSHMR_Synth,MEDIUM
+133,fixtures/scan_subset/0138_KSHMR_Hip_Hop_Snare_02_A#.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.3306233610532868,Low classification margin or package classification mismatch,None,0138_KSHMR_Hip,MEDIUM
+454,fixtures/scan_subset/0512_KSHMR_Bass_Growl_20_E.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.358590345267249,Acoustic category conflict,None,0512_KSHMR_Bass,HIGH
+572,fixtures/scan_subset/0626_KSHMR_Psy_Bass_20_E.wav,Bass One-Shot,One-Shot,ACOUSTIC_CLASSIFIER,0.3733873459645548,Acoustic category conflict,None,0626_KSHMR_Psy,HIGH
+654,fixtures/scan_subset/0734_KSHMR_Synth_Loop_19_128_D#.wav,Synth Loop,Loop,ACOUSTIC_CLASSIFIER,0.3752638629030334,Low classification margin or package classification mismatch,None,0734_KSHMR_Synth,MEDIUM
+295,fixtures/scan_subset/0337_KSHMR_Closed_Hat_15_Vinyl.wav,Hi-Hat,One-Shot,ACOUSTIC_CLASSIFIER,0.40204719021801605,Low classification margin or package classification mismatch,None,0337_KSHMR_Closed,MEDIUM
+290,fixtures/scan_subset/0335_KSHMR_Closed_Hat_13_Dirty.wav,Hi-Hat,One-Shot,ACOUSTIC_CLASSIFIER,0.4154828498696115,Low classification margin or package classification mismatch,None,0335_KSHMR_Closed,MEDIUM
+487,fixtures/scan_subset/0547_KSHMR_Bass_Pluck_15_G.wav,Kick,One-Shot,ACOUSTIC_CLASSIFIER,0.4169269938698479,Acoustic category conflict,None,0547_KSHMR_Bass,HIGH
+521,fixtures/scan_subset/0577_KSHMR_Bass_Whomp_08_F.wav,Bass One-Shot,One-Shot,ACOUSTIC_CLASSIFIER,0.42110304320175224,Low classification margin or package classification mismatch,None,0577_KSHMR_Bass,MEDIUM
+151,fixtures/scan_subset/0162_KSHMR_Hip_Hop_Snare_26_G#.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.4295630768276095,Low classification margin or package classification mismatch,None,0162_KSHMR_Hip,MEDIUM
+372,fixtures/scan_subset/0426_KSHMR_Indian_Percussion_08_D.wav,Bass One-Shot,One-Shot,ACOUSTIC_CLASSIFIER,0.43272303166431286,Acoustic category conflict,None,0426_KSHMR_Indian,HIGH
+1194,fixtures/scan_subset/1279_KSHMR_Mini_Sweep_09.wav,Riser,One-Shot,ACOUSTIC_CLASSIFIER,0.4340806328682514,Low classification margin or package classification mismatch,None,1279_KSHMR_Mini,MEDIUM
+316,fixtures/scan_subset/0340_KSHMR_Closed_Hat_18_Vinyl.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.43459743034254045,Acoustic category conflict,None,0340_KSHMR_Closed,HIGH
+353,fixtures/scan_subset/0402_KSHMR_Percussion_Flam_19_G#.wav,Percussion,One-Shot,ACOUSTIC_CLASSIFIER,0.4445870469766376,Low classification margin or package classification mismatch,None,0402_KSHMR_Percussion,MEDIUM
+1048,fixtures/scan_subset/1127_KSHMR_Psy_FX_06_E.wav,FX,One-Shot,ACOUSTIC_CLASSIFIER,0.4451959266526367,Low classification margin or package classification mismatch,None,1127_KSHMR_Psy,MEDIUM
+256,fixtures/scan_subset/0292_KSHMR_Clap_Classic_04.wav,Clap,One-Shot,ACOUSTIC_CLASSIFIER,0.45035030550454286,Low classification margin or package classification mismatch,None,0292_KSHMR_Clap,MEDIUM
+641,fixtures/scan_subset/0725_KSHMR_Synth_Loop_11_120_Bbm.wav,FX,One-Shot,ACOUSTIC_CLASSIFIER,0.4521972807967044,Acoustic category conflict,None,0725_KSHMR_Synth,HIGH
+485,fixtures/scan_subset/0542_KSHMR_Bass_Pluck_10_E.wav,Bass One-Shot,One-Shot,ACOUSTIC_CLASSIFIER,0.47503774417812866,Low classification margin or package classification mismatch,None,0542_KSHMR_Bass,MEDIUM
+464,fixtures/scan_subset/0524_KSHMR_Bass_Growl_32_F.wav,Kick,One-Shot,ACOUSTIC_CLASSIFIER,0.4764901461099551,Acoustic category conflict,None,0524_KSHMR_Bass,HIGH
+903,fixtures/scan_subset/0974_KSHMR_Impact_Scary_10.wav,Impact,One-Shot,ACOUSTIC_CLASSIFIER,0.48369119037122427,Low classification margin or package classification mismatch,None,0974_KSHMR_Impact,MEDIUM
+475,fixtures/scan_subset/0535_KSHMR_Bass_Pluck_03_B.wav,Bass One-Shot,One-Shot,ACOUSTIC_CLASSIFIER,0.48646965668062325,Low classification margin or package classification mismatch,None,0535_KSHMR_Bass,MEDIUM
+152,fixtures/scan_subset/0161_KSHMR_Hip_Hop_Snare_25_G#.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.49121683342237427,Low classification margin or package classification mismatch,None,0161_KSHMR_Hip,MEDIUM
+148,fixtures/scan_subset/0153_KSHMR_Hip_Hop_Snare_17_E.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.4976519434826192,Low classification margin or package classification mismatch,None,0153_KSHMR_Hip,MEDIUM
+494,fixtures/scan_subset/0555_KSHMR_Bass_Shot_08_F#.wav,Bass One-Shot,One-Shot,ACOUSTIC_CLASSIFIER,0.49964596063610145,Low classification margin or package classification mismatch,None,0555_KSHMR_Bass,MEDIUM
+1029,fixtures/scan_subset/1104_KSHMR_Industrial_Grime_04_95_G.wav,Music Loop,Loop,ACOUSTIC_CLASSIFIER,0.5000096347828352,Acoustic category conflict,None,1104_KSHMR_Industrial,HIGH
+22,fixtures/scan_subset/0017_KSHMR_Big_Kick_18_F.wav,Bass Loop,Loop,ACOUSTIC_CLASSIFIER,0.5045466173581616,Acoustic category conflict,None,0017_KSHMR_Big,HIGH
+155,fixtures/scan_subset/0159_KSHMR_Hip_Hop_Snare_23_F#.wav,Percussion,One-Shot,ACOUSTIC_CLASSIFIER,0.5098410683858048,Acoustic category conflict,None,0159_KSHMR_Hip,HIGH
+564,fixtures/scan_subset/0625_KSHMR_Psy_Bass_19_E.wav,Bass Loop,Loop,ACOUSTIC_CLASSIFIER,0.5151194912196062,Low classification margin or package classification mismatch,None,0625_KSHMR_Psy,MEDIUM
+223,fixtures/scan_subset/0236_KSHMR_Human_Single_Clap_06.wav,Clap,One-Shot,ACOUSTIC_CLASSIFIER,0.5248430751909186,Low classification margin or package classification mismatch,None,0236_KSHMR_Human,MEDIUM
+681,fixtures/scan_subset/0759_KSHMR_Synth_Loop_43_147_Am.wav,Music Loop,Loop,ACOUSTIC_CLASSIFIER,0.528229391331102,Acoustic category conflict,None,0759_KSHMR_Synth,HIGH
+712,fixtures/scan_subset/0794_KSHMR_Vocal_Melody_28_128_Em.wav,Vocal Loop,Loop,ACOUSTIC_CLASSIFIER,0.5288830895142521,Low classification margin or package classification mismatch,None,0794_KSHMR_Vocal,MEDIUM
+39,fixtures/scan_subset/0037_KSHMR_Hardstyle_Kick_15_E.wav,Kick,One-Shot,ACOUSTIC_CLASSIFIER,0.5312666030896386,Low classification margin or package classification mismatch,None,0037_KSHMR_Hardstyle,MEDIUM
+997,fixtures/scan_subset/1079_KSHMR_Ambiance_Hard_Strike_04_A#.wav,Impact,One-Shot,ACOUSTIC_CLASSIFIER,0.5316659246278979,Acoustic category conflict,None,1079_KSHMR_Ambiance,HIGH
+498,fixtures/scan_subset/0545_KSHMR_Bass_Pluck_13_Invisible_Children_E.wav,Bass One-Shot,One-Shot,ACOUSTIC_CLASSIFIER,0.5327624186192956,Low classification margin or package classification mismatch,None,0545_KSHMR_Bass,MEDIUM
+481,fixtures/scan_subset/0540_KSHMR_Bass_Pluck_08_D#.wav,Bass Loop,Loop,ACOUSTIC_CLASSIFIER,0.5329803380110625,Acoustic category conflict,None,0540_KSHMR_Bass,HIGH
+630,fixtures/scan_subset/0697_KSHMR_Synth_Shot_25_E.wav,Kick,One-Shot,ACOUSTIC_CLASSIFIER,0.5339994432818072,Acoustic category conflict,None,0697_KSHMR_Synth,HIGH
+402,fixtures/scan_subset/0455_KSHMR_Percussion_High_Knock_06_G#.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.536849584096961,Acoustic category conflict,None,0455_KSHMR_Percussion,HIGH
+288,fixtures/scan_subset/0315_KSHMR_Crash_16.wav,Riser,One-Shot,ACOUSTIC_CLASSIFIER,0.5399799874763952,Acoustic category conflict,None,0315_KSHMR_Crash,HIGH
+658,fixtures/scan_subset/0740_KSHMR_Synth_Loop_25_128_Fm.wav,Synth Loop,Loop,ACOUSTIC_CLASSIFIER,0.5411606758928218,Low classification margin or package classification mismatch,None,0740_KSHMR_Synth,MEDIUM
+638,fixtures/scan_subset/0717_KSHMR_Synth_Loop_05_97_Am.wav,Music Loop,Loop,ACOUSTIC_CLASSIFIER,0.5433394503392492,Acoustic category conflict,None,0717_KSHMR_Synth,HIGH
+405,fixtures/scan_subset/0464_KSHMR_Percussion_High_Rimshot_05_E.wav,Clap,One-Shot,ACOUSTIC_CLASSIFIER,0.5520861052474165,Acoustic category conflict,None,0464_KSHMR_Percussion,HIGH
+504,fixtures/scan_subset/0561_KSHMR_Bass_Stab_04_E.wav,Bass One-Shot,One-Shot,ACOUSTIC_CLASSIFIER,0.5562177600606477,Low classification margin or package classification mismatch,None,0561_KSHMR_Bass,MEDIUM
+146,fixtures/scan_subset/0157_KSHMR_Hip_Hop_Snare_21_F.wav,Percussion,One-Shot,ACOUSTIC_CLASSIFIER,0.5564365383876047,Acoustic category conflict,None,0157_KSHMR_Hip,HIGH
+965,fixtures/scan_subset/1035_KSHMR_Ambiance_Drone_18_F_128_EDM_Section_Texture.wav,Impact,One-Shot,ACOUSTIC_CLASSIFIER,0.5573276119328662,Acoustic category conflict,None,1035_KSHMR_Ambiance,HIGH
+509,fixtures/scan_subset/0568_KSHMR_Bass_Stab_11_F#.wav,Snare,One-Shot,ACOUSTIC_CLASSIFIER,0.5616120660152383,Acoustic category conflict,None,0568_KSHMR_Bass,HIGH
+721,fixtures/scan_subset/0783_KSHMR_Vocal_Melody_17_120_F#m.wav,Vocal Loop,Loop,ACOUSTIC_CLASSIFIER,0.5616332318783201,Low classification margin or package classification mismatch,None,0783_KSHMR_Vocal,MEDIUM
+556,fixtures/scan_subset/0612_KSHMR_Psy_Bass_06_B.wav,Bass Loop,Loop,ACOUSTIC_CLASSIFIER,0.5620155041413167,Low classification margin or package classification mismatch,None,0612_KSHMR_Psy,MEDIUM
+8,fixtures/scan_subset/0008_KSHMR_Big_Kick_09_E.wav,Bass Loop,Loop,ACOUSTIC_CLASSIFIER,0.5647788652369549,Acoustic category conflict,None,0008_KSHMR_Big,HIGH

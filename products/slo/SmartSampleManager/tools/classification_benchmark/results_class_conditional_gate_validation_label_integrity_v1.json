@@ -1,0 +1,48 @@
+{
+  "record_type": "slo_completed_labelling_csv_integrity",
+  "schema_version": "1.0.0",
+  "method_version": "completed_labelling_csv_integrity_v1",
+  "generated_epoch": 1789210375.702666,
+  "files": [
+    {
+      "csv": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/verified_class_conditional_gate_validation_v1.csv",
+      "manifest": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/class_conditional_gate_validation_manifest_v1.json",
+      "n_manifest": 120,
+      "n_rows": 120,
+      "n_completed": 120,
+      "n_skipped": 0,
+      "label_counts": {
+        "Clap": 39,
+        "Kick": 40,
+        "Snare": 40,
+        "Vocal One-Shot": 1
+      },
+      "missing_manifest_ids": [],
+      "unknown_csv_ids": [],
+      "duplicate_ids": [],
+      "duplicate_paths": [],
+      "path_mismatches": [],
+      "missing_labels": [],
+      "invalid_escape_rows": [],
+      "integrity_ok": true,
+      "complete": true,
+      "ok": true
+    }
+  ],
+  "summary": {
+    "n_files": 1,
+    "n_rows": 120,
+    "n_completed": 120,
+    "n_skipped": 0,
+    "all_integrity_ok": true,
+    "all_complete": true
+  },
+  "decision": "integrity evidence only; labels are not promoted automatically",
+  "safety": {
+    "read_only": true,
+    "labels_created": false,
+    "labels_promoted_to_gold": false,
+    "source_audio_modified": false,
+    "rename_actions": false
+  }
+}

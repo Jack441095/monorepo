@@ -1,0 +1,10 @@
+{
+  "suite": "THURSDAY_V2H_HOLDOUT_RESULTS",
+  "generated_at": 1787521421.52417,
+  "note": "Holdout = benchmark run once at final qualification only",
+  "scenarios": 265,
+  "passed": 265,
+  "failed": 0,
+  "contamination": "NO",
+  "qualified": true
+}

@@ -1,0 +1,112 @@
+{
+  "timestamp": "20260714T163737Z",
+  "overall": {
+    "ok": true,
+    "failures": [],
+    "categories": {
+      "model_dependencies": {
+        "ok": true,
+        "failures": [],
+        "checks": {
+          "kenn_lora": {
+            "ok": true,
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/Audio_Engineering_Company/Audio_Too/studio/kenn/kenn/artifacts/models/kenn-lora",
+            "total_bytes": 89796416
+          },
+          "kenn_mlx": {
+            "ok": true,
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/Audio_Engineering_Company/Audio_Too/studio/kenn/kenn/artifacts/models/kenn-mlx",
+            "total_bytes": 880107012
+          },
+          "audiogen_active_manifest": {
+            "ok": true,
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/Audio_Engineering_Company/Audio_Too/studio/audiogen/audiogen/training_data/active_models/active_manifest.json",
+            "expected_count": 4
+          }
+        }
+      },
+      "kenn_retrieval_latency": {
+        "label": "kenn_retrieval_latency",
+        "ok": true,
+        "failures": [],
+        "cold_start_s": 0.1733,
+        "steady_state_samples_s": [
+          0.0518,
+          0.0555
+        ],
+        "steady_state_mean_s": 0.0536,
+        "steady_state_max_s": 0.0555,
+        "slo_s": 0.5
+      },
+      "tts_latency": {
+        "label": "tts_latency",
+        "ok": true,
+        "failures": [],
+        "cold_start_s": 3.0717,
+        "steady_state_samples_s": [
+          1.1984,
+          0.9626
+        ],
+        "steady_state_mean_s": 1.0805,
+        "steady_state_max_s": 1.1984,
+        "slo_s": 2.0
+      },
+      "automix_render_ratio": {
+        "ok": true,
+        "failures": [],
+        "worst_case": "edm",
+        "worst_ratio": 1.222,
+        "case_ratios": {
+          "pop": 0.905,
+          "rock": 0.921,
+          "hip_hop": 0.928,
+          "edm": 1.222,
+          "acoustic_folk": 0.8,
+          "classical": 0.774,
+          "jazz": 0.899,
+          "podcast_spoken_word": 0.567,
+          "ambient_cinematic": 0.972,
+          "metal": 0.848
+        },
+        "slo_ratio": 2.0
+      },
+      "automix_genre_matrix": {
+        "ok": true,
+        "failures": [],
+        "pass_rate": 0.9,
+        "passed_cases": [
+          "pop",
+          "rock",
+          "hip_hop",
+          "acoustic_folk",
+          "classical",
+          "jazz",
+          "podcast_spoken_word",
+          "ambient_cinematic",
+          "metal"
+        ],
+        "failed_cases": [
+          "edm"
+        ]
+      },
+      "automix_quality": {
+        "ok": true,
+        "failures": [],
+        "summary": {
+          "runs": 30,
+          "valid": 30,
+          "lufs_within_tolerance_rate": 1.0,
+          "clipping_rate": 0.0,
+          "mean_abs_lufs_error_LU": 0.004,
+          "max_abs_lufs_error_LU": 0.01,
+          "gate_targets": [
+            -14.0,
+            -16.0
+          ],
+          "gate_lufs_within_tolerance_rate": 1.0,
+          "gate_clipping_rate": 0.0
+        }
+      }
+    }
+  }
+}

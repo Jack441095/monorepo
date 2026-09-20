@@ -1,0 +1,164 @@
+{
+  "schema_version": "slo_estate_refresh_registry_v1",
+  "package_id": "L-01-SLO-ESTATE-REFRESH-V1",
+  "observation_date": "2026-08-30",
+  "status": "canonical_candidate_preserved; release_truth_not_declared",
+  "owner": "NITE DSP",
+  "canonical_source_candidate": {
+    "path": "products/slo",
+    "sha": "c6d0746ac876a0a3af9244907486ffc001b3e718",
+    "branch": "main",
+    "remote": "https://github.com/Jack441095/Nite_DSP_01.git",
+    "remote_sync": "main matches origin/main",
+    "tracked_modifications": 0,
+    "untracked_entries": 49,
+    "release_truth": "not_clean"
+  },
+  "isolated_qualification_checkpoint": {
+    "path": "workspace/worktrees/slo/format-aware-scan-v1",
+    "sha": "4645425535a35da06fb734c0a9a08e821b116ade",
+    "branch": "engineering/slo-format-aware-scan-v1",
+    "dirty_entries": 0,
+    "shared_sha_is_ancestor": true,
+    "qualification_scope": "format-aware scan, full local build/direct-binary qualification, and receipt updates",
+    "release_truth": "engineering_evidence_only"
+  },
+  "size_snapshot": {
+    "repository_total": "20G",
+    "smart_sample_manager_total": "19G",
+    "build_directory": {
+      "path": "products/slo/_build",
+      "size": "593M",
+      "file_count": 1154,
+      "class": "generated_build_state"
+    },
+    "cache_directory": {
+      "path": "products/slo/_cache",
+      "size": "885M",
+      "file_count": 7494,
+      "class": "generated_dependency_or_runtime_cache"
+    },
+    "classification_tools": {
+      "path": "products/slo/SmartSampleManager/tools/classification_benchmark",
+      "file_count": 15354,
+      "class": "qualification_results_or_private_evaluation_state; contents not opened"
+    },
+    "models_directory": {
+      "path": "products/slo/SmartSampleManager/Models",
+      "size": "23M",
+      "class": "product_or_research_model_state; contents not opened"
+    },
+    "fixtures": {
+      "path": "products/slo/SmartSampleManager/fixtures",
+      "size": "41M",
+      "class": "fixture_or_evaluation_state; contents not opened"
+    }
+  },
+  "filename_only_protected_inventory": {
+    "audio_files": 15287,
+    "onnx_model_files": 4,
+    "database_files": 0,
+    "secret_extension_files": 0,
+    "environment_named_files": 1,
+    "method": "find filename inventory only; no audio, model, corpus, or secret contents opened",
+    "policy": "preserve; no move, cleanup, deletion, or reclassification of protected contents"
+  },
+  "reference_scan": {
+    "absolute_volume_reference_files": 21,
+    "audio_too_reference_files": 12,
+    "nite_dsp_01_reference_files": 15,
+    "scope": "text-like files excluding _build, _cache, audio, and model paths",
+    "interpretation": "findings require semantic/path-owner review; no blind replacement is authorized"
+  },
+  "root_gitlink_comparison": {
+    "root_recorded_slo_gitlink": "0c679644c11770890159f46978ba05c6bbebc4de",
+    "checked_out_slo_sha": "c6d0746ac876a0a3af9244907486ffc001b3e718",
+    "matches": false,
+    "action": "leave_in_place",
+    "reason": "shared checkout is dirty and must not be overwritten"
+  },
+  "duplicate_authority": {
+    "canonical_policy": "platform is the commercial website/backend authority",
+    "audit_ref": "workspace/worktrees/root/portfolio-evidence-receipts-v1/validation/audits/stage-2-platform-canonicality-v1/PLATFORM_CANONICALITY_DUPLICATE_AUTHORITY_AUDIT_V1.md",
+    "comparison_units": [
+      {"canonical": "platform/backend", "duplicate": "products/slo/nitedsp/backend", "bounded_diff_entries": 17},
+      {"canonical": "platform/website", "duplicate": "products/slo/nitedsp/website", "bounded_diff_entries": 56}
+    ],
+    "action": "freeze_duplicate_runtime_authority; do not copy, merge, quarantine, or retire in this package"
+  },
+  "worktrees": [
+    {"path": "products/slo", "branch": "main", "sha": "c6d0746ac876a0a3af9244907486ffc001b3e718", "dirty_entries": 49, "role": "canonical_candidate_dirty"},
+    {"path": "workspace/worktrees/slo-phase4", "branch": "engineering/slo-master-plan-phase-4", "sha": "0efda0cd4457faee1dc2d527ddbfccea59ae96b1", "dirty_entries": 0, "role": "engineering"},
+    {"path": "workspace/worktrees/slo/audio-foundation-probe-v1", "branch": "research/slo-audio-foundation-probe-v1", "sha": "301ad0a070b6d522b526d3809fcfd0f3a77035c4", "dirty_entries": 0, "role": "research"},
+    {"path": "workspace/worktrees/slo/build-entrypoint-v1", "branch": "engineering/slo-build-entrypoint-v1", "sha": "0774513e0eec2bc4a5ab356eb98d3ec96a4d835a", "dirty_entries": 0, "role": "build"},
+    {"path": "workspace/worktrees/slo/format-aware-scan-v1", "branch": "engineering/slo-format-aware-scan-v1", "sha": "4645425535a35da06fb734c0a9a08e821b116ade", "dirty_entries": 0, "role": "qualification"},
+    {"path": "workspace/worktrees/slo/private-beta-readiness-v1", "branch": "engineering/slo-private-beta-readiness-v1", "sha": "e62c81959450536230e2fe84980b616a10f74ccf", "dirty_entries": 0, "role": "qualification"},
+    {"path": "workspace/worktrees/slo/rc1", "branch": "release/ssm-technical-beta-rc1", "sha": "533849894660c2a42b08217f5d044367c3db68a5", "dirty_entries": 0, "role": "release"},
+    {"path": "workspace/worktrees/slo/release-eng", "branch": "engineering/release-engineering-qa", "sha": "533849894660c2a42b08217f5d044367c3db68a5", "dirty_entries": 0, "role": "release"},
+    {"path": "workspace/worktrees/slo/v4h-closeout", "branch": "engineering/slo-v4h-closeout-reconciliation", "sha": "f9b34b0540aa79e2df56c7227368d403eccb0041", "dirty_entries": 2, "role": "qualification_wip"},
+    {"path": "workspace/worktrees/slo/v4h-qualification", "branch": "engineering/slo-classification-v4h-qualification", "sha": "0304cb24403b5b4409e4584a1963672d2fa2c32e", "dirty_entries": 4, "role": "qualification_wip"},
+    {"path": "workspace/worktrees/slo/v5-generalisation", "branch": "engineering/slo-v5-generalisation", "sha": "b68b452d2c366143ffc7216a614910e0d00d98d1", "dirty_entries": 6, "role": "engineering_wip"},
+    {"path": "workspace/worktrees/slo/v5b-ground-truth-fusion", "branch": "engineering/slo-v5b-ground-truth-fusion", "sha": "1cfc690928c31d57f35bdb613a64d076bc393c02", "dirty_entries": 2, "role": "engineering_wip"},
+    {"path": "workspace/worktrees/slo/v5c-data-engine", "branch": "engineering/slo-v5c1-human-evidence", "sha": "ac4d36f99098cea6a9ab3847f8f77fd9b5088f1d", "dirty_entries": 3, "role": "engineering_wip"}
+  ],
+  "untracked_inventory": [
+    {"path": "README.md", "class": "product_documentation"},
+    {"path": "SLO_AUDIT_PRECHECK.json", "class": "qualification_evidence"},
+    {"path": "SLO_BETA_BLOCKER_REGISTER_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_CLASSIFICATION_ACCURACY_REPORT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_CLASS_BY_CLASS_REPORT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_FILE_DATA_SAFETY_AUDIT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_FULL_PRODUCT_CLASSIFICATION_BETA_READINESS_AUDIT_V1_FINAL_REPORT.md", "class": "qualification_evidence"},
+    {"path": "SLO_FULL_TEST_RESULTS_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_HOST_VALIDATION_REPORT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_LICENSE_MODEL_AUDIT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_OOD_UNKNOWN_REPORT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_PACKAGING_DISTRIBUTION_AUDIT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_PERFORMANCE_REPORT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_SECURITY_PRIVACY_AUDIT_V1.md", "class": "qualification_evidence"},
+    {"path": "SLO_SOURCE_ARCHITECTURE_MAP.md", "class": "architecture_evidence"},
+    {"path": "SLO_TEST_INVENTORY.md", "class": "qualification_evidence"},
+    {"path": "SmartSampleManager/CMakePresets.json", "class": "build_configuration"},
+    {"path": "SmartSampleManager/docs/SLO_CLASSIFICATION_V4_FINAL_CLOSEOUT_REPORT.md", "class": "qualification_evidence"},
+    {"path": "SmartSampleManager/scripts/__pycache__/", "class": "generated_state"},
+    {"path": "SmartSampleManager/scripts/codesign_and_package.py", "class": "release_tooling"},
+    {"path": "SmartSampleManager/scripts/distribution.xml", "class": "release_tooling"},
+    {"path": "SmartSampleManager/scripts/measure_build.py", "class": "build_tooling"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/ood_gate_analysis_summary.json", "class": "evaluation_result; contents_not_opened"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/results_ood_negative.json", "class": "evaluation_result; contents_not_opened"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/results_readonly_safety_receipt.json", "class": "qualification_evidence"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/results_real_corpus_audio_only.json", "class": "protected_evaluation_result; contents_not_opened"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/results_real_corpus_full.json", "class": "protected_evaluation_result; contents_not_opened"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/results_real_corpus_v2_audio_only.json", "class": "protected_evaluation_result; contents_not_opened"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/results_real_corpus_v2_full.json", "class": "protected_evaluation_result; contents_not_opened"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/results_rt_deadline_stress.json", "class": "qualification_evidence"},
+    {"path": "SmartSampleManager/tools/classification_benchmark/results_vocal_loop_crossvendor.json", "class": "evaluation_result; contents_not_opened"},
+    {"path": "docs/BUILD_SYSTEM_OPTIMISATION_2026_08_22.md", "class": "build_documentation"},
+    {"path": "docs/BUILD_TREE_POLICY.md", "class": "build_documentation"},
+    {"path": "docs/NITE_DSP_BUILD_OPTIMISATION_REPORT_V1.md", "class": "build_documentation"},
+    {"path": "docs/NITE_DSP_BUILD_OPTIMISATION_REPORT_V1_1.md", "class": "build_documentation"},
+    {"path": "docs/THURSDAY_AUTONOMOUS_RECOVERY_AND_QUALIFICATION_REPORT.md", "class": "historical_cross_product_evidence"},
+    {"path": "docs/THURSDAY_V2B_FINAL_REPORT.md", "class": "historical_cross_product_evidence"},
+    {"path": "docs/THURSDAY_V2_FINAL_REPORT.md", "class": "historical_cross_product_evidence"},
+    {"path": "nitedsp/backend/FROZEN_CANONICAL_MOVED.md", "class": "legacy_duplicate_authority"},
+    {"path": "nitedsp/backend/docs/", "class": "legacy_duplicate_authority"},
+    {"path": "nitedsp/backend/tests/test_commerce_qualification.py", "class": "legacy_duplicate_authority_test"},
+    {"path": "slo_audit_receipt_v1.json", "class": "qualification_evidence"},
+    {"path": "slo_beta_blockers_v1.json", "class": "qualification_evidence"},
+    {"path": "slo_beta_readiness_v1.json", "class": "qualification_evidence"},
+    {"path": "slo_class_metrics_v1.json", "class": "qualification_evidence"},
+    {"path": "slo_classification_metrics_v1.json", "class": "qualification_evidence"},
+    {"path": "slo_host_validation_v1.json", "class": "qualification_evidence"},
+    {"path": "slo_performance_v1.json", "class": "qualification_evidence"},
+    {"path": "slo_test_results_v1.json", "class": "qualification_evidence"}
+  ],
+  "decisions": {
+    "canonical_source": "products/slo remains the declared product source candidate, but the dirty checkout is not release truth",
+    "worktree_policy": "preserve all worktrees; classify dirty WIP before any integration",
+    "generated_state_policy": "future builds/caches/results belong outside product source roots; no cleanup performed here",
+    "research_policy": "audio foundation probe and classification research remain separate from product release claims",
+    "migration_action": "leave_in_place"
+  },
+  "rollback": "Additive registry only. Withdraw this registry and its report from the isolated qualification branch; do not reset, clean, or alter products/slo, its worktrees, audio, models, evaluation results, or duplicate nitedsp trees.",
+  "next_package": "Refresh SLO product/release manifest provenance from this registry, then qualify only a clean source checkpoint for host, licensing, packaging, install, and release decisions."
+}

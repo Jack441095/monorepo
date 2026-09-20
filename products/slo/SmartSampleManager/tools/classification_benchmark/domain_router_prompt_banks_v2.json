@@ -1,0 +1,44 @@
+{
+  "music_sample": [
+    "a short producer drum machine or instrument sample",
+    "an isolated studio sample intended for music production",
+    "an electronic or acoustic musical one-shot or loop",
+    "a sample-pack sound for making a song"
+  ],
+  "speech_voice": [
+    "human speech or spoken voice",
+    "a person talking or narrating",
+    "a spoken language recording",
+    "a human vocal performance or vocal phrase"
+  ],
+  "environment_sfx": [
+    "a diegetic environmental sound effect, not a music-production sample",
+    "a foley or everyday object recording",
+    "a cinematic sound effect or designed impact",
+    "a real-world action, object, vehicle, or weather sound"
+  ],
+  "animal_bioacoustic": [
+    "an animal or bird sound",
+    "a wildlife recording",
+    "a bioacoustic field recording",
+    "an insect, amphibian, or marine animal call"
+  ],
+  "mechanical_industrial": [
+    "a machine or mechanical recording",
+    "industrial equipment, motor, or engine sound",
+    "a power tool or pneumatic machine",
+    "mechanical impacts or machinery operating"
+  ],
+  "ambience_field": [
+    "a continuous ambience or soundscape",
+    "a field recording atmosphere",
+    "background environmental ambience",
+    "room tone, crowd, city, forest, ocean, rain, or wind ambience"
+  ],
+  "unknown_or_mixture": [
+    "an unusual mixed or unidentifiable audio recording",
+    "audio that does not fit a known sound category",
+    "a complex mixture of multiple sound sources",
+    "an ambiguous recording requiring human review"
+  ]
+}

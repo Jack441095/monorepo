@@ -1,0 +1,21 @@
+# KENN Standalone Public Beta Core Dependencies
+#
+# Clean, lightweight production dependencies for KENN retrieval, RAG chat,
+# WAV Mix Review signal analysis, and FastAPI public web service.
+# Completely standalone with zero dependencies on external sibling repositories.
+
+certifi>=2024.2.2
+fastapi>=0.115,<1
+httpx>=0.27.0,<1
+librosa>=0.10,<1  # optional, heavier: real per-sample BPM/key estimate (offline analysis only, opt-in per file)
+numpy>=1.26,<3
+onnxruntime>=1.17,<2
+pydantic>=2.6,<3
+pyloudnorm>=0.1.1,<1  # MIT-licensed ITU-R BS.1770 integrated LUFS/LRA for Mix Review (offline analysis only)
+pypdf>=4.0,<6
+pytest>=8.0,<10
+python-multipart>=0.0.9,<1
+scipy>=1.10,<2  # true-peak oversampling for Mix Review (offline analysis only)
+scikit-learn>=1.4,<2  # bounded calibration and optional adaptive clustering
+tokenizers>=0.19,<1
+uvicorn[standard]>=0.30,<1

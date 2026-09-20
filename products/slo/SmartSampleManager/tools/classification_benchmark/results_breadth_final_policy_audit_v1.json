@@ -1,0 +1,356 @@
+{
+  "record_type": "slo_current_policy_gate_audit",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T18:19:14",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 8,
+    "splits": 5,
+    "policy_threshold": 0.5,
+    "trusted_filename_classes": [
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Hi-Hat",
+      "Kick",
+      "Percussion Loop",
+      "Snare"
+    ]
+  },
+  "inventory": {
+    "n_rows": 1832,
+    "n_classes": 28,
+    "n_collections": 81,
+    "classes": [
+      "Bass Hit",
+      "Bass Loop",
+      "Bass Reese",
+      "Chord Loop",
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Foley",
+      "Foley Loop",
+      "Hi-Hat",
+      "Hi-Hat Loop",
+      "Impact",
+      "Kick",
+      "Kick Loop",
+      "Other/none",
+      "Pad",
+      "Percussion",
+      "Percussion Loop",
+      "Rimshot",
+      "Riser",
+      "SFX",
+      "Snare",
+      "Synth Loop",
+      "Synth One-Shot",
+      "Top Loop",
+      "Vocal Loop",
+      "Vocal One-Shot",
+      "Weather/Nature Atmos"
+    ]
+  },
+  "results": {
+    "audio_only": {
+      "actions": {
+        "auto_rename": {
+          "n": 1851,
+          "share": 12.63,
+          "precision": 87.41
+        },
+        "suggest": {
+          "n": 1949,
+          "share": 13.3,
+          "precision": 84.56
+        },
+        "review": {
+          "n": 10537,
+          "share": 71.9,
+          "precision": 45.76
+        },
+        "never_act": {
+          "n": 319,
+          "share": 2.18,
+          "precision": 36.68
+        }
+      },
+      "auto_per_seed": [
+        {
+          "n": 220,
+          "precision": 86.81818181818181
+        },
+        {
+          "n": 234,
+          "precision": 86.32478632478633
+        },
+        {
+          "n": 231,
+          "precision": 87.87878787878788
+        },
+        {
+          "n": 230,
+          "precision": 87.82608695652173
+        },
+        {
+          "n": 227,
+          "precision": 87.22466960352423
+        },
+        {
+          "n": 241,
+          "precision": 87.55186721991701
+        },
+        {
+          "n": 229,
+          "precision": 88.646288209607
+        },
+        {
+          "n": 239,
+          "precision": 87.02928870292887
+        }
+      ],
+      "auto_by_class": {
+        "Clap": {
+          "n": 643,
+          "precision": 88.49
+        },
+        "Drum Loop": {
+          "n": 404,
+          "precision": 85.89
+        },
+        "Kick": {
+          "n": 804,
+          "precision": 87.31
+        }
+      },
+      "filename_override_threshold": null
+    },
+    "name_if_audio_conf_below_0.40": {
+      "actions": {
+        "auto_rename": {
+          "n": 2215,
+          "share": 15.11,
+          "precision": 84.24
+        },
+        "suggest": {
+          "n": 3238,
+          "share": 22.09,
+          "precision": 80.76
+        },
+        "review": {
+          "n": 8917,
+          "share": 60.84,
+          "precision": 47.31
+        },
+        "never_act": {
+          "n": 286,
+          "share": 1.95,
+          "precision": 40.56
+        }
+      },
+      "auto_per_seed": [
+        {
+          "n": 272,
+          "precision": 83.82352941176471
+        },
+        {
+          "n": 277,
+          "precision": 83.75451263537906
+        },
+        {
+          "n": 278,
+          "precision": 84.89208633093526
+        },
+        {
+          "n": 277,
+          "precision": 84.47653429602889
+        },
+        {
+          "n": 272,
+          "precision": 84.55882352941177
+        },
+        {
+          "n": 284,
+          "precision": 83.80281690140845
+        },
+        {
+          "n": 277,
+          "precision": 84.83754512635379
+        },
+        {
+          "n": 278,
+          "precision": 83.81294964028777
+        }
+      ],
+      "auto_by_class": {
+        "Clap": {
+          "n": 751,
+          "precision": 89.08
+        },
+        "Drum Loop": {
+          "n": 461,
+          "precision": 84.16
+        },
+        "Kick": {
+          "n": 1003,
+          "precision": 80.66
+        }
+      },
+      "filename_override_threshold": 0.4
+    },
+    "name_if_audio_conf_below_0.50": {
+      "actions": {
+        "auto_rename": {
+          "n": 2434,
+          "share": 16.61,
+          "precision": 84.06
+        },
+        "suggest": {
+          "n": 3684,
+          "share": 25.14,
+          "precision": 81.79
+        },
+        "review": {
+          "n": 8252,
+          "share": 56.3,
+          "precision": 45.9
+        },
+        "never_act": {
+          "n": 286,
+          "share": 1.95,
+          "precision": 40.91
+        }
+      },
+      "auto_per_seed": [
+        {
+          "n": 297,
+          "precision": 84.17508417508418
+        },
+        {
+          "n": 305,
+          "precision": 83.27868852459017
+        },
+        {
+          "n": 302,
+          "precision": 84.43708609271523
+        },
+        {
+          "n": 303,
+          "precision": 84.48844884488449
+        },
+        {
+          "n": 303,
+          "precision": 83.82838283828383
+        },
+        {
+          "n": 310,
+          "precision": 83.54838709677419
+        },
+        {
+          "n": 305,
+          "precision": 84.91803278688525
+        },
+        {
+          "n": 309,
+          "precision": 83.81877022653721
+        }
+      ],
+      "auto_by_class": {
+        "Clap": {
+          "n": 838,
+          "precision": 90.21
+        },
+        "Drum Loop": {
+          "n": 512,
+          "precision": 84.18
+        },
+        "Kick": {
+          "n": 1084,
+          "precision": 79.24
+        }
+      },
+      "filename_override_threshold": 0.5
+    },
+    "name_if_audio_conf_below_0.60": {
+      "actions": {
+        "auto_rename": {
+          "n": 2456,
+          "share": 16.76,
+          "precision": 83.88
+        },
+        "suggest": {
+          "n": 3702,
+          "share": 25.26,
+          "precision": 82.82
+        },
+        "review": {
+          "n": 8212,
+          "share": 56.03,
+          "precision": 45.98
+        },
+        "never_act": {
+          "n": 286,
+          "share": 1.95,
+          "precision": 41.26
+        }
+      },
+      "auto_per_seed": [
+        {
+          "n": 300,
+          "precision": 83.66666666666667
+        },
+        {
+          "n": 308,
+          "precision": 83.44155844155844
+        },
+        {
+          "n": 307,
+          "precision": 84.36482084690553
+        },
+        {
+          "n": 307,
+          "precision": 84.03908794788273
+        },
+        {
+          "n": 306,
+          "precision": 83.66013071895425
+        },
+        {
+          "n": 311,
+          "precision": 83.92282958199357
+        },
+        {
+          "n": 307,
+          "precision": 84.03908794788273
+        },
+        {
+          "n": 310,
+          "precision": 83.87096774193549
+        }
+      ],
+      "auto_by_class": {
+        "Clap": {
+          "n": 826,
+          "precision": 92.01
+        },
+        "Drum Loop": {
+          "n": 511,
+          "precision": 84.15
+        },
+        "Kick": {
+          "n": 1119,
+          "precision": 77.75
+        }
+      },
+      "filename_override_threshold": 0.6
+    }
+  },
+  "decision": "audit only; no approval, rename, or policy mutation",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false
+  }
+}

@@ -1,0 +1,47 @@
+# Core runtime (website smoke, Ableton index, PDF download)
+pypdf>=4.0.0,<7
+fpdf2>=2.7.0,<3
+certifi>=2024.0.0
+httpx>=0.27.0,<1
+# NumPy version is a TIGHT constraint, do not loosen — there is exactly one window
+# that satisfies both sides on Intel macOS:
+#   - LOWER bound >=2.0: the realtime player uses np.asarray(..., copy=True), a
+#     NumPy 2.0+ API (crashes on 1.x with "asarray() got an unexpected keyword
+#     argument 'copy'").
+#   - UPPER bound <2.1 on x86_64: numba 0.60.0 (the last Intel macOS wheel) only
+#     supports NumPy<=2.0. With NumPy 2.1+ numba FAILS TO IMPORT and ALL of
+#     AudioGen's DSP (master_bus/mixer/reverb/sampler) silently falls back to pure
+#     Python — ~100x slower render (7-15s/bar), which manifests as NO AUDIO in the
+#     realtime player. This is not theoretical: an unpinned upgrade to NumPy 2.5
+#     caused exactly that (2026-07-04). Keep NumPy on the 2.0.x line here.
+# Apple Silicon (arm64) uses numba>=0.61 (see studio/audiogen/audiogen/pyproject.toml),
+# which supports newer NumPy, so it is not capped.
+# Torch 2.2 (final Intel macOS wheel) is ABI-incompatible with NumPy 2.x and prints a
+# harmless import warning; KENN retrieval uses the torch-free ONNX embedder instead.
+numpy>=2.0.0,<2.1; platform_machine == "x86_64"
+numpy>=2.0.0,<3; platform_machine != "x86_64"
+# numba/llvmlite pinned to the last Intel-macOS-compatible pair so DSP stays JIT-fast.
+numba==0.60.0; platform_machine == "x86_64"
+llvmlite==0.43.0; platform_machine == "x86_64"
+PyYAML>=6.0.0,<7
+scikit-learn>=1.5.0,<2
+scipy>=1.7.0
+# KENN semantic search — torch-free ONNX embedding backend (all-MiniLM-L6-v2).
+# Avoids sentence-transformers/torch, which is ABI-incompatible with NumPy 2.x here.
+# Model fetched via scripts/fetch_embedding_model.py.
+onnxruntime>=1.17,<2
+tokenizers>=0.15,<1
+soundfile>=0.12.1
+sounddevice>=0.4.6
+kokoro-onnx>=0.5.0,<1; platform_system == "Darwin"
+
+# --- Autonomous Agent Stack (Qwen Coder local agents) ---
+# These power business/agents/CodingAgent, MetaAgent, and all autonomous agents.
+# They are optional for the core audio runtime but required for `python -m business.agents.*`
+click>=8.1.0,<9
+# NOTE: Ollama itself must be installed system-wide (brew install ollama or the
+# install script in docs/QWEN_CODER_LOCAL_AGENT_SETUP.md). The Python package
+# `ollama` is only needed if you call the Ollama *Python* SDK directly; the agents
+# use the REST API via httpx (already a core dependency), so it is not strictly
+# required. Listed here for completeness / advanced use.
+# ollama>=0.3.0

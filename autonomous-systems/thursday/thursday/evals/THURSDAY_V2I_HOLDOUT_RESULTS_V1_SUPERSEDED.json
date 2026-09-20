@@ -1,0 +1,77 @@
+{
+  "holdout": "THURSDAY_LONG_HORIZON_HOLDOUT_V1",
+  "frozen_digest_sha256": "6f340a9cf24978b705b8fa7b9642d8997dcb1de73b02bd9e67a6d11f5b2bc272",
+  "run_count": 1,
+  "contamination": "NO",
+  "executed_at_epoch": 1787526505.28302,
+  "elapsed_seconds": 0.2,
+  "total": 12,
+  "passed": 10,
+  "failed": 2,
+  "qualified": false,
+  "results": [
+    {
+      "case": "H-01 seeded 21-day integrity-clean run",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-02 seeded 45-day integrity-clean run with crashes",
+      "pass": false,
+      "error": "NameError: name 'Event' is not defined"
+    },
+    {
+      "case": "H-03 approval replay refused on drifted target",
+      "pass": false,
+      "error": "ValueError: Invalid lifecycle transition WAITING_FOR_APPROVAL \u2192 PROPOSED for candidate ae4b62128ec2f33b816c3abc1239c2d0. Allowed: ['ABANDONED', 'APPROVED', 'DEFERRED', 'REJECTED', 'SUPERSEDED']"
+    },
+    {
+      "case": "H-04 multi-day TOCTOU drift refuses execution",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-05 restart preserves waiting approvals and credentials",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-06 compaction leaves critical provenance intact",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-07 brief quality holds across 14 days",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-08 rejected work not re-asked without new evidence",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-09 priority order stable across quiet week",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-10 expired owner decision inert",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-11 candidate identity collision resisted",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-12 simulated clock refuses rewind",
+      "pass": true,
+      "error": ""
+    }
+  ],
+  "status": "SUPERSEDED",
+  "superseded_by": "THURSDAY_LONG_HORIZON_HOLDOUT_V2",
+  "justification": "Two of twelve cases contained harness-level defects discovered at first execution: H-02 raised NameError (missing Event import in the holdout fixture) and H-03 attempted an illegal lifecycle transition during case setup. Neither failure exercises Thursday's behaviour; the tested properties could not run at all. Per qualification discipline the defective frozen set is preserved here unmodified, declared superseded, and replaced by THURSDAY_LONG_HORIZON_HOLDOUT_V2 (fresh digest, single execution). No case content was tuned against observed outcomes."
+}

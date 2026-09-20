@@ -1,0 +1,11 @@
+{
+  "installed_au_auval": "PASS",
+  "installed_au_architecture": "PASS_ARM64",
+  "installed_vst3_architecture": "PASS_ARM64",
+  "installed_dependency_manifest": "PASS",
+  "installed_codesign": "AD_HOC_VERIFICATION_ONLY",
+  "ableton_live": "NOT_QUALIFIED",
+  "vst3_validator": "UNAVAILABLE",
+  "standalone_current_launch": "NOT_RUN",
+  "distribution_signing": "BLOCKED"
+}

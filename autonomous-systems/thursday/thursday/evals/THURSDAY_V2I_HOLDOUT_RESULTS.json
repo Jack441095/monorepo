@@ -1,0 +1,74 @@
+{
+  "holdout": "THURSDAY_LONG_HORIZON_HOLDOUT_V3",
+  "frozen_digest_sha256": "254a05a9c067049304b631f1176dfadc4e7019cc3c767b791e4b47e6966bcf50",
+  "run_count": 1,
+  "contamination": "NO",
+  "executed_at_epoch": 1787526788.640853,
+  "elapsed_seconds": 0.68,
+  "total": 12,
+  "passed": 12,
+  "failed": 0,
+  "qualified": true,
+  "results": [
+    {
+      "case": "H-01 seeded 21-day integrity-clean run",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-02 seeded 45-day integrity-clean run with crashes",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-03 approval replay refused on drifted target",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-04 multi-day TOCTOU drift refuses execution",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-05 restart preserves waiting approvals and credentials",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-06 compaction leaves critical provenance intact",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-07 brief quality holds across 14 days",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-08 rejected work not re-asked without new evidence",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-09 priority order stable across quiet week",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-10 expired owner decision inert",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-11 candidate identity collision resisted",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "case": "H-12 simulated clock refuses rewind",
+      "pass": true,
+      "error": ""
+    }
+  ]
+}

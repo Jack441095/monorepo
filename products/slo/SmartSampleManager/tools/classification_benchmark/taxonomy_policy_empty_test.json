@@ -1,0 +1,9 @@
+{
+  "min_collections": 5,
+  "min_support": 20,
+  "n_label_rows_joined": 329,
+  "precision_floor": 0.95,
+  "qualified_classes": [],
+  "safety": "empty or sparse evidence produces no qualified classes",
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,214 @@
+{
+  "receipt": "SLO_IMPROVEMENT_RECEIPT_V1",
+  "generated": "2026-09-11T00:22:07",
+  "git_sha": "fd4e0e3",
+  "branch": "main",
+  "versions": {
+    "taxonomy": "1.1.0",
+    "dataset": "1.0.0",
+    "policy": "1.0.0",
+    "corrections_schema": 1,
+    "model": "nearest-centroid Perch+CLAP + multi-window DSP"
+  },
+  "operating_points": {
+    "85": {
+      "arm": "mw-fusion",
+      "coverage": 68.8,
+      "precision": 87.6,
+      "meets": true
+    },
+    "90": {
+      "arm": "multi-window audio",
+      "coverage": 32.5,
+      "precision": 91.0,
+      "meets": true
+    },
+    "95": {
+      "arm": "audio-only",
+      "coverage": 14.8,
+      "precision": 95.1,
+      "meets": "MARGINAL",
+      "advertise": false,
+      "reason": "0.1pp margin, inside seed noise"
+    }
+  },
+  "decision_policy": {
+    "target": 0.93,
+    "seeds": 12,
+    "tiers": {
+      "auto_rename": {
+        "share": 13.8,
+        "precision": 90.8,
+        "n": 1262
+      },
+      "suggest": {
+        "share": 8.1,
+        "precision": 87.7,
+        "n": 742
+      },
+      "review": {
+        "share": 74.8,
+        "precision": 65.1,
+        "n": 6839
+      },
+      "never_act": {
+        "share": 3.3,
+        "precision": 37.5,
+        "n": 301
+      }
+    },
+    "auto_rename_precision": 91.47,
+    "raw_classifier_precision": 90.1,
+    "delta_pp": 1.37,
+    "auto_per_seed": [
+      87.05,
+      93.33,
+      89.16,
+      89.19,
+      90.48,
+      92.47,
+      95.16,
+      89.54,
+      92.08,
+      91.14,
+      95.08,
+      92.93
+    ],
+    "percussion_in_auto_rename": 0,
+    "impulse_responses_in_auto_rename": 0,
+    "policy_version": "1.0.0"
+  },
+  "recommended_beta_calibration": 0.93,
+  "calibration_sweep": {
+    "0.90": 89.7,
+    "0.93": 90.8,
+    "0.95": 92.9
+  },
+  "auto_rename_classes": [
+    "Kick",
+    "Clap",
+    "Drum Loop"
+  ],
+  "suggest_classes": [
+    "Snare",
+    "Hi-Hat",
+    "Crash",
+    "Percussion Loop",
+    "Foley"
+  ],
+  "never_act": [
+    "Percussion",
+    "impulse responses"
+  ],
+  "review": [
+    "Other/none",
+    "below-gate"
+  ],
+  "safety_tests": {
+    "auto_rename_beats_raw": true,
+    "percussion_in_auto_rename": 0,
+    "impulse_responses_in_auto_rename": 0,
+    "sample_files_modified": 0,
+    "source_audio_verified_unmodified": 1139
+  },
+  "rejection_boundary": {
+    "audio-only": {
+      "false_accept_at_0.5": 20.17,
+      "real_sounds_wrongly_rejected": 2.18,
+      "junk_recall": 60.5
+    },
+    "multi-window": {
+      "false_accept_at_0.5": 19.33,
+      "real_sounds_wrongly_rejected": 2.33,
+      "junk_recall": 60.5
+    },
+    "filename_overrides_correct_audio": 28,
+    "impulse_responses_excluded": 9,
+    "per_class_policy": {
+      "Percussion": {
+        "n": 50,
+        "acts_on": 52.0,
+        "precision": 15.4,
+        "policy": "abstain"
+      },
+      "Percussion Loop": {
+        "n": 62,
+        "acts_on": 62.9,
+        "precision": 61.5,
+        "policy": "suggest"
+      },
+      "Foley": {
+        "n": 55,
+        "acts_on": 45.5,
+        "precision": 68.0,
+        "policy": "suggest"
+      },
+      "Other/none": {
+        "n": 119,
+        "acts_on": 73.1,
+        "precision": 72.4,
+        "policy": "suggest"
+      },
+      "Hi-Hat": {
+        "n": 73,
+        "acts_on": 82.2,
+        "precision": 80.0,
+        "policy": "suggest"
+      },
+      "Crash": {
+        "n": 26,
+        "acts_on": 80.8,
+        "precision": 81.0,
+        "policy": "suggest"
+      },
+      "Snare": {
+        "n": 103,
+        "acts_on": 79.6,
+        "precision": 82.9,
+        "policy": "suggest"
+      },
+      "Drum Loop": {
+        "n": 77,
+        "acts_on": 84.4,
+        "precision": 90.8,
+        "policy": "rename"
+      },
+      "Clap": {
+        "n": 98,
+        "acts_on": 93.9,
+        "precision": 93.5,
+        "policy": "rename"
+      },
+      "Kick": {
+        "n": 99,
+        "acts_on": 87.9,
+        "precision": 94.3,
+        "policy": "rename"
+      }
+    }
+  },
+  "label_assets": {
+    "critical_csvs_tracked": true,
+    "was_gitignored": true,
+    "checksums": true,
+    "provenance_per_row": true,
+    "offdrive_backups": true,
+    "safety_tests_passing": 12
+  },
+  "blockers": [
+    "Percussion incoherent (-0.120), excluded from auto-rename",
+    "19.3% of junk still confidently mislabelled",
+    "Top Loop vs Hi-Hat Loop unevidenced (6 and 13 labels)",
+    "Sub Bass has 0 labels, Atmosphere 3",
+    "encoder multi-window crop arm untested",
+    "210MB model-size decision open"
+  ],
+  "untouched": {
+    "submit": true,
+    "platform": true,
+    "payment": true,
+    "railway": true,
+    "user_samples": true,
+    "production_classifier": true
+  }
+}

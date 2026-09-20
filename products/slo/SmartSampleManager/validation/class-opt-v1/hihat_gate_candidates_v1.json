@@ -1,0 +1,653 @@
+{
+ "record_type": "slo_hihihat_gate_candidates",
+ "schema_version": "1.0.0",
+ "safety": {
+  "read_only": true,
+  "labels_created": false,
+  "rename_actions": false
+ },
+ "source_queue": "tools/classification_benchmark/full_taxonomy_high_confidence_review_v1.csv",
+ "note": "candidate-visible sourcing manifest; run build_blind_class_gate_review_queue.py on the machine with the sample library mounted to export the candidate-hidden review CSV",
+ "items": [
+  {
+   "id": 0,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/HAT_FT.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.938296,
+   "candidate_similarity": 0.825085,
+   "vendor": "Mike Shinoda Drums",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 1,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Hi-Hat) Don't Sleep.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.927831,
+   "candidate_similarity": 0.80322,
+   "vendor": "Drum Recollection",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 2,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_K (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.926564,
+   "candidate_similarity": 0.805683,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 3,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_K (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.922424,
+   "candidate_similarity": 0.792266,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 4,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/HAT_WR.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.918816,
+   "candidate_similarity": 0.765109,
+   "vendor": "Mike Shinoda Drums",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 5,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_J (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.916863,
+   "candidate_similarity": 0.809346,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 6,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat (5).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.915155,
+   "candidate_similarity": 0.762561,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 7,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Hi-Hat) Find A Way.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.913367,
+   "candidate_similarity": 0.780411,
+   "vendor": "Drum Recollection",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 8,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_03_Clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.913248,
+   "candidate_similarity": 0.778181,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 9,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Hihats/CPA_TCP_hihat_dirty_dancers.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.910001,
+   "candidate_similarity": 0.798966,
+   "vendor": "Capsun ProAudio - City Pop",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 10,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Hihats/Just Jared - OP1 Drums Hihat 14.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.909275,
+   "candidate_similarity": 0.848671,
+   "vendor": "Just Jared - OP1 Drums",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 11,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_14_Vinyl.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.908555,
+   "candidate_similarity": 0.805562,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 12,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_05_Clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.907917,
+   "candidate_similarity": 0.764433,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 13,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Hats/LFM2_Anotha CHH #1.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.907872,
+   "candidate_similarity": 0.778095,
+   "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 14,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat (9).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.906593,
+   "candidate_similarity": 0.770653,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 15,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_21_Wide.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.905343,
+   "candidate_similarity": 0.758406,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 16,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_01_Clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.905223,
+   "candidate_similarity": 0.747354,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 17,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_04_Clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.901317,
+   "candidate_similarity": 0.754523,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 18,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_J (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.901005,
+   "candidate_similarity": 0.79902,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 19,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_08_Clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.897088,
+   "candidate_similarity": 0.735564,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 20,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/HAT 2_MBS.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.89424,
+   "candidate_similarity": 0.828267,
+   "vendor": "Mike Shinoda Drums",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 21,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/HAT_SOB.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.891312,
+   "candidate_similarity": 0.726257,
+   "vendor": "Mike Shinoda Drums",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 22,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat (8).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.888812,
+   "candidate_similarity": 0.73012,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 23,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Open/KSHMR_Open_Hat_03_Short.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.888187,
+   "candidate_similarity": 0.789721,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 24,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_closed_hat_04_clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.887764,
+   "candidate_similarity": 0.799567,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 25,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_19_Wide.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.887169,
+   "candidate_similarity": 0.738875,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 26,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_C (3).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.885305,
+   "candidate_similarity": 0.791129,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 27,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_N (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.884312,
+   "candidate_similarity": 0.773808,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 28,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_N (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.87926,
+   "candidate_similarity": 0.786235,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 29,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_M (3).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.877993,
+   "candidate_similarity": 0.736812,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 30,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_H (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.876156,
+   "candidate_similarity": 0.738188,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 31,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_11_Dirty.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.874958,
+   "candidate_similarity": 0.784511,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 32,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Hats/LFM2_Bright CHH #2.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.874843,
+   "candidate_similarity": 0.74706,
+   "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 33,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Open/KSHMR_Open_Hat_01_Short.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.874195,
+   "candidate_similarity": 0.775486,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 34,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_P (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.874143,
+   "candidate_similarity": 0.810433,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 35,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_I (6).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.873257,
+   "candidate_similarity": 0.79603,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 36,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_I (5).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.872166,
+   "candidate_similarity": 0.775395,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 37,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat (13).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.869232,
+   "candidate_similarity": 0.719844,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 38,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_N (3).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.867694,
+   "candidate_similarity": 0.748477,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 39,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/5 - Hats & Cymbals/Hi Hat - Rich.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.866587,
+   "candidate_similarity": 0.761524,
+   "vendor": "Minimal Audio",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 40,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_17_Vinyl.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.865985,
+   "candidate_similarity": 0.79194,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 41,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_P (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.865718,
+   "candidate_similarity": 0.802515,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 42,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_C (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.864785,
+   "candidate_similarity": 0.786463,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 43,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_L (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.861149,
+   "candidate_similarity": 0.804671,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 44,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_B (3).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.86076,
+   "candidate_similarity": 0.802641,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 45,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Coast2coast Kit Samples/Organic - HiHat_C (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.860068,
+   "candidate_similarity": 0.765268,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 46,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_07_Clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.859487,
+   "candidate_similarity": 0.753887,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 47,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Juggernaut Kit Samples/Organic - HiHat_D (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.859478,
+   "candidate_similarity": 0.75265,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 48,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Hi Hats/All In One Hi Hat .wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.857932,
+   "candidate_similarity": 0.733567,
+   "vendor": "Drum Recollection",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 49,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_C (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.854413,
+   "candidate_similarity": 0.755197,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 50,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Hi Hats/Favorite Hi Hat .wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.853049,
+   "candidate_similarity": 0.71963,
+   "vendor": "Drum Recollection",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 51,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_closed_hat_10_hard.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.851482,
+   "candidate_similarity": 0.782043,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 52,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_D (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.851458,
+   "candidate_similarity": 0.793293,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 53,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_B (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.849392,
+   "candidate_similarity": 0.792948,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 54,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Open/KSHMR_Open_Hat_05_Short.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.848768,
+   "candidate_similarity": 0.748266,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 55,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_A (3).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.844332,
+   "candidate_similarity": 0.748003,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 56,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/2 Open Hats/Organic - O.HiHat_H (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.841835,
+   "candidate_similarity": 0.764507,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 57,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_D (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.840099,
+   "candidate_similarity": 0.793806,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 58,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_closed_hat_01_clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.83901,
+   "candidate_similarity": 0.796024,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 59,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_closed_hat_03_clean.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.835937,
+   "candidate_similarity": 0.745609,
+   "vendor": "Sounds of KSHMR Vol.3",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 60,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_O (1).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.835257,
+   "candidate_similarity": 0.771502,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 61,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Vintage Kit Samples/Organic - HiHat_D (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.833382,
+   "candidate_similarity": 0.718269,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 62,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Hihats/CPA_TCP_hihat_power_stance.wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.830814,
+   "candidate_similarity": 0.811471,
+   "vendor": "Capsun ProAudio - City Pop",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  },
+  {
+   "id": 63,
+   "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_A (2).wav",
+   "candidate_class": "Hi-Hat",
+   "candidate_confidence": 0.826969,
+   "candidate_similarity": 0.749404,
+   "vendor": "Organic Drum Kit",
+   "action": "review",
+   "reason": "full-taxonomy class precision not yet qualified for action"
+  }
+ ]
+}

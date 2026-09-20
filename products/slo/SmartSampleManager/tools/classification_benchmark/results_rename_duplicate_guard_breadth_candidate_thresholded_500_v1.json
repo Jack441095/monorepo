@@ -1,0 +1,4037 @@
+{
+  "record_type": "slo_rename_duplicate_guard_audit",
+  "schema_version": "1.0.0",
+  "method_version": "rename_duplicate_guard_v1",
+  "source_plan": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/rename_plan_breadth_candidate_thresholded_dryrun_500_v1.jsonl",
+  "source_plan_sha256": "79b9e1b26b5f294d08d13c549c5fd22f3f514fa697e8b453abae5d5466f0e4ec",
+  "source_exact_receipt": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_content_identity_testing_v1.json",
+  "source_exact_record_type": "slo_content_identity_manifest",
+  "source_near_receipt": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_near_duplicate_candidates_testing_v1.json",
+  "n_plan_rows": 500,
+  "plan_action_counts": {
+    "never_act": 41,
+    "suggest": 169,
+    "review": 290
+  },
+  "flag_counts": {
+    "acoustic_near_duplicate": 2
+  },
+  "rows": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Cajon_Loop_83_Percussion_Bendji_Allonce_115_loop.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Djembe_Loop_25_Percussion_Bendji_Allonce_120_loop.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Djembe_Loop_44_Percussion_Bendji_Allonce_110_loop.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Shaker_Loop_1_Percussion_Bendji_Allonce_120_loop.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/one_shot/Percussion/RT_Bendji_Allonce_Conga_Riff_15_Percussion_Bendji_Allonce_one_shot.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 3.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 4.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 5.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 6.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 7.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 8.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Aah 9.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 1.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 10.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 4.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 5.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 6.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 7.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 8.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Breath Sound 9.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 10.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 4.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 5.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 6.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 7.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 8.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Ooh 9.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Reverse Aah 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Reverse Aah 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Reverse Ooh 1.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Reverse Ooh 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Reverse Ooh 3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Misc Sounds/BLA - Reverse Ooh 4.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Bubble Tea 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Bubble Tea 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Dear Destiny 1.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Dear Destiny 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Do You Like It 1.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Do You Like It 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Give It All 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Give It All 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Go A Little Psycho 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Go A Little Psycho 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - In Your Dreams 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - In Your Dreams 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - No 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - No 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Nowhere to Breathe 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Nowhere to Breathe 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Oh My God 1.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Oh My God 2.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Say It Like You Need It 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Say It Like You Need It 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Yeah 1.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - Yeah 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - You Like It When I Go 1.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Spoken Phrases/BLA - You Like It When I Go 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Alone 1 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Alone 2 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Bad Guy 1 - D Major.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Bad Guy 2 - D Major.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Call You Out 1 - D# Harmonic Minor.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Call You Out 2 - D# Harmonic Minor.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Didn_t Want Me Now 1 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Didn_t Want Me Now 2 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Do You Remember 1 - D Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Do You Remember 2 - D Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Don_t Have To Be So Wasted 1 - G Major.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Don_t Have To Be So Wasted 2 - G Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Feel Good 1 - E Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Feel Good 2 - E Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Give It Away 1 - C Melodic Minor.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Give It Away 2 - C Melodic Minor.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Go 1 - D Major.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Go 2 - D Major.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Hey, I Don_t Like You 1 - E Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Hey, I Don_t Like You 2 - E Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - I Can_t Breathe 1 - F# Major.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - I Can_t Breathe 2 - F# Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - I_ll Find You 1 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - I_ll Find You 2 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - I_ll Give You A Reason 1 - F Major.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - I_ll Give You A Reason 2 - F Major.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Like You Know 1 - E Minor.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Like You Know 2 - E Minor.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Love It 1 - C# Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Love It 2 - C# Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Love You Down 1 - F Harmonic Minor.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Love You Down 2 - F Harmonic Minor.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Make It Like You Know 1 - D Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Make It Like You Know 2 - D Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Mean It 1 - F Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Mean It 2 - F Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Need It 1 - F# Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Need It 2 - F# Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Nowhere To Go 1 - F# Minor.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Nowhere To Go 2 - F# Minor.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Pedestal 1 - E Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Pedestal 2 - E Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Playtime 1 - C# Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Playtime 2 - C# Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Think About Their Feelings 1 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Think About Their Feelings 2 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Used To 1 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Used To 2 - C Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Wasted 1 - E Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - Wasted 2 - E Major.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - You Got It 1 - C Major.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Lotus Audio x Dianna Artist Pack/Sung Phrases/BLA - You Got It 2 - C Major.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_03.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_04.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_05.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_06.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_07.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_09.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_12.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A#/Diamaudix_Audio_PAS_IV_Sweep_FX_Bb_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_03.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_04.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_06.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_07.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_09.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_11.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_12.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/A/Diamaudix_Audio_PAS_IV_Sweep_FX_A_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B14.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B15.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B16.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_02.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_04.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_05.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_06.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_07.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_08.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_09.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_11.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/B/Diamaudix_Audio_PAS_IV_Sweep_FX_B_13.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_03.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_04.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_06.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_09.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_11.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_13.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C#/Diamaudix_Audio_PAS_IV_Sweep_FX_C#_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_02.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_04.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_05.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_06.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_08.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_09.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_11.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_12.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/C/Diamaudix_Audio_PAS_IV_Sweep_FX_C_16.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_03.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_04.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_06.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_09.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_11.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_12.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_14.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D#/Diamaudix_Audio_PAS_IV_Sweep_FX_Eb_16.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_02.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_04.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_06.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_08.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_09.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_10.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_15.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/D/Diamaudix_Audio_PAS_IV_Sweep_FX_D_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_02.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_04.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_06.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_07.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_09.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_10.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_11.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_12.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_13.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/E/Diamaudix_Audio_PAS_IV_Sweep_FX_E_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_02.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_04.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_05.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_06.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_07.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_08.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_09.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_11.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_12.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F#/Diamaudix_Audio_PAS_IV_Sweep_FX_F#_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_02.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_04.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_06.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_08.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_09.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_10.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/F/Diamaudix_Audio_PAS_IV_Sweep_FX_F_16.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_03.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_04.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_05.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_06.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_09.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_11.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_12.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G#/Diamaudix_Audio_PAS_IV_Sweep_FX_Ab_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_04.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_05.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_06.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_09.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_11.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_14.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_15.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/G/Diamaudix_Audio_PAS_IV_Sweep_FX_G_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_04.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_06.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_09.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_10.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_13.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_14.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_15.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_16.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_17.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/X/Diamaudix_Audio_PAS_IV_Sweep_FX_X_18.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C04.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C06.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C07.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C08.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C09.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C10.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C12.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C13.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C14.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C15.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C16.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C17.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C18.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C19.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C20.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C21.wav",
+      "plan_action": "never_act",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C22.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C23.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Analog Atmospheres/Diamaudix_Audio_PAS_IV_Atmospheres_C24.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Arp_Loop_Gm.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Bass_Loop_Gm.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Full_Drum_Loop_Gm.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Hat_Loop.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Kick_Snare_Loop_Gm.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Arp_Loop_01_Bmin_118bpm.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Bass_Loop_01_Bmin_118bpm.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Full_Drum_Loop_01_118bpm.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Hat_Loop_01_118bpm.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Kick_Loop_01_118bpm.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Perc_Loop_01_118bpm.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Snare_Loop_01_118bpm.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Chh_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Chh_02.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Chh_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Clap_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Clap_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Clap_03.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Clap_04.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Clap_05.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_A_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_A_02.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_Ab_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_F#_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_F_01.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_02.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_04.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_01.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_02.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_03.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Barry White - Im Gonna Love You Just A Little More Baby (Break).wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Bill Withers - Kissing My Love (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Brethren - Outside Love (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Chicago - Skinny Boy (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Chuck Jackson - Through All Time (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Fills/Hugh Brodie - Corn Bread & Beans (Fill).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Fills/Mohawks - Landscape (Fill).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Fills/Paul Kantner - Flowers of the Night (Fill).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Fred Hughes - Who You Really Are (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Funkadelic - I Be You (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Harvey & The Phenomenals - Soul & Sunshine (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Help - Take A Look At Yourself (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Hookfoot - Is Anyone There (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Jimmy Smith - Number One (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Little Richard - The Rill Thing (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Love - Doggone (Break 1).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Love - Doggone (Break 2).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Mohawks - Landscape (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Moments - Sexy Mama (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Ocean - Put Your Hand in the Hand (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Peter Herbolzheimer - Butterfly (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Power Of Zeus - Sorcerer of Isis (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Skull Snaps - Turn My Back On Love (Break).wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Solomon Burke - Get Out Of My Life Woman (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Steve Grossman - Zulu Stomp (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Sugar Billy Garner - I Got Some (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Berlin Breaks/Tony Newman - Soulthing (Break).wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_10.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_13.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_14.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_4.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_5.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_6.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_7.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_8.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_9.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_10.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_13.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_14.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_4.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_5.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_6.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_7.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_8.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/105 BPM/monosole_105bpm_9.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_10.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_13.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_14.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_15.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_16.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_17.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_18.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_19.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_20.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_4.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_5.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_6.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_7.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_8.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/110 BPM/monosole_110bpm_9.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_10.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_11.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_12.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_13.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_14.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_15.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_16.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_17.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_18.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_4.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_5.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_6.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_7.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_8.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/115 BPM/monosole_115bpm_9.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_4.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_5.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_6.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_7.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_8.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/120 BPM/monosole_120bpm_9.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 3.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 1.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 2.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 2_2.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 2_3.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 SNARE 3.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 KICK 1.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 KICK 2.wav",
+      "plan_action": "review",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 SNARE 1.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 SNARE 2.wav",
+      "plan_action": "suggest",
+      "flags": [],
+      "exact_group": null,
+      "near_duplicate_group_indices": [],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/monosole_85bpm_1.wav",
+      "plan_action": "review",
+      "flags": [
+        "acoustic_near_duplicate"
+      ],
+      "exact_group": null,
+      "near_duplicate_group_indices": [
+        0
+      ],
+      "safe_to_auto_act": false
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/monosole_85bpm_10.wav",
+      "plan_action": "review",
+      "flags": [
+        "acoustic_near_duplicate"
+      ],
+      "exact_group": null,
+      "near_duplicate_group_indices": [
+        1
+      ],
+      "safe_to_auto_act": false
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "rename_plan_modified": false,
+    "source_audio_modified": false,
+    "auto_action_enabled": false,
+    "exact_aliases_are_not_safe_to_auto_act": true,
+    "acoustic_similarity_is_not_duplicate_proof": true
+  }
+}

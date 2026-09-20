@@ -1,0 +1,52 @@
+{
+  "base_sha256": "475b763b4a2407bd69a070c4b96779540235e537a114e698c7ea426be3885163",
+  "embedding_dimensions": 2048,
+  "embeddings_sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401",
+  "labels_sha256": "ec79edc0a549a1bd49c4691088eb01a84d8240f9274659a6cac1afb768dbe14a",
+  "map_non_drum_to_rejection": false,
+  "method_version": "breadth_target_corpus_v1",
+  "missing_embeddings_sha256": "51f6af3f57617dfffaf390a7341e68c3b087656e0ef2e9d0ba6112608c64ff7d",
+  "n_appended_rows": 297,
+  "n_base_rows": 1553,
+  "n_human_corrections_overlapping_base": 4,
+  "n_output_rows": 1850,
+  "output": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_breadth_final_v1.npz",
+  "overlap_corrections": [
+    {
+      "new_label": "Kick",
+      "old_label": "Other/none",
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Lex Luger Drumkit/Lex_Luger_Drumkit/LL_one_shots/LL_kick_pink_2.wav",
+      "raw_label": "Kick"
+    },
+    {
+      "new_label": "Clap",
+      "old_label": "Crash",
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Clap) Ant-Man.wav",
+      "raw_label": "Clap"
+    },
+    {
+      "new_label": "Synth Loop",
+      "old_label": "Percussion Loop",
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+      "raw_label": "Synth Loop"
+    },
+    {
+      "new_label": "Hi-Hat Loop",
+      "old_label": "Hi-Hat",
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Hihat/TCP_110_hihat_loop_ladies_night.wav",
+      "raw_label": "Hi-Hat Loop"
+    }
+  ],
+  "receipt": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/receipt_corpus_breadth_final_v1.json",
+  "record_type": "slo_breadth_target_corpus",
+  "safety": {
+    "production_model_changed": false,
+    "rename_actions": false,
+    "research_only": true,
+    "sealed_validation_changed": false,
+    "source_audio_modified": false,
+    "source_audio_renamed": false
+  },
+  "schema_version": "1.0.0",
+  "target_completed_labels": 311
+}

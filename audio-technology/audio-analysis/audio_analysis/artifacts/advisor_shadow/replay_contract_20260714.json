@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-07-14T23:33:58.900892+00:00",
+  "receipt_schema": "audio-too.kenn-advisor-shadow/v1",
+  "results": [
+    {
+      "expectation_met": true,
+      "expected_status": "valid",
+      "human_ratings": {},
+      "id": "contract-valid-gain-01",
+      "latency_ms": 0.239,
+      "operation_count": 1,
+      "rejection_reason": "",
+      "status": "valid",
+      "would_change": [
+        {
+          "after": 1.5,
+          "before": 0.0,
+          "delta": 1.5,
+          "operation": "gain_delta",
+          "stem_id": "stem-01",
+          "unit": "dB"
+        }
+      ]
+    },
+    {
+      "expectation_met": true,
+      "expected_status": "rejected",
+      "human_ratings": {},
+      "id": "contract-reject-clamp-01",
+      "latency_ms": 0.129,
+      "operation_count": 0,
+      "rejection_reason": "gain delta exceeds +/-3.0 dB clamp",
+      "status": "rejected",
+      "would_change": []
+    }
+  ],
+  "schema": "audio-too.kenn-advisor-replay/v1",
+  "summary": {
+    "cases": 2,
+    "expected_status_accuracy": 1.0,
+    "human_rating_coverage": {
+      "audible_improvement": 0.0,
+      "explanation_quality": 0.0,
+      "usefulness": 0.0
+    },
+    "human_rating_means": {
+      "audible_improvement": null,
+      "explanation_quality": null,
+      "usefulness": null
+    },
+    "mean_latency_ms": 0.184,
+    "schema_valid_rate": 0.5,
+    "status_counts": {
+      "no_proposal": 0,
+      "provider_error": 0,
+      "rejected": 1,
+      "valid": 1
+    },
+    "total_operations": 1
+  }
+}

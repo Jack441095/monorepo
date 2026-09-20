@@ -1,0 +1,138 @@
+{
+  "receipt": "SLO_BETA_INTEGRATION_RECEIPT_V1",
+  "generated": "2026-09-11T01:14:47",
+  "git_sha": "4540cef",
+  "branch": "main",
+  "integration": {
+    "policy_header": "Source/BetaDecisionPolicy.h",
+    "gated_function": "SampleManagerEngine::reorganizeSamples",
+    "preview_api": "SampleManagerEngine::previewBetaSort() [const, no filesystem access]",
+    "gate_default_enabled": true,
+    "app_builds": true,
+    "auto_rename_is_preview_only": true,
+    "enum_name": "AutoRenameEligible -- eligibility, never permission",
+    "requires_approval": true,
+    "independent_gates": [
+      "decision policy eligibility",
+      "user Copy/Move confirmation"
+    ]
+  },
+  "policy_tiers": {
+    "auto_rename": [
+      "Kick",
+      "Clap",
+      "Drum Loop"
+    ],
+    "suggest": [
+      "Snare",
+      "Hi-Hat",
+      "Crash",
+      "Percussion Loop",
+      "Foley"
+    ],
+    "review": [
+      "Other/none",
+      "below-gate",
+      "unclassified"
+    ],
+    "never_act": [
+      "Percussion",
+      "impulse responses"
+    ]
+  },
+  "measured_policy": {
+    "target": 0.93,
+    "seeds": 12,
+    "tiers": {
+      "auto_rename": {
+        "share": 13.8,
+        "precision": 90.8,
+        "n": 1262
+      },
+      "suggest": {
+        "share": 8.1,
+        "precision": 87.7,
+        "n": 742
+      },
+      "review": {
+        "share": 74.8,
+        "precision": 65.1,
+        "n": 6839
+      },
+      "never_act": {
+        "share": 3.3,
+        "precision": 37.5,
+        "n": 301
+      }
+    },
+    "auto_rename_precision": 91.47,
+    "raw_classifier_precision": 90.1,
+    "delta_pp": 1.37,
+    "auto_per_seed": [
+      87.05,
+      93.33,
+      89.16,
+      89.19,
+      90.48,
+      92.47,
+      95.16,
+      89.54,
+      92.08,
+      91.14,
+      95.08,
+      92.93
+    ],
+    "percussion_in_auto_rename": 0,
+    "impulse_responses_in_auto_rename": 0,
+    "policy_version": "1.0.0"
+  },
+  "tests": {
+    "test_beta_decision_policy": "17/17",
+    "test_beta_sort_gate": "6/6",
+    "test_ground_truth": "22/22",
+    "test_label_safety": "12/12",
+    "corrections_store_self_test": "6/6",
+    "test_domain_generalization": "pass",
+    "test_label_tool": "pass",
+    "test_labelling_allocation": "18/18"
+  },
+  "safety": {
+    "sample_files_modified_6h": 0,
+    "labelled_files_present": "1069/1069",
+    "source_audio_verified_unmodified": 1139,
+    "policy_header_has_filesystem_access": false,
+    "corrections_store_has_audio_column": false,
+    "sprint_export_copies_audio": false
+  },
+  "sprint_export": {
+    "file": "SLO_400_FILE_LABEL_SPRINT_EXPORT_V1.csv",
+    "rows": 400,
+    "collections": 60,
+    "escape_hatch_columns": [
+      "not_in_list_label",
+      "note"
+    ]
+  },
+  "active_learning": {
+    "implemented": true,
+    "tested": true,
+    "wired_to_juce_ui": false
+  },
+  "blockers": [
+    "corrections store not yet called from the JUCE UI",
+    "beta preview UI sections specified but not implemented in PluginEditor",
+    "Percussion incoherent (-0.120); excluded from auto-rename",
+    "19.3% of junk still confidently mislabelled",
+    "Sub Bass has zero labels; Top/Hi-Hat Loop unevidenced",
+    "210MB model-size decision open"
+  ],
+  "untouched": {
+    "submit": true,
+    "platform": true,
+    "payment": true,
+    "licensing": true,
+    "railway": true,
+    "user_samples": true,
+    "production_classifier_weights": true
+  }
+}

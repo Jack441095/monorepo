@@ -1,0 +1,318 @@
+{
+  "taxonomy_version": "1.1.0",
+  "created": "2026-09-10",
+  "axes": {
+    "function_family": "what the sound DOES in a track",
+    "temporal_form": "One-Shot | Loop | Fill | Rejection",
+    "source_attributes": "provenance tags, NOT classes (foley, weather, vinyl, ...)"
+  },
+  "principles": [
+    "A class must name ONE thing. Negative silhouette means it names several.",
+    "Provenance is an ATTRIBUTE, not a class. Foley describes where a sound came from, not what it does; splitting it acoustically manufactures structure that is not there.",
+    "Other/none is REJECTION material. Its heterogeneity is intended and it must never be asked to form a compact prototype, nor be an auto-rename target.",
+    "Definitions cite measurable physics where measurement supports them, so a human and the model can agree on a boundary."
+  ],
+  "classes": {
+    "Kick": {
+      "family": "Kick",
+      "form": "One-Shot",
+      "definition": "Low-frequency drum hit, fundamental typically 50-120 Hz, fast attack, dominant energy below 200 Hz.",
+      "coherence": 0.252,
+      "status": "coherent"
+    },
+    "Snare": {
+      "family": "Snare",
+      "form": "One-Shot",
+      "definition": "Mid-band drum hit with noise component from snare wires, fundamental typically 180-350 Hz.",
+      "coherence": 0.049,
+      "status": "marginal"
+    },
+    "Clap": {
+      "family": "Clap",
+      "form": "One-Shot",
+      "definition": "Multi-burst noise transient, little harmonic content, energy concentrated 1-4 kHz.",
+      "coherence": 0.223,
+      "status": "coherent"
+    },
+    "Hi-Hat": {
+      "family": "Hi-Hat",
+      "form": "One-Shot",
+      "definition": "Short bright metallic transient, very high zero-crossing rate, negligible low end.",
+      "coherence": 0.072,
+      "status": "coherent"
+    },
+    "Crash": {
+      "family": "Crash",
+      "form": "One-Shot",
+      "definition": "Metallic cymbal with long bright decay, broad bandwidth, single onset.",
+      "coherence": 0.077,
+      "status": "coherent"
+    },
+    "Rimshot": {
+      "family": "Rimshot",
+      "form": "One-Shot",
+      "definition": "Sharp stick-on-rim crack, instant attack, very short decay.",
+      "coherence": 0.105,
+      "status": "coherent"
+    },
+    "Percussion": {
+      "family": "Percussion",
+      "form": "One-Shot",
+      "definition": "PARENT CLASS ONLY - not a leaf. Measured incoherent; use a subtype.",
+      "coherence": -0.12,
+      "status": "incoherent_parent",
+      "subtypes": {
+        "Tom": {
+          "definition": "Pitched drum with real low end. The only percussion subtype with substantial energy below 200 Hz.",
+          "physics": {
+            "centroid_hz": 1217,
+            "energy_below_200hz": 0.4,
+            "decay_s": 0.26,
+            "attack_ms": 16
+          }
+        },
+        "Shaker/Tambourine": {
+          "definition": "Bright rattling noise, essentially no low end, high zero-crossing rate.",
+          "physics": {
+            "centroid_hz": 3859,
+            "energy_below_200hz": 0.0,
+            "decay_s": 0.13,
+            "attack_ms": 36
+          }
+        },
+        "Hand Drum": {
+          "definition": "Conga, bongo, djembe and related. Did not emerge as a separate cluster - too few examples. Provisional. NOT OBSERVED in the owner sprint - no examples produced.",
+          "physics": null
+        },
+        "Other Percussive Hit": {
+          "definition": "Instant attack, gone within ~60 ms, low harmonicity. A crack rather than a tone.",
+          "physics": {
+            "centroid_hz": 2815,
+            "energy_below_200hz": 0.08,
+            "decay_s": 0.06,
+            "attack_ms": 0
+          }
+        },
+        "Unsure": {
+          "definition": "Reviewer could not place it. Kept explicitly rather than guessed.",
+          "physics": null
+        },
+        "Metallic": {
+          "definition": "Bell, chime, metallic strike. Distinct ring and long bright decay.",
+          "physics": null
+        }
+      },
+      "observed_counts": {
+        "Other Percussive Hit": 25,
+        "Shaker/Tambourine": 8,
+        "Tom": 7,
+        "Metallic": 1,
+        "Hand Drum": 0
+      }
+    },
+    "Foley": {
+      "family": "Foley",
+      "form": "One-Shot",
+      "definition": "PROVENANCE label, not an acoustic class. Recorded real-world object. Do NOT split acoustically - measured clusters are weak (0.103) and that is the correct result for a provenance label.",
+      "coherence": -0.115,
+      "status": "provenance_not_acoustic"
+    },
+    "Drum Loop": {
+      "family": "Drum",
+      "form": "Loop",
+      "definition": "Repeating multi-instrument drum pattern.",
+      "coherence": 0.144,
+      "status": "coherent"
+    },
+    "Percussion Loop": {
+      "family": "Percussion",
+      "form": "Loop",
+      "definition": "Repeating percussion pattern. Measured incoherent - contains at least bright/noisy (shaker, hat, top) and low/tonal (conga, hand drum) groups.",
+      "coherence": -0.108,
+      "status": "incoherent_pending_split"
+    },
+    "Drum Fill": {
+      "family": "Drum",
+      "form": "Fill",
+      "definition": "Non-repeating transitional drum phrase. Distinct from a loop: it does not repeat.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Bass Reese": {
+      "family": "Bass",
+      "form": "One-Shot",
+      "definition": "SUSTAINED detuned-saw bass. Long sustain, high harmonicity. The most acoustically coherent class in the corpus.",
+      "coherence": 0.507,
+      "status": "coherent"
+    },
+    "Bass Hit": {
+      "family": "Bass",
+      "form": "One-Shot",
+      "definition": "Fast-attack low-sustain bass hit. Distinct from Bass Reese on the envelope axis despite few examples.",
+      "coherence": -0.076,
+      "status": "incoherent_pending_split"
+    },
+    "Synth One-Shot": {
+      "family": "Synth",
+      "form": "One-Shot",
+      "definition": "Measured to contain THREE groups, only one of which is a one-shot. Should be split by envelope into Synth Pluck (short, fast attack) and Synth Tone/Pad (sustained). Duration separates them at d-prime 2.47.",
+      "coherence": 0.009,
+      "status": "incoherent_pending_split"
+    },
+    "Synth Loop": {
+      "family": "Synth",
+      "form": "Loop",
+      "definition": "Repeating synthesised phrase.",
+      "coherence": -0.008,
+      "status": "incoherent_pending_split"
+    },
+    "Pad": {
+      "family": "Synth",
+      "form": "One-Shot",
+      "definition": "Sustained harmonic bed, slow attack.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Vocal One-Shot": {
+      "family": "Vocal",
+      "form": "One-Shot",
+      "definition": "Single sung or spoken utterance.",
+      "coherence": -0.034,
+      "status": "incoherent_pending_split"
+    },
+    "Vocal Loop": {
+      "family": "Vocal",
+      "form": "Loop",
+      "definition": "Repeating vocal phrase.",
+      "coherence": 0.071,
+      "status": "coherent"
+    },
+    "SFX": {
+      "family": "FX",
+      "form": "One-Shot",
+      "definition": "Designed sound effect. Measured incoherent - a catch-all.",
+      "coherence": -0.024,
+      "status": "incoherent_pending_split"
+    },
+    "Riser": {
+      "family": "FX",
+      "form": "One-Shot",
+      "definition": "Rising-pitch or rising-energy transition effect.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Impact": {
+      "family": "FX",
+      "form": "One-Shot",
+      "definition": "Large low-frequency hit used for emphasis.",
+      "coherence": 0.145,
+      "status": "coherent"
+    },
+    "Atmosphere": {
+      "family": "FX",
+      "form": "Loop",
+      "definition": "Synthesised sustained textural bed.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Weather/Nature Atmos": {
+      "family": "FX",
+      "form": "Loop",
+      "definition": "RECORDED atmosphere (rain, wind). NOTE: this is a provenance distinction from Atmosphere, not a functional one - consider migrating to a source attribute.",
+      "coherence": null,
+      "status": "provenance_candidate"
+    },
+    "Foley Loop": {
+      "family": "Foley",
+      "form": "Loop",
+      "definition": "Repeating recorded real-world pattern. Provenance label, see Foley.",
+      "coherence": 0.002,
+      "status": "provenance_not_acoustic"
+    },
+    "Kick Loop": {
+      "family": "Kick",
+      "form": "Loop",
+      "definition": "Repeating kick pattern.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Snare Loop": {
+      "family": "Snare",
+      "form": "Loop",
+      "definition": "Repeating snare pattern.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Hi-Hat Loop": {
+      "family": "Hi-Hat",
+      "form": "Loop",
+      "definition": "Repeating hi-hat pattern.",
+      "coherence": 0.086,
+      "status": "coherent"
+    },
+    "Top Loop": {
+      "family": "Percussion",
+      "form": "Loop",
+      "definition": "Repeating high-frequency percussion layer.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Bass Loop": {
+      "family": "Bass",
+      "form": "Loop",
+      "definition": "Repeating bassline.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Chord Loop": {
+      "family": "Harmonic",
+      "form": "Loop",
+      "definition": "Repeating chord progression.",
+      "coherence": null,
+      "status": "too_few_examples"
+    },
+    "Loop": {
+      "family": "Unknown",
+      "form": "Loop",
+      "definition": "Generic loop, family unknown.",
+      "coherence": null,
+      "status": "underspecified"
+    },
+    "Other/none": {
+      "family": "Rejection",
+      "form": "Rejection",
+      "definition": "REJECTION material. Not an acoustic class, never an auto-rename target. Heterogeneity is intended and expected; negative silhouette here is correct.",
+      "coherence": -0.196,
+      "status": "rejection_by_design"
+    }
+  },
+  "rejection_reasons": [
+    "unsupported instrument",
+    "mixed/full music",
+    "noise or texture",
+    "ambiguous",
+    "corrupt or unusable",
+    "other"
+  ],
+  "excluded_material": {
+    "impulse_response": {
+      "rule": "Files under an impulse-response directory are flagged is_impulse_response=true and EXCLUDED from the default train/eval split.",
+      "rationale": "An impulse response is a measurement of a space, not a musical sample. The product would never usefully rename one. They are the worst-performing collection (12.5%). Labels are RETAINED, never deleted, so the decision is reversible.",
+      "override": "build_ground_truth.py --include-ir"
+    }
+  },
+  "changelog": [
+    {
+      "version": "1.1.0",
+      "date": "2026-09-10",
+      "changes": [
+        "Percussion subtypes populated by owner sprint: 25 Other Percussive Hit, 8 Shaker/Tambourine, 7 Tom, 1 Metallic.",
+        "Added Metallic subtype (measured present, 1 example).",
+        "Hand Drum retained but still unobserved - the sprint produced none.",
+        "6 primary labels CORRECTED from Percussion: 2 Percussion Loop, 2 Hi-Hat, 1 Rimshot, 1 Other/none.",
+        "Foley Percussion recorded as source_attributes=foley with class Percussion, per the provenance-is-an-attribute principle.",
+        "Percussion coherence improved -0.154 -> -0.120: still incoherent, so it remains an incoherent_parent."
+      ]
+    }
+  ]
+}

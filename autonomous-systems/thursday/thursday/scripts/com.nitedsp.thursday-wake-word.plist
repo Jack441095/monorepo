@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Hands-free "Hey Jarvis" wake word for Thursday -- desktop only (see
+      thursday/wake_word.py's module docstring for why: iOS Safari
+      suspends background mic access, so this can only ever work on this
+      Mac, listening through its real microphone). Runs
+      thursday/scripts/run_wake_word.sh.
+
+      Separate service from com.nitedsp.thursday-server on purpose --
+      microphone access is more privacy-sensitive than the HTTP server's
+      existing surfaces, so it has its own independent kill switch rather
+      than being bundled into the always-on server process.
+
+      First run must happen in a foreground Terminal (not via launchd) so
+      macOS can show the microphone permission prompt interactively --
+      already done and granted as of 2026-09-02, so this plist assumes
+      that's already in place. If mic access ever needs re-granting
+      (e.g. after a macOS reset), run
+      thursday/scripts/run_wake_word.sh directly in Terminal first.
+
+      Kill switch: `launchctl unload ~/Library/LaunchAgents/com.nitedsp.thursday-wake-word.plist`
+      or remove this file -- stops all microphone access from this
+      service immediately.
+
+      Added 2026-09-02.
+    -->
+    <key>Label</key>
+    <string>com.nitedsp.thursday-wake-word</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/zsh</string>
+        <string>/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/autonomous-systems/thursday/thursday/scripts/run_wake_word.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/autonomous-systems/thursday</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>15</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/Ganders4/Library/Logs/Thursday/wake-word.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/Ganders4/Library/Logs/Thursday/wake-word.err.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/Audio_Too/.venv/bin</string>
+    </dict>
+</dict>
+</plist>

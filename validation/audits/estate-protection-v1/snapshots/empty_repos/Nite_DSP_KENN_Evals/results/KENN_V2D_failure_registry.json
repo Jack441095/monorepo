@@ -1,0 +1,1193 @@
+{
+  "product_holdout": [],
+  "realistic": [
+    {
+      "case_id": "realistic-headroom-000",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.569448434119321,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-005",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.748604394363813,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-010",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.562358490343028,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-015",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.500215275011765,
+            -14.590753055146308
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-020",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.559524132465677,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-025",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.633519707955498,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-030",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.549611157155342,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-035",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.606409722395577,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-040",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.705268749982094,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-045",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.536882504426792,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-050",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.603560955679956,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-headroom-055",
+      "issue": "headroom",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "headroom",
+        "measured_value": 14.500215275011765,
+        "unit": "dBFS_margin",
+        "score": 0.0,
+        "severity": "mild",
+        "confidence_kind": "derived",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "R"
+        ],
+        "analysis_scope": "mix_in_progress",
+        "evidence": {
+          "max_sample_peak_dbfs": -14.500215275011765,
+          "headroom_db": 14.500215275011765,
+          "channel_peaks_dbfs": [
+            -14.552442281573516,
+            -14.500215275011765
+          ]
+        },
+        "limitations": [
+          "Sample-peak margin is not a universal mastering target; true peak is not estimated."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-000",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5979698457177314,
+        "unit": "dB",
+        "score": 0.18299497428628855,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.5969029533486285,
+          "median_window_delta_db": 2.5979698457177314,
+          "p95_abs_window_delta_db": 2.6029176529015454,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-005",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5990323323291964,
+        "unit": "dB",
+        "score": 0.1831720553881994,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.6005283172939233,
+          "median_window_delta_db": 2.5990323323291964,
+          "p95_abs_window_delta_db": 2.608528365556591,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-010",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5953161369606867,
+        "unit": "dB",
+        "score": 0.1825526894934478,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.5966559287276603,
+          "median_window_delta_db": 2.5953161369606867,
+          "p95_abs_window_delta_db": 2.6085923300675518,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-015",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.596382814883226,
+        "unit": "dB",
+        "score": 0.18273046914720434,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.595719028723151,
+          "median_window_delta_db": 2.596382814883226,
+          "p95_abs_window_delta_db": 2.6028716217545047,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-020",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.6019640354120774,
+        "unit": "dB",
+        "score": 0.18366067256867957,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.6030060158792168,
+          "median_window_delta_db": 2.6019640354120774,
+          "p95_abs_window_delta_db": 2.6126558458238254,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-025",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5932490417036584,
+        "unit": "dB",
+        "score": 0.1822081736172764,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.5979186716088805,
+          "median_window_delta_db": 2.5932490417036584,
+          "p95_abs_window_delta_db": 2.6080084005789863,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-030",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.6030452095970222,
+        "unit": "dB",
+        "score": 0.18384086826617038,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.601701498798562,
+          "median_window_delta_db": 2.6030452095970222,
+          "p95_abs_window_delta_db": 2.611639705778731,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-035",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5981866946370173,
+        "unit": "dB",
+        "score": 0.18303111577283623,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.599350274835883,
+          "median_window_delta_db": 2.5981866946370173,
+          "p95_abs_window_delta_db": 2.610006927435232,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-040",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.6012845012627626,
+        "unit": "dB",
+        "score": 0.18354741687712708,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.5995919994394736,
+          "median_window_delta_db": 2.6012845012627626,
+          "p95_abs_window_delta_db": 2.6090450702125034,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-045",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.6084158042843724,
+        "unit": "dB",
+        "score": 0.18473596738072873,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.606548010686888,
+          "median_window_delta_db": 2.6084158042843724,
+          "p95_abs_window_delta_db": 2.6166184365103016,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-050",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.6001277717530753,
+        "unit": "dB",
+        "score": 0.18335462862551255,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.599343715698325,
+          "median_window_delta_db": 2.6001277717530753,
+          "p95_abs_window_delta_db": 2.6092423242155527,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-055",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.596324149403941,
+        "unit": "dB",
+        "score": 0.18272069156732348,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.592653853402018,
+          "median_window_delta_db": 2.596324149403941,
+          "p95_abs_window_delta_db": 2.600967104677808,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-060",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.6018626198427777,
+        "unit": "dB",
+        "score": 0.18364376997379628,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.5999078679314103,
+          "median_window_delta_db": 2.6018626198427777,
+          "p95_abs_window_delta_db": 2.6080812306326715,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-065",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5983155740146415,
+        "unit": "dB",
+        "score": 0.18305259566910692,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.60047412856826,
+          "median_window_delta_db": 2.5983155740146415,
+          "p95_abs_window_delta_db": 2.608218432244742,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-070",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.592781262221635,
+        "unit": "dB",
+        "score": 0.18213021037027252,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.594646181110157,
+          "median_window_delta_db": 2.592781262221635,
+          "p95_abs_window_delta_db": 2.602972269367032,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-lr_persistent-075",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5928125294950393,
+        "unit": "dB",
+        "score": 0.18213542158250653,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.5937179922841196,
+          "median_window_delta_db": 2.5928125294950393,
+          "p95_abs_window_delta_db": 2.6099962751641135,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-000",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5986146428916186,
+        "unit": "dB",
+        "score": 0.18310244048193644,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.6011183822658523,
+          "median_window_delta_db": 2.5986146428916186,
+          "p95_abs_window_delta_db": 2.6112791947470457,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-001",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "observe",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 4.203257285717107,
+        "unit": "dB",
+        "score": 0.47074335256945243,
+        "severity": "moderate",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 4.202645855810982,
+          "median_window_delta_db": 4.203257285717107,
+          "p95_abs_window_delta_db": 4.21202829699608,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-005",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.6016206916644204,
+        "unit": "dB",
+        "score": 0.18360344861073674,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.6015856647779803,
+          "median_window_delta_db": 2.6016206916644204,
+          "p95_abs_window_delta_db": 2.609261039221634,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-006",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "observe",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 4.2034801411077805,
+        "unit": "dB",
+        "score": 0.4706899994925893,
+        "severity": "moderate",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 4.202219503739242,
+          "median_window_delta_db": 4.2034801411077805,
+          "p95_abs_window_delta_db": 4.2065985584775545,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-010",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.5947840718389124,
+        "unit": "dB",
+        "score": 0.18246401197315207,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.597865505276747,
+          "median_window_delta_db": 2.5947840718389124,
+          "p95_abs_window_delta_db": 2.611534138538338,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-011",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "observe",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 4.200931450262917,
+        "unit": "dB",
+        "score": 0.47029841047815596,
+        "severity": "moderate",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 4.199941889912569,
+          "median_window_delta_db": 4.200931450262917,
+          "p95_abs_window_delta_db": 4.2085901260601855,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-015",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "abstain",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 2.6061893510264618,
+        "unit": "dB",
+        "score": 0.18436489183774363,
+        "severity": "mild",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 2.6059537465922293,
+          "median_window_delta_db": 2.6061893510264618,
+          "p95_abs_window_delta_db": 2.616499408029174,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    },
+    {
+      "case_id": "realistic-multi_lr_phase-016",
+      "issue": "lr_imbalance",
+      "expected": "recommend",
+      "actual": "observe",
+      "measurement": {
+        "issue_type": "lr_imbalance",
+        "measured_value": 4.197660120535142,
+        "unit": "dB",
+        "score": 0.46981268100447393,
+        "severity": "moderate",
+        "confidence_kind": "measured",
+        "confidence_bucket": "high",
+        "persistence": 1.0,
+        "affected_channels": [
+          "L",
+          "R"
+        ],
+        "analysis_scope": "unknown",
+        "evidence": {
+          "channel_delta_db": 4.197667579953221,
+          "median_window_delta_db": 4.197660120535142,
+          "p95_abs_window_delta_db": 4.2121596549170155,
+          "direction_consistency": 1.0,
+          "window_count": 8
+        },
+        "limitations": [
+          "A stereo render cannot distinguish persistent mix imbalance from an intentional arrangement without context."
+        ],
+        "analysis_version": "kenn.measured_candidates.v2c.1"
+      },
+      "root_cause": "boundary_or_scope"
+    }
+  ]
+}

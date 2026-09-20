@@ -1,0 +1,37 @@
+{
+  "cases": [],
+  "generated_at": "2026-07-14T23:47:23.097677+00:00",
+  "privacy": {
+    "excluded_fields": [
+      "job_id",
+      "project_id",
+      "artifact_id",
+      "feedback_id",
+      "actor_id",
+      "reason",
+      "timestamps",
+      "original stem names",
+      "decision logs"
+    ],
+    "pseudonymization": "HMAC-SHA256 with caller-held salt"
+  },
+  "readiness": {
+    "failures": [
+      "requires at least 20 reviewed operations",
+      "requires at least one accepted operation",
+      "requires at least one rejected or needs_work operation",
+      "requires at least one rating backed by an A/B preview"
+    ],
+    "minimum_cases": 20,
+    "ready": false
+  },
+  "schema": "audio-too.kenn-advisor-reviewed-export/v1",
+  "summary": {
+    "decisions": {},
+    "excluded_rows": 0,
+    "exclusions": {},
+    "exported_cases": 0,
+    "feedback_rows": 0,
+    "preview_backed_audible_cases": 0
+  }
+}

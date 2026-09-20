@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "audio-too-stem-separation"
+version = "0.1.0"
+description = "AI stem separation (Demucs v4) — isolates drums/bass/vocals/other from a mixed stereo track"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    # Torch is deliberately excluded from the main repo's core install
+    # (Torch 2.2's last Intel-macOS wheel is ABI-incompatible with NumPy 2.x
+    # — see the root requirements.txt). This module is isolated in its own
+    # venv for exactly that reason, mirroring studio/audiogen's isolation:
+    # torch lives here, never in the shared project environment.
+    "torch>=2.2,<2.3; platform_machine == 'x86_64' and sys_platform == 'darwin'",
+    "torch>=2.6,<3; platform_machine != 'x86_64' or sys_platform != 'darwin'",
+    "torchaudio>=2.2,<2.3; platform_machine == 'x86_64' and sys_platform == 'darwin'",
+    "torchaudio>=2.6,<3; platform_machine != 'x86_64' or sys_platform != 'darwin'",
+    "demucs>=4.0,<5",
+    "numpy>=1.26,<3",
+    # File I/O uses soundfile directly, not torchaudio.load/save -- recent
+    # torchaudio (2.9+) moved its default I/O backend to a separate
+    # `torchcodec` package that isn't pulled in automatically, and soundfile
+    # is simpler/more stable for plain WAV read/write anyway. torchaudio
+    # itself is still used for its (torchcodec-independent) tensor-only
+    # resample function.
+    "soundfile>=0.12,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.6",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+namespaces = true
+include = [
+    "core*",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "slow: requires the real Demucs model + torch inference; skipped unless explicitly run",
+]
+
+# NOTE: ruff config intentionally lives ONLY in the repo-root pyproject.toml,
+# same convention as studio/audiogen — see that file's own note.

@@ -1,0 +1,57 @@
+{
+ "benchmark_id": "STEREO_BENCH_1.0",
+ "n_cases": 320,
+ "healthy_fraction": 0.625,
+ "naive_broadband_corr_detector": {
+  "recall": 0.667,
+  "false_positive_rate": 0.2,
+  "tp": 80,
+  "fp": 40,
+  "fn": 40,
+  "tn": 160
+ },
+ "bandaware_side_sub_detector": {
+  "recall": 1.0,
+  "false_positive_rate": 0.015,
+  "tp": 120,
+  "fp": 3,
+  "fn": 0,
+  "tn": 197
+ },
+ "healthy_false_positives_by_kind": {
+  "haas_widened_guitar": {
+   "naive_rate": 0.0,
+   "bandaware_rate": 0.0
+  },
+  "wide_reverb_return": {
+   "naive_rate": 1.0,
+   "bandaware_rate": 0.075
+  },
+  "detuned_wide_pad": {
+   "naive_rate": 0.0,
+   "bandaware_rate": 0.0
+  },
+  "narrow_kick_bass_mono": {
+   "naive_rate": 0.0,
+   "bandaware_rate": 0.0
+  },
+  "slight_balance_offset": {
+   "naive_rate": 0.0,
+   "bandaware_rate": 0.0
+  }
+ },
+ "problem_recall_by_kind": {
+  "antiphase_lowband": {
+   "naive": 1.0,
+   "bandaware": 1.0
+  },
+  "bass_only_right_55hz": {
+   "naive": 0.0,
+   "bandaware": 1.0
+  },
+  "side_heavy_bass": {
+   "naive": 1.0,
+   "bandaware": 1.0
+  }
+ }
+}

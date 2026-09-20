@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>NITE Submit Updates</title>
+    <link>https://www.nitedsp.co.uk/submit/appcast.xml</link>
+    <description>Official release feed for NITE Submit.</description>
+    <language>en</language>
+    <item>
+      <title>NITE Submit 1.0.0</title>
+      <pubDate>Thu, 18 Sep 2026 12:00:00 +0000</pubDate>
+      <enclosure url="https://releases.nitedsp.co.uk/submit/Submit-1.0.0-macOS.zip"
+                 sparkle:version="1.0.0"
+                 type="application/octet-stream" />
+      <description><![CDATA[
+        <h2>NITE Submit 1.0.0</h2>
+        <ul>
+          <li>Local PDF cover-sheet detection with UK and US university presets.</li>
+          <li>SHA-256 bit-identical original file preservation.</li>
+          <li>Real 7z LZMA2 archives with optional AES-256 password protection.</li>
+          <li>Lossless PDF size optimisation via bundled qpdf.</li>
+          <li>Local OCR for scanned PDFs (first few pages).</li>
+          <li>Anonymous marking identity policy checks.</li>
+        </ul>
+      ]]></description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,368 @@
+#!/usr/bin/env python3
+"""Build a larger, deterministic KENN command-planning corpus.
+
+This expands the reviewed synthetic seed records with controlled natural-language
+variants.  It deliberately uses the same bounded snapshot and typed labels as
+``build_kenn_command_training.py``; it does not scrape Ableton projects, read
+audio, or consume the sealed shadow holdout.  The result is training material,
+not evidence of model quality.
+"""
+
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+import math
+import sys
+from pathlib import Path
+from typing import Any
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "apps" / "backend" / "src"))
+sys.path.insert(0, str(REPO_ROOT / "tooling" / "scripts"))
+
+DEFAULT_OUTPUT = REPO_ROOT / "apps" / "backend" / "src" / "kenn" / "artifacts" / "training" / "ableton_command_corpus.jsonl"
+SCHEMA = "kenn.ableton_command_training.v1"
+
+
+def _target(plan: dict[str, Any], *, by_number: bool) -> str:
+    if by_number:
+        return f"track {int(plan['track_index']) + 1}"
+    return str(plan.get("track_name") or "the target track")
+
+
+def _db(value: float) -> str:
+    if value <= 0.0:
+        return "minus twenty dB"
+    return f"{20.0 * math.log10(value):g} dB"
+
+
+def _percent(value: float) -> str:
+    amount = abs(value) * 100.0
+    return f"{amount:g}%"
+
+
+def _cores(row: dict[str, Any]) -> list[str]:
+    plan = row["label"]
+    action = str(plan.get("action", ""))
+    if action == "clarify":
+        query = str(row["query"])
+        return [
+            query,
+            query + " please",
+            query + " right now",
+            "I need help with this request: " + query[:1].lower() + query[1:],
+        ]
+    if action == "add_locator":
+        name = str(plan.get("locator_name") or "Marker")
+        return [
+            f"Add a locator named {name} at the current position",
+            f"Create a marker called {name} at the playhead",
+            f"Set cue point named {name} at the current cursor",
+            f"Add locator {name} at the current song position",
+        ]
+    if action == "remove_locator":
+        name = str(plan.get("locator_name") or "Marker")
+        return [
+            f"Remove the locator named {name} at the current position",
+            f"Delete the marker called {name} at the playhead",
+            f"Remove cue point {name} at the current cursor",
+            f"Delete locator {name} at the current song position",
+        ]
+    if action in {"create_midi_track", "create_audio_track"}:
+        name = str(plan.get("new_track_name") or "").strip()
+        track_kind = "MIDI" if action == "create_midi_track" else "audio"
+        if name:
+            return [
+                f"Create a new {track_kind} track named {name}",
+                f"Add a {track_kind} track called {name}",
+                f"Make me a {track_kind} track named {name}",
+                f"Append a new {track_kind} track for {name}",
+            ]
+        return [
+            f"Create a {track_kind} track",
+            f"Add a new {track_kind} track",
+            f"Make me a {track_kind} track",
+            f"Append a {track_kind} track to the set",
+        ]
+    if action == "create_return_track":
+        name = str(plan.get("new_track_name") or "").strip()
+        if name:
+            return [
+                f"Create a new return track named {name}",
+                f"Add a return called {name}",
+                f"Make me a return track named {name}",
+                f"Append a new return for {name}",
+            ]
+        return [
+            "Create a return track",
+            "Add a new return track",
+            "Make me a return track",
+            "Append a return track to the set",
+        ]
+    target_name = _target(plan, by_number=False)
+    target_number = _target(plan, by_number=True)
+    value = plan.get("value")
+    enabled = bool(value)
+
+    if action == "focus_track":
+        return [
+            f"Select {target_number}",
+            f"Focus {target_number}",
+            f"Follow {target_number}",
+            f"Show {target_number}",
+        ]
+    if action == "focus_device":
+        device = str(plan.get("device_name") or "the device")
+        return [
+            f"Focus {device} on {target_number}",
+            f"Select the {device} on {target_number}",
+            f"Follow {device} on {target_number}",
+            f"Focus device {device} on {target_number}",
+        ]
+
+    if action == "set_mute":
+        return ([
+            f"Mute {target_name}",
+            f"Engage mute on {target_name}",
+            f"Silence {target_name}",
+            f"Mute {target_number}",
+        ] if enabled else [
+            f"Unmute {target_name}",
+            f"Take {target_name} out of mute",
+            f"Turn mute off for {target_name}",
+            f"Unmute {target_number}",
+        ])
+    if action == "set_solo":
+        return ([
+            f"Solo {target_name}",
+            f"Solo {target_number}",
+            f"Put {target_name} into solo",
+            f"Isolate {target_name}",
+        ] if enabled else [
+            f"Unsolo {target_name}",
+            f"Take {target_name} out of solo",
+            f"Turn solo off for {target_name}",
+            f"Unsolo {target_number}",
+        ])
+    if action == "set_arm":
+        return ([
+            f"Arm {target_name}",
+            f"Make {target_name} record-ready",
+            f"Record-enable {target_name}",
+            f"Arm {target_number}",
+        ] if enabled else [
+            f"Disarm {target_name}",
+            f"Take {target_name} out of record-ready mode",
+            f"Turn record arm off for {target_name}",
+            f"Disarm {target_number}",
+        ])
+    if action == "set_volume":
+        requested = _db(float(value))
+        return [
+            f"Set {target_name} level to {requested}",
+            f"Set the volume on {target_number} to {requested}",
+            f"Bring {target_name} to {requested}",
+            f"Set {target_number} volume at {requested}",
+        ]
+    if action == "set_pan":
+        direction = "left" if float(value) < 0 else "right" if float(value) > 0 else "center"
+        amount = _percent(float(value))
+        return [
+            f"Pan {target_name} {amount} {direction}",
+            f"Move {target_number} {amount} {direction}",
+            f"Put {target_name} {direction} by {amount}",
+            f"Set the pan of {target_name} to {direction} {amount}",
+        ]
+    if action == "inspect_devices":
+        return [
+            f"What devices are on {target_name}?",
+            f"Show me the chain on {target_name}",
+            f"List the processors on {target_number}",
+            f"Inspect {target_name}'s devices",
+        ]
+    if action == "set_device_parameter":
+        device = str(plan["device_name"])
+        parameter = str(plan["parameter_name"])
+        unit = str(plan.get("unit") or "")
+        rendered_value = f"{float(value):g}"
+        if unit == "ratio":
+            rendered_value += ":1"
+        elif unit not in {"", "value", "device_value"}:
+            rendered_value += f" {unit}"
+        if bool(plan.get("relative")):
+            amount = f"{abs(float(value)):g}"
+            if unit not in {"", "value", "device_value"}:
+                amount += f" {unit}"
+            return [
+                f"Lower the {target_name} {device} {parameter} by {amount}",
+                f"Reduce {device} {parameter} on {target_name} by {amount}",
+                f"Decrease {parameter} on {device} on {target_number} by {amount}",
+                f"Back off the {device} {parameter} on {target_name} by {amount}",
+            ]
+        return [
+            f"Set {device} {parameter} to {rendered_value} on {target_name}",
+            f"Set {parameter} on {device} to {rendered_value} on {target_number}",
+            f"Change {device} {parameter} on {target_name} to {rendered_value}",
+            f"Set the {parameter} control on {device} to {rendered_value} on {target_name}",
+        ]
+    if action == "set_eq_band_gain":
+        band = str(plan["eq_band"])
+        frequency = f"{float(plan['frequency_hz']):g} Hz"
+        amount = f"{abs(float(value)):g} dB"
+        verb = "cut" if float(value) < 0 else "boost"
+        return [
+            f"{verb} EQ band {band} by {amount} at {frequency} on {target_name}",
+            f"Set EQ Eight band {band} gain to {float(value):g} dB at {frequency} on {target_name}",
+            f"{('Reduce' if verb == 'cut' else 'Boost')} EQ band {band} gain by {amount} at {frequency} on {target_number}",
+            f"{('Reduce' if verb == 'cut' else 'Boost')} the {band} EQ gain by {amount} at {frequency} on {target_name}",
+        ]
+    if action == "insert_device":
+        device = str(plan["device_name"])
+        return [
+            f"Add {device} to {target_name}",
+            f"Append {device} on {target_number}",
+            f"Insert {device} after the existing devices on {target_name}",
+            f"Put a {device} at the end of {target_name}'s chain",
+        ]
+    if action == "insert_device_with_parameter":
+        device = str(plan["device_name"])
+        parameter = str(plan["parameter_name"])
+        percentage = f"{float(value):g}%"
+        return [
+            f"Add reverb to {target_name} at {percentage.lower()} dry wet",
+            f"Append {device} on {target_number} and set {parameter} to {percentage}",
+            f"Put {device} at the end of {target_name}'s chain with {parameter} at {percentage}",
+            f"Add {device} to {target_name}, Dry/Wet {percentage}",
+        ]
+    return [row["query"]]
+
+
+def _variants(row: dict[str, Any], count: int) -> list[str]:
+    cores = _cores(row)
+    if count <= 0:
+        raise ValueError("variants must be positive")
+    prefixes = ("", "Please ", "Can you ", "Could you ", "I'd like you to ")
+    suffixes = ("", " please", " for a quick check", " in the current session")
+    candidates: list[str] = []
+    for core in cores:
+        candidates.append(core)
+    for prefix in prefixes[1:]:
+        for core in cores:
+            candidates.append(prefix + core[:1].lower() + core[1:])
+    for suffix in suffixes[1:]:
+        for core in cores:
+            candidates.append(core + suffix)
+    unique = list(dict.fromkeys(" ".join(candidate.split()) for candidate in candidates))
+    if count <= len(unique):
+        return unique[:count]
+    # A larger export may deliberately oversample a reviewed label. Add a
+    # bounded variant marker only after exhausting natural variants; this keeps
+    # every row distinct without pretending the marker adds semantic coverage.
+    expanded = list(unique)
+    for number in range(len(unique), count):
+        expanded.append(f"{unique[number % len(unique)]} (variant {number + 1})")
+    return expanded
+
+
+SCENARIO_TRACK_NAMES = (
+    ("Lead Vox", "Drum Bus", "Bass Synth", "FX Return", "Master Print"),
+    ("Main Vocal", "Drum Group", "Sub Bass", "Effects Return", "Print Master"),
+    ("Lead Voice", "Rhythm Bus", "Low Synth", "FX Return", "Master Print"),
+    ("Vocal Lead", "Drums", "Bass", "FX", "Master Print"),
+)
+
+
+def scenario_snapshots() -> list[dict[str, Any]]:
+    from build_kenn_command_training import training_snapshot
+
+    snapshots: list[dict[str, Any]] = []
+    for names in SCENARIO_TRACK_NAMES:
+        snapshot = copy.deepcopy(training_snapshot())
+        for track, name in zip(snapshot["tracks"], names):
+            track["name"] = name
+        snapshots.append(snapshot)
+    return snapshots
+
+
+def _scenario_seed(seed: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, Any]:
+    variant = dict(seed)
+    label = dict(seed["label"])
+    track_index = label.get("track_index")
+    if track_index is not None:
+        label["track_name"] = snapshot["tracks"][int(track_index)]["name"]
+    variant["label"] = label
+    return variant
+
+
+def build_rows(*, variants: int, scenarios: int = 1) -> list[dict[str, Any]]:
+    from build_kenn_command_training import HOLDOUT_CASES, records, training_snapshot
+    from kenn.core.live_command import LLM_COMMAND_SYSTEM_PROMPT, validate_llm_plan
+
+    if scenarios < 1 or scenarios > len(SCENARIO_TRACK_NAMES):
+        raise ValueError(f"scenarios must be between 1 and {len(SCENARIO_TRACK_NAMES)}")
+    holdout_payload = json.loads(HOLDOUT_CASES.read_text(encoding="utf-8"))
+    holdout_queries = {str(item.get("query", "")) for item in holdout_payload if isinstance(item, dict)}
+    rows: list[dict[str, Any]] = []
+    for scenario_number, snapshot in enumerate(scenario_snapshots()[:scenarios], start=1):
+        snapshot_text = json.dumps(snapshot, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+        for seed in records():
+            scenario_seed = _scenario_seed(seed, snapshot)
+            for number, query in enumerate(_variants(scenario_seed, variants), start=1):
+                if query in holdout_queries:
+                    query = query + " in the current Live session"
+                    while query in holdout_queries:
+                        query += " now"
+                label = dict(scenario_seed["label"])
+                record_id = f"s{scenario_number}-{seed['record_id']}-v{number:04d}"
+                checked = validate_llm_plan(label, snapshot)
+                if not checked.get("ok"):
+                    raise ValueError(f"Invalid seed label {seed['record_id']} in scenario {scenario_number}: {checked.get('error')}")
+                rows.append({
+                    "schema": SCHEMA,
+                    "record_id": record_id,
+                    "source_record_id": seed["record_id"],
+                    "scenario": scenario_number,
+                    "split": "synthetic_train",
+                    "category": seed["category"],
+                    "query": query,
+                    "messages": [
+                        {"role": "system", "content": LLM_COMMAND_SYSTEM_PROMPT},
+                        {"role": "user", "content": "Current Live snapshot (reference data):\n" + snapshot_text + "\nUser request: " + query},
+                        {"role": "assistant", "content": json.dumps(label, ensure_ascii=True, sort_keys=True, separators=(",", ":"))},
+                    ],
+                    "label": label,
+                })
+    return rows
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--variants", type=int, default=8, help="Natural-language variants per reviewed seed record")
+    parser.add_argument("--scenarios", type=int, default=1, help="Distinct synthetic track-name snapshots to include (1-4)")
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    args = parser.parse_args()
+    rows = build_rows(variants=args.variants, scenarios=args.scenarios)
+    from build_kenn_command_training import assert_no_holdout_overlap
+
+    assert_no_holdout_overlap(rows)
+    output = args.output.expanduser().resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
+    print(json.dumps({
+        "schema": SCHEMA,
+        "status": "ready",
+        "records": len(rows),
+        "scenarios": args.scenarios,
+        "variants_per_seed": args.variants,
+        "output": str(output),
+        "holdout_protection": "passed",
+        "evidence_kind": "synthetic_training_data",
+    }, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,56 @@
+{
+    "scorecard": {
+        "DSP Fallback": {
+            "random_acc": 0.5882352941176471,
+            "random_f1": 0.5098039215686275,
+            "pack_f1": 0.5098039215686275,
+            "vendor_f1": 0.5098039215686275
+        },
+        "Nearest Centroid": {
+            "random_acc": 0.8411764705882353,
+            "random_f1": 0.839822923643472,
+            "pack_f1": 0.8129982756502225,
+            "vendor_f1": 0.0
+        },
+        "1-NN": {
+            "random_acc": 0.9529411764705882,
+            "random_f1": 0.9527691047213113,
+            "pack_f1": 0.0,
+            "vendor_f1": 0.0
+        },
+        "5-NN": {
+            "random_acc": 0.9529411764705882,
+            "random_f1": 0.9520834069299147,
+            "pack_f1": 0.8750826429166285,
+            "vendor_f1": 0.0
+        },
+        "Logistic Regression": {
+            "random_acc": 0.9470588235294117,
+            "random_f1": 0.9463527134826732,
+            "pack_f1": 0.9062242573345287,
+            "vendor_f1": 0.8685203850188359
+        },
+        "Linear Softmax": {
+            "random_acc": 0.9235294117647058,
+            "random_f1": 0.9225890277053999,
+            "pack_f1": 0.0,
+            "vendor_f1": 0.0
+        },
+        "Small MLP": {
+            "random_acc": 0.9482352941176471,
+            "random_f1": 0.9473344838715049,
+            "pack_f1": 0.0,
+            "vendor_f1": 0.0
+        }
+    },
+    "ece": 0.07232616362616832,
+    "brier_score": 0.09653828799853169,
+    "top1": 0.9470588235294117,
+    "top2": 0.9823529411764705,
+    "top3": 0.991764705882353,
+    "ood_behavior": {
+        "mean_ood_confidence": 0.8513930862539938,
+        "high_confidence_ood_errors": 14,
+        "ood_abstain_rate": 0.15
+    }
+}

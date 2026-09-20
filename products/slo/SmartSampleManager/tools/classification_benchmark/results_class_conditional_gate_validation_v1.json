@@ -1,0 +1,1263 @@
+{
+  "record_type": "slo_class_conditional_gate_validation",
+  "schema_version": "1.0.0",
+  "method_version": "class_conditional_gate_validation_v1",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false,
+    "approval_granted": false
+  },
+  "source_manifest": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/class_conditional_gate_validation_manifest_v1.json",
+  "source_labels": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/verified_class_conditional_gate_validation_v1.csv",
+  "summary": {
+    "n_manifest": 120,
+    "n_labelled": 120,
+    "descriptive_95_classes": [
+      "Clap",
+      "Kick",
+      "Snare"
+    ],
+    "statistically_supported_95_classes": []
+  },
+  "classes": {
+    "Clap": {
+      "n": 40,
+      "correct": 39,
+      "precision": 0.975,
+      "wilson_95_lower": 0.8711834051199223,
+      "wilson_95_upper": 0.9955732825922052,
+      "descriptive_95": true,
+      "statistically_supported_95": false
+    },
+    "Kick": {
+      "n": 40,
+      "correct": 40,
+      "precision": 1.0,
+      "wilson_95_lower": 0.9123754607496077,
+      "wilson_95_upper": 1.0,
+      "descriptive_95": true,
+      "statistically_supported_95": false
+    },
+    "Snare": {
+      "n": 40,
+      "correct": 40,
+      "precision": 1.0,
+      "wilson_95_lower": 0.9123754607496077,
+      "wilson_95_upper": 1.0,
+      "descriptive_95": true,
+      "statistically_supported_95": false
+    }
+  },
+  "confusion": {
+    "Clap -> Clap": 39,
+    "Clap -> Vocal One-Shot": 1,
+    "Kick -> Kick": 40,
+    "Snare -> Snare": 40
+  },
+  "rows": [
+    {
+      "id": 0,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Claps/AKT-CLP-A005_bip.wav",
+      "candidate_class": "Clap",
+      "human_label": "Vocal One-Shot",
+      "candidate_correct": false,
+      "vendor": "Breaks",
+      "candidate_confidence": 0.8463335633277893,
+      "candidate_similarity": 0.7392326593399048
+    },
+    {
+      "id": 1,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Claps/AKT-CLP-A011_bip.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Breaks",
+      "candidate_confidence": 0.8302252888679504,
+      "candidate_similarity": 0.770997166633606
+    },
+    {
+      "id": 2,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Claps/AKT-CLP-A013_bip.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Breaks",
+      "candidate_confidence": 0.8353474736213684,
+      "candidate_similarity": 0.7434016466140747
+    },
+    {
+      "id": 3,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Snares/CPA_TCP_clap_in_the_room.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Capsun ProAudio - City Pop",
+      "candidate_confidence": 0.7797591686248779,
+      "candidate_similarity": 0.7800925970077515
+    },
+    {
+      "id": 4,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap_ClapTrapLayer_03.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.8865945935249329,
+      "candidate_similarity": 0.7433076500892639
+    },
+    {
+      "id": 5,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap_ClapTrapLayer_07.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.862779438495636,
+      "candidate_similarity": 0.7855322360992432
+    },
+    {
+      "id": 6,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap_LastMin1st_SP12R.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.9040428400039673,
+      "candidate_similarity": 0.8556259274482727
+    },
+    {
+      "id": 7,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap_LastMin2st_SP12R.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.8310573101043701,
+      "candidate_similarity": 0.750679075717926
+    },
+    {
+      "id": 8,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jackboot Stone Cyn Samples/Clap PlayWithMe.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.7507920265197754,
+      "candidate_similarity": 0.7564285397529602
+    },
+    {
+      "id": 9,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Ryu 3 Samples/Clap_Layered004_MPC60_st.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.8723944425582886,
+      "candidate_similarity": 0.7765594124794006
+    },
+    {
+      "id": 10,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Thumper Samples/Clap Gold 4.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.8809514045715332,
+      "candidate_similarity": 0.7736908197402954
+    },
+    {
+      "id": 11,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/4 - Claps/Clap - Birch.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Minimal Audio",
+      "candidate_confidence": 0.811454176902771,
+      "candidate_similarity": 0.7111835479736328
+    },
+    {
+      "id": 12,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (14).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.7750260233879089,
+      "candidate_similarity": 0.761495053768158
+    },
+    {
+      "id": 13,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (17).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.9163278937339783,
+      "candidate_similarity": 0.768739640712738
+    },
+    {
+      "id": 14,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (22).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.8566546440124512,
+      "candidate_similarity": 0.719225287437439
+    },
+    {
+      "id": 15,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (25).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.887651801109314,
+      "candidate_similarity": 0.7799085974693298
+    },
+    {
+      "id": 16,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (29).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.854509711265564,
+      "candidate_similarity": 0.7130985260009766
+    },
+    {
+      "id": 17,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (30).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.8357117772102356,
+      "candidate_similarity": 0.7139468193054199
+    },
+    {
+      "id": 18,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (34).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.8071359395980835,
+      "candidate_similarity": 0.7224034070968628
+    },
+    {
+      "id": 19,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (36).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.823138952255249,
+      "candidate_similarity": 0.7114453315734863
+    },
+    {
+      "id": 20,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (41).wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.8880426287651062,
+      "candidate_similarity": 0.7329912781715393
+    },
+    {
+      "id": 21,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Single_Claps/KSHMR_Human_Single_Clap_12.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8450391292572021,
+      "candidate_similarity": 0.7916902899742126
+    },
+    {
+      "id": 22,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_02_Horse.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8452078104019165,
+      "candidate_similarity": 0.7143330574035645
+    },
+    {
+      "id": 23,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_03_Horse.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8976976275444031,
+      "candidate_similarity": 0.762427568435669
+    },
+    {
+      "id": 24,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_04_Horse.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8780807852745056,
+      "candidate_similarity": 0.7640181183815002
+    },
+    {
+      "id": 25,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_05_Squishy.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8013332486152649,
+      "candidate_similarity": 0.7867442965507507
+    },
+    {
+      "id": 26,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_06_Squishy.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.9114623069763184,
+      "candidate_similarity": 0.7993347644805908
+    },
+    {
+      "id": 27,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_07_Squishy.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8810957670211792,
+      "candidate_similarity": 0.7678372859954834
+    },
+    {
+      "id": 28,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_08_Squishy.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.9066930413246155,
+      "candidate_similarity": 0.7798686623573303
+    },
+    {
+      "id": 29,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_09_Squishy.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8770136833190918,
+      "candidate_similarity": 0.78873610496521
+    },
+    {
+      "id": 30,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_16.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8412694931030273,
+      "candidate_similarity": 0.7893211245536804
+    },
+    {
+      "id": 31,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_21.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7862447500228882,
+      "candidate_similarity": 0.7661328315734863
+    },
+    {
+      "id": 32,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_22.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8858455419540405,
+      "candidate_similarity": 0.8083707690238953
+    },
+    {
+      "id": 33,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_29.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.833905041217804,
+      "candidate_similarity": 0.7306643128395081
+    },
+    {
+      "id": 34,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Classic_02.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.9026378393173218,
+      "candidate_similarity": 0.7923387289047241
+    },
+    {
+      "id": 35,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Classic_06.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8030069470405579,
+      "candidate_similarity": 0.7783069014549255
+    },
+    {
+      "id": 36,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Classic_08.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8865834474563599,
+      "candidate_similarity": 0.7938345074653625
+    },
+    {
+      "id": 37,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Hard_02.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8182607293128967,
+      "candidate_similarity": 0.7631399035453796
+    },
+    {
+      "id": 38,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Hard_03.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8853777647018433,
+      "candidate_similarity": 0.7210014462471008
+    },
+    {
+      "id": 39,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Like_A_G6.wav",
+      "candidate_class": "Clap",
+      "human_label": "Clap",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7936695218086243,
+      "candidate_similarity": 0.7086254954338074
+    },
+    {
+      "id": 40,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_A_01.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Black Octopus Sound - Pure Analog Sweeps IV (2021)",
+      "candidate_confidence": 0.9116232991218567,
+      "candidate_similarity": 0.8491045236587524
+    },
+    {
+      "id": 41,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_F_01.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Black Octopus Sound - Pure Analog Sweeps IV (2021)",
+      "candidate_confidence": 0.8476548194885254,
+      "candidate_similarity": 0.8055466413497925
+    },
+    {
+      "id": 42,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - Essential Kicks/Paper.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Breaks",
+      "candidate_confidence": 0.8129443526268005,
+      "candidate_similarity": 0.7069791555404663
+    },
+    {
+      "id": 43,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - Essential Kicks/Regret.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Breaks",
+      "candidate_confidence": 0.873281717300415,
+      "candidate_similarity": 0.7822811603546143
+    },
+    {
+      "id": 44,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Kicks/CPA_TCP_kick_dirty_dancers.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Capsun ProAudio - City Pop",
+      "candidate_confidence": 0.8345988392829895,
+      "candidate_similarity": 0.7547346949577332
+    },
+    {
+      "id": 45,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Kicks/CPA_TCP_kick_duvet.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Capsun ProAudio - City Pop",
+      "candidate_confidence": 0.8053299784660339,
+      "candidate_similarity": 0.7625840306282043
+    },
+    {
+      "id": 46,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Kicks/CPA_TCP_kick_glitterball.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Capsun ProAudio - City Pop",
+      "candidate_confidence": 0.8592658638954163,
+      "candidate_similarity": 0.7968882918357849
+    },
+    {
+      "id": 47,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/Kicks/Bomber Man Kick.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Drum Recollection",
+      "candidate_confidence": 0.8038177490234375,
+      "candidate_similarity": 0.7365730404853821
+    },
+    {
+      "id": 48,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/Kicks/Drill Kick Please_.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Drum Recollection",
+      "candidate_confidence": 0.8288605809211731,
+      "candidate_similarity": 0.7456410527229309
+    },
+    {
+      "id": 49,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Kicks/WTFIT Kick.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Drum Recollection",
+      "candidate_confidence": 0.850852370262146,
+      "candidate_similarity": 0.8022573590278625
+    },
+    {
+      "id": 50,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 1/New Wave Drum Kit/Kicks/Draco Kick .wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Drum Recollection",
+      "candidate_confidence": 0.8538541197776794,
+      "candidate_similarity": 0.7655543684959412
+    },
+    {
+      "id": 51,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon May 2022 Samples/FRUITY KICK.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "IMANU",
+      "candidate_confidence": 0.8001155257225037,
+      "candidate_similarity": 0.7121977806091309
+    },
+    {
+      "id": 52,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 1.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Just Jared - OP1 Drums",
+      "candidate_confidence": 0.8168359398841858,
+      "candidate_similarity": 0.7381695508956909
+    },
+    {
+      "id": 53,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 16.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Just Jared - OP1 Drums",
+      "candidate_confidence": 0.8213518261909485,
+      "candidate_similarity": 0.749810516834259
+    },
+    {
+      "id": 54,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 3.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Just Jared - OP1 Drums",
+      "candidate_confidence": 0.867267906665802,
+      "candidate_similarity": 0.7879770994186401
+    },
+    {
+      "id": 55,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Raw Drums/Processed/Kick Processed 2.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Koan Sound",
+      "candidate_confidence": 0.8177465796470642,
+      "candidate_similarity": 0.7710846662521362
+    },
+    {
+      "id": 56,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Raw Drums/Processed/Kick Processed 4.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Koan Sound",
+      "candidate_confidence": 0.885246753692627,
+      "candidate_similarity": 0.8191808462142944
+    },
+    {
+      "id": 57,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_808 Kick (1) (G).wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.8434196710586548,
+      "candidate_similarity": 0.7426661849021912
+    },
+    {
+      "id": 58,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick 909 Punch (1) (G).wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.8927656412124634,
+      "candidate_similarity": 0.8241897821426392
+    },
+    {
+      "id": 59,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Abstract Hits/MGF-DigiHits-125.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "MGF Mega Pack",
+      "candidate_confidence": 0.8323417901992798,
+      "candidate_similarity": 0.7347004413604736
+    },
+    {
+      "id": 60,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Abstract Hits/MGF-DigiHits-25.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "MGF Mega Pack",
+      "candidate_confidence": 0.8271508812904358,
+      "candidate_similarity": 0.7365931272506714
+    },
+    {
+      "id": 61,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/PABLO/3briwilkic4.WAV",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.8370718359947205,
+      "candidate_similarity": 0.7395615577697754
+    },
+    {
+      "id": 62,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/PABLO/8delkic90.WAV",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.877924919128418,
+      "candidate_similarity": 0.7724534869194031
+    },
+    {
+      "id": 63,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/PACMANNY/PENKCK1.WAV",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.8855358958244324,
+      "candidate_similarity": 0.8005037903785706
+    },
+    {
+      "id": 64,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/2 - Kick/Kick - Batter.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Minimal Audio",
+      "candidate_confidence": 0.8380518555641174,
+      "candidate_similarity": 0.7756427526473999
+    },
+    {
+      "id": 65,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/2 - Kick/Kick - Booted.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Minimal Audio",
+      "candidate_confidence": 0.8235975503921509,
+      "candidate_similarity": 0.7552098631858826
+    },
+    {
+      "id": 66,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/2 - Kick/Kick - Deformed.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Minimal Audio",
+      "candidate_confidence": 0.8208649754524231,
+      "candidate_similarity": 0.7541841864585876
+    },
+    {
+      "id": 67,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/2 - Kick/Kick - Muffler.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Minimal Audio",
+      "candidate_confidence": 0.8025385737419128,
+      "candidate_similarity": 0.7567378282546997
+    },
+    {
+      "id": 68,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 1.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Old Movies 1 - Vintage Collection (Drum Kit)",
+      "candidate_confidence": 0.8857463002204895,
+      "candidate_similarity": 0.8112305402755737
+    },
+    {
+      "id": 69,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 10.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Old Movies 1 - Vintage Collection (Drum Kit)",
+      "candidate_confidence": 0.8060349225997925,
+      "candidate_similarity": 0.7409636378288269
+    },
+    {
+      "id": 70,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 11.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Old Movies 1 - Vintage Collection (Drum Kit)",
+      "candidate_confidence": 0.9044740796089172,
+      "candidate_similarity": 0.8609750866889954
+    },
+    {
+      "id": 71,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 13.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Old Movies 1 - Vintage Collection (Drum Kit)",
+      "candidate_confidence": 0.8382847905158997,
+      "candidate_similarity": 0.7758617997169495
+    },
+    {
+      "id": 72,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (10).wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.8477887511253357,
+      "candidate_similarity": 0.7957497835159302
+    },
+    {
+      "id": 73,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (104).wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.879069447517395,
+      "candidate_similarity": 0.8260753154754639
+    },
+    {
+      "id": 74,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (11).wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.8731228113174438,
+      "candidate_similarity": 0.8032320737838745
+    },
+    {
+      "id": 75,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (119).wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.8180845379829407,
+      "candidate_similarity": 0.765330970287323
+    },
+    {
+      "id": 76,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_studio/JVIEWS_studio_one_shots/JVIEWS_deep_kick_01.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Organic Electronics 2 J.Views",
+      "candidate_confidence": 0.8177804350852966,
+      "candidate_similarity": 0.7301449775695801
+    },
+    {
+      "id": 77,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_studio/JVIEWS_studio_one_shots/JVIEWS_deep_kick_02_trans_hihat.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Organic Electronics 2 J.Views",
+      "candidate_confidence": 0.8323766589164734,
+      "candidate_similarity": 0.7520502805709839
+    },
+    {
+      "id": 78,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Drum_Enhancers/KSHMR_Kick_Enhancer_11_Sub_D#.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8151800036430359,
+      "candidate_similarity": 0.7103684544563293
+    },
+    {
+      "id": 79,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Big_Kicks/KSHMR_Big_Kick_02_D.wav",
+      "candidate_class": "Kick",
+      "human_label": "Kick",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8326411247253418,
+      "candidate_similarity": 0.7707533836364746
+    },
+    {
+      "id": 80,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_03.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Black Octopus Sound - Pure Analog Sweeps IV (2021)",
+      "candidate_confidence": 0.7445096969604492,
+      "candidate_similarity": 0.742124617099762
+    },
+    {
+      "id": 81,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Snares/AKT-SNR-A004_bip.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Breaks",
+      "candidate_confidence": 0.7102922201156616,
+      "candidate_similarity": 0.7220523357391357
+    },
+    {
+      "id": 82,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/Snares/Rexxus Snare.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Drum Recollection",
+      "candidate_confidence": 0.751219630241394,
+      "candidate_similarity": 0.7708044648170471
+    },
+    {
+      "id": 83,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Snares/No Savage Snare.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Drum Recollection",
+      "candidate_confidence": 0.7981032133102417,
+      "candidate_similarity": 0.7758442163467407
+    },
+    {
+      "id": 84,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Snares/Aye section 8 just straight cooked this mf up snare.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Drum Recollection",
+      "candidate_confidence": 0.7596920728683472,
+      "candidate_similarity": 0.7724375128746033
+    },
+    {
+      "id": 85,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan_Sound_2025/Shaper Table Track Project/Samples/Imported/Snare Mighty Bit Reduce.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Koan Sound",
+      "candidate_confidence": 0.7575292587280273,
+      "candidate_similarity": 0.745425820350647
+    },
+    {
+      "id": 86,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 #2 (2).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.8464929461479187,
+      "candidate_similarity": 0.7491480708122253
+    },
+    {
+      "id": 87,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 #2 (3).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.8318611979484558,
+      "candidate_similarity": 0.7175191044807434
+    },
+    {
+      "id": 88,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Hi (1).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.837812602519989,
+      "candidate_similarity": 0.7555468678474426
+    },
+    {
+      "id": 89,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Hi (2).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.8040486574172974,
+      "candidate_similarity": 0.7434544563293457
+    },
+    {
+      "id": 90,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Hi (3).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.8239147663116455,
+      "candidate_similarity": 0.724094808101654
+    },
+    {
+      "id": 91,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Medium (1).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.8162243962287903,
+      "candidate_similarity": 0.7522110939025879
+    },
+    {
+      "id": 92,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Medium (2).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Loaded Samples - Lo-Fi Memphis 2",
+      "candidate_confidence": 0.8125707507133484,
+      "candidate_similarity": 0.7381648421287537
+    },
+    {
+      "id": 93,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/SNR_WR.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.7882481813430786,
+      "candidate_similarity": 0.7103216052055359
+    },
+    {
+      "id": 94,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/63_SNARE.WAV",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.6794994473457336,
+      "candidate_similarity": 0.719001829624176
+    },
+    {
+      "id": 95,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Cookie Monster Samples/SD_GoldDust2_MPC60.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.778045117855072,
+      "candidate_similarity": 0.7195751070976257
+    },
+    {
+      "id": 96,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Snare Gold 1.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.7194833159446716,
+      "candidate_similarity": 0.723418116569519
+    },
+    {
+      "id": 97,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Snare LastGate.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.6802560687065125,
+      "candidate_similarity": 0.7408078908920288
+    },
+    {
+      "id": 98,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jungle Gym Samples/Snare KaiTracid 3.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Mike Shinoda Drums",
+      "candidate_confidence": 0.7970014214515686,
+      "candidate_similarity": 0.7375029921531677
+    },
+    {
+      "id": 99,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/2 - Snare/Snare - Metal Spread 1.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Minimal Audio",
+      "candidate_confidence": 0.7466867566108704,
+      "candidate_similarity": 0.7344232201576233
+    },
+    {
+      "id": 100,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/2 - Snare/Snare - Noise Probe.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Minimal Audio",
+      "candidate_confidence": 0.7716310620307922,
+      "candidate_similarity": 0.7380571961402893
+    },
+    {
+      "id": 101,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 13.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Old Movies 1 - Vintage Collection (Drum Kit)",
+      "candidate_confidence": 0.7475324869155884,
+      "candidate_similarity": 0.7312567234039307
+    },
+    {
+      "id": 102,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 23.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Old Movies 1 - Vintage Collection (Drum Kit)",
+      "candidate_confidence": 0.850684404373169,
+      "candidate_similarity": 0.7478455305099487
+    },
+    {
+      "id": 103,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 39.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Old Movies 1 - Vintage Collection (Drum Kit)",
+      "candidate_confidence": 0.6849677562713623,
+      "candidate_similarity": 0.7149749398231506
+    },
+    {
+      "id": 104,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (102).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.7963276505470276,
+      "candidate_similarity": 0.745087206363678
+    },
+    {
+      "id": 105,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (18).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.6888662576675415,
+      "candidate_similarity": 0.7272905707359314
+    },
+    {
+      "id": 106,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (28).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.7889516949653625,
+      "candidate_similarity": 0.7452377080917358
+    },
+    {
+      "id": 107,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (34).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.7567377686500549,
+      "candidate_similarity": 0.7370839715003967
+    },
+    {
+      "id": 108,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (41).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.721588134765625,
+      "candidate_similarity": 0.714918315410614
+    },
+    {
+      "id": 109,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (44).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.7045674324035645,
+      "candidate_similarity": 0.7068586945533752
+    },
+    {
+      "id": 110,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (77).wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Organic Drum Kit",
+      "candidate_confidence": 0.86842280626297,
+      "candidate_similarity": 0.8032509088516235
+    },
+    {
+      "id": 111,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Stick_Clap_03.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7279573678970337,
+      "candidate_similarity": 0.7324160933494568
+    },
+    {
+      "id": 112,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Hard_Snares/KSHMR_Hard_Snare_03_D#.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7296745777130127,
+      "candidate_similarity": 0.7076133489608765
+    },
+    {
+      "id": 113,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Hip_Hop_Snares/KSHMR_Hip_Hop_Snare_19_F.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7335527539253235,
+      "candidate_similarity": 0.7433170676231384
+    },
+    {
+      "id": 114,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Hip_Hop_Snares/KSHMR_Hip_Hop_Snare_26_G#.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7074334025382996,
+      "candidate_similarity": 0.7359421253204346
+    },
+    {
+      "id": 115,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_03_A.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.8014973998069763,
+      "candidate_similarity": 0.7564994096755981
+    },
+    {
+      "id": 116,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_05_A.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7393578886985779,
+      "candidate_similarity": 0.7515751719474792
+    },
+    {
+      "id": 117,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_08_A#.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7230629324913025,
+      "candidate_similarity": 0.727924108505249
+    },
+    {
+      "id": 118,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_11_B.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7548829317092896,
+      "candidate_similarity": 0.7615978121757507
+    },
+    {
+      "id": 119,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_13_C.wav",
+      "candidate_class": "Snare",
+      "human_label": "Snare",
+      "candidate_correct": true,
+      "vendor": "Sounds of KSHMR Vol.3",
+      "candidate_confidence": 0.7991971969604492,
+      "candidate_similarity": 0.7609908580780029
+    }
+  ],
+  "decision": "validation evidence only; no class is promoted automatically",
+  "generated": "2026-09-14T14:00:26"
+}

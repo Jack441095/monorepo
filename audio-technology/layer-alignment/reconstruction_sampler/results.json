@@ -1,0 +1,130 @@
+{
+  "benchmark": "SAMPLER_RECON_EVAL_0.1",
+  "seed": 20260822,
+  "shift_factor": 1.5,
+  "environment": {
+    "python": "3.12.13",
+    "numpy": "1.26.4",
+    "platform": "macOS-26.5.2-x86_64-i386-64bit"
+  },
+  "summary": {
+    "resampling_baseline": {
+      "mean_pitch_error_hz": 18.1,
+      "mean_duration_error_seconds": 0.5,
+      "mean_centroid_drift_hz": 2117.2859769491733
+    },
+    "reconstruction_pv": {
+      "mean_pitch_error_hz": 32.3,
+      "mean_duration_error_seconds": 0.0,
+      "mean_centroid_drift_hz": 2115.486645316275
+    }
+  },
+  "rows": [
+    {
+      "fixture": "sine",
+      "method": "resampling_baseline",
+      "pitch_hz": 330.0,
+      "pitch_error_hz": 0.0,
+      "duration_seconds": 1.0,
+      "duration_error_seconds": 0.5,
+      "spectral_centroid_drift_hz": 4.596103849573012,
+      "modulation_rate_hz": 1.0
+    },
+    {
+      "fixture": "sine",
+      "method": "reconstruction_pv",
+      "pitch_hz": 330.0,
+      "pitch_error_hz": 0.0,
+      "duration_seconds": 1.5,
+      "duration_error_seconds": 0.0,
+      "spectral_centroid_drift_hz": 4.905881219042328,
+      "modulation_rate_hz": 30.0
+    },
+    {
+      "fixture": "saw",
+      "method": "resampling_baseline",
+      "pitch_hz": 330.0,
+      "pitch_error_hz": 0.0,
+      "duration_seconds": 1.0,
+      "duration_error_seconds": 0.5,
+      "spectral_centroid_drift_hz": 4397.819973893499,
+      "modulation_rate_hz": 30.0
+    },
+    {
+      "fixture": "saw",
+      "method": "reconstruction_pv",
+      "pitch_hz": 330.0,
+      "pitch_error_hz": 0.0,
+      "duration_seconds": 1.5,
+      "duration_error_seconds": 0.0,
+      "spectral_centroid_drift_hz": 4050.275292637715,
+      "modulation_rate_hz": 30.0
+    },
+    {
+      "fixture": "fm",
+      "method": "resampling_baseline",
+      "pitch_hz": 420.0,
+      "pitch_error_hz": 90.0,
+      "duration_seconds": 1.0,
+      "duration_error_seconds": 0.5,
+      "spectral_centroid_drift_hz": 3.186101056479856,
+      "modulation_rate_hz": 22.0
+    },
+    {
+      "fixture": "fm",
+      "method": "reconstruction_pv",
+      "pitch_hz": 491.3333333333333,
+      "pitch_error_hz": 161.33333333333331,
+      "duration_seconds": 1.5,
+      "duration_error_seconds": 0.0,
+      "spectral_centroid_drift_hz": 17.79223872895318,
+      "modulation_rate_hz": 20.0
+    },
+    {
+      "fixture": "pluck",
+      "method": "resampling_baseline",
+      "pitch_hz": 330.0,
+      "pitch_error_hz": 0.0,
+      "duration_seconds": 1.0,
+      "duration_error_seconds": 0.5,
+      "spectral_centroid_drift_hz": 4.2326261828961265,
+      "modulation_rate_hz": 1.0
+    },
+    {
+      "fixture": "pluck",
+      "method": "reconstruction_pv",
+      "pitch_hz": 330.0,
+      "pitch_error_hz": 0.0,
+      "duration_seconds": 1.5,
+      "duration_error_seconds": 0.0,
+      "spectral_centroid_drift_hz": 21.260873988970104,
+      "modulation_rate_hz": 1.3333333333333333
+    },
+    {
+      "fixture": "noise_layered_bass",
+      "method": "resampling_baseline",
+      "pitch_hz": 82.0,
+      "pitch_error_hz": 0.5,
+      "duration_seconds": 1.0,
+      "duration_error_seconds": 0.5,
+      "spectral_centroid_drift_hz": 6176.59507976342,
+      "modulation_rate_hz": 1.0
+    },
+    {
+      "fixture": "noise_layered_bass",
+      "method": "reconstruction_pv",
+      "pitch_hz": 82.66666666666667,
+      "pitch_error_hz": 0.1666666666666714,
+      "duration_seconds": 1.5,
+      "duration_error_seconds": 0.0,
+      "spectral_centroid_drift_hz": 6483.198940006692,
+      "modulation_rate_hz": 1.3333333333333333
+    }
+  ],
+  "observed": "The phase-vocoder path preserves rendered duration while the resampling baseline does not; quality metrics are fixture-dependent.",
+  "limitations": [
+    "The phase-vocoder prototype is not production-quality and has no perceptual listening score.",
+    "Synthetic signals do not represent a broad instrument corpus.",
+    "Spectral centroid drift is not a complete timbre metric."
+  ]
+}

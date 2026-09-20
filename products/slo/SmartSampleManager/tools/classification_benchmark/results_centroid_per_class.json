@@ -1,0 +1,62 @@
+{
+  "Clap": {
+    "n": 90,
+    "logreg": 86.5,
+    "centroid": 92.2,
+    "delta": 5.7
+  },
+  "Crash": {
+    "n": 22,
+    "logreg": 67.6,
+    "centroid": 69.3,
+    "delta": 1.7
+  },
+  "Drum Loop": {
+    "n": 41,
+    "logreg": 79.0,
+    "centroid": 86.0,
+    "delta": 7.0
+  },
+  "Foley": {
+    "n": 26,
+    "logreg": 15.4,
+    "centroid": 47.1,
+    "delta": 31.7
+  },
+  "Hi-Hat": {
+    "n": 59,
+    "logreg": 70.8,
+    "centroid": 73.9,
+    "delta": 3.2
+  },
+  "Kick": {
+    "n": 71,
+    "logreg": 80.8,
+    "centroid": 91.4,
+    "delta": 10.6
+  },
+  "Other/none": {
+    "n": 55,
+    "logreg": 29.1,
+    "centroid": 16.8,
+    "delta": -12.3
+  },
+  "Percussion": {
+    "n": 47,
+    "logreg": 17.0,
+    "centroid": 5.1,
+    "delta": -12.0
+  },
+  "Percussion Loop": {
+    "n": 28,
+    "logreg": 41.1,
+    "centroid": 48.2,
+    "delta": 7.1
+  },
+  "Snare": {
+    "n": 85,
+    "logreg": 72.6,
+    "centroid": 72.9,
+    "delta": 0.3
+  }
+}

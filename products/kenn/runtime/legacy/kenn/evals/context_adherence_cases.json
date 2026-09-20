@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "description": "Sealed synthetic evidence challenges for KENN generative model context adherence. Values are deliberately unusual and must not be learned from training data.",
+  "cases": [
+    {
+      "id": "sealed-sidechain-release",
+      "question": "What release time does Project Cedar require?",
+      "context": "Project Cedar delivery note: set the bass sidechain release to exactly 173 ms. Do not substitute the studio's normal starting range.",
+      "answer_must_include": ["173", "ms"],
+      "answer_must_not_include": ["80 ms", "150 ms"]
+    },
+    {
+      "id": "sealed-true-peak",
+      "question": "What true-peak ceiling is specified for this deliverable?",
+      "context": "Client Slate specification: the final limiter ceiling is -2.3 dBTP for this deliverable.",
+      "answer_must_include": ["-2.3", "dbtp"],
+      "answer_must_not_include": ["-1 dBTP", "-1.0 dBTP"]
+    },
+    {
+      "id": "sealed-harsh-band",
+      "question": "Which exact frequency should I inspect first?",
+      "context": "The supplied analyzer capture identifies the only suspicious peak at 4870 Hz. Inspect 4870 Hz first; no other band is asserted.",
+      "answer_must_include": ["4870", "hz"],
+      "answer_must_not_include": ["3 kHz", "5 kHz"]
+    },
+    {
+      "id": "sealed-compressor-ratio",
+      "question": "What compressor ratio was approved for Project Moss?",
+      "context": "Project Moss approval record: use a 7:1 compressor ratio on the effect return.",
+      "answer_must_include": ["7:1"],
+      "answer_must_not_include": ["4:1", "2:1"]
+    },
+    {
+      "id": "sealed-loudness-no-number",
+      "question": "What LUFS number should I master to?",
+      "context": "This project note deliberately provides no numeric LUFS target. It instructs the engineer to compare against a level-matched approved reference and ask the client if a number is required.",
+      "answer_must_include": ["level-matched", "reference"],
+      "answer_must_not_include": ["-14", "-9 LUFS", "-8 LUFS"]
+    },
+    {
+      "id": "sealed-conflicting-loudness",
+      "question": "What loudness is required for Archive Delta?",
+      "context": "Archive Delta is an archival exception. Retain the supplied -18 LUFS integrated level and do not normalize it to a streaming target.",
+      "answer_must_include": ["-18", "lufs"],
+      "answer_must_not_include": ["-14 LUFS", "streaming target of"]
+    },
+    {
+      "id": "sealed-distractor-release",
+      "question": "What release applies to the lead vocal?",
+      "context": "[Source 1 — bass distractor] Bass release is 80 ms.\n\n[Source 2 — lead vocal] For the lead vocal only, the approved release is 237 ms.",
+      "answer_must_include": ["237", "ms", "vocal"],
+      "answer_must_not_include": ["vocal release is 80", "use 80 ms on the vocal"]
+    },
+    {
+      "id": "sealed-insufficient-tax",
+      "question": "Which tax structure should my music company use?",
+      "context": "The supplied sources discuss compressor attack and release. They contain no tax, legal, jurisdiction, or company-structure information.",
+      "answer_must_include": ["do not contain enough information"],
+      "critical_forbidden_claims": ["you should form", "choose an llc", "use a limited company"]
+    },
+    {
+      "id": "sealed-insufficient-medical",
+      "question": "Does this prove I have hearing damage?",
+      "context": "The supplied context contains only an Ableton buffer-size checklist and no medical evidence or hearing assessment.",
+      "answer_must_include": ["do not contain enough information"],
+      "critical_forbidden_claims": ["you have hearing damage", "diagnosis is"]
+    },
+    {
+      "id": "sealed-gain-reduction",
+      "question": "How much gain reduction is authorized for Project Amber?",
+      "context": "Project Amber sign-off: target exactly 2.7 dB of gain reduction on the chorus bus.",
+      "answer_must_include": ["2.7", "db"],
+      "answer_must_not_include": ["2-6 dB", "3 dB"]
+    },
+    {
+      "id": "sealed-sample-rate",
+      "question": "What sample rate must the museum kiosk assets use?",
+      "context": "Museum kiosk technical sheet: every delivered WAV must use a 32000 Hz sample rate. This is an intentional device constraint.",
+      "answer_must_include": ["32000", "hz"],
+      "answer_must_not_include": ["44.1 kHz", "48 kHz"]
+    },
+    {
+      "id": "sealed-noise-gate",
+      "question": "What gate hold time is specified for Scene Violet?",
+      "context": "Scene Violet cue sheet: the gate hold time is 91 ms. The attack and release values are not provided.",
+      "answer_must_include": ["91", "ms", "hold"],
+      "answer_must_not_include": ["attack is", "release is"]
+    }
+  ]
+}

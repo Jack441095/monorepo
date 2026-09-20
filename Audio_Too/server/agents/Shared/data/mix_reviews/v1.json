@@ -1,0 +1,17 @@
+{
+  "title": "Test Mix v1",
+  "metrics": {
+    "filename": "test_mix_v1.wav",
+    "mix_goal": {"key": "pop_vocal", "label": "Pop Vocal Mix"},
+    "technical_score": 68
+  },
+  "flags": [
+    {"label": "Low presence", "severity": "high", "detail": "Vocal buried"},
+    {"label": "Low-mid build-up", "severity": "medium", "detail": ""}
+  ],
+  "action_plan": [],
+  "comparison_advice": [],
+  "version_advice": [],
+  "revision_impact": {},
+  "revision_agent": {}
+}

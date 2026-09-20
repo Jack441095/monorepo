@@ -1,0 +1,22 @@
+{
+  "evidence_status": "REPOSITORY_HELD_HISTORICAL_BENCHMARK",
+  "classes": {
+    "Bass Loop": {"precision": 0.927536231884058, "recall": 0.9552238805970149, "f1": 0.9411764705882353},
+    "Bass One-Shot": {"precision": 0.9270833333333334, "recall": 0.9081632653061225, "f1": 0.9175257731958762},
+    "Clap": {"precision": 0.9302325581395349, "recall": 0.9523809523809523, "f1": 0.9411764705882352},
+    "FX": {"precision": 0.9801980198019802, "recall": 0.99, "f1": 0.9850746268656716},
+    "Foley": {"precision": 0.9896907216494846, "recall": 0.96, "f1": 0.9746192893401014},
+    "Hi-Hat": {"precision": 1.0, "recall": 0.9722222222222222, "f1": 0.9859154929577464},
+    "Impact": {"precision": 0.9444444444444444, "recall": 1.0, "f1": 0.9714285714285714},
+    "Kick": {"precision": 0.9680851063829787, "recall": 0.9680851063829787, "f1": 0.9680851063829787},
+    "Music Loop": {"precision": 0.9615384615384616, "recall": 1.0, "f1": 0.9803921568627451},
+    "Percussion": {"precision": 0.956989247311828, "recall": 0.9468085106382979, "f1": 0.9518716577540107},
+    "Riser": {"precision": 0.9893617021276596, "recall": 0.9893617021276596, "f1": 0.9893617021276596},
+    "Snare": {"precision": 0.9213483146067416, "recall": 0.9534883720930233, "f1": 0.9371428571428573},
+    "Synth": {"precision": 0.9722222222222222, "recall": 0.875, "f1": 0.9210526315789473},
+    "Synth Loop": {"precision": 1.0, "recall": 0.9361702127659575, "f1": 0.967032967032967},
+    "Vocal Loop": {"precision": 1.0, "recall": 1.0, "f1": 1.0},
+    "Vocal Phrase": {"precision": 1.0, "recall": 1.0, "f1": 1.0}
+  },
+  "limiting_v4h_evidence": {"known_accuracy": 0.764, "vocal_loop_recall": 0.075, "ood_false_known": 0.416}
+}

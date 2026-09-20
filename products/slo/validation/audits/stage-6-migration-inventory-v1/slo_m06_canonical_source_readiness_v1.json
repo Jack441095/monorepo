@@ -1,0 +1,120 @@
+{
+  "schema_version": "slo_canonical_source_migration_readiness_v1",
+  "package_id": "SLO-M06-CANONICAL-SOURCE-V1",
+  "generated_at": "2026-08-30T11:05:00Z",
+  "status": "canonical_candidate_release_blocked",
+  "authority": "Clean isolated SLO checkpoint plus product-truth and qualification receipts; shared dirty checkout and protected data remain preserved.",
+  "programme_requirement": "M-06: treat Smart Sample Manager lineage as provenance, preserve unique history, make products/slo canonical, and do not import unrelated Audio_Too business/R&D code.",
+  "owner_authorization": {
+    "migration_lane_approved": true,
+    "release_promotion_approved": false,
+    "protected_data_access_approved": false,
+    "approval_source": "Owner instruction in active programme thread on 2026-08-30"
+  },
+  "candidate": {
+    "repository_path": "products/slo",
+    "worktree": "workspace/worktrees/slo/slo-m06-canonical-source-v1",
+    "branch": "engineering/slo-m06-canonical-source-v1",
+    "sha": "68b67009dc25bd9424d0c7cdbc11d2a7ce487c2f",
+    "dirty_entries": 0,
+    "observed_size": "32M",
+    "source_product": "SmartSampleManager",
+    "user_visible_product": "SLO",
+    "clean_source_candidate": true
+  },
+  "shared_checkout": {
+    "path": "products/slo",
+    "branch": "main",
+    "sha": "c6d0746ac876a0a3af9244907486ffc001b3e718",
+    "dirty_entries": 49,
+    "release_truth": "not_clean",
+    "cutover_performed": false
+  },
+  "controls": {
+    "physical_migration_performed": false,
+    "shared_checkout_modified": false,
+    "unrelated_audio_too_code_imported": false,
+    "protected_audio_or_data_opened": false,
+    "models_or_holdouts_moved": false,
+    "duplicate_platform_trees_retired": false,
+    "release_authorized": false,
+    "external_action_taken": false
+  },
+  "gates": [
+    {
+      "gate_id": "M06-G01-CLEAN-SOURCE",
+      "requirement": "One clean SLO source/release candidate exists.",
+      "status": "pass",
+      "observed": "Isolated worktree is clean at 68b67009; no generated build/cache state is present in the candidate worktree.",
+      "evidence_refs": ["workspace/worktrees/slo/slo-m06-canonical-source-v1 @ 68b67009dc25bd9424d0c7cdbc11d2a7ce487c2f"]
+    },
+    {
+      "gate_id": "M06-G02-PRODUCT-TRUTH",
+      "requirement": "Purpose, identity, supported scope, authority, release status, and rollback are explicit.",
+      "status": "pass_with_limitations",
+      "observed": "SLO product truth is valid; SLO/Smart Sample Manager identity is explicit, WAV-only scope is declared, Platform is release authority, and release_ready=false.",
+      "evidence_refs": ["workspace/worktrees/slo/slo-m06-canonical-source-v1/SLO_PRODUCT_TRUTH_MANIFEST_V1.json", "workspace/worktrees/slo/slo-m06-canonical-source-v1/validation/audits/stage-2-slo-product-truth-v1/SLO_PRODUCT_TRUTH_PACKAGE_REPORT_V1.md"]
+    },
+    {
+      "gate_id": "M06-G03-BUILD-QUALIFICATION",
+      "requirement": "Candidate builds and direct qualification results are receipt-backed.",
+      "status": "pass_with_limitations",
+      "observed": "Fresh candidate receipt records ssm_qual_full exit 0 and 37 passed, 1 owner/environment-blocked, 0 code failures for declared local scope.",
+      "evidence_refs": ["workspace/worktrees/slo/slo-m06-canonical-source-v1/validation/audits/stage-6-migration-inventory-v1/SLO_M06A_FULL_QUALIFICATION_RECEIPT_V1.md", "workspace/worktrees/slo/slo-m06-canonical-source-v1 @ bfe067c"]
+    },
+    {
+      "gate_id": "M06-G04-SCOPE-SAFETY",
+      "requirement": "Supported formats and safe default behavior are honest and directly tested.",
+      "status": "pass_with_limitations",
+      "observed": "WAV-only support is declared; format-aware scan and read-only safety evidence pass. AIFF/FLAC/MP3 are not claimed.",
+      "evidence_refs": ["workspace/worktrees/slo/slo-m06-canonical-source-v1/SLO_PRODUCT_TRUTH_MANIFEST_V1.json", "workspace/worktrees/slo/slo-m06-canonical-source-v1/validation/audits/stage-6-migration-inventory-v1/SLO_M06A_FULL_QUALIFICATION_RECEIPT_V1.md"]
+    },
+    {
+      "gate_id": "M06-G05-DATA-BOUNDARY",
+      "requirement": "Owner audio, private corpora, holdouts, and large data are outside the product source boundary.",
+      "status": "blocked",
+      "observed": "The clean candidate is source-only, but the shared SLO estate contains large protected/evaluation/model material and the external private data root is absent; no data cutover has occurred.",
+      "evidence_refs": ["workspace/worktrees/slo/slo-m06-canonical-source-v1/validation/audits/stage-2-slo-estate-refresh-v1/slo_estate_refresh_registry_v1.json", "validation/audits/stage-6-migration-inventory-v1/audio_too_migration_units_v1.json"]
+    },
+    {
+      "gate_id": "M06-G06-RELEASE-HOST-LICENSING",
+      "requirement": "Host/UI, licensing, signing, installation, support, capacity, and rollback are qualified.",
+      "status": "blocked",
+      "observed": "Direct licensing is owner/environment-blocked; DAW/UI host, signing/notarisation, clean-machine, support, capacity, and release rollback remain open.",
+      "evidence_refs": ["workspace/worktrees/slo/slo-m06-canonical-source-v1/SLO_PRODUCT_TRUTH_MANIFEST_V1.json", "workspace/worktrees/slo/slo-m06-canonical-source-v1/validation/audits/stage-6-migration-inventory-v1/SLO_M06A_FULL_QUALIFICATION_RECEIPT_V1.md"]
+    },
+    {
+      "gate_id": "M06-G07-DUPLICATE-AUTHORITY",
+      "requirement": "SLO-local backend/website copies do not act as commercial platform authorities.",
+      "status": "blocked",
+      "observed": "nitedsp/backend and nitedsp/website remain in the candidate tree; P-01 semantic diff and consumer migration are not complete.",
+      "evidence_refs": ["validation/audits/stage-2-platform-canonicality-v1/platform_duplicate_migration_units_v1.json", "workspace/worktrees/slo/slo-m06-canonical-source-v1/SLO_PRODUCT_TRUTH_MANIFEST_V1.json"]
+    },
+    {
+      "gate_id": "M06-G08-CUTOVER-ROLLBACK",
+      "requirement": "Consumers are updated and a qualified cutover/rollback observation exists before shared pointer change or retirement.",
+      "status": "not_started",
+      "observed": "The shared checkout and root gitlink were not changed; no consumer cutover, observation window, or retirement receipt exists.",
+      "evidence_refs": ["workspace/worktrees/slo/slo-m06-canonical-source-v1/validation/audits/stage-2-slo-estate-refresh-v1/SLO_ESTATE_REFRESH_PACKAGE_REPORT_V1.md"]
+    }
+  ],
+  "decision": {
+    "recommendation": "Use 68b67009 as the clean SLO engineering/release candidate for remaining qualification; keep the shared dirty checkout and duplicate trees preserved until the remaining gates close.",
+    "canonical_candidate_accepted": true,
+    "shared_pointer_cutover_authorized": false,
+    "retirement_authorized": false,
+    "safe_next_actions": [
+      "qualify licensing/host/signing/installation/support/capacity/rollback with approved environments",
+      "define and execute semantic platform-duplicate consumer migration",
+      "create the external private-data root and approved data cutover plan before moving protected material"
+    ]
+  },
+  "rollback": "No rollback is required; the candidate is an additional clean worktree. Restore use of the prior shared checkout by leaving its branch and gitlink unchanged. Do not delete or clean any existing SLO worktree.",
+  "limitations": [
+    "A clean source candidate is not the same as a release-qualified product.",
+    "The shared SLO checkout remains dirty and contains protected/private material.",
+    "The root superproject gitlink and checked-out SLO SHA remain divergent and were not overwritten.",
+    "Platform duplicate semantic migration, licensing, host, signing, installation, support, capacity, and rollback evidence remain incomplete."
+  ],
+  "next_package": "L-07/L-08: host/licensing/release qualification and owner-approved consumer/cutover plan; retain release block until those receipts exist."
+}

@@ -1,0 +1,29 @@
+{
+  "record_type": "slo_rename_plan_dry_run_audit",
+  "schema_version": "1.0.0",
+  "method_version": "apply_rename_plan_validation_v1",
+  "source_plan": "SmartSampleManager/tools/classification_benchmark/full_taxonomy_v3_suggest_rename_plan_testing_v2.jsonl",
+  "duplicate_guard": "SmartSampleManager/tools/classification_benchmark/results_rename_duplicate_guard_testing_v1.json",
+  "source_plan_sha256": "fc2dc7aba7783731a0e932aa00d0b2be763bbe01377854bb357d91099abc5d12",
+  "duplicate_guard_sha256": "bb3a7b5329334b236db7806f87a5d45c3fe78b270186c83a3d8fcfe00cb7ff3b",
+  "n_plan_rows": 7315,
+  "n_selected_suggestions": 386,
+  "n_validation_problems": 30,
+  "n_duplicate_flagged_selected": 30,
+  "duplicate_flag_counts": {
+    "exact_duplicate_canonical": 13,
+    "exact_duplicate_alias": 16,
+    "acoustic_near_duplicate": 11
+  },
+  "n_selected_without_duplicate_flags": 356,
+  "interpretation": "The 356 unflagged suggestions still require explicit reviewer approval; duplicate-free does not mean auto-approved.",
+  "decision": "read-only dry run; no row is approved and no filesystem mutation is permitted",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "plan_modified": false,
+    "approval_granted": false,
+    "rename_actions": false,
+    "gpu_1_touched": false
+  }
+}

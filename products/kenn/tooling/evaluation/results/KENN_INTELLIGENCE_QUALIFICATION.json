@@ -1,0 +1,14 @@
+{
+  "commands": [
+    "python3 scripts/evaluate_chat_hard_cases.py",
+    "python3 scripts/evaluate_retrieval_modes.py",
+    "python3 scripts/evaluate_session_grounded_advice.py",
+    "python3 scripts/qualify_assistant_recovery.py",
+    "python3 scripts/evaluate_arrangement_intelligence.py"
+  ],
+  "details": "Hard cases 15/15; hybrid recall@4 0.9828; corpus hashes match; session-grounded advice 6/6; assistant recovery 8/8 with 7/7 safety cases; arrangement intelligence 4/4.",
+  "generated_at": "2026-09-15T05:20:59.466487+00:00",
+  "passed": true,
+  "schema": "kenn.intelligence_qualification.v1",
+  "source_sha256": "2bef30c3dece3e1752702bb728c4b836bff2912f8f15049b7ba2e9727f0f4a6b"
+}

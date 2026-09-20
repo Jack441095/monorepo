@@ -1,0 +1,55 @@
+{
+  "program": "SLO Working Product Readiness Program V1",
+  "timestamp_utc": "2026-08-30T01:45:18Z",
+  "repo": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo",
+  "head_sha_before": "be3e6310a6aae86c0e6b138c0c75aadc9546fdd2",
+  "head_sha_after": "8f640a2104ed0f736f332acf8ba53e429cae326b",
+  "tasks": [
+    {"id": 1, "name": "Inspect current state", "status": "done", "evidence": "SLO_CURRENT_WORKING_STATE_AUDIT_V1.md", "key_findings": ["WAV-only scanning, decode path is dr_wav-specific", "stale PRODUCT_NAME \"Smart Sample Manager\", 38 files reference it", "packaging scripts already substantial, blocked on Jack's Apple ID + clean-machine access", "one legitimate mutation feature (Sort Library), opt-in and tested"]},
+    {"id": 2, "name": "Define working properly", "status": "done", "evidence": "SLO_V1_WORKING_PRODUCT_DEFINITION.md", "open_question_for_jack": "Is WAV-only acceptable for V1 beta, or a launch blocker?"},
+    {"id": 3, "name": "Producer taxonomy layer", "status": "done", "evidence": "SLO_PRODUCER_TAXONOMY_IMPLEMENTATION_PLAN_V1.md", "fix_implemented": "confidence banding (High >=0.75 / Medium >=0.5 / Low <0.5) in PluginEditor.cpp", "verified_gaps": ["Vocal Chop/Pad/Stab as primary types", "rimshot/acoustic-electronic-snare/clean-distorted-808 subtypes", "Saturated/Distorted/Clean attribute (needs new THD DSP work)"]},
+    {"id": 4, "name": "Scan/index pipeline", "status": "done", "evidence": "SLO_SCAN_INDEX_PIPELINE_REPORT_V1.md", "verdict": "solid for WAV; format coverage is the one real gap"},
+    {"id": 5, "name": "Similarity search", "status": "done", "evidence": "SLO_SIMILARITY_SEARCH_REPORT_V1.md", "tests_run": ["TestFindSimilar", "TestFindSimilarWeighted", "TestNearDuplicates", "TestEmbeddingQuality", "TestTimbreRefinement", "TestReferenceSearch"], "tests_result": "all pass"},
+    {"id": 6, "name": "UI/UX audit", "status": "done_proportionate", "evidence": "SLO_PRIVATE_BETA_READINESS_V2.md#ui-ux-audit", "gap_found": "no scan-progress/status indicator wired into PluginEditor.cpp", "unclear": "explicit empty/error state labels not located via targeted search"},
+    {"id": 7, "name": "Ableton/DAW workflow", "status": "done_partial_by_necessity", "evidence": "SLO_ABLETON_WORKFLOW_VALIDATION_V1.md", "fix_implemented": "missing-file drag-guard added to SampleCanvas.cpp, matching PrecisionBrowser.cpp", "cannot_verify": "actual behavior inside a live Ableton session -- requires Jack's access (B-004)"},
+    {"id": 8, "name": "Performance and stability", "status": "deferred_to_existing_evidence", "note": "dedicated perf/soak tooling already exists and was exercised this session for classification work; not re-run for this program's two small code changes to avoid duplicating still-current evidence"},
+    {"id": 9, "name": "Read-only safety tests", "status": "done", "evidence": "SLO_READ_ONLY_SAFETY_REPORT_V1.md", "tests_run": ["TestReadOnlySafetyQualification", "TestMalformedAudio", "TestMultiInstance"], "tests_result": "all pass, fresh SHA-256 checksum evidence"},
+    {"id": 10, "name": "Build and packaging", "status": "done", "evidence": "SLO_PRIVATE_BETA_READINESS_V2.md#packaging", "note": "packaging scripts verified to compile cleanly; no real signing/notarization executed (B-001 blocked on Jack)"},
+    {"id": 11, "name": "Tests and evidence", "status": "done", "evidence": "SLO_WORKING_PROPERLY_TEST_REPORT_V1.md", "regression_tests_total": 34, "regression_tests_pass": 34, "excluded_not_regressions": ["ClassificationBenchmark (CLI tool)", "BenchmarkScan (CLI tool)", "TestLicensing (manual tool, needs live licensing server, matches B-003)"]},
+    {"id": 12, "name": "Fix implementation", "status": "done", "fixes": ["confidence banding (PluginEditor.cpp)", "missing-file drag-guard (SampleCanvas.cpp)"], "note": "no further fixes manufactured beyond what the audit genuinely found safe and small"},
+    {"id": 13, "name": "Deliverables", "status": "done", "files": [
+      "SLO_CURRENT_WORKING_STATE_AUDIT_V1.md",
+      "SLO_V1_WORKING_PRODUCT_DEFINITION.md",
+      "SLO_PRODUCER_TAXONOMY_IMPLEMENTATION_PLAN_V1.md",
+      "SLO_SCAN_INDEX_PIPELINE_REPORT_V1.md",
+      "SLO_SIMILARITY_SEARCH_REPORT_V1.md",
+      "SLO_READ_ONLY_SAFETY_REPORT_V1.md",
+      "SLO_ABLETON_WORKFLOW_VALIDATION_V1.md",
+      "SLO_WORKING_PROPERLY_TEST_REPORT_V1.md",
+      "SLO_PRIVATE_BETA_READINESS_V2.md",
+      "SLO_WORKING_PROPERLY_RECEIPT_V1.json"
+    ]}
+  ],
+  "code_changes": [
+    {"file": "SmartSampleManager/Source/PluginEditor.cpp", "change": "confidence banding: High/Medium/Low instead of a single NEEDS-REVIEW threshold"},
+    {"file": "SmartSampleManager/Source/SampleCanvas.cpp", "change": "added missing-file existence guard before starting an external drag, matching PrecisionBrowser.cpp's existing behavior"}
+  ],
+  "build_verdict": {
+    "full_rebuild": "ssm_qual_full, exit 0",
+    "regression_suite": "34/34 real tests pass, run directly (not just built)"
+  },
+  "safety_confirmation": {
+    "submit_touched": false,
+    "platform_touched": false,
+    "payment_download_licensing_railway_touched": false,
+    "real_user_sample_files_touched": false,
+    "real_signing_or_notarization_executed": false,
+    "public_launch_claims_made": false
+  },
+  "private_beta_ready": "engineering-side: yes, evidenced. overall: no -- blocked on B-001/B-002/B-003/B-004/B-005, all require Jack directly",
+  "new_gaps_surfaced_this_program": [
+    "WAV-only scanning (not previously tracked as a blocker)",
+    "stale \"Smart Sample Manager\" PRODUCT_NAME (not previously tracked)",
+    "no scan-progress UI indicator (not previously tracked)"
+  ]
+}

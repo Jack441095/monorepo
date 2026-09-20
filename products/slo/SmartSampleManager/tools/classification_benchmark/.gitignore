@@ -1,0 +1,21 @@
+fixtures/
+*.wav
+classification_results.json
+classification_errors.csv
+confusion_matrix.csv
+performance_results.json
+
+# V4-F qualification run output -- large generated scan dumps/CSVs from a
+# specific benchmark run, reproducible from ClassificationBenchmark + the
+# real-sample fixtures corpus. Kept local only; see the qualification report
+# at SmartSampleManager/docs/SLO_CLASSIFICATION_V4F_QUALIFICATION_REPORT.md
+# for the numbers these produced.
+v4f_results/
+
+# V4-G qualification run output -- same rationale as v4f_results/ above; see
+# docs/SLO_CLASSIFICATION_V4G_{OOD,BPM,QUALIFICATION}_REPORT.md.
+v4g_results/
+
+# V4-H qualification run output -- same rationale as v4f_results/ above; see
+# docs/SLO_CLASSIFICATION_V4H_FINAL_CALIBRATION_REPORT.md.
+v4h_results/

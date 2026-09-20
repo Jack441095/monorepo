@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Automix — Intelligent Audio Mixdown System</title>
+  <meta name="description" content="Offline psychoacoustic mixdown system that automatically classifies, prepares, balances, carves, and validates audio stems.">
+  <style>
+    :root {
+      /* Unified to the flat Thursday/KENN dark palette (was neon/glassmorphism). */
+      --bg-gradient: #0b0b0b;
+      --card-bg: #111111;
+      --card-border: #2a2a2a;
+      --neon-cyan: #60a5fa;
+      --neon-purple: #a78bfa;
+      --neon-pink: #f87171;
+      --neon-green: #22c55e;
+      --text-main: #e4e4e7;
+      --text-muted: #71717a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 600;
+    }
+
+    /* Navbar styling */
+    header {
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(7, 10, 19, 0.8);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-badge {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border: 1px solid var(--neon-cyan);
+      border-radius: 4px;
+      color: var(--neon-cyan);
+      -webkit-text-fill-color: var(--neon-cyan); /* fix gradient background override */
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+      margin-left: 20px;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* Main Layout */
+    .main-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 40px auto;
+      padding: 0 24px;
+      flex-grow: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 968px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Left Card: Input Parameters */
+    .section-title {
+      font-size: 22px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title span {
+      background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    input[type="text"], select {
+      flex-grow: 1;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--text-muted);
+    }
+
+    /* Preference Sliders */
+    .sliders-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: rgba(30, 41, 59, 0.2);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .slider-labels span:nth-child(2) {
+      color: var(--neon-cyan);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 10px var(--neon-cyan);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Drag & Drop upload area */
+    .upload-zone {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: rgba(30, 41, 59, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .upload-zone:hover, .upload-zone.dragging {
+      border-color: var(--neon-cyan);
+      background: rgba(6, 182, 212, 0.05);
+    }
+
+    .upload-icon {
+      font-size: 32px;
+      background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .file-list {
+      width: 100%;
+      max-height: 150px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+
+    .file-item span:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
+
+    .file-item span:last-child {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 100%);
+      color: white;
+      border: none;
+      padding: 16px 24px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      background: #334155;
+      color: #64748b;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Right Card: Processing & Logs Console */
+    .console-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-badge.active {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--neon-cyan);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+
+    .status-badge.complete {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--neon-green);
+      border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .status-badge.failed {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .console-body {
+      background: rgba(7, 10, 19, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px;
+      color: #38bdf8;
+      overflow-y: auto;
+      flex-grow: 1;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .console-line {
+      line-height: 1.5;
+    }
+
+    .console-line.timestamp {
+      color: #64748b;
+      margin-right: 8px;
+    }
+
+    .console-line.system {
+      color: var(--neon-purple);
+    }
+
+    .console-line.error {
+      color: #ef4444;
+      font-weight: bold;
+    }
+
+    .console-line.success {
+      color: var(--neon-green);
+    }
+
+    .progress-bar-container {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+    }
+
+    /* Results Block */
+    .results-card {
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .results-header {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--neon-green);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .results-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-download {
+      grid-column: span 2;
+      background: linear-gradient(135deg, var(--neon-green) 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Player styling */
+    .audio-player-container {
+      background: rgba(7, 10, 19, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    audio {
+      width: 100%;
+      height: 36px;
+      outline: none;
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 40px;
+      background: rgba(7, 10, 19, 0.5);
+    }
+  </style>
+  <link rel="stylesheet" href="/studio-theme.css">
+  <script src="/app-shell.js" data-active="automix" data-page="AutoMix" defer></script>
+</head>
+<body>
+
+  <main class="main-container">
+    
+    <!-- Left Column: Settings Panel -->
+    <section class="card">
+      <h2 class="section-title">
+        <span>⚙️</span> Mix Parameters
+      </h2>
+
+      <!-- Project Setup -->
+      <div class="form-group">
+        <label for="projectId">Project ID</label>
+        <div class="input-row">
+          <input type="text" id="projectId" placeholder="e.g. project123" required>
+          <button type="button" class="btn-secondary" id="btnGenId">Generate ID</button>
+        </div>
+      </div>
+
+      <!-- Genre Selector -->
+      <div class="form-group">
+        <label for="genreSelect">Mix Genre Style</label>
+        <select id="genreSelect">
+          <option value="pop" selected>Pop (Bright, polished vocals)</option>
+          <option value="hip_hop">Hip-Hop (Heavy sub bass, punchy drums)</option>
+          <option value="rock">Rock (Wide guitars, room-filled drums)</option>
+          <option value="edm">EDM (Maximum energy, wide synths, clean low end)</option>
+          <option value="acoustic">Acoustic (Natural dynamics, organic rooms)</option>
+          <option value="jazz">Jazz (Wide/natural panning, fully raw dynamics)</option>
+          <option value="cinematic">Cinematic (Large spaces, epic dynamics)</option>
+          <option value="podcast">Podcast (Mono voice-focused, highly compressed)</option>
+        </select>
+      </div>
+
+      <!-- M8.4b — Target loudness preset -->
+      <div class="form-group">
+        <label for="targetLufsSelect">Target Loudness</label>
+        <select id="targetLufsSelect">
+          <option value="-14" selected>Streaming — Spotify (-14 LUFS)</option>
+          <option value="-16">Streaming — Apple Music (-16 LUFS)</option>
+          <option value="-9">Club / DJ (-9 LUFS)</option>
+          <option value="-11">CD Master (-11 LUFS)</option>
+          <option value="-23">Broadcast — EBU R128 (-23 LUFS)</option>
+        </select>
+      </div>
+
+      <!-- Preference Sliders -->
+      <div class="form-group">
+        <label>Aesthetic Modifiers</label>
+        <div class="sliders-container">
+          <!-- Warm / Bright -->
+          <div class="slider-group">
+            <div class="slider-labels">
+              <span>Warm</span>
+              <span>Tonal Character</span>
+              <span>Bright</span>
+            </div>
+            <input type="range" id="sliderBrightWarm" min="0" max="1" step="0.1" value="0.5">
+          </div>
+
+          <!-- Dynamic / Compressed -->
+          <div class="slider-group">
+            <div class="slider-labels">
+              <span>Dynamic</span>
+              <span>Dynamic Range</span>
+              <span>Compressed</span>
+            </div>
+            <input type="range" id="sliderDynamic" min="0" max="1" step="0.1" value="0.5">
+          </div>
+
+          <!-- Dry / Wet -->
+          <div class="slider-group">
+            <div class="slider-labels">
+              <span>Dry</span>
+              <span>Spatial Depth</span>
+              <span>Wet</span>
+            </div>
+            <input type="range" id="sliderSpatial" min="0" max="1" step="0.1" value="0.5">
+          </div>
+
+          <!-- Narrow / Wide -->
+          <div class="slider-group">
+            <div class="slider-labels">
+              <span>Narrow</span>
+              <span>Stereo Width</span>
+              <span>Wide</span>
+            </div>
+            <input type="range" id="sliderWidth" min="0" max="1" step="0.1" value="0.5">
+          </div>
+        </div>
+      </div>
+
+      <!-- Engine Corrections (opt-in; off by default -- these affect the
+           actual mix decisions, not just tone/space/width like the sliders
+           above) -->
+      <div class="form-group">
+        <label>Engine Corrections</label>
+        <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 8px;">
+          Off by default. Each one applies a real correction the engine
+          detected but doesn't act on unless you ask it to.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+            <input type="checkbox" id="chkMaskingCorrections">
+            <span>De-mask overlapping stems (dynamic-EQ the lower-priority stem where two elements clash)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+            <input type="checkbox" id="chkMonoCompatCorrection">
+            <span>Fix mono-compatibility warnings (narrow stems flagged for phase/fold-down issues)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+            <input type="checkbox" id="chkProactiveCrestReduction">
+            <span>Denser master (proactive crest-factor reduction toward reference-track density)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Stem Upload Section -->
+      <div class="form-group">
+        <label>Stem Upload</label>
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-icon">📁</div>
+          <p>Drag & drop stem files here, or click to browse</p>
+          <p style="font-size: 11px; color: var(--text-muted);">Supports ZIP or multiple WAV files</p>
+          <input type="file" id="fileInput" multiple style="display: none;">
+        </div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+
+      <!-- Reference Track Upload Section -->
+      <div class="form-group">
+        <label>Optional Reference Track (For EQ Match)</label>
+        <div class="upload-zone" id="refUploadZone" style="padding: 16px; border-color: rgba(255,255,255,0.08);">
+          <div class="upload-icon" style="font-size: 20px;">🎵</div>
+          <p style="font-size: 13px;">Drag & drop reference track here, or click to browse</p>
+          <input type="file" id="refFileInput" style="display: none;" accept="audio/wav">
+        </div>
+        <div class="file-list" id="refFileList"></div>
+        <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+          No reference? Pop, Hip-Hop, EDM, Acoustic and Cinematic use a curated genre reference
+          library automatically -- upload your own to override it.
+        </p>
+      </div>
+
+      <!-- Trigger Action -->
+      <button class="btn-primary" id="btnStartMix" disabled>
+        🚀 Start Automix Engine
+      </button>
+    </section>
+
+    <!-- Right Column: Console & Status Log -->
+    <section class="card">
+      <div class="console-container">
+        <div class="console-header">
+          <h3>Live Console Output</h3>
+          <span class="status-badge" id="statusBadge">Idle</span>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+
+        <div class="console-body" id="consoleBody">
+          <div class="console-line system">[System] Waiting for project configuration and stems...</div>
+        </div>
+
+        <!-- Result details (hidden by default) -->
+        <div class="results-card" id="resultsCard" style="display: none;">
+          <div class="results-header">
+            <span>🎉</span> Mixdown Complete!
+          </div>
+          <div class="audio-player-container">
+            <label style="font-size: 11px; margin-bottom: 4px;">Preview Mixdown</label>
+            <audio id="audioPreview" controls></audio>
+          </div>
+          <div class="results-actions">
+            <button class="btn-download" id="btnDownload">
+              Download ZIP Master Package
+            </button>
+            <button class="btn-secondary" id="btnViewReport">
+              View EQ Masking Report
+            </button>
+            <button class="btn-secondary" id="btnViewMatchReport" style="display:none;">
+              View Reference Match Report
+            </button>
+            <button class="btn-secondary" id="btnViewDecisions">
+              Read Decisions Log
+            </button>
+          </div>
+          <!-- Before / After: raw upload vs finished mixdown -->
+          <div id="beforeAfterSection" class="form-group" style="display:none; margin-top:16px; border-top:1px solid rgba(96,165,250,0.25); padding-top:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-size:13px; color:var(--neon-cyan); font-weight:600; display:flex; align-items:center; gap:6px;">
+                📈 Before / After
+              </div>
+              <div style="display:flex; gap:12px; font-size:11px;">
+                <span style="color:var(--text-muted);">■ Raw upload</span>
+                <span style="color:var(--neon-cyan);">■ Delivered mix</span>
+              </div>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
+              The raw uploaded stems (unprocessed, summed at unity gain) compared against the finished delivered mixdown.
+            </p>
+            <div id="beforeAfterStats" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:8px; margin-bottom:14px;"></div>
+            <div id="beforeAfterBands" style="display:flex; flex-direction:column; gap:8px;"></div>
+            <div id="beforeAfterStemsSection" style="display:none; margin-top:14px;">
+              <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;">Per-stem</div>
+              <div id="beforeAfterStems" style="display:flex; flex-direction:column; gap:4px;"></div>
+              <div id="beforeAfterStemsNote" style="font-size:10px; color:var(--text-muted); margin-top:6px;"></div>
+            </div>
+          </div>
+
+          <!-- 40-Band LTAS Spectrum Visualizer -->
+          <div id="spectrumVisualizerSection" class="form-group" style="display:none; margin-top:16px; border-top:1px solid rgba(96,165,250,0.25); padding-top:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-size:13px; color:var(--neon-cyan); font-weight:600; display:flex; align-items:center; gap:6px;">
+                📊 Long-Term Average Spectrum (LTAS) Comparison
+              </div>
+              <div style="display:flex; gap:12px; font-size:11px;">
+                <span style="color:var(--neon-cyan);">● Your Mixdown</span>
+                <span style="color:var(--neon-purple);">┄ Pro Reference Target</span>
+              </div>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
+              40-band spectral comparison across 20Hz–20kHz logarithmic frequency scale. Dips and spectral deficits are automatically highlighted.
+            </p>
+            <div id="spectrumSvgContainer" style="width:100%; height:200px; background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:8px; position:relative; overflow:hidden;">
+              <svg id="spectrumSvg" width="100%" height="100%" viewBox="0 0 800 200" preserveAspectRatio="none">
+                <!-- Logarithmic grid and spectral curves generated dynamically -->
+              </svg>
+            </div>
+            <div id="spectrumTooltips" style="margin-top:8px; font-size:11px; color:var(--text-muted); display:flex; gap:12px; flex-wrap:wrap;"></div>
+          </div>
+
+          <div id="advisorReview" class="form-group" style="display:none; margin-top:16px; border-top:1px solid rgba(139,92,246,0.35); padding-top:16px;">
+            <div style="font-size:13px; color:var(--neon-purple); font-weight:600;">✦ KENN Advisor A/B Review</div>
+            <p style="font-size:11px; color:var(--text-muted); margin:6px 0 12px;">
+              Shadow suggestions were not applied to your delivered mix. Compare the level-matched
+              baseline and candidate before adding an audible-improvement score.
+            </p>
+            <div id="advisorReviewOperations"></div>
+          </div>
+          <div class="form-group" style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+            <label for="feedbackInput" style="margin-bottom: 8px; display: block; font-size: 11px;">Request a Revision (e.g. "make vocals louder")</label>
+            <textarea id="feedbackInput" placeholder="Enter mixing feedback..." rows="2" style="width: 100%; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 10px; color: var(--text-main); font-family: inherit; font-size: 13px; outline: none; resize: none;"></textarea>
+            <button class="btn-primary" id="btnSubmitRevision" style="padding: 10px 14px; font-size: 13px; margin-top: 8px; width: 100%; background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%); box-shadow: 0 4px 10px rgba(236,72,153,0.15);">
+              🔄 Submit Revision
+            </button>
+          </div>
+          <!-- M8.5: KENN Natural Language Mix Control -->
+          <div class="form-group" style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px;">
+            <label for="nlAdjustInput" style="margin-bottom: 6px; display: block; font-size: 11px; color: var(--neon-purple);">✦ Ask KENN to adjust (e.g. "make the vocal brighter")</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="nlAdjustInput" placeholder="Natural language adjustment…"
+                style="flex:1; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(139,92,246,0.3); border-radius:6px; padding:9px 12px; color:var(--text-main); font-size:13px;">
+              <button id="btnNlAdjust" style="padding:9px 14px; border-radius:6px; background: rgba(139,92,246,0.2); border:1px solid rgba(139,92,246,0.5); color:var(--text-main); cursor:pointer; font-size:13px; white-space:nowrap;">Parse Intent</button>
+            </div>
+            <div id="nlAdjustResult" style="margin-top:8px; font-size:12px; color:var(--text-secondary); min-height:18px;"></div>
+          </div>
+          <!-- KENN render explainability: "why did you do that" grounded in this render's own decisions -->
+          <div class="form-group" style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px;">
+            <label for="kennExplainInput" style="margin-bottom: 6px; display: block; font-size: 11px; color: var(--neon-purple);">✦ Ask KENN why (e.g. "why did you cut the vocal at 3.5kHz?")</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="kennExplainInput" placeholder="Ask about this render's decisions…"
+                style="flex:1; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(139,92,246,0.3); border-radius:6px; padding:9px 12px; color:var(--text-main); font-size:13px;">
+              <button id="btnKennExplain" style="padding:9px 14px; border-radius:6px; background: rgba(139,92,246,0.2); border:1px solid rgba(139,92,246,0.5); color:var(--text-main); cursor:pointer; font-size:13px; white-space:nowrap;">Ask</button>
+            </div>
+            <div id="kennExplainResult" style="margin-top:8px; font-size:12px; color:var(--text-secondary); min-height:18px; white-space:pre-wrap;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Audio_Too Automix Engine v1.0 · Multi-Band Psychoacoustic Carving System</p>
+  </footer>
+
+  <script src="/automix.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "files": [
+    {
+      "file": "real_kick_a.wav",
+      "sha256_before": "eae5f39518f7df0719b0d14dd2daff270aa3eaea71c082d1c77bac2afb1a01f8",
+      "sha256_after": "eae5f39518f7df0719b0d14dd2daff270aa3eaea71c082d1c77bac2afb1a01f8",
+      "size_before": 176444,
+      "size_after": 176444,
+      "identical": true
+    },
+    {
+      "file": "real_kick_b.wav",
+      "sha256_before": "bcc198c55c4f2ebc399dac0c6721bb05861a8c7441c26898ac8eab42db0e2932",
+      "sha256_after": "bcc198c55c4f2ebc399dac0c6721bb05861a8c7441c26898ac8eab42db0e2932",
+      "size_before": 176444,
+      "size_after": 176444,
+      "identical": true
+    },
+    {
+      "file": "real_sustained_noise.wav",
+      "sha256_before": "7eaacaa03e48809ec80038565ba4814fe971809cf496023214c5bd66581a8338",
+      "sha256_after": "7eaacaa03e48809ec80038565ba4814fe971809cf496023214c5bd66581a8338",
+      "size_before": 176444,
+      "size_after": 176444,
+      "identical": true
+    },
+    {
+      "file": "test_kick.wav",
+      "sha256_before": "71b1dbbcc8a2a1e9989527df30f8620de2525da0d18ec62ea1ac7f63f2af5a51",
+      "sha256_after": "71b1dbbcc8a2a1e9989527df30f8620de2525da0d18ec62ea1ac7f63f2af5a51",
+      "size_before": 89348,
+      "size_after": 89348,
+      "identical": true
+    }
+  ],
+  "file_count_before": 4,
+  "file_count_after": 4,
+  "all_checks_passed": true
+}

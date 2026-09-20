@@ -1,0 +1,58 @@
+{
+  "soak": "THURSDAY_V2H_SOAK",
+  "seed": 20260823,
+  "cycles": 5000,
+  "elapsed_seconds": 18.93,
+  "cycles_per_second": 264.2,
+  "total_operations": 66495,
+  "counters": {
+    "no_action": 2036,
+    "opp_detected": 2964,
+    "plans_sealed": 2964,
+    "qa_veto": 564,
+    "qa_fail": 533,
+    "qa_pass": 1707,
+    "security_veto": 0,
+    "security_approved": 1707,
+    "evidence_rejected": 160,
+    "scope_drift_detected": 296,
+    "integrated": 1403,
+    "rejected": 304,
+    "heavy_deferred": 0,
+    "errors": 0,
+    "invalid_state_transitions_accepted": 0,
+    "invalid_state_transitions_blocked": 1707,
+    "orphan_tasks": 0,
+    "stale_leases_accepted": 0,
+    "stale_leases_rejected": 3414,
+    "duplicate_side_effects_accepted": 0,
+    "duplicate_side_effects_blocked": 3414,
+    "rollback_failures": 0,
+    "rollbacks_executed": 1707,
+    "scope_escapes_undetected": 0,
+    "unsupported_claims_accepted": 0
+  },
+  "latency_ms": {
+    "p50": 0.024,
+    "p95": 10.579,
+    "p99": 37.893,
+    "max": 267.718
+  },
+  "rss_baseline_mb": 25.38,
+  "rss_end_mb": 21.25,
+  "rss_peak_mb": 25.98,
+  "rss_drift_mb": -4.13,
+  "host_load_start": [
+    76.77,
+    61.52,
+    59.25
+  ],
+  "host_load_end": [
+    65.79,
+    59.98,
+    58.75
+  ],
+  "timing_environment": "CONTESTED",
+  "integrity_ok": true,
+  "qualified": true
+}

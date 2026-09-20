@@ -1,0 +1,56 @@
+{
+  "timestamp": "20260802T151032Z",
+  "overall": {
+    "ok": true,
+    "failures": [],
+    "categories": {
+      "model_dependencies": {
+        "ok": true,
+        "failures": [],
+        "checks": {
+          "kenn_lora": {
+            "ok": true,
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/Audio_Engineering_Company/Audio_Too/studio/kenn/kenn/artifacts/models/kenn-lora",
+            "total_bytes": 89796416
+          },
+          "kenn_mlx": {
+            "ok": true,
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/Audio_Engineering_Company/Audio_Too/studio/kenn/kenn/artifacts/models/kenn-mlx",
+            "total_bytes": 880107012
+          },
+          "audiogen_active_manifest": {
+            "ok": true,
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/Audio_Engineering_Company/Audio_Too/studio/audiogen/audiogen/training_data/active_models/active_manifest.json",
+            "expected_count": 4
+          }
+        }
+      },
+      "kenn_retrieval_latency": {
+        "label": "kenn_retrieval_latency",
+        "ok": true,
+        "failures": [],
+        "cold_start_s": 0.1875,
+        "steady_state_samples_s": [
+          0.0405,
+          0.0527
+        ],
+        "steady_state_mean_s": 0.0466,
+        "steady_state_max_s": 0.0527,
+        "slo_s": 0.5
+      },
+      "tts_latency": {
+        "label": "tts_latency",
+        "ok": true,
+        "failures": [],
+        "cold_start_s": 2.1837,
+        "steady_state_samples_s": [
+          0.9314,
+          0.8058
+        ],
+        "steady_state_mean_s": 0.8686,
+        "steady_state_max_s": 0.9314,
+        "slo_s": 3.5
+      }
+    }
+  }
+}

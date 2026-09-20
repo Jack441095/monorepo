@@ -1,0 +1,23 @@
+DiskSweep v1.0.0 ship checklist
+
+CODE DONE:
+[ ] sh qa/selfcheck.sh green on release branch
+[ ] pytest >= 30 green with AND without Ollama running
+[ ] parity fuzz 5k/5k (part of pytest)
+[ ] ruff check + format clean
+[ ] SwiftUI builds in Xcode 16+ (needs full Xcode; CLT-only boxes parse-check only)
+[ ] CHANGELOG Unreleased section dated + version bumped in CMakeLists
+
+SIGN + PACKAGE (needs Apple Developer account):
+[ ] export APPLE_TEAM_ID=...; sh packaging/package.sh 1.0.0
+[ ] Gatekeeper passes on fresh VM (spctl -a -vv DiskSweep.app)
+[ ] Notarize + staple; first-run FDA prompt appears
+
+BETA (qa/BETA_KIT):
+[ ] 10 reports in, zero data-loss, zero BLOCKED bypasses
+[ ] each false-SAFE/false-BLOCKED has a new test in tests/test_policy.py
+
+RELEASE:
+[ ] git tag products/disksweep-v1.0.0; attach DMG + .sha256
+[ ] MANUAL.md linked from release notes
+[ ] post-ship: 30-day crash/undo-restore watch, then App Store vs direct decision

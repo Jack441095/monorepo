@@ -1,0 +1,15 @@
+{
+  "source_sha": "706c152f84f197b5b7154879468198602736c539",
+  "sandbox_policy_hash": "8d1511a05d31491d5350450585aa642b5b6cd4679ad8144b93c33d8f7b7cfed7",
+  "sandbox_runner_hash": "0b8bddd344832669d83f59fc5ea685e039517a8d9b1af8f22ea098e1432341ba",
+  "execution_test_hash": "83a085a2c9fd4d2cdbd4d7e68b27674d46e3b993c0d895d3cd43446e911506a5",
+  "execution_benchmark_hash": "3e01c79a33f6e45800b251295ac8fc063d843c789dc9374d8ce6517e6791ba2e",
+  "qualifications": {
+    "execution_v1_overall_accuracy": 1.0,
+    "sandbox_creation": "PASS",
+    "command_filtering": "PASS",
+    "heartbeat_robustness": "PASS",
+    "sandbox_escape_containment": "PASS",
+    "duplicate_execution_prevention": "PASS"
+  }
+}

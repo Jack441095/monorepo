@@ -1,0 +1,8 @@
+{
+  "v2c_holdout_cases": 88,
+  "realistic_cases": 232,
+  "product_decoder": "audio_analysis.utils.audio_io_api.decode_audio_bytes",
+  "analysis_version": "kenn.measured_candidates.v2c.1",
+  "feature_flag": "KENN_MEASURED_GATE_V2C",
+  "default": "off"
+}

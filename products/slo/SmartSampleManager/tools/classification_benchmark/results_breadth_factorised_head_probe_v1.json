@@ -1,0 +1,195 @@
+{
+  "record_type": "slo_factorised_head_benchmark",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T18:35:11",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 3,
+    "splits": 5,
+    "epochs": 40,
+    "sealed_validation_excluded": true,
+    "decision_gate_pp": 2.0
+  },
+  "inputs": {
+    "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_breadth_final_v1.npz",
+    "manifest": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/factorised_training_manifest_breadth_v1.json",
+    "n_rows": 1832,
+    "n_classes": 28,
+    "n_collections": 81
+  },
+  "inventory": {
+    "Atmosphere": {
+      "n": 5,
+      "groups": 3
+    },
+    "Bass Hit": {
+      "n": 30,
+      "groups": 10
+    },
+    "Bass Loop": {
+      "n": 44,
+      "groups": 11
+    },
+    "Bass Reese": {
+      "n": 49,
+      "groups": 8
+    },
+    "Chord Loop": {
+      "n": 36,
+      "groups": 12
+    },
+    "Clap": {
+      "n": 99,
+      "groups": 14
+    },
+    "Crash": {
+      "n": 60,
+      "groups": 13
+    },
+    "Drum Fill": {
+      "n": 5,
+      "groups": 3
+    },
+    "Drum Loop": {
+      "n": 159,
+      "groups": 33
+    },
+    "Foley": {
+      "n": 125,
+      "groups": 25
+    },
+    "Foley Loop": {
+      "n": 68,
+      "groups": 17
+    },
+    "Hi-Hat": {
+      "n": 130,
+      "groups": 21
+    },
+    "Hi-Hat Loop": {
+      "n": 53,
+      "groups": 13
+    },
+    "Impact": {
+      "n": 31,
+      "groups": 10
+    },
+    "Kick": {
+      "n": 130,
+      "groups": 27
+    },
+    "Kick Loop": {
+      "n": 11,
+      "groups": 5
+    },
+    "Loop": {
+      "n": 8,
+      "groups": 2
+    },
+    "Other/none": {
+      "n": 120,
+      "groups": 32
+    },
+    "Pad": {
+      "n": 6,
+      "groups": 5
+    },
+    "Percussion": {
+      "n": 89,
+      "groups": 17
+    },
+    "Percussion Loop": {
+      "n": 124,
+      "groups": 30
+    },
+    "Rimshot": {
+      "n": 54,
+      "groups": 15
+    },
+    "Riser": {
+      "n": 17,
+      "groups": 5
+    },
+    "SFX": {
+      "n": 68,
+      "groups": 19
+    },
+    "Snare": {
+      "n": 114,
+      "groups": 23
+    },
+    "Synth Loop": {
+      "n": 83,
+      "groups": 24
+    },
+    "Synth One-Shot": {
+      "n": 49,
+      "groups": 15
+    },
+    "Top Loop": {
+      "n": 13,
+      "groups": 6
+    },
+    "Vocal Loop": {
+      "n": 36,
+      "groups": 12
+    },
+    "Vocal One-Shot": {
+      "n": 22,
+      "groups": 10
+    },
+    "Weather/Nature Atmos": {
+      "n": 12,
+      "groups": 6
+    }
+  },
+  "per_seed": {
+    "centroid": [
+      {
+        "accuracy": 54.96724890829694,
+        "macro_f1": 46.7787645335807
+      },
+      {
+        "accuracy": 56.277292576419214,
+        "macro_f1": 48.85806645503558
+      },
+      {
+        "accuracy": 56.222707423580786,
+        "macro_f1": 47.71356103368481
+      }
+    ],
+    "factorised_head": [
+      {
+        "accuracy": 53.548034934497814,
+        "macro_f1": 45.127511924814314
+      },
+      {
+        "accuracy": 54.58515283842795,
+        "macro_f1": 45.86956982679214
+      },
+      {
+        "accuracy": 55.45851528384279,
+        "macro_f1": 46.656664991502154
+      }
+    ]
+  },
+  "summary": {
+    "centroid": {
+      "accuracy": 55.822,
+      "macro_f1": 47.783,
+      "accuracy_sd": 0.605
+    },
+    "factorised_head": {
+      "accuracy": 54.531,
+      "macro_f1": 45.885,
+      "accuracy_sd": 0.781
+    }
+  },
+  "decision": "research evidence only; no production weights or rename actions",
+  "safety": {
+    "read_only": true,
+    "production_model_changed": false,
+    "source_audio_modified": false,
+    "rename_actions": false
+  }
+}

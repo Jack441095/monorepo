@@ -1,0 +1,27 @@
+{
+  "schema": "audio-too.automix-listening-benchmark/v1",
+  "status": "corpus_pending",
+  "notes": "Slots define required coverage only. They are not evidence until assets and explicit rights records exist.",
+  "projects": [
+    {"id":"lbv1-001","status":"pending_assets","genre":"pop","density":"dense","source_quality":"clean"},
+    {"id":"lbv1-002","status":"pending_assets","genre":"pop","density":"sparse","source_quality":"problematic"},
+    {"id":"lbv1-003","status":"pending_assets","genre":"rap","density":"dense","source_quality":"clean"},
+    {"id":"lbv1-004","status":"pending_assets","genre":"rap","density":"sparse","source_quality":"problematic"},
+    {"id":"lbv1-005","status":"pending_assets","genre":"electronic","density":"dense","source_quality":"clean"},
+    {"id":"lbv1-006","status":"pending_assets","genre":"electronic","density":"sparse","source_quality":"problematic"},
+    {"id":"lbv1-007","status":"pending_assets","genre":"rock","density":"dense","source_quality":"clean"},
+    {"id":"lbv1-008","status":"pending_assets","genre":"rock","density":"sparse","source_quality":"problematic"},
+    {"id":"lbv1-009","status":"pending_assets","genre":"acoustic","density":"sparse","source_quality":"clean"},
+    {"id":"lbv1-010","status":"pending_assets","genre":"acoustic","density":"dense","source_quality":"problematic"},
+    {"id":"lbv1-011","status":"pending_assets","genre":"podcast","density":"sparse","source_quality":"clean"},
+    {"id":"lbv1-012","status":"pending_assets","genre":"podcast","density":"dense","source_quality":"problematic"},
+    {"id":"lbv1-013","status":"pending_assets","genre":"pop","density":"dense","source_quality":"problematic"},
+    {"id":"lbv1-014","status":"pending_assets","genre":"rap","density":"dense","source_quality":"problematic"},
+    {"id":"lbv1-015","status":"pending_assets","genre":"electronic","density":"dense","source_quality":"problematic"},
+    {"id":"lbv1-016","status":"pending_assets","genre":"rock","density":"dense","source_quality":"problematic"},
+    {"id":"lbv1-017","status":"pending_assets","genre":"acoustic","density":"sparse","source_quality":"problematic"},
+    {"id":"lbv1-018","status":"pending_assets","genre":"podcast","density":"sparse","source_quality":"problematic"},
+    {"id":"lbv1-019","status":"pending_assets","genre":"pop","density":"sparse","source_quality":"clean"},
+    {"id":"lbv1-020","status":"pending_assets","genre":"rock","density":"sparse","source_quality":"clean"}
+  ]
+}

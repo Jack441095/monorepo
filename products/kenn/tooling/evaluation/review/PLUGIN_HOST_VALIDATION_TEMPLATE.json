@@ -1,0 +1,17 @@
+{
+  "schema": "kenn.plugin_host_validation.v1",
+  "archive_sha256": "",
+  "source_git_commit": "",
+  "developer_team_id": "",
+  "tested_at": "",
+  "environment": "clean_local_account",
+  "checks": {
+    "auval_passed": false,
+    "vst3_validator_passed": false,
+    "ableton_au_discovered": false,
+    "ableton_vst3_discovered": false,
+    "rollback_verified": false
+  },
+  "tester_signoff": false,
+  "notes": "Do not include usernames, home paths, project names, or credentials."
+}

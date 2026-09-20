@@ -1,0 +1,14 @@
+{
+  "num_iterations": 2000,
+  "block_size": 512,
+  "sample_rate": 44100,
+  "deadline_ms": 11.61,
+  "deadline_misses": 0,
+  "deadline_miss_pct": 0,
+  "callback_mean_ms": 0.0738264,
+  "callback_max_ms": 9.148,
+  "callback_p99_ms": 0.910625,
+  "total_allocations": 0,
+  "callbacks_with_any_alloc": 0,
+  "max_allocations_in_one_callback": 0
+}

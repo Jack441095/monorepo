@@ -1,0 +1,28 @@
+{
+  "record_type": "slo_granularity_label_effect_corpus",
+  "schema_version": "1.0.0",
+  "safety": "research-only; fixed base rows; source audio read-only",
+  "n_rows": 1553,
+  "n_label_updates": 61,
+  "n_ground_truth_paths_in_base": 1274,
+  "update_pairs": {
+    "Other/none -> Drum Loop": 23,
+    "Other/none -> Foley": 3,
+    "Other/none -> Snare": 4,
+    "Other/none -> Hi-Hat": 5,
+    "Other/none -> Percussion": 2,
+    "Other/none -> Clap": 1,
+    "Other/none -> Kick": 2,
+    "Other/none -> Impact": 1,
+    "Other/none -> Bass Hit": 1,
+    "Other/none -> Hi-Hat Loop": 1,
+    "Other/none -> Synth Loop": 14,
+    "Other/none -> SFX": 1,
+    "Other/none -> Synth One-Shot": 1,
+    "Other/none -> Pad": 1,
+    "Other/none -> Bass Loop": 1
+  },
+  "base_sha256": "475b763b4a2407bd69a070c4b96779540235e537a114e698c7ea426be3885163",
+  "labels_sha256": "28a532ce9fb5794ace075918b5180981236d5dfad42674c84e554219937b2661",
+  "output": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_granularity_relabelled_v1.npz"
+}

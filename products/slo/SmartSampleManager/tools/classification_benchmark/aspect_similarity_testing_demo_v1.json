@@ -1,0 +1,105 @@
+{
+  "record_type": "slo_aspect_similarity_search",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T12:58:45",
+  "query_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Chest_Kicks/KSHMR_Chest_Kick_05.wav",
+  "weights": {
+    "spectrum": 1.0,
+    "timbre": 1.0,
+    "pitch": 1.0,
+    "amplitude": 1.0
+  },
+  "n_results": 10,
+  "results": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick Hard.wav",
+      "overall": 0.9331224113702774,
+      "spectrum": 0.9052614569664001,
+      "timbre": 0.9446498155593872,
+      "pitch": 0.9646208882331848,
+      "amplitude": 0.9179574847221375
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/1 - Kick/Kick - Terminate.wav",
+      "overall": 0.9095516204833984,
+      "spectrum": 0.8965118527412415,
+      "timbre": 0.8432565927505493,
+      "pitch": 0.9265223741531372,
+      "amplitude": 0.9719156622886658
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_21_F#.wav",
+      "overall": 0.872707188129425,
+      "spectrum": 0.7392663359642029,
+      "timbre": 0.8707115650177002,
+      "pitch": 0.8865305781364441,
+      "amplitude": 0.994320273399353
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_15_G#.wav",
+      "overall": 0.8660926222801208,
+      "spectrum": 0.7939965724945068,
+      "timbre": 0.9888324737548828,
+      "pitch": 0.7522285580635071,
+      "amplitude": 0.9293128848075867
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/2026/Koan_Kick.wav",
+      "overall": 0.8577936142683029,
+      "spectrum": 0.869594156742096,
+      "timbre": 0.8000348210334778,
+      "pitch": 0.9779525995254517,
+      "amplitude": 0.7835928797721863
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 1.wav",
+      "overall": 0.8062319234013557,
+      "spectrum": 0.891884982585907,
+      "timbre": 0.9255350232124329,
+      "pitch": 0.48542651534080505,
+      "amplitude": 0.9220811724662781
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/BD_GoldBar001_MPC60.wav",
+      "overall": 0.7853021770715714,
+      "spectrum": 0.751189112663269,
+      "timbre": 0.9324617981910706,
+      "pitch": 0.5453295707702637,
+      "amplitude": 0.9122282266616821
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Regret the Hour - Indie Rock/splice-export__regret-the-hour-distance_edited/one_shot/Drums/Tom/RT_Regret_the_Hour_Floor_Tom_1_Drums_Anders_Fleming_one_shot.wav",
+      "overall": 0.7409380525350571,
+      "spectrum": 0.7884328961372375,
+      "timbre": 0.5116736888885498,
+      "pitch": 0.8953124284744263,
+      "amplitude": 0.7683331966400146
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Origin Sound - Adore - RNB Soul (2025)/one_shots/drum_hits/kicks/OS_AD_kick_loungin.wav",
+      "overall": 0.7399668535217643,
+      "spectrum": 0.9867991805076599,
+      "timbre": 0.05280464515089989,
+      "pitch": 0.92603999376297,
+      "amplitude": 0.9942235946655273
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/SIIK Sounds - Eclipse (Full Pack)/SIIK Sounds Eclipse (Construction Kits & FLPs)/Kit 04 - Emin (174BPM)/ECLIPSE Construction Kit 04 - Emin 174BPM (FLP)/ECLIPSE Kick 23.wav",
+      "overall": 0.7274723704904318,
+      "spectrum": 0.9423774480819702,
+      "timbre": 0.9704330563545227,
+      "pitch": 0.05135854333639145,
+      "amplitude": 0.9457204341888428
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "semantic_label_created": false,
+    "rename_actions": false
+  },
+  "index": {
+    "version": "physics_v1_1",
+    "cache_sha256": "0735a59286a2799b547c89467cfb8e7b449fd2803aaa4674c807e59099443452"
+  }
+}

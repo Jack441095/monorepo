@@ -1,0 +1,1009 @@
+{
+  "record_type": "slo_query_by_example_results",
+  "schema_version": "1.0.0",
+  "method_version": "query_by_example_v1",
+  "query": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+    "index": 0,
+    "content_identity": {
+      "content_sha256": "5647560b46a2e2fd5696ee9697004a38ac0daf64b68caa85fedb37abd3c003dd",
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav"
+      ]
+    },
+    "definition_card": {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 8.0,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -19.387450836062758,
+        "peak_dbfs": -3.738804184414545,
+        "crest_factor": 6.059437810788446,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.00175,
+        "trailing_silence_seconds": 0.0033125
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 2518.8101142318837,
+        "spectral_rolloff_hz": 4745.642430278885,
+        "spectral_flatness": 0.0809837132692337,
+        "zero_crossing_rate": 0.18044618401394422,
+        "low_band_energy_ratio": 0.8835337284537508,
+        "high_band_energy_ratio": 0.05312698811987921,
+        "harmonic_energy_ratio": 0.44007736444473267
+      },
+      "temporal": {
+        "onset_count": 64,
+        "onset_density_per_second": 8.0,
+        "estimated_tempo_bpm": 156.25,
+        "periodicity_seconds": 1.984,
+        "periodicity_strength": 0.42136250761819455,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 190.54853245469437,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.7696099041285399
+      },
+      "heuristic_tags": [
+        "low_end_heavy",
+        "transient_dense"
+      ],
+      "uncertainty_reasons": []
+    }
+  },
+  "results": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_03_92_Cuba.wav",
+      "embedding_cosine": 0.598163902759552,
+      "content_identity": {
+        "content_sha256": "74e53938941289b2003ad3c6c8f2084c57c8f0d6355104f50b66130a3f04401c",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_03_92_Cuba.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_03_92_Cuba.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.5689688131384325,
+        "aspects": {
+          "spectrum": 0.6534440381452843,
+          "timbre": 0.5275320038565747,
+          "pitch": 0.7838519525483076,
+          "amplitude": 0.6456899141596328,
+          "temporal": 0.47637275876549073,
+          "spatial": 0.3269222113553046
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_03_92_Cuba.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 5.2174375,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -25.454304092101637,
+          "peak_dbfs": -3.9728318378042085,
+          "crest_factor": 11.859697524590096,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.002125,
+          "trailing_silence_seconds": 0.0025625
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 2359.0091564453737,
+          "spectral_rolloff_hz": 4585.032393292683,
+          "spectral_flatness": 0.0491408035159111,
+          "zero_crossing_rate": 0.1652296112804878,
+          "low_band_energy_ratio": 0.16550846296459695,
+          "high_band_energy_ratio": 0.20700353293565377,
+          "harmonic_energy_ratio": 0.1655186265707016
+        },
+        "temporal": {
+          "onset_count": 44,
+          "onset_density_per_second": 8.43325866385558,
+          "estimated_tempo_bpm": 125.0,
+          "periodicity_seconds": 0.32,
+          "periodicity_strength": 0.49268563128526727,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 231.85713792385292,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.3782983463768153
+        },
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "wide_or_decorrelated"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_11_Percussion_Daniel_Sadownick_137__loop.wav",
+      "embedding_cosine": 0.5923939347267151,
+      "content_identity": {
+        "content_sha256": "383db4e2e72b140b617e410005b45c893e184b24a9a181283b5e80d246d7f69e",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_11_Percussion_Daniel_Sadownick_137__loop.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_11_Percussion_Daniel_Sadownick_137__loop.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.6913093073491813,
+        "aspects": {
+          "spectrum": 0.6547464398622947,
+          "timbre": 0.6081825516714912,
+          "pitch": 0.8516082186491853,
+          "amplitude": 0.7750990004917576,
+          "temporal": 0.6181568489571103,
+          "spatial": 0.6400627844632492
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_11_Percussion_Daniel_Sadownick_137__loop.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 7.0073125,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -15.481747372532,
+          "peak_dbfs": -0.7949321162336132,
+          "crest_factor": 5.424263303608701,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0054375,
+          "trailing_silence_seconds": 0.0011875
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 1445.2802099373562,
+          "spectral_rolloff_hz": 3173.087899543379,
+          "spectral_flatness": 0.023039374500513077,
+          "zero_crossing_rate": 0.05467635202625571,
+          "low_band_energy_ratio": 0.9177923284421635,
+          "high_band_energy_ratio": 0.01213612604492489,
+          "harmonic_energy_ratio": 0.4797566533088684
+        },
+        "temporal": {
+          "onset_count": 48,
+          "onset_density_per_second": 6.849987067081709,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_seconds": 1.76,
+          "periodicity_strength": 0.5655916475749749,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7762366590299901
+        },
+        "pitch": {
+          "median_f0_hz": 168.65945738198036,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9257760564791938
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_42_128.wav",
+      "embedding_cosine": 0.5529681444168091,
+      "content_identity": {
+        "content_sha256": "7381130ad42446c88256498777644c65b325eda2bc1430a9263035b0f7c39b1f",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_42_128.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_42_128.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.6623434629130881,
+        "aspects": {
+          "spectrum": 0.5829836644684668,
+          "timbre": 0.6340511183810191,
+          "pitch": 0.8327025113698044,
+          "amplitude": 0.7614288246561474,
+          "temporal": 0.4761076047911797,
+          "spatial": 0.6867870538119111
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_42_128.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 3.75,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -15.30322524006557,
+          "peak_dbfs": -1.210822995881071,
+          "crest_factor": 5.065474252560305,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.001375,
+          "trailing_silence_seconds": 0.0013125
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 1696.7891827741669,
+          "spectral_rolloff_hz": 3493.445444915254,
+          "spectral_flatness": 0.031941112130880356,
+          "zero_crossing_rate": 0.09330723649364407,
+          "low_band_energy_ratio": 0.46604544794680786,
+          "high_band_energy_ratio": 0.07351471618300065,
+          "harmonic_energy_ratio": 0.2574983835220337
+        },
+        "temporal": {
+          "onset_count": 30,
+          "onset_density_per_second": 8.0,
+          "estimated_tempo_bpm": 125.0,
+          "periodicity_seconds": 0.928,
+          "periodicity_strength": 0.5646771973302592,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7758708789321037
+        },
+        "pitch": {
+          "median_f0_hz": 165.45957866542824,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9011157541804302
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "noisy_or_inharmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+      "embedding_cosine": 0.5402901768684387,
+      "content_identity": {
+        "content_sha256": "1c6674640cfe7d985e5e435f0943d3821702c415ebbcb1728e7f1eeaee709099",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.6603898025014175,
+        "aspects": {
+          "spectrum": 0.6218719797826979,
+          "timbre": 0.5702224754985341,
+          "pitch": 0.5368682038733398,
+          "amplitude": 0.7955647774049951,
+          "temporal": 0.5981195085991717,
+          "spatial": 0.8396918698497661
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 7.3846875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -15.573883448825868,
+          "peak_dbfs": -0.32603089627981446,
+          "crest_factor": 5.786189163802139,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0006875,
+          "trailing_silence_seconds": 0.0006875
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 1492.8493654358915,
+          "spectral_rolloff_hz": 3391.9439935064934,
+          "spectral_flatness": 0.017337985336780548,
+          "zero_crossing_rate": 0.05192268668831169,
+          "low_band_energy_ratio": 0.7639848672226215,
+          "high_band_energy_ratio": 0.018966923945468523,
+          "harmonic_energy_ratio": 0.809769868850708
+        },
+        "temporal": {
+          "onset_count": 60,
+          "onset_density_per_second": 8.124920655071728,
+          "estimated_tempo_bpm": 104.16666666666667,
+          "periodicity_seconds": 0.928,
+          "periodicity_strength": 0.6019856180134883,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7907942472053954
+        },
+        "pitch": {
+          "median_f0_hz": 77.19231851732091,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.8307620007452358
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "tonal_or_harmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_25_122.wav",
+      "embedding_cosine": 0.5289987325668335,
+      "content_identity": {
+        "content_sha256": "c96cd80c676bbaeef8933983cbb7db5b69d66c72f8db90e2d215b205c1187531",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_25_122.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_25_122.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.5612258882942476,
+        "aspects": {
+          "spectrum": 0.5884123488819986,
+          "timbre": 0.358081561796212,
+          "pitch": 0.6166732004811786,
+          "amplitude": 0.6621641456172762,
+          "temporal": 0.2891417635948508,
+          "spatial": 0.8528823093939694
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_25_122.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 3.9345,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -23.056605034770385,
+          "peak_dbfs": -2.2293704968222037,
+          "crest_factor": 10.999215903618644,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0006875,
+          "trailing_silence_seconds": 0.001875
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 1490.4112443387885,
+          "spectral_rolloff_hz": 3274.3267276422766,
+          "spectral_flatness": 0.01643584482371807,
+          "zero_crossing_rate": 0.06888735391260163,
+          "low_band_energy_ratio": 0.690524678535191,
+          "high_band_energy_ratio": 0.02724145685423036,
+          "harmonic_energy_ratio": 0.5657333135604858
+        },
+        "temporal": {
+          "onset_count": 24,
+          "onset_density_per_second": 6.0998856271444915,
+          "estimated_tempo_bpm": 125.0,
+          "periodicity_seconds": 0.256,
+          "periodicity_strength": 0.5959087139047609,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7883634855619044
+        },
+        "pitch": {
+          "median_f0_hz": 115.07248263213401,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.8253067038829498
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "tonal_or_harmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_38_130.wav",
+      "embedding_cosine": 0.5204192996025085,
+      "content_identity": {
+        "content_sha256": "723be0ddab7ed8f4116b2798ea552a7f5613eef09845fb693e3dc86fecf1bda3",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_38_130.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_38_130.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.6216964671666388,
+        "aspects": {
+          "spectrum": 0.6019838263296048,
+          "timbre": 0.6282107914395594,
+          "pitch": 0.8799739804854759,
+          "amplitude": 0.6216019496511426,
+          "temporal": 0.41552472802804924,
+          "spatial": 0.5828835270660009
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_38_130.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 3.692375,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -25.185192016991476,
+          "peak_dbfs": -2.9529947774212633,
+          "crest_factor": 12.930337537311877,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0003125,
+          "trailing_silence_seconds": 0.00225
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 2918.6284469337133,
+          "spectral_rolloff_hz": 5612.742456896552,
+          "spectral_flatness": 0.12070590257644653,
+          "zero_crossing_rate": 0.2104450094288793,
+          "low_band_energy_ratio": 0.41251052157434603,
+          "high_band_energy_ratio": 0.1977483830899532,
+          "harmonic_energy_ratio": 0.3795037567615509
+        },
+        "temporal": {
+          "onset_count": 30,
+          "onset_density_per_second": 8.124851890720741,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_seconds": 0.928,
+          "periodicity_strength": 0.6742066972920141,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8196826789168057
+        },
+        "pitch": {
+          "median_f0_hz": 209.56694191193682,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.5806911410049731
+        },
+        "heuristic_tags": [
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_22_115_Africa.wav",
+      "embedding_cosine": 0.5098358988761902,
+      "content_identity": {
+        "content_sha256": "dc7d6a039dd611101e58095271dde24a987bb9114df8360d0e334274e4f849eb",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_22_115_Africa.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_22_115_Africa.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.6120465435117212,
+        "aspects": {
+          "spectrum": 0.5584456395797711,
+          "timbre": 0.5884267445606998,
+          "pitch": 0.5315075503064232,
+          "amplitude": 0.8561080645829732,
+          "temporal": 0.43987147140284055,
+          "spatial": 0.6979197906376196
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_22_115_Africa.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 4.1739375,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -20.875831518831156,
+          "peak_dbfs": -5.983131692510444,
+          "crest_factor": 5.5543723628691986,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0001875,
+          "trailing_silence_seconds": 0.0008125
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 979.4926669918808,
+          "spectral_rolloff_hz": 2069.835400763359,
+          "spectral_flatness": 0.005201703868806362,
+          "zero_crossing_rate": 0.033490130009541985,
+          "low_band_energy_ratio": 0.9047781983492703,
+          "high_band_energy_ratio": 0.004691046067149108,
+          "harmonic_energy_ratio": 0.37094900012016296
+        },
+        "temporal": {
+          "onset_count": 29,
+          "onset_density_per_second": 6.947875956455984,
+          "estimated_tempo_bpm": 117.1875,
+          "periodicity_seconds": 0.256,
+          "periodicity_strength": 0.4251027457353701,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 73.10125362373171,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.6437320205462488
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_43_128.wav",
+      "embedding_cosine": 0.5017924904823303,
+      "content_identity": {
+        "content_sha256": "c9bb6fcf70cc4d5b40b96957aa25d7b2738040231c9c861503bd5f6fcd1dd48d",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_43_128.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_43_128.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.598636369156846,
+        "aspects": {
+          "spectrum": 0.6804923853872229,
+          "timbre": 0.5940454443435634,
+          "pitch": 0.6265008296988983,
+          "amplitude": 0.8594301551573003,
+          "temporal": 0.3674683575164441,
+          "spatial": 0.4638810428376474
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_43_128.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 3.75,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -17.69148972080715,
+          "peak_dbfs": -1.506296929747192,
+          "crest_factor": 6.445544922039434,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0,
+          "trailing_silence_seconds": 0.0025625
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 1850.7619549178826,
+          "spectral_rolloff_hz": 4172.801906779661,
+          "spectral_flatness": 0.04332282021641731,
+          "zero_crossing_rate": 0.10337079581567797,
+          "low_band_energy_ratio": 0.5671041524577213,
+          "high_band_energy_ratio": 0.04253385651798011,
+          "harmonic_energy_ratio": 0.23768465220928192
+        },
+        "temporal": {
+          "onset_count": 33,
+          "onset_density_per_second": 8.8,
+          "estimated_tempo_bpm": 125.0,
+          "periodicity_seconds": 0.48,
+          "periodicity_strength": 0.5826695671866632,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7830678268746654
+        },
+        "pitch": {
+          "median_f0_hz": 118.34336980970137,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.5007654076415985
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "noisy_or_inharmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_39_136.wav",
+      "embedding_cosine": 0.4858522415161133,
+      "content_identity": {
+        "content_sha256": "83724daeffb5c33e55c604e932141f3d5ba4b994bd2587a364b3ce8698c3047c",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_39_136.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_39_136.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.6730507268350757,
+        "aspects": {
+          "spectrum": 0.725677646873043,
+          "timbre": 0.4480608085585532,
+          "pitch": 0.7715627914717237,
+          "amplitude": 0.7216422007761017,
+          "temporal": 0.5580024208005623,
+          "spatial": 0.8133584925304707
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_39_136.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 7.058875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -20.899923175458763,
+          "peak_dbfs": -1.3741183329262312,
+          "crest_factor": 9.468697498262511,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0001875,
+          "trailing_silence_seconds": 0.0015625
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 2095.3201228062376,
+          "spectral_rolloff_hz": 4620.2983597285065,
+          "spectral_flatness": 0.05635233223438263,
+          "zero_crossing_rate": 0.12678079044117646,
+          "low_band_energy_ratio": 0.4778540240930626,
+          "high_band_energy_ratio": 0.025472507843942352,
+          "harmonic_energy_ratio": 0.25950103998184204
+        },
+        "temporal": {
+          "onset_count": 67,
+          "onset_density_per_second": 9.491597457101875,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_seconds": 1.76,
+          "periodicity_strength": 0.6681193403540047,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.817247736141602
+        },
+        "pitch": {
+          "median_f0_hz": 235.44104517214504,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.8419140648693536
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "noisy_or_inharmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_26_Percussion_Daniel_Sadownick_135__loop.wav",
+      "embedding_cosine": 0.4850267767906189,
+      "content_identity": {
+        "content_sha256": "6843009495bd14a84ad3887d1bc23e35007c5d24bd688e58f17550419a6aa37f",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_26_Percussion_Daniel_Sadownick_135__loop.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_26_Percussion_Daniel_Sadownick_135__loop.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.5914092592751471,
+        "aspects": {
+          "spectrum": 0.6058797686659013,
+          "timbre": 0.5730675098418836,
+          "pitch": 0.7696763897906114,
+          "amplitude": 0.6834185196740408,
+          "temporal": 0.22992514479559759,
+          "spatial": 0.6864882228828479
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_26_Percussion_Daniel_Sadownick_135__loop.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 3.5555625,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -15.618608023222569,
+          "peak_dbfs": 1.897482638933099,
+          "crest_factor": 7.512846803404699,
+          "clipped_fraction": 0.0006328112640404999,
+          "leading_silence_seconds": 0.0015,
+          "trailing_silence_seconds": 0.0006875
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 1905.3313513310188,
+          "spectral_rolloff_hz": 3986.6071428571427,
+          "spectral_flatness": 0.030610093846917152,
+          "zero_crossing_rate": 0.12143380301339286,
+          "low_band_energy_ratio": 0.5272141210808798,
+          "high_band_energy_ratio": 0.1380753666275358,
+          "harmonic_energy_ratio": 0.41179385781288147
+        },
+        "temporal": {
+          "onset_count": 20,
+          "onset_density_per_second": 5.624989013693332,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_seconds": 0.448,
+          "periodicity_strength": 0.6931303271196989,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8272521308478796
+        },
+        "pitch": {
+          "median_f0_hz": 236.01052591964913,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.6379517308992096
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_03_100.wav",
+      "embedding_cosine": 0.4783792495727539,
+      "content_identity": {
+        "content_sha256": "a119ee2b0bba2aeb1e105d20c10a4497f1995f0f452b9ec47ce05e79584f9700",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_03_100.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_03_100.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_17_105_Brazil.wav",
+      "embedding_cosine": 0.4743054509162903,
+      "content_identity": {
+        "content_sha256": "2b02a45374e97e39147e192a7614b9169de7f469ed0a096af5c5c6dafe783497",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_17_105_Brazil.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_17_105_Brazil.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_41_140_Africa.wav",
+      "embedding_cosine": 0.47335922718048096,
+      "content_identity": {
+        "content_sha256": "87fd17bd5330c62bfaa2f30542f5318fb7d1287a11cfd7e447611b1d16fb257c",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_41_140_Africa.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_41_140_Africa.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 4/FRANCOIS1.wav",
+      "embedding_cosine": 0.4708818197250366,
+      "content_identity": {
+        "content_sha256": "fa1526ba9fa3e092f8d9cf2ed663ec529e1cbb49377852e07732919e794763f5",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 4/FRANCOIS1.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 4/FRANCOIS1.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_10_100_Full.wav",
+      "embedding_cosine": 0.46905097365379333,
+      "content_identity": {
+        "content_sha256": "04c904900135fa34b741aa1641ef3ee0bf96744c25f66805fcdba816da8e142d",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_10_100_Full.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_10_100_Full.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_02_98.wav",
+      "embedding_cosine": 0.4685189425945282,
+      "content_identity": {
+        "content_sha256": "f90a66c95706e1b0cb77794ab9c36517fe22ce01f43c13d94c2521fa730d77a0",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_02_98.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Ethnic_Drum_Loops/KSHMR_Ethnic_Drum_Loop_02_98.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_7_Percussion_Daniel_Sadownick_120__loop.wav",
+      "embedding_cosine": 0.46617287397384644,
+      "content_identity": {
+        "content_sha256": "67dde168ffd09c6c4cb9837898481b624efe1c77d386f01708b8d164b09836a2",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_7_Percussion_Daniel_Sadownick_120__loop.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_7_Percussion_Daniel_Sadownick_120__loop.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_49_150.wav",
+      "embedding_cosine": 0.4659873843193054,
+      "content_identity": {
+        "content_sha256": "c70ff17f79402d495c430d75cb8dc6b1e029b9766517fdf140df419d28552d9c",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_49_150.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_49_150.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Moombah_Loops/KSHMR_Moombah_Drum_Loop_10_105.wav",
+      "embedding_cosine": 0.46478039026260376,
+      "content_identity": {
+        "content_sha256": "a5f0dd534c1750b09d012ec1bca56a92250bd0f47a1c6959e8d4d8ecc41b1cc2",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Moombah_Loops/KSHMR_Moombah_Drum_Loop_10_105.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Moombah_Loops/KSHMR_Moombah_Drum_Loop_10_105.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_04_92_Cuba.wav",
+      "embedding_cosine": 0.46407055854797363,
+      "content_identity": {
+        "content_sha256": "d2713ad78a0e517197e417b6fe0563925fea59fe09221b655851a40daeaddb41",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_04_92_Cuba.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_04_92_Cuba.wav"
+        ]
+      },
+      "aspect_similarity": null
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "source_files_modified": false,
+    "semantic_labels_created": false,
+    "rename_actions": false,
+    "similarity_is_not_class_probability": true
+  },
+  "errors": [],
+  "embedding_cache": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+    "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401",
+    "n_indexed": 7315
+  },
+  "content_index": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_content_addressed_embedding_index_testing_v1.json",
+    "sha256": "f8f2736bb3d456656b035de854dde75c74dc6215b27755819722c754e8b284a6",
+    "n_content_ids": 6980
+  }
+}

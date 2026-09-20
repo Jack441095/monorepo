@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "metrics": {
+    "sandbox_creation": "PASS",
+    "command_filtering": "PASS",
+    "heartbeat_robustness": "PASS",
+    "sandbox_escape_containment": "PASS",
+    "duplicate_execution_prevention": "PASS"
+  }
+}

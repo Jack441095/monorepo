@@ -1,0 +1,19 @@
+DiskSweep privileged helper — install SPEC (SMJobBless)
+
+WHY: standard users cannot move /Library/Application Support/* rows to
+Trash. The helper exists ONLY for that. Scanner never runs as root.
+
+CHECKLIST (Xcode 16+, paid Apple Developer account):
+1. Targets: app (com.nitedsp.disksweep) + helper tool
+   (com.nitedsp.disksweep.helper, LaunchDaemons plist).
+2. Both sign with same Team ID; helper gets Info.plist SMPrivilegedExecutables
+   entry mirrored in app's launchd plist (SMAuthorizedClients).
+3. Helper links ../scanner/policy.hpp (already does) — refuses BLOCKED +
+   non-Trash dst even if the app is compromised.
+4. Install prompt fires ONLY when user checks a /Library/* row and presses
+   Move to Trash (consent sheet first, per-item list).
+5. Uninstall: app removal unloads helper; QA must verify no leftover daemon.
+
+WITHOUT signing (dev): helper.cpp compiles standalone for logic tests:
+  clang++ -std=c++17 -I../scanner helper.cpp -o /tmp/ds-helper
+  echo '{"src":"/tmp/x","dst":"$HOME/.Trash/Disksweep/t/x"}' | /tmp/ds-helper

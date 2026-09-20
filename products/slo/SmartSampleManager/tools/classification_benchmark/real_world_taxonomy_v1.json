@@ -1,0 +1,97 @@
+{
+  "schema_version": "slo.real_world_taxonomy.v1",
+  "status": "dormant_reference_only",
+  "production_enabled": false,
+  "purpose": "Reference ontology for a future environmental and animal sound branch. This file is not imported by production classification or rename code.",
+  "activation_requirements": [
+    "human_by_ear_labels_from_multiple_collections",
+    "collection_held_out_evaluation",
+    "per_class_precision_gate_at_95_percent_for_auto_action",
+    "explicit_owner_approval_to_merge_with_music_sample_taxonomy"
+  ],
+  "design": {
+    "primary_axes": ["domain", "source", "event", "form"],
+    "independent_attributes": [
+      "tonal_or_noisy",
+      "pitched_or_unpitched",
+      "transient_or_sustained",
+      "single_source_or_mixture",
+      "dry_or_processed",
+      "confidence",
+      "uncertainty_reason"
+    ],
+    "species_policy": "Do not infer a species when the recording only supports a broader animal family. Use animal_unknown rather than a guessed species."
+  },
+  "domains": [
+    {
+      "id": "animal",
+      "display_name": "Animal",
+      "children": [
+        {"id": "bird", "display_name": "Bird"},
+        {"id": "mammal", "display_name": "Mammal"},
+        {"id": "insect", "display_name": "Insect"},
+        {"id": "amphibian", "display_name": "Amphibian"},
+        {"id": "reptile", "display_name": "Reptile"},
+        {"id": "marine_animal", "display_name": "Marine animal"},
+        {"id": "animal_unknown", "display_name": "Animal, type unknown"}
+      ]
+    },
+    {
+      "id": "human",
+      "display_name": "Human sound",
+      "children": [
+        {"id": "speech", "display_name": "Speech"},
+        {"id": "laugh", "display_name": "Laugh"},
+        {"id": "cry", "display_name": "Cry"},
+        {"id": "cough_sneeze", "display_name": "Cough or sneeze"},
+        {"id": "vocalisation_unknown", "display_name": "Human vocalisation, type unknown"}
+      ]
+    },
+    {
+      "id": "environment",
+      "display_name": "Environment",
+      "children": [
+        {"id": "weather", "display_name": "Weather"},
+        {"id": "water", "display_name": "Water"},
+        {"id": "fire", "display_name": "Fire"},
+        {"id": "wind", "display_name": "Wind"},
+        {"id": "nature_ambience", "display_name": "Nature ambience"},
+        {"id": "environment_unknown", "display_name": "Environment, type unknown"}
+      ]
+    },
+    {
+      "id": "mechanical",
+      "display_name": "Mechanical or transport",
+      "children": [
+        {"id": "engine", "display_name": "Engine"},
+        {"id": "vehicle", "display_name": "Vehicle"},
+        {"id": "machine", "display_name": "Machine"},
+        {"id": "mechanical_unknown", "display_name": "Mechanical, type unknown"}
+      ]
+    },
+    {
+      "id": "impact_material",
+      "display_name": "Impact or material",
+      "children": [
+        {"id": "metal", "display_name": "Metal"},
+        {"id": "wood", "display_name": "Wood"},
+        {"id": "glass", "display_name": "Glass"},
+        {"id": "stone", "display_name": "Stone"},
+        {"id": "paper", "display_name": "Paper"},
+        {"id": "material_unknown", "display_name": "Material, type unknown"}
+      ]
+    }
+  ],
+  "rejection_states": [
+    "other_none",
+    "not_in_list",
+    "not_enough_info",
+    "taxonomy_gap",
+    "mixture_or_multiple_sources"
+  ],
+  "reference_ontologies": [
+    {"name": "AudioSet", "scope": "broad hierarchical sound events", "status": "reference_only"},
+    {"name": "FSD50K", "scope": "open sound-event vocabulary", "status": "reference_only"},
+    {"name": "ESC-50", "scope": "compact environmental benchmark", "status": "reference_only"}
+  ]
+}

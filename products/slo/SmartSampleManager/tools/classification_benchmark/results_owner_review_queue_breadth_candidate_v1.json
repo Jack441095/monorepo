@@ -1,0 +1,19 @@
+{
+  "record_type": "slo_owner_review_queue",
+  "schema_version": "1.0.0",
+  "method_version": "owner_review_queue_v1",
+  "source_collection": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/review_collections_breadth_candidate_v4_evidence.json",
+  "source_collection_sha256": "7e92e1001e65de587aa95e1bc4b69468c5e716710dfdf8925e115cc1136b3c3f",
+  "source_duplicate_guard": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_full_taxonomy_breadth_candidate_duplicate_guard_v3_similarity_gate.json",
+  "source_duplicate_guard_sha256": "e862c4af9e17d6e1f5c2560f86fcf2ad2b62e4a4faf76ad769df7e6458ccf26f",
+  "n_rows": 388,
+  "safety": {
+    "read_only": true,
+    "labels_created": false,
+    "suggestions_promoted": false,
+    "rename_actions": false,
+    "source_audio_modified": false
+  },
+  "csv_out": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/owner_review_queue_breadth_candidate_v1.csv",
+  "csv_sha256": "9a85b866a263ed71003b7d7d1b146c2a671e0556daca41f20dc37d692706144b"
+}

@@ -1,0 +1,15 @@
+name: "Weekly Summary"
+description: "End-of-week summary with pipeline, profit report, and week ahead"
+triggers:
+  phrase: "weekly summary"
+  patterns:
+    - "end of week"
+    - "week wrap.?up"
+    - "weekly roundup"
+    - "friday review"
+requires: []
+steps:
+  - service: "weekly_review"
+  - service: "profit"
+  - service: "week_ahead"
+  - say: "That's your week. Enjoy the weekend!"

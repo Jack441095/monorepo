@@ -1,0 +1,9 @@
+{
+  "_comment": "Phase 5, Sections 7-8. Approved plugin-identity baseline. A release fails if CMakeLists.txt's identity fields drift from this file without a deliberate, reviewed update to this file in the same change. This guards against ANY accidental identity drift, not only a rebrand -- BUNDLE_ID/PLUGIN_MANUFACTURER_CODE/PLUGIN_CODE become permanently load-bearing the moment a real DAW session references them (docs/NITE_DSP_PRODUCT_IDENTITY.md).",
+  "_status": "APPLIED -- current SLO display identity approved and applied to CMakeLists.txt. Legacy project name, bundle ID, manufacturer code, and plugin code are retained for compatibility; see docs/FINAL_PRODUCT_IDENTITY.md.",
+  "company_name": "NITE DSP",
+  "bundle_id": "com.nitedsp.smartsamplemanager",
+  "plugin_manufacturer_code": "NDSP",
+  "plugin_code": "AtSm",
+  "product_name": "SLO"
+}

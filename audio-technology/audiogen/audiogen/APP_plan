@@ -1,0 +1,35 @@
+
+
+Split main.py into a package (e.g. app/ or runner/) with modules like:
+runner/cli_args.py (argparse only)
+runner/session.py (start/stop, emotion switching, seed handling)
+runner/ui_realtime_cli.py (interactive commands)
+runner/offline.py (export/training entrypoints)
+
+Make generation components swappable behind interfaces:
+Composer (arrangement / section plan)
+Generator (melody/chords/arp/bass event generation)
+Renderer (sampler + FX + mastering)
+Player (realtime buffering, underflow policy) Then new features (new model,
+new rhythm engine, new arrangement policy) become “add one module” instead of
+ “touch 12 files”.
+
+------ Better controllability -----////
+
+MIDI input to influence harmony/melody (live “guide notes”, chord hold, rhythm tap)
+A small set of musical “knobs” that map to many internals (you already started this with macros)
+Scene system: save/recall a full state quickly (emotion + macro + arrangement + mix + seed)
+Outputs people can use
+
+Stems export (per channel + FX returns) alongside master
+Stronger MIDI export fidelity (articulations/velocities/CC where useful)
+“Song report” improvements: include structure timeline, key changes, motif usage, loudness stats
+Sound design / mixing
+
+Lightweight per-channel dynamics/EQ presets (not dozens of knobs—just a few curated modes)
+Consistent loudness target for exports (LUFS-ish proxy is fine if you don’t want full BS.1770 yet)
+More robust sample-pack metadata + validation (you already have dataset validation patterns—extend that idea)
+Model evolution without breaking everything
+
+Keep Markov as a dependable baseline, but add one stronger conditioned model at a time (e.g. rhythm templates conditioned on section role; or melody conditioned on chord function + motif state)
+Build an evaluation harness: “does this change improve X?” (diversity, repetition, cadence hit-rate, underflow rate, render time)

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "audio_feature_frame.v1",
+  "title": "Audio Too real-time feature frame",
+  "type": "object",
+  "required": [
+    "peak_dbfs", "rms_dbfs", "stereo_correlation", "stereo_width",
+    "sample_rate", "analysed_samples"
+  ],
+  "properties": {
+    "peak_dbfs": { "type": "number", "minimum": -120, "maximum": 6 },
+    "rms_dbfs": { "type": "number", "minimum": -120, "maximum": 6 },
+    "stereo_correlation": { "type": "number", "minimum": -1, "maximum": 1 },
+    "stereo_width": { "type": "number", "minimum": 0, "maximum": 1 },
+    "low_energy": { "type": "number", "minimum": 0 },
+    "mid_energy": { "type": "number", "minimum": 0 },
+    "high_energy": { "type": "number", "minimum": 0 },
+    "crest_db": { "type": "number", "minimum": 0, "maximum": 120 },
+    "transient_ratio": { "type": "number", "minimum": 0, "maximum": 10 },
+    "clipped_samples": { "type": "integer", "minimum": 0 },
+    "sample_rate": { "type": "number", "exclusiveMinimum": 0 },
+    "analysed_samples": { "type": "integer", "exclusiveMinimum": 0 }
+  },
+  "additionalProperties": true
+}

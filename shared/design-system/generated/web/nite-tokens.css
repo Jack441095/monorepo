@@ -1,0 +1,96 @@
+/* GENERATED FILE — derived from tokens/nite_design_tokens.json. DO NOT EDIT BY HAND.
+ * Regenerate with: python3 tools/generate_tokens.py
+ * */
+/* NITE DSP Design System 1.0.1 — EMBER — Warm Technical Minimalism */
+
+:root {
+  --nite-color-surface-base: #0C0B09;
+  --nite-color-surface-raised: #14120F;
+  --nite-color-surface-overlay: #1C1915;
+  --nite-color-surface-inset: #080706;
+  --nite-color-surface-hover: #191612;
+  --nite-color-elevation-modal: #201C16;
+  --nite-color-border-hairline-subtle: rgba(42, 38, 31, 0.55);  /* #2A261F @0.55 */
+  --nite-color-border-hairline-strong: rgba(42, 38, 31, 0.9);  /* #2A261F @0.9 */
+  --nite-color-text-primary: #EDE8E0;
+  --nite-color-text-secondary: #A39B8F;
+  --nite-color-text-tertiary: #827B71;
+  --nite-color-text-disabled: #4A453D;
+  --nite-color-text-inverse: #1A1207;
+  --nite-color-interactive-base: #E89B3C;
+  --nite-color-interactive-bright: #F7B955;
+  --nite-color-interactive-dim: rgba(138, 95, 40, 0.35);  /* #8A5F28 @0.35 */
+  --nite-color-interactive-ink: #1A1207;
+  --nite-color-semantic-playing: #7FB069;
+  --nite-color-semantic-success: #7FB069;
+  --nite-color-semantic-warning: #E5B84B;
+  --nite-color-semantic-error: #E5484D;
+  --nite-color-semantic-destructive: #E5484D;
+  --nite-color-semantic-favorite: #D9A75A;
+  --nite-color-semantic-unknown: #4A453D;
+  --nite-color-semantic-disabled: #4A453D;
+  --nite-state-playing: #7FB069;
+  --nite-state-success: #7FB069;
+  --nite-state-warning: #E5B84B;
+  --nite-state-error: #E5484D;
+  --nite-state-favorite: #D9A75A;
+  --nite-state-unknown: #4A453D;
+  --nite-state-disabled: #4A453D;
+  --nite-interactive-default: #E89B3C;
+  --nite-interactive-hover: #F7B955;
+  --nite-interactive-selected: #E89B3C;
+  --nite-text-onAccent: #1A1207;
+  --nite-slo-category-kick: #C96F4A;
+  --nite-slo-category-snare: #E3C567;
+  --nite-slo-category-clap: #D98BA6;
+  --nite-slo-category-hihat: #9FC2A5;
+  --nite-slo-category-percussion: #B98BD6;
+  --nite-slo-category-bass: #6E93B8;
+  --nite-slo-category-synth: #7FB0C4;
+  --nite-slo-category-vocal: #E0A96B;
+  --nite-slo-category-unknown: #4A453D;
+  --nite-kenn-severity-high: #E5484D;
+  --nite-kenn-severity-medium: #E5B84B;
+  --nite-kenn-severity-low: #7FB069;
+
+  --nite-space-xs: 4px;
+  --nite-space-s: 8px;
+  --nite-space-m: 12px;
+  --nite-space-l: 16px;
+  --nite-space-xl: 24px;
+  --nite-space-xxl: 32px;
+  --nite-radius-s: 3px;
+  --nite-radius-m: 6px;
+  --nite-radius-l: 8px;
+  --nite-stroke-hairline: 1px;
+  --nite-stroke-icon: 1.5px;
+  --nite-stroke-emphasis: 2px;
+  --nite-stroke-heavy: 3px;
+  --nite-comp-row-height: 27px;
+  --nite-comp-map-point-size: 7px;
+  --nite-comp-type-minSizePx: 10px;
+
+  --nite-motion-fast-duration: 120ms;
+  --nite-motion-standard-duration: 180ms;
+  --nite-motion-slow-duration: 300ms;
+  --nite-motion-pulse-duration: 400ms;
+  --nite-comp-tooltip-delayMs: 250ms;
+
+  --nite-opacity-dimmedFocusMode: 0.15;
+  --nite-opacity-proposalUncertain: 0.6;
+  --nite-opacity-similarityEdgeMax: 0.75;
+  --nite-opacity-softFill: 0.55;
+  --nite-opacity-vizFillMax: 0.6;
+
+  --motion-easing: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    /* DS §12: transforms -> instant + opacity; no bounce/parallax/entrance */
+    --motion-fast-duration: 0ms;
+    --motion-standard-duration: 0ms;
+    --motion-slow-duration: 0ms;
+    --motion-pulse-duration: 0ms;
+  }
+}

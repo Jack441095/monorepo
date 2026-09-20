@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-audiogen-pure-markov"
+version = "0.8.1"
+description = "Generative audio composition with Markov melody models and realtime playback"
+readme = "docs/COMMANDS.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=1.26,<3",
+    "scipy>=1.11,<2",
+    # 0.60.0 is the last numba wheel ever published for Intel macOS (x86_64); it
+    # only supports NumPy<=2.0, so under the project's x86_64/Rosetta venv (NumPy
+    # 2.x) it silently fails to import. All numba call sites (master_bus, mixer,
+    # reverb, sampler) guard with _have_numba() and fall back to pure Python — but
+    # measured impact is severe, not cosmetic: mixer eq_filters ran 5.9x over the
+    # realtime budget, master_bus full_rt 1.28x over, on the pure-Python fallback
+    # (2026-07-02, see docs/BACKLOG.md). arm64 has no such ceiling — pin the two
+    # platforms separately so a native arm64 venv gets a current, fast numba.
+    "numba>=0.59,<0.61; platform_machine == 'x86_64'",
+    "numba>=0.61,<1; platform_machine == 'arm64'",
+    "sounddevice>=0.4.6",
+    "mido>=1.3",
+    "pretty_midi>=0.2.10",
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.6",
+    "mypy>=1.8",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+namespaces = true
+include = [
+    "ai*",
+    "audio*",
+    "composition*",
+    "core*",
+    "data*",
+    "midi*",
+    "presets*",
+    "sampler*",
+    "utils*",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+markers = [
+    "slow: heavier or IO-bound tests; run full suite locally or in CI `test-slow` job",
+    "isolated: run in a subprocess (auto-applied to RT/audio tests; see tests/conftest.py)",
+]
+
+# NOTE: ruff config intentionally lives ONLY in the repo-root pyproject.toml so a
+# single lint ruleset governs the whole tree. A nested [tool.ruff] block here would
+# be auto-discovered per-file by ruff and silently diverge (it previously added the
+# "UP" ruleset, which broke `main.py check` with thousands of pyupgrade errors).

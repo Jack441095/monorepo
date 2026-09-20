@@ -1,0 +1,423 @@
+{
+  "generated": "2026-09-11T18:38:14",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "incumbent": "StandardScaler -> L2 -> cosine nearest centroid on frozen corpus_v2 embeddings",
+    "seeds": 8,
+    "splits": 5,
+    "min_examples": 5,
+    "min_collections": 5
+  },
+  "identity": {
+    "corpus_sha256": "03d2ad963c32df1a79cbbee2c72b783dfe707cf1cef1b802dbef8e5d42507c74",
+    "n_rows_on_disk": 1282,
+    "n_unique_paths": 1282,
+    "duplicate_rows_removed": 0,
+    "label_hash": "757add721534644f66740f2398214aebe35242914850ca462738e1e76f889d4d",
+    "path_hash": "591fda2762a53f30b1986dbabbfc758225f4c8ffbd55b0267015971afc92f90c",
+    "embedding_hash": "4a28f85d903041ba4a0d15f8d8459bc8f3655c04174d325f6c98ea2aa7a1572f"
+  },
+  "label_inventory": {
+    "Atmosphere": {
+      "examples": 5,
+      "collections": 3,
+      "eligible": false,
+      "excluded_reasons": [
+        "collections<5"
+      ]
+    },
+    "Bass Hit": {
+      "examples": 30,
+      "collections": 10,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Bass Loop": {
+      "examples": 3,
+      "collections": 3,
+      "eligible": false,
+      "excluded_reasons": [
+        "examples<5",
+        "collections<5"
+      ]
+    },
+    "Bass Reese": {
+      "examples": 33,
+      "collections": 7,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Chord Loop": {
+      "examples": 1,
+      "collections": 1,
+      "eligible": false,
+      "excluded_reasons": [
+        "examples<5",
+        "collections<5"
+      ]
+    },
+    "Clap": {
+      "examples": 99,
+      "collections": 14,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Crash": {
+      "examples": 26,
+      "collections": 9,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Drum Fill": {
+      "examples": 3,
+      "collections": 2,
+      "eligible": false,
+      "excluded_reasons": [
+        "examples<5",
+        "collections<5"
+      ]
+    },
+    "Drum Loop": {
+      "examples": 104,
+      "collections": 32,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Foley": {
+      "examples": 82,
+      "collections": 22,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Foley Loop": {
+      "examples": 26,
+      "collections": 12,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Hi-Hat": {
+      "examples": 120,
+      "collections": 21,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Hi-Hat Loop": {
+      "examples": 19,
+      "collections": 9,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Impact": {
+      "examples": 32,
+      "collections": 10,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Kick": {
+      "examples": 106,
+      "collections": 27,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Kick Loop": {
+      "examples": 6,
+      "collections": 5,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Loop": {
+      "examples": 8,
+      "collections": 2,
+      "eligible": false,
+      "excluded_reasons": [
+        "collections<5"
+      ]
+    },
+    "Other/none": {
+      "examples": 64,
+      "collections": 24,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Pad": {
+      "examples": 7,
+      "collections": 6,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Percussion": {
+      "examples": 89,
+      "collections": 16,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Percussion Loop": {
+      "examples": 74,
+      "collections": 24,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Rimshot": {
+      "examples": 23,
+      "collections": 13,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Riser": {
+      "examples": 14,
+      "collections": 4,
+      "eligible": false,
+      "excluded_reasons": [
+        "collections<5"
+      ]
+    },
+    "SFX": {
+      "examples": 50,
+      "collections": 18,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Snare": {
+      "examples": 110,
+      "collections": 21,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Synth Loop": {
+      "examples": 46,
+      "collections": 23,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Synth One-Shot": {
+      "examples": 47,
+      "collections": 14,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Top Loop": {
+      "examples": 12,
+      "collections": 5,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Vocal Loop": {
+      "examples": 25,
+      "collections": 12,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Vocal One-Shot": {
+      "examples": 13,
+      "collections": 10,
+      "eligible": true,
+      "excluded_reasons": []
+    },
+    "Weather/Nature Atmos": {
+      "examples": 5,
+      "collections": 5,
+      "eligible": true,
+      "excluded_reasons": []
+    }
+  },
+  "primary_result": {
+    "n_files": 1248,
+    "n_classes": 25,
+    "n_collections": 80,
+    "classes": [
+      "Bass Hit",
+      "Bass Reese",
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Foley",
+      "Foley Loop",
+      "Hi-Hat",
+      "Hi-Hat Loop",
+      "Impact",
+      "Kick",
+      "Kick Loop",
+      "Other/none",
+      "Pad",
+      "Percussion",
+      "Percussion Loop",
+      "Rimshot",
+      "SFX",
+      "Snare",
+      "Synth Loop",
+      "Synth One-Shot",
+      "Top Loop",
+      "Vocal Loop",
+      "Vocal One-Shot",
+      "Weather/Nature Atmos"
+    ],
+    "accuracy_mean": 57.09,
+    "accuracy_sd": 0.62,
+    "per_seed": [
+      57.21,
+      57.69,
+      57.37,
+      57.77,
+      57.13,
+      56.33,
+      57.37,
+      55.85
+    ],
+    "macro_f1": 47.53,
+    "coverage_at_90_precision": 26.0,
+    "coverage_at_95_precision": 13.8,
+    "per_class": {
+      "Bass Hit": {
+        "precision": 48.5,
+        "recall": 53.3,
+        "f1": 50.8,
+        "n": 30
+      },
+      "Bass Reese": {
+        "precision": 60.4,
+        "recall": 97.0,
+        "f1": 74.4,
+        "n": 33
+      },
+      "Clap": {
+        "precision": 68.6,
+        "recall": 83.8,
+        "f1": 75.5,
+        "n": 99
+      },
+      "Crash": {
+        "precision": 46.5,
+        "recall": 76.9,
+        "f1": 58.0,
+        "n": 26
+      },
+      "Drum Loop": {
+        "precision": 84.0,
+        "recall": 76.0,
+        "f1": 79.8,
+        "n": 104
+      },
+      "Foley": {
+        "precision": 47.0,
+        "recall": 37.8,
+        "f1": 41.9,
+        "n": 82
+      },
+      "Foley Loop": {
+        "precision": 34.9,
+        "recall": 57.7,
+        "f1": 43.5,
+        "n": 26
+      },
+      "Hi-Hat": {
+        "precision": 81.6,
+        "recall": 70.0,
+        "f1": 75.3,
+        "n": 120
+      },
+      "Hi-Hat Loop": {
+        "precision": 28.9,
+        "recall": 57.9,
+        "f1": 38.6,
+        "n": 19
+      },
+      "Impact": {
+        "precision": 64.7,
+        "recall": 68.8,
+        "f1": 66.7,
+        "n": 32
+      },
+      "Kick": {
+        "precision": 74.1,
+        "recall": 78.3,
+        "f1": 76.1,
+        "n": 106
+      },
+      "Kick Loop": {
+        "precision": 42.9,
+        "recall": 50.0,
+        "f1": 46.2,
+        "n": 6
+      },
+      "Other/none": {
+        "precision": 37.1,
+        "recall": 20.3,
+        "f1": 26.3,
+        "n": 64
+      },
+      "Pad": {
+        "precision": 9.1,
+        "recall": 42.9,
+        "f1": 15.0,
+        "n": 7
+      },
+      "Percussion": {
+        "precision": 30.0,
+        "recall": 3.4,
+        "f1": 6.1,
+        "n": 89
+      },
+      "Percussion Loop": {
+        "precision": 62.5,
+        "recall": 33.8,
+        "f1": 43.9,
+        "n": 74
+      },
+      "Rimshot": {
+        "precision": 24.7,
+        "recall": 78.3,
+        "f1": 37.5,
+        "n": 23
+      },
+      "SFX": {
+        "precision": 40.0,
+        "recall": 20.0,
+        "f1": 26.7,
+        "n": 50
+      },
+      "Snare": {
+        "precision": 68.1,
+        "recall": 70.0,
+        "f1": 69.1,
+        "n": 110
+      },
+      "Synth Loop": {
+        "precision": 35.7,
+        "recall": 43.5,
+        "f1": 39.2,
+        "n": 46
+      },
+      "Synth One-Shot": {
+        "precision": 54.3,
+        "recall": 53.2,
+        "f1": 53.8,
+        "n": 47
+      },
+      "Top Loop": {
+        "precision": 11.8,
+        "recall": 16.7,
+        "f1": 13.8,
+        "n": 12
+      },
+      "Vocal Loop": {
+        "precision": 57.6,
+        "recall": 76.0,
+        "f1": 65.5,
+        "n": 25
+      },
+      "Vocal One-Shot": {
+        "precision": 25.0,
+        "recall": 23.1,
+        "f1": 24.0,
+        "n": 13
+      },
+      "Weather/Nature Atmos": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "n": 5
+      }
+    }
+  },
+  "note": "Classes excluded for sparse collection support remain targets for breadth-first labelling; they are not treated as failed classes."
+}

@@ -9,6 +9,7 @@ threads exercise real Postgres-level locking, not an in-process mock).
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+import time
 
 from app import models
 
@@ -112,9 +113,12 @@ def test_concurrent_duplicate_webhook_never_double_processes(client, db_session)
     }
     raw_body = json.dumps(payload).encode("utf-8")
     secret = "test-webhook-secret"
-    signed_payload = f"1700000000:{raw_body.decode('utf-8')}"
+    # Timestamp must be inside the replay-protection window (commerce.py
+    # rejects signed-but-stale deliveries); use the current wall clock.
+    ts = str(int(time.time()))
+    signed_payload = f"{ts}:{raw_body.decode('utf-8')}"
     h1 = hmac.new(secret.encode(), signed_payload.encode(), hashlib.sha256).hexdigest()
-    headers = {"Paddle-Signature": f"ts=1700000000;h1={h1}", "Content-Type": "application/json"}
+    headers = {"Paddle-Signature": f"ts={ts};h1={h1}", "Content-Type": "application/json"}
 
     def send_webhook(_):
         return client.post("/webhooks/paddle", content=raw_body, headers=headers)

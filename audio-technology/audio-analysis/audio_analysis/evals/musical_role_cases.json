@@ -1,0 +1,21 @@
+{
+  "schema": "audio-too.musical-role-eval.v1",
+  "cases": [
+    {"id":"lead-vocal","name":"Lead Vocal.wav","instrument":"vocal","confidence":0.95,"expected_role":"focal_element","expected_priority":"foreground","expected_ambiguous":false},
+    {"id":"main-vocal","name":"Main Vox.wav","instrument":"vocal","confidence":0.90,"expected_role":"focal_element","expected_priority":"foreground","expected_ambiguous":false},
+    {"id":"backing-vocal","name":"Backing Vocal.wav","instrument":"backing_vocal","confidence":0.90,"expected_role":"supporting_voice","expected_priority":"support","expected_ambiguous":false},
+    {"id":"harmony-vocal","name":"Harmony Double.wav","instrument":"vocal","confidence":0.88,"expected_role":"supporting_voice","expected_priority":"support","expected_ambiguous":false},
+    {"id":"kick-anchor","name":"Kick In.wav","instrument":"kick","confidence":0.94,"expected_role":"rhythmic_anchor","expected_priority":"support","expected_ambiguous":false},
+    {"id":"sub-anchor","name":"Sub Bass.wav","instrument":"sub_bass","confidence":0.91,"expected_role":"rhythmic_anchor","expected_priority":"support","expected_ambiguous":false},
+    {"id":"hat-layer","name":"Closed Hats.wav","instrument":"hihat","confidence":0.88,"expected_role":"rhythmic_layer","expected_priority":"background","expected_ambiguous":false},
+    {"id":"perc-layer","name":"Percussion.wav","instrument":"percussion","confidence":0.82,"expected_role":"rhythmic_layer","expected_priority":"background","expected_ambiguous":false},
+    {"id":"lead-synth","name":"Synth Lead.wav","instrument":"synth_lead","confidence":0.86,"expected_role":"focal_element","expected_priority":"foreground","expected_ambiguous":false},
+    {"id":"pad-texture","name":"Warm Pad.wav","instrument":"synth_pad","confidence":0.87,"expected_role":"sustained_texture","expected_priority":"background","expected_ambiguous":false},
+    {"id":"strings-texture","name":"Strings.wav","instrument":"strings","confidence":0.83,"expected_role":"sustained_texture","expected_priority":"background","expected_ambiguous":false},
+    {"id":"guitar-ambiguous","name":"Guitar 04.wav","instrument":"guitar","confidence":0.86,"expected_role":"accompaniment","expected_priority":"unknown","expected_ambiguous":true},
+    {"id":"keys-ambiguous","name":"Keys.wav","instrument":"keys","confidence":0.81,"expected_role":"accompaniment","expected_priority":"unknown","expected_ambiguous":true},
+    {"id":"sparse-riser","name":"Riser FX.wav","instrument":"fx","confidence":0.88,"active_windows":[3],"total_windows":4,"expected_role":"transition","expected_priority":"background","expected_ambiguous":false},
+    {"id":"dense-fx-ambiguous","name":"Noise FX.wav","instrument":"fx","confidence":0.84,"active_windows":[0,1,2,3],"total_windows":4,"expected_role":"texture","expected_priority":"unknown","expected_ambiguous":true},
+    {"id":"unknown-source","name":"Audio 17.wav","instrument":"other","confidence":0.42,"expected_role":"unknown","expected_priority":"unknown","expected_ambiguous":true}
+  ]
+}

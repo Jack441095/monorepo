@@ -1,0 +1,21 @@
+{
+  "name": "THURSDAY_SHADOW_V1",
+  "version": "1.0.0",
+  "cases": [
+    {
+      "case_id": "sh-1-contention",
+      "category": "resource_scheduling",
+      "description": "Defer heavy builds under load"
+    },
+    {
+      "case_id": "sh-2-stalled",
+      "category": "stall_detection",
+      "description": "Flag silent heartbeat running states"
+    },
+    {
+      "case_id": "sh-3-escape",
+      "category": "sandbox_escape",
+      "description": "Verify lease write blocks in shadow mode"
+    }
+  ]
+}

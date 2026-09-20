@@ -1,0 +1,226 @@
+{
+  "generated_at": "2026-07-14T23:41:14.749040+00:00",
+  "results": [
+    {
+      "expected_status": "valid",
+      "genre": "pop",
+      "id": "pop-vocal-gain-drift",
+      "latency_ms": 0.568,
+      "operations": [
+        {
+          "evidence_source_ids": [
+            "automix-gain-staging-note-3@index:v-f625ecc469f8"
+          ],
+          "operation": "gain_delta",
+          "stem_id": "vocal-01",
+          "value": -1.25
+        }
+      ],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "valid",
+      "status_match": true
+    },
+    {
+      "expected_status": "valid",
+      "genre": "pop",
+      "id": "pop-vocal-ratio-drift",
+      "latency_ms": 0.338,
+      "operations": [
+        {
+          "evidence_source_ids": [
+            "automix-compression-ratios-note-4@index:v-f625ecc469f8"
+          ],
+          "operation": "compressor_ratio",
+          "stem_id": "vocal-01",
+          "value": 3.5
+        }
+      ],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "valid",
+      "status_match": true
+    },
+    {
+      "expected_status": "valid",
+      "genre": "hip_hop",
+      "id": "hip-hop-kick-ratio",
+      "latency_ms": 0.248,
+      "operations": [
+        {
+          "evidence_source_ids": [
+            "automix-compression-ratios-note-4@index:v-f625ecc469f8"
+          ],
+          "operation": "compressor_ratio",
+          "stem_id": "kick-01",
+          "value": 5.0
+        }
+      ],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "valid",
+      "status_match": true
+    },
+    {
+      "expected_status": "valid",
+      "genre": "rock",
+      "id": "rock-snare-gain",
+      "latency_ms": 0.358,
+      "operations": [
+        {
+          "evidence_source_ids": [
+            "automix-gain-staging-note-3@index:v-f625ecc469f8"
+          ],
+          "operation": "gain_delta",
+          "stem_id": "snare-01",
+          "value": 1.2
+        }
+      ],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "valid",
+      "status_match": true
+    },
+    {
+      "expected_status": "valid",
+      "genre": "acoustic",
+      "id": "acoustic-vocal-ratio",
+      "latency_ms": 0.253,
+      "operations": [
+        {
+          "evidence_source_ids": [
+            "automix-compression-ratios-note-4@index:v-f625ecc469f8"
+          ],
+          "operation": "compressor_ratio",
+          "stem_id": "vocal-01",
+          "value": 2.0
+        }
+      ],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "valid",
+      "status_match": true
+    },
+    {
+      "expected_status": "valid",
+      "genre": "podcast",
+      "id": "podcast-vocal-gain",
+      "latency_ms": 0.236,
+      "operations": [
+        {
+          "evidence_source_ids": [
+            "automix-gain-staging-note-3@index:v-f625ecc469f8"
+          ],
+          "operation": "gain_delta",
+          "stem_id": "voice-01",
+          "value": -2.0
+        }
+      ],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "valid",
+      "status_match": true
+    },
+    {
+      "expected_status": "no_proposal",
+      "genre": "pop",
+      "id": "canonical-abstention",
+      "latency_ms": 0.053,
+      "operations": [],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "no_proposal",
+      "status_match": true
+    },
+    {
+      "expected_status": "no_proposal",
+      "genre": "pop",
+      "id": "weak-classification-abstention",
+      "latency_ms": 0.05,
+      "operations": [],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "no_proposal",
+      "status_match": true
+    },
+    {
+      "expected_status": "no_proposal",
+      "genre": "pop",
+      "id": "tiny-drift-abstention",
+      "latency_ms": 0.047,
+      "operations": [],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "no_proposal",
+      "status_match": true
+    },
+    {
+      "expected_status": "no_proposal",
+      "genre": "pop",
+      "id": "unbounded-drift-abstention",
+      "latency_ms": 0.046,
+      "operations": [],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "no_proposal",
+      "status_match": true
+    },
+    {
+      "expected_status": "valid",
+      "genre": "pop",
+      "id": "multi-stem-multi-operation",
+      "latency_ms": 0.357,
+      "operations": [
+        {
+          "evidence_source_ids": [
+            "automix-gain-staging-note-3@index:v-f625ecc469f8"
+          ],
+          "operation": "gain_delta",
+          "stem_id": "kick-01",
+          "value": 1.0
+        },
+        {
+          "evidence_source_ids": [
+            "automix-gain-staging-note-3@index:v-f625ecc469f8"
+          ],
+          "operation": "gain_delta",
+          "stem_id": "vocal-01",
+          "value": -1.0
+        },
+        {
+          "evidence_source_ids": [
+            "automix-compression-ratios-note-4@index:v-f625ecc469f8"
+          ],
+          "operation": "compressor_ratio",
+          "stem_id": "vocal-01",
+          "value": 3.5
+        }
+      ],
+      "operations_match": true,
+      "passed": true,
+      "rejection_reason": "",
+      "status": "valid",
+      "status_match": true
+    }
+  ],
+  "schema": "audio-too.kenn-advisor-producer-benchmark/v1",
+  "summary": {
+    "cases": 11,
+    "pass_rate": 1.0,
+    "passed": 11,
+    "proposals": 7,
+    "provider_errors": 0,
+    "schema_valid_rate": 1.0,
+    "unexpected_rejections": 0
+  }
+}

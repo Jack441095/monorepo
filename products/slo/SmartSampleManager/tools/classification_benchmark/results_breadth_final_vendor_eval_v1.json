@@ -1,0 +1,85 @@
+{
+  "classes": [
+    "Atmosphere",
+    "Bass Hit",
+    "Bass Loop",
+    "Bass Reese",
+    "Chord Loop",
+    "Clap",
+    "Crash",
+    "Drum Fill",
+    "Drum Loop",
+    "Foley",
+    "Foley Loop",
+    "Hi-Hat",
+    "Hi-Hat Loop",
+    "Impact",
+    "Kick",
+    "Kick Loop",
+    "Loop",
+    "Other/none",
+    "Pad",
+    "Percussion",
+    "Percussion Loop",
+    "Rimshot",
+    "Riser",
+    "SFX",
+    "Snare",
+    "Synth Loop",
+    "Synth One-Shot",
+    "Top Loop",
+    "Vocal Loop",
+    "Vocal One-Shot",
+    "Weather/Nature Atmos"
+  ],
+  "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_breadth_final_v1.npz",
+  "mode": "vendor",
+  "record_type": "slo_breadth_final_vendor_eval",
+  "results": {
+    "baseline": {
+      "acc": 53.53378378378378,
+      "macro_f1": 40.31852772875052,
+      "per_seed": [
+        54.38,
+        52.7,
+        54.54,
+        52.27,
+        52.92,
+        54.16,
+        54.05,
+        53.24
+      ],
+      "sd": 0.8017227160106071,
+      "worst_group": 13.316624895572263
+    },
+    "nearest-centroid": {
+      "acc": 55.12837837837837,
+      "macro_f1": 43.53045619191198,
+      "per_seed": [
+        54.16,
+        55.46,
+        55.62,
+        54.49,
+        55.78,
+        55.35,
+        54.43,
+        55.73
+      ],
+      "sd": 0.6147906103069142,
+      "worst_group": 18.645833333333332
+    }
+  },
+  "rows_evaluated": 1850,
+  "rows_total": 1850,
+  "safety": {
+    "production_model_changed": false,
+    "rename_actions": false,
+    "research_only": true,
+    "sealed_validation_changed": false,
+    "source_audio_modified": false
+  },
+  "schema_version": "1.0.0",
+  "seeds": 8,
+  "splits": 5,
+  "vendors": 81
+}

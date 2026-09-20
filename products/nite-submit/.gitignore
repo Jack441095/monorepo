@@ -1,0 +1,22 @@
+.DS_Store
+.build/
+*.o
+artifacts/*.zip
+artifacts/Submit-*-macOS.app/
+artifacts/Submit-*-macOS.dmg
+artifacts/*-release-manifest.json
+artifacts/*-distribution-readiness.json
+real_validation_corpus/**/*.pdf
+# Generated local validation reports and renamed-copy outputs stay on disk but
+# are never committed. Keep the workflow README visible in the repository.
+real_validation_corpus/test_results/*
+!real_validation_corpus/test_results/README.md
+# Private tester PDFs, manifests, progress, and results stay local. Keep only
+# the workflow documentation and blank schema under version control.
+real_validation_corpus/beta_intake/*
+!real_validation_corpus/beta_intake/README.md
+!real_validation_corpus/beta_intake/manifest.template.json
+# Local owner-review manifest may contain absolute machine paths.
+real_validation_corpus/manifests/real_manifest.json
+NITE_Submit.bundle
+tools/license-private-key.base64

@@ -1,0 +1,18 @@
+i-id,tier,product,problem,finding_ref,effort_weeks,rice,definition_of_done,status,evidence_ref
+I-T1-01,1,estate,canonical-repo chaos; wrong-checkout fixes,F-01,1-2,120,decision log + deletions + drift CI green,partial-tooling-done; deletions await owner,EXECUTION_REPORT_2026-09-17.md (commit 09bb007 drift-gate.sh)
+I-T1-02,1,estate,env/keys sprawl,F-02,0.5,100,ls-files shows only .example + public key,done-audit; no rotation needed,EXECUTION_LOG.md L-02
+I-T1-03,1,estate,suites unrun/broken (nacl missing; no CTest),F-05,2,110,three receipts: backend collect+run; SLO CTest; KENN subset,partial (backend 106 passed; KENN repro; SLO shim prepared),EXECUTION_LOG.md L-03/L-04/L-05
+I-T1-04,1,SLO/platform,unpinned brew deps + Python/Node drift,F-03,1-2,90,clean-checkout build receipt,partial (matrix done; pins prepared await clean tree),EXECUTION_LOG.md L-06
+I-T1-05,1,KENN/DiskSweep,cloud fallback in local products,F-11/F-15,0.5-1,95,default ollama + fail-closed test + privacy doc line,partial (disksweep done-by-code; kenn flip awaits owner),EXECUTION_LOG.md L-07/L-08
+I-T1-06,1,Files/Paraphrase/Windows,orphaned/empty scaffolds,F-07/F-08,0.3,80,archived + redirected; sale surface clean,partial (listing done; removal awaits owner batch),EXECUTION_LOG.md L-09
+I-T2-01,2,Submit,unsigned RC; appcast unsigned,F-05/F-16,1,96,signed + notarised + parity receipt,awaiting-owner (toolchain verified present),EXECUTION_REPORT_2026-09-17.md Tier2
+I-T2-02,2,Platform,Paddle idempotency/PII unaudited,F-18,2,100,sandbox live-fire receipt,blocked-on-secret (HMAC verified by code),EXECUTION_REPORT_2026-09-17.md Tier2
+I-T2-03,2,SLO,beta NO-GO (licensing + R-01 + DAW),F-02,6-8,70,beta gate receipt,hold (gated on R-01/R-04),deep-research plan
+I-T2-04,2,KENN,5 failing tests; pilot unqualified,F-03,3-4,65,kappa>=0.6 receipt + pilot label,hold (failures reproduced; fix pending R-03),EXECUTION_LOG.md L-04
+I-T2-05,2,DiskSweep,helper unreviewed; no DMG,F-14,2-3,75,5k fuzz receipt + DMG,hold (gated on R-05),deep-research plan
+I-T2-06,2,estate,no per-product CI gates,F-06/F-10,2,90,4 product gates green; main protected,prepared (drift-gate ready to wire),EXECUTION_REPORT_2026-09-17.md Tier2
+I-T3-01,3,cross-product,no shared safety lib,,3,60,adopted in 2 products,not-started (gate 2 unmet),deep-research plan
+I-T3-02,3,Submit-DiskSweep,no shared licensing client,,2,64,offline-verify fail <0.1%,not-started (gate 2 unmet),deep-research plan
+I-T3-03,3,all,no unified update channel,,8,47,2 products on channel,not-started (gate 2 unmet),deep-research plan
+I-T3-04,3,backend,paraphrase demand unproven,,2,40,paid pilot or deletion (kill: zero pilots 90d),not-started,deep-research plan
+I-T3-05,3,bundle,bundle WTP unknown,,8,38,decision (kill: WTP <£30),not-started,deep-research plan

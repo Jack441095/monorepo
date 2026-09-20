@@ -16,6 +16,7 @@ the dev server's SQLite `licenses`/`activations`, and looked up by
 from __future__ import annotations
 
 import base64
+import functools
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,10 +33,16 @@ from .rate_limit import rate_limit
 router = APIRouter(prefix="/v1", tags=["licensing"])
 
 
-def _load_signing_key() -> SigningKey:
+@functools.lru_cache(maxsize=1)
+def _get_signing_key() -> SigningKey:
     # Production (Railway or any host without a guaranteed-persistent
     # filesystem) supplies the key via env var; local/staging keeps reading
     # the generated keypair file. See config.py's licensing key comment.
+    #
+    # Deliberately lazy (not at import time): a missing/malformed key used to
+    # crash the whole backend on import, taking down every endpoint -- even
+    # ones that never sign. Now the failure is confined to the /v1 routes
+    # that actually need the key.
     if settings.licensing_private_key_base64:
         return SigningKey(base64.b64decode(settings.licensing_private_key_base64.strip()))
 
@@ -48,12 +55,9 @@ def _load_signing_key() -> SigningKey:
     return SigningKey(base64.b64decode(private_path.read_text().strip()))
 
 
-_signing_key = _load_signing_key()
-
-
 def _sign_payload(payload: dict) -> schemas.SignedToken:
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    signature = _signing_key.sign(canonical.encode("utf-8")).signature
+    signature = _get_signing_key().sign(canonical.encode("utf-8")).signature
     return schemas.SignedToken(
         token_json=canonical,
         token=payload,
@@ -197,7 +201,40 @@ def validate(req: schemas.ValidateRequest, db: Session = Depends(get_db)) -> sch
     return _issue_token(entitlement, req.device_id, now)
 
 
-@router.post("/deactivate")
+def _verify_activation_possession(req: schemas.DeactivateRequest) -> bool:
+    """Possession proof for /v1/deactivate (SANDBOX_TO_LIVE_CHECKLIST P2).
+
+    The caller must present the signed activation token that /v1/activate
+    or /v1/validate issued for this exact license_key + device_id. Without
+    this, anyone who learns only the license key (which is emailed in
+    plaintext purchase confirmations) could remotely deactivate a
+    customer's device. The Ed25519 signature is verified against this
+    server's own key, and the embedded claims must match the request.
+    Admin revoke remains the support escape hatch for lost tokens.
+    """
+    if not req.activation_token_json or not req.activation_signature:
+        return False
+    raw = req.activation_token_json.encode("utf-8")
+    try:
+        signature = base64.b64decode(req.activation_signature, validate=True)
+        # Any failure to verify -- bad signature, malformed base64, wrong
+        # key -- means "no proof", never an error surface.
+        _get_signing_key().verify_key.verify(raw, signature)
+    except Exception:
+        return False
+    try:
+        claims = json.loads(req.activation_token_json)
+    except ValueError:
+        return False
+    if not isinstance(claims, dict):
+        return False
+    return claims.get("license_key") == req.license_key and claims.get("device_id") == req.device_id
+
+
+@router.post(
+    "/deactivate",
+    dependencies=[Depends(rate_limit("licensing:deactivate", max_requests=20, window_seconds=60))],
+)
 def deactivate(req: schemas.DeactivateRequest, db: Session = Depends(get_db)) -> dict:
     now = datetime.now(timezone.utc)
     entitlement = _get_entitlement(db, req.license_key)
@@ -213,6 +250,13 @@ def deactivate(req: schemas.DeactivateRequest, db: Session = Depends(get_db)) ->
     )
     if activation is None:
         raise HTTPException(status_code=404, detail="Active activation not found")
+
+    if not _verify_activation_possession(req):
+        raise HTTPException(
+            status_code=403,
+            detail="Possession proof required: present the signed activation token "
+            "issued for this license and device",
+        )
 
     activation.deactivated_at = now
     db.commit()

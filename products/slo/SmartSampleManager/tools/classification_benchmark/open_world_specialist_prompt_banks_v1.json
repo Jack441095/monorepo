@@ -1,0 +1,63 @@
+{
+  "music_sample": {
+    "Kick": ["a kick drum", "a bass drum hit", "a deep thumping kick drum"],
+    "Snare": ["a snare drum", "a sharp cracking snare", "a snare drum backbeat"],
+    "Clap": ["a hand clap", "hands clapping once", "a sharp clap slap"],
+    "Hi-Hat": ["a hi-hat cymbal", "a closed hi-hat tick", "a short crisp metallic cymbal"],
+    "Crash": ["a crash cymbal", "a bright cymbal crash", "a ringing orchestral cymbal"],
+    "Percussion": ["a shaker rattling", "a tambourine shaking", "a conga or bongo hit", "a woodblock click"],
+    "Bass": ["a deep sub bass note", "a low frequency bass sound", "an 808 bass note"],
+    "Synth": ["a synthesizer tone", "an electronic keyboard sound", "a synthetic musical texture"],
+    "Vocal": ["a human singing voice", "a spoken vocal phrase", "a chopped vocal sample"],
+    "Impact": ["a heavy cinematic impact", "a large impact hit", "an explosive boom sound"],
+    "Riser": ["a rising whoosh building tension", "an ascending sweep", "a build up transition effect"],
+    "Ambience": ["a continuous atmospheric soundscape", "a background ambience recording", "an environmental atmosphere"]
+  },
+  "speech_voice": {
+    "Speech": ["human speech or spoken words", "a person talking", "a spoken language recording"],
+    "Singing": ["a person singing", "a sung vocal performance", "a melodic human voice"],
+    "Whisper": ["a whispered human voice", "quiet whispering", "breathy whispered speech"],
+    "Shout": ["a person shouting", "a loud yelled voice", "an excited vocal exclamation"],
+    "Laughter": ["human laughter", "people laughing", "a laughing voice"],
+    "Breathing": ["human breathing", "a breath sound", "close microphone breathing"],
+    "Crowd": ["a crowd of people talking", "crowd voices and chatter", "a public gathering"],
+    "Vocal Effect": ["a processed vocal effect", "an edited or chopped voice", "a reverberant vocal sound"]
+  },
+  "environment_sfx": {
+    "Footsteps": ["footsteps walking", "shoes moving on a surface", "a person walking"],
+    "Door": ["a door opening or closing", "a door slam", "a hinge and door sound"],
+    "Vehicle": ["a vehicle or car sound", "a passing vehicle", "road traffic and vehicles"],
+    "Water": ["running or splashing water", "a water sound effect", "waves or flowing water"],
+    "Wind": ["wind blowing", "a gust of wind", "a windy outdoor recording"],
+    "Fire": ["fire crackling", "burning flames", "a fireplace fire"],
+    "Explosion": ["an explosion sound effect", "a blast or detonation", "a loud explosive boom"],
+    "Weapon": ["a weapon or gunshot sound", "a firearm sound effect", "a sword or weapon impact"],
+    "Everyday Object": ["an everyday household object sound", "a foley object recording", "a practical sound effect"]
+  },
+  "animal_bioacoustic": {
+    "Bird": ["a bird singing or calling", "birdsong", "a bird field recording"],
+    "Dog": ["a dog barking", "a canine animal sound", "a dog growl or whine"],
+    "Cat": ["a cat meowing", "a feline animal sound", "a cat purr"],
+    "Insect": ["insects buzzing or chirping", "a cricket or insect sound", "an insect field recording"],
+    "Frog": ["a frog calling", "frogs croaking", "an amphibian sound"],
+    "Marine Animal": ["a whale or dolphin sound", "an underwater animal recording", "a marine bioacoustic sound"],
+    "Wild Animal": ["a wild animal call", "a mammal or wildlife sound", "an animal field recording"]
+  },
+  "mechanical_industrial": {
+    "Engine": ["an engine running", "a combustion engine", "a vehicle motor"],
+    "Electric Motor": ["an electric motor", "a motor whirring", "an electrical machine sound"],
+    "Machine": ["industrial machinery", "a factory machine", "mechanical equipment operating"],
+    "Power Tool": ["a power tool", "drilling or sawing", "an electric tool sound"],
+    "Alarm": ["a mechanical or industrial alarm", "a warning buzzer", "a repeating alarm tone"],
+    "Pneumatic": ["compressed air or pneumatics", "an air tool", "a pneumatic machine"],
+    "Mechanical Impact": ["metal machinery impacts", "a mechanical clank", "an industrial impact sound"]
+  },
+  "ambience_field": {
+    "Rain": ["rain falling", "a rainy ambience", "rain and drops"],
+    "Ocean": ["ocean waves", "seaside ambience", "waves on a beach"],
+    "Forest": ["a forest soundscape", "woodland ambience", "nature sounds in a forest"],
+    "City": ["city street ambience", "urban background noise", "a city soundscape"],
+    "Room Tone": ["quiet room tone", "an indoor ambient recording", "background room noise"],
+    "Crowd Ambience": ["a crowd ambience", "background people and chatter", "a busy public space"]
+  }
+}

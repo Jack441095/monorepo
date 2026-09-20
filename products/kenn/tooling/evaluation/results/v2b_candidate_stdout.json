@@ -1,0 +1,697 @@
+{
+  "A_raw": {
+    "development": {
+      "cases": 567,
+      "precision": 0.0641,
+      "recall": 0.9462,
+      "healthy_false_positive_rate": 1.0,
+      "harmful_advice_rate": 0.8241,
+      "abstention_rate": 0.1194,
+      "average_recommendations_healthy": 8.892,
+      "average_recommendations_fault": 10.308,
+      "per_detector": {
+        "clipping": {
+          "fp": 525,
+          "tp": 42
+        },
+        "headroom": {
+          "fp": 534,
+          "tp": 33
+        },
+        "dc": {
+          "fp": 534,
+          "tp": 33
+        },
+        "lr_imbalance": {
+          "fp": 534,
+          "tp": 33
+        },
+        "bass_excess": {
+          "fp": 389,
+          "tp": 29,
+          "fn": 4
+        },
+        "mud": {
+          "fp": 389,
+          "tp": 29,
+          "fn": 4
+        },
+        "harshness": {
+          "fp": 389,
+          "tp": 29,
+          "fn": 4
+        },
+        "resonance": {
+          "fp": 389,
+          "tp": 29,
+          "fn": 4
+        },
+        "anti_phase": {
+          "fp": 534,
+          "tp": 33
+        },
+        "wide_bass": {
+          "fp": 534,
+          "tp": 33
+        },
+        "over_compression": {
+          "fp": 389,
+          "tp": 29,
+          "fn": 4
+        }
+      }
+    },
+    "calibration": {
+      "cases": 233,
+      "precision": 0.0694,
+      "recall": 0.9405,
+      "healthy_false_positive_rate": 1.0,
+      "harmful_advice_rate": 0.8272,
+      "abstention_rate": 0.1112,
+      "average_recommendations_healthy": 8.892,
+      "average_recommendations_fault": 10.267,
+      "per_detector": {
+        "clipping": {
+          "fp": 215,
+          "tp": 18
+        },
+        "headroom": {
+          "fp": 218,
+          "tp": 15
+        },
+        "dc": {
+          "fp": 218,
+          "tp": 15
+        },
+        "lr_imbalance": {
+          "fp": 218,
+          "tp": 15
+        },
+        "bass_excess": {
+          "fp": 163,
+          "tp": 13,
+          "fn": 2
+        },
+        "mud": {
+          "fp": 163,
+          "tp": 13,
+          "fn": 2
+        },
+        "harshness": {
+          "fp": 163,
+          "tp": 13,
+          "fn": 2
+        },
+        "resonance": {
+          "fp": 163,
+          "tp": 13,
+          "fn": 2
+        },
+        "anti_phase": {
+          "fp": 218,
+          "tp": 15
+        },
+        "wide_bass": {
+          "fp": 218,
+          "tp": 15
+        },
+        "over_compression": {
+          "fp": 163,
+          "tp": 13,
+          "fn": 2
+        }
+      }
+    },
+    "holdout": {
+      "cases": 184,
+      "precision": 0.0661,
+      "recall": 0.92,
+      "healthy_false_positive_rate": 1.0,
+      "harmful_advice_rate": 0.8024,
+      "abstention_rate": 0.1408,
+      "average_recommendations_healthy": 8.892,
+      "average_recommendations_fault": 9.911,
+      "per_detector": {
+        "clipping": {
+          "fp": 169,
+          "tp": 15
+        },
+        "headroom": {
+          "fp": 173,
+          "tp": 11
+        },
+        "dc": {
+          "fp": 173,
+          "tp": 11
+        },
+        "lr_imbalance": {
+          "fp": 173,
+          "tp": 11
+        },
+        "bass_excess": {
+          "fp": 118,
+          "tp": 9,
+          "fn": 2
+        },
+        "mud": {
+          "fp": 118,
+          "tp": 9,
+          "fn": 2
+        },
+        "harshness": {
+          "fp": 118,
+          "tp": 9,
+          "fn": 2
+        },
+        "resonance": {
+          "fp": 118,
+          "tp": 9,
+          "fn": 2
+        },
+        "anti_phase": {
+          "fp": 173,
+          "tp": 11
+        },
+        "wide_bass": {
+          "fp": 173,
+          "tp": 11
+        },
+        "over_compression": {
+          "fp": 118,
+          "tp": 9,
+          "fn": 2
+        }
+      }
+    }
+  },
+  "B_dual": {
+    "development": {
+      "cases": 567,
+      "precision": 1.0,
+      "recall": 0.6022,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.9641,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.704,
+      "per_detector": {
+        "clipping": {
+          "fn": 8,
+          "tp": 34
+        },
+        "headroom": {
+          "fn": 9,
+          "tp": 24
+        },
+        "dc": {
+          "fn": 8,
+          "tp": 25
+        },
+        "lr_imbalance": {
+          "fn": 14,
+          "tp": 19
+        },
+        "bass_excess": {
+          "fn": 14,
+          "tp": 19
+        },
+        "mud": {
+          "fn": 13,
+          "tp": 20
+        },
+        "harshness": {
+          "fn": 17,
+          "tp": 16
+        },
+        "resonance": {
+          "fn": 22,
+          "tp": 11
+        },
+        "anti_phase": {
+          "fn": 13,
+          "tp": 20
+        },
+        "wide_bass": {
+          "fn": 12,
+          "tp": 21
+        },
+        "over_compression": {
+          "fn": 18,
+          "tp": 15
+        }
+      }
+    },
+    "calibration": {
+      "cases": 233,
+      "precision": 1.0,
+      "recall": 0.5774,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.9622,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.647,
+      "per_detector": {
+        "clipping": {
+          "fn": 3,
+          "tp": 15
+        },
+        "headroom": {
+          "fn": 4,
+          "tp": 11
+        },
+        "dc": {
+          "fn": 4,
+          "tp": 11
+        },
+        "lr_imbalance": {
+          "fn": 8,
+          "tp": 7
+        },
+        "bass_excess": {
+          "fn": 6,
+          "tp": 9
+        },
+        "mud": {
+          "fn": 6,
+          "tp": 9
+        },
+        "harshness": {
+          "fn": 8,
+          "tp": 7
+        },
+        "resonance": {
+          "fn": 10,
+          "tp": 5
+        },
+        "anti_phase": {
+          "fn": 6,
+          "tp": 9
+        },
+        "wide_bass": {
+          "fn": 7,
+          "tp": 8
+        },
+        "over_compression": {
+          "fn": 9,
+          "tp": 6
+        }
+      }
+    },
+    "holdout": {
+      "cases": 184,
+      "precision": 1.0,
+      "recall": 0.64,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.9605,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.792,
+      "per_detector": {
+        "clipping": {
+          "fn": 2,
+          "tp": 13
+        },
+        "headroom": {
+          "fn": 3,
+          "tp": 8
+        },
+        "dc": {
+          "fn": 2,
+          "tp": 9
+        },
+        "lr_imbalance": {
+          "fn": 5,
+          "tp": 6
+        },
+        "bass_excess": {
+          "fn": 4,
+          "tp": 7
+        },
+        "mud": {
+          "fn": 4,
+          "tp": 7
+        },
+        "harshness": {
+          "fn": 6,
+          "tp": 5
+        },
+        "resonance": {
+          "fn": 7,
+          "tp": 4
+        },
+        "anti_phase": {
+          "fn": 2,
+          "tp": 9
+        },
+        "wide_bass": {
+          "fn": 4,
+          "tp": 7
+        },
+        "over_compression": {
+          "fn": 6,
+          "tp": 5
+        }
+      }
+    }
+  },
+  "C_confounded": {
+    "development": {
+      "cases": 567,
+      "precision": 1.0,
+      "recall": 0.6022,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.9641,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.704,
+      "per_detector": {
+        "clipping": {
+          "fn": 8,
+          "tp": 34
+        },
+        "headroom": {
+          "fn": 9,
+          "tp": 24
+        },
+        "dc": {
+          "fn": 8,
+          "tp": 25
+        },
+        "lr_imbalance": {
+          "fn": 14,
+          "tp": 19
+        },
+        "bass_excess": {
+          "fn": 14,
+          "tp": 19
+        },
+        "mud": {
+          "fn": 13,
+          "tp": 20
+        },
+        "harshness": {
+          "fn": 17,
+          "tp": 16
+        },
+        "resonance": {
+          "fn": 22,
+          "tp": 11
+        },
+        "anti_phase": {
+          "fn": 13,
+          "tp": 20
+        },
+        "wide_bass": {
+          "fn": 12,
+          "tp": 21
+        },
+        "over_compression": {
+          "fn": 18,
+          "tp": 15
+        }
+      }
+    },
+    "calibration": {
+      "cases": 233,
+      "precision": 1.0,
+      "recall": 0.5774,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.9622,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.647,
+      "per_detector": {
+        "clipping": {
+          "fn": 3,
+          "tp": 15
+        },
+        "headroom": {
+          "fn": 4,
+          "tp": 11
+        },
+        "dc": {
+          "fn": 4,
+          "tp": 11
+        },
+        "lr_imbalance": {
+          "fn": 8,
+          "tp": 7
+        },
+        "bass_excess": {
+          "fn": 6,
+          "tp": 9
+        },
+        "mud": {
+          "fn": 6,
+          "tp": 9
+        },
+        "harshness": {
+          "fn": 8,
+          "tp": 7
+        },
+        "resonance": {
+          "fn": 10,
+          "tp": 5
+        },
+        "anti_phase": {
+          "fn": 6,
+          "tp": 9
+        },
+        "wide_bass": {
+          "fn": 7,
+          "tp": 8
+        },
+        "over_compression": {
+          "fn": 9,
+          "tp": 6
+        }
+      }
+    },
+    "holdout": {
+      "cases": 184,
+      "precision": 1.0,
+      "recall": 0.64,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.9605,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.792,
+      "per_detector": {
+        "clipping": {
+          "fn": 2,
+          "tp": 13
+        },
+        "headroom": {
+          "fn": 3,
+          "tp": 8
+        },
+        "dc": {
+          "fn": 2,
+          "tp": 9
+        },
+        "lr_imbalance": {
+          "fn": 5,
+          "tp": 6
+        },
+        "bass_excess": {
+          "fn": 4,
+          "tp": 7
+        },
+        "mud": {
+          "fn": 4,
+          "tp": 7
+        },
+        "harshness": {
+          "fn": 6,
+          "tp": 5
+        },
+        "resonance": {
+          "fn": 7,
+          "tp": 4
+        },
+        "anti_phase": {
+          "fn": 2,
+          "tp": 9
+        },
+        "wide_bass": {
+          "fn": 4,
+          "tp": 7
+        },
+        "over_compression": {
+          "fn": 6,
+          "tp": 5
+        }
+      }
+    }
+  },
+  "D_hierarchical": {
+    "development": {
+      "cases": 567,
+      "precision": 1.0,
+      "recall": 0.629,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.9625,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.736,
+      "per_detector": {
+        "clipping": {
+          "fn": 7,
+          "tp": 35
+        },
+        "headroom": {
+          "fn": 8,
+          "tp": 25
+        },
+        "dc": {
+          "fn": 6,
+          "tp": 27
+        },
+        "lr_imbalance": {
+          "fn": 13,
+          "tp": 20
+        },
+        "bass_excess": {
+          "fn": 14,
+          "tp": 19
+        },
+        "mud": {
+          "fn": 14,
+          "tp": 19
+        },
+        "harshness": {
+          "fn": 17,
+          "tp": 16
+        },
+        "resonance": {
+          "fn": 23,
+          "tp": 10
+        },
+        "anti_phase": {
+          "fn": 6,
+          "tp": 27
+        },
+        "wide_bass": {
+          "fn": 7,
+          "tp": 26
+        },
+        "over_compression": {
+          "fn": 23,
+          "tp": 10
+        }
+      }
+    },
+    "calibration": {
+      "cases": 233,
+      "precision": 1.0,
+      "recall": 0.5952,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.961,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.667,
+      "per_detector": {
+        "clipping": {
+          "fn": 3,
+          "tp": 15
+        },
+        "headroom": {
+          "fn": 3,
+          "tp": 12
+        },
+        "dc": {
+          "fn": 2,
+          "tp": 13
+        },
+        "lr_imbalance": {
+          "fn": 7,
+          "tp": 8
+        },
+        "bass_excess": {
+          "fn": 7,
+          "tp": 8
+        },
+        "mud": {
+          "fn": 6,
+          "tp": 9
+        },
+        "harshness": {
+          "fn": 10,
+          "tp": 5
+        },
+        "resonance": {
+          "fn": 11,
+          "tp": 4
+        },
+        "anti_phase": {
+          "fn": 4,
+          "tp": 11
+        },
+        "wide_bass": {
+          "fn": 4,
+          "tp": 11
+        },
+        "over_compression": {
+          "fn": 11,
+          "tp": 4
+        }
+      }
+    },
+    "holdout": {
+      "cases": 184,
+      "precision": 1.0,
+      "recall": 0.624,
+      "healthy_false_positive_rate": 0.0,
+      "harmful_advice_rate": 0.0,
+      "abstention_rate": 0.9615,
+      "average_recommendations_healthy": 0.0,
+      "average_recommendations_fault": 0.772,
+      "per_detector": {
+        "clipping": {
+          "fn": 2,
+          "tp": 13
+        },
+        "headroom": {
+          "fn": 2,
+          "tp": 9
+        },
+        "dc": {
+          "fn": 2,
+          "tp": 9
+        },
+        "lr_imbalance": {
+          "fn": 5,
+          "tp": 6
+        },
+        "bass_excess": {
+          "fn": 5,
+          "tp": 6
+        },
+        "mud": {
+          "fn": 5,
+          "tp": 6
+        },
+        "harshness": {
+          "fn": 6,
+          "tp": 5
+        },
+        "resonance": {
+          "fn": 8,
+          "tp": 3
+        },
+        "anti_phase": {
+          "fn": 1,
+          "tp": 10
+        },
+        "wide_bass": {
+          "fn": 4,
+          "tp": 7
+        },
+        "over_compression": {
+          "fn": 7,
+          "tp": 4
+        }
+      }
+    }
+  }
+}

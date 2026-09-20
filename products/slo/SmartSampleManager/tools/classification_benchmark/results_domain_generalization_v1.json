@@ -1,0 +1,1399 @@
+{
+  "generated": "2026-09-10T11:57:59",
+  "n_files": 524,
+  "classes": [
+    "Clap",
+    "Crash",
+    "Drum Loop",
+    "Foley",
+    "Hi-Hat",
+    "Kick",
+    "Other/none",
+    "Percussion",
+    "Percussion Loop",
+    "Snare"
+  ],
+  "seeds": 8,
+  "splits": 5,
+  "n_vendors": 30,
+  "n_packs": 71,
+  "n_families": 411,
+  "grid": {
+    "clap|random": {
+      "acc_mean": 67.36641221374046,
+      "acc_sd": 1.2219702743192475,
+      "per_seed": [
+        68.13,
+        67.37,
+        65.65,
+        68.7,
+        65.65,
+        67.75,
+        66.6,
+        69.08
+      ],
+      "macro_f1": 62.31728374963578,
+      "worst_fold": 61.8853021978022,
+      "top2": 80.84446564885496,
+      "prec_at_50cov": 86.49809160305344,
+      "per_class": {
+        "Clap": {
+          "precision": 82.5,
+          "recall": 88.9,
+          "f1": 85.6,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 56.5,
+          "recall": 59.1,
+          "f1": 57.8,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 78.0,
+          "recall": 78.0,
+          "f1": 78.0,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 34.6,
+          "recall": 34.6,
+          "f1": 34.6,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 69.4,
+          "recall": 72.9,
+          "f1": 71.1,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 82.7,
+          "recall": 87.3,
+          "f1": 84.9,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 47.9,
+          "recall": 41.8,
+          "f1": 44.7,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 42.1,
+          "recall": 34.0,
+          "f1": 37.6,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 70.0,
+          "recall": 75.0,
+          "f1": 72.4,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 75.0,
+          "recall": 74.1,
+          "f1": 74.6,
+          "n": 85
+        }
+      }
+    },
+    "clap|family": {
+      "acc_mean": 65.48187022900763,
+      "acc_sd": 0.9174086127399521,
+      "per_seed": [
+        65.65,
+        66.79,
+        63.55,
+        65.65,
+        66.22,
+        64.69,
+        65.65,
+        65.65
+      ],
+      "macro_f1": 60.398828999696775,
+      "worst_fold": 59.03742599691785,
+      "top2": 78.62595419847328,
+      "prec_at_50cov": 82.5381679389313,
+      "per_class": {
+        "Clap": {
+          "precision": 82.8,
+          "recall": 85.6,
+          "f1": 84.2,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 52.4,
+          "recall": 50.0,
+          "f1": 51.2,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 82.9,
+          "recall": 70.7,
+          "f1": 76.3,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 31.6,
+          "recall": 23.1,
+          "f1": 26.7,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 61.5,
+          "recall": 67.8,
+          "f1": 64.5,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 85.9,
+          "recall": 85.9,
+          "f1": 85.9,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 51.9,
+          "recall": 50.9,
+          "f1": 51.4,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 33.3,
+          "recall": 38.3,
+          "f1": 35.6,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 58.1,
+          "recall": 64.3,
+          "f1": 61.0,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 69.1,
+          "recall": 65.9,
+          "f1": 67.5,
+          "n": 85
+        }
+      }
+    },
+    "clap|pack": {
+      "acc_mean": 59.4942748091603,
+      "acc_sd": 1.2828558835638106,
+      "per_seed": [
+        59.73,
+        58.78,
+        58.59,
+        62.4,
+        59.73,
+        57.82,
+        58.97,
+        59.92
+      ],
+      "macro_f1": 53.06816021958428,
+      "worst_fold": 49.68816390238612,
+      "top2": 74.52290076335879,
+      "prec_at_50cov": 77.24236641221376,
+      "per_class": {
+        "Clap": {
+          "precision": 77.9,
+          "recall": 82.2,
+          "f1": 80.0,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 61.9,
+          "recall": 59.1,
+          "f1": 60.5,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 62.7,
+          "recall": 78.0,
+          "f1": 69.6,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 17.1,
+          "recall": 23.1,
+          "f1": 19.7,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 63.9,
+          "recall": 66.1,
+          "f1": 65.0,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 78.6,
+          "recall": 77.5,
+          "f1": 78.0,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 50.0,
+          "recall": 30.9,
+          "f1": 38.2,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 18.4,
+          "recall": 19.1,
+          "f1": 18.8,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 48.1,
+          "recall": 46.4,
+          "f1": 47.3,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 69.1,
+          "recall": 65.9,
+          "f1": 67.5,
+          "n": 85
+        }
+      }
+    },
+    "clap|vendor": {
+      "acc_mean": 58.99332061068702,
+      "acc_sd": 1.6511700840336097,
+      "per_seed": [
+        60.31,
+        60.88,
+        58.02,
+        59.35,
+        56.87,
+        59.35,
+        56.3,
+        60.88
+      ],
+      "macro_f1": 52.5987948905992,
+      "worst_fold": 37.342972019174745,
+      "top2": 74.28435114503816,
+      "prec_at_50cov": 76.57442748091603,
+      "per_class": {
+        "Clap": {
+          "precision": 74.1,
+          "recall": 88.9,
+          "f1": 80.8,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 63.2,
+          "recall": 54.5,
+          "f1": 58.5,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 61.1,
+          "recall": 80.5,
+          "f1": 69.5,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 18.8,
+          "recall": 11.5,
+          "f1": 14.3,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 63.1,
+          "recall": 69.5,
+          "f1": 66.1,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 84.4,
+          "recall": 76.1,
+          "f1": 80.0,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 43.6,
+          "recall": 30.9,
+          "f1": 36.2,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 28.9,
+          "recall": 27.7,
+          "f1": 28.3,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 47.8,
+          "recall": 39.3,
+          "f1": 43.1,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 60.4,
+          "recall": 64.7,
+          "f1": 62.5,
+          "n": 85
+        }
+      },
+      "by_vendor": {
+        "Breaks": {
+          "n": 53,
+          "acc": 67.9
+        },
+        "Drum Recollection": {
+          "n": 35,
+          "acc": 77.1
+        },
+        "Koan Sound": {
+          "n": 8,
+          "acc": 50.0
+        },
+        "MGF Mega Pack": {
+          "n": 29,
+          "acc": 24.1
+        },
+        "Mike Shinoda Drums": {
+          "n": 89,
+          "acc": 55.1
+        },
+        "Minimal Audio": {
+          "n": 21,
+          "acc": 61.9
+        },
+        "Old Movies 1 - Vintage Collection (Drum Kit)": {
+          "n": 19,
+          "acc": 47.4
+        },
+        "Organic Drum Kit": {
+          "n": 93,
+          "acc": 68.8
+        },
+        "Organic Electronics 2 J.Views": {
+          "n": 11,
+          "acc": 27.3
+        },
+        "Sounds of KSHMR Vol.3": {
+          "n": 116,
+          "acc": 61.2
+        }
+      }
+    },
+    "clap|packfam": {
+      "acc_mean": 64.67080152671755,
+      "acc_sd": 1.320237986834131,
+      "per_seed": [
+        64.5,
+        65.46,
+        65.08,
+        66.6,
+        62.98,
+        66.22,
+        62.98,
+        63.55
+      ],
+      "macro_f1": 59.17498032939302,
+      "worst_fold": 57.047733029281304,
+      "top2": 78.53053435114504,
+      "prec_at_50cov": 82.5381679389313,
+      "per_class": {
+        "Clap": {
+          "precision": 78.4,
+          "recall": 88.9,
+          "f1": 83.3,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 56.5,
+          "recall": 59.1,
+          "f1": 57.8,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 72.5,
+          "recall": 70.7,
+          "f1": 71.6,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 15.4,
+          "recall": 15.4,
+          "f1": 15.4,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 65.6,
+          "recall": 67.8,
+          "f1": 66.7,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 85.9,
+          "recall": 85.9,
+          "f1": 85.9,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 42.4,
+          "recall": 45.5,
+          "f1": 43.9,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 28.6,
+          "recall": 25.5,
+          "f1": 27.0,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 60.9,
+          "recall": 50.0,
+          "f1": 54.9,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 71.4,
+          "recall": 64.7,
+          "f1": 67.9,
+          "n": 85
+        }
+      }
+    },
+    "perch|random": {
+      "acc_mean": 69.44179389312976,
+      "acc_sd": 1.245722460796461,
+      "per_seed": [
+        69.66,
+        69.08,
+        71.18,
+        70.04,
+        66.6,
+        69.08,
+        69.66,
+        70.23
+      ],
+      "macro_f1": 63.61259093937379,
+      "worst_fold": 64.36355311355311,
+      "top2": 82.18034351145039,
+      "prec_at_50cov": 89.69465648854961,
+      "per_class": {
+        "Clap": {
+          "precision": 82.1,
+          "recall": 86.7,
+          "f1": 84.3,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 75.0,
+          "recall": 68.2,
+          "f1": 71.4,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 72.7,
+          "recall": 78.0,
+          "f1": 75.3,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 35.3,
+          "recall": 23.1,
+          "f1": 27.9,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 77.2,
+          "recall": 74.6,
+          "f1": 75.9,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 89.0,
+          "recall": 91.5,
+          "f1": 90.3,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 57.8,
+          "recall": 47.3,
+          "f1": 52.0,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 48.7,
+          "recall": 40.4,
+          "f1": 44.2,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 48.5,
+          "recall": 57.1,
+          "f1": 52.5,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 66.3,
+          "recall": 78.8,
+          "f1": 72.0,
+          "n": 85
+        }
+      }
+    },
+    "perch|family": {
+      "acc_mean": 66.41221374045801,
+      "acc_sd": 1.5177455840254657,
+      "per_seed": [
+        67.37,
+        66.22,
+        63.93,
+        67.56,
+        68.51,
+        66.6,
+        66.98,
+        64.12
+      ],
+      "macro_f1": 60.29270709019309,
+      "worst_fold": 59.288697830168566,
+      "top2": 80.00954198473283,
+      "prec_at_50cov": 86.59351145038168,
+      "per_class": {
+        "Clap": {
+          "precision": 84.9,
+          "recall": 87.8,
+          "f1": 86.3,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 65.0,
+          "recall": 59.1,
+          "f1": 61.9,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 50.0,
+          "recall": 41.5,
+          "f1": 45.3,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 35.3,
+          "recall": 23.1,
+          "f1": 27.9,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 69.0,
+          "recall": 67.8,
+          "f1": 68.4,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 91.3,
+          "recall": 88.7,
+          "f1": 90.0,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 40.7,
+          "recall": 43.6,
+          "f1": 42.1,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 38.3,
+          "recall": 38.3,
+          "f1": 38.3,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 46.9,
+          "recall": 53.6,
+          "f1": 50.0,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 64.2,
+          "recall": 71.8,
+          "f1": 67.8,
+          "n": 85
+        }
+      }
+    },
+    "perch|pack": {
+      "acc_mean": 60.329198473282446,
+      "acc_sd": 1.2123860457607878,
+      "per_seed": [
+        59.54,
+        61.07,
+        59.92,
+        63.17,
+        59.73,
+        58.97,
+        59.92,
+        60.31
+      ],
+      "macro_f1": 52.750365072327156,
+      "worst_fold": 47.52252236781477,
+      "top2": 73.73568702290076,
+      "prec_at_50cov": 80.96374045801525,
+      "per_class": {
+        "Clap": {
+          "precision": 75.0,
+          "recall": 86.7,
+          "f1": 80.4,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 58.6,
+          "recall": 77.3,
+          "f1": 66.7,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 50.0,
+          "recall": 58.5,
+          "f1": 53.9,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 27.3,
+          "recall": 23.1,
+          "f1": 25.0,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 66.7,
+          "recall": 71.2,
+          "f1": 68.9,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 84.7,
+          "recall": 85.9,
+          "f1": 85.3,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 34.9,
+          "recall": 27.3,
+          "f1": 30.6,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 24.1,
+          "recall": 14.9,
+          "f1": 18.4,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 42.9,
+          "recall": 32.1,
+          "f1": 36.7,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 61.3,
+          "recall": 67.1,
+          "f1": 64.0,
+          "n": 85
+        }
+      }
+    },
+    "perch|vendor": {
+      "acc_mean": 60.019083969465655,
+      "acc_sd": 1.1647476732570317,
+      "per_seed": [
+        62.21,
+        59.73,
+        59.35,
+        59.16,
+        58.4,
+        59.73,
+        60.11,
+        61.45
+      ],
+      "macro_f1": 52.573960218465984,
+      "worst_fold": 37.61673022935537,
+      "top2": 72.80534351145039,
+      "prec_at_50cov": 79.15076335877862,
+      "per_class": {
+        "Clap": {
+          "precision": 78.6,
+          "recall": 85.6,
+          "f1": 81.9,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 66.7,
+          "recall": 72.7,
+          "f1": 69.6,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 61.5,
+          "recall": 78.0,
+          "f1": 68.8,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 26.3,
+          "recall": 19.2,
+          "f1": 22.2,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 57.4,
+          "recall": 66.1,
+          "f1": 61.4,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 84.3,
+          "recall": 83.1,
+          "f1": 83.7,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 40.5,
+          "recall": 30.9,
+          "f1": 35.1,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 25.0,
+          "recall": 10.6,
+          "f1": 14.9,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 32.3,
+          "recall": 35.7,
+          "f1": 33.9,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 62.0,
+          "recall": 72.9,
+          "f1": 67.0,
+          "n": 85
+        }
+      },
+      "by_vendor": {
+        "Breaks": {
+          "n": 53,
+          "acc": 52.8
+        },
+        "Drum Recollection": {
+          "n": 35,
+          "acc": 68.6
+        },
+        "Koan Sound": {
+          "n": 8,
+          "acc": 75.0
+        },
+        "MGF Mega Pack": {
+          "n": 29,
+          "acc": 34.5
+        },
+        "Mike Shinoda Drums": {
+          "n": 89,
+          "acc": 67.4
+        },
+        "Minimal Audio": {
+          "n": 21,
+          "acc": 61.9
+        },
+        "Old Movies 1 - Vintage Collection (Drum Kit)": {
+          "n": 19,
+          "acc": 47.4
+        },
+        "Organic Drum Kit": {
+          "n": 93,
+          "acc": 63.4
+        },
+        "Organic Electronics 2 J.Views": {
+          "n": 11,
+          "acc": 45.5
+        },
+        "Sounds of KSHMR Vol.3": {
+          "n": 116,
+          "acc": 65.5
+        }
+      }
+    },
+    "perch|packfam": {
+      "acc_mean": 66.41221374045801,
+      "acc_sd": 0.7573715585108587,
+      "per_seed": [
+        64.89,
+        67.56,
+        67.18,
+        65.84,
+        66.41,
+        66.41,
+        66.6,
+        66.41
+      ],
+      "macro_f1": 60.1053332953973,
+      "worst_fold": 60.08511225164064,
+      "top2": 79.98568702290075,
+      "prec_at_50cov": 86.11641221374046,
+      "per_class": {
+        "Clap": {
+          "precision": 83.7,
+          "recall": 85.6,
+          "f1": 84.6,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 66.7,
+          "recall": 63.6,
+          "f1": 65.1,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 60.4,
+          "recall": 70.7,
+          "f1": 65.2,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 30.8,
+          "recall": 15.4,
+          "f1": 20.5,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 69.4,
+          "recall": 72.9,
+          "f1": 71.1,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 86.5,
+          "recall": 90.1,
+          "f1": 88.3,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 46.4,
+          "recall": 47.3,
+          "f1": 46.8,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 41.0,
+          "recall": 34.0,
+          "f1": 37.2,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 48.0,
+          "recall": 42.9,
+          "f1": 45.3,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 67.0,
+          "recall": 74.1,
+          "f1": 70.4,
+          "n": 85
+        }
+      }
+    },
+    "perch+clap|random": {
+      "acc_mean": 71.82729007633588,
+      "acc_sd": 1.0095469451096768,
+      "per_seed": [
+        72.9,
+        72.33,
+        73.66,
+        70.8,
+        70.61,
+        71.18,
+        71.18,
+        71.95
+      ],
+      "macro_f1": 67.27331111246932,
+      "worst_fold": 67.9842032967033,
+      "top2": 84.42270992366412,
+      "prec_at_50cov": 90.60114503816794,
+      "per_class": {
+        "Clap": {
+          "precision": 81.2,
+          "recall": 86.7,
+          "f1": 83.9,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 80.0,
+          "recall": 72.7,
+          "f1": 76.2,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 81.0,
+          "recall": 82.9,
+          "f1": 81.9,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 32.0,
+          "recall": 30.8,
+          "f1": 31.4,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 76.7,
+          "recall": 78.0,
+          "f1": 77.3,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 89.0,
+          "recall": 91.5,
+          "f1": 90.3,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 60.4,
+          "recall": 52.7,
+          "f1": 56.3,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 47.4,
+          "recall": 38.3,
+          "f1": 42.4,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 63.3,
+          "recall": 67.9,
+          "f1": 65.5,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 69.6,
+          "recall": 75.3,
+          "f1": 72.3,
+          "n": 85
+        }
+      }
+    },
+    "perch+clap|family": {
+      "acc_mean": 68.89312977099236,
+      "acc_sd": 1.036524856030556,
+      "per_seed": [
+        69.66,
+        68.32,
+        67.37,
+        69.85,
+        68.32,
+        68.32,
+        70.8,
+        68.51
+      ],
+      "macro_f1": 64.1093030502783,
+      "worst_fold": 63.04083589379323,
+      "top2": 82.18034351145039,
+      "prec_at_50cov": 87.40458015267176,
+      "per_class": {
+        "Clap": {
+          "precision": 82.1,
+          "recall": 86.7,
+          "f1": 84.3,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 71.4,
+          "recall": 68.2,
+          "f1": 69.8,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 68.6,
+          "recall": 58.5,
+          "f1": 63.2,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 36.4,
+          "recall": 30.8,
+          "f1": 33.3,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 71.2,
+          "recall": 71.2,
+          "f1": 71.2,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 94.3,
+          "recall": 93.0,
+          "f1": 93.6,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 52.7,
+          "recall": 52.7,
+          "f1": 52.7,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 43.2,
+          "recall": 34.0,
+          "f1": 38.1,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 60.0,
+          "recall": 75.0,
+          "f1": 66.7,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 63.2,
+          "recall": 70.6,
+          "f1": 66.7,
+          "n": 85
+        }
+      }
+    },
+    "perch+clap|pack": {
+      "acc_mean": 64.2175572519084,
+      "acc_sd": 1.304846787326083,
+      "per_seed": [
+        62.4,
+        62.98,
+        64.12,
+        65.65,
+        66.41,
+        63.17,
+        65.08,
+        63.93
+      ],
+      "macro_f1": 57.70465010707679,
+      "worst_fold": 52.199316951086814,
+      "top2": 76.95610687022901,
+      "prec_at_50cov": 81.63167938931298,
+      "per_class": {
+        "Clap": {
+          "precision": 75.2,
+          "recall": 87.8,
+          "f1": 81.0,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 66.7,
+          "recall": 72.7,
+          "f1": 69.6,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 63.0,
+          "recall": 70.7,
+          "f1": 66.7,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 36.4,
+          "recall": 30.8,
+          "f1": 33.3,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 63.6,
+          "recall": 71.2,
+          "f1": 67.2,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 83.8,
+          "recall": 87.3,
+          "f1": 85.5,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 43.2,
+          "recall": 29.1,
+          "f1": 34.8,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 26.5,
+          "recall": 19.1,
+          "f1": 22.2,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 48.1,
+          "recall": 46.4,
+          "f1": 47.3,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 68.5,
+          "recall": 71.8,
+          "f1": 70.1,
+          "n": 85
+        }
+      }
+    },
+    "perch+clap|vendor": {
+      "acc_mean": 62.11832061068702,
+      "acc_sd": 1.8229936235250774,
+      "per_seed": [
+        64.5,
+        63.93,
+        60.88,
+        61.45,
+        58.59,
+        62.4,
+        61.45,
+        63.74
+      ],
+      "macro_f1": 54.91768824058066,
+      "worst_fold": 37.95109645638011,
+      "top2": 75.93034351145039,
+      "prec_at_50cov": 81.10687022900763,
+      "per_class": {
+        "Clap": {
+          "precision": 79.8,
+          "recall": 87.8,
+          "f1": 83.6,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 70.8,
+          "recall": 77.3,
+          "f1": 73.9,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 62.3,
+          "recall": 80.5,
+          "f1": 70.2,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 22.2,
+          "recall": 15.4,
+          "f1": 18.2,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 57.7,
+          "recall": 69.5,
+          "f1": 63.1,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 87.1,
+          "recall": 85.9,
+          "f1": 86.5,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 47.5,
+          "recall": 34.5,
+          "f1": 40.0,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 30.4,
+          "recall": 14.9,
+          "f1": 20.0,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 33.3,
+          "recall": 32.1,
+          "f1": 32.7,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 64.6,
+          "recall": 75.3,
+          "f1": 69.6,
+          "n": 85
+        }
+      },
+      "by_vendor": {
+        "Breaks": {
+          "n": 53,
+          "acc": 56.6
+        },
+        "Drum Recollection": {
+          "n": 35,
+          "acc": 77.1
+        },
+        "Koan Sound": {
+          "n": 8,
+          "acc": 75.0
+        },
+        "MGF Mega Pack": {
+          "n": 29,
+          "acc": 31.0
+        },
+        "Mike Shinoda Drums": {
+          "n": 89,
+          "acc": 70.8
+        },
+        "Minimal Audio": {
+          "n": 21,
+          "acc": 61.9
+        },
+        "Old Movies 1 - Vintage Collection (Drum Kit)": {
+          "n": 19,
+          "acc": 52.6
+        },
+        "Organic Drum Kit": {
+          "n": 93,
+          "acc": 65.6
+        },
+        "Organic Electronics 2 J.Views": {
+          "n": 11,
+          "acc": 36.4
+        },
+        "Sounds of KSHMR Vol.3": {
+          "n": 116,
+          "acc": 67.2
+        }
+      }
+    },
+    "perch+clap|packfam": {
+      "acc_mean": 69.01240458015266,
+      "acc_sd": 0.9539002396532523,
+      "per_seed": [
+        67.18,
+        70.23,
+        69.27,
+        69.47,
+        67.75,
+        69.27,
+        69.66,
+        69.27
+      ],
+      "macro_f1": 63.908566057453925,
+      "worst_fold": 62.95142350046623,
+      "top2": 82.75286259541986,
+      "prec_at_50cov": 88.02480916030535,
+      "per_class": {
+        "Clap": {
+          "precision": 82.3,
+          "recall": 87.8,
+          "f1": 84.9,
+          "n": 90
+        },
+        "Crash": {
+          "precision": 71.4,
+          "recall": 68.2,
+          "f1": 69.8,
+          "n": 22
+        },
+        "Drum Loop": {
+          "precision": 72.5,
+          "recall": 70.7,
+          "f1": 71.6,
+          "n": 41
+        },
+        "Foley": {
+          "precision": 28.6,
+          "recall": 23.1,
+          "f1": 25.5,
+          "n": 26
+        },
+        "Hi-Hat": {
+          "precision": 71.2,
+          "recall": 71.2,
+          "f1": 71.2,
+          "n": 59
+        },
+        "Kick": {
+          "precision": 90.4,
+          "recall": 93.0,
+          "f1": 91.7,
+          "n": 71
+        },
+        "Other/none": {
+          "precision": 52.7,
+          "recall": 52.7,
+          "f1": 52.7,
+          "n": 55
+        },
+        "Percussion": {
+          "precision": 37.8,
+          "recall": 29.8,
+          "f1": 33.3,
+          "n": 47
+        },
+        "Percussion Loop": {
+          "precision": 66.7,
+          "recall": 64.3,
+          "f1": 65.5,
+          "n": 28
+        },
+        "Snare": {
+          "precision": 68.4,
+          "recall": 76.5,
+          "f1": 72.2,
+          "n": 85
+        }
+      }
+    },
+    "perch+clap-knn|random": {
+      "acc_mean": 69.79961832061068,
+      "acc_sd": 0.5939837594460267,
+      "per_seed": [
+        70.42,
+        68.89,
+        70.61,
+        70.04,
+        69.08,
+        70.04,
+        69.27,
+        70.04
+      ],
+      "macro_f1": 61.58949085730862,
+      "worst_fold": 65.07554945054946,
+      "top2": 84.16030534351144,
+      "prec_at_50cov": 92.12786259541986
+    },
+    "perch+clap-knn|vendor": {
+      "acc_mean": 64.07442748091603,
+      "acc_sd": 0.8413736683467764,
+      "per_seed": [
+        63.74,
+        65.08,
+        64.5,
+        63.17,
+        63.55,
+        65.27,
+        62.79,
+        64.5
+      ],
+      "macro_f1": 52.45505367082468,
+      "worst_fold": 31.96719298499054,
+      "top2": 74.92843511450381,
+      "prec_at_50cov": 85.54389312977099
+    }
+  },
+  "vendor_probe": {
+    "accuracy": 62.6,
+    "majority": 25.5,
+    "n": 455,
+    "n_vendors": 8
+  },
+  "headline": {
+    "random": 71.82729007633588,
+    "family": 68.89312977099236,
+    "pack": 64.2175572519084,
+    "vendor": 62.11832061068702,
+    "random_minus_vendor": 9.71,
+    "random_minus_family": 2.93
+  }
+}

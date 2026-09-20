@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Thursday's HTTP server (thursday/server.py), kept running so it's
+      reachable from other devices over Tailscale without a manual start.
+      Runs thursday/scripts/run_server.sh, which resolves this machine's
+      current Tailscale IPv4 address at every start and binds only to
+      that address -- never 0.0.0.0, so this is never reachable over the
+      regular LAN/wifi, only the private tailnet.
+
+      This is NITE DSP's canonical Thursday deployment -- this repo
+      (autonomous-systems/thursday), not Audio_Too/thursday, which is
+      archived. Replaces com.audio-too.thursday-server.plist
+      (2026-09-02).
+
+      Auth: THURSDAY_SERVER_TOKEN, loaded by server.py itself from
+      Audio_Too/.env (gitignored, not in this plist) via
+      thursday.repo_root.audio_too_root()'s upward search -- Audio_Too
+      still holds the real credentials/model files/business data this
+      server's live integrations need (see docs/EXTRACTION_COUPLING.md),
+      independent of which repo's server.py process is actually running.
+
+      Kill switch: `launchctl unload ~/Library/LaunchAgents/com.nitedsp.thursday-server.plist`
+      or remove this file. The server is read/write against local state
+      only (task ledger, session store) -- nothing external, nothing that
+      needs unwinding.
+
+      Added 2026-09-02.
+    -->
+    <key>Label</key>
+    <string>com.nitedsp.thursday-server</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/zsh</string>
+        <string>/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/autonomous-systems/thursday/thursday/scripts/run_server.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/autonomous-systems/thursday</string>
+
+    <!-- Start when this plist is loaded, and again at every login. -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Restart if the process exits for any reason (crash, Tailscale
+         briefly dropping, etc). ThrottleInterval prevents a fast
+         crash-restart loop if something is persistently wrong. -->
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>15</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/Ganders4/Library/Logs/Thursday/server.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/Ganders4/Library/Logs/Thursday/server.err.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/Audio_Too/.venv/bin</string>
+    </dict>
+</dict>
+</plist>

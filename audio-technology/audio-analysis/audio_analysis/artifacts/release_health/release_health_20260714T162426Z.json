@@ -1,0 +1,35 @@
+{
+  "timestamp": "20260714T162426Z",
+  "overall": {
+    "ok": true,
+    "failures": [],
+    "categories": {
+      "kenn_retrieval_latency": {
+        "label": "kenn_retrieval_latency",
+        "ok": true,
+        "failures": [],
+        "cold_start_s": 0.2047,
+        "steady_state_samples_s": [
+          0.0525,
+          0.0601
+        ],
+        "steady_state_mean_s": 0.0563,
+        "steady_state_max_s": 0.0601,
+        "slo_s": 0.5
+      },
+      "tts_latency": {
+        "label": "tts_latency",
+        "ok": true,
+        "failures": [],
+        "cold_start_s": 2.8892,
+        "steady_state_samples_s": [
+          1.3431,
+          0.9114
+        ],
+        "steady_state_mean_s": 1.1273,
+        "steady_state_max_s": 1.3431,
+        "slo_s": 2.0
+      }
+    }
+  }
+}

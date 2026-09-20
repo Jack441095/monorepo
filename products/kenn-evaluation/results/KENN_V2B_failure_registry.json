@@ -1,0 +1,71 @@
+{
+  "candidate": "D_hierarchical",
+  "failures": [
+    {
+      "issue_type": "clipping",
+      "class": "threshold_or_missing_context",
+      "count": 2,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "headroom",
+      "class": "threshold_or_missing_context",
+      "count": 2,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "dc",
+      "class": "threshold_or_missing_context",
+      "count": 2,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "lr_imbalance",
+      "class": "threshold_or_missing_context",
+      "count": 5,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "bass_excess",
+      "class": "threshold_or_missing_context",
+      "count": 5,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "mud",
+      "class": "threshold_or_missing_context",
+      "count": 5,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "harshness",
+      "class": "threshold_or_missing_context",
+      "count": 6,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "resonance",
+      "class": "threshold_or_missing_context",
+      "count": 8,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "anti_phase",
+      "class": "threshold_or_missing_context",
+      "count": 1,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "wide_bass",
+      "class": "threshold_or_missing_context",
+      "count": 4,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    },
+    {
+      "issue_type": "over_compression",
+      "class": "threshold_or_missing_context",
+      "count": 7,
+      "next_action": "inspect boundary score distribution before threshold changes"
+    }
+  ]
+}

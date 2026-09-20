@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blind A/B Multitrack Listening Benchmark — Audio Too</title>
+  <meta name="description" content="Blind pairwise A/B listening benchmark interface for evaluating multitrack mixdown quality.">
+  <style>
+    :root {
+      --bg-gradient: #0b0b0b;
+      --card-bg: #111111;
+      --card-border: #2a2a2a;
+      --accent-blue: #60a5fa;
+      --accent-purple: #a78bfa;
+      --accent-green: #22c55e;
+      --text-main: #e4e4e7;
+      --text-muted: #71717a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(11, 11, 11, 0.9);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav {
+      display: flex;
+      gap: 16px;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--accent-blue);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 32px auto;
+      padding: 0 20px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    .ab-switcher {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn-ab {
+      flex: 1;
+      padding: 14px;
+      border: 2px solid var(--card-border);
+      background: #18181b;
+      color: var(--text-main);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-ab:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .btn-ab.active {
+      background: rgba(96, 165, 250, 0.15);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .audio-player-box {
+      background: #18181b;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    audio {
+      width: 100%;
+      height: 40px;
+    }
+
+    .rating-group {
+      margin-bottom: 18px;
+    }
+
+    .rating-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent-blue);
+    }
+
+    .val-badge {
+      font-weight: 700;
+      color: var(--accent-blue);
+      min-width: 40px;
+    }
+
+    .radio-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .radio-option {
+      flex: 1;
+      background: #18181b;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .radio-option input {
+      accent-color: var(--accent-blue);
+    }
+
+    textarea, input[type="text"], select {
+      width: 100%;
+      padding: 10px 14px;
+      background: #18181b;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent-blue);
+      color: #0b0b0b;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 12px;
+    }
+
+    .btn-submit:hover {
+      background: #3b82f6;
+    }
+
+    .status-msg {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/dashboard.html" class="brand">🎧 Audio Too</a>
+    <nav>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/automix.html">AutoMix</a>
+      <a href="/listening_benchmark.html" class="active">Listening Benchmark</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <h1>🎧 Blind A/B Multitrack Producer Benchmark</h1>
+      <p class="subtitle">Listen to two randomized mix versions of the multitrack project below and rate their audio quality on 4 core dimensions.</p>
+
+      <div id="sessionInfo" style="margin-bottom:16px; font-size:0.9rem; color:var(--text-muted);">
+        Project: <strong id="projName" style="color:var(--text-main);">Loading...</strong> | Genre: <strong id="projGenre" style="color:var(--accent-purple);">Pop</strong>
+      </div>
+
+      <!-- Blind Mix Switcher Buttons -->
+      <div class="ab-switcher">
+        <button id="btnMix1" class="btn-ab active" onclick="switchMix(1)">🎛️ Mix 1</button>
+        <button id="btnMix2" class="btn-ab" onclick="switchMix(2)">🎛️ Mix 2</button>
+      </div>
+
+      <div class="audio-player-box">
+        <audio id="benchmarkAudio" controls preload="auto"></audio>
+      </div>
+
+      <!-- Ratings Form -->
+      <form id="benchmarkForm" onsubmit="submitRating(event)">
+
+        <div class="rating-group">
+          <label>1. Tonal Balance & Clarity (1 = Muddy/Harsh, 5 = Pristine)</label>
+          <div class="slider-row">
+            <input type="range" id="scoreClarity" min="1" max="5" value="3" oninput="updateVal('valClarity', this.value)">
+            <span id="valClarity" class="val-badge">3 / 5</span>
+          </div>
+        </div>
+
+        <div class="rating-group">
+          <label>2. Low-End Weight & Control (1 = Boomy/Thin, 5 = Punchy & Centred)</label>
+          <div class="slider-row">
+            <input type="range" id="scoreBass" min="1" max="5" value="3" oninput="updateVal('valBass', this.value)">
+            <span id="valBass" class="val-badge">3 / 5</span>
+          </div>
+        </div>
+
+        <div class="rating-group">
+          <label>3. Stereo Imaging & Width (1 = Narrow/Phasey, 5 = Wide & Stable)</label>
+          <div class="slider-row">
+            <input type="range" id="scoreWidth" min="1" max="5" value="3" oninput="updateVal('valWidth', this.value)">
+            <span id="valWidth" class="val-badge">3 / 5</span>
+          </div>
+        </div>
+
+        <div class="rating-group">
+          <label>4. Overall Punch & Dynamics (1 = Flattened/Lacking, 5 = Dynamic Impact)</label>
+          <div class="slider-row">
+            <input type="range" id="scorePunch" min="1" max="5" value="3" oninput="updateVal('valPunch', this.value)">
+            <span id="valPunch" class="val-badge">3 / 5</span>
+          </div>
+        </div>
+
+        <div class="rating-group">
+          <label>Overall Pairwise Preference</label>
+          <div class="radio-row">
+            <label class="radio-option">
+              <input type="radio" name="preference" value="mix1" required> Mix 1 is Better
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="preference" value="mix2" required> Mix 2 is Better
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="preference" value="equal"> Equal / No Preference
+            </label>
+          </div>
+        </div>
+
+        <div class="rating-group" style="margin-top:16px;">
+          <label>Producer Name / Handle (Optional)</label>
+          <input type="text" id="producerName" placeholder="e.g. Alex Producer">
+        </div>
+
+        <div class="rating-group">
+          <label>Detailed Producer Feedback & Notes (Optional)</label>
+          <textarea id="feedbackText" rows="3" placeholder="Share specific thoughts on vocal presence, drum punch, or frequency balance..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Producer Benchmark Rating</button>
+      </form>
+
+      <div id="statusMsg" class="status-msg"></div>
+    </div>
+  </main>
+
+  <script src="/listening_benchmark.js"></script>
+</body>
+</html>

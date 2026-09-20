@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NITE DSP — EMBER Token Reference Harness (non-production)</title>
+<style>
+/* Loads the generated token file directly — proves web consumption of the canonical source. */
+@import url("../generated/web/nite-tokens.css");
+
+* { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--nite-color-surface-base);
+  color: var(--nite-color-text-primary);
+  font-family: Inter, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: var(--nite-space-m);
+  padding: var(--nite-space-xl);
+  display: grid;
+  gap: var(--nite-space-l);
+}
+h1 { font-size: 17px; font-weight: 600; }
+h2 { font-size: 13px; font-weight: 500; color: var(--nite-color-text-secondary); margin-bottom: 8px; }
+.panel { background: var(--nite-color-surface-raised); border: 1px solid var(--nite-color-border-hairline-subtle); border-radius: var(--nite-radius-m); padding: var(--nite-space-l); }
+.row { display: flex; gap: var(--nite-space-m); flex-wrap: wrap; align-items: center; }
+
+.swatch { width: 88px; border-radius: var(--nite-radius-s); overflow: hidden; font-size: 10px; font-family: "SF Mono", Menlo, monospace; color: var(--nite-color-text-tertiary); }
+.swatch .chip { height: 40px; }
+
+button {
+  background: var(--nite-color-surface-overlay);
+  color: var(--nite-color-text-primary);
+  border: 1px solid var(--nite-color-border-hairline-strong);
+  border-radius: var(--nite-radius-s);
+  padding: 6px 14px;
+  font-size: 11px;
+  transition: background var(--nite-motion-fast-duration) var(--motion-easing),
+              border-color var(--nite-motion-fast-duration) var(--motion-easing);
+}
+button.primary { background: var(--nite-color-interactive-base); color: var(--nite-color-interactive-ink); border-color: transparent; font-weight: 500; }
+button:hover { border-color: var(--nite-color-interactive-bright); }
+button:focus-visible { outline: 2px solid var(--nite-color-interactive-bright); outline-offset: 1px; }
+
+.state-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: var(--nite-radius-s);
+  border: 1.5px solid; font-size: 11px;
+}
+.st-playing  { border-color: var(--nite-state-playing);  color: var(--nite-state-playing); }
+.st-favorite { border-color: var(--nite-state-favorite); color: var(--nite-state-favorite); }
+.st-warning  { border-color: var(--nite-state-warning);  color: var(--nite-state-warning); }
+.st-error    { border-color: var(--nite-state-error);    color: var(--nite-state-error); }
+.st-unknown  { border-color: var(--nite-state-unknown);  color: var(--nite-state-unknown); border-style: dashed; }
+.st-proposal { border-color: var(--nite-interactive-default); color: var(--nite-interactive-default); border-style: dashed; }
+
+.cat-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: var(--nite-radius-s);
+  background: var(--nite-color-surface-overlay);
+  border: 1px solid var(--nite-color-border-hairline-subtle);
+  font-size: 11px;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.map-demo { display: flex; gap: var(--nite-space-l); align-items: center; }
+.map-point { position: relative; width: 56px; height: 56px; display: grid; place-items: center; }
+svg.shape { display: block; }
+.lbl { font-size: 9px; color: var(--nite-color-text-tertiary); text-align: center; margin-top: 2px; font-family: "SF Mono", Menlo, monospace; }
+
+.mono-num { font-family: "SF Mono", "JetBrains Mono", Menlo, monospace; font-variant-numeric: tabular-nums; color: var(--nite-color-text-secondary); }
+.caption { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--nite-color-text-tertiary); }
+</style>
+</head>
+<body>
+<h1>NITE DSP · EMBER Token Reference Harness</h1>
+<div class="caption">Non-production · consumes generated/web/nite-tokens.css from the canonical JSON</div>
+
+<section class="panel">
+  <h2>Surfaces &amp; interaction</h2>
+  <div class="row">
+    <div class="swatch"><div class="chip" style="background:var(--nite-color-surface-base)"></div>base</div>
+    <div class="swatch"><div class="chip" style="background:var(--nite-color-surface-raised)"></div>raised</div>
+    <div class="swatch"><div class="chip" style="background:var(--nite-color-surface-overlay)"></div>overlay</div>
+    <div class="swatch"><div class="chip" style="background:var(--nite-color-surface-inset)"></div>inset</div>
+    <div class="swatch"><div class="chip" style="background:var(--nite-color-interactive-base)"></div>copper</div>
+    <div class="swatch"><div class="chip" style="background:var(--nite-state-playing)"></div>playing</div>
+    <div class="swatch"><div class="chip" style="background:var(--nite-state-favorite)"></div>favorite</div>
+    <div class="swatch"><div class="chip" style="background:var(--nite-state-warning)"></div>warning</div>
+    <div class="swatch"><div class="chip" style="background:var(--nite-state-error)"></div>error</div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Buttons &amp; semantic states</h2>
+  <div class="row" style="margin-bottom:12px">
+    <button class="primary">Primary Action</button>
+    <button>Ghost Action</button>
+    <button style="color:var(--nite-state-error);border-color:var(--nite-state-error)">Destructive…</button>
+  </div>
+  <div class="row">
+    <span class="state-chip st-playing">▶ Playing</span>
+    <span class="state-chip st-favorite">★ Favourite</span>
+    <span class="state-chip st-warning">▲ HIGH</span>
+    <span class="state-chip st-error">✕ Error</span>
+    <span class="state-chip st-unknown">? Unclassified</span>
+    <span class="state-chip st-proposal">Provisional proposal</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>SLO category palette + R-CVD-1 MAP family shapes (default-on)</h2>
+  <div class="row" style="margin-bottom:12px">
+    <span class="cat-pill"><span class="dot" style="background:#C96F4A"></span>Kick</span>
+    <span class="cat-pill"><span class="dot" style="background:#E3C567"></span>Snare</span>
+    <span class="cat-pill"><span class="dot" style="background:#D98BA6"></span>Clap</span>
+    <span class="cat-pill"><span class="dot" style="background:#9FC2A5"></span>Hi-Hat</span>
+    <span class="cat-pill"><span class="dot" style="background:#B98BD6"></span>Percussion</span>
+    <span class="cat-pill"><span class="dot" style="background:#6E93B8"></span>Bass</span>
+    <span class="cat-pill"><span class="dot" style="background:#7FB0C4"></span>Synth</span>
+    <span class="cat-pill"><span class="dot" style="background:#E0A96B"></span>Vocal</span>
+    <span class="cat-pill"><span class="dot" style="border:1.5px dashed #4A453D"></span>Unknown</span>
+  </div>
+  <div class="map-demo">
+    <div class="map-point"><div><svg class="shape" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="#C96F4A" fill-opacity="0.55" stroke="#EDE8E0" stroke-opacity="0.4" stroke-width="1.5"/></svg><div class="lbl">● drums</div></div></div>
+    <div class="map-point"><div><svg class="shape" width="28" height="28" viewBox="0 0 28 28"><rect x="4" y="4" width="20" height="20" rx="2" fill="#6E93B8" fill-opacity="0.55" stroke="#EDE8E0" stroke-opacity="0.4" stroke-width="1.5"/></svg><div class="lbl">■ bass</div></div></div>
+    <div class="map-point"><div><svg class="shape" width="28" height="28" viewBox="0 0 28 28"><polygon points="14,3 25,24 3,24" fill="#7FB0C4" fill-opacity="0.55" stroke="#EDE8E0" stroke-opacity="0.4" stroke-width="1.5"/></svg><div class="lbl">▲ synth</div></div></div>
+    <div class="map-point"><div><svg class="shape" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="none" stroke="#E0A96B" stroke-width="2"/></svg><div class="lbl">○ vocal</div></div></div>
+    <div class="map-point"><div><svg class="shape" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="none" stroke="#4A453D" stroke-width="1.5" stroke-dasharray="4 3"/></svg><div class="lbl">◌ unknown</div></div></div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Typography &amp; technical numerals</h2>
+  <div class="row" style="gap:24px">
+    <div><div class="caption">Metadata / mono</div>
+      <div class="mono-num">−9.4 LUFS · 174 BPM · 12.4 kHz</div></div>
+    <div><div class="caption">Tabular alignment</div>
+      <div class="mono-num">101.20<br>98.75<br>104.00</div></div>
+  </div>
+</section>
+
+</body>
+</html>

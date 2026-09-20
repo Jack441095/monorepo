@@ -1,0 +1,211 @@
+{
+  "record_type": "slo_factorised_head_benchmark",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T11:09:13",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 5,
+    "splits": 5,
+    "epochs": 80,
+    "sealed_validation_excluded": true,
+    "decision_gate_pp": 2.0
+  },
+  "inputs": {
+    "corpus": "/mnt/data/slo_training/corpus_v4b_escape_recovered.npz",
+    "manifest": "/mnt/data/slo_training/factorised_training_manifest_v1.json",
+    "n_rows": 1495,
+    "n_classes": 27,
+    "n_collections": 80
+  },
+  "inventory": {
+    "Atmosphere": {
+      "n": 5,
+      "groups": 3
+    },
+    "Bass Hit": {
+      "n": 30,
+      "groups": 10
+    },
+    "Bass Loop": {
+      "n": 38,
+      "groups": 11
+    },
+    "Bass Reese": {
+      "n": 48,
+      "groups": 7
+    },
+    "Chord Loop": {
+      "n": 36,
+      "groups": 12
+    },
+    "Clap": {
+      "n": 89,
+      "groups": 14
+    },
+    "Crash": {
+      "n": 59,
+      "groups": 13
+    },
+    "Drum Fill": {
+      "n": 3,
+      "groups": 2
+    },
+    "Drum Loop": {
+      "n": 81,
+      "groups": 31
+    },
+    "Foley": {
+      "n": 112,
+      "groups": 23
+    },
+    "Foley Loop": {
+      "n": 45,
+      "groups": 14
+    },
+    "Hi-Hat": {
+      "n": 115,
+      "groups": 21
+    },
+    "Hi-Hat Loop": {
+      "n": 47,
+      "groups": 12
+    },
+    "Impact": {
+      "n": 31,
+      "groups": 10
+    },
+    "Kick": {
+      "n": 100,
+      "groups": 26
+    },
+    "Kick Loop": {
+      "n": 6,
+      "groups": 5
+    },
+    "Loop": {
+      "n": 8,
+      "groups": 2
+    },
+    "Other/none": {
+      "n": 120,
+      "groups": 33
+    },
+    "Pad": {
+      "n": 6,
+      "groups": 5
+    },
+    "Percussion": {
+      "n": 86,
+      "groups": 16
+    },
+    "Percussion Loop": {
+      "n": 107,
+      "groups": 28
+    },
+    "Rimshot": {
+      "n": 54,
+      "groups": 15
+    },
+    "Riser": {
+      "n": 14,
+      "groups": 4
+    },
+    "SFX": {
+      "n": 49,
+      "groups": 17
+    },
+    "Snare": {
+      "n": 103,
+      "groups": 21
+    },
+    "Synth Loop": {
+      "n": 32,
+      "groups": 18
+    },
+    "Synth One-Shot": {
+      "n": 46,
+      "groups": 13
+    },
+    "Top Loop": {
+      "n": 12,
+      "groups": 5
+    },
+    "Vocal Loop": {
+      "n": 25,
+      "groups": 12
+    },
+    "Vocal One-Shot": {
+      "n": 13,
+      "groups": 10
+    },
+    "Weather/Nature Atmos": {
+      "n": 5,
+      "groups": 5
+    }
+  },
+  "per_seed": {
+    "centroid": [
+      {
+        "accuracy": 55.1170568561873,
+        "macro_f1": 48.009184983328595
+      },
+      {
+        "accuracy": 55.18394648829431,
+        "macro_f1": 47.51402659692104
+      },
+      {
+        "accuracy": 55.05016722408027,
+        "macro_f1": 47.43567376467584
+      },
+      {
+        "accuracy": 55.05016722408027,
+        "macro_f1": 48.07321803755977
+      },
+      {
+        "accuracy": 55.25083612040134,
+        "macro_f1": 48.24347420496293
+      }
+    ],
+    "factorised_head": [
+      {
+        "accuracy": 55.65217391304348,
+        "macro_f1": 48.69012028019009
+      },
+      {
+        "accuracy": 55.31772575250836,
+        "macro_f1": 48.3224561083302
+      },
+      {
+        "accuracy": 54.98327759197325,
+        "macro_f1": 47.704829455156016
+      },
+      {
+        "accuracy": 55.78595317725753,
+        "macro_f1": 49.542084920872256
+      },
+      {
+        "accuracy": 55.38461538461539,
+        "macro_f1": 48.8253419609772
+      }
+    ]
+  },
+  "summary": {
+    "centroid": {
+      "accuracy": 55.13,
+      "macro_f1": 47.855,
+      "accuracy_sd": 0.078
+    },
+    "factorised_head": {
+      "accuracy": 55.425,
+      "macro_f1": 48.617,
+      "accuracy_sd": 0.279
+    }
+  },
+  "decision": "research evidence only; no production weights or rename actions",
+  "safety": {
+    "read_only": true,
+    "production_model_changed": false,
+    "source_audio_modified": false,
+    "rename_actions": false
+  }
+}

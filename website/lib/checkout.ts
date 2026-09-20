@@ -43,6 +43,19 @@ export async function startCheckout(price: CheckoutPrice = "active"): Promise<St
   }
 
   const data = await res.json();
-  window.location.href = data.checkout_url;
+  const checkoutUrl = typeof data?.checkout_url === "string" ? data.checkout_url : "";
+  let parsed: URL;
+  try {
+    parsed = new URL(checkoutUrl, window.location.origin);
+  } catch {
+    return { ok: false, status: res.status, error: "Could not start checkout. Please try again." };
+  }
+  // Defense in depth: the backend supplies a Paddle https URL. Never
+  // navigate to a non-https or non-Paddle URL even if the response is
+  // compromised or a dev backend misbehaves.
+  if (parsed.protocol !== "https:" || !parsed.hostname.endsWith("paddle.com")) {
+    return { ok: false, status: res.status, error: "Could not start checkout. Please try again." };
+  }
+  window.location.href = parsed.toString();
   return { ok: true };
 }

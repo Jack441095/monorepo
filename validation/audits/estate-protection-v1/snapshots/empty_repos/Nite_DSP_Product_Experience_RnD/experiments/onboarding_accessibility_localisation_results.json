@@ -1,0 +1,578 @@
+{
+  "version": "px-onboarding-accessibility-localisation-v1",
+  "evidence_class": "structural synthetic stress test",
+  "onboarding_steps": [
+    "install",
+    "open",
+    "select library",
+    "scan",
+    "understand classification",
+    "search",
+    "audition",
+    "drag sample into DAW"
+  ],
+  "empty_states": [
+    "no library",
+    "scanning",
+    "no results",
+    "no favourites",
+    "no history",
+    "no similar samples",
+    "unknown",
+    "offline model",
+    "analysis failed",
+    "permission denied"
+  ],
+  "localisation": {
+    "rows": [
+      {
+        "locale": "en",
+        "control": "search",
+        "estimated_width_px": 98.0,
+        "budget_px": 220,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "en",
+        "control": "find_similar",
+        "estimated_width_px": 84.0,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "en",
+        "control": "find_complement",
+        "estimated_width_px": 105.0,
+        "budget_px": 170,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "en",
+        "control": "preview",
+        "estimated_width_px": 84.0,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "en",
+        "control": "drag",
+        "estimated_width_px": 77.0,
+        "budget_px": 140,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "en",
+        "control": "apply",
+        "estimated_width_px": 98.0,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "en",
+        "control": "reject",
+        "estimated_width_px": 105.0,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "en",
+        "control": "undo",
+        "estimated_width_px": 77.0,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "en",
+        "control": "empty",
+        "estimated_width_px": 336.0,
+        "budget_px": 320,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "search",
+        "estimated_width_px": 132.3,
+        "budget_px": 220,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "find_similar",
+        "estimated_width_px": 113.4,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "find_complement",
+        "estimated_width_px": 141.8,
+        "budget_px": 170,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "preview",
+        "estimated_width_px": 113.4,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "drag",
+        "estimated_width_px": 104.0,
+        "budget_px": 140,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "apply",
+        "estimated_width_px": 132.3,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "reject",
+        "estimated_width_px": 141.8,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "undo",
+        "estimated_width_px": 104.0,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "de-x-pseudo",
+        "control": "empty",
+        "estimated_width_px": 453.6,
+        "budget_px": 320,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      },
+      {
+        "locale": "es",
+        "control": "search",
+        "estimated_width_px": 115.6,
+        "budget_px": 220,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "es",
+        "control": "find_similar",
+        "estimated_width_px": 99.1,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "es",
+        "control": "find_complement",
+        "estimated_width_px": 123.9,
+        "budget_px": 170,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "es",
+        "control": "preview",
+        "estimated_width_px": 99.1,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "es",
+        "control": "drag",
+        "estimated_width_px": 90.9,
+        "budget_px": 140,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "es",
+        "control": "apply",
+        "estimated_width_px": 115.6,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "es",
+        "control": "reject",
+        "estimated_width_px": 123.9,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "es",
+        "control": "undo",
+        "estimated_width_px": 90.9,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "es",
+        "control": "empty",
+        "estimated_width_px": 396.5,
+        "budget_px": 320,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      },
+      {
+        "locale": "fr",
+        "control": "search",
+        "estimated_width_px": 111.7,
+        "budget_px": 220,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "fr",
+        "control": "find_similar",
+        "estimated_width_px": 95.8,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "fr",
+        "control": "find_complement",
+        "estimated_width_px": 119.7,
+        "budget_px": 170,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "fr",
+        "control": "preview",
+        "estimated_width_px": 95.8,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "fr",
+        "control": "drag",
+        "estimated_width_px": 87.8,
+        "budget_px": 140,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "fr",
+        "control": "apply",
+        "estimated_width_px": 111.7,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "fr",
+        "control": "reject",
+        "estimated_width_px": 119.7,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "fr",
+        "control": "undo",
+        "estimated_width_px": 87.8,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "fr",
+        "control": "empty",
+        "estimated_width_px": 383.0,
+        "budget_px": 320,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "search",
+        "estimated_width_px": 151.9,
+        "budget_px": 220,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "find_similar",
+        "estimated_width_px": 130.2,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "find_complement",
+        "estimated_width_px": 162.8,
+        "budget_px": 170,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "preview",
+        "estimated_width_px": 130.2,
+        "budget_px": 130,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "drag",
+        "estimated_width_px": 119.4,
+        "budget_px": 140,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "apply",
+        "estimated_width_px": 151.9,
+        "budget_px": 150,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "reject",
+        "estimated_width_px": 162.8,
+        "budget_px": 150,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "undo",
+        "estimated_width_px": 119.4,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "cjk-x-pseudo",
+        "control": "empty",
+        "estimated_width_px": 520.8,
+        "budget_px": 320,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "search",
+        "estimated_width_px": 119.6,
+        "budget_px": 220,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "find_similar",
+        "estimated_width_px": 102.5,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "find_complement",
+        "estimated_width_px": 128.1,
+        "budget_px": 170,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "preview",
+        "estimated_width_px": 102.5,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "drag",
+        "estimated_width_px": 93.9,
+        "budget_px": 140,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "apply",
+        "estimated_width_px": 119.6,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "reject",
+        "estimated_width_px": 128.1,
+        "budget_px": 150,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "undo",
+        "estimated_width_px": 93.9,
+        "budget_px": 130,
+        "overflow": false,
+        "action": "fits"
+      },
+      {
+        "locale": "ar-x-pseudo",
+        "control": "empty",
+        "estimated_width_px": 409.9,
+        "budget_px": 320,
+        "overflow": true,
+        "action": "allow wrap or expand"
+      }
+    ],
+    "overflow_count": 9,
+    "worst_locale": "cjk-x-pseudo"
+  },
+  "accessibility": {
+    "focus_order": [
+      "search",
+      "filters",
+      "results",
+      "preview",
+      "find_similar",
+      "find_complement",
+      "drag",
+      "favorites"
+    ],
+    "focus_order_unique": true,
+    "state_grammar": {
+      "playing": [
+        "glyph:play",
+        "halo",
+        "text"
+      ],
+      "success": [
+        "glyph:check",
+        "text"
+      ],
+      "warning": [
+        "glyph:warning",
+        "text-chip"
+      ],
+      "error": [
+        "glyph:error",
+        "text"
+      ],
+      "unknown": [
+        "hollow-dashed-outline",
+        "text"
+      ]
+    },
+    "color_independent_states": true,
+    "reduced_motion_policy": "transforms instant; opacity only; no entrance/bounce/parallax",
+    "text_scale_150_percent": {
+      "scale": 1.5,
+      "overflow_controls": [
+        "reject",
+        "empty"
+      ],
+      "requires_adaptive_layout": true
+    },
+    "control_semantics": [
+      {
+        "id": "search",
+        "role": "textbox",
+        "accessible_name": "Search samples",
+        "keyboard": true
+      },
+      {
+        "id": "find_similar",
+        "role": "button",
+        "accessible_name": "Find similar",
+        "keyboard": true
+      },
+      {
+        "id": "find_complement",
+        "role": "button",
+        "accessible_name": "Find complement",
+        "keyboard": true
+      },
+      {
+        "id": "preview",
+        "role": "button",
+        "accessible_name": "Play preview",
+        "keyboard": true
+      },
+      {
+        "id": "drag",
+        "role": "button",
+        "accessible_name": "Drag to DAW",
+        "keyboard": true
+      },
+      {
+        "id": "apply",
+        "role": "button",
+        "accessible_name": "Apply proposal",
+        "keyboard": true
+      },
+      {
+        "id": "reject",
+        "role": "button",
+        "accessible_name": "Reject proposal",
+        "keyboard": true
+      },
+      {
+        "id": "undo",
+        "role": "button",
+        "accessible_name": "Undo change",
+        "keyboard": true
+      },
+      {
+        "id": "empty",
+        "role": "button",
+        "accessible_name": "No results. Change the search or clear a filter.",
+        "keyboard": true
+      }
+    ],
+    "all_controls_named_and_keyboard_reachable": true
+  },
+  "assertions": {
+    "focus_order_valid": true,
+    "states_are_not_color_only": true,
+    "controls_have_names_and_keyboard_path": true,
+    "overflow_is_explicitly_detected": true
+  },
+  "limitations": [
+    "No screen reader, JUCE component tree, or rendered UI was exercised.",
+    "Width estimates are a layout stress proxy; real font metrics and translated copy must be tested in the UI.",
+    "The onboarding journey is a specification, not observed human research."
+  ]
+}

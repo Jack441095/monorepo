@@ -1,0 +1,39 @@
+{
+  "agent": "mix_revision_agent",
+  "status": "ready",
+  "goal": "Create the next focused revision for Test Mix (Pop Vocal Mix target).",
+  "summary": "3 step revision checklist for Pop Vocal Mix. (2 flag(s) deprioritised as expected for Pop Vocal Mix)",
+  "steps": [
+    {
+      "id": "step-1",
+      "status": "done",
+      "category": "repair",
+      "focus": "Vocal presence",
+      "action": "Boost 5 kHz shelf on vocal bus by 1 dB",
+      "why": "Vocal needs clarity"
+    },
+    {
+      "id": "step-2",
+      "status": "done",
+      "category": "reference",
+      "focus": "Reference check",
+      "action": "Reference track has brighter vocal",
+      "why": "Reference comparison from Mix Review Lab."
+    },
+    {
+      "id": "step-3",
+      "status": "done",
+      "category": "export",
+      "focus": "Export next revision",
+      "action": "Export Test Mix as the next version with the same track title in KENN, then run Mix Review Lab again.",
+      "why": "Keeping the title identical lets the timeline compare versions automatically."
+    }
+  ],
+  "goal_key": "pop_vocal",
+  "goal_label": "Pop Vocal Mix",
+  "relevant_flag_count": 0,
+  "filtered_flag_count": 2,
+  "done_count": 3,
+  "total_steps": 3,
+  "progress": 1.0
+}

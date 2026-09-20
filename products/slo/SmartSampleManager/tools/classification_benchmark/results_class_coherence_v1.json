@@ -1,0 +1,251 @@
+{
+  "coherence": {
+    "Clap": {
+      "n": 90,
+      "coherence": 0.576,
+      "silhouette": 0.2551,
+      "packs": 18,
+      "packs_per_file": 0.2
+    },
+    "Crash": {
+      "n": 22,
+      "coherence": 0.5158,
+      "silhouette": 0.1224,
+      "packs": 7,
+      "packs_per_file": 0.318
+    },
+    "Drum Loop": {
+      "n": 41,
+      "coherence": 0.6038,
+      "silhouette": 0.226,
+      "packs": 15,
+      "packs_per_file": 0.366
+    },
+    "Foley": {
+      "n": 26,
+      "coherence": 0.3613,
+      "silhouette": -0.0252,
+      "packs": 11,
+      "packs_per_file": 0.423
+    },
+    "Hi-Hat": {
+      "n": 59,
+      "coherence": 0.4893,
+      "silhouette": 0.1038,
+      "packs": 21,
+      "packs_per_file": 0.356
+    },
+    "Kick": {
+      "n": 71,
+      "coherence": 0.6311,
+      "silhouette": 0.3428,
+      "packs": 18,
+      "packs_per_file": 0.254
+    },
+    "Other/none": {
+      "n": 55,
+      "coherence": 0.2781,
+      "silhouette": -0.1425,
+      "packs": 21,
+      "packs_per_file": 0.382
+    },
+    "Percussion": {
+      "n": 47,
+      "coherence": 0.2358,
+      "silhouette": -0.1366,
+      "packs": 15,
+      "packs_per_file": 0.319
+    },
+    "Percussion Loop": {
+      "n": 28,
+      "coherence": 0.4476,
+      "silhouette": -0.0159,
+      "packs": 14,
+      "packs_per_file": 0.5
+    },
+    "Snare": {
+      "n": 85,
+      "coherence": 0.4277,
+      "silhouette": 0.0481,
+      "packs": 24,
+      "packs_per_file": 0.282
+    }
+  },
+  "splitting": {
+    "baseline": {
+      "acc": 65.33078880407125,
+      "sd": 1.1849832067555428,
+      "macro_f1": 55.95965300655168,
+      "per_seed": [
+        66.22,
+        64.31,
+        66.03,
+        63.55,
+        64.89,
+        66.98
+      ],
+      "per_class": {
+        "Clap": 92.6,
+        "Crash": 73.5,
+        "Drum Loop": 85.8,
+        "Foley": 50.6,
+        "Hi-Hat": 73.4,
+        "Kick": 91.8,
+        "Other/none": 16.1,
+        "Percussion": 4.3,
+        "Percussion Loop": 48.2,
+        "Snare": 72.5
+      }
+    },
+    "Percussion split into 2": {
+      "acc": 63.80407124681934,
+      "sd": 1.3067836249474618,
+      "macro_f1": 56.115486559426074,
+      "per_seed": [
+        65.84,
+        62.6,
+        64.12,
+        63.36,
+        62.02,
+        64.89
+      ],
+      "per_class": {
+        "Clap": 91.1,
+        "Crash": 70.5,
+        "Drum Loop": 85.8,
+        "Foley": 42.3,
+        "Hi-Hat": 61.6,
+        "Kick": 92.0,
+        "Other/none": 15.5,
+        "Percussion": 17.4,
+        "Percussion Loop": 48.2,
+        "Snare": 69.2
+      }
+    },
+    "Percussion split into 3": {
+      "acc": 63.99491094147584,
+      "sd": 1.1164076828743141,
+      "macro_f1": 56.85208788062445,
+      "per_seed": [
+        64.5,
+        63.55,
+        64.31,
+        64.31,
+        61.83,
+        65.46
+      ],
+      "per_class": {
+        "Clap": 90.4,
+        "Crash": 70.5,
+        "Drum Loop": 85.8,
+        "Foley": 34.0,
+        "Hi-Hat": 66.4,
+        "Kick": 91.5,
+        "Other/none": 15.8,
+        "Percussion": 24.1,
+        "Percussion Loop": 48.2,
+        "Snare": 66.9
+      }
+    },
+    "Other/none split into 3": {
+      "acc": 65.26717557251908,
+      "sd": 1.1397247370972612,
+      "macro_f1": 56.73609891840558,
+      "per_seed": [
+        66.03,
+        64.12,
+        65.46,
+        63.36,
+        66.22,
+        66.41
+      ],
+      "per_class": {
+        "Clap": 92.4,
+        "Crash": 71.2,
+        "Drum Loop": 82.5,
+        "Foley": 48.7,
+        "Hi-Hat": 72.9,
+        "Kick": 89.4,
+        "Other/none": 26.4,
+        "Percussion": 4.3,
+        "Percussion Loop": 45.8,
+        "Snare": 71.6
+      }
+    },
+    "both split into 3": {
+      "acc": 64.02671755725191,
+      "sd": 0.7926167808127965,
+      "macro_f1": 57.63254228457358,
+      "per_seed": [
+        64.5,
+        63.36,
+        64.12,
+        64.12,
+        62.79,
+        65.27
+      ],
+      "per_class": {
+        "Clap": 90.2,
+        "Crash": 68.2,
+        "Drum Loop": 82.5,
+        "Foley": 34.0,
+        "Hi-Hat": 65.8,
+        "Kick": 89.2,
+        "Other/none": 25.5,
+        "Percussion": 24.1,
+        "Percussion Loop": 45.8,
+        "Snare": 66.3
+      }
+    },
+    "ALL classes into 2": {
+      "acc": 63.295165394402034,
+      "sd": 1.2252773717721528,
+      "macro_f1": 54.836342362818776,
+      "per_seed": [
+        64.5,
+        60.88,
+        63.36,
+        63.93,
+        62.79,
+        64.31
+      ],
+      "per_class": {
+        "Clap": 93.3,
+        "Crash": 69.7,
+        "Drum Loop": 83.3,
+        "Foley": 27.6,
+        "Hi-Hat": 63.0,
+        "Kick": 88.0,
+        "Other/none": 17.6,
+        "Percussion": 12.4,
+        "Percussion Loop": 53.6,
+        "Snare": 71.6
+      }
+    }
+  },
+  "rejection": {
+    "as_class": {
+      "coverage_at_95": 22.3,
+      "per_seed": [
+        20.4,
+        24.0,
+        23.3,
+        21.8,
+        19.7,
+        24.8
+      ]
+    },
+    "as_rejection": {
+      "coverage_at_95": 22.3,
+      "per_seed": [
+        20.4,
+        24.0,
+        23.3,
+        21.8,
+        19.7,
+        24.8
+      ]
+    }
+  },
+  "seeds": 6
+}

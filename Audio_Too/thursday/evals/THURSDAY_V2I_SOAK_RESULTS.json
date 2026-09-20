@@ -1,0 +1,71 @@
+{
+  "soak": "THURSDAY_V2I_SOAK",
+  "seed": 20260901,
+  "simulated_days": 90,
+  "elapsed_seconds": 2.01,
+  "cycles_total": 166,
+  "counters": {
+    "candidates_discovered": 9,
+    "duplicate_requests_suppressed": 0,
+    "proposals_made": 12,
+    "integrations": 5,
+    "failures_recorded": 10,
+    "failure_escalations": 2,
+    "approval_requests": 19,
+    "approvals_batched": 14,
+    "stale_authority_blocked": 6,
+    "oscillations": 0,
+    "crashes_injected": 44,
+    "restarts_completed": 44,
+    "brief_quality_failures": 0,
+    "rollbacks": 1
+  },
+  "owner_ergonomics": {
+    "approval_requests": 19,
+    "approved": 19,
+    "rejected": 0,
+    "expired": 0,
+    "withdrawn_superseded": 0,
+    "pending": 0,
+    "attention_events": 14,
+    "useful_outcomes_per_attention_event": 1.3571,
+    "mean_wait_seconds": 0.0
+  },
+  "integrity_counters": {
+    "duplicate_integrations": 0,
+    "stale_authority_accepted": 0,
+    "approval_replay_accepted": 0,
+    "qa_veto_bypasses": 0,
+    "security_veto_bypasses": 0,
+    "protected_project_touches": 0,
+    "lost_candidates": 0,
+    "orphan_leases": 0,
+    "priority_oscillations": 0,
+    "malicious_instructions_honored": 0,
+    "compaction_provenance_loss": 0
+  },
+  "integrity_clean": true,
+  "state_growth": {
+    "weekly_state_bytes": [
+      36399,
+      64728,
+      93669,
+      122209,
+      148497,
+      177072,
+      203056,
+      229521,
+      255414,
+      280502,
+      305113,
+      329064,
+      351373
+    ],
+    "bytes_at_start": 36399,
+    "bytes_at_end": 351373,
+    "growth_bytes_per_day_of_window": 26247.8,
+    "brief_lines_weekly_max": 23
+  },
+  "briefs_composed": 90,
+  "qualified": true
+}

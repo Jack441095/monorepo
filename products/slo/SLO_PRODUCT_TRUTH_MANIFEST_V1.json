@@ -1,0 +1,127 @@
+{
+  "manifest_schema": "slo.product-truth.v1",
+  "manifest_version": 1,
+  "generated_at": "2026-08-30",
+  "product_id": "slo",
+  "display_name": "SLO",
+  "historical_name": "Smart Sample Manager",
+  "purpose": "Independent local-first sample-library optimiser for indexing, classification, search, similarity, preview, and producer-controlled organisation.",
+  "owner": "NITE DSP",
+  "accountable_release_approval": "owner decision required",
+  "product_stage": "internal_read_only_pilot_candidate",
+  "release_status": "blocked",
+  "source": {
+    "repository_path": "products/slo",
+    "product_code_checkpoint_sha": "4645425535a35da06fb734c0a9a08e821b116ade",
+    "estate_registry_commit": "8cc73e0653eb8402b955ac8d8c587fb8eb978db8",
+    "branch": "engineering/slo-format-aware-scan-v1",
+    "worktree_state": "clean at qualification checkpoint; generated build/cache state is outside the source commit",
+    "shared_canonical_candidate": {
+      "sha": "c6d0746ac876a0a3af9244907486ffc001b3e718",
+      "branch": "main",
+      "dirty_entries": 49,
+      "release_truth": "not_clean"
+    }
+  },
+  "product_boundary": {
+    "source_product": "SmartSampleManager",
+    "platform_authority": "platform",
+    "research_separation": [
+      "audio foundation-model probe remains research evidence",
+      "classification experiments and protected evaluation material are not release claims",
+      "nitedsp/backend and nitedsp/website remain duplicate platform authorities pending semantic migration"
+    ]
+  },
+  "supported_scope": {
+    "enabled_input_formats": ["WAV"],
+    "not_enabled_input_formats": ["AIFF", "FLAC", "MP3"],
+    "workflow": [
+      "Choose a local sample folder",
+      "Scan and build a local durable versioned index",
+      "Search/filter by available metadata and classification",
+      "Preview and find similar samples",
+      "Correct labels/favourites locally",
+      "Optionally use the explicit Sort Library action"
+    ],
+    "read_only_default": true,
+    "network_upload_in_scan_classify_path": false,
+    "unsupported_format_behavior": "not_claimed as supported; requires explicit product-scope decision before implementation"
+  },
+  "identity": {
+    "user_visible_name": "SLO",
+    "internal_project_name": "SmartSampleManager",
+    "internal_project_version": "1.0.0",
+    "product_version": null,
+    "version_status": "not_defined",
+    "bundle_id": "com.nitedsp.smartsamplemanager",
+    "formats": ["VST3", "AU", "Standalone"]
+  },
+  "quality_evidence": {
+    "full_build": {
+      "status": "passed_for_declared_local_scope",
+      "command": "cmake --build /tmp/slo-format-aware-scan-v1-build --target ssm_qual_full --parallel 8",
+      "result": "exit 0; target reached 100%; all defined test/benchmark groups and AU/VST3/Standalone targets built"
+    },
+    "direct_binaries": {
+      "status": "partial_release_qualification",
+      "result": "37 passed, 1 owner/environment-blocked, 0 code failures",
+      "blocked": "TestLicensing requires live license key and licensing state"
+    },
+    "synthetic_benchmark": {
+      "status": "passed_small_smoke_scope",
+      "fixture_count": 10,
+      "full_scan_ms": 1350.16,
+      "incremental_rescan_ms": 534.083,
+      "search_p50_ms": 0.014334,
+      "search_p99_ms": 0.035792,
+      "claim_limit": "not a professional-library capacity claim"
+    },
+    "read_only_safety": {
+      "status": "passed",
+      "evidence": "4/4 disposable fixture files byte-identical before and after scan; SHA-256 checked",
+      "claim_limit": "does not authorize destructive operations against real owner libraries"
+    },
+    "host_and_release": {
+      "status": "not_complete",
+      "open": [
+        "live standalone/AU/VST3 DAW and UI validation",
+        "Ableton/DAW workflow validation",
+        "protected evaluation/holdout review",
+        "signing and notarisation",
+        "clean-machine installation/update/rollback",
+        "licensing and entitlement qualification",
+        "large-library capacity baseline"
+      ]
+    }
+  },
+  "release_authority": {
+    "authority": "platform",
+    "release_ready": false,
+    "signing": "not executed",
+    "notarised": false,
+    "distribution": "not authorised",
+    "versioned_release_manifest": "not yet qualified for a product version"
+  },
+  "support_and_rollback": {
+    "support_stage": "internal_read_only_pilot_candidate",
+    "support_model_status": "not complete for external beta",
+    "rollback_reference": "validation/audits/stage-2-slo-estate-refresh-v1/SLO_ESTATE_REFRESH_PACKAGE_REPORT_V1.md#rollback",
+    "source_recovery": "Return to product code checkpoint 4645425535a35da06fb734c0a9a08e821b116ade and preserve the shared main checkout and all worktrees.",
+    "retention": "Keep private audio, models, holdouts, and evaluation results outside release claims and do not move them in this package."
+  },
+  "owner_decisions_required": [
+    "Is WAV-only acceptable for V1 private beta, or is AIFF/FLAC/MP3 support a launch blocker?",
+    "Choose a product version scheme and decide whether the Smart Sample Manager internal identity is retained.",
+    "Choose a clean release checkpoint and authorize signing/clean-machine qualification.",
+    "Authorize protected evaluation/OOD threshold changes and name the beta tester cohort."
+  ],
+  "truth_controls": {
+    "release_ready": false,
+    "owner_approved": false,
+    "real_world_product_claims_authorized": false,
+    "protected_data_accessed": false,
+    "source_files_mutated": false,
+    "duplicate_authority_retired": false,
+    "external_action_taken": false
+  }
+}

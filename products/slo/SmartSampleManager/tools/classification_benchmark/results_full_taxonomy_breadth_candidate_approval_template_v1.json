@@ -1,0 +1,4688 @@
+{
+  "record_type": "slo_rename_approval_gate_audit",
+  "schema_version": "1.0.0",
+  "method_version": "explicit_approval_receipt_v1",
+  "source_plan": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/full_taxonomy_breadth_candidate_suggest_plan_testing_v3_similarity_gate.jsonl",
+  "source_plan_sha256": "0560cdba556f6dcfaaa393b33f2e03e08ecbbacd2c13e235fda7b710af07d88e",
+  "duplicate_guard": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_full_taxonomy_breadth_candidate_duplicate_guard_v3_similarity_gate.json",
+  "duplicate_guard_sha256": "e862c4af9e17d6e1f5c2560f86fcf2ad2b62e4a4faf76ad769df7e6458ccf26f",
+  "source_owner_review_queue": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/owner_review_queue_breadth_candidate_v1.csv",
+  "source_owner_review_queue_sha256": "9a85b866a263ed71003b7d7d1b146c2a671e0556daca41f20dc37d692706144b",
+  "qualified_classes": [],
+  "n_candidate_rows": 388,
+  "counts": {
+    "blocked": 388,
+    "owner_decision_missing": 388,
+    "ready_for_explicit_approval": 0
+  },
+  "qualification_summary": {
+    "suggestion_rows": 388,
+    "duplicate_blocked_rows": 0,
+    "ready_for_explicit_approval": 0
+  },
+  "rows": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Clap_05.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_A_01.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_F_01.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_02.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Snare_03.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Claps/AKT-CLP-A005_bip.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Claps/AKT-CLP-A011_bip.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Claps/AKT-CLP-A013_bip.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Snares/AKT-SNR-A004_bip.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - Essential Kicks/Paper.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - Essential Kicks/Regret.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Kicks/CPA_TCP_kick_dirty_dancers.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Kicks/CPA_TCP_kick_glitterball.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Kicks/CPA_TCP_kick_power_stance.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Kicks/CPA_TCP_kick_romantics.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Snares/CPA_TCP_clap_in_the_room.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Snare) Section8 Outta Here.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/Kicks/Turn That Velocity Up.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/Snares/Rexxus Snare.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Kicks/Roland Cloud Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Kicks/WTFIT Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 1/New Wave Drum Kit/Kicks/Draco Kick .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 1/New Wave Drum Kit/Kicks/Rackity Kick  .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 1/New Wave Drum Kit/Kicks/Use For Drill Kick  .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Snares/No Savage Snare.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Kicks/Akai Kick .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Kicks/Dragon Ball Kick .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Kicks/Dust Kick .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Kicks/Jeffe Kick .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Kicks/MacBook Kick .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Kicks/N9 Kick .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Kicks/Rackz 2.0 Kick .wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/Snares/Night Light Snare .wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Kicks/Hard Pi'erre Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Kicks/Hard Rack Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Kicks/I Hate Kicks Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Kicks/Owen Starlight Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Kicks/Pain Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Snares/Aye section 8 just straight cooked this mf up snare.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 16.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 3.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 8.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Raw Drums/Processed/Kick Processed 4.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan_Sound_2025/Shaper Table Track Project/Samples/Imported/Snare Mighty Bit Reduce.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_808 Kick (1) (G).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick 909 Punch (1) (G).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick 909 Punch (2) (G).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick 909 Reg (1) (G).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick 909 Reg (2) (G).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick A1 (1).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick A1 (2).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick Airy (1) (G).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick Bitcrush (1) (G).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick Bitcrush (2) (G).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick Club (1).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick Club (2).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_Kick Elec (C).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 #1 (1).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 #2 (2).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 #2 (3).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Hi (1).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Hi (2).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Hi (3).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Medium (1).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808 Medium (2).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare Clap (2).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare Rocket (1).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare Rocket (2).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Analogue Collection/Perc/SP Kicky7.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Abstract Hits/MGF-DigiHits-125.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Abstract Hits/MGF-DigiHits-25.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Abstract Hits/MGF-DigiHits-53.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 2/B54-PiSh_01.L.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 2/B57-PiSh_01.L.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/KIK_BLP.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/KIK_MPS.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/63_SNARE.WAV",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/KIK14.WAV",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/PABLO/3briwilkic4.WAV",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/PABLO/8delkic90.WAV",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/PACMANNY/PENKCK1.WAV",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/A_KICK1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK lo serious.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NewFinishesA/PENKCK1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK lo serious.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Kick AllOver 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Kick AllOver 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap_ClapTrapLayer_03.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap_ClapTrapLayer_07.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap_LastMin1st_SP12R.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap_LastMin2st_SP12R.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/Analog_Clap2_MPC60.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Auckland2013 Samples/Kick Gamsay 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Auckland2013 Samples/Snare Ame 1.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bowser Meat Samples/Snare EricSneo 3 V3.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Kick Paper.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Kick Argon 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Confetti Samples/BD_GoldDust004_MPC60.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Confetti Samples/BD_GoldDust006_MPC60.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Confetti Samples/BD_GoldDust007_MPC60.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Confetti Samples/BD_GoldDust008_MPC60.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Confetti Samples/BD_GoldRing001_MPC60.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Cookie Monster Samples/SD_GoldDust2_MPC60.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/BD_Fat808_01_Tran.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Snare Gold 1.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Snare Gold 5.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Snare LastGate.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Snare UnSkool 1.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Kick AwakeArise 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Kick Bionic 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Snare EricSneo 3 V3.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/BD_GoldBar001_MPC60.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/BD_GoldChain3_MPC60.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/BD_Goldbabe4_MPC60.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/Kick Fiasco 3.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Kick 909 6.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare IrieMun.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Kick 909 6.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare IrieMun.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Horizons Samples/Kick Greedy.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/Kick CLP 3.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Kick AwakeArise 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Kick Bionic 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Snare EricSneo 3 V3.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jackboot Stone Cyn Samples/Clap PlayWithMe.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jackboot Stone Cyn Samples/Kick CottonLow.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jungle Gym Samples/Kick DownBelow 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jungle Gym Samples/Snare KaiTracid 3.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Killing Fields Samples/Kick Potions 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna FOR PRINT Samples/Kick 909 5.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna FOR PRINT Samples/Snare Gold 7.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna Samples/Kick 909 5.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna Samples/Snare Gold 7.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna2 Samples/Kick 909 5.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna2 Samples/Snare Gold 7.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/PaperWeight Samples/Kick ZeroCash 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RECHARGE THEME 1 Samples/BD_AlienAnalog008.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Recharged Samples/BD_AlienAnalog008.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Recharged Samples/Kick JumpRope 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Regalia Samples/Kick Downbeat 1.WAV",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Regalia Samples/Kick DriveBy 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Ryu 3 Samples/Clap_Layered004_MPC60_st.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Slammie Samples/Kick Absynth B 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Spirals Samples/Kick Concrete 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Spirals Samples/Kick Grizzly 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Spirals Samples/Kick MoveSomethin 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Spirals Samples/Kick SlicenDice 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Thumper Samples/Clap Gold 4.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Thumper Samples/Kick Gold 4.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Victimized Remix Samples/BD_808Thudd1_H3500Fat.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Victimized Remix Samples/BD_AlienAnalog007.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Victory March Samples/Kick CoolKid.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Kick AwakeArise 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Kick Bionic 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Snare EricSneo 3 V3.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Water Taxi Samples/B54-PiSh_01.L.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Water Taxi Samples/B57-PiSh_01.L.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/2 - Kick/Kick - Batter.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/2 - Kick/Kick - Booted.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/1 - Kick/Kick - Deep Chunk 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/2 - Snare/Snare - Metal Spread 1.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/2 - Snare/Snare - Noise Probe.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/2 - Kick /Kick - Beige.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/2 - Kick /Kick - Buff.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/2 - Kick /Kick - Grainer.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/2 - Kick /Kick - Khaki.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/2 - Kick /Kick - Sand.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/2 - Kick /Kick - Taupe.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/2 - Kick /Kick - Topaz.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/4 - Claps/Clap - Magnolia.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 1.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 11.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 13.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 14.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 15.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 17.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 18.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 2.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 20.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 22.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 23.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 24.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 25.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 26.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 3.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 30.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 33.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 34.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 4.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 5.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 6.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Kicks/Kick 8.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 13.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 23.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 39.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (10).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (104).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (11).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (119).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (12).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (120).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (126).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (129).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (13).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (130).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (131).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (140).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (141).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (142).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (15).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (152).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (153).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (16).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (17).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (24).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (25).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (28).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (29).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (3).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (30).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (4).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (51).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (57).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (62).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (65).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (86).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/1 Kicks/Organic - Kick (9).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (102).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (107).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (116).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (18).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (24).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (28).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (34).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (41).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (44).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (5).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (77).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (78).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (88).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (89).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (92).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (14).wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (17).wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (25).wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (34).wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (41).wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Coast2coast Kit Samples/Organic - Snare (107).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Deep Impact Kit Samples/Organic - Kick (142).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Domination Kit Samples/Organic - Kick (126).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Ethnic Stomp Kit Samples/Organic - Kick (120).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Head Trauma Kit Samples/Organic - Snare (28).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Imagination Kit Samples/Organic - Kick (30).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Imagination Kit Samples/Organic - Snare (90).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Imperial Kit Samples/Organic - Kick (104).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Imperial Kit Samples/Organic - Snare (41).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Juggernaut Kit Samples/Organic - Snare (116).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Jungle Thump Kit Samples/Organic - Snare (24).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/New Age Kit 1 Samples/Organic - Kick (146).wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/New Age Kit 2 Samples/Organic - Snare (78).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Sun Tzu Kit Samples/Organic - Snare (5).wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_studio/JVIEWS_studio_one_shots/JVIEWS_deep_kick_02_trans_hihat.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Single_Claps/KSHMR_Human_Single_Clap_12.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_03_Horse.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_04_Horse.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_05_Squishy.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_06_Squishy.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_07_Squishy.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_08_Squishy.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Natural_Hand_Claps/KSHMR_Stacks/KSHMR_Human_Stack_Clap_09_Squishy.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_16.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_21.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_22.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_29.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Classic_02.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Classic_06.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Classic_08.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Hard_02.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Snappy_01.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Stick_Clap_03.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Wide_Clap_01.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Wide_Clap_02.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Wide_Clap_03.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Trap_Claps/KSHMR_Trap_Clap_02.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Trap_Claps/KSHMR_Trap_Clap_08.wav",
+      "action": "suggest",
+      "label": "Clap",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Big_Kicks/KSHMR_Big_Kick_02_D.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Chest_Kicks/KSHMR_Chest_Kick_01.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Chest_Kicks/KSHMR_Chest_Kick_02.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Chest_Kicks/KSHMR_Chest_Kick_06.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Jungle_Kicks/KSHMR_Jungle_Kick_04.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Jungle_Kicks/KSHMR_Jungle_Kick_05.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Stomp_Kicks/KSHMR_Stomp_Kick_13.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Thump_Kicks/KSHMR_Thump_Kick_01.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Thump_Kicks/KSHMR_Thump_Kick_02.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Thump_Kicks/KSHMR_Thump_Kick_03.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Thump_Kicks/KSHMR_Thump_Kick_04.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Thump_Kicks/KSHMR_Thump_Kick_05.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Thump_Kicks/KSHMR_Thump_Kick_06.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Thump_Kicks/KSHMR_Thump_Kick_07.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Thump_Kicks/KSHMR_Thump_Kick_08.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_01_A.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_06_B.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_08_D#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_09_F.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_10_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_11_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_12_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_14_G.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Psy_Kicks/KSHMR_Psy_Kick_16_G#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_01_A.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_02_A.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_03_C#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_04_D.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_05_D#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_09_E.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_10_E.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_11_E.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_12_F.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_14_F.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_15_F.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_16_F.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_17_F_Soft.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_19_F.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_20_F.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_21_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_22_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_23_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_24_F#_Soft.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_25_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_26_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_27_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_28_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_29_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_30_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_31_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_32_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_33_G.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_35_G.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_36_G_Soft.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_37_G.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_38_G.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_39_G.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_41_G#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_43_G#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Punchy_Kicks/KSHMR_Punchy_Kick_44_G#_Soft.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_01_Back_To_Me_C.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_02_Carry_Me_Home_A.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_04_Festival_of_Lights_D.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_07_Good_Vibes_Soldier_G#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_09_Harder_A#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_15_Magic_G#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_16_Mandala_E.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_18_Power_F.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_20_Strange_Lands_G#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Signature_Kicks/KSHMR_Signature_Kick_24_Underwater_C#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Hard_Snares/KSHMR_Hard_Snare_03_D#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Hip_Hop_Snares/KSHMR_Hip_Hop_Snare_19_F.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Hip_Hop_Snares/KSHMR_Hip_Hop_Snare_26_G#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_01_A.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_03_A.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_05_A.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_08_A#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_11_B.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_13_C.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_14_C#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_15_C#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_16_C#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_18_D#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_20_D#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_24_E.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_27_E.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_30_F.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_31_F.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_32_F.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_34_F#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_35_F#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_37_G.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_40_G.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Tight_Snares/KSHMR_Tight_Snare_41_G#.wav",
+      "action": "suggest",
+      "label": "Snare",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/7SKIES/7SKIES_Kick_F#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/BASSJACKERS/BASSJACKERS_Kick_Zero.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/HARDWELL/HARDWELL_Spaceman_Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/LUIS_TORRES/LUIS_TORRES_Home_Kick.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/MAURICE_WEST/MAURICE_WEST_Voices_In_My_Head_Kick_G#.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/RADIOLOGY/RADIOLOGY_Monsta_Kick_G.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/ZEDD/ZEDD_Kick_02.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/ZEDD/ZEDD_Kick_clean_Happy_Now.wav",
+      "action": "suggest",
+      "label": "Kick",
+      "status": "blocked",
+      "reasons": [
+        "owner_decision_missing"
+      ],
+      "owner_decision": "",
+      "owner_reviewer": "",
+      "owner_note": ""
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "plan_modified": false,
+    "approval_granted": false,
+    "source_audio_modified": false,
+    "rename_actions": false
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "source_receipt": "results_full_taxonomy_human_audit_v3_new_labels.json",
+  "population": "256 new human-labelled files across 79 collections",
+  "confidence_floor": 0.685,
+  "class_thresholds": {
+    "Bass Loop": 0.500,
+    "Crash": 0.400,
+    "Hi-Hat Loop": 0.400,
+    "Percussion Loop": 0.400
+  },
+  "suggest_classes": [
+    "Bass Loop",
+    "Crash",
+    "Hi-Hat Loop",
+    "Percussion Loop"
+  ],
+  "raw_precision": {
+    "Bass Loop": 0.9466,
+    "Crash": 0.8918,
+    "Hi-Hat Loop": 0.9907,
+    "Percussion Loop": 0.9283
+  },
+  "auto_classes": [],
+  "safety": "suggestions require explicit approval; no class is qualified for automatic rename"
+}

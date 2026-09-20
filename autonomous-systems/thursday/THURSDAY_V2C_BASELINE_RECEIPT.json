@@ -1,0 +1,18 @@
+{
+  "source_sha": "11d1ec1961aa65377f17bf129a71fcbafd96dfc8",
+  "database_schema_version": "022",
+  "company_intelligence_version": "1.0.0",
+  "company_intelligence_hash": "d1674fe059e3d35ab91e48cdacfe514bfca7eac392d1ea66c064fda828abecaf",
+  "company_state_hash": "8e7d25c749aa35d1c076b575b62459a98866a13c6cd3ba1e2d39676b96e0028b",
+  "behavioural_benchmark": "THURSDAY_BEHAVIOURAL_V3",
+  "behavioural_benchmark_hash": "399eedd67448d732677cc3a4c68551b830678daa4041d19ab4ec13045bcf7761",
+  "proactivity_benchmark": "thursday.proactivity_benchmark.v1",
+  "qualifications": {
+    "behavioural_v3_overall_accuracy": 0.9962,
+    "behavioural_v3_priority_accuracy": 0.9583,
+    "behavioural_v3_enumeration_completeness": 1.0,
+    "behavioural_v3_unsupported_claim_rate": 0.0,
+    "proactivity_accuracy": 1.0,
+    "memory_v1_accuracy": 1.0
+  }
+}

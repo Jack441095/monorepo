@@ -1,0 +1,15 @@
+{
+  "decision": "E_BLOCKED_BY_EXTERNAL_CREDENTIAL_DISTRIBUTION_DEPENDENCY",
+  "blockers": [
+    {"id": "B-001", "severity": "P0", "status": "OPEN", "summary": "Developer ID signing, notarization, installer/update flow absent"},
+    {"id": "B-002", "severity": "P0", "status": "OPEN", "summary": "Clean-machine validation incomplete"},
+    {"id": "B-003", "severity": "P0", "status": "OPEN", "summary": "Production HTTPS licensing endpoint and credentials absent"},
+    {"id": "B-012", "severity": "P0", "status": "OPEN", "summary": "Clean aggregate and fast qualification fail for helper-based engine tests with 13,044 duplicate JUCE symbols"},
+    {"id": "B-004", "severity": "P1", "status": "OPEN", "summary": "Ableton Live VST3 host matrix not qualified"},
+    {"id": "B-005", "severity": "P1", "status": "OPEN", "summary": "Blind AL-002 review incomplete"},
+    {"id": "B-006", "severity": "P1", "status": "OPEN", "summary": "Cross-vendor leakage-controlled accuracy not established"},
+    {"id": "B-007", "severity": "P1", "status": "OPEN", "summary": "Historical OOD false-known rate remains high"},
+    {"id": "B-008", "severity": "P1", "status": "OPEN", "summary": "Vocal Loop recall is weak in limiting V4-H evidence"},
+    {"id": "B-009", "severity": "P1", "status": "OPEN", "summary": "Large-scale memory and long-soak gates incomplete"}
+  ]
+}

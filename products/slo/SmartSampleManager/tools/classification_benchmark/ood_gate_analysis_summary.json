@@ -1,0 +1,94 @@
+{
+  "false_known": {
+    "matched": 168,
+    "count": 168,
+    "rate_pct": 100.0,
+    "by_source": {
+      "syd_park": {
+        "total": 80,
+        "false_known": 80
+      },
+      "leichhardt": {
+        "total": 80,
+        "false_known": 80
+      },
+      "guitar_loops": {
+        "total": 8,
+        "false_known": 8
+      }
+    },
+    "evidence_sources": {
+      "DSP": 168
+    },
+    "predicted_subcategories": {
+      "Bass One-Shot": 61,
+      "": 40,
+      "Kick": 32,
+      "Music Loop": 22,
+      "Riser": 6,
+      "Bass Loop": 3,
+      "Vocal Phrase": 2,
+      "Impact": 1,
+      "Atmosphere": 1
+    }
+  },
+  "false_unknown": {
+    "matched": 620,
+    "count": 110,
+    "rate_pct": 17.741935483870968,
+    "by_class": {
+      "Percussion": {
+        "total": 60,
+        "false_unknown": 13
+      },
+      "Atmosphere": {
+        "total": 60,
+        "false_unknown": 20
+      },
+      "Clap": {
+        "total": 60,
+        "false_unknown": 0
+      },
+      "Kick": {
+        "total": 60,
+        "false_unknown": 4
+      },
+      "Snare": {
+        "total": 60,
+        "false_unknown": 4
+      },
+      "Hi-Hat": {
+        "total": 60,
+        "false_unknown": 8
+      },
+      "FX": {
+        "total": 58,
+        "false_unknown": 4
+      },
+      "Bass One-Shot": {
+        "total": 60,
+        "false_unknown": 14
+      },
+      "Foley": {
+        "total": 40,
+        "false_unknown": 22
+      },
+      "Vocal Phrase": {
+        "total": 41,
+        "false_unknown": 5
+      },
+      "Bass Loop": {
+        "total": 15,
+        "false_unknown": 4
+      },
+      "Impact": {
+        "total": 31,
+        "false_unknown": 9
+      },
+      "Riser": {
+        "total": 15,
+        "false_unknown": 3
+      }
+    }
+  }
+}

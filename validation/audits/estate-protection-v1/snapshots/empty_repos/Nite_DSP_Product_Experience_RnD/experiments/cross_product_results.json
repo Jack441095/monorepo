@@ -1,0 +1,73 @@
+{
+  "version": "px-cross-product-contract-v1",
+  "contract_basis": "existing nite_ai AgentRequest / CapabilityDefinition envelope shape",
+  "evidence_class": "synthetic contract validation",
+  "observed_registered_platform_capabilities": [
+    "company.brief.daily",
+    "company.review.weekly",
+    "company.goals.list",
+    "company.tasks.list",
+    "company.risks.list",
+    "company.decisions.pending",
+    "company.agents.status",
+    "company.approvals.pending",
+    "company.approvals.decide"
+  ],
+  "candidate_audio_capabilities": [
+    "audio.mix.analyze",
+    "audio.sample.find_similar",
+    "audio.sample.find_complement",
+    "audio.sample.evaluate_fit"
+  ],
+  "results": [
+    {
+      "case": "kenn_to_slo",
+      "accepted": true,
+      "reason": "accepted as evidence/reference payload",
+      "payload_keys": [
+        "bpm",
+        "frequency_holes_hz",
+        "issue",
+        "pitch_class",
+        "source_product",
+        "transient_profile"
+      ]
+    },
+    {
+      "case": "slo_to_kenn",
+      "accepted": true,
+      "reason": "accepted as evidence/reference payload",
+      "payload_keys": [
+        "feature_summary",
+        "mix_context_ref",
+        "sample_ref",
+        "source_product"
+      ]
+    },
+    {
+      "case": "unsafe_raw_audio",
+      "accepted": false,
+      "reason": "raw/private fields rejected: ['audio_bytes']",
+      "payload_keys": [
+        "audio_bytes",
+        "bpm",
+        "frequency_holes_hz",
+        "issue",
+        "pitch_class",
+        "source_product",
+        "transient_profile"
+      ]
+    }
+  ],
+  "assertions": {
+    "kenn_to_slo_accepted": true,
+    "slo_to_kenn_accepted": true,
+    "raw_audio_rejected": true,
+    "product_ownership_preserved": true
+  },
+  "limitations": [
+    "No live SLO or KENN adapter is registered for these candidate audio capabilities.",
+    "Feature sufficiency and ranking quality need real local fixtures and human validation.",
+    "Capability IDs require platform-owner review before registration."
+  ]
+}

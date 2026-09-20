@@ -1,0 +1,23 @@
+path,category,expected,got,action,pass
+/System/Library/x,Other,BLOCKED,BLOCKED,unselectable,True
+/System,Other,BLOCKED,BLOCKED,unselectable,True
+/bin/bash,Other,BLOCKED,BLOCKED,unselectable,True
+/usr/bin/x,Other,BLOCKED,BLOCKED,unselectable,True
+/private/var/vm/sleepimage,Other,BLOCKED,BLOCKED,unselectable,True
+/Library/Extensions/foo.kext/Contents/x,Other,BLOCKED,BLOCKED,unselectable,True
+/Volumes/B/Backups.backupdb/m/x,Other,BLOCKED,BLOCKED,unselectable,True
+/usr/local/var/cache/brew/x,Cache,SAFE,SAFE,trashable,True
+/usr/local/Caches/pip/x,Cache,SAFE,SAFE,trashable,True
+/usr/../tmp/evil,Other,REVIEW,REVIEW,needs_checkbox,True
+/usr2/fake,Other,REVIEW,REVIEW,needs_checkbox,True
+/SYSTEM/x,Other,REVIEW,REVIEW,needs_checkbox,True
+/Library/Caches/com.foo/x,Cache,SAFE,SAFE,trashable,True
+~/Library/Logs/a.log,Log,SAFE,SAFE,trashable,True
+/x/.Trash/y,Trash,SAFE,SAFE,trashable,True
+/x/node_modules/.npm/z,Other,SAFE,SAFE,trashable,True
+/x/Library/Developer/Xcode/DerivedData/b,Dev,SAFE,SAFE,trashable,True
+/Users/u/Library/Application Support/Orphan/x,Other,REVIEW,REVIEW,needs_checkbox,True
+/Users/u/Downloads/a.dmg,Downloads,REVIEW,REVIEW,needs_checkbox,True
+/Users/u/Documents/thesis.pdf,Other,REVIEW,REVIEW,needs_checkbox,True
+/Models/llama/q,AIModel,REVIEW,REVIEW,needs_checkbox,True
+/x/some/thing,Mystery,REVIEW,REVIEW,needs_checkbox,True

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KENN Public Beta - Mix Engineering Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="kenn-nav">
+    <div class="kenn-nav-left">
+      <span class="kenn-nav-wordmark">KENN</span>
+      <div class="kenn-nav-sep"></div>
+      <span class="kenn-nav-page">Public Beta - Mix Engineering Assistant</span>
+    </div>
+  </nav>
+
+  <main class="app-shell">
+    <section class="sidebar" aria-label="Knowledge base status">
+      <div>
+        <p class="eyebrow">Public Beta Scope</p>
+        <h1>KENN</h1>
+        <p class="subtitle">Kernel Engineering Neural Network</p>
+        <p class="summary">Ask a mix-engineering question grounded in verified sources, or upload a 16-bit/24-bit PCM WAV track to review signal metrics (clipping, headroom, channel balance, phase/mono compatibility, DC offset, and approximate loudness).</p>
+      </div>
+
+      <div class="session-manager">
+        <span class="examples-label">Session history</span>
+        <select id="session-select" aria-label="Resume session">
+          <option value="">-- Active session --</option>
+        </select>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button type="button" id="new-session-btn">New session</button>
+          <button type="button" id="clear-session-btn">Clear session</button>
+        </div>
+      </div>
+
+      <div class="examples">
+        <span class="examples-label">Try a question</span>
+        <div id="starter-questions" class="starter-questions"></div>
+      </div>
+
+      <form id="mix-review-form" class="mix-review-widget upload-card">
+        <span class="examples-label">Mix Review (WAV)</span>
+        <p class="privacy-note">Audio is analyzed securely on the server for diagnostic fault detection and is not retained for model training.</p>
+
+        <label class="field-label" for="mix-review-file">Upload WAV track</label>
+        <input id="mix-review-file" name="file" type="file" accept=".wav,audio/wav" aria-label="Stereo WAV file for mix review">
+        <p class="upload-mode-hint">Upload a 16-bit or 24-bit PCM .wav file (up to 50 MB) for deterministic fault diagnosis.</p>
+        <label class="field-label" for="mix-review-compare-file">Optional comparison WAV</label>
+        <input id="mix-review-compare-file" name="file_b" type="file" accept=".wav,audio/wav" aria-label="Optional second WAV for measured comparison">
+        <p class="upload-mode-hint">Choose a second file to compare measured fields and source hashes.</p>
+
+        <div style="margin: 12px 0;">
+          <label style="font-size: 12px; display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="upload-consent" required style="margin-top: 2px;">
+            <span>I agree to upload this WAV file for server-side diagnostic analysis.</span>
+          </label>
+        </div>
+
+        <button type="submit" id="mix-review-submit">Analyze WAV</button>
+      </form>
+
+      <!-- Feedback Capture Widget -->
+      <section id="feedback-widget" class="session-manager" style="margin-top: 16px; display: none;">
+        <span class="examples-label">Feedback</span>
+        <p style="font-size: 12px; color: #a0a0a0; margin-bottom: 8px;">How helpful was KENN's last answer or analysis?</p>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;" id="rating-buttons">
+          <button type="button" class="rating-btn" data-rating="1">1⭐</button>
+          <button type="button" class="rating-btn" data-rating="2">2⭐</button>
+          <button type="button" class="rating-btn" data-rating="3">3⭐</button>
+          <button type="button" class="rating-btn" data-rating="4">4⭐</button>
+          <button type="button" class="rating-btn" data-rating="5">5⭐</button>
+        </div>
+        <input type="text" id="feedback-comments" placeholder="Optional comments..." style="width: 100%; font-size: 12px; padding: 6px; margin-bottom: 8px;">
+        <button type="button" id="submit-feedback-btn" style="width: 100%;">Submit Feedback</button>
+        <p id="feedback-status" class="upload-mode-hint" style="margin-top: 4px;"></p>
+      </section>
+    </section>
+
+    <section class="workspace" aria-label="Conversation and workspace">
+      <header class="workspace-header">
+        <div>
+          <h2 class="workspace-title">Mix Engineering Workspace</h2>
+          <p id="workspace-subtitle" class="workspace-subtitle">Ask mix advice or run a WAV Mix Review</p>
+        </div>
+        <div class="status-indicator">
+          <span id="status-dot" class="dot"></span>
+          <span id="status-text">Ready</span>
+        </div>
+      </header>
+
+      <div id="messages" class="messages-scroll" role="log" aria-live="polite"></div>
+
+      <footer class="composer-shell">
+        <form id="chat-form" class="composer-form">
+          <div class="composer-input-row">
+            <input
+              id="question"
+              type="text"
+              placeholder="Ask a mix question (e.g. How do I remove mud from low-mids?)"
+              autocomplete="off"
+              aria-label="Mix question input"
+            >
+            <button type="submit" id="send-btn" class="btn-primary">Ask KENN</button>
+          </div>
+        </form>
+      </footer>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

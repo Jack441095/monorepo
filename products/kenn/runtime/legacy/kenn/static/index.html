@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KENN · Thursday</title>
+  <!-- Geist Sans / Geist Mono: matches the live site's typography convention
+       (platform/website/app/layout.tsx uses next/font/google Geist + Geist
+       Mono). Loaded via Google Fonts here since this static page isn't part
+       of the Next.js build. styles.css falls back to system fonts if this
+       is ever blocked/offline. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/kenn/styles.css">
+</head>
+<body>
+
+  <nav class="kenn-nav">
+    <div class="kenn-nav-left">
+      <a class="kenn-nav-wordmark" href="/hub">Thursday<span>.</span></a>
+      <div class="kenn-nav-sep"></div>
+      <span class="kenn-nav-page">KENN</span>
+    </div>
+    <div class="kenn-nav-right">
+      <a class="kenn-nav-link active" href="/kenn">KENN</a>
+      <a class="kenn-nav-link" href="/audio-analysis">Mix Review</a>
+      <a class="kenn-nav-link" href="/automix">AutoMix</a>
+      <a class="kenn-nav-link" href="/creative-lab">AudioGen</a>
+      <button type="button" class="kenn-nav-link" id="live-control-toggle">Live</button>
+      <a class="kenn-nav-link" href="/hub">← Hub</a>
+    </div>
+  </nav>
+
+  <div id="live-control-overlay" class="live-control-overlay" hidden>
+    <section class="live-control-panel" aria-label="Live Ableton session control">
+      <div class="live-control-header">
+        <div class="status-indicator">
+          <span id="live-status-dot" class="dot"></span>
+          <span id="live-status-text">Disconnected from Live</span>
+        </div>
+        <div class="live-control-actions">
+          <button type="button" id="btn-refresh-session" class="btn-primary">Sync session</button>
+          <button type="button" id="live-control-close" aria-label="Close live control">&times;</button>
+        </div>
+      </div>
+      <div id="track-container" class="track-grid">
+        <p class="upload-mode-hint">Click "Sync session" to query the active Ableton Live session via the OSC bridge.</p>
+      </div>
+    </section>
+  </div>
+
+  <main class="app-shell">
+    <section class="sidebar" aria-label="Knowledge base status">
+      <div>
+        <p class="eyebrow">Knowledge base</p>
+        <h1>KENN</h1>
+        <p class="subtitle">Kernel Engineering Neural Network</p>
+        <p class="summary">Ask a production question, or upload audio to review a mix, separate it into stems, or start an AutoMix render. Best for Ableton, mixing, mastering, game audio, and workflow checks.</p>
+      </div>
+
+      <div class="session-manager">
+        <span class="examples-label">Session history</span>
+        <select id="session-select" aria-label="Resume session">
+          <option value="">-- Active session --</option>
+        </select>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button type="button" id="new-session-btn">New session</button>
+          <button type="button" id="clear-session-btn">Clear session</button>
+        </div>
+      </div>
+
+      <div id="trends-card" class="session-manager" style="display:none;">
+        <span class="examples-label">Trending this week</span>
+        <ul id="trends-list"></ul>
+      </div>
+
+      <div class="examples">
+        <span class="examples-label">Try a question</span>
+        <div id="starter-questions" class="starter-questions"></div>
+      </div>
+
+      <section class="context-widget" aria-label="Session context">
+        <span class="examples-label">Session context</span>
+        <select id="session-mix-goal" aria-label="Mix target">
+          <option value="premaster">Premaster / general mix</option>
+          <option value="club">Club / electronic / trap</option>
+          <option value="rap_vocal">Rap / drill vocal</option>
+          <option value="pop_vocal">Pop vocal</option>
+          <option value="podcast">Podcast / dialogue</option>
+          <option value="game_audio">Game audio asset</option>
+          <option value="master">Finished master</option>
+        </select>
+        <input id="session-goal" type="text" placeholder="Goal, e.g. louder master or cleaner vocal">
+      </section>
+
+      <form id="mix-review-form" class="mix-review-widget upload-card">
+        <span class="examples-label">Studio tools</span>
+        <p class="privacy-note">Audio is processed locally. Avoid private client material unless comfortable sharing for testing.</p>
+
+        <label class="field-label" for="mix-review-file">Track or stems</label>
+        <input id="mix-review-file" name="file" type="file" multiple
+          accept=".wav,audio/wav,audio/x-wav,.aiff,.aif,.flac,.mp3,.m4a"
+          aria-label="Mix WAV, or multiple stem files for AutoMix">
+        <p class="upload-mode-hint" id="upload-mode-hint">Add one file to review it or split it into stems. Add two or more to start an AutoMix render.</p>
+
+        <div id="single-file-mode-toggle" class="segmented-toggle" hidden>
+          <label><input type="radio" name="single-file-mode" value="review" checked><span>Review</span></label>
+          <label><input type="radio" name="single-file-mode" value="separate"><span>Separate stems</span></label>
+        </div>
+
+        <div id="review-only-fields" class="review-only-fields" hidden>
+          <label class="field-label" for="mix-review-title">Track title <span class="field-optional">(optional)</span></label>
+          <input id="mix-review-title" name="title" type="text" placeholder="e.g. Midnight Drive">
+          <label class="field-label" for="mix-review-version">Version <span class="field-optional">(optional)</span></label>
+          <input id="mix-review-version" name="version" type="text" placeholder="e.g. v2">
+          <label class="field-label" for="mix-review-reference">Reference track <span class="field-optional">(optional)</span></label>
+          <input id="mix-review-reference" name="reference" type="file" accept=".wav,audio/wav,audio/x-wav" aria-label="Reference WAV (optional)">
+        </div>
+
+        <label class="field-label" for="automix-genre" id="automix-genre-label" hidden>Genre</label>
+        <select id="automix-genre" aria-label="AutoMix genre" hidden>
+          <option value="pop">Pop</option>
+          <option value="hip_hop">Hip hop</option>
+          <option value="edm">EDM</option>
+          <option value="rock">Rock</option>
+          <option value="acoustic">Acoustic</option>
+          <option value="jazz">Jazz</option>
+          <option value="cinematic">Cinematic</option>
+          <option value="podcast">Podcast</option>
+        </select>
+
+        <button type="submit" id="mix-review-submit">Analyse WAV</button>
+      </form>
+
+      <form id="audiogen-form" class="audiogen-widget">
+        <span class="examples-label">AudioGen</span>
+        <input id="audiogen-prompt" type="text" placeholder="Idea, e.g. dark drill loop">
+        <div class="inline-fields">
+          <select id="audiogen-emotion" aria-label="AudioGen emotion">
+            <option value="joy">Joy</option>
+            <option value="excitement">Excitement</option>
+            <option value="love">Love</option>
+            <option value="sadness">Sadness</option>
+            <option value="fear">Fear</option>
+            <option value="curiosity">Curiosity</option>
+            <option value="neutral">Neutral</option>
+          </select>
+          <input id="audiogen-bars" type="number" min="1" max="16" value="8" aria-label="Bars" style="width:70px;">
+        </div>
+        <div class="button-row">
+          <button type="submit">Generate loop</button>
+          <button type="button" id="audiogen-full-song">Full song</button>
+        </div>
+        <div id="audiogen-status" class="compact-status">AudioGen status pending</div>
+        <div id="audiogen-history" class="audiogen-history"></div>
+      </form>
+
+      <div class="status-panel">
+        <span id="status-dot" class="dot"></span>
+        <span id="status-text">Ready</span>
+      </div>
+    </section>
+
+    <section class="chat-panel" aria-label="KENN chat">
+      <div id="mixing-doctor-banner" class="mixing-doctor-banner" hidden>
+        <div class="banner-header">
+          <span class="banner-title">🏥 KENN Mixing Doctor Alerts</span>
+          <button id="close-alerts-btn" class="close-alerts-btn" aria-label="Close alerts">&times;</button>
+        </div>
+        <div id="mixing-alerts-list" class="mixing-alerts-list"></div>
+      </div>
+
+      <div id="session-state-card" class="session-state-card" hidden>
+        <div class="banner-header">
+          <span class="banner-title">🎚️ Live Ableton Session</span>
+          <button id="close-session-card-btn" class="close-alerts-btn" aria-label="Close session card">&times;</button>
+        </div>
+        <div id="session-state-tracks" class="session-state-tracks"></div>
+      </div>
+
+      <div id="project-manager-card" class="project-manager-card" hidden>
+        <div class="banner-header">
+          <span class="banner-title">🩺 Project Health &amp; Organisation</span>
+          <button id="close-project-manager-btn" class="close-alerts-btn" aria-label="Close project manager">&times;</button>
+        </div>
+        <div id="project-manager-summary" class="project-manager-summary"></div>
+        <div id="project-manager-recommendations" class="project-manager-recommendations"></div>
+      </div>
+
+      <div id="messages" class="messages">
+        <article class="message assistant">
+          <div class="label">KENN</div>
+          <p>Try a specific production question, or use Studio tools on the left: upload one file to review a mix or split it into stems, or several to start an AutoMix render.</p>
+        </article>
+      </div>
+      <div class="composer-container">
+        <div id="chat-attach-chip" class="attach-chip" hidden></div>
+        <form id="chat-form" class="composer">
+          <label class="attach-btn" title="Attach audio" aria-label="Attach audio">
+            📎
+            <input id="chat-attach-file" type="file" multiple hidden
+              accept=".wav,audio/wav,audio/x-wav,.aiff,.aif,.flac,.mp3,.m4a">
+          </label>
+          <div class="composer-field">
+            <input id="question" name="question" type="text" autocomplete="off"
+              placeholder="e.g. How do I saturate sub bass without clipping?"
+              required aria-autocomplete="list" aria-controls="question-suggest-list">
+            <ul id="question-suggest-list" class="typeahead-list" hidden></ul>
+          </div>
+          <label class="ableton-context-toggle" title="Include the most recent cached Ableton project structure. This never triggers a new Live poll.">
+            <input id="include-ableton-context" type="checkbox">
+            <span>Use Live context</span>
+          </label>
+          <button type="submit">Ask KENN</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="/kenn/app.js"></script>
+</body>
+</html>

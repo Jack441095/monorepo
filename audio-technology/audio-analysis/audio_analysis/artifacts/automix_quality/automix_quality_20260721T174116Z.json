@@ -1,0 +1,201 @@
+{
+  "timestamp": "20260721T174116Z",
+  "summary": {
+    "runs": 30,
+    "valid": 0,
+    "lufs_within_tolerance_rate": 0.0,
+    "clipping_rate": 0.0,
+    "mean_abs_lufs_error_LU": 0.0,
+    "max_abs_lufs_error_LU": 0.0,
+    "mean_abs_selfreport_gap_LU": 0.0,
+    "max_true_peak_dbtp": -120.0,
+    "gate_targets": [
+      -14.0,
+      -16.0
+    ],
+    "gate_lufs_within_tolerance_rate": 0.0,
+    "gate_clipping_rate": 0.0
+  },
+  "rows": [
+    {
+      "profile": "dense_synthetic",
+      "genre": "pop",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "pop",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "pop",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "rock",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "rock",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "rock",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "electronic",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "electronic",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "electronic",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "hiphop",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "hiphop",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "hiphop",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "acoustic",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "acoustic",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "dense_synthetic",
+      "genre": "acoustic",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "pop",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "pop",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "pop",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "rock",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "rock",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "rock",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "electronic",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "electronic",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "electronic",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "hiphop",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "hiphop",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "hiphop",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "acoustic",
+      "target_lufs": -14.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "acoustic",
+      "target_lufs": -16.0,
+      "error": "name 'plan' is not defined"
+    },
+    {
+      "profile": "quiet_dynamic",
+      "genre": "acoustic",
+      "target_lufs": -9.0,
+      "error": "name 'plan' is not defined"
+    }
+  ]
+}

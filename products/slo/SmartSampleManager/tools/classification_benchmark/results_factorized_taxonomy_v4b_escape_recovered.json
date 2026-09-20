@@ -1,0 +1,60 @@
+{
+  "generated": "2026-09-11T14:46:13",
+  "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_v4b_escape_recovered.npz",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 8,
+    "splits": 5
+  },
+  "family_mapping": {
+    "Bass Hit": "bass",
+    "Bass Loop": "bass",
+    "Bass Reese": "bass",
+    "Clap": "drums",
+    "Crash": "drums",
+    "Drum Fill": "drums",
+    "Drum Loop": "drums",
+    "Hi-Hat": "drums",
+    "Hi-Hat Loop": "drums",
+    "Kick": "drums",
+    "Kick Loop": "drums",
+    "Percussion": "drums",
+    "Percussion Loop": "drums",
+    "Rimshot": "drums",
+    "Snare": "drums",
+    "Top Loop": "drums",
+    "Foley": "fx",
+    "Foley Loop": "fx",
+    "Impact": "fx",
+    "Riser": "fx",
+    "SFX": "fx",
+    "Atmosphere": "fx",
+    "Chord Loop": "tonal",
+    "Loop": "tonal",
+    "Pad": "tonal",
+    "Synth Loop": "tonal",
+    "Synth One-Shot": "tonal",
+    "Vocal Loop": "tonal",
+    "Vocal One-Shot": "tonal",
+    "Weather/Nature Atmos": "tonal",
+    "Other/none": "reject"
+  },
+  "n_files": 1523,
+  "n_classes": 27,
+  "n_families": 5,
+  "result": {
+    "accuracy_mean": 44.53,
+    "accuracy_sd": 0.6,
+    "macro_f1": 37.49,
+    "per_seed_accuracy": [
+      43.47,
+      43.8,
+      44.39,
+      45.24,
+      45.17,
+      44.85,
+      44.39,
+      44.91
+    ]
+  }
+}

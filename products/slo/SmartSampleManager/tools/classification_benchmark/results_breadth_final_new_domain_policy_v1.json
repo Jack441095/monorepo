@@ -1,0 +1,91 @@
+{
+  "candidate_policy": {
+    "accepted_by_class": {
+      "Clap": {
+        "n": 39,
+        "precision": 0.9743589743589743
+      },
+      "Kick": {
+        "n": 26,
+        "precision": 1.0
+      },
+      "Snare": {
+        "n": 40,
+        "precision": 1.0
+      }
+    },
+    "coverage": 0.875,
+    "n_accepted": 105,
+    "precision": 0.9904761904761905
+  },
+  "decision": "audit_only; no production policy or rename action changed",
+  "errors": [
+    {
+      "accepted": true,
+      "confidence": 0.8057393431663513,
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Claps/AKT-CLP-A005_bip.wav",
+      "predicted": "Clap",
+      "true": "Vocal One-Shot"
+    }
+  ],
+  "n_overlap_excluded": 18,
+  "n_training_rows": 1832,
+  "n_validation_rows": 120,
+  "overall": {
+    "accuracy": 0.9916666666666667,
+    "n_correct": 119
+  },
+  "predicted_counts": {
+    "Clap": 40,
+    "Kick": 40,
+    "Snare": 40
+  },
+  "protocol": {
+    "candidate_thresholds": {
+      "Clap": 0.7170043587684631,
+      "Kick": 0.811768651008606,
+      "Snare": 0.6104221343994141
+    },
+    "classes": [
+      "Bass Hit",
+      "Bass Loop",
+      "Bass Reese",
+      "Chord Loop",
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Foley",
+      "Foley Loop",
+      "Hi-Hat",
+      "Hi-Hat Loop",
+      "Impact",
+      "Kick",
+      "Kick Loop",
+      "Other/none",
+      "Pad",
+      "Percussion",
+      "Percussion Loop",
+      "Rimshot",
+      "Riser",
+      "SFX",
+      "Snare",
+      "Synth Loop",
+      "Synth One-Shot",
+      "Top Loop",
+      "Vocal Loop",
+      "Vocal One-Shot",
+      "Weather/Nature Atmos"
+    ],
+    "classifier": "standardized cosine nearest centroid",
+    "training": "corpus_breadth_final_v1 excluding any overlapping validation paths",
+    "validation": "verified_class_conditional_gate_validation_v1"
+  },
+  "record_type": "slo_breadth_new_domain_candidate_policy_qualification",
+  "safety": {
+    "production_model_changed": false,
+    "read_only": true,
+    "rename_actions": false,
+    "source_audio_modified": false
+  },
+  "schema_version": "1.0.0"
+}

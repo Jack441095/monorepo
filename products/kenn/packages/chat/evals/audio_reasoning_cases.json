@@ -1,0 +1,8 @@
+[
+  {"id":"crest","query":"What does a crest factor of 7 dB suggest?","requires":"grounded_audio_advice"},
+  {"id":"phase","query":"Why does widening my synth make the mix weak in mono?","requires":"grounded_audio_advice"},
+  {"id":"kick_bass","query":"Why does my kick disappear when the bass enters?","requires":"grounded_audio_advice"},
+  {"id":"harshness","query":"How can I reduce harshness without dulling the vocal?","requires":"grounded_audio_advice"},
+  {"id":"master_clip","query":"What should I inspect if my master clips?","requires":"grounded_audio_advice"},
+  {"id":"absent_audio","query":"Find the loudest spectral peaks in my mix","requires":"ask_for_audio"}
+]

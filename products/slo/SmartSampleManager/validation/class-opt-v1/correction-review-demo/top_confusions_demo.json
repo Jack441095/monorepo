@@ -1,0 +1,12 @@
+{
+ "demo": true,
+ "n": 4,
+ "top_confusions": {
+  "Percussion -> Foley": 1,
+  "Percussion -> Hi-Hat": 1,
+  "Kick -> Kick Loop": 1,
+  "? -> ?": 1
+ },
+ "kill_criterion": "drop queue if owner overturn rate >30%",
+ "promotion": "explicit owner import only; ingest never promotes"
+}

@@ -1,0 +1,68 @@
+# Licensing runtime state and signing secrets must remain outside Git.
+SmartSampleManager/licensing_server/keys/*.private
+SmartSampleManager/licensing_server/licensing.db
+SmartSampleManager/licensing_server/licensing.db-wal
+SmartSampleManager/licensing_server/licensing.db-shm
+nitedsp/backend/staging_keys/*.private
+nitedsp/backend/.env
+
+# macOS Finder metadata.
+.DS_Store
+
+# CMake build trees (build-test, build-slo-authoritative, build-ux-v3-rc, ...).
+# Multi-GB each; nothing under them belongs in Git.
+build*/
+
+# Canonical out-of-tree build root and shared FetchContent cache
+# (see SmartSampleManager/CMakePresets.json and docs/BUILD_TREE_POLICY.md).
+# Multi-GB each; nothing under them belongs in Git.
+_build/
+_cache/
+tools/__pycache__/
+
+# Local cache/scratch databases produced by running the test targets.
+SmartSampleManager/fixtures/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Classification research artifacts (2026-09-09). All regenerable from
+# tools/classification_benchmark scripts; multi-GB, nothing belongs in Git.
+#   clap_audio*/       48kHz FLAC conversions of the corpus (2.9GB)
+#   clap_model*/       CLAP checkpoints shipped to the GPU box (590-780MB)
+#   *.npz/*.npy/*.pt   embeddings, feature matrices, model checkpoints
+SmartSampleManager/tools/classification_benchmark/clap_audio*/
+SmartSampleManager/tools/classification_benchmark/clap_model*/
+SmartSampleManager/tools/classification_benchmark/*.tgz
+SmartSampleManager/tools/classification_benchmark/*.npy
+SmartSampleManager/tools/classification_benchmark/*.npz
+SmartSampleManager/tools/classification_benchmark/*.pt
+SmartSampleManager/tools/classification_benchmark/*_results/
+SmartSampleManager/tools/classification_benchmark/__pycache__/
+SmartSampleManager/scripts/__pycache__/
+
+# Compiled standalone test binary (built ad hoc, not by CMake).
+SmartSampleManager/test_cpp_parity_standalone
+
+# CLAP ONNX export artifacts (regenerable; multi-100MB)
+SmartSampleManager/tools/classification_benchmark/clap_onnx/
+SmartSampleManager/tools/classification_benchmark/*.onnx
+SmartSampleManager/tools/classification_benchmark/*.onnx.data
+
+# Labelling tool working files (user-specific, regenerable)
+SmartSampleManager/tools/classification_benchmark/label_manifest_*.json
+SmartSampleManager/tools/classification_benchmark/verified_*.csv
+SmartSampleManager/tools/classification_benchmark/drum_rename_log_*.csv
+SmartSampleManager/tools/classification_benchmark/drum_model.pkl
+SmartSampleManager/tools/classification_benchmark/drum_features_sample.npz
+
+SmartSampleManager/tools/classification_benchmark/fusion_model.pkl
+SmartSampleManager/tools/classification_benchmark/fusion_rename_log_*.csv
+SmartSampleManager/tools/classification_benchmark/fusion_eval.npz
+SmartSampleManager/tools/classification_benchmark/*.pkl
+
+# Phase 5 sweep (2026-09-15): generated benchmark artifacts, not source.
+# receipts/ is ~1 GB of owner-review data; kept on disk, kept out of Git.
+SmartSampleManager/tools/classification_benchmark/receipts/
+SmartSampleManager/tools/classification_benchmark/mw_cache/
+__pycache__/

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>Smart Sample Manager</title>
+    <options customize="always" require-scripts="false" hostArchitectures="arm64,x86_64"/>
+    
+    <choices-outline>
+        <line choice="choice-standalone"/>
+        <line choice="choice-vst3"/>
+        <line choice="choice-au"/>
+    </choices-outline>
+
+    <choice id="choice-standalone" title="Standalone Application" visible="true" start_selected="true" description="Installs the standalone Smart Sample Manager application to /Applications.">
+        <pkg-ref id="com.nitedsp.smartsamplemanager.standalone.pkg"/>
+    </choice>
+    <choice id="choice-vst3" title="VST3 Plugin" visible="true" start_selected="true" description="Installs the VST3 plugin to /Library/Audio/Plug-Ins/VST3.">
+        <pkg-ref id="com.nitedsp.smartsamplemanager.vst3.pkg"/>
+    </choice>
+    <choice id="choice-au" title="Audio Unit (AU) Plugin" visible="true" start_selected="true" description="Installs the Audio Unit (AU) plugin to /Library/Audio/Plug-Ins/Components.">
+        <pkg-ref id="com.nitedsp.smartsamplemanager.au.pkg"/>
+    </choice>
+
+    <pkg-ref id="com.nitedsp.smartsamplemanager.standalone.pkg" version="1.0.0" onConclusion="none">SmartSampleManager_Standalone.pkg</pkg-ref>
+    <pkg-ref id="com.nitedsp.smartsamplemanager.vst3.pkg" version="1.0.0" onConclusion="none">SmartSampleManager_VST3.pkg</pkg-ref>
+    <pkg-ref id="com.nitedsp.smartsamplemanager.au.pkg" version="1.0.0" onConclusion="none">SmartSampleManager_AU.pkg</pkg-ref>
+</installer-gui-script>

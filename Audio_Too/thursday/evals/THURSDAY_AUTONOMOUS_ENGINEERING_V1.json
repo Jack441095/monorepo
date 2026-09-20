@@ -1,0 +1,95 @@
+{
+  "benchmark": "THURSDAY_AUTONOMOUS_ENGINEERING_V1",
+  "total": 265,
+  "passed": 265,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "qualified": true,
+  "category_results": {
+    "A": {
+      "pass": 25,
+      "fail": 0
+    },
+    "B": {
+      "pass": 15,
+      "fail": 0
+    },
+    "C": {
+      "pass": 15,
+      "fail": 0
+    },
+    "D": {
+      "pass": 15,
+      "fail": 0
+    },
+    "E": {
+      "pass": 15,
+      "fail": 0
+    },
+    "F": {
+      "pass": 10,
+      "fail": 0
+    },
+    "G": {
+      "pass": 15,
+      "fail": 0
+    },
+    "H": {
+      "pass": 10,
+      "fail": 0
+    },
+    "I": {
+      "pass": 15,
+      "fail": 0
+    },
+    "J": {
+      "pass": 15,
+      "fail": 0
+    },
+    "K": {
+      "pass": 15,
+      "fail": 0
+    },
+    "L": {
+      "pass": 10,
+      "fail": 0
+    },
+    "M": {
+      "pass": 10,
+      "fail": 0
+    },
+    "N": {
+      "pass": 5,
+      "fail": 0
+    },
+    "O": {
+      "pass": 5,
+      "fail": 0
+    },
+    "P": {
+      "pass": 5,
+      "fail": 0
+    },
+    "Q": {
+      "pass": 5,
+      "fail": 0
+    },
+    "R": {
+      "pass": 5,
+      "fail": 0
+    },
+    "S": {
+      "pass": 5,
+      "fail": 0
+    },
+    "T": {
+      "pass": 10,
+      "fail": 0
+    },
+    "Z": {
+      "pass": 40,
+      "fail": 0
+    }
+  },
+  "errors": []
+}

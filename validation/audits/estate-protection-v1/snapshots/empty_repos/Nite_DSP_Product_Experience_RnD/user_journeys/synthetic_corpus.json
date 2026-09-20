@@ -1,0 +1,3524 @@
+{
+  "version": "px-user-journeys-v1",
+  "evidence_class": "synthetic scenario generation and friction estimates",
+  "archetype_count": 9,
+  "task_count": 15,
+  "scenario_count": 135,
+  "archetypes": [
+    "beginner_producer",
+    "intermediate_electronic_producer",
+    "professional_producer",
+    "mix_engineer",
+    "sound_designer",
+    "ableton_power_user",
+    "large_sample_library_user",
+    "keyboard_accessibility_user",
+    "nite_dsp_company_owner"
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "beginner_producer:find_kick",
+      "archetype": "beginner_producer",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 10,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:find_complementary_clap",
+      "archetype": "beginner_producer",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 11,
+        "clicks": 12,
+        "keystrokes": 5,
+        "context_switches": 4,
+        "decision_points": 7,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "beginner_producer:replace_bass_sample",
+      "archetype": "beginner_producer",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 10,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:diagnose_harsh_chorus",
+      "archetype": "beginner_producer",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 6,
+        "context_switches": 4,
+        "decision_points": 5,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:compare_reference",
+      "archetype": "beginner_producer",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 7,
+        "keystrokes": 5,
+        "context_switches": 4,
+        "decision_points": 7,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "beginner_producer:recover_failed_scan",
+      "archetype": "beginner_producer",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 7,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:navigate_20k_map",
+      "archetype": "beginner_producer",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "beginner_producer:use_slo_keyboard_only",
+      "archetype": "beginner_producer",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 12,
+        "clicks": 0,
+        "keystrokes": 11,
+        "context_switches": 2,
+        "decision_points": 8,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 7,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:approve_thursday_action",
+      "archetype": "beginner_producer",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 4,
+        "decision_points": 6,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:understand_kenn_evidence",
+      "archetype": "beginner_producer",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 6,
+        "context_switches": 4,
+        "decision_points": 7,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:switch_language",
+      "archetype": "beginner_producer",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "beginner_producer:use_three_plugin_instances",
+      "archetype": "beginner_producer",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 7,
+        "keystrokes": 5,
+        "context_switches": 4,
+        "decision_points": 6,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "beginner_producer:find_recent_sample",
+      "archetype": "beginner_producer",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 6,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:nothing_needs_fixing",
+      "archetype": "beginner_producer",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 4,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "beginner_producer:chatbot_first_plugin",
+      "archetype": "beginner_producer",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 8,
+        "keystrokes": 7,
+        "context_switches": 4,
+        "decision_points": 7,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 13,
+        "clicks": 7,
+        "keystrokes": 5,
+        "context_switches": 4,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:find_kick",
+      "archetype": "intermediate_electronic_producer",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 8,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:find_complementary_clap",
+      "archetype": "intermediate_electronic_producer",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 10,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:replace_bass_sample",
+      "archetype": "intermediate_electronic_producer",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 8,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:diagnose_harsh_chorus",
+      "archetype": "intermediate_electronic_producer",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:compare_reference",
+      "archetype": "intermediate_electronic_producer",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:recover_failed_scan",
+      "archetype": "intermediate_electronic_producer",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:navigate_20k_map",
+      "archetype": "intermediate_electronic_producer",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:use_slo_keyboard_only",
+      "archetype": "intermediate_electronic_producer",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 0,
+        "keystrokes": 11,
+        "context_switches": 2,
+        "decision_points": 7,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:approve_thursday_action",
+      "archetype": "intermediate_electronic_producer",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:understand_kenn_evidence",
+      "archetype": "intermediate_electronic_producer",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:switch_language",
+      "archetype": "intermediate_electronic_producer",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:use_three_plugin_instances",
+      "archetype": "intermediate_electronic_producer",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:find_recent_sample",
+      "archetype": "intermediate_electronic_producer",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 5,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:nothing_needs_fixing",
+      "archetype": "intermediate_electronic_producer",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "intermediate_electronic_producer:chatbot_first_plugin",
+      "archetype": "intermediate_electronic_producer",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 7,
+        "keystrokes": 7,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 12,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    },
+    {
+      "scenario_id": "professional_producer:find_kick",
+      "archetype": "professional_producer",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 7,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:find_complementary_clap",
+      "archetype": "professional_producer",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 9,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 4,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "professional_producer:replace_bass_sample",
+      "archetype": "professional_producer",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 7,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:diagnose_harsh_chorus",
+      "archetype": "professional_producer",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:compare_reference",
+      "archetype": "professional_producer",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "professional_producer:recover_failed_scan",
+      "archetype": "professional_producer",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:navigate_20k_map",
+      "archetype": "professional_producer",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 4,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "professional_producer:use_slo_keyboard_only",
+      "archetype": "professional_producer",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 0,
+        "keystrokes": 11,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:approve_thursday_action",
+      "archetype": "professional_producer",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:understand_kenn_evidence",
+      "archetype": "professional_producer",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:switch_language",
+      "archetype": "professional_producer",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 4,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "professional_producer:use_three_plugin_instances",
+      "archetype": "professional_producer",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "professional_producer:find_recent_sample",
+      "archetype": "professional_producer",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 4,
+        "clicks": 4,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:nothing_needs_fixing",
+      "archetype": "professional_producer",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "professional_producer:chatbot_first_plugin",
+      "archetype": "professional_producer",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 7,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 10,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    },
+    {
+      "scenario_id": "mix_engineer:find_kick",
+      "archetype": "mix_engineer",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 8,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:find_complementary_clap",
+      "archetype": "mix_engineer",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 10,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "mix_engineer:replace_bass_sample",
+      "archetype": "mix_engineer",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 8,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:diagnose_harsh_chorus",
+      "archetype": "mix_engineer",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:compare_reference",
+      "archetype": "mix_engineer",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "mix_engineer:recover_failed_scan",
+      "archetype": "mix_engineer",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:navigate_20k_map",
+      "archetype": "mix_engineer",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "mix_engineer:use_slo_keyboard_only",
+      "archetype": "mix_engineer",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 0,
+        "keystrokes": 11,
+        "context_switches": 2,
+        "decision_points": 7,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:approve_thursday_action",
+      "archetype": "mix_engineer",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:understand_kenn_evidence",
+      "archetype": "mix_engineer",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:switch_language",
+      "archetype": "mix_engineer",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "mix_engineer:use_three_plugin_instances",
+      "archetype": "mix_engineer",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "mix_engineer:find_recent_sample",
+      "archetype": "mix_engineer",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 5,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:nothing_needs_fixing",
+      "archetype": "mix_engineer",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "mix_engineer:chatbot_first_plugin",
+      "archetype": "mix_engineer",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 7,
+        "keystrokes": 7,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 10,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    },
+    {
+      "scenario_id": "sound_designer:find_kick",
+      "archetype": "sound_designer",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 8,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:find_complementary_clap",
+      "archetype": "sound_designer",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 10,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "sound_designer:replace_bass_sample",
+      "archetype": "sound_designer",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 8,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:diagnose_harsh_chorus",
+      "archetype": "sound_designer",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:compare_reference",
+      "archetype": "sound_designer",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "sound_designer:recover_failed_scan",
+      "archetype": "sound_designer",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:navigate_20k_map",
+      "archetype": "sound_designer",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "sound_designer:use_slo_keyboard_only",
+      "archetype": "sound_designer",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 0,
+        "keystrokes": 11,
+        "context_switches": 2,
+        "decision_points": 7,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:approve_thursday_action",
+      "archetype": "sound_designer",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:understand_kenn_evidence",
+      "archetype": "sound_designer",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:switch_language",
+      "archetype": "sound_designer",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "sound_designer:use_three_plugin_instances",
+      "archetype": "sound_designer",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "sound_designer:find_recent_sample",
+      "archetype": "sound_designer",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 5,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:nothing_needs_fixing",
+      "archetype": "sound_designer",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "sound_designer:chatbot_first_plugin",
+      "archetype": "sound_designer",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 7,
+        "keystrokes": 7,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 11,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    },
+    {
+      "scenario_id": "ableton_power_user:find_kick",
+      "archetype": "ableton_power_user",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 7,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:find_complementary_clap",
+      "archetype": "ableton_power_user",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 8,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "ableton_power_user:replace_bass_sample",
+      "archetype": "ableton_power_user",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 7,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:diagnose_harsh_chorus",
+      "archetype": "ableton_power_user",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 3,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:compare_reference",
+      "archetype": "ableton_power_user",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "ableton_power_user:recover_failed_scan",
+      "archetype": "ableton_power_user",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:navigate_20k_map",
+      "archetype": "ableton_power_user",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "ableton_power_user:use_slo_keyboard_only",
+      "archetype": "ableton_power_user",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 0,
+        "keystrokes": 11,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:approve_thursday_action",
+      "archetype": "ableton_power_user",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:understand_kenn_evidence",
+      "archetype": "ableton_power_user",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:switch_language",
+      "archetype": "ableton_power_user",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "ableton_power_user:use_three_plugin_instances",
+      "archetype": "ableton_power_user",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "ableton_power_user:find_recent_sample",
+      "archetype": "ableton_power_user",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 4,
+        "clicks": 4,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:nothing_needs_fixing",
+      "archetype": "ableton_power_user",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "ableton_power_user:chatbot_first_plugin",
+      "archetype": "ableton_power_user",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 7,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 9,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    },
+    {
+      "scenario_id": "large_sample_library_user:find_kick",
+      "archetype": "large_sample_library_user",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 9,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:find_complementary_clap",
+      "archetype": "large_sample_library_user",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 12,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 7,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "large_sample_library_user:replace_bass_sample",
+      "archetype": "large_sample_library_user",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 9,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:diagnose_harsh_chorus",
+      "archetype": "large_sample_library_user",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:compare_reference",
+      "archetype": "large_sample_library_user",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 7,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 7,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "large_sample_library_user:recover_failed_scan",
+      "archetype": "large_sample_library_user",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 7,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:navigate_20k_map",
+      "archetype": "large_sample_library_user",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "large_sample_library_user:use_slo_keyboard_only",
+      "archetype": "large_sample_library_user",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 12,
+        "clicks": 0,
+        "keystrokes": 11,
+        "context_switches": 2,
+        "decision_points": 8,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 7,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:approve_thursday_action",
+      "archetype": "large_sample_library_user",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:understand_kenn_evidence",
+      "archetype": "large_sample_library_user",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 7,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:switch_language",
+      "archetype": "large_sample_library_user",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "large_sample_library_user:use_three_plugin_instances",
+      "archetype": "large_sample_library_user",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 7,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "large_sample_library_user:find_recent_sample",
+      "archetype": "large_sample_library_user",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 6,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:nothing_needs_fixing",
+      "archetype": "large_sample_library_user",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "large_sample_library_user:chatbot_first_plugin",
+      "archetype": "large_sample_library_user",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 8,
+        "keystrokes": 7,
+        "context_switches": 3,
+        "decision_points": 7,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 13,
+        "clicks": 7,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:find_kick",
+      "archetype": "keyboard_accessibility_user",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 0,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:find_complementary_clap",
+      "archetype": "keyboard_accessibility_user",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 11,
+        "clicks": 0,
+        "keystrokes": 6,
+        "context_switches": 4,
+        "decision_points": 8,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:replace_bass_sample",
+      "archetype": "keyboard_accessibility_user",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 0,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:diagnose_harsh_chorus",
+      "archetype": "keyboard_accessibility_user",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 4,
+        "decision_points": 5,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:compare_reference",
+      "archetype": "keyboard_accessibility_user",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 0,
+        "keystrokes": 6,
+        "context_switches": 4,
+        "decision_points": 8,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 8,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:recover_failed_scan",
+      "archetype": "keyboard_accessibility_user",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 0,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:navigate_20k_map",
+      "archetype": "keyboard_accessibility_user",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 6,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:use_slo_keyboard_only",
+      "archetype": "keyboard_accessibility_user",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 12,
+        "clicks": 0,
+        "keystrokes": 13,
+        "context_switches": 2,
+        "decision_points": 9,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 8,
+        "clicks": 0,
+        "keystrokes": 8,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:approve_thursday_action",
+      "archetype": "keyboard_accessibility_user",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 0,
+        "keystrokes": 6,
+        "context_switches": 4,
+        "decision_points": 6,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:understand_kenn_evidence",
+      "archetype": "keyboard_accessibility_user",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 4,
+        "decision_points": 8,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:switch_language",
+      "archetype": "keyboard_accessibility_user",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:use_three_plugin_instances",
+      "archetype": "keyboard_accessibility_user",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 0,
+        "keystrokes": 6,
+        "context_switches": 4,
+        "decision_points": 6,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:find_recent_sample",
+      "archetype": "keyboard_accessibility_user",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 0,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:nothing_needs_fixing",
+      "archetype": "keyboard_accessibility_user",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 0,
+        "keystrokes": 6,
+        "context_switches": 4,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 0,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "keyboard_accessibility_user:chatbot_first_plugin",
+      "archetype": "keyboard_accessibility_user",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 0,
+        "keystrokes": 8,
+        "context_switches": 4,
+        "decision_points": 8,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 14,
+        "clicks": 0,
+        "keystrokes": 6,
+        "context_switches": 4,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:find_kick",
+      "archetype": "nite_dsp_company_owner",
+      "task": "find_kick",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 8,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:find_complementary_clap",
+      "archetype": "nite_dsp_company_owner",
+      "task": "find_complementary_clap",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 9,
+        "clicks": 10,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 240,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:replace_bass_sample",
+      "archetype": "nite_dsp_company_owner",
+      "task": "replace_bass_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 8,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:diagnose_harsh_chorus",
+      "archetype": "nite_dsp_company_owner",
+      "task": "diagnose_harsh_chorus",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 4,
+        "wait_ms": 700,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 480,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:compare_reference",
+      "archetype": "nite_dsp_company_owner",
+      "task": "compare_reference",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 1250,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 875,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:recover_failed_scan",
+      "archetype": "nite_dsp_company_owner",
+      "task": "recover_failed_scan",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 6,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 1500,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 625,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:navigate_20k_map",
+      "archetype": "nite_dsp_company_owner",
+      "task": "navigate_20k_map",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 2,
+        "decision_points": 5,
+        "wait_ms": 250,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 4,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:use_slo_keyboard_only",
+      "archetype": "nite_dsp_company_owner",
+      "task": "use_slo_keyboard_only",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 10,
+        "clicks": 0,
+        "keystrokes": 11,
+        "context_switches": 2,
+        "decision_points": 7,
+        "wait_ms": 300,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 6,
+        "clicks": 0,
+        "keystrokes": 7,
+        "context_switches": 2,
+        "decision_points": 3,
+        "wait_ms": 200,
+        "error_recovery": 1
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:approve_thursday_action",
+      "archetype": "nite_dsp_company_owner",
+      "task": "approve_thursday_action",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 350,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 220,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:understand_kenn_evidence",
+      "archetype": "nite_dsp_company_owner",
+      "task": "understand_kenn_evidence",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 5,
+        "keystrokes": 6,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 280,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:switch_language",
+      "archetype": "nite_dsp_company_owner",
+      "task": "switch_language",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 5,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 150,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 4,
+        "clicks": 3,
+        "keystrokes": 2,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 120,
+        "error_recovery": 0
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:use_three_plugin_instances",
+      "archetype": "nite_dsp_company_owner",
+      "task": "use_three_plugin_instances",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 7,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 600,
+        "error_recovery": 2
+      },
+      "proposed": {
+        "steps": 5,
+        "clicks": 4,
+        "keystrokes": 2,
+        "context_switches": 2,
+        "decision_points": 2,
+        "wait_ms": 450,
+        "error_recovery": 1
+      },
+      "promotion_status": "CONTINUE_R&D"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:find_recent_sample",
+      "archetype": "nite_dsp_company_owner",
+      "task": "find_recent_sample",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 5,
+        "clicks": 5,
+        "keystrokes": 3,
+        "context_switches": 2,
+        "decision_points": 4,
+        "wait_ms": 180,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 100,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:nothing_needs_fixing",
+      "archetype": "nite_dsp_company_owner",
+      "task": "nothing_needs_fixing",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 6,
+        "clicks": 5,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 5,
+        "wait_ms": 400,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 3,
+        "clicks": 2,
+        "keystrokes": 1,
+        "context_switches": 1,
+        "decision_points": 2,
+        "wait_ms": 180,
+        "error_recovery": 0
+      },
+      "promotion_status": "PROMOTE"
+    },
+    {
+      "scenario_id": "nite_dsp_company_owner:chatbot_first_plugin",
+      "archetype": "nite_dsp_company_owner",
+      "task": "chatbot_first_plugin",
+      "evidence_class": "synthetic estimate, not human research",
+      "current": {
+        "steps": 8,
+        "clicks": 7,
+        "keystrokes": 7,
+        "context_switches": 3,
+        "decision_points": 6,
+        "wait_ms": 500,
+        "error_recovery": 1
+      },
+      "proposed": {
+        "steps": 11,
+        "clicks": 6,
+        "keystrokes": 5,
+        "context_switches": 3,
+        "decision_points": 2,
+        "wait_ms": 650,
+        "error_recovery": 2
+      },
+      "promotion_status": "DROP/PARK"
+    }
+  ],
+  "task_totals": {
+    "find_kick": {
+      "count": 9,
+      "current_steps": 65,
+      "proposed_steps": 38,
+      "step_reduction": 27,
+      "status": "PROMOTE",
+      "mean_step_reduction": 3.0
+    },
+    "find_complementary_clap": {
+      "count": 9,
+      "current_steps": 84,
+      "proposed_steps": 46,
+      "step_reduction": 38,
+      "status": "CONTINUE_R&D",
+      "mean_step_reduction": 4.22
+    },
+    "replace_bass_sample": {
+      "count": 9,
+      "current_steps": 75,
+      "proposed_steps": 46,
+      "step_reduction": 29,
+      "status": "PROMOTE",
+      "mean_step_reduction": 3.22
+    },
+    "diagnose_harsh_chorus": {
+      "count": 9,
+      "current_steps": 56,
+      "proposed_steps": 46,
+      "step_reduction": 10,
+      "status": "PROMOTE",
+      "mean_step_reduction": 1.11
+    },
+    "compare_reference": {
+      "count": 9,
+      "current_steps": 75,
+      "proposed_steps": 56,
+      "step_reduction": 19,
+      "status": "CONTINUE_R&D",
+      "mean_step_reduction": 2.11
+    },
+    "recover_failed_scan": {
+      "count": 9,
+      "current_steps": 75,
+      "proposed_steps": 38,
+      "step_reduction": 37,
+      "status": "PROMOTE",
+      "mean_step_reduction": 4.11
+    },
+    "navigate_20k_map": {
+      "count": 9,
+      "current_steps": 56,
+      "proposed_steps": 46,
+      "step_reduction": 10,
+      "status": "CONTINUE_R&D",
+      "mean_step_reduction": 1.11
+    },
+    "use_slo_keyboard_only": {
+      "count": 9,
+      "current_steps": 93,
+      "proposed_steps": 56,
+      "step_reduction": 37,
+      "status": "PROMOTE",
+      "mean_step_reduction": 4.11
+    },
+    "approve_thursday_action": {
+      "count": 9,
+      "current_steps": 56,
+      "proposed_steps": 46,
+      "step_reduction": 10,
+      "status": "PROMOTE",
+      "mean_step_reduction": 1.11
+    },
+    "understand_kenn_evidence": {
+      "count": 9,
+      "current_steps": 65,
+      "proposed_steps": 46,
+      "step_reduction": 19,
+      "status": "PROMOTE",
+      "mean_step_reduction": 2.11
+    },
+    "switch_language": {
+      "count": 9,
+      "current_steps": 46,
+      "proposed_steps": 38,
+      "step_reduction": 8,
+      "status": "CONTINUE_R&D",
+      "mean_step_reduction": 0.89
+    },
+    "use_three_plugin_instances": {
+      "count": 9,
+      "current_steps": 65,
+      "proposed_steps": 46,
+      "step_reduction": 19,
+      "status": "CONTINUE_R&D",
+      "mean_step_reduction": 2.11
+    },
+    "find_recent_sample": {
+      "count": 9,
+      "current_steps": 46,
+      "proposed_steps": 29,
+      "step_reduction": 17,
+      "status": "PROMOTE",
+      "mean_step_reduction": 1.89
+    },
+    "nothing_needs_fixing": {
+      "count": 9,
+      "current_steps": 56,
+      "proposed_steps": 29,
+      "step_reduction": 27,
+      "status": "PROMOTE",
+      "mean_step_reduction": 3.0
+    },
+    "chatbot_first_plugin": {
+      "count": 9,
+      "current_steps": 75,
+      "proposed_steps": 103,
+      "step_reduction": -28,
+      "status": "DROP/PARK",
+      "mean_step_reduction": -3.11
+    }
+  },
+  "best_step_reduction": "find_complementary_clap",
+  "worst_proposed_feature": "chatbot_first_plugin",
+  "limitations": [
+    "Metrics are scenario-model outputs, not observed user timings.",
+    "No real users were recruited or contacted.",
+    "Promotion status is a research recommendation and still needs technical and human gates."
+  ]
+}

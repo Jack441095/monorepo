@@ -1,0 +1,762 @@
+{
+  "receipt": "SLO_CLASSIFIER_IMPROVEMENT_RECEIPT_V1",
+  "generated": "2026-09-11T00:07:08",
+  "git_sha_at_audit": "e2612fb",
+  "git_sha_now": "e2612fb",
+  "branch": "main",
+  "dataset": {
+    "version": "1.0.0",
+    "taxonomy_version": "1.1.0",
+    "files": 1069,
+    "collections": 80,
+    "evaluated_files": 762,
+    "evaluated_collections": 70
+  },
+  "protocol": {
+    "splits": "collection-held-out StratifiedGroupKFold",
+    "seeds": 8,
+    "gates_fitted_on": "training collections only",
+    "calibration_margin_pp": 3,
+    "note": "random CV overstates unseen-collection accuracy by ~9.7pp and is never a promotion baseline"
+  },
+  "primary_target": {
+    "goal": "increase coverage at 90% precision above 41% without dropping below 90%",
+    "finding": "the stated 41% was never real: fusion measures 89.3-89.8% precision at 4/8/12 seeds and misses the 90% target at every one",
+    "true_baseline_coverage_at_90": 31.4,
+    "achieved_coverage_at_90": 32.5,
+    "delta_pp": 1.1,
+    "arm": "multi-window audio",
+    "stable_across_seed_counts": true,
+    "target_met": false,
+    "target_met_explanation": "coverage improved and the 90% promise is kept, but 41% was an incorrect baseline; measured against the true 31.4% baseline this is +1.1pp, not +9pp"
+  },
+  "operating_points": {
+    "85": {
+      "arm": "mw-fusion",
+      "coverage": 68.8,
+      "precision": 87.6,
+      "meets": true
+    },
+    "90": {
+      "arm": "multi-window audio",
+      "coverage": 32.5,
+      "precision": 91.0,
+      "meets": true
+    },
+    "95": {
+      "arm": "audio-only",
+      "coverage": 14.8,
+      "precision": 95.1,
+      "meets": "MARGINAL",
+      "warning": "0.1pp margin, inside seed noise -- must not be advertised"
+    }
+  },
+  "ablation": {
+    "audio-only (incumbent)": {
+      "acc": 69.69,
+      "sd": 0.85,
+      "per_seed": [
+        70.21,
+        69.82,
+        70.21,
+        69.42,
+        70.47,
+        69.29,
+        67.72,
+        70.34
+      ],
+      "macro_f1": 65.14,
+      "cov85": 61.8,
+      "cov90": 44.4,
+      "cov95": 19.5,
+      "other_none_false_accept": 19.01,
+      "rejection_boundary_errors": 62,
+      "total_errors": 226,
+      "per_class": {
+        "Clap": {
+          "precision": 74.0,
+          "recall": 92.9,
+          "n": 98
+        },
+        "Crash": {
+          "precision": 57.6,
+          "recall": 73.1,
+          "n": 26
+        },
+        "Drum Loop": {
+          "precision": 67.0,
+          "recall": 87.0,
+          "n": 77
+        },
+        "Foley": {
+          "precision": 45.2,
+          "recall": 60.0,
+          "n": 55
+        },
+        "Hi-Hat": {
+          "precision": 72.0,
+          "recall": 74.0,
+          "n": 73
+        },
+        "Kick": {
+          "precision": 82.2,
+          "recall": 83.8,
+          "n": 99
+        },
+        "Other/none": {
+          "precision": 82.8,
+          "recall": 60.5,
+          "n": 119
+        },
+        "Percussion": {
+          "precision": 60.0,
+          "recall": 24.0,
+          "n": 50
+        },
+        "Percussion Loop": {
+          "precision": 62.0,
+          "recall": 50.0,
+          "n": 62
+        },
+        "Snare": {
+          "precision": 74.0,
+          "recall": 71.8,
+          "n": 103
+        }
+      },
+      "confusion": [
+        [
+          91,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          1,
+          19,
+          0,
+          0,
+          2,
+          0,
+          2,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          67,
+          0,
+          0,
+          0,
+          2,
+          0,
+          8,
+          0
+        ],
+        [
+          5,
+          1,
+          0,
+          33,
+          3,
+          2,
+          2,
+          2,
+          4,
+          3
+        ],
+        [
+          3,
+          7,
+          1,
+          3,
+          54,
+          0,
+          1,
+          1,
+          2,
+          1
+        ],
+        [
+          4,
+          0,
+          1,
+          4,
+          1,
+          83,
+          3,
+          0,
+          0,
+          3
+        ],
+        [
+          3,
+          3,
+          18,
+          8,
+          1,
+          5,
+          72,
+          0,
+          5,
+          4
+        ],
+        [
+          1,
+          2,
+          0,
+          8,
+          9,
+          8,
+          0,
+          12,
+          0,
+          10
+        ],
+        [
+          2,
+          0,
+          13,
+          6,
+          2,
+          2,
+          5,
+          1,
+          31,
+          0
+        ],
+        [
+          13,
+          1,
+          0,
+          8,
+          3,
+          1,
+          0,
+          3,
+          0,
+          74
+        ]
+      ]
+    },
+    "multi-window audio": {
+      "acc": 69.57,
+      "sd": 0.81,
+      "per_seed": [
+        70.34,
+        69.29,
+        69.95,
+        69.55,
+        70.47,
+        69.29,
+        67.72,
+        69.95
+      ],
+      "macro_f1": 64.92,
+      "cov85": 63.3,
+      "cov90": 45.6,
+      "cov95": 19.8,
+      "other_none_false_accept": 19.12,
+      "rejection_boundary_errors": 65,
+      "total_errors": 229,
+      "per_class": {
+        "Clap": {
+          "precision": 74.0,
+          "recall": 92.9,
+          "n": 98
+        },
+        "Crash": {
+          "precision": 57.1,
+          "recall": 76.9,
+          "n": 26
+        },
+        "Drum Loop": {
+          "precision": 67.7,
+          "recall": 87.0,
+          "n": 77
+        },
+        "Foley": {
+          "precision": 44.4,
+          "recall": 58.2,
+          "n": 55
+        },
+        "Hi-Hat": {
+          "precision": 71.1,
+          "recall": 74.0,
+          "n": 73
+        },
+        "Kick": {
+          "precision": 81.4,
+          "recall": 83.8,
+          "n": 99
+        },
+        "Other/none": {
+          "precision": 81.4,
+          "recall": 58.8,
+          "n": 119
+        },
+        "Percussion": {
+          "precision": 61.1,
+          "recall": 22.0,
+          "n": 50
+        },
+        "Percussion Loop": {
+          "precision": 60.8,
+          "recall": 50.0,
+          "n": 62
+        },
+        "Snare": {
+          "precision": 74.0,
+          "recall": 71.8,
+          "n": 103
+        }
+      },
+      "confusion": [
+        [
+          91,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          1,
+          20,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          67,
+          0,
+          0,
+          0,
+          2,
+          0,
+          8,
+          0
+        ],
+        [
+          5,
+          1,
+          0,
+          32,
+          4,
+          2,
+          2,
+          2,
+          4,
+          3
+        ],
+        [
+          3,
+          7,
+          1,
+          3,
+          54,
+          0,
+          1,
+          1,
+          2,
+          1
+        ],
+        [
+          4,
+          0,
+          1,
+          4,
+          1,
+          83,
+          3,
+          0,
+          0,
+          3
+        ],
+        [
+          3,
+          3,
+          18,
+          9,
+          1,
+          5,
+          70,
+          0,
+          6,
+          4
+        ],
+        [
+          1,
+          2,
+          0,
+          8,
+          9,
+          9,
+          0,
+          11,
+          0,
+          10
+        ],
+        [
+          2,
+          1,
+          12,
+          5,
+          2,
+          2,
+          6,
+          1,
+          31,
+          0
+        ],
+        [
+          13,
+          1,
+          0,
+          8,
+          3,
+          1,
+          0,
+          3,
+          0,
+          74
+        ]
+      ]
+    },
+    "mw-form + audio-family": {
+      "acc": 68.6,
+      "sd": 0.56,
+      "per_seed": [
+        68.64,
+        69.03,
+        69.42,
+        68.64,
+        68.77,
+        68.5,
+        67.32,
+        68.5
+      ],
+      "macro_f1": 62.48,
+      "cov85": 59.2,
+      "cov90": 43.1,
+      "cov95": 4.0,
+      "other_none_false_accept": 22.16,
+      "rejection_boundary_errors": 66,
+      "total_errors": 240,
+      "per_class": {
+        "Clap": {
+          "precision": 74.0,
+          "recall": 92.9,
+          "n": 98
+        },
+        "Crash": {
+          "precision": 57.1,
+          "recall": 76.9,
+          "n": 26
+        },
+        "Drum Loop": {
+          "precision": 60.2,
+          "recall": 92.2,
+          "n": 77
+        },
+        "Foley": {
+          "precision": 41.5,
+          "recall": 61.8,
+          "n": 55
+        },
+        "Hi-Hat": {
+          "precision": 72.0,
+          "recall": 74.0,
+          "n": 73
+        },
+        "Kick": {
+          "precision": 80.6,
+          "recall": 83.8,
+          "n": 99
+        },
+        "Other/none": {
+          "precision": 78.5,
+          "recall": 61.3,
+          "n": 119
+        },
+        "Percussion": {
+          "precision": 80.0,
+          "recall": 8.0,
+          "n": 50
+        },
+        "Percussion Loop": {
+          "precision": 66.7,
+          "recall": 29.0,
+          "n": 62
+        },
+        "Snare": {
+          "precision": 73.3,
+          "recall": 71.8,
+          "n": 103
+        }
+      },
+      "confusion": [
+        [
+          91,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          1,
+          20,
+          0,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          71,
+          0,
+          0,
+          0,
+          3,
+          0,
+          3,
+          0
+        ],
+        [
+          5,
+          1,
+          0,
+          34,
+          3,
+          2,
+          3,
+          1,
+          3,
+          3
+        ],
+        [
+          3,
+          7,
+          2,
+          4,
+          54,
+          0,
+          1,
+          0,
+          1,
+          1
+        ],
+        [
+          4,
+          0,
+          1,
+          4,
+          1,
+          83,
+          3,
+          0,
+          0,
+          3
+        ],
+        [
+          3,
+          3,
+          20,
+          8,
+          1,
+          5,
+          73,
+          0,
+          2,
+          4
+        ],
+        [
+          1,
+          2,
+          0,
+          13,
+          9,
+          9,
+          1,
+          4,
+          0,
+          11
+        ],
+        [
+          2,
+          0,
+          24,
+          6,
+          2,
+          3,
+          7,
+          0,
+          18,
+          0
+        ],
+        [
+          13,
+          2,
+          0,
+          10,
+          3,
+          1,
+          0,
+          0,
+          0,
+          74
+        ]
+      ]
+    }
+  },
+  "rejection_boundary": {
+    "audio-only": {
+      "false_accept_at_0.5": 20.17,
+      "real_sounds_wrongly_rejected": 2.18,
+      "junk_recall": 60.5
+    },
+    "multi-window": {
+      "false_accept_at_0.5": 19.33,
+      "real_sounds_wrongly_rejected": 2.33,
+      "junk_recall": 60.5
+    },
+    "filename_overrides_correct_audio": 28,
+    "impulse_responses_excluded": 9,
+    "per_class_policy": {
+      "Percussion": {
+        "n": 50,
+        "acts_on": 52.0,
+        "precision": 15.4,
+        "policy": "abstain"
+      },
+      "Percussion Loop": {
+        "n": 62,
+        "acts_on": 62.9,
+        "precision": 61.5,
+        "policy": "suggest"
+      },
+      "Foley": {
+        "n": 55,
+        "acts_on": 45.5,
+        "precision": 68.0,
+        "policy": "suggest"
+      },
+      "Other/none": {
+        "n": 119,
+        "acts_on": 73.1,
+        "precision": 72.4,
+        "policy": "suggest"
+      },
+      "Hi-Hat": {
+        "n": 73,
+        "acts_on": 82.2,
+        "precision": 80.0,
+        "policy": "suggest"
+      },
+      "Crash": {
+        "n": 26,
+        "acts_on": 80.8,
+        "precision": 81.0,
+        "policy": "suggest"
+      },
+      "Snare": {
+        "n": 103,
+        "acts_on": 79.6,
+        "precision": 82.9,
+        "policy": "suggest"
+      },
+      "Drum Loop": {
+        "n": 77,
+        "acts_on": 84.4,
+        "precision": 90.8,
+        "policy": "rename"
+      },
+      "Clap": {
+        "n": 98,
+        "acts_on": 93.9,
+        "precision": 93.5,
+        "policy": "rename"
+      },
+      "Kick": {
+        "n": 99,
+        "acts_on": 87.9,
+        "precision": 94.3,
+        "policy": "rename"
+      }
+    }
+  },
+  "accuracy": {
+    "audio_only": 69.69,
+    "multi_window": 69.57,
+    "macro_f1_audio_only": 65.14,
+    "macro_f1_multi_window": 64.92,
+    "note": "accuracy flat by design; the layer improves confidence ORDERING, which is what a gated renamer needs"
+  },
+  "multi_window_layer": {
+    "features": 55,
+    "windows": [
+      "full",
+      "attack",
+      "early",
+      "mid",
+      "tail"
+    ],
+    "contrasts": 10,
+    "stereo_measured_before_downmix": true,
+    "encoder_crop_arm": "NOT TESTED -- extraction incomplete"
+  },
+  "rejected_this_round": {
+    "mw-form + audio-family": "68.60% / F1 62.48, worse than either component; form is already 88.8% from the encoder",
+    "per_class_gating": "previously rejected: undershoots its precision promise by 12pp on unseen collections"
+  },
+  "safety": {
+    "sample_files_modified": 0,
+    "sample_files_moved_or_renamed": 0,
+    "source_audio_verified_unmodified": 1139,
+    "repos_touched": [
+      "products/slo/SmartSampleManager"
+    ],
+    "submit_touched": false,
+    "platform_touched": false,
+    "payment_touched": false,
+    "railway_touched": false,
+    "production_classifier_modified": false
+  },
+  "blockers": [
+    "Percussion remains incoherent (silhouette -0.120) and must never auto-rename (15.4% precision)",
+    "rejection boundary still ~27% of all errors; 19.3% of junk gets a confident real label",
+    "Top Loop vs Hi-Hat Loop unresolved -- no by-ear evidence exists yet",
+    "encoder multi-window crop arm untested",
+    "210MB model-size product decision still open",
+    "working label CSVs still gitignored between dataset builds"
+  ]
+}

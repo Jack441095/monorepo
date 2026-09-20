@@ -1,0 +1,99 @@
+{
+  "schema_version": "SLO_CLASSIFICATION_CORPUS_METADATA_PREFLIGHT_V2",
+  "observed_at": "2026-09-01T03:55:29+01:00",
+  "candidate": {
+    "branch": "engineering/slo-build-entry-v1",
+    "source_sha_at_observation": "089e60b368e2"
+  },
+  "command": "PYTHONPATH=SmartSampleManager/tools/classification_benchmark python3 -B -c 'from audit_corpus_metadata import audit; ...'",
+  "source_root": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing",
+  "method": {
+    "taxonomy_class_count": 17,
+    "minimum_families_per_class": 5,
+    "audio_operations": [],
+    "candidate_boundary": "vendor + mapped source folder + first 5 underscore-delimited filename tokens",
+    "legacy_boundary": "first 3 underscore-delimited filename tokens"
+  },
+  "inventory": {
+    "files": 5157,
+    "vendors": 15,
+    "classes": 17,
+    "missing_classes": [],
+    "missing_mapped_folders": 0,
+    "unmatched_filename_split_files": 3,
+    "class_counts": {
+      "Atmosphere": 316,
+      "Bass Loop": 27,
+      "Bass One-Shot": 826,
+      "Clap": 219,
+      "FX": 37,
+      "Foley": 387,
+      "Hi-Hat": 425,
+      "Impact": 76,
+      "Kick": 433,
+      "Music Loop": 75,
+      "Percussion": 1251,
+      "Riser": 25,
+      "Snare": 482,
+      "Synth": 50,
+      "Synth Loop": 77,
+      "Vocal Loop": 53,
+      "Vocal Phrase": 398
+    }
+  },
+  "boundary_results": {
+    "legacy": {
+      "status": "BLOCKED",
+      "mixed_family_count": 20,
+      "class_family_counts": {
+        "Atmosphere": 291,
+        "Bass Loop": 27,
+        "Bass One-Shot": 778,
+        "Clap": 207,
+        "FX": 35,
+        "Foley": 369,
+        "Hi-Hat": 366,
+        "Impact": 76,
+        "Kick": 408,
+        "Music Loop": 1,
+        "Percussion": 1081,
+        "Riser": 25,
+        "Snare": 440,
+        "Synth": 11,
+        "Synth Loop": 31,
+        "Vocal Loop": 9,
+        "Vocal Phrase": 398
+      }
+    },
+    "candidate": {
+      "status": "PASS",
+      "mixed_family_count": 0,
+      "insufficient_class_family_support": [],
+      "class_family_counts": {
+        "Atmosphere": 293,
+        "Bass Loop": 27,
+        "Bass One-Shot": 826,
+        "Clap": 219,
+        "FX": 37,
+        "Foley": 387,
+        "Hi-Hat": 425,
+        "Impact": 76,
+        "Kick": 433,
+        "Music Loop": 44,
+        "Percussion": 1243,
+        "Riser": 25,
+        "Snare": 482,
+        "Synth": 50,
+        "Synth Loop": 76,
+        "Vocal Loop": 53,
+        "Vocal Phrase": 398
+      }
+    }
+  },
+  "overall_status": "BLOCKED",
+  "limitations": [
+    "The candidate boundary is a metadata revalidation, not owner- or blind-review approval.",
+    "Labels are still derived from vendor folder mappings and are not independent per-file ground truth.",
+    "No audio decode, model rebuild, native build, research scorecard, or release qualification was performed by this receipt."
+  ]
+}

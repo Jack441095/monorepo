@@ -1,0 +1,27 @@
+# Isolated requirements for the autonomous agent stack.
+# Use: pip install -r requirements-agents.txt
+# (Core runtime deps from requirements.txt are also needed for full app,
+#  but these are the minimal extras for the agents themselves.)
+
+# LLM client — agents talk to Ollama over REST via httpx (already in core reqs)
+httpx>=0.27.0,<1
+
+# CLI parsing used by __main__.py / MetaAgent
+click>=8.1.0,<9
+
+# Progress bars for task execution
+tqdm>=4.66.0,<5
+
+# Testing
+pytest>=8.0.0,<9
+
+# Linting (used as an agent tool)
+ruff>=0.8.0,<1
+
+# --- System dependency (not pip) ---
+# Ollama must be installed system-wide:
+#   macOS:  brew install ollama   (or curl -fsSL https://ollama.ai/install.sh | sh)
+#   Linux:  see https://ollama.ai/download
+# Then pull models:
+#   ollama pull qwen2.5-coder:7b
+#   ollama pull qwen2.5-coder:1.5b

@@ -1,0 +1,20 @@
+component,product,version,licence,obligation,satisfied,evidence,severity_if_open
+JUCE 8.0.2,SLO + KENN vst3,8.0.2 FetchContent,AGPLv3 OR commercial,commercial licence before closed-source distribution,NO — recorded OPEN in THIRD_PARTY_NOTICES.txt:11-18,SmartSampleManager/CMakeLists.txt:85-89; KENN vst3-plugin/CMakeLists.txt:34-36,P0 — blocks all paid distribution of SLO + KENN plugin
+ONNX Runtime,SLO,brew unpinned (host 1.29.0_3),MIT,attribution in NOTICES,YES (text reproduced :654) + pin missing,CMakeLists.txt:129-134,P2 — pin version
+TagLib,SLO,brew unpinned (host 2.3.1),LGPL-2.1-only OR MPL-1.1,dynamic link + attribution,YES (:645-651) + pin missing,CMakeLists.txt:129-134,P2 — pin version
+umappp + transitives,SLO,v3.3.2,BSD-2-Clause / MIT / Apache-2.0 / Eigen Apache,attribution,YES (:21-180),CMakeLists.txt:96-100,P3 — none
+hnswlib,SLO,v0.8.0,Apache-2.0,attribution,YES (:440),CMakeLists.txt:120-124,P3 — none
+dr_libs (dr_wav),SLO,wav-0.14.5,Public Domain / MIT-0,none,YES (:389),CMakeLists.txt:110-114,P3 — none
+libsodium,SLO,brew unpinned,ISC,attribution,YES (:677),CMakeLists.txt:202-207,P3 — none
+SQLite,SLO,system,Public Domain,none,YES (:697),engine cache,P3 — none
+PANNs CNN10 weights,SLO,Models/panns_cnn10_embedding.onnx + .data (23M),code MIT / AudioSet CC-BY-4.0 / weights: no file; README says no restrictive Zenodo licence found,confirm weights distributable before bundling in dmg,Models/README.md:26-33,P1 — legal confirm pre-ship
+CLAP checkpoints,research only,clap_onnx/*.onnx (no licence file),UNKNOWN — do not ship,quarantine from all shippables,tools/classification_benchmark/clap_onnx/,P1 if ever bundled (currently research-only: OK)
+p7zip 7za,Submit,bundled binary,LGPL-2.1,bundle licence text,YES (7za-LICENSE-LGPL-2.1.txt),THIRD_PARTY_NOTICES.md:7-18,P3 — none
+qpdf/libqpdf,Submit,bundled,Apache-2.0,bundle licence text,YES (qpdf-LICENSE-Apache-2.0.txt),THIRD_PARTY_NOTICES.md,P3 — none
+OpenSSL libcrypto + libjpeg-turbo,Submit,system/bundled,Apache-2.0 / IJG-BSD-3/zlib,attribution (links only in file),PARTIAL — links not bundled text,THIRD_PARTY_NOTICES.md,P3 — bundle texts at ship
+AbletonOSC,KENN,vendored third_party/,MIT,attribution,PRESUMED (LICENSE.md present; check bundled),third_party/AbletonOSC/LICENSE.md:1,P3 — confirm bundled at pack
+all-MiniLM-L6-v2 + Kokoro voices,KENN,artifacts models/,licence texts retained per file — determination OPEN,legal determination + bundle decision,UX/velvet_thunder/THIRD_PARTY_NOTICES.md:9-12,P2 — decide before shipping KENN features using them
+Velvet Thunder UX,KENN,UX/velvet_thunder/,proprietary (viewing/reference only),do not distribute outside org,YES if internal only,UX/velvet_thunder/LICENSE:1-9,P2 if ever shipped externally
+Sansation font,website family,public/fonts + ReadMe,freeware incl. commercial; must ship txt; no mod/rename/sell,ship ReadMe txt in every bundle,website/public/fonts/Sansation_1.31_ReadMe.txt:1-14,P3 — verify dmg packaging includes txt
+Python backend deps,backend,requirements pins,no GPL/AGPL names spotted — UNVERIFIED,generate SBOM (pip-licenses) pre-launch,requirements files (local),P2 — SBOM before charging
+testing-assets corpus,estate,57G commercial packs (KSHMR/Shinoda/Black Octopus/...),redistribution almost surely prohibited,QUARANTINED from bundles/shippables; internal eval use only; no LICENCE files exist,testing-assets/ top dirs; benchmark_reports/*.json,P1 if any pack content ships (currently: none)

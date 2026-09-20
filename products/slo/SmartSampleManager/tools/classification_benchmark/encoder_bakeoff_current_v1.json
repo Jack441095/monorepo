@@ -1,0 +1,139 @@
+{
+  "record_type": "slo_encoder_bakeoff_current",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T12:51:31",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 5,
+    "splits": 5,
+    "minimum_examples": 5,
+    "minimum_collections": 5,
+    "decision_gate_pp": 2.0
+  },
+  "inventory": {
+    "n_rows": 1495,
+    "n_manifest_rows": 1525,
+    "n_encoder_rows": 1495,
+    "n_classes": 27,
+    "n_collections": 80,
+    "encoder_missing_paths": [
+      "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Hihat_and_Cymbal_Loops/KSHMR_Acoustic_Hat_Loops/KSHMR_Acoustic_Hat_Loop_13_120.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_128_RISERS/SB_IR&D_7_128_RISER_001.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/Felly Fel.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Lex Luger Drumkit/Lex_Luger_Drumkit/LL_one_shots/LL_riser_pink.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/FRENCH3.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/MGF Mega Pack/Misc + Found Sound/Cassette Noise/MGF_CNOISE_ATMOS_18.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_124_RISERS/SB_IR&D_7_124_RISER_001.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 4/HAMPSHIRE_2.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_120_RISERS/SB_IR&D_7_120_RISER_035.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_124_IMPACTS/SB_IR&D_7_124_IMPACT_001.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Vocals/KSHMR_Vocals_FX/KSHMR_Crowd/KSHMR_Crowd_Chant/KSHMR_Crowd_Chant_Loop_01_Ohh_Ohh_124.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_124_RISERS/SB_IR&D_7_124_RISER_059.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Production Music Live - Acoustic - Melodic House 4/Atmosphere Loops/PMLxOT4_LAR_Atmos_Loop_006_125BPM.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_120_RISERS/SB_IR&D_7_120_RISER_002.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/PAR.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/2023/Sweeps/Noise Sweep.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/MGF Mega Pack/Misc + Found Sound/Cassette Noise/MGF_CNOISE_ATMOS_21.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/THAI.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_120_RISERS/SB_IR&D_7_120_RISER_001.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Maximum FX (2019)/SB_MFX_124_LOOPS/SB_MFX_124_RISES/SB_MFX_124_RISE_001.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/PRISON.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_120_RISERS/SB_IR&D_7_120_RISER_014.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Teddy Killerz/Producer Pack (1)/Samples/Drums Fill 174 BPM - 1.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Maximum FX (2019)/SB_MFX_140_LOOPS/SB_MFX_140_RISES/SB_MFX_140_RISE_001.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Production Music Live - Acoustic - Melodic House 4/Atmosphere Loops/PMLxOT4_SOL_Atmos_Loop_001_123BPM_Cmin.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Sounds of KSHMR Vol.3/KSHMR_Fills/KSHMR_Acoustic_Fills/KSHMR_Acoustic_Fill_15_116.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Maximum FX (2019)/SB_MFX_128_LOOPS/SB_MFX_128_RISES/SB_MFX_128_RISE_001.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Sounds of KSHMR Vol.3/KSHMR_Fills/KSHMR_Signature_Fills/KSHMR_Signature_Fill_16_Doonka_2_128.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Soundbox - Impacts, Risers & Drops 7 (2021)/SB_IR&D_7_124_RISERS/SB_IR&D_7_124_RISER_094.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Rosentricks - Essentials/Ambience/RT_Ambience_Night_Sky_C_105.wav"
+    ]
+  },
+  "results": {
+    "incumbent": {
+      "accuracy": 54.702,
+      "accuracy_sd": 0.565,
+      "macro_f1": 47.398,
+      "per_seed": [
+        54.916,
+        53.98,
+        54.114,
+        55.452,
+        55.05
+      ],
+      "delta_pp_vs_incumbent": 0.0
+    },
+    "mert": {
+      "accuracy": 31.679,
+      "accuracy_sd": 1.078,
+      "macro_f1": 27.063,
+      "per_seed": [
+        30.769,
+        30.1,
+        32.241,
+        33.043,
+        32.241
+      ],
+      "delta_pp_vs_incumbent": -23.023
+    },
+    "ast": {
+      "accuracy": 45.699,
+      "accuracy_sd": 0.355,
+      "macro_f1": 40.143,
+      "per_seed": [
+        45.819,
+        45.084,
+        46.087,
+        45.552,
+        45.953
+      ],
+      "delta_pp_vs_incumbent": -9.003
+    },
+    "incumbent+mert": {
+      "accuracy": 54.488,
+      "accuracy_sd": 0.618,
+      "macro_f1": 46.403,
+      "per_seed": [
+        54.582,
+        53.645,
+        53.98,
+        55.385,
+        54.849
+      ],
+      "delta_pp_vs_incumbent": -0.214
+    },
+    "incumbent+ast": {
+      "accuracy": 54.502,
+      "accuracy_sd": 0.474,
+      "macro_f1": 47.042,
+      "per_seed": [
+        54.916,
+        53.779,
+        54.114,
+        54.983,
+        54.716
+      ],
+      "delta_pp_vs_incumbent": -0.2
+    },
+    "incumbent+mert+ast": {
+      "accuracy": 54.167,
+      "accuracy_sd": 0.741,
+      "macro_f1": 46.731,
+      "per_seed": [
+        54.849,
+        53.244,
+        53.378,
+        55.05,
+        54.314
+      ],
+      "delta_pp_vs_incumbent": -0.535
+    }
+  },
+  "decision": "research evidence only; no production weights or rename actions",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false
+  }
+}

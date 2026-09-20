@@ -1,0 +1,2522 @@
+{
+  "record_type": "slo_context_preview_plan",
+  "schema_version": "1.0.0",
+  "method_version": "context_preview_plan_v1",
+  "targets": {
+    "bpm": 128.0,
+    "key": "C",
+    "pitch_semitones": null
+  },
+  "n_input": 7315,
+  "n_planned": 100,
+  "previews": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 156.25,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.8192,
+        "duration_multiplier": 1.22070312,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Shaker_Loop_1_Percussion_Bendji_Allonce_120_loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Perc_Loop_01_118bpm.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 234.375,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.54613333,
+        "duration_multiplier": 1.83105469,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/103 BPM/103BPM_4.wav",
+      "action": "suggest",
+      "predicted_class": "Hi-Hat Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 104.16666666666667,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.2288,
+        "duration_multiplier": 0.81380208,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Edison Breaks/So Fresh So Clean.wav",
+      "action": "suggest",
+      "predicted_class": "Hi-Hat Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 156.25,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.8192,
+        "duration_multiplier": 1.22070312,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/Josche.wav",
+      "action": "suggest",
+      "predicted_class": "Hi-Hat Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/CHINA SOUL_2.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 234.375,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.54613333,
+        "duration_multiplier": 1.83105469,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/SYMPH.wav",
+      "action": "suggest",
+      "predicted_class": "Hi-Hat Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/ALEXIA.wav",
+      "action": "suggest",
+      "predicted_class": "Hi-Hat Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 93.75,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.36533333,
+        "duration_multiplier": 0.73242188,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/CANADIA.wav",
+      "action": "suggest",
+      "predicted_class": "Hi-Hat Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/CHINA 80.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 64.65517241379311,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.97973333,
+        "duration_multiplier": 0.50511853,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_100_perc_loop_power_stance.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 98.6842105263158,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.29706667,
+        "duration_multiplier": 0.77097039,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_110_perc_loop_ladies_night.wav",
+      "action": "suggest",
+      "predicted_class": "Hi-Hat Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 110.29411764705883,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.16053333,
+        "duration_multiplier": 0.86167279,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_110_perc_loop_ladies_night_no_hats.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 110.29411764705883,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.16053333,
+        "duration_multiplier": 0.86167279,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_120_perc_loop_perfect_storm.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 156.25,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.8192,
+        "duration_multiplier": 1.22070312,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_120_perc_loop_perfect_storm_no_hats.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_77_perc_loop_romantics.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 104.16666666666667,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.2288,
+        "duration_multiplier": 0.81380208,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_77_perc_loop_romantics_no_hats.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 104.16666666666667,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.2288,
+        "duration_multiplier": 0.81380208,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_85_perc_loop_glitterball.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 110.29411764705883,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.16053333,
+        "duration_multiplier": 0.86167279,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_85_perc_loop_glitterball_no_hats.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 85.22727272727273,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.50186667,
+        "duration_multiplier": 0.66583807,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_95_perc_loop_dirty_dancers.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 93.75,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.36533333,
+        "duration_multiplier": 0.73242188,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_95_perc_loop_dirty_dancers_no_hats.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 93.75,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.36533333,
+        "duration_multiplier": 0.73242188,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_11_Percussion_Daniel_Sadownick_137__loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 104.16666666666667,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.2288,
+        "duration_multiplier": 0.81380208,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_26_Percussion_Daniel_Sadownick_135__loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_7_Percussion_Daniel_Sadownick_120__loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel deSimone - Experimental Percussion/splice-export__daniel-desimone-experimental-percussion_edited/loop/Percussion/RT_Experimental_Percussion_Percussion_Loop_4_Percussion_Daniel_deSimon_85_loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 170.45454545454547,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.75093333,
+        "duration_multiplier": 1.33167614,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Percussion Loop) Don't Be Hating 140bpm.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Percussion Loop) Everywhere Percs 140bpm.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 187.5,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.68266667,
+        "duration_multiplier": 1.46484375,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon August 2024 Samples/Stab Sequel D#harmm.wav",
+      "action": "suggest",
+      "predicted_class": "Bass Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 170.45454545454547,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.75093333,
+        "duration_multiplier": 1.33167614,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples 2/Modular Hardware Pack 001/Raw/VCO2 + TRIPTYCH (Long) 2.wav",
+      "action": "suggest",
+      "predicted_class": "Bass Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #1 [65BPM] (G#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #10 [65BPM] (E).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 85.22727272727273,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.50186667,
+        "duration_multiplier": 0.66583807,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #11 [65BPM] (G#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #12 [65BPM] (A).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 85.22727272727273,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.50186667,
+        "duration_multiplier": 0.66583807,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #13 [65BPM] (F).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #14 [65BPM] (D).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #2 [65BPM] (A#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #3 [65BPM] (F#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 85.22727272727273,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.50186667,
+        "duration_multiplier": 0.66583807,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #4 [65BPM] (A).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 85.22727272727273,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.50186667,
+        "duration_multiplier": 0.66583807,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #5 [65BPM] (E).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #6 [65BPM] (F#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 64.65517241379311,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.97973333,
+        "duration_multiplier": 0.50511853,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 64.65517241379311,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.97973333,
+        "duration_multiplier": 0.50511853,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #8 [65BPM] (E).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #9 [65BPM] (F#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Clave Loop #1 [65BPM].wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 85.22727272727273,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.50186667,
+        "duration_multiplier": 0.66583807,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Clave Loop #2 [65BPM].wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "form_hint": "possibly_loop",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_808 Cym (1).wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_China Cym.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_Crash Cym (1).wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_Crash Cym (2).wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 144.23076923076923,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.88746667,
+        "duration_multiplier": 1.12680288,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_Crash Cym (3).wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_Crash Cym (4).wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (OG Versions)/OGSTEM_DR5 Bones #7 [72 BPM] (E).wav",
+      "action": "suggest",
+      "predicted_class": "Bass Loop",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 144.23076923076923,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.88746667,
+        "duration_multiplier": 1.12680288,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Long + Med/Open Hat-5.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Long + Med/Open Hat.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Short/Loose Hat-1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 144.23076923076923,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.88746667,
+        "duration_multiplier": 1.12680288,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Short/Open Hat-1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Short/Open Hat-3.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/CRASH_FT.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/808 21.WAV",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/LEFTRIGHT/CRASH.WAV",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/CRASH.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 208.33333333333334,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.6144,
+        "duration_multiplier": 1.62760417,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/CRASH1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/CRASHNEW.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 156.25,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.8192,
+        "duration_multiplier": 1.22070312,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NewFinishesA/CRASH1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NewFinishesA/R!SPLASH.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 144.23076923076923,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.88746667,
+        "duration_multiplier": 1.12680288,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 21.WAV",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Xero Current/CRASH.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 208.33333333333334,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.6144,
+        "duration_multiplier": 1.62760417,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Xero Current/R!SPLASH.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 144.23076923076923,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.88746667,
+        "duration_multiplier": 1.12680288,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/China StudioGong.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Airborne Samples/China DubRemix.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Airborne Samples/China Krypt.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 144.23076923076923,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.88746667,
+        "duration_multiplier": 1.12680288,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V108 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V117 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V127 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V24 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V40 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V54 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V65 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V77 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V88 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V98 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/China StudioGong.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 133.92857142857142,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.95573333,
+        "duration_multiplier": 1.04631696,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bottles Samples/808 21.WAV",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Crash Slinger.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Crash Slinger.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Crash 808 2.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Crash 808X.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Crash Generator.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 156.25,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.8192,
+        "duration_multiplier": 1.22070312,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Crash LowDown.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 156.25,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.8192,
+        "duration_multiplier": 1.22070312,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Crash PopRnB.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 125.0,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.024,
+        "duration_multiplier": 0.9765625,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Crash Handy.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 170.45454545454547,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.75093333,
+        "duration_multiplier": 1.33167614,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Crash TapedOver.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 170.45454545454547,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.75093333,
+        "duration_multiplier": 1.33167614,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/China Central V4.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_sustained",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Crash Argon 1.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 144.23076923076923,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.88746667,
+        "duration_multiplier": 1.12680288,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Crash ElektroAc.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "mixed_or_uncertain_form",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 117.1875,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 1.09226667,
+        "duration_multiplier": 0.91552734,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Crash Motherboard.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 156.25,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.8192,
+        "duration_multiplier": 1.22070312,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Crash Handy.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 170.45454545454547,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.75093333,
+        "duration_multiplier": 1.33167614,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Crash TapedOver.wav",
+      "action": "suggest",
+      "predicted_class": "Crash",
+      "form_hint": "possibly_one_shot",
+      "tempo": {
+        "status": "planned",
+        "source_bpm": 170.45454545454547,
+        "target_bpm": 128.0,
+        "time_stretch_rate": 0.75093333,
+        "duration_multiplier": 1.33167614,
+        "reason": null
+      },
+      "pitch": {
+        "status": "unavailable",
+        "target_key": "C",
+        "semitones": null,
+        "reason": "source_key_unavailable"
+      },
+      "render": {
+        "status": "plan_only",
+        "output_path": null,
+        "source_replaced": false
+      }
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "source_audio_replaced": false,
+    "files_created": false,
+    "rename_actions": false,
+    "key_inferred_from_median_pitch": false
+  }
+}

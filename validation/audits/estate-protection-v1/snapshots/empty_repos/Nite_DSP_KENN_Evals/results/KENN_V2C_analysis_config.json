@@ -1,0 +1,11 @@
+{
+  "analysis_version": "kenn.measured_candidates.v2c.1",
+  "sample_rates": [
+    44100,
+    48000,
+    96000
+  ],
+  "window_seconds": 0.1,
+  "frozen_gate": "v2b.1",
+  "v2c_gate": "scope_context.v2c.1"
+}

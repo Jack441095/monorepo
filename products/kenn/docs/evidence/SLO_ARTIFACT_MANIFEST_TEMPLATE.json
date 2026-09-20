@@ -1,0 +1,48 @@
+{
+  "schema": "kenn.slo_artifact_manifest.v1",
+  "contract_schema": "kenn.audio_classification.v1",
+  "model_id": "replace-with-stable-slo-model-id",
+  "inference_version": "1",
+  "model": {
+    "path": "model.onnx",
+    "sha256": "sha256:<64-lowercase-hex-characters>",
+    "format": "onnx"
+  },
+  "label_map": {
+    "path": "labels.json",
+    "sha256": "sha256:<64-lowercase-hex-characters>"
+  },
+  "preprocessing": {
+    "path": "preprocessing.json",
+    "sha256": "sha256:<64-lowercase-hex-characters>"
+  },
+  "evaluation_receipt": {
+    "path": "evaluation.json",
+    "sha256": "sha256:<64-lowercase-hex-characters>"
+  },
+  "calibration": {
+    "path": "calibration.json",
+    "sha256": "sha256:<64-lowercase-hex-characters>"
+  },
+  "evaluation": {
+    "split_strategy": "artist_and_pack_disjoint",
+    "audio_only": {
+      "accuracy": 0.0,
+      "macro_f1": 0.0,
+      "per_class_metrics_required": true
+    },
+    "calibration": {
+      "audio_only_ece": 0.0,
+      "maximum_audio_only_ece": 0.15
+    },
+    "ood_evaluation": {
+      "unknown_and_out_of_distribution_cases_required": 5,
+      "minimum_correct_rejection_rate": 0.9
+    }
+  },
+  "allow_advisory_integration": false,
+  "limitations": [
+    "Advisory only; uncertain and out-of-distribution samples must remain Unknown.",
+    "Audio-only and metadata-assisted results are reported separately."
+  ]
+}

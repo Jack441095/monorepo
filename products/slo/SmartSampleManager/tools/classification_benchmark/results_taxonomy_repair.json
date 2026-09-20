@@ -1,0 +1,170 @@
+{
+  "gate_pp": 2.0,
+  "k": 3,
+  "seeds": 8,
+  "results": {
+    "none|none": {
+      "acc": 68.8,
+      "sd": 0.58,
+      "per_seed": [
+        69.03,
+        68.77,
+        69.55,
+        67.45,
+        69.29,
+        68.9,
+        68.64,
+        68.77
+      ],
+      "macro_f1": 64.19,
+      "cov95": 18.1,
+      "percussion_recall": 12.5,
+      "delta": 0.0
+    },
+    "Percussion|embedding": {
+      "acc": 67.86,
+      "sd": 0.87,
+      "per_seed": [
+        67.32,
+        67.72,
+        69.16,
+        66.14,
+        68.37,
+        67.72,
+        68.77,
+        67.72
+      ],
+      "macro_f1": 64.49,
+      "cov95": 16.8,
+      "percussion_recall": 26.8,
+      "delta": -0.94
+    },
+    "Percussion|physics": {
+      "acc": 68.52,
+      "sd": 0.96,
+      "per_seed": [
+        67.72,
+        68.11,
+        70.21,
+        66.8,
+        69.16,
+        68.9,
+        68.9,
+        68.37
+      ],
+      "macro_f1": 64.81,
+      "cov95": 17.2,
+      "percussion_recall": 25.2,
+      "delta": -0.28
+    },
+    "Percussion+PercLoop|embedding": {
+      "acc": 67.08,
+      "sd": 0.72,
+      "per_seed": [
+        67.19,
+        67.06,
+        68.11,
+        66.14,
+        67.32,
+        66.27,
+        68.11,
+        66.4
+      ],
+      "macro_f1": 63.65,
+      "cov95": 19.2,
+      "percussion_recall": 26.6,
+      "delta": -1.72
+    },
+    "Percussion+PercLoop|physics": {
+      "acc": 68.23,
+      "sd": 0.75,
+      "per_seed": [
+        67.72,
+        67.72,
+        69.69,
+        67.19,
+        68.37,
+        68.64,
+        68.77,
+        67.72
+      ],
+      "macro_f1": 64.62,
+      "cov95": 17.8,
+      "percussion_recall": 25.0,
+      "delta": -0.57
+    },
+    "Percussion+Foley|embedding": {
+      "acc": 67.11,
+      "sd": 0.93,
+      "per_seed": [
+        66.27,
+        66.93,
+        68.37,
+        65.75,
+        67.45,
+        66.67,
+        68.64,
+        66.8
+      ],
+      "macro_f1": 63.81,
+      "cov95": 14.1,
+      "percussion_recall": 22.3,
+      "delta": -1.69
+    },
+    "Percussion+Foley|physics": {
+      "acc": 68.06,
+      "sd": 0.89,
+      "per_seed": [
+        67.59,
+        67.45,
+        69.29,
+        66.54,
+        68.5,
+        69.03,
+        68.64,
+        67.45
+      ],
+      "macro_f1": 64.38,
+      "cov95": 16.2,
+      "percussion_recall": 23.2,
+      "delta": -0.74
+    },
+    "all three|embedding": {
+      "acc": 66.72,
+      "sd": 0.72,
+      "per_seed": [
+        66.67,
+        66.54,
+        67.59,
+        66.54,
+        66.67,
+        65.49,
+        67.98,
+        66.27
+      ],
+      "macro_f1": 63.47,
+      "cov95": 18.4,
+      "percussion_recall": 22.3,
+      "delta": -2.08
+    },
+    "all three|physics": {
+      "acc": 67.86,
+      "sd": 0.75,
+      "per_seed": [
+        67.98,
+        67.32,
+        68.64,
+        67.19,
+        67.59,
+        68.77,
+        68.77,
+        66.67
+      ],
+      "macro_f1": 64.34,
+      "cov95": 18.2,
+      "percussion_recall": 23.0,
+      "delta": -0.94
+    }
+  },
+  "promoted": []
+}

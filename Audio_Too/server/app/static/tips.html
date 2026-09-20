@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Studio tips — Audio_Too</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/studio-theme.css">
+    <script src="/app-shell.js" data-page="Tips" defer></script>
+  </head>
+  <body class="hub-page">
+    <header class="hub-header">
+      <nav class="hub-nav">
+        <a class="brand" href="/hub">Audio_Too</a>
+        <div>
+          <a href="/">Website</a>
+          <a href="/#ask">Services</a>
+          <a href="/dashboard">Dashboard</a>
+        </div>
+      </nav>
+      <div>
+        <p class="eyebrow">Audio Tips LLM</p>
+        <h1>Studio tips</h1>
+        <p class="section-intro">Ask production and Ableton workflow questions. Answers come from your <strong>local approved notes</strong> first (retrieval-only on this page — no cloud rewrite).</p>
+        <p id="tips-disclaimer" class="compact-disclaimer"></p>
+      </div>
+      <p id="tips-status-line" class="status"></p>
+    </header>
+
+    <main class="hub-main">
+      <section class="business-ask-panel">
+        <form id="studio-tips-form" class="enquiry-form">
+          <label class="hp-field" aria-hidden="true">Company website<input type="text" name="company_website" tabindex="-1" autocomplete="off"></label>
+          <label>Your question
+            <span class="composer-field">
+              <input id="studio-tips-input" name="question" required minlength="3" maxlength="500" placeholder="e.g. How do I sidechain bass to the kick?" aria-autocomplete="list" aria-controls="studio-tips-typeahead">
+              <ul id="studio-tips-typeahead" class="typeahead-list" hidden></ul>
+            </span>
+          </label>
+          <div id="studio-tips-suggest" class="chip-row"></div>
+          <button type="submit">Get tip</button>
+          <p id="studio-tips-status" class="status"></p>
+          <pre id="studio-tips-answer" class="business-answer" aria-live="polite"></pre>
+          <div id="studio-tips-sources" class="studio-tips-sources"></div>
+        </form>
+        <p class="compact-disclaimer">For mixing/mastering quotes see <a href="/#ask">services FAQ</a>. To improve weak answers, add notes in the <a href="/dashboard">dashboard</a> → Transcript Review.</p>
+      </section>
+    </main>
+
+    <script src="/studio-tips.js"></script>
+  </body>
+</html>

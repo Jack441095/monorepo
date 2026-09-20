@@ -1,0 +1,176 @@
+{
+  "$schema": "nite-design-tokens-1.0",
+  "meta": {
+    "designSystem": "NITE DSP Design System",
+    "direction": "OBSIDIAN — High-End Pro-Audio System",
+    "version": "2.0.0",
+    "frozen": false,
+    "freezeDate": "2026-08-25",
+    "canonicalSpec": "../design_prototypes/ember/NITE_DSP_DESIGN_SYSTEM_V1.md",
+    "localisationSpec": "../design_prototypes/ember/NITE_DSP_LOCALISATION_ARCHITECTURE_V1.md",
+    "cvdEvidence": "../design_prototypes/ember/EMBER_CVD_VALIDATION_REPORT.md",
+    "changeControl": {
+      "1.0.x": "clarifications, accessibility corrections, documentation fixes; no identity change",
+      "1.x": "compatible additions (new components/capabilities)",
+      "2.0": "material identity change (surfaces, accent, semantics, typography architecture)",
+      "2.1": "light and dark dual-theme palette architecture"
+    }
+  },
+  "themes": {
+    "dark": {
+      "name": "Obsidian Dark",
+      "color.surface.base": "#0A0E17",
+      "color.surface.raised": "#111726",
+      "color.surface.overlay": "#161F33",
+      "color.surface.inset": "#05101A",
+      "color.surface.hover": "#1B2438",
+      "color.border.hairline.subtle": "#1E2A3F",
+      "color.border.hairline.strong": "#334155",
+      "color.text.primary": "#F8FAFC",
+      "color.text.secondary": "#94A3B8",
+      "color.text.tertiary": "#64748B",
+      "color.interactive.base": "#397BFF",
+      "color.semantic.success": "#F0445A"
+    },
+    "light": {
+      "name": "Platinum Light",
+      "color.surface.base": "#F8FAFC",
+      "color.surface.raised": "#FFFFFF",
+      "color.surface.overlay": "#F1F5F9",
+      "color.surface.inset": "#E2E8F0",
+      "color.surface.hover": "#E2E8F0",
+      "color.border.hairline.subtle": "#CBD5E1",
+      "color.border.hairline.strong": "#94A3B8",
+      "color.text.primary": "#0F172A",
+      "color.text.secondary": "#475569",
+      "color.text.tertiary": "#64748B",
+      "color.interactive.base": "#2563EB",
+      "color.semantic.success": "#E11D48"
+    }
+  },
+  "layers": {
+    "global": {
+      "color.surface.base":        { "type": "color", "value": "#0A0E17", "spec": "DS §3.1 window/list backgrounds" },
+      "color.surface.raised":      { "type": "color", "value": "#111726", "spec": "DS §3.1 inspectors, toolbars, preview panes" },
+      "color.surface.overlay":     { "type": "color", "value": "#161F33", "spec": "DS §3.1 cards inside raised areas, buttons" },
+      "color.surface.inset":       { "type": "color", "value": "#05101A", "spec": "DS §3.1 visualisation wells, inputs" },
+      "color.surface.hover":       { "type": "color", "value": "#1B2438", "spec": "DS §3.1 hover on base" },
+      "color.elevation.modal":     { "type": "color", "value": "#202B42", "spec": "DS §3.1 modals/popovers (+hairline+shadow)" },
+
+      "color.border.hairline.subtle": { "type": "color", "value": "#1E2A3F", "alpha": 0.55, "spec": "DS §3.1" },
+      "color.border.hairline.strong": { "type": "color", "value": "#334155", "alpha": 0.90, "spec": "DS §3.1" },
+
+      "color.text.primary":   { "type": "color", "value": "#F8FAFC", "contrastOnBase": 15.0,  "spec": "DS §3.2" },
+      "color.text.secondary": { "type": "color", "value": "#94A3B8", "contrastOnBase": 7.0,   "spec": "DS §3.2" },
+      "color.text.tertiary":  { "type": "color", "value": "#64748B", "contrastOnBase": 4.7,   "spec": "DS §3.2 contrast floor for readable metadata" },
+      "color.text.disabled":  { "type": "color", "value": "#475569", "spec": "DS §3.2 decorative/disabled only" },
+      "color.text.inverse":   { "type": "color", "value": "#FFFFFF", "spec": "DS §3.2 text on accent fills" },
+
+      "color.interactive.base":   { "type": "color", "value": "#397BFF", "role": "pro-audio blue", "spec": "DS §3.3 selection edge, focus, primary button, playhead, proposal stroke" },
+      "color.interactive.bright": { "type": "color", "value": "#56A8FF", "role": "pro-audio blue", "spec": "DS §3.3 hover/focus ring" },
+      "color.interactive.dim":    { "type": "color", "value": "#1D4DB7", "alpha": 0.35, "role": "pro-audio blue", "spec": "DS §3.3 selected-row fill" },
+      "color.interactive.ink":    { "type": "color", "value": "#FFFFFF", "role": "pro-audio blue", "spec": "DS §3.3 text on blue" },
+
+      "color.semantic.playing":     { "type": "color", "value": "#F0445A", "redundantEncoding": ["glyph:play", "halo", "edge"], "spec": "DS §3.4 sounding" },
+      "color.semantic.success":     { "type": "color", "value": "#F0445A", "redundantEncoding": ["glyph:check"], "spec": "DS §3.4 completed/healthy" },
+      "color.semantic.warning":     { "type": "color", "value": "#E5B84B", "redundantEncoding": ["glyph:warning-triangle", "text-chip"], "spec": "DS §3.4 attention; chips carry literal text HIGH/MEDIUM/LOW" },
+      "color.semantic.error":       { "type": "color", "value": "#E5484D", "redundantEncoding": ["glyph:error-x", "text"], "spec": "DS §3.4 failure" },
+      "color.semantic.destructive": { "type": "color", "value": "#E5484D", "redundantEncoding": ["confirm-pattern"], "spec": "DS §3.4 explicit confirm pattern; never a lone red button" },
+      "color.semantic.favorite":    { "type": "color", "value": "#D9A75A", "redundantEncoding": ["glyph:star"], "spec": "DS §3.4 + star glyph" },
+      "color.semantic.unknown":     { "type": "color", "value": "#4A453D", "style": "hollow-dashed-outline", "redundantEncoding": ["dashed-outline"], "spec": "DS §3.4 hollow, dashed outline" },
+      "color.semantic.disabled":    { "type": "color", "value": "#4A453D", "redundantEncoding": ["reduced-opacity", "blocked-cursor"], "spec": "DS §3.4 + reduced-opacity control + blocked cursor" },
+
+      "ai.proposal":   { "type": "style", "stroke": "#E89B3C", "dashPattern": [6, 4], "tag": "provisional", "handles": true, "spec": "DS §3.4/§11 MACHINE PROPOSAL = PROVISIONAL" },
+      "ai.accepted":   { "type": "style", "stroke": null, "dashPattern": null, "note": "solid authoritative styling, no special hue; 200ms dashed→solid transition", "spec": "DS §3.4/§11 USER DECISION = AUTHORITATIVE" },
+      "ai.uncertain":  { "type": "style", "opacity": 0.60, "affordance": "?", "spec": "DS §3.4 proposal at 60% opacity + ? affordance" },
+
+      "type.family.primary": { "type": "fontFamily", "stack": ["Inter", "-apple-system", "Segoe UI", "Roboto"], "spec": "DS §7 Inter-class grotesque" },
+      "type.family.mono":    { "type": "fontFamily", "stack": ["SF Mono", "JetBrains Mono", "Menlo", "Consolas"], "spec": "DS §7 technical mono fallback chain" },
+      "type.numerals.tabular": { "type": "flag", "value": true, "spec": "DS §7 tabular figures ON wherever numbers align" },
+
+      "space.xs":  { "type": "dimension", "value": 4,  "unit": "px", "spec": "DS §15 scale 4/8/12/16/24/32" },
+      "space.s":   { "type": "dimension", "value": 8,  "unit": "px", "spec": "DS §15" },
+      "space.m":   { "type": "dimension", "value": 12, "unit": "px", "spec": "DS §15" },
+      "space.l":   { "type": "dimension", "value": 16, "unit": "px", "spec": "DS §15" },
+      "space.xl":  { "type": "dimension", "value": 24, "unit": "px", "spec": "DS §15" },
+      "space.xxl": { "type": "dimension", "value": 32, "unit": "px", "spec": "DS §15" },
+
+      "radius.s": { "type": "dimension", "value": 3, "unit": "px", "spec": "DS §15/C-09 radii 3/6/8" },
+      "radius.m": { "type": "dimension", "value": 6, "unit": "px", "spec": "DS §15/C-09" },
+      "radius.l": { "type": "dimension", "value": 8, "unit": "px", "spec": "DS §15/C-09" },
+
+      "stroke.hairline": { "type": "dimension", "value": 1,   "unit": "px", "spec": "DS §15 strokes 1/1.5/2/3" },
+      "stroke.icon":     { "type": "dimension", "value": 1.5, "unit": "px", "spec": "DS §15 icon language 1.5px stroke" },
+      "stroke.emphasis": { "type": "dimension", "value": 2,   "unit": "px", "spec": "DS §15" },
+      "stroke.heavy":    { "type": "dimension", "value": 3,   "unit": "px", "spec": "DS §15" },
+
+      "motion.fast.duration":     { "type": "duration", "value": 120, "unit": "ms", "use": "hover", "spec": "DS §12" },
+      "motion.standard.duration": { "type": "duration", "value": 180, "unit": "ms", "use": "selection, inspector, tabs", "spec": "DS §12" },
+      "motion.slow.duration":     { "type": "duration", "value": 300, "unit": "ms", "use": "overlays, modal", "spec": "DS §12" },
+      "motion.pulse.duration":    { "type": "duration", "value": 400, "unit": "ms", "use": "playback onset pulse, single-shot", "spec": "DS §12" },
+      "motion.easing":            { "type": "easing", "css": "cubic-bezier(0.25, 1, 0.5, 1)", "name": "ease-out-quart", "spec": "DS §12" },
+      "motion.reducedMotionPolicy": { "type": "policy", "rule": "transforms→instant + opacity; no bounce/parallax/entrance animation", "spec": "DS §12" },
+
+      "opacity.dimmedFocusMode": { "type": "opacity", "value": 0.15, "spec": "DS §10 focus mode non-similar points dim to 15%" },
+      "opacity.proposalUncertain": { "type": "opacity", "value": 0.60, "spec": "DS §3.4 ai.uncertain" },
+      "opacity.similarityEdgeMax": { "type": "opacity", "value": 0.75, "spec": "DS §15 opacity ramp .15/.35/.55/.75" },
+      "opacity.softFill": { "type": "opacity", "value": 0.55, "spec": "DS §15 opacity ramp" },
+      "opacity.vizFillMax": { "type": "opacity", "value": 0.60, "spec": "DS §9 brightest permitted large area ≤60% opacity fills" },
+
+      "visualisation.ink":       { "type": "color", "value": "#EDE8E0", "strokeWidth": 2, "fillOpacityRange": [0.50, 0.60], "spec": "DS §11 primary data off-white @2px stroke / 50–60% fill" },
+      "visualisation.reference": { "type": "color", "value": "#A39B8F", "dashPattern": [5, 4], "spec": "DS §11 reference/target grey dashed 5-4" },
+      "visualisation.grid":      { "type": "color", "value": "#2A261F", "labelStyle": "mono 9–10px tertiary", "spec": "DS §11 hairline grids" },
+      "visualisation.pulse":     { "type": "policy", "rule": "no persistent glow; transient pulse playback onset only (≤400ms)", "spec": "DS §11 glow policy" }
+    },
+
+    "semantic": {
+      "state.playing":   { "aliasOf": "nite.color.semantic.playing" },
+      "state.success":   { "aliasOf": "nite.color.semantic.success" },
+      "state.warning":   { "aliasOf": "nite.color.semantic.warning" },
+      "state.error":     { "aliasOf": "nite.color.semantic.error" },
+      "state.favorite":  { "aliasOf": "nite.color.semantic.favorite" },
+      "state.unknown":   { "aliasOf": "nite.color.semantic.unknown" },
+      "state.disabled":  { "aliasOf": "nite.color.semantic.disabled" },
+      "interactive.default": { "aliasOf": "nite.color.interactive.base" },
+      "interactive.hover":   { "aliasOf": "nite.color.interactive.bright" },
+      "interactive.selected":{ "aliasOf": "nite.color.interactive.base" },
+      "text.onAccent":       { "aliasOf": "nite.color.interactive.ink" }
+    },
+
+    "productAliases": {
+      "slo.category.kick":       { "aliasOf": "raw:#C96F4A", "family": "drums", "shape": "circle",   "spec": "DS §6 classification ONLY" },
+      "slo.category.snare":      { "aliasOf": "raw:#E3C567", "family": "drums", "shape": "circle",   "spec": "DS §6" },
+      "slo.category.clap":       { "aliasOf": "raw:#D98BA6", "family": "drums", "shape": "circle",   "spec": "DS §6 C-08 final #D98BA6" },
+      "slo.category.hihat":      { "aliasOf": "raw:#9FC2A5", "family": "drums", "shape": "circle",   "spec": "DS §6" },
+      "slo.category.percussion": { "aliasOf": "raw:#B98BD6", "family": "drums", "shape": "circle",   "spec": "DS §6" },
+      "slo.category.bass":       { "aliasOf": "raw:#6E93B8", "family": "bass",  "shape": "square",   "spec": "DS §6 R-CVD-1 family shape" },
+      "slo.category.synth":      { "aliasOf": "raw:#7FB0C4", "family": "synth", "shape": "triangle", "spec": "DS §6 R-CVD-1 family shape" },
+      "slo.category.vocal":      { "aliasOf": "raw:#E0A96B", "family": "vocal", "shape": "hollow-circle", "spec": "DS §6 R-CVD-1 family shape" },
+      "slo.category.unknown":    { "aliasOf": "nite.color.semantic.unknown", "family": null, "shape": "dashed-hollow", "spec": "DS §6 hollow #4A453D" },
+      "kenn.severity.high":      { "aliasOf": "nite.color.semantic.error",   "requiresTextChip": true, "spec": "DS C-05 text+colour mandatory" },
+      "kenn.severity.medium":    { "aliasOf": "nite.color.semantic.warning", "requiresTextChip": true, "spec": "DS C-05" },
+      "kenn.severity.low":       { "aliasOf": "nite.color.semantic.success", "requiresTextChip": true, "spec": "DS C-05" }
+    },
+
+    "component": {
+      "comp.row.height":            { "type": "dimension", "value": 27, "unit": "px", "spec": "DS §15 example" },
+      "comp.map.point.size":        { "type": "dimension", "value": 7,  "unit": "px", "spec": "DS §15 example" },
+      "comp.map.point.hoverScale":  { "type": "scalar",    "value": 1.5, "spec": "DS §10 hover scale ~1.5×" },
+      "comp.tooltip.delayMs":       { "type": "duration",  "value": 250, "unit": "ms", "spec": "DS §10 tooltip after 250ms delay" },
+      "comp.map.zoom.minPercent":   { "type": "scalar",    "value": 50,  "spec": "DS §10 zoom 50%–800%" },
+      "comp.map.zoom.maxPercent":   { "type": "scalar",    "value": 800, "spec": "DS §10" },
+      "comp.type.minSizePx":        { "type": "dimension", "value": 10,  "unit": "px", "spec": "DS §7 min text size 10px" },
+      "comp.caption.trackingPct":   { "type": "scalar",    "value": 6,   "spec": "DS §7 CAPS +6% tracking" }
+    },
+
+    "accentBudget": {
+      "slo.list":    { "minPct": 5, "maxPct": 8,  "notes": "selection edge+fill, primary button; favourite gold excluded from count" },
+      "slo.split":   { "minPct": 4, "maxPct": 6,  "notes": "playhead + primary actions; waveform stays neutral" },
+      "slo.map":     { "minPct": 3, "maxPct": 5,  "notes": "selected ring + labels only; category colours dominate" },
+      "kenn.analysis": { "minPct": 3, "maxPct": 6, "notes": "proposal curves only until accepted" },
+      "kenn.automix":  { "minPct": 3, "maxPct": 6, "notes": "proposal markers; applied values become neutral" },
+      "modal":       { "maxPct": 10, "notes": "one copper primary action max per modal" },
+      "website":     { "maxPct": 12, "notes": "marketing surfaces may spend more" }
+    }
+  }
+}

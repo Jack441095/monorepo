@@ -1,0 +1,43 @@
+{
+  "target": 0.9,
+  "calibrated_at": 0.93,
+  "seeds": 12,
+  "results": {
+    "filename-only": {
+      "coverage": 34.34,
+      "precision": 93.07,
+      "meets_target": true
+    },
+    "audio-only": {
+      "coverage": 31.31,
+      "precision": 90.57,
+      "meets_target": true
+    },
+    "fusion": {
+      "coverage": 51.38,
+      "precision": 90.94,
+      "meets_target": true
+    },
+    "fusion+agree": {
+      "coverage": 49.95,
+      "precision": 91.11,
+      "meets_target": true
+    },
+    "family+form": {
+      "coverage": 37.38,
+      "precision": 93.48,
+      "meets_target": true
+    },
+    "mw-audio": {
+      "coverage": 31.92,
+      "precision": 90.98,
+      "meets_target": true
+    },
+    "mw-fusion": {
+      "coverage": 51.87,
+      "precision": 90.91,
+      "meets_target": true
+    }
+  },
+  "best_meeting_target": "mw-fusion"
+}

@@ -1,0 +1,236 @@
+**/.DS_Store
+**/.venv/
+**/.venv-*/
+**/__pycache__/
+*.pyc
+*.pyo
+*.bak
+.env
+.env.*
+!.env.example
+
+# Commercial reference tracks (Stage D style-classifier validation) —
+# copyrighted third-party audio, never committed, even to a private repo.
+reference_tracks/
+
+# Jack's own real project stems, for real-world AutoMix DSP validation
+# against actual production material instead of synthetic test signals.
+# Personal/unreleased material — never committed.
+project_stems/
+testing_track_stems/
+podcast_test_stems/
+
+# Developer & CI artifacts — always local
+tmp_*.log
+.shelf/
+.history/
+*.sublime-project
+*.sublime-workspace
+.cache/
+.vscode/*
+!.vscode/settings.json
+.continuedev/
+run_server.py
+start.sh
+thursday.sh
+.git_audio_too_backup_*/
+*.log
+.pycache/
+ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Shared podcast report snapshots — runtime only, never committed
+data/podcast_reports/
+
+# SQLite databases — runtime only, never committed
+data/*.db
+data/logs/
+data/*.db-shm
+data/*.db-wal
+server/agents/Shared/data/*.db
+server/data/*.db
+server/data/*.db-shm
+server/data/*.db-wal
+studio/kenn/data/*.db
+studio/kenn/kenn/chats/*.db
+studio/kenn/kenn/chats/*.db-shm
+studio/kenn/kenn/chats/*.db-wal
+
+# --- BUSINESS (income) ---
+
+# Live business agent data — use seed/ on fresh setup
+server/agents/Shared/data/*.json
+server/agents/Shared/data/activity.jsonl
+!server/agents/Shared/data/seed/
+server/agents/Shared/exports/*
+!server/agents/Shared/exports/.gitkeep
+server/agents/Shared/backups/
+
+server/agents/Marketing/leads/*
+!server/agents/Marketing/leads/.gitkeep
+server/agents/Marketing/outputs/*
+!server/agents/Marketing/outputs/.gitkeep
+
+# Portfolio audio — regenerable via AudioGen
+server/portfolio/audio/*.wav
+server/portfolio/audio/*.mp3
+server/portfolio/audio/*.aiff
+server/portfolio/audio/*.aif
+server/portfolio/audio/*.m4a
+!server/portfolio/audio/.gitkeep
+
+# Client stem uploads (per project)
+data/stem_uploads/
+
+# Downloaded public-domain/CC0 test audio (fetch via
+# scripts/fetch_podcast_test_corpus.py; not committed — regenerable)
+data/podcast_test_corpus/
+
+# Autonomous producer / commercial-dispatch run output — generated, not source
+# (job manifests are demo/runtime artifacts and may reference placeholder
+# clients/invoices; never commit them as if they were real deliveries)
+data/commercial_deliveries/
+
+# --- STUDIO (creative/engineering) ---
+
+# Audiogen runtime — regenerable caches and artifacts
+studio/audiogen/audiogen/.cache/
+studio/audiogen/audiogen/.pytest_cache/
+studio/audiogen/audiogen/.ruff_cache/
+studio/audiogen/audiogen/.mypy_cache/
+studio/audiogen/audiogen/logs/
+studio/audiogen/audiogen/exports/*
+!studio/audiogen/audiogen/exports/stem_exporter.py
+studio/audiogen/audiogen/songs/
+studio/audiogen/audiogen/artifacts/runs/
+studio/audiogen/audiogen/artifacts/datasets/
+studio/audiogen/audiogen/artifacts/quality_audits/*.json
+
+# Checkpointed model weights — regenerable, too large for GitHub
+studio/audiogen/audiogen/training_data/active_models/*.pkl
+studio/audiogen/audiogen/training_data/active_models/*.pt
+studio/audiogen/audiogen/training_data/active_models/stages/active/*.pkl
+studio/audiogen/audiogen/training_data/active_models/stages/active/*.pt
+
+# KENN rebuildable index and web cache
+studio/kenn/kenn/data/index/*
+!studio/kenn/kenn/data/index/README.md
+studio/kenn/kenn/Training_Data_Sources/web_cache/
+
+# KENN server logs (console+rotating-file logging, see scripts/log_setup.py)
+studio/kenn/kenn/logs/
+
+# KENN benchmark/audit/training output
+studio/kenn/kenn/artifacts/benchmarks/*.json
+studio/kenn/kenn/artifacts/benchmarks/*.jsonl
+studio/kenn/kenn/artifacts/audits/*.json
+studio/kenn/kenn/artifacts/training/*.json
+studio/kenn/kenn/artifacts/training/*.jsonl
+
+# Training PDFs — download or copy locally
+studio/kenn/kenn/Training_Data_PDF/*.pdf
+!studio/kenn/kenn/Training_Data_PDF/audio-too-workflow-checklist.pdf
+
+# MixReview runtime uploads/reports
+studio/agents/MixReview/data/mix_reviews/
+
+# --- THURSDAY (orchestrator) ---
+thursday/sessions/
+thursday/alerts/
+thursday/logs/
+thursday/analytics/
+thursday/user_data/
+thursday/profiles/*
+!thursday/profiles/benchmark.json
+thursday/calendar_data/
+thursday/.last_briefing.txt
+
+# Thursday runtime state now defaults outside the repository (see
+# docs/THURSDAY_RUNTIME_STATE.md). These rules protect upgraded legacy
+# installs and explicit overrides that still point at the old directories.
+
+# --- SHARED ---
+
+# Local AudioGen dashboard runtime state
+data/audiogen_render_queue.json
+data/audiogen_render_history.json
+data/audio_queries/
+data/artifacts/
+data/creative_lab_sessions.json
+
+# Scan/benchmark analysis outputs — regenerable
+artifacts/
+
+# Test fixture artifacts
+tmp_pytest/
+
+# Transient root files
+tmp/
+.claude/worktrees/
+
+# Build artifacts (macOS app bundle / dmg from scripts/build_mac_app.py)
+/dist/
+/out/
+
+# One-off SQLite backups (e.g. before a data cleanup) — never committed
+data/*.db.bak*
+
+# Native DSP kernel build artifacts (platform/arch-specific, built on demand)
+studio/audio_analysis/audio_analysis/dsp_engine/native/*.dylib
+studio/audio_analysis/audio_analysis/dsp_engine/native/*.so
+
+# VST3 plugin CMake build output (compiled binaries + vendored deps, not source)
+studio/vst3_plugins/*/build/
+studio/vst3_plugins/*/build-release/
+studio/vst3_plugins/*/build-arm64/
+# Catches every one-off build dir created by recovery/validation phases
+# (build-phase85, build-recovery-r1, build-canonical-integration, etc.)
+studio/vst3_plugins/*/build-*/
+
+# Packaged release installers (built artifacts, not source)
+studio/vst3_plugins/*/*.dmg
+
+# KENNMixAssistant CMake build output (root-level build dir, same rule as above)
+/build/
+
+# NITE DSP website: Next.js build output and npm deps -- regenerable, not source
+nitedsp/website/.next/
+nitedsp/website/node_modules/
+
+# Licensing dev/test server: the Ed25519 private signing key must never be
+# committed (production uses a separate keypair generated on the real
+# backend anyway -- this one only signs local test licenses), and the local
+# SQLite license/activation database is generated test data, not source.
+studio/vst3_plugins/SmartSampleManager/licensing_server/keys/
+studio/vst3_plugins/SmartSampleManager/licensing_server/licensing.db
+studio/vst3_plugins/SmartSampleManager/licensing_server/licensing.db-wal
+studio/vst3_plugins/SmartSampleManager/licensing_server/licensing.db-shm
+
+# NITE DSP backend: same rule as the dev licensing server above -- the
+# staging Ed25519 private key must never be committed either.
+nitedsp/backend/staging_keys/
+
+# NITE DSP backend: local mock storage standing in for real release-artifact
+# hosting during staging -- generated/placeholder test data, not source.
+nitedsp/backend/mock_storage/
+
+# Model export intermediates: the downloaded checkpoint is reproducible via
+# model_export/README.md's curl command and shouldn't bloat the repo with a
+# 25MB file; the exported .onnx/.onnx.data are committed under Models/
+# instead (the canonical shipped location), not duplicated here.
+studio/vst3_plugins/SmartSampleManager/model_export/*.pth
+studio/vst3_plugins/SmartSampleManager/model_export/*.onnx
+studio/vst3_plugins/SmartSampleManager/model_export/*.onnx.data
+
+# Internal docs and planning documents — not part of the public/work repo
+docs/
+
+# Never committed: contains passport number / personal address
+LICENSE_SHENRENDAO.md
+
+# Runtime caches, model caches, and personal data dumps — not source
+data/coreml_cache/
+server/data/
+sample_pack_testing/
+studio/kenn/kenn/data/*.db

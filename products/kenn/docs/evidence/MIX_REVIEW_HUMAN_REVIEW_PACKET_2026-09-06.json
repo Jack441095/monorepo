@@ -1,0 +1,557 @@
+{
+  "schema": "kenn.mix_review_human_review_packet.v1",
+  "generated_at": "2026-09-06T21:27:46.131532+00:00",
+  "engine": "mix-review/core/local_engine.py (KENN-owned, deterministic, no external runtime)",
+  "evidence_kind": "real_mixes",
+  "corpus_source": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems (rights confirmed by the corpus owner)",
+  "corpus_note": "8 real song mixdowns (KENN AutoMix-rendered, real stem content), 2 A/B variant renders of the same song, and 1 raw unprocessed drum stem for contrast. No raw audio or filesystem path is included in this packet -- only measured findings and a truncated content hash for identity.",
+  "case_count": 11,
+  "cases": [
+    {
+      "case_id": "al_james",
+      "audio_identity": {
+        "sha256": "2192e2c25dc588f1",
+        "byte_length": 52619180
+      },
+      "input_context": {
+        "filename": "al_james.wav",
+        "format": "wav",
+        "duration_seconds": 198.863,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.90 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.9,
+            "loudness_range_lu": 4.21
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "ae_mere_humsafar",
+      "audio_identity": {
+        "sha256": "1aff8ca03a9c6aa5",
+        "byte_length": 69827174
+      },
+      "input_context": {
+        "filename": "ae_mere_humsafar.wav",
+        "format": "wav",
+        "duration_seconds": 263.897,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.96 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.96,
+            "loudness_range_lu": 6.79
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "amyhelmandthehandsomestrangers_rescueme",
+      "audio_identity": {
+        "sha256": "95942f6f332ddc78",
+        "byte_length": 68066174
+      },
+      "input_context": {
+        "filename": "amyhelmandthehandsomestrangers_rescueme.wav",
+        "format": "wav",
+        "duration_seconds": 257.242,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.92 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.92,
+            "loudness_range_lu": 4.74
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "angeloboltini_fragments",
+      "audio_identity": {
+        "sha256": "a355db5fc344b3f3",
+        "byte_length": 46893014
+      },
+      "input_context": {
+        "filename": "angeloboltini_fragments.wav",
+        "format": "wav",
+        "duration_seconds": 177.222,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "channel_imbalance",
+          "severity": "medium",
+          "confidence": 0.8,
+          "explanation": "Left/right RMS level differs by 3.09 dB across the whole file, at or above the 3.0 dB flag threshold.",
+          "suggested_next_step": "Check for an unintended pan/gain offset between channels; if the imbalance is an intentional wide arrangement choice, no correction is needed.",
+          "evidence": {
+            "left_rms_dbfs": -19.07,
+            "right_rms_dbfs": -15.98,
+            "imbalance_db": 3.09,
+            "flag_threshold_db": 3.0
+          }
+        },
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.84 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.84,
+            "loudness_range_lu": 4.61
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "atlantisbound_itwasmyfaultforwaiting",
+      "audio_identity": {
+        "sha256": "b18edf1f849d4c16",
+        "byte_length": 63390290
+      },
+      "input_context": {
+        "filename": "atlantisbound_itwasmyfaultforwaiting.wav",
+        "format": "wav",
+        "duration_seconds": 239.57,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.86 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.86,
+            "loudness_range_lu": 5.63
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "dream_of_you",
+      "audio_identity": {
+        "sha256": "caf45abc11440f01",
+        "byte_length": 21390872
+      },
+      "input_context": {
+        "filename": "dream_of_you.wav",
+        "format": "wav",
+        "duration_seconds": 80.842,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.87 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.87,
+            "loudness_range_lu": 2.76
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "reggueton_pop",
+      "audio_identity": {
+        "sha256": "5d5ad17f5ab3c43d",
+        "byte_length": 37836872
+      },
+      "input_context": {
+        "filename": "reggueton_pop.wav",
+        "format": "wav",
+        "duration_seconds": 142.996,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.89 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.89,
+            "loudness_range_lu": 6.22
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "stranger",
+      "audio_identity": {
+        "sha256": "4cffabb62958a357",
+        "byte_length": 54300536
+      },
+      "input_context": {
+        "filename": "stranger.wav",
+        "format": "wav",
+        "duration_seconds": 205.217,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.92 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.92,
+            "loudness_range_lu": 1.81
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "REAL_stranger_electronic_baseline",
+      "audio_identity": {
+        "sha256": "b4cb31d6d2da3345",
+        "byte_length": 54300536
+      },
+      "input_context": {
+        "filename": "REAL_stranger_electronic_baseline.wav",
+        "format": "wav",
+        "duration_seconds": 205.217,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.92 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.92,
+            "loudness_range_lu": 1.81
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "REAL_stranger_electronic_matched",
+      "audio_identity": {
+        "sha256": "56a054a41a3bd8b8",
+        "byte_length": 54300536
+      },
+      "input_context": {
+        "filename": "REAL_stranger_electronic_matched.wav",
+        "format": "wav",
+        "duration_seconds": 205.217,
+        "sample_rate_hz": 44100,
+        "channel_layout": "stereo",
+        "channel_count": 2
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "headroom",
+          "severity": "medium",
+          "confidence": 0.85,
+          "explanation": "Sample peak is -0.81 dBFS, above the -1.0 dBFS flag threshold, leaving little headroom before a mastering/limiting stage.",
+          "suggested_next_step": "Leave at least 1 dB of peak headroom before any mastering or limiting stage.",
+          "evidence": {
+            "sample_peak_dbfs": -0.81,
+            "flag_threshold_dbfs": -1.0
+          }
+        },
+        {
+          "fault_family": "calibrated_lufs_bs1770",
+          "severity": "low",
+          "confidence": 0.95,
+          "explanation": "Integrated loudness is -13.96 LUFS (ITU-R BS.1770-4 K-weighted, gated), above the -14 LUFS common streaming reference used here as an informational marker.",
+          "suggested_next_step": "This is informational, not a pass/fail gate -- confirm the actual delivery target for this release (streaming platforms vary) before adjusting gain.",
+          "evidence": {
+            "integrated_lufs": -13.96,
+            "loudness_range_lu": 3.59
+          }
+        },
+        {
+          "fault_family": "true_peak_intersample",
+          "severity": "low",
+          "confidence": 0.9,
+          "explanation": "Estimated true peak is -0.72 dBTP (4x oversampled), above the -1 dBTP common delivery ceiling used here as an informational marker.",
+          "suggested_next_step": "Consider a true-peak limiter before final delivery if this file will be lossy-encoded (inter-sample peaks can clip after encoding even when sample-peak looks safe).",
+          "evidence": {
+            "true_peak_dbtp": -0.72
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    },
+    {
+      "case_id": "al_james_raw_kick_stem",
+      "audio_identity": {
+        "sha256": "b4da0c2a024397d4",
+        "byte_length": 26530287
+      },
+      "input_context": {
+        "filename": "al_james_raw_kick_stem.wav",
+        "format": "wav",
+        "duration_seconds": 200.526,
+        "sample_rate_hz": 44100,
+        "channel_layout": "mono",
+        "channel_count": 1
+      },
+      "technical_rating": "Minor issues found",
+      "detected_findings": [
+        {
+          "fault_family": "clipping",
+          "severity": "low",
+          "confidence": 0.9,
+          "explanation": "Found 2 run(s) of 3+ consecutive samples within 0.3 dB of full scale (6 samples total, 0.0001% of all samples).",
+          "suggested_next_step": "Reduce gain into the loudest section(s) or check for a clipped source/plugin stage, then re-render and re-analyse.",
+          "evidence": {
+            "clipped_sample_count": 6,
+            "clip_run_count": 2,
+            "clipped_fraction": 1e-06,
+            "threshold_dbfs": -0.3,
+            "min_run_samples": 3
+          }
+        },
+        {
+          "fault_family": "headroom",
+          "severity": "medium",
+          "confidence": 0.85,
+          "explanation": "Sample peak is -0.00 dBFS, above the -1.0 dBFS flag threshold, leaving little headroom before a mastering/limiting stage.",
+          "suggested_next_step": "Leave at least 1 dB of peak headroom before any mastering or limiting stage.",
+          "evidence": {
+            "sample_peak_dbfs": -0.0,
+            "flag_threshold_dbfs": -1.0
+          }
+        },
+        {
+          "fault_family": "true_peak_intersample",
+          "severity": "low",
+          "confidence": 0.9,
+          "explanation": "Estimated true peak is 0.01 dBTP (4x oversampled), above the -1 dBTP common delivery ceiling used here as an informational marker.",
+          "suggested_next_step": "Consider a true-peak limiter before final delivery if this file will be lossy-encoded (inter-sample peaks can clip after encoding even when sample-peak looks safe).",
+          "evidence": {
+            "true_peak_dbtp": 0.01
+          }
+        }
+      ],
+      "explicitly_not_evaluated": [
+        "masking",
+        "eq_tonal_balance",
+        "dynamics_arrangement",
+        "genre_context"
+      ],
+      "reviewer_scores": {
+        "useful_findings": null,
+        "false_flags": null,
+        "missed_problems": null,
+        "confusing_wording": null,
+        "should_have_abstained_but_didnt": null,
+        "notes": ""
+      }
+    }
+  ],
+  "criteria": [
+    "useful_findings: did this finding genuinely help, or would a mixing engineer already know/ignore it?",
+    "false_flags: did the engine flag something that isn't really a problem in this mix?",
+    "missed_problems: did you hear a real technical issue the engine didn't flag at all?",
+    "confusing_wording: was any finding's explanation unclear or could it mislead a non-expert?",
+    "should_have_abstained_but_didnt: did the engine make a claim it didn't have enough evidence for?"
+  ],
+  "scoring_scale": "For useful_findings/false_flags/missed_problems/confusing_wording/should_have_abstained_but_didnt: fill with a short list of specific findings/timestamps, or an empty list/'none' if not applicable. Use notes for anything else.",
+  "independent_reviewers_required": 2,
+  "instructions": "For each case, listen to the actual mix (paths supplied separately, out of this JSON) and compare against the engine's findings above. Score each of the 5 criteria per case. This qualifies the *current* fault-family set (clipping, headroom, silence/truncation, channel imbalance, phase/polarity, DC offset, loudness estimate, calibrated LUFS, true-peak) against real listening judgment -- it does not and cannot evaluate masking, tonal balance, arrangement, or genre-context claims, since KENN does not measure those yet (see explicitly_not_evaluated per case).",
+  "limitations": [
+    "This is a small (11-case) curated sample, not a statistically powered benchmark.",
+    "All 11 cases came from AutoMix-rendered or raw stem content from the same test corpus; results may not generalize to hand-mixed commercial masters from other genres/engineers.",
+    "A single reviewer's judgment is a data point, not proof; the plan calls for at least two independent reviewers."
+  ]
+}
