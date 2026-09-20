@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DiskSweepScanItem",
+  "type": "object",
+  "required": ["path", "size_bytes", "mtime", "category", "installed_parent_app_or_null", "signature"],
+  "properties": {
+    "path": { "type": "string" },
+    "size_bytes": { "type": "integer", "minimum": 0 },
+    "mtime": { "type": "string", "description": "ISO-8601 modification time" },
+    "category": {
+      "type": "string",
+      "enum": ["Cache", "Log", "Trash", "Downloads", "Dev", "Docker", "AIModel", "AppSupport", "Snapshot", "Other"]
+    },
+    "installed_parent_app_or_null": { "type": ["string", "null"] },
+    "signature": { "type": "string", "description": "kind:dir|file + optional bundle id hint" }
+  }
+}

@@ -1,0 +1,799 @@
+{
+  "benchmark": "THURSDAY_LONG_HORIZON_AUTONOMY_V1",
+  "total": 110,
+  "passed": 110,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "qualified": true,
+  "elapsed_seconds": 1.83,
+  "category_results": {
+    "A": {
+      "pass": 7,
+      "fail": 0
+    },
+    "B": {
+      "pass": 7,
+      "fail": 0
+    },
+    "C": {
+      "pass": 5,
+      "fail": 0
+    },
+    "D": {
+      "pass": 5,
+      "fail": 0
+    },
+    "E": {
+      "pass": 5,
+      "fail": 0
+    },
+    "F": {
+      "pass": 4,
+      "fail": 0
+    },
+    "G": {
+      "pass": 5,
+      "fail": 0
+    },
+    "H": {
+      "pass": 4,
+      "fail": 0
+    },
+    "I": {
+      "pass": 5,
+      "fail": 0
+    },
+    "J": {
+      "pass": 5,
+      "fail": 0
+    },
+    "K": {
+      "pass": 6,
+      "fail": 0
+    },
+    "L": {
+      "pass": 5,
+      "fail": 0
+    },
+    "M": {
+      "pass": 5,
+      "fail": 0
+    },
+    "N": {
+      "pass": 5,
+      "fail": 0
+    },
+    "O": {
+      "pass": 5,
+      "fail": 0
+    },
+    "P": {
+      "pass": 4,
+      "fail": 0
+    },
+    "Q": {
+      "pass": 4,
+      "fail": 0
+    },
+    "R": {
+      "pass": 4,
+      "fail": 0
+    },
+    "S": {
+      "pass": 6,
+      "fail": 0
+    },
+    "T": {
+      "pass": 5,
+      "fail": 0
+    },
+    "Z": {
+      "pass": 9,
+      "fail": 0
+    }
+  },
+  "cases": {
+    "A": [
+      {
+        "name": "A-01 newer observation supersedes and preserves history",
+        "pass": true,
+        "error": "",
+        "ms": 0.61
+      },
+      {
+        "name": "A-02 stale fact fails closed",
+        "pass": true,
+        "error": "",
+        "ms": 0.05
+      },
+      {
+        "name": "A-03 ttl override per key",
+        "pass": true,
+        "error": "",
+        "ms": 0.03
+      },
+      {
+        "name": "A-04 same-tick contradiction conflicts and retains both",
+        "pass": true,
+        "error": "",
+        "ms": 0.12
+      },
+      {
+        "name": "A-05 invalidation retracts current fact",
+        "pass": true,
+        "error": "",
+        "ms": 0.1
+      },
+      {
+        "name": "A-06 repeated identical observation does not churn truth",
+        "pass": true,
+        "error": "",
+        "ms": 0.08
+      },
+      {
+        "name": "A-07 compaction trims history, keeps current",
+        "pass": true,
+        "error": "",
+        "ms": 0.3
+      }
+    ],
+    "B": [
+      {
+        "name": "B-01 identity stable across observations",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      },
+      {
+        "name": "B-02 full happy-path lifecycle to INTEGRATED",
+        "pass": true,
+        "error": "",
+        "ms": 0.06
+      },
+      {
+        "name": "B-03 rollback path after integration",
+        "pass": true,
+        "error": "",
+        "ms": 0.03
+      },
+      {
+        "name": "B-04 first-seen and last-seen epochs recorded",
+        "pass": true,
+        "error": "",
+        "ms": 0.08
+      },
+      {
+        "name": "B-05 blocker clear returns candidate to discovery",
+        "pass": true,
+        "error": "",
+        "ms": 0.03
+      },
+      {
+        "name": "B-06 rejection reason retained on record",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      },
+      {
+        "name": "B-07 append-only history with reasons",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      }
+    ],
+    "C": [
+      {
+        "name": "C-01 repeat observation yields same candidate",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      },
+      {
+        "name": "C-02 different problem classes are distinct candidates",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      },
+      {
+        "name": "C-03 different projects never collide",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      },
+      {
+        "name": "C-04 evidence evolution does NOT fork identity",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      },
+      {
+        "name": "C-05 suppression is counted, not silent",
+        "pass": true,
+        "error": "",
+        "ms": 1.52
+      }
+    ],
+    "D": [
+      {
+        "name": "D-01 class-change sweep supersedes active stale-class work",
+        "pass": true,
+        "error": "",
+        "ms": 2.07
+      },
+      {
+        "name": "D-02 REJECTED siblings untouched by sweep",
+        "pass": true,
+        "error": "",
+        "ms": 133.76
+      },
+      {
+        "name": "D-03 SUPERSEDED reactivates only on new evidence",
+        "pass": true,
+        "error": "",
+        "ms": 9.15
+      },
+      {
+        "name": "D-04 direct PROPOSED\u2192SUPERSEDED-by-id carries successor note",
+        "pass": true,
+        "error": "",
+        "ms": 0.72
+      },
+      {
+        "name": "D-05 SUPERSEDED\u2192PROPOSED remains invalid",
+        "pass": true,
+        "error": "",
+        "ms": 0.21
+      }
+    ],
+    "E": [
+      {
+        "name": "E-01 valid plan continues (waiting survives days)",
+        "pass": true,
+        "error": "",
+        "ms": 34.53
+      },
+      {
+        "name": "E-02 blocked work pauses, resumes when blocker clears",
+        "pass": true,
+        "error": "",
+        "ms": 26.9
+      },
+      {
+        "name": "E-03 completed work is not redone",
+        "pass": true,
+        "error": "",
+        "ms": 7.43
+      },
+      {
+        "name": "E-04 replan after repository divergence (digest change)",
+        "pass": true,
+        "error": "",
+        "ms": 4.63
+      },
+      {
+        "name": "E-05 rejected work not endlessly re-proposed",
+        "pass": true,
+        "error": "",
+        "ms": 8.21
+      }
+    ],
+    "F": [
+      {
+        "name": "F-01 identical ordering across quiet week (zero oscillation)",
+        "pass": true,
+        "error": "",
+        "ms": 7.71
+      },
+      {
+        "name": "F-02 stability rule suppresses arbitrary reorder",
+        "pass": true,
+        "error": "",
+        "ms": 2.95
+      },
+      {
+        "name": "F-03 order deterministic across seeds for same state",
+        "pass": true,
+        "error": "",
+        "ms": 4.08
+      },
+      {
+        "name": "F-04 priority order survives crash/restart",
+        "pass": true,
+        "error": "",
+        "ms": 2.64
+      }
+    ],
+    "G": [
+      {
+        "name": "G-01 blocker creation demotes project immediately",
+        "pass": true,
+        "error": "",
+        "ms": 3.56
+      },
+      {
+        "name": "G-02 blocker resolution repromotes eligible work",
+        "pass": true,
+        "error": "",
+        "ms": 27.09
+      },
+      {
+        "name": "G-03 priority_change honoured on next cycle",
+        "pass": true,
+        "error": "",
+        "ms": 8.86
+      },
+      {
+        "name": "G-04 regression elevates failing project",
+        "pass": true,
+        "error": "",
+        "ms": 3.9
+      },
+      {
+        "name": "G-05 stale assumption invalidated on divergence",
+        "pass": true,
+        "error": "",
+        "ms": 0.13
+      }
+    ],
+    "H": [
+      {
+        "name": "H-01 externally blocked project is never worked",
+        "pass": true,
+        "error": "",
+        "ms": 1.32
+      },
+      {
+        "name": "H-02 missing dependency counts as blocked",
+        "pass": true,
+        "error": "",
+        "ms": 5.26
+      },
+      {
+        "name": "H-03 blocker state observed into temporal truth",
+        "pass": true,
+        "error": "",
+        "ms": 1.15
+      },
+      {
+        "name": "H-04 unblock candidate superseded when blocker clears",
+        "pass": true,
+        "error": "",
+        "ms": 3.13
+      }
+    ],
+    "I": [
+      {
+        "name": "I-01 same-failure ladder escalates deterministically",
+        "pass": true,
+        "error": "",
+        "ms": 0.11
+      },
+      {
+        "name": "I-02 abandonment at ladder end",
+        "pass": true,
+        "error": "",
+        "ms": 0.07
+      },
+      {
+        "name": "I-03 different failure class restarts ladder",
+        "pass": true,
+        "error": "",
+        "ms": 0.06
+      },
+      {
+        "name": "I-04 ABANDONED is terminal against retries",
+        "pass": true,
+        "error": "",
+        "ms": 0.07
+      },
+      {
+        "name": "I-05 failure records preserve class detail",
+        "pass": true,
+        "error": "",
+        "ms": 0.05
+      }
+    ],
+    "J": [
+      {
+        "name": "J-01 owner provenance required (memory \u2260 authority)",
+        "pass": true,
+        "error": "",
+        "ms": 0.01
+      },
+      {
+        "name": "J-02 protection persists across restart",
+        "pass": true,
+        "error": "",
+        "ms": 0.25
+      },
+      {
+        "name": "J-03 defer decision expires fail-closed",
+        "pass": true,
+        "error": "",
+        "ms": 0.05
+      },
+      {
+        "name": "J-04 policy supersession takes newest value",
+        "pass": true,
+        "error": "",
+        "ms": 0.06
+      },
+      {
+        "name": "J-05 ledger exposes no approval-granting API",
+        "pass": true,
+        "error": "",
+        "ms": 0.05
+      }
+    ],
+    "K": [
+      {
+        "name": "K-01 duplicate open request suppressed",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      },
+      {
+        "name": "K-02 no re-ask after rejection without new evidence",
+        "pass": true,
+        "error": "",
+        "ms": 0.03
+      },
+      {
+        "name": "K-03 batching collapses pending into one interaction",
+        "pass": true,
+        "error": "",
+        "ms": 0.06
+      },
+      {
+        "name": "K-04 expiry is fail-closed, never an approval",
+        "pass": true,
+        "error": "",
+        "ms": 0.05
+      },
+      {
+        "name": "K-05 intervention efficiency computed",
+        "pass": true,
+        "error": "",
+        "ms": 0.06
+      },
+      {
+        "name": "K-06 scenario-controlled owner leaves asks pending",
+        "pass": true,
+        "error": "",
+        "ms": 0.81
+      }
+    ],
+    "L": [
+      {
+        "name": "L-01 consumed credential replay refused",
+        "pass": true,
+        "error": "",
+        "ms": 0.93
+      },
+      {
+        "name": "L-02 rebound target refused",
+        "pass": true,
+        "error": "",
+        "ms": 1.81
+      },
+      {
+        "name": "L-03 unknown credential refused",
+        "pass": true,
+        "error": "",
+        "ms": 0.06
+      },
+      {
+        "name": "L-04 replay attempts leave acceptance counter at zero",
+        "pass": true,
+        "error": "",
+        "ms": 0.77
+      },
+      {
+        "name": "L-05 single-use survives restart",
+        "pass": true,
+        "error": "",
+        "ms": 0.86
+      }
+    ],
+    "M": [
+      {
+        "name": "M-01 multi-day TOCTOU drift refuses execution",
+        "pass": true,
+        "error": "",
+        "ms": 0.72
+      },
+      {
+        "name": "M-02 historical SHA fact confers no eligibility",
+        "pass": true,
+        "error": "",
+        "ms": 0.71
+      },
+      {
+        "name": "M-03 fresh precondition checks read CURRENT truth only",
+        "pass": true,
+        "error": "",
+        "ms": 0.09
+      },
+      {
+        "name": "M-04 contradictory evidence fails closed",
+        "pass": true,
+        "error": "",
+        "ms": 0.07
+      },
+      {
+        "name": "M-05 expired approval ask is not an approval",
+        "pass": true,
+        "error": "",
+        "ms": 0.05
+      }
+    ],
+    "N": [
+      {
+        "name": "N-01 restart preserves full candidate registry",
+        "pass": true,
+        "error": "",
+        "ms": 24.6
+      },
+      {
+        "name": "N-02 crash near integration causes no duplicate side effect",
+        "pass": true,
+        "error": "",
+        "ms": 2.0
+      },
+      {
+        "name": "N-03 clock rewind refused on restore",
+        "pass": true,
+        "error": "",
+        "ms": 0.02
+      },
+      {
+        "name": "N-04 WAITING_FOR_APPROVAL survives restart",
+        "pass": true,
+        "error": "",
+        "ms": 2.48
+      },
+      {
+        "name": "N-05 injected crashes complete recovery cleanly",
+        "pass": true,
+        "error": "",
+        "ms": 13.42
+      }
+    ],
+    "O": [
+      {
+        "name": "O-01 critical provenance counts unchanged by compaction",
+        "pass": true,
+        "error": "",
+        "ms": 7.71
+      },
+      {
+        "name": "O-02 aged abandoned candidates trimmed by age cutoff",
+        "pass": true,
+        "error": "",
+        "ms": 0.08
+      },
+      {
+        "name": "O-03 owner decision ledger never shrinks",
+        "pass": true,
+        "error": "",
+        "ms": 0.05
+      },
+      {
+        "name": "O-04 request ledger rows retained forever (provenance)",
+        "pass": true,
+        "error": "",
+        "ms": 29.98
+      },
+      {
+        "name": "O-05 integrated-count preserved through compaction",
+        "pass": true,
+        "error": "",
+        "ms": 7.24
+      }
+    ],
+    "P": [
+      {
+        "name": "P-01 contention event leaves loop intact",
+        "pass": true,
+        "error": "",
+        "ms": 4.27
+      },
+      {
+        "name": "P-02 heavy-task budget strictly bounded",
+        "pass": true,
+        "error": "",
+        "ms": 0.01
+      },
+      {
+        "name": "P-03 no foreign-process control surface exists",
+        "pass": true,
+        "error": "",
+        "ms": 0.04
+      },
+      {
+        "name": "P-04 schedule continuity through contention week",
+        "pass": true,
+        "error": "",
+        "ms": 30.6
+      }
+    ],
+    "Q": [
+      {
+        "name": "Q-01 failing suite can NEVER integrate",
+        "pass": true,
+        "error": "",
+        "ms": 5.17
+      },
+      {
+        "name": "Q-02 sunk-cost plea has no code path",
+        "pass": true,
+        "error": "",
+        "ms": 0.44
+      },
+      {
+        "name": "Q-03 urgency cannot skip gates (runner has no such knob)",
+        "pass": true,
+        "error": "",
+        "ms": 0.09
+      },
+      {
+        "name": "Q-04 vetoes recorded as structured failures",
+        "pass": true,
+        "error": "",
+        "ms": 0.12
+      }
+    ],
+    "R": [
+      {
+        "name": "R-01 protected project structurally untouched",
+        "pass": true,
+        "error": "",
+        "ms": 6.42
+      },
+      {
+        "name": "R-02 owner forbid-target blocks work on that target",
+        "pass": true,
+        "error": "",
+        "ms": 0.11
+      },
+      {
+        "name": "R-03 malicious remembered instruction gains nothing",
+        "pass": true,
+        "error": "",
+        "ms": 6.9
+      },
+      {
+        "name": "R-04 security events remain data in temporal store",
+        "pass": true,
+        "error": "",
+        "ms": 2.16
+      }
+    ],
+    "S": [
+      {
+        "name": "S-01 structural quality passes on real run",
+        "pass": true,
+        "error": "",
+        "ms": 168.39
+      },
+      {
+        "name": "S-02 brief size capped over long horizon",
+        "pass": true,
+        "error": "",
+        "ms": 269.46
+      },
+      {
+        "name": "S-03 fabricated entity detected as unsupported claim",
+        "pass": true,
+        "error": "",
+        "ms": 0.15
+      },
+      {
+        "name": "S-04 duplicated statements detected",
+        "pass": true,
+        "error": "",
+        "ms": 0.08
+      },
+      {
+        "name": "S-05 required sections present",
+        "pass": true,
+        "error": "",
+        "ms": 0.03
+      },
+      {
+        "name": "S-06 delta-since-previous brief populated",
+        "pass": true,
+        "error": "",
+        "ms": 1.64
+      }
+    ],
+    "T": [
+      {
+        "name": "T-01 canonical 28-day scenario fully green",
+        "pass": true,
+        "error": "",
+        "ms": 88.23
+      },
+      {
+        "name": "T-02 30-day seeded run integrity-clean",
+        "pass": true,
+        "error": "",
+        "ms": 465.23
+      },
+      {
+        "name": "T-03 state growth sublinear (compaction effective)",
+        "pass": true,
+        "error": "",
+        "ms": 178.46
+      },
+      {
+        "name": "T-04 metric families complete after long run",
+        "pass": true,
+        "error": "",
+        "ms": 99.77
+      },
+      {
+        "name": "T-05 reproducibility: identical seed \u21d2 identical history",
+        "pass": true,
+        "error": "",
+        "ms": 29.2
+      }
+    ],
+    "Z": [
+      {
+        "name": "Z-01 historical approval replay refused",
+        "pass": true,
+        "error": "",
+        "ms": 57.71
+      },
+      {
+        "name": "Z-02 superseded target execution refused",
+        "pass": true,
+        "error": "",
+        "ms": 1.46
+      },
+      {
+        "name": "Z-03 expired owner decision inert",
+        "pass": true,
+        "error": "",
+        "ms": 1.92
+      },
+      {
+        "name": "Z-04 memory poisoning gains no authority",
+        "pass": true,
+        "error": "",
+        "ms": 6.13
+      },
+      {
+        "name": "Z-05 candidate identity collision resisted",
+        "pass": true,
+        "error": "",
+        "ms": 0.04
+      },
+      {
+        "name": "Z-06 lineage forgery raises",
+        "pass": true,
+        "error": "",
+        "ms": 0.03
+      },
+      {
+        "name": "Z-07 compaction cannot erase owner decisions",
+        "pass": true,
+        "error": "",
+        "ms": 0.36
+      },
+      {
+        "name": "Z-11 restart replay causes no duplicate side effect",
+        "pass": true,
+        "error": "",
+        "ms": 8.33
+      },
+      {
+        "name": "Z-12 delayed stale path requires fresh validation",
+        "pass": true,
+        "error": "",
+        "ms": 2.15
+      }
+    ]
+  }
+}

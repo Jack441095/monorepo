@@ -1,0 +1,47 @@
+{
+  "name": "kenn-audio-dev",
+  "displayName": "KENN Audio Dev Agent",
+  "description": "Grounded AI Co-pilot for C++/JUCE, Python audio DSP, and plugin development.",
+  "version": "1.0.0",
+  "publisher": "audio-engineering-company",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onCommand:kenn.askAudioDev",
+    "onCommand:kenn.insertDspSnippet",
+    "onLanguage:cpp",
+    "onLanguage:python"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "kenn.askAudioDev",
+        "title": "KENN: Ask Audio Dev Agent",
+        "category": "KENN Audio"
+      },
+      {
+        "command": "kenn.insertDspSnippet",
+        "title": "KENN: Insert Audio DSP Code Snippet",
+        "category": "KENN Audio"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "kenn.askAudioDev",
+          "group": "kenn@1"
+        },
+        {
+          "command": "kenn.insertDspSnippet",
+          "group": "kenn@2"
+        }
+      ]
+    }
+  }
+}

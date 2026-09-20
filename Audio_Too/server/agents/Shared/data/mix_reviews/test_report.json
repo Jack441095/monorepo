@@ -1,0 +1,21 @@
+{
+  "title": "Test Mix",
+  "metrics": {
+    "filename": "test_mix.wav",
+    "mix_goal": {
+      "key": "pop_vocal",
+      "label": "Pop Vocal Mix"
+    },
+    "technical_score": 72
+  },
+  "flags": [
+    {"label": "Low presence", "severity": "medium", "detail": "Vocal is sitting behind the instrumental"},
+    {"label": "Low-mid build-up", "severity": "medium", "detail": "Guitars and keys crowding 200-400 Hz"}
+  ],
+  "action_plan": [
+    {"focus": "Vocal presence", "action": "Boost 5 kHz shelf on vocal bus by 1 dB", "reason": "Vocal needs clarity", "decision": "fix_first"}
+  ],
+  "comparison_advice": ["Reference track has brighter vocal"],
+  "version_advice": [],
+  "revision_impact": {}
+}

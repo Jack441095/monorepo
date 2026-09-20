@@ -1,0 +1,114 @@
+{
+  "version": "px-kenn-workflow-v1",
+  "evidence_class": "synthetic prototype behavior",
+  "cases": [
+    {
+      "case": "measured_issues_apply_then_undo",
+      "measurement": {
+        "schema": "px.kenn.measurement.v1",
+        "metrics": {
+          "harshness_db": 5.1,
+          "low_end_masking_db": 4.2,
+          "stereo_correlation": 0.06
+        }
+      },
+      "detected_count": 3,
+      "ranked_issue_ids": [
+        "harshness",
+        "low-end-masking",
+        "mono-risk"
+      ],
+      "proposal_status": [
+        "provisional",
+        "provisional",
+        "provisional"
+      ],
+      "decided": {
+        "proposal_id": "proposal:harshness",
+        "status": "applied",
+        "requires_user_decision": true,
+        "reversible": true,
+        "basis": {
+          "finding_id": "harshness",
+          "confidence": "measured",
+          "evidence": "spectral energy is 5.1 dB above the fixture baseline in the chorus",
+          "focus": "2.8-4.2 kHz"
+        },
+        "diff": {
+          "before": "unchanged",
+          "after_preview": "preview a bounded dynamic cut, then decide"
+        },
+        "undo_available": true
+      },
+      "nothing_important_needs_fixing": false
+    },
+    {
+      "case": "measured_issues_reject",
+      "measurement": {
+        "schema": "px.kenn.measurement.v1",
+        "metrics": {
+          "harshness_db": 5.1,
+          "low_end_masking_db": 4.2,
+          "stereo_correlation": 0.06
+        }
+      },
+      "detected_count": 3,
+      "ranked_issue_ids": [
+        "harshness",
+        "low-end-masking",
+        "mono-risk"
+      ],
+      "proposal_status": [
+        "provisional",
+        "provisional",
+        "provisional"
+      ],
+      "decided": {
+        "proposal_id": "proposal:harshness",
+        "status": "rejected",
+        "requires_user_decision": true,
+        "reversible": true,
+        "basis": {
+          "finding_id": "harshness",
+          "confidence": "measured",
+          "evidence": "spectral energy is 5.1 dB above the fixture baseline in the chorus",
+          "focus": "2.8-4.2 kHz"
+        },
+        "diff": {
+          "before": "unchanged",
+          "after_preview": "preview a bounded dynamic cut, then decide"
+        },
+        "undo_available": false
+      },
+      "nothing_important_needs_fixing": false
+    },
+    {
+      "case": "healthy_mix_no_action",
+      "measurement": {
+        "schema": "px.kenn.measurement.v1",
+        "metrics": {
+          "harshness_db": 1.2,
+          "low_end_masking_db": 1.8,
+          "stereo_correlation": 0.42
+        }
+      },
+      "detected_count": 0,
+      "ranked_issue_ids": [],
+      "proposal_status": [],
+      "decided": null,
+      "nothing_important_needs_fixing": true
+    }
+  ],
+  "assertions": {
+    "issues_are_prioritised": true,
+    "proposal_is_not_authoritative": true,
+    "apply_keeps_undo": true,
+    "reject_does_not_apply": true,
+    "healthy_fixture_has_no_action": true
+  },
+  "limitations": [
+    "No audio is analysed and no JUCE/DAW parameter is changed.",
+    "The fixture thresholds are illustrative, not KENN production thresholds.",
+    "Human trust and cognitive load still require moderated testing."
+  ]
+}

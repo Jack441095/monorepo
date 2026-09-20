@@ -1,0 +1,7 @@
+# Licensed/owner audio NEVER enters git. Manifests + hashes only.
+real_audio_import/
+results/real_v1/derived/
+results/real_v1/blind_pack_real/
+datasets/smoke_fixtures/
+__pycache__/
+*.pyc

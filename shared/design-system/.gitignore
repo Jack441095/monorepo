@@ -1,0 +1,18 @@
+# Build/test artifacts
+tmp/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
+
+# Never commit binaries/fonts/db/audio
+*.aif
+*.wav
+*.flac
+*.db
+*.sqlite3
+*.dylib
+*.ttf
+*.otf

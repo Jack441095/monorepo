@@ -1,0 +1,6 @@
+case_id,expected_problem,predicted_problem,detection,diagnosis_ok,recommendation_safe,unnecessary_processing
+healthy_reference,,,True,True,True,False
+resonance_3200,harshness,harshness,True,True,True,False
+low_end_excess,sub excess,sub excess,True,True,True,False
+hard_clipping,clipping,clipping,True,True,True,False
+mono_cancellation,mono incompatibility,mono incompatibility,True,True,True,False

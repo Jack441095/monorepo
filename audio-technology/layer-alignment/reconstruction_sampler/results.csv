@@ -1,0 +1,11 @@
+fixture,method,pitch_hz,pitch_error_hz,duration_seconds,duration_error_seconds,spectral_centroid_drift_hz,modulation_rate_hz
+sine,resampling_baseline,330.0,0.0,1.0,0.5,4.596103849573012,1.0
+sine,reconstruction_pv,330.0,0.0,1.5,0.0,4.905881219042328,30.0
+saw,resampling_baseline,330.0,0.0,1.0,0.5,4397.819973893499,30.0
+saw,reconstruction_pv,330.0,0.0,1.5,0.0,4050.275292637715,30.0
+fm,resampling_baseline,420.0,90.0,1.0,0.5,3.186101056479856,22.0
+fm,reconstruction_pv,491.3333333333333,161.33333333333331,1.5,0.0,17.79223872895318,20.0
+pluck,resampling_baseline,330.0,0.0,1.0,0.5,4.2326261828961265,1.0
+pluck,reconstruction_pv,330.0,0.0,1.5,0.0,21.260873988970104,1.3333333333333333
+noise_layered_bass,resampling_baseline,82.0,0.5,1.0,0.5,6176.59507976342,1.0
+noise_layered_bass,reconstruction_pv,82.66666666666667,0.1666666666666714,1.5,0.0,6483.198940006692,1.3333333333333333

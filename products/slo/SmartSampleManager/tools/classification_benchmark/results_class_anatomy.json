@@ -1,0 +1,276 @@
+{
+  "Percussion": {
+    "cluster_0": {
+      "n": 22,
+      "median": {
+        "duration": 1.172359375,
+        "attack_ms": 36.0,
+        "decay_s": 0.132,
+        "sustain": 0.015587348025292158,
+        "centroid_hz": 3859.0168282155673,
+        "bandwidth_hz": 2725.148499660764,
+        "flatness": 0.09294082596898079,
+        "zcr": 0.14525951816604887,
+        "harmonicity": 0.38621190190315247,
+        "onsets_per_s": 4.0,
+        "low_energy": 0.0004960681835655123
+      },
+      "examples": [
+        "MIDDLE EAST PERC.wav",
+        "Organic - Shaker_C (27).wav",
+        "Organic - Mazhar Tambourine (19).wav"
+      ]
+    },
+    "cluster_1": {
+      "n": 15,
+      "median": {
+        "duration": 1.35,
+        "attack_ms": 16.0,
+        "decay_s": 0.256,
+        "sustain": 0.008134915493428707,
+        "centroid_hz": 1217.0168157718736,
+        "bandwidth_hz": 1714.6488143286972,
+        "flatness": 0.1599256992340088,
+        "zcr": 0.01960358796296296,
+        "harmonicity": 0.49124377965927124,
+        "onsets_per_s": 2.7697234604232484,
+        "low_energy": 0.40388932824134827
+      },
+      "examples": [
+        "Organic - Tom_G (1).wav",
+        "Organic - Tom_D (4).wav",
+        "Organic - Tom_D (3).wav"
+      ]
+    },
+    "cluster_2": {
+      "n": 13,
+      "median": {
+        "duration": 0.38003125,
+        "attack_ms": 0.0,
+        "decay_s": 0.056,
+        "sustain": 0.014886143617331982,
+        "centroid_hz": 2814.706215033373,
+        "bandwidth_hz": 2954.5929233318275,
+        "flatness": 0.17158165574073792,
+        "zcr": 0.08250403025793651,
+        "harmonicity": 0.21613943576812744,
+        "onsets_per_s": 5.333333333333333,
+        "low_energy": 0.0806354358792305
+      },
+      "examples": [
+        "KSHMR_Percussion_High_Rimshot_03_D.wav",
+        "Snakes Rim .wav",
+        "Perc 02.wav"
+      ]
+    },
+    "discriminative": {
+      "duration": 0.311,
+      "attack_ms": 1.034,
+      "decay_s": 1.597,
+      "sustain": 0.645,
+      "centroid_hz": 1.699,
+      "bandwidth_hz": 1.171,
+      "flatness": 0.593,
+      "zcr": 1.548,
+      "harmonicity": 1.654,
+      "onsets_per_s": 0.586,
+      "low_energy": 1.19
+    },
+    "silhouette": 0.159
+  },
+  "Synth One-Shot": {
+    "cluster_0": {
+      "n": 7,
+      "median": {
+        "duration": 9.256625,
+        "attack_ms": 128.0,
+        "decay_s": 3.568,
+        "sustain": 0.6676258444786072,
+        "centroid_hz": 2817.655644399272,
+        "bandwidth_hz": 3644.9224134566985,
+        "flatness": 0.002103774342685938,
+        "zcr": 0.054201819449067906,
+        "harmonicity": 0.9760439395904541,
+        "onsets_per_s": 5.999752669770262,
+        "low_energy": 0.00010161354293813929
+      },
+      "examples": [
+        "Square Wave C3.wav",
+        "Saw C3.wav",
+        "Kieran C3.wav"
+      ]
+    },
+    "cluster_1": {
+      "n": 6,
+      "median": {
+        "duration": 10.0,
+        "attack_ms": 432.0,
+        "decay_s": 3.452,
+        "sustain": 0.46892303228378296,
+        "centroid_hz": 1693.7309375700534,
+        "bandwidth_hz": 1478.3202211535877,
+        "flatness": 0.00011148955854878295,
+        "zcr": 0.05874303541044083,
+        "harmonicity": 0.8164722323417664,
+        "onsets_per_s": 8.135646095106638,
+        "low_energy": 0.00010245063458569348
+      },
+      "examples": [
+        "Supermassive Sine (C).wav",
+        "Organ 1.wav",
+        "Granular Piano.wav"
+      ]
+    },
+    "cluster_2": {
+      "n": 6,
+      "median": {
+        "duration": 1.20275,
+        "attack_ms": 24.0,
+        "decay_s": 0.48,
+        "sustain": 0.1860070303082466,
+        "centroid_hz": 1233.8606183755396,
+        "bandwidth_hz": 1230.7652616708301,
+        "flatness": 0.00016442812375316862,
+        "zcr": 0.03173506198575525,
+        "harmonicity": 0.8090585768222809,
+        "onsets_per_s": 5.442304543950375,
+        "low_energy": 0.008269063895568252
+      },
+      "examples": [
+        "NADRISK_SYNTH_G_2.wav",
+        "G1-1.wav",
+        "RT_One_Shot_Cassette_Pluck_C.wav"
+      ]
+    },
+    "discriminative": {
+      "duration": 2.473,
+      "attack_ms": 0.965,
+      "decay_s": 2.201,
+      "sustain": 1.978,
+      "centroid_hz": 1.006,
+      "bandwidth_hz": 1.506,
+      "flatness": 1.227,
+      "zcr": 0.495,
+      "harmonicity": 1.093,
+      "onsets_per_s": 0.444,
+      "low_energy": 0.929
+    },
+    "silhouette": 0.139
+  },
+  "Percussion Loop": {
+    "cluster_0": {
+      "n": 26,
+      "median": {
+        "duration": 4.709859375,
+        "attack_ms": 208.0,
+        "decay_s": 0.184,
+        "sustain": 0.19697555154561996,
+        "centroid_hz": 4138.370457744648,
+        "bandwidth_hz": 3251.1954743321885,
+        "flatness": 0.08842796087265015,
+        "zcr": 0.17687156558059242,
+        "harmonicity": 0.32230226695537567,
+        "onsets_per_s": 3.8166511112407395,
+        "low_energy": 0.008939698454923928
+      },
+      "examples": [
+        "Snare - Tek Sync - 172 BPM.wav",
+        "ECLIPSE Construction Kit 06 - FX.wav",
+        "Shaker LP - 90 BPM (2).wav"
+      ]
+    },
+    "cluster_1": {
+      "n": 22,
+      "median": {
+        "duration": 7.532328124999999,
+        "attack_ms": 268.0,
+        "decay_s": 0.33999999999999997,
+        "sustain": 0.3584166020154953,
+        "centroid_hz": 1880.8262085418314,
+        "bandwidth_hz": 2228.165305753217,
+        "flatness": 0.0029547855956479907,
+        "zcr": 0.052880154095256274,
+        "harmonicity": 0.403534859418869,
+        "onsets_per_s": 6.06978055586697,
+        "low_energy": 0.2166343256831169
+      },
+      "examples": [
+        "SS_SS_105_perc_loop_kongoma_touba_busy.w",
+        "KSHMR_Synth_Loop_19_128_D#.wav",
+        "SS_SS_100_perc_loop_mbour_full.wav"
+      ]
+    },
+    "discriminative": {
+      "duration": 0.432,
+      "attack_ms": 0.098,
+      "decay_s": 0.296,
+      "sustain": 0.609,
+      "centroid_hz": 0.9,
+      "bandwidth_hz": 0.823,
+      "flatness": 1.02,
+      "zcr": 0.9,
+      "harmonicity": 0.414,
+      "onsets_per_s": 0.218,
+      "low_energy": 0.345
+    },
+    "silhouette": 0.108
+  },
+  "Foley": {
+    "cluster_0": {
+      "n": 21,
+      "median": {
+        "duration": 0.5860625,
+        "attack_ms": 0.0,
+        "decay_s": 0.08,
+        "sustain": 0.008465527556836605,
+        "centroid_hz": 3209.4427618163554,
+        "bandwidth_hz": 2540.8210547370863,
+        "flatness": 0.01953830197453499,
+        "zcr": 0.09795214393721198,
+        "harmonicity": 0.2677488327026367,
+        "onsets_per_s": 6.836146122623371,
+        "low_energy": 0.026467807590961456
+      },
+      "examples": [
+        "Reverse Rimshot.wav",
+        "KSHMR_Snap_13.wav",
+        "KSHMR_Snap_07.wav"
+      ]
+    },
+    "cluster_1": {
+      "n": 19,
+      "median": {
+        "duration": 1.25003125,
+        "attack_ms": 136.0,
+        "decay_s": 0.16,
+        "sustain": 0.18998245894908905,
+        "centroid_hz": 3331.405670290468,
+        "bandwidth_hz": 3340.007027387072,
+        "flatness": 0.03188939765095711,
+        "zcr": 0.12722412109375,
+        "harmonicity": 0.2974696755409241,
+        "onsets_per_s": 7.048070040196024,
+        "low_energy": 0.013315201736986637
+      },
+      "examples": [
+        "HHH_Foley 9.wav",
+        "HHH_Foley 14.wav",
+        "HHH_Foley 8.wav"
+      ]
+    },
+    "discriminative": {
+      "duration": 0.997,
+      "attack_ms": 0.641,
+      "decay_s": 0.519,
+      "sustain": 1.137,
+      "centroid_hz": 0.358,
+      "bandwidth_hz": 0.225,
+      "flatness": 0.591,
+      "zcr": 0.397,
+      "harmonicity": 0.251,
+      "onsets_per_s": 0.181,
+      "low_energy": 0.264
+    },
+    "silhouette": 0.103
+  }
+}

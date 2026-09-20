@@ -1,0 +1,19 @@
+System performance benchmark
+timestamp_utc: 2026-09-18T14:37:45.546264+00:00
+ok: True
+
+Offline:
+- section_8bar.wall_ms: 392.15
+- arranged_song_ambient.wall_ms: 1054.66
+
+Realtime:
+- bars_profiled: 10
+- render_ratio_max: 0.0574
+- render_ratio_p95: 0.043
+- total_p95_ms: 147.238
+- master_p95_ms: 53.824
+- spike_bars: 0
+- chord_cache_delta_max: 2
+- over_budget_bars: 0
+
+DSP included: False (ok=True)

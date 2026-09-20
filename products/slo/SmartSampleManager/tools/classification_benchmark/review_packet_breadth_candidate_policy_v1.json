@@ -1,0 +1,49 @@
+{
+  "candidate_policy": {
+    "classes": [
+      "Clap",
+      "Kick",
+      "Snare"
+    ],
+    "mean_coverage": 0.07314410480349345,
+    "mean_repeated_seed_precision": 0.9702834671115544,
+    "minimum_repeated_seed_precision": 0.9577464788732394,
+    "thresholds": {
+      "Clap": 0.7170043587684631,
+      "Kick": 0.811768651008606,
+      "Snare": 0.6104221343994141
+    }
+  },
+  "decision": "review_only; no owner approval; no production policy or rename action changed",
+  "evidence": {
+    "receipt_corpus_breadth_final_v1.json": "4fbc6685941acef05b135bb67516b08e5f2068eb828bab0a79c5f59369822c9c",
+    "results_breadth_final_candidate_policy_v1.json": "2f73684f7f6521ea167681761ae1f97251ba9fe4eee521adb7c8acd3de5ed8be",
+    "results_breadth_final_class_gates_v1.json": "a7dc4cdab57e704fd968c7e2985f0a49674f170be2c51a5db9c573d521df6690",
+    "results_breadth_final_new_domain_policy_v1.json": "02afb7cfdcd2321fee30a08669ec2233798631fd974b7491c537af4039011a7d"
+  },
+  "generated": "2026-09-12T18:25:01",
+  "method_version": "candidate_policy_review_v1",
+  "new_domain_qualification": {
+    "accepted": 105,
+    "coverage": 0.875,
+    "overlap_excluded_from_training": 18,
+    "precision": 0.9904761904761905,
+    "validation_rows": 120
+  },
+  "record_type": "slo_breadth_candidate_policy_review_packet",
+  "required_before_promotion": [
+    "explicit owner approval of Clap/Kick/Snare candidate tier",
+    "re-run approval gate against the exact production model artifact",
+    "duplicate/content identity guard",
+    "dry-run rename plan with zero automatic actions until approval receipt exists"
+  ],
+  "safety": {
+    "auto_approved": false,
+    "production_model_changed": false,
+    "read_only": true,
+    "rename_actions": false,
+    "sealed_validation_changed": false,
+    "source_audio_modified": false
+  },
+  "schema_version": "1.0.0"
+}

@@ -22,7 +22,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
 
@@ -228,6 +228,38 @@ class MagicLinkToken(Base):
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class WaitlistEntry(Base):
+    __tablename__ = "waitlist_entries"
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid)
+    email: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    name: Mapped[str | None] = mapped_column(String, nullable=True)
+    product_id: Mapped[str] = mapped_column(ForeignKey("products.id"), nullable=False, index=True)
+    use_case: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("email", "product_id", name="uq_waitlist_email_product"),
+    )
+
+
+class ContactEntry(Base):
+    """Contact form submissions -- lightweight records for tracking enquiries.
+
+    Not a user account; just a stored message that gets forwarded to the
+    business owner's email.
+    """
+
+    __tablename__ = "contact_entries"
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    phone: Mapped[str | None] = mapped_column(String, nullable=True)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
+
+
 class AdminAuditLogEntry(Base):
     """Section 73 -- sensitive admin actions: actor, action, target,
     timestamp. Never logs secrets."""
@@ -240,3 +272,31 @@ class AdminAuditLogEntry(Base):
     target: Mapped[str] = mapped_column(String, nullable=False)
     reason: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
+
+
+class ParaphraseOrder(Base):
+    """Anonymous pay-what-you-like purchase for the paraphrase product.
+
+    Deliberately NOT a `users`/`purchases`/`entitlements` row: paraphrase is
+    anonymous-by-design (no email, no account), and its unlock is a
+    short-lived session token rather than a perpetual software licence.
+    Forms the bridge between a real Paddle transaction.completed event and
+    the browser that paid: the client generated a random `hint` before
+    starting checkout and sent it via Paddle custom_data; the webhook
+    records it here; the redemption endpoint proves it and issues the
+    signed unlock token (app/paraphrase_orders.py). Idempotent via the
+    unique provider_order_id -- a duplicate webhook delivery updates
+    nothing.
+    """
+
+    __tablename__ = "paraphrase_orders"
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid)
+    hint: Mapped[str] = mapped_column(String, nullable=False, unique=True, index=True)
+    provider_order_id: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
+    currency: Mapped[str] = mapped_column(String, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
+    redeemed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+

@@ -1,0 +1,1059 @@
+{
+  "args": {
+    "emotion": "neutral",
+    "gate": true,
+    "include_dsp": false,
+    "performance": "low",
+    "root": 60,
+    "rt_seconds": 12.0,
+    "seed": 0
+  },
+  "config": {
+    "active_conversation_preset": "default_ambient_01",
+    "active_sample_pack": "default",
+    "active_style_profile": "default",
+    "audio": {
+      "reverb_wet": 0.24,
+      "rt_bypass_master_multiband": true,
+      "rt_reverb_default_tier": "high_rt",
+      "sample_rate": 48000,
+      "target_buffer_bars": 14
+    },
+    "composition": {
+      "arranged_song_mode": "snowfall",
+      "arranged_songs_default": true,
+      "compose_runtime_mode": "",
+      "default_tempo": 70.0,
+      "section_k_samples": 4,
+      "section_pick_use_wall_clock": true
+    },
+    "performance_mode": "high",
+    "samplers": {
+      "arp": "samples/default/arp.wav",
+      "bass": "samples/default/bass.wav",
+      "chords": "samples/default/chords.wav",
+      "counter_melody": "samples/default/melody.wav",
+      "drone": "samples/default/drone.wav",
+      "melody": "samples/default/melody.wav"
+    }
+  },
+  "dsp": {
+    "failures": [],
+    "included": false,
+    "ok": true,
+    "steps": []
+  },
+  "offline_composition": {
+    "arranged_song_ambient": {
+      "metadata_keys": [
+        "active_conversation_preset",
+        "active_sample_pack",
+        "active_style_profile",
+        "ai",
+        "arrangement_form",
+        "audio",
+        "composition",
+        "locked_progressions_by_family",
+        "metrics",
+        "modulation_lift_applied",
+        "modulation_lift_semitones",
+        "motif_development",
+        "primary_emotion_for_postprocess",
+        "quality_report",
+        "section_chord_progressions",
+        "section_emotions",
+        "section_phrase_spans",
+        "section_roles",
+        "section_roots",
+        "section_signatures",
+        "seed",
+        "song_blueprint",
+        "song_postprocess"
+      ],
+      "metrics": {
+        "activity_jump_p95": 0.8139999999999992,
+        "arp_activity": 0.22978703703703698,
+        "chord_center_jump_p95": 17.0,
+        "chord_change_rate_per_bar": 1.2962962962962963,
+        "chord_repeat_frac": 0.0,
+        "counter_activity": 0.0212962962962964,
+        "events_per_channel": {
+          "0": 47,
+          "1": 93,
+          "2": 129,
+          "3": 79,
+          "5": 4
+        },
+        "lead_abs_interval_p95": 9.0,
+        "lead_activity": 0.7276316640000007,
+        "lead_arp_overlap": 0.17865164344001497,
+        "lead_counter_overlap": 0.030565933069043472,
+        "lead_max_leap": 11,
+        "lead_pitch_range": 22,
+        "lead_repeat_frac": 0.046875,
+        "total_events": 352,
+        "velocity_jump_p95": 9.150000000000006
+      },
+      "samples": [
+        {
+          "channel": "melody",
+          "duration_beats": 0.862,
+          "midi": 64,
+          "start_beats": 0.0,
+          "velocity": 42
+        },
+        {
+          "channel": "chords",
+          "duration_beats": 3.75,
+          "midi": 48,
+          "start_beats": 0.25,
+          "velocity": 72
+        },
+        {
+          "channel": "chords",
+          "duration_beats": 3.75,
+          "midi": 52,
+          "start_beats": 0.25,
+          "velocity": 75
+        },
+        {
+          "channel": "chords",
+          "duration_beats": 3.75,
+          "midi": 55,
+          "start_beats": 0.25,
+          "velocity": 67
+        },
+        {
+          "channel": "melody",
+          "duration_beats": 0.862,
+          "midi": 65,
+          "start_beats": 0.788,
+          "velocity": 43
+        },
+        {
+          "channel": "melody",
+          "duration_beats": 1.15,
+          "midi": 67,
+          "start_beats": 1.575,
+          "velocity": 49
+        },
+        {
+          "channel": "melody",
+          "duration_beats": 2.736,
+          "midi": 60,
+          "start_beats": 4.0,
+          "velocity": 58
+        },
+        {
+          "channel": "chords",
+          "duration_beats": 1.35,
+          "midi": 48,
+          "start_beats": 4.25,
+          "velocity": 65
+        },
+        {
+          "channel": "bass",
+          "duration_beats": 4.0,
+          "midi": 48,
+          "start_beats": 16.0,
+          "velocity": 56
+        },
+        {
+          "channel": "arp",
+          "duration_beats": 0.36,
+          "midi": 72,
+          "start_beats": 16.0,
+          "velocity": 47
+        },
+        {
+          "channel": "bass",
+          "duration_beats": 4.0,
+          "midi": 48,
+          "start_beats": 20.0,
+          "velocity": 56
+        },
+        {
+          "channel": "arp",
+          "duration_beats": 0.36,
+          "midi": 57,
+          "start_beats": 20.0,
+          "velocity": 66
+        },
+        {
+          "channel": "arp",
+          "duration_beats": 0.265,
+          "midi": 65,
+          "start_beats": 20.25,
+          "velocity": 59
+        },
+        {
+          "channel": "arp",
+          "duration_beats": 0.265,
+          "midi": 65,
+          "start_beats": 20.75,
+          "velocity": 65
+        },
+        {
+          "channel": "bass",
+          "duration_beats": 4.0,
+          "midi": 48,
+          "start_beats": 24.0,
+          "velocity": 56
+        },
+        {
+          "channel": "bass",
+          "duration_beats": 4.0,
+          "midi": 48,
+          "start_beats": 28.0,
+          "velocity": 56
+        },
+        {
+          "channel": "counter_melody",
+          "duration_beats": 0.65,
+          "midi": 56,
+          "start_beats": 65.0,
+          "velocity": 44
+        },
+        {
+          "channel": "counter_melody",
+          "duration_beats": 0.5,
+          "midi": 64,
+          "start_beats": 77.5,
+          "velocity": 52
+        },
+        {
+          "channel": "counter_melody",
+          "duration_beats": 0.65,
+          "midi": 57,
+          "start_beats": 79.0,
+          "velocity": 47
+        },
+        {
+          "channel": "counter_melody",
+          "duration_beats": 0.5,
+          "midi": 66,
+          "start_beats": 101.5,
+          "velocity": 51
+        }
+      ],
+      "sections": [
+        {
+          "bars": 4,
+          "emotion": "neutral",
+          "root": 60
+        },
+        {
+          "bars": 7,
+          "emotion": "neutral",
+          "root": 60
+        },
+        {
+          "bars": 5,
+          "emotion": "neutral",
+          "root": 62
+        },
+        {
+          "bars": 7,
+          "emotion": "neutral",
+          "root": 64
+        },
+        {
+          "bars": 4,
+          "emotion": "neutral",
+          "root": 57
+        }
+      ],
+      "summary": {
+        "channels": {
+          "arp": 79,
+          "bass": 47,
+          "chords": 93,
+          "counter_melody": 4,
+          "melody": 129
+        },
+        "event_count": 352,
+        "timeline_beats": {
+          "bars_est": 27.0,
+          "end_max": 108.015,
+          "span": 108.015,
+          "start_min": 0.0
+        }
+      },
+      "wall_ms": 1054.66
+    },
+    "emotion": "neutral",
+    "root_midi": 60,
+    "section_8bar": {
+      "samples": [
+        {
+          "channel": "bass",
+          "duration_beats": 2.0,
+          "midi": 37,
+          "start_beats": 0.0,
+          "velocity": 58
+        },
+        {
+          "channel": "melody",
+          "duration_beats": 0.475,
+          "midi": 65,
+          "start_beats": 0.0,
+          "velocity": 73
+        },
+        {
+          "channel": "arp",
+          "duration_beats": 4.0,
+          "midi": 56,
+          "start_beats": 0.0,
+          "velocity": 64
+        },
+        {
+          "channel": "chords",
+          "duration_beats": 1.35,
+          "midi": 49,
+          "start_beats": 0.25,
+          "velocity": 68
+        },
+        {
+          "channel": "chords",
+          "duration_beats": 1.35,
+          "midi": 55,
+          "start_beats": 0.25,
+          "velocity": 64
+        },
+        {
+          "channel": "chords",
+          "duration_beats": 1.35,
+          "midi": 65,
+          "start_beats": 0.25,
+          "velocity": 64
+        },
+        {
+          "channel": "melody",
+          "duration_beats": 0.475,
+          "midi": 62,
+          "start_beats": 0.5,
+          "velocity": 83
+        },
+        {
+          "channel": "melody",
+          "duration_beats": 0.475,
+          "midi": 65,
+          "start_beats": 1.0,
+          "velocity": 74
+        },
+        {
+          "channel": "chords",
+          "duration_beats": 2.4,
+          "midi": 49,
+          "start_beats": 1.5,
+          "velocity": 81
+        },
+        {
+          "channel": "bass",
+          "duration_beats": 2.0,
+          "midi": 37,
+          "start_beats": 2.0,
+          "velocity": 56
+        },
+        {
+          "channel": "melody",
+          "duration_beats": 0.912,
+          "midi": 65,
+          "start_beats": 2.0,
+          "velocity": 76
+        },
+        {
+          "channel": "bass",
+          "duration_beats": 2.0,
+          "midi": 33,
+          "start_beats": 4.0,
+          "velocity": 58
+        },
+        {
+          "channel": "arp",
+          "duration_beats": 4.0,
+          "midi": 70,
+          "start_beats": 4.0,
+          "velocity": 66
+        },
+        {
+          "channel": "arp",
+          "duration_beats": 0.53,
+          "midi": 65,
+          "start_beats": 4.5,
+          "velocity": 65
+        },
+        {
+          "channel": "arp",
+          "duration_beats": 0.53,
+          "midi": 61,
+          "start_beats": 5.0,
+          "velocity": 63
+        },
+        {
+          "channel": "bass",
+          "duration_beats": 2.0,
+          "midi": 33,
+          "start_beats": 6.0,
+          "velocity": 56
+        }
+      ],
+      "summary": {
+        "channels": {
+          "arp": 57,
+          "bass": 18,
+          "chords": 29,
+          "melody": 37
+        },
+        "event_count": 141,
+        "timeline_beats": {
+          "bars_est": 8.0,
+          "end_max": 32.0,
+          "span": 32.0,
+          "start_min": 0.0
+        }
+      },
+      "wall_ms": 392.15
+    },
+    "seed": 0
+  },
+  "offline_elapsed_s": 2.38,
+  "offline_gate": {
+    "failures": [],
+    "ok": true
+  },
+  "ok": true,
+  "repo": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo/audio-technology/audiogen/audiogen",
+  "rt_benchmark": {
+    "audio_metrics": {
+      "crest_db": 27.438741871245206,
+      "peak": 0.004382184706628323,
+      "rms": 0.00018610309052746743,
+      "spectral_tilt_db_per_oct": -19.77709470104502,
+      "true_peak_est": 0.004382184706628323
+    },
+    "buffer_size": 8192,
+    "buffer_underruns": 0,
+    "callback_underflows": 0,
+    "cold_start": {
+      "chunks_generated": 17,
+      "elapsed_ms": 12434.47,
+      "emotion_switch_latency_ms": 6.05,
+      "emotion_switch_stage": "cold_start",
+      "first_profiled_chunk": 2,
+      "first_profiled_dominant_stage": "master",
+      "first_profiled_elapsed_ms": 493.79,
+      "first_profiled_render_ratio": 0.0087,
+      "first_profiled_total_ms": 29.94,
+      "init_ms": 383.05,
+      "section_compose_ms": 265.52
+    },
+    "cold_start_gate": {
+      "failures": [],
+      "ok": true
+    },
+    "delay_bus_enabled": true,
+    "elapsed_ms": 12434.47,
+    "emotion": "neutral",
+    "init_ms": 383.05,
+    "performance": "low",
+    "playback_stats": {
+      "buffer_capacity": 1024,
+      "buffer_fill": 14,
+      "buffer_fill_avg": 13.95656903920219,
+      "buffer_high_watermark": 14,
+      "buffer_low_watermark": 14,
+      "buffer_underruns": 0,
+      "callback_count": 63,
+      "callback_frames": 516096,
+      "callback_underflows": 0,
+      "chunks_generated": 17,
+      "emergency_active": false,
+      "emergency_reason": "",
+      "gen_culprit": "mono",
+      "gen_stage_ema_ms": {
+        "chords": 7.447575721108505,
+        "master": 17.27703826804836,
+        "mix": 13.744906390473549,
+        "mono": 27.260224252380738,
+        "total": 68.69542487731155
+      },
+      "gen_stage_last_ms": {
+        "chords": 1.6766249973443337,
+        "master": 15.837165999982972,
+        "mix": 15.39891699940199,
+        "mono": 11.858249999932013,
+        "total": 47.94112499803305
+      },
+      "last_emotion_switch_emotion": "neutral",
+      "last_emotion_switch_latency_ms": 6.048625000403263,
+      "last_emotion_switch_stage": "cold_start",
+      "last_gen_time_ms": 51.57208442687988,
+      "last_section_compose_time_ms": 265.52295684814453,
+      "max_gen_time_ms": 290.2881462497414,
+      "paused": false,
+      "playing": true,
+      "quality_tier": "normal",
+      "queued_buffer_bars": 13,
+      "rt_mode_candidate": "",
+      "rt_mode_candidate_streak": 0,
+      "rt_mode_stable": "normal",
+      "rt_watchdog_last_ratio": 0.015041857957839966,
+      "rt_watchdog_safe_bars_remaining": 0,
+      "rt_watchdog_triggered_count": 0,
+      "stream_recovery_attempts": 0,
+      "target_buffer_bars": 14,
+      "total_bars": 3
+    },
+    "prewarm": {
+      "chords": {
+        "attempts": 210,
+        "enabled": true,
+        "root_note": 60,
+        "skipped": false,
+        "successes": 210,
+        "tempo_bpm": 70.0
+      },
+      "mix_master": {
+        "bar_samples": 151200,
+        "enabled": true,
+        "ok": true,
+        "tempo_bpm": 70.0
+      },
+      "mono": {}
+    },
+    "quality_tier": "normal",
+    "render_watchdog_triggers": 0,
+    "reverb_rt60": 10.0,
+    "reverb_wet": 0.22,
+    "rt_cprofile_slow_bars": [],
+    "run_seconds": 12.0,
+    "sample_rate": 44100,
+    "sampler_cache": {
+      "chord_cache_bytes": 66591000,
+      "chord_cache_entries": 60,
+      "chord_sampler_note_cache_entries": 118,
+      "chord_sampler_note_cache_maxsize": 256,
+      "chord_sampler_random_start": false,
+      "chord_sampler_shimmer": false
+    },
+    "shutdown_ms": 331.33,
+    "stage_gate": {
+      "failures": [],
+      "ok": true
+    },
+    "stage_gate_summary": {
+      "bars_profiled": 10,
+      "chord_cache_delta_max": 2,
+      "culprit_counts": {
+        "master": 5,
+        "mono": 5
+      },
+      "dominant_culprit": "master",
+      "dominant_stage": "master",
+      "near_budget_bars": 0,
+      "over_budget_bars": 0,
+      "render_ratio_max": 0.0574,
+      "render_ratio_mean": 0.019,
+      "render_ratio_p95": 0.043,
+      "render_ratio_p99": 0.0545,
+      "spike_bars": 0,
+      "stage_max_ms": {
+        "chords": 17.524,
+        "master": 57.473,
+        "mix": 50.464,
+        "mono": 38.421
+      },
+      "stage_mean_ms": {
+        "chords": 6.582,
+        "master": 23.934,
+        "mix": 17.356,
+        "mono": 11.64
+      },
+      "stage_p95_ms": {
+        "chords": 16.415,
+        "master": 53.824,
+        "mix": 40.072,
+        "mono": 30.003
+      },
+      "stage_p99_ms": {
+        "chords": 17.302,
+        "master": 56.743,
+        "mix": 48.386,
+        "mono": 36.737
+      },
+      "total_max_ms": 196.822,
+      "total_mean_ms": 65.184,
+      "total_p95_ms": 147.238,
+      "total_p99_ms": 186.905
+    },
+    "stage_gate_warmup_bars": 1,
+    "stage_samples": [
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 2,
+        "culprit": "master",
+        "elapsed_ms": 493.79,
+        "quality_tier": "normal",
+        "render_ratio": 0.0087,
+        "sampler_cache": {
+          "chord_cache_bytes": 66132360,
+          "chord_cache_entries": 56,
+          "chord_sampler_note_cache_entries": 61,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 0
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 0,
+          "current_section_bars": 8,
+          "next_bar_index": 3,
+          "next_section_ready": false,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 0.364,
+          "master": 15.858,
+          "mix": 11.398,
+          "mono": 1.907,
+          "total": 29.94
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 5,
+        "culprit": "master",
+        "elapsed_ms": 596.18,
+        "quality_tier": "normal",
+        "render_ratio": 0.0072,
+        "sampler_cache": {
+          "chord_cache_bytes": 66661560,
+          "chord_cache_entries": 56,
+          "chord_sampler_note_cache_entries": 72,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 0
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 0,
+          "current_section_bars": 8,
+          "next_bar_index": 6,
+          "next_section_ready": false,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 0.178,
+          "master": 10.961,
+          "mix": 10.287,
+          "mono": 3.001,
+          "total": 24.696
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 8,
+        "culprit": "master",
+        "elapsed_ms": 700.12,
+        "quality_tier": "normal",
+        "render_ratio": 0.0063,
+        "sampler_cache": {
+          "chord_cache_bytes": 66837960,
+          "chord_cache_entries": 56,
+          "chord_sampler_note_cache_entries": 75,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 0
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 0,
+          "current_section_bars": 8,
+          "next_bar_index": 9,
+          "next_section_ready": false,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 0.394,
+          "master": 11.688,
+          "mix": 9.174,
+          "mono": 0.134,
+          "total": 21.596
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 9,
+        "culprit": "master",
+        "elapsed_ms": 1117.97,
+        "quality_tier": "normal",
+        "render_ratio": 0.0574,
+        "sampler_cache": {
+          "chord_cache_bytes": 66837960,
+          "chord_cache_entries": 56,
+          "chord_sampler_note_cache_entries": 75,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 0
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 0,
+          "current_section_bars": 8,
+          "next_bar_index": 10,
+          "next_section_ready": false,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 17.524,
+          "master": 57.473,
+          "mix": 50.464,
+          "mono": 38.421,
+          "total": 196.822
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 10,
+        "culprit": "master",
+        "elapsed_ms": 1224.5,
+        "quality_tier": "normal",
+        "render_ratio": 0.0253,
+        "sampler_cache": {
+          "chord_cache_bytes": 66837960,
+          "chord_cache_entries": 56,
+          "chord_sampler_note_cache_entries": 75,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 0
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 0,
+          "current_section_bars": 8,
+          "next_bar_index": 11,
+          "next_section_ready": false,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 0.93,
+          "master": 49.365,
+          "mix": 27.371,
+          "mono": 3.496,
+          "total": 86.635
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 11,
+        "culprit": "master",
+        "elapsed_ms": 1329.93,
+        "quality_tier": "normal",
+        "render_ratio": 0.0228,
+        "sampler_cache": {
+          "chord_cache_bytes": 66026520,
+          "chord_cache_entries": 56,
+          "chord_sampler_note_cache_entries": 76,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 0
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 0,
+          "current_section_bars": 16,
+          "next_bar_index": 1,
+          "next_section_ready": false,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 0.996,
+          "master": 44.136,
+          "mix": 17.961,
+          "mono": 3.865,
+          "total": 78.041
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 13,
+        "culprit": "mono",
+        "elapsed_ms": 1651.13,
+        "quality_tier": "normal",
+        "render_ratio": 0.0139,
+        "sampler_cache": {
+          "chord_cache_bytes": 66502800,
+          "chord_cache_entries": 57,
+          "chord_sampler_note_cache_entries": 98,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 1
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 0,
+          "current_section_bars": 16,
+          "next_bar_index": 3,
+          "next_section_ready": true,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 15.059,
+          "master": 12.941,
+          "mix": 10.346,
+          "mono": 9.091,
+          "total": 47.804
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 14,
+        "culprit": "mono",
+        "elapsed_ms": 1756.24,
+        "quality_tier": "normal",
+        "render_ratio": 0.0124,
+        "sampler_cache": {
+          "chord_cache_bytes": 66008880,
+          "chord_cache_entries": 58,
+          "chord_sampler_note_cache_entries": 105,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 1
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 0,
+          "current_section_bars": 16,
+          "next_bar_index": 3,
+          "next_section_ready": true,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 8.593,
+          "master": 13.108,
+          "mix": 11.152,
+          "mono": 8.608,
+          "total": 42.389
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 15,
+        "culprit": "mono",
+        "elapsed_ms": 4254.11,
+        "quality_tier": "normal",
+        "render_ratio": 0.0155,
+        "sampler_cache": {
+          "chord_cache_bytes": 66150000,
+          "chord_cache_entries": 60,
+          "chord_sampler_note_cache_entries": 112,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 2
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 1,
+          "current_section_bars": 16,
+          "next_bar_index": 4,
+          "next_section_ready": true,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 10.829,
+          "master": 12.149,
+          "mix": 10.701,
+          "mono": 18.217,
+          "total": 53.094
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 16,
+        "culprit": "mono",
+        "elapsed_ms": 7560.6,
+        "quality_tier": "normal",
+        "render_ratio": 0.0154,
+        "sampler_cache": {
+          "chord_cache_bytes": 66502800,
+          "chord_cache_entries": 60,
+          "chord_sampler_note_cache_entries": 116,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 0
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 2,
+          "current_section_bars": 16,
+          "next_bar_index": 5,
+          "next_section_ready": true,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 9.641,
+          "master": 11.687,
+          "mix": 10.706,
+          "mono": 19.714,
+          "total": 52.821
+        }
+      },
+      {
+        "bar_seconds": 3.4286,
+        "chunk": 17,
+        "culprit": "mono",
+        "elapsed_ms": 11084.73,
+        "quality_tier": "normal",
+        "render_ratio": 0.014,
+        "sampler_cache": {
+          "chord_cache_bytes": 66591000,
+          "chord_cache_entries": 60,
+          "chord_sampler_note_cache_entries": 118,
+          "chord_sampler_note_cache_maxsize": 256,
+          "chord_sampler_random_start": false,
+          "chord_sampler_shimmer": false
+        },
+        "sampler_cache_delta": {
+          "chord_cache_entries": 0
+        },
+        "scheduler": {
+          "arranged_song_iteration": 0,
+          "arrangement_role_hint": "",
+          "bars_played_this_section": 3,
+          "current_section_bars": 16,
+          "next_bar_index": 6,
+          "next_section_ready": true,
+          "pending_emotion_set": false,
+          "pending_root_set": false,
+          "section_index": 0
+        },
+        "stages_ms": {
+          "chords": 1.677,
+          "master": 15.837,
+          "mix": 15.399,
+          "mono": 11.858,
+          "total": 47.941
+        }
+      }
+    ],
+    "stage_summary": {
+      "bars_profiled": 11,
+      "chord_cache_delta_max": 2,
+      "culprit_counts": {
+        "master": 6,
+        "mono": 5
+      },
+      "dominant_culprit": "master",
+      "dominant_stage": "master",
+      "near_budget_bars": 0,
+      "over_budget_bars": 0,
+      "render_ratio_max": 0.0574,
+      "render_ratio_mean": 0.0181,
+      "render_ratio_p95": 0.0413,
+      "render_ratio_p99": 0.0542,
+      "spike_bars": 0,
+      "stage_max_ms": {
+        "chords": 17.524,
+        "master": 57.473,
+        "mix": 50.464,
+        "mono": 38.421
+      },
+      "stage_mean_ms": {
+        "chords": 6.017,
+        "master": 23.2,
+        "mix": 16.814,
+        "mono": 10.756
+      },
+      "stage_p95_ms": {
+        "chords": 16.291,
+        "master": 53.419,
+        "mix": 38.917,
+        "mono": 29.067
+      },
+      "stage_p99_ms": {
+        "chords": 17.277,
+        "master": 56.662,
+        "mix": 48.155,
+        "mono": 36.55
+      },
+      "total_max_ms": 196.822,
+      "total_mean_ms": 61.98,
+      "total_p95_ms": 141.728,
+      "total_p99_ms": 185.803
+    }
+  },
+  "thresholds": {
+    "SYS_BENCH_MAX_OVER_BUDGET_BARS": 999,
+    "SYS_BENCH_MAX_RENDER_RATIO": 5.0,
+    "SYS_BENCH_MAX_SECTION_MS": 300000.0,
+    "SYS_BENCH_MAX_SONG_MS": 600000.0,
+    "SYS_BENCH_MAX_UNDERRUNS": 999,
+    "SYS_BENCH_MIN_PROFILED_BARS": 1
+  },
+  "timestamp_utc": "2026-09-18T14:37:45.546264+00:00",
+  "underrun_gate": {
+    "failures": [],
+    "ok": true
+  }
+}

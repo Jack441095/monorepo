@@ -1,0 +1,2616 @@
+{
+  "filters": {
+    "action": null,
+    "duplicate_only": false,
+    "family": "Kick",
+    "form": null,
+    "has_measurement": [],
+    "max_measurements": {},
+    "min_measurements": {},
+    "predicted_label": null
+  },
+  "generated_at": "2026-09-12T17:02:11Z",
+  "index": {
+    "n_records": 6980,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/unified_evidence_index_testing_v1.jsonl"
+  },
+  "method_version": "unified_evidence_search_v1",
+  "n_input": 6980,
+  "n_matched": 25,
+  "query": {
+    "normalized": "bd",
+    "resolved_terms": [
+      "kick"
+    ],
+    "terms": [
+      "kick"
+    ],
+    "text": "BD"
+  },
+  "record_type": "slo_unified_evidence_search_results",
+  "results": [
+    {
+      "attributes": {},
+      "content_id": "sha256:627633180994a59bde6d9f6794d528567c0570fd28f8413b5d31c18f3270220b",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_A_02.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            111
+          ]
+        },
+        "extension": ".wav",
+        "filename": "Diamaudix_Audio_PAS_IV_Kick_A_02.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.61426,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.700 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_A_02.wav"
+        },
+        "size_bytes": 109538
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_A_02.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:9f73a42f6ebf4a601944a284c9a4543668afd90cddd4658dc0ad4709d5163b39",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_Ab_01.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            112
+          ]
+        },
+        "extension": ".wav",
+        "filename": "Diamaudix_Audio_PAS_IV_Kick_Ab_01.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.443837,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.377 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_Ab_01.wav"
+        },
+        "size_bytes": 109538
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_Ab_01.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:c5939053f8871e87c873af5c6e6f1a65b34014662a125fd9de8641cfee3f2d4f",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_F#_01.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            113
+          ]
+        },
+        "extension": ".wav",
+        "filename": "Diamaudix_Audio_PAS_IV_Kick_F#_01.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.522637,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.548 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_F#_01.wav"
+        },
+        "size_bytes": 164282
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Kick_F#_01.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:751d5c8e449a41efe3affd3b499d066bc9a19a313945cf09a7e419dc260fa38e",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            206
+          ]
+        },
+        "extension": ".wav",
+        "filename": "24 KICK 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.455838,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.582 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 1.wav"
+        },
+        "size_bytes": 126404
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:93c39b55e8396514be0234dc0ff5928125c7957775380d8167ff6ccd182a7381",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            207
+          ]
+        },
+        "extension": ".wav",
+        "filename": "24 KICK 2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.227177,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.195 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 2.wav"
+        },
+        "size_bytes": 123496
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 2.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:5203982cd6ea6ad48c5d12e386b7db60c60f585b04efd622a69c3e4ce6101851",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 3.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            208
+          ]
+        },
+        "extension": ".wav",
+        "filename": "24 KICK 3.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.42067,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.454 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 3.wav"
+        },
+        "size_bytes": 125404
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/24 KICK 3.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:3de709aaaf924b0a27ddb556ee1c8ea0cb8069278e33eaac956e33418bb34951",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 KICK 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            214
+          ]
+        },
+        "extension": ".wav",
+        "filename": "29 KICK 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.45373,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.587 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 KICK 1.wav"
+        },
+        "size_bytes": 126376
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 KICK 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:1689083fbca3bf397852daed81a4763189d80dfe1272b24cea9d0e0a136652a3",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 KICK 2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            215
+          ]
+        },
+        "extension": ".wav",
+        "filename": "29 KICK 2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.25074,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.217 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 KICK 2.wav"
+        },
+        "size_bytes": 124088
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/85 BPM/Chops/29 KICK 2.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:95f2d6a5fc8edd52bbae27d1082bd4654a9cf28e175304a7c42ef0f2ce01279b",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/90 BPM/monosole_90bpm_kick 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            279
+          ]
+        },
+        "extension": ".wav",
+        "filename": "monosole_90bpm_kick 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.496715,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.575 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/90 BPM/monosole_90bpm_kick 1.wav"
+        },
+        "size_bytes": 118808
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/90 BPM/monosole_90bpm_kick 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:30b91a3e061b5fe612515132a74c24bb1cb4b6b47419895533d63da89cb6db89",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/85 BPM/Chops/85BPM_3 KICK 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            358
+          ]
+        },
+        "extension": ".wav",
+        "filename": "85BPM_3 KICK 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.267131,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.255 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/85 BPM/Chops/85BPM_3 KICK 1.wav"
+        },
+        "size_bytes": 61756
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/85 BPM/Chops/85BPM_3 KICK 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:9cfb2333255bc4cd31489ef3d90735b3ad85d881de737d969e7abc1460592eb1",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": true,
+        "prediction_present": true
+      },
+      "measurements": {
+        "attack_ms": {
+          "method": "physics_v1_1",
+          "unit": "milliseconds",
+          "valid": true,
+          "value": 560.0
+        },
+        "attack_to_tail_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.1406787782907486
+        },
+        "beating_depth": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.29308968782424927
+        },
+        "beating_rate_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 1.3888888359069824
+        },
+        "decay_seconds": {
+          "method": "physics_v1_1",
+          "unit": "seconds",
+          "valid": true,
+          "value": 0.10400000214576721
+        },
+        "fundamental_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 0.0
+        },
+        "glide_within_100ms_cents": {
+          "method": "physics_v1_1",
+          "unit": "cents",
+          "valid": true,
+          "value": 0.0
+        },
+        "harmonic_density": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 24.0
+        },
+        "harmonic_spacing_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 46.875
+        },
+        "harmonicity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.3333333432674408
+        },
+        "high_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.028687892481684685
+        },
+        "inharmonicity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.09351851791143417
+        },
+        "low_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.9418700337409973
+        },
+        "mid_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.016574272885918617
+        },
+        "mid_side_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.0
+        },
+        "noise_tonal_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.05006144940853119
+        },
+        "onset_density": {
+          "method": "physics_v1_1",
+          "unit": "events_per_second",
+          "valid": true,
+          "value": 4.212928295135498
+        },
+        "partial_count": {
+          "method": "physics_v1_1",
+          "unit": "count",
+          "valid": true,
+          "value": 6.0
+        },
+        "phase_correlation": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 1.0
+        },
+        "pitch_confidence": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.0
+        },
+        "pitch_drop_cents": {
+          "method": "physics_v1_1",
+          "unit": "cents",
+          "valid": true,
+          "value": 0.0
+        },
+        "pitch_drop_rate_cps": {
+          "method": "physics_v1_1",
+          "unit": "cents_per_second",
+          "valid": true,
+          "value": 0.0
+        },
+        "rhythmic_autocorr": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.6160058975219727
+        },
+        "sideband_energy": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.8909892439842224
+        },
+        "spectral_centroid": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 4039.30419921875
+        },
+        "spectral_flatness": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.05006144940853119
+        },
+        "spectral_flux": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 237.8606414794922
+        },
+        "spectral_purity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.2976829707622528
+        },
+        "stereo_width": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.0
+        },
+        "sub_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.012867823243141174
+        },
+        "sustain_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.19213257730007172
+        },
+        "transient_strength": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 13.66586685180664
+        }
+      },
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/85 BPM/Chops/85BPM_3 KICK 2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            359
+          ]
+        },
+        "extension": ".wav",
+        "filename": "85BPM_3 KICK 2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.246271,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.223 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/85 BPM/Chops/85BPM_3 KICK 2.wav",
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/85 BPM/Chops/85BPM_3 KICK 2.wav"
+        },
+        "size_bytes": 125796
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": "physics_v1_1"
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/85 BPM/Chops/85BPM_3 KICK 2.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:26c72d2c2d7158f0c7f48c13e95bcb5d74931ec502ed04b1a801f78c0312293b",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            714
+          ]
+        },
+        "extension": ".wav",
+        "filename": "FOCUS KICK 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.234493,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.192 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 1.wav"
+        },
+        "size_bytes": 331484
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:4f5f4c6c9c32695b7e7ab5a08471cbec2ab8cebf62a78635ddcb0dcfb4dbbddc",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            715
+          ]
+        },
+        "extension": ".wav",
+        "filename": "FOCUS KICK 2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.204502,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.173 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 2.wav"
+        },
+        "size_bytes": 334540
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 2.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:05580c49eda58f04d356946fd5608ff306f8b20c235d89feed0b2044d83eee2c",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 3.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            716
+          ]
+        },
+        "extension": ".wav",
+        "filename": "FOCUS KICK 3.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.176889,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.134 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 3.wav"
+        },
+        "size_bytes": 162084
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/FOCUS KICK 3.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:43e91b3f8f8d369ab2d106e3b5d4bdee5a929903aa497d8b5fdc3a1205611f87",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/RUSH KICK 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            719
+          ]
+        },
+        "extension": ".wav",
+        "filename": "RUSH KICK 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.101376,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.083 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/RUSH KICK 1.wav"
+        },
+        "size_bytes": 126308
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/RUSH KICK 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:fcdf62fbcd8117917d9cd0ce1d85c656df6e529e1c315adad0bb0005833dced9",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE HAT & KICK 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            722
+          ]
+        },
+        "extension": ".wav",
+        "filename": "WHITE HAT & KICK 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.272421,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.248 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE HAT & KICK 1.wav"
+        },
+        "size_bytes": 236796
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE HAT & KICK 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:84010e72094d14b375fc79ef632cb9cad5999f1882aff7d50e12aa861ffc45e3",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE HAT & KICK 2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            723
+          ]
+        },
+        "extension": ".wav",
+        "filename": "WHITE HAT & KICK 2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.148892,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.125 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE HAT & KICK 2.wav"
+        },
+        "size_bytes": 118348
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE HAT & KICK 2.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:c4f7ad6407ee0a4e735db3853925ec29506394930ee8f69cd88a40b541aaaeba",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            724
+          ]
+        },
+        "extension": ".wav",
+        "filename": "WHITE KICK 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.216867,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.180 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1.wav"
+        },
+        "size_bytes": 249708
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:2126d3e19bcb28b7171eb83f77248d32e3f7b92fb4549cc1997c06e2f2891afa",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1_2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            725
+          ]
+        },
+        "extension": ".wav",
+        "filename": "WHITE KICK 1_2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.216173,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.163 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1_2.wav"
+        },
+        "size_bytes": 249708
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1_2.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:53fcbce221f577e3c3c8e117d359570bca8b80355c0cdee86851fd6e24d4af99",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1_3.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            726
+          ]
+        },
+        "extension": ".wav",
+        "filename": "WHITE KICK 1_3.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.393122,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.440 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1_3.wav"
+        },
+        "size_bytes": 249708
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 1_3.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:5b9048aab868043225d8b2ee764a10c2091652f3de9c6204e59b5ced9a94ff13",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": true,
+        "prediction_present": true
+      },
+      "measurements": {
+        "attack_ms": {
+          "method": "physics_v1_1",
+          "unit": "milliseconds",
+          "valid": true,
+          "value": 0.0
+        },
+        "attack_to_tail_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 5.698793411254883
+        },
+        "beating_depth": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.3173634707927704
+        },
+        "beating_rate_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 1.4044944047927856
+        },
+        "decay_seconds": {
+          "method": "physics_v1_1",
+          "unit": "seconds",
+          "valid": true,
+          "value": 0.10400000214576721
+        },
+        "fundamental_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 25.0
+        },
+        "glide_within_100ms_cents": {
+          "method": "physics_v1_1",
+          "unit": "cents",
+          "valid": true,
+          "value": 0.0
+        },
+        "harmonic_density": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 28.44444465637207
+        },
+        "harmonic_spacing_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 31.25
+        },
+        "harmonicity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.9166666865348816
+        },
+        "high_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.001617233850993216
+        },
+        "inharmonicity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.025689642876386642
+        },
+        "low_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.7155062556266785
+        },
+        "mid_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.043521467596292496
+        },
+        "mid_side_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.4571911692619324
+        },
+        "noise_tonal_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.0018463700544089079
+        },
+        "onset_density": {
+          "method": "physics_v1_1",
+          "unit": "events_per_second",
+          "valid": true,
+          "value": 9.897052764892578
+        },
+        "partial_count": {
+          "method": "physics_v1_1",
+          "unit": "count",
+          "valid": true,
+          "value": 12.0
+        },
+        "phase_correlation": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.7413049936294556
+        },
+        "pitch_confidence": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.010000001639127731
+        },
+        "pitch_drop_cents": {
+          "method": "physics_v1_1",
+          "unit": "cents",
+          "valid": true,
+          "value": 70.0
+        },
+        "pitch_drop_rate_cps": {
+          "method": "physics_v1_1",
+          "unit": "cents_per_second",
+          "valid": true,
+          "value": 145.8333282470703
+        },
+        "rhythmic_autocorr": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.20867818593978882
+        },
+        "sideband_energy": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.4259668290615082
+        },
+        "spectral_centroid": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 2371.745361328125
+        },
+        "spectral_flatness": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.0018463700544089079
+        },
+        "spectral_flux": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 21.831710815429688
+        },
+        "spectral_purity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.015910539776086807
+        },
+        "stereo_width": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.31374824047088623
+        },
+        "sub_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.23935504257678986
+        },
+        "sustain_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.08349372446537018
+        },
+        "transient_strength": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 4.396585464477539
+        }
+      },
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            727
+          ]
+        },
+        "extension": ".wav",
+        "filename": "WHITE KICK 2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.238563,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.214 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 2.wav",
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 2.wav"
+        },
+        "size_bytes": 124804
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": "physics_v1_1"
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 2.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:12ac021b27c8087330ec17ebefadcd1aaa70b2f20efa6d7fe6c72d4c287e6d72",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": true,
+        "prediction_present": true
+      },
+      "measurements": {
+        "attack_ms": {
+          "method": "physics_v1_1",
+          "unit": "milliseconds",
+          "valid": true,
+          "value": 0.0
+        },
+        "attack_to_tail_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 4.3344855308532715
+        },
+        "beating_depth": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.3157781660556793
+        },
+        "beating_rate_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 1.4044944047927856
+        },
+        "decay_seconds": {
+          "method": "physics_v1_1",
+          "unit": "seconds",
+          "valid": true,
+          "value": 0.10400000214576721
+        },
+        "fundamental_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 25.0
+        },
+        "glide_within_100ms_cents": {
+          "method": "physics_v1_1",
+          "unit": "cents",
+          "valid": true,
+          "value": 0.0
+        },
+        "harmonic_density": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 21.63380241394043
+        },
+        "harmonic_spacing_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 39.0625
+        },
+        "harmonicity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.9166666865348816
+        },
+        "high_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.014361369423568249
+        },
+        "inharmonicity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.026157712563872337
+        },
+        "low_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.6968992352485657
+        },
+        "mid_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.046104609966278076
+        },
+        "mid_side_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.43517595529556274
+        },
+        "noise_tonal_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.018057573586702347
+        },
+        "onset_density": {
+          "method": "physics_v1_1",
+          "unit": "events_per_second",
+          "valid": true,
+          "value": 2.8277294635772705
+        },
+        "partial_count": {
+          "method": "physics_v1_1",
+          "unit": "count",
+          "valid": true,
+          "value": 14.0
+        },
+        "phase_correlation": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.7763847708702087
+        },
+        "pitch_confidence": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.009999999776482582
+        },
+        "pitch_drop_cents": {
+          "method": "physics_v1_1",
+          "unit": "cents",
+          "valid": true,
+          "value": 70.0
+        },
+        "pitch_drop_rate_cps": {
+          "method": "physics_v1_1",
+          "unit": "cents_per_second",
+          "valid": true,
+          "value": 291.6666564941406
+        },
+        "rhythmic_autocorr": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.07198712229728699
+        },
+        "sideband_energy": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.42661967873573303
+        },
+        "spectral_centroid": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 3629.57080078125
+        },
+        "spectral_flatness": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.018057573586702347
+        },
+        "spectral_flux": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 49.63444900512695
+        },
+        "spectral_purity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.01508762314915657
+        },
+        "stereo_width": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.30322131514549255
+        },
+        "sub_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.2426348775625229
+        },
+        "sustain_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.09772668778896332
+        },
+        "transient_strength": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 13.66249942779541
+        }
+      },
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 3.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            728
+          ]
+        },
+        "extension": ".wav",
+        "filename": "WHITE KICK 3.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.155042,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.129 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 3.wav",
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 3.wav"
+        },
+        "size_bytes": 124804
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": "physics_v1_1"
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 3.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:4b303e7fc80da2fd6ed1c14db714c046492f3c94f4c266aa3a25d99063f6e56a",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 3_2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            729
+          ]
+        },
+        "extension": ".wav",
+        "filename": "WHITE KICK 3_2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.159342,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.115 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 3_2.wav"
+        },
+        "size_bytes": 249708
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 3_2.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:26a090786632a1dbc50d8ab9091a2d46b332b9e7e9949442f0940d70fd80d044",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": true,
+        "prediction_present": true
+      },
+      "measurements": {
+        "attack_ms": {
+          "method": "physics_v1_1",
+          "unit": "milliseconds",
+          "valid": true,
+          "value": 688.0
+        },
+        "attack_to_tail_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 1.1621322631835938
+        },
+        "beating_depth": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.05084548145532608
+        },
+        "beating_rate_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 2.931323289871216
+        },
+        "decay_seconds": {
+          "method": "physics_v1_1",
+          "unit": "seconds",
+          "valid": true,
+          "value": 0.0560000017285347
+        },
+        "fundamental_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 0.0
+        },
+        "glide_within_100ms_cents": {
+          "method": "physics_v1_1",
+          "unit": "cents",
+          "valid": true,
+          "value": 0.0
+        },
+        "harmonic_density": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 24.380952835083008
+        },
+        "harmonic_spacing_hz": {
+          "method": "physics_v1_1",
+          "unit": "Hz",
+          "valid": true,
+          "value": 54.6875
+        },
+        "harmonicity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.5
+        },
+        "high_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.04608917608857155
+        },
+        "inharmonicity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.07573412358760834
+        },
+        "low_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.8722374439239502
+        },
+        "mid_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.05153344199061394
+        },
+        "mid_side_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.17531569302082062
+        },
+        "noise_tonal_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.036305904388427734
+        },
+        "onset_density": {
+          "method": "physics_v1_1",
+          "unit": "events_per_second",
+          "valid": true,
+          "value": 5.657412052154541
+        },
+        "partial_count": {
+          "method": "physics_v1_1",
+          "unit": "count",
+          "valid": true,
+          "value": 14.0
+        },
+        "phase_correlation": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.9440411925315857
+        },
+        "pitch_confidence": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.0
+        },
+        "pitch_drop_cents": {
+          "method": "physics_v1_1",
+          "unit": "cents",
+          "valid": true,
+          "value": 0.0
+        },
+        "pitch_drop_rate_cps": {
+          "method": "physics_v1_1",
+          "unit": "cents_per_second",
+          "valid": true,
+          "value": 0.0
+        },
+        "rhythmic_autocorr": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.4469996690750122
+        },
+        "sideband_energy": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.9870355129241943
+        },
+        "spectral_centroid": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 4803.65576171875
+        },
+        "spectral_flatness": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.036305904388427734
+        },
+        "spectral_flux": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 116.29083251953125
+        },
+        "spectral_purity": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.1575484424829483
+        },
+        "stereo_width": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.14916476607322693
+        },
+        "sub_energy_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.030139939859509468
+        },
+        "sustain_ratio": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 0.16312937438488007
+        },
+        "transient_strength": {
+          "method": "physics_v1_1",
+          "unit": "ratio",
+          "valid": true,
+          "value": 15.634459495544434
+        }
+      },
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL KICK 1.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            791
+          ]
+        },
+        "extension": ".wav",
+        "filename": "CRYSTAL KICK 1.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.412823,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.463 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL KICK 1.wav",
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL KICK 1.wav"
+        },
+        "size_bytes": 1683916
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": "physics_v1_1"
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL KICK 1.wav"
+    },
+    {
+      "attributes": {},
+      "content_id": "sha256:36d43395d624018adf0f4643ec2417cb43584783a43166bed265292e3c05f85b",
+      "duplicate_group": "",
+      "family": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "form": {
+        "alternatives": [],
+        "confidence": 0.0,
+        "source": "unknown",
+        "state": "unknown",
+        "value": "unknown"
+      },
+      "identity": {
+        "alternatives": [],
+        "confidence": 0.97,
+        "source": "trusted_filename_override",
+        "state": "predicted",
+        "value": "Kick"
+      },
+      "legacy": {
+        "acoustic_measurements_present": false,
+        "prediction_present": true
+      },
+      "measurements": {},
+      "metadata": {
+        "aliases": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL KICK 1_2.wav"
+        ],
+        "embedding": {
+          "cache": {
+            "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+            "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401"
+          },
+          "dimensions": 2048,
+          "model_version": "candidate_embeddings_testing_v1",
+          "row_indices": [
+            792
+          ]
+        },
+        "extension": ".wav",
+        "filename": "CRYSTAL KICK 1_2.wav",
+        "prediction": {
+          "accepted_at_calibrated_95": false,
+          "action": "review",
+          "confidence": 0.97,
+          "full_taxonomy_similarity": 0.135807,
+          "fusion_reason": "filename class 'Kick' overrides audio confidence 0.112 below 0.70",
+          "label": "Kick",
+          "source": "trusted_filename_override"
+        },
+        "provenance": {
+          "acoustic_path": null,
+          "identity_manifest": "complete_file_sha256",
+          "prediction_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL KICK 1_2.wav"
+        },
+        "size_bytes": 241564
+      },
+      "model_versions": {
+        "embedding": "candidate_embeddings_testing_v1",
+        "evidence_index": "unified_evidence_index_v1",
+        "physics": ""
+      },
+      "record_type": "slo_audio_evidence_record",
+      "schema_version": "1.0.0",
+      "source_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL KICK 1_2.wav"
+    }
+  ],
+  "safety": {
+    "decisions_changed": false,
+    "metadata_written": false,
+    "read_only": true,
+    "rename_actions": false,
+    "semantic_labels_created": false,
+    "similarity_is_not_class_probability": true,
+    "source_audio_modified": false,
+    "unknown_values_filled": false
+  },
+  "schema_version": "1.0.0"
+}

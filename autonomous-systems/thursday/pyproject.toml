@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thursday"
+version = "0.1.0"
+description = "Thursday — the AI business orchestrator for NITE DSP / Audio_Too. Mid-extraction into a standalone repo; see docs/EXTRACTION_COUPLING.md."
+requires-python = ">=3.11"
+readme = "README.md"
+
+# Deliberately no install_requires here: `import thursday` itself (the
+# session/intent/resolver/formatter/errors core) is pure standard library,
+# verified by walking every import in that path. Individual features pull in
+# extras lazily at call time (numpy, onnxruntime, httpx, PyYAML, faster-
+# whisper, kokoro-onnx, sounddevice, soundfile, psutil, and audio_too/nite_ai
+# themselves for the real cross-repo integration points) -- see
+# docs/EXTRACTION_COUPLING.md for what's deferred and why. Adding a blanket
+# dependency list here would overstate what standalone `pip install -e .`
+# actually needs and understate what's still coupled to Audio_Too.
+
+[tool.setuptools.packages.find]
+include = ["thursday*"]

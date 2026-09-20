@@ -1,0 +1,3546 @@
+{
+  "record_type": "slo_rename_approval_gate_audit",
+  "schema_version": "1.0.0",
+  "method_version": "rename_approval_gate_v1",
+  "source_plan": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/full_taxonomy_v3_suggest_rename_plan_testing_v2.jsonl",
+  "source_plan_sha256": "fc2dc7aba7783731a0e932aa00d0b2be763bbe01377854bb357d91099abc5d12",
+  "duplicate_guard": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_rename_duplicate_guard_testing_v1.json",
+  "qualified_classes": [],
+  "n_candidate_rows": 386,
+  "counts": {
+    "blocked": 386,
+    "suggestion_requires_explicit_approval": 386,
+    "exact_duplicate_canonical": 13,
+    "exact_duplicate_alias": 16,
+    "acoustic_near_duplicate": 11
+  },
+  "qualification_summary": {
+    "suggestion_rows": 386,
+    "duplicate_blocked_rows": 30,
+    "suggestion_rows_without_duplicate_flags": 356,
+    "ready_for_explicit_approval": 0
+  },
+  "rows": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Shaker_Loop_1_Percussion_Bendji_Allonce_120_loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Perc_Loop_01_118bpm.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/103 BPM/103BPM_4.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Edison Breaks/So Fresh So Clean.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/Josche.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/CHINA SOUL_2.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/SYMPH.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/ALEXIA.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/CANADIA.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/CHINA 80.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_100_perc_loop_power_stance.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_110_perc_loop_ladies_night.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_110_perc_loop_ladies_night_no_hats.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_120_perc_loop_perfect_storm.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_120_perc_loop_perfect_storm_no_hats.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_77_perc_loop_romantics.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_77_perc_loop_romantics_no_hats.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_85_perc_loop_glitterball.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_85_perc_loop_glitterball_no_hats.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_95_perc_loop_dirty_dancers.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_95_perc_loop_dirty_dancers_no_hats.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_11_Percussion_Daniel_Sadownick_137__loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_26_Percussion_Daniel_Sadownick_135__loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_7_Percussion_Daniel_Sadownick_120__loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel deSimone - Experimental Percussion/splice-export__daniel-desimone-experimental-percussion_edited/loop/Percussion/RT_Experimental_Percussion_Percussion_Loop_4_Percussion_Daniel_deSimon_85_loop.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Percussion Loop) Don't Be Hating 140bpm.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Percussion Loop) Everywhere Percs 140bpm.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon August 2024 Samples/Stab Sequel D#harmm.wav",
+      "action": "suggest",
+      "label": "Bass Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples 2/Modular Hardware Pack 001/Raw/VCO2 + TRIPTYCH (Long) 2.wav",
+      "action": "suggest",
+      "label": "Bass Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #1 [65BPM] (G#).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #10 [65BPM] (E).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #11 [65BPM] (G#).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #12 [65BPM] (A).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #13 [65BPM] (F).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #14 [65BPM] (D).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #2 [65BPM] (A#).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #3 [65BPM] (F#).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #4 [65BPM] (A).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #5 [65BPM] (E).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #6 [65BPM] (F#).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #8 [65BPM] (E).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #9 [65BPM] (F#).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Clave Loop #1 [65BPM].wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Clave Loop #2 [65BPM].wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_808 Cym (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_China Cym.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_Crash Cym (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_Crash Cym (2).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_Crash Cym (3).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_Crash Cym (4).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (OG Versions)/OGSTEM_DR5 Bones #7 [72 BPM] (E).wav",
+      "action": "suggest",
+      "label": "Bass Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Long + Med/Open Hat-5.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Long + Med/Open Hat.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Short/Loose Hat-1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Short/Open Hat-1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Short/Open Hat-3.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/CRASH_FT.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/808 21.WAV",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/LEFTRIGHT/CRASH.WAV",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/CRASH.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/CRASH1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/CRASHNEW.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NewFinishesA/CRASH1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NewFinishesA/R!SPLASH.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 21.WAV",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Xero Current/CRASH.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Xero Current/R!SPLASH.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/China StudioGong.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Airborne Samples/China DubRemix.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Airborne Samples/China Krypt.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V108 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V117 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V127 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V24 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V40 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V54 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V65 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V77 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V88 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V98 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/China StudioGong.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bottles Samples/808 21.WAV",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Crash Slinger.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Crash Slinger.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Crash 808 2.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Crash 808X.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Crash Generator.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Crash LowDown.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Crash PopRnB.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Crash Handy.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Crash TapedOver.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/China Central V4.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Crash Argon 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Crash ElektroAc.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Crash Motherboard.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Crash Handy.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Crash TapedOver.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Killing Fields Samples/Crash FiberOptic.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Killing Fields Samples/Crash UpInSmoke.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Recharged Samples/Crash SinisterEights.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Ride Or Die Samples/Crash AR60sLate V127 3.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Slammie Samples/Crash 70sDnB.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Slammie Samples/Crash CouldWork.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Swingy One Samples/Crash AR60sLate V127 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Swingy One Samples/Crash AR70sOpen V127 3.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Swingy One Samples/Crash AllOver.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Thumper Samples/Crash Gold 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Thumper Samples/Crash Gold 2.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Thumper Samples/Crash Gold 3.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Crash Handy.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Crash TapedOver.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 2 Samples/China Monolith A.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 2 Samples/Crash Argon 1.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/4 - Hats/Hi-Hat - Junk Splash.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/5 - Deep Textures/Texture - Bowed Cymbal High.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/5 - Deep Textures/Texture - Bowed Cymbal Low.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/1 - Loops/5 - Glitch FX - 172 BPM/SFX - Infra Data 2 - 172 BPM.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/5 - Hats & Cymbals/Hi Hat - Wind.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/2 Open Hats/Organic - O.HiHat_(9).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/2 Open Hats/Organic - O.HiHat_A (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/2 Open Hats/Organic - O.HiHat_E (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/2 Open Hats/Organic - O.HiHat_G (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/2 Open Hats/Organic - O.HiHat_I (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (10).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (11).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (12).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (13).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (14).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (15).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (16).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (17).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (18).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (19).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (2).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (20).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (3).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (4).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (5).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (6).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (7).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (8).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (9).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (10).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (11).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (12).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (13).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (14).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (15).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (16).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (17).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (18).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (19).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (2).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (20).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (21).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (22).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (23).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (24).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (25).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (26).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (27).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (28).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (29).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (3).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (30).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (31).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (32).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (33).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (34).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (35).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (36).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (37).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (4).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (5).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (6).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (7).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (8).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (9).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Cajon Rythm LP - 94 BPM (A).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Cajon Rythm LP - 94 BPM (B).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Perc LP- 100 BPM (2).wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Perc LP- 93 BPM (4)A.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Perc LP- 93 BPM (4)B.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Perc LP- 93 BPM (4)C.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Shaker LP - 100 BPM (1).wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Shaker LP - 89 BPM.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Shaker LP - 93 BPM (2).wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Coast2coast Kit Samples/Organic - Cymbal (2).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Deep Impact Kit Samples/Organic - Cymbal (6).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Demolition Kit Samples/Organic - Cymbal (23).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Dirty Doz-it Kit Samples/Organic - Cymbal (20).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Dirty Doz-it Kit Samples/Organic - O.HiHat_G (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Domination Kit Samples/Organic - Cymbal (12).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Domination Kit Samples/Organic - Cymbal (33).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Domination Kit Samples/Organic - O.HiHat_(8).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Earthquake Kit Samples/Organic - Cymbal (11).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Ethnic Stomp Kit Samples/Organic - Cymbal (34).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Grungy Kit Samples/Organic - Cymbal (12).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Head Trauma Kit Samples/Organic - Cymbal (33).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Head Trauma Kit Samples/Organic - O.HiHat_A (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_canonical",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Imagination Kit Samples/Organic - Cymbal (25).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Imperial Kit Samples/Organic - Cymbal (4).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Imperial Kit Samples/Organic - O.HiHat_(5).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Juggernaut Kit Samples/Organic - Cymbal (13).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Jungle Thump Kit Samples/Organic - Cymbal (5).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Motivation Kit Samples/Organic - Cymbal (21).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Neptune Kit Samples/Organic - Cymbal (17).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/New Age Kit 1 Samples/Organic - Cymbal (2).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/New Age Kit 2 Samples/Organic - Cymbal (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Stadium Kit Samples/Organic - Cymbal (11).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Stadium Kit Samples/Organic - O.HiHat_A (1).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Studio Kit Samples/Organic - Cymbal (6).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Sun Tzu Kit Samples/Organic - Cymbal (15).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Sun Tzu Kit Samples/Organic - Zill Finger Cymbal (13).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Sun Tzu Kit Samples/Organic - Zill Finger Cymbal (14).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Sun Tzu Kit Samples/Organic - Zill Finger Cymbal (17).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/That Knock Kit Samples/Organic - Cymbal (12).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval",
+        "exact_duplicate_alias",
+        "acoustic_near_duplicate"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Vintage Kit Samples/Organic - Cymbal (3).wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_desert/JVIEWS_desert_one_shots/JVIEWS_quiet_deep_crash.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_studio/JVIEWS_studio_one_shots/JVIEWS_analog_machine_drum_noise_crash.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_01.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_02.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_03.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_04.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_05.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_06.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_07.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_08.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_09.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_10.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_11.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_crash_12.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_open_hat_02_full_open.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_open_hat_03_full_open.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Acoustic_Drums/Hi-Hat/kshmr_acoustic_open_hat_17_roll_and_close.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_01.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_02.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_03.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_04.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_05.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_06.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_07.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_08.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_09.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_10.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_11.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_12.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_13.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_14.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_15.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_16.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_17_Long.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_18_Drum_Machine.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_19_Drum_Machine.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_20_Drum_Machine.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_FX_01_Glitch_Out.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_FX_02_Tape_Stop.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Crash_FX_03_Tape_Stop.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Rides/KSHMR_Ride_06.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_01.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_02.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_03.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_04.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_05.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_06.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_07.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_08.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_09.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes/KSHMR_Orchestral_Crash_10.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_01.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_02.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_03.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_04.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_05.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_06.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_07.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_08.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_09.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_01.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_02.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_03.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_04.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_05.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_06.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_07.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_08_Ending_Deep.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_09_Ending_Light.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_10_Roll_Up.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Crash_Transitions/KSHMR_Orchestral_Crash_Transition_11_Small_Wash_and_Hit.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_01.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_02.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_03.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_04.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_05.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_06.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_07.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_08.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_10.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_11.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_12.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_13.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_14.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_15.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_16.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_17.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_18.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_19.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_20.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_21.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_22_Reverse_01.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_23_Reverse_02.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Transitions/KSHMR_Cymbal_Transitions/KSHMR_Cymbal_Transition_24_Reverse_03.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_02_90.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_03_92_Cuba.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_04_92_Cuba.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_05_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_07_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_08_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_09_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_10_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_11_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_12_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_13_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_14_100.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_16_105_Brazil.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_17_105_Brazil.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_19_110.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_20_112.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_21_112.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_22_115_Africa.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_23_115_Africa.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_24_115_Tribal.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_25_122.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_26_123.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_30_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_31_128_Momentum.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_32_128_Momentum.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_33_128_Momentum.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_34_128_Momentum.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_35_128_Momentum.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_36_128_Momentum.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_37_128_Momentum.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_38_130.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_39_136.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_40_140_Africa.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_41_140_Africa.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_42_140_Cuba.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_43_140_Tribal.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_44_140_Tribal.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_45_140_Triplet.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_46_140_Triplet.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_47_150.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_48_150.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_49_150.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_50_150.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_51_160.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Hihat_and_Cymbal_Loops/KSHMR_Cymbal_Loops/KSHMR_Cymbal_Loop_02_110_Hand_Cymbals.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_14_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_15_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_16_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_17_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_18_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_19_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_20_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_21_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_22_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_23_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_24_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_26_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_27_130.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Shaker_Loops/KSHMR_Shaker_Loop_28_140.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Tambourine_Loops/KSHMR_Tambourine_Loop_01_90.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Tambourine_Loops/KSHMR_Tambourine_Loop_07_110.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Tambourine_Loops/KSHMR_Tambourine_Loop_11_128.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_FX_Elements/KSHMR_Ambiance_and_Foley/KSHMR_Ambiance_Elemental/KSHMR_Water/KSHMR_Water_04_Splash.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/7SKIES/7SKIES_Shooting_Star_Crash.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/BASSJACKERS/BASSJACKERS_Crash_Cho.wav",
+      "action": "suggest",
+      "label": "Crash",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/CROSSNADERS/CROSSNADERS_Perc_Loop_Instinct_Killa_150.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/HARDWELL/HARDWELL_Shaker_Loop_128.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/LUIS_TORRES/LUIS_TORRES_Ride_Fall.wav",
+      "action": "suggest",
+      "label": "Hi-Hat Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_World_Sounds/KSHMR_India/KSHMR_India_PL_Sitar_and_Percussion_Loop_80_C#.wav",
+      "action": "suggest",
+      "label": "Percussion Loop",
+      "status": "blocked",
+      "reasons": [
+        "suggestion_requires_explicit_approval"
+      ]
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "plan_modified": false,
+    "approval_granted": false,
+    "source_audio_modified": false,
+    "rename_actions": false
+  }
+}

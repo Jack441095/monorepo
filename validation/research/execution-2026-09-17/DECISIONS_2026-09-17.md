@@ -1,0 +1,31 @@
+# OWNER DECISIONS — running log (started 2026-09-17)
+
+## D-01 · Payments provider: spike Polar in sandbox (APPROVED 2026-09-17)
+- Decision: evaluate Polar as Paddle alternative; Paddle stays as fallback.
+- Why: Merchant of Record (global VAT handled), free to start (5% + 50¢, same headline as Paddle), Next.js-native integration (`@polar-sh/nextjs`), sandbox for testing, license keys via benefits engine, signed webhooks (small redo of existing HMAC pattern in `backend/app/commerce.py`).
+- Considered: Lemon Squeezy (easiest, same price, but Stripe-acquisition future + surcharges), Gumroad (10% — too expensive), Stripe direct (not MoR — VAT burden on us), Creem (too new).
+- Next: sandbox spike — checkout route + webhook handler + license issuance + R-07-style live-fire (duplicate/replay/out-of-order). No prod keys, no real charges.
+- Status: SCAFFOLDED 2026-09-17 — commit `edbd5f4` on `exec/polar-spike` (stacks on `exec/cleanup-website`; merge website first): `backend/app/polar_provider.py` (provider + router, fail-closed verified, idempotent fulfill) + `website/lib/polar-checkout.ts` (tier-only client). Plan: `POLAR_SPIKE.md`. BLOCKED_ON_OWNER: sandbox token + product IDs + first-delivery header/event confirmation.
+
+## D-02 · KENN LLM default provider: flip openai → ollama (APPROVED 2026-09-17)
+- Change: `source/kenn/llm/llm_rewrite.py` default provider `"openai"` → `"ollama"` (loopback `http://127.0.0.1:11434/v1`).
+- Explicit env (`KENN_LLM_PROVIDER` / `AUDIO_TOO_LLM_PROVIDER`) still overrides; cloud use remains possible, just no longer the silent default.
+- Status: DONE 2026-09-17 — 1-file commit `3ca0035` on KENN branch `exec/I-T1-05-loopback` (never main, never pushed). Verified: clean-env default → provider `ollama`, base `http://127.0.0.1:11434/v1`; explicit `AUDIO_TOO_LLM_PROVIDER=openai` still overrides (cloud path preserved). Regression: 96 passed across test_llm_command_adapter + test_prompt_injection_boundaries + test_live_command. NOTE: HEAD-version code only reads `AUDIO_TOO_LLM_PROVIDER` (the `KENN_`-namespaced vars live in an uncommitted refactor on develop) — the flip must be carried onto that refactor at merge. Incident: first attempt committed onto develop via `--work-tree` misuse (swept staged docs renames, unpushed); repaired with `reset --mixed` + `read-tree` restoring exact pre-existing dirty state, then recommitted properly. develop verified back at 3c82fe9 with original status.
+- Follow-up: one-line UX disclosure that AI features run locally via Ollama.
+
+## D-03 · Canonical repo per product (PARTIAL 2026-09-17)
+- KENN→kenn-standalone CONFIRMED (stays standalone, owner).
+- Website: platform/website is the fuller copy (38 routes, Next 16.3.5, paraphrase/portfolio/services pages, touched today) vs root website/ (29 routes, Next 16.3.0, but TRACKED with today's commits 55c1e5a/7e7c0c9). platform/ is UNTRACKED (zero git history). Safe sequence: commit platform copy first, THEN remove old. Awaiting owner go on that sequence.
+- Thursday: NOT a duplicate — Audio_Too/thursday is the live deployment; autonomous-systems/thursday is a documented in-progress standalone extraction (README + EXTRACTION_COUPLING.md; `import thursday` standalone OK, service bridges still coupled). Keep both; no deletion. Finish extraction contract instead.
+- SLO: live products/slo (Nite-DSP/slo, engine edits today 01:40) is canonical; products-archive/slo frozen at 2026-09-12 (tools/benchmark outputs only), unreferenced from live code. Keep archive read-only (useful for R-01); no deletion.
+- Still open: Thursday final home (post-extraction), platform backend vs root backend, Audio_Too product-vs-private.
+
+## D-05 · Merges (APPROVED + EXECUTED 2026-09-17, owner: "you have permissions")
+- Monorepo `1a9674b` merge `exec/r07-webhook-tests` (new test file only) — verified 4 passed + 1 xfailed post-merge.
+- Monorepo `3a121fa` merge `exec/cleanup-website` (canonical website) — no conflicts; paraphrase route present post-merge. Follow-up remains: `npm run build:production`.
+- KENN `b8803e9` merge `exec/r-03-mixreview` into develop — 58/58 post-merge.
+- KENN flip: `exec/I-T1-05-loopback` NOT merged (collides with uncommitted KENN_-namespace refactor on same lines). Instead applied the identical 1-word flip to the refactored line in the working tree (uncommitted, verified ollama default). Branch kept as record; flip rides with the refactor's own commit.
+## D-04 · Big cleanup batch (APPROVED + EXECUTED 2026-09-17)
+- Website: canonical = platform copy. Commit `afc7312` on monorepo branch `exec/cleanup-website` (81 files, +3966/−511): root website/ replaced wholesale by platform/website content (38 routes, Next 16.3.5). Pre-verified: zero routes/files only-in-root; platform page.tsx strictly richer (+94 lines: metadata, WaitlistCounter, SEO). No secrets staged (`.env.local`/`.vercel`/`node_modules` ignored); junk (`test-results`, `tsbuildinfo`) excluded. Root `package.json` (`npm --prefix website`) keeps working — canonical dir stays `website/`. Diverged files (api.ts, commerce-config.ts, components, check-production-config.mjs) took platform versions — review the branch diff for regressions before merge. Follow-up: `npm run build:production` verification (needs npm install; skipped per no-install guardrail). NOTE: working tree on ops/mirror-and-notes still shows old website/; the new copy lives on the branch until merged.
+- Scaffolds (branch `exec/cleanup-scaffolds`, filesystem-only — paths were untracked): deleted monorepo products/kenn residue (`.ruff_cache` + `.runtime`: eval receipts, kenn.db — skeleton-only residue, real evidence in standalone KENN), `nite-submit-windows/` (empty), `nite-paraphrase/{engine,evals,tests}` (empty; parent dir kept), `nite-files/.build` (1.8M objects, useless without source). KEPT: nite-files `.dmg/.zip` artifacts (only distributables). Unreferenced verified: website `/products/kenn` hrefs are marketing routes, unrelated. One dangling pointer: `backend/app/config.py:131` comment references removed `products/nite-paraphrase/engine/` (file has in-progress dirty changes — owner to repoint to `backend/app/paraphrase.py`, not touched here).
+- Rollback: website via `git revert`/branch delete; scaffold deletions are live (caches/empties/objects only — nothing of value).

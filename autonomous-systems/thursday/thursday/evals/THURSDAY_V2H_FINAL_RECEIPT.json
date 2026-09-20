@@ -1,0 +1,37 @@
+{
+  "qualification": "THURSDAY_V2H_FINAL_RECEIPT",
+  "version": "thursday/v2h-autonomous-engineering",
+  "generated_at": 1787522851.787509,
+  "benchmark": {
+    "name": "THURSDAY_AUTONOMOUS_ENGINEERING_V1",
+    "total": 265,
+    "passed": 265,
+    "pass_rate": 1.0,
+    "qualified": true
+  },
+  "holdout": {
+    "scenarios": 265,
+    "passed": 265,
+    "run_count": 1,
+    "contamination": "NO",
+    "note": "consumed from frozen single-run artifact; never rerun here"
+  },
+  "soak": {
+    "cycles": 5000,
+    "operations": 66495,
+    "errors": 0,
+    "elapsed_seconds": 18.93,
+    "timing_environment": "CONTESTED",
+    "rss_drift_mb": -4.13,
+    "integrity_ok": true,
+    "qualified": true
+  },
+  "regression": {
+    "collected": 768,
+    "passed": 768,
+    "failed": 0,
+    "duration_seconds": 109.61,
+    "qualified": true
+  },
+  "overall_qualified": true
+}

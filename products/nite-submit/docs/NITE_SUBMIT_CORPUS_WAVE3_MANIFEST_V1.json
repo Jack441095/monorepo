@@ -1,0 +1,104 @@
+{
+  "manifest_version": "CORPUS_WAVE3_V1",
+  "created": "2026-08-24",
+  "purpose": "Controlled public university title-page and name/title extraction regression fixtures",
+  "policy": {
+    "source_scope": "Official university domains only",
+    "access_scope": "Publicly accessible documents; no portal or authentication bypass",
+    "reuse_scope": "Local QA only; source PDFs remain gitignored and are not redistributed",
+    "privacy_scope": "Reject documents exposing student numbers or other unnecessary personal identifiers",
+    "evaluation_rule": "Guidance documents are layout_only; thesis truth values were reviewed and scored in wave3_manifest.json"
+  },
+  "documents": [
+    {
+      "file": "real_validation_corpus/university_templates/wave3/south_carolina_research_project_guidelines.pdf",
+      "institution": "University of South Carolina",
+      "country": "US",
+      "type": "official_research_project_guidance",
+      "evaluation_mode": "layout_only",
+      "source_url": "https://oiraa.sc.edu/study/colleges_schools/public_health/documents/research_project_guidelines.pdf",
+      "licence_class": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "sha256": "cdb33ed2529174bf18ee8026a196ffb41f764e64bd3a229af9334e75bf80b87b",
+      "download_date": "2026-08-24",
+      "notes": "Official research-project guidance with sample title-page arrangement and explicit filename convention; layout/adversarial fixture only."
+    },
+    {
+      "file": "real_validation_corpus/university_templates/wave3/anschutz_capstone_final_report.pdf",
+      "institution": "University of Colorado Anschutz Medical Campus",
+      "country": "US",
+      "type": "official_capstone_report_template",
+      "evaluation_mode": "layout_only",
+      "source_url": "https://medschool.cuanschutz.edu/docs/librariesprovider157/anat-6950/anat-6950-final-report.pdf?sfvrsn=53671cb9_0",
+      "licence_class": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "sha256": "762332eb1e3a5d3883f29eca65f7ff8b883e2f7cdeb3f4d64623fddb44f0fe79",
+      "download_date": "2026-08-24",
+      "notes": "Template-style capstone report with placeholder name/title/mentor fields; useful heading false-positive fixture."
+    },
+    {
+      "file": "real_validation_corpus/university_templates/wave3/uga_mph_capstone_manual.pdf",
+      "institution": "University of Georgia",
+      "country": "US",
+      "type": "official_capstone_manual",
+      "evaluation_mode": "layout_only",
+      "source_url": "https://publichealth.uga.edu/wp-content/uploads/2016/12/MPH-Capstone-Manual-2014-15.pdf",
+      "licence_class": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "sha256": "e308ebcc19f8d51ddbdd94587531becfd2f05ca3990c708347fb5538c44c6d8a",
+      "download_date": "2026-08-24",
+      "notes": "Official MPH capstone manual with sample project/signature fields and unusual spaced text extraction."
+    },
+    {
+      "file": "real_validation_corpus/dissertations/wave3/whiterose_28683_charles_phd_sheffield.pdf",
+      "institution": "University of Sheffield",
+      "country": "UK",
+      "type": "thesis",
+      "evaluation_mode": "accuracy_candidate",
+      "source_url": "https://etheses.whiterose.ac.uk/id/eprint/28683/1/J%20Charles%20-%20PhD%20Thesis.pdf",
+      "licence_class": "OPEN_LICENSE",
+      "licence_reference": "CC BY-NC-ND 4.0 stated in the thesis",
+      "sha256": "d9c4e7a7f5b1197f0df46455e0899830303879f58e1de751670c46e3137d3239",
+      "download_date": "2026-08-24",
+      "truth_review": {
+        "student_name": "Jared A Charles",
+        "student_id": "ABSENT_FROM_QUALIFIED_CORPUS",
+        "university": "University of Sheffield",
+        "project_title": "Reconstruction of Soil Stress-Strain Response Using Optimisation"
+      }
+    },
+    {
+      "file": "real_validation_corpus/dissertations/wave3/whiterose_27895_murray_phd_sheffield.pdf",
+      "institution": "University of Sheffield",
+      "country": "UK",
+      "type": "thesis",
+      "evaluation_mode": "accuracy_candidate",
+      "source_url": "https://etheses.whiterose.ac.uk/id/eprint/27895/1/HM_Thesis_Final.pdf",
+      "licence_class": "OPEN_LICENSE",
+      "licence_reference": "CC BY-NC-ND 4.0 stated in the thesis",
+      "sha256": "b53845299a504fbf60d666a0fdb50645cfcb3ea923c1a6f85b6f80ca3603ad3e",
+      "download_date": "2026-08-24",
+      "truth_review": {
+        "student_name": "Hannah Louise Murray",
+        "student_id": "ABSENT_FROM_QUALIFIED_CORPUS",
+        "university": "University of Sheffield",
+        "project_title": "Defining the Role of Complement Factor B of the Alternative Complement Pathway in Diabetic Retinopathy"
+      }
+    },
+    {
+      "file": "real_validation_corpus/dissertations/wave3/whiterose_22495_morales_martinez_phd_sheffield.pdf",
+      "institution": "University of Sheffield",
+      "country": "UK",
+      "type": "thesis",
+      "evaluation_mode": "accuracy_candidate",
+      "source_url": "https://etheses.whiterose.ac.uk/id/eprint/22495/1/Thesis%20Gabriela%20Morales%20Martinez.pdf",
+      "licence_class": "OPEN_LICENSE",
+      "licence_reference": "CC BY-NC-ND 4.0 stated by the White Rose record/thesis",
+      "sha256": "4d7879bf73eb46d736065bd266c4454478aa2843ad572427f99b271760806a5f",
+      "download_date": "2026-08-24",
+      "truth_review": {
+        "student_name": "Gabriela Morales Martinez",
+        "student_id": "ABSENT_FROM_QUALIFIED_CORPUS",
+        "university": "University of Sheffield",
+        "project_title": "Knowledge Evolution in Social Media: Understanding the Effects of Website Designs on the Selection of User-Generated Content"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "sprint_date": "2026-08-22",
+  "python": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/Audio_Too/.venv/bin/python",
+  "dependencies_verified": {
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "soundfile": "0.14.0",
+    "scikit_learn": "1.9.0"
+  },
+  "librosa": "not installed; not required by current experiments",
+  "production_repositories_modified": [],
+  "owner_data_modified": false,
+  "external_writes": false
+}

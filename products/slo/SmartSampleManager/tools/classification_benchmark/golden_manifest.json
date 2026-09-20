@@ -1,0 +1,2552 @@
+[
+    {
+        "sample_id": 1,
+        "source_fixture": "kick_00.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 2,
+        "source_fixture": "kick_01.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 3,
+        "source_fixture": "kick_02.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 4,
+        "source_fixture": "kick_03.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 5,
+        "source_fixture": "kick_04.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 6,
+        "source_fixture": "kick_05.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 7,
+        "source_fixture": "kick_06.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 8,
+        "source_fixture": "kick_07.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 9,
+        "source_fixture": "kick_08.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 10,
+        "source_fixture": "kick_09.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Kick",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Kick"
+    },
+    {
+        "sample_id": 11,
+        "source_fixture": "snare_00.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 12,
+        "source_fixture": "snare_01.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 13,
+        "source_fixture": "snare_02.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 14,
+        "source_fixture": "snare_03.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 15,
+        "source_fixture": "snare_04.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 16,
+        "source_fixture": "snare_05.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 17,
+        "source_fixture": "snare_06.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 18,
+        "source_fixture": "snare_07.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 19,
+        "source_fixture": "snare_08.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 20,
+        "source_fixture": "snare_09.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Snare",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Snare"
+    },
+    {
+        "sample_id": 21,
+        "source_fixture": "hi-hat_00.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 22,
+        "source_fixture": "hi-hat_01.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 23,
+        "source_fixture": "hi-hat_02.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 24,
+        "source_fixture": "hi-hat_03.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 25,
+        "source_fixture": "hi-hat_04.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 26,
+        "source_fixture": "hi-hat_05.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 27,
+        "source_fixture": "hi-hat_06.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 28,
+        "source_fixture": "hi-hat_07.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 29,
+        "source_fixture": "hi-hat_08.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 30,
+        "source_fixture": "hi-hat_09.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Hi-Hat",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Hi-Hat"
+    },
+    {
+        "sample_id": 31,
+        "source_fixture": "clap_00.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 32,
+        "source_fixture": "clap_01.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 33,
+        "source_fixture": "clap_02.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 34,
+        "source_fixture": "clap_03.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 35,
+        "source_fixture": "clap_04.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 36,
+        "source_fixture": "clap_05.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 37,
+        "source_fixture": "clap_06.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 38,
+        "source_fixture": "clap_07.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 39,
+        "source_fixture": "clap_08.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 40,
+        "source_fixture": "clap_09.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Clap",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Clap"
+    },
+    {
+        "sample_id": 41,
+        "source_fixture": "percussion_00.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 42,
+        "source_fixture": "percussion_01.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 43,
+        "source_fixture": "percussion_02.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 44,
+        "source_fixture": "percussion_03.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 45,
+        "source_fixture": "percussion_04.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 46,
+        "source_fixture": "percussion_05.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 47,
+        "source_fixture": "percussion_06.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 48,
+        "source_fixture": "percussion_07.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 49,
+        "source_fixture": "percussion_08.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 50,
+        "source_fixture": "percussion_09.wav",
+        "expected_category": "Drums",
+        "expected_subcategory": "Percussion",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Percussion"
+    },
+    {
+        "sample_id": 51,
+        "source_fixture": "bass_one-shot_00.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 52,
+        "source_fixture": "bass_one-shot_01.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "D Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 53,
+        "source_fixture": "bass_one-shot_02.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 54,
+        "source_fixture": "bass_one-shot_03.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "D Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 55,
+        "source_fixture": "bass_one-shot_04.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 56,
+        "source_fixture": "bass_one-shot_05.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "D Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 57,
+        "source_fixture": "bass_one-shot_06.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 58,
+        "source_fixture": "bass_one-shot_07.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "D Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 59,
+        "source_fixture": "bass_one-shot_08.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 60,
+        "source_fixture": "bass_one-shot_09.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass One-Shot",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "D Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass One-Shot"
+    },
+    {
+        "sample_id": 61,
+        "source_fixture": "bass_loop_00.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 62,
+        "source_fixture": "bass_loop_01.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 63,
+        "source_fixture": "bass_loop_02.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 140,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 64,
+        "source_fixture": "bass_loop_03.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 160,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 65,
+        "source_fixture": "bass_loop_04.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 66,
+        "source_fixture": "bass_loop_05.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 67,
+        "source_fixture": "bass_loop_06.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 140,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 68,
+        "source_fixture": "bass_loop_07.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 160,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 69,
+        "source_fixture": "bass_loop_08.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 70,
+        "source_fixture": "bass_loop_09.wav",
+        "expected_category": "Bass",
+        "expected_subcategory": "Bass Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Bass Loop"
+    },
+    {
+        "sample_id": 71,
+        "source_fixture": "synth_00.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 72,
+        "source_fixture": "synth_01.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "E Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 73,
+        "source_fixture": "synth_02.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 74,
+        "source_fixture": "synth_03.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "E Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 75,
+        "source_fixture": "synth_04.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 76,
+        "source_fixture": "synth_05.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "E Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 77,
+        "source_fixture": "synth_06.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 78,
+        "source_fixture": "synth_07.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "E Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 79,
+        "source_fixture": "synth_08.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 80,
+        "source_fixture": "synth_09.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "E Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth"
+    },
+    {
+        "sample_id": 81,
+        "source_fixture": "synth_loop_00.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 82,
+        "source_fixture": "synth_loop_01.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 83,
+        "source_fixture": "synth_loop_02.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 140,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 84,
+        "source_fixture": "synth_loop_03.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 160,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 85,
+        "source_fixture": "synth_loop_04.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 86,
+        "source_fixture": "synth_loop_05.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 87,
+        "source_fixture": "synth_loop_06.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 140,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 88,
+        "source_fixture": "synth_loop_07.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 160,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 89,
+        "source_fixture": "synth_loop_08.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 90,
+        "source_fixture": "synth_loop_09.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Synth Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Synth Loop"
+    },
+    {
+        "sample_id": 91,
+        "source_fixture": "vocal_phrase_00.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 92,
+        "source_fixture": "vocal_phrase_01.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 93,
+        "source_fixture": "vocal_phrase_02.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 94,
+        "source_fixture": "vocal_phrase_03.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 95,
+        "source_fixture": "vocal_phrase_04.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 96,
+        "source_fixture": "vocal_phrase_05.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 97,
+        "source_fixture": "vocal_phrase_06.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 98,
+        "source_fixture": "vocal_phrase_07.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 99,
+        "source_fixture": "vocal_phrase_08.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 100,
+        "source_fixture": "vocal_phrase_09.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Phrase",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Phrase"
+    },
+    {
+        "sample_id": 101,
+        "source_fixture": "vocal_loop_00.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 102,
+        "source_fixture": "vocal_loop_01.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 103,
+        "source_fixture": "vocal_loop_02.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 140,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 104,
+        "source_fixture": "vocal_loop_03.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 160,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 105,
+        "source_fixture": "vocal_loop_04.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 106,
+        "source_fixture": "vocal_loop_05.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 107,
+        "source_fixture": "vocal_loop_06.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 140,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 108,
+        "source_fixture": "vocal_loop_07.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 160,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 109,
+        "source_fixture": "vocal_loop_08.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 110,
+        "source_fixture": "vocal_loop_09.wav",
+        "expected_category": "Vocals",
+        "expected_subcategory": "Vocal Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "A Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Vocal Loop"
+    },
+    {
+        "sample_id": 111,
+        "source_fixture": "impact_00.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 112,
+        "source_fixture": "impact_01.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 113,
+        "source_fixture": "impact_02.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 114,
+        "source_fixture": "impact_03.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 115,
+        "source_fixture": "impact_04.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 116,
+        "source_fixture": "impact_05.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 117,
+        "source_fixture": "impact_06.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 118,
+        "source_fixture": "impact_07.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 119,
+        "source_fixture": "impact_08.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 120,
+        "source_fixture": "impact_09.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Impact",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Impact"
+    },
+    {
+        "sample_id": 121,
+        "source_fixture": "riser_00.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 122,
+        "source_fixture": "riser_01.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 123,
+        "source_fixture": "riser_02.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 124,
+        "source_fixture": "riser_03.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 125,
+        "source_fixture": "riser_04.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 126,
+        "source_fixture": "riser_05.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 127,
+        "source_fixture": "riser_06.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 128,
+        "source_fixture": "riser_07.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 129,
+        "source_fixture": "riser_08.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 130,
+        "source_fixture": "riser_09.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Riser",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Riser"
+    },
+    {
+        "sample_id": 131,
+        "source_fixture": "foley_00.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 132,
+        "source_fixture": "foley_01.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 133,
+        "source_fixture": "foley_02.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 134,
+        "source_fixture": "foley_03.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 135,
+        "source_fixture": "foley_04.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 136,
+        "source_fixture": "foley_05.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 137,
+        "source_fixture": "foley_06.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 138,
+        "source_fixture": "foley_07.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 139,
+        "source_fixture": "foley_08.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 140,
+        "source_fixture": "foley_09.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "Foley",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Foley"
+    },
+    {
+        "sample_id": 141,
+        "source_fixture": "fx_00.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 142,
+        "source_fixture": "fx_01.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 143,
+        "source_fixture": "fx_02.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 144,
+        "source_fixture": "fx_03.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 145,
+        "source_fixture": "fx_04.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 146,
+        "source_fixture": "fx_05.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 147,
+        "source_fixture": "fx_06.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 148,
+        "source_fixture": "fx_07.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 149,
+        "source_fixture": "fx_08.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 150,
+        "source_fixture": "fx_09.wav",
+        "expected_category": "FX",
+        "expected_subcategory": "FX",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of FX"
+    },
+    {
+        "sample_id": 151,
+        "source_fixture": "atmosphere_00.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 152,
+        "source_fixture": "atmosphere_01.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 153,
+        "source_fixture": "atmosphere_02.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 154,
+        "source_fixture": "atmosphere_03.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 155,
+        "source_fixture": "atmosphere_04.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 156,
+        "source_fixture": "atmosphere_05.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 157,
+        "source_fixture": "atmosphere_06.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 158,
+        "source_fixture": "atmosphere_07.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 159,
+        "source_fixture": "atmosphere_08.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 160,
+        "source_fixture": "atmosphere_09.wav",
+        "expected_category": "Ambience",
+        "expected_subcategory": "Atmosphere",
+        "expected_loop_status": "One-Shot",
+        "expected_tonal_status": "atonal",
+        "expected_key": "Unknown",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "One-Shot"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Atmosphere"
+    },
+    {
+        "sample_id": 161,
+        "source_fixture": "music_loop_00.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 162,
+        "source_fixture": "music_loop_01.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 163,
+        "source_fixture": "music_loop_02.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 140,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 164,
+        "source_fixture": "music_loop_03.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 160,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 165,
+        "source_fixture": "music_loop_04.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 166,
+        "source_fixture": "music_loop_05.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 167,
+        "source_fixture": "music_loop_06.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 140,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 168,
+        "source_fixture": "music_loop_07.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 160,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 169,
+        "source_fixture": "music_loop_08.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 100,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    },
+    {
+        "sample_id": 170,
+        "source_fixture": "music_loop_09.wav",
+        "expected_category": "Instruments",
+        "expected_subcategory": "Music Loop",
+        "expected_loop_status": "Loop",
+        "expected_tonal_status": "tonal",
+        "expected_key": "C Major",
+        "expected_bpm": 120,
+        "expected_secondary_tags": [
+            "Loop"
+        ],
+        "label_confidence": "HIGH-CONFIDENCE LABEL",
+        "notes": "Programmatic synthesis of Music Loop"
+    }
+]

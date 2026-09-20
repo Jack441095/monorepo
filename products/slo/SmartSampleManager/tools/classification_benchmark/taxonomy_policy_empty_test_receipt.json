@@ -1,0 +1,383 @@
+{
+  "class_report": {
+    "Clap": {
+      "collections": 8,
+      "correct": 91,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Black Octopus Sound - Pure Analog Sweeps IV (2021)": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Breaks": {
+          "correct": 7,
+          "n": 7,
+          "precision": 1.0
+        },
+        "Drum Recollection": {
+          "correct": 11,
+          "n": 12,
+          "precision": 0.9166666666666666
+        },
+        "Mike Shinoda Drums": {
+          "correct": 16,
+          "n": 16,
+          "precision": 1.0
+        },
+        "Minimal Audio": {
+          "correct": 4,
+          "n": 4,
+          "precision": 1.0
+        },
+        "Organic Drum Kit": {
+          "correct": 24,
+          "n": 25,
+          "precision": 0.96
+        },
+        "Organic Electronics 2 J.Views": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Sounds of KSHMR Vol.3": {
+          "correct": 27,
+          "n": 27,
+          "precision": 1.0
+        }
+      },
+      "precision": 0.978494623655914,
+      "support": 93,
+      "wilson_lower_95": 0.9249439098234603
+    },
+    "Crash": {
+      "collections": 4,
+      "correct": 15,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Mike Shinoda Drums": {
+          "correct": 4,
+          "n": 4,
+          "precision": 1.0
+        },
+        "Minimal Audio": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Organic Drum Kit": {
+          "correct": 6,
+          "n": 6,
+          "precision": 1.0
+        },
+        "Sounds of KSHMR Vol.3": {
+          "correct": 4,
+          "n": 4,
+          "precision": 1.0
+        }
+      },
+      "precision": 1.0,
+      "support": 15,
+      "wilson_lower_95": 0.7961107336956521
+    },
+    "Drum Loop": {
+      "collections": 5,
+      "correct": 14,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Breaks": {
+          "correct": 7,
+          "n": 10,
+          "precision": 0.7
+        },
+        "Loaded Samples - Lo-Fi Memphis 2": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Mike Shinoda Drums": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Organic Drum Kit": {
+          "correct": 2,
+          "n": 2,
+          "precision": 1.0
+        },
+        "Sounds of KSHMR Vol.3": {
+          "correct": 3,
+          "n": 5,
+          "precision": 0.6
+        }
+      },
+      "precision": 0.7368421052631579,
+      "support": 19,
+      "wilson_lower_95": 0.5120803155892935
+    },
+    "Hi-Hat": {
+      "collections": 11,
+      "correct": 47,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Black Octopus Sound - Pure Analog Sweeps IV (2021)": {
+          "correct": 2,
+          "n": 2,
+          "precision": 1.0
+        },
+        "Capsun ProAudio - City Pop": {
+          "correct": 2,
+          "n": 2,
+          "precision": 1.0
+        },
+        "Drum Recollection": {
+          "correct": 9,
+          "n": 9,
+          "precision": 1.0
+        },
+        "Koan Sound": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "MGF Mega Pack": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Mike Shinoda Drums": {
+          "correct": 7,
+          "n": 7,
+          "precision": 1.0
+        },
+        "Minimal Audio": {
+          "correct": 3,
+          "n": 4,
+          "precision": 0.75
+        },
+        "Old Movies 1 - Vintage Collection (Drum Kit)": {
+          "correct": 2,
+          "n": 2,
+          "precision": 1.0
+        },
+        "Organic Drum Kit": {
+          "correct": 10,
+          "n": 10,
+          "precision": 1.0
+        },
+        "Organic Electronics 2 J.Views": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Sounds of KSHMR Vol.3": {
+          "correct": 9,
+          "n": 10,
+          "precision": 0.9
+        }
+      },
+      "precision": 0.9591836734693877,
+      "support": 49,
+      "wilson_lower_95": 0.8628671652316888
+    },
+    "Kick": {
+      "collections": 9,
+      "correct": 65,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Breaks": {
+          "correct": 4,
+          "n": 4,
+          "precision": 1.0
+        },
+        "Drum Recollection": {
+          "correct": 5,
+          "n": 5,
+          "precision": 1.0
+        },
+        "MGF Mega Pack": {
+          "correct": 2,
+          "n": 2,
+          "precision": 1.0
+        },
+        "Mike Shinoda Drums": {
+          "correct": 13,
+          "n": 15,
+          "precision": 0.8666666666666667
+        },
+        "Minimal Audio": {
+          "correct": 4,
+          "n": 4,
+          "precision": 1.0
+        },
+        "Old Movies 1 - Vintage Collection (Drum Kit)": {
+          "correct": 2,
+          "n": 2,
+          "precision": 1.0
+        },
+        "Organic Drum Kit": {
+          "correct": 10,
+          "n": 10,
+          "precision": 1.0
+        },
+        "Organic Electronics 2 J.Views": {
+          "correct": 2,
+          "n": 2,
+          "precision": 1.0
+        },
+        "Sounds of KSHMR Vol.3": {
+          "correct": 23,
+          "n": 23,
+          "precision": 1.0
+        }
+      },
+      "precision": 0.9701492537313433,
+      "support": 67,
+      "wilson_lower_95": 0.8975324995811697
+    },
+    "Kick Loop": {
+      "collections": 2,
+      "correct": 1,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Minimal Audio": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Sounds of KSHMR Vol.3": {
+          "correct": 0,
+          "n": 1,
+          "precision": 0.0
+        }
+      },
+      "precision": 0.5,
+      "support": 2,
+      "wilson_lower_95": 0.09452865480086611
+    },
+    "Other/none": {
+      "collections": 1,
+      "correct": 0,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "MGF Mega Pack": {
+          "correct": 0,
+          "n": 1,
+          "precision": 0.0
+        }
+      },
+      "precision": 0.0,
+      "support": 1,
+      "wilson_lower_95": 0.0
+    },
+    "Percussion Loop": {
+      "collections": 1,
+      "correct": 2,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Sounds of KSHMR Vol.3": {
+          "correct": 2,
+          "n": 2,
+          "precision": 1.0
+        }
+      },
+      "precision": 1.0,
+      "support": 2,
+      "wilson_lower_95": 0.3423719528896193
+    },
+    "Rimshot": {
+      "collections": 1,
+      "correct": 0,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Mike Shinoda Drums": {
+          "correct": 0,
+          "n": 1,
+          "precision": 0.0
+        }
+      },
+      "precision": 0.0,
+      "support": 1,
+      "wilson_lower_95": 0.0
+    },
+    "Snare": {
+      "collections": 13,
+      "correct": 77,
+      "eligible_for_auto": false,
+      "per_collection": {
+        "Black Octopus Sound - Pure Analog Sweeps IV (2021)": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Breaks": {
+          "correct": 5,
+          "n": 5,
+          "precision": 1.0
+        },
+        "Capsun ProAudio - City Pop": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Drum Recollection": {
+          "correct": 4,
+          "n": 4,
+          "precision": 1.0
+        },
+        "Just Jared - OP1 Drums": {
+          "correct": 1,
+          "n": 1,
+          "precision": 1.0
+        },
+        "Koan Sound": {
+          "correct": 6,
+          "n": 6,
+          "precision": 1.0
+        },
+        "Loaded Samples - Lo-Fi Memphis 2": {
+          "correct": 0,
+          "n": 1,
+          "precision": 0.0
+        },
+        "Mike Shinoda Drums": {
+          "correct": 12,
+          "n": 12,
+          "precision": 1.0
+        },
+        "Minimal Audio": {
+          "correct": 3,
+          "n": 4,
+          "precision": 0.75
+        },
+        "Old Movies 1 - Vintage Collection (Drum Kit)": {
+          "correct": 5,
+          "n": 5,
+          "precision": 1.0
+        },
+        "Organic Drum Kit": {
+          "correct": 18,
+          "n": 18,
+          "precision": 1.0
+        },
+        "Organic Electronics 2 J.Views": {
+          "correct": 4,
+          "n": 5,
+          "precision": 0.8
+        },
+        "Sounds of KSHMR Vol.3": {
+          "correct": 17,
+          "n": 17,
+          "precision": 1.0
+        }
+      },
+      "precision": 0.9625,
+      "support": 80,
+      "wilson_lower_95": 0.8954510802560569
+    }
+  },
+  "n_classes_observed": 10,
+  "n_label_rows_joined": 329,
+  "qualified_classes": [],
+  "schema_version": "1.0.0"
+}

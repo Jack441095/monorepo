@@ -1,0 +1,130 @@
+{
+  "record_type": "slo_current_class_gate_recalibration",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-14T14:00:52",
+  "protocol": {
+    "outer_split": "GroupKFold by vendor/collection",
+    "inner_calibration": "three-fold StratifiedGroupKFold by vendor/collection",
+    "seeds": 5,
+    "splits": 5,
+    "minimum_calibration_predictions_per_class": 20
+  },
+  "inventory": {
+    "n_rows": 120,
+    "n_classes": 3,
+    "n_collections": 15,
+    "candidate_classes": [
+      "Clap",
+      "Kick",
+      "Snare"
+    ],
+    "out_of_scope_human_labels": [
+      "Vocal One-Shot"
+    ],
+    "n_out_of_scope_human_labels": 1,
+    "validation_receipt_mode": true
+  },
+  "results": [
+    {
+      "target_precision": 0.9,
+      "auto_n": 586,
+      "auto_precision": 99.1467576791809,
+      "auto_share": 97.66666666666667,
+      "per_seed": [
+        {
+          "auto_n": 119,
+          "auto_precision": 99.15966386554622,
+          "auto_share": 99.16666666666667
+        },
+        {
+          "auto_n": 116,
+          "auto_precision": 99.13793103448276,
+          "auto_share": 96.66666666666667
+        },
+        {
+          "auto_n": 116,
+          "auto_precision": 99.13793103448276,
+          "auto_share": 96.66666666666667
+        },
+        {
+          "auto_n": 116,
+          "auto_precision": 99.13793103448276,
+          "auto_share": 96.66666666666667
+        },
+        {
+          "auto_n": 119,
+          "auto_precision": 99.15966386554622,
+          "auto_share": 99.16666666666667
+        }
+      ],
+      "by_class": {
+        "Clap": {
+          "n": 190,
+          "precision": 97.36842105263158
+        },
+        "Kick": {
+          "n": 200,
+          "precision": 100.0
+        },
+        "Snare": {
+          "n": 196,
+          "precision": 100.0
+        }
+      }
+    },
+    {
+      "target_precision": 0.95,
+      "auto_n": 586,
+      "auto_precision": 99.1467576791809,
+      "auto_share": 97.66666666666667,
+      "per_seed": [
+        {
+          "auto_n": 119,
+          "auto_precision": 99.15966386554622,
+          "auto_share": 99.16666666666667
+        },
+        {
+          "auto_n": 116,
+          "auto_precision": 99.13793103448276,
+          "auto_share": 96.66666666666667
+        },
+        {
+          "auto_n": 116,
+          "auto_precision": 99.13793103448276,
+          "auto_share": 96.66666666666667
+        },
+        {
+          "auto_n": 116,
+          "auto_precision": 99.13793103448276,
+          "auto_share": 96.66666666666667
+        },
+        {
+          "auto_n": 119,
+          "auto_precision": 99.15966386554622,
+          "auto_share": 99.16666666666667
+        }
+      ],
+      "by_class": {
+        "Clap": {
+          "n": 190,
+          "precision": 97.36842105263158
+        },
+        "Kick": {
+          "n": 200,
+          "precision": 100.0
+        },
+        "Snare": {
+          "n": 196,
+          "precision": 100.0
+        }
+      }
+    }
+  ],
+  "decision": "research audit only; no policy mutation or rename approval",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false
+  }
+}

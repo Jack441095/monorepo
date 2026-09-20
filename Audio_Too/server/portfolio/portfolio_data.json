@@ -1,0 +1,567 @@
+{
+  "codebases": [
+    {
+      "type": "Local web app",
+      "title": "Audio_Too business dashboard",
+      "description": "SQLite-backed dashboard for enquiries, clients, leads, invoices, drafts, activity, backups, and client stem upload links.",
+      "tags": [
+        "Python HTTP server",
+        "SQLite CRM",
+        "Signed upload links",
+        "Admin sessions"
+      ]
+    },
+    {
+      "type": "Retrieval system",
+      "title": "Audio Tips LLM",
+      "description": "A retrieval-first Ableton and production assistant built from approved notes, transcripts, PDFs, and gap tracking.",
+      "tags": [
+        "BM25 retrieval",
+        "Transcript review",
+        "Knowledge gaps",
+        "Public Q&A"
+      ]
+    },
+    {
+      "type": "CLI tooling",
+      "title": "Agent command workspace",
+      "description": "Admin, marketing, and research launchers for repeatable business tasks, exports, backups, invoice PDFs, and follow-ups.",
+      "tags": [
+        "Command routing",
+        "Draft approval",
+        "XLSX exports",
+        "Activity logs"
+      ]
+    }
+  ],
+  "stats": [
+    {
+      "value": "55",
+      "label": "automated tests"
+    },
+    {
+      "value": "2",
+      "label": "main workspaces"
+    },
+    {
+      "value": "3",
+      "label": "agent areas"
+    },
+    {
+      "value": "1",
+      "label": "local database"
+    }
+  ],
+  "audio": [
+    {
+      "title": "Mix balance demo",
+      "description": "Level balance and clarity across drums, bass, and vocals.",
+      "src": "/portfolio/audio/mix-balance-demo.wav"
+    },
+    {
+      "title": "Mastering loudness demo",
+      "description": "Controlled loudness and tone for release preparation.",
+      "src": "/portfolio/audio/mastering-demo.wav"
+    },
+    {
+      "title": "Podcast cleanup demo",
+      "description": "Dialogue cleanup, noise reduction, and leveling.",
+      "src": "/portfolio/audio/podcast-cleanup-demo.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from KENN prompt: generate a joy chorus",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260628-010635.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy full song",
+      "description": "Full-song generative render from KENN AudioGen using the joy emotion mode.",
+      "src": "/portfolio/audio/kenn-full-song-joy-20260628-010608.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from KENN prompt: Generate a joy loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260629-235253.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy full song",
+      "description": "Full-song generative render from kenn AudioGen using the joy emotion mode.",
+      "src": "/portfolio/audio/kenn-full-song-joy-20260630-140942.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: test with publish",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260630-141704.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: a happy loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260630-141759.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: Generate a joy loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260630-142126.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: Generate a joy loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260630-144300.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: a joyful test loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260708-121019.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260804-205044.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a 120bpm techno loop and load it into track 2",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260804-205144.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a 120bpm techno loop and load it into track 2",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260804-205310.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260804-211224.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260804-211410.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260804-233803.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-012457.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-012522.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: make me a lo-fi loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-091811.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-092052.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-094401.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-095058.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-095825.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-100744.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-101717.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-102756.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-110715.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-110826.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-111625.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-111649.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-112137.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-114247.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-142044.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-143111.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-144100.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-144652.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-144815.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-152843.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-160819.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-161911.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-163026.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-163524.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-164038.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-164408.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-164844.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-165929.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-170700.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-192424.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-192624.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-193216.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-194807.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-195023.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-200302.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-201354.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-201840.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-202805.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-212831.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-213439.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-214430.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-221623.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-232102.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-233344.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260805-235146.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260806-002639.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260806-010246.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-120419.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-120711.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-122704.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-124316.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-125802.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a techno loop at 128 bpm",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-142018.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-150540.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-150905.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-151324.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-151544.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-173227.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-180946.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-181540.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-183333.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-184623.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-192258.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-192448.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-194419.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-204255.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260810-205405.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-000441.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-001941.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-002025.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-002127.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-002358.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-003503.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-091819.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-093826.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-100655.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-104545.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-105215.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-105343.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-121511.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-124858.wav"
+    },
+    {
+      "title": "KENN AudioGen - Joy chorus",
+      "description": "Generated from kenn prompt: generate a pop loop",
+      "src": "/portfolio/audio/kenn-audiogen-joy-20260811-141535.wav"
+    }
+  ]
+}

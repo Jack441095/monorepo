@@ -1,0 +1,15 @@
+name: "Morning Briefing"
+description: "Daily morning check-in with business status, reminders, and agenda"
+triggers:
+  phrase: "good morning"
+  patterns:
+    - "^morning$"
+    - "morning briefing"
+    - "start my day"
+    - "daily briefing"
+requires: []
+steps:
+  - service: "business_status"
+  - service: "reminders"
+  - service: "sessions"
+  - say: "That's your morning roundup. What's next?"

@@ -1,0 +1,26 @@
+{
+  "timestamp": "20260719T101918Z",
+  "overall": {
+    "ok": false,
+    "failures": [
+      "tts_latency: steady-state max 2.026s exceeds SLO 2.000s"
+    ],
+    "categories": {
+      "tts_latency": {
+        "label": "tts_latency",
+        "ok": false,
+        "failures": [
+          "tts_latency: steady-state max 2.026s exceeds SLO 2.000s"
+        ],
+        "cold_start_s": 3.5902,
+        "steady_state_samples_s": [
+          2.0258,
+          1.5592
+        ],
+        "steady_state_mean_s": 1.7925,
+        "steady_state_max_s": 2.0258,
+        "slo_s": 2.0
+      }
+    }
+  }
+}

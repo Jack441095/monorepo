@@ -1,0 +1,2002 @@
+[
+  {
+    "id": 0,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_FX_Elements/KSHMR_Sub_Drops/KSHMR_Sub_Drop_11_F#.wav",
+    "hint": "audio: Bass Hit | filename: Downlifter | waveform: strong sub energy (50% below 60Hz); 2250-cent downward pitch glide; long 3.8s decay"
+  },
+  {
+    "id": 1,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Household Percussion April 2016/HOUSEHOLD_022.wav",
+    "hint": "audio: Bass Hit | filename: Foley | waveform: strong sub energy (86% below 60Hz)"
+  },
+  {
+    "id": 2,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) Me.wav",
+    "hint": "audio: Bass Hit | filename: Kick | waveform: strong sub energy (71% below 60Hz); noisy rather than tonal"
+  },
+  {
+    "id": 3,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (OG Versions)/OGSTEM_Still Mobbin #5 [73 BPM] (F#).wav",
+    "hint": "audio: Bass Hit | filename: Loop | waveform: 680-cent downward pitch glide; long 4.4s decay; clear harmonic series (f0 46Hz)"
+  },
+  {
+    "id": 4,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Retro Digital Collection/Bass/DX11 E Organ 1 - C1.wav",
+    "hint": "audio: Bass Hit | filename: Organ | waveform: 470-cent downward pitch glide; long 3.4s decay; clear harmonic series (f0 33Hz)"
+  },
+  {
+    "id": 5,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Synths/KSHMR_Bass_Shots/KSHMR_Bass_Pluck/KSHMR_Bass_Pluck_10_E.wav",
+    "hint": "audio: Bass Hit | filename: Pluck | waveform: detuned beating at 2.4Hz; clear harmonic series (f0 41Hz)"
+  },
+  {
+    "id": 6,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODY CHOPS/CHOP_Halloween '94 #1 (C#).wav",
+    "hint": "audio: Bass Hit | filename: Vocal Chop | waveform: detuned beating at 1.5Hz; clear harmonic series (f0 35Hz)"
+  },
+  {
+    "id": 7,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Fills/KSHMR_Signature_Fills/KSHMR_Signature_Fill_09_Dead_Mans_Hand_3_128.wav",
+    "hint": "audio: Bass Loop | filename: Drum Fill | waveform: detuned beating at 8.5Hz; wide stereo image"
+  },
+  {
+    "id": 8,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/7 FIRES BKK BREAK_5.wav",
+    "hint": "audio: Bass Loop | filename: Drum Loop | waveform: detuned beating at 3.0Hz; clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 9,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Household Percussion April 2016/HOUSEHOLD_271.wav",
+    "hint": "audio: Bass Loop | filename: Foley | waveform: 300-cent downward pitch glide; detuned beating at 4.5Hz; clear harmonic series (f0 62Hz)"
+  },
+  {
+    "id": 10,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/ks-samples-01/Bass Guitar Stab 2_F.wav",
+    "hint": "audio: Bass Loop | filename: Guitar | waveform: strong sub energy (92% below 60Hz); 890-cent downward pitch glide; long 3.6s decay; near-pure sine (83% of energy at the fundamental); clear harmonic series (f0 44Hz)"
+  },
+  {
+    "id": 11,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Impact Pt2 #5 [71 BPM] (D).wav",
+    "hint": "audio: Bass Loop | filename: Impact | waveform: 560-cent downward pitch glide; detuned beating at 2.4Hz; clear harmonic series (f0 37Hz)"
+  },
+  {
+    "id": 12,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/CTM 808 (Without Kick).wav",
+    "hint": "audio: Bass Loop | filename: Kick | waveform: strong sub energy (98% below 60Hz); long 1.4s decay; near-pure sine (90% of energy at the fundamental); clear harmonic series (f0 35Hz); noisy rather than tonal"
+  },
+  {
+    "id": 13,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Violence #5 [72 BPM] (F).wav",
+    "hint": "audio: Bass Loop | filename: Loop | waveform: strong sub energy (51% below 60Hz); clear harmonic series (f0 39Hz); noisy rather than tonal"
+  },
+  {
+    "id": 14,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/MARCH TOMS_3.wav",
+    "hint": "audio: Bass Loop | filename: Percussion | waveform: noisy rather than tonal"
+  },
+  {
+    "id": 15,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Melodic_Loops/Melodic_Stack_no_keys/CPA_TCP_77_melodic_stack_careful_no_keys_D.wav",
+    "hint": "audio: Bass Loop | filename: Piano | waveform: detuned beating at 1.5Hz"
+  },
+  {
+    "id": 16,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon May 2022 Samples/radiohead ttype pluck Fm 118_2.wav",
+    "hint": "audio: Bass Loop | filename: Pluck | waveform: detuned beating at 1.8Hz; clear harmonic series (f0 52Hz); noisy rather than tonal"
+  },
+  {
+    "id": 17,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Strap In the Ride #5 [72 BPM] (C#).wav",
+    "hint": "audio: Bass Loop | filename: Ride | waveform: strong sub energy (50% below 60Hz); clear harmonic series (f0 35Hz)"
+  },
+  {
+    "id": 18,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Orchestral_Instruments/KSHMR_Strings/KSHMR_String_Loops/KSHMR_String_Loop_19_140_Em.wav",
+    "hint": "audio: Bass Loop | filename: Strings | waveform: 770-cent downward pitch glide; detuned beating at 1.2Hz; long 3.5s decay; clear harmonic series (f0 82Hz); wide stereo image"
+  },
+  {
+    "id": 19,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Airborne Samples/BigBuzz Eb1 CLP.wav",
+    "hint": "audio: Bass Reese | filename: Clap | waveform: detuned beating at 1.3Hz; clear harmonic series (f0 80Hz)"
+  },
+  {
+    "id": 20,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF Juno 106 1/PWM Lead/PWM Lead - F#1.wav",
+    "hint": "audio: Bass Reese | filename: Lead | waveform: detuned beating at 3.1Hz; long 4.6s decay; clear harmonic series (f0 93Hz)"
+  },
+  {
+    "id": 21,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Loops (Cassette Processed)/Rage DR5 #2 [76 BPM] (D).wav",
+    "hint": "audio: Bass Reese | filename: Loop | waveform: strong sub energy (58% below 60Hz); detuned beating at 1.6Hz; long 3.8s decay; clear harmonic series (f0 41Hz)"
+  },
+  {
+    "id": 22,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF Sub Phatty 1/Slight Pluck Lead/Slight Pluck Lead-1 F#1.wav",
+    "hint": "audio: Bass Reese | filename: Pluck | waveform: 1060-cent downward pitch glide; detuned beating at 2.2Hz; long 4.8s decay; clear harmonic series (f0 92Hz)"
+  },
+  {
+    "id": 23,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Orchestral_Instruments/KSHMR_Brass/KSHMR_Brass_Loops/KSHMR_Brass_Loop_08_128_Dm.wav",
+    "hint": "audio: Chord Loop | filename: Brass | waveform: long 1.8s decay; clear harmonic series (f0 73Hz); wide stereo image"
+  },
+  {
+    "id": 24,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/5 - Deep Textures/Texture - Bowed Cymbal Low.wav",
+    "hint": "audio: Chord Loop | filename: Crash | waveform: 1630-cent downward pitch glide; long 5.2s decay; clear harmonic series (f0 43Hz)"
+  },
+  {
+    "id": 25,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/deergha break.wav",
+    "hint": "audio: Chord Loop | filename: Drum Loop | waveform: strong sub energy (38% below 60Hz); detuned beating at 1.3Hz; clear harmonic series (f0 54Hz)"
+  },
+  {
+    "id": 26,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Song_Starters/KSHMR_Song_Starters_Hip_Hop/KSHMR_Song_Starter_Hip_Hop_Holy_Water_104_Dm.wav",
+    "hint": "audio: Chord Loop | filename: Foley | waveform: 3830-cent downward pitch glide"
+  },
+  {
+    "id": 27,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Melodic_Loops/Melodic_Stack_no_guitar/CPA_TCP_105_melodic_stack_breeze_no_guitar_F#m.wav",
+    "hint": "audio: Chord Loop | filename: Guitar | waveform: detuned beating at 2.8Hz"
+  },
+  {
+    "id": 28,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/3 - Bass Loops/Bass - Boom Payback - G - 78 BPM.wav",
+    "hint": "audio: Chord Loop | filename: Impact | waveform: 2170-cent downward pitch glide; long 2.7s decay; clear harmonic series (f0 49Hz)"
+  },
+  {
+    "id": 29,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Me.wav",
+    "hint": "audio: Chord Loop | filename: Kick | waveform: strong sub energy (71% below 60Hz); noisy rather than tonal"
+  },
+  {
+    "id": 30,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon June 2024 Samples /Mysterious lead Aharmm.wav",
+    "hint": "audio: Chord Loop | filename: Lead | waveform: long 2.9s decay"
+  },
+  {
+    "id": 31,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - Kingsway Music Library 2/03 CHBLAP65bpm.wav",
+    "hint": "audio: Chord Loop | filename: Loop | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 32,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (OG Versions)/OGSTEM_Organ Donor #1 [75 BPM] (B).wav",
+    "hint": "audio: Chord Loop | filename: Organ | waveform: detuned beating at 3.5Hz; clear harmonic series (f0 92Hz)"
+  },
+  {
+    "id": 33,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Melodic_Loops/Synth/CPA_TCP_110_synth_pad_deep_diver_Cm.wav",
+    "hint": "audio: Chord Loop | filename: Pad | waveform: 1210-cent downward pitch glide; detuned beating at 1.6Hz; wide stereo image"
+  },
+  {
+    "id": 34,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+    "hint": "audio: Chord Loop | filename: Percussion Loop | waveform: detuned beating at 1.1Hz; long 1.7s decay"
+  },
+  {
+    "id": 35,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Melodic_Loops/Melodic_Stack_no_keys/CPA_TCP_77_melodic_stack_careless_no_keys_D.wav",
+    "hint": "audio: Chord Loop | filename: Piano | waveform: 470-cent downward pitch glide"
+  },
+  {
+    "id": 36,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon January 2022 Samples/Random Delay Pluck G#m.wav",
+    "hint": "audio: Chord Loop | filename: Pluck | waveform: 670-cent downward pitch glide; long 3.1s decay"
+  },
+  {
+    "id": 37,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/1 - Drum Loops/3 - Snare Loops/Rimshot - Dub Ya - 78 BPM.wav",
+    "hint": "audio: Chord Loop | filename: Rimshot | waveform: 1330-cent downward pitch glide; detuned beating at 1.3Hz; sharp transient"
+  },
+  {
+    "id": 38,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 4.wav",
+    "hint": "audio: Chord Loop | filename: Snare | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 39,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Analogue Collection/Chords - Pads/JX3P Strings D5 CMaj7.wav",
+    "hint": "audio: Chord Loop | filename: Strings | waveform: detuned beating at 3.0Hz; clear harmonic series (f0 42Hz)"
+  },
+  {
+    "id": 40,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODY CHOPS/CHOP_Kickin It #1 (C#).wav",
+    "hint": "audio: Chord Loop | filename: Vocal Chop | waveform: detuned beating at 1.6Hz; long 6.0s decay; clear harmonic series (f0 138Hz)"
+  },
+  {
+    "id": 41,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/datnew break - 10.wav",
+    "hint": "audio: Clap | filename: Drum Loop | waveform: detuned beating at 1.5Hz; clear harmonic series (f0 62Hz)"
+  },
+  {
+    "id": 42,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Hihats/Just Jared - OP1 Drums Hihat 15.1.wav",
+    "hint": "audio: Clap | filename: Hi-Hat | waveform: sharp transient; noisy rather than tonal"
+  },
+  {
+    "id": 43,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Perc/LFM2_Clap 808_REV (3).wav",
+    "hint": "audio: Clap | filename: Kick | waveform: noisy rather than tonal"
+  },
+  {
+    "id": 44,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Stadium_Loops/KSHMR_Stadium_Loop_05_128.wav",
+    "hint": "audio: Clap | filename: Loop | waveform: detuned beating at 2.1Hz; long 3.2s decay; clear harmonic series (f0 27Hz); wide stereo image"
+  },
+  {
+    "id": 45,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Snares/Just Jared - OP1 Drums Snare 14.wav",
+    "hint": "audio: Clap | filename: Snare | waveform: detuned beating at 1.9Hz; noisy rather than tonal"
+  },
+  {
+    "id": 46,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Clap_FX/KSHMR_Clap_FX_08_Reverb_Clap_w_Flutter.wav",
+    "hint": "audio: Crash | filename: Clap | waveform: clear harmonic series (f0 26Hz); wide stereo image"
+  },
+  {
+    "id": 47,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Fills/KSHMR_Short_Fills/KSHMR_Short_Fills_130-160/KSHMR_Short_Drum_Fill_17_160.wav",
+    "hint": "audio: Crash | filename: Drum Fill | waveform: detuned beating at 3.7Hz"
+  },
+  {
+    "id": 48,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Cinematic_Drum_Loops/KSHMR_Cinematic_Drum_Loop_01_64.wav",
+    "hint": "audio: Crash | filename: Drum Loop | waveform: wide stereo image"
+  },
+  {
+    "id": 49,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Open Hat) Destroyed.wav",
+    "hint": "audio: Crash | filename: Hi-Hat | waveform: noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 50,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Cymbals/LFM2_808 Cym (1).wav",
+    "hint": "audio: Crash | filename: Kick | waveform: clear harmonic series (f0 713Hz)"
+  },
+  {
+    "id": 51,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Rides/KSHMR_Ride_06.wav",
+    "hint": "audio: Crash | filename: Ride | waveform: clear harmonic series (f0 1043Hz); wide stereo image"
+  },
+  {
+    "id": 52,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon January 2022 Samples/FX Riser.wav",
+    "hint": "audio: Crash | filename: Riser | waveform: 430-cent downward pitch glide; noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 53,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bowser Meat Samples/Snare EricSneo 3 V2.wav",
+    "hint": "audio: Crash | filename: Snare | waveform: clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 54,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Fills/KSHMR_Long_Fills/KSHMR_Long_Fill_15_140.wav",
+    "hint": "audio: Drum Loop | filename: Drum Fill | waveform: 2550-cent downward pitch glide; detuned beating at 4.7Hz"
+  },
+  {
+    "id": 55,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Breaks/African Music Machine - Black Water Gold.wav",
+    "hint": "audio: Drum Loop | filename: Foley | waveform: detuned beating at 7.6Hz"
+  },
+  {
+    "id": 56,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/FALO BOOM BAP.wav",
+    "hint": "audio: Drum Loop | filename: Impact | waveform: detuned beating at 3.5Hz"
+  },
+  {
+    "id": 57,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 2/85 BPM/Chops/85BPM_3 KICK 2.wav",
+    "hint": "audio: Drum Loop | filename: Kick | waveform: detuned beating at 1.4Hz"
+  },
+  {
+    "id": 58,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/95 BPM/monosole_95bpm_11.wav",
+    "hint": "audio: Drum Loop | filename: Loop | waveform: strong sub energy (36% below 60Hz); 770-cent downward pitch glide; detuned beating at 1.6Hz; clear harmonic series (f0 31Hz)"
+  },
+  {
+    "id": 59,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL SNARE 1.wav",
+    "hint": "audio: Drum Loop | filename: Snare | waveform: 1130-cent downward pitch glide; detuned beating at 1.5Hz; sharp transient"
+  },
+  {
+    "id": 60,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Marching_Band_Snare_Loops/KSHMR_Marching_Snare_Loop_12_116.wav",
+    "hint": "audio: Drum Loop | filename: Snare Loop | waveform: 410-cent downward pitch glide; detuned beating at 4.8Hz"
+  },
+  {
+    "id": 61,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Claps/AKT-CLP-A006_bip.wav",
+    "hint": "audio: Foley | filename: Clap | waveform: noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 62,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (18).wav",
+    "hint": "audio: Foley | filename: Crash | waveform: clear harmonic series (f0 1138Hz)"
+  },
+  {
+    "id": 63,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/datnew break - 1.wav",
+    "hint": "audio: Foley | filename: Drum Loop | waveform: detuned beating at 1.5Hz; clear harmonic series (f0 61Hz)"
+  },
+  {
+    "id": 64,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Perc & Hi Hat) Barber Shop.wav",
+    "hint": "audio: Foley | filename: Hi-Hat | waveform: noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 65,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE KICK 3.wav",
+    "hint": "audio: Foley | filename: Kick | waveform: detuned beating at 1.4Hz; sharp transient; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 66,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 2/Key Desk.wav",
+    "hint": "audio: Foley | filename: Piano | waveform: clear harmonic series (f0 55Hz)"
+  },
+  {
+    "id": 67,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/WHITE SNARE 1_2.wav",
+    "hint": "audio: Foley | filename: Snare | waveform: strong sub energy (94% below 60Hz); detuned beating at 2.7Hz; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 68,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Hand_Clap_Loops/KSHMR_Hand_Clap_Loop_01_100.wav",
+    "hint": "audio: Foley Loop | filename: Clap | waveform: detuned beating at 2.5Hz; wide stereo image"
+  },
+  {
+    "id": 69,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/FILL.wav",
+    "hint": "audio: Foley Loop | filename: Drum Fill | waveform: detuned beating at 2.2Hz; long 1.0s decay; clear harmonic series (f0 27Hz)"
+  },
+  {
+    "id": 70,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/watchinu break.wav",
+    "hint": "audio: Foley Loop | filename: Drum Loop | waveform: strong sub energy (36% below 60Hz); 670-cent downward pitch glide; detuned beating at 1.5Hz; clear harmonic series (f0 44Hz)"
+  },
+  {
+    "id": 71,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Household Percussion April 2016/HOUSEHOLD_378.wav",
+    "hint": "audio: Foley Loop | filename: Foley | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 72,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Main_Instruments/KSHMR_Guitar/KSHMR_Guitar_FX/KSHMR_Guitar_FX_02_Mute_Strum_104_.wav",
+    "hint": "audio: Foley Loop | filename: Guitar | waveform: detuned beating at 6.9Hz; clear harmonic series (f0 26Hz)"
+  },
+  {
+    "id": 73,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_countryside/JVIEWS_countryside_loops/JVIEWS_hihat_alternative_earth_top_particles_130.wav",
+    "hint": "audio: Foley Loop | filename: Hi-Hat | waveform: detuned beating at 1.1Hz; wide stereo image"
+  },
+  {
+    "id": 74,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/CHIKA LOOP.wav",
+    "hint": "audio: Foley Loop | filename: Loop | waveform: 300-cent downward pitch glide; detuned beating at 1.9Hz"
+  },
+  {
+    "id": 75,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon August 2024 Samples/DRONE C _2.wav",
+    "hint": "audio: Foley Loop | filename: Pad | waveform: 430-cent downward pitch glide; detuned beating at 1.9Hz; clear harmonic series (f0 65Hz); wide stereo image"
+  },
+  {
+    "id": 76,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/1 - Drum Loops/4 - Top Loops/Perc - Low Slug - 78 BPM.wav",
+    "hint": "audio: Foley Loop | filename: Percussion | waveform: detuned beating at 5.2Hz; wide stereo image"
+  },
+  {
+    "id": 77,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Percussion Loop) Everywhere Percs 140bpm.wav",
+    "hint": "audio: Foley Loop | filename: Percussion Loop | waveform: 2790-cent downward pitch glide; clear harmonic series (f0 405Hz); wide stereo image"
+  },
+  {
+    "id": 78,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon February 2023 Samples/fast piano arp Dm.wav",
+    "hint": "audio: Foley Loop | filename: Piano | waveform: detuned beating at 2.3Hz; long 3.5s decay; wide stereo image"
+  },
+  {
+    "id": 79,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/The Zulla Stems/The Zulla - Kalimba.wav",
+    "hint": "audio: Foley Loop | filename: Pluck | waveform: long 2.6s decay; clear harmonic series (f0 109Hz); wide stereo image"
+  },
+  {
+    "id": 80,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (OG Versions)/OGSTEM_Strap In the Ride #2 [72 BPM] (C#).wav",
+    "hint": "audio: Foley Loop | filename: Ride | waveform: 690-cent downward pitch glide; detuned beating at 4.8Hz"
+  },
+  {
+    "id": 81,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/1 - Loops/2 - Snare - 172 BPM/Snare - Broken Transient - 172 BPM.wav",
+    "hint": "audio: Foley Loop | filename: Snare | waveform: detuned beating at 1.4Hz"
+  },
+  {
+    "id": 82,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Claps/@prod.ksubi - Clap + Hi Hat.wav",
+    "hint": "audio: Hi-Hat | filename: Clap | waveform: sharp transient; noisy rather than tonal"
+  },
+  {
+    "id": 83,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Crash Motherboard.wav",
+    "hint": "audio: Hi-Hat | filename: Crash | waveform: detuned beating at 1.9Hz; clear harmonic series (f0 27Hz); noisy rather than tonal"
+  },
+  {
+    "id": 84,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/FUGITIVE/BREAK_7.WAV",
+    "hint": "audio: Hi-Hat | filename: Drum Loop | waveform: strong sub energy (45% below 60Hz); 500-cent downward pitch glide; sharp transient"
+  },
+  {
+    "id": 85,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Open Hats/808 Kylen Open Hat.wav",
+    "hint": "audio: Hi-Hat | filename: Kick | waveform: clear harmonic series (f0 665Hz); noisy rather than tonal"
+  },
+  {
+    "id": 86,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/5 - Hats & Cymbals/Ride - Choked.wav",
+    "hint": "audio: Hi-Hat | filename: Ride | waveform: detuned beating at 2.7Hz; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 87,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Snare) Hi End Snare.wav",
+    "hint": "audio: Hi-Hat | filename: Snare | waveform: detuned beating at 1.2Hz; sharp transient; clear harmonic series (f0 0Hz); noisy rather than tonal"
+  },
+  {
+    "id": 88,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/NICKY_ROMERO/NICKY_ROMERO_Clap_Toulouse.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Clap | waveform: detuned beating at 1.1Hz; clear harmonic series (f0 25Hz); noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 89,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/CHINA 80.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Crash | waveform: 1110-cent downward pitch glide; detuned beating at 2.1Hz"
+  },
+  {
+    "id": 90,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/LUIS_TORRES/LUIS_TORRES_Ride_Fall.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Downlifter | waveform: detuned beating at 2.1Hz; clear harmonic series (f0 405Hz)"
+  },
+  {
+    "id": 91,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Fills/KSHMR_Long_Fills/KSHMR_Long_Fill_17_140.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Drum Fill | waveform: detuned beating at 4.7Hz; long 1.8s decay; clear harmonic series (f0 42Hz); wide stereo image"
+  },
+  {
+    "id": 92,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Full_Drum_Loop_Gm.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Drum Loop | waveform: 630-cent downward pitch glide; detuned beating at 2.0Hz"
+  },
+  {
+    "id": 93,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Open Hats/TwentySix Open Hat.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Hi-Hat | waveform: clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 94,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 2/CHOPS/CRYSTAL KICK 1.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Kick | waveform: detuned beating at 2.9Hz"
+  },
+  {
+    "id": 95,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Dirty Arse Drum Breaks/Dirty Arse Drum Breaks 1/100 BPM/monosole_100bpm_10.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Loop | waveform: strong sub energy (54% below 60Hz); 580-cent downward pitch glide; detuned beating at 2.1Hz; clear harmonic series (f0 31Hz)"
+  },
+  {
+    "id": 96,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 5/MARCH TOMS.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion | waveform: detuned beating at 1.9Hz"
+  },
+  {
+    "id": 97,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Shaker_Loop_1_Percussion_Bendji_Allonce_120_loop.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion Loop | waveform: detuned beating at 8.0Hz"
+  },
+  {
+    "id": 98,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/1 - Loops/2 - Snare - 172 BPM/Snare - Tight Micro - 172 BPM.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Snare | waveform: 680-cent downward pitch glide; detuned beating at 4.3Hz; clear harmonic series (f0 255Hz); wide stereo image"
+  },
+  {
+    "id": 99,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/CHINA SOUL_2.wav",
+    "hint": "audio: Kick | filename: Crash | waveform: detuned beating at 2.1Hz; clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 100,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_FX_Elements/KSHMR_Sub_Drops/KSHMR_Sub_Drop_13_G.wav",
+    "hint": "audio: Kick | filename: Downlifter | waveform: strong sub energy (86% below 60Hz); 1520-cent downward pitch glide; long 1.6s decay; clear harmonic series (f0 38Hz)"
+  },
+  {
+    "id": 101,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/hold tight break.wav",
+    "hint": "audio: Kick | filename: Drum Loop | waveform: strong sub energy (55% below 60Hz); detuned beating at 1.7Hz"
+  },
+  {
+    "id": 102,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Household Percussion April 2016/HOUSEHOLD_200.wav",
+    "hint": "audio: Kick | filename: Foley | waveform: strong sub energy (71% below 60Hz); 620-cent downward pitch glide"
+  },
+  {
+    "id": 103,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF DX21 Vol 1/GTR Pluck/GTR Pluck 4 G0.wav",
+    "hint": "audio: Kick | filename: Guitar | waveform: detuned beating at 2.0Hz; near-pure sine (93% of energy at the fundamental)"
+  },
+  {
+    "id": 104,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/BOOM.wav",
+    "hint": "audio: Kick | filename: Impact | waveform: strong sub energy (80% below 60Hz); 490-cent downward pitch glide; long 1.1s decay; near-pure sine (79% of energy at the fundamental)"
+  },
+  {
+    "id": 105,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/bitty loop Samples/45bpmBD8_SP1200R.wav",
+    "hint": "audio: Kick | filename: Loop | waveform: strong sub energy (40% below 60Hz); detuned beating at 1.9Hz"
+  },
+  {
+    "id": 106,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Synths/KSHMR_Bass_Shots/KSHMR_Bass_Pluck/KSHMR_Bass_Pluck_12_E.wav",
+    "hint": "audio: Kick | filename: Pluck | waveform: detuned beating at 2.7Hz; clear harmonic series (f0 41Hz)"
+  },
+  {
+    "id": 107,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 1/CHOPS/RUSH SNARE 1.wav",
+    "hint": "audio: Kick | filename: Snare | waveform: detuned beating at 1.4Hz; sharp transient"
+  },
+  {
+    "id": 108,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Full_Drum_Loop_01_118bpm.wav",
+    "hint": "audio: Kick Loop | filename: Drum Loop | waveform: strong sub energy (49% below 60Hz); 670-cent downward pitch glide; detuned beating at 2.0Hz"
+  },
+  {
+    "id": 109,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/BOOM BAP.wav",
+    "hint": "audio: Kick Loop | filename: Impact | waveform: detuned beating at 1.5Hz"
+  },
+  {
+    "id": 110,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/808.wav",
+    "hint": "audio: Kick Loop | filename: Kick | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 111,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Drum Loops/Just Jared - OP1 Drums Loop 8 (81 BPM).wav",
+    "hint": "audio: Kick Loop | filename: Loop | waveform: strong sub energy (40% below 60Hz)"
+  },
+  {
+    "id": 112,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/ZEDD/ZEDD_Claps_Snare_Done_with_Love_128.wav",
+    "hint": "audio: Kick Loop | filename: Snare | waveform: detuned beating at 1.1Hz; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 113,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Orchestral_Instruments/KSHMR_Brass/KSHMR_Brass_Loops/KSHMR_Brass_Loop_19_152_C#.wav",
+    "hint": "audio: Other/none | filename: Brass | waveform: 510-cent downward pitch glide; detuned beating at 2.5Hz; long 4.3s decay; clear harmonic series (f0 138Hz); wide stereo image"
+  },
+  {
+    "id": 114,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF Sub Phatty 1/Tape Lead 2/Tape Lead 2-22 D#0.wav",
+    "hint": "audio: Other/none | filename: Lead | waveform: strong sub energy (52% below 60Hz); detuned beating at 2.0Hz; long 1.9s decay; clear harmonic series (f0 39Hz)"
+  },
+  {
+    "id": 115,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Player Haters #3 [77 BPM] (F).wav",
+    "hint": "audio: Other/none | filename: Loop | waveform: strong sub energy (54% below 60Hz); 200-cent downward pitch glide; long 3.7s decay"
+  },
+  {
+    "id": 116,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Organ Donor #5 [75 BPM] (B).wav",
+    "hint": "audio: Other/none | filename: Organ | waveform: 670-cent downward pitch glide; clear harmonic series (f0 62Hz)"
+  },
+  {
+    "id": 117,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF JX3P Vol 5/Washboard Pad/Washboard Pad C0.wav",
+    "hint": "audio: Other/none | filename: Pad | waveform: 620-cent downward pitch glide; detuned beating at 2.4Hz; long 5.7s decay; clear harmonic series (f0 33Hz)"
+  },
+  {
+    "id": 118,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_World_Sounds/KSHMR_India/KSHMR_India_PL_Sitar_and_Percussion_Loop_80_C#.wav",
+    "hint": "audio: Other/none | filename: Percussion Loop | waveform: long 1.5s decay; clear harmonic series (f0 278Hz); wide stereo image"
+  },
+  {
+    "id": 119,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF Alpha Juno Vol 1/G Star Lead/G Star Lead - F#2.wav",
+    "hint": "audio: Pad | filename: Lead | waveform: 2530-cent downward pitch glide; long 7.7s decay; clear harmonic series (f0 140Hz)"
+  },
+  {
+    "id": 120,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (OG Versions)/OGSTEM_In My Brain #2 [76 BPM] (F#).wav",
+    "hint": "audio: Pad | filename: Loop | waveform: 1210-cent downward pitch glide; long 6.2s decay; clear harmonic series (f0 82Hz)"
+  },
+  {
+    "id": 121,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Orchestral_Instruments/KSHMR_Strings/KSHMR_String_Loops/KSHMR_String_Loop_04_105_Fm.wav",
+    "hint": "audio: Pad | filename: Strings | waveform: detuned beating at 1.7Hz; long 3.3s decay; clear harmonic series (f0 87Hz); wide stereo image"
+  },
+  {
+    "id": 122,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Perc/LFM2_Cowbell 808_REV (3).wav",
+    "hint": "audio: Percussion | filename: Kick | waveform: sharp transient; noisy rather than tonal"
+  },
+  {
+    "id": 123,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/2 Cajon Box/1 Cajon Box/2 Snare Slap/Organic - Cajon Snare_A (19).wav",
+    "hint": "audio: Percussion | filename: Snare | waveform: detuned beating at 1.0Hz; sharp transient; clear harmonic series (f0 42Hz); noisy rather than tonal"
+  },
+  {
+    "id": 124,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/blockparty break.wav",
+    "hint": "audio: Percussion Loop | filename: Drum Loop | waveform: 420-cent downward pitch glide; detuned beating at 3.6Hz"
+  },
+  {
+    "id": 125,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Main_Instruments/KSHMR_Guitar/KSHMR_Guitar_Chords/KSHMR_Acoustic_Chords/KSHMR_Acoustic_Guitar_Chords_29_128_D-Bm-F#m-A_Muted.wav",
+    "hint": "audio: Percussion Loop | filename: Guitar | waveform: detuned beating at 1.6Hz; long 1.8s decay; wide stereo image"
+  },
+  {
+    "id": 126,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/No Kick LP - 90 BPM (A).wav",
+    "hint": "audio: Percussion Loop | filename: Kick | waveform: noisy rather than tonal"
+  },
+  {
+    "id": 127,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/1 - Loops/1 - Full Loops /Drums - Punch Shuffler - 130 BPM.wav",
+    "hint": "audio: Percussion Loop | filename: Loop | waveform: strong sub energy (52% below 60Hz); 1930-cent downward pitch glide; detuned beating at 2.2Hz; clear harmonic series (f0 27Hz)"
+  },
+  {
+    "id": 128,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 4/COWBELL.wav",
+    "hint": "audio: Percussion Loop | filename: Percussion | waveform: detuned beating at 3.6Hz"
+  },
+  {
+    "id": 129,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/2 Cajon Box/1 Cajon Box/2 Snare Slap/Organic - Cajon Snare_A (22).wav",
+    "hint": "audio: Percussion Loop | filename: Snare | waveform: detuned beating at 1.0Hz; sharp transient"
+  },
+  {
+    "id": 130,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Snare_Drum_Loops/KSHMR_Snare_Loop_06_130.wav",
+    "hint": "audio: Percussion Loop | filename: Snare Loop | waveform: detuned beating at 2.7Hz; clear harmonic series (f0 473Hz)"
+  },
+  {
+    "id": 131,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Orchestral_Instruments/KSHMR_Strings/KSHMR_String_Loops/KSHMR_String_Loop_15_128_Fm_Col_Legno.wav",
+    "hint": "audio: Percussion Loop | filename: Strings | waveform: detuned beating at 4.3Hz; long 3.2s decay; wide stereo image"
+  },
+  {
+    "id": 132,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Clap_03.wav",
+    "hint": "audio: Rimshot | filename: Clap | waveform: detuned beating at 1.7Hz; noisy rather than tonal"
+  },
+  {
+    "id": 133,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/back and forth break.wav",
+    "hint": "audio: Rimshot | filename: Drum Loop | waveform: detuned beating at 1.7Hz; clear harmonic series (f0 49Hz)"
+  },
+  {
+    "id": 134,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Ohh_04.wav",
+    "hint": "audio: Rimshot | filename: Hi-Hat | waveform: detuned beating at 1.5Hz; noisy rather than tonal"
+  },
+  {
+    "id": 135,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/One_Shots/Drum_One_Shots/Kicks/CPA_TCP_kick_ladies_night.wav",
+    "hint": "audio: Rimshot | filename: Kick | waveform: strong sub energy (57% below 60Hz)"
+  },
+  {
+    "id": 136,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_Perc_Loop_01_118bpm.wav",
+    "hint": "audio: Rimshot | filename: Percussion Loop | waveform: detuned beating at 3.9Hz; clear harmonic series (f0 25Hz); noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 137,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Clap) Got The Keys.wav",
+    "hint": "audio: Rimshot | filename: Piano | waveform: detuned beating at 2.3Hz; clear harmonic series (f0 26Hz)"
+  },
+  {
+    "id": 138,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Gems From The Crates/Snares/AKT-SNR-A044_bip.wav",
+    "hint": "audio: Rimshot | filename: Snare | waveform: noisy rather than tonal"
+  },
+  {
+    "id": 139,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/5 - Deep Textures/Texture - Bowed Cymbal High.wav",
+    "hint": "audio: SFX | filename: Crash | waveform: long 5.3s decay; clear harmonic series (f0 69Hz); wide stereo image"
+  },
+  {
+    "id": 140,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF Alpha Juno Vol 1/G Star Lead/G Star Lead - F#5.wav",
+    "hint": "audio: SFX | filename: Lead | waveform: long 7.6s decay; clear harmonic series (f0 1118Hz)"
+  },
+  {
+    "id": 141,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (OG Versions)/OGSTEM_The Prophecy #4 [72 BPM] (A#).wav",
+    "hint": "audio: SFX | filename: Loop | waveform: strong sub energy (41% below 60Hz); long 7.3s decay; clear harmonic series (f0 58Hz)"
+  },
+  {
+    "id": 142,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF JX3P Vol 5/Hard Cider/Hard Cider Sync 27 B3.wav",
+    "hint": "audio: SFX | filename: Organ | waveform: long 1.6s decay; clear harmonic series (f0 504Hz)"
+  },
+  {
+    "id": 143,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF JX3P Vol 5/Washboard Pad/Washboard Pad 2 E0.wav",
+    "hint": "audio: SFX | filename: Pad | waveform: 990-cent downward pitch glide; detuned beating at 2.4Hz; long 5.7s decay; clear harmonic series (f0 42Hz)"
+  },
+  {
+    "id": 144,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Big_Snares/KSHMR_Big_Snare_08.wav",
+    "hint": "audio: SFX | filename: Snare | waveform: detuned beating at 1.1Hz; wide stereo image"
+  },
+  {
+    "id": 145,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Analogue Collection/Chords - Pads/JX3P Strings D5 Fmaj7.wav",
+    "hint": "audio: SFX | filename: Strings | waveform: 1920-cent downward pitch glide; detuned beating at 1.6Hz; long 7.4s decay; clear harmonic series (f0 42Hz)"
+  },
+  {
+    "id": 146,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra One Shots/Diamaudix_Audio_PAS_IV_Clap_04.wav",
+    "hint": "audio: Snare | filename: Clap | waveform: detuned beating at 1.7Hz; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 147,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/The Drum Broker - International Breaks & Essential Kicks/The Drum Broker - International Breaks 3/7 FIRES BKK BREAK_3.wav",
+    "hint": "audio: Snare | filename: Drum Loop | waveform: 310-cent downward pitch glide; detuned beating at 1.5Hz"
+  },
+  {
+    "id": 148,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Raw Drums/Raw/Raw Hat 06.wav",
+    "hint": "audio: Snare | filename: Hi-Hat | waveform: sharp transient"
+  },
+  {
+    "id": 149,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare 808_REV (2).wav",
+    "hint": "audio: Snare | filename: Kick | waveform: clear harmonic series (f0 182Hz)"
+  },
+  {
+    "id": 150,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Auckland2013 Samples/45bpmSD9_SP1200F.wav",
+    "hint": "audio: Snare | filename: Loop | waveform: detuned beating at 2.4Hz; sharp transient"
+  },
+  {
+    "id": 151,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Orchestral_Instruments/KSHMR_Brass/KSHMR_Brass_Loops/KSHMR_Brass_Loop_15_140_E_Arabic.wav",
+    "hint": "audio: Synth Loop | filename: Brass | waveform: detuned beating at 4.7Hz; clear harmonic series (f0 331Hz); wide stereo image"
+  },
+  {
+    "id": 152,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Melodic_Loops/Melodic_Stack_no_guitar/CPA_TCP_100_melodic_stack_traffic_control_no_guitar_E.wav",
+    "hint": "audio: Synth Loop | filename: Guitar | waveform: 700-cent downward pitch glide; detuned beating at 1.7Hz"
+  },
+  {
+    "id": 153,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Song_Starters/KSHMR_Song_Starters_Hip_Hop/KSHMR_Song_Starter_Hip_Hop_Lavish_140_Fm_Lead.wav",
+    "hint": "audio: Synth Loop | filename: Lead | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 154,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Black Octopus Sound - Pure Analog Sweeps IV (2021)/Xtra Loops/Diamaudix_Audio_PAS_IV_120_Arp_Loop_Gm.wav",
+    "hint": "audio: Synth Loop | filename: Loop | waveform: detuned beating at 2.0Hz"
+  },
+  {
+    "id": 155,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon January 2022 Samples/Breakthrough Piano F harmonic minor.wav",
+    "hint": "audio: Synth Loop | filename: Piano | waveform: 430-cent downward pitch glide; detuned beating at 1.2Hz; long 7.3s decay; wide stereo image"
+  },
+  {
+    "id": 156,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Orchestral_Instruments/KSHMR_Strings/KSHMR_String_Loops/KSHMR_String_Loop_14_128_Fm.wav",
+    "hint": "audio: Synth Loop | filename: Strings | waveform: detuned beating at 4.3Hz; long 2.7s decay; wide stereo image"
+  },
+  {
+    "id": 157,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_FX_Elements/KSHMR_Sub_Drops/KSHMR_Sub_Drop_01_A.wav",
+    "hint": "audio: Synth One-Shot | filename: Downlifter | waveform: 2200-cent downward pitch glide; long 3.4s decay"
+  },
+  {
+    "id": 158,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/808s/Another Spinz 808 .wav",
+    "hint": "audio: Synth One-Shot | filename: Kick | waveform: strong sub energy (97% below 60Hz); 450-cent downward pitch glide; long 1.7s decay; noisy rather than tonal"
+  },
+  {
+    "id": 159,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Analogue Collection/Singles/P08_LEAD_23 C2.wav",
+    "hint": "audio: Synth One-Shot | filename: Lead | waveform: detuned beating at 5.8Hz; long 4.7s decay; near-pure sine (92% of energy at the fundamental)"
+  },
+  {
+    "id": 160,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (OG Versions)/OGSTEM_Hollow Tips #4 [70 BPM] (E).wav",
+    "hint": "audio: Synth One-Shot | filename: Loop | waveform: long 2.9s decay; clear harmonic series (f0 1008Hz); wide stereo image"
+  },
+  {
+    "id": 161,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Retro Digital Collection/Bass/DX21 RGB Organ C1.wav",
+    "hint": "audio: Synth One-Shot | filename: Organ | waveform: 460-cent downward pitch glide; detuned beating at 2.9Hz; long 4.7s decay; clear harmonic series (f0 65Hz)"
+  },
+  {
+    "id": 162,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF JX3P Vol 5/Washboard Pad/Washboard Pad 18 G2.wav",
+    "hint": "audio: Synth One-Shot | filename: Pad | waveform: detuned beating at 2.2Hz; long 5.5s decay; clear harmonic series (f0 200Hz)"
+  },
+  {
+    "id": 163,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Down to Ride #2 [74 BPM] (G).wav",
+    "hint": "audio: Synth One-Shot | filename: Ride | waveform: 730-cent downward pitch glide; noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 164,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Fills/KSHMR_Synth_Fills/KSHMR_Synth_Fill_21_155_Dm.wav",
+    "hint": "audio: Vocal Loop | filename: Drum Fill | waveform: detuned beating at 1.3Hz; wide stereo image"
+  },
+  {
+    "id": 165,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Open Hats/Sandman Open Hat.wav",
+    "hint": "audio: Vocal Loop | filename: Hi-Hat | waveform: detuned beating at 2.2Hz; clear harmonic series (f0 50Hz); wide stereo image"
+  },
+  {
+    "id": 166,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Synths/KSHMR_Synth_Loops/KSHMR_Synth_Loop_28_128_F#m.wav",
+    "hint": "audio: Vocal Loop | filename: Loop | waveform: detuned beating at 1.1Hz; wide stereo image"
+  },
+  {
+    "id": 167,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/Open Hats/Reversed Slingshot Open Hat.wav",
+    "hint": "audio: Vocal One-Shot | filename: Hi-Hat | waveform: noisy rather than tonal"
+  },
+  {
+    "id": 168,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF Alpha Juno Vol 1/G Star Lead/G Star Lead - F#6.wav",
+    "hint": "audio: Vocal One-Shot | filename: Lead | waveform: long 7.6s decay; clear harmonic series (f0 1118Hz)"
+  },
+  {
+    "id": 169,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Still Mobbin #2 [73 BPM] (F#).wav",
+    "hint": "audio: Vocal One-Shot | filename: Loop | waveform: 180-cent downward pitch glide; detuned beating at 5.9Hz; clear harmonic series (f0 1112Hz)"
+  },
+  {
+    "id": 170,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Sentient/sentient_bass+drums+fx/Sentient - Break.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Drum Loop | waveform: no readable waveform evidence"
+  },
+  {
+    "id": 171,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Silk Wave Stems/Drums - Foley.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Foley | waveform: no readable waveform evidence"
+  },
+  {
+    "id": 172,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/The Zulla Stems/The Zulla - Guitar.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Guitar | waveform: no readable waveform evidence"
+  },
+  {
+    "id": 173,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Open Hats/@prod.ksubi - Le wa Open Hat.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Hi-Hat | waveform: detuned beating at 2.9Hz; clear harmonic series (f0 421Hz); wide stereo image"
+  },
+  {
+    "id": 174,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Sentient/sentient_bass+drums+fx/Sentient - Kick.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Kick | waveform: no readable waveform evidence"
+  },
+  {
+    "id": 175,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Deadly Theme #3 [73 BPM] (G).wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Loop | waveform: detuned beating at 1.4Hz; clear harmonic series (f0 1171Hz); wide stereo image"
+  },
+  {
+    "id": 176,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/The Zulla Stems/The Zulla - Percussion.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Percussion | waveform: no readable waveform evidence"
+  },
+  {
+    "id": 177,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_808 Heavy (3) (G).wav",
+    "hint": "audio: Bass Hit | filename: Kick | waveform: strong sub energy (98% below 60Hz); 280-cent downward pitch glide; long 3.3s decay; near-pure sine (91% of energy at the fundamental)"
+  },
+  {
+    "id": 178,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/3 - Bass Loops/Bass - Electric Boomerang - Emin - 78 BPM.wav",
+    "hint": "audio: Bass Hit | filename: Loop | waveform: clear harmonic series (f0 41Hz)"
+  },
+  {
+    "id": 179,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Home Clouds - Pop Rock/splice-export__home-clouds-at-rubber-tracks-london-pop-up/loop/Drums/RT_Home_Clouds_Drum_Loop_13_Drums_Will_Allen_132_loop.wav",
+    "hint": "audio: Bass Loop | filename: Drum Loop | waveform: 250-cent downward pitch glide; detuned beating at 4.4Hz; long 2.2s decay; clear harmonic series (f0 37Hz)"
+  },
+  {
+    "id": 180,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/1 - Loops/5 - Foley Loops/Foley - Filtered Vinyl - 130 BPM.wav",
+    "hint": "audio: Bass Loop | filename: Foley | waveform: long 1.6s decay; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 181,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Main_Instruments/KSHMR_Guitar/KSHMR_Guitar_Chords/KSHMR_Acoustic_Chords/KSHMR_Acoustic_Guitar_Chords_34_140_Am-G-F-G.wav",
+    "hint": "audio: Bass Loop | filename: Guitar | waveform: 350-cent downward pitch glide; detuned beating at 1.2Hz; wide stereo image"
+  },
+  {
+    "id": 182,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Cool EFX Samples/Impact HasItAll.wav",
+    "hint": "audio: Bass Loop | filename: Impact | waveform: strong sub energy (64% below 60Hz); detuned beating at 1.2Hz; long 7.7s decay; clear harmonic series (f0 27Hz); wide stereo image"
+  },
+  {
+    "id": 183,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/1 - Loops/1 - Kick - 172 BPM/Kick - Snap Cellar 2 - 172 BPM.wav",
+    "hint": "audio: Bass Loop | filename: Kick | waveform: strong sub energy (85% below 60Hz); detuned beating at 2.9Hz; clear harmonic series (f0 25Hz)"
+  },
+  {
+    "id": 184,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/3 - Bass Loops/Bass - Cycle - CMaj - 78 BPM.wav",
+    "hint": "audio: Bass Loop | filename: Loop | waveform: strong sub energy (97% below 60Hz); detuned beating at 1.6Hz; long 6.7s decay"
+  },
+  {
+    "id": 185,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon August 2024 Samples/piano reese Cm.wav",
+    "hint": "audio: Bass Loop | filename: Piano | waveform: strong sub energy (65% below 60Hz); 190-cent downward pitch glide; detuned beating at 1.2Hz; long 1.4s decay; clear harmonic series (f0 44Hz); wide stereo image"
+  },
+  {
+    "id": 186,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_06.wav",
+    "hint": "audio: Chord Loop | filename: Crash | waveform: long 1.5s decay; clear harmonic series (f0 27Hz); wide stereo image"
+  },
+  {
+    "id": 187,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Cinematic_Drum_Loops/KSHMR_Cinematic_Drum_Loop_10_100.wav",
+    "hint": "audio: Chord Loop | filename: Drum Loop | waveform: wide stereo image"
+  },
+  {
+    "id": 188,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Melodic Elements (Old Movies)/DK_Guitar.wav",
+    "hint": "audio: Chord Loop | filename: Guitar | waveform: 1930-cent downward pitch glide; long 3.0s decay"
+  },
+  {
+    "id": 189,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Deep_Impacts/KSHMR_Orchestral_Deep_Impact_02.wav",
+    "hint": "audio: Chord Loop | filename: Impact | waveform: strong sub energy (87% below 60Hz); long 2.0s decay; wide stereo image"
+  },
+  {
+    "id": 190,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/1 - Drum Loops/2 - Kick Loops/Kick - Refresh 2 - 64 BPM.wav",
+    "hint": "audio: Chord Loop | filename: Kick | waveform: strong sub energy (82% below 60Hz); 1440-cent downward pitch glide"
+  },
+  {
+    "id": 191,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Retro Digital Collection/Singles/SY OPL Lead 9 - C3.wav",
+    "hint": "audio: Chord Loop | filename: Lead | waveform: 1650-cent downward pitch glide; detuned beating at 3.2Hz; long 4.4s decay; clear harmonic series (f0 131Hz)"
+  },
+  {
+    "id": 192,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon January 2023 Samples/diva mood F#phrygian harmonic minor or whatever dude 154 bpm_2.wav",
+    "hint": "audio: Chord Loop | filename: Loop | waveform: clear harmonic series (f0 39Hz)"
+  },
+  {
+    "id": 193,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Analogue Collection/Chords - Pads/JX3P Organ 2 4th.wav",
+    "hint": "audio: Chord Loop | filename: Organ | waveform: 1680-cent downward pitch glide; long 1.0s decay; clear harmonic series (f0 87Hz)"
+  },
+  {
+    "id": 194,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon August 2022 Samples/charming pad Em.wav",
+    "hint": "audio: Chord Loop | filename: Pad | waveform: 2200-cent downward pitch glide; long 1.3s decay; clear harmonic series (f0 88Hz); wide stereo image"
+  },
+  {
+    "id": 195,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/IMANU Patreon June 2022 Samples/weird piano arp G#m with an extra A.wav",
+    "hint": "audio: Chord Loop | filename: Piano | waveform: strong sub energy (41% below 60Hz); detuned beating at 5.8Hz; long 9.9s decay; clear harmonic series (f0 28Hz); wide stereo image"
+  },
+  {
+    "id": 196,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF Sub Phatty 1/Slight Pluck Lead/Slight Pluck Lead-2 F#2.wav",
+    "hint": "audio: Chord Loop | filename: Pluck | waveform: 2250-cent downward pitch glide; detuned beating at 2.2Hz; long 4.7s decay; near-pure sine (91% of energy at the fundamental); clear harmonic series (f0 184Hz)"
+  },
+  {
+    "id": 197,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_countryside/JVIEWS_countryside_one_shots/JVIEWS_hollow_tree_snare_01.wav",
+    "hint": "audio: Chord Loop | filename: Snare | waveform: 230-cent downward pitch glide; wide stereo image"
+  },
+  {
+    "id": 198,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/THE_GOLDEN_ARMY/GOLDEN_ARMY_Strings_Loop_G_140.wav",
+    "hint": "audio: Chord Loop | filename: Strings | waveform: detuned beating at 2.3Hz; long 2.1s decay; clear harmonic series (f0 393Hz); wide stereo image"
+  },
+  {
+    "id": 199,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Melodic Elements (Old Movies)/McLintock 1963 Chop I.wav",
+    "hint": "audio: Chord Loop | filename: Vocal Chop | waveform: long 6.0s decay"
+  },
+  {
+    "id": 200,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/5 - Hats & Cymbals/Hi Hat - Basin.wav",
+    "hint": "audio: Clap | filename: Hi-Hat | waveform: wide stereo image"
+  },
+  {
+    "id": 201,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 2.WAV",
+    "hint": "audio: Clap | filename: Kick | waveform: detuned beating at 1.1Hz"
+  },
+  {
+    "id": 202,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Foley Pack 01/Foley Drums/Snare 12.wav",
+    "hint": "audio: Clap | filename: Snare | waveform: sharp transient; wide stereo image"
+  },
+  {
+    "id": 203,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Ian Chang - Dirty Drums/splice-export__ian-chang-dirty-drums/one_shot/Drums/Hat/RT_Ian_Chang_Open_Hi_Hat_Soft_Drums_Ian_Chang_one_shot.wav",
+    "hint": "audio: Crash | filename: Hi-Hat | waveform: long 1.1s decay"
+  },
+  {
+    "id": 204,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Analogue Collection/Perc/MOD_KICK 14.wav",
+    "hint": "audio: Crash | filename: Kick | waveform: strong sub energy (49% below 60Hz); 390-cent downward pitch glide; long 1.1s decay; clear harmonic series (f0 55Hz)"
+  },
+  {
+    "id": 205,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_studio/JVIEWS_studio_one_shots/JVIEWS_analog_machine_drum_snare_02.wav",
+    "hint": "audio: Crash | filename: Snare | waveform: 2880-cent downward pitch glide; sharp transient"
+  },
+  {
+    "id": 206,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Ian Chang - Dirty Drums/splice-export__ian-chang-dirty-drums/loop/Drums/Dirty-Loop/RT_Ian_Chang_Dirty_Loop_147_Drums_Ian_Chang_72_loop.wav",
+    "hint": "audio: Drum Loop | filename: Loop | waveform: detuned beating at 2.4Hz"
+  },
+  {
+    "id": 207,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Xero Current/MOBB1_SN.wav",
+    "hint": "audio: Drum Loop | filename: Snare | waveform: 360-cent downward pitch glide; detuned beating at 1.0Hz"
+  },
+  {
+    "id": 208,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/Claps/Orlando 100x Clap.wav",
+    "hint": "audio: Foley | filename: Clap | waveform: clear harmonic series (f0 36Hz); wide stereo image"
+  },
+  {
+    "id": 209,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_FX_Elements/KSHMR_Ambiance_and_Foley/KSHMR_Ambiance_Elemental/KSHMR_Water/KSHMR_Water_04_Splash.wav",
+    "hint": "audio: Foley | filename: Crash | waveform: clear harmonic series (f0 26Hz); wide stereo image"
+  },
+  {
+    "id": 210,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/FUGITIVE/BREAK_6.WAV",
+    "hint": "audio: Foley | filename: Drum Loop | waveform: strong sub energy (60% below 60Hz)"
+  },
+  {
+    "id": 211,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Hats/LFM2_Phase OHH (1).wav",
+    "hint": "audio: Foley | filename: Hi-Hat | waveform: detuned beating at 2.7Hz; clear harmonic series (f0 26Hz)"
+  },
+  {
+    "id": 212,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Places 808.wav",
+    "hint": "audio: Foley | filename: Kick | waveform: strong sub energy (85% below 60Hz); noisy rather than tonal"
+  },
+  {
+    "id": 213,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Snares/@prod.ksubi - A With A Ding Snare.wav",
+    "hint": "audio: Foley | filename: Snare | waveform: detuned beating at 1.5Hz; sharp transient; clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 214,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/1 - Drum Loops/3 - Snare Loops/Clap - Abominable Break - 78 BPM.wav",
+    "hint": "audio: Foley Loop | filename: Drum Loop | waveform: 1160-cent downward pitch glide; detuned beating at 1.3Hz; clear harmonic series (f0 54Hz); wide stereo image"
+  },
+  {
+    "id": 215,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/1 - Loops/5 - Foley Loops/Foley - Skipper 1 - 130 BPM.wav",
+    "hint": "audio: Foley Loop | filename: Foley | waveform: detuned beating at 1.1Hz; clear harmonic series (f0 26Hz); wide stereo image"
+  },
+  {
+    "id": 216,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/1 - Loops/5 - Glitch FX - 172 BPM/SFX - Expo Sweep - 172 BPM.wav",
+    "hint": "audio: Foley Loop | filename: Loop | waveform: 200-cent downward pitch glide; clear harmonic series (f0 30Hz); wide stereo image"
+  },
+  {
+    "id": 217,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Cool EFX Samples/Drone SpaceMirror.wav",
+    "hint": "audio: Foley Loop | filename: Pad | waveform: detuned beating at 3.0Hz; wide stereo image"
+  },
+  {
+    "id": 218,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_desert/JVIEWS_desert_loops/JVIEWS_percussion_rattle_01_120.wav",
+    "hint": "audio: Foley Loop | filename: Percussion | waveform: detuned beating at 2.0Hz"
+  },
+  {
+    "id": 219,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #8 [65BPM] (E).wav",
+    "hint": "audio: Foley Loop | filename: Percussion Loop | waveform: detuned beating at 2.2Hz"
+  },
+  {
+    "id": 220,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/CLAP.WAV",
+    "hint": "audio: Hi-Hat | filename: Clap | waveform: sharp transient; noisy rather than tonal"
+  },
+  {
+    "id": 221,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/4 - Hats/Hi-Hat - Junk Splash.wav",
+    "hint": "audio: Hi-Hat | filename: Crash | waveform: detuned beating at 1.6Hz; sharp transient; wide stereo image"
+  },
+  {
+    "id": 222,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan_Sound_2025/Shaper Table Track Project/Samples/Imported/Hihat Open Vinyl Kick.wav",
+    "hint": "audio: Hi-Hat | filename: Kick | waveform: detuned beating at 2.6Hz; clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 223,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Snares/LFM2_Snare Phase Tite.wav",
+    "hint": "audio: Hi-Hat | filename: Snare | waveform: detuned beating at 2.3Hz; clear harmonic series (f0 559Hz)"
+  },
+  {
+    "id": 224,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Hihat_and_Cymbal_Loops/KSHMR_Cymbal_Loops/KSHMR_Cymbal_Loop_02_110_Hand_Cymbals.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Crash | waveform: 1240-cent downward pitch glide; detuned beating at 1.8Hz; clear harmonic series (f0 331Hz)"
+  },
+  {
+    "id": 225,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/weedem break.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Drum Loop | waveform: detuned beating at 3.1Hz; clear harmonic series (f0 27Hz)"
+  },
+  {
+    "id": 226,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/1 - Loops/4 - Hi Hat - 172 BPM/Hi Hat - Click Space Slow - 172 BPM.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Hi-Hat | waveform: detuned beating at 5.0Hz; clear harmonic series (f0 26Hz); noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 227,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_studio/JVIEWS_studio_loops/JVIEWS_analog_machine_drum_06_no_kick_126_F#.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Kick | waveform: strong sub energy (70% below 60Hz); detuned beating at 4.2Hz; clear harmonic series (f0 46Hz)"
+  },
+  {
+    "id": 228,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Drum Loops/Just Jared - OP1 Drums Loop 1 (72 BPM).wav",
+    "hint": "audio: Hi-Hat Loop | filename: Loop | waveform: strong sub energy (57% below 60Hz); 1680-cent downward pitch glide; detuned beating at 4.8Hz; clear harmonic series (f0 43Hz)"
+  },
+  {
+    "id": 229,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/KRANE Samples/KRNE_SpliceSamplePack/Drums/Loops/KRNE_126_Summer_Perc.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion | waveform: 240-cent downward pitch glide; detuned beating at 1.3Hz; clear harmonic series (f0 156Hz); wide stereo image"
+  },
+  {
+    "id": 230,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_77_perc_loop_romantics.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion Loop | waveform: detuned beating at 5.1Hz"
+  },
+  {
+    "id": 231,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/FUGITIVE/BREAK_4.WAV",
+    "hint": "audio: Kick | filename: Drum Loop | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 232,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Ian Chang - Dirty Drums/splice-export__ian-chang-dirty-drums/one_shot/Drums/Snare/RT_Ian_Chang_Tea_Towel_Open_Snare_1_Medium_Drums_Ian_Chang_one_shot.wav",
+    "hint": "audio: Kick | filename: Snare | waveform: 220-cent downward pitch glide; sharp transient"
+  },
+  {
+    "id": 233,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Breaks/Laidback Breaks/likethis break.wav",
+    "hint": "audio: Kick Loop | filename: Drum Loop | waveform: 1860-cent downward pitch glide; clear harmonic series (f0 63Hz)"
+  },
+  {
+    "id": 234,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/1 - Loops/2 - Kick/Kick - Topaz - 130 BPM.wav",
+    "hint": "audio: Kick Loop | filename: Kick | waveform: strong sub energy (75% below 60Hz); 1580-cent downward pitch glide; detuned beating at 1.1Hz; clear harmonic series (f0 28Hz); noisy rather than tonal"
+  },
+  {
+    "id": 235,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/3 - Bass Loops/Bass - Dub Jug - E - 78 BPM.wav",
+    "hint": "audio: Kick Loop | filename: Loop | waveform: strong sub energy (88% below 60Hz); 350-cent downward pitch glide; detuned beating at 5.2Hz; long 1.2s decay"
+  },
+  {
+    "id": 236,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Retro Digital Collection/Bass/DX21 RGB Organ A0.wav",
+    "hint": "audio: Other/none | filename: Organ | waveform: strong sub energy (70% below 60Hz); 180-cent downward pitch glide; detuned beating at 3.0Hz; long 4.6s decay; clear harmonic series (f0 55Hz)"
+  },
+  {
+    "id": 237,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/4 - Atmospheric Loops/Atmosphere - Aurora - Emin - 64 BPM.wav",
+    "hint": "audio: Pad | filename: Loop | waveform: detuned beating at 5.6Hz; long 8.5s decay; clear harmonic series (f0 83Hz); wide stereo image"
+  },
+  {
+    "id": 238,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 1.WAV",
+    "hint": "audio: Percussion | filename: Kick | waveform: detuned beating at 1.1Hz; clear harmonic series (f0 809Hz)"
+  },
+  {
+    "id": 239,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Mike_s Beats #1/BREAK_1.wav",
+    "hint": "audio: Percussion Loop | filename: Drum Loop | waveform: detuned beating at 7.2Hz; long 1.4s decay; clear harmonic series (f0 31Hz)"
+  },
+  {
+    "id": 240,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Zill Rythm - 105 BPM (5).wav",
+    "hint": "audio: Percussion Loop | filename: Loop | waveform: detuned beating at 2.2Hz; clear harmonic series (f0 654Hz)"
+  },
+  {
+    "id": 241,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Melodic Elements (Old Movies)/TNW_Drum & Percussion.wav",
+    "hint": "audio: Percussion Loop | filename: Percussion | waveform: detuned beating at 2.2Hz"
+  },
+  {
+    "id": 242,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Claps/Preset Clap.wav",
+    "hint": "audio: Rimshot | filename: Clap | waveform: detuned beating at 1.1Hz"
+  },
+  {
+    "id": 243,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/FUGITIVE/BREAK_3.WAV",
+    "hint": "audio: Rimshot | filename: Drum Loop | waveform: sharp transient; clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 244,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Hi-Hats/Virtual Hi-Hat.wav",
+    "hint": "audio: Rimshot | filename: Hi-Hat | waveform: sharp transient; noisy rather than tonal"
+  },
+  {
+    "id": 245,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 14.wav",
+    "hint": "audio: Rimshot | filename: Kick | waveform: detuned beating at 2.6Hz; clear harmonic series (f0 28Hz)"
+  },
+  {
+    "id": 246,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Snares/Drops Snare.wav",
+    "hint": "audio: Rimshot | filename: Snare | waveform: detuned beating at 1.1Hz"
+  },
+  {
+    "id": 247,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/6 Cymbals & Toms/1 Cymbals/Organic - Cymbal (14).wav",
+    "hint": "audio: SFX | filename: Crash | waveform: long 2.8s decay; clear harmonic series (f0 26Hz); noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 248,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Vocals/KSHMR_Vocals_FX/KSHMR_Crowd/KSHMR_Crowd_Chant/KSHMR_Crowd_Chant_Loop_05_Yeah_Yeah_Yeah_127_Dm.wav",
+    "hint": "audio: SFX | filename: Loop | waveform: detuned beating at 1.1Hz; long 1.6s decay; wide stereo image"
+  },
+  {
+    "id": 249,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Clap) Venom Attraction.wav",
+    "hint": "audio: Snare | filename: Clap | waveform: noisy rather than tonal"
+  },
+  {
+    "id": 250,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/FUGITIVE/BREAK_5.WAV",
+    "hint": "audio: Snare | filename: Drum Loop | waveform: clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 251,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Short/Foot Hat-4.wav",
+    "hint": "audio: Snare | filename: Hi-Hat | waveform: detuned beating at 1.6Hz"
+  },
+  {
+    "id": 252,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras 2 Samples/Kick Klevines.wav",
+    "hint": "audio: Snare | filename: Kick | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 253,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Fills/KSHMR_Instrumental_Fills/KSHMR_Instrumental_Fill_04_100_Guitar_Dm.wav",
+    "hint": "audio: Synth Loop | filename: Guitar | waveform: detuned beating at 1.0Hz"
+  },
+  {
+    "id": 254,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_Low Down #1 [75 BPM] (C#).wav",
+    "hint": "audio: Synth Loop | filename: Loop | waveform: strong sub energy (66% below 60Hz); detuned beating at 1.8Hz; long 1.8s decay; clear harmonic series (f0 36Hz)"
+  },
+  {
+    "id": 255,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Kicks & 808s/LFM2_808 Clean #2 (BASS ONLY) (G).wav",
+    "hint": "audio: Synth One-Shot | filename: Kick | waveform: strong sub energy (99% below 60Hz); 180-cent downward pitch glide; long 4.4s decay; near-pure sine (93% of energy at the fundamental)"
+  },
+  {
+    "id": 256,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Vocals/KSHMR_Vocals_FX/KSHMR_Crowd/KSHMR_Crowd_Chant/KSHMR_Crowd_Chant_Loop_01_Ohh_Ohh_124.wav",
+    "hint": "audio: Vocal Loop | filename: Hi-Hat | waveform: detuned beating at 1.0Hz; wide stereo image"
+  },
+  {
+    "id": 257,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Vocals/KSHMR_Vocals_Ethnic/KSHMR_Indian_Vocals/KSHMR_Bhangra_Shouts/KSHMR_Bhangra_Shout_10_Ohh_Ha_F.wav",
+    "hint": "audio: Vocal One-Shot | filename: Hi-Hat | waveform: 1970-cent downward pitch glide; wide stereo image"
+  },
+  {
+    "id": 258,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/IMANU/es tu reel stems/etr_00_11 chord pitchbend experiments_3_alasen hat 22.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Hi-Hat | waveform: long 1.9s decay; clear harmonic series (f0 25Hz); noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 259,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/DRE SAMPLES/808_RVSE_CALI.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Kick | waveform: strong sub energy (94% below 60Hz); near-pure sine (92% of energy at the fundamental)"
+  },
+  {
+    "id": 260,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Analogue Collection/Perc/MOD_KICK 07.wav",
+    "hint": "audio: Bass Hit | filename: Kick | waveform: strong sub energy (54% below 60Hz); near-pure sine (95% of energy at the fundamental)"
+  },
+  {
+    "id": 261,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/KORE - Grooves/splice-export__kore-london-grooves/loop/Drums/RT_Kore_Players_Drum_Loop_62_Drums_Sarah_Jones_135_loop.wav",
+    "hint": "audio: Bass Loop | filename: Drum Loop | waveform: strong sub energy (37% below 60Hz); 290-cent downward pitch glide; detuned beating at 4.5Hz; clear harmonic series (f0 53Hz)"
+  },
+  {
+    "id": 262,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Deep_Impacts/KSHMR_Orchestral_Deep_Impact_03.wav",
+    "hint": "audio: Bass Loop | filename: Impact | waveform: strong sub energy (88% below 60Hz); long 2.3s decay"
+  },
+  {
+    "id": 263,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hardstyle_Kicks/KSHMR_Sickdellz_Kick_Madness_All_Keys/KSHMR_x_SD_Madness_Kick_04_F#.wav",
+    "hint": "audio: Bass Loop | filename: Kick | waveform: strong sub energy (81% below 60Hz); detuned beating at 1.4Hz; clear harmonic series (f0 46Hz)"
+  },
+  {
+    "id": 264,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Frame Drum Rythm 1 LP - 115 BPM (A).wav",
+    "hint": "audio: Bass Loop | filename: Loop | waveform: detuned beating at 2.9Hz; long 3.8s decay; near-pure sine (97% of energy at the fundamental)"
+  },
+  {
+    "id": 265,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_countryside/JVIEWS_countryside_tonal/JVIEWS_outdoor_tape_guitar_140_F.wav",
+    "hint": "audio: Chord Loop | filename: Guitar | waveform: detuned beating at 1.8Hz; long 2.5s decay; wide stereo image"
+  },
+  {
+    "id": 266,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Stems (Cassette Processed)/STEM_The Prophecy #4 [72 BPM] (A#).wav",
+    "hint": "audio: Chord Loop | filename: Loop | waveform: strong sub energy (46% below 60Hz); long 4.1s decay; clear harmonic series (f0 58Hz)"
+  },
+  {
+    "id": 267,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Multisamples/MGF JX3P Vol 5/Washboard Pad/Washboard Pad 5 A0.wav",
+    "hint": "audio: Chord Loop | filename: Pad | waveform: 1450-cent downward pitch glide; detuned beating at 2.4Hz; long 5.9s decay; clear harmonic series (f0 56Hz)"
+  },
+  {
+    "id": 268,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/The Zulla Stems/The Zulla - Piano.wav",
+    "hint": "audio: Chord Loop | filename: Piano | waveform: long 3.2s decay; wide stereo image"
+  },
+  {
+    "id": 269,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Song_Starters/KSHMR_Song_Starters_Main/KSHMR_Song_Starter_37_Tears_On_A_Harp_120_Cm-A#-Fm.wav",
+    "hint": "audio: Chord Loop | filename: Pluck | waveform: 380-cent downward pitch glide; wide stereo image"
+  },
+  {
+    "id": 270,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_13_Dirty.wav",
+    "hint": "audio: Clap | filename: Hi-Hat | waveform: detuned beating at 1.6Hz"
+  },
+  {
+    "id": 271,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_countryside/JVIEWS_countryside_one_shots/JVIEWS_kick_helper_crunchy_leaves_03.wav",
+    "hint": "audio: Clap | filename: Kick | waveform: detuned beating at 1.7Hz; wide stereo image"
+  },
+  {
+    "id": 272,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/3 - Snare/Snare - Skimming.wav",
+    "hint": "audio: Clap | filename: Snare | waveform: detuned beating at 1.6Hz"
+  },
+  {
+    "id": 273,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Hats/LFM2_Real OHH.wav",
+    "hint": "audio: Crash | filename: Hi-Hat | waveform: detuned beating at 1.7Hz; clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 274,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 11.WAV",
+    "hint": "audio: Crash | filename: Kick | waveform: clear harmonic series (f0 45Hz)"
+  },
+  {
+    "id": 275,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Snares/KSHMR_Orchestral_Snare_06_Short_Roll.wav",
+    "hint": "audio: Crash | filename: Snare | waveform: 3180-cent downward pitch glide; wide stereo image"
+  },
+  {
+    "id": 276,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Drum Loops/Just Jared - OP1 Drums Loop 3 (74 BPM).wav",
+    "hint": "audio: Drum Loop | filename: Loop | waveform: 260-cent downward pitch glide; clear harmonic series (f0 46Hz)"
+  },
+  {
+    "id": 277,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/7SKIES/7SKIES_Taico_Snare_Fill.wav",
+    "hint": "audio: Drum Loop | filename: Snare | waveform: wide stereo image"
+  },
+  {
+    "id": 278,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/CLAP young.wav",
+    "hint": "audio: Foley | filename: Clap | waveform: detuned beating at 2.6Hz"
+  },
+  {
+    "id": 279,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/hat grime.wav",
+    "hint": "audio: Foley | filename: Hi-Hat | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 280,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Kicks/Just Jared - OP1 Drums Kick 12.wav",
+    "hint": "audio: Foley | filename: Kick | waveform: clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 281,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Snares/Just Jared - OP1 Drums Snare 6.wav",
+    "hint": "audio: Foley | filename: Snare | waveform: detuned beating at 1.6Hz; sharp transient"
+  },
+  {
+    "id": 282,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Acoustic_Drum_Loops/KSHMR_Acoustic_Drum_Loop_17_128.wav",
+    "hint": "audio: Foley Loop | filename: Drum Loop | waveform: detuned beating at 1.1Hz; long 3.7s decay; clear harmonic series (f0 28Hz); wide stereo image"
+  },
+  {
+    "id": 283,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Foley & Percussion (Old Movies)/TBTWD_Foley 1.wav",
+    "hint": "audio: Foley Loop | filename: Foley | waveform: detuned beating at 1.8Hz; clear harmonic series (f0 31Hz)"
+  },
+  {
+    "id": 284,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/2 - Melodics/1 - Pads/Pad - Beneath - Cmaj.wav",
+    "hint": "audio: Foley Loop | filename: Pad | waveform: 2660-cent downward pitch glide; long 4.9s decay; clear harmonic series (f0 127Hz); wide stereo image"
+  },
+  {
+    "id": 285,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Percussion/KSHMR_Tambourines/KSHMR_Tambourine_Shake_03.wav",
+    "hint": "audio: Foley Loop | filename: Percussion | waveform: clear harmonic series (f0 342Hz)"
+  },
+  {
+    "id": 286,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_30_128.wav",
+    "hint": "audio: Foley Loop | filename: Percussion Loop | waveform: 770-cent downward pitch glide; detuned beating at 1.1Hz; clear harmonic series (f0 516Hz); wide stereo image"
+  },
+  {
+    "id": 287,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Drop_Claps/KSHMR_Drop_Clap_05_128.wav",
+    "hint": "audio: Hi-Hat | filename: Clap | waveform: detuned beating at 2.1Hz; long 1.4s decay; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 288,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/5 Percussion/4 Metalic/3 Zill Finger Cymbals/Organic - Zill Finger Cymbal (12).wav",
+    "hint": "audio: Hi-Hat | filename: Crash | waveform: detuned beating at 1.2Hz; clear harmonic series (f0 1171Hz)"
+  },
+  {
+    "id": 289,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 10.WAV",
+    "hint": "audio: Hi-Hat | filename: Kick | waveform: detuned beating at 1.1Hz; clear harmonic series (f0 60Hz)"
+  },
+  {
+    "id": 290,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/2 - Snare/Snare - Data Punch 2.wav",
+    "hint": "audio: Hi-Hat | filename: Snare | waveform: detuned beating at 2.6Hz; sharp transient; clear harmonic series (f0 29Hz)"
+  },
+  {
+    "id": 291,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Drum_loops_full/TCP_85_drum_loop_glitterball.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Drum Loop | waveform: 1460-cent downward pitch glide; detuned beating at 1.4Hz"
+  },
+  {
+    "id": 292,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/1 - Drum Loops/1 - Full Loops/Drums - Quarter Tattdrum - 64 BPM.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Loop | waveform: strong sub energy (92% below 60Hz); 370-cent downward pitch glide; detuned beating at 1.6Hz"
+  },
+  {
+    "id": 293,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/1 - Loops/3 - Perc - 172 BPM/Perc - Terminal Tops 2 - 172 BPM.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion | waveform: 190-cent downward pitch glide; detuned beating at 2.9Hz; wide stereo image"
+  },
+  {
+    "id": 294,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Percussion Loop) Don't Be Hating 140bpm.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion Loop | waveform: 410-cent downward pitch glide; detuned beating at 4.7Hz; clear harmonic series (f0 33Hz); noisy rather than tonal"
+  },
+  {
+    "id": 295,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Big_Snares/KSHMR_Big_Snare_21.wav",
+    "hint": "audio: Kick | filename: Snare | waveform: 760-cent downward pitch glide; detuned beating at 1.1Hz"
+  },
+  {
+    "id": 296,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/KORE - Grooves/splice-export__kore-london-grooves/loop/Drums/RT_Kore_Players_Drum_Loop_4_Drums_Sarah_Jones_114_loop.wav",
+    "hint": "audio: Kick Loop | filename: Drum Loop | waveform: strong sub energy (65% below 60Hz); detuned beating at 1.9Hz"
+  },
+  {
+    "id": 297,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/ZEDD/ZEDD_Kick_01_I_Want_You_to_Know.wav",
+    "hint": "audio: Kick Loop | filename: Kick | waveform: strong sub energy (47% below 60Hz); 890-cent downward pitch glide; detuned beating at 2.2Hz"
+  },
+  {
+    "id": 298,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Drum Loops/Drum Loop 9 - 93 BPM (A).wav",
+    "hint": "audio: Percussion Loop | filename: Drum Loop | waveform: detuned beating at 1.9Hz; clear harmonic series (f0 25Hz)"
+  },
+  {
+    "id": 299,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_World_Sounds/KSHMR_India/KSHMR_India_PL_Tumbi_Loop_100_A_Arabic.wav",
+    "hint": "audio: Percussion Loop | filename: Loop | waveform: 200-cent downward pitch glide; detuned beating at 1.7Hz"
+  },
+  {
+    "id": 300,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Shaker LP - 85 BPM (2).wav",
+    "hint": "audio: Percussion Loop | filename: Percussion | waveform: detuned beating at 5.7Hz; clear harmonic series (f0 1106Hz); wide stereo image"
+  },
+  {
+    "id": 301,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Snares/Just Jared - OP1 Drums Clap 1.wav",
+    "hint": "audio: Rimshot | filename: Clap | waveform: detuned beating at 3.5Hz"
+  },
+  {
+    "id": 302,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Hihats/Just Jared - OP1 Drums Hihat 4.wav",
+    "hint": "audio: Rimshot | filename: Hi-Hat | waveform: sharp transient"
+  },
+  {
+    "id": 303,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Perc/LFM2_Clap 808_REV (2).wav",
+    "hint": "audio: Rimshot | filename: Kick | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 304,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Snares/Just Jared - OP1 Drums Snare 5.wav",
+    "hint": "audio: Rimshot | filename: Snare | waveform: clear harmonic series (f0 28Hz)"
+  },
+  {
+    "id": 305,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Orchestral_Drums/KSHMR_Cymbals/KSHMR_Crashes_Scary/KSHMR_Orchestral_Crash_Scary_05.wav",
+    "hint": "audio: SFX | filename: Crash | waveform: long 1.4s decay; clear harmonic series (f0 1106Hz); wide stereo image"
+  },
+  {
+    "id": 306,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/JoBurg Samples/Clap Ektl B.wav",
+    "hint": "audio: Snare | filename: Clap | waveform: detuned beating at 3.0Hz; clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 307,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Victory March Samples/HH_AlienSoul2_60s.wav",
+    "hint": "audio: Snare | filename: Hi-Hat | waveform: sharp transient; clear harmonic series (f0 0Hz); wide stereo image"
+  },
+  {
+    "id": 308,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Drum_Enhancers/KSHMR_Kick_Enhancer_06_Stomp.wav",
+    "hint": "audio: Snare | filename: Kick | waveform: detuned beating at 1.1Hz; clear harmonic series (f0 27Hz); wide stereo image"
+  },
+  {
+    "id": 309,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Synths/KSHMR_Synth_Loops/KSHMR_Synth_Loop_07_100_F#m.wav",
+    "hint": "audio: Synth Loop | filename: Loop | waveform: detuned beating at 1.0Hz; long 2.6s decay; wide stereo image"
+  },
+  {
+    "id": 310,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Pizzaria Samples/Kick ZeroCash 9.wav",
+    "hint": "audio: Synth One-Shot | filename: Kick | waveform: strong sub energy (97% below 60Hz); 200-cent downward pitch glide; long 1.6s decay; near-pure sine (95% of energy at the fundamental)"
+  },
+  {
+    "id": 311,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Just Jared - OP1 Drums/Hihats/Just Jared - OP1 Drums Hihat 3.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Hi-Hat | waveform: sharp transient; clear harmonic series (f0 26Hz); noisy rather than tonal"
+  },
+  {
+    "id": 312,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Lille Samples/BD_Fat808Long_01_Tran.wav",
+    "hint": "audio: Bass Hit | filename: Kick | waveform: strong sub energy (83% below 60Hz); 660-cent downward pitch glide; long 2.8s decay"
+  },
+  {
+    "id": 313,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Machines For Music Volume 1/Machines_For_Music_Volume_1_copy/24_Bit_Wav_Samples/Loops/M4M_Loops/M4M_90_Drunk_Half_Beat_Full_Drum_Loop.wav",
+    "hint": "audio: Bass Loop | filename: Drum Loop | waveform: detuned beating at 3.0Hz; clear harmonic series (f0 25Hz)"
+  },
+  {
+    "id": 314,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Action_Loops/KSHMR_Action_Loop_26_128_G#.wav",
+    "hint": "audio: Bass Loop | filename: Loop | waveform: detuned beating at 2.7Hz; long 1.5s decay; clear harmonic series (f0 52Hz)"
+  },
+  {
+    "id": 315,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Live_Instruments/KSHMR_Main_Instruments/KSHMR_Guitar/KSHMR_Guitar_Chords/KSHMR_Acoustic_Chords/KSHMR_Acoustic_Guitar_Chords_30_128_D#m-Em.wav",
+    "hint": "audio: Chord Loop | filename: Guitar | waveform: detuned beating at 4.3Hz"
+  },
+  {
+    "id": 316,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/3 - Bass Loops/Bass - Basic Sign - C - 78 BPM.wav",
+    "hint": "audio: Chord Loop | filename: Loop | waveform: clear harmonic series (f0 66Hz)"
+  },
+  {
+    "id": 317,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/3 - Bass Loops/Bass - Remote Drone 2 - G - 78 BPM.wav",
+    "hint": "audio: Chord Loop | filename: Pad | waveform: strong sub energy (98% below 60Hz); long 7.4s decay; near-pure sine (92% of energy at the fundamental)"
+  },
+  {
+    "id": 318,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/MELODIES (X3 & DR5)/Loops (Cassette Processed)/Descend Piano #1 [80 BPM] (D#).wav",
+    "hint": "audio: Chord Loop | filename: Piano | waveform: 320-cent downward pitch glide; long 4.8s decay; clear harmonic series (f0 73Hz)"
+  },
+  {
+    "id": 319,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hardstyle_Kicks/KSHMR_Hardstyle_Kicks/KSHMR_Hardstyle_Kick_06_C.wav",
+    "hint": "audio: Clap | filename: Kick | waveform: detuned beating at 2.3Hz; clear harmonic series (f0 66Hz)"
+  },
+  {
+    "id": 320,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 25.wav",
+    "hint": "audio: Clap | filename: Snare | waveform: detuned beating at 2.5Hz; clear harmonic series (f0 0Hz); noisy rather than tonal"
+  },
+  {
+    "id": 321,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/UTS Foley 1/Long + Med/Open Hat-4.wav",
+    "hint": "audio: Crash | filename: Hi-Hat | waveform: 160-cent downward pitch glide; clear harmonic series (f0 516Hz)"
+  },
+  {
+    "id": 322,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Open/KSHMR_Open_Hat_15_808.wav",
+    "hint": "audio: Crash | filename: Kick | waveform: 270-cent downward pitch glide; detuned beating at 1.7Hz; clear harmonic series (f0 883Hz); wide stereo image"
+  },
+  {
+    "id": 323,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/KJ SAWKA 40x40x40 DRUM PACK/kj_sawka_40x40x40_beat_folder/KJ_SAWKA_87_BPM_LOOPS/KJ_SAWKA_London_Bridge_2013_87_bpm_4bar6_Dry.wav",
+    "hint": "audio: Drum Loop | filename: Loop | waveform: detuned beating at 5.8Hz"
+  },
+  {
+    "id": 324,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/4 - Claps/Clap - Aether.wav",
+    "hint": "audio: Foley | filename: Clap | waveform: detuned beating at 1.4Hz; wide stereo image"
+  },
+  {
+    "id": 325,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/4 - Hats/Hi-Hat - Toy Open.wav",
+    "hint": "audio: Foley | filename: Hi-Hat | waveform: detuned beating at 2.0Hz; sharp transient; clear harmonic series (f0 1037Hz); wide stereo image"
+  },
+  {
+    "id": 326,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Perc/LFM2_Clave 808_REV.wav",
+    "hint": "audio: Foley | filename: Kick | waveform: sharp transient"
+  },
+  {
+    "id": 327,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Foley Pack 01/Foley Drums/Snare 11.wav",
+    "hint": "audio: Foley | filename: Snare | waveform: sharp transient; wide stereo image"
+  },
+  {
+    "id": 328,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_FX_Elements/KSHMR_Ambiance_and_Foley/KSHMR_Ambiance_Designed/KSHMR_Drones/KSHMR_Ambiance_Drone_14_F.wav",
+    "hint": "audio: Foley Loop | filename: Pad | waveform: detuned beating at 2.2Hz; long 2.9s decay; clear harmonic series (f0 44Hz); wide stereo image"
+  },
+  {
+    "id": 329,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Open/KSHMR_Open_Hat_16_808.wav",
+    "hint": "audio: Hi-Hat | filename: Kick | waveform: detuned beating at 1.7Hz; clear harmonic series (f0 55Hz)"
+  },
+  {
+    "id": 330,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (3).wav",
+    "hint": "audio: Hi-Hat | filename: Snare | waveform: sharp transient; clear harmonic series (f0 25Hz); noisy rather than tonal"
+  },
+  {
+    "id": 331,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Drum Loop F [73BPM].wav",
+    "hint": "audio: Hi-Hat Loop | filename: Drum Loop | waveform: strong sub energy (38% below 60Hz); detuned beating at 1.5Hz; clear harmonic series (f0 43Hz)"
+  },
+  {
+    "id": 332,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Zill Rythm - 105 BPM (4).wav",
+    "hint": "audio: Hi-Hat Loop | filename: Loop | waveform: detuned beating at 2.2Hz; clear harmonic series (f0 654Hz)"
+  },
+  {
+    "id": 333,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Percussion Loops/Shaker LP - 90 BPM (2).wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion | waveform: detuned beating at 6.0Hz; clear harmonic series (f0 1178Hz); wide stereo image"
+  },
+  {
+    "id": 334,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_50_150.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion Loop | waveform: 230-cent downward pitch glide; detuned beating at 5.0Hz; clear harmonic series (f0 968Hz); wide stereo image"
+  },
+  {
+    "id": 335,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/1 - Drum Loops/2 - Kick Loops/Kick - Abominable Break - 78 BPM.wav",
+    "hint": "audio: Kick Loop | filename: Drum Loop | waveform: strong sub energy (87% below 60Hz); detuned beating at 2.6Hz; long 10.0s decay; near-pure sine (80% of energy at the fundamental)"
+  },
+  {
+    "id": 336,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Cinematic_Drum_Loops/KSHMR_Cinematic_Drum_Loop_16_120.wav",
+    "hint": "audio: Percussion Loop | filename: Drum Loop | waveform: 560-cent downward pitch glide; detuned beating at 1.5Hz; long 4.0s decay; clear harmonic series (f0 34Hz); wide stereo image"
+  },
+  {
+    "id": 337,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_desert/JVIEWS_desert_loops/JVIEWS_percussion_shaker_amp_110.wav",
+    "hint": "audio: Percussion Loop | filename: Percussion | waveform: detuned beating at 7.3Hz; long 7.3s decay; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 338,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Clap AR60sLate V127 1.wav",
+    "hint": "audio: Rimshot | filename: Clap | waveform: detuned beating at 1.7Hz"
+  },
+  {
+    "id": 339,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Raw Drums/Raw/Raw Hat 04.wav",
+    "hint": "audio: Rimshot | filename: Hi-Hat | waveform: 1920-cent downward pitch glide; sharp transient; clear harmonic series (f0 78Hz)"
+  },
+  {
+    "id": 340,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Kick Bonaparte 5.wav",
+    "hint": "audio: Rimshot | filename: Kick | waveform: clear harmonic series (f0 0Hz)"
+  },
+  {
+    "id": 341,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Foley Pack 01/Foley Drums/Snare 04.wav",
+    "hint": "audio: Rimshot | filename: Snare | waveform: sharp transient; wide stereo image"
+  },
+  {
+    "id": 342,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/4 - Claps/Clap - Elm.wav",
+    "hint": "audio: Snare | filename: Clap | waveform: detuned beating at 2.5Hz; noisy rather than tonal"
+  },
+  {
+    "id": 343,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/4 - Hats/Hi-Hat - Acoustic Real.wav",
+    "hint": "audio: Snare | filename: Hi-Hat | waveform: detuned beating at 3.3Hz; sharp transient; clear harmonic series (f0 0Hz); noisy rather than tonal"
+  },
+  {
+    "id": 344,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_808s/KSHMR_808_01_Clean_C.wav",
+    "hint": "audio: Synth One-Shot | filename: Kick | waveform: strong sub energy (83% below 60Hz); 940-cent downward pitch glide; long 2.6s decay"
+  },
+  {
+    "id": 345,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Sentient/sentient_bass+drums+fx/Sentient - Hi-Hat.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Hi-Hat | waveform: no readable waveform evidence"
+  },
+  {
+    "id": 346,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Beatboxing/KSHMR_Beatbox_Kick_07_D#.wav",
+    "hint": "audio: Bass Hit | filename: Kick | waveform: 190-cent downward pitch glide; long 1.2s decay; clear harmonic series (f0 78Hz)"
+  },
+  {
+    "id": 347,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/1 - Drum Loops/1 - Full Loops/Drums - Abominable Break - 78 BPM.wav",
+    "hint": "audio: Bass Loop | filename: Drum Loop | waveform: strong sub energy (87% below 60Hz); detuned beating at 2.6Hz; long 10.0s decay; near-pure sine (80% of energy at the fundamental)"
+  },
+  {
+    "id": 348,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Melodic Elements (Old Movies)/Mysterious Loop 4.wav",
+    "hint": "audio: Chord Loop | filename: Loop | waveform: long 4.4s decay; clear harmonic series (f0 63Hz)"
+  },
+  {
+    "id": 349,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_city/JVIEWS_city_tonal/JVIEWS_distant_train_intercity_pad_Emin.wav",
+    "hint": "audio: Chord Loop | filename: Pad | waveform: long 4.2s decay; clear harmonic series (f0 39Hz); wide stereo image"
+  },
+  {
+    "id": 350,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Melodic Elements (Old Movies)/TNK_Piano 1.wav",
+    "hint": "audio: Chord Loop | filename: Piano | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 351,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/2 Snares/Organic - Snare (73).wav",
+    "hint": "audio: Clap | filename: Snare | waveform: clear harmonic series (f0 0Hz); wide stereo image"
+  },
+  {
+    "id": 352,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/REFLECT/1 - Drums/5 - Hats & Cymbals/Hi Hat - Wind.wav",
+    "hint": "audio: Crash | filename: Hi-Hat | waveform: clear harmonic series (f0 295Hz)"
+  },
+  {
+    "id": 353,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan_Sound_2025/Shaper Table Track Project/Samples/Imported/Funk 111 bpm.aif",
+    "hint": "audio: Drum Loop | filename: Loop | waveform: strong sub energy (38% below 60Hz); detuned beating at 3.7Hz"
+  },
+  {
+    "id": 354,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (70).wav",
+    "hint": "audio: Foley | filename: Clap | waveform: noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 355,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Hats/Open Hat 1.wav",
+    "hint": "audio: Foley | filename: Hi-Hat | waveform: detuned beating at 2.2Hz; noisy rather than tonal"
+  },
+  {
+    "id": 356,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Analogue Collection/Perc/VOY_Mini Kick 2.wav",
+    "hint": "audio: Foley | filename: Kick | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 357,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Snare AR60sLate V24 1.wav",
+    "hint": "audio: Foley | filename: Snare | waveform: sharp transient"
+  },
+  {
+    "id": 358,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Hip_Hop_Snares/KSHMR_Hip_Hop_Snare_10_D.wav",
+    "hint": "audio: Hi-Hat | filename: Snare | waveform: clear harmonic series (f0 216Hz)"
+  },
+  {
+    "id": 359,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/MGF Mega Pack/Misc + Found Sound/Casiotone 501/Drums/Casiotone 501 Drum Loop 1.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Drum Loop | waveform: detuned beating at 5.8Hz; clear harmonic series (f0 98Hz)"
+  },
+  {
+    "id": 360,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_VIP_Friends_of_KSHMR/MRBLACK/MRBLACK_Psy_Loop.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Loop | waveform: detuned beating at 1.2Hz; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 361,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Tambourine_Loops/KSHMR_Tambourine_Loop_16_140.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Percussion | waveform: detuned beating at 4.7Hz"
+  },
+  {
+    "id": 362,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Drum Loops/Drum Loop 11 - 83 BPM (A).wav",
+    "hint": "audio: Kick Loop | filename: Drum Loop | waveform: strong sub energy (51% below 60Hz); detuned beating at 1.7Hz"
+  },
+  {
+    "id": 363,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Solo/KSHMR_Tambourine_Loops/KSHMR_Tambourine_Loop_17_140.wav",
+    "hint": "audio: Percussion Loop | filename: Percussion | waveform: detuned beating at 1.2Hz; long 1.0s decay; wide stereo image"
+  },
+  {
+    "id": 364,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/3 - Snare/Clap - Abominable.wav",
+    "hint": "audio: Rimshot | filename: Clap | waveform: wide stereo image"
+  },
+  {
+    "id": 365,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/OP_HH.WAV",
+    "hint": "audio: Rimshot | filename: Hi-Hat | waveform: clear harmonic series (f0 1037Hz)"
+  },
+  {
+    "id": 366,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Beatboxing/KSHMR_Beatbox_Kick_01.wav",
+    "hint": "audio: Rimshot | filename: Kick | waveform: strong sub energy (81% below 60Hz); detuned beating at 2.9Hz"
+  },
+  {
+    "id": 367,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Snare AR60sLate V24 3.wav",
+    "hint": "audio: Rimshot | filename: Snare | waveform: sharp transient"
+  },
+  {
+    "id": 368,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (8).wav",
+    "hint": "audio: Snare | filename: Clap | waveform: noisy rather than tonal"
+  },
+  {
+    "id": 369,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/4 Hi-Hats/1 Closed Hats/Organic - HiHat_G (2).wav",
+    "hint": "audio: Snare | filename: Hi-Hat | waveform: sharp transient; clear harmonic series (f0 25Hz); noisy rather than tonal"
+  },
+  {
+    "id": 370,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS/Hats/LFM2_Bright OHH #1.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Hi-Hat | waveform: detuned beating at 3.2Hz; clear harmonic series (f0 27Hz)"
+  },
+  {
+    "id": 371,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Drum Loops/Drum Loop 3 - 115 BPM (A).wav",
+    "hint": "audio: Bass Loop | filename: Drum Loop | waveform: detuned beating at 2.9Hz; long 1.3s decay"
+  },
+  {
+    "id": 372,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Synths/KSHMR_Synth_Loops/KSHMR_Synth_Loop_09_102_Gm.wav",
+    "hint": "audio: Chord Loop | filename: Loop | waveform: detuned beating at 1.1Hz; wide stereo image"
+  },
+  {
+    "id": 373,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_FX_Elements/KSHMR_Ambiance_and_Foley/KSHMR_Ambiance_Designed/KSHMR_Drones/KSHMR_Ambiance_Drone_08_D#.wav",
+    "hint": "audio: Chord Loop | filename: Pad | waveform: 1920-cent downward pitch glide; long 5.7s decay; wide stereo image"
+  },
+  {
+    "id": 374,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_studio/JVIEWS_studio_tonal/JVIEWS_cassette_keys_130_Dmin.wav",
+    "hint": "audio: Chord Loop | filename: Piano | waveform: long 1.1s decay"
+  },
+  {
+    "id": 375,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Snares/KSHMR_Big_Snares/KSHMR_Big_Snare_20.wav",
+    "hint": "audio: Clap | filename: Snare | waveform: detuned beating at 2.8Hz; clear harmonic series (f0 0Hz); wide stereo image"
+  },
+  {
+    "id": 376,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Hats/Open Hat 6.wav",
+    "hint": "audio: Crash | filename: Hi-Hat | waveform: detuned beating at 1.5Hz; clear harmonic series (f0 507Hz)"
+  },
+  {
+    "id": 377,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Stadium_Loops/KSHMR_Stadium_Loop_13_180.wav",
+    "hint": "audio: Drum Loop | filename: Loop | waveform: 1360-cent downward pitch glide; long 3.6s decay; clear harmonic series (f0 42Hz)"
+  },
+  {
+    "id": 378,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_countryside/JVIEWS_countryside_one_shots/JVIEWS_hollow_tree_clap.wav",
+    "hint": "audio: Foley | filename: Clap | waveform: 360-cent downward pitch glide; wide stereo image"
+  },
+  {
+    "id": 379,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Neptune Kit Samples/Organic - HiHat_I (2).wav",
+    "hint": "audio: Foley | filename: Hi-Hat | waveform: clear harmonic series (f0 28Hz); noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 380,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gnarly Tribal Samples/Kick PlatBounce 5.wav",
+    "hint": "audio: Foley | filename: Kick | waveform: strong sub energy (83% below 60Hz); 850-cent downward pitch glide; detuned beating at 1.4Hz"
+  },
+  {
+    "id": 381,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/3 - Snare/Snare - Quarter Tatt.wav",
+    "hint": "audio: Foley | filename: Snare | waveform: 490-cent downward pitch glide; clear harmonic series (f0 40Hz); wide stereo image"
+  },
+  {
+    "id": 382,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/1 - Drum Loops/4 - Top Loops/Perc - Abominable Break - 78 BPM.wav",
+    "hint": "audio: Hi-Hat Loop | filename: Drum Loop | waveform: detuned beating at 2.6Hz; sharp transient; clear harmonic series (f0 26Hz); wide stereo image"
+  },
+  {
+    "id": 383,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Cinematic_Drum_Loops/KSHMR_Cinematic_Drum_Loop_26_128.wav",
+    "hint": "audio: Kick Loop | filename: Drum Loop | waveform: detuned beating at 1.1Hz; long 1.4s decay; clear harmonic series (f0 44Hz); wide stereo image"
+  },
+  {
+    "id": 384,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Clap 2.wav",
+    "hint": "audio: Rimshot | filename: Clap | waveform: detuned beating at 3.7Hz"
+  },
+  {
+    "id": 385,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/ELEMENT/1 - Drums/4 - Hats/Hi-Hat - Rezz.wav",
+    "hint": "audio: Rimshot | filename: Hi-Hat | waveform: detuned beating at 2.3Hz; sharp transient; clear harmonic series (f0 66Hz); wide stereo image"
+  },
+  {
+    "id": 386,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Minimal Audio/MICROTECH/2 - One Shots/2 - Snare/Snare - Tone Snap 1.wav",
+    "hint": "audio: Rimshot | filename: Snare | waveform: sharp transient"
+  },
+  {
+    "id": 387,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Regular_Claps/KSHMR_Clap_Heavy_05.wav",
+    "hint": "audio: Snare | filename: Clap | waveform: 1060-cent downward pitch glide; clear harmonic series (f0 48Hz); wide stereo image"
+  },
+  {
+    "id": 388,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/CL_HH.WAV",
+    "hint": "audio: Weather/Nature Atmos | filename: Hi-Hat | waveform: clear harmonic series (f0 1138Hz)"
+  },
+  {
+    "id": 389,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Acoustic_Drum_Loops/KSHMR_Acoustic_Drum_Loop_14_128.wav",
+    "hint": "audio: Bass Loop | filename: Drum Loop | waveform: no distinctive acoustic evidence"
+  },
+  {
+    "id": 390,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/New Age Kit 1 Samples/Organic - O.HiHat_(15).wav",
+    "hint": "audio: Crash | filename: Hi-Hat | waveform: clear harmonic series (f0 28Hz)"
+  },
+  {
+    "id": 391,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Claps/KSHMR_Pre-Shifted_Claps/KSHMR_Pre_Shifted_Clap_03.wav",
+    "hint": "audio: Foley | filename: Clap | waveform: wide stereo image"
+  },
+  {
+    "id": 392,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Cymbals/KSHMR_Hi_Hats_Closed/KSHMR_Closed_Hat_12_Dirty.wav",
+    "hint": "audio: Foley | filename: Hi-Hat | waveform: detuned beating at 1.9Hz; clear harmonic series (f0 25Hz); wide stereo image"
+  },
+  {
+    "id": 393,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Electronics 2 J.Views/JVIEWS_desert/JVIEWS_desert_one_shots/JVIEWS_desertwood_kick_01.wav",
+    "hint": "audio: Foley | filename: Kick | waveform: 2230-cent downward pitch glide; detuned beating at 1.4Hz"
+  },
+  {
+    "id": 394,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Foley & Percussion (Old Movies)/possible snare.wav",
+    "hint": "audio: Foley | filename: Snare | waveform: detuned beating at 1.1Hz; clear harmonic series (f0 28Hz)"
+  },
+  {
+    "id": 395,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/8 Drum Loops/Drum Loops/Drum Loop 8 - 93 BPM (A).wav",
+    "hint": "audio: Hi-Hat Loop | filename: Drum Loop | waveform: 3740-cent downward pitch glide; detuned beating at 3.1Hz"
+  },
+  {
+    "id": 396,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/3 Claps/Organic - Clap (79).wav",
+    "hint": "audio: Rimshot | filename: Clap | waveform: noisy rather than tonal; wide stereo image"
+  },
+  {
+    "id": 397,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/New Age Kit 2 Samples/Organic - HiHat (4).wav",
+    "hint": "audio: Rimshot | filename: Hi-Hat | waveform: sharp transient; clear harmonic series (f0 27Hz); noisy rather than tonal"
+  },
+  {
+    "id": 398,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Snares/Snare 34.wav",
+    "hint": "audio: Rimshot | filename: Snare | waveform: 250-cent downward pitch glide"
+  },
+  {
+    "id": 399,
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Old Movies 1 - Vintage Collection (Drum Kit)/Hats/Hat Roll 3.wav",
+    "hint": "audio: Weather/Nature Atmos | filename: Hi-Hat | waveform: detuned beating at 2.8Hz; clear harmonic series (f0 27Hz)"
+  }
+]

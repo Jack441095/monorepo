@@ -1,0 +1,36 @@
+{
+  "record_type": "slo_panns_train_serve_skew_measurement",
+  "schema_version": "1.0.0",
+  "method_version": "measure_panns_train_serve_skew_v1",
+  "n_files": 12,
+  "training_pipeline": {
+    "sample_rate_hz": 32000,
+    "window_seconds": 10,
+    "window_samples": 320000,
+    "resampler": "librosa soxr_hq"
+  },
+  "production_pipeline": {
+    "sample_rate_hz": 32000,
+    "window_seconds": 5,
+    "window_samples": 160000,
+    "resampler": "C++ linear interpolation"
+  },
+  "cosine_to_training_embedding": {
+    "window_only": {"mean": 0.9365, "min": 0.8690, "max": 0.9840},
+    "resampler_only": {"mean": 0.9995, "min": 0.9965, "max": 1.0000},
+    "production_both": {"mean": 0.9365, "min": 0.8684, "max": 0.9838}
+  },
+  "interpretation": "The 5-second production window is a material train/serve shift; the resampler difference is negligible in this sample.",
+  "decision": "Do not promote a PANNs-trained classifier until training embeddings are re-extracted with the production window or the product window is deliberately widened and re-qualified.",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false,
+    "gpu_1_touched": false
+  },
+  "inputs": {
+    "model_sha256": "cbc3653cf2ef3cc35f6be48c4863b6d735b0ff85af3b3e9607706a0f467ffad2",
+    "script_sha256": "59d2f8bd4dcb339d175955c3831a3b0663c3cf9c3bc04888f753d3b41f6c4cbe"
+  }
+}

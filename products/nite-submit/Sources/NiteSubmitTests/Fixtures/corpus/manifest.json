@@ -1,0 +1,2572 @@
+{
+ "corpus_id": "NITE_SUBMIT_PDF_CORPUS_V1",
+ "generator_seed": 20260823,
+ "cases": [
+  {
+   "id": "clear_000",
+   "truth": {
+    "student_name": "Fatima Silva",
+    "student_id": "28507301",
+    "university": "UWE Bristol",
+    "module_code": "UFMAAX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_001",
+   "truth": {
+    "student_name": "Noor Gandy",
+    "student_id": "50756447",
+    "university": "University of the West of England",
+    "module_code": "UFMBHX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_002",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "80332677",
+    "university": "Bath Spa University",
+    "module_code": "UFMCOX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_003",
+   "truth": {
+    "student_name": "Oskar Haddad",
+    "student_id": "50722275",
+    "university": "Cardiff University",
+    "module_code": "UFMDVX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_004",
+   "truth": {
+    "student_name": "Sofia Sharma",
+    "student_id": "12215435",
+    "university": "University of Southampton",
+    "module_code": "UFMECX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_005",
+   "truth": {
+    "student_name": "Ethan Bennett",
+    "student_id": "69605632",
+    "university": "UWE Bristol",
+    "module_code": "UFMFJX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_006",
+   "truth": {
+    "student_name": "Fatima Wei",
+    "student_id": "10934173",
+    "university": "University of the West of England",
+    "module_code": "UFMGQX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_007",
+   "truth": {
+    "student_name": "Ethan Rossi",
+    "student_id": "62600930",
+    "university": "Bath Spa University",
+    "module_code": "UFMHXX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_008",
+   "truth": {
+    "student_name": "Tomas Rossi",
+    "student_id": "74893672",
+    "university": "Cardiff University",
+    "module_code": "UFMIEX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_009",
+   "truth": {
+    "student_name": "Zoe Murphy",
+    "student_id": "76682289",
+    "university": "University of Southampton",
+    "module_code": "UFMJLX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_010",
+   "truth": {
+    "student_name": "Tomas Sharma",
+    "student_id": "15395022",
+    "university": "UWE Bristol",
+    "module_code": "UFMKSX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_011",
+   "truth": {
+    "student_name": "Amara Kowalski",
+    "student_id": "41247969",
+    "university": "University of the West of England",
+    "module_code": "UFMLZX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_012",
+   "truth": {
+    "student_name": "Fatima Novak",
+    "student_id": "77872433",
+    "university": "Bath Spa University",
+    "module_code": "UFMMGX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_013",
+   "truth": {
+    "student_name": "Amara Gandy",
+    "student_id": "19485683",
+    "university": "Cardiff University",
+    "module_code": "UFMNNX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_014",
+   "truth": {
+    "student_name": "Liam Haddad",
+    "student_id": "18495318",
+    "university": "University of Southampton",
+    "module_code": "UFMOUX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_015",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "56560103",
+    "university": "UWE Bristol",
+    "module_code": "UFMPBX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_016",
+   "truth": {
+    "student_name": "Sofia Muller",
+    "student_id": "46946789",
+    "university": "University of the West of England",
+    "module_code": "UFMQIX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_017",
+   "truth": {
+    "student_name": "Liam Wei",
+    "student_id": "53504230",
+    "university": "Bath Spa University",
+    "module_code": "UFMRPX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_018",
+   "truth": {
+    "student_name": "Ethan Sharma",
+    "student_id": "65796851",
+    "university": "Cardiff University",
+    "module_code": "UFMSWX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_019",
+   "truth": {
+    "student_name": "Zoe Novak",
+    "student_id": "79573349",
+    "university": "University of Southampton",
+    "module_code": "UFMTDX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_020",
+   "truth": {
+    "student_name": "Jack Muller",
+    "student_id": "98240020",
+    "university": "UWE Bristol",
+    "module_code": "UFMUKX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_021",
+   "truth": {
+    "student_name": "Chen Bennett",
+    "student_id": "11066286",
+    "university": "University of the West of England",
+    "module_code": "UFMVRX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_022",
+   "truth": {
+    "student_name": "Tomas Novak",
+    "student_id": "58708171",
+    "university": "Bath Spa University",
+    "module_code": "UFMWYX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_023",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "75203598",
+    "university": "Cardiff University",
+    "module_code": "UFMXFX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_024",
+   "truth": {
+    "student_name": "Tomas Rossi",
+    "student_id": "64115897",
+    "university": "University of Southampton",
+    "module_code": "UFMYMX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_025",
+   "truth": {
+    "student_name": "Chen Rossi",
+    "student_id": "43220768",
+    "university": "UWE Bristol",
+    "module_code": "UFMZTX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_026",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "97126819",
+    "university": "University of the West of England",
+    "module_code": "UFMAAX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_027",
+   "truth": {
+    "student_name": "Ethan Wei",
+    "student_id": "46182910",
+    "university": "Bath Spa University",
+    "module_code": "UFMBHX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_028",
+   "truth": {
+    "student_name": "Oskar Okonkwo",
+    "student_id": "67485940",
+    "university": "Cardiff University",
+    "module_code": "UFMCOX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_029",
+   "truth": {
+    "student_name": "Liam Muller",
+    "student_id": "96020336",
+    "university": "University of Southampton",
+    "module_code": "UFMDVX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_030",
+   "truth": {
+    "student_name": "Amara Wei",
+    "student_id": "94168719",
+    "university": "UWE Bristol",
+    "module_code": "UFMECX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_031",
+   "truth": {
+    "student_name": "Oskar Haddad",
+    "student_id": "73163354",
+    "university": "University of the West of England",
+    "module_code": "UFMFJX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_032",
+   "truth": {
+    "student_name": "Sofia Wei",
+    "student_id": "64665025",
+    "university": "Bath Spa University",
+    "module_code": "UFMGQX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_033",
+   "truth": {
+    "student_name": "Zoe Rossi",
+    "student_id": "60003842",
+    "university": "Cardiff University",
+    "module_code": "UFMHXX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_034",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "88094128",
+    "university": "University of Southampton",
+    "module_code": "UFMIEX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_035",
+   "truth": {
+    "student_name": "Liam Gandy",
+    "student_id": "69651377",
+    "university": "UWE Bristol",
+    "module_code": "UFMJLX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_036",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "20633432",
+    "university": "University of the West of England",
+    "module_code": "UFMKSX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_037",
+   "truth": {
+    "student_name": "Liam Sharma",
+    "student_id": "37566273",
+    "university": "Bath Spa University",
+    "module_code": "UFMLZX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_038",
+   "truth": {
+    "student_name": "Sofia Wei",
+    "student_id": "99109241",
+    "university": "Cardiff University",
+    "module_code": "UFMMGX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_039",
+   "truth": {
+    "student_name": "Zoe Haddad",
+    "student_id": "21046740",
+    "university": "University of Southampton",
+    "module_code": "UFMNNX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_040",
+   "truth": {
+    "student_name": "Sofia Muller",
+    "student_id": "67439695",
+    "university": "UWE Bristol",
+    "module_code": "UFMOUX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_041",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "73487157",
+    "university": "University of the West of England",
+    "module_code": "UFMPBX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_042",
+   "truth": {
+    "student_name": "Ethan Murphy",
+    "student_id": "36810336",
+    "university": "Bath Spa University",
+    "module_code": "UFMQIX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_043",
+   "truth": {
+    "student_name": "Liam Novak",
+    "student_id": "29907372",
+    "university": "Cardiff University",
+    "module_code": "UFMRPX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_044",
+   "truth": {
+    "student_name": "Chen Muller",
+    "student_id": "23500553",
+    "university": "University of Southampton",
+    "module_code": "UFMSWX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_045",
+   "truth": {
+    "student_name": "Tomas Wei",
+    "student_id": "15775943",
+    "university": "UWE Bristol",
+    "module_code": "UFMTDX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_046",
+   "truth": {
+    "student_name": "Zoe Kowalski",
+    "student_id": "82466792",
+    "university": "University of the West of England",
+    "module_code": "UFMUKX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_047",
+   "truth": {
+    "student_name": "Noor Muller",
+    "student_id": "58702605",
+    "university": "Bath Spa University",
+    "module_code": "UFMVRX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_048",
+   "truth": {
+    "student_name": "Liam Gandy",
+    "student_id": "81961106",
+    "university": "Cardiff University",
+    "module_code": "UFMWYX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_049",
+   "truth": {
+    "student_name": "Zoe Silva",
+    "student_id": "82002328",
+    "university": "University of Southampton",
+    "module_code": "UFMXFX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_050",
+   "truth": {
+    "student_name": "Ethan Muller",
+    "student_id": "60684920",
+    "university": "UWE Bristol",
+    "module_code": "UFMYMX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_051",
+   "truth": {
+    "student_name": "Ethan Bennett",
+    "student_id": "99276624",
+    "university": "University of the West of England",
+    "module_code": "UFMZTX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_052",
+   "truth": {
+    "student_name": "Fatima Gandy",
+    "student_id": "36880141",
+    "university": "Bath Spa University",
+    "module_code": "UFMAAX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_053",
+   "truth": {
+    "student_name": "Oskar Muller",
+    "student_id": "39329914",
+    "university": "Cardiff University",
+    "module_code": "UFMBHX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_054",
+   "truth": {
+    "student_name": "Fatima Sharma",
+    "student_id": "30733350",
+    "university": "University of Southampton",
+    "module_code": "UFMCOX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_055",
+   "truth": {
+    "student_name": "Priya Muller",
+    "student_id": "77019499",
+    "university": "UWE Bristol",
+    "module_code": "UFMDVX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_056",
+   "truth": {
+    "student_name": "Ethan Gandy",
+    "student_id": "91932727",
+    "university": "University of the West of England",
+    "module_code": "UFMECX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_057",
+   "truth": {
+    "student_name": "Tomas Rossi",
+    "student_id": "42237198",
+    "university": "Bath Spa University",
+    "module_code": "UFMFJX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_058",
+   "truth": {
+    "student_name": "Sofia Silva",
+    "student_id": "20380438",
+    "university": "Cardiff University",
+    "module_code": "UFMGQX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_059",
+   "truth": {
+    "student_name": "Zoe Sharma",
+    "student_id": "48845220",
+    "university": "University of Southampton",
+    "module_code": "UFMHXX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_060",
+   "truth": {
+    "student_name": "Zoe Wei",
+    "student_id": "39203870",
+    "university": "UWE Bristol",
+    "module_code": "UFMIEX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_061",
+   "truth": {
+    "student_name": "Tomas Wei",
+    "student_id": "77185477",
+    "university": "University of the West of England",
+    "module_code": "UFMJLX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_062",
+   "truth": {
+    "student_name": "Sofia Muller",
+    "student_id": "72217522",
+    "university": "Bath Spa University",
+    "module_code": "UFMKSX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_063",
+   "truth": {
+    "student_name": "Sofia Wei",
+    "student_id": "73586608",
+    "university": "Cardiff University",
+    "module_code": "UFMLZX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_064",
+   "truth": {
+    "student_name": "Oskar Gandy",
+    "student_id": "92210423",
+    "university": "University of Southampton",
+    "module_code": "UFMMGX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_065",
+   "truth": {
+    "student_name": "Oskar Gandy",
+    "student_id": "48329401",
+    "university": "UWE Bristol",
+    "module_code": "UFMNNX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_066",
+   "truth": {
+    "student_name": "Oskar Kowalski",
+    "student_id": "37338370",
+    "university": "University of the West of England",
+    "module_code": "UFMOUX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_067",
+   "truth": {
+    "student_name": "Amara Sharma",
+    "student_id": "99790014",
+    "university": "Bath Spa University",
+    "module_code": "UFMPBX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_068",
+   "truth": {
+    "student_name": "Amara Silva",
+    "student_id": "40489473",
+    "university": "Cardiff University",
+    "module_code": "UFMQIX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_069",
+   "truth": {
+    "student_name": "Chen Murphy",
+    "student_id": "46470642",
+    "university": "University of Southampton",
+    "module_code": "UFMRPX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_070",
+   "truth": {
+    "student_name": "Tomas Okonkwo",
+    "student_id": "66165066",
+    "university": "UWE Bristol",
+    "module_code": "UFMSWX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_071",
+   "truth": {
+    "student_name": "Tomas Murphy",
+    "student_id": "14929110",
+    "university": "University of the West of England",
+    "module_code": "UFMTDX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_072",
+   "truth": {
+    "student_name": "Zoe Kowalski",
+    "student_id": "42134146",
+    "university": "Bath Spa University",
+    "module_code": "UFMUKX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_073",
+   "truth": {
+    "student_name": "Jack Bennett",
+    "student_id": "44605234",
+    "university": "Cardiff University",
+    "module_code": "UFMVRX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_074",
+   "truth": {
+    "student_name": "Chen Bennett",
+    "student_id": "94706345",
+    "university": "University of Southampton",
+    "module_code": "UFMWYX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_075",
+   "truth": {
+    "student_name": "Sofia Sharma",
+    "student_id": "14987953",
+    "university": "UWE Bristol",
+    "module_code": "UFMXFX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_076",
+   "truth": {
+    "student_name": "Jack Wei",
+    "student_id": "62006288",
+    "university": "University of the West of England",
+    "module_code": "UFMYMX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_077",
+   "truth": {
+    "student_name": "Priya Okonkwo",
+    "student_id": "81658127",
+    "university": "Bath Spa University",
+    "module_code": "UFMZTX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_078",
+   "truth": {
+    "student_name": "Oskar Okonkwo",
+    "student_id": "25180111",
+    "university": "Cardiff University",
+    "module_code": "UFMAAX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_079",
+   "truth": {
+    "student_name": "Noor Sharma",
+    "student_id": "52387437",
+    "university": "University of Southampton",
+    "module_code": "UFMBHX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_080",
+   "truth": {
+    "student_name": "Jack Muller",
+    "student_id": "86722693",
+    "university": "UWE Bristol",
+    "module_code": "UFMCOX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_081",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "26003414",
+    "university": "University of the West of England",
+    "module_code": "UFMDVX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_082",
+   "truth": {
+    "student_name": "Priya Kowalski",
+    "student_id": "87697118",
+    "university": "Bath Spa University",
+    "module_code": "UFMECX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_083",
+   "truth": {
+    "student_name": "Priya Okonkwo",
+    "student_id": "82259674",
+    "university": "Cardiff University",
+    "module_code": "UFMFJX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_084",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "53773777",
+    "university": "University of Southampton",
+    "module_code": "UFMGQX-30-1",
+    "project_title": "Interactive Audio Systems"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_085",
+   "truth": {
+    "student_name": "Chen Sharma",
+    "student_id": "99083357",
+    "university": "UWE Bristol",
+    "module_code": "UFMHXX-30-2",
+    "project_title": "Adaptive Game Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_086",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "22127958",
+    "university": "University of the West of England",
+    "module_code": "UFMIEX-30-3",
+    "project_title": "Machine Listening Report"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_087",
+   "truth": {
+    "student_name": "Sofia Kowalski",
+    "student_id": "22261605",
+    "university": "Bath Spa University",
+    "module_code": "UFMJLX-30-1",
+    "project_title": "Final Major Project"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_088",
+   "truth": {
+    "student_name": "Amara Sharma",
+    "student_id": "87146553",
+    "university": "Cardiff University",
+    "module_code": "UFMKSX-30-2",
+    "project_title": "Soundscape Composition Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "clear_089",
+   "truth": {
+    "student_name": "Zoe Novak",
+    "student_id": "76746383",
+    "university": "University of Southampton",
+    "module_code": "UFMLZX-30-3",
+    "project_title": "Reverb Network Analysis"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "12345678",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 0"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "87654321",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "24012345",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 3"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "B09876543",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 4"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "12345678",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 5"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_06",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 6"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_07",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "87654321",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 7"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_08",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "24012345",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 8"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_09",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "B09876543",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 9"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_10",
+   "truth": {
+    "student_name": "Fatima Bennett",
+    "student_id": "12345678",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 10"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_11",
+   "truth": {
+    "student_name": "Oskar Novak",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 11"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_12",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "87654321",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 12"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_13",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "24012345",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 13"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_14",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "B09876543",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 14"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_15",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "12345678",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 15"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_16",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 16"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_17",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "87654321",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 17"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_18",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "24012345",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 18"
+   },
+   "meta": {}
+  },
+  {
+   "id": "id_variant_19",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "B09876543",
+    "university": "University of the West of England",
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 19"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_00",
+   "truth": {
+    "student_name": "Jack Murphy",
+    "student_id": "20000000",
+    "university": "Cardiff University",
+    "module_code": "CS101",
+    "project_title": "Adaptive Game Audio 0"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_01",
+   "truth": {
+    "student_name": "Amara Haddad",
+    "student_id": "20000001",
+    "university": "Cardiff University",
+    "module_code": "MUSC4001",
+    "project_title": "Adaptive Game Audio 1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_02",
+   "truth": {
+    "student_name": "Sofia Wei",
+    "student_id": "20000002",
+    "university": "Cardiff University",
+    "module_code": "UFMXYZ-30-3",
+    "project_title": "Adaptive Game Audio 2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_03",
+   "truth": {
+    "student_name": "Liam Sharma",
+    "student_id": "20000003",
+    "university": "Cardiff University",
+    "module_code": "ENG2087A",
+    "project_title": "Adaptive Game Audio 3"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_04",
+   "truth": {
+    "student_name": "Noor Silva",
+    "student_id": "20000004",
+    "university": "Cardiff University",
+    "module_code": "DA101",
+    "project_title": "Adaptive Game Audio 4"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_05",
+   "truth": {
+    "student_name": "Chen Muller",
+    "student_id": "20000005",
+    "university": "Cardiff University",
+    "module_code": "CS101",
+    "project_title": "Adaptive Game Audio 5"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_06",
+   "truth": {
+    "student_name": "Priya Kowalski",
+    "student_id": "20000006",
+    "university": "Cardiff University",
+    "module_code": "MUSC4001",
+    "project_title": "Adaptive Game Audio 6"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_07",
+   "truth": {
+    "student_name": "Tomas Bennett",
+    "student_id": "20000007",
+    "university": "Cardiff University",
+    "module_code": "UFMXYZ-30-3",
+    "project_title": "Adaptive Game Audio 7"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_08",
+   "truth": {
+    "student_name": "Zoe Novak",
+    "student_id": "20000008",
+    "university": "Cardiff University",
+    "module_code": "ENG2087A",
+    "project_title": "Adaptive Game Audio 8"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_09",
+   "truth": {
+    "student_name": "Ethan Gandy",
+    "student_id": "20000009",
+    "university": "Cardiff University",
+    "module_code": "DA101",
+    "project_title": "Adaptive Game Audio 9"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_10",
+   "truth": {
+    "student_name": "Fatima Okonkwo",
+    "student_id": "20000010",
+    "university": "Cardiff University",
+    "module_code": "CS101",
+    "project_title": "Adaptive Game Audio 10"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_11",
+   "truth": {
+    "student_name": "Oskar Rossi",
+    "student_id": "20000011",
+    "university": "Cardiff University",
+    "module_code": "MUSC4001",
+    "project_title": "Adaptive Game Audio 11"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_12",
+   "truth": {
+    "student_name": "Jack Murphy",
+    "student_id": "20000012",
+    "university": "Cardiff University",
+    "module_code": "UFMXYZ-30-3",
+    "project_title": "Adaptive Game Audio 12"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_13",
+   "truth": {
+    "student_name": "Amara Haddad",
+    "student_id": "20000013",
+    "university": "Cardiff University",
+    "module_code": "ENG2087A",
+    "project_title": "Adaptive Game Audio 13"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_14",
+   "truth": {
+    "student_name": "Sofia Wei",
+    "student_id": "20000014",
+    "university": "Cardiff University",
+    "module_code": "DA101",
+    "project_title": "Adaptive Game Audio 14"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_15",
+   "truth": {
+    "student_name": "Liam Sharma",
+    "student_id": "20000015",
+    "university": "Cardiff University",
+    "module_code": "CS101",
+    "project_title": "Adaptive Game Audio 15"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_16",
+   "truth": {
+    "student_name": "Noor Silva",
+    "student_id": "20000016",
+    "university": "Cardiff University",
+    "module_code": "MUSC4001",
+    "project_title": "Adaptive Game Audio 16"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_17",
+   "truth": {
+    "student_name": "Chen Muller",
+    "student_id": "20000017",
+    "university": "Cardiff University",
+    "module_code": "UFMXYZ-30-3",
+    "project_title": "Adaptive Game Audio 17"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_18",
+   "truth": {
+    "student_name": "Priya Kowalski",
+    "student_id": "20000018",
+    "university": "Cardiff University",
+    "module_code": "ENG2087A",
+    "project_title": "Adaptive Game Audio 18"
+   },
+   "meta": {}
+  },
+  {
+   "id": "module_format_19",
+   "truth": {
+    "student_name": "Tomas Bennett",
+    "student_id": "20000019",
+    "university": "Cardiff University",
+    "module_code": "DA101",
+    "project_title": "Adaptive Game Audio 19"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "30000000",
+    "university": "University of Southampton",
+    "project_title": "Interactive Audio Systems",
+    "module_code": "UFMABC-30-1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "30000001",
+    "university": "University of Southampton",
+    "project_title": "Adaptive Game Audio",
+    "module_code": "UFMABC-30-2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "30000002",
+    "university": "University of Southampton",
+    "project_title": "Machine Listening Report",
+    "module_code": "UFMABC-30-3"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "30000003",
+    "university": "University of Southampton",
+    "project_title": "Final Major Project",
+    "module_code": "UFMABC-30-4"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "30000004",
+    "university": "University of Southampton",
+    "project_title": "Soundscape Composition Study",
+    "module_code": "UFMABC-30-5"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "30000005",
+    "university": "University of Southampton",
+    "project_title": "Reverb Network Analysis",
+    "module_code": "UFMABC-30-6"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_06",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "30000006",
+    "university": "University of Southampton",
+    "project_title": "Interactive Audio Systems",
+    "module_code": "UFMABC-30-7"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_07",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "30000007",
+    "university": "University of Southampton",
+    "project_title": "Adaptive Game Audio",
+    "module_code": "UFMABC-30-8"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_08",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "30000008",
+    "university": "University of Southampton",
+    "project_title": "Machine Listening Report",
+    "module_code": "UFMABC-30-9"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_staff_09",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "30000009",
+    "university": "University of Southampton",
+    "project_title": "Final Major Project",
+    "module_code": "UFMABC-30-1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_refs_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "40000000",
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 0"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_refs_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "40000001",
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_refs_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "40000002",
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_refs_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "40000003",
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 3"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_refs_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "40000004",
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 4"
+   },
+   "meta": {}
+  },
+  {
+   "id": "adversarial_refs_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "40000005",
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 5"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "50000000",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 0: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "50000001",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 1: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "50000002",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 2: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "50000003",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 3: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "50000004",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 4: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "50000005",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 5: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_06",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "50000006",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 6: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_07",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "50000007",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 7: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_08",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "50000008",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 8: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_09",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "50000009",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 9: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_10",
+   "truth": {
+    "student_name": "Fatima Bennett",
+    "student_id": "50000010",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 10: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_11",
+   "truth": {
+    "student_name": "Oskar Novak",
+    "student_id": "50000011",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 11: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_12",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "50000012",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 12: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_13",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "50000013",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 13: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_14",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "50000014",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 14: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_15",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "50000015",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 15: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_16",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "50000016",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 16: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_17",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "50000017",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 17: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_18",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "50000018",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 18: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_19",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "50000019",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 19: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_20",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "50000020",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 20: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_21",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "50000021",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 21: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_22",
+   "truth": {
+    "student_name": "Fatima Bennett",
+    "student_id": "50000022",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 22: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_23",
+   "truth": {
+    "student_name": "Oskar Novak",
+    "student_id": "50000023",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 23: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_24",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "50000024",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 24: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_25",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "50000025",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 25: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_26",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "50000026",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 26: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_27",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "50000027",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 27: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_28",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "50000028",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 28: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_29",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "50000029",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 29: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_30",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "50000030",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 30: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_31",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "50000031",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 31: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_32",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "50000032",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 32: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_33",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "50000033",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 33: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_34",
+   "truth": {
+    "student_name": "Fatima Bennett",
+    "student_id": "50000034",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 34: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_35",
+   "truth": {
+    "student_name": "Oskar Novak",
+    "student_id": "50000035",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 35: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_36",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "50000036",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 36: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_37",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "50000037",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 37: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_38",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "50000038",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 38: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "implicit_title_39",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "50000039",
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 39: Sonic Environments"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_06",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_07",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_08",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "missing_fields_09",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "university": "Some University"
+   },
+   "meta": {}
+  },
+  {
+   "id": "image_only_00",
+   "truth": {},
+   "meta": {
+    "image_only": "true"
+   }
+  },
+  {
+   "id": "image_only_01",
+   "truth": {},
+   "meta": {
+    "image_only": "true"
+   }
+  },
+  {
+   "id": "image_only_02",
+   "truth": {},
+   "meta": {
+    "image_only": "true"
+   }
+  },
+  {
+   "id": "image_only_03",
+   "truth": {},
+   "meta": {
+    "image_only": "true"
+   }
+  },
+  {
+   "id": "image_only_04",
+   "truth": {},
+   "meta": {
+    "image_only": "true"
+   }
+  },
+  {
+   "id": "weird_unicode_00",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "66778899",
+    "university": "University of the West of England",
+    "module_code": "UFMUNI-30-3",
+    "project_title": "Etude for Spatial Audio"
+   },
+   "meta": {}
+  },
+  {
+   "id": "weird_path_title_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "11223344",
+    "university": "University of the West of England",
+    "module_code": "UFMPTH-30-3",
+    "project_title": "Final Report v2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "long_title_00",
+   "truth": {
+      "student_name": "Amara Okonkwo",
+      "student_id": "22334455",
+      "university": "Cardiff University",
+      "module_code": "MUSC4001",
+      "project_title": "An Extended Investigation into Spatial Audio Perception and Binaural Rendering Techniques"
+   },
+   "meta": {}
+  },
+  {
+   "id": "multi_institution_00",
+   "truth": {
+      "student_name": "Liam Murphy",
+      "student_id": "33445566",
+      "university": "University of the West of England",
+      "module_code": "UFMXXX-30-3",
+      "project_title": "Dual Institution Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "whitespace_00",
+   "truth": {
+      "student_name": "Sofia Rossi",
+      "student_id": "55667788",
+      "university": "Bath Spa University",
+      "module_code": "BSP222",
+      "project_title": "Messy Whitespace Study"
+   },
+   "meta": {}
+  },
+  {
+   "id": "metadata_only_title_00",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "77889900",
+    "university": "University of Southampton",
+    "project_title": "Metadata Sourced Project Title"
+   },
+   "meta": {
+    "title": "Metadata Sourced Project Title"
+   }
+  },
+  {
+   "id": "malformed_00",
+   "truth": {},
+   "meta": {
+    "malformed": "true"
+   }
+  },
+  {
+   "id": "long_report_00",
+   "truth": {
+    "student_name": "Ethan Bennett",
+    "student_id": "88990011",
+    "university": "University of the West of England",
+    "module_code": "UFMLNG-40-3",
+    "project_title": "Long Form Dissertation on Acoustics"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_00",
+   "truth": {
+    "student_name": "Jack Wei",
+    "student_id": "90000000",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 0"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_01",
+   "truth": {
+    "student_name": "Amara Sharma",
+    "student_id": "90000001",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_02",
+   "truth": {
+    "student_name": "Sofia Silva",
+    "student_id": "90000002",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_03",
+   "truth": {
+    "student_name": "Liam Muller",
+    "student_id": "90000003",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 3"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_04",
+   "truth": {
+    "student_name": "Noor Kowalski",
+    "student_id": "90000004",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 4"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_05",
+   "truth": {
+    "student_name": "Chen Bennett",
+    "student_id": "90000005",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 5"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_06",
+   "truth": {
+    "student_name": "Priya Novak",
+    "student_id": "90000006",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 6"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_07",
+   "truth": {
+    "student_name": "Tomas Gandy",
+    "student_id": "90000007",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 7"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_08",
+   "truth": {
+    "student_name": "Zoe Okonkwo",
+    "student_id": "90000008",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 8"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_09",
+   "truth": {
+    "student_name": "Ethan Rossi",
+    "student_id": "90000009",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 9"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "A7000000",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 0"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "A7000001",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "A7000002",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "A7000003",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 3"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "A7000004",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 4"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "A7000005",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 5"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_06",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "A7000006",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 6"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_07",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "A7000007",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 7"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_08",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "A7000008",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 8"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_09",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "A7000009",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 9"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "C8000000",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 0: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "C8000001",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 1: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "C8000002",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 2: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "C8000003",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 3: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "C8000004",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 4: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "C8000005",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 5: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_06",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "C8000006",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 6: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_07",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "C8000007",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 7: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_08",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "C8000008",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 8: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_09",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "C8000009",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 9: Perception and Practice"
+   },
+   "meta": {}
+  }
+ ]
+}

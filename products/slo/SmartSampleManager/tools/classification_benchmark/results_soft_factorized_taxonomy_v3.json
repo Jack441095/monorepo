@@ -1,0 +1,160 @@
+{
+  "generated": "2026-09-11T14:52:19",
+  "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_v3.npz",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 8,
+    "splits": 5,
+    "coefficients_preregistered": true
+  },
+  "n_files": 1283,
+  "n_classes": 25,
+  "n_families": 15,
+  "n_forms": 3,
+  "family_map": {
+    "Bass Hit": "Bass",
+    "Bass Loop": "Bass",
+    "Bass Reese": "Bass",
+    "Chord Loop": "Harmonic",
+    "Clap": "Clap",
+    "Crash": "Crash",
+    "Drum Loop": "Drum",
+    "Foley": "Foley",
+    "Foley Loop": "Foley",
+    "Hi-Hat": "Hi-Hat",
+    "Hi-Hat Loop": "Hi-Hat",
+    "Kick": "Kick",
+    "Kick Loop": "Kick",
+    "Other/none": "Rejection",
+    "Pad": "Synth",
+    "Percussion": "Percussion",
+    "Percussion Loop": "Percussion",
+    "Rimshot": "Rimshot",
+    "SFX": "FX",
+    "Snare": "Snare",
+    "Synth Loop": "Synth",
+    "Synth One-Shot": "Synth",
+    "Vocal Loop": "Vocal",
+    "Vocal One-Shot": "Vocal",
+    "Weather/Nature Atmos": "FX"
+  },
+  "form_map": {
+    "Bass Hit": "One-Shot",
+    "Bass Loop": "Loop",
+    "Bass Reese": "One-Shot",
+    "Chord Loop": "Loop",
+    "Clap": "One-Shot",
+    "Crash": "One-Shot",
+    "Drum Loop": "Loop",
+    "Foley": "One-Shot",
+    "Foley Loop": "Loop",
+    "Hi-Hat": "One-Shot",
+    "Hi-Hat Loop": "Loop",
+    "Kick": "One-Shot",
+    "Kick Loop": "Loop",
+    "Other/none": "Rejection",
+    "Pad": "One-Shot",
+    "Percussion": "One-Shot",
+    "Percussion Loop": "Loop",
+    "Rimshot": "One-Shot",
+    "SFX": "One-Shot",
+    "Snare": "One-Shot",
+    "Synth Loop": "Loop",
+    "Synth One-Shot": "One-Shot",
+    "Vocal Loop": "Loop",
+    "Vocal One-Shot": "One-Shot",
+    "Weather/Nature Atmos": "Loop"
+  },
+  "results": {
+    "flat": {
+      "family_bonus": 0.0,
+      "form_bonus": 0.0,
+      "accuracy_mean": 57.01,
+      "accuracy_sd": 0.27,
+      "macro_f1": 49.37,
+      "per_seed_accuracy": [
+        56.82,
+        57.6,
+        57.05,
+        56.9,
+        57.29,
+        56.74,
+        56.82,
+        56.9
+      ],
+      "delta_vs_flat": 0.0
+    },
+    "soft_family_025": {
+      "family_bonus": 0.25,
+      "form_bonus": 0.0,
+      "accuracy_mean": 57.13,
+      "accuracy_sd": 0.42,
+      "macro_f1": 49.44,
+      "per_seed_accuracy": [
+        56.59,
+        57.52,
+        57.05,
+        56.51,
+        57.6,
+        57.52,
+        56.82,
+        57.44
+      ],
+      "delta_vs_flat": 0.12
+    },
+    "soft_form_025": {
+      "family_bonus": 0.0,
+      "form_bonus": 0.25,
+      "accuracy_mean": 57.25,
+      "accuracy_sd": 0.48,
+      "macro_f1": 49.14,
+      "per_seed_accuracy": [
+        57.05,
+        57.76,
+        57.13,
+        57.13,
+        58.07,
+        56.35,
+        57.44,
+        57.05
+      ],
+      "delta_vs_flat": 0.23
+    },
+    "soft_both_025": {
+      "family_bonus": 0.25,
+      "form_bonus": 0.25,
+      "accuracy_mean": 57.45,
+      "accuracy_sd": 0.56,
+      "macro_f1": 49.31,
+      "per_seed_accuracy": [
+        56.82,
+        58.14,
+        57.29,
+        57.05,
+        58.46,
+        57.44,
+        56.82,
+        57.6
+      ],
+      "delta_vs_flat": 0.44
+    },
+    "soft_both_050": {
+      "family_bonus": 0.5,
+      "form_bonus": 0.5,
+      "accuracy_mean": 56.62,
+      "accuracy_sd": 0.9,
+      "macro_f1": 48.23,
+      "per_seed_accuracy": [
+        55.11,
+        57.29,
+        56.59,
+        55.88,
+        58.3,
+        56.59,
+        56.12,
+        57.05
+      ],
+      "delta_vs_flat": -0.4
+    }
+  }
+}

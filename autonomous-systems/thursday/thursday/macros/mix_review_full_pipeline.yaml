@@ -1,0 +1,16 @@
+name: "Full Mix Review Pipeline"
+description: "Complete mix review workflow: scan audio, ask KENN for fixes, generate correction rack"
+triggers:
+  patterns:
+    - "full mix review"
+    - "mix review pipeline"
+    - "complete mix review"
+requires:
+  - audio_path
+steps:
+  - service: "audio_analysis"
+  - service: "kenn_review_handoff"
+  - service: "mix_review_correction_rack"
+  - say: "Review complete. Should I draft an email to the client?"
+  - service: "admin_agent"
+  - say: "Email drafted for your review."

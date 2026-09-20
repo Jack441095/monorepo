@@ -1,0 +1,33 @@
+# Git & VCS
+.git
+.gitignore
+.github
+
+# Virtual Environments & Caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+.cache/
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Build & Dist Artifacts
+build/
+dist/
+*.egg-info/
+*.dylib
+out/
+tmp/
+
+# Sensitive Environment Files
+.env
+.env.local

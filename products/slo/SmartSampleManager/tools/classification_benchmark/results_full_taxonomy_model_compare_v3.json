@@ -1,0 +1,67 @@
+{
+  "generated": "2026-09-11T14:27:53",
+  "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_v3.npz",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 4,
+    "splits": 5
+  },
+  "n_files": 1283,
+  "n_classes": 25,
+  "classes": [
+    "Bass Hit",
+    "Bass Loop",
+    "Bass Reese",
+    "Chord Loop",
+    "Clap",
+    "Crash",
+    "Drum Loop",
+    "Foley",
+    "Foley Loop",
+    "Hi-Hat",
+    "Hi-Hat Loop",
+    "Kick",
+    "Kick Loop",
+    "Other/none",
+    "Pad",
+    "Percussion",
+    "Percussion Loop",
+    "Rimshot",
+    "SFX",
+    "Snare",
+    "Synth Loop",
+    "Synth One-Shot",
+    "Vocal Loop",
+    "Vocal One-Shot",
+    "Weather/Nature Atmos"
+  ],
+  "results": {
+    "centroid": {
+      "accuracy_mean": 57.09,
+      "accuracy_sd": 0.3,
+      "macro_f1": 49.43,
+      "coverage_at_90_precision": 24.1,
+      "coverage_at_95_precision": 14.9,
+      "per_seed_accuracy": [
+        56.82,
+        57.6,
+        57.05,
+        56.9
+      ]
+    },
+    "logistic": {
+      "accuracy_mean": 54.33,
+      "accuracy_sd": 0.61,
+      "macro_f1": 47.16,
+      "coverage_at_90_precision": 15.5,
+      "coverage_at_95_precision": 5.1,
+      "per_seed_accuracy": [
+        54.64,
+        55.03,
+        54.25,
+        53.39
+      ]
+    }
+  },
+  "decision": "retain centroid unless another arm clears it on the same folds"
+}

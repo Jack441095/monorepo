@@ -1,0 +1,271 @@
+{
+  "views": {
+    "attack": [
+      "head",
+      0.25
+    ],
+    "short": [
+      "head",
+      1.0
+    ],
+    "early": [
+      "head",
+      5.0
+    ],
+    "centre": [
+      "centre",
+      5.0
+    ],
+    "tail": [
+      "tail",
+      2.0
+    ],
+    "spread": [
+      "spread",
+      1.0
+    ]
+  },
+  "seeds": 8,
+  "control": "single:early",
+  "results": {
+    "single:attack": {
+      "acc": 59.14,
+      "sd": 0.73,
+      "macro_f1": 52.63,
+      "per_class": {
+        "Clap": 89.4,
+        "Crash": 57.7,
+        "Drum Loop": 57.5,
+        "Foley": 46.6,
+        "Hi-Hat": 71.2,
+        "Kick": 73.0,
+        "Other/none": 55.0,
+        "Percussion": 6.8,
+        "Percussion Loop": 19.0,
+        "Snare": 71.2
+      }
+    },
+    "single:short": {
+      "acc": 67.46,
+      "sd": 0.69,
+      "macro_f1": 62.43,
+      "per_class": {
+        "Clap": 92.6,
+        "Crash": 73.6,
+        "Drum Loop": 77.8,
+        "Foley": 60.7,
+        "Hi-Hat": 71.2,
+        "Kick": 83.2,
+        "Other/none": 59.8,
+        "Percussion": 14.8,
+        "Percussion Loop": 41.5,
+        "Snare": 70.3
+      }
+    },
+    "single:early": {
+      "acc": 69.51,
+      "sd": 0.54,
+      "macro_f1": 65.2,
+      "per_class": {
+        "Clap": 91.3,
+        "Crash": 76.0,
+        "Drum Loop": 86.7,
+        "Foley": 57.0,
+        "Hi-Hat": 74.0,
+        "Kick": 84.0,
+        "Other/none": 58.3,
+        "Percussion": 18.5,
+        "Percussion Loop": 53.2,
+        "Snare": 71.5
+      }
+    },
+    "single:centre": {
+      "acc": 69.22,
+      "sd": 0.57,
+      "macro_f1": 64.89,
+      "per_class": {
+        "Clap": 90.4,
+        "Crash": 72.6,
+        "Drum Loop": 87.3,
+        "Foley": 55.7,
+        "Hi-Hat": 74.0,
+        "Kick": 84.1,
+        "Other/none": 58.1,
+        "Percussion": 18.8,
+        "Percussion Loop": 52.8,
+        "Snare": 71.5
+      }
+    },
+    "single:tail": {
+      "acc": 66.81,
+      "sd": 0.59,
+      "macro_f1": 61.47,
+      "per_class": {
+        "Clap": 89.2,
+        "Crash": 66.3,
+        "Drum Loop": 85.6,
+        "Foley": 52.7,
+        "Hi-Hat": 76.4,
+        "Kick": 81.3,
+        "Other/none": 53.9,
+        "Percussion": 15.5,
+        "Percussion Loop": 48.4,
+        "Snare": 69.5
+      }
+    },
+    "single:spread": {
+      "acc": 63.37,
+      "sd": 0.69,
+      "macro_f1": 59.02,
+      "per_class": {
+        "Clap": 77.0,
+        "Crash": 72.1,
+        "Drum Loop": 82.8,
+        "Foley": 53.2,
+        "Hi-Hat": 65.1,
+        "Kick": 78.4,
+        "Other/none": 58.5,
+        "Percussion": 17.2,
+        "Percussion Loop": 41.3,
+        "Snare": 64.7
+      }
+    },
+    "concat:attack+early": {
+      "acc": 68.22,
+      "sd": 0.47,
+      "macro_f1": 62.93,
+      "per_class": {
+        "Clap": 90.9,
+        "Crash": 66.3,
+        "Drum Loop": 86.9,
+        "Foley": 55.2,
+        "Hi-Hat": 71.1,
+        "Kick": 84.5,
+        "Other/none": 59.2,
+        "Percussion": 14.8,
+        "Percussion Loop": 44.0,
+        "Snare": 73.5
+      }
+    },
+    "late:attack+early": {
+      "acc": 67.27,
+      "sd": 0.69,
+      "macro_f1": 61.94,
+      "per_class": {
+        "Clap": 91.8,
+        "Crash": 72.1,
+        "Drum Loop": 82.5,
+        "Foley": 53.6,
+        "Hi-Hat": 71.6,
+        "Kick": 83.5,
+        "Other/none": 59.4,
+        "Percussion": 13.5,
+        "Percussion Loop": 38.7,
+        "Snare": 72.5
+      }
+    },
+    "concat:early+tail": {
+      "acc": 68.55,
+      "sd": 0.25,
+      "macro_f1": 63.63,
+      "per_class": {
+        "Clap": 90.8,
+        "Crash": 73.6,
+        "Drum Loop": 84.4,
+        "Foley": 56.1,
+        "Hi-Hat": 73.6,
+        "Kick": 84.2,
+        "Other/none": 57.7,
+        "Percussion": 16.8,
+        "Percussion Loop": 52.0,
+        "Snare": 69.9
+      }
+    },
+    "late:early+tail": {
+      "acc": 68.58,
+      "sd": 0.43,
+      "macro_f1": 63.48,
+      "per_class": {
+        "Clap": 92.1,
+        "Crash": 74.5,
+        "Drum Loop": 85.6,
+        "Foley": 55.5,
+        "Hi-Hat": 74.7,
+        "Kick": 84.3,
+        "Other/none": 57.3,
+        "Percussion": 16.0,
+        "Percussion Loop": 49.6,
+        "Snare": 69.7
+      }
+    },
+    "concat:attack+early+tail": {
+      "acc": 68.73,
+      "sd": 0.64,
+      "macro_f1": 63.37,
+      "per_class": {
+        "Clap": 91.6,
+        "Crash": 66.3,
+        "Drum Loop": 86.9,
+        "Foley": 57.3,
+        "Hi-Hat": 72.9,
+        "Kick": 84.6,
+        "Other/none": 59.1,
+        "Percussion": 14.5,
+        "Percussion Loop": 47.2,
+        "Snare": 72.5
+      }
+    },
+    "late:attack+early+tail": {
+      "acc": 68.71,
+      "sd": 0.49,
+      "macro_f1": 63.27,
+      "per_class": {
+        "Clap": 93.1,
+        "Crash": 73.6,
+        "Drum Loop": 85.7,
+        "Foley": 58.2,
+        "Hi-Hat": 73.3,
+        "Kick": 84.5,
+        "Other/none": 59.4,
+        "Percussion": 14.2,
+        "Percussion Loop": 41.7,
+        "Snare": 72.3
+      }
+    },
+    "concat:all six": {
+      "acc": 69.1,
+      "sd": 0.48,
+      "macro_f1": 64.18,
+      "per_class": {
+        "Clap": 92.3,
+        "Crash": 69.7,
+        "Drum Loop": 87.3,
+        "Foley": 59.1,
+        "Hi-Hat": 71.2,
+        "Kick": 83.8,
+        "Other/none": 60.4,
+        "Percussion": 17.2,
+        "Percussion Loop": 49.4,
+        "Snare": 70.0
+      }
+    },
+    "late:all six": {
+      "acc": 69.07,
+      "sd": 0.47,
+      "macro_f1": 64.23,
+      "per_class": {
+        "Clap": 92.7,
+        "Crash": 76.9,
+        "Drum Loop": 85.4,
+        "Foley": 59.5,
+        "Hi-Hat": 74.0,
+        "Kick": 84.0,
+        "Other/none": 60.1,
+        "Percussion": 16.0,
+        "Percussion Loop": 44.6,
+        "Snare": 70.6
+      }
+    }
+  },
+  "best": "single:early"
+}

@@ -1,0 +1,70 @@
+{
+  "schema": "audio-too.kenn-advisor-replay-cases/v1",
+  "description": "Synthetic anonymized contract fixture; not human listening evidence.",
+  "cases": [
+    {
+      "id": "contract-valid-gain-01",
+      "correlation_id": "automix-replay:contract-valid-gain-01",
+      "expected_status": "valid",
+      "plan": {
+        "stems": [{
+          "stem_name": "stem-01", "instrument": "vocal", "gain_db": 0.0,
+          "pan": 0.0, "eq_bands": [], "compressor": {"ratio": 3.0}, "gate": null,
+          "reverb_send": 0.0, "reverb_type": "room", "reverb_decay_s": 1.2,
+          "delay_send": 0.0, "stereo_width": 1.0, "mono_below_hz": 120.0,
+          "saturation_drive_db": 0.0, "saturation_mix": 0.0
+        }],
+        "bus": {
+          "bus_compressor": null, "bus_eq_bands": [], "limiter_ceiling_db": -1.0,
+          "limiter_threshold_db": 0.0, "saturation_drive_db": 0.0,
+          "saturation_mix": 0.0
+        },
+        "genre": "pop", "target_lufs": -14.0, "mix_goal": "premaster",
+        "decisions_log": []
+      },
+      "proposal": {
+        "schema": "audio-too.kenn-advisor/v1",
+        "source_plan_revision": "sha256:1a5e1c3c16548cc668db6fa0d101e77e9339925148b7e2af3b4a2aee0c01bb27",
+        "model_version": "contract-fixture-v1", "prompt_version": "advisor-v1",
+        "correlation_id": "automix-replay:contract-valid-gain-01",
+        "operations": [{
+          "stem_id": "stem-01", "operation": "gain_delta", "value": 1.5,
+          "unit": "dB", "evidence_source_ids": ["source-01"], "confidence": 0.9,
+          "reason": "Synthetic valid replay fixture."
+        }]
+      }
+    },
+    {
+      "id": "contract-reject-clamp-01",
+      "correlation_id": "automix-replay:contract-reject-clamp-01",
+      "expected_status": "rejected",
+      "plan": {
+        "stems": [{
+          "stem_name": "stem-01", "instrument": "vocal", "gain_db": 0.0,
+          "pan": 0.0, "eq_bands": [], "compressor": {"ratio": 3.0}, "gate": null,
+          "reverb_send": 0.0, "reverb_type": "room", "reverb_decay_s": 1.2,
+          "delay_send": 0.0, "stereo_width": 1.0, "mono_below_hz": 120.0,
+          "saturation_drive_db": 0.0, "saturation_mix": 0.0
+        }],
+        "bus": {
+          "bus_compressor": null, "bus_eq_bands": [], "limiter_ceiling_db": -1.0,
+          "limiter_threshold_db": 0.0, "saturation_drive_db": 0.0,
+          "saturation_mix": 0.0
+        },
+        "genre": "pop", "target_lufs": -14.0, "mix_goal": "premaster",
+        "decisions_log": []
+      },
+      "proposal": {
+        "schema": "audio-too.kenn-advisor/v1",
+        "source_plan_revision": "sha256:1a5e1c3c16548cc668db6fa0d101e77e9339925148b7e2af3b4a2aee0c01bb27",
+        "model_version": "contract-fixture-v1", "prompt_version": "advisor-v1",
+        "correlation_id": "automix-replay:contract-reject-clamp-01",
+        "operations": [{
+          "stem_id": "stem-01", "operation": "gain_delta", "value": 9.0,
+          "unit": "dB", "evidence_source_ids": ["source-01"], "confidence": 0.9,
+          "reason": "Synthetic rejected replay fixture."
+        }]
+      }
+    }
+  ]
+}

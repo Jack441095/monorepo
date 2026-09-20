@@ -1,0 +1,17 @@
+{
+  "source_sha": "bc1bf98d6493582622395882acd05ae0cf6ab64a",
+  "specialist_registry_hash": "9d5ffd63d1fba1bd3c625b9578d9351738f391c2de1aa485f8f9382140a53a5f",
+  "task_schema_hash": "b52c49de4e65438df0e8c693807682310bf30fca2a881d04a1f5ec4ebdcd7800",
+  "result_schema_hash": "b52c49de4e65438df0e8c693807682310bf30fca2a881d04a1f5ec4ebdcd7800",
+  "agent_orchestrator_hash": "07b6f338aac812f5db15ece54ead437af195d15d8fa4d3f90fb67b3fe545bb94",
+  "reconciliation_policy_hash": "ceb9877fe7033eb6d8377e790555993a9872742f1b1ea74ae20a20507e33cdc2",
+  "benchmark_hash": "e7104e79e0a010fb35dd67ece0144e38a0f90c507efb1449a9714760dfe75220",
+  "qualifications": {
+    "orchestration_v1_overall_accuracy": 1.0,
+    "routing_accuracy": 1.0,
+    "decomposition_accuracy": 1.0,
+    "dependency_correctness": 1.0,
+    "cycle_detection": "PASS",
+    "resource_aware_scheduling": "PASS"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 22, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "ssm-base",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/../_build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "FETCHCONTENT_BASE_DIR": "${sourceDir}/../_cache/fetchcontent",
+        "SSM_INSTALL_PLUGINS_AFTER_BUILD": "OFF"
+      }
+    },
+    {
+      "name": "ssm-dev",
+      "displayName": "FAST DEV (Debug; no LTO; no install)",
+      "inherits": "ssm-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "SSM_ENABLE_LTO": "OFF",
+        "SSM_TEST_LTO": "OFF",
+        "SSM_BUNDLE_APPLE_DEPS": "OFF"
+      }
+    },
+    {
+      "name": "ssm-qualification",
+      "displayName": "QUALIFICATION (Release; plugin LTO; tests no LTO)",
+      "inherits": "ssm-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "SSM_ENABLE_LTO": "ON",
+        "SSM_TEST_LTO": "OFF",
+        "SSM_BUNDLE_APPLE_DEPS": "OFF"
+      }
+    },
+    {
+      "name": "ssm-release-candidate",
+      "displayName": "RELEASE CANDIDATE (Release; LTO everywhere)",
+      "inherits": "ssm-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "SSM_ENABLE_LTO": "ON",
+        "SSM_TEST_LTO": "ON",
+        "SSM_BUNDLE_APPLE_DEPS": "ON"
+      }
+    },
+    {
+      "name": "ssm-sanitize",
+      "displayName": "SANITIZE (Debug; ASan+UBSan on project targets; no LTO; no install)",
+      "inherits": "ssm-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "SSM_ENABLE_LTO": "OFF",
+        "SSM_TEST_LTO": "OFF",
+        "SSM_BUNDLE_APPLE_DEPS": "OFF",
+        "SSM_SANITIZE": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "ssm-dev", "configurePreset": "ssm-dev" },
+    { "name": "ssm-qualification", "configurePreset": "ssm-qualification" },
+    { "name": "ssm-release-candidate", "configurePreset": "ssm-release-candidate" },
+    { "name": "ssm-sanitize", "configurePreset": "ssm-sanitize" }
+  ]
+}

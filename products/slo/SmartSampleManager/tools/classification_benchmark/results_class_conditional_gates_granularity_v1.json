@@ -1,0 +1,4051 @@
+{
+  "record_type": "slo_class_conditional_gate_audit",
+  "schema_version": "1.0.0",
+  "method_version": "class_conditional_gates_v1",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false,
+    "approval_granted": false
+  },
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 8,
+    "splits": 5,
+    "target_precision": 0.95,
+    "threshold_policy": "maximum per-seed class threshold",
+    "min_accepted_per_seed": 20,
+    "min_examples": 5,
+    "min_collections": 5
+  },
+  "corpus": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_granularity_relabelled_v1.npz",
+    "sha256": "626c4f00d3e51984144a12575d0ef1571e0712ec063fe3aeadac8c9e6cf885c0",
+    "n_files": 1523,
+    "n_classes": 27,
+    "n_collections": 80,
+    "classes": [
+      "Bass Hit",
+      "Bass Loop",
+      "Bass Reese",
+      "Chord Loop",
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Foley",
+      "Foley Loop",
+      "Hi-Hat",
+      "Hi-Hat Loop",
+      "Impact",
+      "Kick",
+      "Kick Loop",
+      "Other/none",
+      "Pad",
+      "Percussion",
+      "Percussion Loop",
+      "Rimshot",
+      "SFX",
+      "Snare",
+      "Synth Loop",
+      "Synth One-Shot",
+      "Top Loop",
+      "Vocal Loop",
+      "Vocal One-Shot",
+      "Weather/Nature Atmos"
+    ]
+  },
+  "seed_summary": [
+    {
+      "seed": 0,
+      "accuracy": 0.582403151674327,
+      "n_predictions": 1523
+    },
+    {
+      "seed": 1,
+      "accuracy": 0.5778069599474721,
+      "n_predictions": 1523
+    },
+    {
+      "seed": 2,
+      "accuracy": 0.572554169402495,
+      "n_predictions": 1523
+    },
+    {
+      "seed": 3,
+      "accuracy": 0.5784635587655942,
+      "n_predictions": 1523
+    },
+    {
+      "seed": 4,
+      "accuracy": 0.5797767564018385,
+      "n_predictions": 1523
+    },
+    {
+      "seed": 5,
+      "accuracy": 0.5830597504924491,
+      "n_predictions": 1523
+    },
+    {
+      "seed": 6,
+      "accuracy": 0.587655942219304,
+      "n_predictions": 1523
+    },
+    {
+      "seed": 7,
+      "accuracy": 0.5771503611293499,
+      "n_predictions": 1523
+    }
+  ],
+  "classes": {
+    "Bass Hit": {
+      "conservative_threshold": 0.7153933644294739,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 5,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 36,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.1388888888888889,
+          "seed": 0
+        },
+        {
+          "n_candidates": 37,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.13513513513513514,
+          "seed": 1
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 36,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 37,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.10810810810810811,
+          "seed": 4
+        },
+        {
+          "n_candidates": 40,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.125,
+          "seed": 5
+        },
+        {
+          "n_candidates": 39,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.10256410256410256,
+          "seed": 6
+        },
+        {
+          "n_candidates": 38,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 36,
+          "n_accepted": 9,
+          "precision": 1.0,
+          "threshold": 0.5538002252578735,
+          "coverage": 0.25,
+          "seed": 0,
+          "class": "Bass Hit"
+        },
+        {
+          "n_candidates": 37,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.6162523031234741,
+          "coverage": 0.1891891891891892,
+          "seed": 1,
+          "class": "Bass Hit"
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.6215299963951111,
+          "coverage": 0.07317073170731707,
+          "seed": 2,
+          "class": "Bass Hit"
+        },
+        {
+          "n_candidates": 36,
+          "n_accepted": 6,
+          "precision": 1.0,
+          "threshold": 0.5519823431968689,
+          "coverage": 0.16666666666666666,
+          "seed": 3,
+          "class": "Bass Hit"
+        },
+        {
+          "n_candidates": 37,
+          "n_accepted": 6,
+          "precision": 1.0,
+          "threshold": 0.6092495322227478,
+          "coverage": 0.16216216216216217,
+          "seed": 4,
+          "class": "Bass Hit"
+        },
+        {
+          "n_candidates": 40,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7153933644294739,
+          "coverage": 0.125,
+          "seed": 5,
+          "class": "Bass Hit"
+        },
+        {
+          "n_candidates": 39,
+          "n_accepted": 6,
+          "precision": 1.0,
+          "threshold": 0.5887808203697205,
+          "coverage": 0.15384615384615385,
+          "seed": 6,
+          "class": "Bass Hit"
+        },
+        {
+          "n_candidates": 38,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.6511486768722534,
+          "coverage": 0.13157894736842105,
+          "seed": 7,
+          "class": "Bass Hit"
+        }
+      ]
+    },
+    "Bass Loop": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 45,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 45,
+          "n_accepted": 22,
+          "precision": 0.9545454545454546,
+          "threshold": 0.31001266837120056,
+          "coverage": 0.4888888888888889,
+          "seed": 0,
+          "class": "Bass Loop"
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 23,
+          "precision": 0.9565217391304348,
+          "threshold": 0.32878875732421875,
+          "coverage": 0.4791666666666667,
+          "seed": 1,
+          "class": "Bass Loop"
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.523338258266449,
+          "coverage": 0.02040816326530612,
+          "seed": 2,
+          "class": "Bass Loop"
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.41949474811553955,
+          "coverage": 0.11904761904761904,
+          "seed": 3,
+          "class": "Bass Loop"
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4,
+          "class": "Bass Loop"
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.4471506178379059,
+          "coverage": 0.061224489795918366,
+          "seed": 5,
+          "class": "Bass Loop"
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.44312024116516113,
+          "coverage": 0.024390243902439025,
+          "seed": 6,
+          "class": "Bass Loop"
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.4755701720714569,
+          "coverage": 0.08333333333333333,
+          "seed": 7,
+          "class": "Bass Loop"
+        }
+      ]
+    },
+    "Bass Reese": {
+      "conservative_threshold": 0.7946940660476685,
+      "min_seed_accepted": 12,
+      "max_seed_accepted": 27,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 68,
+          "n_accepted": 12,
+          "precision": 1.0,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.17647058823529413,
+          "seed": 0
+        },
+        {
+          "n_candidates": 64,
+          "n_accepted": 21,
+          "precision": 0.9523809523809523,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.328125,
+          "seed": 1
+        },
+        {
+          "n_candidates": 70,
+          "n_accepted": 19,
+          "precision": 0.9473684210526315,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.2714285714285714,
+          "seed": 2
+        },
+        {
+          "n_candidates": 70,
+          "n_accepted": 27,
+          "precision": 0.9629629629629629,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.38571428571428573,
+          "seed": 3
+        },
+        {
+          "n_candidates": 68,
+          "n_accepted": 12,
+          "precision": 1.0,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.17647058823529413,
+          "seed": 4
+        },
+        {
+          "n_candidates": 68,
+          "n_accepted": 17,
+          "precision": 1.0,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.25,
+          "seed": 5
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 24,
+          "precision": 1.0,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.3582089552238806,
+          "seed": 6
+        },
+        {
+          "n_candidates": 65,
+          "n_accepted": 21,
+          "precision": 1.0,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.3230769230769231,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 68,
+          "n_accepted": 31,
+          "precision": 0.967741935483871,
+          "threshold": 0.7271081805229187,
+          "coverage": 0.45588235294117646,
+          "seed": 0,
+          "class": "Bass Reese"
+        },
+        {
+          "n_candidates": 64,
+          "n_accepted": 21,
+          "precision": 0.9523809523809523,
+          "threshold": 0.7946940660476685,
+          "coverage": 0.328125,
+          "seed": 1,
+          "class": "Bass Reese"
+        },
+        {
+          "n_candidates": 70,
+          "n_accepted": 23,
+          "precision": 0.9565217391304348,
+          "threshold": 0.7768399119377136,
+          "coverage": 0.32857142857142857,
+          "seed": 2,
+          "class": "Bass Reese"
+        },
+        {
+          "n_candidates": 70,
+          "n_accepted": 35,
+          "precision": 0.9714285714285714,
+          "threshold": 0.7472994923591614,
+          "coverage": 0.5,
+          "seed": 3,
+          "class": "Bass Reese"
+        },
+        {
+          "n_candidates": 68,
+          "n_accepted": 25,
+          "precision": 0.96,
+          "threshold": 0.7408425211906433,
+          "coverage": 0.36764705882352944,
+          "seed": 4,
+          "class": "Bass Reese"
+        },
+        {
+          "n_candidates": 68,
+          "n_accepted": 35,
+          "precision": 0.9714285714285714,
+          "threshold": 0.7182807326316833,
+          "coverage": 0.5147058823529411,
+          "seed": 5,
+          "class": "Bass Reese"
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 29,
+          "precision": 0.9655172413793104,
+          "threshold": 0.7704107165336609,
+          "coverage": 0.43283582089552236,
+          "seed": 6,
+          "class": "Bass Reese"
+        },
+        {
+          "n_candidates": 65,
+          "n_accepted": 28,
+          "precision": 0.9642857142857143,
+          "threshold": 0.7778350710868835,
+          "coverage": 0.4307692307692308,
+          "seed": 7,
+          "class": "Bass Reese"
+        }
+      ]
+    },
+    "Chord Loop": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 24,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 30,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 44,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 33,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 26,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 24,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0,
+          "class": "Chord Loop"
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1,
+          "class": "Chord Loop"
+        },
+        {
+          "n_candidates": 30,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "Chord Loop"
+        },
+        {
+          "n_candidates": 44,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3,
+          "class": "Chord Loop"
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4,
+          "class": "Chord Loop"
+        },
+        {
+          "n_candidates": 33,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5,
+          "class": "Chord Loop"
+        },
+        {
+          "n_candidates": 26,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6,
+          "class": "Chord Loop"
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.4605477750301361,
+          "coverage": 0.08571428571428572,
+          "seed": 7,
+          "class": "Chord Loop"
+        }
+      ]
+    },
+    "Clap": {
+      "conservative_threshold": 0.7504013776779175,
+      "min_seed_accepted": 41,
+      "max_seed_accepted": 51,
+      "robust_candidate": true,
+      "per_seed": [
+        {
+          "n_candidates": 140,
+          "n_accepted": 51,
+          "precision": 0.9607843137254902,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.36428571428571427,
+          "seed": 0
+        },
+        {
+          "n_candidates": 136,
+          "n_accepted": 51,
+          "precision": 0.9803921568627451,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.375,
+          "seed": 1
+        },
+        {
+          "n_candidates": 131,
+          "n_accepted": 46,
+          "precision": 0.9782608695652174,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.3511450381679389,
+          "seed": 2
+        },
+        {
+          "n_candidates": 135,
+          "n_accepted": 51,
+          "precision": 0.9607843137254902,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.37777777777777777,
+          "seed": 3
+        },
+        {
+          "n_candidates": 143,
+          "n_accepted": 47,
+          "precision": 0.9787234042553191,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.32867132867132864,
+          "seed": 4
+        },
+        {
+          "n_candidates": 132,
+          "n_accepted": 44,
+          "precision": 0.9772727272727273,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.3333333333333333,
+          "seed": 5
+        },
+        {
+          "n_candidates": 144,
+          "n_accepted": 44,
+          "precision": 0.9772727272727273,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.3055555555555556,
+          "seed": 6
+        },
+        {
+          "n_candidates": 139,
+          "n_accepted": 41,
+          "precision": 0.975609756097561,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.2949640287769784,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 140,
+          "n_accepted": 51,
+          "precision": 0.9607843137254902,
+          "threshold": 0.7504013776779175,
+          "coverage": 0.36428571428571427,
+          "seed": 0,
+          "class": "Clap"
+        },
+        {
+          "n_candidates": 136,
+          "n_accepted": 54,
+          "precision": 0.9629629629629629,
+          "threshold": 0.742036759853363,
+          "coverage": 0.39705882352941174,
+          "seed": 1,
+          "class": "Clap"
+        },
+        {
+          "n_candidates": 131,
+          "n_accepted": 53,
+          "precision": 0.9622641509433962,
+          "threshold": 0.7231202721595764,
+          "coverage": 0.40458015267175573,
+          "seed": 2,
+          "class": "Clap"
+        },
+        {
+          "n_candidates": 135,
+          "n_accepted": 55,
+          "precision": 0.9636363636363636,
+          "threshold": 0.7271930575370789,
+          "coverage": 0.4074074074074074,
+          "seed": 3,
+          "class": "Clap"
+        },
+        {
+          "n_candidates": 143,
+          "n_accepted": 53,
+          "precision": 0.9622641509433962,
+          "threshold": 0.7245761752128601,
+          "coverage": 0.3706293706293706,
+          "seed": 4,
+          "class": "Clap"
+        },
+        {
+          "n_candidates": 132,
+          "n_accepted": 51,
+          "precision": 0.9607843137254902,
+          "threshold": 0.7181234359741211,
+          "coverage": 0.38636363636363635,
+          "seed": 5,
+          "class": "Clap"
+        },
+        {
+          "n_candidates": 144,
+          "n_accepted": 50,
+          "precision": 0.96,
+          "threshold": 0.7205048203468323,
+          "coverage": 0.3472222222222222,
+          "seed": 6,
+          "class": "Clap"
+        },
+        {
+          "n_candidates": 139,
+          "n_accepted": 52,
+          "precision": 0.9615384615384616,
+          "threshold": 0.7083299160003662,
+          "coverage": 0.37410071942446044,
+          "seed": 7,
+          "class": "Clap"
+        }
+      ]
+    },
+    "Crash": {
+      "conservative_threshold": 0.8746503591537476,
+      "min_seed_accepted": 7,
+      "max_seed_accepted": 11,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 60,
+          "n_accepted": 9,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.15,
+          "seed": 0
+        },
+        {
+          "n_candidates": 63,
+          "n_accepted": 10,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.15873015873015872,
+          "seed": 1
+        },
+        {
+          "n_candidates": 63,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.12698412698412698,
+          "seed": 2
+        },
+        {
+          "n_candidates": 62,
+          "n_accepted": 10,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.16129032258064516,
+          "seed": 3
+        },
+        {
+          "n_candidates": 63,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.1111111111111111,
+          "seed": 4
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.11594202898550725,
+          "seed": 5
+        },
+        {
+          "n_candidates": 62,
+          "n_accepted": 11,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.1774193548387097,
+          "seed": 6
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.11940298507462686,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 60,
+          "n_accepted": 22,
+          "precision": 0.9545454545454546,
+          "threshold": 0.7664015293121338,
+          "coverage": 0.36666666666666664,
+          "seed": 0,
+          "class": "Crash"
+        },
+        {
+          "n_candidates": 63,
+          "n_accepted": 25,
+          "precision": 0.96,
+          "threshold": 0.7428134679794312,
+          "coverage": 0.3968253968253968,
+          "seed": 1,
+          "class": "Crash"
+        },
+        {
+          "n_candidates": 63,
+          "n_accepted": 22,
+          "precision": 0.9545454545454546,
+          "threshold": 0.7865412831306458,
+          "coverage": 0.3492063492063492,
+          "seed": 2,
+          "class": "Crash"
+        },
+        {
+          "n_candidates": 62,
+          "n_accepted": 25,
+          "precision": 0.96,
+          "threshold": 0.7304600477218628,
+          "coverage": 0.4032258064516129,
+          "seed": 3,
+          "class": "Crash"
+        },
+        {
+          "n_candidates": 63,
+          "n_accepted": 22,
+          "precision": 0.9545454545454546,
+          "threshold": 0.795036792755127,
+          "coverage": 0.3492063492063492,
+          "seed": 4,
+          "class": "Crash"
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 10,
+          "precision": 1.0,
+          "threshold": 0.8637689352035522,
+          "coverage": 0.14492753623188406,
+          "seed": 5,
+          "class": "Crash"
+        },
+        {
+          "n_candidates": 62,
+          "n_accepted": 27,
+          "precision": 0.9629629629629629,
+          "threshold": 0.7253453135490417,
+          "coverage": 0.43548387096774194,
+          "seed": 6,
+          "class": "Crash"
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.8746503591537476,
+          "coverage": 0.11940298507462686,
+          "seed": 7,
+          "class": "Crash"
+        }
+      ]
+    },
+    "Drum Loop": {
+      "conservative_threshold": 0.6405960917472839,
+      "min_seed_accepted": 32,
+      "max_seed_accepted": 38,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 95,
+          "n_accepted": 32,
+          "precision": 0.96875,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.3368421052631579,
+          "seed": 0
+        },
+        {
+          "n_candidates": 93,
+          "n_accepted": 36,
+          "precision": 1.0,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.3870967741935484,
+          "seed": 1
+        },
+        {
+          "n_candidates": 93,
+          "n_accepted": 33,
+          "precision": 1.0,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.3548387096774194,
+          "seed": 2
+        },
+        {
+          "n_candidates": 93,
+          "n_accepted": 38,
+          "precision": 0.9473684210526315,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.40860215053763443,
+          "seed": 3
+        },
+        {
+          "n_candidates": 92,
+          "n_accepted": 36,
+          "precision": 0.9722222222222222,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.391304347826087,
+          "seed": 4
+        },
+        {
+          "n_candidates": 97,
+          "n_accepted": 33,
+          "precision": 1.0,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.3402061855670103,
+          "seed": 5
+        },
+        {
+          "n_candidates": 99,
+          "n_accepted": 36,
+          "precision": 1.0,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.36363636363636365,
+          "seed": 6
+        },
+        {
+          "n_candidates": 95,
+          "n_accepted": 35,
+          "precision": 0.9714285714285714,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.3684210526315789,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 95,
+          "n_accepted": 43,
+          "precision": 0.9534883720930233,
+          "threshold": 0.5888567566871643,
+          "coverage": 0.45263157894736844,
+          "seed": 0,
+          "class": "Drum Loop"
+        },
+        {
+          "n_candidates": 93,
+          "n_accepted": 66,
+          "precision": 0.9545454545454546,
+          "threshold": 0.3791930377483368,
+          "coverage": 0.7096774193548387,
+          "seed": 1,
+          "class": "Drum Loop"
+        },
+        {
+          "n_candidates": 93,
+          "n_accepted": 48,
+          "precision": 0.9583333333333334,
+          "threshold": 0.5682588815689087,
+          "coverage": 0.5161290322580645,
+          "seed": 2,
+          "class": "Drum Loop"
+        },
+        {
+          "n_candidates": 93,
+          "n_accepted": 46,
+          "precision": 0.9565217391304348,
+          "threshold": 0.6020984053611755,
+          "coverage": 0.4946236559139785,
+          "seed": 3,
+          "class": "Drum Loop"
+        },
+        {
+          "n_candidates": 92,
+          "n_accepted": 45,
+          "precision": 0.9555555555555556,
+          "threshold": 0.5633143186569214,
+          "coverage": 0.4891304347826087,
+          "seed": 4,
+          "class": "Drum Loop"
+        },
+        {
+          "n_candidates": 97,
+          "n_accepted": 61,
+          "precision": 0.9508196721311475,
+          "threshold": 0.43192872405052185,
+          "coverage": 0.6288659793814433,
+          "seed": 5,
+          "class": "Drum Loop"
+        },
+        {
+          "n_candidates": 99,
+          "n_accepted": 55,
+          "precision": 0.9636363636363636,
+          "threshold": 0.5015988349914551,
+          "coverage": 0.5555555555555556,
+          "seed": 6,
+          "class": "Drum Loop"
+        },
+        {
+          "n_candidates": 95,
+          "n_accepted": 35,
+          "precision": 0.9714285714285714,
+          "threshold": 0.6405960917472839,
+          "coverage": 0.3684210526315789,
+          "seed": 7,
+          "class": "Drum Loop"
+        }
+      ]
+    },
+    "Foley": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 75,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 65,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 75,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 79,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 75,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0,
+          "class": "Foley"
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1,
+          "class": "Foley"
+        },
+        {
+          "n_candidates": 65,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "Foley"
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3,
+          "class": "Foley"
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4,
+          "class": "Foley"
+        },
+        {
+          "n_candidates": 75,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.6831448078155518,
+          "coverage": 0.013333333333333334,
+          "seed": 5,
+          "class": "Foley"
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6,
+          "class": "Foley"
+        },
+        {
+          "n_candidates": 79,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.5804852843284607,
+          "coverage": 0.012658227848101266,
+          "seed": 7,
+          "class": "Foley"
+        }
+      ]
+    },
+    "Foley Loop": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 43,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 36,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 46,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 51,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 39,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 44,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 44,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 43,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4456339478492737,
+          "coverage": 0.023255813953488372,
+          "seed": 0,
+          "class": "Foley Loop"
+        },
+        {
+          "n_candidates": 36,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.5386101603507996,
+          "coverage": 0.027777777777777776,
+          "seed": 1,
+          "class": "Foley Loop"
+        },
+        {
+          "n_candidates": 46,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "Foley Loop"
+        },
+        {
+          "n_candidates": 51,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.5118206143379211,
+          "coverage": 0.0196078431372549,
+          "seed": 3,
+          "class": "Foley Loop"
+        },
+        {
+          "n_candidates": 39,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4211612045764923,
+          "coverage": 0.02564102564102564,
+          "seed": 4,
+          "class": "Foley Loop"
+        },
+        {
+          "n_candidates": 44,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.46414846181869507,
+          "coverage": 0.022727272727272728,
+          "seed": 5,
+          "class": "Foley Loop"
+        },
+        {
+          "n_candidates": 44,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6,
+          "class": "Foley Loop"
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.5355536937713623,
+          "coverage": 0.024390243902439025,
+          "seed": 7,
+          "class": "Foley Loop"
+        }
+      ]
+    },
+    "Hi-Hat": {
+      "conservative_threshold": 0.8531381487846375,
+      "min_seed_accepted": 5,
+      "max_seed_accepted": 10,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 120,
+          "n_accepted": 10,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.08333333333333333,
+          "seed": 0
+        },
+        {
+          "n_candidates": 121,
+          "n_accepted": 9,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.0743801652892562,
+          "seed": 1
+        },
+        {
+          "n_candidates": 128,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.0625,
+          "seed": 2
+        },
+        {
+          "n_candidates": 123,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.056910569105691054,
+          "seed": 3
+        },
+        {
+          "n_candidates": 121,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.06611570247933884,
+          "seed": 4
+        },
+        {
+          "n_candidates": 120,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.058333333333333334,
+          "seed": 5
+        },
+        {
+          "n_candidates": 122,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.040983606557377046,
+          "seed": 6
+        },
+        {
+          "n_candidates": 113,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.061946902654867256,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 120,
+          "n_accepted": 23,
+          "precision": 0.9565217391304348,
+          "threshold": 0.7867564558982849,
+          "coverage": 0.19166666666666668,
+          "seed": 0,
+          "class": "Hi-Hat"
+        },
+        {
+          "n_candidates": 121,
+          "n_accepted": 23,
+          "precision": 0.9565217391304348,
+          "threshold": 0.7831516265869141,
+          "coverage": 0.19008264462809918,
+          "seed": 1,
+          "class": "Hi-Hat"
+        },
+        {
+          "n_candidates": 128,
+          "n_accepted": 24,
+          "precision": 0.9583333333333334,
+          "threshold": 0.749422013759613,
+          "coverage": 0.1875,
+          "seed": 2,
+          "class": "Hi-Hat"
+        },
+        {
+          "n_candidates": 123,
+          "n_accepted": 9,
+          "precision": 1.0,
+          "threshold": 0.8462845087051392,
+          "coverage": 0.07317073170731707,
+          "seed": 3,
+          "class": "Hi-Hat"
+        },
+        {
+          "n_candidates": 121,
+          "n_accepted": 23,
+          "precision": 0.9565217391304348,
+          "threshold": 0.7550048828125,
+          "coverage": 0.19008264462809918,
+          "seed": 4,
+          "class": "Hi-Hat"
+        },
+        {
+          "n_candidates": 120,
+          "n_accepted": 20,
+          "precision": 0.95,
+          "threshold": 0.7654170393943787,
+          "coverage": 0.16666666666666666,
+          "seed": 5,
+          "class": "Hi-Hat"
+        },
+        {
+          "n_candidates": 122,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.8443223834037781,
+          "coverage": 0.05737704918032787,
+          "seed": 6,
+          "class": "Hi-Hat"
+        },
+        {
+          "n_candidates": 113,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.8531381487846375,
+          "coverage": 0.061946902654867256,
+          "seed": 7,
+          "class": "Hi-Hat"
+        }
+      ]
+    },
+    "Hi-Hat Loop": {
+      "conservative_threshold": 0.7463325262069702,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 5,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 69,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.07246376811594203,
+          "seed": 0
+        },
+        {
+          "n_candidates": 72,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.07246376811594203,
+          "seed": 2
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.04477611940298507,
+          "seed": 3
+        },
+        {
+          "n_candidates": 70,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.02857142857142857,
+          "seed": 4
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.057971014492753624,
+          "seed": 5
+        },
+        {
+          "n_candidates": 73,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.0410958904109589,
+          "seed": 6
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.043478260869565216,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 69,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7463325262069702,
+          "coverage": 0.07246376811594203,
+          "seed": 0,
+          "class": "Hi-Hat Loop"
+        },
+        {
+          "n_candidates": 72,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.6990199685096741,
+          "coverage": 0.041666666666666664,
+          "seed": 1,
+          "class": "Hi-Hat Loop"
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 6,
+          "precision": 1.0,
+          "threshold": 0.7412056922912598,
+          "coverage": 0.08695652173913043,
+          "seed": 2,
+          "class": "Hi-Hat Loop"
+        },
+        {
+          "n_candidates": 67,
+          "n_accepted": 6,
+          "precision": 1.0,
+          "threshold": 0.7074788808822632,
+          "coverage": 0.08955223880597014,
+          "seed": 3,
+          "class": "Hi-Hat Loop"
+        },
+        {
+          "n_candidates": 70,
+          "n_accepted": 6,
+          "precision": 1.0,
+          "threshold": 0.7188546061515808,
+          "coverage": 0.08571428571428572,
+          "seed": 4,
+          "class": "Hi-Hat Loop"
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7391413450241089,
+          "coverage": 0.07246376811594203,
+          "seed": 5,
+          "class": "Hi-Hat Loop"
+        },
+        {
+          "n_candidates": 73,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.7119909524917603,
+          "coverage": 0.1095890410958904,
+          "seed": 6,
+          "class": "Hi-Hat Loop"
+        },
+        {
+          "n_candidates": 69,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7384023070335388,
+          "coverage": 0.057971014492753624,
+          "seed": 7,
+          "class": "Hi-Hat Loop"
+        }
+      ]
+    },
+    "Impact": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 43,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 39,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 44,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 42,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7341781258583069,
+          "coverage": 0.11904761904761904,
+          "seed": 0,
+          "class": "Impact"
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1,
+          "class": "Impact"
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.6896312832832336,
+          "coverage": 0.11904761904761904,
+          "seed": 2,
+          "class": "Impact"
+        },
+        {
+          "n_candidates": 43,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.8583070039749146,
+          "coverage": 0.023255813953488372,
+          "seed": 3,
+          "class": "Impact"
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7424330115318298,
+          "coverage": 0.11904761904761904,
+          "seed": 4,
+          "class": "Impact"
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7337126731872559,
+          "coverage": 0.0975609756097561,
+          "seed": 5,
+          "class": "Impact"
+        },
+        {
+          "n_candidates": 39,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7043768167495728,
+          "coverage": 0.10256410256410256,
+          "seed": 6,
+          "class": "Impact"
+        },
+        {
+          "n_candidates": 44,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7096053957939148,
+          "coverage": 0.11363636363636363,
+          "seed": 7,
+          "class": "Impact"
+        }
+      ]
+    },
+    "Kick": {
+      "conservative_threshold": 0.7983547449111938,
+      "min_seed_accepted": 45,
+      "max_seed_accepted": 49,
+      "robust_candidate": true,
+      "per_seed": [
+        {
+          "n_candidates": 112,
+          "n_accepted": 46,
+          "precision": 0.9565217391304348,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.4107142857142857,
+          "seed": 0
+        },
+        {
+          "n_candidates": 112,
+          "n_accepted": 49,
+          "precision": 0.9591836734693877,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.4375,
+          "seed": 1
+        },
+        {
+          "n_candidates": 113,
+          "n_accepted": 48,
+          "precision": 0.9583333333333334,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.4247787610619469,
+          "seed": 2
+        },
+        {
+          "n_candidates": 113,
+          "n_accepted": 47,
+          "precision": 0.9574468085106383,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.415929203539823,
+          "seed": 3
+        },
+        {
+          "n_candidates": 112,
+          "n_accepted": 46,
+          "precision": 0.9565217391304348,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.4107142857142857,
+          "seed": 4
+        },
+        {
+          "n_candidates": 112,
+          "n_accepted": 48,
+          "precision": 0.9583333333333334,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.42857142857142855,
+          "seed": 5
+        },
+        {
+          "n_candidates": 109,
+          "n_accepted": 45,
+          "precision": 0.9777777777777777,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.41284403669724773,
+          "seed": 6
+        },
+        {
+          "n_candidates": 117,
+          "n_accepted": 48,
+          "precision": 0.9583333333333334,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.41025641025641024,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 112,
+          "n_accepted": 52,
+          "precision": 0.9615384615384616,
+          "threshold": 0.7583432793617249,
+          "coverage": 0.4642857142857143,
+          "seed": 0,
+          "class": "Kick"
+        },
+        {
+          "n_candidates": 112,
+          "n_accepted": 52,
+          "precision": 0.9615384615384616,
+          "threshold": 0.7857535481452942,
+          "coverage": 0.4642857142857143,
+          "seed": 1,
+          "class": "Kick"
+        },
+        {
+          "n_candidates": 113,
+          "n_accepted": 53,
+          "precision": 0.9622641509433962,
+          "threshold": 0.7671476602554321,
+          "coverage": 0.4690265486725664,
+          "seed": 2,
+          "class": "Kick"
+        },
+        {
+          "n_candidates": 113,
+          "n_accepted": 53,
+          "precision": 0.9622641509433962,
+          "threshold": 0.768920361995697,
+          "coverage": 0.4690265486725664,
+          "seed": 3,
+          "class": "Kick"
+        },
+        {
+          "n_candidates": 112,
+          "n_accepted": 47,
+          "precision": 0.9574468085106383,
+          "threshold": 0.796611487865448,
+          "coverage": 0.41964285714285715,
+          "seed": 4,
+          "class": "Kick"
+        },
+        {
+          "n_candidates": 112,
+          "n_accepted": 52,
+          "precision": 0.9615384615384616,
+          "threshold": 0.7883110046386719,
+          "coverage": 0.4642857142857143,
+          "seed": 5,
+          "class": "Kick"
+        },
+        {
+          "n_candidates": 109,
+          "n_accepted": 62,
+          "precision": 0.9516129032258065,
+          "threshold": 0.7214503288269043,
+          "coverage": 0.5688073394495413,
+          "seed": 6,
+          "class": "Kick"
+        },
+        {
+          "n_candidates": 117,
+          "n_accepted": 48,
+          "precision": 0.9583333333333334,
+          "threshold": 0.7983547449111938,
+          "coverage": 0.41025641025641024,
+          "seed": 7,
+          "class": "Kick"
+        }
+      ]
+    },
+    "Kick Loop": {
+      "conservative_threshold": 0.4830746054649353,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 2,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 10,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.1,
+          "seed": 0
+        },
+        {
+          "n_candidates": 9,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.1111111111111111,
+          "seed": 1
+        },
+        {
+          "n_candidates": 7,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 10,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.2,
+          "seed": 3
+        },
+        {
+          "n_candidates": 10,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.1,
+          "seed": 4
+        },
+        {
+          "n_candidates": 8,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.25,
+          "seed": 5
+        },
+        {
+          "n_candidates": 7,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.14285714285714285,
+          "seed": 6
+        },
+        {
+          "n_candidates": 6,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 10,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.42869335412979126,
+          "coverage": 0.4,
+          "seed": 0,
+          "class": "Kick Loop"
+        },
+        {
+          "n_candidates": 9,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.392498642206192,
+          "coverage": 0.3333333333333333,
+          "seed": 1,
+          "class": "Kick Loop"
+        },
+        {
+          "n_candidates": 7,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.43262383341789246,
+          "coverage": 0.14285714285714285,
+          "seed": 2,
+          "class": "Kick Loop"
+        },
+        {
+          "n_candidates": 10,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.4830746054649353,
+          "coverage": 0.2,
+          "seed": 3,
+          "class": "Kick Loop"
+        },
+        {
+          "n_candidates": 10,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.38532721996307373,
+          "coverage": 0.4,
+          "seed": 4,
+          "class": "Kick Loop"
+        },
+        {
+          "n_candidates": 8,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.3491727411746979,
+          "coverage": 0.5,
+          "seed": 5,
+          "class": "Kick Loop"
+        },
+        {
+          "n_candidates": 7,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.4256502687931061,
+          "coverage": 0.42857142857142855,
+          "seed": 6,
+          "class": "Kick Loop"
+        },
+        {
+          "n_candidates": 6,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.3877592980861664,
+          "coverage": 0.16666666666666666,
+          "seed": 7,
+          "class": "Kick Loop"
+        }
+      ]
+    },
+    "Other/none": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 34,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 38,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 40,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 29,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 33,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 37,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 38,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 34,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0,
+          "class": "Other/none"
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4304869472980499,
+          "coverage": 0.024390243902439025,
+          "seed": 1,
+          "class": "Other/none"
+        },
+        {
+          "n_candidates": 38,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "Other/none"
+        },
+        {
+          "n_candidates": 40,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3,
+          "class": "Other/none"
+        },
+        {
+          "n_candidates": 29,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4,
+          "class": "Other/none"
+        },
+        {
+          "n_candidates": 33,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5,
+          "class": "Other/none"
+        },
+        {
+          "n_candidates": 37,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6,
+          "class": "Other/none"
+        },
+        {
+          "n_candidates": 38,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7,
+          "class": "Other/none"
+        }
+      ]
+    },
+    "Pad": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 40,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 43,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 47,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 40,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0,
+          "class": "Pad"
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1,
+          "class": "Pad"
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "Pad"
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3,
+          "class": "Pad"
+        },
+        {
+          "n_candidates": 43,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4,
+          "class": "Pad"
+        },
+        {
+          "n_candidates": 42,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5,
+          "class": "Pad"
+        },
+        {
+          "n_candidates": 47,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6,
+          "class": "Pad"
+        },
+        {
+          "n_candidates": 41,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7,
+          "class": "Pad"
+        }
+      ]
+    },
+    "Percussion": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 26,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 36,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 33,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 28,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 23,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 40,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 21,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 26,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4611685574054718,
+          "coverage": 0.038461538461538464,
+          "seed": 0,
+          "class": "Percussion"
+        },
+        {
+          "n_candidates": 36,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4995228350162506,
+          "coverage": 0.027777777777777776,
+          "seed": 1,
+          "class": "Percussion"
+        },
+        {
+          "n_candidates": 33,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "Percussion"
+        },
+        {
+          "n_candidates": 35,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3,
+          "class": "Percussion"
+        },
+        {
+          "n_candidates": 28,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4,
+          "class": "Percussion"
+        },
+        {
+          "n_candidates": 23,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5,
+          "class": "Percussion"
+        },
+        {
+          "n_candidates": 40,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.48411449790000916,
+          "coverage": 0.025,
+          "seed": 6,
+          "class": "Percussion"
+        },
+        {
+          "n_candidates": 21,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7,
+          "class": "Percussion"
+        }
+      ]
+    },
+    "Percussion Loop": {
+      "conservative_threshold": 0.48959699273109436,
+      "min_seed_accepted": 8,
+      "max_seed_accepted": 16,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 60,
+          "n_accepted": 9,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.15,
+          "seed": 0
+        },
+        {
+          "n_candidates": 65,
+          "n_accepted": 14,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.2153846153846154,
+          "seed": 1
+        },
+        {
+          "n_candidates": 57,
+          "n_accepted": 12,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.21052631578947367,
+          "seed": 2
+        },
+        {
+          "n_candidates": 61,
+          "n_accepted": 13,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.21311475409836064,
+          "seed": 3
+        },
+        {
+          "n_candidates": 62,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.12903225806451613,
+          "seed": 4
+        },
+        {
+          "n_candidates": 60,
+          "n_accepted": 14,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.23333333333333334,
+          "seed": 5
+        },
+        {
+          "n_candidates": 60,
+          "n_accepted": 15,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.25,
+          "seed": 6
+        },
+        {
+          "n_candidates": 58,
+          "n_accepted": 16,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.27586206896551724,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 60,
+          "n_accepted": 11,
+          "precision": 1.0,
+          "threshold": 0.4674761891365051,
+          "coverage": 0.18333333333333332,
+          "seed": 0,
+          "class": "Percussion Loop"
+        },
+        {
+          "n_candidates": 65,
+          "n_accepted": 20,
+          "precision": 0.95,
+          "threshold": 0.446607768535614,
+          "coverage": 0.3076923076923077,
+          "seed": 1,
+          "class": "Percussion Loop"
+        },
+        {
+          "n_candidates": 57,
+          "n_accepted": 20,
+          "precision": 0.95,
+          "threshold": 0.4462682008743286,
+          "coverage": 0.3508771929824561,
+          "seed": 2,
+          "class": "Percussion Loop"
+        },
+        {
+          "n_candidates": 61,
+          "n_accepted": 13,
+          "precision": 1.0,
+          "threshold": 0.48959699273109436,
+          "coverage": 0.21311475409836064,
+          "seed": 3,
+          "class": "Percussion Loop"
+        },
+        {
+          "n_candidates": 62,
+          "n_accepted": 13,
+          "precision": 1.0,
+          "threshold": 0.4602952301502228,
+          "coverage": 0.20967741935483872,
+          "seed": 4,
+          "class": "Percussion Loop"
+        },
+        {
+          "n_candidates": 60,
+          "n_accepted": 20,
+          "precision": 0.95,
+          "threshold": 0.4377534091472626,
+          "coverage": 0.3333333333333333,
+          "seed": 5,
+          "class": "Percussion Loop"
+        },
+        {
+          "n_candidates": 60,
+          "n_accepted": 21,
+          "precision": 0.9523809523809523,
+          "threshold": 0.4463152587413788,
+          "coverage": 0.35,
+          "seed": 6,
+          "class": "Percussion Loop"
+        },
+        {
+          "n_candidates": 58,
+          "n_accepted": 24,
+          "precision": 0.9583333333333334,
+          "threshold": 0.41350117325782776,
+          "coverage": 0.41379310344827586,
+          "seed": 7,
+          "class": "Percussion Loop"
+        }
+      ]
+    },
+    "Rimshot": {
+      "conservative_threshold": 0.7985901832580566,
+      "min_seed_accepted": 2,
+      "max_seed_accepted": 5,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 89,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.0449438202247191,
+          "seed": 0
+        },
+        {
+          "n_candidates": 89,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.056179775280898875,
+          "seed": 1
+        },
+        {
+          "n_candidates": 93,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.043010752688172046,
+          "seed": 2
+        },
+        {
+          "n_candidates": 87,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.022988505747126436,
+          "seed": 3
+        },
+        {
+          "n_candidates": 90,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.03333333333333333,
+          "seed": 4
+        },
+        {
+          "n_candidates": 91,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.04395604395604396,
+          "seed": 5
+        },
+        {
+          "n_candidates": 88,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.045454545454545456,
+          "seed": 6
+        },
+        {
+          "n_candidates": 84,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.03571428571428571,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 89,
+          "n_accepted": 9,
+          "precision": 1.0,
+          "threshold": 0.7488778233528137,
+          "coverage": 0.10112359550561797,
+          "seed": 0,
+          "class": "Rimshot"
+        },
+        {
+          "n_candidates": 89,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.776605486869812,
+          "coverage": 0.07865168539325842,
+          "seed": 1,
+          "class": "Rimshot"
+        },
+        {
+          "n_candidates": 93,
+          "n_accepted": 10,
+          "precision": 1.0,
+          "threshold": 0.7651227116584778,
+          "coverage": 0.10752688172043011,
+          "seed": 2,
+          "class": "Rimshot"
+        },
+        {
+          "n_candidates": 87,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.7159081697463989,
+          "coverage": 0.08045977011494253,
+          "seed": 3,
+          "class": "Rimshot"
+        },
+        {
+          "n_candidates": 90,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.7378523945808411,
+          "coverage": 0.08888888888888889,
+          "seed": 4,
+          "class": "Rimshot"
+        },
+        {
+          "n_candidates": 91,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.7972629070281982,
+          "coverage": 0.054945054945054944,
+          "seed": 5,
+          "class": "Rimshot"
+        },
+        {
+          "n_candidates": 88,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.7985901832580566,
+          "coverage": 0.045454545454545456,
+          "seed": 6,
+          "class": "Rimshot"
+        },
+        {
+          "n_candidates": 84,
+          "n_accepted": 11,
+          "precision": 1.0,
+          "threshold": 0.7172746062278748,
+          "coverage": 0.13095238095238096,
+          "seed": 7,
+          "class": "Rimshot"
+        }
+      ]
+    },
+    "SFX": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 23,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 26,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 18,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 19,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 31,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 27,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 22,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 24,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 23,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.5447025895118713,
+          "coverage": 0.043478260869565216,
+          "seed": 0,
+          "class": "SFX"
+        },
+        {
+          "n_candidates": 26,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.2571682333946228,
+          "coverage": 0.19230769230769232,
+          "seed": 1,
+          "class": "SFX"
+        },
+        {
+          "n_candidates": 18,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "SFX"
+        },
+        {
+          "n_candidates": 19,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.40275856852531433,
+          "coverage": 0.05263157894736842,
+          "seed": 3,
+          "class": "SFX"
+        },
+        {
+          "n_candidates": 31,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.33079978823661804,
+          "coverage": 0.06451612903225806,
+          "seed": 4,
+          "class": "SFX"
+        },
+        {
+          "n_candidates": 27,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.42635399103164673,
+          "coverage": 0.037037037037037035,
+          "seed": 5,
+          "class": "SFX"
+        },
+        {
+          "n_candidates": 22,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.4301091134548187,
+          "coverage": 0.09090909090909091,
+          "seed": 6,
+          "class": "SFX"
+        },
+        {
+          "n_candidates": 24,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.40334805846214294,
+          "coverage": 0.08333333333333333,
+          "seed": 7,
+          "class": "SFX"
+        }
+      ]
+    },
+    "Snare": {
+      "conservative_threshold": 0.6603232026100159,
+      "min_seed_accepted": 45,
+      "max_seed_accepted": 50,
+      "robust_candidate": true,
+      "per_seed": [
+        {
+          "n_candidates": 114,
+          "n_accepted": 45,
+          "precision": 0.9555555555555556,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.39473684210526316,
+          "seed": 0
+        },
+        {
+          "n_candidates": 116,
+          "n_accepted": 46,
+          "precision": 0.9565217391304348,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.39655172413793105,
+          "seed": 1
+        },
+        {
+          "n_candidates": 113,
+          "n_accepted": 50,
+          "precision": 0.96,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.4424778761061947,
+          "seed": 2
+        },
+        {
+          "n_candidates": 115,
+          "n_accepted": 46,
+          "precision": 0.9565217391304348,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.4,
+          "seed": 3
+        },
+        {
+          "n_candidates": 115,
+          "n_accepted": 47,
+          "precision": 0.9574468085106383,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.40869565217391307,
+          "seed": 4
+        },
+        {
+          "n_candidates": 115,
+          "n_accepted": 49,
+          "precision": 0.9591836734693877,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.4260869565217391,
+          "seed": 5
+        },
+        {
+          "n_candidates": 112,
+          "n_accepted": 48,
+          "precision": 0.9583333333333334,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.42857142857142855,
+          "seed": 6
+        },
+        {
+          "n_candidates": 116,
+          "n_accepted": 46,
+          "precision": 0.9565217391304348,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.39655172413793105,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 114,
+          "n_accepted": 53,
+          "precision": 0.9622641509433962,
+          "threshold": 0.6284918785095215,
+          "coverage": 0.4649122807017544,
+          "seed": 0,
+          "class": "Snare"
+        },
+        {
+          "n_candidates": 116,
+          "n_accepted": 47,
+          "precision": 0.9574468085106383,
+          "threshold": 0.6588367819786072,
+          "coverage": 0.4051724137931034,
+          "seed": 1,
+          "class": "Snare"
+        },
+        {
+          "n_candidates": 113,
+          "n_accepted": 50,
+          "precision": 0.96,
+          "threshold": 0.6603232026100159,
+          "coverage": 0.4424778761061947,
+          "seed": 2,
+          "class": "Snare"
+        },
+        {
+          "n_candidates": 115,
+          "n_accepted": 48,
+          "precision": 0.9583333333333334,
+          "threshold": 0.6484786868095398,
+          "coverage": 0.41739130434782606,
+          "seed": 3,
+          "class": "Snare"
+        },
+        {
+          "n_candidates": 115,
+          "n_accepted": 54,
+          "precision": 0.9629629629629629,
+          "threshold": 0.6269209384918213,
+          "coverage": 0.46956521739130436,
+          "seed": 4,
+          "class": "Snare"
+        },
+        {
+          "n_candidates": 115,
+          "n_accepted": 51,
+          "precision": 0.9607843137254902,
+          "threshold": 0.6434265971183777,
+          "coverage": 0.4434782608695652,
+          "seed": 5,
+          "class": "Snare"
+        },
+        {
+          "n_candidates": 112,
+          "n_accepted": 54,
+          "precision": 0.9629629629629629,
+          "threshold": 0.6124296188354492,
+          "coverage": 0.48214285714285715,
+          "seed": 6,
+          "class": "Snare"
+        },
+        {
+          "n_candidates": 116,
+          "n_accepted": 51,
+          "precision": 0.9607843137254902,
+          "threshold": 0.6329657435417175,
+          "coverage": 0.4396551724137931,
+          "seed": 7,
+          "class": "Snare"
+        }
+      ]
+    },
+    "Synth Loop": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 62,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 53,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 51,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 56,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 57,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 62,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.5275036692619324,
+          "coverage": 0.016129032258064516,
+          "seed": 0,
+          "class": "Synth Loop"
+        },
+        {
+          "n_candidates": 53,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1,
+          "class": "Synth Loop"
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4359964430332184,
+          "coverage": 0.02040816326530612,
+          "seed": 2,
+          "class": "Synth Loop"
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4631839990615845,
+          "coverage": 0.020833333333333332,
+          "seed": 3,
+          "class": "Synth Loop"
+        },
+        {
+          "n_candidates": 51,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.4140550494194031,
+          "coverage": 0.0196078431372549,
+          "seed": 4,
+          "class": "Synth Loop"
+        },
+        {
+          "n_candidates": 56,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.45242807269096375,
+          "coverage": 0.017857142857142856,
+          "seed": 5,
+          "class": "Synth Loop"
+        },
+        {
+          "n_candidates": 57,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.42424431443214417,
+          "coverage": 0.017543859649122806,
+          "seed": 6,
+          "class": "Synth Loop"
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7,
+          "class": "Synth Loop"
+        }
+      ]
+    },
+    "Synth One-Shot": {
+      "conservative_threshold": 0.46896663308143616,
+      "min_seed_accepted": 1,
+      "max_seed_accepted": 3,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 54,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.018518518518518517,
+          "seed": 0
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.041666666666666664,
+          "seed": 1
+        },
+        {
+          "n_candidates": 54,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.037037037037037035,
+          "seed": 2
+        },
+        {
+          "n_candidates": 55,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.03636363636363636,
+          "seed": 3
+        },
+        {
+          "n_candidates": 50,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.06,
+          "seed": 4
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.02040816326530612,
+          "seed": 5
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.041666666666666664,
+          "seed": 6
+        },
+        {
+          "n_candidates": 53,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.018867924528301886,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 54,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.3846457600593567,
+          "coverage": 0.12962962962962962,
+          "seed": 0,
+          "class": "Synth One-Shot"
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.4472697079181671,
+          "coverage": 0.0625,
+          "seed": 1,
+          "class": "Synth One-Shot"
+        },
+        {
+          "n_candidates": 54,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.43649768829345703,
+          "coverage": 0.07407407407407407,
+          "seed": 2,
+          "class": "Synth One-Shot"
+        },
+        {
+          "n_candidates": 55,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.46896663308143616,
+          "coverage": 0.03636363636363636,
+          "seed": 3,
+          "class": "Synth One-Shot"
+        },
+        {
+          "n_candidates": 50,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.4318637549877167,
+          "coverage": 0.08,
+          "seed": 4,
+          "class": "Synth One-Shot"
+        },
+        {
+          "n_candidates": 49,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.45816025137901306,
+          "coverage": 0.04081632653061224,
+          "seed": 5,
+          "class": "Synth One-Shot"
+        },
+        {
+          "n_candidates": 48,
+          "n_accepted": 5,
+          "precision": 1.0,
+          "threshold": 0.4147880971431732,
+          "coverage": 0.10416666666666667,
+          "seed": 6,
+          "class": "Synth One-Shot"
+        },
+        {
+          "n_candidates": 53,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.44561439752578735,
+          "coverage": 0.05660377358490566,
+          "seed": 7,
+          "class": "Synth One-Shot"
+        }
+      ]
+    },
+    "Top Loop": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 21,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 22,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 16,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 14,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 23,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0,
+          "class": "Top Loop"
+        },
+        {
+          "n_candidates": 21,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1,
+          "class": "Top Loop"
+        },
+        {
+          "n_candidates": 22,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "Top Loop"
+        },
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3,
+          "class": "Top Loop"
+        },
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4,
+          "class": "Top Loop"
+        },
+        {
+          "n_candidates": 16,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5,
+          "class": "Top Loop"
+        },
+        {
+          "n_candidates": 14,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6,
+          "class": "Top Loop"
+        },
+        {
+          "n_candidates": 23,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7,
+          "class": "Top Loop"
+        }
+      ]
+    },
+    "Vocal Loop": {
+      "conservative_threshold": 0.6540467739105225,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 1,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 35,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.02857142857142857,
+          "seed": 0
+        },
+        {
+          "n_candidates": 31,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 32,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.03125,
+          "seed": 2
+        },
+        {
+          "n_candidates": 29,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 32,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.03125,
+          "seed": 4
+        },
+        {
+          "n_candidates": 30,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.03333333333333333,
+          "seed": 5
+        },
+        {
+          "n_candidates": 32,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.03125,
+          "seed": 6
+        },
+        {
+          "n_candidates": 34,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 35,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.6540467739105225,
+          "coverage": 0.02857142857142857,
+          "seed": 0,
+          "class": "Vocal Loop"
+        },
+        {
+          "n_candidates": 31,
+          "n_accepted": 10,
+          "precision": 1.0,
+          "threshold": 0.49092164635658264,
+          "coverage": 0.3225806451612903,
+          "seed": 1,
+          "class": "Vocal Loop"
+        },
+        {
+          "n_candidates": 32,
+          "n_accepted": 13,
+          "precision": 1.0,
+          "threshold": 0.4182022213935852,
+          "coverage": 0.40625,
+          "seed": 2,
+          "class": "Vocal Loop"
+        },
+        {
+          "n_candidates": 29,
+          "n_accepted": 8,
+          "precision": 1.0,
+          "threshold": 0.5436791181564331,
+          "coverage": 0.27586206896551724,
+          "seed": 3,
+          "class": "Vocal Loop"
+        },
+        {
+          "n_candidates": 32,
+          "n_accepted": 15,
+          "precision": 1.0,
+          "threshold": 0.40415364503860474,
+          "coverage": 0.46875,
+          "seed": 4,
+          "class": "Vocal Loop"
+        },
+        {
+          "n_candidates": 30,
+          "n_accepted": 9,
+          "precision": 1.0,
+          "threshold": 0.4882660508155823,
+          "coverage": 0.3,
+          "seed": 5,
+          "class": "Vocal Loop"
+        },
+        {
+          "n_candidates": 32,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.5640187859535217,
+          "coverage": 0.21875,
+          "seed": 6,
+          "class": "Vocal Loop"
+        },
+        {
+          "n_candidates": 34,
+          "n_accepted": 7,
+          "precision": 1.0,
+          "threshold": 0.5254350304603577,
+          "coverage": 0.20588235294117646,
+          "seed": 7,
+          "class": "Vocal Loop"
+        }
+      ]
+    },
+    "Vocal One-Shot": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 9,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 16,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 10,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 14,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 11,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0,
+          "class": "Vocal One-Shot"
+        },
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1,
+          "class": "Vocal One-Shot"
+        },
+        {
+          "n_candidates": 9,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.45890820026397705,
+          "coverage": 0.1111111111111111,
+          "seed": 2,
+          "class": "Vocal One-Shot"
+        },
+        {
+          "n_candidates": 16,
+          "n_accepted": 1,
+          "precision": 1.0,
+          "threshold": 0.49737027287483215,
+          "coverage": 0.0625,
+          "seed": 3,
+          "class": "Vocal One-Shot"
+        },
+        {
+          "n_candidates": 13,
+          "n_accepted": 4,
+          "precision": 1.0,
+          "threshold": 0.36748695373535156,
+          "coverage": 0.3076923076923077,
+          "seed": 4,
+          "class": "Vocal One-Shot"
+        },
+        {
+          "n_candidates": 10,
+          "n_accepted": 2,
+          "precision": 1.0,
+          "threshold": 0.416027694940567,
+          "coverage": 0.2,
+          "seed": 5,
+          "class": "Vocal One-Shot"
+        },
+        {
+          "n_candidates": 14,
+          "n_accepted": 3,
+          "precision": 1.0,
+          "threshold": 0.36742857098579407,
+          "coverage": 0.21428571428571427,
+          "seed": 6,
+          "class": "Vocal One-Shot"
+        },
+        {
+          "n_candidates": 11,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7,
+          "class": "Vocal One-Shot"
+        }
+      ]
+    },
+    "Weather/Nature Atmos": {
+      "conservative_threshold": 1.0,
+      "min_seed_accepted": 0,
+      "max_seed_accepted": 0,
+      "robust_candidate": false,
+      "per_seed": [
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0
+        },
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1
+        },
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2
+        },
+        {
+          "n_candidates": 8,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3
+        },
+        {
+          "n_candidates": 14,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4
+        },
+        {
+          "n_candidates": 14,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5
+        },
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6
+        },
+        {
+          "n_candidates": 15,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7
+        }
+      ],
+      "per_seed_individual_gates": [
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 0,
+          "class": "Weather/Nature Atmos"
+        },
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 1,
+          "class": "Weather/Nature Atmos"
+        },
+        {
+          "n_candidates": 17,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 2,
+          "class": "Weather/Nature Atmos"
+        },
+        {
+          "n_candidates": 8,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 3,
+          "class": "Weather/Nature Atmos"
+        },
+        {
+          "n_candidates": 14,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 4,
+          "class": "Weather/Nature Atmos"
+        },
+        {
+          "n_candidates": 14,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 5,
+          "class": "Weather/Nature Atmos"
+        },
+        {
+          "n_candidates": 13,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 6,
+          "class": "Weather/Nature Atmos"
+        },
+        {
+          "n_candidates": 15,
+          "n_accepted": 0,
+          "precision": 0.0,
+          "threshold": 1.0,
+          "coverage": 0.0,
+          "seed": 7,
+          "class": "Weather/Nature Atmos"
+        }
+      ]
+    }
+  },
+  "robust_candidate_classes": [
+    "Clap",
+    "Kick",
+    "Snare"
+  ],
+  "decision": "audit_only; candidate classes still require new-domain validation and explicit owner approval before auto-action",
+  "generated": "2026-09-11T19:09:21"
+}

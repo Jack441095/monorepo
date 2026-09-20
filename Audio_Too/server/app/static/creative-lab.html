@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AudioGen · Thursday</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/studio-theme.css">
+  </head>
+  <body class="creative-lab-page">
+    <nav class="studio-nav">
+      <div class="studio-nav-left">
+        <a class="studio-nav-wordmark" href="/hub">Thursday<span>.</span></a>
+        <div class="studio-nav-div"></div>
+        <span class="studio-nav-page">AudioGen</span>
+      </div>
+      <div class="studio-nav-right">
+        <a class="studio-nav-link" href="/audio-analysis">Mix Review</a>
+        <a class="studio-nav-link" href="/automix">AutoMix</a>
+        <a class="studio-nav-link active" href="/creative-lab">AudioGen</a>
+        <a class="studio-nav-link" href="/portfolio">Portfolio</a>
+        <a class="studio-nav-link" href="/hub">← Hub</a>
+      </div>
+    </nav>
+    <header class="hub-header creative-lab-header" style="display:none"></header>
+
+    <main class="creative-lab-main">
+      <section class="auth-panel creative-auth" id="creative-auth">
+        <div>
+          <h2>Unlock Audio_Gen</h2>
+          <p class="compact-status">Uses the same dashboard session. Generation, KENN ask, and history require sign-in.</p>
+        </div>
+        <label>Password <input id="creative-password" type="password" autocomplete="current-password"></label>
+        <button type="button" id="creative-unlock">Unlock</button>
+      </section>
+
+      <p id="creative-status" class="status compact-status">Checking session…</p>
+      <div id="creative-service-status" class="hub-status"></div>
+      <div id="creative-quality" class="lm-improve-scorecards creative-quality"></div>
+      <div id="creative-repair-quality" class="lm-improve-scorecards creative-quality creative-repair-quality"></div>
+      <div id="creative-repair-recommendations" class="creative-recommendations"></div>
+
+      <section class="creative-grid">
+        <article class="creative-panel">
+          <div class="section-title compact">
+            <h2>KENN</h2>
+            <div class="button-row compact">
+              <button type="button" class="secondary" id="creative-new-session">New session</button>
+              <button type="button" class="secondary" id="creative-clear-chat">Clear</button>
+            </div>
+          </div>
+          <form id="creative-ask-form" class="mini-form">
+            <textarea id="creative-question" rows="4" placeholder="Ask KENN for a production idea, arrangement direction, or mix decision…"></textarea>
+            <div class="creative-preset-row">
+              <button type="button" data-creative-question="Give me a dark garage chorus idea with arrangement notes.">Dark chorus idea</button>
+              <button type="button" data-creative-question="How should I build a sad vocal hook into a fuller section?">Sad vocal hook</button>
+              <button type="button" data-creative-question="Suggest a mix checklist before I generate a loop.">Mix checklist</button>
+            </div>
+            <button type="submit">Ask KENN</button>
+          </form>
+          <div id="creative-chat" class="creative-chat"></div>
+        </article>
+
+        <article class="creative-panel">
+          <div class="section-title compact">
+            <h2>AudioGen</h2>
+            <button type="button" class="secondary" id="creative-refresh">Refresh</button>
+          </div>
+          <form id="creative-audiogen-form" class="mini-form">
+            <textarea id="creative-prompt" rows="4" placeholder="e.g. Generate a moody intro loop with soft chords and a simple hook"></textarea>
+            <input id="creative-emotion" type="hidden" value="joy">
+            <div class="creative-preset-row" aria-label="Prompt presets">
+              <button type="button" data-creative-preset="sadness" data-prompt="Generate a sad chorus loop with warm chords, restrained drums, and a simple vocal-topline space.">Sad chorus</button>
+              <button type="button" data-creative-preset="excitement" data-prompt="Generate an energetic intro idea with bright movement, punchy drums, and a clear lift into the drop.">Energetic intro</button>
+              <button type="button" data-creative-preset="fear" data-prompt="Generate a dark garage bass phrase with tight sub movement and sparse atmospheric hits.">Dark garage</button>
+              <button type="button" data-creative-preset="relief" data-prompt="Generate an ambient transition bed with soft texture, slow harmonic movement, and no busy drums.">Ambient bed</button>
+            </div>
+            <div class="emotion-grid creative-emotions" id="creative-emotions">
+              <button type="button" class="emotion-button active" data-creative-emotion="joy">Joy</button>
+              <button type="button" class="emotion-button" data-creative-emotion="sadness">Sadness</button>
+              <button type="button" class="emotion-button" data-creative-emotion="excitement">Excitement</button>
+              <button type="button" class="emotion-button" data-creative-emotion="fear">Fear</button>
+              <button type="button" class="emotion-button" data-creative-emotion="love">Love</button>
+              <button type="button" class="emotion-button" data-creative-emotion="grief">Grief</button>
+              <button type="button" class="emotion-button" data-creative-emotion="neutral">Neutral</button>
+            </div>
+            <div class="audiogen-actions">
+              <label>Bars <input id="creative-bars" type="number" min="1" max="16" value="4"></label>
+              <label class="checkbox-label"><input id="creative-publish" type="checkbox"> Publish to portfolio</label>
+              <button type="submit">Generate loop</button>
+              <button type="button" id="creative-render-song">Generate full song</button>
+            </div>
+          </form>
+          <div id="creative-audiogen-result" class="ableton-answer"></div>
+          <div id="creative-mix-review-result" class="ableton-answer"></div>
+        </article>
+      </section>
+
+      <section class="creative-grid lower">
+        <article class="creative-panel">
+          <div class="section-title compact">
+            <h2>Player</h2>
+            <span class="compact-status">Load from generation result or history.</span>
+          </div>
+          <div class="audiogen-player-panel" id="creative-player-panel" hidden>
+            <audio id="creative-player" preload="metadata"></audio>
+            <div class="transport-controls">
+              <button type="button" id="creative-play">Play</button>
+              <button type="button" id="creative-pause">Pause</button>
+              <button type="button" id="creative-stop">Stop</button>
+            </div>
+            <p id="creative-player-label" class="compact-status"></p>
+          </div>
+        </article>
+
+        <article class="creative-panel">
+          <div class="section-title compact">
+            <h2>Render queue</h2>
+            <button type="button" class="secondary" id="creative-jobs-refresh">Refresh</button>
+          </div>
+          <div id="creative-jobs" class="audiogen-jobs"></div>
+        </article>
+
+        <article class="creative-panel creative-history-panel">
+          <div class="section-title compact">
+            <h2>AudioGen history</h2>
+            <button type="button" class="secondary" id="creative-history-refresh">Refresh</button>
+          </div>
+          <div id="creative-history" class="audiogen-jobs"></div>
+        </article>
+
+        <article class="creative-panel creative-history-panel">
+          <div class="section-title compact">
+            <h2>Audio_Gen sessions</h2>
+            <button type="button" class="secondary" id="creative-sessions-refresh">Refresh</button>
+          </div>
+          <div id="creative-sessions" class="audiogen-jobs"></div>
+        </article>
+
+        <article class="creative-panel">
+          <div class="section-title compact">
+            <h2>KENN repair queue</h2>
+            <span class="compact-status">From bad-source and wrong-direction feedback.</span>
+          </div>
+          <div id="creative-repair-queue" class="audiogen-jobs"></div>
+        </article>
+
+        <article class="creative-panel">
+          <div class="section-title compact">
+            <h2>Repair comparison</h2>
+            <span class="compact-status">Original answer vs latest repaired KENN result.</span>
+          </div>
+          <div id="creative-repair-comparison" class="creative-repair-comparison"></div>
+        </article>
+
+        <article class="creative-panel">
+          <div class="section-title compact">
+            <h2>Training records</h2>
+            <button type="button" class="secondary" id="creative-training-refresh">Refresh</button>
+          </div>
+          <div id="creative-training-records" class="audiogen-jobs"></div>
+        </article>
+
+        <article class="creative-panel">
+          <div class="section-title compact">
+            <h2>Prompt leaderboard</h2>
+            <span class="compact-status">AudioGen prompts worth reusing.</span>
+          </div>
+          <div id="creative-prompt-leaderboard" class="audiogen-jobs"></div>
+        </article>
+
+        <article class="creative-panel creative-history-panel">
+          <div class="section-title compact">
+            <h2>Session replay</h2>
+            <span class="compact-status">Open a session to trace KENN, generation, feedback, and Mix Review.</span>
+          </div>
+          <div id="creative-session-replay" class="creative-replay"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/app-shell.js" data-active="creative-lab" data-page="AudioGen" defer></script>
+    <script src="/creative-lab.js"></script>
+  </body>
+</html>

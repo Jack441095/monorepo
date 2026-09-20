@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: repo-hygiene
+        name: repo hygiene
+        entry: python3 scripts/repo_hygiene.py check
+        language: system
+        pass_filenames: false
+      - id: ruff-check
+        name: ruff check
+        entry: python3 -m ruff check business studio scripts tests thursday
+        language: system
+        pass_filenames: false

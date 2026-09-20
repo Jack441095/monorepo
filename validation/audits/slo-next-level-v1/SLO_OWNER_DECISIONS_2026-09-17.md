@@ -1,0 +1,13 @@
+# SLO Owner Decisions — 2026-09-17
+Only Jack can decide. Options + consequences + recommendation + deadline.
+
+1. **Encoder bet: freeze PANNs for beta and fund CLAP gates post-beta, or kill CLAP now?** Options: (a) gated dual-track [RECOMMENDED] — PANNs ships beta, CLAP gets R-03 + 7 promotion gates (C++ path, size budget, OOD recal, license, vendor-held-out, latency/memory, blind); (b) kill CLAP, all-in PANNs+taxonomy. Consequence: (a) costs ~8wk research insurance for +8pp option; (b) saves budget but caps ceiling ~74%. Deadline: before any CLAP C++ work starts.
+2. **What accuracy may we ever claim?** Options: (a) split-label contract only — audio-only/fused/adversarial + vendor-held-out + CIs [RECOMMENDED]; (b) single headline. Consequence: (a) slower marketing, durable trust; (b) fast + false. Deadline: this week (blocks all messaging).
+3. **Auto-rename: ever, or suggest-only forever?** (a) 4-outcome calibration (auto/suggest/Unknown/human-review per `SLO_END_STATE_EXECUTION_PLAN_V1.md`) gated on R-02 coverage bars [RECOMMENDED]; (b) suggest-only. Consequence: (a) differentiation with quantified risk; (b) safer, less magic. Deadline: before F-06/F-07 scope lock.
+4. **Format scope: stay WAV-only with honest messaging, or fund AIFF/FLAC?** (a) message now + R-08 spike then decide [RECOMMENDED]; (b) WAV-only indefinitely. Consequence: Ableton catalogs are rarely WAV-only. Deadline: before B-004 matrix.
+5. **Release gates: immutable clean-tree Release + signing/notarization + clean-mac + Ableton matrix — fund all now?** [YES RECOMMENDED] — B-001/B-002/B-004 are the paid-launch critical path; dirty tree (413 files) must be resolved first. Deadline: 30d.
+6. **Licensing model: solo/perpetual vs bundle vs sub, Paddle offline-grace shape?** Unblocks B-003 + F-12 OTA design. Deadline: 30d (engineering needs entitlement semantics).
+7. **Local-only absolute, or opt-in cloud batch (F-17)?** Privacy is the brand (`local-first` positioning). [RECOMMENDED: local-only for beta; cloud only as opt-in vendor-B2B later.] Deadline: before F-16/F-17 scoping.
+8. **B-014 scope: graduate which subcats to beta?** Bass/HiHat proven leakage-free; 5 classes metadata-gated. [RECOMMENDED: graduate proven only; rest stay hidden.] Deadline: B-014 close.
+9. **Windows port: fund, defer, or kill?** [RECOMMENDED: defer until macOS beta priced.] Consequence: JUCE portability real but support doubles. Deadline: 90d.
+10. **Canonical source + doc truth: confirm `products/slo/` (repo `slo`, `main`) canonical; authorize marking older audits SUPERSEDED + deleting broken symlink?** [YES RECOMMENDED.] Deadline: now.

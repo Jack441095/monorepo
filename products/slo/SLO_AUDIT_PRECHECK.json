@@ -1,0 +1,92 @@
+{
+  "audit": "SLO_FULL_PRODUCT_CLASSIFICATION_BETA_READINESS_AUDIT_V1",
+  "mode": "READ-MOSTLY QUALIFICATION",
+  "captured_at_utc": "2026-08-24T10:11:58Z",
+  "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo",
+  "repo": {
+    "root": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo",
+    "branch": "engineering/build-system-optimisation",
+    "head": "dd60ddb31c66d8ee43f318764c0ac1f9eb972eef",
+    "remote": "https://github.com/Jack441095/Nite_DSP_01.git",
+    "dirty_before_audit": true,
+    "status_entry_count_before_audit": 20,
+    "untracked_entry_count_before_audit": 14,
+    "worktrees": {
+      "rc1": {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/workspace/worktrees/slo/rc1",
+        "head": "533849894660c2a42b08217f5d044367c3db68a5"
+      },
+      "foundation_probe": {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/workspace/worktrees/slo/audio-foundation-probe-v1",
+        "head": "301ad0a070b6d522b526d3809fcfd0f3a77035c4"
+      }
+    },
+    "git_fsck": "PASS: no fsck diagnostics returned",
+    "force_pushes": 0
+  },
+  "machine": {
+    "os": "macOS 26.5.2 (25F84)",
+    "architecture": "arm64",
+    "ram_bytes": 17179869184,
+    "available_disk": "421GiB",
+    "compiler": "Apple clang 21.0.0 (clang-2100.1.1.101)",
+    "cmake": "4.1.2",
+    "xcodebuild": "BLOCKED: active developer directory is CommandLineTools; full Xcode unavailable",
+    "python": "3.13.7",
+    "node": "v26.7.0",
+    "torch": "NOT RECORDED: precheck import probe syntax error; no research execution authorised",
+    "juce": "8.0.2 (from CMake configuration and pinned source)",
+    "onnx_runtime": "1.29.0 (from linked binary metadata)",
+    "taglib": "2.3.1 (from linked binary metadata)",
+    "libsodium": "1.0.22 / dylib compatibility 31.0.0 (from linked binary metadata)"
+  },
+  "processes": {
+    "active_foreign_slo_or_ableton_processes": 0,
+    "note": "Only audit shell/diagnostic processes were present."
+  },
+  "builds": {
+    "existing_builds": [
+      "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/build-test",
+      "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/workspace/builds/slo-qualification-v1",
+      "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/_build/ssm-qualification"
+    ],
+    "existing_build_test_configuration": "Release / arm64 / Unix Makefiles / plugin auto-install disabled",
+    "existing_qualification_cache_source": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/workspace/worktrees/slo/rc1/SmartSampleManager"
+  },
+  "installed_product": {
+    "au": "/Users/Ganders4/Library/Audio/Plug-Ins/Components/Smart Sample Manager.component",
+    "vst3": "/Users/Ganders4/Library/Audio/Plug-Ins/VST3/Smart Sample Manager.vst3",
+    "standalone": "NOT LOCATED IN PRECHECK",
+    "binary_architecture": "arm64",
+    "codesign": "ad-hoc; TeamIdentifier not set",
+    "bundled_runtime_observed": true,
+    "product_name_observed": "Smart Sample Manager"
+  },
+  "host": {
+    "ableton": "/Applications/Ableton Live 12 Suite.app",
+    "version": "NOT READ: Info.plist query returned no value",
+    "full_xcode": false
+  },
+  "data_scope": {
+    "customer_data_used": false,
+    "owner_audio_paths": "NOT ENUMERATED OR ACCESSED; protected from audit execution",
+    "protected_evaluation": "Protected/holdout/AL-001/AL-002 locations identified by filename inventory only; no protected labels or one-shot evaluations accessed",
+    "known_safe_fixture_roots": [
+      "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/test_*.wav",
+      "synthetic temporary directories created by existing test executables"
+    ],
+    "current_corpus_paths": [
+      "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/real_*.wav",
+      "existing qualification/holdout corpora were not opened or rerun"
+    ],
+    "cache_database_paths": "To be resolved from runtime source; production cache is not to be mutated"
+  },
+  "audit_safety": {
+    "owner_audio_modified": false,
+    "protected_holdouts_rerun": 0,
+    "production_plugins_overwritten": false,
+    "network_uploads": 0,
+    "features_added": 0,
+    "forbidden_commands_run": []
+  }
+}

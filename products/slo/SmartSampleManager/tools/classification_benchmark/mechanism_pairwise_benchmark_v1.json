@@ -1,0 +1,320 @@
+{
+  "record_type": "slo_mechanism_pairwise_benchmark",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T12:48:05",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 5,
+    "splits": 5,
+    "decision_gate_pp": 2.0
+  },
+  "pairs": {
+    "Bass Hit__vs__Bass Reese": {
+      "status": "evaluated",
+      "counts": {
+        "Bass Hit": 30,
+        "Bass Reese": 48
+      },
+      "collections": {
+        "Bass Hit": 10,
+        "Bass Reese": 7
+      },
+      "n_rows": 78,
+      "arms": {
+        "embedding": {
+          "accuracy": 97.949,
+          "accuracy_sd": 0.628,
+          "per_seed": [
+            97.436,
+            97.436,
+            97.436,
+            98.718,
+            98.718
+          ],
+          "delta_pp_vs_embedding": 0.0
+        },
+        "waveform": {
+          "accuracy": 90.0,
+          "accuracy_sd": 0.959,
+          "per_seed": [
+            88.462,
+            89.744,
+            91.026,
+            91.026,
+            89.744
+          ],
+          "delta_pp_vs_embedding": -7.949
+        },
+        "fused": {
+          "accuracy": 97.949,
+          "accuracy_sd": 0.628,
+          "per_seed": [
+            97.436,
+            97.436,
+            97.436,
+            98.718,
+            98.718
+          ],
+          "delta_pp_vs_embedding": 0.0
+        }
+      }
+    },
+    "Percussion__vs__Percussion Loop": {
+      "status": "evaluated",
+      "counts": {
+        "Percussion": 86,
+        "Percussion Loop": 106
+      },
+      "collections": {
+        "Percussion": 16,
+        "Percussion Loop": 28
+      },
+      "n_rows": 192,
+      "arms": {
+        "embedding": {
+          "accuracy": 92.396,
+          "accuracy_sd": 1.122,
+          "per_seed": [
+            93.229,
+            93.75,
+            92.708,
+            90.625,
+            91.667
+          ],
+          "delta_pp_vs_embedding": 0.0
+        },
+        "waveform": {
+          "accuracy": 91.458,
+          "accuracy_sd": 0.417,
+          "per_seed": [
+            91.667,
+            91.667,
+            91.667,
+            90.625,
+            91.667
+          ],
+          "delta_pp_vs_embedding": -0.938
+        },
+        "fused": {
+          "accuracy": 92.708,
+          "accuracy_sd": 1.093,
+          "per_seed": [
+            93.75,
+            93.75,
+            93.229,
+            91.146,
+            91.667
+          ],
+          "delta_pp_vs_embedding": 0.312
+        }
+      }
+    },
+    "Hi-Hat__vs__Hi-Hat Loop": {
+      "status": "evaluated",
+      "counts": {
+        "Hi-Hat": 115,
+        "Hi-Hat Loop": 47
+      },
+      "collections": {
+        "Hi-Hat": 21,
+        "Hi-Hat Loop": 12
+      },
+      "n_rows": 162,
+      "arms": {
+        "embedding": {
+          "accuracy": 93.951,
+          "accuracy_sd": 0.605,
+          "per_seed": [
+            93.827,
+            93.21,
+            95.062,
+            93.827,
+            93.827
+          ],
+          "delta_pp_vs_embedding": 0.0
+        },
+        "waveform": {
+          "accuracy": 85.062,
+          "accuracy_sd": 3.181,
+          "per_seed": [
+            88.272,
+            86.42,
+            86.42,
+            85.185,
+            79.012
+          ],
+          "delta_pp_vs_embedding": -8.889
+        },
+        "fused": {
+          "accuracy": 93.951,
+          "accuracy_sd": 0.605,
+          "per_seed": [
+            93.827,
+            93.21,
+            95.062,
+            93.827,
+            93.827
+          ],
+          "delta_pp_vs_embedding": 0.0
+        }
+      }
+    },
+    "Synth Loop__vs__Synth One-Shot": {
+      "status": "evaluated",
+      "counts": {
+        "Synth Loop": 32,
+        "Synth One-Shot": 46
+      },
+      "collections": {
+        "Synth Loop": 18,
+        "Synth One-Shot": 13
+      },
+      "n_rows": 78,
+      "arms": {
+        "embedding": {
+          "accuracy": 87.436,
+          "accuracy_sd": 2.968,
+          "per_seed": [
+            87.179,
+            85.897,
+            83.333,
+            88.462,
+            92.308
+          ],
+          "delta_pp_vs_embedding": 0.0
+        },
+        "waveform": {
+          "accuracy": 87.949,
+          "accuracy_sd": 1.026,
+          "per_seed": [
+            89.744,
+            87.179,
+            87.179,
+            88.462,
+            87.179
+          ],
+          "delta_pp_vs_embedding": 0.513
+        },
+        "fused": {
+          "accuracy": 88.718,
+          "accuracy_sd": 2.206,
+          "per_seed": [
+            89.744,
+            87.179,
+            85.897,
+            88.462,
+            92.308
+          ],
+          "delta_pp_vs_embedding": 1.282
+        }
+      }
+    },
+    "Vocal Loop__vs__Vocal One-Shot": {
+      "status": "evaluated",
+      "counts": {
+        "Vocal Loop": 25,
+        "Vocal One-Shot": 13
+      },
+      "collections": {
+        "Vocal Loop": 12,
+        "Vocal One-Shot": 10
+      },
+      "n_rows": 38,
+      "arms": {
+        "embedding": {
+          "accuracy": 73.158,
+          "accuracy_sd": 4.528,
+          "per_seed": [
+            65.789,
+            78.947,
+            71.053,
+            76.316,
+            73.684
+          ],
+          "delta_pp_vs_embedding": 0.0
+        },
+        "waveform": {
+          "accuracy": 72.632,
+          "accuracy_sd": 7.178,
+          "per_seed": [
+            84.211,
+            76.316,
+            71.053,
+            68.421,
+            63.158
+          ],
+          "delta_pp_vs_embedding": -0.526
+        },
+        "fused": {
+          "accuracy": 73.158,
+          "accuracy_sd": 4.528,
+          "per_seed": [
+            65.789,
+            78.947,
+            71.053,
+            76.316,
+            73.684
+          ],
+          "delta_pp_vs_embedding": 0.0
+        }
+      }
+    },
+    "Foley__vs__Impact": {
+      "status": "evaluated",
+      "counts": {
+        "Foley": 112,
+        "Impact": 31
+      },
+      "collections": {
+        "Foley": 23,
+        "Impact": 10
+      },
+      "n_rows": 143,
+      "arms": {
+        "embedding": {
+          "accuracy": 84.056,
+          "accuracy_sd": 1.736,
+          "per_seed": [
+            81.818,
+            83.217,
+            85.315,
+            86.713,
+            83.217
+          ],
+          "delta_pp_vs_embedding": 0.0
+        },
+        "waveform": {
+          "accuracy": 81.958,
+          "accuracy_sd": 2.846,
+          "per_seed": [
+            78.322,
+            82.517,
+            79.021,
+            84.615,
+            85.315
+          ],
+          "delta_pp_vs_embedding": -2.098
+        },
+        "fused": {
+          "accuracy": 84.196,
+          "accuracy_sd": 1.69,
+          "per_seed": [
+            81.818,
+            83.217,
+            85.315,
+            86.713,
+            83.916
+          ],
+          "delta_pp_vs_embedding": 0.14
+        }
+      }
+    }
+  },
+  "decision": "research evidence only; pairwise gains may inform targeted review rules but do not change global policy",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false
+  }
+}

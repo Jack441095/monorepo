@@ -1,0 +1,10 @@
+{
+  "suite": "THURSDAY_V2H_TEST_RECEIPT",
+  "generated_at": 1787522851.787509,
+  "runner": "pytest tests/thursday -q",
+  "collected": 768,
+  "passed": 768,
+  "failed": 0,
+  "duration_seconds": 109.61,
+  "qualified": true
+}

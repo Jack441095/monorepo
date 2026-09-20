@@ -1,0 +1,70 @@
+{
+  "model": "mispeech/dasheng-base",
+  "licence": "apache-2.0",
+  "size_mb": 342,
+  "seeds": 6,
+  "results": {
+    "dasheng|logreg|random": {
+      "acc": 67.81,
+      "sd": 0.41,
+      "macro_f1": 61.52
+    },
+    "dasheng|logreg|vendor": {
+      "acc": 58.62,
+      "sd": 1.8,
+      "macro_f1": 51.5
+    },
+    "dasheng|centroid|random": {
+      "acc": 49.46,
+      "sd": 1.04,
+      "macro_f1": 47.69
+    },
+    "dasheng|centroid|vendor": {
+      "acc": 43.26,
+      "sd": 1.93,
+      "macro_f1": 40.71
+    },
+    "perch+clap|logreg|random": {
+      "acc": 71.91,
+      "sd": 1.13,
+      "macro_f1": 67.33
+    },
+    "perch+clap|logreg|vendor": {
+      "acc": 61.96,
+      "sd": 1.97,
+      "macro_f1": 54.98
+    },
+    "perch+clap|centroid|random": {
+      "acc": 69.88,
+      "sd": 0.77,
+      "macro_f1": 63.28
+    },
+    "perch+clap|centroid|vendor": {
+      "acc": 65.33,
+      "sd": 1.18,
+      "macro_f1": 55.96
+    },
+    "perch+clap+dasheng|logreg|random": {
+      "acc": 73.47,
+      "sd": 1.06,
+      "macro_f1": 68.34
+    },
+    "perch+clap+dasheng|logreg|vendor": {
+      "acc": 64.41,
+      "sd": 1.8,
+      "macro_f1": 56.41
+    },
+    "perch+clap+dasheng|centroid|random": {
+      "acc": 68.51,
+      "sd": 0.65,
+      "macro_f1": 62.1
+    },
+    "perch+clap+dasheng|centroid|vendor": {
+      "acc": 63.04,
+      "sd": 1.55,
+      "macro_f1": 55.0
+    }
+  },
+  "delta_vendor_centroid": -2.29,
+  "verdict": "REJECT"
+}

@@ -1,0 +1,50 @@
+{
+  "benchmark": "KENN_GOLDEN_BENCHMARK_V2",
+  "candidate": "D_hierarchical",
+  "holdout": {
+    "clipping": {
+      "fn": 2,
+      "tp": 13
+    },
+    "headroom": {
+      "fn": 2,
+      "tp": 9
+    },
+    "dc": {
+      "fn": 2,
+      "tp": 9
+    },
+    "lr_imbalance": {
+      "fn": 5,
+      "tp": 6
+    },
+    "bass_excess": {
+      "fn": 5,
+      "tp": 6
+    },
+    "mud": {
+      "fn": 5,
+      "tp": 6
+    },
+    "harshness": {
+      "fn": 6,
+      "tp": 5
+    },
+    "resonance": {
+      "fn": 8,
+      "tp": 3
+    },
+    "anti_phase": {
+      "fn": 1,
+      "tp": 10
+    },
+    "wide_bass": {
+      "fn": 4,
+      "tp": 7
+    },
+    "over_compression": {
+      "fn": 7,
+      "tp": 4
+    }
+  }
+}

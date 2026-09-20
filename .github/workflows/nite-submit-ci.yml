@@ -1,0 +1,58 @@
+name: NITE Submit CI
+
+# NITE Submit CI — manual release factory
+# This repository is the Submit code backup. Automatic macOS CI is disabled to
+# avoid paid runner usage; run this workflow manually when a release check is
+# deliberately needed. Signing/notarisation remain separate owner gates.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: products/nite-submit
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version source of truth present
+        run: |
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo "::error::VERSION file missing or not semver: '$VERSION'"; exit 1; }
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Building version $VERSION"
+
+      - name: Build (release)
+        run: swift build -c release 2>&1 | tail -5
+
+      - name: Test suite
+        run: |
+          swift build -c release --product nitesubmit-tests
+          swift run nitesubmit-tests
+
+      - name: Package smoke (app bundle assembly + verification)
+        run: |
+          zsh tools/package_app.sh
+          zsh tools/verify_app_bundle.sh "artifacts/Submit-${VERSION}-macOS.app"
+
+      # Release identity manifest on every tag: version, commit SHA, dirty
+      # state, toolchain, checksums — the required release identity fields.
+      - name: Release manifest (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: zsh tools/write_release_manifest.sh
+
+      - name: Upload artifacts
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: nite-submit-${{ env.VERSION }}-manifests
+          path: |
+            artifacts/*-release-manifest.json
+            artifacts/*-distribution-readiness.json
+          if-no-files-found: warn

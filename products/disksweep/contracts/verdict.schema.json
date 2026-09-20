@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DiskSweepVerdict",
+  "type": "object",
+  "required": ["path", "size_bytes", "safety", "reason", "reclaim_bytes", "action"],
+  "properties": {
+    "path": { "type": "string" },
+    "size_bytes": { "type": "integer", "minimum": 0 },
+    "safety": { "type": "string", "enum": ["SAFE", "REVIEW", "BLOCKED"] },
+    "reason": { "type": "string" },
+    "reclaim_bytes": { "type": "integer", "minimum": 0 },
+    "action": { "type": "string", "enum": ["trashable", "needs_checkbox", "unselectable"], "description": "UI binding: SAFE->trashable, REVIEW->needs_checkbox, BLOCKED->unselectable" }
+  }
+}

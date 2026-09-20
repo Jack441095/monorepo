@@ -1,0 +1,98 @@
+{
+  "generated": "2026-09-11T11:38:11",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 8,
+    "splits": 5,
+    "min_examples": 5,
+    "min_collections": 5
+  },
+  "identity": {
+    "corpus_sha256": "10b889dcab4ee3c94ce728f7d3451890939ff44cdb1c51bbea694b86c58c842f",
+    "acoustic_feature_version": "physics_v1_1",
+    "acoustic_cache_sha256": "b309c9003fab0dc55fe5ac055c66f615db6909206b6f23821bda62d6cc088d83",
+    "n_files": 1022,
+    "n_classes": 23,
+    "classes": [
+      "Bass Hit",
+      "Bass Reese",
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Foley",
+      "Foley Loop",
+      "Hi-Hat",
+      "Hi-Hat Loop",
+      "Kick",
+      "Kick Loop",
+      "Other/none",
+      "Pad",
+      "Percussion",
+      "Percussion Loop",
+      "Rimshot",
+      "SFX",
+      "Snare",
+      "Synth Loop",
+      "Synth One-Shot",
+      "Vocal Loop",
+      "Vocal One-Shot",
+      "Weather/Nature Atmos"
+    ],
+    "feature_hash_audio": "c98eadccc76efa0e076b4504543dbfe18135674405494f6438d4a3cd5cf8b55a",
+    "feature_hash_waveform": "b816b35978a6b80937b654a2b31292ff3da045eb31fdcc0b2c5f3f40a0c55483"
+  },
+  "results": {
+    "audio": {
+      "accuracy_mean": 56.4,
+      "accuracy_sd": 0.47,
+      "per_seed": [
+        56.36,
+        55.77,
+        56.46,
+        56.85,
+        55.77,
+        56.75,
+        57.14,
+        56.07
+      ],
+      "macro_f1": 46.9,
+      "coverage_at_90_precision": 27.1,
+      "coverage_at_95_precision": 12.7
+    },
+    "waveform": {
+      "accuracy_mean": 36.8,
+      "accuracy_sd": 0.61,
+      "per_seed": [
+        37.38,
+        36.3,
+        36.89,
+        36.11,
+        37.08,
+        37.28,
+        35.81,
+        37.57
+      ],
+      "macro_f1": 29.7,
+      "coverage_at_90_precision": 0.1,
+      "coverage_at_95_precision": 0.1
+    },
+    "audio+waveform": {
+      "accuracy_mean": 56.52,
+      "accuracy_sd": 0.51,
+      "per_seed": [
+        56.65,
+        56.16,
+        56.36,
+        57.24,
+        55.77,
+        56.85,
+        57.14,
+        55.97
+      ],
+      "macro_f1": 47.13,
+      "coverage_at_90_precision": 27.3,
+      "coverage_at_95_precision": 12.8
+    }
+  },
+  "interpretation": "Use waveform features for fusion only if the audio+waveform arm improves the frozen audio arm on the same folds; otherwise retain them for explanations and targeted mechanism rules."
+}

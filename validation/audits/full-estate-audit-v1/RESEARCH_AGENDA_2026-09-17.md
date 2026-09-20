@@ -1,0 +1,11 @@
+# RESEARCH AGENDA — 2026-09-17
+
+- R-01 · SLO classification quality · SLO · 10d · corpus: real-authorised packs + strict-blind gate (`_artifacts/slo_strict_blind_class_gate_v2/` 72 wavs). H: top-1 ≥70% on 16-class producer taxonomy with UNKNOWN rate ≤15% at fixed OOD threshold. Method: freeze engine, run `classification_benchmark/`, confusion/OOD curves, PANNs-CNN10 vs CLAP AB. Success: winner + threshold shipped to BetaDecisionPolicy. Fail: neither hits 70% → hold beta, rescope taxonomy. Unlocks: ship/hold SLO beta + FT2-01.
+- R-02 · SLO format expansion cost · SLO · 5d · decode AIFF/FLAC/MP3 via TagLib/dr_libs. H: scan throughput within 20% of WAV with zero journal regressions. Unlocks: FT2-01 flag.
+- R-03 · KENN mix-review validity · KENN · 10d · human listening reference for clipping/headroom/silence/imbalance/phase/DC + loudness. H: fault agreement κ≥0.6; LUFS within ±1 of BS.1770 ref after fixing 5 failures. Fail: κ<0.4 → keep "not qualified" label. Unlocks: qualified pilot claim.
+- R-04 · Plugin host compatibility · SLO+KENN · 7d · pluginval + Ableton/Logic/Reaper smoke, VST3/AU parity, ThreadSanitizer. H: 0 crashes, RT-thread clean. Unlocks: SHIP for plugins.
+- R-05 · DiskSweep SAFE/REVIEW/BLOCKED accuracy · DiskSweep · 7d · labelled corpus; H: BLOCKED precision ≥99%, Trash-only guarantee fuzz 5k/5k pass; LLM-vs-rules latency/cost. Unlocks: beta + pricing.
+- R-06 · Submit field-detection generalisation · Submit · 7d · private authorised corpora per university profile; H: ≥98% correct renames, zero overwrites (renamex_np exclusive). Unlocks: site-licence pricing.
+- R-07 · Paddle/entitlement robustness · Platform · 5d · webhook signature, idempotency, offline verify, refund/fraud paths; H: duplicate-webhook safe, offline grace defined. Unlocks: charging.
+- R-08 · AudioGen/AutoMix quality metric · Audio_Too/KENN · 10d · define objective + human protocol, cost/render, provenance gate. H: metric with inter-rater ≥0.6. Fail: no metric → freeze generative sales, keep research. Unlocks: continue/freeze.
+- R-09 · Windows portability (C++/JUCE) · SLO/Submit · 5d spike · H: scanner+plugin build on Windows with parity fuzz pass. Fail: >4wk forecast → stay macOS-only (OWNER Q3).

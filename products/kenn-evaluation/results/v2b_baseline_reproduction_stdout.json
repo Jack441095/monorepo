@@ -1,0 +1,116 @@
+{
+  "per_fault": {
+    "clipping": {
+      "cases": 15,
+      "recall": 0.3333,
+      "hits": 5
+    },
+    "headroom": {
+      "cases": 15,
+      "recall": 0.0,
+      "hits": 0
+    },
+    "dc": {
+      "cases": 10,
+      "recall": 1.0,
+      "hits": 10
+    },
+    "bass_excess": {
+      "cases": 25,
+      "recall": 1.0,
+      "hits": 25
+    },
+    "hf_excess": {
+      "cases": 30,
+      "recall": 0.5333,
+      "hits": 16
+    },
+    "resonance": {
+      "cases": 15,
+      "recall": 1.0,
+      "hits": 15
+    },
+    "mud": {
+      "cases": 15,
+      "recall": 1.0,
+      "hits": 15
+    },
+    "harshness": {
+      "cases": 15,
+      "recall": 1.0,
+      "hits": 15
+    },
+    "lr_imbalance": {
+      "cases": 15,
+      "recall": 0.0,
+      "hits": 0
+    },
+    "anti_phase": {
+      "cases": 15,
+      "recall": 1.0,
+      "hits": 15
+    },
+    "wide_bass": {
+      "cases": 15,
+      "recall": 1.0,
+      "hits": 15
+    },
+    "over_compression": {
+      "cases": 25,
+      "recall": 1.0,
+      "hits": 25
+    },
+    "transient_peaks": {
+      "cases": 10,
+      "recall": 0.6,
+      "hits": 6
+    },
+    "silence": {
+      "cases": 10,
+      "recall": 1.0,
+      "hits": 10
+    },
+    "near_silence": {
+      "cases": 10,
+      "recall": 0.0,
+      "hits": 0
+    },
+    "noise": {
+      "cases": 10,
+      "recall": 0.0,
+      "hits": 0
+    }
+  },
+  "healthy_false_positive_rate": 1.0,
+  "multi_fault_recall": 0.8333,
+  "analysis_runtime_s": 210.345,
+  "mean_case_runtime_s": 0.8397,
+  "errors": 0,
+  "flag_counts": {
+    "Low-mid build-up": 148,
+    "Over-widened air": 193,
+    "Over-compressed (LRA)": 240,
+    "Harsh digital clipping": 180,
+    "Harsh resonance": 789,
+    "Low presence": 90,
+    "Heavy sub": 27,
+    "Low-end heavy balance": 25,
+    "Slow transient attacks": 21,
+    "Narrow presence": 20,
+    "Hot Mix": 84,
+    "Low dynamics": 34,
+    "Perceived harshness": 77,
+    "DC offset": 10,
+    "Low headroom": 16,
+    "Bright top end": 21,
+    "Mono risk": 43,
+    "Very wide sides": 31,
+    "Side Bass Mud": 25,
+    "Low-End Phase Cancellation": 55,
+    "Dark tonal balance": 25,
+    "Spiky transients": 39,
+    "Crushed transients": 4,
+    "Clipping risk": 14,
+    "Inter-sample clipping": 12
+  }
+}

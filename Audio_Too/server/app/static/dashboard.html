@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Audio_Too Dashboard</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/studio-theme.css">
+    <script src="/app-shell.js" data-active="dashboard" data-page="Dashboard" defer></script>
+  </head>
+  <body>
+    <main class="admin-app control-panel">
+      <header class="admin-header">
+        <div>
+          <a href="/hub">← Hub</a>
+          <a href="/">Public site</a>
+          <h1>Audio_Too Dashboard</h1>
+          <p class="control-subtitle">Website operations and the Ableton knowledge LM are separated into clear workspaces.</p>
+        </div>
+        <div class="auth-panel compact">
+          <label>Password<input id="admin-password" type="password" autocomplete="current-password"></label>
+          <button id="admin-unlock" type="button">Sign in</button>
+          <button id="admin-logout" type="button" class="secondary">Sign out</button>
+        </div>
+      </header>
+
+      <nav class="control-tabs" role="tablist" aria-label="Dashboard sections">
+        <div class="primary-tabs-row">
+          <button type="button" class="primary-tab active" data-category="overview">Overview</button>
+          <button type="button" class="primary-tab" data-category="work">Clients & Work</button>
+          <button type="button" class="primary-tab" data-category="finance">Finance & Comm</button>
+          <button type="button" class="primary-tab" data-category="audio">Audio Tools</button>
+          <button type="button" class="primary-tab" data-category="models">Knowledge & Models</button>
+          <button type="button" class="primary-tab" data-category="system">System</button>
+        </div>
+
+        <div class="sub-tabs-row" id="sub-tabs-overview">
+          <button type="button" class="tab active" data-tab="overview">Home Overview</button>
+        </div>
+
+        <div class="sub-tabs-row" id="sub-tabs-work" hidden>
+          <button type="button" class="tab" data-tab="enquiries">Enquiries</button>
+          <button type="button" class="tab" data-tab="clients">Clients</button>
+          <button type="button" class="tab" data-tab="leads">Leads</button>
+          <button type="button" class="tab" data-tab="stems">Stem uploads</button>
+          <button type="button" class="tab" data-tab="portfolio-ops">Portfolio</button>
+          <button type="button" class="tab" data-tab="calendar">Calendar</button>
+        </div>
+
+        <div class="sub-tabs-row" id="sub-tabs-finance" hidden>
+          <button type="button" class="tab" data-tab="invoices">Invoices</button>
+          <button type="button" class="tab" data-tab="drafts">Drafts</button>
+          <button type="button" class="tab" data-tab="campaigns">Campaigns</button>
+        </div>
+
+        <div class="sub-tabs-row" id="sub-tabs-audio" hidden>
+          <button type="button" class="tab" data-tab="mix-review">Mix review</button>
+          <button type="button" class="tab" data-tab="music-analysis">Music analysis</button>
+        </div>
+
+        <div class="sub-tabs-row" id="sub-tabs-models" hidden>
+          <button type="button" class="tab" data-tab="ableton">LM Chat</button>
+          <button type="button" class="tab" data-tab="audiogen">AudioGen</button>
+          <button type="button" class="tab" data-tab="lm-improve">Improve</button>
+          <button type="button" class="tab" data-tab="knowledge-admin">Knowledge admin</button>
+          <button type="button" class="tab" data-tab="transcripts">Transcript review</button>
+          <button type="button" class="tab" data-tab="lm-gaps">Knowledge gaps</button>
+        </div>
+
+        <div class="sub-tabs-row" id="sub-tabs-system" hidden>
+          <button type="button" class="tab" data-tab="activity">Activity log</button>
+        </div>
+      </nav>
+
+      <section class="metrics metrics-bar" id="admin-metrics"></section>
+      <p id="admin-status" class="status"></p>
+
+      <section class="tab-panel active" data-panel="overview">
+        <div id="dashboard-hub" class="dashboard-hub">
+          <div class="hub-status" id="hub-status"></div>
+          <div class="hub-actions" id="hub-actions"></div>
+          <div class="hub-grid">
+            <article class="hub-card">
+              <div class="section-title"><h2>Due & overdue</h2></div>
+              <div id="hub-due"></div>
+            </article>
+            <article class="hub-card">
+              <div class="section-title"><h2>Needs attention</h2></div>
+              <div id="hub-attention"></div>
+            </article>
+            <article class="hub-card">
+              <div class="section-title"><h2>Client intake</h2><button type="button" data-goto="enquiries">Open enquiries</button></div>
+              <div id="client-intake-panel"></div>
+            </article>
+            <article class="hub-card">
+              <div class="section-title"><h2>Project readiness</h2><button type="button" data-refresh>Refresh</button></div>
+              <div id="project-readiness-panel"></div>
+            </article>
+            <article class="hub-card">
+              <div class="section-title"><h2>Recent activity</h2><button type="button" data-goto="activity">View all</button></div>
+              <div id="hub-activity" class="table-wrap"></div>
+            </article>
+            <article class="hub-card">
+              <div class="section-title"><h2>Workspaces</h2></div>
+              <div id="hub-modules" class="hub-modules"></div>
+            </article>
+            <article class="hub-card">
+              <div class="section-title"><h2>Audio engineering LM</h2><button type="button" data-goto="transcripts">Review notes</button></div>
+              <div id="hub-ableton"></div>
+            </article>
+            <article class="hub-card hub-card-wide">
+              <div class="section-title"><h2>Ask agent</h2></div>
+              <form id="agent-task-form" class="mini-form agent-task-form">
+                <textarea id="agent-task-input" rows="3" placeholder="Plain English, e.g. draft a follow-up email for a mixing client"></textarea>
+                <div class="button-row">
+                  <select id="agent-task-agent">
+                    <option value="auto">Auto route</option>
+                    <option value="admin">Admin</option>
+                    <option value="marketing">Marketing</option>
+                  </select>
+                  <button type="submit">Run task</button>
+                </div>
+              </form>
+              <pre id="agent-task-output" class="build-output agent-output"></pre>
+            </article>
+          </div>
+        </div>
+        <article>
+          <div class="section-title"><h2>Active projects</h2><button data-refresh>Refresh</button></div>
+          <p class="compact-status">Use <strong>Upload link</strong> to copy a client stem portal URL (14 days).</p>
+          <div id="admin-projects" class="table-wrap"></div>
+          <div id="project-workspace" class="project-workspace"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="clients" hidden>
+        <article>
+          <div class="section-title"><h2>Clients</h2><button data-refresh>Refresh</button></div>
+          <div id="admin-clients" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="enquiries" hidden>
+        <article>
+          <div class="section-title"><h2>Website enquiries</h2><button data-refresh>Refresh</button></div>
+          <p class="compact-status">New submissions land here first. Convert to client when you are ready to work the lead.</p>
+          <div id="admin-enquiries" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="leads" hidden>
+        <article>
+          <div class="section-title"><h2>Leads</h2><button data-refresh>Refresh</button></div>
+          <div id="admin-leads" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="campaigns" hidden>
+        <article>
+          <div class="section-title"><h2>Campaigns</h2><button data-refresh>Refresh</button></div>
+          <div id="admin-campaigns" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="invoices" hidden>
+        <article>
+          <div class="section-title"><h2>Invoices</h2><button data-refresh>Refresh</button></div>
+          <div id="admin-invoices" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="drafts" hidden>
+        <article>
+          <div class="section-title"><h2>Draft Queue</h2><button data-refresh>Refresh</button></div>
+          <form id="draft-form" class="mini-form">
+            <input name="recipient" placeholder="Recipient">
+            <input name="subject" placeholder="Subject">
+            <textarea name="body" rows="4" placeholder="Draft body"></textarea>
+            <button type="submit">Create draft</button>
+          </form>
+          <div id="admin-drafts" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="transcripts" hidden>
+        <div class="transcript-layout">
+          <aside>
+            <div class="section-title"><h2>Transcript drafts</h2><button id="transcripts-refresh" type="button">Refresh</button></div>
+            <form id="web-fetch-form" class="mini-form paraphrase-form">
+              <input id="web-fetch-url" name="url" placeholder="https://… article URL" required>
+              <input id="web-fetch-title" name="title" placeholder="Title (optional)">
+              <input id="web-fetch-tags" name="tags" placeholder="Tags (optional)">
+              <button type="submit">Fetch web page → draft note</button>
+            </form>
+            <p id="web-fetch-status" class="status compact-status"></p>
+            <div class="button-row">
+              <button id="import-web-pack" type="button">Import web pack</button>
+              <button id="import-web-suggested" type="button">Import suggested URLs</button>
+              <button id="train-chatbot" type="button">Train from transcripts</button>
+            </div>
+            <p id="transcript-llm-status" class="compact-status"></p>
+            <form id="paraphrase-form" class="mini-form paraphrase-form">
+              <input id="paraphrase-creator" name="creator" placeholder="Creator (optional)">
+              <input id="paraphrase-tags" name="tags" placeholder="Tags (optional)">
+              <label class="checkbox-row"><input id="paraphrase-force" type="checkbox"> Regenerate existing notes</label>
+              <label class="checkbox-row"><input id="paraphrase-llm" type="checkbox"> Polish with LLM after paraphrase</label>
+              <button id="transcript-paraphrase-all" type="submit">Paraphrase all transcripts</button>
+            </form>
+            <p id="paraphrase-status" class="status compact-status"></p>
+            <ul id="transcript-list" class="transcript-list"></ul>
+          </aside>
+          <article class="transcript-editor">
+            <div class="section-title">
+              <h2 id="transcript-editor-title">Select a note</h2>
+              <div class="button-row">
+                <button id="transcript-save" type="button" disabled>Save</button>
+                <button id="transcript-polish-llm" type="button" disabled>Polish with LLM</button>
+                <button id="transcript-approve" type="button" disabled>Approve</button>
+                <button id="transcript-build" type="button">Rebuild index</button>
+              </div>
+            </div>
+            <textarea id="transcript-content" rows="22" placeholder="Open a draft note to edit…" disabled></textarea>
+            <pre id="transcript-build-output" class="build-output"></pre>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="stems" hidden>
+        <article>
+          <div class="section-title">
+            <h2>Client stem uploads</h2>
+            <button type="button" id="stems-refresh">Refresh</button>
+          </div>
+          <p class="compact-status">On Overview → Active projects, click <strong>Upload link</strong> and send it to the client. Files save under <code>data/stem_uploads/</code>.</p>
+          <div id="stems-table" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="portfolio-ops" hidden>
+        <article>
+          <div class="section-title">
+            <h2>Portfolio publishing</h2>
+            <div class="button-row">
+              <a class="button secondary" href="/portfolio" target="_blank" rel="noreferrer">Open portfolio</a>
+              <button type="button" id="portfolio-ops-refresh">Refresh</button>
+            </div>
+          </div>
+          <p class="compact-status">Drop WAV files into <code>Portfolio/audio/</code>, refresh, then publish public audio entries here.</p>
+          <div id="portfolio-ops-summary" class="hub-status"></div>
+          <div class="lm-improve-grid">
+            <section>
+              <h3 class="lm-subheading">Project candidates</h3>
+              <div id="portfolio-candidates"></div>
+            </section>
+            <section>
+              <h3 class="lm-subheading">Audio files</h3>
+              <div id="portfolio-audio-files"></div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="music-analysis" hidden>
+        <div class="section-title">
+          <h2>Music Analysis</h2>
+        </div>
+        <div class="mix-review-layout" style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; margin-top: 16px;">
+          <aside class="mix-review-sidebar" style="display: flex; flex-direction: column; gap: 20px;">
+            <article class="hub-card" style="padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin: 0;">
+              <h3 style="margin-top: 0; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px;">Analyse Harmony</h3>
+              <form id="music-analysis-form" class="mini-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Analysis goal
+                  <select id="music-analysis-goal" name="mix_goal" aria-label="Analysis goal" style="width: 100%;">
+                    <option value="premaster">General music</option>
+                    <option value="club">Club / electronic</option>
+                    <option value="pop_vocal">Pop vocal</option>
+                    <option value="rap_vocal">Rap vocal</option>
+                    <option value="game_audio">Game audio</option>
+                  </select>
+                </label>
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Audio file
+                  <input id="music-analysis-file" name="file" type="file" accept=".wav,.wave,.aif,.aiff,.flac,.mp3,.m4a,audio/*" required style="font-size: 11px;">
+                </label>
+                <button type="submit" style="margin-top: 6px; width: 100%;">Analyse music</button>
+              </form>
+            </article>
+          </aside>
+          <main class="mix-review-main" style="display: flex; flex-direction: column; gap: 20px;">
+            <p id="music-analysis-status" class="status compact-status" style="margin: 0; font-weight: 600; color: var(--accent); min-height: 20px;"></p>
+            <div id="music-analysis-result"></div>
+          </main>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="mix-review" hidden>
+        <div class="section-title">
+          <h2>Mix Review Lab</h2>
+          <button type="button" id="mix-review-refresh">Refresh</button>
+        </div>
+        
+        <div class="mix-review-layout" style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; margin-top: 16px;">
+          <aside class="mix-review-sidebar" style="display: flex; flex-direction: column; gap: 20px;">
+            <article class="hub-card" style="padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin: 0;">
+              <h3 style="margin-top: 0; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px;">Analyse Mix</h3>
+              <p class="compact-status" style="margin-bottom: 12px;">Upload a WAV mix for spectrum, dynamics, and mix-advice analysis.</p>
+              <form id="mix-review-form" class="mini-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <input id="mix-review-title" name="title" placeholder="Track title (optional)">
+                <input id="mix-review-version" name="version" placeholder="Version label, e.g. v2 or chorus fix (optional)">
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Mix goal
+                  <select id="mix-review-goal" name="mix_goal" aria-label="Mix goal" style="width: 100%;">
+                    <option value="premaster">Premaster</option>
+                    <option value="club">Club / electronic</option>
+                    <option value="pop_vocal">Pop vocal</option>
+                    <option value="rap_vocal">Rap vocal</option>
+                    <option value="podcast">Podcast / dialogue</option>
+                    <option value="game_audio">Game audio</option>
+                    <option value="master">Master</option>
+                  </select>
+                </label>
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Monitoring level
+                  <select id="mix-review-phon-level" name="phon_level" aria-label="Monitoring level" style="width: 100%;">
+                    <option value="40">40 phon (Quiet / low level)</option>
+                    <option value="60" selected>60 phon (Standard / moderate)</option>
+                    <option value="80">80 phon (Loud / critical listening)</option>
+                  </select>
+                </label>
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Saved reference (optional)
+                  <select id="mix-review-reference-id" name="reference_id" aria-label="Saved reference" style="width: 100%;">
+                    <option value="">No saved reference</option>
+                  </select>
+                </label>
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Mix audio file
+                  <input id="mix-review-file" name="file" type="file" accept=".wav,.wave,.aif,.aiff,.flac,.mp3,.m4a,audio/*" required style="font-size: 11px;">
+                </label>
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Compare audio file (optional)
+                  <input id="mix-review-reference" name="reference" type="file" accept=".wav,.wave,.aif,.aiff,.flac,.mp3,.m4a,audio/*" aria-label="Reference audio (optional)" style="font-size: 11px;">
+                </label>
+                <button type="submit" style="margin-top: 6px; width: 100%;">Analyse mix</button>
+              </form>
+            </article>
+
+            <article class="hub-card" style="padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin: 0;">
+              <h3 style="margin-top: 0; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px;">Save Reference Track</h3>
+              <form id="mix-reference-form" class="mini-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <input id="mix-reference-name" name="name" placeholder="Reference name" required>
+                <input id="mix-reference-style" name="style" placeholder="Style / genre (optional)">
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Reference audio file
+                  <input id="mix-reference-file" name="file" type="file" accept=".wav,.wave,.aif,.aiff,.flac,.mp3,.m4a,audio/*" required style="font-size: 11px;">
+                </label>
+                <button type="submit" style="margin-top: 6px; width: 100%;">Save reference</button>
+              </form>
+              <div id="mix-reference-list" class="compact-list" style="margin-top: 14px; max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--line); padding-top: 10px;"></div>
+            </article>
+
+            <article class="hub-card" style="padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin: 0;">
+              <h3 style="margin-top: 0; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px;">Stem Masking Analyzer</h3>
+              <p class="compact-status" style="margin-bottom: 12px;">Upload multiple stems (e.g. Drums, Vocals, Bass) to analyze frequency masking conflicts.</p>
+              <form id="mix-stems-form" class="mini-form" style="display: flex; flex-direction: column; gap: 10px;">
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Upload Stems (Select multiple WAVs)
+                  <input id="mix-stems-files" name="files" type="file" accept=".wav,audio/wav,audio/x-wav" multiple required style="font-size: 11px;">
+                </label>
+                <button type="submit" style="margin-top: 6px; width: 100%;">Analyze Stems</button>
+              </form>
+              <div id="mix-stems-results" style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--line); display: none;"></div>
+            </article>
+
+            <article class="hub-card" style="padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin: 0;">
+              <h3 style="margin-top: 0; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px;">Catalogue QA</h3>
+              <p class="compact-status" style="margin-bottom: 12px;">Scan Portfolio/audio and rank files by risk, issue type, and analysis speed.</p>
+              <button type="button" id="mix-review-qa-refresh" style="width: 100%;">Run QA scan</button>
+              <div id="mix-review-qa-result" class="compact-list" style="margin-top: 14px; max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--line); padding-top: 10px;"></div>
+            </article>
+
+            <details id="mix-review-calibration-details" style="margin-top: 4px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; background: var(--panel);">
+              <summary style="font-weight: 700; cursor: pointer; color: var(--accent); font-size: 14px;">Target Calibration Settings</summary>
+              <div class="calibration-panel" style="margin-top: 12px; display: grid; gap: 14px;">
+                <p class="compact-status" style="margin: 0; font-size: 12px;">Calibrate target thresholds for each mix goal.</p>
+                
+                <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Select Mix Goal:
+                  <select id="calibration-goal-select" aria-label="Goal select" style="width: 100%;">
+                    <option value="premaster">Premaster</option>
+                    <option value="club">Club / electronic</option>
+                    <option value="pop_vocal">Pop vocal</option>
+                    <option value="rap_vocal">Rap vocal</option>
+                    <option value="podcast">Podcast / dialogue</option>
+                    <option value="game_audio">Game audio</option>
+                    <option value="master">Master</option>
+                  </select>
+                </label>
+
+                <div id="calibration-goal-content" style="display: grid; gap: 12px;">
+                  <label style="font-size: 12px; display: flex; flex-direction: column; gap: 4px;">Goal Summary:
+                    <textarea id="calibration-goal-summary" rows="2" placeholder="Overall summary of checks for this goal"></textarea>
+                  </label>
+                  
+                  <h4 style="margin: 8px 0 0 0; font-size: 12px; font-weight: 700;">Target Checks</h4>
+                  <div id="calibration-checks-container" style="display: grid; gap: 12px;">
+                    <!-- Check inputs will be rendered here dynamically -->
+                  </div>
+                  
+                  <div style="margin-top: 8px;">
+                    <button type="button" id="calibration-add-check-btn" class="button secondary" style="min-height: 30px; height: 30px; padding: 4px 10px; font-size: 11px;">+ Add Check</button>
+                  </div>
+                </div>
+
+                <div class="button-row" style="margin-top: 12px; display: flex; align-items: center; gap: 12px;">
+                  <button type="button" id="calibration-save-btn" style="min-height: 32px; height: 32px; padding: 0 12px; font-size: 12px;">Save Calibration</button>
+                  <span id="calibration-status" class="status compact-status" style="font-size: 11px;"></span>
+                </div>
+              </div>
+            </details>
+          </aside>
+
+          <main class="mix-review-main" style="display: flex; flex-direction: column; gap: 20px;">
+            <p id="mix-review-status" class="status compact-status" style="margin: 0; font-weight: 600; color: var(--accent); min-height: 20px;"></p>
+            <div id="mix-review-latest"></div>
+
+            <div id="mix-version-timeline-card" class="hub-card" style="padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin: 0; display: none;">
+              <h3 style="margin-top: 0; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px;">Mix Version History</h3>
+              <div id="mix-version-timeline-list" style="display: flex; gap: 16px; overflow-x: auto; padding: 4px 0 12px 0; align-items: stretch; scrollbar-width: thin;">
+                <!-- Timeline cards rendered here -->
+              </div>
+            </div>
+            
+            <!-- A8.2 A/B Comparison Card -->
+            <div class="hub-card" style="padding:16px; background:var(--panel); border:1px solid var(--line); border-radius:8px;">
+              <h3 style="margin:0 0 12px 0; font-size:15px; font-weight:700;">Compare A/B</h3>
+              <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:8px; align-items:end;">
+                <div>
+                  <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:4px;">Mix A</label>
+                  <select id="ab-compare-a" style="width:100%; font-size:12px;"><option>— no reviews yet —</option></select>
+                </div>
+                <div>
+                  <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:4px;">Mix B</label>
+                  <select id="ab-compare-b" style="width:100%; font-size:12px;"><option>— no reviews yet —</option></select>
+                </div>
+                <button type="button" id="ab-compare-btn" class="button-link" style="white-space:nowrap;">Compare</button>
+              </div>
+              <div id="ab-compare-result" style="margin-top:12px;"></div>
+            </div>
+
+            <div class="previous-reviews-panel" style="border-top: 1px solid var(--line); padding-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+              <h3 class="lm-subheading" style="margin: 0; font-size: 18px; font-weight: 700;">Previous reviews</h3>
+              <div id="mix-review-list" style="display: flex; flex-direction: column; gap: 16px;"></div>
+            </div>
+          </main>
+        </div>
+      </section>
+
+
+      <section class="tab-panel" data-panel="lm-gaps" hidden>
+        <article>
+          <div class="section-title">
+            <h2>Knowledge gaps</h2>
+            <button type="button" id="lm-gaps-refresh">Refresh</button>
+          </div>
+          <p class="compact-status">Weak questions → <strong>Create draft note</strong> → edit in Transcript Review → Approve → <code>./ableton build</code> (auto-rechecks open gaps).</p>
+          <p id="lm-gaps-summary" class="compact-status"></p>
+          <div class="lm-gaps-toolbar">
+            <button type="button" id="lm-gaps-retest-all">Recheck all open</button>
+          </div>
+          <h3 class="lm-subheading">Open gaps</h3>
+          <div id="lm-gaps-table" class="table-wrap"></div>
+          <h3 class="lm-subheading">Drafted (note linked)</h3>
+          <div id="lm-gaps-drafted" class="table-wrap"></div>
+          <h3 class="lm-subheading">Recent questions (all channels)</h3>
+          <div id="lm-queries-table" class="table-wrap"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="lm-improve" hidden>
+        <article>
+          <div class="section-title">
+            <h2>LLM improvement</h2>
+            <button type="button" id="lm-improve-refresh">Refresh</button>
+          </div>
+          <p class="compact-status">One place to check quality, review tester feedback, and turn weak answers into approved notes.</p>
+          <div id="lm-improve-status" class="status compact-status"></div>
+          <div id="lm-improve-scorecards" class="lm-improve-scorecards"></div>
+          <div class="lm-improve-actions">
+            <button type="button" id="lm-run-audit">Run audit</button>
+            <button type="button" id="lm-run-bench" class="secondary">Run benchmark</button>
+            <button type="button" id="lm-run-eval" class="secondary">Run evals</button>
+            <button type="button" id="lm-run-export-training" class="secondary">Export training</button>
+            <button type="button" data-goto="lm-gaps" class="secondary">Open gaps</button>
+            <button type="button" data-goto="transcripts" class="secondary">Review notes</button>
+          </div>
+          <section class="lm-repair-plan-panel">
+            <div class="section-title">
+              <h3 class="lm-subheading">Repair plan</h3>
+              <span class="compact-status">Prioritized from feedback, evals, route labels, and weak retrieval.</span>
+            </div>
+            <div id="lm-repair-plan"></div>
+          </section>
+          <section class="lm-training-panel">
+            <div class="section-title">
+              <h3 class="lm-subheading">Training records</h3>
+              <div class="button-row">
+                <button type="button" id="training-records-refresh" class="secondary">Refresh records</button>
+                <button type="button" id="training-records-export">Export reviewed JSONL</button>
+                <button type="button" id="training-hard-negatives-export" class="secondary">Export hard negatives</button>
+                <button type="button" id="training-route-memory-export" class="secondary">Export route memory</button>
+              </div>
+            </div>
+            <div class="training-records-filters">
+              <select id="training-records-filter" aria-label="Training record filter">
+                <option value="all">All records</option>
+                <option value="needs_review">Needs review</option>
+                <option value="fallback">Fallback</option>
+                <option value="wrong_source">Wrong source</option>
+                <option value="wrong_route">Wrong route</option>
+                <option value="wrong_intent">Wrong intent</option>
+                <option value="weak_match">Weak match</option>
+                <option value="eval_failed">Eval failed</option>
+              </select>
+              <div id="training-records-diagnostics" class="compact-status"></div>
+            </div>
+            <p id="training-records-summary" class="compact-status"></p>
+            <div id="training-records-table" class="table-wrap training-records-table"></div>
+          </section>
+          <div class="lm-improve-grid">
+            <section class="lm-improve-agent-panel">
+              <h3 class="lm-subheading">Improvement agent queue</h3>
+              <p class="compact-status">Ranked from open gaps, weak demo questions, and tester “needs work” feedback.</p>
+              <div id="lm-agent-queue"></div>
+            </section>
+            <section>
+              <h3 class="lm-subheading">Latest audit</h3>
+              <div id="lm-latest-audit" class="build-output"></div>
+            </section>
+            <section>
+              <h3 class="lm-subheading">Tester feedback</h3>
+              <div id="lm-feedback-table" class="table-wrap"></div>
+            </section>
+            <section>
+              <h3 class="lm-subheading">Answer quality queue</h3>
+              <div id="lm-quality-table" class="table-wrap"></div>
+            </section>
+            <section>
+              <h3 class="lm-subheading">Recent questions</h3>
+              <div id="lm-improve-queries" class="table-wrap"></div>
+            </section>
+            <section>
+              <h3 class="lm-subheading">Run output</h3>
+              <pre id="lm-improve-output" class="build-output"></pre>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="knowledge-admin" hidden>
+        <div class="knowledge-admin-layout">
+          <aside class="knowledge-admin-sidebar">
+            <div class="section-title">
+              <h2>Knowledge Admin</h2>
+              <button type="button" id="knowledge-refresh">Refresh</button>
+            </div>
+            <p class="compact-status">Browse, edit, approve, rebuild, and evaluate the Audio Tips LLM knowledge base.</p>
+            <div class="knowledge-filters">
+              <input id="knowledge-search" type="search" placeholder="Search notes, tags, text">
+              <select id="knowledge-status-filter">
+                <option value="all">All statuses</option>
+                <option value="Draft">Draft</option>
+                <option value="Approved">Approved</option>
+                <option value="Unmarked">Unmarked</option>
+              </select>
+            </div>
+            <div id="knowledge-summary" class="compact-status"></div>
+            <div id="knowledge-note-list" class="knowledge-note-list"></div>
+          </aside>
+          <article class="knowledge-editor">
+            <div class="section-title">
+              <h2 id="knowledge-editor-title">Select a note</h2>
+              <div class="button-row">
+                <button type="button" id="knowledge-save" disabled>Save</button>
+                <button type="button" id="knowledge-approve" disabled>Approve</button>
+                <button type="button" id="knowledge-rebuild">Rebuild index</button>
+                <button type="button" id="knowledge-run-eval" class="secondary">Run evals</button>
+              </div>
+            </div>
+            <div id="knowledge-note-meta" class="hub-status"></div>
+            <textarea id="knowledge-content" rows="24" placeholder="Open a note to edit…" disabled></textarea>
+            <h3 class="lm-subheading">Feedback needing repair</h3>
+            <p class="compact-status">Use these to open or create repair notes, then rebuild and retest from the Improve tab.</p>
+            <div id="knowledge-feedback" class="table-wrap"></div>
+            <div class="section-title" style="margin-top: 24px;">
+              <h3 class="lm-subheading" style="margin: 0;">Suggested Notes from Session Gaps</h3>
+              <button type="button" id="knowledge-run-clustering" class="secondary">Run Gap Clustering</button>
+            </div>
+            <p class="compact-status">These draft notes were automatically clustered and generated from unanswered user queries.</p>
+            <div id="knowledge-suggested-notes" class="table-wrap"></div>
+            <h3 class="lm-subheading">Command output</h3>
+            <pre id="knowledge-output" class="build-output"></pre>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="ableton" hidden>
+        <article class="ableton-panel">
+          <div class="section-title">
+            <h2>KENN</h2>
+            <a id="ableton-open-tab" href="http://127.0.0.1:8090" target="_blank" rel="noreferrer">Open in new tab</a>
+          </div>
+          <p id="ableton-web-status" class="status compact-status"></p>
+          <iframe id="ableton-iframe" class="ableton-iframe" src="http://127.0.0.1:8090" title="Ableton chat (./ableton web)"></iframe>
+          <details class="ableton-quick-ask">
+            <summary>Quick ask (built into control panel)</summary>
+            <form id="ableton-ask-form" class="mini-form ableton-ask">
+              <span class="composer-field">
+                <textarea id="ableton-question" rows="3" placeholder="Ask about Ableton workflows, mixing, sound design…" aria-autocomplete="list" aria-controls="ableton-typeahead"></textarea>
+                <ul id="ableton-typeahead" class="typeahead-list" hidden></ul>
+              </span>
+              <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+                <button type="submit">Ask</button>
+              </div>
+            </form>
+            <div id="ableton-answer" class="ableton-answer"></div>
+            <div id="ableton-followups" class="ableton-followups"></div>
+            <div id="ableton-sources" class="ableton-sources"></div>
+          </details>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="audiogen" hidden>
+        <article>
+          <div class="section-title">
+            <h2>AudioGen</h2>
+            <button type="button" id="audiogen-refresh">Refresh status</button>
+          </div>
+          <p class="compact-status">Generate local chorus ideas or full-song renders from LLM_AudioGen and publish the WAV into <code>Portfolio/audio/</code>.</p>
+          <div id="audiogen-status" class="hub-status"></div>
+          <form id="audiogen-form" class="mini-form audiogen-form">
+            <textarea id="audiogen-prompt" rows="3" placeholder="e.g. generate a dark garage chorus with sad chords and a simple hook"></textarea>
+            <input id="audiogen-emotion" type="hidden" value="joy">
+            <div class="emotion-grid" aria-label="Emotion buttons">
+              <button type="button" class="emotion-button active" data-audiogen-emotion="joy">Joy</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="admiration">Admiration</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="amusement">Amusement</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="anger">Anger</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="annoyance">Annoyance</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="approval">Approval</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="caring">Caring</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="confusion">Confusion</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="curiosity">Curiosity</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="desire">Desire</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="disappointment">Disappointment</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="disapproval">Disapproval</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="disgust">Disgust</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="embarrassment">Embarrassment</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="excitement">Excitement</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="fear">Fear</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="gratitude">Gratitude</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="grief">Grief</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="love">Love</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="nervousness">Nervousness</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="optimism">Optimism</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="pride">Pride</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="realization">Realization</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="relief">Relief</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="remorse">Remorse</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="sadness">Sadness</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="surprise">Surprise</button>
+              <button type="button" class="emotion-button" data-audiogen-emotion="neutral">Neutral</button>
+            </div>
+            <div class="audiogen-actions">
+              <label>
+                <span>Project</span>
+                <select id="audiogen-project" aria-label="Project for AudioGen render">
+                  <option value="">No project</option>
+                </select>
+              </label>
+              <label>
+                <span>Bars</span>
+                <input id="audiogen-bars" type="number" min="1" max="16" value="4" aria-label="Bars">
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px;">
+                <input id="audiogen-chain-automix" type="checkbox">
+                <span>Auto-mix after render</span>
+              </label>
+              <button type="submit">Generate loop</button>
+              <button type="button" id="audiogen-render-song">Generate full song</button>
+            </div>
+          </form>
+          <div id="audiogen-result" class="ableton-answer"></div>
+          <div class="audiogen-player-panel" id="audiogen-player-panel" hidden>
+            <audio id="audiogen-player" preload="metadata"></audio>
+            <div class="transport-controls" aria-label="Audio transport controls">
+              <button type="button" id="audiogen-play">Play</button>
+              <button type="button" id="audiogen-pause">Pause</button>
+              <button type="button" id="audiogen-stop">Stop</button>
+            </div>
+          </div>
+          <div class="audiogen-jobs-panel">
+            <div class="section-title compact">
+              <h3>Render queue</h3>
+              <button type="button" id="audiogen-jobs-refresh">Refresh queue</button>
+            </div>
+            <div id="audiogen-jobs" class="audiogen-jobs"></div>
+          </div>
+          <div class="audiogen-jobs-panel">
+            <div class="section-title compact">
+              <h3>Render history</h3>
+              <button type="button" id="audiogen-history-refresh">Refresh history</button>
+            </div>
+            <div id="audiogen-history" class="audiogen-jobs"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-panel="calendar" hidden>
+        <article class="calendar-app-layout">
+          <div class="calendar-header-bar">
+            <div class="calendar-month-nav">
+              <button type="button" id="calendar-prev-month" class="nav-btn">&larr;</button>
+              <h2 id="calendar-month-label">Month Year</h2>
+              <button type="button" id="calendar-next-month" class="nav-btn">&rarr;</button>
+            </div>
+            <div class="calendar-controls">
+              <label class="toggle-completed-label">
+                <input type="checkbox" id="calendar-toggle-completed" checked>
+                <span>Show Completed</span>
+              </label>
+              <button type="button" class="btn-primary" id="calendar-btn-add">+ Add Event</button>
+            </div>
+          </div>
+
+          <div class="calendar-body-columns">
+            <!-- Calendar Monthly Grid -->
+            <div class="calendar-grid-container-wrap">
+              <div id="calendar-grid-container" class="calendar-month-grid"></div>
+            </div>
+
+            <!-- Upcoming Events list sidebar -->
+            <div class="calendar-upcoming-sidebar">
+              <h3>Agenda List</h3>
+              <div id="calendar-events-list" class="upcoming-events-list"></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Modal to Add Event -->
+        <div id="calendar-add-modal" class="calendar-modal">
+          <div class="calendar-modal-content">
+            <div class="calendar-modal-header">
+              <h3>Create Calendar Event</h3>
+              <button type="button" class="calendar-modal-close">&times;</button>
+            </div>
+            <form id="calendar-add-form">
+              <div class="form-group">
+                <label for="add-event-title">Event Title / Description</label>
+                <input type="text" id="add-event-title" placeholder="e.g. Mixing session with Sarah" required autocomplete="off">
+              </div>
+              <div class="form-group">
+                <label for="add-event-when">When (Supports natural language like 'tomorrow at 3pm')</label>
+                <input type="text" id="add-event-when" placeholder="e.g. tomorrow at 3pm, or 2026-08-15 14:00" required autocomplete="off">
+              </div>
+              <div class="calendar-modal-footer">
+                <button type="button" class="btn-secondary calendar-modal-close">Cancel</button>
+                <button type="submit" class="btn-primary">Save Event</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Modal to View/Complete Event -->
+        <div id="calendar-detail-modal" class="calendar-modal">
+          <div class="calendar-modal-content">
+            <div class="calendar-modal-header">
+              <h3 id="detail-modal-title">Event Title</h3>
+              <button type="button" class="calendar-modal-close">&times;</button>
+            </div>
+            <div class="calendar-modal-body">
+              <p><strong>Date & Time:</strong> <span id="detail-modal-date">Date here</span></p>
+              <p><strong>Status:</strong> <span id="detail-modal-status" class="status-badge">Active</span></p>
+            </div>
+            <div class="calendar-modal-footer">
+              <button type="button" class="btn-secondary calendar-modal-close">Close</button>
+              <button type="button" class="btn-primary" id="detail-modal-btn-complete">Mark Completed</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="activity" hidden>
+        <article>
+          <div class="section-title"><h2>Agent activity</h2><button id="activity-refresh" type="button">Refresh</button></div>
+          <div id="activity-log" class="table-wrap"></div>
+        </article>
+      </section>
+    </main>
+    <script src="/api_client.js"></script>
+    <script src="/dashboard_core.js"></script>
+    <script src="/crm_workspaces.js"></script>
+    <script src="/audio_features.js"></script>
+    <script src="/calendar_widget.js"></script>
+    <script src="/router.js"></script>
+  </body>
+</html>

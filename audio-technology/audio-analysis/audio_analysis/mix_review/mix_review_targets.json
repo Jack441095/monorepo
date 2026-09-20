@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "notes": "Editable Mix Review Lab targets. Use metric for top-level metrics, or path for nested metrics such as tonal_balance.low_end_share.",
+  "goals": {
+    "premaster": {
+      "summary": "Premaster checks favour headroom, translation, and enough dynamics for mastering.",
+      "checks": [
+        {"label": "Peak headroom", "metric": "peak_dbfs", "max": -1.0, "target": "Peak at or below -1 dBFS", "education": "Premasters need space for mastering moves and delivery encoding."},
+        {"label": "True peak safety", "metric": "true_peak_dbfs", "max": -1.0, "target": "True peak at or below -1 dBFS", "education": "Inter-sample peaks can clip even when sample peaks look safe."},
+        {"label": "Useful dynamics", "metric": "crest_factor_db", "min": 7.0, "target": "Crest factor above 7 dB", "education": "Some punch left in the mix gives mastering more room to work."},
+        {"label": "Low-end proportion", "path": ["tonal_balance", "low_end_share"], "max": 0.52, "target": "Low end below 52% of broad energy", "education": "Too much low end can make a premaster feel loud but small."},
+        {"label": "Stereo stability", "metric": "stereo_correlation", "min": 0.2, "target": "Correlation above 0.20", "education": "Important mix elements should survive mono playback."}
+      ]
+    },
+    "club": {
+      "summary": "Club/electronic checks prioritise controlled bass power, punch, and mono-safe low end.",
+      "checks": [
+        {"label": "Club low-end weight", "path": ["tonal_balance", "low_end_share"], "min": 0.16, "max": 0.62, "target": "Low end around 16-62%", "education": "Dance mixes can be bass-forward, but the low end still needs control."},
+        {"label": "Low-end mono safety", "path": ["stereo_field", "low_side_share"], "max": 0.08, "target": "Sub/bass side energy below 8%", "education": "Club playback usually rewards centred kick and bass foundations."},
+        {"label": "Low-band phase", "path": ["stereo_field", "low_band_correlation"], "min": 0.55, "target": "Low-band correlation above 0.55", "education": "Phasey low end can lose weight when summed or played on large systems."},
+        {"label": "Punch reserve", "metric": "crest_factor_db", "min": 5.5, "target": "Crest factor above 5.5 dB", "education": "A loud electronic mix still needs enough transient shape to hit."}
+      ]
+    },
+    "pop_vocal": {
+      "summary": "Pop vocal checks focus on intelligibility, low-mid masking, and comfortable brightness.",
+      "checks": [
+        {"label": "Vocal clarity band", "path": ["tonal_balance", "clarity_share"], "min": 0.06, "target": "Presence/air above 6%", "education": "A vocal-led mix needs enough upper-mid information to read at low volume."},
+        {"label": "Low-mid masking", "path": ["bands", "low_mids"], "max": 0.34, "target": "Low mids below 34%", "education": "Dense low mids can hide lyric detail and make reverbs feel cloudy."},
+        {"label": "Harshness guard", "path": ["tonal_balance", "perceived_clarity_share"], "max": 0.58, "target": "Ear-weighted clarity below 58%", "education": "Brightness should help the vocal speak without making S/T sounds painful."},
+        {"label": "Lead translation", "metric": "stereo_correlation", "min": 0.2, "target": "Correlation above 0.20", "education": "A vocal can be wide around the edges, but the lead should stay anchored."}
+      ]
+    },
+    "rap_vocal": {
+      "summary": "Rap vocal checks protect lyric focus against dense drums and bass.",
+      "checks": [
+        {"label": "Lyric clarity band", "path": ["tonal_balance", "clarity_share"], "min": 0.05, "target": "Presence/air above 5%", "education": "Fast vocals need enough edge to stay intelligible over drums."},
+        {"label": "Bass masking", "path": ["tonal_balance", "low_end_share"], "max": 0.56, "target": "Low end below 56%", "education": "Kick and 808 energy can mask vocal body when the balance is too low-heavy."},
+        {"label": "Low-mid room", "path": ["bands", "low_mids"], "max": 0.36, "target": "Low mids below 36%", "education": "The vocal body needs room around the lower mids without becoming boxy."},
+        {"label": "Punch reserve", "metric": "crest_factor_db", "min": 5.0, "target": "Crest factor above 5 dB", "education": "Rap mixes often work loud, but the drum pocket still needs impact."}
+      ]
+    },
+    "podcast": {
+      "summary": "Podcast/dialogue checks prioritise stable level, speech clarity, and listener comfort.",
+      "checks": [
+        {"label": "Consistent level", "path": ["dynamic_profile", "section_range_db"], "max": 8.0, "target": "Section range below 8 dB", "education": "Speech should not force the listener to keep adjusting volume."},
+        {"label": "Speech clarity", "path": ["tonal_balance", "clarity_share"], "min": 0.04, "target": "Presence/air above 4%", "education": "Clear consonants help speech translate on phones and laptops."},
+        {"label": "Low rumble control", "path": ["tonal_balance", "low_end_share"], "max": 0.38, "target": "Low end below 38%", "education": "Rumble and plosives eat headroom and make dialogue feel muddy."},
+        {"label": "Peak safety", "metric": "peak_dbfs", "max": -1.0, "target": "Peak at or below -1 dBFS", "education": "Speech exports still need room for platform encoding."}
+      ]
+    },
+    "game_audio": {
+      "summary": "Game audio checks favour implementation headroom, reliable playback, and repeatable loudness.",
+      "checks": [
+        {"label": "Implementation headroom", "metric": "true_peak_dbfs", "max": -1.0, "target": "True peak at or below -1 dBFS", "education": "Interactive playback can stack sounds, so assets need safe headroom."},
+        {"label": "Playback consistency", "path": ["dynamic_profile", "section_range_db"], "max": 10.0, "target": "Section range below 10 dB", "education": "Game assets should remain usable across varied playback contexts."},
+        {"label": "Low-end control", "path": ["tonal_balance", "low_end_share"], "max": 0.55, "target": "Low end below 55%", "education": "Low-frequency build-up multiplies quickly when several assets play together."},
+        {"label": "Mono compatibility", "metric": "stereo_correlation", "min": 0.2, "target": "Correlation above 0.20", "education": "Game audio often reaches mono, phone, TV, and headset playback paths."}
+      ]
+    },
+    "master": {
+      "summary": "Master checks focus on delivery safety, loudness damage, and final translation.",
+      "checks": [
+        {"label": "True peak ceiling", "metric": "true_peak_dbfs", "max": -0.3, "target": "True peak at or below -0.3 dBFS", "education": "A safer ceiling reduces codec and platform clipping risk."},
+        {"label": "No clipping", "metric": "clipped_frames_estimate", "max": 0, "target": "No clipped frames", "education": "A finished master should not rely on accidental digital clipping."},
+        {"label": "Punch after limiting", "metric": "crest_factor_db", "min": 4.0, "target": "Crest factor above 4 dB", "education": "Very low crest factor can mean limiting is flattening the music."},
+        {"label": "Stereo stability", "metric": "stereo_correlation", "min": 0.1, "target": "Correlation above 0.10", "education": "Wide masters still need a stable image and mono compatibility."}
+      ]
+    }
+  }
+}

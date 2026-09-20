@@ -1,0 +1,120 @@
+{
+  "record_type": "slo_definition_card_eval",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-11T17:26:04",
+  "protocol": {
+    "split": "StratifiedGroupKFold by collection",
+    "seeds": 4,
+    "splits": 5,
+    "min_examples": 5,
+    "min_collections": 5
+  },
+  "identity": {
+    "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_v3.npz",
+    "n_corpus_rows": 1325,
+    "n_evaluated": 1283,
+    "n_card_errors": 0,
+    "n_classes": 25,
+    "classes": [
+      "Bass Hit",
+      "Bass Loop",
+      "Bass Reese",
+      "Chord Loop",
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Foley",
+      "Foley Loop",
+      "Hi-Hat",
+      "Hi-Hat Loop",
+      "Kick",
+      "Kick Loop",
+      "Other/none",
+      "Pad",
+      "Percussion",
+      "Percussion Loop",
+      "Rimshot",
+      "SFX",
+      "Snare",
+      "Synth Loop",
+      "Synth One-Shot",
+      "Vocal Loop",
+      "Vocal One-Shot",
+      "Weather/Nature Atmos"
+    ],
+    "path_hash": "b2f8e55b5fa2e9a50723c952f49aae29a007a7acd3cb04877168d3d5fb9cf135",
+    "definition_feature_version": "definition_card_v1"
+  },
+  "results": {
+    "physical_definition_features": {
+      "accuracy_mean": 33.44,
+      "accuracy_sd": 0.71,
+      "per_seed_accuracy": [
+        33.52,
+        34.53,
+        33.13,
+        32.58
+      ],
+      "macro_f1": 26.71,
+      "coverage_at_90_precision": 0.1,
+      "coverage_at_95_precision": 0.1
+    },
+    "frozen_audio_embedding": {
+      "accuracy_mean": 57.09,
+      "accuracy_sd": 0.3,
+      "per_seed_accuracy": [
+        56.82,
+        57.6,
+        57.05,
+        56.9
+      ],
+      "macro_f1": 49.43,
+      "coverage_at_90_precision": 24.1,
+      "coverage_at_95_precision": 14.9
+    },
+    "audio_plus_definition_features": {
+      "accuracy_mean": 57.05,
+      "accuracy_sd": 0.43,
+      "per_seed_accuracy": [
+        56.59,
+        57.68,
+        57.21,
+        56.74
+      ],
+      "macro_f1": 49.45,
+      "coverage_at_90_precision": 24.1,
+      "coverage_at_95_precision": 14.2
+    }
+  },
+  "feature_names": [
+    "signal.rms_dbfs",
+    "signal.peak_dbfs",
+    "signal.crest_factor",
+    "signal.clipped_fraction",
+    "signal.leading_silence_seconds",
+    "signal.trailing_silence_seconds",
+    "spectrum.spectral_centroid_hz",
+    "spectrum.spectral_rolloff_hz",
+    "spectrum.spectral_flatness",
+    "spectrum.zero_crossing_rate",
+    "spectrum.low_band_energy_ratio",
+    "spectrum.high_band_energy_ratio",
+    "spectrum.harmonic_energy_ratio",
+    "temporal.onset_count",
+    "temporal.onset_density_per_second",
+    "temporal.estimated_tempo_bpm",
+    "temporal.periodicity_seconds",
+    "temporal.periodicity_strength",
+    "temporal.form_hint_confidence",
+    "pitch.median_f0_hz",
+    "pitch.voiced_frame_fraction",
+    "spatial.stereo_correlation"
+  ],
+  "safety": {
+    "source_audio_modified": false,
+    "labels_created": false,
+    "production_classifier_changed": false,
+    "rename_plan_applied": false
+  },
+  "interpretation": "Promote physical fields only if the combined arm improves the frozen audio arm on identical grouped folds; otherwise keep them as explanation and policy signals."
+}

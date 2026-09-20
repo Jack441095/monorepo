@@ -1,0 +1,68 @@
+{
+  "record_type": "slo_class_gate_promotion_review_packet",
+  "schema_version": "1.0.0",
+  "method_version": "class_gate_promotion_review_v1",
+  "generated": "2026-09-12T11:52:55",
+  "source_queue": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_class_conditional_gate_testing_review_v1.json",
+  "source_validation": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_class_conditional_gate_validation_v1.json",
+  "summary": {
+    "n_candidates": 408,
+    "candidate_classes": 3,
+    "review_approval_candidate_classes": 3
+  },
+  "classes": {
+    "Clap": {
+      "candidate_rows": 47,
+      "validation": {
+        "n": 40,
+        "correct": 39,
+        "precision": 0.975,
+        "wilson_95_lower": 0.8711834051199223,
+        "wilson_95_upper": 0.9955732825922052,
+        "descriptive_95": true,
+        "statistically_supported_95": false
+      },
+      "review_approval_candidate": true,
+      "auto_approved": false,
+      "decision": "separate explicit review required"
+    },
+    "Kick": {
+      "candidate_rows": 280,
+      "validation": {
+        "n": 40,
+        "correct": 40,
+        "precision": 1.0,
+        "wilson_95_lower": 0.9123754607496077,
+        "wilson_95_upper": 1.0,
+        "descriptive_95": true,
+        "statistically_supported_95": false
+      },
+      "review_approval_candidate": true,
+      "auto_approved": false,
+      "decision": "separate explicit review required"
+    },
+    "Snare": {
+      "candidate_rows": 81,
+      "validation": {
+        "n": 40,
+        "correct": 40,
+        "precision": 1.0,
+        "wilson_95_lower": 0.9123754607496077,
+        "wilson_95_upper": 1.0,
+        "descriptive_95": true,
+        "statistically_supported_95": false
+      },
+      "review_approval_candidate": true,
+      "auto_approved": false,
+      "decision": "separate explicit review required"
+    }
+  },
+  "decision": "validation evidence only; no class is approved or promoted automatically",
+  "safety": {
+    "read_only": true,
+    "auto_approved": false,
+    "production_model_changed": false,
+    "rename_actions": false,
+    "source_audio_modified": false
+  }
+}

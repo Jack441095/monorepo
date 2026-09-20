@@ -1,0 +1,8 @@
+{
+  "sealed_vendors": [
+    "Drum Recollection",
+    "Minimal Audio",
+    "Old Movies 1 - Vintage Collection (Drum Kit)"
+  ],
+  "rule": "never use for model selection, thresholds, prompt exemplars or error-driven relabelling"
+}

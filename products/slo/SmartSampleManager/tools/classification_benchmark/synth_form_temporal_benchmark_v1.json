@@ -1,0 +1,480 @@
+{
+  "record_type": "slo_synth_form_temporal_benchmark",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T12:49:33",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 5,
+    "splits": 5,
+    "pair": [
+      "Synth Loop",
+      "Synth One-Shot"
+    ],
+    "decision_gate_pp": 2.0
+  },
+  "inventory": {
+    "n_rows": 78,
+    "n_collections": 27,
+    "counts": {
+      "Synth Loop": 32,
+      "Synth One-Shot": 46
+    }
+  },
+  "results": {
+    "temporal_weight_0.1": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr"
+      ],
+      "weight": 0.1,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.64,
+      "per_seed": [
+        87.179,
+        85.897,
+        84.615,
+        88.462,
+        92.308
+      ]
+    },
+    "temporal_weight_0.25": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr"
+      ],
+      "weight": 0.25,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.64,
+      "per_seed": [
+        87.179,
+        85.897,
+        84.615,
+        88.462,
+        92.308
+      ]
+    },
+    "temporal_weight_0.5": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr"
+      ],
+      "weight": 0.5,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.64,
+      "per_seed": [
+        87.179,
+        85.897,
+        84.615,
+        88.462,
+        92.308
+      ]
+    },
+    "temporal_weight_1": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr"
+      ],
+      "weight": 1.0,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.64,
+      "per_seed": [
+        87.179,
+        85.897,
+        84.615,
+        88.462,
+        92.308
+      ]
+    },
+    "temporal_weight_2": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr"
+      ],
+      "weight": 2.0,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.64,
+      "per_seed": [
+        87.179,
+        85.897,
+        84.615,
+        88.462,
+        92.308
+      ]
+    },
+    "temporal_weight_4": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr"
+      ],
+      "weight": 4.0,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.64,
+      "per_seed": [
+        87.179,
+        85.897,
+        84.615,
+        88.462,
+        92.308
+      ]
+    },
+    "pitch_and_shape_weight_0.1": {
+      "feature_names": [
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 0.1,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.512,
+      "per_seed": [
+        88.462,
+        87.179,
+        83.333,
+        88.462,
+        91.026
+      ]
+    },
+    "pitch_and_shape_weight_0.25": {
+      "feature_names": [
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 0.25,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.512,
+      "per_seed": [
+        88.462,
+        87.179,
+        83.333,
+        88.462,
+        91.026
+      ]
+    },
+    "pitch_and_shape_weight_0.5": {
+      "feature_names": [
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 0.5,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.512,
+      "per_seed": [
+        88.462,
+        87.179,
+        83.333,
+        88.462,
+        91.026
+      ]
+    },
+    "pitch_and_shape_weight_1": {
+      "feature_names": [
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 1.0,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.512,
+      "per_seed": [
+        88.462,
+        87.179,
+        83.333,
+        88.462,
+        91.026
+      ]
+    },
+    "pitch_and_shape_weight_2": {
+      "feature_names": [
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 2.0,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.512,
+      "per_seed": [
+        88.462,
+        87.179,
+        83.333,
+        88.462,
+        91.026
+      ]
+    },
+    "pitch_and_shape_weight_4": {
+      "feature_names": [
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 4.0,
+      "accuracy": 87.692,
+      "accuracy_sd": 2.512,
+      "per_seed": [
+        88.462,
+        87.179,
+        83.333,
+        88.462,
+        91.026
+      ]
+    },
+    "temporal_plus_shape_weight_0.1": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr",
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 0.1,
+      "accuracy": 87.949,
+      "accuracy_sd": 2.083,
+      "per_seed": [
+        88.462,
+        87.179,
+        84.615,
+        88.462,
+        91.026
+      ]
+    },
+    "temporal_plus_shape_weight_0.25": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr",
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 0.25,
+      "accuracy": 87.949,
+      "accuracy_sd": 2.083,
+      "per_seed": [
+        88.462,
+        87.179,
+        84.615,
+        88.462,
+        91.026
+      ]
+    },
+    "temporal_plus_shape_weight_0.5": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr",
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 0.5,
+      "accuracy": 87.949,
+      "accuracy_sd": 2.083,
+      "per_seed": [
+        88.462,
+        87.179,
+        84.615,
+        88.462,
+        91.026
+      ]
+    },
+    "temporal_plus_shape_weight_1": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr",
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 1.0,
+      "accuracy": 87.949,
+      "accuracy_sd": 2.083,
+      "per_seed": [
+        88.462,
+        87.179,
+        84.615,
+        88.462,
+        91.026
+      ]
+    },
+    "temporal_plus_shape_weight_2": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr",
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 2.0,
+      "accuracy": 87.949,
+      "accuracy_sd": 2.083,
+      "per_seed": [
+        88.462,
+        87.179,
+        84.615,
+        88.462,
+        91.026
+      ]
+    },
+    "temporal_plus_shape_weight_4": {
+      "feature_names": [
+        "attack_ms",
+        "decay_seconds",
+        "sustain_ratio",
+        "attack_to_tail_ratio",
+        "onset_density",
+        "transient_strength",
+        "rhythmic_autocorr",
+        "fundamental_hz",
+        "pitch_confidence",
+        "harmonicity",
+        "spectral_purity",
+        "partial_count",
+        "beating_rate_hz",
+        "beating_depth"
+      ],
+      "weight": 4.0,
+      "accuracy": 87.949,
+      "accuracy_sd": 2.083,
+      "per_seed": [
+        88.462,
+        87.179,
+        84.615,
+        88.462,
+        91.026
+      ]
+    }
+  },
+  "best_temporal_arm": {
+    "feature_names": [
+      "attack_ms",
+      "decay_seconds",
+      "sustain_ratio",
+      "attack_to_tail_ratio",
+      "onset_density",
+      "transient_strength",
+      "rhythmic_autocorr",
+      "fundamental_hz",
+      "pitch_confidence",
+      "harmonicity",
+      "spectral_purity",
+      "partial_count",
+      "beating_rate_hz",
+      "beating_depth"
+    ],
+    "weight": 0.1,
+    "accuracy": 87.949,
+    "accuracy_sd": 2.083,
+    "per_seed": [
+      88.462,
+      87.179,
+      84.615,
+      88.462,
+      91.026
+    ]
+  },
+  "decision": "research evidence only; no production policy or rename actions",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false
+  }
+}

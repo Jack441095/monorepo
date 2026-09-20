@@ -1,0 +1,14 @@
+{
+  "title": "NITE DSP — Audio_Too Data Browser",
+  "description": "Read-only view of Audio_Too's business database (leads, clients, invoices, projects, etc.) via Datasette. Companion to Thursday's ops modules -- not a substitute for them, for anything not worth a dedicated command.",
+  "plugins": {
+    "datasette-auth-passwords": {
+      "jack_password_hash": {
+        "$env": "DATASETTE_JACK_PASSWORD_HASH"
+      }
+    }
+  },
+  "allow": {
+    "id": "jack"
+  }
+}

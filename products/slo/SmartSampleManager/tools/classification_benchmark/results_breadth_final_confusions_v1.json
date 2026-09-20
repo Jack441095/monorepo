@@ -1,0 +1,386 @@
+{
+  "classes": [
+    "Bass Hit",
+    "Bass Loop",
+    "Bass Reese",
+    "Chord Loop",
+    "Clap",
+    "Crash",
+    "Drum Loop",
+    "Foley",
+    "Foley Loop",
+    "Hi-Hat",
+    "Hi-Hat Loop",
+    "Impact",
+    "Kick",
+    "Kick Loop",
+    "Other/none",
+    "Pad",
+    "Percussion",
+    "Percussion Loop",
+    "Rimshot",
+    "Riser",
+    "SFX",
+    "Snare",
+    "Synth Loop",
+    "Synth One-Shot",
+    "Top Loop",
+    "Vocal Loop",
+    "Vocal One-Shot",
+    "Weather/Nature Atmos"
+  ],
+  "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_breadth_final_v1.npz",
+  "n_classes": 28,
+  "n_errors": 6451,
+  "n_files": 1832,
+  "protocol": {
+    "classifier": "standardized cosine nearest centroid",
+    "seeds": 8,
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "splits": 5
+  },
+  "record_type": "slo_breadth_confusion_audit",
+  "safety": {
+    "production_model_changed": false,
+    "read_only": true,
+    "rename_actions": false,
+    "source_audio_modified": false
+  },
+  "schema_version": "1.0.0",
+  "seed_accuracy": [
+    {
+      "accuracy": 0.5496724890829694,
+      "seed": 0
+    },
+    {
+      "accuracy": 0.5627729257641921,
+      "seed": 1
+    },
+    {
+      "accuracy": 0.5622270742358079,
+      "seed": 2
+    },
+    {
+      "accuracy": 0.5616812227074236,
+      "seed": 3
+    },
+    {
+      "accuracy": 0.5622270742358079,
+      "seed": 4
+    },
+    {
+      "accuracy": 0.5649563318777293,
+      "seed": 5
+    },
+    {
+      "accuracy": 0.5453056768558951,
+      "seed": 6
+    },
+    {
+      "accuracy": 0.5698689956331878,
+      "seed": 7
+    }
+  ],
+  "top_confusions": [
+    {
+      "n": 146,
+      "predicted": "Hi-Hat Loop",
+      "share_of_errors": 0.022632150054255153,
+      "true": "Percussion Loop"
+    },
+    {
+      "n": 131,
+      "predicted": "Kick",
+      "share_of_errors": 0.020306929158270037,
+      "true": "Percussion"
+    },
+    {
+      "n": 130,
+      "predicted": "Rimshot",
+      "share_of_errors": 0.02015191443187103,
+      "true": "Foley"
+    },
+    {
+      "n": 126,
+      "predicted": "Hi-Hat",
+      "share_of_errors": 0.019531855526274997,
+      "true": "Percussion"
+    },
+    {
+      "n": 121,
+      "predicted": "Clap",
+      "share_of_errors": 0.018756781894279956,
+      "true": "Foley"
+    },
+    {
+      "n": 105,
+      "predicted": "Foley Loop",
+      "share_of_errors": 0.01627654627189583,
+      "true": "Foley"
+    },
+    {
+      "n": 105,
+      "predicted": "Snare",
+      "share_of_errors": 0.01627654627189583,
+      "true": "Percussion"
+    },
+    {
+      "n": 99,
+      "predicted": "Clap",
+      "share_of_errors": 0.015346457913501782,
+      "true": "Snare"
+    },
+    {
+      "n": 97,
+      "predicted": "Drum Loop",
+      "share_of_errors": 0.015036428460703766,
+      "true": "Other/none"
+    },
+    {
+      "n": 93,
+      "predicted": "Foley",
+      "share_of_errors": 0.014416369555107736,
+      "true": "Percussion"
+    },
+    {
+      "n": 91,
+      "predicted": "Rimshot",
+      "share_of_errors": 0.01410634010230972,
+      "true": "Percussion"
+    },
+    {
+      "n": 90,
+      "predicted": "Top Loop",
+      "share_of_errors": 0.013951325375910711,
+      "true": "Percussion Loop"
+    },
+    {
+      "n": 90,
+      "predicted": "Chord Loop",
+      "share_of_errors": 0.013951325375910711,
+      "true": "Synth Loop"
+    },
+    {
+      "n": 88,
+      "predicted": "Pad",
+      "share_of_errors": 0.013641295923112695,
+      "true": "SFX"
+    },
+    {
+      "n": 85,
+      "predicted": "Synth Loop",
+      "share_of_errors": 0.013176251743915672,
+      "true": "Other/none"
+    },
+    {
+      "n": 78,
+      "predicted": "Pad",
+      "share_of_errors": 0.012091148659122617,
+      "true": "Synth Loop"
+    },
+    {
+      "n": 77,
+      "predicted": "Foley Loop",
+      "share_of_errors": 0.011936133932723608,
+      "true": "Percussion Loop"
+    },
+    {
+      "n": 76,
+      "predicted": "Bass Reese",
+      "share_of_errors": 0.011781119206324601,
+      "true": "Other/none"
+    },
+    {
+      "n": 75,
+      "predicted": "Bass Reese",
+      "share_of_errors": 0.011626104479925592,
+      "true": "Synth Loop"
+    },
+    {
+      "n": 74,
+      "predicted": "Bass Hit",
+      "share_of_errors": 0.011471089753526585,
+      "true": "Kick"
+    },
+    {
+      "n": 73,
+      "predicted": "Chord Loop",
+      "share_of_errors": 0.011316075027127576,
+      "true": "Other/none"
+    },
+    {
+      "n": 73,
+      "predicted": "Rimshot",
+      "share_of_errors": 0.011316075027127576,
+      "true": "Snare"
+    },
+    {
+      "n": 73,
+      "predicted": "Foley Loop",
+      "share_of_errors": 0.011316075027127576,
+      "true": "Synth Loop"
+    },
+    {
+      "n": 71,
+      "predicted": "Crash",
+      "share_of_errors": 0.011006045574329562,
+      "true": "Hi-Hat"
+    },
+    {
+      "n": 70,
+      "predicted": "Pad",
+      "share_of_errors": 0.010851030847930553,
+      "true": "Other/none"
+    },
+    {
+      "n": 68,
+      "predicted": "Riser",
+      "share_of_errors": 0.010541001395132537,
+      "true": "SFX"
+    },
+    {
+      "n": 64,
+      "predicted": "Drum Loop",
+      "share_of_errors": 0.009920942489536505,
+      "true": "Percussion Loop"
+    },
+    {
+      "n": 58,
+      "predicted": "Vocal Loop",
+      "share_of_errors": 0.00899085413114246,
+      "true": "Vocal One-Shot"
+    },
+    {
+      "n": 58,
+      "predicted": "Synth Loop",
+      "share_of_errors": 0.00899085413114246,
+      "true": "Foley Loop"
+    },
+    {
+      "n": 57,
+      "predicted": "Percussion Loop",
+      "share_of_errors": 0.00883583940474345,
+      "true": "Drum Loop"
+    },
+    {
+      "n": 56,
+      "predicted": "Chord Loop",
+      "share_of_errors": 0.008680824678344443,
+      "true": "SFX"
+    },
+    {
+      "n": 54,
+      "predicted": "Pad",
+      "share_of_errors": 0.008370795225546427,
+      "true": "Synth One-Shot"
+    },
+    {
+      "n": 54,
+      "predicted": "Rimshot",
+      "share_of_errors": 0.008370795225546427,
+      "true": "Clap"
+    },
+    {
+      "n": 53,
+      "predicted": "Hi-Hat Loop",
+      "share_of_errors": 0.008215780499147418,
+      "true": "Top Loop"
+    },
+    {
+      "n": 53,
+      "predicted": "Percussion Loop",
+      "share_of_errors": 0.008215780499147418,
+      "true": "Synth Loop"
+    },
+    {
+      "n": 52,
+      "predicted": "Hi-Hat",
+      "share_of_errors": 0.008060765772748411,
+      "true": "Foley"
+    },
+    {
+      "n": 49,
+      "predicted": "Kick",
+      "share_of_errors": 0.0075957215935513875,
+      "true": "Foley"
+    },
+    {
+      "n": 47,
+      "predicted": "Impact",
+      "share_of_errors": 0.0072856921407533715,
+      "true": "Foley"
+    },
+    {
+      "n": 46,
+      "predicted": "Other/none",
+      "share_of_errors": 0.0071306774143543635,
+      "true": "Synth Loop"
+    },
+    {
+      "n": 46,
+      "predicted": "Hi-Hat",
+      "share_of_errors": 0.0071306774143543635,
+      "true": "Crash"
+    },
+    {
+      "n": 45,
+      "predicted": "Bass Hit",
+      "share_of_errors": 0.0069756626879553555,
+      "true": "Other/none"
+    },
+    {
+      "n": 45,
+      "predicted": "Snare",
+      "share_of_errors": 0.0069756626879553555,
+      "true": "Other/none"
+    },
+    {
+      "n": 42,
+      "predicted": "Percussion",
+      "share_of_errors": 0.0065106185087583325,
+      "true": "Foley"
+    },
+    {
+      "n": 42,
+      "predicted": "Percussion Loop",
+      "share_of_errors": 0.0065106185087583325,
+      "true": "Foley Loop"
+    },
+    {
+      "n": 42,
+      "predicted": "Rimshot",
+      "share_of_errors": 0.0065106185087583325,
+      "true": "Hi-Hat"
+    },
+    {
+      "n": 42,
+      "predicted": "Foley Loop",
+      "share_of_errors": 0.0065106185087583325,
+      "true": "Drum Loop"
+    },
+    {
+      "n": 41,
+      "predicted": "Synth One-Shot",
+      "share_of_errors": 0.0063556037823593245,
+      "true": "SFX"
+    },
+    {
+      "n": 41,
+      "predicted": "Foley",
+      "share_of_errors": 0.0063556037823593245,
+      "true": "Rimshot"
+    },
+    {
+      "n": 41,
+      "predicted": "Pad",
+      "share_of_errors": 0.0063556037823593245,
+      "true": "Chord Loop"
+    },
+    {
+      "n": 40,
+      "predicted": "Clap",
+      "share_of_errors": 0.0062005890559603165,
+      "true": "Kick"
+    }
+  ]
+}

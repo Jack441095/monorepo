@@ -1,0 +1,11 @@
+{
+  "evidence_status": "REPOSITORY_HELD_HISTORICAL_NOT_FRESH_CURRENT_RUN",
+  "sample_count": 170,
+  "cold_scan_mean_ms": 25043.2,
+  "cached_scan_mean_ms": 921.499,
+  "rss_peak_mb": 2439.41,
+  "rss_after_mb": 1359.55,
+  "current_1000_scale_gate": "NOT_RUN",
+  "current_10000_scale_gate": "NOT_RUN",
+  "decision": "PASS_WITH_LIMITATIONS"
+}

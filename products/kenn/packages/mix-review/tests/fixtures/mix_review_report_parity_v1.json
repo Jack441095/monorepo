@@ -1,0 +1,40 @@
+{
+  "schema": "kenn.mix_review.report.parity.v1",
+  "analysis": {
+    "ok": true,
+    "flags": [
+      {
+        "label": "synthetic-low-end-check",
+        "severity": "info",
+        "confidence": 0.91,
+        "evidence": "fixture-only metric"
+      }
+    ],
+    "metrics": {
+      "integrated_lufs": -14.2,
+      "true_peak_dbfs": -1.1,
+      "crest_factor_db": 10.4,
+      "stereo_correlation": 0.88,
+      "analysis_version": "synthetic-fixture-v1"
+    },
+    "summary": "Synthetic parity report; not a quality claim."
+  },
+  "required_receipt_fields": [
+    "schema",
+    "status",
+    "source",
+    "audio_uploaded",
+    "external_network",
+    "storage",
+    "runtime_dir",
+    "analysis"
+  ],
+  "required_analysis_fields": ["ok", "flags", "metrics", "summary"],
+  "required_metric_fields": [
+    "integrated_lufs",
+    "true_peak_dbfs",
+    "crest_factor_db",
+    "stereo_correlation",
+    "analysis_version"
+  ]
+}

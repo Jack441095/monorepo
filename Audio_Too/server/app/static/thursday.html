@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thursday</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/studio-theme.css">
+<script src="/app-shell.js" data-active="hub" data-page="Thursday" defer></script>
+</head>
+<body>
+<div class="ts-app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="ts-sidebar">
+    <div>
+      <p class="ts-eyebrow">Navigation</p>
+      <h1>Thursday</h1>
+      <p class="ts-subtitle">Audio_Too Assistant</p>
+    </div>
+
+    <div class="ts-examples">
+      <p class="ts-label">Quick actions</p>
+      <button data-q="how's business">Business Health</button>
+      <button data-q="load kenn">KENN</button>
+      <button data-q="open audiogen">AudioGen Lab</button>
+      <button data-q="analyze my mix">Mix Analysis</button>
+      <button data-q="open dashboard">Dashboard</button>
+    </div>
+
+    <div class="ts-msgs" id=t-msgs>
+      <div class="ts-msg ts-from">
+        <span class=ts-badge>T</span>
+        <div class=ts-bubble>
+          <p>Hey, I'm Thursday. Ask me anything to navigate.</p>
+          <p class="ts-hint">e.g. "how's business", "load kenn", "open audiogen"</p>
+        </div>
+      </div>
+    </div>
+
+    <div id=t-sug class="ts-sug" hidden></div>
+
+    <form class="ts-bar" id=t-form>
+      <input id=t-inp placeholder="Ask Thursday..." autocomplete=off>
+      <button id=t-btn>Ask</button>
+    </form>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="ts-main" id=t-main>
+    <iframe id=t-frame class="t-frame" src="/hub"></iframe>
+  </main>
+
+</div>
+
+<script>
+(function(){
+  var form=document.getElementById('t-form'),
+      inp=document.getElementById('t-inp'),
+      msgs=document.getElementById('t-msgs'),
+      btn=document.getElementById('t-btn'),
+      frame=document.getElementById('t-frame'),
+      sug=document.getElementById('t-sug'),
+      sid='',loading=false;
+
+  function esc(v){return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function nav(u){if(!u||u==='#')return;frame.src=u;}
+  function sc(){msgs.scrollTop=msgs.scrollHeight;}
+  function add(r,t){
+    var d=document.createElement('div');d.className='ts-msg '+(r==='user'?'ts-you':'ts-from');
+    if(r==='user'){d.innerHTML='<div class=ts-bubble><p>'+esc(t)+'</p></div>';}
+    else{d.innerHTML='<span class=ts-badge>T</span><div class=ts-bubble><p>'+esc(t)+'</p></div>';}
+    msgs.appendChild(d);sc();
+  }
+  function addNav(u,l){
+    if(!u)return;nav(u);
+    var d=document.createElement('div');d.className='ts-msg ts-from';
+    d.innerHTML='<span class=ts-badge>T</span><div class=ts-bubble><a class="ts-navbtn" href="'+u+'" target="_top">'+esc(l||'Open')+'</a></div>';
+    msgs.appendChild(d);sc();
+  }
+  function showSug(list){
+    sug.innerHTML='';if(!list||!list.length){sug.hidden=true;return;}
+    sug.hidden=false;
+    list.forEach(function(s){
+      var b=document.createElement('button');b.className='ts-schip';b.textContent=s.label;
+      b.onclick=function(){inp.value=s.label;form.dispatchEvent(new Event('submit'));};
+      sug.appendChild(b);
+    });
+  }
+  async function ask(q){
+    if(loading||!q)return;
+    add('user',q);inp.value='';btn.disabled=true;loading=true;
+    try{
+      var sr=await fetch('/api/auth/session',{credentials:'same-origin'}),s=await sr.json();
+      var r=await fetch('/api/thursday/ask',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':s.csrf_token||''},body:JSON.stringify({question:q,session_id:sid})});
+      var d=await r.json();if(!r.ok)throw new Error(d.error||'Error');
+      sid=d.session_id||sid;add('from',d.answer||'(no response)');
+      if(d.navigate_url)addNav(d.navigate_url,d.navigate_label);
+      showSug(d.suggestions);
+    }catch(e){add('from','Sorry — '+e.message);}
+    finally{btn.disabled=false;loading=false;inp.focus();}
+  }
+  form.onsubmit=function(e){e.preventDefault();var q=inp.value.trim();if(q)ask(q);};
+  inp.onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.dispatchEvent(new Event('submit'));}};
+  document.querySelectorAll('[data-q]').forEach(function(el){el.onclick=function(){ask(el.dataset.q);};});
+  inp.focus();
+})();
+</script>
+</body>
+</html>

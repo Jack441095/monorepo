@@ -1,0 +1,914 @@
+{
+  "record_type": "slo_local_labeller_audit",
+  "schema_version": "1.0.0",
+  "method_version": "local_labeller_audit_v1",
+  "generated_epoch": 1789151656.083214,
+  "servers": [
+    {
+      "port": 8751,
+      "reachable": true,
+      "meta": {
+        "classes": [
+          "Kick",
+          "Snare",
+          "Rimshot",
+          "Hi-Hat",
+          "Crash",
+          "Clap",
+          "Percussion",
+          "Foley",
+          "Kick Loop",
+          "Snare Loop",
+          "Drum Loop",
+          "Top Loop",
+          "Hi-Hat Loop",
+          "Percussion Loop",
+          "Bass Loop",
+          "Foley Loop",
+          "Loop",
+          "Chord Loop",
+          "Other/none",
+          "Misc/Review",
+          "Bass Reese",
+          "Synth One-Shot",
+          "Vocal One-Shot",
+          "Vocal Loop",
+          "SFX",
+          "Riser",
+          "Impact",
+          "Pad",
+          "Atmosphere",
+          "Weather/Nature Atmos",
+          "Drum Fill",
+          "Synth Loop",
+          "Bass Hit"
+        ],
+        "total": 400,
+        "done": 0,
+        "groups": [
+          [
+            "one-shot",
+            [
+              "Kick",
+              "Snare",
+              "Rimshot",
+              "Hi-Hat",
+              "Crash",
+              "Clap",
+              "Percussion",
+              "Foley"
+            ]
+          ],
+          [
+            "loop",
+            [
+              "Kick Loop",
+              "Snare Loop",
+              "Drum Loop",
+              "Top Loop",
+              "Hi-Hat Loop",
+              "Percussion Loop",
+              "Bass Loop",
+              "Foley Loop",
+              "Loop",
+              "Chord Loop"
+            ]
+          ],
+          [
+            "none",
+            [
+              "Other/none",
+              "Misc/Review"
+            ]
+          ],
+          [
+            "tonal",
+            [
+              "Bass Reese",
+              "Synth One-Shot"
+            ]
+          ],
+          [
+            "vocal",
+            [
+              "Vocal One-Shot",
+              "Vocal Loop"
+            ]
+          ],
+          [
+            "fx",
+            [
+              "SFX",
+              "Riser",
+              "Impact"
+            ]
+          ],
+          [
+            "sustain",
+            [
+              "Pad",
+              "Atmosphere",
+              "Weather/Nature Atmos"
+            ]
+          ],
+          [
+            "fill",
+            [
+              "Drum Fill"
+            ]
+          ],
+          [
+            "more",
+            [
+              "Synth Loop",
+              "Bass Hit"
+            ]
+          ]
+        ],
+        "perc_subtypes": [
+          "Tom",
+          "Shaker/Tambourine",
+          "Hand Drum",
+          "Other Percussive Hit",
+          "Unsure"
+        ],
+        "reject_reasons": [
+          "unsupported instrument",
+          "mixed/full music",
+          "noise or texture",
+          "ambiguous",
+          "corrupt or unusable",
+          "other"
+        ],
+        "note_classes": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap",
+          "Not enough info"
+        ],
+        "note_required": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap"
+        ]
+      },
+      "error": null
+    },
+    {
+      "port": 8752,
+      "reachable": true,
+      "meta": {
+        "classes": [
+          "Kick",
+          "Snare",
+          "Rimshot",
+          "Hi-Hat",
+          "Crash",
+          "Clap",
+          "Percussion",
+          "Foley",
+          "Kick Loop",
+          "Snare Loop",
+          "Drum Loop",
+          "Top Loop",
+          "Hi-Hat Loop",
+          "Percussion Loop",
+          "Bass Loop",
+          "Foley Loop",
+          "Loop",
+          "Chord Loop",
+          "Other/none",
+          "Misc/Review",
+          "Bass Reese",
+          "Synth One-Shot",
+          "Vocal One-Shot",
+          "Vocal Loop",
+          "SFX",
+          "Riser",
+          "Impact",
+          "Pad",
+          "Atmosphere",
+          "Weather/Nature Atmos",
+          "Drum Fill",
+          "Synth Loop",
+          "Bass Hit"
+        ],
+        "total": 400,
+        "done": 0,
+        "groups": [
+          [
+            "one-shot",
+            [
+              "Kick",
+              "Snare",
+              "Rimshot",
+              "Hi-Hat",
+              "Crash",
+              "Clap",
+              "Percussion",
+              "Foley"
+            ]
+          ],
+          [
+            "loop",
+            [
+              "Kick Loop",
+              "Snare Loop",
+              "Drum Loop",
+              "Top Loop",
+              "Hi-Hat Loop",
+              "Percussion Loop",
+              "Bass Loop",
+              "Foley Loop",
+              "Loop",
+              "Chord Loop"
+            ]
+          ],
+          [
+            "none",
+            [
+              "Other/none",
+              "Misc/Review"
+            ]
+          ],
+          [
+            "tonal",
+            [
+              "Bass Reese",
+              "Synth One-Shot"
+            ]
+          ],
+          [
+            "vocal",
+            [
+              "Vocal One-Shot",
+              "Vocal Loop"
+            ]
+          ],
+          [
+            "fx",
+            [
+              "SFX",
+              "Riser",
+              "Impact"
+            ]
+          ],
+          [
+            "sustain",
+            [
+              "Pad",
+              "Atmosphere",
+              "Weather/Nature Atmos"
+            ]
+          ],
+          [
+            "fill",
+            [
+              "Drum Fill"
+            ]
+          ],
+          [
+            "more",
+            [
+              "Synth Loop",
+              "Bass Hit"
+            ]
+          ]
+        ],
+        "perc_subtypes": [
+          "Tom",
+          "Shaker/Tambourine",
+          "Hand Drum",
+          "Other Percussive Hit",
+          "Unsure"
+        ],
+        "reject_reasons": [
+          "unsupported instrument",
+          "mixed/full music",
+          "noise or texture",
+          "ambiguous",
+          "corrupt or unusable",
+          "other"
+        ],
+        "note_classes": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap",
+          "Not enough info"
+        ],
+        "note_required": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap"
+        ]
+      },
+      "error": null
+    },
+    {
+      "port": 8753,
+      "reachable": true,
+      "meta": {
+        "classes": [
+          "Kick",
+          "Snare",
+          "Rimshot",
+          "Hi-Hat",
+          "Crash",
+          "Clap",
+          "Percussion",
+          "Foley",
+          "Kick Loop",
+          "Snare Loop",
+          "Drum Loop",
+          "Top Loop",
+          "Hi-Hat Loop",
+          "Percussion Loop",
+          "Bass Loop",
+          "Foley Loop",
+          "Loop",
+          "Chord Loop",
+          "Other/none",
+          "Misc/Review",
+          "Bass Reese",
+          "Synth One-Shot",
+          "Vocal One-Shot",
+          "Vocal Loop",
+          "SFX",
+          "Riser",
+          "Impact",
+          "Pad",
+          "Atmosphere",
+          "Weather/Nature Atmos",
+          "Drum Fill",
+          "Synth Loop",
+          "Bass Hit"
+        ],
+        "total": 400,
+        "done": 0,
+        "groups": [
+          [
+            "one-shot",
+            [
+              "Kick",
+              "Snare",
+              "Rimshot",
+              "Hi-Hat",
+              "Crash",
+              "Clap",
+              "Percussion",
+              "Foley"
+            ]
+          ],
+          [
+            "loop",
+            [
+              "Kick Loop",
+              "Snare Loop",
+              "Drum Loop",
+              "Top Loop",
+              "Hi-Hat Loop",
+              "Percussion Loop",
+              "Bass Loop",
+              "Foley Loop",
+              "Loop",
+              "Chord Loop"
+            ]
+          ],
+          [
+            "none",
+            [
+              "Other/none",
+              "Misc/Review"
+            ]
+          ],
+          [
+            "tonal",
+            [
+              "Bass Reese",
+              "Synth One-Shot"
+            ]
+          ],
+          [
+            "vocal",
+            [
+              "Vocal One-Shot",
+              "Vocal Loop"
+            ]
+          ],
+          [
+            "fx",
+            [
+              "SFX",
+              "Riser",
+              "Impact"
+            ]
+          ],
+          [
+            "sustain",
+            [
+              "Pad",
+              "Atmosphere",
+              "Weather/Nature Atmos"
+            ]
+          ],
+          [
+            "fill",
+            [
+              "Drum Fill"
+            ]
+          ],
+          [
+            "more",
+            [
+              "Synth Loop",
+              "Bass Hit"
+            ]
+          ]
+        ],
+        "perc_subtypes": [
+          "Tom",
+          "Shaker/Tambourine",
+          "Hand Drum",
+          "Other Percussive Hit",
+          "Unsure"
+        ],
+        "reject_reasons": [
+          "unsupported instrument",
+          "mixed/full music",
+          "noise or texture",
+          "ambiguous",
+          "corrupt or unusable",
+          "other"
+        ],
+        "note_classes": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap",
+          "Not enough info"
+        ],
+        "note_required": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap"
+        ]
+      },
+      "error": null
+    },
+    {
+      "port": 8754,
+      "reachable": true,
+      "meta": {
+        "classes": [
+          "Kick",
+          "Snare",
+          "Rimshot",
+          "Hi-Hat",
+          "Crash",
+          "Clap",
+          "Percussion",
+          "Foley",
+          "Kick Loop",
+          "Snare Loop",
+          "Drum Loop",
+          "Top Loop",
+          "Hi-Hat Loop",
+          "Percussion Loop",
+          "Bass Loop",
+          "Foley Loop",
+          "Loop",
+          "Chord Loop",
+          "Other/none",
+          "Misc/Review",
+          "Bass Reese",
+          "Synth One-Shot",
+          "Vocal One-Shot",
+          "Vocal Loop",
+          "SFX",
+          "Riser",
+          "Impact",
+          "Pad",
+          "Atmosphere",
+          "Weather/Nature Atmos",
+          "Drum Fill",
+          "Synth Loop",
+          "Bass Hit"
+        ],
+        "total": 400,
+        "done": 2,
+        "groups": [
+          [
+            "one-shot",
+            [
+              "Kick",
+              "Snare",
+              "Rimshot",
+              "Hi-Hat",
+              "Crash",
+              "Clap",
+              "Percussion",
+              "Foley"
+            ]
+          ],
+          [
+            "loop",
+            [
+              "Kick Loop",
+              "Snare Loop",
+              "Drum Loop",
+              "Top Loop",
+              "Hi-Hat Loop",
+              "Percussion Loop",
+              "Bass Loop",
+              "Foley Loop",
+              "Loop",
+              "Chord Loop"
+            ]
+          ],
+          [
+            "none",
+            [
+              "Other/none",
+              "Misc/Review"
+            ]
+          ],
+          [
+            "tonal",
+            [
+              "Bass Reese",
+              "Synth One-Shot"
+            ]
+          ],
+          [
+            "vocal",
+            [
+              "Vocal One-Shot",
+              "Vocal Loop"
+            ]
+          ],
+          [
+            "fx",
+            [
+              "SFX",
+              "Riser",
+              "Impact"
+            ]
+          ],
+          [
+            "sustain",
+            [
+              "Pad",
+              "Atmosphere",
+              "Weather/Nature Atmos"
+            ]
+          ],
+          [
+            "fill",
+            [
+              "Drum Fill"
+            ]
+          ],
+          [
+            "more",
+            [
+              "Synth Loop",
+              "Bass Hit"
+            ]
+          ]
+        ],
+        "perc_subtypes": [
+          "Tom",
+          "Shaker/Tambourine",
+          "Hand Drum",
+          "Other Percussive Hit",
+          "Unsure"
+        ],
+        "reject_reasons": [
+          "unsupported instrument",
+          "mixed/full music",
+          "noise or texture",
+          "ambiguous",
+          "corrupt or unusable",
+          "other"
+        ],
+        "note_classes": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap",
+          "Not enough info"
+        ],
+        "note_required": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap"
+        ]
+      },
+      "error": null
+    },
+    {
+      "port": 8770,
+      "reachable": true,
+      "meta": {
+        "classes": [
+          "Kick",
+          "Snare",
+          "Rimshot",
+          "Clap",
+          "Hi-Hat",
+          "Crash",
+          "Tom",
+          "Shaker/Tambourine",
+          "Hand Drum",
+          "Other Percussive Hit",
+          "Drum Loop",
+          "Percussion Loop",
+          "Hi-Hat Loop",
+          "Top Loop",
+          "Bass Loop",
+          "Synth Loop",
+          "Vocal Loop",
+          "808",
+          "Bass Hit",
+          "Sub Bass",
+          "Reese Bass",
+          "Synth Bass Sustained",
+          "Synth One-Shot",
+          "Pad",
+          "Vocal One-Shot",
+          "Foley",
+          "Impact",
+          "SFX",
+          "Riser",
+          "Atmosphere",
+          "Other/none",
+          "Not in list",
+          "Not enough info",
+          "Taxonomy gap",
+          "Unknown"
+        ],
+        "total": 51,
+        "done": 51,
+        "groups": [
+          [
+            "drum one-shot",
+            [
+              "Kick",
+              "Snare",
+              "Rimshot",
+              "Clap",
+              "Hi-Hat",
+              "Crash"
+            ]
+          ],
+          [
+            "perc one-shot",
+            [
+              "Tom",
+              "Shaker/Tambourine",
+              "Hand Drum",
+              "Other Percussive Hit"
+            ]
+          ],
+          [
+            "loop",
+            [
+              "Drum Loop",
+              "Percussion Loop",
+              "Hi-Hat Loop",
+              "Top Loop",
+              "Bass Loop",
+              "Synth Loop",
+              "Vocal Loop"
+            ]
+          ],
+          [
+            "bass",
+            [
+              "808",
+              "Bass Hit",
+              "Sub Bass",
+              "Reese Bass",
+              "Synth Bass Sustained"
+            ]
+          ],
+          [
+            "tonal",
+            [
+              "Synth One-Shot",
+              "Pad",
+              "Vocal One-Shot"
+            ]
+          ],
+          [
+            "fx",
+            [
+              "Foley",
+              "Impact",
+              "SFX",
+              "Riser",
+              "Atmosphere"
+            ]
+          ],
+          [
+            "none",
+            [
+              "Other/none",
+              "Not in list",
+              "Not enough info",
+              "Taxonomy gap",
+              "Unknown"
+            ]
+          ]
+        ],
+        "perc_subtypes": [
+          "Tom",
+          "Shaker/Tambourine",
+          "Hand Drum",
+          "Other Percussive Hit",
+          "Unsure"
+        ],
+        "reject_reasons": [
+          "unsupported instrument",
+          "mixed/full music",
+          "noise or texture",
+          "ambiguous",
+          "corrupt or unusable",
+          "other"
+        ],
+        "note_classes": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap",
+          "Not enough info"
+        ],
+        "note_required": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap"
+        ]
+      },
+      "error": null
+    },
+    {
+      "port": 8771,
+      "reachable": true,
+      "meta": {
+        "classes": [
+          "Kick",
+          "Snare",
+          "Rimshot",
+          "Hi-Hat",
+          "Crash",
+          "Clap",
+          "Percussion",
+          "Foley",
+          "Kick Loop",
+          "Snare Loop",
+          "Drum Loop",
+          "Top Loop",
+          "Hi-Hat Loop",
+          "Percussion Loop",
+          "Bass Loop",
+          "Foley Loop",
+          "Loop",
+          "Chord Loop",
+          "Other/none",
+          "Misc/Review",
+          "Bass Reese",
+          "Synth One-Shot",
+          "Vocal One-Shot",
+          "Vocal Loop",
+          "SFX",
+          "Riser",
+          "Impact",
+          "Pad",
+          "Atmosphere",
+          "Weather/Nature Atmos",
+          "Drum Fill",
+          "Synth Loop",
+          "Bass Hit"
+        ],
+        "total": 120,
+        "done": 0,
+        "groups": [
+          [
+            "one-shot",
+            [
+              "Kick",
+              "Snare",
+              "Rimshot",
+              "Hi-Hat",
+              "Crash",
+              "Clap",
+              "Percussion",
+              "Foley"
+            ]
+          ],
+          [
+            "loop",
+            [
+              "Kick Loop",
+              "Snare Loop",
+              "Drum Loop",
+              "Top Loop",
+              "Hi-Hat Loop",
+              "Percussion Loop",
+              "Bass Loop",
+              "Foley Loop",
+              "Loop",
+              "Chord Loop"
+            ]
+          ],
+          [
+            "none",
+            [
+              "Other/none",
+              "Misc/Review"
+            ]
+          ],
+          [
+            "tonal",
+            [
+              "Bass Reese",
+              "Synth One-Shot"
+            ]
+          ],
+          [
+            "vocal",
+            [
+              "Vocal One-Shot",
+              "Vocal Loop"
+            ]
+          ],
+          [
+            "fx",
+            [
+              "SFX",
+              "Riser",
+              "Impact"
+            ]
+          ],
+          [
+            "sustain",
+            [
+              "Pad",
+              "Atmosphere",
+              "Weather/Nature Atmos"
+            ]
+          ],
+          [
+            "fill",
+            [
+              "Drum Fill"
+            ]
+          ],
+          [
+            "more",
+            [
+              "Synth Loop",
+              "Bass Hit"
+            ]
+          ]
+        ],
+        "perc_subtypes": [
+          "Tom",
+          "Shaker/Tambourine",
+          "Hand Drum",
+          "Other Percussive Hit",
+          "Unsure"
+        ],
+        "reject_reasons": [
+          "unsupported instrument",
+          "mixed/full music",
+          "noise or texture",
+          "ambiguous",
+          "corrupt or unusable",
+          "other"
+        ],
+        "note_classes": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap",
+          "Not enough info"
+        ],
+        "note_required": [
+          "Unknown",
+          "Not in list",
+          "Taxonomy gap"
+        ]
+      },
+      "error": null
+    }
+  ],
+  "summary": {
+    "n_servers": 6,
+    "n_reachable": 6,
+    "total_queued": 1771,
+    "total_done": 53
+  },
+  "safety": {
+    "read_only": true,
+    "servers_restarted": false,
+    "labels_modified": false,
+    "source_audio_modified": false
+  }
+}

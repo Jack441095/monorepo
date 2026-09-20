@@ -1,0 +1,15 @@
+name: "New Client Onboarding"
+description: "Full onboarding flow for a new client: create record, project, and welcome email"
+triggers:
+  phrase: "onboard *"
+  patterns:
+    - "onboard (?:a|the|new)? client"
+    - "new client onboarding"
+    - "register (?:a|new)? client"
+requires:
+  - client_name
+steps:
+  - service: "admin_agent"
+  - service: "admin_agent"
+  - service: "marketing_agent"
+  - say: "Client onboarded. Welcome email drafted for approval."

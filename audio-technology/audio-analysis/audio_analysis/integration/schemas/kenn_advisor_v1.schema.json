@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://audio-too.local/schemas/kenn_advisor_v1.schema.json",
+  "title": "Audio Too KENN Advisor Proposal v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "source_plan_revision",
+    "model_version",
+    "prompt_version",
+    "correlation_id",
+    "operations"
+  ],
+  "properties": {
+    "schema": {"const": "audio-too.kenn-advisor/v1"},
+    "source_plan_revision": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "model_version": {"type": "string", "minLength": 1},
+    "prompt_version": {"type": "string", "minLength": 1},
+    "correlation_id": {"type": "string", "minLength": 1},
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/operation"}
+    }
+  },
+  "$defs": {
+    "baseOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stem_id",
+        "operation",
+        "value",
+        "unit",
+        "evidence_source_ids",
+        "confidence",
+        "reason"
+      ],
+      "properties": {
+        "stem_id": {"type": "string", "minLength": 1},
+        "operation": {"enum": ["gain_delta", "compressor_ratio", "eq_gain_delta"]},
+        "value": {"type": "number"},
+        "unit": {"enum": ["dB", "ratio"]},
+        "evidence_source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "confidence": {"type": "number", "minimum": 0.7, "maximum": 1},
+        "reason": {"type": "string", "minLength": 1},
+        "frequency_hz": {"type": "number", "minimum": 20, "maximum": 20000},
+        "q": {"type": "number", "minimum": 0.1, "maximum": 20},
+        "filter_type": {"enum": ["peaking", "low_shelf", "high_shelf"]}
+      }
+    },
+    "operation": {
+      "allOf": [
+        {"$ref": "#/$defs/baseOperation"},
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "operation": {"const": "gain_delta"},
+                "unit": {"const": "dB"},
+                "value": {"minimum": -3, "maximum": 3}
+              },
+              "not": {
+                "anyOf": [
+                  {"required": ["frequency_hz"]},
+                  {"required": ["q"]},
+                  {"required": ["filter_type"]}
+                ]
+              }
+            },
+            {
+              "properties": {
+                "operation": {"const": "compressor_ratio"},
+                "unit": {"const": "ratio"},
+                "value": {"minimum": 1, "maximum": 8}
+              },
+              "not": {
+                "anyOf": [
+                  {"required": ["frequency_hz"]},
+                  {"required": ["q"]},
+                  {"required": ["filter_type"]}
+                ]
+              }
+            },
+            {
+              "required": ["frequency_hz", "q", "filter_type"],
+              "properties": {
+                "operation": {"const": "eq_gain_delta"},
+                "unit": {"const": "dB"},
+                "value": {"minimum": -12, "maximum": 12}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

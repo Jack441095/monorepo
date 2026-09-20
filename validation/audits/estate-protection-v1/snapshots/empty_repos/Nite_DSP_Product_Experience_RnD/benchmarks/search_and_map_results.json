@@ -1,0 +1,278 @@
+{
+  "version": "px-slo-search-map-v1",
+  "environment": "Python synthetic proxy; deterministic random fixtures",
+  "seed": 20260822,
+  "repeats": 9,
+  "sizes": [
+    {
+      "sample_count": 500,
+      "search": [
+        {
+          "query": "kick",
+          "linear_matches": 156,
+          "indexed_matches": 156,
+          "linear_median_ms": 2.5443,
+          "indexed_median_ms": 0.0048,
+          "indexed_speedup": 526.45
+        },
+        {
+          "query": "dark",
+          "linear_matches": 142,
+          "indexed_matches": 142,
+          "linear_median_ms": 0.6015,
+          "indexed_median_ms": 0.0056,
+          "indexed_speedup": 106.93
+        },
+        {
+          "query": "vocal",
+          "linear_matches": 150,
+          "indexed_matches": 150,
+          "linear_median_ms": 0.6437,
+          "indexed_median_ms": 0.0054,
+          "indexed_speedup": 119.75
+        },
+        {
+          "query": "120",
+          "linear_matches": 154,
+          "indexed_matches": 153,
+          "linear_median_ms": 1.1001,
+          "indexed_median_ms": 0.0058,
+          "indexed_speedup": 188.6
+        },
+        {
+          "query": "texture",
+          "linear_matches": 163,
+          "indexed_matches": 163,
+          "linear_median_ms": 1.343,
+          "indexed_median_ms": 0.0071,
+          "indexed_speedup": 189.61
+        }
+      ],
+      "map": {
+        "viewport_area_fraction": 0.04,
+        "visible_points": 18,
+        "culled_visible_points": 18,
+        "full_scan_median_ms": 0.082,
+        "cell_cull_median_ms": 0.0095,
+        "cell_cull_speedup": 8.67
+      }
+    },
+    {
+      "sample_count": 2000,
+      "search": [
+        {
+          "query": "kick",
+          "linear_matches": 650,
+          "indexed_matches": 650,
+          "linear_median_ms": 3.2628,
+          "indexed_median_ms": 0.0271,
+          "indexed_speedup": 120.47
+        },
+        {
+          "query": "dark",
+          "linear_matches": 637,
+          "indexed_matches": 637,
+          "linear_median_ms": 3.762,
+          "indexed_median_ms": 0.0267,
+          "indexed_speedup": 140.86
+        },
+        {
+          "query": "vocal",
+          "linear_matches": 646,
+          "indexed_matches": 646,
+          "linear_median_ms": 14.3392,
+          "indexed_median_ms": 0.0949,
+          "indexed_speedup": 151.07
+        },
+        {
+          "query": "120",
+          "linear_matches": 594,
+          "indexed_matches": 586,
+          "linear_median_ms": 8.0433,
+          "indexed_median_ms": 0.0245,
+          "indexed_speedup": 327.75
+        },
+        {
+          "query": "texture",
+          "linear_matches": 594,
+          "indexed_matches": 594,
+          "linear_median_ms": 20.9093,
+          "indexed_median_ms": 0.0199,
+          "indexed_speedup": 1049.82
+        }
+      ],
+      "map": {
+        "viewport_area_fraction": 0.04,
+        "visible_points": 66,
+        "culled_visible_points": 66,
+        "full_scan_median_ms": 0.2742,
+        "cell_cull_median_ms": 0.0226,
+        "cell_cull_speedup": 12.12
+      }
+    },
+    {
+      "sample_count": 5000,
+      "search": [
+        {
+          "query": "kick",
+          "linear_matches": 1547,
+          "indexed_matches": 1547,
+          "linear_median_ms": 41.717,
+          "indexed_median_ms": 0.1029,
+          "indexed_speedup": 405.35
+        },
+        {
+          "query": "dark",
+          "linear_matches": 1606,
+          "indexed_matches": 1606,
+          "linear_median_ms": 17.3966,
+          "indexed_median_ms": 0.092,
+          "indexed_speedup": 189.09
+        },
+        {
+          "query": "vocal",
+          "linear_matches": 1592,
+          "indexed_matches": 1592,
+          "linear_median_ms": 23.8866,
+          "indexed_median_ms": 0.0922,
+          "indexed_speedup": 259.17
+        },
+        {
+          "query": "120",
+          "linear_matches": 1594,
+          "indexed_matches": 1581,
+          "linear_median_ms": 23.8583,
+          "indexed_median_ms": 0.3908,
+          "indexed_speedup": 61.04
+        },
+        {
+          "query": "texture",
+          "linear_matches": 1556,
+          "indexed_matches": 1556,
+          "linear_median_ms": 33.0074,
+          "indexed_median_ms": 0.0784,
+          "indexed_speedup": 421.15
+        }
+      ],
+      "map": {
+        "viewport_area_fraction": 0.04,
+        "visible_points": 184,
+        "culled_visible_points": 184,
+        "full_scan_median_ms": 0.782,
+        "cell_cull_median_ms": 0.0491,
+        "cell_cull_speedup": 15.93
+      }
+    },
+    {
+      "sample_count": 10000,
+      "search": [
+        {
+          "query": "kick",
+          "linear_matches": 3180,
+          "indexed_matches": 3180,
+          "linear_median_ms": 67.4881,
+          "indexed_median_ms": 0.1993,
+          "indexed_speedup": 338.71
+        },
+        {
+          "query": "dark",
+          "linear_matches": 3108,
+          "indexed_matches": 3108,
+          "linear_median_ms": 52.3102,
+          "indexed_median_ms": 0.1619,
+          "indexed_speedup": 323.15
+        },
+        {
+          "query": "vocal",
+          "linear_matches": 3107,
+          "indexed_matches": 3107,
+          "linear_median_ms": 60.4952,
+          "indexed_median_ms": 0.2752,
+          "indexed_speedup": 219.78
+        },
+        {
+          "query": "120",
+          "linear_matches": 3210,
+          "indexed_matches": 3196,
+          "linear_median_ms": 46.7154,
+          "indexed_median_ms": 0.193,
+          "indexed_speedup": 242.1
+        },
+        {
+          "query": "texture",
+          "linear_matches": 3103,
+          "indexed_matches": 3103,
+          "linear_median_ms": 46.2696,
+          "indexed_median_ms": 0.1844,
+          "indexed_speedup": 250.9
+        }
+      ],
+      "map": {
+        "viewport_area_fraction": 0.04,
+        "visible_points": 415,
+        "culled_visible_points": 415,
+        "full_scan_median_ms": 1.5807,
+        "cell_cull_median_ms": 0.114,
+        "cell_cull_speedup": 13.86
+      }
+    },
+    {
+      "sample_count": 25000,
+      "search": [
+        {
+          "query": "kick",
+          "linear_matches": 7728,
+          "indexed_matches": 7728,
+          "linear_median_ms": 147.4958,
+          "indexed_median_ms": 0.7186,
+          "indexed_speedup": 205.25
+        },
+        {
+          "query": "dark",
+          "linear_matches": 7930,
+          "indexed_matches": 7930,
+          "linear_median_ms": 143.7438,
+          "indexed_median_ms": 0.6728,
+          "indexed_speedup": 213.65
+        },
+        {
+          "query": "vocal",
+          "linear_matches": 7767,
+          "indexed_matches": 7767,
+          "linear_median_ms": 131.9497,
+          "indexed_median_ms": 0.804,
+          "indexed_speedup": 164.12
+        },
+        {
+          "query": "120",
+          "linear_matches": 7859,
+          "indexed_matches": 7765,
+          "linear_median_ms": 184.5267,
+          "indexed_median_ms": 1.8196,
+          "indexed_speedup": 101.41
+        },
+        {
+          "query": "texture",
+          "linear_matches": 7765,
+          "indexed_matches": 7765,
+          "linear_median_ms": 241.9812,
+          "indexed_median_ms": 6.4816,
+          "indexed_speedup": 37.33
+        }
+      ],
+      "map": {
+        "viewport_area_fraction": 0.04,
+        "visible_points": 978,
+        "culled_visible_points": 978,
+        "full_scan_median_ms": 11.9241,
+        "cell_cull_median_ms": 0.3452,
+        "cell_cull_speedup": 34.55
+      }
+    }
+  ],
+  "limitations": [
+    "Does not invoke JUCE, the production HNSW index, or the production QuadTree.",
+    "Indexed search uses exact tokens and therefore is not behaviorally identical to substring search.",
+    "Use results for architecture direction only; validate with a production-shaped fixture before promotion."
+  ]
+}

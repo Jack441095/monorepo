@@ -1,0 +1,1271 @@
+{
+  "assistant_task_completed": true,
+  "changed": false,
+  "events": [
+    {
+      "context": {
+        "available_actions": [
+          "create_live_proposal",
+          "inspect_device_capabilities",
+          "inspect_live"
+        ],
+        "schema": "kenn.session_context.v1",
+        "session_id": "local-live-assistant-qualification-v5",
+        "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+        "track_count": 4,
+        "transport_status": "connected"
+      },
+      "stage": "initial_context"
+    },
+    {
+      "result": {
+        "execution_authorized": false,
+        "next_step": {
+          "action": "inspect_live",
+          "execution_authorized": false,
+          "expected_evidence": [
+            "fresh Live snapshot"
+          ],
+          "kind": "inspection",
+          "mode": "inspect",
+          "objective": "Inspect track 3 in the selected disposable set to gather current state information.",
+          "ok": true,
+          "rationale": "To prepare for the volume adjustment, it is necessary to inspect the current state of track 3 to ensure the adjustment is applied correctly and safely.",
+          "reason": "",
+          "schema": "kenn.assistant_next_step.v1",
+          "session_id": "local-live-assistant-qualification-v5",
+          "step_id": "step-1",
+          "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+          "task_status": "active"
+        },
+        "ok": true,
+        "planner_source": "model_sketch",
+        "planning_latency_ms": 10186.714,
+        "schema": "kenn.planned_assistant_task.v1",
+        "task": {
+          "completed_step_ids": [],
+          "context_binding": {
+            "audio_classification": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "audition": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "generation": {
+              "identified": {},
+              "unidentified": []
+            },
+            "live": "sha256:410e2ef98649e02346816a273e7b6153048cece3080da7e9f3daf4ec74355f04",
+            "measurements": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "offline": {
+              "identified": {},
+              "unidentified": []
+            },
+            "profile": "sha256:1a094c79e6431ac6c83098f5e1e00d0a94aedb58ffde0d5763d7de49ba2854de",
+            "schema": "kenn.assistant_context_binding.v1",
+            "services": "sha256:1486babaa17aafd8dbcbdff764925124a6ba9fe0fef317c38f49c6d1dc904ba9",
+            "session_id": "local-live-assistant-qualification-v5"
+          },
+          "context_rebindings": [],
+          "created_at": "2026-09-09T08:11:42.804Z",
+          "current_step_id": "step-1",
+          "evidence": [],
+          "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+          "plan": {
+            "assumptions": [],
+            "created_at": "2026-09-09T08:11:42.801Z",
+            "execution_authorized": false,
+            "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+            "model_id": "Qwen3-4B-input-bound-v6",
+            "model_provider": "transformers",
+            "schema": "kenn.deliberative_plan.v1",
+            "session_id": "local-live-assistant-qualification-v5",
+            "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+            "status": "ready",
+            "steps": [
+              {
+                "action": "inspect_live",
+                "confirmation_required": false,
+                "depends_on": [],
+                "expected_evidence": [
+                  "fresh Live snapshot"
+                ],
+                "kind": "inspection",
+                "mutating": false,
+                "objective": "Inspect track 3 in the selected disposable set to gather current state information.",
+                "rationale": "To prepare for the volume adjustment, it is necessary to inspect the current state of track 3 to ensure the adjustment is applied correctly and safely.",
+                "schema": "kenn.deliberative_step.v1",
+                "step_id": "step-1"
+              },
+              {
+                "action": "create_live_proposal",
+                "confirmation_required": true,
+                "depends_on": [
+                  "step-1"
+                ],
+                "expected_evidence": [
+                  "typed confirmation-gated proposal"
+                ],
+                "kind": "live_proposal",
+                "mutating": true,
+                "objective": "Prepare the requested reversible volume adjustment for track 3.",
+                "rationale": "Once the current state of track 3 is known, a reversible volume adjustment can be proposed and applied to the track.",
+                "schema": "kenn.deliberative_step.v1",
+                "step_id": "step-2"
+              }
+            ],
+            "unknowns": []
+          },
+          "schema": "kenn.assistant_task.v1",
+          "session_id": "local-live-assistant-qualification-v5",
+          "status": "active",
+          "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+          "updated_at": "2026-09-09T08:11:42.804Z"
+        }
+      },
+      "stage": "planned"
+    },
+    {
+      "result": {
+        "completed_step": true,
+        "next_step": {
+          "action": "create_live_proposal",
+          "execution_authorized": false,
+          "expected_evidence": [
+            "typed confirmation-gated proposal"
+          ],
+          "kind": "live_proposal",
+          "mode": "prepare_live_proposal",
+          "objective": "Prepare the requested reversible volume adjustment for track 3.",
+          "ok": true,
+          "rationale": "Once the current state of track 3 is known, a reversible volume adjustment can be proposed and applied to the track.",
+          "reason": "",
+          "schema": "kenn.assistant_next_step.v1",
+          "session_id": "local-live-assistant-qualification-v5",
+          "step_id": "step-2",
+          "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+          "task_status": "active"
+        },
+        "ok": true,
+        "task": {
+          "completed_step_ids": [
+            "step-1"
+          ],
+          "context_binding": {
+            "audio_classification": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "audition": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "generation": {
+              "identified": {},
+              "unidentified": []
+            },
+            "live": "sha256:410e2ef98649e02346816a273e7b6153048cece3080da7e9f3daf4ec74355f04",
+            "measurements": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "offline": {
+              "identified": {},
+              "unidentified": []
+            },
+            "profile": "sha256:1a094c79e6431ac6c83098f5e1e00d0a94aedb58ffde0d5763d7de49ba2854de",
+            "schema": "kenn.assistant_context_binding.v1",
+            "services": "sha256:1486babaa17aafd8dbcbdff764925124a6ba9fe0fef317c38f49c6d1dc904ba9",
+            "session_id": "local-live-assistant-qualification-v5"
+          },
+          "context_rebindings": [],
+          "created_at": "2026-09-09T08:11:42.804Z",
+          "current_step_id": "step-2",
+          "evidence": [
+            {
+              "evidence_schema": "kenn.session_context.v1",
+              "recorded_at": "2026-09-09T08:11:44.235Z",
+              "schema": "kenn.assistant_step_evidence.v1",
+              "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+              "step_id": "step-1"
+            }
+          ],
+          "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+          "plan": {
+            "assumptions": [],
+            "created_at": "2026-09-09T08:11:42.801Z",
+            "execution_authorized": false,
+            "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+            "model_id": "Qwen3-4B-input-bound-v6",
+            "model_provider": "transformers",
+            "schema": "kenn.deliberative_plan.v1",
+            "session_id": "local-live-assistant-qualification-v5",
+            "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+            "status": "ready",
+            "steps": [
+              {
+                "action": "inspect_live",
+                "confirmation_required": false,
+                "depends_on": [],
+                "expected_evidence": [
+                  "fresh Live snapshot"
+                ],
+                "kind": "inspection",
+                "mutating": false,
+                "objective": "Inspect track 3 in the selected disposable set to gather current state information.",
+                "rationale": "To prepare for the volume adjustment, it is necessary to inspect the current state of track 3 to ensure the adjustment is applied correctly and safely.",
+                "schema": "kenn.deliberative_step.v1",
+                "step_id": "step-1"
+              },
+              {
+                "action": "create_live_proposal",
+                "confirmation_required": true,
+                "depends_on": [
+                  "step-1"
+                ],
+                "expected_evidence": [
+                  "typed confirmation-gated proposal"
+                ],
+                "kind": "live_proposal",
+                "mutating": true,
+                "objective": "Prepare the requested reversible volume adjustment for track 3.",
+                "rationale": "Once the current state of track 3 is known, a reversible volume adjustment can be proposed and applied to the track.",
+                "schema": "kenn.deliberative_step.v1",
+                "step_id": "step-2"
+              }
+            ],
+            "unknowns": []
+          },
+          "schema": "kenn.assistant_task.v1",
+          "session_id": "local-live-assistant-qualification-v5",
+          "status": "active",
+          "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+          "updated_at": "2026-09-09T08:11:44.235Z"
+        }
+      },
+      "stage": "observed"
+    },
+    {
+      "result": {
+        "answer": "I can set volume on '3-Audio' from 0.85 normalized to 0.794 normalized. Nothing has changed. Confirm this exact proposal to apply it.",
+        "assistant_task": {
+          "completed_step": false,
+          "next_step": {
+            "action": "create_live_proposal",
+            "execution_authorized": false,
+            "expected_evidence": [
+              "typed confirmation-gated proposal"
+            ],
+            "kind": "live_proposal",
+            "mode": "wait_for_confirmation",
+            "objective": "Prepare the requested reversible volume adjustment for track 3.",
+            "ok": true,
+            "rationale": "Once the current state of track 3 is known, a reversible volume adjustment can be proposed and applied to the track.",
+            "reason": "",
+            "schema": "kenn.assistant_next_step.v1",
+            "session_id": "local-live-assistant-qualification-v5",
+            "step_id": "step-2",
+            "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+            "task_status": "waiting_for_confirmation"
+          },
+          "ok": true,
+          "task": {
+            "completed_step_ids": [
+              "step-1"
+            ],
+            "context_binding": {
+              "audio_classification": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "audition": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "generation": {
+                "identified": {},
+                "unidentified": []
+              },
+              "live": "sha256:410e2ef98649e02346816a273e7b6153048cece3080da7e9f3daf4ec74355f04",
+              "measurements": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "offline": {
+                "identified": {},
+                "unidentified": []
+              },
+              "profile": "sha256:1a094c79e6431ac6c83098f5e1e00d0a94aedb58ffde0d5763d7de49ba2854de",
+              "schema": "kenn.assistant_context_binding.v1",
+              "services": "sha256:1486babaa17aafd8dbcbdff764925124a6ba9fe0fef317c38f49c6d1dc904ba9",
+              "session_id": "local-live-assistant-qualification-v5"
+            },
+            "context_rebindings": [],
+            "created_at": "2026-09-09T08:11:42.804Z",
+            "current_step_id": "step-2",
+            "evidence": [
+              {
+                "evidence_schema": "kenn.session_context.v1",
+                "recorded_at": "2026-09-09T08:11:44.235Z",
+                "schema": "kenn.assistant_step_evidence.v1",
+                "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+                "step_id": "step-1"
+              },
+              {
+                "action": "set_volume",
+                "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+                "evidence_schema": "kenn.ableton_action_proposal.v1",
+                "progress_only": true,
+                "recorded_at": "2026-09-09T08:11:45.966Z",
+                "schema": "kenn.assistant_step_evidence.v1",
+                "status": "confirmation_required",
+                "step_id": "step-2"
+              }
+            ],
+            "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+            "plan": {
+              "assumptions": [],
+              "created_at": "2026-09-09T08:11:42.801Z",
+              "execution_authorized": false,
+              "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+              "model_id": "Qwen3-4B-input-bound-v6",
+              "model_provider": "transformers",
+              "schema": "kenn.deliberative_plan.v1",
+              "session_id": "local-live-assistant-qualification-v5",
+              "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+              "status": "ready",
+              "steps": [
+                {
+                  "action": "inspect_live",
+                  "confirmation_required": false,
+                  "depends_on": [],
+                  "expected_evidence": [
+                    "fresh Live snapshot"
+                  ],
+                  "kind": "inspection",
+                  "mutating": false,
+                  "objective": "Inspect track 3 in the selected disposable set to gather current state information.",
+                  "rationale": "To prepare for the volume adjustment, it is necessary to inspect the current state of track 3 to ensure the adjustment is applied correctly and safely.",
+                  "schema": "kenn.deliberative_step.v1",
+                  "step_id": "step-1"
+                },
+                {
+                  "action": "create_live_proposal",
+                  "confirmation_required": true,
+                  "depends_on": [
+                    "step-1"
+                  ],
+                  "expected_evidence": [
+                    "typed confirmation-gated proposal"
+                  ],
+                  "kind": "live_proposal",
+                  "mutating": true,
+                  "objective": "Prepare the requested reversible volume adjustment for track 3.",
+                  "rationale": "Once the current state of track 3 is known, a reversible volume adjustment can be proposed and applied to the track.",
+                  "schema": "kenn.deliberative_step.v1",
+                  "step_id": "step-2"
+                }
+              ],
+              "unknowns": []
+            },
+            "schema": "kenn.assistant_task.v1",
+            "session_id": "local-live-assistant-qualification-v5",
+            "status": "waiting_for_confirmation",
+            "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+            "updated_at": "2026-09-09T08:11:45.966Z"
+          }
+        },
+        "changed": false,
+        "command": "Set the volume on track 3 to -2 dB",
+        "confirmation_required": true,
+        "intent": {
+          "action": "set_volume",
+          "parameter": "volume",
+          "track": "3-Audio"
+        },
+        "lifecycle": {
+          "elapsed_ms": 589.4,
+          "observed_at": 1788941504.8286898,
+          "snapshot_age_ms": 0.0,
+          "snapshot_elapsed_ms": 283.1,
+          "snapshot_kind": "topology",
+          "snapshot_observed_at": 1788941504.5224352,
+          "stage": "proposal_ready",
+          "started_at": 1788941504.2393348,
+          "target": {
+            "device_name": "",
+            "parameter": "volume",
+            "track_name": "3-Audio"
+          }
+        },
+        "llm": {
+          "reason": "KENN_LIVE_LLM_ENABLED is not enabled.",
+          "status": "disabled"
+        },
+        "planner": "deterministic_snapshot_boundary",
+        "proposal": {
+          "action": "set_volume",
+          "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+          "after": 0.7943282347242815,
+          "before": 0.8500000238418579,
+          "confidence": 1.0,
+          "confirmation_meta": {
+            "expires_at": 1788941804,
+            "nonce": "229798e0",
+            "service_id": "ableton_action",
+            "text": "set_volume|2|3-Audio|0.8500000238418579|0.7943282347242815|f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225"
+          },
+          "evidence": [
+            "Current Live snapshot value: volume=0.8500000238418579.",
+            "Target identity: track 2 '3-Audio'."
+          ],
+          "operation": "set_volume",
+          "parameter": "volume",
+          "reason": "Explicit user request for set_volume on track '3-Audio'.",
+          "requires_confirmation": true,
+          "risk": "local_mutation",
+          "schema": "kenn.ableton_action_proposal.v1",
+          "session_version": "f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225",
+          "snapshot_exchange": {
+            "address": "batch",
+            "request_id": null,
+            "response_address": "/live/track/get/num_devices",
+            "response_id": null,
+            "response_ok": true,
+            "round_trip_ms": 105.443,
+            "transport": "abletonosc"
+          },
+          "target": "ableton_track",
+          "timestamp": 1788941504.827901,
+          "track_index": 2,
+          "track_name": "3-Audio",
+          "unit": "normalized",
+          "valid_range": [
+            0.0,
+            1.0
+          ]
+        },
+        "proposal_kind": "track",
+        "route": "ableton_command",
+        "schema": "kenn.ableton_command.v1",
+        "session_id": "local-live-assistant-qualification-v5",
+        "status": "confirmation_required"
+      },
+      "stage": "proposal"
+    },
+    {
+      "result": {
+        "answer": "Live change applied and verified.",
+        "assistant_task": {
+          "completed_step": true,
+          "next_step": {
+            "action": "",
+            "execution_authorized": false,
+            "expected_evidence": [],
+            "kind": "",
+            "mode": "complete",
+            "objective": "",
+            "ok": true,
+            "rationale": "",
+            "reason": "Task is completed.",
+            "schema": "kenn.assistant_next_step.v1",
+            "session_id": "local-live-assistant-qualification-v5",
+            "step_id": "",
+            "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+            "task_status": "completed"
+          },
+          "ok": true,
+          "task": {
+            "completed_step_ids": [
+              "step-1",
+              "step-2"
+            ],
+            "context_binding": {
+              "audio_classification": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "audition": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "generation": {
+                "identified": {},
+                "unidentified": []
+              },
+              "live": "sha256:410e2ef98649e02346816a273e7b6153048cece3080da7e9f3daf4ec74355f04",
+              "measurements": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "offline": {
+                "identified": {},
+                "unidentified": []
+              },
+              "profile": "sha256:1a094c79e6431ac6c83098f5e1e00d0a94aedb58ffde0d5763d7de49ba2854de",
+              "schema": "kenn.assistant_context_binding.v1",
+              "services": "sha256:1486babaa17aafd8dbcbdff764925124a6ba9fe0fef317c38f49c6d1dc904ba9",
+              "session_id": "local-live-assistant-qualification-v5"
+            },
+            "context_rebindings": [],
+            "created_at": "2026-09-09T08:11:42.804Z",
+            "current_step_id": "",
+            "evidence": [
+              {
+                "evidence_schema": "kenn.session_context.v1",
+                "recorded_at": "2026-09-09T08:11:44.235Z",
+                "schema": "kenn.assistant_step_evidence.v1",
+                "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+                "step_id": "step-1"
+              },
+              {
+                "action": "set_volume",
+                "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+                "evidence_schema": "kenn.ableton_action_proposal.v1",
+                "progress_only": true,
+                "recorded_at": "2026-09-09T08:11:45.966Z",
+                "schema": "kenn.assistant_step_evidence.v1",
+                "status": "confirmation_required",
+                "step_id": "step-2"
+              },
+              {
+                "action": "set_volume",
+                "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+                "evidence_schema": "kenn.ableton_action_receipt.v1",
+                "receipt_id": "receipt-0a732e91121a46c6bb0f11d28b79c3f8",
+                "recorded_at": "2026-09-09T08:11:48.108Z",
+                "schema": "kenn.assistant_step_evidence.v1",
+                "status": "applied",
+                "step_id": "step-2",
+                "verified": true
+              }
+            ],
+            "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+            "plan": {
+              "assumptions": [],
+              "created_at": "2026-09-09T08:11:42.801Z",
+              "execution_authorized": false,
+              "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+              "model_id": "Qwen3-4B-input-bound-v6",
+              "model_provider": "transformers",
+              "schema": "kenn.deliberative_plan.v1",
+              "session_id": "local-live-assistant-qualification-v5",
+              "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+              "status": "ready",
+              "steps": [
+                {
+                  "action": "inspect_live",
+                  "confirmation_required": false,
+                  "depends_on": [],
+                  "expected_evidence": [
+                    "fresh Live snapshot"
+                  ],
+                  "kind": "inspection",
+                  "mutating": false,
+                  "objective": "Inspect track 3 in the selected disposable set to gather current state information.",
+                  "rationale": "To prepare for the volume adjustment, it is necessary to inspect the current state of track 3 to ensure the adjustment is applied correctly and safely.",
+                  "schema": "kenn.deliberative_step.v1",
+                  "step_id": "step-1"
+                },
+                {
+                  "action": "create_live_proposal",
+                  "confirmation_required": true,
+                  "depends_on": [
+                    "step-1"
+                  ],
+                  "expected_evidence": [
+                    "typed confirmation-gated proposal"
+                  ],
+                  "kind": "live_proposal",
+                  "mutating": true,
+                  "objective": "Prepare the requested reversible volume adjustment for track 3.",
+                  "rationale": "Once the current state of track 3 is known, a reversible volume adjustment can be proposed and applied to the track.",
+                  "schema": "kenn.deliberative_step.v1",
+                  "step_id": "step-2"
+                }
+              ],
+              "unknowns": []
+            },
+            "schema": "kenn.assistant_task.v1",
+            "session_id": "local-live-assistant-qualification-v5",
+            "status": "completed",
+            "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+            "updated_at": "2026-09-09T08:11:48.108Z"
+          }
+        },
+        "changed": true,
+        "command": "apply confirmed KENN Live proposal",
+        "confirmation_required": false,
+        "execution": {
+          "ok": true,
+          "receipt": {
+            "action": "set_volume",
+            "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+            "before": 0.8500000238418579,
+            "correlation_id": "corr-d79dd45e215a4f28afbefb7b39e478d7",
+            "idempotency_key": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+            "readback": 0.7943282127380371,
+            "readback_exchange": {
+              "address": "batch",
+              "request_id": null,
+              "response_address": "/live/track/get/num_devices",
+              "response_id": null,
+              "response_ok": true,
+              "round_trip_ms": 116.11,
+              "transport": "abletonosc"
+            },
+            "receipt_id": "receipt-0a732e91121a46c6bb0f11d28b79c3f8",
+            "requested": 0.7943282347242815,
+            "retry_safe": "safe",
+            "schema": "kenn.ableton_action_receipt.v1",
+            "stage_timings_ms": {
+              "readback": 309.854,
+              "snapshot": 313.043,
+              "total": 623.022,
+              "write": 0.125
+            },
+            "status": "applied",
+            "target": {
+              "parameter": "volume",
+              "target": "ableton_track",
+              "track_index": 2,
+              "track_name": "3-Audio"
+            },
+            "timestamp": 1788941506.9881642,
+            "undo": {
+              "proposal": {
+                "action": "set_volume",
+                "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+                "after": 0.8500000238418579,
+                "before": 0.7943282347242815,
+                "confidence": 1.0,
+                "confirmation_meta": {
+                  "expires_at": 1788941804,
+                  "nonce": "229798e0",
+                  "service_id": "ableton_action",
+                  "text": "set_volume|2|3-Audio|0.8500000238418579|0.7943282347242815|f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225"
+                },
+                "evidence": [
+                  "Current Live snapshot value: volume=0.8500000238418579.",
+                  "Target identity: track 2 '3-Audio'."
+                ],
+                "operation": "set_volume",
+                "parameter": "volume",
+                "reason": "Explicit user request for set_volume on track '3-Audio'.",
+                "requires_confirmation": true,
+                "risk": "local_mutation",
+                "schema": "kenn.ableton_action_proposal.v1",
+                "session_version": "f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225",
+                "snapshot_exchange": {
+                  "address": "batch",
+                  "request_id": null,
+                  "response_address": "/live/track/get/num_devices",
+                  "response_id": null,
+                  "response_ok": true,
+                  "round_trip_ms": 105.443,
+                  "transport": "abletonosc"
+                },
+                "target": "ableton_track",
+                "timestamp": 1788941504.827901,
+                "track_index": 2,
+                "track_name": "3-Audio",
+                "unit": "normalized",
+                "valid_range": [
+                  0.0,
+                  1.0
+                ]
+              }
+            },
+            "verified": true,
+            "write_acknowledgement": "confirmed",
+            "write_exchange": {
+              "address": "/live/track/set/volume",
+              "request_id": 24621,
+              "response_address": null,
+              "response_id": null,
+              "response_ok": false,
+              "round_trip_ms": 0.082,
+              "transport": "abletonosc"
+            }
+          }
+        },
+        "lifecycle": {
+          "elapsed_ms": 623.3,
+          "execution_elapsed_ms": 623.2,
+          "observed_at": 1788941506.988248,
+          "stage": "verified",
+          "started_at": 1788941506.3649821,
+          "verification": "readback_verified"
+        },
+        "ok": true,
+        "planner": "deterministic_snapshot_boundary",
+        "receipt": {
+          "action": "set_volume",
+          "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+          "before": 0.8500000238418579,
+          "correlation_id": "corr-d79dd45e215a4f28afbefb7b39e478d7",
+          "idempotency_key": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+          "readback": 0.7943282127380371,
+          "readback_exchange": {
+            "address": "batch",
+            "request_id": null,
+            "response_address": "/live/track/get/num_devices",
+            "response_id": null,
+            "response_ok": true,
+            "round_trip_ms": 116.11,
+            "transport": "abletonosc"
+          },
+          "receipt_id": "receipt-0a732e91121a46c6bb0f11d28b79c3f8",
+          "requested": 0.7943282347242815,
+          "retry_safe": "safe",
+          "schema": "kenn.ableton_action_receipt.v1",
+          "stage_timings_ms": {
+            "readback": 309.854,
+            "snapshot": 313.043,
+            "total": 623.022,
+            "write": 0.125
+          },
+          "status": "applied",
+          "target": {
+            "parameter": "volume",
+            "target": "ableton_track",
+            "track_index": 2,
+            "track_name": "3-Audio"
+          },
+          "timestamp": 1788941506.9881642,
+          "undo": {
+            "proposal": {
+              "action": "set_volume",
+              "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+              "after": 0.8500000238418579,
+              "before": 0.7943282347242815,
+              "confidence": 1.0,
+              "confirmation_meta": {
+                "expires_at": 1788941804,
+                "nonce": "229798e0",
+                "service_id": "ableton_action",
+                "text": "set_volume|2|3-Audio|0.8500000238418579|0.7943282347242815|f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225"
+              },
+              "evidence": [
+                "Current Live snapshot value: volume=0.8500000238418579.",
+                "Target identity: track 2 '3-Audio'."
+              ],
+              "operation": "set_volume",
+              "parameter": "volume",
+              "reason": "Explicit user request for set_volume on track '3-Audio'.",
+              "requires_confirmation": true,
+              "risk": "local_mutation",
+              "schema": "kenn.ableton_action_proposal.v1",
+              "session_version": "f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225",
+              "snapshot_exchange": {
+                "address": "batch",
+                "request_id": null,
+                "response_address": "/live/track/get/num_devices",
+                "response_id": null,
+                "response_ok": true,
+                "round_trip_ms": 105.443,
+                "transport": "abletonosc"
+              },
+              "target": "ableton_track",
+              "timestamp": 1788941504.827901,
+              "track_index": 2,
+              "track_name": "3-Audio",
+              "unit": "normalized",
+              "valid_range": [
+                0.0,
+                1.0
+              ]
+            }
+          },
+          "verified": true,
+          "write_acknowledgement": "confirmed",
+          "write_exchange": {
+            "address": "/live/track/set/volume",
+            "request_id": 24621,
+            "response_address": null,
+            "response_id": null,
+            "response_ok": false,
+            "round_trip_ms": 0.082,
+            "transport": "abletonosc"
+          }
+        },
+        "route": "ableton_command",
+        "schema": "kenn.ableton_command.v1",
+        "session_id": "local-live-assistant-qualification-v5",
+        "status": "applied"
+      },
+      "stage": "applied"
+    },
+    {
+      "result": {
+        "answer": "This action request was already executed or is already in progress.",
+        "changed": false,
+        "command": "apply confirmed KENN Live proposal",
+        "confirmation_required": false,
+        "execution": {
+          "error": "This action request was already executed or is already in progress.",
+          "idempotency_key": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+          "ok": false
+        },
+        "http_status": 409,
+        "lifecycle": {
+          "elapsed_ms": 0.1,
+          "execution_elapsed_ms": 0.1,
+          "observed_at": 1788941508.112801,
+          "stage": "failed",
+          "started_at": 1788941508.112703,
+          "verification": "not_verified"
+        },
+        "ok": false,
+        "planner": "deterministic_snapshot_boundary",
+        "route": "ableton_command",
+        "schema": "kenn.ableton_command.v1",
+        "session_id": "local-live-assistant-qualification-v5",
+        "status": "failed"
+      },
+      "stage": "replay"
+    },
+    {
+      "result": {
+        "changed": false,
+        "confirmation_required": true,
+        "ok": true,
+        "proposal": {
+          "action": "set_volume",
+          "action_id": "action-c9c570cd1e37478ab147de807a1611b7",
+          "after": 0.8500000238418579,
+          "before": 0.7943282127380371,
+          "confidence": 1.0,
+          "confirmation_meta": {
+            "expires_at": 1788941809,
+            "nonce": "aa6841e1",
+            "service_id": "ableton_action",
+            "text": "set_volume|2|3-Audio|0.7943282127380371|0.8500000238418579|c53f4fba76e7524a9ba1c34e81061c479849341cf573349f0c9da0fe105e9c8f"
+          },
+          "evidence": [
+            "Current Live snapshot value: volume=0.7943282127380371.",
+            "Target identity: track 2 '3-Audio'."
+          ],
+          "operation": "set_volume",
+          "parameter": "volume",
+          "reason": "Explicit user request for set_volume on track '3-Audio'.",
+          "requires_confirmation": true,
+          "risk": "local_mutation",
+          "schema": "kenn.ableton_action_proposal.v1",
+          "session_version": "c53f4fba76e7524a9ba1c34e81061c479849341cf573349f0c9da0fe105e9c8f",
+          "snapshot_exchange": {
+            "address": "batch",
+            "request_id": null,
+            "response_address": "/live/track/get/num_devices",
+            "response_id": null,
+            "response_ok": true,
+            "round_trip_ms": 105.415,
+            "transport": "abletonosc"
+          },
+          "target": "ableton_track",
+          "timestamp": 1788941509.0178618,
+          "track_index": 2,
+          "track_name": "3-Audio",
+          "unit": "normalized",
+          "valid_range": [
+            0.0,
+            1.0
+          ]
+        },
+        "status": "confirmation_required"
+      },
+      "stage": "undo_proposal"
+    },
+    {
+      "result": {
+        "changed": true,
+        "ok": true,
+        "receipt": {
+          "action": "set_volume",
+          "action_id": "action-c9c570cd1e37478ab147de807a1611b7",
+          "before": 0.7943282127380371,
+          "correlation_id": "corr-11286b3026b64e628cb3f82fef1b1cf0",
+          "idempotency_key": "action-c9c570cd1e37478ab147de807a1611b7",
+          "readback": 0.8500000238418579,
+          "readback_exchange": {
+            "address": "batch",
+            "request_id": null,
+            "response_address": "/live/track/get/num_devices",
+            "response_id": null,
+            "response_ok": true,
+            "round_trip_ms": 104.746,
+            "transport": "abletonosc"
+          },
+          "receipt_id": "receipt-5d259a3ae2a245218c14c23bbc36f209",
+          "requested": 0.8500000238418579,
+          "retry_safe": "safe",
+          "schema": "kenn.ableton_action_receipt.v1",
+          "stage_timings_ms": {
+            "readback": 310.281,
+            "snapshot": 306.291,
+            "total": 616.705,
+            "write": 0.133
+          },
+          "status": "applied",
+          "target": {
+            "parameter": "volume",
+            "target": "ableton_track",
+            "track_index": 2,
+            "track_name": "3-Audio"
+          },
+          "timestamp": 1788941509.637333,
+          "undo": {
+            "proposal": {
+              "action": "set_volume",
+              "action_id": "action-c9c570cd1e37478ab147de807a1611b7",
+              "after": 0.7943282127380371,
+              "before": 0.8500000238418579,
+              "confidence": 1.0,
+              "confirmation_meta": {
+                "expires_at": 1788941809,
+                "nonce": "aa6841e1",
+                "service_id": "ableton_action",
+                "text": "set_volume|2|3-Audio|0.7943282127380371|0.8500000238418579|c53f4fba76e7524a9ba1c34e81061c479849341cf573349f0c9da0fe105e9c8f"
+              },
+              "evidence": [
+                "Current Live snapshot value: volume=0.7943282127380371.",
+                "Target identity: track 2 '3-Audio'."
+              ],
+              "operation": "set_volume",
+              "parameter": "volume",
+              "reason": "Explicit user request for set_volume on track '3-Audio'.",
+              "requires_confirmation": true,
+              "risk": "local_mutation",
+              "schema": "kenn.ableton_action_proposal.v1",
+              "session_version": "c53f4fba76e7524a9ba1c34e81061c479849341cf573349f0c9da0fe105e9c8f",
+              "snapshot_exchange": {
+                "address": "batch",
+                "request_id": null,
+                "response_address": "/live/track/get/num_devices",
+                "response_id": null,
+                "response_ok": true,
+                "round_trip_ms": 105.415,
+                "transport": "abletonosc"
+              },
+              "target": "ableton_track",
+              "timestamp": 1788941509.0178618,
+              "track_index": 2,
+              "track_name": "3-Audio",
+              "unit": "normalized",
+              "valid_range": [
+                0.0,
+                1.0
+              ]
+            }
+          },
+          "verified": true,
+          "write_acknowledgement": "confirmed",
+          "write_exchange": {
+            "address": "/live/track/set/volume",
+            "request_id": 24914,
+            "response_address": null,
+            "response_id": null,
+            "response_ok": false,
+            "round_trip_ms": 0.089,
+            "transport": "abletonosc"
+          }
+        },
+        "status": "applied"
+      },
+      "stage": "undo_applied"
+    },
+    {
+      "context": {
+        "available_actions": [
+          "create_live_proposal",
+          "inspect_device_capabilities",
+          "inspect_live"
+        ],
+        "schema": "kenn.session_context.v1",
+        "session_id": "local-live-assistant-qualification-v5",
+        "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+        "track_count": 4,
+        "transport_status": "connected"
+      },
+      "stage": "final_context"
+    }
+  ],
+  "evidence_kind": "real_live",
+  "final_snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+  "initial_snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+  "limitations": [
+    "This qualifies one supervised reversible assistant action on a disposable set.",
+    "It does not authorize autonomous or destructive operation."
+  ],
+  "plan": {
+    "assumptions": [],
+    "created_at": "2026-09-09T08:11:42.801Z",
+    "execution_authorized": false,
+    "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
+    "model_id": "Qwen3-4B-input-bound-v6",
+    "model_provider": "transformers",
+    "schema": "kenn.deliberative_plan.v1",
+    "session_id": "local-live-assistant-qualification-v5",
+    "snapshot_fingerprint": "sha256:d4d577fe56adf942302ad818d8e99a858d2d27202feac2bf9def4ab61733be3d",
+    "status": "ready",
+    "steps": [
+      {
+        "action": "inspect_live",
+        "confirmation_required": false,
+        "depends_on": [],
+        "expected_evidence": [
+          "fresh Live snapshot"
+        ],
+        "kind": "inspection",
+        "mutating": false,
+        "objective": "Inspect track 3 in the selected disposable set to gather current state information.",
+        "rationale": "To prepare for the volume adjustment, it is necessary to inspect the current state of track 3 to ensure the adjustment is applied correctly and safely.",
+        "schema": "kenn.deliberative_step.v1",
+        "step_id": "step-1"
+      },
+      {
+        "action": "create_live_proposal",
+        "confirmation_required": true,
+        "depends_on": [
+          "step-1"
+        ],
+        "expected_evidence": [
+          "typed confirmation-gated proposal"
+        ],
+        "kind": "live_proposal",
+        "mutating": true,
+        "objective": "Prepare the requested reversible volume adjustment for track 3.",
+        "rationale": "Once the current state of track 3 is known, a reversible volume adjustment can be proposed and applied to the track.",
+        "schema": "kenn.deliberative_step.v1",
+        "step_id": "step-2"
+      }
+    ],
+    "unknowns": []
+  },
+  "planner_evidence_sha256": "2d669f4b6180fcd2c572e60cc18ebbde7abfe4b376496d5c47aa9baacac4925c",
+  "planner_id": "Qwen3-4B-input-bound-v6",
+  "planner_provider": "transformers",
+  "planner_transport_sha256": "47863fc0ec00a01b25847ffb109a2b2845d8d90d24643d06372f7eb662fdd826",
+  "proposal": {
+    "action": "set_volume",
+    "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+    "after": 0.7943282347242815,
+    "before": 0.8500000238418579,
+    "confidence": 1.0,
+    "confirmation_meta": {
+      "expires_at": 1788941804,
+      "nonce": "229798e0",
+      "service_id": "ableton_action",
+      "text": "set_volume|2|3-Audio|0.8500000238418579|0.7943282347242815|f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225"
+    },
+    "evidence": [
+      "Current Live snapshot value: volume=0.8500000238418579.",
+      "Target identity: track 2 '3-Audio'."
+    ],
+    "operation": "set_volume",
+    "parameter": "volume",
+    "reason": "Explicit user request for set_volume on track '3-Audio'.",
+    "requires_confirmation": true,
+    "risk": "local_mutation",
+    "schema": "kenn.ableton_action_proposal.v1",
+    "session_version": "f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225",
+    "snapshot_exchange": {
+      "address": "batch",
+      "request_id": null,
+      "response_address": "/live/track/get/num_devices",
+      "response_id": null,
+      "response_ok": true,
+      "round_trip_ms": 105.443,
+      "transport": "abletonosc"
+    },
+    "target": "ableton_track",
+    "timestamp": 1788941504.827901,
+    "track_index": 2,
+    "track_name": "3-Audio",
+    "unit": "normalized",
+    "valid_range": [
+      0.0,
+      1.0
+    ]
+  },
+  "replay_rejected": true,
+  "restored_exactly": true,
+  "runner_sha256": "33284f7306586c13826f6c4276952578f826a6974cf85c373f5e1eda679a50e8",
+  "schema": "kenn.real_live_assistant_task_qualification.v1",
+  "session_id": "local-live-assistant-qualification-v5",
+  "source_git_commit": "16d8d09a299cc897afe417ac4ae9947d83143a9a",
+  "status": "passed",
+  "task_id": "task-0dec3f8fe83c4f918503dc69231ea5f0",
+  "undo_receipt": {
+    "action": "set_volume",
+    "action_id": "action-c9c570cd1e37478ab147de807a1611b7",
+    "before": 0.7943282127380371,
+    "correlation_id": "corr-11286b3026b64e628cb3f82fef1b1cf0",
+    "idempotency_key": "action-c9c570cd1e37478ab147de807a1611b7",
+    "readback": 0.8500000238418579,
+    "readback_exchange": {
+      "address": "batch",
+      "request_id": null,
+      "response_address": "/live/track/get/num_devices",
+      "response_id": null,
+      "response_ok": true,
+      "round_trip_ms": 104.746,
+      "transport": "abletonosc"
+    },
+    "receipt_id": "receipt-5d259a3ae2a245218c14c23bbc36f209",
+    "requested": 0.8500000238418579,
+    "retry_safe": "safe",
+    "schema": "kenn.ableton_action_receipt.v1",
+    "stage_timings_ms": {
+      "readback": 310.281,
+      "snapshot": 306.291,
+      "total": 616.705,
+      "write": 0.133
+    },
+    "status": "applied",
+    "target": {
+      "parameter": "volume",
+      "target": "ableton_track",
+      "track_index": 2,
+      "track_name": "3-Audio"
+    },
+    "timestamp": 1788941509.637333,
+    "undo": {
+      "proposal": {
+        "action": "set_volume",
+        "action_id": "action-c9c570cd1e37478ab147de807a1611b7",
+        "after": 0.7943282127380371,
+        "before": 0.8500000238418579,
+        "confidence": 1.0,
+        "confirmation_meta": {
+          "expires_at": 1788941809,
+          "nonce": "aa6841e1",
+          "service_id": "ableton_action",
+          "text": "set_volume|2|3-Audio|0.7943282127380371|0.8500000238418579|c53f4fba76e7524a9ba1c34e81061c479849341cf573349f0c9da0fe105e9c8f"
+        },
+        "evidence": [
+          "Current Live snapshot value: volume=0.7943282127380371.",
+          "Target identity: track 2 '3-Audio'."
+        ],
+        "operation": "set_volume",
+        "parameter": "volume",
+        "reason": "Explicit user request for set_volume on track '3-Audio'.",
+        "requires_confirmation": true,
+        "risk": "local_mutation",
+        "schema": "kenn.ableton_action_proposal.v1",
+        "session_version": "c53f4fba76e7524a9ba1c34e81061c479849341cf573349f0c9da0fe105e9c8f",
+        "snapshot_exchange": {
+          "address": "batch",
+          "request_id": null,
+          "response_address": "/live/track/get/num_devices",
+          "response_id": null,
+          "response_ok": true,
+          "round_trip_ms": 105.415,
+          "transport": "abletonosc"
+        },
+        "target": "ableton_track",
+        "timestamp": 1788941509.0178618,
+        "track_index": 2,
+        "track_name": "3-Audio",
+        "unit": "normalized",
+        "valid_range": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    "verified": true,
+    "write_acknowledgement": "confirmed",
+    "write_exchange": {
+      "address": "/live/track/set/volume",
+      "request_id": 24914,
+      "response_address": null,
+      "response_id": null,
+      "response_ok": false,
+      "round_trip_ms": 0.089,
+      "transport": "abletonosc"
+    }
+  },
+  "write_receipt": {
+    "action": "set_volume",
+    "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+    "before": 0.8500000238418579,
+    "correlation_id": "corr-d79dd45e215a4f28afbefb7b39e478d7",
+    "idempotency_key": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+    "readback": 0.7943282127380371,
+    "readback_exchange": {
+      "address": "batch",
+      "request_id": null,
+      "response_address": "/live/track/get/num_devices",
+      "response_id": null,
+      "response_ok": true,
+      "round_trip_ms": 116.11,
+      "transport": "abletonosc"
+    },
+    "receipt_id": "receipt-0a732e91121a46c6bb0f11d28b79c3f8",
+    "requested": 0.7943282347242815,
+    "retry_safe": "safe",
+    "schema": "kenn.ableton_action_receipt.v1",
+    "stage_timings_ms": {
+      "readback": 309.854,
+      "snapshot": 313.043,
+      "total": 623.022,
+      "write": 0.125
+    },
+    "status": "applied",
+    "target": {
+      "parameter": "volume",
+      "target": "ableton_track",
+      "track_index": 2,
+      "track_name": "3-Audio"
+    },
+    "timestamp": 1788941506.9881642,
+    "undo": {
+      "proposal": {
+        "action": "set_volume",
+        "action_id": "action-e55b3bf8b49c4fcc81a231c2d1387dce",
+        "after": 0.8500000238418579,
+        "before": 0.7943282347242815,
+        "confidence": 1.0,
+        "confirmation_meta": {
+          "expires_at": 1788941804,
+          "nonce": "229798e0",
+          "service_id": "ableton_action",
+          "text": "set_volume|2|3-Audio|0.8500000238418579|0.7943282347242815|f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225"
+        },
+        "evidence": [
+          "Current Live snapshot value: volume=0.8500000238418579.",
+          "Target identity: track 2 '3-Audio'."
+        ],
+        "operation": "set_volume",
+        "parameter": "volume",
+        "reason": "Explicit user request for set_volume on track '3-Audio'.",
+        "requires_confirmation": true,
+        "risk": "local_mutation",
+        "schema": "kenn.ableton_action_proposal.v1",
+        "session_version": "f62fbd3a4428f027295e443746d740678c8dff9ddc2a078a9388cbd4f5ea7225",
+        "snapshot_exchange": {
+          "address": "batch",
+          "request_id": null,
+          "response_address": "/live/track/get/num_devices",
+          "response_id": null,
+          "response_ok": true,
+          "round_trip_ms": 105.443,
+          "transport": "abletonosc"
+        },
+        "target": "ableton_track",
+        "timestamp": 1788941504.827901,
+        "track_index": 2,
+        "track_name": "3-Audio",
+        "unit": "normalized",
+        "valid_range": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    "verified": true,
+    "write_acknowledgement": "confirmed",
+    "write_exchange": {
+      "address": "/live/track/set/volume",
+      "request_id": 24621,
+      "response_address": null,
+      "response_id": null,
+      "response_ok": false,
+      "round_trip_ms": 0.082,
+      "transport": "abletonosc"
+    }
+  },
+  "latency_benchmark": {
+    "measured_at": "2026-09-16T09:18:36+00:00",
+    "query_count": 12,
+    "total_latency_ms": {
+      "median": 127.7,
+      "mean": 167.6,
+      "p95": 210.9,
+      "max": 609.1,
+      "min": 35.2
+    },
+    "first_token_ms": {
+      "median": 70.4,
+      "mean": 66.2,
+      "p95": 76.5,
+      "max": 81.3,
+      "min": 0.2
+    },
+    "budget": {
+      "total_p95_ms": 1500,
+      "first_token_ms": 300
+    },
+    "passed": true
+  }
+}

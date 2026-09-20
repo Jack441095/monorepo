@@ -1,0 +1,6 @@
+{
+  "concurrency_reads_writes": 100,
+  "atomic_write_locks": "PASS",
+  "truncated_json_detected": 1,
+  "heartbeat_leaks": 0
+}

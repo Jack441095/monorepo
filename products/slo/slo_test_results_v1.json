@@ -1,0 +1,26 @@
+{
+  "runner": "direct_executables_and_cmake_qualification_groups",
+  "ctest_registered_tests": 0,
+  "clean_release_configure": {"status": "PASS", "build_dir": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/workspace/builds/slo-audit-v1", "architecture": "arm64", "install_after_build": false, "test_lto": false},
+  "clean_release_full_build": {"status": "FAIL", "failed_targets": ["helper_based_engine_tests"], "diagnostic": "ld: 13044 duplicate symbols; JUCE module objects linked both directly and via ssm_engine_core_test/ssm_engine_core_prod"},
+  "clean_release_fast_group": {"status": "FAIL", "diagnostic": "same duplicate JUCE symbol failure in TestPathTraversal, TestDuplicateDetection, TestPruneMissing, TestSafetyRegression and peer helper targets"},
+  "existing_tree_results": {
+    "TestTaxonomy": "PASS",
+    "TestXmpWriter": "PASS",
+    "TestSafetyRegression": "PASS",
+    "TestAcousticClassifierParity": "BLOCKED_STALE_BINARY_MISSING",
+    "filename_invariance": "BLOCKED_STALE_BINARY_ENGINE_INITIALIZATION"
+  },
+  "fresh_clean_results": {
+    "TestTaxonomy": "PASS",
+    "TestCachedReclassification": {"status": "PASS", "mock_rows": 1000, "throughput_files_per_sec": 8738.14},
+    "TestXmpWriter": "PASS",
+    "TestAcousticClassifierParity": {"status": "PASS", "cases": 10, "max_logit_error": 0.00000316082, "max_probability_error": 0.00000029717, "ood_regression_checks": "PASS"},
+    "ClassificationBenchmark": "BLOCKED_LINK_TARGET_UNAVAILABLE"
+  },
+  "licensing": "NOT_RUN_EXTERNAL_AUTHORIZATION_REQUIRED",
+  "ableton": "NOT_QUALIFIED",
+  "debug_build": "NOT_RUN",
+  "owner_audio_modified": false,
+  "protected_holdouts_rerun": 0
+}

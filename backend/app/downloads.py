@@ -21,7 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+from . import models
 from .auth import get_current_user
 from .config import settings
 from .database import get_db
@@ -100,10 +100,23 @@ def fetch(token: str, db: Session = Depends(get_db)):
     claims = read_download_token(token)
     if claims is None:
         raise HTTPException(status_code=400, detail="Download link expired or invalid")
+    if not isinstance(claims, dict):
+        raise HTTPException(status_code=400, detail="Download link expired or invalid")
+    release_id = claims.get("release_id")
+    user_id = claims.get("user_id")
+    if not isinstance(release_id, str) or not release_id:
+        raise HTTPException(status_code=400, detail="Download link expired or invalid")
+    if not isinstance(user_id, str) or not user_id:
+        raise HTTPException(status_code=400, detail="Download link expired or invalid")
 
-    release = db.get(models.Release, claims["release_id"])
+    release = db.get(models.Release, release_id)
     if release is None:
         raise HTTPException(status_code=404, detail="Release not found")
+
+    user = db.get(models.User, user_id)
+    if user is None:
+        raise HTTPException(status_code=403, detail="No active entitlement for this product")
+    _require_entitlement(db, user, release.product_id)
 
     try:
         storage = get_storage()
@@ -118,7 +131,7 @@ def fetch(token: str, db: Session = Depends(get_db)):
             )
             if not signed_url:
                 raise HTTPException(status_code=503, detail="Release storage is unavailable")
-            db.add(models.Download(release_id=release.id, user_id=claims["user_id"]))
+            db.add(models.Download(release_id=release.id, user_id=user_id))
             db.commit()
             return RedirectResponse(signed_url, status_code=307)
         if not file_path.is_file():
@@ -130,7 +143,7 @@ def fetch(token: str, db: Session = Depends(get_db)):
     except StorageError as exc:
         raise HTTPException(status_code=503, detail="Release storage is unavailable") from exc
 
-    db.add(models.Download(release_id=release.id, user_id=claims["user_id"]))
+    db.add(models.Download(release_id=release.id, user_id=user_id))
     db.commit()
 
     return FileResponse(file_path, filename=file_path.name, media_type="application/octet-stream")

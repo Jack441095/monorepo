@@ -1,0 +1,44 @@
+{
+  "gate_version": "v2b.1",
+  "winner": "D_hierarchical",
+  "benchmark": "KENN_GOLDEN_BENCHMARK_V2",
+  "detectors": {
+    "default": {
+      "observe": 0.47,
+      "recommend": 0.7,
+      "strong": 0.88
+    },
+    "detectors": {
+      "clipping": {
+        "observe": 0.28,
+        "recommend": 0.48,
+        "strong": 0.74
+      },
+      "headroom": {
+        "observe": 0.32,
+        "recommend": 0.54,
+        "strong": 0.8
+      },
+      "lr_imbalance": {
+        "observe": 0.34,
+        "recommend": 0.56,
+        "strong": 0.82
+      },
+      "dc": {
+        "observe": 0.2,
+        "recommend": 0.38,
+        "strong": 0.68
+      },
+      "anti_phase": {
+        "observe": 0.28,
+        "recommend": 0.48,
+        "strong": 0.74
+      },
+      "wide_bass": {
+        "observe": 0.34,
+        "recommend": 0.56,
+        "strong": 0.82
+      }
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "100": {
+    "accuracy": 62.01,
+    "sd": 4.0,
+    "collections": 31.3,
+    "families": 93.8,
+    "runs": 12
+  },
+  "150": {
+    "accuracy": 63.21,
+    "sd": 4.04,
+    "collections": 38.0,
+    "families": 137.3,
+    "runs": 12
+  },
+  "200": {
+    "accuracy": 63.41,
+    "sd": 4.13,
+    "collections": 43.8,
+    "families": 181.0,
+    "runs": 12
+  },
+  "250": {
+    "accuracy": 64.34,
+    "sd": 4.23,
+    "collections": 47.2,
+    "families": 223.2,
+    "runs": 12
+  },
+  "300": {
+    "accuracy": 64.25,
+    "sd": 4.31,
+    "collections": 50.2,
+    "families": 265.2,
+    "runs": 12
+  },
+  "400": {
+    "accuracy": 65.9,
+    "sd": 4.43,
+    "collections": 55.9,
+    "families": 347.6,
+    "runs": 12
+  },
+  "500": {
+    "accuracy": 66.22,
+    "sd": 4.7,
+    "collections": 59.6,
+    "families": 433.0,
+    "runs": 11
+  },
+  "slopes": {
+    "pp_per_doubling_labels": 1.81,
+    "pp_per_doubling_collections": 4.47
+  }
+}

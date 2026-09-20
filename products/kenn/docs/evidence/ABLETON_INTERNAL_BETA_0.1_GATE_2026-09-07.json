@@ -1,0 +1,122 @@
+{
+  "claims_boundary": "no approval for autonomous, destructive, or public Ableton use",
+  "decision": "not_ready",
+  "gates": [
+    {
+      "details": "All required release documents and the pinned AbletonOSC vendor are present.",
+      "evidence": [
+        "docs/ABLETON_ASSISTANT_READINESS_REPORT.md",
+        "docs/ABLETON_ASSISTANT_UPGRADE_PLAN.md",
+        "docs/ABLETON_ASSISTANT_CURRENT_STATE.md",
+        "docs/ABLETON_ASSISTANT_SUPPORT_RUNBOOK.md",
+        "docs/ABLETON_ASSISTANT_ROLLBACK_PLAN.md",
+        "docs/ABLETON_ASSISTANT_TESTER_GUIDE.md",
+        "scripts/install_abletonosc.py",
+        "third_party/AbletonOSC/__init__.py",
+        "third_party/AbletonOSC/LICENSE.md"
+      ],
+      "id": "artifacts",
+      "name": "Release artifacts and AbletonOSC identity",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "The captured report contains the qualified read-only, reversible track/transport, device, failure, and saved-set recovery evidence.",
+      "evidence": [
+        "docs/ABLETON_LIVE_REAL_QUALIFICATION_2026-09-01.md"
+      ],
+      "id": "real_live",
+      "name": "Real Ableton Live qualification",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "1 explicitly qualified Live/OS configuration(s) are declared and cross-checked against cited evidence.",
+      "evidence": [
+        "docs/ABLETON_LIVE_SUPPORT_MATRIX.json"
+      ],
+      "id": "support_matrix",
+      "name": "Explicit supported Live/OS matrix",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "Two independent reviewer score files are still required; no scores are assumed.",
+      "evidence": [
+        "docs/ABLETON_ASSISTANT_HUMAN_REVIEW_PACKET_2026-09-01.json"
+      ],
+      "id": "human_review",
+      "name": "Independent human review and adjudication",
+      "required_for": [
+        "qualified"
+      ],
+      "status": "pending"
+    },
+    {
+      "details": "HEAD is 9337cccdef45d3843d5d3297adeb33eba404c579; KENN source snapshot is clean. Ignored only the declared untracked, out-of-scope colleague UX handoff directory.",
+      "evidence": [
+        "git metadata"
+      ],
+      "id": "source_snapshot",
+      "name": "Reproducible source snapshot",
+      "required_for": [
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "No complete signed/notarized plug-in archive and checksum are present; run scripts/package_macos_plugins.sh with release credentials.",
+      "evidence": [
+        "dist/KENN-Mix-Assistant-0.1.0-macOS.zip",
+        "dist/KENN-Mix-Assistant-0.1.0-macOS.zip.sha256"
+      ],
+      "id": "plugin_distribution",
+      "name": "Signed and notarized macOS plug-in archive",
+      "required_for": [
+        "qualified"
+      ],
+      "status": "pending"
+    },
+    {
+      "details": "590 passed, 5 warnings in 75.37s (0:01:15)",
+      "evidence": [
+        "python3 -m pytest source/kenn/tests chat/tests mix-review/tests automix/tests -q"
+      ],
+      "id": "automated_suite",
+      "name": "Automated regression suite",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "Not requested; captured qualification evidence is evaluated separately.",
+      "evidence": [
+        "python3 scripts/qualify_ableton_live.py --mode real --endpoint http://127.0.0.1:8090"
+      ],
+      "id": "current_live",
+      "name": "Current Ableton Live runtime",
+      "required_for": [],
+      "status": "not_run"
+    }
+  ],
+  "generated_at": "2026-09-07T12:03:20.122481+00:00",
+  "profile": "qualified",
+  "schema": "kenn.internal_beta_readiness.v1",
+  "summary": {
+    "failed": 0,
+    "passed": 5,
+    "pending": 2,
+    "required_gate_count": 7
+  }
+}

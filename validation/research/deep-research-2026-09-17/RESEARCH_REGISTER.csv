@@ -1,0 +1,12 @@
+r-id,title,product,hypothesis,metric,threshold,timebox_days,decision
+R-01,SLO strict-blind classification gate,SLO,top-1 >=70% with UNKNOWN <=15% at frozen OOD threshold; PANNs-CNN10 vs CLAP AB,top-1 accuracy + UNKNOWN rate,>=70% / <=15%,10,ship/hold SLO beta
+R-02,SLO format expansion cost,SLO,AIFF/FLAC/MP3 within 20% of WAV throughput with zero journal regressions,throughput delta + journal diff,<=20% / zero regress,5,format flag on/off
+R-03,KENN mix-review validity + 5-test fix,KENN,fault agreement kappa>=0.6; LUFS ±1 vs BS.1770 after fixing decode/loudness,kappa + LUFS error,>=0.6 / ±1 LU,10,qualified-pilot or not-qualified
+R-04,Plugin host compatibility,SLO+KENN,0 crashes with RT-thread clean across 3 hosts,crashes + RT violations,0 / 0,7,SHIP plugins or HARDEN
+R-05,DiskSweep accuracy + Trash guarantee,DiskSweep,BLOCKED precision >=99%; Trash-only fuzz 5000/5000 pass,precision + fuzz pass,>=99% / 5000-5000,7,beta + pricing or hold
+R-06,Submit generalisation + update integrity,Submit,>=98% renames with zero overwrites; tampered appcast rejected,rename accuracy + overwrites + feed test,>=98% / 0 / reject,7,site-licence pack or hold
+R-07,Paddle/entitlement live-fire,Platform,duplicate-webhook safe with offline grace; no double-fulfil,idempotency + replay result,pass sandbox live-fire,5,charge-ready or hold
+R-08,AudioGen/AutoMix metric or freeze,Audio_Too/KENN,objective metric with inter-rater >=0.6 else freeze sales,inter-rater agreement,>=0.6 else freeze,10,continue or freeze
+R-09,Windows portability spike,SLO/Submit,scanner+plugin build on Windows with parity fuzz pass,build + fuzz result,pass or >4wk forecast→macOS-only,5,port price or macOS-only
+R-10,Testability triage,Estate,backend collects + SLO CTest wired + KENN subset runnable,collect/run receipts,3 receipts green,5,test plan or rewrite
+R-11,Licence + cost clearance,Estate,per-component licence table filled; no cost cliff <10x scale,table coverage + cost model,100% / no cliff,5,shippable or hold bundle

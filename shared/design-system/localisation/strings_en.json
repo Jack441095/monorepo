@@ -1,0 +1,67 @@
+{
+  "$meta": {
+    "locale": "en",
+    "isFallbackLocale": true,
+    "spec": "NITE_DSP_LOCALISATION_ARCHITECTURE_V1.md §2",
+    "note": "Keys are the contract. English copy is reference. Never localise internal identifiers."
+  },
+  "action": {
+    "play": "Play",
+    "stop": "Stop",
+    "preview": "Preview",
+    "find_similar": "Find Similar",
+    "apply": "Apply",
+    "adjust": "Adjust",
+    "dismiss": "Dismiss",
+    "audition_ab": "A/B Audition",
+    "search": "Search",
+    "filter": "Filter",
+    "settings": "Settings"
+  },
+  "view": {
+    "map": "Map",
+    "list": "List",
+    "split": "Split"
+  },
+  "category": {
+    "kick": "Kick",
+    "snare": "Snare",
+    "clap": "Clap",
+    "hihat": "Hi-Hat",
+    "percussion": "Percussion",
+    "bass": "Bass",
+    "synth": "Synth",
+    "vocal": "Vocal",
+    "unknown": "Unknown"
+  },
+  "state": {
+    "playing": "Playing",
+    "favorite": "Favourite",
+    "unknown": "Unclassified"
+  },
+  "analysis": {
+    "low_mid_buildup": "Low-mid buildup",
+    "vocal_masking": "Vocal masking",
+    "sibilance": "Sibilance"
+  },
+  "kenn": {
+    "severity.high": "HIGH",
+    "severity.medium": "MEDIUM",
+    "severity.low": "LOW",
+    "confidence.high": "High confidence",
+    "confidence.medium": "Medium confidence",
+    "confidence.low": "Low confidence"
+  },
+  "ai": {
+    "proposal.provisional": "Provisional",
+    "proposal.accepted": "Applied",
+    "proposal.uncertain": "Needs review"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "ok": "OK",
+    "results.count": "{count, plural, one {# sample} other {# samples}}"
+  }
+}

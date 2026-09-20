@@ -1,0 +1,36 @@
+{
+  "rejection_mapped": false,
+  "seeds": 8,
+  "results": {
+    "0.90": {
+      "global_coverage": 42.23,
+      "global_precision": 88.8,
+      "per_class_coverage": 49.84,
+      "per_class_precision": 80.06,
+      "delta": 7.6,
+      "paired_t": 2.69,
+      "oracle_coverage": 47.22,
+      "folds": 40
+    },
+    "0.95": {
+      "global_coverage": 25.41,
+      "global_precision": 92.01,
+      "per_class_coverage": 40.11,
+      "per_class_precision": 82.59,
+      "delta": 14.7,
+      "paired_t": 5.0,
+      "oracle_coverage": 38.06,
+      "folds": 40
+    },
+    "0.98": {
+      "global_coverage": 14.16,
+      "global_precision": 94.75,
+      "per_class_coverage": 35.62,
+      "per_class_precision": 84.71,
+      "delta": 21.46,
+      "paired_t": 9.75,
+      "oracle_coverage": 34.58,
+      "folds": 40
+    }
+  }
+}

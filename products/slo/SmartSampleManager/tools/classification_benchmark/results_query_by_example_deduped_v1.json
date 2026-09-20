@@ -1,0 +1,1025 @@
+{
+  "record_type": "slo_query_by_example_results",
+  "schema_version": "1.0.0",
+  "method_version": "query_by_example_v1",
+  "query": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) Alien Isolation.wav",
+    "index": 1198,
+    "content_identity": {
+      "content_sha256": "1c34ec1bdbae71ca62a2d4bd692b2897f8b890f13e8b2352b6347abb50bc8167",
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) Alien Isolation.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) Alien Isolation.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Alien Isolation.wav"
+      ]
+    },
+    "definition_card": {
+      "record_type": "slo_audio_definition_card",
+      "schema_version": "1.0.0",
+      "feature_version": "definition_card_v1",
+      "safety": {
+        "source_modified": false,
+        "semantic_label_created": false,
+        "rename_action": false,
+        "heuristics_are_not_ground_truth": true
+      },
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) Alien Isolation.wav",
+      "source": {
+        "sample_rate_hz": 44100,
+        "channels": 2,
+        "analysis_sample_rate_hz": 16000,
+        "analysis_duration_seconds": 1.7143125,
+        "truncated": false
+      },
+      "signal": {
+        "rms_dbfs": -9.159976777564605,
+        "peak_dbfs": -0.08302667349146009,
+        "crest_factor": 2.8434625007657237,
+        "clipped_fraction": 0.0,
+        "leading_silence_seconds": 0.0013125,
+        "trailing_silence_seconds": 0.3760625
+      },
+      "spectrum": {
+        "spectral_centroid_hz": 137.65076665647354,
+        "spectral_rolloff_hz": 186.77662037037038,
+        "spectral_flatness": 1.9936876924475655e-05,
+        "zero_crossing_rate": 0.005154079861111111,
+        "low_band_energy_ratio": 0.9916191005892091,
+        "high_band_energy_ratio": 1.5186339580101731e-05,
+        "harmonic_energy_ratio": 0.7868472337722778
+      },
+      "temporal": {
+        "onset_count": 3,
+        "onset_density_per_second": 1.7499726566772396,
+        "estimated_tempo_bpm": 170.45454545454547,
+        "periodicity_seconds": 0.352,
+        "periodicity_strength": 0.11380409512286775,
+        "form_hint": "mixed_or_uncertain_form",
+        "form_hint_confidence": 0.35
+      },
+      "pitch": {
+        "median_f0_hz": 40.0,
+        "voiced_frame_fraction": 1.0
+      },
+      "spatial": {
+        "stereo_correlation": 0.999990763444029
+      },
+      "heuristic_tags": [
+        "low_end_heavy",
+        "dark",
+        "tonal_or_harmonic",
+        "mostly_mono"
+      ],
+      "uncertainty_reasons": [
+        "weak_periodicity"
+      ]
+    }
+  },
+  "results": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/My Type Of Energy 808.wav",
+      "embedding_cosine": 0.8171716332435608,
+      "content_identity": {
+        "content_sha256": "09be5377f79337ebdc5801ea9b0f22debcf941cde074f5533d0f82fa93ded888",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/My Type Of Energy 808.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/My Type Of Energy 808.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.7973599445071896,
+        "aspects": {
+          "spectrum": 0.7586693037663395,
+          "timbre": 0.7269553671624949,
+          "pitch": 0.5000019370111344,
+          "amplitude": 0.9844607774838565,
+          "temporal": 0.8140986714310119,
+          "spatial": 0.9999736101883002
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/My Type Of Energy 808.wav",
+        "source": {
+          "sample_rate_hz": 48000,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.6635,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -9.059157745213588,
+          "peak_dbfs": -0.2394274984932453,
+          "crest_factor": 2.760492123681928,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0005625,
+          "trailing_silence_seconds": 0.91575
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 127.08204198845178,
+          "spectral_rolloff_hz": 202.52403846153845,
+          "spectral_flatness": 0.5000007152557373,
+          "zero_crossing_rate": 0.005211463341346154,
+          "low_band_energy_ratio": 0.9911047904348368,
+          "high_band_energy_ratio": 8.709313163663293e-07,
+          "harmonic_energy_ratio": 0.5590764284133911
+        },
+        "temporal": {
+          "onset_count": 5,
+          "onset_density_per_second": 3.005710850616171,
+          "estimated_tempo_bpm": 170.45454545454547,
+          "periodicity_seconds": 0.32,
+          "periodicity_strength": 0.18766536156219074,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 3003.724368616883,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 1.0
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Lowered Room 808.wav",
+      "embedding_cosine": 0.8046152591705322,
+      "content_identity": {
+        "content_sha256": "19fbf860898e6258697edd196bbab99842617d15fb9a60758c2d24bd5920c65f",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/808s/Lowered Room 808.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/808s/Lowered Room 808.wav",
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Lowered Room 808.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.8932194705669122,
+        "aspects": {
+          "spectrum": 0.7295487357924643,
+          "timbre": 0.8534745782084423,
+          "pitch": 0.9446143372292599,
+          "amplitude": 0.9385137257534988,
+          "temporal": 0.8931893051244576,
+          "spatial": 0.9999761412933507
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Lowered Room 808.wav",
+        "source": {
+          "sample_rate_hz": 48000,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.8461875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -8.025843923030155,
+          "peak_dbfs": 0.001220696484989639,
+          "crest_factor": 2.519725499120664,
+          "clipped_fraction": 0.031957750770168256,
+          "leading_silence_seconds": 0.0015625,
+          "trailing_silence_seconds": 0.9863125
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 105.27884225085094,
+          "spectral_rolloff_hz": 183.86314655172413,
+          "spectral_flatness": 0.48276010155677795,
+          "zero_crossing_rate": 0.0036789466594827585,
+          "low_band_energy_ratio": 0.9938709091892034,
+          "high_band_energy_ratio": 3.0381176403198263e-06,
+          "harmonic_energy_ratio": 0.8680994510650635
+        },
+        "temporal": {
+          "onset_count": 4,
+          "onset_density_per_second": 2.1666271708588645,
+          "estimated_tempo_bpm": 267.85714285714283,
+          "periodicity_seconds": 0.256,
+          "periodicity_strength": 0.11356590840099022,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 41.6610853547993,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9999991140909745
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "possible_clipping",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity",
+          "clipping_may_distort_features"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/808s/Lil Dist. Spinz 808 .wav",
+      "embedding_cosine": 0.7955641746520996,
+      "content_identity": {
+        "content_sha256": "f61077a3aea7dd8b819a1e5b4e310af2fc7e3440c5770bd3e3654a1618660370",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/808s/Lil Dist. Spinz 808 .wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/808s/Lil Dist. Spinz 808 .wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.8011401547178153,
+        "aspects": {
+          "spectrum": 0.521193267174491,
+          "timbre": 0.6906457972421808,
+          "pitch": 1.0,
+          "amplitude": 0.8599601653312605,
+          "temporal": 0.735067833553212,
+          "spatial": 0.9999738650057475
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/808s/Lil Dist. Spinz 808 .wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.8461875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -6.1665856006997295,
+          "peak_dbfs": -0.016553791746055903,
+          "crest_factor": 2.030025954087608,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.001875,
+          "trailing_silence_seconds": 0.802
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 59.667988783520116,
+          "spectral_rolloff_hz": 97.38685344827586,
+          "spectral_flatness": 0.38220497965812683,
+          "zero_crossing_rate": 0.005682583512931034,
+          "low_band_energy_ratio": 0.9987049694903688,
+          "high_band_energy_ratio": 2.3054675966384085e-07,
+          "harmonic_energy_ratio": 0.9435522556304932
+        },
+        "temporal": {
+          "onset_count": 6,
+          "onset_density_per_second": 3.2499407562882965,
+          "estimated_tempo_bpm": 117.1875,
+          "periodicity_seconds": 0.288,
+          "periodicity_strength": 0.26358096405725384,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 40.0,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9999999108115512
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) New Slay.wav",
+      "embedding_cosine": 0.7948338389396667,
+      "content_identity": {
+        "content_sha256": "3189883068038cb8f0aec4ade915e85e634db687b68a92ef781fdd862ad0077d",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) New Slay.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) New Slay.wav",
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) New Slay.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.6001050025501643,
+        "aspects": {
+          "spectrum": 0.42245542144103787,
+          "timbre": 0.5021715820420429,
+          "pitch": 0.500000847597839,
+          "amplitude": 0.6331483969396801,
+          "temporal": 0.5428801570920853,
+          "spatial": 0.9999736101883002
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) New Slay.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 6.8571875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -17.66326721303952,
+          "peak_dbfs": 0.008649888480980625,
+          "crest_factor": 7.648844908839395,
+          "clipped_fraction": 0.003144510777924623,
+          "leading_silence_seconds": 0.0005625,
+          "trailing_silence_seconds": 5.9408125
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 27.2199698231776,
+          "spectral_rolloff_hz": 44.22238372093023,
+          "spectral_flatness": 0.8511666059494019,
+          "zero_crossing_rate": 0.001380813953488372,
+          "low_band_energy_ratio": 0.9938014191976107,
+          "high_band_energy_ratio": 1.5506826470735058e-06,
+          "harmonic_energy_ratio": 0.5607707500457764
+        },
+        "temporal": {
+          "onset_count": 1,
+          "onset_density_per_second": 0.1458323839037506,
+          "estimated_tempo_bpm": 208.33333333333334,
+          "periodicity_seconds": 0.288,
+          "periodicity_strength": 0.02088797151147166,
+          "form_hint": "possibly_sustained",
+          "form_hint_confidence": 0.55
+        },
+        "pitch": {
+          "median_f0_hz": 4000.0,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 1.0
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "possible_clipping",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Favorite 808.wav",
+      "embedding_cosine": 0.7793635129928589,
+      "content_identity": {
+        "content_sha256": "79d9af304c668d17814c83c9bf0dfa13457d5172a0448217faaa48eb0ff1269e",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Favorite 808.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Favorite 808.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.8154727093187767,
+        "aspects": {
+          "spectrum": 0.5323018075031432,
+          "timbre": 0.7690047759184458,
+          "pitch": 0.8139942731281676,
+          "amplitude": 0.9347499735497335,
+          "temporal": 0.8439107005442258,
+          "spatial": 0.9988747252689435
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Favorite 808.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.8461875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -10.283227830758289,
+          "peak_dbfs": -0.22546132429823645,
+          "crest_factor": 3.1833788410160553,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0,
+          "trailing_silence_seconds": 1.140875
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 218.87221497029702,
+          "spectral_rolloff_hz": 477.9094827586207,
+          "spectral_flatness": 0.44973310828208923,
+          "zero_crossing_rate": 0.029027478448275863,
+          "low_band_energy_ratio": 0.9961327268870926,
+          "high_band_energy_ratio": 2.5718265449211617e-06,
+          "harmonic_energy_ratio": 0.8358985185623169
+        },
+        "temporal": {
+          "onset_count": 5,
+          "onset_density_per_second": 2.7082839635735807,
+          "estimated_tempo_bpm": 267.85714285714283,
+          "periodicity_seconds": 0.256,
+          "periodicity_strength": 0.11199358818507689,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 46.99856394734768,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9995966955292203
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Crime 808.wav",
+      "embedding_cosine": 0.771098256111145,
+      "content_identity": {
+        "content_sha256": "47d9394cd0f685ebb426c28e9afcb482cdf728b48802406807ae47d820cef10f",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Crime 808.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Crime 808.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.8172824136233182,
+        "aspects": {
+          "spectrum": 0.6688135755451491,
+          "timbre": 0.8957927853260768,
+          "pitch": 0.500000847597839,
+          "amplitude": 0.9625080520183289,
+          "temporal": 0.876605611056995,
+          "spatial": 0.9999736101955202
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Crime 808.wav",
+        "source": {
+          "sample_rate_hz": 48000,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.8461875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -9.660844419524974,
+          "peak_dbfs": 0.04271330313947882,
+          "crest_factor": 3.056172658964991,
+          "clipped_fraction": 0.05321777988422086,
+          "leading_silence_seconds": 0.0,
+          "trailing_silence_seconds": 1.056
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 178.5043679246204,
+          "spectral_rolloff_hz": 228.98706896551724,
+          "spectral_flatness": 0.5000907778739929,
+          "zero_crossing_rate": 0.004478717672413793,
+          "low_band_energy_ratio": 0.9967408171386243,
+          "high_band_energy_ratio": 7.564367274064285e-06,
+          "harmonic_energy_ratio": 0.8013891577720642
+        },
+        "temporal": {
+          "onset_count": 2,
+          "onset_density_per_second": 1.0833135854294322,
+          "estimated_tempo_bpm": 187.5,
+          "periodicity_seconds": 0.32,
+          "periodicity_strength": 0.14462964129213984,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 4000.0,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9999999999974729
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "noisy_or_inharmonic",
+          "possible_clipping",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity",
+          "clipping_may_distort_features"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/Guilty Spinz.wav",
+      "embedding_cosine": 0.7708985805511475,
+      "content_identity": {
+        "content_sha256": "7b95596a25677558856bf2229ef6d1ef642a08ff70625d31a73e08c797824035",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/Guilty Spinz.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/Guilty Spinz.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.8752236797994795,
+        "aspects": {
+          "spectrum": 0.770019566736581,
+          "timbre": 0.8295056067822707,
+          "pitch": 1.0,
+          "amplitude": 0.9424565093348817,
+          "temporal": 0.7093843086504132,
+          "spatial": 0.9999760872927302
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/Guilty Spinz.wav",
+        "source": {
+          "sample_rate_hz": 48000,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.8461875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -9.759572898572154,
+          "peak_dbfs": -1.0695292986823397,
+          "crest_factor": 2.7195821373412086,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0016875,
+          "trailing_silence_seconds": 0.699
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 114.94746064664352,
+          "spectral_rolloff_hz": 181.4385775862069,
+          "spectral_flatness": 0.31113770604133606,
+          "zero_crossing_rate": 0.0048912311422413795,
+          "low_band_energy_ratio": 0.9950591668037815,
+          "high_band_energy_ratio": 1.0729560897707619e-06,
+          "harmonic_energy_ratio": 0.8612974882125854
+        },
+        "temporal": {
+          "onset_count": 5,
+          "onset_density_per_second": 2.7082839635735807,
+          "estimated_tempo_bpm": 234.375,
+          "periodicity_seconds": 0.256,
+          "periodicity_strength": 0.38808233649647095,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 40.0,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9999991329916431
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Morbius 808.wav",
+      "embedding_cosine": 0.7688155174255371,
+      "content_identity": {
+        "content_sha256": "ec7f28b0aa749df02bc2e12da82c81779c92a8181882c0aacf5394331fab4085",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Morbius 808.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Morbius 808.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.8216008577361299,
+        "aspects": {
+          "spectrum": 0.747251341988641,
+          "timbre": 0.8306166413256822,
+          "pitch": 0.7608740172814275,
+          "amplitude": 0.8216238875807499,
+          "temporal": 0.7692627527171139,
+          "spatial": 0.9999765055231652
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Morbius 808.wav",
+        "source": {
+          "sample_rate_hz": 44100,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.8461875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -12.469643553987824,
+          "peak_dbfs": -1.6593200680969986,
+          "crest_factor": 3.4714920441698,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.0030625,
+          "trailing_silence_seconds": 1.01775
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 122.90946097492376,
+          "spectral_rolloff_hz": 172.27909482758622,
+          "spectral_flatness": 0.48276954889297485,
+          "zero_crossing_rate": 0.00537109375,
+          "low_band_energy_ratio": 0.9950020429968204,
+          "high_band_energy_ratio": 2.4618269147529436e-06,
+          "harmonic_energy_ratio": 0.814649224281311
+        },
+        "temporal": {
+          "onset_count": 5,
+          "onset_density_per_second": 2.7082839635735807,
+          "estimated_tempo_bpm": 208.33333333333334,
+          "periodicity_seconds": 0.288,
+          "periodicity_strength": 0.2690749385138573,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 50.11648560936237,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9999989866075211
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/808s/Spottem Yeah I Gottem 808.wav",
+      "embedding_cosine": 0.7674968242645264,
+      "content_identity": {
+        "content_sha256": "38487b2c87b830e48ab6bcf6d777f91696f6a4852cda17d2a9b8bb7672314816",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/808s/Spottem Yeah I Gottem 808.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/808s/Spottem Yeah I Gottem 808.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.7742419748286378,
+        "aspects": {
+          "spectrum": 0.689870083623114,
+          "timbre": 0.8212657838707698,
+          "pitch": 0.500000847597839,
+          "amplitude": 0.9101053053134306,
+          "temporal": 0.7242354308185295,
+          "spatial": 0.9999743977481437
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 2/808s/Spottem Yeah I Gottem 808.wav",
+        "source": {
+          "sample_rate_hz": 48000,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.8461875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -10.299983286718255,
+          "peak_dbfs": -1.6657975579169115,
+          "crest_factor": 2.7021489597619035,
+          "clipped_fraction": 0.0,
+          "leading_silence_seconds": 0.001625,
+          "trailing_silence_seconds": 1.060625
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 100.0135260715504,
+          "spectral_rolloff_hz": 172.00969827586206,
+          "spectral_flatness": 0.5344834923744202,
+          "zero_crossing_rate": 0.004040948275862069,
+          "low_band_energy_ratio": 0.9951750229135867,
+          "high_band_energy_ratio": 2.124219779309731e-06,
+          "harmonic_energy_ratio": 0.867040753364563
+        },
+        "temporal": {
+          "onset_count": 5,
+          "onset_density_per_second": 2.7082839635735807,
+          "estimated_tempo_bpm": 125.0,
+          "periodicity_seconds": 0.256,
+          "periodicity_strength": 0.34528653306949936,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 4000.0,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9999997243468889
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Beam 808.wav",
+      "embedding_cosine": 0.7591189742088318,
+      "content_identity": {
+        "content_sha256": "a57eb40132703c0888727afcf9a2507ecbd26f6208fd6ab3015c919995847129",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Beam 808.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Beam 808.wav"
+        ]
+      },
+      "aspect_similarity": {
+        "overall": 0.9273202145577257,
+        "aspects": {
+          "spectrum": 0.7946635362852872,
+          "timbre": 0.8848299450841295,
+          "pitch": 1.0,
+          "amplitude": 0.9627061323439605,
+          "temporal": 0.9217459530119365,
+          "spatial": 0.9999757206210399
+        }
+      },
+      "definition_card": {
+        "record_type": "slo_audio_definition_card",
+        "schema_version": "1.0.0",
+        "feature_version": "definition_card_v1",
+        "safety": {
+          "source_modified": false,
+          "semantic_label_created": false,
+          "rename_action": false,
+          "heuristics_are_not_ground_truth": true
+        },
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Beam 808.wav",
+        "source": {
+          "sample_rate_hz": 48000,
+          "channels": 2,
+          "analysis_sample_rate_hz": 16000,
+          "analysis_duration_seconds": 1.8461875,
+          "truncated": false
+        },
+        "signal": {
+          "rms_dbfs": -8.509457354711621,
+          "peak_dbfs": 0.011820804846639773,
+          "crest_factor": 2.6672511311364104,
+          "clipped_fraction": 0.04962930363248587,
+          "leading_silence_seconds": 0.001875,
+          "trailing_silence_seconds": 0.5755
+        },
+        "spectrum": {
+          "spectral_centroid_hz": 117.7598661244987,
+          "spectral_rolloff_hz": 184.9407327586207,
+          "spectral_flatness": 0.2586216628551483,
+          "zero_crossing_rate": 0.006457098599137931,
+          "low_band_energy_ratio": 0.9974116133595694,
+          "high_band_energy_ratio": 1.124832416814535e-06,
+          "harmonic_energy_ratio": 0.8858092427253723
+        },
+        "temporal": {
+          "onset_count": 3,
+          "onset_density_per_second": 1.6249703781441482,
+          "estimated_tempo_bpm": 312.5,
+          "periodicity_seconds": 0.256,
+          "periodicity_strength": 0.1088962979855462,
+          "form_hint": "mixed_or_uncertain_form",
+          "form_hint_confidence": 0.35
+        },
+        "pitch": {
+          "median_f0_hz": 40.0,
+          "voiced_frame_fraction": 1.0
+        },
+        "spatial": {
+          "stereo_correlation": 0.9999992613298272
+        },
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "possible_clipping",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": [
+          "weak_periodicity",
+          "clipping_may_distort_features"
+        ]
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Distorted_Kicks/KSHMR_Distorted_Kick_01_C.wav",
+      "embedding_cosine": 0.7518898844718933,
+      "content_identity": {
+        "content_sha256": "8ea8d63c948678a93c11c9fdf1bbbc0c9ea1c795f4e7e76f8aded3db0ecd6f40",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Distorted_Kicks/KSHMR_Distorted_Kick_01_C.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums/KSHMR_Kicks/KSHMR_Hip_Hop_kicks/KSHMR_Distorted_Kicks/KSHMR_Distorted_Kick_01_C.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Upgraded Spinz.wav",
+      "embedding_cosine": 0.7506362199783325,
+      "content_identity": {
+        "content_sha256": "e27160306c993091e02fe34be87178d414d46782199d3f08c65b6ad489d060df",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Upgraded Spinz.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Upgraded Spinz.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Bio 808.wav",
+      "embedding_cosine": 0.7461531162261963,
+      "content_identity": {
+        "content_sha256": "bd4f6bb6f3c1947385c1942db6ac6933760974f29056ffc696b47dfeefed36d8",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Bio 808.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/@prod.ksubi - Bio 808.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/808s/Prophecy 808 .wav",
+      "embedding_cosine": 0.7446712851524353,
+      "content_identity": {
+        "content_sha256": "61fb7e290c8aad7529626beaa43587eb9e556562702245b4f18e164b8256ea3f",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/808s/Prophecy 808 .wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Official Drum Kit Vol. 1/808s/Prophecy 808 .wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 1/New Wave Drum Kit/808s/Slime 808 .wav",
+      "embedding_cosine": 0.7428221106529236,
+      "content_identity": {
+        "content_sha256": "22cbd2a2fccaeb9d07f9db83ecb596817dcadc531d586d4c6a3033e116a7970c",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 1/New Wave Drum Kit/808s/Slime 808 .wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 1/New Wave Drum Kit/808s/Slime 808 .wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Runnitt.wav",
+      "embedding_cosine": 0.7380917072296143,
+      "content_identity": {
+        "content_sha256": "5eacf33f83cfce681a8c2785a03da42feae310f478d594db9818de05f7f42448",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Runnitt.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Runnitt.wav"
+        ]
+      },
+      "aspect_similarity": null
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/Spinzay.wav",
+      "embedding_cosine": 0.7352376580238342,
+      "content_identity": {
+        "content_sha256": "6e879c4a0884b96430ec37240d595171dad5aa8058f85c648a7c75dadf809f78",
+        "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/Spinzay.wav",
+        "alias_paths": [
+          "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drum Kit Vol. 001/808s/Spinzay.wav"
+        ]
+      },
+      "aspect_similarity": null
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "source_files_modified": false,
+    "semantic_labels_created": false,
+    "rename_actions": false,
+    "similarity_is_not_class_probability": true,
+    "content_aliases_deduplicated": true
+  },
+  "errors": [],
+  "embedding_cache": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/candidate_embeddings_testing_v1.npz",
+    "sha256": "2e63c0662b155c89ab781c6551966fc33de533007f6179c443c3aa4b64d5d401",
+    "n_indexed": 7315
+  },
+  "content_index": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_content_addressed_embedding_index_testing_v1.json",
+    "sha256": "f8f2736bb3d456656b035de854dde75c74dc6215b27755819722c754e8b284a6",
+    "n_content_ids": 6980
+  }
+}

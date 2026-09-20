@@ -1,0 +1,12 @@
+[project]
+name = "audio-analysis"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["nite-core"]
+
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["audio_analysis*"]

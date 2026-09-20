@@ -1,0 +1,54 @@
+{
+  "timestamp": "20260709T225924Z",
+  "overall": {
+    "ok": false,
+    "failures": [
+      "automix render ratio: worst case 'edm' at 3.104x exceeds SLO 2.00x",
+      "genre matrix: pass rate 70.00% (7/10) below 90.00% -- failed cases: ['rock', 'hip_hop', 'edm']"
+    ],
+    "categories": {
+      "automix_render_ratio": {
+        "ok": false,
+        "failures": [
+          "automix render ratio: worst case 'edm' at 3.104x exceeds SLO 2.00x"
+        ],
+        "worst_case": "edm",
+        "worst_ratio": 3.104,
+        "case_ratios": {
+          "pop": 1.972,
+          "rock": 2.096,
+          "hip_hop": 2.223,
+          "edm": 3.104,
+          "acoustic_folk": 1.638,
+          "classical": 1.471,
+          "jazz": 1.81,
+          "podcast_spoken_word": 1.153,
+          "ambient_cinematic": 1.819,
+          "metal": 1.89
+        },
+        "slo_ratio": 2.0
+      },
+      "automix_genre_matrix": {
+        "ok": false,
+        "failures": [
+          "genre matrix: pass rate 70.00% (7/10) below 90.00% -- failed cases: ['rock', 'hip_hop', 'edm']"
+        ],
+        "pass_rate": 0.7,
+        "passed_cases": [
+          "pop",
+          "acoustic_folk",
+          "classical",
+          "jazz",
+          "podcast_spoken_word",
+          "ambient_cinematic",
+          "metal"
+        ],
+        "failed_cases": [
+          "rock",
+          "hip_hop",
+          "edm"
+        ]
+      }
+    }
+  }
+}

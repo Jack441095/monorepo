@@ -1,0 +1,37 @@
+{
+  "version": "px-performance-budgets-v1",
+  "evidence_class": "recommended budgets with measured proxy references",
+  "conditions": {
+    "ui_frame_budget_ms": 16.7,
+    "map_frame_fail_ms": 33.4,
+    "search_fixture": "25,000 synthetic samples",
+    "ipc_fixture": "existing nite_ai LocalRuntime company.brief.daily, 100 requests"
+  },
+  "budgets": {
+    "plugin_open_ms": {"target": 250, "stretch": 150, "fail": 500},
+    "first_paint_ms": {"target": 100, "stretch": 60, "fail": 200},
+    "search_response_ms": {"target": 50, "stretch": 20, "fail": 200},
+    "filter_update_ms": {"target": 50, "stretch": 20, "fail": 100},
+    "map_frame_p95_ms": {"target": 16.7, "stretch": 8.3, "fail": 33.4},
+    "audition_start_warm_ms": {"target": 100, "stretch": 50, "fail": 250},
+    "drag_initiation_ms": {"target": 100, "stretch": 50, "fail": 250},
+    "ipc_roundtrip_p95_ms": {"target": 5, "stretch": 2, "fail": 20},
+    "background_analysis_ui_block_ms": {"target": 0, "stretch": 0, "fail": 16.7},
+    "library_scan_ui_frame_p95_ms": {"target": 16.7, "stretch": 8.3, "fail": 33.4}
+  },
+  "measured_proxies": {
+    "search_linear_25000_worst_query_median_ms": 241.9812,
+    "search_indexed_25000_worst_query_median_ms": 6.4816,
+    "map_full_scan_25000_median_ms": 11.9241,
+    "map_cell_cull_25000_median_ms": 0.3452,
+    "ipc_roundtrip_median_ms": 0.5481,
+    "ipc_roundtrip_p95_ms": 16.3472,
+    "ipc_roundtrip_max_ms": 131.4537
+  },
+  "interpretation": [
+    "Synthetic search proxy misses the 50 ms target for the observed linear path and meets it for the exact-token candidate.",
+    "Synthetic map proxy stays below one frame for both paths, but it does not invoke JUCE or the production QuadTree.",
+    "Measured IPC median is healthy; the P95 and maximum tail need cold-start, concurrency, and host-load investigation before a hard promise.",
+    "Budgets are recommendations, not release qualification until measured on representative hardware and real fixtures."
+  ]
+}

@@ -1,0 +1,260 @@
+{
+  "record_type": "slo_physical_feature_fusion_eval",
+  "schema_version": "1.0.0",
+  "method_version": "physical_feature_fusion_v1",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false
+  },
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 5,
+    "splits": 5,
+    "min_examples": 5,
+    "min_collections": 5,
+    "feature_version": "definition_card_v1",
+    "fusion": "standardise each block on train fold, L2 normalise rows, concatenate acoustic block with stated weight, nearest centroid",
+    "weights": [
+      0.0,
+      0.25,
+      0.5,
+      1.0
+    ]
+  },
+  "corpus": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_breadth_final_v1.npz",
+    "sha256": "676215be62160ea6da8c2cb4073d504670b4043bf9bfb15e7da0ef5410a95642",
+    "n_rows": 1832,
+    "n_classes": 28,
+    "n_collections": 81,
+    "classes": [
+      "Bass Hit",
+      "Bass Loop",
+      "Bass Reese",
+      "Chord Loop",
+      "Clap",
+      "Crash",
+      "Drum Loop",
+      "Foley",
+      "Foley Loop",
+      "Hi-Hat",
+      "Hi-Hat Loop",
+      "Impact",
+      "Kick",
+      "Kick Loop",
+      "Other/none",
+      "Pad",
+      "Percussion",
+      "Percussion Loop",
+      "Rimshot",
+      "Riser",
+      "SFX",
+      "Snare",
+      "Synth Loop",
+      "Synth One-Shot",
+      "Top Loop",
+      "Vocal Loop",
+      "Vocal One-Shot",
+      "Weather/Nature Atmos"
+    ]
+  },
+  "acoustic_features": [
+    "source.analysis_duration_seconds",
+    "signal.rms_dbfs",
+    "signal.peak_dbfs",
+    "signal.crest_factor",
+    "signal.clipped_fraction",
+    "signal.leading_silence_seconds",
+    "signal.trailing_silence_seconds",
+    "spectrum.spectral_centroid_hz",
+    "spectrum.spectral_rolloff_hz",
+    "spectrum.spectral_flatness",
+    "spectrum.zero_crossing_rate",
+    "spectrum.low_band_energy_ratio",
+    "spectrum.high_band_energy_ratio",
+    "spectrum.harmonic_energy_ratio",
+    "temporal.onset_count",
+    "temporal.onset_density_per_second",
+    "temporal.estimated_tempo_bpm",
+    "temporal.periodicity_seconds",
+    "temporal.periodicity_strength",
+    "pitch.median_f0_hz",
+    "pitch.voiced_frame_fraction",
+    "spatial.stereo_correlation"
+  ],
+  "definition_cards": {
+    "path": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_breadth_final_physical_feature_cards_1850_v1.json",
+    "n_cards": 1850,
+    "n_errors": 0
+  },
+  "results": {
+    "acoustic_weight_0": {
+      "acoustic_weight": 0.0,
+      "accuracy_mean": 0.5597161572052402,
+      "accuracy_sd": 0.005033686411964429,
+      "macro_f1_mean": 0.48046794189597125,
+      "coverage_at_90_precision_mean": 0.21899563318777293,
+      "coverage_at_95_precision_mean": 0.10709606986899563,
+      "per_seed": [
+        {
+          "accuracy": 0.5496724890829694,
+          "macro_f1": 0.46778764533580697,
+          "coverage_at_90_precision": 0.16266375545851527,
+          "coverage_at_95_precision": 0.07641921397379912
+        },
+        {
+          "accuracy": 0.5627729257641921,
+          "macro_f1": 0.48858066455035587,
+          "coverage_at_90_precision": 0.23635371179039302,
+          "coverage_at_95_precision": 0.12663755458515283
+        },
+        {
+          "accuracy": 0.5622270742358079,
+          "macro_f1": 0.4771356103368481,
+          "coverage_at_90_precision": 0.24781659388646288,
+          "coverage_at_95_precision": 0.14410480349344978
+        },
+        {
+          "accuracy": 0.5616812227074236,
+          "macro_f1": 0.48202254769153013,
+          "coverage_at_90_precision": 0.22980349344978165,
+          "coverage_at_95_precision": 0.11135371179039301
+        },
+        {
+          "accuracy": 0.5622270742358079,
+          "macro_f1": 0.4868132415653154,
+          "coverage_at_90_precision": 0.2183406113537118,
+          "coverage_at_95_precision": 0.0769650655021834
+        }
+      ],
+      "delta_accuracy_pp_vs_embedding_only": 0.0
+    },
+    "acoustic_weight_0.25": {
+      "acoustic_weight": 0.25,
+      "accuracy_mean": 0.5596069868995632,
+      "accuracy_sd": 0.0049956599077063705,
+      "macro_f1_mean": 0.4803377357438663,
+      "coverage_at_90_precision_mean": 0.2193231441048035,
+      "coverage_at_95_precision_mean": 0.10709606986899563,
+      "per_seed": [
+        {
+          "accuracy": 0.5496724890829694,
+          "macro_f1": 0.46778764533580697,
+          "coverage_at_90_precision": 0.16430131004366813,
+          "coverage_at_95_precision": 0.0769650655021834
+        },
+        {
+          "accuracy": 0.5627729257641921,
+          "macro_f1": 0.48858066455035587,
+          "coverage_at_90_precision": 0.23635371179039302,
+          "coverage_at_95_precision": 0.12609170305676856
+        },
+        {
+          "accuracy": 0.5622270742358079,
+          "macro_f1": 0.4771356103368481,
+          "coverage_at_90_precision": 0.24781659388646288,
+          "coverage_at_95_precision": 0.14410480349344978
+        },
+        {
+          "accuracy": 0.5611353711790393,
+          "macro_f1": 0.4813715169310052,
+          "coverage_at_90_precision": 0.22980349344978165,
+          "coverage_at_95_precision": 0.11135371179039301
+        },
+        {
+          "accuracy": 0.5622270742358079,
+          "macro_f1": 0.4868132415653154,
+          "coverage_at_90_precision": 0.2183406113537118,
+          "coverage_at_95_precision": 0.0769650655021834
+        }
+      ],
+      "delta_accuracy_pp_vs_embedding_only": -0.010917030567691999
+    },
+    "acoustic_weight_0.5": {
+      "acoustic_weight": 0.5,
+      "accuracy_mean": 0.5600436681222708,
+      "accuracy_sd": 0.004942895817760617,
+      "macro_f1_mean": 0.48060377892618994,
+      "coverage_at_90_precision_mean": 0.2193231441048035,
+      "coverage_at_95_precision_mean": 0.10742358078602621,
+      "per_seed": [
+        {
+          "accuracy": 0.5502183406113537,
+          "macro_f1": 0.46778411986577006,
+          "coverage_at_90_precision": 0.16593886462882096,
+          "coverage_at_95_precision": 0.07860262008733625
+        },
+        {
+          "accuracy": 0.5622270742358079,
+          "macro_f1": 0.4878145893579807,
+          "coverage_at_90_precision": 0.23580786026200873,
+          "coverage_at_95_precision": 0.12663755458515283
+        },
+        {
+          "accuracy": 0.5627729257641921,
+          "macro_f1": 0.47760093765179457,
+          "coverage_at_90_precision": 0.2472707423580786,
+          "coverage_at_95_precision": 0.14410480349344978
+        },
+        {
+          "accuracy": 0.5616812227074236,
+          "macro_f1": 0.48153658956694434,
+          "coverage_at_90_precision": 0.2292576419213974,
+          "coverage_at_95_precision": 0.11244541484716157
+        },
+        {
+          "accuracy": 0.5633187772925764,
+          "macro_f1": 0.48828265818845995,
+          "coverage_at_90_precision": 0.2183406113537118,
+          "coverage_at_95_precision": 0.07532751091703056
+        }
+      ],
+      "delta_accuracy_pp_vs_embedding_only": 0.032751091703064894
+    },
+    "acoustic_weight_1": {
+      "acoustic_weight": 1.0,
+      "accuracy_mean": 0.5598253275109171,
+      "accuracy_sd": 0.0048405675278155565,
+      "macro_f1_mean": 0.4802727279931953,
+      "coverage_at_90_precision_mean": 0.21943231441048033,
+      "coverage_at_95_precision_mean": 0.12183406113537117,
+      "per_seed": [
+        {
+          "accuracy": 0.550764192139738,
+          "macro_f1": 0.4703932119376149,
+          "coverage_at_90_precision": 0.1653930131004367,
+          "coverage_at_95_precision": 0.08133187772925764
+        },
+        {
+          "accuracy": 0.5622270742358079,
+          "macro_f1": 0.48690469404964665,
+          "coverage_at_90_precision": 0.23635371179039302,
+          "coverage_at_95_precision": 0.13100436681222707
+        },
+        {
+          "accuracy": 0.5633187772925764,
+          "macro_f1": 0.47782271712654617,
+          "coverage_at_90_precision": 0.24344978165938866,
+          "coverage_at_95_precision": 0.15010917030567686
+        },
+        {
+          "accuracy": 0.5589519650655022,
+          "macro_f1": 0.4788084430601465,
+          "coverage_at_90_precision": 0.23198689956331878,
+          "coverage_at_95_precision": 0.11408296943231441
+        },
+        {
+          "accuracy": 0.5638646288209607,
+          "macro_f1": 0.48743457379202254,
+          "coverage_at_90_precision": 0.21997816593886463,
+          "coverage_at_95_precision": 0.1326419213973799
+        }
+      ],
+      "delta_accuracy_pp_vs_embedding_only": 0.010917030567691999
+    }
+  },
+  "decision": "research_only; no promotion unless an arm clears the pre-registered +2pp accuracy gate and class/rejection gates",
+  "generated": "2026-09-12T18:47:05"
+}

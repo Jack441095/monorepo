@@ -1,0 +1,118 @@
+{
+ "artifact": "LAYER_ALIGNMENT_FROZEN_ENGINE_V1",
+ "canonical_digest_sha256": "3ca58dc6e4cb5f66554ce76604c1c0389bbb59becec30313007a0cb7ebf3d887",
+ "config": {
+  "classify_thresholds": {
+   "agree_tol_samples": 3.0,
+   "coh_related": 0.45,
+   "coh_unrelated": 0.22,
+   "prom_related": 12.0,
+   "prom_unrelated": 5.0
+  },
+  "estimator_config": {
+   "ambiguity_rel_threshold": 0.85,
+   "confidence_feature": "gcc_soft gamma=0.35",
+   "cross_spectrum": {
+    "floor_db": -70.0,
+    "smooth_bins": 7,
+    "window": "hann"
+   },
+   "default_bands_hz": [
+    [
+     "sub",
+     20,
+     60
+    ],
+    [
+     "bass",
+     60,
+     250
+    ],
+    [
+     "low_mid",
+     250,
+     500
+    ],
+    [
+     "mid",
+     500,
+     2000
+    ],
+    [
+     "high_mid",
+     2000,
+     6000
+    ],
+    [
+     "high",
+     6000,
+     16000
+    ]
+   ],
+   "gcc_soft_gamma": 0.35,
+   "non_overlapping_abstain_below": 0.15,
+   "primary": "xcorr_plain(parabolic on unnormalised profile)",
+   "spectral_overlap_rel_thr_db": -20.0
+  },
+  "fast_search": {
+   "bands_hz_weight": [
+    [
+     20,
+     120,
+     3.0
+    ],
+    [
+     120,
+     250,
+     2.0
+    ],
+    [
+     20,
+     null,
+     1.0
+    ]
+   ],
+   "coarse_step": 2,
+   "max_dev": 10,
+   "prior_weight": 0.05
+  },
+  "policy_notes": [
+   "estimate-then-verify: correlation owns timing; energy objective verifies within +/-10 samples of measured offset",
+   "NO_ACTION is first-class; abstention classes: UNRELATED, AMBIGUOUS(periodic), AMBIGUOUS(non-overlapping spectra)",
+   "low-band benefit gate blocks broadband-only 'wins' on decorrelated material"
+  ],
+  "recommend_policy": {
+   "low_band_gate_db": {
+    "active_low_min": 2.5,
+    "broadband_fallback": 1.0
+   },
+   "min_improvement_db": 0.25
+  }
+ },
+ "created_utc": "2026-08-23T19:25:42.569384+00:00",
+ "engine_files_sha256": {
+  "cpp_spike/nla_spike.bin": "085b1d6d928fd29dee587d8b23c7697a7d8b1b49e27a1da07d212c2e91673d1a",
+  "cpp_spike/nla_spike.cpp": "a0bb29f87f0c1a835ce2fbdd2a09d0f4bd5524b63d7f0e238d952286e2d0486c",
+  "src/nla/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "src/nla/corpus.py": "e901a5c2c7059db7e1d1358bcf1c40fbd81e06a3c83cc1884b256ce74a98c442",
+  "src/nla/decision.py": "f48d8faaff0bba8b6c202be548ff8a5203a781eae9a628f1580c62f960675ce8",
+  "src/nla/interaction.py": "94ca5b135502f5ff40a73e2ed3ae881afb403e5f9d7a14db91925a7e519ada72",
+  "src/nla/methods.py": "65c8cbc6ea7b939f0f3c6bde9086b91941d848cc7427454c4018a2f7dde0cab9",
+  "src/nla/scenarios.py": "1a4117f7bd6f1ee361b8e90d3baf18e006d480c3e6b3f322283b24f4c55d19fc"
+ },
+ "environment": {
+  "machine": "x86_64",
+  "numpy": "1.26.4",
+  "platform": "macOS-26.5.2-x86_64-i386-64bit",
+  "python": "3.12.13",
+  "scipy": "1.13.1"
+ },
+ "git_branch": "research/layer-alignment-real-validation-v1",
+ "git_dirty": true,
+ "git_head": "81711d28b5187a9d2a32cdb3e24733790cd41d5a",
+ "rules": [
+  "no tuning on real audio after this freeze",
+  "failures found on real audio are REPORTED (V2 backlog), not patched",
+  "real audio must not become a secret development set"
+ ]
+}

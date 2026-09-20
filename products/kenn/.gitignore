@@ -1,0 +1,132 @@
+# KENN product. Build output, dependency caches, virtualenvs,
+# and generated artifacts are deliberately excluded: they are large and
+# fully regenerable.
+
+# OS / editor noise
+.DS_Store
+._*
+.vscode/
+.vscode/*.log
+
+# Local AI/editor agent metadata (never part of the product source)
+.claude/
+**/.claude/
+.cursor/
+**/.cursor/
+.codex/
+**/.codex/
+.windsurf/
+**/.windsurf/
+.continue/
+**/.continue/
+.roo/
+**/.roo/
+.junie/
+**/.junie/
+.amazonq/
+**/.amazonq/
+.aider*
+**/.aider*
+.mcp.json
+**/.mcp.json
+AGENTS.md
+**/AGENTS.md
+CLAUDE.md
+**/CLAUDE.md
+GEMINI.md
+**/GEMINI.md
+.github/copilot-instructions.md
+**/copilot-instructions.md
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.env
+.env.*
+!.env.example
+
+# Build systems / dependency fetch caches (JUCE, Eigen, dr_libs, node, etc.)
+build/
+build-*/
+_build/
+_cache/
+_deps/
+dist/
+*.o
+*.a
+*.dylib
+node_modules/
+
+# Pure build/cache scratch space — not source, not final reports
+workspace/builds/
+workspace/caches/
+workspace/worktrees/
+workspace/tmp/
+
+# Large binary/model/media artifacts that don't belong in git
+*.safetensors
+*.pkl
+*.dmg
+*.tar.gz
+*.zip
+*.sqlite3
+*.sqlite
+data/*.db
+*.wav
+*.pack
+
+# Toolchains vendored into validation runs
+**/toolchain/
+
+# KENN's built retrieval index and local runtime DBs -- regenerated from
+# apps/backend/src/kenn/Training_Data_Notes/ via `python3 apps/backend/src/kenn/main.py build`.
+# Not committed: it's generated, can be large, and staleness would be
+# invisible if committed alongside source content that has since changed.
+apps/backend/src/kenn/data/
+apps/backend/src/kenn/chats/
+apps/backend/src/kenn/artifacts/
+apps/backend/src/kenn/logs/
+# Local knowledge corpora are kept on each workstation. Reviewed source files
+# that are already part of the repository are force-added during migrations;
+# newly harvested material must go through an explicit licensing/review pass.
+apps/backend/src/kenn/Training_Data_Notes/
+apps/backend/src/kenn/Training_Data_Sources/
+apps/backend/src/kenn/Training_Data_Transcripts/
+apps/backend/src/kenn/Training_Data_PDF/
+# Licensed Ableton manuals are local-only source material. They may be indexed
+# only through the explicit build flag and must never be staged or distributed.
+apps/backend/src/kenn/Training_Data_PDF/live*-manual-*.pdf
+packages/chat/.runtime/
+.runtime/
+
+# Raw build logs — no lasting value, can be large
+*.log
+
+# Point-in-time beta gate reports are regenerated locally. Durable, source-bound
+# qualification receipts remain explicitly tracked under evaluation/results/.
+tooling/evaluation/results/KENN_INTERNAL_BETA_READINESS.json
+
+# Sensitive real-document corpus pending privacy review (see
+# NITE_DSP_REPOSITORY_OWNERSHIP_AUDIT_V1.md) — excluded here as a second
+# layer of protection on top of nite-submit's own .gitignore.
+**/real_validation_corpus/
+
+# Legacy/superseded repos, already fully backed up on their own branches of
+# github.com/Jack441095/Nite_DSP_01 (ux/slo-v3-premium-product,
+# web/nitedsp-world-class-v3) — kept on disk for reference, not re-linked
+# here since they're dead branches, not active work.
+archive/legacy-layout/slo-ux-v3/
+archive/legacy-layout/web-v3/
+
+# Empty placeholder repos (zero commits) left over from a prior estate
+# audit snapshot — nothing to protect.
+validation/audits/estate-protection-v1/snapshots/empty_repos/
+research/audio/lab/
+research/product-experience/Nite_DSP_Product_Experience_RnD/
+
+# Local frontend dependencies and output
+apps/frontend/node_modules/
+apps/frontend/dist/

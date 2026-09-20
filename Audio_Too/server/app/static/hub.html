@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0b0b">
+    <meta name="application-name" content="Audio_Too">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Audio_Too">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <title>Thursday</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg:        #0b0b0b;
+        --surface:   #111111;
+        --surface-2: #181818;
+        --surface-3: #202020;
+        --border:    #2a2a2a;
+        --border-2:  #363636;
+        --text:      #e4e4e7;
+        --muted:     #71717a;
+        --muted-2:   #52525b;
+        --green:     #22c55e;
+        --green-dim: #166534;
+        --purple:    #a78bfa;
+        --purple-dim:#4c1d95;
+        --blue:      #60a5fa;
+        --blue-dim:  #1e3a5f;
+        --red:       #f87171;
+        --amber:     #fbbf24;
+        --radius:    8px;
+        --radius-lg: 12px;
+      }
+
+      html, body { height: 100%; }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      /* ── Header ─────────────────────────────────────────────── */
+      .hub-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        height: 52px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        gap: 16px;
+      }
+      .hub-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .hub-wordmark {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      .hub-wordmark span { color: var(--blue); }
+      .hub-divider { width: 1px; height: 20px; background: var(--border-2); }
+      .hub-subtitle { font-size: 12px; color: var(--muted); letter-spacing: 0.02em; }
+
+      .hub-header-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      /* ── Status pills ────────────────────────────────────────── */
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        border: 1px solid transparent;
+      }
+      .pill::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .pill-green  { background: rgba(34,197,94,.08);  border-color: rgba(34,197,94,.2);  color: var(--green);  }
+      .pill-green::before  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+      .pill-amber  { background: rgba(251,191,36,.08);  border-color: rgba(251,191,36,.2);  color: var(--amber);  }
+      .pill-amber::before  { background: var(--amber); }
+      .pill-muted  { background: rgba(113,113,122,.08);  border-color: rgba(113,113,122,.2);  color: var(--muted);  }
+      .pill-muted::before  { background: var(--muted); }
+      .pill-red    { background: rgba(248,113,113,.08);  border-color: rgba(248,113,113,.2);  color: var(--red);    }
+      .pill-red::before    { background: var(--red); }
+
+      /* ── Main layout ─────────────────────────────────────────── */
+      .hub-body {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      /* ── Left panel — services ───────────────────────────────── */
+      .hub-services {
+        width: 300px;
+        flex-shrink: 0;
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      .services-section {
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .services-section:last-child { border-bottom: none; }
+
+      .section-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .section-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-studio   { background: var(--green); box-shadow: 0 0 5px var(--green); }
+      .dot-business { background: var(--purple); box-shadow: 0 0 5px var(--purple); }
+
+      .service-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 12px;
+        border-radius: var(--radius);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        margin-bottom: 6px;
+        text-decoration: none;
+        color: inherit;
+        transition: background .12s, border-color .12s;
+      }
+      .service-card:last-child { margin-bottom: 0; }
+      .service-card:hover { background: var(--surface-3); border-color: var(--border-2); }
+
+      .sc-info { min-width: 0; }
+      .sc-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sc-desc {
+        font-size: 11px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 1px;
+      }
+      .sc-badge {
+        flex-shrink: 0;
+        margin-left: 8px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        padding: 2px 7px;
+        border-radius: 999px;
+        color: var(--muted);
+        background: var(--surface-3);
+        border: 1px solid var(--border-2);
+      }
+      .sc-badge-green  { color: var(--green);  background: rgba(34,197,94,.08);  border-color: rgba(34,197,94,.2); }
+      .sc-badge-purple { color: var(--purple); background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.2); }
+
+      /* ── Right panel — chat ──────────────────────────────────── */
+      .hub-chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 0;
+      }
+
+      .chat-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        background: var(--surface);
+      }
+      .chat-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .chat-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .voice-badge {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid;
+      }
+      .voice-thursday {
+        color: var(--blue);
+        background: rgba(96,165,250,.08);
+        border-color: rgba(96,165,250,.25);
+      }
+      .voice-kenn {
+        color: var(--green);
+        background: rgba(34,197,94,.08);
+        border-color: rgba(34,197,94,.25);
+      }
+      .tts-toggle {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        color: var(--muted);
+        cursor: pointer;
+        user-select: none;
+      }
+      .tts-toggle input { accent-color: var(--green); cursor: pointer; }
+      .tts-select {
+        background: var(--surface-hover);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        outline: none;
+        cursor: pointer;
+      }
+      .tts-select:focus {
+        border-color: var(--green);
+      }
+      #tts-loading {
+        font-size: 10px;
+        color: var(--muted);
+        display: none;
+        letter-spacing: 0.03em;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.15s ease;
+      }
+      #tts-loading:hover {
+        color: #ef4444; /* red */
+        text-decoration: underline;
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-2) transparent;
+      }
+      .chat-messages::-webkit-scrollbar { width: 4px; }
+      .chat-messages::-webkit-scrollbar-track { background: transparent; }
+      .chat-messages::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+      .msg-feedback-container {
+        display: flex;
+        gap: 8px;
+        margin-top: 6px;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+      }
+      .msg-feedback-container:hover {
+        opacity: 1.0;
+      }
+      .feedback-up-btn, .feedback-down-btn {
+        background: transparent;
+        border: 1px solid var(--border-2);
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 2px 6px;
+        font-size: 11px;
+        color: var(--text-muted);
+        transition: all 0.2s ease;
+      }
+      .feedback-up-btn:hover {
+        background: rgba(46, 204, 113, 0.15);
+        border-color: #2ecc71;
+        color: #2ecc71;
+      }
+      .feedback-down-btn:hover {
+        background: rgba(231, 76, 60, 0.15);
+        border-color: #e74c3c;
+        color: #e74c3c;
+      }
+      .feedback-up-btn.active {
+        background: #2ecc71;
+        border-color: #2ecc71;
+        color: #fff;
+      }
+      .feedback-down-btn.active {
+        background: #e74c3c;
+        border-color: #e74c3c;
+        color: #fff;
+      }
+
+      @keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+      .msg {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        max-width: 88%;
+        animation: msgIn .18s ease;
+      }
+      .msg-user { align-self: flex-end; flex-direction: row-reverse; }
+      .msg-assistant, .msg-kenn { align-self: flex-start; }
+
+      /* Avatar circle */
+      .msg-avatar {
+        width: 26px; height: 26px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 10px; font-weight: 700;
+        margin-top: 2px;
+      }
+      .msg-avatar-thursday {
+        background: rgba(96,165,250,.12);
+        color: var(--blue);
+        border: 1px solid rgba(96,165,250,.22);
+      }
+      .msg-avatar-kenn {
+        background: rgba(34,197,94,.1);
+        color: var(--green);
+        border: 1px solid rgba(34,197,94,.2);
+      }
+
+      /* Body column: name header + bubble */
+      .msg-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+      .msg-header { display: flex; align-items: baseline; gap: 8px; padding: 0 2px; }
+      .msg-name {
+        font-size: 10px; font-weight: 600;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        color: var(--muted);
+      }
+      .msg-name-kenn { color: var(--green); }
+      .msg-name-thursday { color: var(--blue); }
+      .msg-route {
+        font-size: 9px; color: var(--muted-2);
+        letter-spacing: 0.03em;
+      }
+
+      .msg-bubble {
+        padding: 10px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        font-size: 13px;
+        line-height: 1.65;
+        word-break: break-word;
+      }
+      .msg-user .msg-bubble {
+        background: rgba(96,165,250,.09);
+        border-color: rgba(96,165,250,.18);
+        border-top-right-radius: 4px;
+      }
+      .msg-assistant .msg-bubble {
+        background: var(--surface-2);
+        border-top-left-radius: 4px;
+      }
+      .msg-kenn .msg-bubble {
+        background: rgba(34,197,94,.04);
+        border-color: rgba(34,197,94,.14);
+        border-top-left-radius: 4px;
+      }
+
+      /* Markdown elements inside bubbles */
+      .msg-bubble p { margin: 0 0 0.55em; }
+      .msg-bubble p:last-child { margin-bottom: 0; }
+      .msg-bubble strong { font-weight: 600; color: var(--text); }
+      .msg-bubble em { font-style: italic; color: var(--text); }
+      .msg-bubble .mh { font-weight: 600; margin: 0.6em 0 0.15em; }
+      .msg-bubble .mh2 { font-size: 13px; }
+      .msg-bubble .mh3 { font-size: 12px; color: var(--muted); }
+      .msg-bubble ul, .msg-bubble ol { margin: 0.3em 0; padding-left: 1.4em; }
+      .msg-bubble li { margin: 0.15em 0; }
+      .msg-bubble code {
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-family: "SF Mono","Fira Code",monospace;
+        font-size: 11.5px;
+      }
+      .msg-bubble pre {
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin: 0.5em 0;
+        overflow-x: auto;
+      }
+      .msg-bubble pre code {
+        background: none; border: none; padding: 0;
+        font-size: 12px; line-height: 1.5; white-space: pre;
+      }
+
+      /* Nav suggestions */
+      .chat-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 0 20px 10px;
+      }
+      .sugg-btn {
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border-2);
+        background: var(--surface-2);
+        color: var(--muted);
+        text-decoration: none;
+        transition: border-color .12s, color .12s;
+      }
+      .sugg-btn:hover { border-color: var(--border-2); color: var(--text); }
+
+      /* ── Chat input ──────────────────────────────────────────── */
+      .chat-input-area {
+        padding: 12px 20px 16px;
+        border-top: 1px solid var(--border);
+        background: var(--surface);
+        flex-shrink: 0;
+      }
+      .chat-form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: var(--surface-2);
+        border: 1px solid var(--border-2);
+        border-radius: var(--radius-lg);
+        padding: 8px 12px;
+        transition: border-color .12s;
+      }
+      .chat-form:focus-within { border-color: rgba(96,165,250,.4); }
+      .chat-form.siri-listening {
+        border-color: var(--blue) !important;
+        box-shadow: 0 0 15px rgba(96, 165, 250, 0.4) !important;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+      .chat-form.siri-speaking {
+        border-color: var(--purple) !important;
+        box-shadow: 0 0 15px rgba(167, 139, 250, 0.4) !important;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+
+      #thursday-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text);
+        font-size: 13px;
+        font-family: inherit;
+        line-height: 1.5;
+        min-width: 0;
+      }
+      #thursday-input::placeholder { color: var(--muted-2); }
+
+      .icon-btn {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: background .12s, color .12s, border-color .12s;
+        line-height: 1;
+      }
+      .icon-btn:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-2); }
+      #mic-btn.recording {
+        background: rgba(239,68,68,.15);
+        border-color: rgba(239,68,68,.35);
+        color: var(--red);
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+      @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)} 50%{box-shadow:0 0 0 5px rgba(239,68,68,0)} }
+
+      #thursday-submit {
+        flex-shrink: 0;
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        border: 1px solid rgba(96,165,250,.28);
+        background: rgba(96,165,250,.1);
+        color: var(--blue);
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background .12s, border-color .12s;
+      }
+      #thursday-submit:hover:not(:disabled) {
+        background: rgba(96,165,250,.2);
+        border-color: rgba(96,165,250,.5);
+      }
+      #thursday-submit:disabled { opacity: .35; cursor: default; }
+
+      /* ── Thinking indicator ──────────────────────────────────── */
+      .thinking {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+        padding: 10px 14px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        border-top-left-radius: 4px;
+        width: fit-content;
+      }
+      .thinking span {
+        width: 5px; height: 5px;
+        border-radius: 50%;
+        background: var(--muted-2);
+        animation: bounce 1.2s ease-in-out infinite;
+      }
+      .thinking span:nth-child(2) { animation-delay: .15s; }
+      .thinking span:nth-child(3) { animation-delay: .3s; }
+      @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
+
+      /* ── Scrollbar ───────────────────────────────────────────── */
+      .hub-services::-webkit-scrollbar { width: 4px; }
+      .hub-services::-webkit-scrollbar-track { background: transparent; }
+      .hub-services::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+      /* Standalone/mobile application shell */
+      @media (max-width: 760px) {
+        .hub-header { padding: 0 14px; }
+        .hub-subtitle, .hub-divider, #pill-llm, #pill-audio { display: none; }
+        .hub-body { flex-direction: column; overflow: hidden; }
+        .hub-services {
+          width: 100%;
+          max-height: 126px;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+          flex-direction: row;
+          overflow-x: auto;
+          overflow-y: hidden;
+        }
+        .services-section { min-width: 270px; border-bottom: none; border-right: 1px solid var(--border); }
+        .service-card { padding: 6px 10px; }
+        .chat-header, .chat-messages, .chat-input-area { padding-left: 12px; padding-right: 12px; }
+        .msg { max-width: 92%; }
+      }
+    </style>
+    <link rel="stylesheet" href="/studio-theme.css">
+    <script src="/app-shell.js" data-active="hub" data-page="Hub" defer></script>
+  </head>
+  <body>
+
+    <!-- ── Header ──────────────────────────────────────────────── -->
+    <header class="hub-header">
+      <div class="hub-header-left">
+        <span class="hub-wordmark">Thursday<span>.</span></span>
+        <div class="hub-divider"></div>
+        <span class="hub-subtitle">AI Studio Orchestrator</span>
+      </div>
+      <div class="hub-header-right">
+        <span id="pill-kenn"  class="pill pill-muted">KENN</span>
+        <span id="pill-llm"   class="pill pill-muted">LLM</span>
+        <span id="pill-audio" class="pill pill-muted">AudioGen</span>
+      </div>
+    </header>
+
+    <!-- ── Body ────────────────────────────────────────────────── -->
+    <div class="hub-body">
+
+      <!-- ── Services sidebar ──────────────────────────────────── -->
+      <nav class="hub-services" aria-label="Website, Portfolio, Audio_Gen, and KENN services">
+
+        <div class="services-section">
+          <div class="section-label">
+            <span class="section-dot dot-studio"></span>
+            Studio
+          </div>
+          <a class="service-card" href="/kenn">
+            <div class="sc-info">
+              <div class="sc-name">KENN</div>
+              <div class="sc-desc">Audio engineering knowledge base</div>
+            </div>
+            <span id="kenn-badge" class="sc-badge">—</span>
+          </a>
+          <a class="service-card" href="/audio-analysis">
+            <div class="sc-info">
+              <div class="sc-name">Mix Review</div>
+              <div class="sc-desc">Analyse audio, get a spoken verdict</div>
+            </div>
+            <span class="sc-badge sc-badge-green">Online</span>
+          </a>
+          <a class="service-card" href="/automix">
+            <div class="sc-info">
+              <div class="sc-name">AutoMix</div>
+              <div class="sc-desc">AI-assisted stem mixing</div>
+            </div>
+            <span class="sc-badge sc-badge-green">Online</span>
+          </a>
+          <a class="service-card" href="/creative-lab">
+            <div class="sc-info">
+              <div class="sc-name">AudioGen</div>
+              <div class="sc-desc">Generate loops, beats, full songs</div>
+            </div>
+            <span id="audiogen-badge" class="sc-badge">—</span>
+          </a>
+          <div class="service-card" title="DAW plugin — not a web page. Load it in your DAW's plugin list.">
+            <div class="sc-info">
+              <div class="sc-name">Smart Sample Manager</div>
+              <div class="sc-desc">AI sample tagging &amp; similarity map (VST3/AU)</div>
+            </div>
+            <span id="ssm-badge" class="sc-badge">—</span>
+          </div>
+        </div>
+
+        <div class="services-section">
+          <div class="section-label">
+            <span class="section-dot dot-business"></span>
+            Business
+          </div>
+          <a class="service-card" href="/dashboard">
+            <div class="sc-info">
+              <div class="sc-name">Dashboard</div>
+              <div class="sc-desc">Business overview, pipeline, reminders</div>
+            </div>
+            <span class="sc-badge sc-badge-purple">Live</span>
+          </a>
+          <a class="service-card" href="/dashboard?tab=crm">
+            <div class="sc-info">
+              <div class="sc-name">Clients &amp; CRM</div>
+              <div class="sc-desc">Client records, sessions, enquiries</div>
+            </div>
+            <span class="sc-badge sc-badge-purple">Live</span>
+          </a>
+          <a class="service-card" href="/dashboard?tab=invoices">
+            <div class="sc-info">
+              <div class="sc-name">Invoices</div>
+              <div class="sc-desc">Drafts, sent invoices, payment tracking</div>
+            </div>
+            <span class="sc-badge sc-badge-purple">Live</span>
+          </a>
+          <a class="service-card" href="/dashboard?tab=calendar">
+            <div class="sc-info">
+              <div class="sc-name">Calendar</div>
+              <div class="sc-desc">Agenda, scheduling, daily briefing</div>
+            </div>
+            <span class="sc-badge sc-badge-purple">Live</span>
+          </a>
+        </div>
+
+      </nav>
+
+      <!-- ── Chat panel ─────────────────────────────────────────── -->
+      <section class="hub-chat">
+        <div class="chat-header">
+          <span class="chat-title">Ask Thursday</span>
+          <div class="chat-controls">
+            <span id="tts-loading">● Speaking…</span>
+            <select id="tts-voice" class="tts-select" title="TTS Voice Profile">
+              <option value="af_heart" selected>Heart (Warm F)</option>
+              <option value="af_bella">Bella (Crisp F)</option>
+              <option value="af_sarah">Sarah (Natural F)</option>
+              <option value="af_nicole">Nicole (Prof F)</option>
+              <option value="am_adam">Adam (Clear M)</option>
+            </select>
+            <label class="tts-toggle">
+              <input type="checkbox" id="tts-enabled" checked>
+              <span>Voice</span>
+            </label>
+            <label class="tts-toggle" style="margin-left: 10px;" title="Hands-free continuous conversation mode">
+              <input type="checkbox" id="siri-enabled">
+              <span>Siri Mode</span>
+            </label>
+            <label class="tts-toggle" style="margin-left: 10px;" title="Require 'Hey Thursday' wake word to submit">
+              <input type="checkbox" id="wake-word-enabled" checked>
+              <span>Hey Thursday</span>
+            </label>
+            <span id="active-voice-badge" class="voice-badge voice-thursday">Thursday</span>
+          </div>
+        </div>
+
+        <div id="chat-messages" class="chat-messages">
+          <div class="msg msg-assistant">
+            <div class="msg-avatar msg-avatar-thursday">T</div>
+            <div class="msg-body">
+              <div class="msg-header"><span class="msg-name msg-name-thursday">Thursday</span></div>
+              <div class="msg-bubble">Hi — what do you need? Ask a production question, say "speak with KENN", try "how's business", or type "show invoices".</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="chat-suggestions" class="chat-suggestions"></div>
+
+        <div class="chat-input-area">
+          <div class="chat-form">
+            <input type="text" id="thursday-input" placeholder="Ask Thursday anything…" autocomplete="off">
+            <button type="button" id="mic-btn" class="icon-btn" title="Click to speak" aria-label="Voice input">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            </button>
+            <button type="button" id="thursday-submit" title="Send (Enter)" aria-label="Send">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // Inject Mock SpeechRecognition if requested via URL search param
+      if (window.location.search.includes('mockSpeech=1') || window.location.search.includes('test=1')) {
+        class MockSpeechRecognition {
+          constructor() {
+            this.continuous = false;
+            this.interimResults = false;
+            this.lang = 'en-US';
+          }
+          start() {
+            setTimeout(() => {
+              if (this.onstart) this.onstart();
+              setTimeout(() => {
+                if (this.onresult) {
+                  const event = { results: [[{ transcript: "Thursday, how's business" }]] };
+                  this.onresult(event);
+                }
+                setTimeout(() => {
+                  if (this.onend) this.onend();
+                }, 100);
+              }, 1200);
+            }, 200);
+          }
+          abort() {}
+          stop() {}
+        }
+        window.SpeechRecognition = MockSpeechRecognition;
+        window.webkitSpeechRecognition = MockSpeechRecognition;
+        console.log("Mock SpeechRecognition injected successfully!");
+      }
+
+      // ── Elements ───────────────────────────────────────────────
+      const input       = document.getElementById('thursday-input');
+      const submitBtn   = document.getElementById('thursday-submit');
+      const messages    = document.getElementById('chat-messages');
+      const suggestions = document.getElementById('chat-suggestions');
+      const voiceBadge  = document.getElementById('active-voice-badge');
+      const ttsEnabled  = document.getElementById('tts-enabled');
+      const siriEnabled = document.getElementById('siri-enabled');
+      const ttsLoading  = document.getElementById('tts-loading');
+      const micBtn      = document.getElementById('mic-btn');
+
+      let sessionId   = '';
+      let loading     = false;
+      let activeVoice = 'thursday';
+      let currentSource = null;
+      let csrfToken   = '';
+
+      // AudioContext — unlocked on first interaction, bypasses autoplay policy
+      let audioCtx = null;
+      function unlockAudio() {
+        if (audioCtx) return;
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          // Play a silent buffer to fully unlock
+          const buf = audioCtx.createBuffer(1, 1, 22050);
+          const src = audioCtx.createBufferSource();
+          src.buffer = buf;
+          src.connect(audioCtx.destination);
+          src.start(0);
+        } catch(e) {}
+      }
+      document.addEventListener('click', unlockAudio, { once: true });
+      document.addEventListener('keydown', unlockAudio, { once: true });
+
+      // ── Audible states / sound effects (P0 Voice States) ──
+      const SoundEffects = {
+        playTone(frequency, type, duration, volume) {
+          try {
+            unlockAudio();
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') {
+              audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+          } catch (e) {
+            console.warn("Audible tone blocked or failed:", e);
+          }
+        },
+        listening() {
+          // Upward clean tone chime
+          this.playTone(523.25, 'sine', 0.15, 0.08); // C5
+          setTimeout(() => this.playTone(659.25, 'sine', 0.15, 0.08), 80); // E5
+        },
+        thinking() {
+          // Subtle low frequency hum
+          this.playTone(220, 'triangle', 0.2, 0.04);
+        },
+        confirming() {
+          // Double chime (attention/confirm)
+          this.playTone(587.33, 'sine', 0.1, 0.08); // D5
+          setTimeout(() => this.playTone(587.33, 'sine', 0.1, 0.08), 100);
+        },
+        executing() {
+          // Successful ascending sweep
+          this.playTone(440, 'sine', 0.1, 0.08); // A4
+          setTimeout(() => this.playTone(880, 'sine', 0.2, 0.08), 100); // A5
+        },
+        failed() {
+          // Descending buzzer tone
+          this.playTone(180, 'sawtooth', 0.3, 0.08);
+        }
+      };
+
+      // ── Intent → branch mapping ────────────────────────────────
+      const INTENT_ROUTE = {
+        production_qa:             { branch: 'studio',   leaf: 'KENN' },
+        kenn_voice_mode:           { branch: 'studio',   leaf: 'Voice' },
+        mix_review_audio_analysis: { branch: 'studio',   leaf: 'Mix Review' },
+        audio_generation:          { branch: 'studio',   leaf: 'AudioGen' },
+        financial:                 { branch: 'business', leaf: 'Finance' },
+        client_mgmt:               { branch: 'business', leaf: 'CRM' },
+        business_ops:              { branch: 'business', leaf: 'Dashboard' },
+        calendar_scheduling:       { branch: 'business', leaf: 'Calendar' },
+        agent_tasks:               { branch: 'business', leaf: 'Agent' },
+        search:                    { branch: 'business', leaf: 'Search' },
+        system_diagnostics:        { branch: 'system',   leaf: 'Diagnostics' },
+        macro:                     { branch: 'system',   leaf: 'Macro' },
+        system:                    { branch: 'system',   leaf: 'System' },
+      };
+
+      function esc(v) {
+        return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      function renderMarkdown(raw) {
+        const PH_BLOCK = '@@CODEBLOCK_', PH_INLINE = '@@INLINECODE_', END = '@@';
+        const blocks = [], inlines = [];
+        let t = String(raw);
+        t = t.replace(/```[\w]*\n?([\s\S]*?)```/g, (_, c) => { blocks.push(c); return PH_BLOCK + (blocks.length-1) + END; });
+        t = t.replace(/`([^`\n]+)`/g, (_, c) => { inlines.push(c); return PH_INLINE + (inlines.length-1) + END; });
+        // Escape HTML
+        t = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        // Bold / italic
+        t = t.replace(/\*\*\*([^*\n]+)\*\*\*/g,'<strong><em>$1</em></strong>');
+        t = t.replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>');
+        t = t.replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+        // Line-by-line for headers + lists
+        const lines = t.split('\n');
+        let inUl = false, inOl = false;
+        const out = [];
+        for (const line of lines) {
+          const hm = line.match(/^(#{1,3}) (.+)$/);
+          const ul = line.match(/^[-*•] (.+)$/);
+          const ol = line.match(/^\d+\. (.+)$/);
+          if (inUl && !ul) { out.push('</ul>'); inUl = false; }
+          if (inOl && !ol) { out.push('</ol>'); inOl = false; }
+          if (hm) {
+            const cls = ['mh','mh1','mh2','mh3'][hm[1].length] || 'mh';
+            out.push(`<p class="mh ${cls}">${hm[2]}</p>`);
+          } else if (ul) {
+            if (!inUl) { out.push('<ul>'); inUl = true; }
+            out.push(`<li>${ul[1]}</li>`);
+          } else if (ol) {
+            if (!inOl) { out.push('<ol>'); inOl = true; }
+            out.push(`<li>${ol[1]}</li>`);
+          } else { out.push(line); }
+        }
+        if (inUl) out.push('</ul>');
+        if (inOl) out.push('</ol>');
+        t = out.join('\n');
+        // Paragraphs
+        t = '<p>' + t.replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>') + '</p>';
+        // Restore inline code
+        inlines.forEach((c, i) => {
+          const e = c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          t = t.replace(PH_INLINE + i + END, `<code>${e}</code>`);
+        });
+        // Restore code blocks
+        blocks.forEach((c, i) => {
+          const e = c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          t = t.replace(PH_BLOCK + i + END, `<pre><code>${e}</code></pre>`);
+        });
+        return t;
+      }
+
+      function updateVoiceBadge(voice) {
+        activeVoice = voice;
+        voiceBadge.textContent = voice === 'kenn' ? 'KENN' : 'Thursday';
+        voiceBadge.className = 'voice-badge voice-' + voice;
+      }
+
+      function detectVoiceSwitch(question, answer) {
+        if (/\bkenn\b/i.test(question) && /\b(speak with|talk to|switch to|kenn mode)\b/i.test(question)) updateVoiceBadge('kenn');
+        else if (/back to thursday|thursday mode/i.test(question)) updateVoiceBadge('thursday');
+        if (/KENN here/i.test(answer)) updateVoiceBadge('kenn');
+        else if (/Back to Thursday/i.test(answer)) updateVoiceBadge('thursday');
+      }
+
+function extractForSpeech(text) {
+        let t = text;
+        // Strip trailing meta/citation sections that are never meant to be
+        // spoken aloud — e.g. KENN's "Past reasoning on this topic:" block,
+        // which dumps raw "User query: ... / Conclusion: ..." records for
+        // audit purposes. This must run BEFORE the "short answer" extraction
+        // below (which only fires when that template matched) so it also
+        // catches non-templated/degraded answers where the reasoning dump is
+        // effectively the entire body of text. Left unstripped, this text was
+        // fed whole into the sentence-splitter — its embedded quotes and
+        // question marks fragment it into many tiny, disjointed TTS chunks,
+        // and its length routinely blew past the 400-char cap below, so
+        // playback both stuttered (many short start/stop clips) and cut off
+        // mid-sentence (hard truncation landing inside the reasoning dump).
+        // Non-greedy up to the first blank line: the backend always follows
+        // this block with a blank-line boundary (see chat_answer.py's
+        // build_intent_answer) before the real answer body resumes, since
+        // the block is inserted near the TOP of the answer, not the end.
+        // Falls back to end-of-string if no blank line is found so this
+        // still degrades safely against future formatting changes.
+        t = t.replace(/past reasoning on this topic\s*:[\s\S]*?(?:\n[ \t]*\n|$)/i, '').trim();
+        const m = t.match(/short answer\s*:?\s*([\s\S]+?)(?=try this|why it matters|sources|you could also ask|$)/i);
+        if (m) t = m[1].trim();
+        t = t.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/`[^`]+`/g,'').replace(/#+\s*/g,'');
+        t = t.replace(/[ \t\r\f]+/g, ' ').replace(/\n\s*/g, '\n').trim();
+        if (t.length <= 400) return t;
+        // Truncate at the last sentence boundary within the cap instead of a
+        // raw character cut, so playback never audibly stops mid-sentence.
+        const clipped = t.slice(0, 397);
+        const lastBoundary = Math.max(clipped.lastIndexOf('. '), clipped.lastIndexOf('! '), clipped.lastIndexOf('? '));
+        return (lastBoundary > 200 ? clipped.slice(0, lastBoundary + 1) : clipped) + (lastBoundary > 200 ? '' : '...');
+      }
+
+      function browserSpeechFallback(text, voice) {
+        if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) return false;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = voice === 'kenn' ? 1.02 : 1.08;
+        const preferred = voice === 'kenn' ? ['Alex', 'Daniel', 'Tom'] : ['Samantha', 'Fiona', 'Kate'];
+        const voices = window.speechSynthesis.getVoices();
+        utterance.voice = voices.find(v => preferred.includes(v.name)) || null;
+        utterance.onend = () => { ttsLoading.style.display = 'none'; };
+        utterance.onerror = () => {
+          ttsLoading.textContent = 'Voice playback failed';
+          ttsLoading.style.display = 'inline';
+        };
+        window.speechSynthesis.speak(utterance);
+        return true;
+      }
+
+      class SpeechQueueManager {
+        constructor() {
+          this.queue = [];
+          this.isProcessing = false;
+          this.unreadText = "";
+          this.spokenSentences = new Set();
+          this.processedLength = 0;
+        }
+
+        reset() {
+          this.queue = [];
+          this.isProcessing = false;
+          this.unreadText = "";
+          this.spokenSentences.clear();
+          this.processedLength = 0;
+          if (currentSource) {
+            try { currentSource.stop(); } catch(e) {}
+            currentSource = null;
+          }
+          if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+          }
+          ttsLoading.style.display = 'none';
+          const form = document.querySelector('.chat-form');
+          if (form) {
+            form.classList.remove('siri-speaking');
+          }
+        }
+
+        feedToken(token, voice) {
+          if (!ttsEnabled.checked) return;
+          this.unreadText += token;
+
+          const currentSpokenText = extractForSpeech(this.unreadText);
+          if (!currentSpokenText) return;
+
+          this._processIncoming(voice, false);
+        }
+
+        finalize(voice) {
+          if (!ttsEnabled.checked) return;
+          const currentSpokenText = extractForSpeech(this.unreadText);
+          if (currentSpokenText) {
+            this._processIncoming(voice, true);
+          }
+        }
+
+        _processIncoming(voice, isFinal) {
+          const currentSpokenText = extractForSpeech(this.unreadText);
+          while (this.processedLength < currentSpokenText.length) {
+            const unprocessed = currentSpokenText.slice(this.processedLength);
+            if (!unprocessed) break;
+
+            const useCommaSplit = (this.processedLength === 0);
+            const regex = useCommaSplit ? /(?:[^.!?;\n,]|,(?=\d))+([.!?;\n]|,(?!\d)|$)/ : /[^.!?;\n]+([.!?;\n]|$)/;
+            const match = unprocessed.match(regex);
+            if (!match) break;
+
+            const matchedText = match[0];
+            const delimiter = match[1] || "";
+
+            if (delimiter === "" && !isFinal) {
+              break;
+            }
+
+            const trimmed = matchedText.trim();
+            this.processedLength += matchedText.length;
+
+            if (trimmed) {
+              this.enqueue(trimmed, voice);
+            }
+          }
+        }
+
+        async fetchAudio(text, voice, speed) {
+          try {
+            if (!audioCtx) { unlockAudio(); if (audioCtx) audioCtx.resume(); }
+            const response = await fetch('/api/thursday/speak', {
+              method: 'POST', credentials: 'same-origin',
+              headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+              body: JSON.stringify({ text: text, voice: voice, speed: speed })
+            });
+            if (!response.ok) throw new Error('TTS fetch failed');
+            const arrayBuf = await response.arrayBuffer();
+            if (audioCtx) {
+              return await audioCtx.decodeAudioData(arrayBuf);
+            }
+            return arrayBuf;
+          } catch (e) {
+            console.error("Audio pre-fetch failed:", e);
+            return null;
+          }
+        }
+
+        enqueue(text, voice) {
+          // Calculate dynamic speed based on text length
+          let speed = 1.10;
+          if (text.length < 50) {
+            speed = 1.14; // snappy for short affirmations
+          } else if (text.length > 150) {
+            speed = 1.06; // slower for long explanations
+          }
+
+          // Use the selected voice dropdown if the speaker is Thursday (i.e. not 'kenn').
+          // KENN's voice is a distinct male voice, so we preserve it.
+          const voiceSelect = document.getElementById('tts-voice');
+          const selectedVoice = voiceSelect ? voiceSelect.value : 'af_heart';
+          const resolvedVoice = (voice === 'kenn') ? 'kenn' : selectedVoice;
+
+          const fetchPromise = this.fetchAudio(text, resolvedVoice, speed);
+          this.queue.push({ text, voice: resolvedVoice, speed, fetchPromise });
+          this.processQueue();
+        }
+
+        async processQueue() {
+          if (this.isProcessing) return;
+          this.isProcessing = true;
+
+          while (this.queue.length > 0) {
+            if (!ttsEnabled.checked) {
+              this.queue = [];
+              break;
+            }
+            const item = this.queue.shift();
+            ttsLoading.textContent = '● Speaking…';
+            ttsLoading.style.display = 'inline';
+
+            try {
+              const audioData = await item.fetchPromise;
+              if (!ttsEnabled.checked) break;
+              if (!audioData) throw new Error('TTS unavailable');
+
+              if (audioCtx) {
+                await new Promise((resolve) => {
+                  if (!ttsEnabled.checked) { resolve(); return; }
+                  const src = audioCtx.createBufferSource();
+                  src.buffer = audioData;
+                  src.connect(audioCtx.destination);
+                  src.onended = resolve;
+                  src.start(0);
+                  currentSource = src;
+                });
+              } else {
+                const blob = new Blob([audioData], { type: 'audio/wav' });
+                const url = URL.createObjectURL(blob);
+                await new Promise((resolve, reject) => {
+                  if (!ttsEnabled.checked) { resolve(); return; }
+                  const audio = new Audio(url);
+                  audio.onended = resolve;
+                  audio.onerror = reject;
+                  audio.play().catch(reject);
+                });
+                URL.revokeObjectURL(url);
+              }
+            } catch (e) {
+              console.error("Streaming TTS error, falling back:", e);
+              await new Promise((resolve) => {
+                if (!window.speechSynthesis || !window.SpeechSynthesisUtterance || !ttsEnabled.checked) {
+                  resolve();
+                  return;
+                }
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(item.text);
+                utterance.rate = item.voice === 'kenn' ? 1.02 : 1.08;
+                const preferred = item.voice === 'kenn' ? ['Alex', 'Daniel', 'Tom'] : ['Samantha', 'Fiona', 'Kate'];
+                const voices = window.speechSynthesis.getVoices();
+                utterance.voice = voices.find(v => preferred.includes(v.name)) || null;
+                utterance.onend = () => resolve();
+                utterance.onerror = () => resolve();
+                window.speechSynthesis.speak(utterance);
+              });
+            }
+          }
+
+          this.isProcessing = false;
+          if (this.queue.length === 0) {
+            ttsLoading.style.display = 'none';
+            if (!loading) {
+              const form = document.querySelector('.chat-form');
+              if (form) {
+                form.classList.remove('siri-speaking');
+              }
+              if (siriEnabled && siriEnabled.checked) {
+                startSiriListening();
+              }
+            }
+          }
+        }
+      }
+      const speechQueueManager = new SpeechQueueManager();
+
+      async function speakText(text, voice) {
+        speechQueueManager.reset();
+        speechQueueManager.feedToken(text, voice);
+        speechQueueManager.finalize(voice);
+      }
+
+      function addThinking() {
+        const el = document.createElement('div');
+        const isKenn = activeVoice === 'kenn';
+        el.className = 'msg msg-assistant' + (isKenn ? ' msg-kenn' : '');
+        el.id = 'thinking-indicator';
+        const avatarClass = isKenn ? 'msg-avatar-kenn' : 'msg-avatar-thursday';
+        const avatarLetter = isKenn ? 'K' : 'T';
+        const nameClass = isKenn ? 'msg-name msg-name-kenn' : 'msg-name msg-name-thursday';
+        const name = isKenn ? 'KENN' : 'Thursday';
+        el.innerHTML =
+          `<div class="msg-avatar ${avatarClass}">${avatarLetter}</div>` +
+          '<div class="msg-body">' +
+            `<div class="msg-header"><span class="${nameClass}">${name}</span></div>` +
+            '<div class="thinking"><span></span><span></span><span></span></div>' +
+          '</div>';
+        messages.appendChild(el);
+        messages.scrollTop = messages.scrollHeight;
+        return el;
+      }
+
+      async function submitExplicitFeedback(turnId, rating, btn) {
+        const container = btn.closest('.msg-feedback-container');
+        if (!container) return;
+
+        // Remove active class from both buttons
+        container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+
+        try {
+          await ensureCsrf();
+          const resp = await fetch('/api/thursday/feedback', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+            body: JSON.stringify({ turn_id: turnId, rating: rating, session_id: sessionId })
+          });
+          if (resp.ok) {
+            btn.classList.add('active');
+            SoundEffects.confirming();
+          } else {
+            console.error('Failed to submit feedback');
+          }
+        } catch (err) {
+          console.error('Error submitting feedback:', err);
+        }
+      }
+
+      function attachFeedbackButtons(msgDiv, turnId) {
+        if (!turnId || msgDiv.querySelector('.msg-feedback-container')) return;
+        const msgBody = msgDiv.querySelector('.msg-body');
+        if (!msgBody) return;
+
+        const feedbackContainer = document.createElement('div');
+        feedbackContainer.className = 'msg-feedback-container';
+
+        const thumbsUp = document.createElement('button');
+        thumbsUp.className = 'feedback-up-btn';
+        thumbsUp.type = 'button';
+        thumbsUp.title = 'Helpful';
+        thumbsUp.innerHTML = '👍';
+        thumbsUp.onclick = () => submitExplicitFeedback(turnId, 1, thumbsUp);
+
+        const thumbsDown = document.createElement('button');
+        thumbsDown.className = 'feedback-down-btn';
+        thumbsDown.type = 'button';
+        thumbsDown.title = 'Not helpful';
+        thumbsDown.innerHTML = '👎';
+        thumbsDown.onclick = () => submitExplicitFeedback(turnId, -1, thumbsDown);
+
+        feedbackContainer.appendChild(thumbsUp);
+        feedbackContainer.appendChild(thumbsDown);
+        msgBody.appendChild(feedbackContainer);
+      }
+
+      function addMessage(role, text, intent, turnId) {
+        const thinking = document.getElementById('thinking-indicator');
+        if (thinking) thinking.remove();
+
+        // KENN owns the answer when the route is KENN (production_qa) or the voice is
+        // switched to KENN — label + colour the message as KENN in either case.
+        const routeMap = INTENT_ROUTE[intent];
+        const isKenn = (role === 'assistant' && (routeMap && routeMap.leaf === 'KENN'));
+        if (role === 'assistant') activeVoice = isKenn ? 'kenn' : 'thursday';
+        const div = document.createElement('div');
+
+        if (role === 'user') {
+          div.className = 'msg msg-user';
+          div.innerHTML = '<div class="msg-bubble">' + esc(text) + '</div>';
+        } else {
+          div.className = 'msg msg-assistant' + (isKenn ? ' msg-kenn' : '');
+          const avatarClass = isKenn ? 'msg-avatar-kenn' : 'msg-avatar-thursday';
+          const avatarLetter = isKenn ? 'K' : 'T';
+          const nameClass = isKenn ? 'msg-name msg-name-kenn' : 'msg-name msg-name-thursday';
+          const name = isKenn ? 'KENN' : 'Thursday';
+          const map = routeMap;
+          const routeHtml = (map && intent && intent !== 'unknown')
+            ? `<span class="msg-route">${esc(map.branch)} › ${esc(map.leaf)}</span>`
+            : '';
+          div.innerHTML =
+            `<div class="msg-avatar ${avatarClass}">${avatarLetter}</div>` +
+            '<div class="msg-body">' +
+              `<div class="msg-header"><span class="${nameClass}">${name}</span>${routeHtml}</div>` +
+              `<div class="msg-bubble">${renderMarkdown(text)}</div>` +
+            '</div>';
+          if (turnId) {
+            attachFeedbackButtons(div, turnId);
+          }
+        }
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+        return div;
+      }
+
+      function renderSuggestions(suggs, navigateUrl, navigateLabel) {
+        suggestions.innerHTML = '';
+        if (navigateUrl) {
+          const a = document.createElement('a');
+          a.className = 'sugg-btn';
+          a.href = navigateUrl;
+          a.textContent = navigateLabel || 'Open';
+          suggestions.appendChild(a);
+        }
+        (suggs || []).forEach(function(s) {
+          const a = document.createElement('a');
+          a.className = 'sugg-btn';
+          a.href = s.url;
+          a.textContent = s.label;
+          suggestions.appendChild(a);
+        });
+      }
+
+      // ── Core send function ─────────────────────────────────────
+      async function sendMessage() {
+        const question = input.value.trim();
+        if (!question || loading) return;
+        speechQueueManager.reset();
+        if (siriEnabled && siriEnabled.checked) {
+          stopSiriRecognition();
+          const form = document.querySelector('.chat-form');
+          if (form) {
+            form.classList.add('siri-speaking');
+            form.classList.remove('siri-listening');
+          }
+        }
+        SoundEffects.thinking();
+        // Unlock audio NOW — we are still inside the user-gesture context
+        // (click or keydown). Once the first await fires, that context is gone
+        // and AudioContext.resume() will silently fail on Chrome.
+        unlockAudio();
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        input.value = '';
+        suggestions.innerHTML = '';
+        addMessage('user', question);
+        addThinking();
+        submitBtn.disabled = true;
+        loading = true;
+
+        try {
+          await ensureCsrf();
+
+          const resp = await fetch('/api/thursday/ask', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+            body: JSON.stringify({ question: question, session_id: sessionId, stream: true })
+          });
+
+          if (!resp.ok) {
+            const data = await resp.json().catch(() => ({}));
+            throw new Error(data.error || 'Thursday error');
+          }
+
+          const contentType = resp.headers.get("Content-Type") || "";
+          if (contentType.includes("text/event-stream")) {
+            const thinking = document.getElementById('thinking-indicator');
+            if (thinking) thinking.remove();
+
+            // Provisional guess only — corrected in both directions once the
+            // "metadata" event confirms which service actually answered.
+            const isKenn = activeVoice === 'kenn';
+            const routeMap = isKenn ? INTENT_ROUTE.production_qa : null;
+            const div = document.createElement('div');
+            div.className = 'msg msg-assistant' + (isKenn ? ' msg-kenn' : '');
+            const avatarClass = isKenn ? 'msg-avatar-kenn' : 'msg-avatar-thursday';
+            const avatarLetter = isKenn ? 'K' : 'T';
+            const nameClass = isKenn ? 'msg-name msg-name-kenn' : 'msg-name msg-name-thursday';
+            const name = isKenn ? 'KENN' : 'Thursday';
+            const routeHtml = routeMap ? `<span class="msg-route">${esc(routeMap.branch)} › ${esc(routeMap.leaf)}</span>` : '';
+            div.innerHTML =
+              `<div class="msg-avatar ${avatarClass}">${avatarLetter}</div>` +
+              '<div class="msg-body">' +
+                `<div class="msg-header"><span class="${nameClass}">${name}</span>${routeHtml}</div>` +
+                '<div class="msg-bubble"></div>' +
+              '</div>';
+            messages.appendChild(div);
+            const bubble = div.querySelector('.msg-bubble');
+
+            const reader = resp.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let buffer = "";
+            let streamDone = false;
+            let accumulatedAnswer = "";
+            let fullData = null;
+
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop();
+
+              for (const line of lines) {
+                const stripped = line.trim();
+                if (!stripped) continue;
+                if (stripped.startsWith("data: ")) {
+                  const jsonStr = stripped.slice(6).trim();
+                  try {
+                    const chunk = JSON.parse(jsonStr);
+                    if (chunk.event === "token") {
+                      accumulatedAnswer += chunk.token;
+                      bubble.innerHTML = renderMarkdown(accumulatedAnswer);
+                      messages.scrollTop = messages.scrollHeight;
+                      speechQueueManager.feedToken(chunk.token, activeVoice);
+                    } else if (chunk.event === "metadata") {
+                      fullData = chunk.data;
+                      sessionId = fullData.session_id || sessionId;
+                      if (fullData.intent === "confirm" || fullData.intent === "clarify") {
+                        SoundEffects.confirming();
+                      } else if (fullData.intent === "action_receipt") {
+                        SoundEffects.executing();
+                      }
+
+                      if (fullData.turn_id) {
+                        attachFeedbackButtons(div, fullData.turn_id);
+                      }
+                      
+                      // Trust only the backend-confirmed service for this turn — the
+                      // intent classifier alone (fullData.intent) can say "production_qa"
+                      // even when KENN's own pipeline asked a clarifying question or the
+                      // disambiguator intercepted, so it is not proof KENN answered.
+                      // Correct the badge in BOTH directions each turn (not just toward
+                      // KENN) so a later Thursday-only reply doesn't inherit a stale label.
+                      const isActuallyKenn = fullData.service === "kenn";
+                      activeVoice = isActuallyKenn ? 'kenn' : 'thursday';
+                      div.classList.toggle('msg-kenn', isActuallyKenn);
+                      const avatar = div.querySelector('.msg-avatar');
+                      if (avatar) {
+                        avatar.className = isActuallyKenn ? 'msg-avatar msg-avatar-kenn' : 'msg-avatar msg-avatar-thursday';
+                        avatar.textContent = isActuallyKenn ? 'K' : 'T';
+                      }
+                      const nameSpan = div.querySelector('.msg-name');
+                      if (nameSpan) {
+                        nameSpan.className = isActuallyKenn ? 'msg-name msg-name-kenn' : 'msg-name msg-name-thursday';
+                        nameSpan.textContent = isActuallyKenn ? 'KENN' : 'Thursday';
+                      }
+                      const header = div.querySelector('.msg-header');
+                      if (header) {
+                        const existingRoute = header.querySelector('.msg-route');
+                        if (isActuallyKenn && !existingRoute) {
+                          header.insertAdjacentHTML('beforeend', '<span class="msg-route">studio › KENN</span>');
+                        } else if (!isActuallyKenn && existingRoute) {
+                          existingRoute.remove();
+                        }
+                      }
+                    } else if (chunk.event === "done") {
+                      streamDone = true;
+                      break;
+                    }
+                  } catch (e) {
+                    console.error("Thursday stream JSON error:", e);
+                  }
+                }
+              }
+              if (streamDone) break;
+            }
+
+            if (fullData) {
+              detectVoiceSwitch(question, accumulatedAnswer);
+              speechQueueManager.finalize(activeVoice);
+              renderSuggestions(fullData.suggestions, fullData.navigate_url, fullData.navigate_label);
+            }
+          } else {
+            const data = await resp.json();
+            sessionId = data.session_id || sessionId;
+            if (data.intent === "confirm" || data.intent === "clarify") {
+              SoundEffects.confirming();
+            } else if (data.intent === "action_receipt") {
+              SoundEffects.executing();
+            }
+            detectVoiceSwitch(question, data.answer || '');
+            addMessage('assistant', data.answer || '(No response)', data.intent, data.turn_id);
+            speakText(data.answer || '', activeVoice);
+            renderSuggestions(data.suggestions, data.navigate_url, data.navigate_label);
+          }
+        } catch (err) {
+          SoundEffects.failed();
+          const thinking = document.getElementById('thinking-indicator');
+          if (thinking) thinking.remove();
+          addMessage('assistant', 'Error: ' + err.message);
+        } finally {
+          submitBtn.disabled = false;
+          loading = false;
+          if (siriEnabled && siriEnabled.checked && !speechQueueManager.isProcessing && speechQueueManager.queue.length === 0) {
+            const form = document.querySelector('.chat-form');
+            if (form) {
+              form.classList.remove('siri-speaking');
+            }
+            startSiriListening();
+          }
+        }
+      }
+
+      // ── Event listeners ────────────────────────────────────────
+      submitBtn.addEventListener('click', sendMessage);
+      ttsLoading.addEventListener('click', function() {
+        speechQueueManager.reset();
+      });
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      async function ensureCsrf() {
+        if (csrfToken) return csrfToken;
+        const response = await fetch('/api/auth/session', { credentials: 'same-origin' });
+        const session = await response.json();
+        csrfToken = session.csrf_token || '';
+        if (!response.ok || !csrfToken) throw new Error('Sign in before using voice controls');
+        return csrfToken;
+      }
+
+      // ── Siri Mode (Hands-free webkitSpeechRecognition loop) ───
+      let siriRecognition = null;
+      let siriListening = false;
+      let siriActiveCommandMode = false;
+
+      function initSiriRecognition() {
+        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+          console.warn("SpeechRecognition not supported in this browser.");
+          return;
+        }
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        siriRecognition = new SpeechRec();
+        siriRecognition.continuous = false;
+        siriRecognition.interimResults = false;
+        siriRecognition.lang = 'en-US';
+
+        siriRecognition.onstart = () => {
+          siriListening = true;
+          micBtn.classList.add('recording');
+          micBtn.title = 'Siri Mode Listening... Click to cancel';
+          
+          const wakeWordEnabled = document.getElementById('wake-word-enabled');
+          const isWakeWordChecked = wakeWordEnabled && wakeWordEnabled.checked;
+          const form = document.querySelector('.chat-form');
+
+          if (isWakeWordChecked && !siriActiveCommandMode) {
+            input.placeholder = "Say 'Hey Thursday'...";
+            if (form) {
+              form.classList.remove('siri-listening');
+              form.classList.remove('siri-speaking');
+            }
+          } else {
+            input.placeholder = siriActiveCommandMode ? "Yes? I'm listening..." : 'Listening... Speak now';
+            if (form) {
+              form.classList.add('siri-listening');
+              form.classList.remove('siri-speaking');
+            }
+            if (!isWakeWordChecked || siriActiveCommandMode) {
+              SoundEffects.listening();
+            }
+          }
+        };
+
+        siriRecognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript.trim();
+          if (!transcript) return;
+
+          const wakeWordEnabled = document.getElementById('wake-word-enabled');
+          const isWakeWordChecked = wakeWordEnabled && wakeWordEnabled.checked;
+
+          if (isWakeWordChecked) {
+            if (siriActiveCommandMode) {
+              input.value = transcript;
+              siriActiveCommandMode = false;
+              sendMessage();
+            } else {
+              const transcriptLower = transcript.toLowerCase();
+              const wakeMatch = transcriptLower.match(/^(?:hey\s+)?thursday[,\s]*(.*)$/i);
+              if (wakeMatch) {
+                const command = wakeMatch[1].trim();
+                if (command) {
+                  input.value = command;
+                  sendMessage();
+                } else {
+                  siriActiveCommandMode = true;
+                  SoundEffects.listening();
+                  input.placeholder = "Yes? I'm listening...";
+                  input.value = "";
+                }
+              } else {
+                console.log("Wake word 'Thursday' not found in: ", transcript);
+              }
+            }
+          } else {
+            input.value = transcript;
+            sendMessage();
+          }
+        };
+
+        siriRecognition.onerror = (err) => {
+          if (err.error !== 'no-speech') {
+            console.error("Siri recognition error:", err);
+            SoundEffects.failed();
+          }
+          siriActiveCommandMode = false;
+          setTimeout(() => {
+            if (siriEnabled && siriEnabled.checked && !loading && !speechQueueManager.isProcessing) {
+              startSiriListening();
+            }
+          }, 400);
+        };
+
+        siriRecognition.onend = () => {
+          siriListening = false;
+          siriActiveCommandMode = false;
+          micBtn.classList.remove('recording');
+          input.placeholder = 'Ask Thursday anything…';
+          const form = document.querySelector('.chat-form');
+          if (form) {
+            form.classList.remove('siri-listening');
+          }
+          setTimeout(() => {
+            if (siriEnabled && siriEnabled.checked && !loading && !speechQueueManager.isProcessing && !siriListening) {
+              startSiriListening();
+            }
+          }, 400);
+        };
+      }
+
+      function startSiriListening() {
+        if (!siriRecognition) initSiriRecognition();
+        if (!siriRecognition) return;
+        if (siriListening) return;
+        try {
+          siriRecognition.start();
+        } catch (e) {
+          console.warn("Could not start Siri recognition:", e);
+        }
+      }
+
+      function stopSiriRecognition() {
+        if (siriRecognition) {
+          try {
+            siriRecognition.abort();
+          } catch(e) {}
+        }
+        siriListening = false;
+        siriActiveCommandMode = false;
+        micBtn.classList.remove('recording');
+        input.placeholder = 'Ask Thursday anything…';
+        const form = document.querySelector('.chat-form');
+        if (form) {
+          form.classList.remove('siri-listening');
+          form.classList.remove('siri-speaking');
+        }
+      }
+
+      if (siriEnabled) {
+        siriEnabled.addEventListener('change', function() {
+          if (this.checked) {
+            ttsEnabled.checked = true;
+            startSiriListening();
+          } else {
+            stopSiriRecognition();
+            const form = document.querySelector('.chat-form');
+            if (form) {
+              form.classList.remove('siri-speaking');
+              form.classList.remove('siri-listening');
+            }
+          }
+        });
+      }
+
+      const wakeWordEnabled = document.getElementById('wake-word-enabled');
+      if (wakeWordEnabled) {
+        wakeWordEnabled.addEventListener('change', function() {
+          if (siriEnabled && siriEnabled.checked) {
+            stopSiriRecognition();
+            setTimeout(() => {
+              startSiriListening();
+            }, 100);
+          }
+        });
+      }
+
+      // Interruption support: stop speech when user interacts with input or chat
+      input.addEventListener('focus', () => {
+        if (speechQueueManager.isProcessing) {
+          speechQueueManager.reset();
+        }
+      });
+      input.addEventListener('input', () => {
+        if (speechQueueManager.isProcessing) {
+          speechQueueManager.reset();
+        }
+      });
+      if (messages) {
+        messages.addEventListener('click', () => {
+          if (speechQueueManager.isProcessing) {
+            speechQueueManager.reset();
+          }
+        });
+      }
+
+      // ── Mic (browser capture → local Whisper) ──────────────────
+      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        micBtn.style.display = 'none';
+        input.placeholder = 'Voice capture is not supported in this browser';
+      } else {
+        let recorder = null;
+        let micStream = null;
+        let audioParts = [];
+        let stopTimer = null;
+        let listening = false;
+
+        function resetMic(message = 'Ask Thursday anything…') {
+          listening = false;
+          if (stopTimer) clearTimeout(stopTimer);
+          stopTimer = null;
+          if (micStream) micStream.getTracks().forEach(track => track.stop());
+          micStream = null;
+          recorder = null;
+          micBtn.classList.remove('recording');
+          micBtn.title = 'Click to speak';
+          input.placeholder = message;
+        }
+
+        micBtn.addEventListener('click', async function() {
+          if (siriEnabled && siriEnabled.checked) {
+            siriEnabled.checked = false;
+            stopSiriRecognition();
+            const form = document.querySelector('.chat-form');
+            if (form) {
+              form.classList.remove('siri-speaking');
+              form.classList.remove('siri-listening');
+            }
+            return;
+          }
+          if (loading) return;
+          if (listening && recorder) { recorder.stop(); return; }
+          try {
+            speechQueueManager.reset();
+            unlockAudio();
+            micStream = await navigator.mediaDevices.getUserMedia({
+              audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+            });
+            // Ordered capability negotiation: Firefox/Chromium prefer Opus;
+            // Safari uses fragmented MP4/AAC.
+            const mimeType = [
+              'audio/webm;codecs=opus',
+              'audio/mp4;codecs=mp4a.40.2',
+              'audio/mp4',
+              'audio/ogg;codecs=opus',
+              'audio/webm'
+            ]
+              .find(type => MediaRecorder.isTypeSupported(type)) || '';
+            recorder = new MediaRecorder(micStream, mimeType ? { mimeType } : undefined);
+            audioParts = [];
+            recorder.ondataavailable = event => { if (event.data.size) audioParts.push(event.data); };
+            recorder.onerror = event => resetMic('Microphone recording failed — click to retry');
+            recorder.onstop = async () => {
+              const recordedType = recorder?.mimeType || mimeType || 'audio/webm';
+              const blob = new Blob(audioParts, { type: recordedType });
+              if (micStream) micStream.getTracks().forEach(track => track.stop());
+              micStream = null;
+              listening = false;
+              micBtn.classList.remove('recording');
+              input.placeholder = 'Transcribing locally…';
+              try {
+                await ensureCsrf();
+                const response = await fetch('/api/thursday/transcribe', {
+                  method: 'POST', credentials: 'same-origin',
+                  headers: { 'Content-Type': recordedType, 'X-CSRF-Token': csrfToken },
+                  body: blob
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Transcription failed');
+                input.value = String(data.text || '').trim();
+                resetMic();
+                if (input.value) sendMessage();
+              } catch (error) {
+                SoundEffects.failed();
+                resetMic(error.message || 'Voice input failed — click to retry');
+                micBtn.title = error.message || 'Voice input failed';
+              }
+            };
+            recorder.start(250);
+            listening = true;
+            SoundEffects.listening();
+            micBtn.classList.add('recording');
+            micBtn.title = 'Listening… click to stop';
+            input.placeholder = 'Listening… click the mic when finished';
+            stopTimer = setTimeout(() => {
+              if (recorder && recorder.state === 'recording') recorder.stop();
+            }, 8000);
+          } catch (error) {
+            SoundEffects.failed();
+            const denied = error?.name === 'NotAllowedError';
+            resetMic(denied ? 'Allow microphone access in browser settings' : 'Microphone unavailable — click to retry');
+            micBtn.title = error?.message || 'Microphone unavailable';
+          }
+        });
+      }
+
+      // ── Status pills ───────────────────────────────────────────
+      (async function() {
+        try {
+          const r = await fetch('/api/hub/status');
+          const d = await r.json();
+
+          const kennOk = d.kenn?.running;
+          const llmOk  = d.llm?.ready;
+          const agOk   = d.audiogen?.ok;
+
+          document.getElementById('pill-kenn').className  = 'pill ' + (kennOk ? 'pill-green' : 'pill-red');
+          document.getElementById('pill-kenn').textContent = 'KENN';
+          document.getElementById('pill-llm').className   = 'pill ' + (llmOk  ? 'pill-green' : 'pill-amber');
+          document.getElementById('pill-llm').textContent = d.llm?.model || 'LLM';
+          document.getElementById('pill-audio').className = 'pill ' + (agOk   ? 'pill-green' : 'pill-muted');
+          document.getElementById('pill-audio').textContent = 'AudioGen';
+
+          const kennBadge = document.getElementById('kenn-badge');
+          if (kennBadge) {
+            kennBadge.textContent = kennOk ? 'Online' : 'Offline';
+            kennBadge.className = 'sc-badge ' + (kennOk ? 'sc-badge-green' : '');
+          }
+          const agBadge = document.getElementById('audiogen-badge');
+          if (agBadge) {
+            agBadge.textContent = agOk ? 'Ready' : 'Unavail';
+            agBadge.className = 'sc-badge ' + (agOk ? 'sc-badge-green' : '');
+          }
+
+          const ssmOk = d.smart_sample_manager?.ok;
+          const ssmBadge = document.getElementById('ssm-badge');
+          if (ssmBadge) {
+            ssmBadge.textContent = ssmOk ? 'Ready' : 'Not built';
+            ssmBadge.className = 'sc-badge ' + (ssmOk ? 'sc-badge-green' : '');
+          }
+        } catch(e) {}
+      })();
+
+    }); // DOMContentLoaded
+    </script>
+  </body>
+</html>

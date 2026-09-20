@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KENN Demo</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/studio-theme.css">
+    <script src="/app-shell.js" data-page="Demo" defer></script>
+  </head>
+  <body class="demo-page">
+    <main class="demo-shell">
+      <header class="demo-header">
+        <div>
+          <a class="brand" href="/hub">Audio_Too</a>
+          <p class="eyebrow">Private tester demo</p>
+          <h1>KENN</h1>
+          <p class="section-intro">Ask production, Ableton, mixing, mastering, and workflow questions. Feedback from this page becomes improvement work for the knowledge base.</p>
+        </div>
+        <form id="demo-login-form" class="auth-panel compact">
+          <label>Demo password<input id="demo-password" type="password" autocomplete="current-password"></label>
+          <button type="submit">Enter demo</button>
+        </form>
+      </header>
+
+      <p id="demo-status" class="status"></p>
+
+      <section id="demo-app" class="demo-chat" hidden>
+        <aside class="demo-sidebar">
+          <div class="section-title">
+            <h2>Try asking</h2>
+            <button type="button" id="demo-logout" class="secondary">Sign out</button>
+          </div>
+          <div id="demo-session-stats" class="demo-session-stats"></div>
+          <div id="demo-starters" class="demo-starters"></div>
+        </aside>
+
+        <section class="demo-chat-panel">
+          <div id="demo-messages" class="demo-messages"></div>
+          <form id="demo-ask-form" class="demo-composer">
+            <label class="hp-field" aria-hidden="true">Company website<input type="text" name="company_website" tabindex="-1" autocomplete="off"></label>
+            <textarea id="demo-question" name="question" rows="3" maxlength="500" required placeholder="Ask about Ableton, mixing, mastering, stems, vocals, game audio..."></textarea>
+            <button type="submit">Ask</button>
+            <div id="demo-live-suggest" class="demo-live-suggest" aria-label="Suggested prompts"></div>
+          </form>
+          <p class="compact-disclaimer">Tester access only. Do not enter private client information or unreleased material.</p>
+        </section>
+      </section>
+    </main>
+    <script src="/demo.js"></script>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+{
+  "record_type": "slo_waveform_fusion_current_benchmark",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T12:45:29",
+  "protocol": {
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "seeds": 5,
+    "splits": 5,
+    "minimum_examples": 5,
+    "minimum_collections": 5,
+    "promotion_gate_pp": 2.0
+  },
+  "inputs": {
+    "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_v4b_escape_recovered.npz",
+    "manifest": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/factorised_training_manifest_v1.json",
+    "n_rows": 1493,
+    "n_waveform_rows": 1493,
+    "waveform_excluded_paths": [
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/SIIK Sounds - Eclipse (Full Pack)/SIIK Sounds Eclipse (Construction Kits & FLPs)/Kit 05 - Fmin (175BPM)/ECLIPSE Construction Kit 05 - FX.wav",
+      "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/SIIK Sounds - Eclipse (Full Pack)/SIIK Sounds Eclipse (Construction Kits & FLPs)/Kit 05 - Fmin (175BPM)/ECLIPSE Construction Kit 05 - Fills.wav"
+    ],
+    "n_classes": 27,
+    "n_collections": 80,
+    "waveform_feature_version": "physics_v1_1",
+    "waveform_cache_sha256": "0735a59286a2799b547c89467cfb8e7b449fd2803aaa4674c807e59099443452"
+  },
+  "results": {
+    "audio": {
+      "accuracy": 54.762,
+      "accuracy_sd": 0.502,
+      "macro_f1": 47.548,
+      "per_seed": [
+        55.057,
+        54.186,
+        54.253,
+        54.789,
+        55.526
+      ]
+    },
+    "waveform": {
+      "accuracy": 34.642,
+      "accuracy_sd": 0.642,
+      "macro_f1": 29.378,
+      "per_seed": [
+        33.691,
+        34.293,
+        34.762,
+        35.633,
+        34.829
+      ]
+    },
+    "audio+waveform": {
+      "accuracy": 54.99,
+      "accuracy_sd": 0.532,
+      "macro_f1": 47.834,
+      "per_seed": [
+        55.258,
+        54.387,
+        54.521,
+        54.923,
+        55.861
+      ]
+    }
+  },
+  "decision": "research evidence only; no production weights or rename actions",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false
+  }
+}

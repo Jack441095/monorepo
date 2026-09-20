@@ -1,0 +1,273 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mix Review · Thursday</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/studio-theme.css">
+</head>
+<body>
+<nav class="studio-nav">
+  <div class="studio-nav-left">
+    <a class="studio-nav-wordmark" href="/hub">Thursday<span>.</span></a>
+    <div class="studio-nav-div"></div>
+    <span class="studio-nav-page">Mix Review</span>
+  </div>
+  <div class="studio-nav-right">
+    <a class="studio-nav-link active" href="/audio-analysis">Mix Review</a>
+    <a class="studio-nav-link" href="/automix">AutoMix</a>
+    <a class="studio-nav-link" href="/creative-lab">AudioGen</a>
+    <a class="studio-nav-link" href="/hub">← Hub</a>
+  </div>
+</nav>
+<main class="aa-app">
+  <header class="aa-header">
+    <div class="aa-brand">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#0891b2"/>
+        <text x="16" y="22" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-weight="800" font-size="18">W</text>
+      </svg>
+      <div>
+        <h1>Audio Analysis</h1>
+        <span class="aa-pill">Tool</span>
+      </div>
+    </div>
+    <p class="aa-sub">Upload a WAV for mix review, loudness check, stereo analysis, and file diagnostics.</p>
+  </header>
+
+  <div class="aa-body">
+    <section class="aa-upload">
+      <form id="aa-upload-form" class="aa-form">
+        <div class="aa-inline">
+          <div class="aa-input-group">
+            <label for="aa-title">Track title</label>
+            <input id="aa-title" type="text" placeholder="Optional">
+          </div>
+          <div class="aa-input-group">
+            <label for="aa-version">Version</label>
+            <input id="aa-version" type="text" placeholder="e.g. v2">
+          </div>
+        </div>
+
+        <div class="aa-dropzone" id="aa-dropzone">
+          <div class="aa-drop-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <p>Drop a WAV here or click to browse</p>
+          <span class="aa-drop-hint">Supports .wav, up to 200MB</span>
+          <input id="aa-file" type="file" accept=".wav,audio/wav,audio/x-wav" hidden>
+        </div>
+
+        <div class="aa-inline">
+          <div class="aa-input-group">
+            <label for="aa-reference">Reference WAV (optional)</label>
+            <input id="aa-reference" type="file" accept=".wav,audio/wav,audio/x-wav">
+          </div>
+          <div class="aa-input-group">
+            <label for="aa-target">Mix target</label>
+            <select id="aa-target">
+              <option value="premaster">Premaster / general mix</option>
+              <option value="club">Club / electronic / trap</option>
+              <option value="rap_vocal">Rap / drill vocal</option>
+              <option value="pop_vocal">Pop vocal</option>
+              <option value="podcast">Podcast / dialogue</option>
+              <option value="game_audio">Game audio asset</option>
+              <option value="master">Finished master</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="aa-btn aa-btn-primary" id="aa-submit">Analyse WAV</button>
+      </form>
+
+      <div id="aa-status" class="aa-status">Ready</div>
+    </section>
+
+    <section class="aa-results" id="aa-results" hidden>
+      <div class="aa-metrics" id="aa-metrics"></div>
+
+      <div class="aa-section" id="aa-loudness" hidden>
+        <h3>Loudness</h3>
+        <div class="aa-metric-grid" id="aa-loudness-grid"></div>
+      </div>
+
+      <div class="aa-section" id="aa-stereo" hidden>
+        <h3>Stereo</h3>
+        <div class="aa-metric-grid" id="aa-stereo-grid"></div>
+      </div>
+
+      <div class="aa-section" id="aa-diag" hidden>
+        <h3>Diagnostics</h3>
+        <div id="aa-diag-content"></div>
+      </div>
+
+      <div class="aa-section" id="aa-comparison" hidden>
+        <h3>vs Reference</h3>
+        <div id="aa-comparison-content"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  var form=document.getElementById('aa-upload-form'),
+      fileInput=document.getElementById('aa-file'),
+      refInput=document.getElementById('aa-reference'),
+      dropzone=document.getElementById('aa-dropzone'),
+      titleInput=document.getElementById('aa-title'),
+      versionInput=document.getElementById('aa-version'),
+      targetInput=document.getElementById('aa-target'),
+      status=document.getElementById('aa-status'),
+      results=document.getElementById('aa-results'),
+      submitBtn=document.getElementById('aa-submit'),
+      loading=false;
+
+  var metricsEl=document.getElementById('aa-metrics'),
+      loudnessSec=document.getElementById('aa-loudness'),
+      loudnessGrid=document.getElementById('aa-loudness-grid'),
+      stereoSec=document.getElementById('aa-stereo'),
+      stereoGrid=document.getElementById('aa-stereo-grid'),
+      diagSec=document.getElementById('aa-diag'),
+      diagContent=document.getElementById('aa-diag-content'),
+      compSec=document.getElementById('aa-comparison'),
+      compContent=document.getElementById('aa-comparison-content');
+
+  // Dropzone
+  dropzone.onclick=function(){fileInput.click();};
+  dropzone.ondragover=function(e){e.preventDefault();dropzone.classList.add('aa-dragover');};
+  dropzone.ondragleave=function(){dropzone.classList.remove('aa-dragover');};
+  dropzone.ondrop=function(e){
+    e.preventDefault();
+    dropzone.classList.remove('aa-dragover');
+    if(e.dataTransfer.files.length) fileInput.files=e.dataTransfer.files;
+  };
+  fileInput.onchange=function(){
+    if(fileInput.files.length){
+      var name=fileInput.files[0].name;
+      dropzone.querySelector('p').textContent=name;
+      dropzone.querySelector('.aa-drop-hint').textContent=(fileInput.files[0].size/1e6).toFixed(1)+'MB';
+    }
+  };
+
+  var csrfToken='';
+  async function ensureCsrf(){
+    if(csrfToken)return csrfToken;
+    var r=await fetch('/api/auth/session',{credentials:'same-origin'});
+    var d=await r.json();
+    csrfToken=d.csrf_token||'';
+    return csrfToken;
+  }
+
+  function setStatus(msg, ok){
+    status.textContent=msg;
+    status.style.color=ok===false?'#dc2626':ok?'#16a34a':'#6b7280';
+  }
+
+  function showMetrics(data){
+    results.hidden=false;
+    // Summary metrics bar
+    var metrics={
+      'Level':'Loudness',
+      'Dynamics':'Dynamics',
+      'Stereo':'Stereo',
+      'Translation':'Translation'
+    };
+    metricsEl.innerHTML='';
+    Object.keys(metrics).forEach(function(k){
+      var v=data[k.toLowerCase()]||{};
+      var score=v.score!==undefined?v.score:(v.status||'—');
+      var el=document.createElement('div');el.className='aa-metric-card';
+      if(typeof score==='number'){
+        var pct=Math.round(score*100);
+        el.innerHTML='<span class="aa-metric-label">'+k+'</span><span class="aa-metric-score'+(pct<50?' aa-low':pct<75?' aa-mid':' aa-high')+'">'+pct+'%</span>';
+      }else{
+        el.innerHTML='<span class="aa-metric-label">'+k+'</span><span class="aa-metric-score">'+score+'</span>';
+      }
+      metricsEl.appendChild(el);
+    });
+
+    // Loudness
+    if(data.loudness){
+      loudnessSec.hidden=false;
+      loudnessGrid.innerHTML='';
+      var items=['integrated','short_term','momentary','range','true_peak'];
+      items.forEach(function(k){
+        var v=data.loudness[k];
+        if(v===undefined)return;
+        var el=document.createElement('div');el.className='aa-stat';
+        el.innerHTML='<span class="aa-stat-label">'+k.replace(/_/g,' ')+'</span><span class="aa-stat-value">'+(typeof v==='number'?v.toFixed(1):v)+'</span>';
+        loudnessGrid.appendChild(el);
+      });
+    }
+
+    // Stereo
+    if(data.stereo){
+      stereoSec.hidden=false;
+      stereoGrid.innerHTML='';
+      var items=['width','balance','correlation'];
+      items.forEach(function(k){
+        var v=data.stereo[k];
+        if(v===undefined)return;
+        var el=document.createElement('div');el.className='aa-stat';
+        el.innerHTML='<span class="aa-stat-label">'+k+'</span><span class="aa-stat-value">'+(typeof v==='number'?v.toFixed(2):v)+'</span>';
+        stereoGrid.appendChild(el);
+      });
+    }
+
+    // Diagnostics
+    if(data.diagnostics){
+      diagSec.hidden=false;
+      diagContent.innerHTML='<pre style="font-size:0.82rem;color:#374151;white-space:pre-wrap">'+JSON.stringify(data.diagnostics,null,2)+'</pre>';
+    }
+
+    // Comparison
+    if(data.comparison){
+      compSec.hidden=false;
+      compContent.innerHTML='<pre style="font-size:0.82rem;color:#374151;white-space:pre-wrap">'+JSON.stringify(data.comparison,null,2)+'</pre>';
+    }
+  }
+
+  async function upload(){
+    if(loading)return;
+    var file=fileInput.files[0];
+    if(!file){setStatus('Select a WAV file first.',false);return;}
+    loading=true;
+    submitBtn.disabled=true;
+    setStatus('Uploading & analysing...',null);
+
+    var fd=new FormData();
+    fd.append('file',file);
+    fd.append('title',titleInput.value||'');
+    fd.append('version',versionInput.value||'');
+    fd.append('target',targetInput.value);
+    if(refInput.files[0]) fd.append('reference',refInput.files[0]);
+
+    try{
+      var csrf=await ensureCsrf();
+      var r=await fetch('/api/admin/mix-review',{method:'POST',body:fd,credentials:'same-origin',headers:{'X-CSRF-Token':csrf}});
+      var d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Analysis failed');
+      showMetrics(d);
+      setStatus('Analysis complete',true);
+    }catch(e){
+      setStatus('Error: '+e.message,false);
+    }finally{
+      loading=false;
+      submitBtn.disabled=false;
+    }
+  }
+
+  form.onsubmit=function(e){e.preventDefault();upload();};
+  setStatus('Ready',true);
+})();
+</script>
+<script src="/app-shell.js" data-active="audio-analysis" data-page="Mix Review" defer></script>
+</body>
+</html>

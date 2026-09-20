@@ -1,0 +1,25 @@
+[tool.pytest.ini_options]
+testpaths = ["tests", "scripts/setup"]
+pythonpath = [".", "scripts", "server", "server/app", "studio", "studio/audiogen/audiogen", "server/agents"]
+markers = [
+    "slow: resource-intensive or hardware-facing tests",
+    "isolated: tests executed in a fresh subprocess",
+    "benchmark: performance benchmark tests",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["server/app", "server/agents", "studio/kenn", "studio/audio_analysis", "studio/audiogen", "thursday", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501", "I001", "E402"]
+
+[tool.ruff.lint.per-file-ignores]
+# __init__.py re-exports symbols for the package's public API; unused-import there
+# is intentional, not dead code.
+"__init__.py" = ["F401"]
+# planner.py is a re-export hub for the section_planner API surface (tests and
+# sibling modules import helpers from it), so its "unused" imports are load-bearing.
+"studio/audiogen/audiogen/composition/section_planner/planner.py" = ["F401"]

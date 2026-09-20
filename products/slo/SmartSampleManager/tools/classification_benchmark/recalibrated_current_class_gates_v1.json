@@ -1,0 +1,172 @@
+{
+  "record_type": "slo_current_class_gate_recalibration",
+  "schema_version": "1.0.0",
+  "generated": "2026-09-12T12:56:09",
+  "protocol": {
+    "outer_split": "StratifiedGroupKFold by vendor/collection",
+    "inner_calibration": "three-fold StratifiedGroupKFold by vendor/collection",
+    "seeds": 5,
+    "splits": 5,
+    "minimum_calibration_predictions_per_class": 20
+  },
+  "inventory": {
+    "n_rows": 1495,
+    "n_classes": 27,
+    "n_collections": 80
+  },
+  "results": [
+    {
+      "target_precision": 0.9,
+      "auto_n": 1418,
+      "auto_precision": 84.6262341325811,
+      "auto_share": 18.96989966555184,
+      "per_seed": [
+        {
+          "auto_n": 325,
+          "auto_precision": 84.3076923076923,
+          "auto_share": 21.73913043478261
+        },
+        {
+          "auto_n": 248,
+          "auto_precision": 84.2741935483871,
+          "auto_share": 16.588628762541806
+        },
+        {
+          "auto_n": 312,
+          "auto_precision": 84.93589743589743,
+          "auto_share": 20.869565217391305
+        },
+        {
+          "auto_n": 320,
+          "auto_precision": 82.8125,
+          "auto_share": 21.40468227424749
+        },
+        {
+          "auto_n": 213,
+          "auto_precision": 87.79342723004694,
+          "auto_share": 14.247491638795987
+        }
+      ],
+      "by_class": {
+        "Bass Reese": {
+          "n": 176,
+          "precision": 90.9090909090909
+        },
+        "Clap": {
+          "n": 213,
+          "precision": 83.09859154929578
+        },
+        "Crash": {
+          "n": 47,
+          "precision": 87.23404255319149
+        },
+        "Drum Loop": {
+          "n": 116,
+          "precision": 72.41379310344827
+        },
+        "Hi-Hat": {
+          "n": 189,
+          "precision": 79.36507936507937
+        },
+        "Hi-Hat Loop": {
+          "n": 11,
+          "precision": 81.81818181818181
+        },
+        "Kick": {
+          "n": 294,
+          "precision": 88.77551020408163
+        },
+        "Percussion Loop": {
+          "n": 43,
+          "precision": 79.06976744186046
+        },
+        "Rimshot": {
+          "n": 11,
+          "precision": 54.54545454545455
+        },
+        "Snare": {
+          "n": 318,
+          "precision": 87.42138364779875
+        }
+      }
+    },
+    {
+      "target_precision": 0.95,
+      "auto_n": 764,
+      "auto_precision": 86.38743455497382,
+      "auto_share": 10.220735785953178,
+      "per_seed": [
+        {
+          "auto_n": 144,
+          "auto_precision": 83.33333333333333,
+          "auto_share": 9.632107023411372
+        },
+        {
+          "auto_n": 123,
+          "auto_precision": 86.17886178861788,
+          "auto_share": 8.22742474916388
+        },
+        {
+          "auto_n": 197,
+          "auto_precision": 88.3248730964467,
+          "auto_share": 13.177257525083611
+        },
+        {
+          "auto_n": 169,
+          "auto_precision": 85.20710059171597,
+          "auto_share": 11.304347826086957
+        },
+        {
+          "auto_n": 131,
+          "auto_precision": 88.54961832061069,
+          "auto_share": 8.762541806020067
+        }
+      ],
+      "by_class": {
+        "Bass Reese": {
+          "n": 131,
+          "precision": 93.12977099236642
+        },
+        "Clap": {
+          "n": 96,
+          "precision": 86.45833333333333
+        },
+        "Crash": {
+          "n": 28,
+          "precision": 89.28571428571429
+        },
+        "Drum Loop": {
+          "n": 59,
+          "precision": 71.1864406779661
+        },
+        "Hi-Hat": {
+          "n": 91,
+          "precision": 86.81318681318682
+        },
+        "Kick": {
+          "n": 147,
+          "precision": 86.39455782312925
+        },
+        "Percussion Loop": {
+          "n": 23,
+          "precision": 73.91304347826087
+        },
+        "Rimshot": {
+          "n": 7,
+          "precision": 57.142857142857146
+        },
+        "Snare": {
+          "n": 182,
+          "precision": 88.46153846153847
+        }
+      }
+    }
+  ],
+  "decision": "research audit only; no policy mutation or rename approval",
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "production_model_changed": false,
+    "rename_actions": false
+  }
+}

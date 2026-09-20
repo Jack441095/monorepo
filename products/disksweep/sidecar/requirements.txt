@@ -1,0 +1,2 @@
+# DiskSweep sidecar runtime: stdlib only (urllib, shutil, json).
+# No third-party runtime dependencies. Ollama is an external local service.

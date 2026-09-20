@@ -1,0 +1,44 @@
+{
+  "programme": "NITE DSP Intelligent Layer Alignment R&D",
+  "candidate": "#2",
+  "determinism": {
+    "seeding": "case_seed = crc32(case_id) & 0x7FFFFFFF",
+    "rng": "numpy default_rng",
+    "note": "every case reproducible from its string id"
+  },
+  "signal_generators": [
+    "impulse", "sine", "multisine", "noise", "bandnoise", "kick",
+    "snare_body", "snare_noise", "bass_transient", "bass_sustained",
+    "synth_transient"
+  ],
+  "transforms": [
+    {"op": "exact_delay", "impl": "frequency-domain phase ramp, integer+fractional"},
+    {"op": "polarity_invert"},
+    {"op": "gain_db"},
+    {"op": "add_noise", "param": "snr_db"},
+    {"op": "minphase_peaking", "impl": "RBJ biquad cascade"},
+    {"op": "allpass_stage", "impl": "2nd-order allpass cascade"},
+    {"op": "lr4_crossover_recombine"},
+    {"op": "linear_phase_eq", "impl": "symmetric FIR, latency=(taps-1)/2"},
+    {"op": "mic_tf", "impl": "resonance stack + HPF"},
+    {"op": "distortion_tanh"}
+  ],
+  "experiment_families": {
+    "offset_sweep":   {"cases": 627, "description": "11 kinds x 19 offsets x 3 SNR; estimator error fields"},
+    "subsample":      {"cases": 200, "description": "fractional delays -4..+4 by 0.25"},
+    "polarity":       {"cases": 150, "description": "5 variants x flip x 3 reps x 5 kinds"},
+    "phase_filters":  {"cases": 100, "description": "dispersive processing; delay-only vs ideal complex correction"},
+    "band_dispersion":{"cases": 24,  "description": "bandwise offset divergence under dispersion (truth=12)"},
+    "transient":      {"cases": 90,  "description": "correlation vs envelope vs flux-onset alignment"},
+    "kick_layers":    {"cases": 224, "description": "sub/body/click stacks; overlap=True reinforcing vs overlap=False intentional layering"},
+    "snare_layers":   {"cases": 90,  "description": "body/noise/clap/room composites"},
+    "bass_layers":    {"cases": 96,  "description": "sub+mid, clean+distorted, parallel sat, parallel comp"},
+    "parallel":       {"cases": 90,  "description": "plugin latency detection across 5 processing modes"},
+    "samplerate":     {"cases": 36,  "description": "44.1/48/88.2/96 kHz, ms-domain errors"},
+    "healthy_controls":{"cases": 230,"description": "6+1 healthy families; NO_ACTION ground truth"},
+    "adversarial":    {"cases": 33,  "description": "sine ambiguity, octave tones, comb copies, double transients, reversed envelope, clipping"}
+  },
+  "total_cases": 2040,
+  "audio_source": "SYNTHETIC ONLY - no owner audio, no customer audio",
+  "production_repos_touched": []
+}

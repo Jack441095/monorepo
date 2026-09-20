@@ -1,0 +1,46 @@
+{
+  "target": 0.93,
+  "seeds": 12,
+  "tiers": {
+    "auto_rename": {
+      "share": 13.8,
+      "precision": 90.8,
+      "n": 1262
+    },
+    "suggest": {
+      "share": 8.1,
+      "precision": 87.7,
+      "n": 742
+    },
+    "review": {
+      "share": 74.8,
+      "precision": 65.1,
+      "n": 6839
+    },
+    "never_act": {
+      "share": 3.3,
+      "precision": 37.5,
+      "n": 301
+    }
+  },
+  "auto_rename_precision": 91.47,
+  "raw_classifier_precision": 90.1,
+  "delta_pp": 1.37,
+  "auto_per_seed": [
+    87.05,
+    93.33,
+    89.16,
+    89.19,
+    90.48,
+    92.47,
+    95.16,
+    89.54,
+    92.08,
+    91.14,
+    95.08,
+    92.93
+  ],
+  "percussion_in_auto_rename": 0,
+  "impulse_responses_in_auto_rename": 0,
+  "policy_version": "1.0.0"
+}

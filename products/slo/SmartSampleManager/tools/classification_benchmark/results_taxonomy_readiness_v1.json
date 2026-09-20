@@ -1,0 +1,55 @@
+{
+  "record_type": "slo_taxonomy_readiness_audit",
+  "schema_version": "1.0.0",
+  "safety": {
+    "read_only": true,
+    "audio_scanned": false,
+    "labels_created": false,
+    "source_files_modified": false,
+    "production_taxonomy_changed": false,
+    "rename_plan_applied": false
+  },
+  "inputs": {
+    "predictions": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/full_taxonomy_v3_candidate_predictions_testing_v1.jsonl",
+    "predictions_record_type": "slo_full_taxonomy_candidate_predictions",
+    "taxonomy": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/real_world_taxonomy_v1.json",
+    "taxonomy_status": "dormant_reference_only"
+  },
+  "summary": {
+    "prediction_rows": 7315,
+    "distinct_predicted_labels": 25,
+    "domain_counts": {
+      "current_music_sample": 7315
+    },
+    "future_or_unmapped_labels": [],
+    "unmapped_labels": []
+  },
+  "predicted_label_counts": {
+    "Bass Hit": 187,
+    "Bass Loop": 241,
+    "Bass Reese": 49,
+    "Chord Loop": 915,
+    "Clap": 426,
+    "Crash": 343,
+    "Drum Loop": 673,
+    "Foley": 219,
+    "Foley Loop": 152,
+    "Hi-Hat": 530,
+    "Hi-Hat Loop": 251,
+    "Kick": 1355,
+    "Kick Loop": 34,
+    "Other/none": 40,
+    "Pad": 82,
+    "Percussion": 12,
+    "Percussion Loop": 201,
+    "Rimshot": 444,
+    "SFX": 144,
+    "Snare": 698,
+    "Synth Loop": 78,
+    "Synth One-Shot": 140,
+    "Vocal Loop": 44,
+    "Vocal One-Shot": 8,
+    "Weather/Nature Atmos": 49
+  },
+  "next_gate": "human labels plus collection-held-out evaluation before activating any future domain"
+}

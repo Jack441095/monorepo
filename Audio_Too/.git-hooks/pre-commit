@@ -1,0 +1,28 @@
+#!/bin/sh
+# Pre-commit hook: run repo hygiene check before allowing commits.
+# Symlink from .git/hooks/pre-commit to this file.
+# Run: ln -sf ../../.git-hooks/pre-commit .git/hooks/pre-commit
+
+set -eu
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+HYGIENE="$ROOT_DIR/scripts/repo_hygiene.py"
+
+if [ ! -f "$HYGIENE" ]; then
+    echo "pre-commit: repo_hygiene.py not found — skipping check"
+    exit 0
+fi
+
+echo "Running repo hygiene check..."
+python3 "$ROOT_DIR/main.py" check 2>/dev/null || python3 "$HYGIENE" check --max-mb 10
+STATUS=$?
+
+if [ $STATUS -ne 0 ]; then
+    echo ""
+    echo " Repo hygiene check failed. Commit blocked."
+    echo "   Run 'python3 main.py check' to see the issues."
+    echo "   Fix tracked generated/large files before committing."
+    exit 1
+fi
+
+echo "✅ Repo hygiene check passed."

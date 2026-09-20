@@ -1,0 +1,39 @@
+{
+  "schema": "kenn.ableton_live_support_matrix.v1",
+  "scope": "KENN Internal Beta 0.1 supervised pilot",
+  "policy": "Only configurations listed here may be described as real-Live-qualified.",
+  "supported_configurations": [
+    {
+      "id": "live-12.4.5-macos-26.5.2-arm64",
+      "status": "qualified",
+      "ableton_live": "12 Suite 12.4.5",
+      "os": "macOS 26.5.2",
+      "architecture": "arm64",
+      "bridge": "AbletonOSC",
+      "evidence": "docs/ABLETON_LIVE_REAL_QUALIFICATION_2026-09-01.md",
+      "further_evidence": "docs/ABLETON_ASSISTANT_CURRENT_STATE.md",
+      "scope": [
+        "read-only session snapshot",
+        "volume",
+        "pan",
+        "mute",
+        "solo",
+        "arm",
+        "rename_track",
+        "transport play",
+        "transport stop",
+        "scene launch (no bespoke undo; recommends transport stop)",
+        "clip-slot stop (no bespoke undo)",
+        "clip audition (fire/stop an existing clip)",
+        "send/return-track control (return-track enumeration, get/set send level)",
+        "supervised MIDI clip creation (exact empty slot only)",
+        "sample import to an exact empty clip slot",
+        "bounded two-step recipe (existing track/transport/device-parameter actions)",
+        "device insertion (append-only, allowlisted): EQ Eight, Glue Compressor, Saturator, Auto Filter, Drum Buss, Compressor, Hybrid Reverb, Echo",
+        "device removal (identity-bound undo of an insertion)",
+        "existing-device parameter control (name-agnostic; qualified reversible parameters include EQ Eight Output/Gain/Q/Frequency, Compressor Threshold/Ratio/Output, Utility Stereo Width, Glue Compressor Threshold/Dry-Wet, Saturator Drive/Dry-Wet, Auto Filter Resonance/Dry-Wet, Drum Buss Drive/Dry-Wet)",
+        "interruption/recovery: offline read during inspection, Live closing after a proposal but before confirmation, a companion restart with a pending proposal, and stale-undo refusal all verified to fail cleanly with no false success"
+      ]
+    }
+  ]
+}

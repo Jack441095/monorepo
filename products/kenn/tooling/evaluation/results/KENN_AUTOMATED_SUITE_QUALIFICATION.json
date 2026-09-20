@@ -1,0 +1,8 @@
+{
+  "command": "python3 -m pytest source/kenn/tests chat/tests mix-review/tests automix/tests -q",
+  "generated_at": "2026-09-15T16:30:28.000000+00:00",
+  "passed": true,
+  "schema": "kenn.automated_suite_qualification.v1",
+  "source_sha256": "895807737bb44a84404d441c5e8757896f105a1dcbe6978be198e34cf10f93af",
+  "summary": "1242 passed, 4 warnings in 98.53s (0:01:38)"
+}

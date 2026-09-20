@@ -1,0 +1,435 @@
+# GPU0 sample-pack label-free results
+
+Date: 2026-09-13 (baseline and multi-view receipts)  
+Method: `label_free_zero_shot_v1` with local `clap_model_music` and the
+default 12-label acoustic prompt bank  
+Receipt:
+`tools/classification_benchmark/receipts/gpu0_sample_pack_resume_receipt_20260912.jsonl`
+
+## Scope
+
+The remote staging area contained 13,210 extension-matching files at the time
+of the first pass. Discovery excluded macOS `._` AppleDouble sidecars. The
+resumed pass covered 8,622 actual audio candidates; the remaining local-only
+portion of the library was not included and must not be inferred from this
+report.
+
+## Results
+
+| Outcome | Files | Share |
+|---|---:|---:|
+| Suggest | 5,649 | 65.5% |
+| Review | 2,973 | 34.5% |
+| Decode error | 1 | <0.1% |
+
+Most frequent top suggestions were Kick (2,083), Snare (1,765), Riser
+(1,617), Crash (733), Clap (715), Synth (460), Impact (373), and Vocal (354).
+The median semantic score was 0.3087; median top-1 margin was 0.0518.
+
+## Interpretation
+
+These are triage statistics, not accuracy measurements. The prompt scores are
+explicitly uncalibrated, no human ear labels or ground truth were read, and
+`semantic_label` remains null for every row. The output is therefore suitable
+for review/search assistance, not automatic renaming.
+
+Beyond the multi-view gate, the next model improvement should be a calibrated
+evidence layer combining CLAP score/margin with physical audio features and
+nearest-neighbour agreement.
+The single remaining decode error is a missing/non-regular MP3 path and should
+be treated as a corpus hygiene issue, not a classifier failure.
+
+## Multi-view consistency pass
+
+Receipt:
+`tools/classification_benchmark/receipts/gpu0_sample_pack_multiview_8622_receipt_20260913.jsonl`
+
+The three-view arm scored full, early-half, and late-half waveform views for
+8,621 files (the known corrupt MP3 was skipped from decoding and remains an
+explicit error in the single-view receipt). Requiring at least 0.67 view
+agreement changed the triage split to:
+
+| Outcome | Files | Share |
+|---|---:|---:|
+| Suggest | 3,482 | 40.4% |
+| Review | 5,139 | 59.6% |
+
+All rows have `view_count: 3`; median view agreement was 0.6667 (minimum
+0.3333, maximum 1.0). This is a conservative reliability gate, not a measured
+accuracy gain: no human labels or ground truth were used, and suggestions
+remain uncalibrated and review-only.
+
+## Ranked review queue
+
+The 5,139 review rows are now ranked by view disagreement first, then small
+top-1 margin and high entropy. The top 500 are exported here:
+`tools/classification_benchmark/receipts/gpu0_multiview_review_queue_20260913.json`.
+This queue is still review-only: it creates no labels, approvals, or rename
+actions and retains the original alternatives and evidence for each file.
+
+## Independent-model agreement pass
+
+The same three-view staging set was scored with the generic `clap_model`
+checkpoint on GPU0:
+`tools/classification_benchmark/receipts/gpu0_sample_pack_generic_multiview_8622_receipt_20260913.jsonl`.
+It produced 4,268 `suggest`, 4,354 `review`, and one decoder-error row across
+8,622 files. These are independent prompt-similarity triage outcomes, not
+accuracy measurements.
+
+The two receipts were combined with
+`tools/classification_benchmark/build_label_free_ensemble_receipt.py`. On the
+aligned 8,621-file set, the strict gate (same top label, both models already
+passing their own score/margin/view gates) retained 1,594 suggestions (18.5%)
+and 7,027 review rows. The ensemble receipt is:
+`tools/classification_benchmark/receipts/gpu0_label_free_ensemble_20260913.jsonl`.
+
+The ensemble remains uncalibrated and human-approval-only. Its purpose is to
+reduce false confidence in label-free operation and expose model disagreement
+as a high-value review signal; it does not manufacture semantic ground truth.
+
+The ensemble review queue is ranked with model disagreement first, then
+gate-status disagreement, weakest three-view agreement, and margin uncertainty:
+`tools/classification_benchmark/receipts/gpu0_ensemble_review_queue_20260913.json`.
+Its top 500 entries are the best candidates for a small, deliberate ear-review
+calibration set if human labeling is later authorized.
+
+## Similarity-search index
+
+The music-tuned model's normalized 512-D vectors are exported in
+`tools/classification_benchmark/receipts/gpu0_music_embeddings_8622_20260913.npz`
+(8,621 paths; one known decoder-error path is absent). The read-only query
+tool, `tools/classification_benchmark/label_free_similarity_search.py`, returns
+cosine-ranked neighbours without semantic labels. A smoke query and its top-20
+results are captured at
+`tools/classification_benchmark/receipts/gpu0_music_similarity_example_20260913.json`;
+the nearest neighbour scored 0.8734 cosine similarity. Similarity is also
+uncalibrated evidence and should be used for browsing or review, not automatic
+replacement or renaming.
+
+The first structured-name candidate export is generated by
+`tools/classification_benchmark/render_label_free_name.py` and captured at
+`tools/classification_benchmark/receipts/gpu0_label_free_name_candidates_20260913.json`.
+It contains 1,594 `suggested_review_required` candidates and 7,027
+`review_required` candidates. Candidate names include a stable content-id
+suffix to prevent collisions; no filename was changed.
+
+For the top 500 ensemble review candidates, physical definition cards were
+computed from the local mirrored corpus with
+`tools/classification_benchmark/build_label_free_physical_cards.py`:
+`tools/classification_benchmark/receipts/gpu0_ensemble_physical_cards_20260913.json`.
+All 500 decoded successfully. The combined name/evidence packet is
+`tools/classification_benchmark/receipts/gpu0_ensemble_name_candidates_with_physics_20260913.json`.
+Every row remains `review_required`; the packet adds provisional form, pitch
+and waveform attributes but does not promote them to semantic truth.
+
+## Open-world domain routing pass
+
+The domain router was then run with the generic CLAP checkpoint across the same
+8,622 staged files, using the seven-way domain bank and three waveform views:
+`tools/classification_benchmark/receipts/gpu0_domain_router_8622_20260913.jsonl`.
+The coarse route distribution was:
+
+| Route | Files |
+|---|---:|
+| music_sample | 6,894 |
+| environment_sfx | 1,380 |
+| mechanical_industrial | 217 |
+| speech_voice | 53 |
+| unknown_or_mixture | 34 |
+| animal_bioacoustic | 33 |
+| ambience_field | 10 |
+| decoder error | 1 |
+
+These are routing suggestions, not accuracy claims: the domain prompt scores
+are uncalibrated, and each specialist must retain its own OOD and abstention
+gate. The router's purpose is to stop a music-sample model from being the
+default judge of every possible sound.
+
+## Time-localized windows
+
+The 500 highest-priority review files were segmented with the read-only energy
+window aid `tools/classification_benchmark/audio_segment_windows.py`. The batch
+manifest is
+`tools/classification_benchmark/receipts/gpu0_ensemble_segment_manifest_20260913.json`:
+500 files, 2,076 active windows, zero segmentation errors; the median file had
+one window and the 90th percentile had 11. These windows are ready for routed
+specialist inference, but the boundaries are not semantic labels.
+
+The first time-localized specialist pass is now complete with
+`tools/classification_benchmark/label_free_segment_classifier.py` and the
+music-tuned CLAP checkpoint. Its receipt is
+`tools/classification_benchmark/receipts/gpu0_segment_classifier_500_20260913.jsonl`.
+It scored all 2,076 windows from all 500 files with zero segment decode
+errors. At the window level, 1,156 windows passed the score/margin suggestion
+gate and 920 stayed in review. At the file level, 324 files had at least one
+suggested window and 176 remained review-only. Each file retains multiple
+candidate labels with their best timestamps; the most common window
+suggestions were Kick (573), Riser (552), Snare (355), Clap (204), Synth
+(101), and Crash (99).
+
+This is the intended multi-label shape for mixed audio: a file can expose
+several candidate events rather than one forced top-1 name. Scores are still
+uncalibrated prompt similarities, `semantic_label` remains null, and every
+candidate is human-approval-only. The next quality step is specialist routing
+per domain plus a small, deliberately sampled calibration set for thresholds;
+the receipt is not evidence of universal correctness.
+
+All of the above evidence is now joined by the read-only packet builder
+`tools/classification_benchmark/build_label_free_evidence_packet.py`. The
+full GPU0 packet is
+`tools/classification_benchmark/receipts/gpu0_evidence_packet_8621_20260913.json`:
+8,621 ensemble rows with complete domain-route coverage and 500 rows enriched
+with physical cards and timestamped segment evidence. This is the stable
+handoff shape for a review UI or query service; it preserves provenance and
+cannot be interpreted as approved metadata.
+
+The packet schema is also verified at the native JUCE boundary by
+`Source/LabelFreeEvidencePacket.h` and `TestLabelFreeEvidencePacket`; the test
+passes against the real 8,621-row packet as well as mutation-rejection fixtures.
+The standalone app exposes the same packet through `Library > Import AI
+Evidence...`, rendering up to 500 review rows in the existing in-app results
+overlay; importing it does not modify library metadata or filenames.
+
+The full named hand-off also carries the conservative fusion result in
+`tools/classification_benchmark/receipts/gpu0_evidence_packet_full_named_fused_8621_20260913.json`.
+Its fusion coverage is 8,621/8,621, so the review UI can inspect the exact
+suggest/review/unknown-domain decision beside the underlying evidence.
+The native overlay now also renders the novelty score and an explicit `OOD
+REVIEW` marker for gate overrides, keeping the reason for abstention visible to
+the reviewer.
+
+## Open-world specialist pilot
+
+The configurable specialist runner
+`tools/classification_benchmark/label_free_specialist_classifier.py` now
+dispatches routed files to domain-specific prompt banks for music, speech,
+environmental SFX, bioacoustics, machinery and ambience. The GPU0 pilot receipt
+is
+`tools/classification_benchmark/receipts/gpu0_open_world_specialist_500_20260913.jsonl`.
+It scored all 500 routed files across five observed domains (music 310,
+environment/SFX 107, mechanical 77, speech 3, ambience 3); 265 passed the
+three-view score/margin gate and 235 remained review-only. These are
+uncalibrated specialist suggestions, not semantic truth.
+
+The joined packet now carries this specialist evidence for 500 rows in its
+`specialist` field, while preserving the same approval and no-mutation contract.
+
+The same 500 rows were rescored with the second CLAP checkpoint and combined
+by `tools/classification_benchmark/build_label_free_specialist_ensemble.py`.
+The specialist agreement receipt is
+`tools/classification_benchmark/receipts/gpu0_open_world_specialist_ensemble_500_20260913.jsonl`:
+206 rows had the same specialist top label, and the stricter two-model,
+three-view gate retained 80 suggestions while leaving 420 in review. This is
+the first domain-specialist reliability signal in the packet, but it remains
+uncalibrated and does not constitute accuracy.
+
+The per-domain scorecard is
+`tools/classification_benchmark/receipts/gpu0_open_world_specialist_scorecard_500_20260913.json`.
+It records agreement rate, suggestion coverage and score/margin/view
+distributions for threshold tuning, with `accuracy_claim: null` and
+`auto_action_allowed: false`. This keeps no-ear-label operation useful while
+making the boundary between confidence evidence and measured correctness
+explicit.
+
+A corpus-wide one-view specialist pass is also complete:
+`tools/classification_benchmark/receipts/gpu0_open_world_specialist_full_8622_20260913.jsonl`.
+It scored 8,587 of 8,622 routed files (35 remained unknown/abstained), with
+5,679 passing the single-view suggestion gate. The companion scorecard is
+`tools/classification_benchmark/receipts/gpu0_open_world_specialist_scorecard_full_8622_20260913.json`.
+These broad-coverage suggestions are still review-only; the production
+promotion path remains the two-model, multi-view agreement gate demonstrated
+on the priority 500.
+For UI hand-off, the optional joined packet is
+`tools/classification_benchmark/receipts/gpu0_evidence_packet_full_specialist_8621_20260913.json`;
+it carries routed specialist evidence across the corpus while retaining
+physical cards and time-localized segments for the priority 500.
+The named priority packet is
+`tools/classification_benchmark/receipts/gpu0_evidence_packet_named_8621_20260913.json`;
+it additionally carries the structured filename candidate for each of the
+500 physical-card rows, now rendered directly by the native evidence overlay.
+The corpus-wide named variant is
+`tools/classification_benchmark/receipts/gpu0_evidence_packet_full_named_8621_20260913.json`;
+it carries a review candidate for every ensemble row (without physical-card
+or segment enrichment).
+
+The routed specialist receipt is also accepted by the uncertainty queue
+builder. Its full-corpus queue contains 2,943 review candidates, with the
+highest 500 exported to
+`tools/classification_benchmark/receipts/gpu0_open_world_specialist_review_queue_full_8622_20260913.json`.
+The queue ranks low margins and high entropy for efficient active review; it
+does not promote labels or perform actions.
+
+The append-only feedback stream now also supports `accept_name_candidate`,
+`correct_name_candidate` and `reject_name_candidate` events. Candidate names
+are validated as single safe filenames; decisions remain evidence until an
+explicit calibration/promotion step.
+
+The localhost review workspace can now load an evidence packet directly
+(`--evidence-packet`) and bind filename-feedback events to the exact candidate
+in that packet. This keeps review provenance intact even when a path also
+appears in an older review collection.
+Evidence-mode events now carry the packet SHA-256, and calibration rejects
+events from a different packet revision.
+
+The evaluation-only command
+`tools/classification_benchmark/evaluate_label_free_specialist.py` now measures
+the receipt against explicit verified labels without using filename text as
+truth. Against `verified_drums.csv`, 237 paths overlapped; after excluding one
+conflicting identity and 88 labels outside the specialist bank, 149 rows were
+scorable, including 25 rows where the router chose a domain whose bank did not
+contain the verified class. On the 124 domain-consistent rows, suggestion
+precision was 80.4% (Wilson lower 72.0%). Counting routing errors end-to-end,
+overall suggestion precision was 68.7% (Wilson lower 60.3%); the
+music-domain slice was 80.4% (lower 72.0%), while the small routed
+environment/speech slices exposed misrouting and scored 0%. No slice qualifies
+for automation. This is exactly the signal needed to tune routing and prompt
+banks before adding any auto tier.
+
+The immutable evaluation receipt is
+`tools/classification_benchmark/receipts/gpu0_open_world_specialist_eval_verified_drums_20260913.json`.
+Its threshold sweep identifies score ≥ 0.15 with margin ≥ 0.18 as the best
+measured high-confidence review slice (41 rows, 95.1% observed precision;
+Wilson lower bound 83.9%). It remains below the 95% lower-bound bar, so it is
+useful for prioritisation and further sampling, not automatic naming.
+
+`build_label_free_name_calibration.py` turns those typed decisions into a
+per-domain Wilson lower-bound report. It uses the latest decision per path,
+requires a configurable minimum review count, and never grants automation;
+the report is a promotion candidate only for a later owner-approved gate.
+The review workspace exposes this report at `/api/name-calibration` when
+started with `--name-calibration`, keeping the quality signal visible without
+turning it into an action.
+
+The router prompt bank is now configurable via `--prompts`; the experimental
+`tools/classification_benchmark/domain_router_prompt_banks_v2.json` adds
+producer-vs-diegetic wording. A paired GPU0 run on the identical 237-file
+overlap with `verified_drums.csv` is recorded in
+`tools/classification_benchmark/receipts/gpu0_domain_router_pair_eval_237_20260913.json`.
+Because every verified row is a music/sample asset, `music_sample` routing is
+the expected-domain test: built-in v1 routed 200/237 (84.4%) and produced 112
+confident expected-domain suggestions (90.3% precision), while v2 routed
+191/237 (80.6%) and produced 99 (84.6% precision). V2 changed 27 decisions,
+improving 9 and worsening 18, so it remains an experiment; v1 stays the
+corpus baseline pending a broader, stratified calibration set.
+
+That calibration set is now materialized as the read-only manifest
+`tools/classification_benchmark/receipts/gpu0_label_free_calibration_sample_500_20260914_v2.json`.
+The v2 manifest selects 500 of the 8,621 evidence rows across 24 open collections:
+it excludes the sealed holdout and exact-content aliases before selecting 200 model
+disagreements, 125 boundary/abstention cases, 75 explicit non-music routes and
+100 random-audit files. It creates no labels; each row records the domain,
+uncertainty signals and review axes that a later owner-approved ear review must
+answer. The manifest is deliberately split from tuning data so a sealed final
+set can be held out for the eventual selective-risk gate.
+The localhost review workspace can expose this manifest with
+`--calibration-sample` and `/api/calibration-sample`, including lane/domain
+filters. This makes the calibration loop inspectable without serving source
+audio or granting any rename action.
+
+The packet now also has a conservative open-world fusion boundary in
+`tools/classification_benchmark/receipts/gpu0_label_free_fused_decision_8621_20260913.json`.
+It requires a supported music route, base-model agreement, specialist
+agreement and each component's own suggestion gate; all other rows abstain or
+enter `unknown_domain`. For non-music routes it preserves a separate
+`domain_candidate_label` when the specialist is confident, but marks that
+candidate open-world and review-only rather than forcing it into the music
+taxonomy. On the 149-row exact-label verified intersection, the
+fusion produced 21 suggestions, all 21 correct (100.0% observed precision;
+84.5% Wilson lower bound) at 14.1% coverage. This is a high-confidence review
+slice, not an automatic rename policy, and the evaluator is
+`gpu0_label_free_fused_decision_eval_verified_drums_20260913.json`.
+
+To widen the check, compatible verified sample-pack CSVs were merged with
+identical duplicates collapsed and 138 conflicting path/label keys excluded;
+the merge report is
+`tools/classification_benchmark/receipts/verified_sample_pack_merge_report_20260914.json`.
+Against the resulting 225-row exact supported-label intersection, the fused
+receipt produced 35 suggestions, all correct (100.0% observed precision; 90.1%
+Wilson lower bound) at 15.6% coverage. The merged CSV and evaluation are
+`verified_sample_pack_merged_for_label_free_eval_20260914.csv` and
+`gpu0_label_free_fused_decision_eval_merged_verified_20260914.json`.
+The overlap is still only 492 of 1,469 merged labels because the GPU0 packet
+covers `sample_pack_testing`; this is stronger calibration evidence, not a
+universal accuracy claim.
+
+An additional corpus-relative OOD safeguard uses leave-one-out kNN density in
+the normalized music embedding index. The receipt
+`tools/classification_benchmark/receipts/gpu0_label_free_embedding_ood_8621_20260914.json`
+flags 95 novelty outliers for review; applying its 0.35 review gate produced
+the final
+`gpu0_label_free_ood_gated_decision_8621_20260914.json`, downgrading 16
+suggestions while preserving each suppressed candidate for inspection. The
+gated policy made no change to the 35/35 verified suggestions, but reduces the
+chance of confidently treating an isolated embedding as known. Novelty is
+corpus-relative and uncalibrated, so it is an abstention aid rather than an
+accuracy claim.
+On the 492-row verified overlap, no fused `suggest` row exceeded the 0.35
+novelty gate, while 7/84 `unknown_domain` rows did; the distributional audit is
+`gpu0_label_free_embedding_ood_eval_merged_verified_20260914.json`. This
+supports the gate as an OOD prioritisation signal, not as proof of semantic
+correctness.
+
+Temporal evidence has now been expanded from the 500-file pilot to the full
+packet. `gpu0_segment_manifest_full_8621_20260914.json` contains all 8,621
+files, 36,281 windows and zero decode errors. The global-batched classifier
+receipt `gpu0_segment_classifier_full_8621_20260914.jsonl` scored every window;
+7,391 files have at least one review-only segment suggestion and 1,230 remain
+file-level review-only. The final joined packet is
+`gpu0_evidence_packet_full_named_ood_gated_segments_8621_20260914.json`.
+Window-level prompt scores remain uncalibrated and are evidence for
+review/routing only; they do not create labels or authorize renaming.
+The read-only audit
+`gpu0_segment_classifier_eval_merged_verified_20260914.json` compares the
+receipt's file-top candidate with a score-sum temporal vote. On the 225-row
+exact supported-label overlap, both methods scored 178/225 (79.11% precision;
+73.33% Wilson lower bound), so temporal windows currently improve localization
+and review context rather than measured accuracy. No temporal auto-promotion
+is enabled.
+
+Unsupervised discovery over the same CLAP index is recorded in
+`gpu0_label_free_cluster_manifest_8621_20260914.json`: DBSCAN yields 153
+cluster hypotheses and 3,527 noise/outlier rows. Cluster membership is
+label-free review evidence for discovering new specialists or taxonomy
+entries, not a semantic label. The assignments are joined into
+`gpu0_evidence_packet_full_named_ood_gated_segments_clusters_8621_20260914.json`
+with complete 8,621-row coverage.
+The native evidence overlay exposes the cluster ID/size (or discovery-noise
+state) as review context while keeping all actions approval-gated.
+The ranked discovery queue
+`gpu0_label_free_cluster_review_queue_8621_20260914.json` contains the top 100
+cluster/noise groups with representative paths, route distributions and fused
+decision counts. It is designed to focus sparse review on groups most likely to
+need a new specialist; no cluster receives a semantic name automatically.
+The companion audit
+`gpu0_label_free_cluster_specialist_proposals_8621_20260914.json` flags 39 of
+the top 100 groups for new-specialist/ontology review, one for domain-router
+improvement, one noise bucket, and 59 as consistent with existing specialists.
+It deliberately emits no semantic cluster names or training labels.
+The corresponding prompt-proposal artifact
+`gpu0_label_free_specialist_prompt_proposals_8621_20260914.json` contains only
+repeated basename hints and draft prompt templates for review. It does not
+promote those hints to labels or training targets.
+
+The optional reference-retrieval experiment is recorded in
+`gpu0_label_free_retrieval_evidence_high_precision_8621_20260914.json`. It uses
+a separately extracted music-CLAP index, excludes 7,233 exact filename
+overlaps, and applies a strict 0.98 similarity gate. The merged verified audit
+found 27/31 correct suggestions (87.10% observed precision; 71.15% Wilson
+lower bound), so retrieval is retained as review evidence and deliberately not
+promoted into the conservative fused decision.
+
+The append-only feedback contract now also supports
+`accept_fused_candidate`, `correct_fused_candidate` and
+`reject_fused_candidate`. `build_label_free_decision_calibration.py` joins
+those events to the packet hash and reports Wilson-bounded precision by domain
+and candidate scope, while keeping `auto_action_allowed: false`. This lets the
+same review loop calibrate open-world candidates as well as structured names.
+
+The specialist-agreement requirement was also measured as an ablation. Removing
+that requirement produced 36/36 correct suggestions on the same merged
+intersection (90.4% Wilson lower bound) versus 35/35 with the requirement, but
+it admits more uncorroborated decisions across the full corpus. The receipts
+are `gpu0_label_free_fused_decision_no_specialist_8621_20260914.json` and
+`gpu0_label_free_fused_decision_no_specialist_eval_merged_verified_20260914.json`;
+the stricter specialist-gated policy remains the default because the product
+target includes open-world/OOD audio, where independent corroboration matters.

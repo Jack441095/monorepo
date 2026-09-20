@@ -1,0 +1,603 @@
+{
+  "review": "KENN_BLIND_ENGINEER_REVIEW_V1",
+  "answer_key": [
+    {
+      "review_id": "REV-001",
+      "case_id": "lr_persistent-005",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-002",
+      "case_id": "clipping-000",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-003",
+      "case_id": "headroom_mastered-009",
+      "ground_truth": [],
+      "scope": "master"
+    },
+    {
+      "review_id": "REV-004",
+      "case_id": "dc-000",
+      "ground_truth": [
+        "dc"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-005",
+      "case_id": "multi_lr_phase-015",
+      "ground_truth": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-006",
+      "case_id": "healthy-043",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-007",
+      "case_id": "headroom_mastered-007",
+      "ground_truth": [],
+      "scope": "master"
+    },
+    {
+      "review_id": "REV-008",
+      "case_id": "clipping-005",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-009",
+      "case_id": "healthy-046",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-010",
+      "case_id": "multi_clip_bass-006",
+      "ground_truth": [
+        "clipping",
+        "bass"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-011",
+      "case_id": "healthy-005",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-012",
+      "case_id": "multi_lr_phase-010",
+      "ground_truth": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-013",
+      "case_id": "healthy-041",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-014",
+      "case_id": "lr_persistent-047",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-015",
+      "case_id": "multi_clip_bass-001",
+      "ground_truth": [
+        "clipping",
+        "bass"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-016",
+      "case_id": "healthy-044",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-017",
+      "case_id": "clipping-010",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-018",
+      "case_id": "lr_persistent-053",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-019",
+      "case_id": "lr_persistent-016",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-020",
+      "case_id": "healthy_saturated-013",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-021",
+      "case_id": "clipping-064",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-022",
+      "case_id": "dc-001",
+      "ground_truth": [
+        "dc"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-023",
+      "case_id": "clipping-056",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-024",
+      "case_id": "clipping-021",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-025",
+      "case_id": "healthy_mastered-017",
+      "ground_truth": [],
+      "scope": "master"
+    },
+    {
+      "review_id": "REV-026",
+      "case_id": "healthy-056",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-027",
+      "case_id": "healthy-054",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-028",
+      "case_id": "lr_persistent-072",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-029",
+      "case_id": "clipping-025",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-030",
+      "case_id": "healthy_saturated-028",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-031",
+      "case_id": "lr_persistent-034",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-032",
+      "case_id": "clipping-062",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-033",
+      "case_id": "clipping-034",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-034",
+      "case_id": "dc-006",
+      "ground_truth": [
+        "dc"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-035",
+      "case_id": "headroom-016",
+      "ground_truth": [
+        "headroom"
+      ],
+      "scope": "mix_in_progress"
+    },
+    {
+      "review_id": "REV-036",
+      "case_id": "lr_persistent-023",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-037",
+      "case_id": "clipping-043",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-038",
+      "case_id": "clipping-066",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-039",
+      "case_id": "healthy-026",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-040",
+      "case_id": "clipping-036",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-041",
+      "case_id": "clipping-050",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-042",
+      "case_id": "healthy_saturated-018",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-043",
+      "case_id": "headroom-009",
+      "ground_truth": [
+        "headroom"
+      ],
+      "scope": "mix_in_progress"
+    },
+    {
+      "review_id": "REV-044",
+      "case_id": "healthy_mastered-005",
+      "ground_truth": [],
+      "scope": "master"
+    },
+    {
+      "review_id": "REV-045",
+      "case_id": "clipping-003",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-046",
+      "case_id": "multi_clip_bass-002",
+      "ground_truth": [
+        "clipping",
+        "bass"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-047",
+      "case_id": "clipping-060",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-048",
+      "case_id": "multi_lr_phase-014",
+      "ground_truth": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-049",
+      "case_id": "lr_alternating-000",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-050",
+      "case_id": "lr_persistent-036",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-051",
+      "case_id": "clipping-001",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-052",
+      "case_id": "headroom-007",
+      "ground_truth": [
+        "headroom"
+      ],
+      "scope": "mix_in_progress"
+    },
+    {
+      "review_id": "REV-053",
+      "case_id": "healthy_saturated-023",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-054",
+      "case_id": "headroom-020",
+      "ground_truth": [
+        "headroom"
+      ],
+      "scope": "mix_in_progress"
+    },
+    {
+      "review_id": "REV-055",
+      "case_id": "healthy_saturated-004",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-056",
+      "case_id": "headroom-005",
+      "ground_truth": [
+        "headroom"
+      ],
+      "scope": "mix_in_progress"
+    },
+    {
+      "review_id": "REV-057",
+      "case_id": "clipping-032",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-058",
+      "case_id": "healthy_mastered-013",
+      "ground_truth": [],
+      "scope": "master"
+    },
+    {
+      "review_id": "REV-059",
+      "case_id": "healthy_saturated-027",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-060",
+      "case_id": "resonance-005",
+      "ground_truth": [
+        "resonance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-061",
+      "case_id": "clipping-009",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-062",
+      "case_id": "healthy_saturated-024",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-063",
+      "case_id": "healthy_mastered-004",
+      "ground_truth": [],
+      "scope": "master"
+    },
+    {
+      "review_id": "REV-064",
+      "case_id": "lr_persistent-007",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-065",
+      "case_id": "headroom-022",
+      "ground_truth": [
+        "headroom"
+      ],
+      "scope": "mix_in_progress"
+    },
+    {
+      "review_id": "REV-066",
+      "case_id": "lr_persistent-044",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-067",
+      "case_id": "lr_persistent-012",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-068",
+      "case_id": "multi_lr_phase-016",
+      "ground_truth": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-069",
+      "case_id": "healthy-011",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-070",
+      "case_id": "dc-007",
+      "ground_truth": [
+        "dc"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-071",
+      "case_id": "healthy-024",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-072",
+      "case_id": "clipping-015",
+      "ground_truth": [
+        "clipping"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-073",
+      "case_id": "lr_persistent-061",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-074",
+      "case_id": "headroom-010",
+      "ground_truth": [
+        "headroom"
+      ],
+      "scope": "mix_in_progress"
+    },
+    {
+      "review_id": "REV-075",
+      "case_id": "headroom-001",
+      "ground_truth": [
+        "headroom"
+      ],
+      "scope": "mix_in_progress"
+    },
+    {
+      "review_id": "REV-076",
+      "case_id": "multi_lr_phase-005",
+      "ground_truth": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-077",
+      "case_id": "lr_alternating-018",
+      "ground_truth": [],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-078",
+      "case_id": "lr_persistent-076",
+      "ground_truth": [
+        "lr_imbalance"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-079",
+      "case_id": "multi_clip_bass-007",
+      "ground_truth": [
+        "clipping",
+        "bass"
+      ],
+      "scope": "unknown"
+    },
+    {
+      "review_id": "REV-080",
+      "case_id": "healthy-037",
+      "ground_truth": [],
+      "scope": "unknown"
+    }
+  ],
+  "sha256": "0dd68619dceb92a979badf4a56e0ea699603aaae6de21a2982e13afdc3b1cf59"
+}

@@ -1,0 +1,33 @@
+{
+  "embedding_dimensions": 2048,
+  "embedding_model_version": "candidate_embeddings_testing_v1",
+  "generated_at": "2026-09-12T16:58:16Z",
+  "input_sha256": {
+    "acoustic": "b174e1dc3310fc6e24585bb7b761ada02851c616a526e182c5d4346aafe9b8db",
+    "embedding_index": "f8f2736bb3d456656b035de854dde75c74dc6215b27755819722c754e8b284a6",
+    "identity": "d37d8876a79c48df48da6bb7b1f59d389b45325e5397f6393a5007c6a1d9d0e6",
+    "predictions": "38c7315091f36b80909caff74c05bb4438e25036c90710fea328b303708d9cbd"
+  },
+  "method_version": "unified_evidence_index_v1",
+  "n_acoustic_paths_outside_embedding_index": 733,
+  "n_alias_paths": 335,
+  "n_content_ids": 6980,
+  "n_embedding_paths": 7315,
+  "n_exact_duplicate_groups": 235,
+  "n_prediction_paths_outside_embedding_index": 0,
+  "n_with_acoustic_measurements": 714,
+  "n_with_predictions": 7315,
+  "output": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/unified_evidence_index_testing_v1.jsonl",
+  "record_type": "slo_unified_evidence_index",
+  "safety": {
+    "content_identity_is_complete_file_sha256": true,
+    "embedding_values_modified": false,
+    "metadata_written": false,
+    "paths_modified": false,
+    "read_only": true,
+    "rename_actions": false,
+    "semantic_labels_created": false,
+    "source_audio_modified": false
+  },
+  "schema_version": "1.0.0"
+}

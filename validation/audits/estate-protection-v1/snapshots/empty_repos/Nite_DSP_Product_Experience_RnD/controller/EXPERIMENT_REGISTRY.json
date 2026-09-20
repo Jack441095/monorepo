@@ -1,0 +1,150 @@
+{
+  "version": "px-experiment-registry-v1",
+  "environment": {
+    "utc": "2026-08-22T17:52:09Z",
+    "host": "macOS",
+    "production_mutation": false,
+    "production_repositories_modified": []
+  },
+  "experiments": [
+    {
+      "experiment_id": "PX-A-001",
+      "track": "PX-A SLO Workflow Lab",
+      "hypothesis": "A token index can reduce repeated text-search latency at large library sizes.",
+      "current_workflow": "Case-insensitive substring scan over each sample's concatenated metadata.",
+      "proposed_workflow": "Normalised token index with ranked candidates before similarity or MAP refinement.",
+      "method": "Deterministic synthetic fixtures at 500, 2000, 5000, 10000, and 25000 samples; nine repeats per query.",
+      "metric": "Median query time and match-count parity.",
+      "result": "At 25000 samples, worst-query median was 241.9812 ms for linear scan and 6.4816 ms for exact-token lookup; one numeric query differed in match count.",
+      "status": "PASS",
+      "artifact": "benchmarks/search_and_map_results.json",
+      "conclusion": "Promote as an isolated indexing spike only; preserve fuzzy/substring semantics and prove parity first."
+    },
+    {
+      "experiment_id": "PX-A-002",
+      "track": "PX-A SLO Workflow Lab",
+      "hypothesis": "Viewport culling keeps MAP work bounded by visible points rather than library size.",
+      "current_workflow": "Production MAP uses cached static layers and QuadTree viewport queries (observed source evidence); proxy compares full scan with cell culling.",
+      "proposed_workflow": "Keep production culling and add measured frame telemetry before changing renderer.",
+      "method": "Deterministic point fixtures and a 4% viewport proxy at five point counts.",
+      "metric": "Visible-count parity and median hit-test/cull time.",
+      "result": "At 25000 points, proxy full scan 11.9241 ms versus cell cull 0.3452 ms with identical visible count.",
+      "status": "PASS",
+      "artifact": "benchmarks/search_and_map_results.json",
+      "conclusion": "Do not replace the current MAP architecture based on this proxy; instrument JUCE P95/P99 next."
+    },
+    {
+      "experiment_id": "PX-B-001",
+      "track": "PX-B KENN Workflow Lab",
+      "hypothesis": "Evidence-first provisional proposals can make automation useful without making it authoritative.",
+      "current_workflow": "KENN/AutoMix emits measured findings, relationships, previews, and opt-in correction flags in the existing package.",
+      "proposed_workflow": "Measure, detect, prioritise, explain with evidence, preview a diff, then require apply/reject and retain undo.",
+      "method": "Synthetic noisy, reject, and healthy fixtures through a small state machine.",
+      "metric": "State invariants and no-action behavior.",
+      "result": "All invariants passed; the healthy fixture produced no action and all proposals stayed provisional until decision.",
+      "status": "PASS",
+      "artifact": "experiments/kenn_workflow_results.json",
+      "conclusion": "Promote the interaction grammar to human testing; do not add chatbot-first presentation."
+    },
+    {
+      "experiment_id": "PX-C-001",
+      "track": "PX-C DAW / Ableton Integration Lab",
+      "hypothesis": "The highest-value portable DAW context is transport-aware audition, while richer session control remains host-specific.",
+      "current_workflow": "SLO reads BPM, playing state, and PPQ position from the portable host playhead; drag exports original files.",
+      "proposed_workflow": "Use portable transport context for audition and an explicitly opt-in Ableton bridge for richer context.",
+      "method": "Read-only source audit of SLO JUCE code, KENN Ableton OSC bridge, and product documentation.",
+      "metric": "Context classified portable, Ableton-specific, or unavailable/unreliable.",
+      "result": "Inventory completed; no live SLO-to-Ableton metadata handoff was found.",
+      "status": "PASS",
+      "artifact": "reports/PX_DAW_INTEGRATION_REPORT.md",
+      "conclusion": "Promote transport-aware audition and native drag reliability; park broad automatic project understanding."
+    },
+    {
+      "experiment_id": "PX-D-001",
+      "track": "PX-D Cross-Product Intelligence Lab",
+      "hypothesis": "KENN-to-SLO complement search is useful if the boundary carries measured features and references rather than raw audio.",
+      "current_workflow": "AI Platform has typed AgentRequest/CapabilityDefinition and company capabilities; candidate audio IDs are not registered live.",
+      "proposed_workflow": "Pass issue evidence and sample feature summaries across candidate audio capabilities, preserving product ownership.",
+      "method": "Synthetic envelope validation and forbidden private-field checks.",
+      "metric": "Accepted safe payloads, rejected raw-audio payloads, ownership invariant.",
+      "result": "Both evidence-only directions accepted; raw audio rejected; ownership invariant passed.",
+      "status": "PASS",
+      "artifact": "experiments/cross_product_results.json",
+      "conclusion": "Proceed to adapter design review, not production registration."
+    },
+    {
+      "experiment_id": "PX-E-001",
+      "track": "PX-E Onboarding / Accessibility / Localisation Lab",
+      "hypothesis": "A structured first-run journey plus redundant state grammar catches accessibility and localisation failures before UI implementation.",
+      "current_workflow": "SLO has editor-level keyboard shortcuts and EMBER supplies redundant semantic encodings; MAP keyboard traversal is absent in the audited source.",
+      "proposed_workflow": "Progressive disclosure, explicit empty-state next actions, complete focus model, and adaptive text layout.",
+      "method": "Structural control semantics, focus order, reduced-motion, colour-independence, 150% text-scale, and six pseudo-locale width stress.",
+      "metric": "Invariant pass rate and overflow detection.",
+      "result": "Accessibility invariants passed; nine width overflows were explicitly detected; CJK pseudo had four and 150% scale flagged Reject plus empty-state copy.",
+      "status": "PASS",
+      "artifact": "experiments/onboarding_accessibility_localisation_results.json",
+      "conclusion": "Promote keyboard/focus and adaptive layout requirements; require rendered JUCE and screen-reader validation."
+    },
+    {
+      "experiment_id": "PX-F-001",
+      "track": "PX-F Plugin Performance & Interaction Lab",
+      "hypothesis": "Explicit latency budgets expose the difference between a fast median and an unsafe tail.",
+      "current_workflow": "SLO uses cached MAP rendering and message-thread file preparation; platform runtime serves local requests over AF_UNIX.",
+      "proposed_workflow": "Release budgets use P95/P99 and worst meaningful spikes, not average FPS or median latency alone.",
+      "method": "Synthetic SLO search/MAP proxy plus 100 requests through the existing nite_ai LocalRuntime and temporary SQLite store.",
+      "metric": "Median, P95, maximum, frame budget, audio-thread boundary.",
+      "result": "IPC median 0.5481 ms, P95 16.3472 ms, max 131.4537 ms; proxy indexed search and culling meet proposed targets.",
+      "status": "PASS",
+      "artifact": "performance/performance_budget_manifest.json",
+      "conclusion": "Adopt budget shape; investigate IPC tails, cold-start, multi-instance, and real JUCE frame traces."
+    },
+    {
+      "experiment_id": "PX-G-001",
+      "track": "PX-G Thursday Company-Interface Research",
+      "hypothesis": "Thursday is more useful as a concise brief plus approval surface than as an always-chat dashboard.",
+      "current_workflow": "Daily brief composes business status, agenda, week ahead, receipts, and scheduler; platform exposes nine company capabilities and separates approval from execution.",
+      "proposed_workflow": "Menu-bar/command-palette entry point with prioritised brief, evidence links, and high-risk approval detail.",
+      "method": "Read-only architecture audit plus targeted daily-brief tests.",
+      "metric": "Capability coverage, approval separation, graceful failure, test outcome.",
+      "result": "Approval separation and local runtime pass; daily-brief test file has 2 failures from active-branch handler wiring.",
+      "status": "INCONCLUSIVE",
+      "artifact": "reports/PX_THURSDAY_INTERFACE_REPORT.md",
+      "conclusion": "Continue R&D after the active branch integration is repaired; do not broaden into autonomous execution."
+    },
+    {
+      "experiment_id": "PX-H-001",
+      "track": "PX-H Synthetic User-Journey & Product Friction Lab",
+      "hypothesis": "Scenario comparison can rank workflow opportunities before human testing, while exposing complexity regressions.",
+      "current_workflow": "Modeled current SLO/KENN/Thursday workflows with multiple context switches and decisions.",
+      "proposed_workflow": "Evidence-first common paths with fewer steps, plus explicit parking of chatbot-first UX.",
+      "method": "Nine synthetic archetypes by fifteen tasks, with deterministic friction estimates.",
+      "metric": "Steps, clicks, keystrokes, contexts, decisions, wait, recovery; current versus proposed.",
+      "result": "135 scenarios generated; complement-search had the largest modeled step reduction; chatbot-first plugin was the only negative step-reduction proposal.",
+      "status": "PASS",
+      "artifact": "user_journeys/synthetic_corpus.json",
+      "conclusion": "Use the ranked corpus to select moderated human tasks; never report estimates as human usability data."
+    }
+  ],
+  "challenge_reviews": [
+    {
+      "subject": "Find Complement",
+      "challenge": "Feature ranking may add a new mode and weakly grounded recommendations.",
+      "decision": "Continue R&D; require candidate acceptance rate, false-positive review, and human time-to-useful-sample evidence."
+    },
+    {
+      "subject": "KENN to SLO",
+      "challenge": "Cross-product handoff could duplicate product semantics and leak private audio.",
+      "decision": "Keep only typed features, evidence, and artifact references; no raw audio or production adapter yet."
+    },
+    {
+      "subject": "Thursday company interface",
+      "challenge": "A dashboard/chat surface can increase interruption and approval ambiguity.",
+      "decision": "Prefer concise brief plus visual approval detail; continue until active daily-brief tests pass."
+    },
+    {
+      "subject": "MAP interaction",
+      "challenge": "New renderer or map modes could destabilise an already-cached implementation.",
+      "decision": "Instrument production-shaped JUCE traces before redesign; preserve the current architecture."
+    }
+  ]
+}

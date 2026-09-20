@@ -1,0 +1,164 @@
+:root,
+[data-theme='light'] {
+  --bg-color: #ffffff;
+  --text-color: #2c3137;
+  --muted-text: #7b848e;
+  --bubble-user: #f3f3f3;
+  --bubble-assistant: #f6f8fb;
+  --panel-bg: rgba(255, 255, 255, 0.9);
+
+  --surface-bg: #ffffff;
+  --floating-bg: rgba(255, 255, 255, 0.96);
+  --floating-bg-hover: #ffffff;
+  --floating-bg-active: #ffffff;
+  --floating-border: rgba(15, 23, 42, 0.08);
+  --floating-border-active: rgba(15, 23, 42, 0.16);
+  --floating-icon: #67707c;
+  --floating-icon-hover: #39424d;
+
+  --popover-bg: rgba(255, 255, 255, 0.98);
+  --popover-shadow: 0 0.18rem 0.36rem rgba(15, 23, 42, 0.16);
+  --lang-card-bg: #f6f8fb;
+  --lang-card-active-bg: #ffffff;
+  --lang-card-active-shadow: 0 0.12rem 0.24rem rgba(15, 23, 42, 0.12);
+
+  --lang-red-dot: #ff6d6f;
+  --lang-red-bg: rgba(255, 109, 111, 0.14);
+  --lang-red-ring: rgba(255, 109, 111, 0.3);
+  --lang-green-dot: #32d18f;
+  --lang-green-bg: rgba(52, 211, 153, 0.14);
+  --lang-green-ring: rgba(52, 211, 153, 0.35);
+
+  --file-card-bg: #f5f6f8;
+
+  --upload-box-bg: #f3f3f3;
+
+  --header-padding-x:2.5%;
+  --header-padding-y: 0.18rem;
+  --header-inner-min-height: 0.75rem;
+  --header-height: calc(var(--header-inner-min-height) + var(--header-padding-y) * 2);
+  --sidebar-header-height: 0.56rem;
+  --sidebar-rail-width: 0.52rem;
+  --header-shadow: 0 0.02rem 0.1rem rgba(15, 23, 42, 0.06);
+  --sidebar-left-shadow: -0.08rem 0 0.24rem rgba(15, 23, 42, 0.1);
+  --header-title-size: 0.22rem;
+  --header-title-weight: 600;
+  --header-title-color: #1a2129;
+  --header-title-tracking: 0.06em;
+  --main-max-width: 12rem;
+  --main-padding-x: 5%;
+  --content-max-width: 8rem;
+  --content-padding-x: 0.32rem;
+
+  --chat-avatar-size: 0.36rem;
+  --chat-avatar-gap: 0.12rem;
+  --chat-content-offset: calc(var(--chat-avatar-size) + var(--chat-avatar-gap));
+  --chat-avatar-user-bg: #e2e2e2;
+  --chat-avatar-user-icon: #111111;
+  --chat-message-size: 0.16rem;
+  --kenn-project-info-max-height: 1.4rem;
+
+  --sort-icon-muted: #9b9b9b;
+  --sort-icon-active: #2c3137;
+
+  --input-bg: #ffffff;
+  --input-border: rgba(15, 23, 42, 0.12);
+  --input-shadow: 0 0.14rem 0.34rem rgba(15, 23, 42, 0.14);
+  --input-text: #3f4751;
+  --input-placeholder: #a2acb7;
+  --icon-subtle: #98a2ad;
+  --send-btn-bg: #7f8c99;
+  --send-icon-color: #ffffff;
+  --toast-bg: #ffffff;
+  --toast-border: rgba(15, 23, 42, 0.1);
+  --toast-shadow: 0 0.12rem 0.4rem rgba(15, 23, 42, 0.18);
+
+  --modal-backdrop: rgba(15, 23, 42, 0.24);
+  --modal-panel-bg: #ffffff;
+  --modal-panel-shadow: 0 0.18rem 0.45rem rgba(15, 23, 42, 0.2);
+  --modal-title-color: #2a343a;
+  --modal-close-color: #6b7680;
+  --modal-close-hover: #27323a;
+
+  --audio-modal-bg: linear-gradient(135deg, #edf4fa 0%, #f7fbff 58%, #ffffff 100%);
+  --audio-subtitle: #6c7a84;
+  --audio-card-bg: #ffffff;
+  --audio-card-border: rgba(0, 0, 0, 0.03);
+  --audio-card-shadow: 0 0.1rem 0.22rem rgba(42, 52, 58, 0.08);
+  --audio-label-color: #566167;
+  --audio-knob-shell-bg: #edf3f8;
+  --audio-knob-bg: linear-gradient(135deg, #f6fafe 0%, #d9e4ec 100%);
+  --audio-knob-border: #dce6ee;
+  --audio-knob-dot: #00668b;
+  --audio-knob-dot-muted: #a9b3bb;
+}
+
+[data-theme='dark'] {
+  --bg-color: #141414;
+  --text-color: #e8e8e8;
+  --muted-text: #a8a8a8;
+  --bubble-user: #4d4d4d;
+  --bubble-assistant: rgba(40, 40, 40, 0.95);
+  --panel-bg: rgba(30, 30, 30, 0.8);
+
+  --surface-bg: #1a1a1a;
+  --floating-bg: rgba(30, 30, 30, 0.88);
+  --floating-bg-hover: rgba(36, 36, 36, 0.94);
+  --floating-bg-active: rgba(42, 42, 42, 0.96);
+  --floating-border: rgba(255, 255, 255, 0.12);
+  --floating-border-active: rgba(255, 255, 255, 0.18);
+  --floating-icon: #9fb6ff;
+  --floating-icon-hover: #dbe5ff;
+
+  --popover-bg: rgba(28, 28, 28, 0.96);
+  --popover-shadow: 0 0.16rem 0.3rem rgba(0, 0, 0, 0.45);
+  --lang-card-bg: rgba(44, 44, 44, 0.95);
+  --lang-card-active-bg: rgba(56, 56, 56, 0.98);
+  --lang-card-active-shadow: 0 0.12rem 0.24rem rgba(0, 0, 0, 0.45);
+
+  --lang-red-dot: #ff6d6f;
+  --lang-red-bg: rgba(255, 109, 111, 0.2);
+  --lang-red-ring: rgba(255, 109, 111, 0.35);
+  --lang-green-dot: #32d18f;
+  --lang-green-bg: rgba(52, 211, 153, 0.2);
+  --lang-green-ring: rgba(52, 211, 153, 0.4);
+
+  --file-card-bg: rgba(44, 44, 44, 0.95);
+
+  --upload-box-bg: #2a2a2a;
+
+  --header-shadow: 0 0.02rem 0.1rem rgba(0, 0, 0, 0.28);
+  --sidebar-left-shadow: -0.08rem 0 0.24rem rgba(0, 0, 0, 0.35);
+  --header-title-color: #f2f4f7;
+
+  --sort-icon-muted: #6b7280;
+  --sort-icon-active: #e8e8e8;
+
+  --input-bg: rgba(34, 34, 34, 0.86);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-shadow: 0 0.1rem 0.34rem rgba(0, 0, 0, 0.35);
+  --input-text: #e0e0e0;
+  --input-placeholder: #888888;
+  --icon-subtle: #b7c3dd;
+  --send-btn-bg: #4f67b9;
+  --send-icon-color: #eef3ff;
+
+  --modal-backdrop: rgba(2, 6, 23, 0.48);
+  --modal-panel-bg: #20262c;
+  --modal-panel-shadow: 0 0.18rem 0.45rem rgba(0, 0, 0, 0.45);
+  --modal-title-color: #e8edf2;
+  --modal-close-color: #9eb0be;
+  --modal-close-hover: #d8e3ec;
+
+  --audio-modal-bg: linear-gradient(135deg, #2a333a 0%, #20272e 58%, #1c2329 100%);
+  --audio-subtitle: #a5b4c2;
+  --audio-card-bg: #273038;
+  --audio-card-border: rgba(255, 255, 255, 0.07);
+  --audio-card-shadow: 0 0.1rem 0.22rem rgba(0, 0, 0, 0.35);
+  --audio-label-color: #d4dee8;
+  --audio-knob-shell-bg: #2e3a44;
+  --audio-knob-bg: linear-gradient(135deg, #374754 0%, #2d3a44 100%);
+  --audio-knob-border: #40515f;
+  --audio-knob-dot: #7ec8ff;
+  --audio-knob-dot-muted: #7a8d9d;
+}

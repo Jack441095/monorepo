@@ -1,0 +1,2345 @@
+{
+  "record_type": "slo_describe_sound_query_results",
+  "schema_version": "1.0.0",
+  "method_version": "describe_sound_query_v1",
+  "query": {
+    "text": "dark transient percussion loop spaceship",
+    "normalized": "dark transient percussion loop spaceship",
+    "filters": {
+      "max_centroid": 2500.0,
+      "tag": "transient_dense",
+      "form": "possibly_loop"
+    },
+    "resolved_terms": [
+      "dark",
+      "transient",
+      "loop",
+      "percussion"
+    ],
+    "unmatched_terms": [
+      "spaceship"
+    ]
+  },
+  "class_terms_used": [
+    "percussion"
+  ],
+  "n_input": 7315,
+  "n_matched": 28,
+  "results": [
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_120_perc_loop_perfect_storm_no_hats.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/Percussion Loop - TCP_120_perc_loop_perfect_storm_no_hats.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.453045,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.6264074444770813,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_95_perc_loop_dirty_dancers_no_hats.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.554611018287022,
+            "pitch": 0.6041828251249501,
+            "spatial": 0.7796566267115503,
+            "spectrum": 0.29985935641011985,
+            "temporal": 0.2152750203710542,
+            "timbre": 0.21337348397156164
+          },
+          "overall": 0.44449305514604304
+        },
+        "facets": {
+          "duration_seconds": 32.0,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -33.34165421718242,
+          "peak_dbfs": -2.2473359584677715,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1493.0399686241901,
+          "low_band_energy_ratio": 0.09816850733533476,
+          "high_band_energy_ratio": 0.8555785304091061,
+          "harmonic_energy_ratio": 0.035939473658800125,
+          "onset_density_per_second": 3.1875,
+          "estimated_tempo_bpm": 117.1875,
+          "periodicity_strength": 0.8705992823611077,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8982397129444432,
+          "median_f0_hz": 4000.0,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.8282274515288927,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 32.0,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -33.34165421718242,
+        "peak_dbfs": -2.2473359584677715,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1493.0399686241901,
+        "low_band_energy_ratio": 0.09816850733533476,
+        "high_band_energy_ratio": 0.8555785304091061,
+        "harmonic_energy_ratio": 0.035939473658800125,
+        "onset_density_per_second": 3.1875,
+        "estimated_tempo_bpm": 117.1875,
+        "periodicity_strength": 0.8705992823611077,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8982397129444432,
+        "median_f0_hz": 4000.0,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.8282274515288927,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/TCP_77_perc_loop_romantics_no_hats.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Capsun ProAudio - City Pop/Loops/Drum_Loops/Percussion/Percussion Loop - TCP_77_perc_loop_romantics_no_hats.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.307057,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.32697945833206177,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Production Music Live - Acoustic - Melodic House 4/Bass Loops/PMLxOT4_DA_Bass_Perc_Loop_004_122BPM_F#maj.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.31640895293560484,
+            "pitch": 0.5033524729443424,
+            "spatial": 0.6005442431685998,
+            "spectrum": 0.5288597731849951,
+            "temporal": 0.2722546490639052,
+            "timbre": 0.44872013115977727
+          },
+          "overall": 0.44502337040953743
+        },
+        "facets": {
+          "duration_seconds": 24.9350625,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -24.23871339972214,
+          "peak_dbfs": -2.4352905399702984,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 552.4295930169831,
+          "low_band_energy_ratio": 0.5282879073321051,
+          "high_band_energy_ratio": 0.0021707725021726074,
+          "harmonic_energy_ratio": 0.10875513404607773,
+          "onset_density_per_second": 3.609375352478062,
+          "estimated_tempo_bpm": 104.16666666666667,
+          "periodicity_strength": 0.5614341442177242,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7745736576870897,
+          "median_f0_hz": 261.6183256068467,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.8142944808072502,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "dark",
+            "noisy_or_inharmonic",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 24.9350625,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -24.23871339972214,
+        "peak_dbfs": -2.4352905399702984,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 552.4295930169831,
+        "low_band_energy_ratio": 0.5282879073321051,
+        "high_band_energy_ratio": 0.0021707725021726074,
+        "harmonic_energy_ratio": 0.10875513404607773,
+        "onset_density_per_second": 3.609375352478062,
+        "estimated_tempo_bpm": 104.16666666666667,
+        "periodicity_strength": 0.5614341442177242,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7745736576870897,
+        "median_f0_hz": 261.6183256068467,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.8142944808072502,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "dark",
+          "noisy_or_inharmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_11_Percussion_Daniel_Sadownick_137__loop.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/Percussion Loop - RT_Percussion_Session_Conga_Loop_11_Percussion_Daniel_Sadownick_137__loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.539631,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.7201744914054871,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.9497879181077583,
+            "pitch": 0.55242796089207,
+            "spatial": 0.7622591184284854,
+            "spectrum": 0.8609313082189853,
+            "temporal": 0.6118239636447095,
+            "timbre": 0.6620667843112052
+          },
+          "overall": 0.7332161756005356
+        },
+        "facets": {
+          "duration_seconds": 7.0073125,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -15.481747372532,
+          "peak_dbfs": -0.7949321162336132,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1445.2802099373562,
+          "low_band_energy_ratio": 0.9177923284421635,
+          "high_band_energy_ratio": 0.01213612604492489,
+          "harmonic_energy_ratio": 0.4797566533088684,
+          "onset_density_per_second": 6.849987067081709,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.5655916475749749,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7762366590299901,
+          "median_f0_hz": 168.65945738198036,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.9257760564791938,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.0073125,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -15.481747372532,
+        "peak_dbfs": -0.7949321162336132,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1445.2802099373562,
+        "low_band_energy_ratio": 0.9177923284421635,
+        "high_band_energy_ratio": 0.01213612604492489,
+        "harmonic_energy_ratio": 0.4797566533088684,
+        "onset_density_per_second": 6.849987067081709,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.5655916475749749,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7762366590299901,
+        "median_f0_hz": 168.65945738198036,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.9257760564791938,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/Percussion Loop - RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.562997,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.9274080991744995,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 1.0,
+            "pitch": 1.0,
+            "spatial": 1.0,
+            "spectrum": 1.0,
+            "temporal": 1.0,
+            "timbre": 1.0
+          },
+          "overall": 1.0
+        },
+        "facets": {
+          "duration_seconds": 7.3846875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -15.573883448825868,
+          "peak_dbfs": -0.32603089627981446,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1492.8493654358915,
+          "low_band_energy_ratio": 0.7639848672226215,
+          "high_band_energy_ratio": 0.018966923945468523,
+          "harmonic_energy_ratio": 0.809769868850708,
+          "onset_density_per_second": 8.124920655071728,
+          "estimated_tempo_bpm": 104.16666666666667,
+          "periodicity_strength": 0.6019856180134883,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7907942472053954,
+          "median_f0_hz": 77.19231851732091,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.8307620007452358,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "tonal_or_harmonic",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.3846875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -15.573883448825868,
+        "peak_dbfs": -0.32603089627981446,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1492.8493654358915,
+        "low_band_energy_ratio": 0.7639848672226215,
+        "high_band_energy_ratio": 0.018966923945468523,
+        "harmonic_energy_ratio": 0.809769868850708,
+        "onset_density_per_second": 8.124920655071728,
+        "estimated_tempo_bpm": 104.16666666666667,
+        "periodicity_strength": 0.6019856180134883,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7907942472053954,
+        "median_f0_hz": 77.19231851732091,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.8307620007452358,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "tonal_or_harmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_26_Percussion_Daniel_Sadownick_135__loop.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/Percussion Loop - RT_Percussion_Session_Conga_Loop_26_Percussion_Daniel_Sadownick_135__loop.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.555553,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.5799379944801331,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Timbales_Loop_3_Percussion_Daniel_Sadownick_125__loop.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.9320478831560027,
+            "pitch": 0.5984318644280482,
+            "spatial": 0.6989093867705001,
+            "spectrum": 0.9159691117580966,
+            "temporal": 0.5786078107823078,
+            "timbre": 0.8424815589434813
+          },
+          "overall": 0.7610746026397394
+        },
+        "facets": {
+          "duration_seconds": 3.5555625,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -15.618608023222569,
+          "peak_dbfs": 1.897482638933099,
+          "clipped_fraction": 0.0006328112640404999,
+          "spectral_centroid_hz": 1905.3313513310188,
+          "low_band_energy_ratio": 0.5272141210808798,
+          "high_band_energy_ratio": 0.1380753666275358,
+          "harmonic_energy_ratio": 0.41179385781288147,
+          "onset_density_per_second": 5.624989013693332,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.6931303271196989,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8272521308478796,
+          "median_f0_hz": 236.01052591964913,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.6379517308992096,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.5555625,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -15.618608023222569,
+        "peak_dbfs": 1.897482638933099,
+        "clipped_fraction": 0.0006328112640404999,
+        "spectral_centroid_hz": 1905.3313513310188,
+        "low_band_energy_ratio": 0.5272141210808798,
+        "high_band_energy_ratio": 0.1380753666275358,
+        "harmonic_energy_ratio": 0.41179385781288147,
+        "onset_density_per_second": 5.624989013693332,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.6931303271196989,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8272521308478796,
+        "median_f0_hz": 236.01052591964913,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.6379517308992096,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #1 [65BPM] (G#).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #1 [65BPM] (G#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.315314,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.7082697153091431,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.8113321124637773,
+            "pitch": 0.6523879072586436,
+            "spatial": null,
+            "spectrum": 0.6744240709945478,
+            "temporal": 0.4551330992624469,
+            "timbre": 0.4924212790848975
+          },
+          "overall": 0.6171396938128626
+        },
+        "facets": {
+          "duration_seconds": 7.3846875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -29.394867355525527,
+          "peak_dbfs": -7.219215186435082,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 2416.441545180852,
+          "low_band_energy_ratio": 0.0003009977982404665,
+          "high_band_energy_ratio": 0.48405719693331584,
+          "harmonic_energy_ratio": 0.24875226616859436,
+          "onset_density_per_second": 4.062460327535864,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.5968269565274844,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7887307826109938,
+          "median_f0_hz": 845.9486953450258,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.3846875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -29.394867355525527,
+        "peak_dbfs": -7.219215186435082,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 2416.441545180852,
+        "low_band_energy_ratio": 0.0003009977982404665,
+        "high_band_energy_ratio": 0.48405719693331584,
+        "harmonic_energy_ratio": 0.24875226616859436,
+        "onset_density_per_second": 4.062460327535864,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.5968269565274844,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7887307826109938,
+        "median_f0_hz": 845.9486953450258,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #13 [65BPM] (F).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #13 [65BPM] (F).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.336233,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.6172595024108887,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.7068849662213708,
+            "pitch": 0.5340699326098751,
+            "spatial": null,
+            "spectrum": 0.8312888841674155,
+            "temporal": 0.5254470059795076,
+            "timbre": 0.5914713322785505
+          },
+          "overall": 0.6378324242513438
+        },
+        "facets": {
+          "duration_seconds": 7.3846875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -22.70981523600274,
+          "peak_dbfs": -3.2383442166746175,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 2136.304173780264,
+          "low_band_energy_ratio": 0.0002922845867699662,
+          "high_band_energy_ratio": 0.18639417231020664,
+          "harmonic_energy_ratio": 0.29055729508399963,
+          "onset_density_per_second": 5.416613770047818,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.8333502349137685,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8833400939655074,
+          "median_f0_hz": 503.3504315960553,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.3846875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -22.70981523600274,
+        "peak_dbfs": -3.2383442166746175,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 2136.304173780264,
+        "low_band_energy_ratio": 0.0002922845867699662,
+        "high_band_energy_ratio": 0.18639417231020664,
+        "harmonic_energy_ratio": 0.29055729508399963,
+        "onset_density_per_second": 5.416613770047818,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.8333502349137685,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8833400939655074,
+        "median_f0_hz": 503.3504315960553,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #14 [65BPM] (D).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #14 [65BPM] (D).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.307316,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.6714959144592285,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.7880719594840178,
+            "pitch": 0.555793969099167,
+            "spatial": null,
+            "spectrum": 0.8988059260489161,
+            "temporal": 0.41391365117904994,
+            "timbre": 0.5821680123780335
+          },
+          "overall": 0.6477507036378369
+        },
+        "facets": {
+          "duration_seconds": 7.3846875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -25.317468859458447,
+          "peak_dbfs": -7.415291796280863,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1855.3666150084996,
+          "low_band_energy_ratio": 0.000218116242745443,
+          "high_band_energy_ratio": 0.01086366745843091,
+          "harmonic_energy_ratio": 0.5040629506111145,
+          "onset_density_per_second": 5.281198425796623,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.6650504653023942,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8160201861209577,
+          "median_f0_hz": 597.1893411330116,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.3846875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -25.317468859458447,
+        "peak_dbfs": -7.415291796280863,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1855.3666150084996,
+        "low_band_energy_ratio": 0.000218116242745443,
+        "high_band_energy_ratio": 0.01086366745843091,
+        "harmonic_energy_ratio": 0.5040629506111145,
+        "onset_density_per_second": 5.281198425796623,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.6650504653023942,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8160201861209577,
+        "median_f0_hz": 597.1893411330116,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #2 [65BPM] (A#).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #2 [65BPM] (A#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.363389,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.648271381855011,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.8065135715893468,
+            "pitch": 0.5287404160800974,
+            "spatial": null,
+            "spectrum": 0.8921635189751335,
+            "temporal": 0.4332081130186937,
+            "timbre": 0.6791385531919916
+          },
+          "overall": 0.6679528345710526
+        },
+        "facets": {
+          "duration_seconds": 7.3846875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -28.863866079560427,
+          "peak_dbfs": -9.806507139490193,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1679.1695450167524,
+          "low_band_energy_ratio": 0.0001315702500656457,
+          "high_band_energy_ratio": 0.00894749651041981,
+          "harmonic_energy_ratio": 0.37802451848983765,
+          "onset_density_per_second": 4.19787567178706,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.577962182162732,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7811848728650929,
+          "median_f0_hz": 474.5327647332551,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.3846875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -28.863866079560427,
+        "peak_dbfs": -9.806507139490193,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1679.1695450167524,
+        "low_band_energy_ratio": 0.0001315702500656457,
+        "high_band_energy_ratio": 0.00894749651041981,
+        "harmonic_energy_ratio": 0.37802451848983765,
+        "onset_density_per_second": 4.19787567178706,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.577962182162732,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7811848728650929,
+        "median_f0_hz": 474.5327647332551,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #4 [65BPM] (A).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #4 [65BPM] (A).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.248318,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.6695610880851746,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.6860819583763308,
+            "pitch": 0.6593970358466964,
+            "spatial": null,
+            "spectrum": 0.8353649163339865,
+            "temporal": 0.6106002725794532,
+            "timbre": 0.4860785803766545
+          },
+          "overall": 0.6555045527026243
+        },
+        "facets": {
+          "duration_seconds": 7.3846875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -27.431417357125255,
+          "peak_dbfs": -3.5207129322709347,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 2141.4772846513547,
+          "low_band_energy_ratio": 0.00020580621515152168,
+          "high_band_energy_ratio": 0.2444118789395492,
+          "harmonic_energy_ratio": 0.22227586805820465,
+          "onset_density_per_second": 2.708306885023909,
+          "estimated_tempo_bpm": 85.22727272727273,
+          "periodicity_strength": 0.6141528534192157,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7956611413676863,
+          "median_f0_hz": 1897.8111565077754,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.3846875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -27.431417357125255,
+        "peak_dbfs": -3.5207129322709347,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 2141.4772846513547,
+        "low_band_energy_ratio": 0.00020580621515152168,
+        "high_band_energy_ratio": 0.2444118789395492,
+        "harmonic_energy_ratio": 0.22227586805820465,
+        "onset_density_per_second": 2.708306885023909,
+        "estimated_tempo_bpm": 85.22727272727273,
+        "periodicity_strength": 0.6141528534192157,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7956611413676863,
+        "median_f0_hz": 1897.8111565077754,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #5 [65BPM] (E).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #5 [65BPM] (E).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.266628,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.5505400896072388,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.7478350619955474,
+            "pitch": 0.7063803914638636,
+            "spatial": null,
+            "spectrum": 0.6855108267225625,
+            "temporal": 0.7761173255330589,
+            "timbre": 0.44904158319702603
+          },
+          "overall": 0.6729770377824116
+        },
+        "facets": {
+          "duration_seconds": 3.692375,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -23.69973335499797,
+          "peak_dbfs": -4.1342348335228305,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 2432.4774916091924,
+          "low_band_energy_ratio": 0.00017583055855618866,
+          "high_band_energy_ratio": 0.35051848510347433,
+          "harmonic_energy_ratio": 0.2270430475473404,
+          "onset_density_per_second": 7.04153830529131,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.6741266373284633,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8196506549313853,
+          "median_f0_hz": 1735.2878710272416,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.692375,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -23.69973335499797,
+        "peak_dbfs": -4.1342348335228305,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 2432.4774916091924,
+        "low_band_energy_ratio": 0.00017583055855618866,
+        "high_band_energy_ratio": 0.35051848510347433,
+        "harmonic_energy_ratio": 0.2270430475473404,
+        "onset_density_per_second": 7.04153830529131,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.6741266373284633,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8196506549313853,
+        "median_f0_hz": 1735.2878710272416,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #6 [65BPM] (F#).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #6 [65BPM] (F#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.260328,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.6876718997955322,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.6742943671341781,
+            "pitch": 0.8089253540277352,
+            "spatial": null,
+            "spectrum": 0.9216800349357165,
+            "temporal": 0.5723778602740349,
+            "timbre": 0.5768146408485944
+          },
+          "overall": 0.7108184514440518
+        },
+        "facets": {
+          "duration_seconds": 7.3846875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -26.259245661506597,
+          "peak_dbfs": -3.1907223710207515,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1883.0811069195665,
+          "low_band_energy_ratio": 0.00026011676775385264,
+          "high_band_energy_ratio": 0.012599011164129734,
+          "harmonic_energy_ratio": 0.289763480424881,
+          "onset_density_per_second": 1.6249841310143456,
+          "estimated_tempo_bpm": 64.65517241379311,
+          "periodicity_strength": 0.7886771079404029,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8654708431761613,
+          "median_f0_hz": 1508.8879658892554,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.3846875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -26.259245661506597,
+        "peak_dbfs": -3.1907223710207515,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1883.0811069195665,
+        "low_band_energy_ratio": 0.00026011676775385264,
+        "high_band_energy_ratio": 0.012599011164129734,
+        "harmonic_energy_ratio": 0.289763480424881,
+        "onset_density_per_second": 1.6249841310143456,
+        "estimated_tempo_bpm": 64.65517241379311,
+        "periodicity_strength": 0.7886771079404029,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8654708431761613,
+        "median_f0_hz": 1508.8879658892554,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #7 [65BPM] (D#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.255365,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.4025284945964813,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Textures - Dust, Dirt & Crackle Vol. 1/CPA_TDDC/CPA_TDDC/TDDC_WAV_LPS/TDDC_INSPIRATION_LPS/TDDC_90_PortoSound_Am/TDDC_90_PortoSound_Flute_Lead_Am.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.25474994413944574,
+            "pitch": 0.7901891628104255,
+            "spatial": null,
+            "spectrum": 0.8656420366626449,
+            "temporal": 0.4129922690466994,
+            "timbre": 0.4808088295588254
+          },
+          "overall": 0.5608764484436082
+        },
+        "facets": {
+          "duration_seconds": 3.692375,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -27.799540173858823,
+          "peak_dbfs": -7.413241606376514,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1859.2117448178149,
+          "low_band_energy_ratio": 0.000948244236793037,
+          "high_band_energy_ratio": 0.11200733381709417,
+          "harmonic_energy_ratio": 0.42277491092681885,
+          "onset_density_per_second": 3.2499407562882965,
+          "estimated_tempo_bpm": 64.65517241379311,
+          "periodicity_strength": 0.657743980237424,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8130975920949697,
+          "median_f0_hz": 1276.976060274947,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.692375,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -27.799540173858823,
+        "peak_dbfs": -7.413241606376514,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1859.2117448178149,
+        "low_band_energy_ratio": 0.000948244236793037,
+        "high_band_energy_ratio": 0.11200733381709417,
+        "harmonic_energy_ratio": 0.42277491092681885,
+        "onset_density_per_second": 3.2499407562882965,
+        "estimated_tempo_bpm": 64.65517241379311,
+        "periodicity_strength": 0.657743980237424,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8130975920949697,
+        "median_f0_hz": 1276.976060274947,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #9 [65BPM] (F#).wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/Percussion Loop - 808 Clave Loop #9 [65BPM] (F#).wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.239559,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.6943392753601074,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Loaded Samples - Lo-Fi Memphis 2/DRUMS & PERC LOOPS/808 Clave Loop #7 [65BPM] (D#).wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.5838907576478005,
+            "pitch": 0.6137088413840217,
+            "spatial": null,
+            "spectrum": 0.8066772442520478,
+            "temporal": 0.8282329139456633,
+            "timbre": 0.574967084923412
+          },
+          "overall": 0.6814953684305891
+        },
+        "facets": {
+          "duration_seconds": 3.692375,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -18.931668056100598,
+          "peak_dbfs": 0.16619170553546303,
+          "clipped_fraction": 3.3853549544669755e-05,
+          "spectral_centroid_hz": 2134.6634100404103,
+          "low_band_energy_ratio": 0.00029178476709395667,
+          "high_band_energy_ratio": 0.23002638125126834,
+          "harmonic_energy_ratio": 0.2926909625530243,
+          "onset_density_per_second": 5.145739530789803,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.6848877544182863,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8239551017673146,
+          "median_f0_hz": 764.3196406673209,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": null,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.692375,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -18.931668056100598,
+        "peak_dbfs": 0.16619170553546303,
+        "clipped_fraction": 3.3853549544669755e-05,
+        "spectral_centroid_hz": 2134.6634100404103,
+        "low_band_energy_ratio": 0.00029178476709395667,
+        "high_band_energy_ratio": 0.23002638125126834,
+        "harmonic_energy_ratio": 0.2926909625530243,
+        "onset_density_per_second": 5.145739530789803,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.6848877544182863,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8239551017673146,
+        "median_f0_hz": 764.3196406673209,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": null,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_17_105_Brazil.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_17_105_Brazil.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.56382,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.7540407776832581,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Senegal Sessions/Loops/Percussion/SS_SS_130_perc_loop_sabar_rufisque.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.7636045383664203,
+            "pitch": 0.8267179460127392,
+            "spatial": 0.5709592538248477,
+            "spectrum": 0.7521960837762182,
+            "temporal": 0.4013634976364266,
+            "timbre": 0.6896924299635077
+          },
+          "overall": 0.6674222915966933
+        },
+        "facets": {
+          "duration_seconds": 4.56875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -22.62259996043801,
+          "peak_dbfs": -1.341030047328943,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1666.056797717597,
+          "low_band_energy_ratio": 0.020195287840440106,
+          "high_band_energy_ratio": 0.029600690220961897,
+          "harmonic_energy_ratio": 0.345905601978302,
+          "onset_density_per_second": 8.317373461012313,
+          "estimated_tempo_bpm": 104.16666666666667,
+          "periodicity_strength": 0.5629490900299579,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7751796360119831,
+          "median_f0_hz": 104.84822558194955,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.9829788726547471,
+          "heuristic_tags": [
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 4.56875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -22.62259996043801,
+        "peak_dbfs": -1.341030047328943,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1666.056797717597,
+        "low_band_energy_ratio": 0.020195287840440106,
+        "high_band_energy_ratio": 0.029600690220961897,
+        "harmonic_energy_ratio": 0.345905601978302,
+        "onset_density_per_second": 8.317373461012313,
+        "estimated_tempo_bpm": 104.16666666666667,
+        "periodicity_strength": 0.5629490900299579,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7751796360119831,
+        "median_f0_hz": 104.84822558194955,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.9829788726547471,
+        "heuristic_tags": [
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_19_110.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_19_110.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.466205,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.5450623035430908,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.8363099541020431,
+            "pitch": 0.5227215074816961,
+            "spatial": 0.6176759296474525,
+            "spectrum": 0.8564835682330013,
+            "temporal": 0.6669338641184597,
+            "timbre": 0.715130400640801
+          },
+          "overall": 0.7025425373705755
+        },
+        "facets": {
+          "duration_seconds": 8.7273125,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -18.095288696281372,
+          "peak_dbfs": -1.8603338062742323,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1410.6080162267026,
+          "low_band_energy_ratio": 0.9390563600361249,
+          "high_band_energy_ratio": 0.013788102795724577,
+          "harmonic_energy_ratio": 0.5044238567352295,
+          "onset_density_per_second": 8.020796780223007,
+          "estimated_tempo_bpm": 110.29411764705883,
+          "periodicity_strength": 0.8579435025938669,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8931774010375468,
+          "median_f0_hz": 225.35153450243527,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.9993889714064886,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "transient_dense",
+            "mostly_mono"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 8.7273125,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -18.095288696281372,
+        "peak_dbfs": -1.8603338062742323,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1410.6080162267026,
+        "low_band_energy_ratio": 0.9390563600361249,
+        "high_band_energy_ratio": 0.013788102795724577,
+        "harmonic_energy_ratio": 0.5044238567352295,
+        "onset_density_per_second": 8.020796780223007,
+        "estimated_tempo_bpm": 110.29411764705883,
+        "periodicity_strength": 0.8579435025938669,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8931774010375468,
+        "median_f0_hz": 225.35153450243527,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.9993889714064886,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "transient_dense",
+          "mostly_mono"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_23_115_Africa.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_23_115_Africa.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.446574,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.4397318959236145,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_43_140_Tribal.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.8801244507919771,
+            "pitch": 0.7732855881023998,
+            "spatial": 0.7712645863868918,
+            "spectrum": 0.7081625953756656,
+            "temporal": 0.5296634904360804,
+            "timbre": 0.756954443024289
+          },
+          "overall": 0.7365758590195505
+        },
+        "facets": {
+          "duration_seconds": 8.347875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -23.80097367318961,
+          "peak_dbfs": -4.638975987772783,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1905.638500678758,
+          "low_band_energy_ratio": 0.8163896573905658,
+          "high_band_energy_ratio": 0.04159469506840149,
+          "harmonic_energy_ratio": 0.35106992721557617,
+          "onset_density_per_second": 6.708294026923019,
+          "estimated_tempo_bpm": 117.1875,
+          "periodicity_strength": 0.7687603709932926,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8575041483973171,
+          "median_f0_hz": 140.92371962244246,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.3756265764703418,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "transient_dense",
+            "wide_or_decorrelated"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 8.347875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -23.80097367318961,
+        "peak_dbfs": -4.638975987772783,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1905.638500678758,
+        "low_band_energy_ratio": 0.8163896573905658,
+        "high_band_energy_ratio": 0.04159469506840149,
+        "harmonic_energy_ratio": 0.35106992721557617,
+        "onset_density_per_second": 6.708294026923019,
+        "estimated_tempo_bpm": 117.1875,
+        "periodicity_strength": 0.7687603709932926,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8575041483973171,
+        "median_f0_hz": 140.92371962244246,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.3756265764703418,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "transient_dense",
+          "wide_or_decorrelated"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_24_115_Tribal.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_24_115_Tribal.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.494782,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.5430077910423279,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_43_140_Tribal.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.9184995511751565,
+            "pitch": 0.5394328110113807,
+            "spatial": 0.9809311031545546,
+            "spectrum": 0.8137527260478554,
+            "temporal": 0.6330837283025555,
+            "timbre": 0.8077905474608079
+          },
+          "overall": 0.7822484111920517
+        },
+        "facets": {
+          "duration_seconds": 8.347875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -22.84595182785353,
+          "peak_dbfs": -4.2339015933778334,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1958.1752874492406,
+          "low_band_energy_ratio": 0.63658569974578,
+          "high_band_energy_ratio": 0.08591283825201243,
+          "harmonic_energy_ratio": 0.394406259059906,
+          "onset_density_per_second": 8.025994639354327,
+          "estimated_tempo_bpm": 117.1875,
+          "periodicity_strength": 0.66617971696029,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8164718867841161,
+          "median_f0_hz": 72.0442351721824,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.2914618181136214,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "transient_dense",
+            "wide_or_decorrelated"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 8.347875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -22.84595182785353,
+        "peak_dbfs": -4.2339015933778334,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1958.1752874492406,
+        "low_band_energy_ratio": 0.63658569974578,
+        "high_band_energy_ratio": 0.08591283825201243,
+        "harmonic_energy_ratio": 0.394406259059906,
+        "onset_density_per_second": 8.025994639354327,
+        "estimated_tempo_bpm": 117.1875,
+        "periodicity_strength": 0.66617971696029,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8164718867841161,
+        "median_f0_hz": 72.0442351721824,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.2914618181136214,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "transient_dense",
+          "wide_or_decorrelated"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_25_122.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_25_122.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.569792,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.5853872895240784,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Senegal Sessions/Loops/Percussion/SS_SS_130_perc_loop_sabar_rufisque.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.7908749701409028,
+            "pitch": 0.9273392184198449,
+            "spatial": 0.8958829412918344,
+            "spectrum": 0.7086917428869322,
+            "temporal": 0.23218515452679112,
+            "timbre": 0.5354847298514054
+          },
+          "overall": 0.6817431261862851
+        },
+        "facets": {
+          "duration_seconds": 3.9345,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -23.056605034770385,
+          "peak_dbfs": -2.2293704968222037,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1490.4112443387885,
+          "low_band_energy_ratio": 0.690524678535191,
+          "high_band_energy_ratio": 0.02724145685423036,
+          "harmonic_energy_ratio": 0.5657333135604858,
+          "onset_density_per_second": 6.0998856271444915,
+          "estimated_tempo_bpm": 125.0,
+          "periodicity_strength": 0.5959087139047609,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7883634855619044,
+          "median_f0_hz": 115.07248263213401,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.8253067038829498,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "tonal_or_harmonic",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.9345,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -23.056605034770385,
+        "peak_dbfs": -2.2293704968222037,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1490.4112443387885,
+        "low_band_energy_ratio": 0.690524678535191,
+        "high_band_energy_ratio": 0.02724145685423036,
+        "harmonic_energy_ratio": 0.5657333135604858,
+        "onset_density_per_second": 6.0998856271444915,
+        "estimated_tempo_bpm": 125.0,
+        "periodicity_strength": 0.5959087139047609,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7883634855619044,
+        "median_f0_hz": 115.07248263213401,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.8253067038829498,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "tonal_or_harmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_32_128_Momentum.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_32_128_Momentum.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.495052,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.7029678821563721,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_37_128_Momentum.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.7795324515609756,
+            "pitch": 0.6183793816077072,
+            "spatial": 0.7519409257341652,
+            "spectrum": 0.713669383172989,
+            "temporal": 0.7266227822744031,
+            "timbre": 0.6908037666979643
+          },
+          "overall": 0.7134914485080341
+        },
+        "facets": {
+          "duration_seconds": 3.75,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -27.9019117465724,
+          "peak_dbfs": -3.5153739466937224,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1218.308749215442,
+          "low_band_energy_ratio": 0.19716115048454022,
+          "high_band_energy_ratio": 0.02246337257286973,
+          "harmonic_energy_ratio": 0.1694536805152893,
+          "onset_density_per_second": 8.0,
+          "estimated_tempo_bpm": 170.45454545454547,
+          "periodicity_strength": 0.7192028690034648,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8376811476013859,
+          "median_f0_hz": 157.80820164888004,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.2679976772839968,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "wide_or_decorrelated"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.75,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -27.9019117465724,
+        "peak_dbfs": -3.5153739466937224,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1218.308749215442,
+        "low_band_energy_ratio": 0.19716115048454022,
+        "high_band_energy_ratio": 0.02246337257286973,
+        "harmonic_energy_ratio": 0.1694536805152893,
+        "onset_density_per_second": 8.0,
+        "estimated_tempo_bpm": 170.45454545454547,
+        "periodicity_strength": 0.7192028690034648,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8376811476013859,
+        "median_f0_hz": 157.80820164888004,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.2679976772839968,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "wide_or_decorrelated"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_33_128_Momentum.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_33_128_Momentum.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.305249,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.4133259356021881,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Koan_Sound_Acoustic_Design/Test Press KOAN Sound Acoustic Design/loops/drums/percussion_loops/djembe/TSP_KOAN_110_perc_djembe_taps_low.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.7508157931712771,
+            "pitch": 0.9337723197485776,
+            "spatial": 0.9692348410918175,
+            "spectrum": 0.7319226478008473,
+            "temporal": 0.5880452452348055,
+            "timbre": 0.4832224746709648
+          },
+          "overall": 0.7428355536197149
+        },
+        "facets": {
+          "duration_seconds": 3.75,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -25.98624465543555,
+          "peak_dbfs": -4.702604020344621,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1542.894521006718,
+          "low_band_energy_ratio": 0.09889708226723772,
+          "high_band_energy_ratio": 0.05680276403164725,
+          "harmonic_energy_ratio": 0.38313400745391846,
+          "onset_density_per_second": 10.4,
+          "estimated_tempo_bpm": 170.45454545454547,
+          "periodicity_strength": 0.7816558565172818,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8626623426069128,
+          "median_f0_hz": 207.9618076556798,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.649660711068538,
+          "heuristic_tags": [
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.75,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -25.98624465543555,
+        "peak_dbfs": -4.702604020344621,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1542.894521006718,
+        "low_band_energy_ratio": 0.09889708226723772,
+        "high_band_energy_ratio": 0.05680276403164725,
+        "harmonic_energy_ratio": 0.38313400745391846,
+        "onset_density_per_second": 10.4,
+        "estimated_tempo_bpm": 170.45454545454547,
+        "periodicity_strength": 0.7816558565172818,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8626623426069128,
+        "median_f0_hz": 207.9618076556798,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.649660711068538,
+        "heuristic_tags": [
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_37_128_Momentum.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_37_128_Momentum.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.506782,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.9356696605682373,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_37_128_Momentum.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 1.0,
+            "pitch": 1.0,
+            "spatial": 1.0,
+            "spectrum": 1.0,
+            "temporal": 1.0,
+            "timbre": 1.0
+          },
+          "overall": 1.0
+        },
+        "facets": {
+          "duration_seconds": 3.75,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -26.09593074586073,
+          "peak_dbfs": -3.629532854040352,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1428.3233142661868,
+          "low_band_energy_ratio": 0.5794065996746571,
+          "high_band_energy_ratio": 0.028468855026384514,
+          "harmonic_energy_ratio": 0.22350186109542847,
+          "onset_density_per_second": 8.8,
+          "estimated_tempo_bpm": 170.45454545454547,
+          "periodicity_strength": 0.61455699579747,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7958227983189881,
+          "median_f0_hz": 95.78126673946439,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.3677818072968946,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "wide_or_decorrelated"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.75,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -26.09593074586073,
+        "peak_dbfs": -3.629532854040352,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1428.3233142661868,
+        "low_band_energy_ratio": 0.5794065996746571,
+        "high_band_energy_ratio": 0.028468855026384514,
+        "harmonic_energy_ratio": 0.22350186109542847,
+        "onset_density_per_second": 8.8,
+        "estimated_tempo_bpm": 170.45454545454547,
+        "periodicity_strength": 0.61455699579747,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7958227983189881,
+        "median_f0_hz": 95.78126673946439,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.3677818072968946,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "wide_or_decorrelated"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_39_136.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_39_136.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.60178,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.6137079000473022,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.6705297525036887,
+            "pitch": 0.5200240647207856,
+            "spatial": 0.968639237481236,
+            "spectrum": 0.6376471619073516,
+            "temporal": 0.5929510780474658,
+            "timbre": 0.3252342100211927
+          },
+          "overall": 0.6191709174469534
+        },
+        "facets": {
+          "duration_seconds": 7.058875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -20.899923175458763,
+          "peak_dbfs": -1.3741183329262312,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 2095.3201228062376,
+          "low_band_energy_ratio": 0.4778540240930626,
+          "high_band_energy_ratio": 0.025472507843942352,
+          "harmonic_energy_ratio": 0.25950103998184204,
+          "onset_density_per_second": 9.491597457101875,
+          "estimated_tempo_bpm": 133.92857142857142,
+          "periodicity_strength": 0.6681193403540047,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.817247736141602,
+          "median_f0_hz": 235.44104517214504,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.8419140648693536,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "noisy_or_inharmonic",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 7.058875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -20.899923175458763,
+        "peak_dbfs": -1.3741183329262312,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 2095.3201228062376,
+        "low_band_energy_ratio": 0.4778540240930626,
+        "high_band_energy_ratio": 0.025472507843942352,
+        "harmonic_energy_ratio": 0.25950103998184204,
+        "onset_density_per_second": 9.491597457101875,
+        "estimated_tempo_bpm": 133.92857142857142,
+        "periodicity_strength": 0.6681193403540047,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.817247736141602,
+        "median_f0_hz": 235.44104517214504,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.8419140648693536,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "noisy_or_inharmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_41_140_Africa.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_41_140_Africa.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.493602,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.5892870426177979,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.6676804051858236,
+            "pitch": 0.9095590104392863,
+            "spatial": 0.3353689832214842,
+            "spectrum": 0.9570178524902783,
+            "temporal": 0.7309201688974447,
+            "timbre": 0.5977409434787527
+          },
+          "overall": 0.699714560618845
+        },
+        "facets": {
+          "duration_seconds": 6.8571875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -21.67763401847415,
+          "peak_dbfs": -4.446347834360179,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1502.8184091266482,
+          "low_band_energy_ratio": 0.7984210968750546,
+          "high_band_energy_ratio": 0.02705524366419064,
+          "harmonic_energy_ratio": 0.6115732789039612,
+          "onset_density_per_second": 9.33327256984004,
+          "estimated_tempo_bpm": 144.23076923076923,
+          "periodicity_strength": 0.7125483240171846,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.835019329606874,
+          "median_f0_hz": 72.0347849716014,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.44837863194858624,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "tonal_or_harmonic",
+            "transient_dense",
+            "wide_or_decorrelated"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 6.8571875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -21.67763401847415,
+        "peak_dbfs": -4.446347834360179,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1502.8184091266482,
+        "low_band_energy_ratio": 0.7984210968750546,
+        "high_band_energy_ratio": 0.02705524366419064,
+        "harmonic_energy_ratio": 0.6115732789039612,
+        "onset_density_per_second": 9.33327256984004,
+        "estimated_tempo_bpm": 144.23076923076923,
+        "periodicity_strength": 0.7125483240171846,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.835019329606874,
+        "median_f0_hz": 72.0347849716014,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.44837863194858624,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "tonal_or_harmonic",
+          "transient_dense",
+          "wide_or_decorrelated"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_43_140_Tribal.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_43_140_Tribal.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.529928,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.5590904951095581,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.6228870931033574,
+            "pitch": 0.5481223550273047,
+            "spatial": 0.21011280668857693,
+            "spectrum": 0.5879121347594701,
+            "temporal": 0.772633743156093,
+            "timbre": 0.400288332189913
+          },
+          "overall": 0.5236594108207858
+        },
+        "facets": {
+          "duration_seconds": 6.8571875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -22.055496792547245,
+          "peak_dbfs": -3.1776018636446417,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 2071.469827212271,
+          "low_band_energy_ratio": 0.2963432087157993,
+          "high_band_energy_ratio": 0.07980481447078232,
+          "harmonic_energy_ratio": 0.3965456485748291,
+          "onset_density_per_second": 8.895775418128787,
+          "estimated_tempo_bpm": 93.75,
+          "periodicity_strength": 0.6969551233662495,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.8287820493464999,
+          "median_f0_hz": 173.74359925334414,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.2847232495208902,
+          "heuristic_tags": [
+            "transient_dense",
+            "wide_or_decorrelated"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 6.8571875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -22.055496792547245,
+        "peak_dbfs": -3.1776018636446417,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 2071.469827212271,
+        "low_band_energy_ratio": 0.2963432087157993,
+        "high_band_energy_ratio": 0.07980481447078232,
+        "harmonic_energy_ratio": 0.3965456485748291,
+        "onset_density_per_second": 8.895775418128787,
+        "estimated_tempo_bpm": 93.75,
+        "periodicity_strength": 0.6969551233662495,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.8287820493464999,
+        "median_f0_hz": 173.74359925334414,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.2847232495208902,
+        "heuristic_tags": [
+          "transient_dense",
+          "wide_or_decorrelated"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_44_140_Tribal.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_44_140_Tribal.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.54006,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.5247271060943604,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Senegal Sessions/Loops/Percussion/SS_SS_130_perc_loop_sabar_rufisque.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.8871077645923656,
+            "pitch": 0.8471582135289959,
+            "spatial": 0.6979699964426566,
+            "spectrum": 0.5336855761962624,
+            "temporal": 0.3692079570580113,
+            "timbre": 0.41947876769083015
+          },
+          "overall": 0.625768045918187
+        },
+        "facets": {
+          "duration_seconds": 6.8571875,
+          "sample_rate_hz": 44100,
+          "rms_dbfs": -20.54747432092367,
+          "peak_dbfs": -0.9259886408377165,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 2331.764239077468,
+          "low_band_energy_ratio": 0.011191864732534414,
+          "high_band_energy_ratio": 0.12418774979555529,
+          "harmonic_energy_ratio": 0.21669010818004608,
+          "onset_density_per_second": 4.9583010527275215,
+          "estimated_tempo_bpm": 93.75,
+          "periodicity_strength": 0.5536150103391825,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.771446004135673,
+          "median_f0_hz": 107.07666666652506,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.9126784784993173,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 6.8571875,
+        "sample_rate_hz": 44100,
+        "rms_dbfs": -20.54747432092367,
+        "peak_dbfs": -0.9259886408377165,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 2331.764239077468,
+        "low_band_energy_ratio": 0.011191864732534414,
+        "high_band_energy_ratio": 0.12418774979555529,
+        "harmonic_energy_ratio": 0.21669010818004608,
+        "onset_density_per_second": 4.9583010527275215,
+        "estimated_tempo_bpm": 93.75,
+        "periodicity_strength": 0.5536150103391825,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.771446004135673,
+        "median_f0_hz": 107.07666666652506,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.9126784784993173,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_46_140_Triplet.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_46_140_Triplet.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.403374,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.43101269006729126,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Samples 2021 ->/Sample Packs/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_37_128_Momentum.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.672306519243696,
+            "pitch": 0.5612819255301427,
+            "spatial": 0.2879419278328964,
+            "spectrum": 0.7826052292489424,
+            "temporal": 0.6875094280788998,
+            "timbre": 0.5370213176935785
+          },
+          "overall": 0.588111057938026
+        },
+        "facets": {
+          "duration_seconds": 3.428625,
+          "sample_rate_hz": 48000,
+          "rms_dbfs": -24.20358393946565,
+          "peak_dbfs": -6.144943657877182,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 1408.6164728771316,
+          "low_band_energy_ratio": 0.2233129698116672,
+          "high_band_energy_ratio": 0.036262561139991815,
+          "harmonic_energy_ratio": 0.12585292756557465,
+          "onset_density_per_second": 7.8748769550475775,
+          "estimated_tempo_bpm": 104.16666666666667,
+          "periodicity_strength": 0.5508702228216972,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7703480891286789,
+          "median_f0_hz": 198.25771344880042,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": -0.06796695322965049,
+          "heuristic_tags": [
+            "noisy_or_inharmonic",
+            "transient_dense",
+            "wide_or_decorrelated"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.428625,
+        "sample_rate_hz": 48000,
+        "rms_dbfs": -24.20358393946565,
+        "peak_dbfs": -6.144943657877182,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 1408.6164728771316,
+        "low_band_energy_ratio": 0.2233129698116672,
+        "high_band_energy_ratio": 0.036262561139991815,
+        "harmonic_energy_ratio": 0.12585292756557465,
+        "onset_density_per_second": 7.8748769550475775,
+        "estimated_tempo_bpm": 104.16666666666667,
+        "periodicity_strength": 0.5508702228216972,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7703480891286789,
+        "median_f0_hz": 198.25771344880042,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": -0.06796695322965049,
+        "heuristic_tags": [
+          "noisy_or_inharmonic",
+          "transient_dense",
+          "wide_or_decorrelated"
+        ],
+        "uncertainty_reasons": []
+      }
+    },
+    {
+      "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/KSHMR_Percussion_Loop_49_150.wav",
+      "destination": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Sounds of KSHMR Vol.3/KSHMR_Drums_Loops/KSHMR_Drum_Loops_Full/KSHMR_Percussion_Loops/Percussion Loop - KSHMR_Percussion_Loop_49_150.wav",
+      "action": "suggest",
+      "predicted_class": "Percussion Loop",
+      "filename_class": "Percussion Loop",
+      "confidence": 1.0,
+      "similarity": 0.513262,
+      "reason": "class passed new-domain suggestion receipt; approval required",
+      "policy_version": "full-taxonomy-1.0.0",
+      "requires_approval": true,
+      "applied": false,
+      "approved": false,
+      "review_evidence": {
+        "nearest_labelled_reference": {
+          "embedding_cosine": 0.4937429428100586,
+          "label": "Percussion Loop",
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Daniel Sadownick - Percussion/splice-export__daniel-sadownick-percussion-session_edited/loop/Percussion/RT_Percussion_Session_Conga_Loop_13_Percussion_Daniel_Sadownick_130__loop.wav",
+          "scope": "predicted_class"
+        },
+        "aspect_similarity_to_reference": {
+          "aspects": {
+            "amplitude": 0.5350110655463924,
+            "pitch": 0.5261485667295676,
+            "spatial": 0.676387393368589,
+            "spectrum": 0.5542053123733168,
+            "temporal": 0.6785056705894845,
+            "timbre": 0.36224816043018004
+          },
+          "overall": 0.5554176948395884
+        },
+        "facets": {
+          "duration_seconds": 3.2,
+          "sample_rate_hz": 48000,
+          "rms_dbfs": -24.53257802096825,
+          "peak_dbfs": -3.1826221409836286,
+          "clipped_fraction": 0.0,
+          "spectral_centroid_hz": 2294.92092201283,
+          "low_band_energy_ratio": 0.47638496744767694,
+          "high_band_energy_ratio": 0.11393484605273294,
+          "harmonic_energy_ratio": 0.15583296120166779,
+          "onset_density_per_second": 8.4375,
+          "estimated_tempo_bpm": 98.6842105263158,
+          "periodicity_strength": 0.6158463812855862,
+          "form_hint": "possibly_loop",
+          "form_hint_confidence": 0.7963385525142346,
+          "median_f0_hz": 214.64254344103836,
+          "voiced_frame_fraction": 1.0,
+          "stereo_correlation": 0.9676082557333805,
+          "heuristic_tags": [
+            "low_end_heavy",
+            "noisy_or_inharmonic",
+            "transient_dense"
+          ],
+          "uncertainty_reasons": []
+        }
+      },
+      "facets": {
+        "duration_seconds": 3.2,
+        "sample_rate_hz": 48000,
+        "rms_dbfs": -24.53257802096825,
+        "peak_dbfs": -3.1826221409836286,
+        "clipped_fraction": 0.0,
+        "spectral_centroid_hz": 2294.92092201283,
+        "low_band_energy_ratio": 0.47638496744767694,
+        "high_band_energy_ratio": 0.11393484605273294,
+        "harmonic_energy_ratio": 0.15583296120166779,
+        "onset_density_per_second": 8.4375,
+        "estimated_tempo_bpm": 98.6842105263158,
+        "periodicity_strength": 0.6158463812855862,
+        "form_hint": "possibly_loop",
+        "form_hint_confidence": 0.7963385525142346,
+        "median_f0_hz": 214.64254344103836,
+        "voiced_frame_fraction": 1.0,
+        "stereo_correlation": 0.9676082557333805,
+        "heuristic_tags": [
+          "low_end_heavy",
+          "noisy_or_inharmonic",
+          "transient_dense"
+        ],
+        "uncertainty_reasons": []
+      }
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "text_created_labels": false,
+    "text_overrode_waveform": false,
+    "unsupported_terms_preserved": true,
+    "rename_actions": false
+  }
+}

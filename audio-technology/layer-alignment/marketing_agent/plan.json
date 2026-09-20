@@ -1,0 +1,72 @@
+{
+  "contract": [
+    "marketing.launch.plan",
+    "marketing.campaign.status",
+    "marketing.content.plan",
+    "marketing.market.research",
+    "marketing.experiments.list"
+  ],
+  "campaign": {
+    "name": "SLO four-week launch research plan",
+    "goal": "Validate qualified demand and trust messaging",
+    "audience": {
+      "name": "Ableton-first sample producers",
+      "job_to_be_done": "Find useful samples quickly without losing trust in tags or musical context",
+      "evidence": [
+        {
+          "text": "Live exposes tag search and sound similarity search as core browser workflows.",
+          "kind": "FACT",
+          "source": "https://www.ableton.com/en/live/",
+          "confidence": 1.0
+        }
+      ]
+    },
+    "channels": [
+      "owned website",
+      "Ableton community research",
+      "email draft only"
+    ],
+    "insights": [
+      {
+        "text": "SLO's current benchmark is single-vendor and has known filename ambiguity.",
+        "kind": "FACT",
+        "source": "Nite_DSP_RnD SLO V5 baseline audit",
+        "confidence": 0.98
+      },
+      {
+        "text": "Search trust is likely a stronger launch message than generic AI classification.",
+        "kind": "INFERENCE",
+        "source": "SLO benchmark limitations + Ableton workflow",
+        "confidence": 0.74
+      },
+      {
+        "text": "Show before/after retrieval examples using legally cleared fixtures.",
+        "kind": "STRATEGY",
+        "source": "Derived launch strategy",
+        "confidence": 0.82
+      },
+      {
+        "text": "A short browser demo comparing ambiguous names could be a compelling creative asset.",
+        "kind": "CREATIVE_IDEA",
+        "source": "Research hypothesis",
+        "confidence": 0.45
+      }
+    ],
+    "experiments": [
+      {
+        "name": "retrieval-proof",
+        "hypothesis": "A concrete search task outperforms abstract AI claims.",
+        "metric": "qualified demo completion rate",
+        "guardrail": "no claim beyond benchmark scope"
+      },
+      {
+        "name": "vendor-honesty",
+        "hypothesis": "Explicitly stating supported corpus limits increases trust.",
+        "metric": "landing-page quality score",
+        "guardrail": "do not imply multi-vendor accuracy before validation"
+      }
+    ],
+    "external_writes": []
+  },
+  "external_writes": []
+}

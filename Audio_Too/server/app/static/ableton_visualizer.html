@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="0; url=http://127.0.0.1:8090">
+  <title>Redirecting to KENN…</title>
+</head>
+<body>
+  <!-- Retired 2026-08-05: the live Ableton session chat + OSC volume/pan
+       control panel this page used to host now lives in the KENN app
+       itself ("Live" nav button) as part of the KENN hub unification
+       (docs/KENN_HUB_UNIFICATION_PLAN_2026-08-05.md).
+
+       Points at the raw KENN port (127.0.0.1:8090), same as dashboard.html's
+       ableton-tab iframe, NOT the /kenn proxy (kenn_proxy_routes.py) — the
+       proxy only forwards /kenn/api/* and /kenn/portfolio/*, but the KENN
+       app's own static/app.js calls bare /api/... paths throughout. Loading
+       the KENN static shell via /kenn as a full top-level page would 404
+       almost every one of those calls against the business app's own
+       (different) route set. Fixing that is real work — extending the
+       proxy's allowlist or rewriting app.js's paths — not a one-line change;
+       tracked as still-open in the plan doc. Until then, raw-port links are
+       the only ones that actually work, same-machine limitation and all. -->
+  <p>Moved to <a href="http://127.0.0.1:8090">KENN</a>.</p>
+</body>
+</html>

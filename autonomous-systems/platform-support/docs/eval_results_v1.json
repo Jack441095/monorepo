@@ -1,0 +1,72 @@
+{
+  "benchmark_version": "THURSDAY_EVAL_V1",
+  "failure_recovery_rate": 1.0,
+  "failures": [],
+  "families": {
+    "approval": {
+      "failed": 0,
+      "failures": [],
+      "passed": 6,
+      "rate": 1.0,
+      "total": 6
+    },
+    "brief": {
+      "failed": 0,
+      "failures": [],
+      "passed": 12,
+      "rate": 1.0,
+      "total": 12
+    },
+    "continuity": {
+      "failed": 0,
+      "failures": [],
+      "passed": 2,
+      "rate": 1.0,
+      "total": 2
+    },
+    "grounding": {
+      "failed": 0,
+      "failures": [],
+      "passed": 14,
+      "rate": 1.0,
+      "total": 14
+    },
+    "proactivity": {
+      "failed": 0,
+      "failures": [],
+      "passed": 10,
+      "rate": 1.0,
+      "total": 10
+    },
+    "recovery": {
+      "failed": 0,
+      "failures": [],
+      "passed": 1,
+      "rate": 1.0,
+      "total": 1
+    },
+    "routing": {
+      "failed": 0,
+      "failures": [],
+      "passed": 47,
+      "rate": 1.0,
+      "total": 47
+    },
+    "unknown_intent": {
+      "failed": 0,
+      "failures": [],
+      "passed": 8,
+      "rate": 1.0,
+      "total": 8
+    },
+    "weekly": {
+      "failed": 0,
+      "failures": [],
+      "passed": 3,
+      "rate": 1.0,
+      "total": 3
+    }
+  },
+  "overall_pass_rate": 1.0,
+  "total_scenarios": 103
+}

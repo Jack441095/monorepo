@@ -1,0 +1,164 @@
+sample_id,filename,predicted_class,confidence,notes
+2,1359_KSHMR_Bass_Loop_03_120_Em.wav,Music Loop,0.8180124163627625,OOD sample falsely accepted as known class with high confidence
+4,1364_KSHMR_Bass_Slide_02_A#.wav,Kick,0.918420135974884,OOD sample falsely accepted as known class with high confidence
+7,1366_KSHMR_Bass_Slide_04_D#.wav,Bass One-Shot,0.9167127013206482,OOD sample falsely accepted as known class with high confidence
+8,1365_KSHMR_Bass_Slide_03_D#.wav,Kick,0.9814680218696594,OOD sample falsely accepted as known class with high confidence
+10,1360_KSHMR_Bass_Loop_04_128_Am.wav,Music Loop,0.7620663046836853,OOD sample falsely accepted as known class with high confidence
+11,1361_KSHMR_Bass_Loop_05_128_Em.wav,Music Loop,0.9808526635169983,OOD sample falsely accepted as known class with high confidence
+12,1369_KSHMR_Cello_02_Melody_95_Dm.wav,Music Loop,0.9961878657341003,OOD sample falsely accepted as known class with high confidence
+13,1368_KSHMR_Cello_01_One_Shot_A#_C.wav,Foley,0.9986467957496643,OOD sample falsely accepted as known class with high confidence
+14,1371_KSHMR_Cello_04_Melody_95_E.wav,Music Loop,0.9010617136955261,OOD sample falsely accepted as known class with high confidence
+15,1373_KSHMR_Cello_06_Melody_100_D.wav,Music Loop,0.9977197051048279,OOD sample falsely accepted as known class with high confidence
+16,1370_KSHMR_Cello_03_Melody_95_E.wav,Music Loop,0.9890778064727783,OOD sample falsely accepted as known class with high confidence
+18,1376_KSHMR_Cello_09_Melody_110_Am.wav,Music Loop,0.9986433386802673,OOD sample falsely accepted as known class with high confidence
+19,1379_KSHMR_Cello_12_Melody_115_C_Arabic.wav,Music Loop,0.9130457639694214,OOD sample falsely accepted as known class with high confidence
+22,1374_KSHMR_Cello_07_Melody_100_Dm.wav,Music Loop,0.8092036247253418,OOD sample falsely accepted as known class with high confidence
+23,1385_KSHMR_Cello_18_Melody_120_Dm.wav,Music Loop,0.9072667360305786,OOD sample falsely accepted as known class with high confidence
+24,1381_KSHMR_Cello_14_Melody_120_Dm.wav,Music Loop,0.9521029591560364,OOD sample falsely accepted as known class with high confidence
+25,1382_KSHMR_Cello_15_Melody_120_Dm.wav,Music Loop,0.8863018155097961,OOD sample falsely accepted as known class with high confidence
+27,1380_KSHMR_Cello_13_Melody_115_Fm.wav,Music Loop,0.8777751922607422,OOD sample falsely accepted as known class with high confidence
+28,1384_KSHMR_Cello_17_Melody_120_Dm.wav,Music Loop,0.8739288449287415,OOD sample falsely accepted as known class with high confidence
+29,1389_KSHMR_Cello_22_Melody_129_G#m.wav,Music Loop,0.8068764805793762,OOD sample falsely accepted as known class with high confidence
+30,1383_KSHMR_Cello_16_Melody_120_Dm.wav,Music Loop,0.8021182417869568,OOD sample falsely accepted as known class with high confidence
+32,1386_KSHMR_Cello_19_Melody_125_F#m.wav,Music Loop,0.9834792613983154,OOD sample falsely accepted as known class with high confidence
+33,1393_KSHMR_Acoustic_Guitar_Chords_04_100_Dm-A#-A-Dm-Gm-A.wav,Music Loop,0.9999839067459106,OOD sample falsely accepted as known class with high confidence
+34,1391_KSHMR_Acoustic_Guitar_Chords_02_88_C#m-F#m-E-D.wav,Music Loop,0.9961088299751282,OOD sample falsely accepted as known class with high confidence
+35,1387_KSHMR_Cello_20_Melody_128_Dm.wav,Music Loop,0.9957287907600403,OOD sample falsely accepted as known class with high confidence
+36,1394_KSHMR_Acoustic_Guitar_Chords_05_100_Fm-A#m-C.wav,Music Loop,0.7987850904464722,OOD sample falsely accepted as known class with high confidence
+38,1392_KSHMR_Acoustic_Guitar_Chords_03_92_Fm-C#-D#-C.wav,Music Loop,0.9893653392791748,OOD sample falsely accepted as known class with high confidence
+39,1396_KSHMR_Acoustic_Guitar_Chords_07_100_F#m-D-A-C#.wav,Music Loop,0.9999949932098389,OOD sample falsely accepted as known class with high confidence
+40,1395_KSHMR_Acoustic_Guitar_Chords_06_100_Fm-G#Maj7-A#m.wav,Music Loop,0.9998695850372314,OOD sample falsely accepted as known class with high confidence
+41,1399_KSHMR_Acoustic_Guitar_Chords_10_108_G-B-Em-C_Low.wav,FX,0.8388532400131226,OOD sample falsely accepted as known class with high confidence
+42,1405_KSHMR_Acoustic_Guitar_Chords_16_115_Fm-A#m_G#-D#.wav,FX,0.8989734649658203,OOD sample falsely accepted as known class with high confidence
+44,1390_KSHMR_Acoustic_Guitar_Chords_01_80_G#m.wav,Music Loop,0.9999881982803345,OOD sample falsely accepted as known class with high confidence
+46,1402_KSHMR_Acoustic_Guitar_Chords_13_112_Cm-A#-G#-Cm-D#-Fm.wav,Music Loop,0.9850872755050659,OOD sample falsely accepted as known class with high confidence
+47,1400_KSHMR_Acoustic_Guitar_Chords_11_110_Em7-A.wav,Music Loop,0.9989110231399536,OOD sample falsely accepted as known class with high confidence
+48,1409_KSHMR_Acoustic_Guitar_Chords_20_128_A#m-D#-Fm.wav,Synth Loop,0.8162312507629395,OOD sample falsely accepted as known class with high confidence
+49,1411_KSHMR_Acoustic_Guitar_Chords_22_128_A#m-D#-Fm_Muted.wav,Music Loop,0.8076409697532654,OOD sample falsely accepted as known class with high confidence
+50,1403_KSHMR_Acoustic_Guitar_Chords_14_115_D#m-F#Maj7-F#-BMaj7.wav,Music Loop,0.9999874830245972,OOD sample falsely accepted as known class with high confidence
+51,1406_KSHMR_Acoustic_Guitar_Chords_17_118_Fm-C#-G#-D#_2X_C#-D#-G#-D#-A#m-C.wav,Music Loop,0.9979752898216248,OOD sample falsely accepted as known class with high confidence
+52,1404_KSHMR_Acoustic_Guitar_Chords_15_115_D#m-F#Maj7-F#-BMaj7.wav,Music Loop,0.9999717473983765,OOD sample falsely accepted as known class with high confidence
+53,1410_KSHMR_Acoustic_Guitar_Chords_21_128_A#m-D#-Fm.wav,Music Loop,0.8134665489196777,OOD sample falsely accepted as known class with high confidence
+54,1408_KSHMR_Acoustic_Guitar_Chords_19_128_Am-G-Em7-FMaj7.wav,Music Loop,0.9641940593719482,OOD sample falsely accepted as known class with high confidence
+55,1407_KSHMR_Acoustic_Guitar_Chords_18_118_Fm-C#-G#-D#_2X_C#-D#-G#-D#-A#m-C.wav,Music Loop,0.8134725689888,OOD sample falsely accepted as known class with high confidence
+56,1412_KSHMR_Acoustic_Guitar_Chords_23_128_C-G-Em.wav,Music Loop,0.9991810917854309,OOD sample falsely accepted as known class with high confidence
+57,1414_KSHMR_Acoustic_Guitar_Chords_25_128_C#-A#m-Fm-G#.wav,Music Loop,0.7998356819152832,OOD sample falsely accepted as known class with high confidence
+58,1416_KSHMR_Acoustic_Guitar_Chords_27_128_D-Bm-F#m-A.wav,Music Loop,0.9958739876747131,OOD sample falsely accepted as known class with high confidence
+59,1418_KSHMR_Acoustic_Guitar_Chords_29_128_D-Bm-F#m-A_Muted.wav,Music Loop,0.8906835317611694,OOD sample falsely accepted as known class with high confidence
+60,1413_KSHMR_Acoustic_Guitar_Chords_24_128_Cm7-Eb-Gm-F.wav,Music Loop,0.9996846914291382,OOD sample falsely accepted as known class with high confidence
+61,1417_KSHMR_Acoustic_Guitar_Chords_28_128_D-Bm-F#m-A_Open.wav,Music Loop,0.8075243234634399,OOD sample falsely accepted as known class with high confidence
+62,1420_KSHMR_Acoustic_Guitar_Chords_31_128_F-Am-G-F.wav,Music Loop,0.9854780435562134,OOD sample falsely accepted as known class with high confidence
+63,1424_KSHMR_Acoustic_Guitar_Chords_35_140_Em.wav,Music Loop,0.968535304069519,OOD sample falsely accepted as known class with high confidence
+65,1421_KSHMR_Acoustic_Guitar_Chords_32_128_Gm-D#-A#-F.wav,Music Loop,0.9476129412651062,OOD sample falsely accepted as known class with high confidence
+66,1415_KSHMR_Acoustic_Guitar_Chords_26_128_C#-D#-Fm-C#-D#-G#-C#-C-Fm-C#-C.wav,Music Loop,0.9919847846031189,OOD sample falsely accepted as known class with high confidence
+67,1422_KSHMR_Acoustic_Guitar_Chords_33_129_G#-D#-A#-Cm.wav,Music Loop,0.9999169111251831,OOD sample falsely accepted as known class with high confidence
+70,1425_KSHMR_Acoustic_Guitar_Chords_36_140_E-A-C#m-A.wav,Music Loop,0.9862924814224243,OOD sample falsely accepted as known class with high confidence
+71,1427_KSHMR_Electric_Guitar_Chords_01_95_Em-D-CMaj7.wav,Music Loop,0.9894664883613586,OOD sample falsely accepted as known class with high confidence
+72,1430_KSHMR_Electric_Guitar_Chords_04_100_F-C-Dm-C.wav,Music Loop,0.9479182362556458,OOD sample falsely accepted as known class with high confidence
+73,1431_KSHMR_Electric_Guitar_Chords_05_100_Fm-G#-D#-C#.wav,Music Loop,0.9720606207847595,OOD sample falsely accepted as known class with high confidence
+74,1432_KSHMR_Electric_Guitar_Chords_06_105_Dm-Gm-Am7-F.wav,Music Loop,0.9727376103401184,OOD sample falsely accepted as known class with high confidence
+75,1429_KSHMR_Electric_Guitar_Chords_03_100_Em-Bm-D-G-Em-Am.wav,Music Loop,0.9705517888069153,OOD sample falsely accepted as known class with high confidence
+77,1428_KSHMR_Electric_Guitar_Chords_02_100_D#-F-Gm-F-D.wav,Music Loop,0.9947026371955872,OOD sample falsely accepted as known class with high confidence
+78,1434_KSHMR_Electric_Guitar_Chords_08_105_Em-C-D_Am.wav,Music Loop,0.9939701557159424,OOD sample falsely accepted as known class with high confidence
+79,1436_KSHMR_Electric_Guitar_Chords_10_107_Cm-D#m7-Gm-A#.wav,Music Loop,0.9992687106132507,OOD sample falsely accepted as known class with high confidence
+80,1435_KSHMR_Electric_Guitar_Chords_09_105_G#-A#m-D#-Fm.wav,Music Loop,0.9668011665344238,OOD sample falsely accepted as known class with high confidence
+82,1441_KSHMR_Electric_Guitar_Chords_15_128_Em-D-CMaj7_Triplet.wav,Music Loop,0.987330973148346,OOD sample falsely accepted as known class with high confidence
+84,1440_KSHMR_Electric_Guitar_Chords_14_128_Em-D-C.wav,Music Loop,0.9978413581848145,OOD sample falsely accepted as known class with high confidence
+85,1437_KSHMR_Electric_Guitar_Chords_11_110_C#m-A-G#-E-C#m-B-E.wav,Music Loop,0.9987974166870117,OOD sample falsely accepted as known class with high confidence
+86,1444_KSHMR_Electric_Guitar_Chords_18_128_Fm-C#-G#-Fm-C#-D#.wav,Music Loop,0.9996138215065002,OOD sample falsely accepted as known class with high confidence
+87,1450_KSHMR_Guitar_FX_01_Feedback_A#.wav,Bass One-Shot,0.9743661880493164,OOD sample falsely accepted as known class with high confidence
+88,1442_KSHMR_Electric_Guitar_Chords_16_128_F-Gm-Dm-A#.wav,Synth Loop,0.7975728511810303,OOD sample falsely accepted as known class with high confidence
+89,1448_KSHMR_Electric_Guitar_Chords_22_128_F#-D#m-A#m-G#.wav,Music Loop,0.9928843975067139,OOD sample falsely accepted as known class with high confidence
+92,1454_KSHMR_Guitar_FX_05_Powerchord_D.wav,Bass One-Shot,0.9969887137413025,OOD sample falsely accepted as known class with high confidence
+93,1453_KSHMR_Guitar_FX_04_Powerchord_B.wav,Bass One-Shot,0.9239484071731567,OOD sample falsely accepted as known class with high confidence
+95,1447_KSHMR_Electric_Guitar_Chords_21_128_Fm7-Cm7-A#m-Cm7.wav,Music Loop,0.9976735711097717,OOD sample falsely accepted as known class with high confidence
+96,1445_KSHMR_Electric_Guitar_Chords_19_128_Fm-D#-Fm-C#-C-Fm.wav,Music Loop,0.9982315897941589,OOD sample falsely accepted as known class with high confidence
+98,1451_KSHMR_Guitar_FX_02_Mute_Strum_104_.wav,FX,0.810008704662323,OOD sample falsely accepted as known class with high confidence
+99,1456_KSHMR_Guitar_FX_07_Scrape_D#.wav,Bass One-Shot,0.9897136688232422,OOD sample falsely accepted as known class with high confidence
+100,1452_KSHMR_Guitar_FX_03_Powerchord_A.wav,Bass One-Shot,0.9874910116195679,OOD sample falsely accepted as known class with high confidence
+101,1455_KSHMR_Guitar_FX_06_Powerchord_G.wav,Bass One-Shot,0.9894070029258728,OOD sample falsely accepted as known class with high confidence
+103,1458_KSHMR_Guitar_Melody_01_75_F#m.wav,Music Loop,0.9950788021087646,OOD sample falsely accepted as known class with high confidence
+104,1460_KSHMR_Guitar_Melody_03_97_Am_Chords.wav,Music Loop,0.9990967512130737,OOD sample falsely accepted as known class with high confidence
+105,1462_KSHMR_Guitar_Melody_03_97_Am_Melody_Electric.wav,Music Loop,0.9610310196876526,OOD sample falsely accepted as known class with high confidence
+106,1461_KSHMR_Guitar_Melody_03_97_Am_Melody_Acoustic.wav,Music Loop,0.9979093670845032,OOD sample falsely accepted as known class with high confidence
+107,1464_KSHMR_Guitar_Melody_05_100_D.wav,Music Loop,0.9968472123146057,OOD sample falsely accepted as known class with high confidence
+108,1459_KSHMR_Guitar_Melody_02_90_Gm.wav,Music Loop,0.9806210398674011,OOD sample falsely accepted as known class with high confidence
+109,1468_KSHMR_Guitar_Melody_08_102_Am_Melody.wav,Music Loop,0.9970903396606445,OOD sample falsely accepted as known class with high confidence
+110,1466_KSHMR_Guitar_Melody_07_100_G#m.wav,Music Loop,0.891865074634552,OOD sample falsely accepted as known class with high confidence
+111,1467_KSHMR_Guitar_Melody_08_102_Am_Chords.wav,Music Loop,0.9998101592063904,OOD sample falsely accepted as known class with high confidence
+112,1473_KSHMR_Guitar_Melody_13_110_Em.wav,Music Loop,0.9854126572608948,OOD sample falsely accepted as known class with high confidence
+113,1471_KSHMR_Guitar_Melody_11_105_Am.wav,Music Loop,0.9999480247497559,OOD sample falsely accepted as known class with high confidence
+114,1470_KSHMR_Guitar_Melody_10_105_Am.wav,Music Loop,0.8961448669433594,OOD sample falsely accepted as known class with high confidence
+115,1465_KSHMR_Guitar_Melody_06_100_F#.wav,Music Loop,0.9944041967391968,OOD sample falsely accepted as known class with high confidence
+116,1475_KSHMR_Guitar_Melody_15_115_Fm.wav,FX,0.8080431818962097,OOD sample falsely accepted as known class with high confidence
+117,1469_KSHMR_Guitar_Melody_09_102_Gm.wav,Music Loop,0.9834393858909607,OOD sample falsely accepted as known class with high confidence
+121,1482_KSHMR_Reverse_Instrument_03_Strings_128_C.wav,Music Loop,0.9464835524559021,OOD sample falsely accepted as known class with high confidence
+123,1474_KSHMR_Guitar_Melody_14_115_Fm.wav,Music Loop,0.9885286688804626,OOD sample falsely accepted as known class with high confidence
+124,1479_KSHMR_Guitar_Melody_19_128_Fm.wav,Synth Loop,0.9910592436790466,OOD sample falsely accepted as known class with high confidence
+125,1477_KSHMR_Guitar_Melody_17_128_Dm.wav,Music Loop,0.9656656384468079,OOD sample falsely accepted as known class with high confidence
+126,1472_KSHMR_Guitar_Melody_12_105_Am.wav,Music Loop,0.9988818764686584,OOD sample falsely accepted as known class with high confidence
+127,1488_KSHMR_Reverse_Instrument_09_Guitar_128_G.wav,Bass One-Shot,0.7756965756416321,OOD sample falsely accepted as known class with high confidence
+132,1487_KSHMR_Reverse_Instrument_08_Guitar_128_G.wav,Music Loop,0.8792676329612732,OOD sample falsely accepted as known class with high confidence
+133,1484_KSHMR_Reverse_Instrument_05_Guitar_and_Voice_128_F.wav,Music Loop,0.8737430572509766,OOD sample falsely accepted as known class with high confidence
+135,1493_KSHMR_Sax_05_Melody_100_Bm.wav,Vocal Loop,0.9862070083618164,OOD sample falsely accepted as known class with high confidence
+136,1492_KSHMR_Sax_04_Melody_89_D#.wav,Synth Loop,0.8273297548294067,OOD sample falsely accepted as known class with high confidence
+138,1490_KSHMR_Sax_02_One_Shot_Long_Solo_Am.wav,Vocal Loop,0.9966358542442322,OOD sample falsely accepted as known class with high confidence
+142,1495_KSHMR_Sax_07_Melody_110_Cm.wav,Vocal Loop,0.9174202084541321,OOD sample falsely accepted as known class with high confidence
+148,1501_KSHMR_Sax_13_Melody_110_Gm.wav,Synth Loop,0.919627845287323,OOD sample falsely accepted as known class with high confidence
+149,1500_KSHMR_Sax_12_Melody_110_F#m.wav,Vocal Loop,0.7686585783958435,OOD sample falsely accepted as known class with high confidence
+151,1513_KSHMR_Sax_25_Melody_140_Dm.wav,Vocal Loop,0.8427307605743408,OOD sample falsely accepted as known class with high confidence
+153,1515_KSHMR_Sax_27_Melody_140_Dm_Triplet.wav,Vocal Loop,0.9920720458030701,OOD sample falsely accepted as known class with high confidence
+154,1512_KSHMR_Sax_24_Melody_140_Am.wav,Vocal Loop,0.9617716670036316,OOD sample falsely accepted as known class with high confidence
+158,1519_KSHMR_Trumpet_04_104_Bm.wav,Synth Loop,0.88007652759552,OOD sample falsely accepted as known class with high confidence
+159,1516_KSHMR_Trumpet_01_89_Fm.wav,Synth Loop,0.9958071708679199,OOD sample falsely accepted as known class with high confidence
+160,1520_KSHMR_Trumpet_05_112_Am.wav,Synth Loop,0.9055169224739075,OOD sample falsely accepted as known class with high confidence
+163,1523_KSHMR_Trumpet_08_124_Em.wav,Synth Loop,0.9504880309104919,OOD sample falsely accepted as known class with high confidence
+164,1525_KSHMR_Trumpet_10_124_G.wav,Synth Loop,0.7568238377571106,OOD sample falsely accepted as known class with high confidence
+166,1514_KSHMR_Sax_26_Melody_140_Dm.wav,Vocal Loop,0.886494517326355,OOD sample falsely accepted as known class with high confidence
+168,1517_KSHMR_Trumpet_02_89_G#.wav,Synth Loop,0.9729567170143127,OOD sample falsely accepted as known class with high confidence
+169,1528_KSHMR_Violin_03_100_Pizzicato_C#m.wav,Percussion,0.9423726201057434,OOD sample falsely accepted as known class with high confidence
+170,1527_KSHMR_Violin_02_100_C#m.wav,Music Loop,0.8397902250289917,OOD sample falsely accepted as known class with high confidence
+171,1526_KSHMR_Violin_01_100_C#.wav,Music Loop,0.9619259238243103,OOD sample falsely accepted as known class with high confidence
+174,1530_KSHMR_Violin_05_100_Gm.wav,Music Loop,0.9760310053825378,OOD sample falsely accepted as known class with high confidence
+175,1533_KSHMR_Violin_08_105_Am.wav,Music Loop,0.7828945517539978,OOD sample falsely accepted as known class with high confidence
+176,1531_KSHMR_Violin_06_104_F#m.wav,Foley,0.9992848038673401,OOD sample falsely accepted as known class with high confidence
+180,1541_KSHMR_Violin_16_128_Em.wav,Foley,0.9518383741378784,OOD sample falsely accepted as known class with high confidence
+181,1544_KSHMR_Violin_FX_03_Scary_A.wav,Foley,0.938193142414093,OOD sample falsely accepted as known class with high confidence
+183,1542_KSHMR_Violin_FX_01_Power_Chord_A.wav,Synth,0.8038118481636047,OOD sample falsely accepted as known class with high confidence
+184,1545_KSHMR_Violin_FX_04_Scary_C.wav,Vocal Loop,0.8628252744674683,OOD sample falsely accepted as known class with high confidence
+186,1535_KSHMR_Violin_10_110_Gm.wav,Music Loop,0.9632099270820618,OOD sample falsely accepted as known class with high confidence
+187,1536_KSHMR_Violin_11_115_Fm.wav,Music Loop,0.9758200645446777,OOD sample falsely accepted as known class with high confidence
+188,1539_KSHMR_Violin_14_128_C#m.wav,Music Loop,0.8834623098373413,OOD sample falsely accepted as known class with high confidence
+193,1550_KSHMR_Brass_Growl_04_G#.wav,Foley,0.8051384687423706,OOD sample falsely accepted as known class with high confidence
+194,1555_KSHMR_Brass_Loop_02_100_Am.wav,Synth Loop,0.9928103685379028,OOD sample falsely accepted as known class with high confidence
+196,1557_KSHMR_Brass_Loop_04_105_Fm.wav,Synth Loop,0.846248209476471,OOD sample falsely accepted as known class with high confidence
+199,1554_KSHMR_Brass_Loop_01_85_G#.wav,Synth Loop,0.7551082968711853,OOD sample falsely accepted as known class with high confidence
+200,1543_KSHMR_Violin_FX_02_Riser.wav,Foley,0.9999046325683594,OOD sample falsely accepted as known class with high confidence
+202,1556_KSHMR_Brass_Loop_03_100_Em.wav,Synth Loop,0.9963117241859436,OOD sample falsely accepted as known class with high confidence
+204,1559_KSHMR_Brass_Loop_06_120_Em.wav,Synth Loop,0.9860188961029053,OOD sample falsely accepted as known class with high confidence
+206,1558_KSHMR_Brass_Loop_05_120_A.wav,Synth Loop,0.9676121473312378,OOD sample falsely accepted as known class with high confidence
+208,1563_KSHMR_Brass_Loop_10_128_E.wav,Synth Loop,0.9841225147247314,OOD sample falsely accepted as known class with high confidence
+209,1564_KSHMR_Brass_Loop_11_128_Fm.wav,Synth Loop,0.8027509450912476,OOD sample falsely accepted as known class with high confidence
+210,1566_KSHMR_Brass_Loop_13_128_Gm.wav,Synth Loop,0.8966377377510071,OOD sample falsely accepted as known class with high confidence
+211,1572_KSHMR_Brass_Loop_19_152_C#.wav,Synth Loop,0.998501181602478,OOD sample falsely accepted as known class with high confidence
+212,1569_KSHMR_Brass_Loop_16_140_Em.wav,Synth Loop,0.9164460301399231,OOD sample falsely accepted as known class with high confidence
+214,1571_KSHMR_Brass_Loop_18_140_Fm.wav,Synth Loop,0.9580107927322388,OOD sample falsely accepted as known class with high confidence
+215,1570_KSHMR_Brass_Loop_17_140_Fm.wav,Synth Loop,0.9426867365837097,OOD sample falsely accepted as known class with high confidence
+219,1577_KSHMR_Brass_Stab_05_E.wav,Impact,0.9097784161567688,OOD sample falsely accepted as known class with high confidence
+222,1580_KSHMR_Brass_Stab_08_E.wav,Bass One-Shot,0.9361675381660461,OOD sample falsely accepted as known class with high confidence
+226,1587_KSHMR_Brass_Sustain_05_D.wav,Synth,0.7870224714279175,OOD sample falsely accepted as known class with high confidence
+230,1589_KSHMR_Brass_Sustain_07_D#.wav,Synth,0.874399721622467,OOD sample falsely accepted as known class with high confidence
+232,1592_KSHMR_Brass_Sustain_10_F.wav,Foley,0.8920701742172241,OOD sample falsely accepted as known class with high confidence
+233,1593_KSHMR_Brass_Sustain_11_F.wav,Bass One-Shot,0.888775110244751,OOD sample falsely accepted as known class with high confidence
+235,1584_KSHMR_Brass_Sustain_02_B.wav,Foley,0.9998490810394287,OOD sample falsely accepted as known class with high confidence
+236,1586_KSHMR_Brass_Sustain_04_C#m.wav,Foley,0.841586172580719,OOD sample falsely accepted as known class with high confidence
+237,1596_KSHMR_Brass_Tension_FX_01_Dissonant_D-D#.wav,Music Loop,0.8669655919075012,OOD sample falsely accepted as known class with high confidence
+240,1588_KSHMR_Brass_Sustain_06_D.wav,Synth,0.7535181045532227,OOD sample falsely accepted as known class with high confidence
+241,1600_KSHMR_Brass_Tension_FX_05_Swell_E.wav,Foley,0.9664424061775208,OOD sample falsely accepted as known class with high confidence
+242,1599_KSHMR_Brass_Tension_FX_04_Swell_C.wav,Music Loop,0.8049612045288086,OOD sample falsely accepted as known class with high confidence
+243,1604_KSHMR_Brass_Tension_FX_09_Tremolo_Fm.wav,Vocal Loop,0.7869845628738403,OOD sample falsely accepted as known class with high confidence
+244,1603_KSHMR_Brass_Tension_FX_08_Swell_G#.wav,Foley,0.8424729108810425,OOD sample falsely accepted as known class with high confidence
+245,1602_KSHMR_Brass_Tension_FX_07_Swell_G.wav,Foley,0.9062038660049438,OOD sample falsely accepted as known class with high confidence
+246,1606_KSHMR_Church_Bell_02_B.wav,Foley,0.8120495080947876,OOD sample falsely accepted as known class with high confidence
+247,1597_KSHMR_Brass_Tension_FX_02_Fall_B.wav,Music Loop,0.9134364724159241,OOD sample falsely accepted as known class with high confidence
+250,1605_KSHMR_Church_Bell_01_A#.wav,Bass One-Shot,0.8089446425437927,OOD sample falsely accepted as known class with high confidence

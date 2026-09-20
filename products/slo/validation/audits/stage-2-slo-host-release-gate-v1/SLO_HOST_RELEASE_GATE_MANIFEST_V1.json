@@ -1,0 +1,46 @@
+{
+  "schema_version": "slo_host_release_gate_candidate_v1",
+  "package_id": "L-07-L-08-HOST-RELEASE-GATE-V1",
+  "product": "slo",
+  "status": "environment_gate_pending",
+  "generated_at": "2026-08-30T14:00:00Z",
+  "candidate": {
+    "worktree": "workspace/worktrees/slo/slo-build-entry-v1",
+    "branch": "engineering/slo-build-entry-v1",
+    "dirty_entries": 0,
+    "source_checkpoint": "68b67009dc25bd9424d0c7cdbc11d2a7ce487c2f",
+    "qualification_descendant": "64fbdcd",
+    "build_entry_descendant": "eba7409",
+    "release_authorized": false
+  },
+  "planned_gates": {
+    "au_validation": "not_run",
+    "vst3_validation": "not_run",
+    "ableton_live_scan_load_render_state_reopen": "not_run",
+    "clean_machine_install_launch_uninstall": "not_run",
+    "signing_notarisation": "not_run",
+    "licensing_staging": "owner_environment_required",
+    "support_rollback_rehearsal": "not_run",
+    "large_library_capacity": "not_run"
+  },
+  "environment_requirements": {
+    "owner_approval": false,
+    "host_session_available": false,
+    "developer_id_credentials_available": false,
+    "staging_license_authority_available": false,
+    "external_private_data_required": false
+  },
+  "scope_controls": {
+    "shared_slo_checkout_modified": false,
+    "protected_data_opened_or_moved": false,
+    "credentials_opened_or_used": false,
+    "production_service_contacted": false,
+    "external_action_taken": false
+  },
+  "quality": {
+    "host_qualified": false,
+    "release_qualified": false,
+    "public_claims_authorized": false
+  },
+  "next_package": "L-07A: run the declared AU/VST3 and host matrix only when an approved host session is available; keep release blocked until licensing/signing/install/support/rollback evidence also passes."
+}

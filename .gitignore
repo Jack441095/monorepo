@@ -2,6 +2,36 @@
 .DS_Store
 ._*
 
+# Local AI/editor agent metadata (never product source)
+.claude/
+**/.claude/
+.cursor/
+**/.cursor/
+.codex/
+**/.codex/
+.windsurf/
+**/.windsurf/
+.continue/
+**/.continue/
+.roo/
+**/.roo/
+.junie/
+**/.junie/
+.amazonq/
+**/.amazonq/
+.aider*
+**/.aider*
+.mcp.json
+**/.mcp.json
+AGENTS.md
+**/AGENTS.md
+CLAUDE.md
+**/CLAUDE.md
+GEMINI.md
+**/GEMINI.md
+.github/copilot-instructions.md
+**/copilot-instructions.md
+
 # Python
 __pycache__/
 *.py[cod]
@@ -58,12 +88,23 @@ dist/
 *.ckpt
 *.safetensors
 *.onnx
+*.onnx.data
 *.bin
+*.npy
+*.npz
 training_data/
 tmp/
 
 # Worktrees — managed by git, not source
 workspace/worktrees/
+workspace/builds/
+workspace/caches/
+workspace/tmp/
+workspace/evidence/
+workspace/review/
+
+# Local model/artifact directories — keep manifests and code, not model weights.
+**/artifacts/models/
 
 # Fixtures / test audio (large binary blobs)
 fixtures/blind_test_audio/

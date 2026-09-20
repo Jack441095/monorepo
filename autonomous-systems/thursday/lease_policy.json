@@ -1,0 +1,8 @@
+{
+  "confinement": {
+    "shadow_execution_enabled": false,
+    "path_traversal_restricted": true,
+    "lease_ttl_sec": 300,
+    "sandbox_escapes_allowed": 0
+  }
+}

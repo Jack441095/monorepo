@@ -1,0 +1,2474 @@
+{
+  "record_type": "slo_canonical_duplicate_groups",
+  "schema_version": "1.0.0",
+  "method_version": "canonical_duplicate_groups_v1",
+  "summary": {
+    "n_input_paths": 7315,
+    "n_missing_or_error": 0,
+    "n_hashed": 3452,
+    "n_exact_duplicate_groups": 235,
+    "n_duplicate_aliases": 335
+  },
+  "groups": [
+    {
+      "sha256": "00a2d42a743432814533f20615d0b24201bd0ab773bb3b836b78579fb0eb1c36",
+      "size_bytes": 99682,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras 2 Samples/Kick Innerworks 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/Kick Innerworks 2.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gamma Ray Samples/Kick Innerworks 2.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/Kick Innerworks 2.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "0221e0ff59385043be77c9d1096bfaee58f1ca27311abb42e22da71ae16216cd",
+      "size_bytes": 156348,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 2/B6-PiSh_01.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Hemispheres Samples/B6-PiSh_01.L.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "042194453f14cb67e45384fa012d7f72ee6c1722272ed23aa0f7392fd65865b0",
+      "size_bytes": 60270,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Confetti Samples/BD_808booty_02.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Lille Samples/BD_808booty_02.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "048667f63a5409daf34c4214a98762582f5e1085ef4fcab86a65c5553f9898a5",
+      "size_bytes": 299348,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Dirty Doz-it Kit Samples/Organic - Clap (46).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Stadium Kit Samples/Organic - Clap (46).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "04a03683ff52408a94f6c904345fe091c4e32405d7c2e9e1b3b582ec8128ab7b",
+      "size_bytes": 15292,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT GF.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT GF.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "04e4d6957654db1ba6db605a3a77fd77c7a46e683d77521b741732cb17405f89",
+      "size_bytes": 28130,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR TBYC.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR TBYC.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "0531fae08f12fc888c0aaecdb19477b9884330d89b4266e5663595a9911db8c8",
+      "size_bytes": 20716,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Horizons Samples/HH_Fat808_01.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/HH_Fat808_01.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "08344cd21c00ef97c253f84b9304162e3fa7918e878d2c535b5024e231f15e9f",
+      "size_bytes": 48149,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Clap AtomHeart 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Clap AtomHeart 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "08e79395138610dbcf2df8c11be56e891e987b1aad9f283a430dbcdaf44300ae",
+      "size_bytes": 19002,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/CLAP mys.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/CLAP mys.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "08fcdc74e7c50486eb90e092318fb939edd308c042ae34462082ba3df28924af",
+      "size_bytes": 15456,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT SOHO.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT SOHO.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "09eab32a43f483daba00a1f444a2a4751489ed26646561166e6198a683e49474",
+      "size_bytes": 354610,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Kicks/Racky Kick.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Kicks/Racky Kick.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "0adb6d90c68b07f4a533777673bfe910ab9a5129278e83e259a57c2186e1f44b",
+      "size_bytes": 376589,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Clap AllGotIt.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Clap AllGotIt.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Clap AllGotIt.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Clap AllGotIt.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Clap AllGotIt.wav"
+      ],
+      "member_count": 5,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "0c06365132bb9d054ff50a04241c6ca1cdb6ce67acca633bc10239be2d0be1f4",
+      "size_bytes": 25510,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare IrieMun.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare IrieMun.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "0d622a541709b565f36a2c28d04d69148d19f66d8c3bd549e32fd8b283b8a712",
+      "size_bytes": 19444,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare 909 8.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare 909 8.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "0e740c7ab509f00a4e4bbe4d33c3d5ab9bd02406178ab2a1a6610311b323aa72",
+      "size_bytes": 354610,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Open Hats/Reverse Open Hat .wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Open Hats/Reverse Open Hat .wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "0fcb54200bc214275dfd4bae64b7aaf4d9d64368bcc752276240488531051443",
+      "size_bytes": 89279,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Clap AllWalks.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Clap AllWalks.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Clap AllWalks.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Clap AllWalks.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Clap AllWalks.wav"
+      ],
+      "member_count": 5,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "101a52db92ba3c00dfccddadf18e109d46074aae6da08464e9401ea1b48cabe3",
+      "size_bytes": 257140,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Clap DeafTrap.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Clap DeafTrap.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "1086d347748d4df25d664a0fb622a799323e95e9745822f3b07f7e323fd174a0",
+      "size_bytes": 274312,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/PACMANNYNEW/Sample23.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/SNDS1/Sample23.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "10a3af0af794ccb3de94ce878a55c16767ed2c014bafbcb8aaea73758b651911",
+      "size_bytes": 266278,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Juggernaut Kit Samples/Organic - HiHat_D (1).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Vintage Kit Samples/Organic - HiHat_D (1).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "11db60dc62ad01a6c947e0db4c683c5ccf96b7d078ae0cbe7e51906d86f06023",
+      "size_bytes": 76816,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Clap DustyCircuit.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Clap DustyCircuit.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Clap DustyCircuit.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Clap DustyCircuit.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "11e378b84ecc00eac14f4b2509fa7135cb2adc22caf587698da8a177c997d296",
+      "size_bytes": 800444,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/AndroidSin f#2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/AndroidSin f#2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "126411d625a2a231cec4485875d3081405fee664c4ba74e5aecbb1de88ffa179",
+      "size_bytes": 49097,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Kick CloseMax.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Kick CloseMax.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "1280c4ab2b5aa0276c4962af9c43006488625d5c566e9061358c46bda67e1d5b",
+      "size_bytes": 16578,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/808er Samples/HH_808booty_02.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bruiser Samples/HH_808booty_02.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Lille Samples/HH_808booty_02.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Tourniquet Samples/HH_808booty_02.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "1305cef7bbaa68c387da9907101a33dfc0068dc6268c25fa6205ccc0f3ea903c",
+      "size_bytes": 257140,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Clap GinLarden.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Clap GinLarden.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "1526bbf7b831c5c3f6a7e9d4468d4cae47160ef7280577e69c4635838d0606e0",
+      "size_bytes": 299352,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Grungy Kit Samples/Organic - O.HiHat_B (1).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/That Knock Kit Samples/Organic - O.HiHat_B (1).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "16cd60bb88bb426c0986ebc515b137f80ac6929619238e8227969ac88fea556c",
+      "size_bytes": 77128,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/808 10.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 10.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "198af46fe113d785b2d6ca64fb22030f92fb9424376b2dcc0ee1389d2721b0c5",
+      "size_bytes": 183286,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 2/B57-PiSh_01.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Water Taxi Samples/B57-PiSh_01.L.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "19a70fd1e2ca8cd4c967b4ae7bd5465decbb10e7b4846b70f178c455b22a77d0",
+      "size_bytes": 227014,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) Antisocial Yeat.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Antisocial Yeat.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "19fbf860898e6258697edd196bbab99842617d15fb9a60758c2d24bd5920c65f",
+      "size_bytes": 709066,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/808s/Lowered Room 808.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Lowered Room 808.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "1c34ec1bdbae71ca62a2d4bd692b2897f8b890f13e8b2352b6347abb50bc8167",
+      "size_bytes": 302582,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) Alien Isolation.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Alien Isolation.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "1f7373219a277ee132ef5f5a45b6351e7960697456fd39eb6be1bdcd5b49d56a",
+      "size_bytes": 14588,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT IDK.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT IDK.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "20958d26382880e2209a40a0777625b7f811c0f140a70681fe962b5b6c642ce1",
+      "size_bytes": 57784,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR caught.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR caught.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "2096b3fa6690cb4064cb9279dd7108a496fe43d21aa5caa462e14c4e761ada61",
+      "size_bytes": 224442,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Kick AR70sTight V127 3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Kick AR70sTight V127 3.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Kick AR70sTight V127 3.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "209d83662d4d3ff86ea11753c0ac277466569364e3c45ab825ae586416a7bf34",
+      "size_bytes": 531842,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Snares/Duke D. Snare.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Snares/Duke D. Snare.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "227274bf766c09a57411946aa233c5371715debe299fc404e13f3444f07f703d",
+      "size_bytes": 42188,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras 2 Samples/Snare Eeprom 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/Snare Eeprom 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gamma Ray Samples/Snare Eeprom 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/Snare Eeprom 1.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "23bcb333cd0ec204833d8aa373d9954a2840b28cd450fe43b93f6ad097110f0b",
+      "size_bytes": 786012,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/AndroidSin f#1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/AndroidSin f#1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "24ca7e666952041e5c8c14e82b7d6ab893b42013ad2b74a07023207f71386034",
+      "size_bytes": 584136,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/AndroidSin c1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/AndroidSin c1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "27bb77647574c20711574ba75463efe58d45add39adc25295e99b0f6594ab00f",
+      "size_bytes": 42640,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Snare DontFront.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Snare DontFront.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Snare DontFront.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Snare DontFront.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "27d54f8e1cf83b39a184f8aaa13ead361a195f02488d91f02115e804cf04773e",
+      "size_bytes": 127298,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Clap Cellophane.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Clap Cellophane.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "2817d386defd90740b6cf6e7a855d63bc9cb17fb2da5fe46ee5d2497f371c2d0",
+      "size_bytes": 302582,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Open Hat) Secret Santa.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Open Hat) Secret Santa.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "297a8b596fac6ea84bb86757185ec52089f29a76fc7bb28487a5f5030b0e11c2",
+      "size_bytes": 40014,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES2/CRACKER9.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/STONEWOOD/CRACKER9.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "2a551dac379f2ad629aff672478742e0ed1e6cbc1775c7d7e42f0ecbf3bc91a3",
+      "size_bytes": 29388,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/BD_Beefy60_05.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/BD_Beefy60_05.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "2b9fd3bca3817e94725051d1f08f02c288bedf8342524714e805f1ef7bcb6f0b",
+      "size_bytes": 235566,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 2/B23-PiSh_01.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Piledriver Samples/B23-PiSh_01.L.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Ride Or Die Samples/B23-PiSh_01.L.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "2c31879f98c9f5494c584443257ef6260629736ea5b450ec3691e5a4a813bcb5",
+      "size_bytes": 383275,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Crash Handy.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Crash Handy.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Crash Handy.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "2dad58cef27ff8d1541ed4ab9b8c97e60a9748011b33b2b100074353713fe36b",
+      "size_bytes": 1175116,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Coast2coast Kit Samples/Organic - Cymbal (2).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/New Age Kit 1 Samples/Organic - Cymbal (2).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "3189883068038cb8f0aec4ade915e85e634db687b68a92ef781fdd862ad0077d",
+      "size_bytes": 1209782,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) New Slay.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) New Slay.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "32c6466084b516d1f7ccd2877df879053b37cba77e8430a341fc3ec34d426d53",
+      "size_bytes": 11198,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR just.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR just.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "32ea183d60a342b0493fb4655a406a3743db42f77d745fefc96aed784fc669d4",
+      "size_bytes": 15444,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT caught.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT caught.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "36ac07bff4c72085ad895fd0a4c30f8c261580135d2f59a4dde99deaf8131a9f",
+      "size_bytes": 81890,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/BD_AlienAnalog002.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/BD_AlienAnalog002.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Victimized Remix Samples/BD_AlienAnalog002.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "36bc97da32be634df206f85f88b92100e1d44e940c62f0a98ce66e697d75d572",
+      "size_bytes": 12696,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/GMAJOR/KIK13.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/KIK13.WAV",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/MJ/KIK13.WAV"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "387199e625bd41e9ace97245108f3fe1d905884217ce791bcf3815c6783317a3",
+      "size_bytes": 160548,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Crash TapedOver.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Crash TapedOver.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Crash TapedOver.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "39135fa59721ce3102ccce46043e64c4cb529dea4ec2328c388bdd886351d456",
+      "size_bytes": 12600,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/tight KIK i cant.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/tight KIK i cant.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "39782c3f363923d7ef2ef7cb57763b3e0aee4e88507e4423edd32f11f92e589e",
+      "size_bytes": 29248,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR head.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR head.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "3994d45a8f5e9b092d04790d5be4c4d1b968f4b8533b889e1e07b4020a1effe1",
+      "size_bytes": 56110,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK head.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK head.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "3bf028dda9c403c2e4696ba6456402a415851afedfd6c03901610f76fa7e3562",
+      "size_bytes": 454200,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Airborne Samples/BD_808_Future2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bruiser Samples/BD_808_Future2.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Tourniquet Samples/BD_808_Future2.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "3d99566ddb195555c90bed966cd6e6638a905b2b41b8e4c2e54a6a17f85b4c35",
+      "size_bytes": 709066,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Hi-Hats/New Go To Hi-Hat.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Claps/New Go To Hi-Hat.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "3fd7d47e48e9d95d723e7800ad5cd47feace5bfcaeaea7d464a3d5133395d732",
+      "size_bytes": 41216048,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples 2/Prophet Sample Pack/Prophet Improv Idea 3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Prophet Sample Pack/Prophet Improv Idea 3.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "419a18937902950a15c48970bde6c0c5147434c093e6d3873ee4faf349358617",
+      "size_bytes": 20338,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/NOYD10.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/MJ/NOYD10.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "43547d324fd74d0bfea2402fb989a053b6905bd1b38808c00c69a7325eb8861f",
+      "size_bytes": 302582,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(808) Me.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(808) Me.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "4380afc45fa378732dc57d7feaadeb98366679f7afff1bc6fddd84a5ea970e47",
+      "size_bytes": 25866,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna FOR PRINT Samples/Kick 909 5.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna Samples/Kick 909 5.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna2 Samples/Kick 909 5.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "4380dcc2f804cc3a5932fb2d15c396adc3df414f903f529de377e1b4a973d9aa",
+      "size_bytes": 354610,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Claps/Kendrick Lamar _No_ Clap.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Claps/Kendrick Lamar _No_ Clap.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "44462309deae0669277d0cc2ea07d10ef7bc958110313fb2ede579461af65d18",
+      "size_bytes": 95373,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Kick AllOver 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Kick AllOver 2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "448539e6cf1c67a0c30f94595f68010eca13cbf86dc22247adee511ba2d14bfe",
+      "size_bytes": 437168,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/BD_FutureProof3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/BD_FutureProof3.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "4667191a96447555a9f8cb5a0930b30e74a4dd5aa289318344327ece55582027",
+      "size_bytes": 647600,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/China StudioGong.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/China StudioGong.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "48e25c129340b46e2650929018e5cf4e88e830e076efb00da3d46c55c8d3c8e9",
+      "size_bytes": 42710,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/Analog_Clap2_MPC60.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/Analog_Clap2_MPC60.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "49411727bb0ade3821be69ba74c21a42a46e1ab154303e1168df29c2ea128bb3",
+      "size_bytes": 24708,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MEGATRON/TIMKICK1.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/LEOPARD/TIMKICK1.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "4c4e6170c492ac3784a22e4a52351174b7d2fcab15b408dd86f0141e9ab3cd35",
+      "size_bytes": 16472,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/hat grime.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/hat grime.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "4c55e221a720fce6bfc9dfb0fa421e2010490abd5ea5adb044cdbcf34ca67c46",
+      "size_bytes": 58900,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK caught.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK caught.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "4de405afecab1a75cef21d30584e27535ffd57fab406afb29b9d1d6937a0ccbf",
+      "size_bytes": 12069,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Snare 80sElectro 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Snare 80sElectro 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Snare 80sElectro 1.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "4e7bc2f8423334f465d94793885d8dff613735033a1a168860c2886e49a1a56b",
+      "size_bytes": 28590,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/CLAP grindin.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/CLAP grindin.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "4f590d7bdb90774aa40bcc142930d14713c5657611bb49845d86b60bad6e73da",
+      "size_bytes": 84332,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Auckland2013 Samples/Snare Cronotilus 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Snare Cronotilus 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Snare Cronotilus 1.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5035b8868980315f0744b35887ecf318f789c23ed32895341979ccedeb40dadb",
+      "size_bytes": 31570,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK faith1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK faith1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5293934e02b1ab3fdf0541d7bdf1f6874ef9e68ba579a4e9063ece774cf5ddbf",
+      "size_bytes": 27674,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NewFinishesA/MKICK1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/PaperWeight Samples/MKICK1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "52c16387bbee19213a5299e077b21eb2537e28889c12874c78f59d01dc446649",
+      "size_bytes": 39208,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/Drumulator_SD2_MPC60.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/Drumulator_SD2_MPC60.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/bitty loop Samples/Drumulator_SD2_MPC60.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "533d2c8aaec39b1a493259f1aca5181ee052781b74bfab083d1ddb57e7a521ee",
+      "size_bytes": 97291,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Clap AllOver.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Clap AllOver.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "55abab7e19c9fcc4014cd1dbbbc7dfc0f782c8f4969424600468527428f5ddd3",
+      "size_bytes": 407166,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/Analog_BD4_MPC60.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Analog_BD4_MPC60.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/bitty loop Samples/Analog_BD4_MPC60.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5677fbcaf4384dede9866030a8e78463c54013bbce5e2d96f7afb63969977915",
+      "size_bytes": 267188,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/PACMANNYNEW/Sample45.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/SNDS1/Sample45.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "578cba31396d6eb2082c69ab54c386f2ba94ffa411706866851337551627c6f8",
+      "size_bytes": 151382,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Hi-Hat) Find A Way.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Hi-Hat) Find A Way.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "586468fef4d71092e5a3bb635a10712aebbbf63c2a8d4ae78d712eae2d81912b",
+      "size_bytes": 39625,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Kick AwakeArise 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Kick AwakeArise 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Kick AwakeArise 1.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5885021d213206828e82e069129ef271c82ae1ed37160e061aa6b43884793340",
+      "size_bytes": 55258,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Kick 808 8.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Kick 808 8.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Kick 808 8.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Kick 808 8.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "59ca8db18c2473446fb7c5e2e5a38a175dafa06cade27052426ade1bdc9a040a",
+      "size_bytes": 40612,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/808 4.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 4.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5b575f8b0bba9e3e2e78602928a2a09e5315693b6a02eaff21b82e2c4d5cdcc7",
+      "size_bytes": 30607,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Snare Bodzin 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare Bodzin 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare Bodzin 1.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5d57f1a4b4f4199aabe5bd300cc4fceb3a02a13aba49e264be0e2768e7307fda",
+      "size_bytes": 177378,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Open Hats/Illuminati Open Hat.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Open Hats/Illuminati Open Hat.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5dd41a8b9883f704ecc14fc4f5c1b005617841e74d0d79130b713a1843ba418e",
+      "size_bytes": 79066,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry 3 Samples/Clap_LastMin3st_SP12R.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry Samples/Clap_LastMin3st_SP12R.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry-Space Station Samples/Clap_LastMin3st_SP12R.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5e0cce4d223768a5108b366fc389e302e3d55a855c9339b9366849b991519904",
+      "size_bytes": 28796,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK grindin.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK grindin.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5e4c5fde55fe7e7413f9dc40b7d0c753700a529e5ec5170709a7c604029c0edc",
+      "size_bytes": 709066,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/808s/Splurge Deal 808.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Splurge Deal 808.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5ec398a903bf9cd8f0773f1d26212fd157a08aab16b41c2b7999105d4c8748ef",
+      "size_bytes": 28314,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR SHAKE.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR SHAKE.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "5f5ec039f489c9e0187d68cf6f26db14e704044e67c6e404071ad1e6ae963430",
+      "size_bytes": 9496,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT head.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT head.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "60ff26ace71348cb165225c964c32f6fe1af5ddcfb6b985081eb5fa5920961c6",
+      "size_bytes": 21616,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT we got.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT we got.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "61be81fe75bf7211fbb888e459e3d3985fe109c90d2641bb21ecf25454840a75",
+      "size_bytes": 10920,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT wait.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT wait.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "62430f8eebca655c9ed773f1693d8530c666368a66341a8e1dbde335052101e7",
+      "size_bytes": 230796,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Clap HugeGroup.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Clap HugeGroup.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 2 Samples/Clap HugeGroup.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Clap HugeGroup.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Clap HugeGroup.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Clap HugeGroup.wav"
+      ],
+      "member_count": 6,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "643544075570996816b89517972b291c81158b7d920c68bca994497825c5cf03",
+      "size_bytes": 14736,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR stick rec.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR stick rec.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "64fae13b0d9ab7005d21b570c5bd21eb4095b07cbdde60ffbb7e8c6befc77038",
+      "size_bytes": 174559,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Kick CarRoom.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Kick CarRoom.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Kick CarRoom.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Panko Samples/Kick CarRoom.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Kick CarRoom.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Kick CarRoom.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Kick CarRoom.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Kick CarRoom.wav"
+      ],
+      "member_count": 8,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "6534ec6a95aa62d60b4d59f74daf901346b6dca6cd6921244121b5e5c61968bd",
+      "size_bytes": 25138,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare 909 9.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare 909 9.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "67b77779ac65ab680c5b10202c7f1e452dae7e11aa10ad711d3c66e09d938ea2",
+      "size_bytes": 43922,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry 3 Samples/Kik_Reg_4_MPC60V.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry Samples/Kik_Reg_4_MPC60V.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry-Space Station Samples/Kik_Reg_4_MPC60V.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "67c3a778ace78c92ac4cf7e70c9c6c00a40e6b5a74814b9fc01165ec311b654e",
+      "size_bytes": 275398,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Deep Impact Kit Samples/Organic - HiHat_F (2).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Studio Kit Samples/Organic - HiHat_F (2).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "6a198a6c89c9b80858b0f41c087336f0b99b9eff839bd477363c05232cfce74b",
+      "size_bytes": 104804,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/808 8.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 8.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "6a550a4d71ad0f604b18a20b16d645b13c98c98b8750f20808d7f72e1d7c5369",
+      "size_bytes": 226710,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bruiser Samples/Clap AllThighs.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jackboot Stone Cyn Samples/Clap AllThighs.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "6bc4435d41895e04f6364a9e9f1a6573cefe01cf893fcfe4441303b544c2dfa4",
+      "size_bytes": 14498,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/KIK15.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/MJ/KIK15.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "6c9d8a608de57e94502cf69b8dd4df30b5173f3b98e7a0fac99e3f97d2d61957",
+      "size_bytes": 805860,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/AndroidSin c2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/AndroidSin c2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "6caa8f9331ced0a6b46c04b45807a830d9a16fb8c308e18b9589b4a0892b320c",
+      "size_bytes": 25784,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Kick 909 6.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Kick 909 6.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "6cf8d686ee43046f21f9c5743f4d511bd21426ed369763b3408ff09b7cb02c1d",
+      "size_bytes": 63974,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK dem.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK dem.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "6d8e8df3aeff3f96beae820aa2ba21855a173590770e0a7d74cc8b9bcecf5e3d",
+      "size_bytes": 30054,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK look.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK look.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "7073eeb0fd7ce5c70797dffce36a1dd6826bf41a89f21918cea8444a9b816b5f",
+      "size_bytes": 28874,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Xero Current/OHKICK2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/PaperWeight Samples/OHKICK2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "707db973af5b42cda6b85c0bcdbdb3ee45110659adce33ea797a3e7cfe281ffa",
+      "size_bytes": 68118,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Kick Absynth A 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Kick Absynth A 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "712e521bc351f46ad686dd4d37083755379d5eaf62aa74e05f80bd52a9821a03",
+      "size_bytes": 58848,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare Arcade 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare Arcade 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "7143d0d5528a643a1f793cff67d3d34cc4c1d2cdcc08ff7d01b467fe732c4234",
+      "size_bytes": 38467,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Kick AR60sLate V127 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Kick AR60sLate V127 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Kick AR60sLate V127 1.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "7202038f93d20dcea4eb0901a3da3498320936a30ef822310f9db1fed61e0ad8",
+      "size_bytes": 148350,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Kick Autopsy 3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Kick Autopsy 3.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Kick Autopsy 3.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Kick Autopsy 3.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "72ab2cf64a725c7192787c02e5ff8e829f6a1ace6242de7deeb65dc6a6614194",
+      "size_bytes": 145441,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Crash Argon 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 2 Samples/Crash Argon 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "75b13c6882de3e693fbefa37815bf7a0b06e22fcb20dd18192206e248c1d60cf",
+      "size_bytes": 243776,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/BD_FutureMPC3000_8.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Headbutt Samples/BD_FutureMPC3000_8.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "75ba29c5303dbba712863715c5f7550fed3cca25ca9c2bc82f5adddb8ffb4771",
+      "size_bytes": 95104,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/Clap_FutureMPC3000_2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/Clap_FutureMPC3000_2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "76f45ecbfd72b37cc35fd0e80f9bff801a63665aca6592cf1a024da2ae367ea7",
+      "size_bytes": 151414,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Clap) Air It Out.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Clap) Air It Out.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "77c7c50b00788bbf724427f8ae928e66fb6c6482dde0ca5279b548419372b56a",
+      "size_bytes": 521767,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bowser Meat Samples/Snare Bodzin 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna FOR PRINT Samples/Snare Bodzin 2.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna Samples/Snare Bodzin 2.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna2 Samples/Snare Bodzin 2.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Rollers Samples/Snare Bodzin 2.wav"
+      ],
+      "member_count": 5,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "782ed0fc21f1983ad29d1463a4bacc521a7f13692708de5867aa4de9d09df99a",
+      "size_bytes": 145883,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras 2 Samples/Kick Bonaparte 7.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/Kick Bonaparte 7.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gamma Ray Samples/Kick Bonaparte 7.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/Kick Bonaparte 7.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "7969add931dfb4596c5900ffa4dfc46ca85ee085ac47cf74e3a299545dcf6dde",
+      "size_bytes": 266278,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Juggernaut Kit Samples/Organic - HiHat_D (2).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Vintage Kit Samples/Organic - HiHat_D (2).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "7b040f112521a30b171731b53a2e2e0883b25a943a9eb8011c82a4e8076daf42",
+      "size_bytes": 302582,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Snare) Snare Snare.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Snare) Snare Snare.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "7b0b260908ee7e402379f4a2ba69f8c84ef11af90a2f5ef455812cc3e24e97f4",
+      "size_bytes": 39842,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK KO.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK KO.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "7cef82257153c2290ba268f5a17966e62fb0e43980c82acf97f5684a29b6fd3b",
+      "size_bytes": 81706,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 2 Samples/Clap Grouper.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Shinkansen Samples/Clap Grouper.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 1 Samples/Clap Grouper.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "7dc55d924745b10b755442f05c982c6ee0e6c506336b8f391c2027b683c2ad7f",
+      "size_bytes": 16058,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Clap BareTog.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Clap BareTog.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "81878353a9da80dad2755981cdf71cce9006a6632020928e98ba484bc0ccdc89",
+      "size_bytes": 2126914,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/808s/Whole Truth 808.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/Whole Truth 808.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "820a992fa1d6c21970db2756bd8c5069cb72b2c644143388369dde7a4924c5ed",
+      "size_bytes": 66751,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Snare Ektl A 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras 2 Samples/Snare Ektl A 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/Snare Ektl A 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gamma Ray Samples/Snare Ektl A 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/Snare Ektl A 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Snare Ektl A 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Snare Ektl A 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Snare Ektl A 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Snare Ektl A 1.wav"
+      ],
+      "member_count": 9,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "8300b3520869ead621be9b0215ca3c0c7c0e94ce6c9ca9bd2346bd3b582ea919",
+      "size_bytes": 619844,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Domination Kit Samples/Organic - Cymbal (33).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Head Trauma Kit Samples/Organic - Cymbal (33).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "83dc6bf3c6bcbcdde91b5c43ccec149343618283f902e1e4c2135e56f8b2c337",
+      "size_bytes": 12286,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Auckland2013 Samples/Snare DMX.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras 2 Samples/Snare DMX.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/Snare DMX.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gamma Ray Samples/Snare DMX.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/Snare DMX.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Snare DMX.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Snare DMX.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Snare DMX.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Snare DMX.wav"
+      ],
+      "member_count": 9,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "84f0fe0df8ba9ece8f4b73ee887244e5a74240df37427b4a671c849588780ef0",
+      "size_bytes": 57926,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples 2/Project Files/Garage Generator Project/Samples/Imported/snare 05.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Foley Pack 01/Foley Drums/Snare 05.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "86e65ec02791d280e227d302f6438d5797c9f569c52552e6b9992353cb310ea8",
+      "size_bytes": 62376,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry 3 Samples/Clap_ClapTrapLayer_09.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry Samples/Clap_ClapTrapLayer_09.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Burberry-Space Station Samples/Clap_ClapTrapLayer_09.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "898e51aa98415be0d11cfa50c4b02502f2aa83978692191a7ce99c7372f59b60",
+      "size_bytes": 49884,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR pls.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR pls.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "89e20084132ae684601644bf86446128524830cf1c19e3916458511a5c7da202",
+      "size_bytes": 28160,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/OPEN HAT dem.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/OPEN HAT dem.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "8c573647da611df561dc1f3ee3e686a5862b06306b25ddaa24946cf57288bd6d",
+      "size_bytes": 302582,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Snare) Glider.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Snare) Glider.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "8cdd47cc820270b9d24b8fd0f8b330abf207f99fb30cd7e5d2239366b18ef105",
+      "size_bytes": 709098,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Hi-Hats/Spotify Hi-Hat (Delay).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Claps/Spotify Hi-Hat (Delay).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "8e24fbd0bc5e845f9f83609d12a7b64fbdb3498a5dad34f36ae27b86862121d8",
+      "size_bytes": 272789,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/808er Samples/BigBuzz Eb1 CLP.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Airborne Samples/BigBuzz Eb1 CLP.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "8f2aaa9e205594aa9d70cc1c56e28f53b88f6dd456bddbf6df16ecf6004fa7bb",
+      "size_bytes": 302582,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Open Hat) Seem 2 Be.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Open Hat) Seem 2 Be.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "8f2bfafe93b40dc2f17f1c64663978563bb8c6b26e34686f9baf82df27236f1c",
+      "size_bytes": 750780,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/AndroidSin c3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/AndroidSin c3.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "933b9ea2e24afe1c5e308224bf218ee24604c05d8eae09eb5e45863d10aae48d",
+      "size_bytes": 32394,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR young.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR young.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "946b78956dcab7fdbd6b9b4a71879c0257cf2295868e17693edec73b6147ad84",
+      "size_bytes": 72708,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Snare Distant 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Snare Distant 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9584af08cd087d3ae0d37bec13e35e32a28f9d1db1daeb3bb288a93411882eec",
+      "size_bytes": 4384114,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Earthquake Kit Samples/Organic - Cymbal (11).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Stadium Kit Samples/Organic - Cymbal (11).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "96ce7daf2d87357294f661df6c49ff4e9f5680e4860a03faaedf50398a74f18a",
+      "size_bytes": 257136,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Clap Quasi.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Clap Quasi.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "980e795aac3edf0c4a58120754320cae5080013bf4b17c7dd53bd78cacc77779",
+      "size_bytes": 127300,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Kick Cronotilus 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Kick Cronotilus 2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9896c348f52caaf5ea43f135684104d2ccaf8097c7e308a053cc46373d12dee5",
+      "size_bytes": 151414,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Snare) He Was Number One.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Snare) He Was Number One.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9932be9fa632e6320154cb058c51d8de8edd11beae406e1fa66d14bcd2ec6a90",
+      "size_bytes": 67085,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Kick Bionic 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Kick Bionic 2.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Kick Bionic 2.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "995144670a98a3e823dcaa6f4a94988024a702e53070d9556002ee713f313903",
+      "size_bytes": 62669,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Animals Beat Samples/Clap Bodzin 3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Shinkansen Samples/Clap Bodzin 3.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 1 Samples/Clap Bodzin 3.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9a52098e8af4c970053a215aa83bd7def82910b34e45d98d12c710488abccdb5",
+      "size_bytes": 12506,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT 2 head.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT 2 head.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9af57132d94f9a686ddb286b0a9f3ba5fd713b8a0acde24ff9c233f64ec19a5b",
+      "size_bytes": 20098,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/FUGITIVE/HAT_L.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/LEOPARD/HAT_L.WAV",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/PACMANNY/HAT_L.WAV"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9bcf0f91115723d21399f410ecc22c00236e5551def9415f2d9ed9c9ecd75bfa",
+      "size_bytes": 4384114,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Domination Kit Samples/Organic - Cymbal (12).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Grungy Kit Samples/Organic - Cymbal (12).wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/That Knock Kit Samples/Organic - Cymbal (12).wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9c3359e4142e0ee1c621b2f8d807794d0944022d6ff66aaae0ece2aa3ce7f6db",
+      "size_bytes": 354610,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Claps/Still Swerving Clap.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Claps/Still Swerving Clap.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9d81c09905105af479f12db0cc51c5b6af4fdd439ae4ffc7178d960745ebbad6",
+      "size_bytes": 22326,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK 2 ohno.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK 2 ohno.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "9ea1a75eb38474f9662b82838e06f01b6abe61f388257f8ab7c6184952a54a9e",
+      "size_bytes": 387453,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Ceremon African 1 V3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Ceremon African 1 V3.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a01243f3f26d43a6e9be6413498a8c39d24f3bf3559fa80fbedab02d097273ad",
+      "size_bytes": 21924,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT u.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT u.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a39932b6d21dd902388b86fb6e028633e966b69d19814f213e9685d9b0e487f1",
+      "size_bytes": 22470,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK pls.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK pls.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a3ca448afc222a408cf0239e70ae0dfc9a319265d85241e73a20dc0e76952c60",
+      "size_bytes": 19797,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Regalia Samples/ClosedHH 70sDnB.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 2 Samples/ClosedHH 70sDnB.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a49be678c71cbc82af0cdae1631b53ce9df3e4e6e282213b030435b6773cce44",
+      "size_bytes": 80566,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Clap Dexterity 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Clap Dexterity 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/PizzaBeatz Samples/Clap Dexterity 1.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a53ede8fc339b8c8298de01fd5ea22ac7a233299d2bff6cea43a1d9f5956a8c0",
+      "size_bytes": 332430,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Juggernaut Kit Samples/Organic - O.HiHat_D (1).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Vintage Kit Samples/Organic - O.HiHat_D (1).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a57ecbd127f866e299d324d7498af000a99a7345744a1808fcb072861a113183",
+      "size_bytes": 45542,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples 2/Project Files/Garage Generator Project/Samples/Imported/Hat 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/ks-samples-01/Hat 2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a61bcdd47f8d075b8d5e44c51758214a09b17af6fb67c1d62975ab0825302fed",
+      "size_bytes": 101498,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chorizo Samples/Clap CoolKid.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/PizzaBeatz Samples/Clap CoolKid.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a82a68a1449a2910ac7ae461e5677bcc75b65990bfd9afe5f21eb29df3f5c4f8",
+      "size_bytes": 69030,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare PostBlip.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare PostBlip.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a85d4c67765677d7e197808d2fefa560ed31e7379e2738bd477a8a83f2410846",
+      "size_bytes": 34116,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/BD_Beefy60_03.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/BD_Beefy60_03.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a92e33a5ee07e5e2fac2a26678e150a228913d3fac4d628a5bf7aa8f44c8ce2d",
+      "size_bytes": 638298,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Dist Org Stabs_18.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras 2 Samples/Dist Org Stabs_18.L.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/Dist Org Stabs_18.L.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gamma Ray Samples/Dist Org Stabs_18.L.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/Dist Org Stabs_18.L.wav"
+      ],
+      "member_count": 5,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a967b73a4d5113284779c1d15a18031cb64d63112318a4e22a20487abb7a733d",
+      "size_bytes": 421984,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/808 21.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 21.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "a9682ef987e379cc2ee1036462037dc412d96ddf5ccee93c9e0fc2bd75da274e",
+      "size_bytes": 79534,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bowser Meat Samples/Kick Absynth B 3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Kick Absynth B 3.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "abe2f3cb7e8c1ef81c0e1632a87ac101cc102ce97956ad84552198ce07071505",
+      "size_bytes": 50408,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bowser Meat Samples/Snare EricSneo 3 V3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Snare EricSneo 3 V3.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Snare EricSneo 3 V3.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Snare EricSneo 3 V3.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ad0e2f0e7603267901dc0f9ffbf2e77b518ade379e5b189d62f76e5c1bdb065b",
+      "size_bytes": 151382,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Hi-Hat) Fernolized.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Hi-Hat) Fernolized.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ad5e1421f1712920abd7f33e23ff721363b08e280803d51f081ad04cffc9f34b",
+      "size_bytes": 106314,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/KEYZ/TRIBE4.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RYGAR sounds/TRIBE4.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ad7406fd766210f630ce224c072ebc01ac1b785715bb66d22e4e0231e7a6411e",
+      "size_bytes": 882108,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/PACMANNYNEW/Sample08.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/SNDS1/Sample08.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "adb8fec9a4eaaad69b89163f2a2323e5b8488f7249dda70eb8ffbf400314fa12",
+      "size_bytes": 31488044,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples 2/Prophet Sample Pack/Prophet Improv Idea 4.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Prophet Sample Pack/Prophet Improv Idea 4.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "aef8875e03a6ecdf580f1d6c801855514d44ec384197859414d9966479dd1744",
+      "size_bytes": 50190,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/GMAJOR/LOOT17.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/LOOT17.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "afd26fb2a9c87205ed96a2f8ca7cc15e4a27d56899f92aee52be5bb3b2328796",
+      "size_bytes": 47887,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Snare Gold 5.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 1 Samples/Snare Gold 5.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b07c3429c909c0ea212c6b11f855d6b6cefad7b6e9a3a8c0701bb2ddd58556cf",
+      "size_bytes": 142482,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Kick 808 6.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Kick 808 6.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Kick 808 6.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Kick 808 6.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Kick 808 6.wav"
+      ],
+      "member_count": 5,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b441193b944145d5255959c866c96a4fc40b5d197b6dc13148e911a6b4b34f82",
+      "size_bytes": 74962,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RECHARGE THEME 1 Samples/BD_AlienAnalog008.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Recharged Samples/BD_AlienAnalog008.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b58336b1120d099e616ff494dcb413c497814b821e87d2620b5cfbe4906d6fa7",
+      "size_bytes": 737576,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Sendai Samples/AnalogClassicC c3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 2 Samples/AnalogClassicC c3.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b618f5e308b78235a9195b5cfea36f69b2e9e79bb093f3e46e145421ddc9d466",
+      "size_bytes": 664052,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RECHARGE THEME 1 Samples/FonTom African 3 V3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Recharged Samples/FonTom African 3 V3.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b70da8ac6dd30c2332d5199cf39331d0ec79ac6abc8e2947a07293b1e44a9314",
+      "size_bytes": 354610,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Kicks/Big Zay Kick.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Kicks/Big Zay Kick.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b7c61617e793c00313fb5e948429ec3749c12dde7dec8122508050e8661b02b6",
+      "size_bytes": 35248,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/CLAP young.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/CLAP young.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b85d32e1a800041cbed59bfcf5a3979e039d9a1f3c8259875bf022e8eebfcb22",
+      "size_bytes": 1066202,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Croissant Samples/Bass C2 ZeroCash.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/PaperWeight Samples/Bass C2 ZeroCash.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 1 Turtles3 Samples/Bass C2 ZeroCash.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles2 Samples/Bass C2 ZeroCash.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles3 Samples/Bass C2 ZeroCash.wav"
+      ],
+      "member_count": 5,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b8db96fa018c78eabf064eb48965130c516cd2d8a1a34e0bba676a82de4ffd52",
+      "size_bytes": 15152,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/HAT mys.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/HAT mys.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b93627423ef19bba345d376a1c75f3145c4e8f52b2cbaa921cffdadf32ca068f",
+      "size_bytes": 65013,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dance Rock Samples/Kick Papery.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Kick Papery.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Kick Papery.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Kick Papery.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "b9b5352eb5ff270433781d9c2454f4c283d764ac27ee7ce2721df6324fae32b8",
+      "size_bytes": 26424,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/bell HAT.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/bell HAT.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "bb997ff55ea446134845a43179cb86c7d59b16706b274db882e16e296b1d847e",
+      "size_bytes": 74840,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/PACMANNYNEW/Sample63.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/SNDS1/Sample63.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "bdad2f3807e12c9cad45ce500e21251e29bc1f4c6bf8199106a73256ebd9f02e",
+      "size_bytes": 177378,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Hi-Hats/Crispy Hi-Hat.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Claps/Crispy Hi-Hat.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "bf152b2c26c4a616a6729fd479c0c4b761bcf71150828fa8c12cef981e57824e",
+      "size_bytes": 44288048,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples 2/Prophet Sample Pack/Prophet Improv Idea 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Prophet Sample Pack/Prophet Improv Idea 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "c14d0f67ee54e309179a73dfa1f6268bcd7e26b7de11a9fc7b6962510a508d44",
+      "size_bytes": 431652,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Head Trauma Kit Samples/Organic - O.HiHat_A (1).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Stadium Kit Samples/Organic - O.HiHat_A (1).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "c29c63a4b6f98f03588a87c11d56d9a4cc36f4e1cf00450eb9a3496b7421f1cf",
+      "size_bytes": 119916,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 1/57-PiSh_01.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Piledriver Samples/57-PiSh_01.L.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "c457f56bea02a365d4196931ae44c936a9b823af40fc42898199f6b70ffd72b9",
+      "size_bytes": 27692,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Snare Generator.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Snare Generator.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Vinyl Kit Samples/Snare Generator.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "c5627f3e7439cf88ddd7a0f5c36868627e77ab439fd248af717a58a0512aedb1",
+      "size_bytes": 30674,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Xero Current/SIMON_SN.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/PaperWeight Samples/SIMON_SN.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "c89733ff99b67bcfdfb5aab6b037611ccd53db631e7e69cc09ac1b6536bfa217",
+      "size_bytes": 627664,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jackboot Samples/BD_Ass808_Dist_007.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Jackboot Stone Cyn Samples/BD_Ass808_Dist_007.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ca4490cee7a11e816731fd632c69f4e275fbf383cf85560d43db671cb6f4164b",
+      "size_bytes": 4851044,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples 2/Foley Pack 02/Walking Through Dead Leaves 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Koan Sound/Koan Sound Samples/Foley Pack 02/Walking Through Dead Leaves 2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ccbeaee53c711b8929aed65660ff7158b4f210ded1ae5c9052de83c713a8f98a",
+      "size_bytes": 100432,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/BD_AlienAnalog013.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/BD_AlienAnalog013.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ce34108b1260285439dcd719c00071056b0a1cc016314ec3166884f440c28e9b",
+      "size_bytes": 26302,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR consider.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR consider.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ce925b7ec9bd5082a1eaaf087b81a5a39dd1ab511d2177b738833c95e17cb19e",
+      "size_bytes": 14744,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chocolate Samples/Snare 808 3.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/Snare 808 3.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "cea2957f666d0c9b0ff7184a99825c778ea62c89deda4793a769b3ba8508155c",
+      "size_bytes": 29156,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/SNR look.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/SNR look.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "cf2194ae924b9e3151aae57250e6d4be02dbfed8e416d8ecf7e6d00d812c7000",
+      "size_bytes": 151598,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 2/B61-PiSh_01.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Water Taxi Samples/B61-PiSh_01.L.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "d1662d492b3c54f7a0cda9e4c73d164ad4d7ad7b67d23a1aa368a87b4f0e90f0",
+      "size_bytes": 119436,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gnarly Tribal Samples/Snare Elated.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/PizzaBeatz Samples/Snare Elated.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Spirals Samples/Snare Elated.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "d26b5f9fbe21310e2537a41a02736c2f11a0b81ade16e8c7cee2b82adf7a29d0",
+      "size_bytes": 33240,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras 2 Samples/Kick Klevines.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Fois Gras Samples/Kick Klevines.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gamma Ray Samples/Kick Klevines.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Humanoid \uf025 Samples/Kick Klevines.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "d2ab31c3a51b62473ca6cae6b606279c5e284e5a51ad2513ceea40064123db3f",
+      "size_bytes": 27326,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK lo serious.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK lo serious.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "d71f452a754eba2e48826b4eac0f5c86615cb925b3979ddcad7cd9816db7800d",
+      "size_bytes": 56345,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Aerial Samples/Kick Bonaparte 5.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Andes Samples/Kick Bonaparte 5.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "d84af573c950f3c6b93dc99c5c2a74603fa9ddc526b0075b294ef1d3ec67cf21",
+      "size_bytes": 432064,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Demolition Kit Samples/Organic - HiHat_I (6).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Sun Tzu Kit Samples/Organic - HiHat_I (6).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "d8878f9bfb6a79f736d56a2b342ab7a2ad50ccc6141be22b93cf7cba292f777a",
+      "size_bytes": 795086,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Amethyst Samples/Crash AR60sLate V127 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Swingy One Samples/Crash AR60sLate V127 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "d8943803ddb500bbfcabb7a68f703d8dd3136fafde6b8d4d8f38ac4db5ecb836",
+      "size_bytes": 85870,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Chorizo Samples/Tamb CLP.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Digi folk Samples/Tamb CLP.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Slammie Samples/Tamb CLP.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "daa1de43c82bebfef10fbce4309c45a9c26c5237aaabdb9312157ad67a58ef2d",
+      "size_bytes": 62124,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bruiser Samples/BD_808booty_03.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Lille Samples/BD_808booty_03.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/RYU 2 Samples/BD_808booty_03.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "dd543e36b8583281fcc593f3704231ee197c5ef494ab005227c1d0819192a3b4",
+      "size_bytes": 1590716,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Deep Impact Kit Samples/Organic - Cymbal (6).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Studio Kit Samples/Organic - Cymbal (6).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ddff022251b0224cb3ced079867dcf40c51eeafd2b1b3c668a49c7548c6c34a6",
+      "size_bytes": 13432,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Bowser Meat Samples/ClosedHH 808.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 2 Samples/ClosedHH 808.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "de08074a3d0fe80b3227712d18e7a106b3058552dd2565206c15b03930b3ee40",
+      "size_bytes": 137559,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare 80sElectro 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare 80sElectro 2.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "de3fb234d015d7e0163421cb47d3c970d6e3731ec751219dfd8e65a5d26e830f",
+      "size_bytes": 64066,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 2/B37-PiSh_01.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Ride Or Die Samples/B37-PiSh_01.L.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e1c3a8a1b432b2d4254b518b23d56a6c590585747a92e0ddc1f8838e852fc9dd",
+      "size_bytes": 27532,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK daddy.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK daddy.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e1ef60678936cedfd4162955cb21df1cf224e91f3a92ec52920680d021a844ec",
+      "size_bytes": 145182,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Kick CLP 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Kick CLP 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Shinkansen Samples/Kick CLP 1.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Turtles Samples/Kick CLP 1.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e349a178c96cf8c2a47d726da3139c973874bfc5d72d5474872caf27c6f19549",
+      "size_bytes": 74720,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Auckland2013 Samples/45bpmBD8_SP1200R.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Lille Samples/45bpmBD8_SP1200R.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/bitty loop Samples/45bpmBD8_SP1200R.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e3530342113f5fed84aa0cdb1fe6ae8fd77ecab669ec56b0e81d775cc1423ea5",
+      "size_bytes": 29776,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/808 13.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 13.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e372d93a258e830f326e653e36c7e652322d901825470ffa2aae1f8ff871ab32",
+      "size_bytes": 14470,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/CLAP candy.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/CLAP candy.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e3f59811c2a16e667981afa253b84e1e2eaa5cb030e91c750f90c46e3fadf56b",
+      "size_bytes": 59883,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare Hood.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare Hood.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e4e843fc72bd268dfa4e4d2cd917664e498be80e7159d45087f6052d92d441b9",
+      "size_bytes": 354610,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/808s/MoneyBagg Joe 808.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/808s/MoneyBagg Joe 808.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e665d0d976d14aaaea6777ffbd8eac64b703894efd56587978f4da03821fbf87",
+      "size_bytes": 151596,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 1/69-PiSh_01.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Hemispheres Samples/69-PiSh_01.L.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e7168677d3c8c9648168a164004319865a3613472ba47145cdc0cf0cdf16b9f3",
+      "size_bytes": 354610,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Open Hats/Rory x Yung Mal Open Hat.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Open Hats/Rory x Yung Mal Open Hat.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e7c860a8bf94e603f891ceaac484bd84fe08943f35615a6fe8f99a74d2696e9a",
+      "size_bytes": 1047028,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/Crash Slinger.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/Crash Slinger.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e7cd7c3cb37d901326d28cde7d4191b44be33918023e975e31482cf2b75fb156",
+      "size_bytes": 75782,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Hi-Hat) Final Hit.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Hi-Hat) Final Hit.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e7d9956f57b66fab4f634ae89746d7f33409bf388a5737456eb328d7baad2b7b",
+      "size_bytes": 23134,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Dubby Samples/Snare Absynth B 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Swingy One Samples/Snare Absynth B 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "e8497406b6c05cddf23ec82c03c9b8b41dd625264885de71319189487ba7410f",
+      "size_bytes": 13944,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/GMAJOR/MCAP10.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/MCAP10.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "eb0634c5a8251fc74429395e64889ee4aa0db45e4cbcc6a51f7cd4d0ebb6d828",
+      "size_bytes": 266278,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Head Trauma Kit Samples/Organic - HiHat_A (1).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Stadium Kit Samples/Organic - HiHat_A (1).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "ed36f070c9fa39e6a78ab7b2c17daae13f805ced34903c0fd998e9fa91ef3ea8",
+      "size_bytes": 39816,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix Samples/ClosedHH Cronotilus.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Castle Of Glass Remix2 Samples/ClosedHH Cronotilus.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "edbefa26f580ce81840a3688a82a9c20334192e28fabb21d0dbf3e0288a8462c",
+      "size_bytes": 302614,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums (Demo)/(Clap) Ant-Man.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/2023 Drums/(Clap) Ant-Man.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f201e6a5553d5381a1f453d5acf8779dd675579dcfa6126abb60cbdb8059b998",
+      "size_bytes": 121610,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gnarly Tribal Samples/Snare SinisterEights.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Recharged Samples/Snare SinisterEights.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f2186385f6578895499f09e3ac428abbda4f542a166cd46ad61ecde74c7d88e5",
+      "size_bytes": 531842,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Kicks/Dancing Kick.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Kicks/Dancing Kick.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f2eaeb37baac0b83f8faa295d50a77220c78b24c5cf99152234f4ab58a2ef4d0",
+      "size_bytes": 38258,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant 2 Samples/BD_BlackHole_06.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Attendant Samples/BD_BlackHole_06.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f36c9678afbd272780515386813297cf9fc2afc1e41c9f951676dff739975290",
+      "size_bytes": 14390,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/big SNR GF.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/big SNR GF.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f629115d8c4eab50f85118b29068626d074861a7aeba4da151d5ffa94991f5ba",
+      "size_bytes": 3620,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/808 14.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/RICK 808/808 14.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f6fe0d64cc0e5f73d362db94024c3a7a3f45bd32dff27a576ee82a92cb89d430",
+      "size_bytes": 33419,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gadd9 Drums Samples/Snare DownInside 1.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Gyoza Samples/Snare DownInside 1.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f7a7197c32452fcb3a6f0a074128fb62d0aabd6b4508fcc1ad00377d59ef067d",
+      "size_bytes": 44268,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LORAX/808_LNG_.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/LEFTRIGHT/808_LNG_.WAV"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f827b9ca5147fefaa808f45cd369873b0d0d1b907a93c6aa9b90a05c8014ea5f",
+      "size_bytes": 16634,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Headbutt Samples/HH_50s_1_MPC60V.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Rollers Samples/HH_50s_1_MPC60V.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f886af118cfda65a7c19884dd33bfea07084a27b77c094cc2322c9662aedd1e2",
+      "size_bytes": 266278,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/Grungy Kit Samples/Organic - HiHat_B (1).wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Organic Drum Kit/Maschine Kits/That Knock Kit Samples/Organic - HiHat_B (1).wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f9503d1150c7efaad5a592424776011f041ebf316a4f3d90c82a39e73e450a33",
+      "size_bytes": 24687,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna FOR PRINT Samples/Snare Gold 7.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna Samples/Snare Gold 7.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna2 Samples/Snare Gold 7.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/maschine ms test 1 Samples/Snare Gold 7.wav"
+      ],
+      "member_count": 4,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "f98710d5ff36a2e14742b1de3977290e9b853aff10c061c16e6c6ce154d32bf8",
+      "size_bytes": 106723,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Denver Samples/Bass Eb1 Roth.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Invader Samples/Bass Eb1 Roth.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "facf97b5fd6f1955f02d253bce561bd813c60c426c4b3341974383dda950ccf0",
+      "size_bytes": 531842,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Claps/Characters Timeline Clap.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Claps/Characters Timeline Clap.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "fae900dda376969c3adbef6a87d44cb3044110849d6ce6720b6f257a165c589e",
+      "size_bytes": 709066,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/Essentials Drumkit Vol. 002/Snares/Creating Wavez Snare.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Drum Recollection/New Wave Drum Kit Vol. 2/Snares/Creating Wavez Snare.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "fb88fe8f2ff067dda8ae53c3269d9da086f5afc6c336f8fbf2eb8629a9512027",
+      "size_bytes": 29792,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/NEPTUNES SAMPLES/KIK_HAT get.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/neptunes/KIK_HAT get.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "fbe2d88e49ebe3fa92137e82524ccf54e8cf8eb1bbfc0445e8660703fd710d15",
+      "size_bytes": 180118,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/Beat Bits 2/B54-PiSh_01.L.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Water Taxi Samples/B54-PiSh_01.L.wav"
+      ],
+      "member_count": 2,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "fccd1561e77989ede6b0995a56b2ea99e392f09b4824b24af5554a3c51975fc4",
+      "size_bytes": 260859,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna FOR PRINT Samples/Kick 808X 2.wav",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna Samples/Kick 808X 2.wav",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MS BEATS/Luna2 Samples/Kick 808X 2.wav"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "fd426264372d0b388ce51f8e1fdd6dc535603f3d0a7a6fe716a3aeb092b22cbe",
+      "size_bytes": 8336,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/80 90S DRUMS/S HARRIS106.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/S HARRIS106.WAV",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES/S HARRIS106.WAV"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    },
+    {
+      "sha256": "fe79d458dedb575493be1e8bd0ecec30733310ca1aae6c3b512ddbf2ee84b490",
+      "size_bytes": 104968,
+      "canonical_path": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/IRIDESCENT/SQRATCH14.WAV",
+      "alias_paths": [
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/LOOSESAMPLES2/SQRATCH14.WAV",
+        "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Mike Shinoda Drums/MPC 1000 Backup/MPC1000 FILES/SUPERFLAT/SQRATCH14.WAV"
+      ],
+      "member_count": 3,
+      "decision": "never_act_without_explicit_duplicate_review"
+    }
+  ],
+  "errors": [],
+  "safety": {
+    "read_only": true,
+    "source_files_modified": false,
+    "files_deleted": false,
+    "files_moved": false,
+    "rename_actions": false,
+    "content_hash_is_byte_identity": true,
+    "canonical_path_is_not_an_apply_instruction": true
+  }
+}

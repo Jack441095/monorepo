@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Send stems — Audio_Too</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/studio-theme.css">
+    <script src="/app-shell.js" data-page="Stem Upload" defer></script>
+  </head>
+  <body class="hub-page">
+    <header class="hub-header">
+      <div>
+        <p class="eyebrow">Client delivery</p>
+        <h1>Send stems</h1>
+        <p id="stem-project-line" class="section-intro">Checking your upload link…</p>
+        <ul id="stem-hints" class="compact-disclaimer"></ul>
+      </div>
+    </header>
+
+    <main class="hub-main">
+      <section id="stem-invalid" class="business-ask-panel" hidden>
+        <p class="status">This upload link is invalid or has expired. Contact Audio_Too for a new link.</p>
+      </section>
+
+      <section id="stem-form-panel" class="business-ask-panel" hidden>
+        <form id="stem-upload-form" class="enquiry-form">
+          <label>Name<input name="name" maxlength="100" placeholder="Your name"></label>
+          <label>Email<input name="email" type="email" maxlength="254" placeholder="For confirmation"></label>
+          <label>Notes<textarea name="notes" rows="3" maxlength="2000" placeholder="BPM, key, stem list, anything we should know"></textarea></label>
+          <label>Files
+            <input name="file" type="file" required accept=".zip,.wav,.aiff,.aif,.flac,.mp3,.m4a,.rar,.7z">
+          </label>
+          <p id="stem-limits" class="compact-disclaimer"></p>
+          <button type="submit">Upload</button>
+          <p id="stem-upload-status" class="status"></p>
+        </form>
+      </section>
+
+      <section id="stem-done" class="business-ask-panel" hidden>
+        <p class="status" id="stem-done-message"></p>
+      </section>
+    </main>
+
+    <script src="/stem-upload.js"></script>
+  </body>
+</html>

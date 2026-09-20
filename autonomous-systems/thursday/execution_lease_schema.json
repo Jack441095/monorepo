@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExecutionLeaseSchema",
+  "type": "object",
+  "properties": {
+    "lease_id": { "type": "string" },
+    "task_id": { "type": "string" },
+    "allowed_paths": { "type": "array", "items": { "type": "string" } },
+    "read_only": { "type": "boolean" },
+    "expires_at": { "type": "number" },
+    "source_sha": { "type": "string" }
+  },
+  "required": ["lease_id", "task_id", "allowed_paths", "read_only", "expires_at"]
+}

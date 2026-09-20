@@ -1,0 +1,20 @@
+{
+  "title": "Test Mix v2",
+  "metrics": {
+    "filename": "test_mix_v2.wav",
+    "mix_goal": {"key": "pop_vocal", "label": "Pop Vocal Mix"},
+    "technical_score": 74
+  },
+  "flags": [
+    {"label": "Low presence", "severity": "low", "detail": "Slight improvement needed"}
+  ],
+  "action_plan": [],
+  "comparison_advice": [],
+  "version_advice": [],
+  "version_comparison": {
+    "crest_delta_db": 1.5,
+    "rms_delta_db": -0.5
+  },
+  "revision_impact": {},
+  "revision_agent": {}
+}

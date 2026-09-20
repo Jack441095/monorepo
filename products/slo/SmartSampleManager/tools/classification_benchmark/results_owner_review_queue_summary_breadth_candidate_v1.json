@@ -1,0 +1,35 @@
+{
+  "record_type": "slo_owner_review_queue_summary",
+  "schema_version": "1.0.0",
+  "source_queue": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/owner_review_queue_breadth_candidate_v1.csv",
+  "source_queue_sha256": "9a85b866a263ed71003b7d7d1b146c2a671e0556daca41f20dc37d692706144b",
+  "n_rows": 388,
+  "predicted_class_counts": {
+    "Snare": 90,
+    "Clap": 41,
+    "Kick": 257
+  },
+  "duplicate_flag_counts": {
+    "acoustic_near_duplicate": 50,
+    "exact_duplicate_canonical": 14,
+    "exact_duplicate_alias": 18
+  },
+  "filename_audio_exact_agreement_rows": 360,
+  "filename_audio_exact_agreement_rate": 0.9278350515463918,
+  "confidence": {
+    "min": 0.621529,
+    "median": 0.8360735,
+    "max": 0.899305
+  },
+  "similarity": {
+    "min": 0.731559,
+    "median": 0.791371,
+    "max": 0.875671
+  },
+  "safety": {
+    "read_only": true,
+    "labels_created": false,
+    "rename_actions": false,
+    "source_audio_modified": false
+  }
+}

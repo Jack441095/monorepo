@@ -1,0 +1,24 @@
+{
+  "record_type": "slo_aspect_similarity",
+  "schema_version": "1.0.0",
+  "method_version": "aspect_similarity_v1",
+  "safety": {
+    "semantic_label_created": false,
+    "rename_action": false,
+    "human_calibration_required": true
+  },
+  "source": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Cajon_Loop_83_Percussion_Bendji_Allonce_115_loop.wav",
+  "candidate": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/sample_pack_testing/Bendji Allonce - Percussion/splice-export__bendji-allonce-percussion-pack_edited/loop/Percussion/RT_Bendji_Allonce_Conga_Loop_45_Percussion_Bendji_Allonce_120_loop.wav",
+  "similarity": {
+    "overall": 0.6012763209814386,
+    "aspects": {
+      "spectrum": 0.8910743436468118,
+      "timbre": 0.5355090213603652,
+      "pitch": 0.5342247734167085,
+      "amplitude": 0.7221444029003024,
+      "temporal": 0.3112182371586386,
+      "spatial": 0.6134871474058049
+    }
+  },
+  "interpretation": "Scores are heuristic evidence for search and explanation, not class probabilities."
+}

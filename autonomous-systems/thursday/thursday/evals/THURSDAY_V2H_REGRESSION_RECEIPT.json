@@ -1,0 +1,24 @@
+{
+  "suite": "THURSDAY_V2H_REGRESSION_RECEIPT",
+  "generated_at": 1787522851.787509,
+  "runner": "pytest tests/thursday -q",
+  "collected": 768,
+  "passed": 768,
+  "failed": 0,
+  "regressions_introduced": 0,
+  "v2h_tests": "82/82 PASS",
+  "v2g_shared_mutation_tests": 33,
+  "per_file_top10": {
+    "tests/thursday/test_autonomous_engineering.py": 82,
+    "tests/thursday/test_utility_tools.py": 65,
+    "tests/thursday/test_thursday_brain.py": 35,
+    "tests/thursday/test_shared_mutation.py": 33,
+    "tests/thursday/test_thursday_company_state.py": 21,
+    "tests/thursday/test_thursday_response_rewrite.py": 19,
+    "tests/thursday/test_thursday_multistep.py": 18,
+    "tests/thursday/test_thursday_routing_quality.py": 18,
+    "tests/thursday/test_thursday_prompt_injection.py": 17,
+    "tests/thursday/test_thursday_company_adversarial.py": 15
+  },
+  "qualified": true
+}

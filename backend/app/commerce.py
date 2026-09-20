@@ -37,6 +37,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import logging
+import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 
@@ -74,7 +75,9 @@ class CommerceProvider(ABC):
     def verify_webhook_signature(self, raw_body: bytes, signature_header: str) -> bool: ...
 
     @abstractmethod
-    def create_checkout_url(self, price_id: str) -> str: ...
+    def create_checkout_url(
+        self, price_id: str, *, custom_data: dict | None = None, success_url: str | None = None
+    ) -> str: ...
 
 
 class PaddleProvider(CommerceProvider):
@@ -88,6 +91,11 @@ class PaddleProvider(CommerceProvider):
     def __init__(self) -> None:
         self.configured = bool(settings.paddle_api_key)
 
+    # Paddle's documented replay-protection guidance: reject events whose
+    # signed timestamp is too far from the current time. Without this, a
+    # captured (still correctly signed) old webhook can be replayed forever.
+    WEBHOOK_MAX_AGE_SECONDS = 5 * 24 * 60 * 60
+
     def verify_webhook_signature(self, raw_body: bytes, signature_header: str) -> bool:
         if not settings.paddle_webhook_secret:
             raise WebhookVerificationError("No paddle_webhook_secret configured")
@@ -99,7 +107,21 @@ class PaddleProvider(CommerceProvider):
         if ts is None or h1 is None:
             raise WebhookVerificationError("Malformed signature header")
 
-        signed_payload = f"{ts}:{raw_body.decode('utf-8')}"
+        try:
+            ts_int = int(ts)
+        except ValueError:
+            raise WebhookVerificationError("Malformed signature timestamp") from None
+        if abs(time.time() - ts_int) > self.WEBHOOK_MAX_AGE_SECONDS:
+            raise WebhookVerificationError("Webhook timestamp outside the acceptable replay window")
+
+        try:
+            body_text = raw_body.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            # A non-UTF-8 body can never be a real Paddle event; fail as a
+            # verification error (400) instead of an unhandled 500.
+            raise WebhookVerificationError("Webhook body is not valid UTF-8") from exc
+
+        signed_payload = f"{ts}:{body_text}"
         expected = hmac.new(
             settings.paddle_webhook_secret.encode("utf-8"),
             signed_payload.encode("utf-8"),
@@ -417,6 +439,17 @@ async def paddle_webhook(
 
     try:
         if event_type == "transaction.completed":
+            try:
+                from . import paraphrase_orders as _paraphrase_orders
+
+                if _paraphrase_orders.handle_transaction_completed(db, payload):
+                    db.commit()
+                    event.processed_at = datetime.now(timezone.utc)
+                    event.processing_error = None
+                    db.commit()
+                    return {"status": "processed"}
+            except ImportError:
+                pass
             _handle_transaction_completed(db, payload)
         elif event_type in ("adjustment.created", "adjustment.updated"):
             _handle_adjustment_event(db, payload)

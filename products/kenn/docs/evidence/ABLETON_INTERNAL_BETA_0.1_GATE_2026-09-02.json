@@ -1,0 +1,110 @@
+{
+  "claims_boundary": "supervised disposable-set pilot only",
+  "decision": "ready_for_supervised_internal_beta",
+  "gates": [
+    {
+      "details": "All required release documents and the managed KENN_Bridge source are present.",
+      "evidence": [
+        "docs/ABLETON_ASSISTANT_READINESS_REPORT.md",
+        "docs/ABLETON_ASSISTANT_UPGRADE_PLAN.md",
+        "docs/ABLETON_ASSISTANT_CURRENT_STATE.md",
+        "docs/ABLETON_ASSISTANT_SUPPORT_RUNBOOK.md",
+        "docs/ABLETON_ASSISTANT_ROLLBACK_PLAN.md",
+        "docs/ABLETON_ASSISTANT_TESTER_GUIDE.md",
+        "source/remote_script/KENN_Bridge/KENN_Bridge.py"
+      ],
+      "id": "artifacts",
+      "name": "Release artifacts and KENN bridge identity",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "The captured report contains the qualified read-only, reversible track/transport, device, failure, and saved-set recovery evidence.",
+      "evidence": [
+        "docs/ABLETON_LIVE_REAL_QUALIFICATION_2026-09-01.md"
+      ],
+      "id": "real_live",
+      "name": "Real Ableton Live qualification",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "1 explicitly qualified Live/OS configuration(s) are declared and cross-checked against cited evidence.",
+      "evidence": [
+        "docs/ABLETON_LIVE_SUPPORT_MATRIX.json"
+      ],
+      "id": "support_matrix",
+      "name": "Explicit supported Live/OS matrix",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "Two independent reviewer score files are still required; no scores are assumed.",
+      "evidence": [
+        "docs/ABLETON_ASSISTANT_HUMAN_REVIEW_PACKET_2026-09-01.json"
+      ],
+      "id": "human_review",
+      "name": "Independent human review and adjudication",
+      "required_for": [
+        "qualified"
+      ],
+      "status": "pending"
+    },
+    {
+      "details": "HEAD is a8c4e52fc5d32e7d2d0ad217213a55b4bcf7f5e5, but the worktree has uncommitted changes; package a reviewed snapshot before qualification.",
+      "evidence": [
+        "git metadata"
+      ],
+      "id": "source_snapshot",
+      "name": "Reproducible source snapshot",
+      "required_for": [
+        "qualified"
+      ],
+      "status": "pending"
+    },
+    {
+      "details": "213 passed, 1 warning in 21.23s",
+      "evidence": [
+        "python3 -m pytest -q"
+      ],
+      "id": "automated_suite",
+      "name": "Automated regression suite",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    },
+    {
+      "details": "Current KENN_Bridge read-only probe is connected and returned a usable real-Live snapshot.",
+      "evidence": [
+        "python3 scripts/qualify_ableton_live.py --mode real"
+      ],
+      "id": "current_live",
+      "name": "Current Ableton Live runtime",
+      "required_for": [
+        "pilot",
+        "qualified"
+      ],
+      "status": "pass"
+    }
+  ],
+  "generated_at": "2026-09-02T09:46:11.953283+00:00",
+  "profile": "pilot",
+  "schema": "kenn.internal_beta_readiness.v1",
+  "summary": {
+    "failed": 0,
+    "passed": 5,
+    "pending": 0,
+    "required_gate_count": 5
+  }
+}

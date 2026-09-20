@@ -1,0 +1,1 @@
+"""Research agent with full autonomy capabilities."""

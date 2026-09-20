@@ -1,0 +1,16 @@
+{
+  "source_sha": "bcf32c5326ded1035b2dfd0fa2f91aecc051168e",
+  "shadow_adapters_hash": "8edcd3cc16e2f224bc4c977b4cdeba1779b6ada01c25b8b47decd35020e5c154",
+  "shadow_snapshot_hash": "15752eea00b1adf724c194fb74837d778394b6edad06b5b07f5cecf6f29adc27",
+  "shadow_planner_hash": "c3edfbc8a32dcc216fb07ef62502a6e6b2a67c2a2ccaceb0fa64fcc2a6385525",
+  "lease_policy_hash": "16cdbb61f0f5dee7b60abcf9657db1b3b1baadb21b67ab80f12282a6bc750aa2",
+  "benchmark_hash": "4e6cfaf0587c5dd6f4c20fd96311e32ffaeac347600f27f471ba9f863b4a82d7",
+  "qualifications": {
+    "shadow_v1_overall_accuracy": 1.0,
+    "live_state_accuracy": 1.0,
+    "owner_attention_accuracy": 1.0,
+    "resource_decision_accuracy": 1.0,
+    "stall_detection_accuracy": 1.0,
+    "shadow_execution_escapes": 0
+  }
+}

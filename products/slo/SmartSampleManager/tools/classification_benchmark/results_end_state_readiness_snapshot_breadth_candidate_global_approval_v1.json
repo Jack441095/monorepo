@@ -1,0 +1,116 @@
+{
+  "record_type": "slo_end_state_readiness_snapshot",
+  "schema_version": "1.0.0",
+  "method_version": "end_state_readiness_snapshot_v1",
+  "generated_from": {
+    "plan": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/full_taxonomy_breadth_candidate_suggest_plan_testing_v3_similarity_gate.jsonl",
+    "collections": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/review_collections_breadth_candidate_v4_evidence.json",
+    "identity": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_content_identity_testing_v1.json",
+    "content_index": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_content_addressed_embedding_index_testing_v1.json",
+    "duplicate_guard": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_full_taxonomy_breadth_candidate_duplicate_guard_v3_similarity_gate.json",
+    "approval_gate": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_full_taxonomy_breadth_candidate_global_approval_v1.json",
+    "labellers": null,
+    "class_gate_queue": null,
+    "validation_labeller": null,
+    "class_gate_fusion": null,
+    "label_integrity": null
+  },
+  "corpus": {
+    "n_files": 7315,
+    "n_content_ids": 6980,
+    "n_alias_paths": 335,
+    "embedding_dimensions": 2048
+  },
+  "review_queues": {
+    "auto_rename": 0,
+    "suggest": 388,
+    "review": 6923,
+    "never_act": 4
+  },
+  "duplicate_safety": {
+    "flagged_paths": 772,
+    "flag_counts": {
+      "acoustic_near_duplicate": 510,
+      "exact_duplicate_canonical": 235,
+      "exact_duplicate_alias": 335
+    }
+  },
+  "approval": {
+    "qualified_classes": [],
+    "candidate_rows": 388,
+    "counts": {
+      "ready_for_explicit_approval": 330,
+      "blocked": 58,
+      "owner_defer": 58
+    },
+    "auto_rows_in_plan": 0,
+    "ready_for_explicit_approval": 330,
+    "blocked_rows": 58
+  },
+  "labellers": {
+    "n_servers": null,
+    "n_reachable": null,
+    "total_queued": null,
+    "total_done": null
+  },
+  "class_gate_review": {
+    "enabled": false,
+    "n_candidates": 0,
+    "candidate_classes": {},
+    "exact_duplicate_candidates": 0,
+    "near_duplicate_candidates": 0,
+    "auto_approved": false
+  },
+  "validation_labeller": {
+    "n_servers": null,
+    "n_reachable": null,
+    "total_queued": null,
+    "total_done": null,
+    "complete": false,
+    "integrity_complete": false,
+    "receipts_consistent": true
+  },
+  "class_gate_fusion_review": {
+    "enabled": false,
+    "n_candidates": 0,
+    "fusion_states": {},
+    "decision": "review-only",
+    "auto_approved": false
+  },
+  "label_integrity": {
+    "enabled": false,
+    "n_files": 0,
+    "n_rows": 0,
+    "all_integrity_ok": false,
+    "all_complete": false,
+    "labels_promoted_to_gold": false
+  },
+  "readiness": {
+    "mode": "review_only",
+    "ready_to_apply": false,
+    "labels_required_for_new_qualification": true,
+    "labelling_handoff_ready": false,
+    "class_gate_review_available": false,
+    "validation_labels_complete": false,
+    "completed_label_integrity_ok": false,
+    "source_audio_modified": false,
+    "rename_actions_applied": false,
+    "gpu_1_touched": false
+  },
+  "errors": [],
+  "input_sha256": {
+    "plan": "0560cdba556f6dcfaaa393b33f2e03e08ecbbacd2c13e235fda7b710af07d88e",
+    "collections": "7e92e1001e65de587aa95e1bc4b69468c5e716710dfdf8925e115cc1136b3c3f",
+    "identity": "d37d8876a79c48df48da6bb7b1f59d389b45325e5397f6393a5007c6a1d9d0e6",
+    "content_index": "f8f2736bb3d456656b035de854dde75c74dc6215b27755819722c754e8b284a6",
+    "duplicate_guard": "e862c4af9e17d6e1f5c2560f86fcf2ad2b62e4a4faf76ad769df7e6458ccf26f",
+    "approval_gate": "2a132c7b9230b4eb646f3c962a3cffc10af4e05fd9e73e753e06fd14481444d5"
+  },
+  "safety": {
+    "read_only": true,
+    "source_audio_modified": false,
+    "plans_modified": false,
+    "approval_granted": false,
+    "rename_actions": false
+  }
+}

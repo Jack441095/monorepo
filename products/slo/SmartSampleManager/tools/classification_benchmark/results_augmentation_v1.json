@@ -1,0 +1,108 @@
+{
+  "generated": "2026-09-10T17:23:25",
+  "seeds": 3,
+  "splits": 5,
+  "gate_pp": 2.0,
+  "baseline": {
+    "acc": 65.52,
+    "sd": 0.86,
+    "per_seed": [
+      66.22,
+      64.31,
+      66.03
+    ],
+    "macro_f1": 56.15,
+    "coverage_at_95": 28.2,
+    "other_none_false_accept": 36.97,
+    "worst_fold": 30.36
+  },
+  "results": {
+    "none": {
+      "acc": 65.52,
+      "sd": 0.86,
+      "per_seed": [
+        66.22,
+        64.31,
+        66.03
+      ],
+      "macro_f1": 56.15,
+      "coverage_at_95": 28.2,
+      "other_none_false_accept": 36.97,
+      "worst_fold": 30.36
+    },
+    "spectral": {
+      "acc": 65.08,
+      "sd": 1.08,
+      "per_seed": [
+        65.84,
+        63.55,
+        65.84
+      ],
+      "macro_f1": 55.4,
+      "coverage_at_95": 27.7,
+      "other_none_false_accept": 38.18,
+      "worst_fold": 30.2
+    },
+    "dynamics": {
+      "acc": 65.59,
+      "sd": 0.77,
+      "per_seed": [
+        66.03,
+        64.5,
+        66.22
+      ],
+      "macro_f1": 56.24,
+      "coverage_at_95": 27.7,
+      "other_none_false_accept": 39.39,
+      "worst_fold": 30.36
+    },
+    "space": {
+      "acc": 65.2,
+      "sd": 1.06,
+      "per_seed": [
+        65.65,
+        63.74,
+        66.22
+      ],
+      "macro_f1": 55.54,
+      "coverage_at_95": 27.7,
+      "other_none_false_accept": 38.18,
+      "worst_fold": 30.36
+    },
+    "format": {
+      "acc": 64.76,
+      "sd": 1.26,
+      "per_seed": [
+        65.65,
+        62.98,
+        65.65
+      ],
+      "macro_f1": 54.63,
+      "coverage_at_95": 25.9,
+      "other_none_false_accept": 39.39,
+      "worst_fold": 30.36
+    },
+    "combined": {
+      "acc": 65.78,
+      "sd": 0.86,
+      "per_seed": [
+        66.79,
+        64.69,
+        65.84
+      ],
+      "macro_f1": 56.25,
+      "coverage_at_95": 26.0,
+      "other_none_false_accept": 41.21,
+      "worst_fold": 30.36
+    }
+  },
+  "collection_probe": {
+    "none": 59.3,
+    "spectral": 60.0,
+    "dynamics": 60.3,
+    "space": 59.9,
+    "format": 57.3,
+    "combined": 57.6
+  },
+  "promoted": []
+}

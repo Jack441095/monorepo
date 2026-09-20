@@ -1,0 +1,22 @@
+{
+  "timestamp": "20260719T101831Z",
+  "overall": {
+    "ok": true,
+    "failures": [],
+    "categories": {
+      "tts_latency": {
+        "label": "tts_latency",
+        "ok": true,
+        "failures": [],
+        "cold_start_s": 3.624,
+        "steady_state_samples_s": [
+          1.9787,
+          1.5368
+        ],
+        "steady_state_mean_s": 1.7577,
+        "steady_state_max_s": 1.9787,
+        "slo_s": 2.0
+      }
+    }
+  }
+}

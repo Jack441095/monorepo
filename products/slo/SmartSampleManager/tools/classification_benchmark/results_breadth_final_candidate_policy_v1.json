@@ -1,0 +1,218 @@
+{
+  "corpus": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/corpus_breadth_final_v1.npz",
+  "decision": "audit_only; no production policy or rename action changed",
+  "per_seed": [
+    {
+      "by_class": {
+        "Clap": {
+          "n": 44,
+          "precision": 0.9545454545454546,
+          "threshold": 0.7170043587684631
+        },
+        "Kick": {
+          "n": 41,
+          "precision": 0.975609756097561,
+          "threshold": 0.811768651008606
+        },
+        "Snare": {
+          "n": 53,
+          "precision": 0.9622641509433962,
+          "threshold": 0.6104221343994141
+        }
+      },
+      "coverage": 0.07532751091703056,
+      "n_candidates": 138,
+      "precision": 0.9637681159420289,
+      "seed": 0
+    },
+    {
+      "by_class": {
+        "Clap": {
+          "n": 44,
+          "precision": 0.9545454545454546,
+          "threshold": 0.7170043587684631
+        },
+        "Kick": {
+          "n": 38,
+          "precision": 1.0,
+          "threshold": 0.811768651008606
+        },
+        "Snare": {
+          "n": 52,
+          "precision": 0.9615384615384616,
+          "threshold": 0.6104221343994141
+        }
+      },
+      "coverage": 0.07314410480349345,
+      "n_candidates": 134,
+      "precision": 0.9701492537313433,
+      "seed": 1
+    },
+    {
+      "by_class": {
+        "Clap": {
+          "n": 41,
+          "precision": 1.0,
+          "threshold": 0.7170043587684631
+        },
+        "Kick": {
+          "n": 39,
+          "precision": 1.0,
+          "threshold": 0.811768651008606
+        },
+        "Snare": {
+          "n": 52,
+          "precision": 0.9615384615384616,
+          "threshold": 0.6104221343994141
+        }
+      },
+      "coverage": 0.07205240174672489,
+      "n_candidates": 132,
+      "precision": 0.9848484848484849,
+      "seed": 2
+    },
+    {
+      "by_class": {
+        "Clap": {
+          "n": 45,
+          "precision": 1.0,
+          "threshold": 0.7170043587684631
+        },
+        "Kick": {
+          "n": 40,
+          "precision": 0.975,
+          "threshold": 0.811768651008606
+        },
+        "Snare": {
+          "n": 50,
+          "precision": 0.96,
+          "threshold": 0.6104221343994141
+        }
+      },
+      "coverage": 0.07368995633187773,
+      "n_candidates": 135,
+      "precision": 0.9777777777777777,
+      "seed": 3
+    },
+    {
+      "by_class": {
+        "Clap": {
+          "n": 46,
+          "precision": 0.9782608695652174,
+          "threshold": 0.7170043587684631
+        },
+        "Kick": {
+          "n": 39,
+          "precision": 0.9743589743589743,
+          "threshold": 0.811768651008606
+        },
+        "Snare": {
+          "n": 47,
+          "precision": 0.9787234042553191,
+          "threshold": 0.6104221343994141
+        }
+      },
+      "coverage": 0.07205240174672489,
+      "n_candidates": 132,
+      "precision": 0.9772727272727273,
+      "seed": 4
+    },
+    {
+      "by_class": {
+        "Clap": {
+          "n": 52,
+          "precision": 0.9615384615384616,
+          "threshold": 0.7170043587684631
+        },
+        "Kick": {
+          "n": 40,
+          "precision": 0.95,
+          "threshold": 0.811768651008606
+        },
+        "Snare": {
+          "n": 50,
+          "precision": 0.96,
+          "threshold": 0.6104221343994141
+        }
+      },
+      "coverage": 0.07751091703056769,
+      "n_candidates": 142,
+      "precision": 0.9577464788732394,
+      "seed": 5
+    },
+    {
+      "by_class": {
+        "Clap": {
+          "n": 36,
+          "precision": 0.9722222222222222,
+          "threshold": 0.7170043587684631
+        },
+        "Kick": {
+          "n": 38,
+          "precision": 0.9736842105263158,
+          "threshold": 0.811768651008606
+        },
+        "Snare": {
+          "n": 50,
+          "precision": 0.96,
+          "threshold": 0.6104221343994141
+        }
+      },
+      "coverage": 0.06768558951965066,
+      "n_candidates": 124,
+      "precision": 0.967741935483871,
+      "seed": 6
+    },
+    {
+      "by_class": {
+        "Clap": {
+          "n": 46,
+          "precision": 0.9565217391304348,
+          "threshold": 0.7170043587684631
+        },
+        "Kick": {
+          "n": 38,
+          "precision": 0.9736842105263158,
+          "threshold": 0.811768651008606
+        },
+        "Snare": {
+          "n": 51,
+          "precision": 0.9607843137254902,
+          "threshold": 0.6104221343994141
+        }
+      },
+      "coverage": 0.07368995633187773,
+      "n_candidates": 135,
+      "precision": 0.9629629629629629,
+      "seed": 7
+    }
+  ],
+  "protocol": {
+    "classes": {
+      "Clap": 0.7170043587684631,
+      "Kick": 0.811768651008606,
+      "Snare": 0.6104221343994141
+    },
+    "classifier": "standardized cosine nearest centroid",
+    "seeds": 8,
+    "split": "StratifiedGroupKFold by vendor/collection",
+    "splits": 5,
+    "target_precision": 0.95,
+    "threshold_source": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_breadth_final_class_gates_v1.json"
+  },
+  "record_type": "slo_breadth_candidate_policy_audit",
+  "safety": {
+    "production_model_changed": false,
+    "read_only": true,
+    "rename_actions": false,
+    "source_audio_modified": false
+  },
+  "schema_version": "1.0.0",
+  "summary": {
+    "coverage_mean": 0.07314410480349345,
+    "n_candidates_max": 142,
+    "n_candidates_min": 124,
+    "precision_mean": 0.9702834671115544,
+    "precision_min": 0.9577464788732394
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "timestamp": "20260709T225604Z",
+  "overall": {
+    "ok": false,
+    "failures": [
+      "automix_render_ratio: No module named 'db'",
+      "automix_genre_matrix: No module named 'db'"
+    ],
+    "categories": {
+      "automix_render_ratio": {
+        "ok": false,
+        "failures": [
+          "automix_render_ratio: No module named 'db'"
+        ]
+      },
+      "automix_genre_matrix": {
+        "ok": false,
+        "failures": [
+          "automix_genre_matrix: No module named 'db'"
+        ]
+      }
+    }
+  }
+}

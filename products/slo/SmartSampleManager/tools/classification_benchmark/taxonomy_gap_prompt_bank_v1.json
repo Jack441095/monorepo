@@ -1,0 +1,57 @@
+{
+  "Bass One-Shot": [
+    "a single bass hit or bass stab",
+    "a short isolated low-frequency bass sound",
+    "one bass note with a hit-like envelope"
+  ],
+  "Bass Loop": [
+    "a repeating bass loop",
+    "a bass phrase repeating over multiple beats",
+    "a looped low-frequency musical bass pattern"
+  ],
+  "Synth": [
+    "an isolated synthesizer tone or synth stab",
+    "an electronic synthesizer sound rather than an acoustic instrument",
+    "a synthetic keyboard-like musical sound"
+  ],
+  "Vocal Phrase": [
+    "a short human vocal phrase or vocal one-shot",
+    "a spoken or sung isolated voice sample",
+    "a chopped human voice sound"
+  ],
+  "FX": [
+    "a designed sound effect rather than a musical instrument",
+    "an electronic cinematic sound effect",
+    "a non-musical transition or special effect"
+  ],
+  "Atmosphere": [
+    "a continuous atmospheric texture or ambience",
+    "an environmental background soundscape",
+    "a sustained ambient drone or room atmosphere"
+  ],
+  "Music Loop": [
+    "a repeating musical loop or phrase",
+    "a multi-beat loop of musical material",
+    "a rhythmic or melodic pattern intended to repeat"
+  ],
+  "Percussion": [
+    "an isolated percussion hit such as a shaker, hand drum, or woodblock",
+    "an acoustic or electronic percussive sound",
+    "a percussion instrument sample"
+  ],
+  "Snare": [
+    "a snare drum hit",
+    "a sharp cracking snare sound",
+    "a snare drum backbeat"
+  ],
+  "Hi-Hat": [
+    "a hi-hat cymbal hit",
+    "a short crisp metallic hat sound",
+    "a closed or open hi-hat"
+  ],
+  "OOD": [
+    "a sound that does not fit any supported sample class",
+    "an unsupported or ambiguous audio recording",
+    "a full musical recording or unrelated sound"
+  ]
+}

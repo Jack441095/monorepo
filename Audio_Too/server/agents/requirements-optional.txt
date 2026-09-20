@@ -1,0 +1,12 @@
+# Intel macOS wheels stop at Torch 2.2; Apple Silicon and other platforms use a
+# current release. On Intel macOS, Torch 2.2 prints a harmless NumPy 2.x ABI
+# warning on import against the root NumPy 2.x pin but still works.
+torch>=2.2,<2.3; sys_platform == "darwin" and platform_machine == "x86_64"
+torch>=2.6,<3; sys_platform != "darwin" or platform_machine != "x86_64"
+
+# Experimental: KENN LoRA fine-tuning/inference (studio/kenn/kenn/llm/kenn_lm.py,
+# studio/kenn/kenn/finetune/). Not enabled by default (KENN_LM_ENABLED unset) —
+# a trained checkpoint exists but was found too slow and under-grounded in
+# testing; see docs/BACKLOG.md "LoRA go/no-go" for the current verdict.
+peft>=0.19,<1
+transformers>=4.40,<5

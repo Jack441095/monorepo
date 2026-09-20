@@ -1,0 +1,14 @@
+{
+  "suggest_classes": [
+    "Clap",
+    "Kick",
+    "Snare"
+  ],
+  "class_thresholds": {
+    "Clap": 0.7170043587684631,
+    "Kick": 0.811768651008606,
+    "Snare": 0.6104221343994141
+  },
+  "owner_approved": false,
+  "auto_enabled": false
+}

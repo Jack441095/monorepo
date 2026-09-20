@@ -1,0 +1,12 @@
+r-id,metric_observed,threshold,met,decision,evidence_ref
+R-01,not run,top-1 >=70% + UNKNOWN <=15%,n/a,HOLD (timeboxed run not started),DEEP_RESEARCH_AND_IMPROVEMENTS_2026-09-17.md
+R-02,not run,throughput within 20% + zero journal regress,n/a,HOLD (not started),same as above
+R-03,5 failed / 53 passed reproduced (24-bit; 32-bit; LUFS KeyError integrated_lufs test_local_engine.py:372; true-peak; full-benchmark),kappa>=0.6 + LUFS ±1,n/a (premise verified; validity protocol not run),HOLD (fix+protocol pending),EXECUTION_REPORT_2026-09-17.md Tier1 I-T1-03
+R-04,not run,0 crashes + RT clean,n/a,HOLD (not started),same as above
+R-05,not run,BLOCKED >=99% + 5000/5000 fuzz,n/a,HOLD (not started),same as above
+R-06,not run,>=98% + 0 overwrites + feed reject,n/a,HOLD (not started),same as above
+R-07,signature verified by code (HMAC compare_digest commerce.py:100-130); live-fire not run,idempotent + replay-safe,n/a (half),HOLD (BLOCKED_ON_SECRET for sandbox values),EXECUTION_REPORT_2026-09-17.md Tier2
+R-08,not run,inter-rater >=0.6 else freeze,n/a,HOLD (not started),same as above
+R-09,not run,build+fuzz or >4wk forecast,n/a,HOLD (not started),same as above
+R-10,backend 106 passed (workdir=backend); KENN mix-review 58 (5F/53P); full KENN 1136 + 5 env errors; SLO 0 CTest confirmed,3 receipts green,PARTIAL (2.5/3; SLO shim + KENN deps pending),EXECUTION_REPORT_2026-09-17.md I-T1-03
+R-11,matrix partial (JUCE/umappp/dr/hnswlib pinned; TagLib/ONNX unpinned; python drift),100% table + no cliff,PARTIAL,HOLD (licence pass not started),EXECUTION_REPORT_2026-09-17.md I-T1-04

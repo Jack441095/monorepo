@@ -1,0 +1,57 @@
+{
+  "manifest_version": "CORPUS_WAVE2_V1",
+  "created": "2026-08-24",
+  "purpose": "Controlled public university layout and extraction regression fixtures",
+  "policy": {
+    "source_scope": "Official university domains only",
+    "access_scope": "Publicly accessible documents; no portal or authentication bypass",
+    "reuse_scope": "Local QA only; source PDFs remain gitignored and are not redistributed",
+    "privacy_scope": "No documents intentionally collected for personal identifiers; reject sensitive or gated material"
+  },
+  "documents": [
+    {
+      "file": "real_validation_corpus/university_templates/wave2/essex_example_thesis_title_page.pdf",
+      "institution": "University of Essex",
+      "country": "UK",
+      "type": "official_title_page_example",
+      "evaluation_mode": "layout_only",
+      "source_url": "https://www.essex.ac.uk/-/media/documents/directories/academic-section/pgre/example-of-thesis-title-page.pdf",
+      "licence_class": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "sha256": "be1bdee79455629a17734bd6b6a5a1fa0c90dd565c9dedca73b865bf71f50be2",
+      "download_date": "2026-08-24"
+    },
+    {
+      "file": "real_validation_corpus/university_templates/wave2/exeter_pgr_thesis_presentation_2026_27.pdf",
+      "institution": "University of Exeter",
+      "country": "UK",
+      "type": "official_thesis_submission_guidance",
+      "evaluation_mode": "layout_only",
+      "source_url": "https://www.exeter.ac.uk/v8media/specificsites/tqa/pgr/PGR_Handbook_Chapter_11.pdf",
+      "licence_class": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "sha256": "219d06a91260c26f737ac6d38907f67051ac2bc88773a592f073f56d6261307e2",
+      "download_date": "2026-08-24"
+    },
+    {
+      "file": "real_validation_corpus/university_templates/wave2/manchester_taught_dissertation_guidance.pdf",
+      "institution": "University of Manchester",
+      "country": "UK",
+      "type": "official_dissertation_submission_guidance",
+      "evaluation_mode": "layout_only",
+      "source_url": "https://documents.manchester.ac.uk/display.aspx?DocID=2863",
+      "licence_class": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "sha256": "e52b8aa496347189f2f299c61b5fe9948d4a69a50ceecdcc7c70fe402cebf54b",
+      "download_date": "2026-08-24"
+    },
+    {
+      "file": "real_validation_corpus/university_templates/wave2/washington_ms_capstone_format_guidelines.pdf",
+      "institution": "University of Washington",
+      "country": "US",
+      "type": "official_capstone_format_guidance",
+      "evaluation_mode": "layout_only",
+      "source_url": "https://depts.washington.edu/nutr/wordpress/wp-content/uploads/2018/04/MS-Capstone-Report-FORMAT-GUIDELINES.pdf",
+      "licence_class": "INSTITUTIONALLY_PUBLISHED_PUBLIC_DOCUMENT",
+      "sha256": "8bf1c857ce27cdee625afe24c3eb190a9e31db391cb8935ffeb4b49a68931d56",
+      "download_date": "2026-08-24"
+    }
+  ]
+}

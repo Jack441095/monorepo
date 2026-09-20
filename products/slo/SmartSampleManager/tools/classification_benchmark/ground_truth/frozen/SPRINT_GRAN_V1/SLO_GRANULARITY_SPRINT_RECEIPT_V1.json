@@ -1,0 +1,92 @@
+{
+  "receipt": "SLO_GRANULARITY_SPRINT_RECEIPT_V1",
+  "generated": "2026-09-11T10:35:57",
+  "git_sha": "c8aa89d",
+  "branch": "main",
+  "versions": {
+    "taxonomy": "1.1.0",
+    "dataset": "1.0.0",
+    "name_evidence": "name_v1",
+    "decision_policy": "1.0.0",
+    "acoustic_evidence": "physics_v1_1",
+    "label_schema_fields": 21
+  },
+  "export": {
+    "path": "tools/classification_benchmark/SLO_GRANULARITY_LABEL_SPRINT_EXPORT_V1.csv",
+    "rows": 400,
+    "by_bucket": {
+      "top_hihat_loop": 60,
+      "bass_family": 60,
+      "percussion_family": 60,
+      "foley_sfx_impact": 60,
+      "rejection_boundary": 80,
+      "low_conf_or_disagreement": 80
+    },
+    "collections": 55,
+    "never_labelled": 240,
+    "high_risk_token": 124,
+    "contains_audio": false,
+    "copies_audio": false
+  },
+  "schema_changes": {
+    "added": [
+      "subtype",
+      "not_in_list_label",
+      "not_enough_info",
+      "taxonomy_gap"
+    ],
+    "retained_for_compatibility": [
+      "percussion_subtype"
+    ],
+    "backward_compatible": true,
+    "tests_passing": 24
+  },
+  "token_risk_changes": "NONE -- granularity cannot be re-measured on the corpus that produced the current numbers; re-measure after labels return",
+  "labels_integrated": false,
+  "labels_status": "EXPORT ONLY -- awaiting owner labelling",
+  "operating_points_current": {
+    "85": {
+      "arm": "mw-fusion",
+      "coverage": 68.2,
+      "precision": 88.7
+    },
+    "90": {
+      "arm": "mw-fusion",
+      "coverage": 52.3,
+      "precision": 90.7,
+      "stable_seeds": [
+        90.8,
+        90.7,
+        90.9
+      ]
+    },
+    "95": {
+      "status": "UNSUPPORTED",
+      "advertise": false
+    }
+  },
+  "thin_label_areas": {
+    "Top Loop": 6,
+    "Sub Bass": 2,
+    "Hi-Hat Loop": 13,
+    "Bass Hit": 12,
+    "Atmosphere": 3,
+    "bd_token_n": 4,
+    "clp_token_n": 6,
+    "crash_token_n": 7,
+    "impact_token_n": 7
+  },
+  "safety": {
+    "samples_modified": 0,
+    "samples_renamed": 0,
+    "samples_moved": 0,
+    "samples_deleted": 0,
+    "export_contains_paths_only": true,
+    "submit_touched": false,
+    "platform_touched": false,
+    "payment_touched": false,
+    "railway_touched": false,
+    "production_classifier_touched": false
+  },
+  "next_owner_action": "label the 400-file export; ~45-60 minutes"
+}

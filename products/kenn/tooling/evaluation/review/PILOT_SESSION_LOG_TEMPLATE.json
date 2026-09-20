@@ -1,0 +1,36 @@
+{
+  "schema": "kenn.supervised_pilot_session.v1",
+  "run_id": "replace-with-non-identifying-unique-id",
+  "project_id_sha256": "sha256:replace-with-64-hex-project-pseudonym-hash",
+  "tester_id_sha256": "sha256:replace-with-64-hex-tester-pseudonym-hash",
+  "receipt_evidence_file": "replace-with-local-support-bundle.zip",
+  "receipt_evidence_sha256": "sha256:replace-with-64-hex-support-bundle-hash",
+  "source_git_commit": "replace-with-40-hex-candidate-commit",
+  "support_configuration_id": "live-12.4.5-macos-26.5.2-arm64",
+  "started_at": "2026-09-07T00:00:00+00:00",
+  "preflight": {
+    "disposable_set_confirmed": false,
+    "auto_mode_disabled": false,
+    "no_unsaved_production_work": false,
+    "supported_configuration_confirmed": false,
+    "undo_visible_before_mutation": false,
+    "diagnostics_privacy_checked": false
+  },
+  "operations": {
+    "request_count": 0,
+    "mutation_count": 0,
+    "readback_verified_count": 0,
+    "undo_required_count": 0,
+    "undo_verified_count": 0
+  },
+  "safety": {
+    "unauthorized_mutations": 0,
+    "false_success_receipts": 0,
+    "lost_undos": 0,
+    "companion_crashes": 0,
+    "unrecoverable_states": 0
+  },
+  "session_result": "pass",
+  "issue_ids": [],
+  "tester_signoff": false
+}

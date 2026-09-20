@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AudioGen · Audio_Too</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/studio-theme.css">
+<script src="/app-shell.js" data-active="creative-lab" data-page="AudioGen" defer></script>
+</head>
+<body>
+<main class="ag-app">
+  <header class="ag-header">
+    <div class="ag-brand">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#5b21b6"/>
+        <text x="16" y="22" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-weight="800" font-size="18">A</text>
+      </svg>
+      <div>
+        <h1>AudioGen</h1>
+        <span class="ag-pill">Lab</span>
+      </div>
+    </div>
+    <p class="ag-sub">Generate loops, samples, and full songs from text prompts.</p>
+  </header>
+
+  <div class="ag-body">
+    <section class="ag-generator">
+      <form id="ag-form" class="ag-form">
+        <div class="ag-input-group">
+          <label for="ag-prompt">Prompt</label>
+          <input id="ag-prompt" type="text" placeholder="e.g. dark drill loop, sad piano, 808 beat" autocomplete="off">
+        </div>
+        <div class="ag-inline">
+          <div class="ag-input-group">
+            <label for="ag-emotion">Emotion</label>
+            <select id="ag-emotion">
+              <option value="joy">Joy</option>
+              <option value="excitement">Excitement</option>
+              <option value="love">Love</option>
+              <option value="sadness">Sadness</option>
+              <option value="fear">Fear</option>
+              <option value="curiosity">Curiosity</option>
+              <option value="neutral" selected>Neutral</option>
+            </select>
+          </div>
+          <div class="ag-input-group">
+            <label for="ag-bars">Bars</label>
+            <input id="ag-bars" type="number" min="1" max="16" value="8">
+          </div>
+        </div>
+        <div class="ag-actions">
+          <button type="submit" class="ag-btn ag-btn-primary">Generate loop</button>
+          <button type="button" id="ag-full-song" class="ag-btn ag-btn-secondary">Full song</button>
+        </div>
+      </form>
+
+      <div id="ag-status" class="ag-status is-ready"><span class="ag-status-dot" aria-hidden="true"></span><span id="ag-status-text">Ready</span></div>
+      <div id="ag-progress-wrap" class="ag-progress" hidden><span id="ag-progress-bar" style="width:0%"></span></div>
+
+      <div id="ag-result" class="ag-result" hidden>
+        <audio id="ag-audio" controls></audio>
+        <div id="ag-meta" class="ag-meta"></div>
+        <div class="ag-waveform-block">
+          <canvas id="ag-waveform" class="ag-waveform-canvas" height="72"></canvas>
+          <div class="ag-waveform-row">
+            <span id="ag-wave-current" class="ag-mono">0:00</span>
+            <span id="ag-wave-duration" class="ag-mono">0:00</span>
+          </div>
+        </div>
+        <div id="ag-automix-row" class="ag-automix-row"></div>
+      </div>
+
+      <div id="ag-trace" class="ag-trace" hidden>
+        <div class="ag-trace-head">
+          <h3>Generation trace</h3>
+          <button type="button" id="ag-trace-close" class="ag-trace-close">Close</button>
+        </div>
+        <div id="ag-trace-body"></div>
+      </div>
+
+      <div class="ag-presets">
+        <p class="ag-preset-label">Quick ideas</p>
+        <div class="ag-chip-row">
+          <button class="ag-chip" data-prompt="dark drill loop with 808 slide">Dark drill</button>
+          <button class="ag-chip" data-prompt="sad piano with strings">Sad piano</button>
+          <button class="ag-chip" data-prompt="lo-fi hip hop beat">Lo-fi beat</button>
+          <button class="ag-chip" data-prompt="tech house groove">Tech house</button>
+          <button class="ag-chip" data-prompt="ambient pad with reverb">Ambient pad</button>
+          <button class="ag-chip" data-prompt="trap beat with hi-hat rolls">Trap beat</button>
+          <button class="ag-chip" data-prompt="garage drum loop">Garage loop</button>
+          <button class="ag-chip" data-prompt="bass synth sub drop">Sub drop</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="ag-history" id="ag-history">
+      <p class="ag-history-label">History</p>
+      <div id="ag-history-list" class="ag-history-grid">
+        <p class="ag-empty">No generations yet — try a prompt.</p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script>
+(function(){
+  var form=document.getElementById('ag-form'),
+      prompt=document.getElementById('ag-prompt'),
+      emotion=document.getElementById('ag-emotion'),
+      bars=document.getElementById('ag-bars'),
+      status=document.getElementById('ag-status'),
+      statusText=document.getElementById('ag-status-text'),
+      progressWrap=document.getElementById('ag-progress-wrap'),
+      progressBar=document.getElementById('ag-progress-bar'),
+      result=document.getElementById('ag-result'),
+      audio=document.getElementById('ag-audio'),
+      meta=document.getElementById('ag-meta'),
+      waveCanvas=document.getElementById('ag-waveform'),
+      waveCurrent=document.getElementById('ag-wave-current'),
+      waveDuration=document.getElementById('ag-wave-duration'),
+      automixRow=document.getElementById('ag-automix-row'),
+      traceEl=document.getElementById('ag-trace'),
+      traceBody=document.getElementById('ag-trace-body'),
+      traceClose=document.getElementById('ag-trace-close'),
+      historyList=document.getElementById('ag-history-list'),
+      fullSongBtn=document.getElementById('ag-full-song'),
+      loading=false;
+
+  // ── Mood -> design-token color mapping ─────────────────────────
+  // Every color here is one of studio-theme.css's existing tokens
+  // (green/warm/purple/accent/accent-dark/blue-dim/muted) reused as-is,
+  // not a new invented palette.
+  var MOOD_COLOR = {
+    joy: 'green', excitement: 'warm', love: 'purple', curiosity: 'accent',
+    sadness: 'accent-dark', fear: 'blue-dim', neutral: 'muted'
+  };
+  function moodColor(mood){ return MOOD_COLOR[(mood||'').toLowerCase()] || 'muted'; }
+
+  // ── Status line: CSS classes driven by real job/request state,
+  // no inline hardcoded colors. ───────────────────────────────────
+  function setStatus(msg, kind){
+    // kind: 'ready' | 'busy' | 'ok' | 'error'
+    statusText.textContent=msg;
+    status.className='ag-status is-'+(kind||'busy');
+  }
+
+  function setProgress(pct){
+    if(pct==null){ progressWrap.hidden=true; return; }
+    progressWrap.hidden=false;
+    progressBar.style.width=Math.max(0,Math.min(100,Number(pct)||0))+'%';
+  }
+
+  function fmtTime(sec){
+    if(!isFinite(sec)||sec<0) sec=0;
+    var m=Math.floor(sec/60), s=Math.floor(sec%60);
+    return m+':'+(s<10?'0':'')+s;
+  }
+
+  // ── Portfolio audio index — the only place a real prompt/description
+  // string for a render is stored server-side today (portfolio_ops
+  // publishes it alongside the WAV). Read-only, existing public
+  // endpoint (/api/portfolio); used to give history cards an honest
+  // prompt snippet instead of inventing one. ─────────────────────────
+  var portfolioBySrc=null;
+  function loadPortfolioIndex(){
+    if(portfolioBySrc) return Promise.resolve(portfolioBySrc);
+    return fetch('/api/portfolio').then(function(r){return r.json();}).then(function(d){
+      portfolioBySrc={};
+      (d.audio||[]).forEach(function(item){
+        if(item&&item.src) portfolioBySrc[item.src]=item;
+      });
+      return portfolioBySrc;
+    }).catch(function(){ portfolioBySrc={}; return portfolioBySrc; });
+  }
+
+  function promptSnippetFor(item){
+    var entry=portfolioBySrc&&item.src?portfolioBySrc[item.src]:null;
+    var desc=entry&&entry.description?String(entry.description):'';
+    if(item.kind==='loop'){
+      var m=desc.match(/prompt:\s*(.+)$/i);
+      if(m&&m[1]) return m[1].trim();
+      return desc || 'No prompt recorded for this render.';
+    }
+    // Full-song renders take an emotion + bar count, not free text —
+    // there is no prompt to show, so say so rather than reusing the
+    // loop label.
+    return 'Full song · no text prompt (mood + bars only)';
+  }
+
+  // ── Waveform: decode the real rendered WAV via Web Audio and draw a
+  // static min/max peak waveform. No synthetic/fake waveform data. ──
+  var audioCtx=null;
+  function getAudioCtx(){
+    if(!audioCtx){
+      var Ctx=window.AudioContext||window.webkitAudioContext;
+      if(Ctx) audioCtx=new Ctx();
+    }
+    return audioCtx;
+  }
+
+  function decodePeaks(url, columns){
+    var ctx=getAudioCtx();
+    if(!ctx) return Promise.reject(new Error('Web Audio not supported in this browser.'));
+    return fetch(url).then(function(r){
+      if(!r.ok) throw new Error('Could not fetch rendered audio ('+r.status+').');
+      return r.arrayBuffer();
+    }).then(function(buf){
+      return new Promise(function(resolve,reject){
+        ctx.decodeAudioData(buf.slice(0), resolve, function(){reject(new Error('Could not decode audio.'));});
+      });
+    }).then(function(audioBuffer){
+      var data=audioBuffer.getChannelData(0);
+      var samplesPerCol=Math.max(1, Math.floor(data.length/columns));
+      var peaks=[];
+      for(var i=0;i<columns;i++){
+        var start=i*samplesPerCol;
+        var end=Math.min(data.length, start+samplesPerCol);
+        var min=0, max=0;
+        for(var j=start;j<end;j++){
+          var v=data[j];
+          if(v<min)min=v;
+          if(v>max)max=v;
+        }
+        peaks.push([min,max]);
+      }
+      return {peaks:peaks, duration:audioBuffer.duration};
+    });
+  }
+
+  function drawWaveform(canvas, peaks, playedFraction, color){
+    var dpr=window.devicePixelRatio||1;
+    var w=canvas.clientWidth||canvas.width, h=canvas.clientHeight||canvas.height;
+    canvas.width=Math.max(1,Math.round(w*dpr));
+    canvas.height=Math.max(1,Math.round(h*dpr));
+    var g=canvas.getContext('2d');
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.clearRect(0,0,w,h);
+    var mid=h/2;
+    var n=peaks.length;
+    var colW=w/n;
+    var playedX=(playedFraction||0)*w;
+    for(var i=0;i<n;i++){
+      var x=i*colW;
+      var min=peaks[i][0], max=peaks[i][1];
+      g.fillStyle = x<=playedX ? (color||'#818cf8') : 'rgba(255,255,255,0.22)';
+      var y1=mid+min*mid, y2=mid+max*mid;
+      g.fillRect(x, Math.min(y1,y2), Math.max(1,colW-1), Math.max(1,Math.abs(y2-y1)));
+    }
+    if(playedX>0&&playedX<w){
+      g.fillStyle='#e0e7ff';
+      g.fillRect(playedX,0,1.5,h);
+    }
+  }
+
+  var mainWave=null; // {peaks, duration}
+  function renderMainWaveform(url){
+    waveCanvas.getContext('2d').clearRect(0,0,waveCanvas.width,waveCanvas.height);
+    mainWave=null;
+    var cols=Math.max(40, Math.floor((waveCanvas.clientWidth||600)/3));
+    decodePeaks(url, cols).then(function(res){
+      mainWave=res;
+      waveDuration.textContent=fmtTime(res.duration);
+      drawWaveform(waveCanvas, res.peaks, 0, '#818cf8');
+    }).catch(function(err){
+      // Honest failure state: no waveform drawn, no fake data — just say why.
+      var g=waveCanvas.getContext('2d');
+      g.clearRect(0,0,waveCanvas.width,waveCanvas.height);
+      waveCurrent.textContent='—';
+      waveDuration.textContent='—';
+      var note=document.createElement('div');
+      note.className='ag-waveform-empty';
+      note.textContent='Waveform unavailable: '+err.message;
+      waveCanvas.parentElement.appendChild(note);
+    });
+  }
+
+  function refreshMainWaveform(){
+    if(!mainWave||!audio.duration) return;
+    var frac=audio.duration?audio.currentTime/audio.duration:0;
+    drawWaveform(waveCanvas, mainWave.peaks, frac, '#818cf8');
+    waveCurrent.textContent=fmtTime(audio.currentTime);
+  }
+  audio.addEventListener('timeupdate', refreshMainWaveform);
+  audio.addEventListener('loadedmetadata', refreshMainWaveform);
+  waveCanvas.addEventListener('click', function(e){
+    if(!mainWave||!isFinite(audio.duration)) return;
+    var rect=waveCanvas.getBoundingClientRect();
+    var frac=(e.clientX-rect.left)/rect.width;
+    audio.currentTime=Math.max(0,Math.min(1,frac))*audio.duration;
+  });
+
+  // ── History: durable job status (queued/running/completed/etc.) ───
+  var csrfToken='';
+  async function ensureCsrf(){
+    if(csrfToken)return csrfToken;
+    var r=await fetch('/api/auth/session',{credentials:'same-origin'});
+    var d=await r.json();
+    csrfToken=d.csrf_token||'';
+    return csrfToken;
+  }
+
+  function showResult(url, promptText, emotionText, barsCount){
+    result.hidden=false;
+    audio.src=url;
+    audio.load();
+    meta.innerHTML='<span><strong>'+promptText+'</strong></span><span>'+emotionText+' · '+barsCount+' bars</span>';
+    renderMainWaveform(url);
+  }
+
+  function sleep(ms){return new Promise(function(res){setTimeout(res,ms);});}
+
+  async function pollFullSongJob(jobId, promptText){
+    for(var i=0;i<90;i++){
+      await sleep(2000);
+      var r=await fetch('/api/admin/audiogen/render-job?id='+encodeURIComponent(jobId));
+      var d=await r.json();
+      if(!d.ok)continue;
+      var job=d.job||{};
+      if(job.status==='completed'){
+        var src=(job.result&&job.result.src)||'';
+        if(src)showResult(src, promptText, job.emotion||'', job.bars||'');
+        setProgress(null);
+        setStatus('Done',"ok");
+        renderAutomixRow(job);
+        loadHistory();
+        return job;
+      }
+      if(job.status==='failed'||job.status==='cancelled'){
+        setProgress(null);
+        setStatus('Render '+job.status+': '+(job.error||job.message||''),'error');
+        return job;
+      }
+      setProgress(job.progress||0);
+      setStatus('Rendering full song… '+(job.progress||0)+'%','busy');
+    }
+    setProgress(null);
+    setStatus('Still rendering — check history in a moment.','busy');
+    return null;
+  }
+
+  // ── Send to AutoMix ─────────────────────────────────────────────
+  // Real trigger path: POST /api/admin/audiogen/render-song already
+  // accepts chain_to_automix/genre/style_prefs and enqueues a full-song
+  // render whose stems get uploaded + queued into AutoMix
+  // (audiogen_bridge.queue_automix_from_stem_files). Chaining an
+  // *already-rendered* clip isn't possible — AutoMix needs the
+  // per-instrument stems captured during rendering
+  // (`--export-stems`), and those are deleted from the scratch export
+  // dir right after a render finishes. So "Send to AutoMix" here is
+  // honestly labeled as starting a fresh full-song render in the same
+  // mood with chaining turned on, not re-using existing audio.
+  function renderAutomixRow(job){
+    automixRow.innerHTML='';
+    if(!job) return;
+    if(job.automix_job_id){
+      var chip=document.createElement('span');
+      chip.className='ag-automix-status is-ok ag-mono';
+      chip.textContent='Sent to AutoMix — job '+job.automix_job_id;
+      automixRow.appendChild(chip);
+      return;
+    }
+    if(job.chain_to_automix){
+      var pending=document.createElement('span');
+      pending.className='ag-automix-status';
+      pending.textContent='AutoMix chain requested — no linked AutoMix job yet.';
+      automixRow.appendChild(pending);
+      return;
+    }
+    var btn=document.createElement('button');
+    btn.type='button';
+    btn.className='ag-automix-btn';
+    btn.textContent='Render full song + send to AutoMix';
+    var statusSpan=document.createElement('span');
+    statusSpan.className='ag-automix-status';
+    btn.onclick=async function(){
+      btn.disabled=true;
+      statusSpan.textContent='Queuing…';
+      try{
+        var csrf=await ensureCsrf();
+        var r=await fetch('/api/admin/audiogen/render-song',{
+          method:'POST',
+          credentials:'same-origin',
+          headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+          body:JSON.stringify({
+            emotion:job.emotion||emotion.value,
+            bars:job.bars||parseInt(bars.value)||8,
+            k:1,
+            chain_to_automix:true
+          })
+        });
+        var d=await r.json();
+        if(!r.ok||!d.ok) throw new Error(d.error||'Could not queue AutoMix render.');
+        statusSpan.textContent='Queued a new full-song render with AutoMix chaining…';
+        var finished=await pollFullSongJob(d.job.id, job.emotion||'');
+        if(finished) renderAutomixRow(finished);
+      }catch(e){
+        statusSpan.className='ag-automix-status is-error';
+        statusSpan.textContent='Error: '+e.message;
+        btn.disabled=false;
+      }
+    };
+    automixRow.appendChild(btn);
+    automixRow.appendChild(statusSpan);
+  }
+
+  // ── Generation trace panel ──────────────────────────────────────
+  function eventLabel(status){
+    var map={queued:'Queued', running:'Running', completed:'Completed', failed:'Failed', cancelled:'Cancelled'};
+    return map[status]||status;
+  }
+
+  async function openTrace(historyItem){
+    traceEl.hidden=false;
+    traceBody.innerHTML='<p class="ag-history-loading">Loading trace…</p>';
+    if(historyItem.kind!=='full_song'){
+      traceBody.innerHTML='<p class="ag-trace-empty">No job record for this render — quick loop generations are not tracked in the durable job queue (only full-song renders are).</p>';
+      return;
+    }
+    try{
+      var jobRes=await fetch('/api/admin/audiogen/render-job?id='+encodeURIComponent(historyItem.id));
+      var jobData=await jobRes.json();
+      if(!jobData.ok){
+        traceBody.innerHTML='<p class="ag-trace-empty">No event log available for this render — its job record is no longer in the queue (older jobs are trimmed after a while).</p>';
+        automixRow.innerHTML='<span class="ag-automix-status">AutoMix status unavailable — this render\'s job record is no longer in the queue.</span>';
+        return;
+      }
+      var evRes=await fetch('/api/admin/audiogen/render-job/events?id='+encodeURIComponent(historyItem.id));
+      var evData=await evRes.json();
+      var html='';
+      if(evData.ok&&evData.events&&evData.events.length){
+        html+='<div class="ag-trace-events">'+evData.events.map(function(ev){
+          return '<div class="ag-trace-event">'
+            +'<span class="ag-trace-event-status">'+eventLabel(ev.status)+'</span>'
+            +'<span class="ag-trace-event-message">'+(ev.message||'')+' <span class="ag-mono">'+(ev.progress||0)+'%</span></span>'
+            +'<span class="ag-trace-event-time ag-mono">'+(ev.created_at||'')+'</span>'
+            +'</div>';
+        }).join('')+'</div>';
+      }else{
+        html+='<p class="ag-trace-empty">No event log available for this render.</p>';
+      }
+      traceBody.innerHTML=html;
+      renderAutomixRow(jobData.job);
+    }catch(e){
+      traceBody.innerHTML='<p class="ag-trace-empty">Could not load the trace: '+e.message+'</p>';
+    }
+  }
+  traceClose.onclick=function(){ traceEl.hidden=true; };
+
+  // ── History card grid ────────────────────────────────────────────
+  var thumbObserver=null;
+  function ensureObserver(){
+    if(thumbObserver) return thumbObserver;
+    if(!('IntersectionObserver' in window)) return null;
+    thumbObserver=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(!entry.isIntersecting) return;
+        var canvas=entry.target;
+        thumbObserver.unobserve(canvas);
+        var src=canvas.dataset.src;
+        var durEl=document.getElementById(canvas.dataset.durationId);
+        decodePeaks(src, Math.max(24,Math.floor(canvas.clientWidth/2))).then(function(res){
+          drawWaveform(canvas, res.peaks, 1, '#a5b4fc');
+          if(durEl) durEl.textContent=fmtTime(res.duration);
+        }).catch(function(){
+          if(durEl) durEl.textContent='—';
+        });
+      });
+    }, {root:historyList, rootMargin:'80px'});
+    return thumbObserver;
+  }
+
+  function historyCard(item, index){
+    var card=document.createElement('button');
+    card.type='button';
+    card.className='ag-card';
+    var canvasId='ag-thumb-'+index;
+    var durId='ag-thumb-dur-'+index;
+    var mood=item.emotion||'neutral';
+    var color=moodColor(mood);
+    var promptSnippet=promptSnippetFor(item);
+    card.innerHTML=
+      '<canvas class="ag-card-thumb" id="'+canvasId+'" data-src="'+escapeHtml(item.src||'')+'" data-duration-id="'+durId+'"></canvas>'
+      +'<div class="ag-card-prompt">'+escapeHtml(promptSnippet)+'</div>'
+      +'<div class="ag-card-meta">'
+      +'<span class="ag-chip-mood" data-mood-color="'+color+'">'+escapeHtml(mood)+'</span>'
+      +'<span class="ag-dot-sep ag-mono" id="'+durId+'">--:--</span>'
+      +'<span class="ag-dot-sep ag-mono">'+escapeHtml(item.created_at||'')+'</span>'
+      +(item.kind==='full_song'?'<span class="ag-dot-sep">Full song</span>':'')
+      +'</div>';
+    card.onclick=function(){
+      document.querySelectorAll('.ag-card.is-selected').forEach(function(el){el.classList.remove('is-selected');});
+      card.classList.add('is-selected');
+      if(item.src){
+        showResult(item.src, promptSnippet, item.emotion||'', item.bars||'');
+      }
+      if(item.kind==='loop'){
+        automixRow.innerHTML='<span class="ag-automix-status">AutoMix chaining is only available for full-song renders (loops don\'t capture stems).</span>';
+      }else{
+        automixRow.innerHTML='<span class="ag-automix-status">Loading AutoMix status…</span>';
+      }
+      openTrace(item);
+    };
+    return card;
+  }
+
+  function escapeHtml(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function loadHistory(){
+    historyList.innerHTML='<p class="ag-history-loading">Loading history…</p>';
+    Promise.all([
+      fetch('/api/admin/audiogen/history?limit=24').then(function(r){return r.json();}),
+      loadPortfolioIndex()
+    ]).then(function(results){
+      var d=results[0];
+      var items=d.items||[];
+      historyList.innerHTML='';
+      if(!items.length){
+        historyList.innerHTML='<p class="ag-empty">No generations yet — try a preset.</p>';
+        return;
+      }
+      var observer=ensureObserver();
+      items.forEach(function(item, i){
+        var card=historyCard(item, i);
+        historyList.appendChild(card);
+        var canvas=card.querySelector('canvas');
+        if(observer && item.src){
+          observer.observe(canvas);
+        }
+      });
+    }).catch(function(err){
+      historyList.innerHTML='<p class="ag-history-error">Could not load history: '+err.message+'</p>';
+    });
+  }
+
+  async function generate(isFullSong){
+    var p=prompt.value.trim();
+    if(!p&&!isFullSong){prompt.focus();return;}
+    if(loading)return;
+    loading=true;
+    automixRow.innerHTML='';
+    traceEl.hidden=true;
+    setStatus('Generating...','busy');
+    try{
+      var csrf=await ensureCsrf();
+      if(isFullSong){
+        var r=await fetch('/api/admin/audiogen/render-song',{
+          method:'POST',
+          credentials:'same-origin',
+          headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+          body:JSON.stringify({emotion:emotion.value,bars:parseInt(bars.value)||8,k:1})
+        });
+        var d=await r.json();
+        if(!r.ok||!d.ok)throw new Error(d.error||'Render queue failed');
+        var jobId=d.job&&d.job.id;
+        if(!jobId)throw new Error('Render queued but no job id was returned.');
+        setStatus('Queued full song render…','busy');
+        setProgress(0);
+        await pollFullSongJob(jobId, p||emotion.value);
+      }else{
+        var r=await fetch('/api/admin/audiogen/generate',{
+          method:'POST',
+          credentials:'same-origin',
+          headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+          body:JSON.stringify({prompt:p,emotion:emotion.value,bars:parseInt(bars.value)||8})
+        });
+        var d=await r.json();
+        if(!r.ok||!d.ok)throw new Error(d.error||'Generation failed');
+        if(d.src) showResult(d.src, p, emotion.value, bars.value);
+        setStatus('Done','ok');
+        // Loop generations aren't tracked in the durable job queue, so
+        // there's no job to chain into AutoMix and no event log — be
+        // upfront about that rather than showing a button that can't work.
+        automixRow.innerHTML='<span class="ag-automix-status">AutoMix chaining is only available for full-song renders (loops don\'t capture stems).</span>';
+        loadHistory();
+      }
+    }catch(e){
+      setProgress(null);
+      setStatus('Error: '+e.message,'error');
+    }finally{
+      loading=false;
+    }
+  }
+
+  form.onsubmit=function(e){e.preventDefault();generate(false);};
+  fullSongBtn.onclick=function(){generate(true);};
+
+  document.querySelectorAll('.ag-chip').forEach(function(el){
+    el.onclick=function(){
+      prompt.value=el.dataset.prompt;
+      form.dispatchEvent(new Event('submit'));
+    };
+  });
+
+  loadHistory();
+  setStatus('Ready','ready');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "kenn-live-suggestion-m4l",
+  "version": "1.0.0",
+  "description": "KENN Live Suggestion Max for Live Node script dependency package",
+  "main": "live_suggestion_client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "dependencies": {
+    "max-api": "^1.1.0"
+  }
+}

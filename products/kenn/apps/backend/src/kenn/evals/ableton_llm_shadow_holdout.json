@@ -1,0 +1,19 @@
+[
+  {"id": "mute-numbered", "category": "supported_control", "query": "Mute track 2", "expected_action": "set_mute", "expects_clarification": false},
+  {"id": "solo-named", "category": "supported_control", "query": "Solo the Vocal", "expected_action": "set_solo", "expects_clarification": false},
+  {"id": "volume-named", "category": "supported_control", "query": "Set the Vocal volume to -6 dB", "expected_action": "set_volume", "expects_clarification": false},
+  {"id": "volume-numbered-order", "category": "supported_control", "query": "Set the volume on track 4 to -6 dB", "expected_action": "set_volume", "expects_clarification": false},
+  {"id": "pan-named", "category": "supported_control", "query": "Pan Drum Bus 30% right", "expected_action": "set_pan", "expects_clarification": false},
+  {"id": "inspect-devices", "category": "inspection", "query": "What devices are on the Vocal?", "expected_action": "inspect_devices", "expects_clarification": false},
+  {"id": "eq-band", "category": "supported_control", "query": "Reduce amplitude by 3 dB at 250 Hz on track 4 band 1A", "expected_action": "set_eq_band_gain", "expects_clarification": false},
+  {"id": "glue-parameter", "category": "supported_control", "query": "Set Glue Compressor Attack to 4 on track 4", "expected_action": "set_device_parameter", "expects_clarification": false},
+  {"id": "saturator-parameter", "category": "supported_control", "query": "Set Saturator Drive to 0.65 on track 4", "expected_action": "set_device_parameter", "expects_clarification": false},
+  {"id": "inspect-exact-device", "category": "inspection", "query": "What parameters are on the Glue Compressor on track 4?", "expected_action": "inspect_device_parameters", "expects_clarification": false},
+  {"id": "insert-eq", "category": "supported_control", "query": "Add EQ on track 2", "expected_action": "insert_device", "expects_clarification": false},
+  {"id": "insert-glue", "category": "supported_control", "query": "Add Glue Compressor on track 2", "expected_action": "insert_device", "expects_clarification": false},
+  {"id": "verified-discrete-display-step", "category": "supported_control", "query": "Set Glue Compressor Attack to 1 ms on track 4", "expected_action": "set_device_parameter", "expects_clarification": false},
+  {"id": "interpolated-display-value", "category": "ambiguity", "query": "Set Glue Compressor Attack to 2 ms on track 4", "expected_action": null, "expects_clarification": true},
+  {"id": "missing-track", "category": "ambiguity", "query": "Mute the Master", "expected_action": null, "expects_clarification": true},
+  {"id": "ambiguous-setting", "category": "ambiguity", "query": "Change band 2 to the EQ Eight setting of .99 track 4", "expected_action": "set_eq_band_gain", "expects_clarification": true},
+  {"id": "unsupported-clip", "category": "unsupported", "query": "Launch a clip on the Vocal", "expected_action": null, "expects_clarification": true}
+]

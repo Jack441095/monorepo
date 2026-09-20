@@ -1,0 +1,284 @@
+/*
+ * studio-theme.css — Thursday dark theme overlay
+ * Load AFTER styles.css to override the default light theme.
+ */
+
+/* ── CSS variable overrides ────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --ink:        #f3f4f6;
+  --muted:      #9ca3af;
+  --line:       #1f2937;
+  --paper:      #0b0e14;
+  --panel:      rgba(17, 24, 39, 0.8);
+  --panel-2:    #161b22;
+  --panel-3:    #1f293d;
+  --accent:     #6366f1;
+  --accent-dark:#4338ca;
+  --warm:       #f43f5e;
+  --border:     rgba(255, 255, 255, 0.08);
+  --border-2:   rgba(255, 255, 255, 0.15);
+  --blue:       #6366f1;
+  --blue-dim:   #312e81;
+  --green:      #10b981;
+  --purple:     #8b5cf6;
+  --radius:     8px;
+  --radius-lg:  14px;
+  --glass-bg:   rgba(22, 27, 34, 0.75);
+  --glass-blur: blur(14px);
+  --glow-accent: 0 0 20px rgba(99, 102, 241, 0.35);
+  --glow-green:  0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+/* ── Base ───────────────────────────────────────────────────────── */
+html, body {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.glass-card, .card, .studio-panel {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-card:hover, .card:hover {
+  border-color: var(--border-2) !important;
+  box-shadow: var(--glow-accent);
+}
+
+/* ── Studio nav bar ─────────────────────────────────────────────── */
+.studio-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 20px;
+  background: #111111;
+  border-bottom: 1px solid #2a2a2a;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+.studio-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.studio-nav-wordmark {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #e4e4e7;
+  text-decoration: none;
+}
+.studio-nav-wordmark span { color: #60a5fa; }
+.studio-nav-div {
+  width: 1px; height: 16px;
+  background: #2a2a2a;
+}
+.studio-nav-page {
+  font-size: 12px;
+  color: #71717a;
+  letter-spacing: 0.02em;
+}
+.studio-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.studio-nav-link {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #2a2a2a;
+  background: transparent;
+  color: #71717a;
+  text-decoration: none;
+  transition: border-color .12s, color .12s;
+  letter-spacing: 0.02em;
+}
+.studio-nav-link:hover { border-color: #363636; color: #e4e4e7; }
+.studio-nav-link.active {
+  background: rgba(96,165,250,.08);
+  border-color: rgba(96,165,250,.2);
+  color: #60a5fa;
+}
+
+/* ── Cards / panels ─────────────────────────────────────────────── */
+.aa-form, .auth-panel, .kenn-panel, .audiogen-panel,
+.automix-card, .mix-review-card,
+section.card, div.card, .panel {
+  background: var(--panel) !important;
+  border-color: var(--border) !important;
+  color: var(--ink) !important;
+}
+
+/* ── Headers ────────────────────────────────────────────────────── */
+.aa-header, .hub-header, .creative-lab-header,
+.page-header, header.aa-header {
+  background: var(--panel) !important;
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--ink) !important;
+}
+.aa-header h1, .hub-header h1 { color: var(--ink) !important; }
+.aa-sub, .section-intro, .eyebrow { color: var(--muted) !important; }
+
+/* ── Inputs ─────────────────────────────────────────────────────── */
+input[type="text"], input[type="password"], input[type="email"],
+input[type="number"], input[type="search"],
+textarea, select {
+  background: var(--panel-2) !important;
+  border: 1px solid var(--border-2) !important;
+  color: var(--ink) !important;
+  border-radius: var(--radius) !important;
+}
+input::placeholder, textarea::placeholder { color: #52525b !important; }
+input:focus, textarea:focus, select:focus {
+  outline: none !important;
+  border-color: rgba(96,165,250,.4) !important;
+  box-shadow: 0 0 0 2px rgba(96,165,250,.08) !important;
+}
+select option { background: var(--panel-2); color: var(--ink); }
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+button, .button, a.button {
+  border-radius: var(--radius) !important;
+  font-weight: 500 !important;
+  transition: background .12s, border-color .12s !important;
+}
+button[type="submit"], .button.primary,
+button.aa-analyse, button#aa-analyse {
+  background: rgba(96,165,250,.12) !important;
+  border: 1px solid rgba(96,165,250,.3) !important;
+  color: #60a5fa !important;
+}
+button[type="submit"]:hover:not(:disabled),
+.button.primary:hover:not(:disabled) {
+  background: rgba(96,165,250,.2) !important;
+  border-color: rgba(96,165,250,.5) !important;
+}
+button.secondary, .button.secondary, a.button.secondary {
+  background: var(--panel-2) !important;
+  border: 1px solid var(--border-2) !important;
+  color: var(--muted) !important;
+}
+button:disabled, .button:disabled { opacity: .4 !important; }
+
+/* ── Pill / badge ───────────────────────────────────────────────── */
+.aa-pill, .pill, .status-pill, .eyebrow-pill {
+  background: var(--panel-2) !important;
+  border: 1px solid var(--border-2) !important;
+  color: var(--muted) !important;
+}
+
+/* ── Drop zone ──────────────────────────────────────────────────── */
+.aa-dropzone, [class*="drop"] {
+  background: var(--panel-2) !important;
+  border: 1.5px dashed var(--border-2) !important;
+  color: var(--muted) !important;
+}
+.aa-dropzone:hover, .aa-dropzone.dragover {
+  border-color: rgba(96,165,250,.4) !important;
+  background: rgba(96,165,250,.04) !important;
+}
+
+/* ── Results / sections ─────────────────────────────────────────── */
+.aa-results h3, .aa-results h2,
+.results-section h3, .section-title {
+  color: var(--ink) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.aa-metric, .metric-row, .stat-row {
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--ink) !important;
+}
+.aa-metric-label, .metric-label { color: var(--muted) !important; }
+.aa-metric-value, .metric-value { color: var(--ink) !important; }
+
+/* ── Tables ─────────────────────────────────────────────────────── */
+table { border-collapse: collapse; width: 100%; }
+th, td {
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--ink) !important;
+}
+th { color: var(--muted) !important; font-weight: 600 !important; }
+tr:hover td { background: rgba(255,255,255,.02) !important; }
+
+/* ── Links ──────────────────────────────────────────────────────── */
+a { color: inherit; }
+a:hover { color: var(--blue); }
+
+/* ── Scrollbars ─────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #363636 transparent;
+}
+*::-webkit-scrollbar { width: 4px; height: 4px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #363636; border-radius: 2px; }
+
+/* ── Audio Analysis page specifics ─────────────────────────────── */
+.aa-app { background: var(--paper) !important; }
+.aa-section { background: var(--panel) !important; border-color: var(--border) !important; }
+.aa-section-head { border-bottom-color: var(--border) !important; }
+.aa-section-head h3 { color: var(--ink) !important; }
+.aa-status { color: var(--green) !important; }
+
+/* ── Creative lab / AudioGen specifics ──────────────────────────── */
+.creative-lab-page { background: var(--paper) !important; }
+.creative-lab-main { background: var(--paper) !important; }
+.kenn-panel, .audiogen-panel {
+  background: var(--panel) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+}
+.kenn-panel h2, .audiogen-panel h2 { color: var(--ink) !important; }
+.quick-prompt, .emotion-btn {
+  background: var(--panel-2) !important;
+  border: 1px solid var(--border-2) !important;
+  color: var(--muted) !important;
+  border-radius: var(--radius) !important;
+}
+.quick-prompt:hover, .emotion-btn:hover,
+.quick-prompt.selected, .emotion-btn.selected {
+  border-color: rgba(34,197,94,.35) !important;
+  color: var(--green) !important;
+  background: rgba(34,197,94,.06) !important;
+}
+
+/* ── Thursday chat page ─────────────────────────────────────────── */
+.thursday-chat-messages {
+  background: var(--paper) !important;
+}
+.thursday-message {
+  background: var(--panel) !important;
+  border-color: var(--border) !important;
+  color: var(--ink) !important;
+}
+
+/* ── AutoMix specifics ──────────────────────────────────────────── */
+.automix-upload-zone {
+  background: var(--panel-2) !important;
+  border-color: var(--border-2) !important;
+}
+.stem-row, .stem-card {
+  background: var(--panel-2) !important;
+  border-color: var(--border) !important;
+}
+
+/* ── Misc overrides ─────────────────────────────────────────────── */
+hr { border-color: var(--border) !important; }
+.compact-status, .hint, small { color: var(--muted) !important; }
+code, pre {
+  background: var(--panel-2) !important;
+  border: 1px solid var(--border) !important;
+  color: #86efac !important;
+}

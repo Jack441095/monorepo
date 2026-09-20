@@ -1,0 +1,25 @@
+{
+  "auto_enabled": false,
+  "classes": [
+    "Clap",
+    "Kick",
+    "Snare"
+  ],
+  "generated": "2026-09-12T18:28:29",
+  "owner_approved": false,
+  "record_type": "slo_class_threshold_candidate_policy",
+  "safety": {
+    "approval_granted": false,
+    "production_model_changed": false,
+    "read_only": true,
+    "rename_actions": false
+  },
+  "schema_version": "1.0.0",
+  "source_gate_receipt": "/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo/SmartSampleManager/tools/classification_benchmark/results_breadth_final_class_gates_v1.json",
+  "source_gate_sha256": "a7dc4cdab57e704fd968c7e2985f0a49674f170be2c51a5db9c573d521df6690",
+  "thresholds": {
+    "Clap": 0.7170043587684631,
+    "Kick": 0.811768651008606,
+    "Snare": 0.6104221343994141
+  }
+}

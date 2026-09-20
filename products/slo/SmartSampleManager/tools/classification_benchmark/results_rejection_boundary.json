@@ -1,0 +1,76 @@
+{
+  "audio-only": {
+    "false_accept_at_0.5": 20.17,
+    "real_sounds_wrongly_rejected": 2.18,
+    "junk_recall": 60.5
+  },
+  "multi-window": {
+    "false_accept_at_0.5": 19.33,
+    "real_sounds_wrongly_rejected": 2.33,
+    "junk_recall": 60.5
+  },
+  "filename_overrides_correct_audio": 28,
+  "impulse_responses_excluded": 9,
+  "per_class_policy": {
+    "Percussion": {
+      "n": 50,
+      "acts_on": 52.0,
+      "precision": 15.4,
+      "policy": "abstain"
+    },
+    "Percussion Loop": {
+      "n": 62,
+      "acts_on": 62.9,
+      "precision": 61.5,
+      "policy": "suggest"
+    },
+    "Foley": {
+      "n": 55,
+      "acts_on": 45.5,
+      "precision": 68.0,
+      "policy": "suggest"
+    },
+    "Other/none": {
+      "n": 119,
+      "acts_on": 73.1,
+      "precision": 72.4,
+      "policy": "suggest"
+    },
+    "Hi-Hat": {
+      "n": 73,
+      "acts_on": 82.2,
+      "precision": 80.0,
+      "policy": "suggest"
+    },
+    "Crash": {
+      "n": 26,
+      "acts_on": 80.8,
+      "precision": 81.0,
+      "policy": "suggest"
+    },
+    "Snare": {
+      "n": 103,
+      "acts_on": 79.6,
+      "precision": 82.9,
+      "policy": "suggest"
+    },
+    "Drum Loop": {
+      "n": 77,
+      "acts_on": 84.4,
+      "precision": 90.8,
+      "policy": "rename"
+    },
+    "Clap": {
+      "n": 98,
+      "acts_on": 93.9,
+      "precision": 93.5,
+      "policy": "rename"
+    },
+    "Kick": {
+      "n": 99,
+      "acts_on": 87.9,
+      "precision": 94.3,
+      "policy": "rename"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# KENN Ableton Assistant Gap Matrix
+
+| Area | Current evidence | State | Gate to close |
+|---|---|---|---|
+| Natural-language slots | 108-case deterministic boundary/coverage holdout, 108/108 with precision/recall/F1 and clarification/abstention/refusal accuracy 1.00 plus category breakdown; explicit EQ band/frequency slots are covered by focused tests | internal pass | Add independent human-reviewed quality set |
+| WAV time metrics | Unit fixtures for mono/stereo, 16/24-bit; 10 s/48 kHz bounded benchmark | working locally | Add real-mix and reference-fixture validation |
+| FFT peaks/bands | Pure sine, harmonics, 24-bit fixtures plus bounded time-localized windows | working locally | Add calibrated reference files |
+| LUFS/LRA | KENN-owned BS.1770-4 integrated loudness and LRA via `pyloudnorm`; full-scale 1 kHz reference and abstention tests | locally qualified measurement | Add rights-cleared real-mix listening/reference validation |
+| True peak | KENN-owned 4x oversampled inter-sample peak via `scipy.signal.resample_poly`; synthetic overshoot and abstention tests | locally qualified measurement | Add calibrated external reference files and real-mix validation |
+| Masking/resonance/harshness | Cautious spectral candidates plus bounded localized evidence | limited hypothesis | Source-aware validation and calibrated reference fixtures |
+| Read-only Live snapshot | Real Live 12 snapshot/hash captured on disposable local set | real-Live pass for captured set | Repeat on each supported Live/OS release |
+| Supported Live writes | Shared service for track/transport and single-device actions; HMAC, stale checks, idempotency, telemetry, readback; legacy AudioGen and batch-device bypasses fail closed | real-Live track/transport plus EQ Eight `Output`/gain/Q, including A/B gain and A-side Q, Compressor, and Utility named parameters pass, including manual stale-state rejection; explicit compound EQ targeting now passes real two-parameter readback, replay, and undo | Expand the device matrix and repeat on each supported Live/OS release |
+| Explicit EQ-band command | Snapshot-bound frequency and band resolution, sparse Live parameter indices, deterministic lifecycle tests, compiled plug-in handoff | real `4-Audio -> EQ Eight -> band 1A` retune from approximately 20.2 Hz / 0 dB to 300 Hz / -3 dB passed confirmation, readback, replay rejection, and restoration | Qualify more bands and device families, then obtain independent human review |
+| Track-level legacy writes | HTTP aliases and autonomous track/transport tools use `LiveActionService` | real-Live pass for volume/pan/mute/solo/arm/play/stop | Repeat on each supported Live/OS release |
+| Undo | Fresh-confirmation receipt inverse for track/transport and single-device actions; legacy batch undo remains separate | real-Live receipt-inverse and native Live Cmd-Z pass for the qualified EQ Eight/Compressor/Utility subset; saved-set crash recovery passed | Verify wider crash scenarios and broader native undo coverage |
+| Product spectral API | Single-file and hash-bound two-file comparison endpoints plus UI evidence cards; bounded time-localized FFT windows; 10 s/48 kHz, 96 kHz, and 4-worker benchmark passes | locally stress-tested | Add reference-fixture validation; retain non-continuous/STFT limitation |
+| Auto mode | No silent mutation path intended | disabled | Keep disabled until every gate qualifies |
+| Public web upload | Existing Mix Review path | separate product | Do not use as proof of Live readiness |
+| AutoMix renderer | External/legacy and unavailable by default | disabled | KENN-owned renderer or retire surface |
+| Runtime state bounds | Live planner retains at most 1,000 unexpired confirmation proposals; Mix Review persists at most 500 metadata-only receipts and lists at most 200 | automated pass | Observe real pilot memory/disk behavior and tune only from evidence |
+| C++ VST3/AU | Universal `arm64 + x86_64` bundles; AU passed `auval`; VST3 passed pluginval strictness 5 and 10 with UI, state, automation, thread-safety, fuzz, rate, and block-size coverage | host-validator pass | Developer ID sign, notarize, staple, Gatekeeper-check, then load the exact release archive in Live |

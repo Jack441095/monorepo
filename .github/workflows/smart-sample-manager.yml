@@ -1,0 +1,143 @@
+name: Smart Sample Manager
+
+# macOS-only C++/JUCE build (Homebrew deps, Accelerate/CoreML), so this is a
+# separate workflow from ci.yml's Linux Python suite, not folded into it --
+# same "run what's actually testable on this runner" philosophy docs/CI.md
+# describes for that workflow, applied to a genuinely different platform.
+#
+# Manual-only because this repository is used as a code backup. Run it when a
+# deliberate macOS plugin qualification check is needed.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: products/slo/SmartSampleManager
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install C++ dependencies
+        run: brew install taglib onnxruntime libsodium
+
+      # JUCE + umappp/hnswlib/dr_libs/etc. are fetched via CMake FetchContent
+      # (see CMakeLists.txt) -- these are large (JUCE alone is a full
+      # framework checkout) and don't change between runs unless
+      # CMakeLists.txt's pinned versions do, so caching them turns a
+      # ~20+ minute cold configure into a cache-hit in seconds on repeat runs.
+      - name: Cache CMake FetchContent dependencies
+        uses: actions/cache@v4
+        with:
+          path: products/slo/SmartSampleManager/build/_deps
+          key: ssm-fetchcontent-${{ runner.os }}-${{ hashFiles('products/slo/SmartSampleManager/CMakeLists.txt') }}
+
+      # The TestLicensing client embeds a hardcoded Ed25519 public key
+      # (Source/Licensing/LicensePublicKey.h) matching a private key that is
+      # deliberately never committed to this repo (see licensing_server/
+      # README.md -- the private key must never touch the repo, CI included).
+      # So CI generates its own throwaway keypair every run and patches the
+      # freshly-generated public key into the source before building, rather
+      # than relying on any committed key material. Both halves of this
+      # keypair are discarded when the runner is torn down.
+      - name: Generate ephemeral CI licensing keypair
+        working-directory: products/slo/SmartSampleManager/licensing_server
+        run: |
+          python3 -m venv .venv
+          ./.venv/bin/pip install -q --upgrade pip
+          ./.venv/bin/pip install -q -r requirements.txt
+          ./.venv/bin/python generate_keypair.py
+          CI_PUBLIC_KEY=$(cat keys/signing_key.public)
+          sed -i '' "s|kServerPublicKeyBase64 = \".*\"|kServerPublicKeyBase64 = \"${CI_PUBLIC_KEY}\"|" \
+            ../Source/Licensing/LicensePublicKey.h
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build
+        run: |
+          cmake --build build -j$(sysctl -n hw.ncpu) --target \
+            SmartSampleManager_Standalone SmartSampleManager_VST3 SmartSampleManager_AU \
+            TestSampleEngine TestPathTraversal TestDuplicateDetection TestPruneMissing \
+            TestEmbeddingQuality TestFindSimilar TestTaxonomy TestXmpWriter TestResilience TestMalformedAudio TestMultiInstance TestSortLibraryAsync TestLicensing
+
+      # Phase 2, Section 79/44 of the master prompt: the release manifest
+      # (docs/RELEASE_MANIFEST.md) must be something the build system
+      # actually verifies, not just a documented description of what should
+      # ship. This is the automated check -- it fails the build if any
+      # unexpected file (in particular, a sibling-plugin artifact like
+      # AudioToo_Reverb/KENNMixAssistant/MidiGenerator) ends up inside a
+      # built bundle.
+      - name: Verify release manifest (no unexpected/sibling-plugin artifacts)
+        run: |
+          python3 scripts/verify_release_manifest.py \
+            "build/SmartSampleManager_artefacts/Debug/VST3/Smart Sample Manager.vst3" --format vst3
+          python3 scripts/verify_release_manifest.py \
+            "build/SmartSampleManager_artefacts/Debug/AU/Smart Sample Manager.component" --format au
+          python3 scripts/verify_release_manifest.py \
+            "build/SmartSampleManager_artefacts/Debug/Standalone/Smart Sample Manager.app" --format standalone
+
+      # Phase 5, Sections 7-8: BUNDLE_ID/PLUGIN_MANUFACTURER_CODE/PLUGIN_CODE
+      # become permanently load-bearing the moment a real DAW session
+      # references them. This fails the build on any unreviewed drift from
+      # docs/APPROVED_IDENTITY_MANIFEST.json.
+      - name: Verify plugin identity has not drifted
+        run: python3 scripts/verify_identity_manifest.py
+
+      # Phase 5.5, Section 64: catches a bundled dependency (or one of its
+      # own transitive dependencies) still pointing at this machine's
+      # Homebrew install rather than the bundled copy -- found and fixed a
+      # real gap here (ONNX Runtime's ~85 transitive deps were unbundled).
+      - name: Verify no Homebrew/dev-machine dependency paths
+        run: |
+          python3 scripts/check_homebrew_dependencies.py \
+            "build/SmartSampleManager_artefacts/Debug/VST3/Smart Sample Manager.vst3"
+          python3 scripts/check_homebrew_dependencies.py \
+            "build/SmartSampleManager_artefacts/Debug/AU/Smart Sample Manager.component"
+          python3 scripts/check_homebrew_dependencies.py \
+            "build/SmartSampleManager_artefacts/Debug/Standalone/Smart Sample Manager.app"
+
+      - name: Run engine test suite
+        run: |
+          ./build/TestSampleEngine
+          ./build/TestPathTraversal
+          ./build/TestDuplicateDetection
+          ./build/TestPruneMissing
+          ./build/TestEmbeddingQuality
+          ./build/TestFindSimilar
+          ./build/TestTaxonomy
+          ./build/TestXmpWriter
+          ./build/TestResilience
+          ./build/TestMalformedAudio
+          ./build/TestMultiInstance
+          ./build/TestSortLibraryAsync
+
+      - name: Run licensing integration test
+        working-directory: products/slo/SmartSampleManager
+        run: |
+          ./licensing_server/.venv/bin/uvicorn server:app --app-dir licensing_server --port 8420 &
+          SERVER_PID=$!
+          sleep 2
+          LICENSE_KEY=$(curl -sf -X POST localhost:8420/v1/admin/licenses \
+            -H "Content-Type: application/json" \
+            -d '{"customer_email":"ci@example.com","max_activations":2}' \
+            | python3 -c "import json,sys;print(json.load(sys.stdin)['license_key'])")
+          ./build/TestLicensing "$LICENSE_KEY"
+          TEST_EXIT=$?
+          kill $SERVER_PID 2>/dev/null || true
+          exit $TEST_EXIT
+
+      - name: Launch smoke test (Standalone app doesn't crash on startup)
+        run: |
+          "build/SmartSampleManager_artefacts/Debug/Standalone/Smart Sample Manager.app/Contents/MacOS/Smart Sample Manager" &
+          APP_PID=$!
+          sleep 5
+          if ! kill -0 $APP_PID 2>/dev/null; then
+            echo "App exited/crashed within 5 seconds of launch"
+            exit 1
+          fi
+          kill $APP_PID

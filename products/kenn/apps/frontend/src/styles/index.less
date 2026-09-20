@@ -1,0 +1,85 @@
+@import './theme.less';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  font-size: 0.16rem;
+  background: var(--surface-bg);
+  color: var(--text-color);
+  overflow: hidden;
+}
+
+.header-container {
+  width: 100%;
+  padding: 0 0.32rem 0 var(--main-padding-x);
+}
+
+.main-container {
+  width: 100%;
+  margin: 0 auto;
+  padding:0 var(--main-padding-x);
+}
+
+.content-container {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-padding-x);
+}
+
+/* 与聊天气泡卡片左缘对齐（跳过头像宽度） */
+.chat-content-offset {
+  margin-left: var(--chat-content-offset);
+}
+
+/* 全局滚动条：细线 #AFAFAF、无两端三角
+ * 注意：Chromium 若同时设 scrollbar-width，会走系统条（带三角）并压过 webkit 自定义，
+ * 故标准属性只给非 webkit；Chrome/Edge 只用 ::-webkit-scrollbar*。
+ */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #afafaf transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #afafaf;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-button:single-button,
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:horizontal:start:decrement,
+::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none;
+  width: 0;
+  height: 0;
+}

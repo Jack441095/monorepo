@@ -163,8 +163,21 @@ def test_full_purchase_to_activation_flow(client, db_session):
     validate_resp = client.post("/v1/validate", json={"license_key": license_key, "device_id": "DEV-A"})
     assert validate_resp.status_code == 200
 
-    # 6. deactivate -> reactivate
-    deactivate_resp = client.post("/v1/deactivate", json={"license_key": license_key, "device_id": "DEV-A"})
+    # 6. deactivate -> reactivate (possession proof: the signed token from
+    # step 5; license_key alone must NOT be sufficient)
+    deactivate_no_proof = client.post(
+        "/v1/deactivate", json={"license_key": license_key, "device_id": "DEV-A"}
+    )
+    assert deactivate_no_proof.status_code == 422  # proof fields now required
+    deactivate_resp = client.post(
+        "/v1/deactivate",
+        json={
+            "license_key": license_key,
+            "device_id": "DEV-A",
+            "activation_token_json": token["token_json"],
+            "activation_signature": token["signature"],
+        },
+    )
     assert deactivate_resp.status_code == 200
     revalidate_resp = client.post("/v1/validate", json={"license_key": license_key, "device_id": "DEV-A"})
     assert revalidate_resp.status_code == 403
@@ -210,10 +223,24 @@ def test_duplicate_webhook_is_idempotent(client, db_session):
 def test_forged_webhook_signature_rejected(client):
     payload = {"event_id": "evt_forged", "event_type": "transaction.completed", "data": {}}
     raw_body = json.dumps(payload).encode()
-    resp = client.post(
+    # Stale timestamp: signature is irrelevant, the replay window rejects it
+    # first with 400 (verification error) -- this used to rely on ts=1 being
+    # merely unsigned.
+    resp_stale = client.post(
         "/webhooks/paddle", content=raw_body, headers={"Paddle-Signature": "ts=1;h1=deadbeef"}
     )
-    assert resp.status_code == 401
+    assert resp_stale.status_code == 400
+
+    # Fresh timestamp with a forged digest -> classic signature rejection 401.
+    fresh_ts = int(time.time())
+    signed = f"{fresh_ts}:{raw_body.decode()}"
+    forged = hmac.new(b"wrong-secret", signed.encode(), hashlib.sha256).hexdigest()
+    resp_forged = client.post(
+        "/webhooks/paddle",
+        content=raw_body,
+        headers={"Paddle-Signature": f"ts={fresh_ts};h1={forged}"},
+    )
+    assert resp_forged.status_code == 401
 
 
 def test_activate_invalid_license_key_rejected(client):

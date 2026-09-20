@@ -1,0 +1,7 @@
+{
+    "overall_accuracy": 0.9654088050314465,
+    "overall_macro_f1": 0.9644909858654127,
+    "fusion_adversarial_accuracy": 0.8828616352201258,
+    "dataset_size_clean": 1272,
+    "ood_size": 250
+}

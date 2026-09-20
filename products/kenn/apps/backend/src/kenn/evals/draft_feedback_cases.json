@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "description": "Reviewable eval cases drafted from tester feedback. Promote selected cases into questions.json.",
+  "cases": [
+    {
+      "id": "feedback-04db77da-test-feedback-question",
+      "question": "test feedback question",
+      "min_confidence": "medium",
+      "min_source_quality": "high",
+      "source_kinds_any": [
+        "note"
+      ],
+      "topics_must_include": [
+        "mixing"
+      ],
+      "answer_must_include": [
+        "mixing",
+        "test",
+        "feedback",
+        "question",
+        "needs",
+        "better",
+        "note"
+      ],
+      "source_must_include": [
+        "test-note.md"
+      ],
+      "feedback": {
+        "id": "04db77da",
+        "comment": "Needs a better note",
+        "failed_top_source": "Weak source",
+        "repair_note": "test-note.md"
+      }
+    }
+  ]
+}

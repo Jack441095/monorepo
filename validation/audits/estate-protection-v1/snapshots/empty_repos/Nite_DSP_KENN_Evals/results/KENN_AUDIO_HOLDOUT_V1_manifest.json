@@ -1,0 +1,4566 @@
+{
+  "benchmark": "KENN_AUDIO_HOLDOUT_V1",
+  "seed": 20260823,
+  "cases": [
+    {
+      "id": "healthy-000",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-001",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-002",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-003",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-004",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-005",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-006",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-007",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-008",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-009",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-010",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-011",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-012",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-013",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-014",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-015",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-016",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-017",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-018",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-019",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-020",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-021",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-022",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-023",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-024",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-025",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-026",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-027",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-028",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-029",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-030",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-031",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-032",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-033",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-034",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-035",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-036",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-037",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-038",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-039",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-040",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-041",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-042",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-043",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-044",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-045",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-046",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-047",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-048",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-049",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-050",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-051",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-052",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-053",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-054",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-055",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-056",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "healthy-057",
+      "split": "development",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "healthy-058",
+      "split": "calibration",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "healthy-059",
+      "split": "holdout",
+      "group": "healthy",
+      "faults": [],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-000",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-001",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-002",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-003",
+      "split": "calibration",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-004",
+      "split": "holdout",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-005",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-006",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-007",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-008",
+      "split": "calibration",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-009",
+      "split": "holdout",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-010",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-011",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-012",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-013",
+      "split": "calibration",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-014",
+      "split": "holdout",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-015",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-016",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-017",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-018",
+      "split": "calibration",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-019",
+      "split": "holdout",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-020",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-021",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-022",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-023",
+      "split": "calibration",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-024",
+      "split": "holdout",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-025",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-026",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_mastered-027",
+      "split": "development",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_mastered-028",
+      "split": "calibration",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_mastered-029",
+      "split": "holdout",
+      "group": "healthy_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-000",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-001",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-002",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-003",
+      "split": "calibration",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-004",
+      "split": "holdout",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-005",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-006",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-007",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-008",
+      "split": "calibration",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-009",
+      "split": "holdout",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-010",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-011",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-012",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-013",
+      "split": "calibration",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-014",
+      "split": "holdout",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-015",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-016",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-017",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-018",
+      "split": "calibration",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-019",
+      "split": "holdout",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-020",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-021",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-022",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-023",
+      "split": "calibration",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-024",
+      "split": "holdout",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-025",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-026",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "healthy_saturated-027",
+      "split": "development",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "healthy_saturated-028",
+      "split": "calibration",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "healthy_saturated-029",
+      "split": "holdout",
+      "group": "healthy_saturated",
+      "faults": [],
+      "confounder": "saturation",
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-000",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-001",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-002",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-003",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-004",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-005",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-006",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-007",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-008",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-009",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-010",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-011",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-012",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-013",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-014",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-015",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-016",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-017",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-018",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-019",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-020",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-021",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-022",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-023",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-024",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-025",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-026",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-027",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-028",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-029",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-030",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-031",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-032",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-033",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-034",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-035",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-036",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-037",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-038",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-039",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-040",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-041",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-042",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-043",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-044",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-045",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-046",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-047",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-048",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-049",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-050",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-051",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-052",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-053",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-054",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-055",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-056",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-057",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-058",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-059",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-060",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-061",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-062",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-063",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-064",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-065",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-066",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-067",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-068",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-069",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-070",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-071",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-072",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-073",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-074",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-075",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-076",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "clipping-077",
+      "split": "development",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "clipping-078",
+      "split": "calibration",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "clipping-079",
+      "split": "holdout",
+      "group": "clipping",
+      "faults": [
+        "clipping"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-000",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-001",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-002",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-003",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-004",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-005",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-006",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-007",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-008",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-009",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-010",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-011",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-012",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-013",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-014",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-015",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-016",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-017",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-018",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-019",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-020",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-021",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-022",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-023",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-024",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-025",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-026",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-027",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-028",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-029",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-030",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-031",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-032",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-033",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-034",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-035",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-036",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-037",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-038",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-039",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-040",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-041",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-042",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-043",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-044",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-045",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-046",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-047",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-048",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-049",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-050",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-051",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-052",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-053",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-054",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-055",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-056",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "headroom-057",
+      "split": "development",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "headroom-058",
+      "split": "calibration",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "headroom-059",
+      "split": "holdout",
+      "group": "headroom",
+      "faults": [
+        "headroom"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "headroom_mastered-000",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "headroom_mastered-001",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "headroom_mastered-002",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "headroom_mastered-003",
+      "split": "calibration",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "headroom_mastered-004",
+      "split": "holdout",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "headroom_mastered-005",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "headroom_mastered-006",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "headroom_mastered-007",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "headroom_mastered-008",
+      "split": "calibration",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "headroom_mastered-009",
+      "split": "holdout",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "headroom_mastered-010",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "headroom_mastered-011",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "headroom_mastered-012",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "headroom_mastered-013",
+      "split": "calibration",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "headroom_mastered-014",
+      "split": "holdout",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "headroom_mastered-015",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "headroom_mastered-016",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "headroom_mastered-017",
+      "split": "development",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "headroom_mastered-018",
+      "split": "calibration",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "headroom_mastered-019",
+      "split": "holdout",
+      "group": "headroom_mastered",
+      "faults": [],
+      "confounder": "mastered",
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-000",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-001",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-002",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-003",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-004",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-005",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-006",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-007",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-008",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-009",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-010",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-011",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-012",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-013",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-014",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-015",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-016",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-017",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-018",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-019",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-020",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-021",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-022",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-023",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-024",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-025",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-026",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-027",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-028",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-029",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-030",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-031",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-032",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-033",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-034",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-035",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-036",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-037",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-038",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-039",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-040",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-041",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-042",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-043",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-044",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-045",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-046",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-047",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-048",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-049",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-050",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-051",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-052",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-053",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-054",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-055",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-056",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-057",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-058",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-059",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-060",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-061",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-062",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-063",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-064",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-065",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-066",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-067",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-068",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-069",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-070",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-071",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-072",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-073",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-074",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-075",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-076",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "lr_persistent-077",
+      "split": "development",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "lr_persistent-078",
+      "split": "calibration",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "lr_persistent-079",
+      "split": "holdout",
+      "group": "lr_persistent",
+      "faults": [
+        "lr_imbalance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "lr_alternating-000",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "lr_alternating-001",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "lr_alternating-002",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "lr_alternating-003",
+      "split": "calibration",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "lr_alternating-004",
+      "split": "holdout",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "lr_alternating-005",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "lr_alternating-006",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "lr_alternating-007",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "lr_alternating-008",
+      "split": "calibration",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "lr_alternating-009",
+      "split": "holdout",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "lr_alternating-010",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "lr_alternating-011",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "lr_alternating-012",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "lr_alternating-013",
+      "split": "calibration",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "lr_alternating-014",
+      "split": "holdout",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "lr_alternating-015",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "lr_alternating-016",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "lr_alternating-017",
+      "split": "development",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "lr_alternating-018",
+      "split": "calibration",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "lr_alternating-019",
+      "split": "holdout",
+      "group": "lr_alternating",
+      "faults": [],
+      "confounder": "alternating_pan",
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "multi_clip_bass-000",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "multi_clip_bass-001",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "multi_clip_bass-002",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "multi_clip_bass-003",
+      "split": "calibration",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "multi_clip_bass-004",
+      "split": "holdout",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "multi_clip_bass-005",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "multi_clip_bass-006",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "multi_clip_bass-007",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "multi_clip_bass-008",
+      "split": "calibration",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "multi_clip_bass-009",
+      "split": "holdout",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "multi_clip_bass-010",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "multi_clip_bass-011",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "multi_clip_bass-012",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "multi_clip_bass-013",
+      "split": "calibration",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "multi_clip_bass-014",
+      "split": "holdout",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "multi_clip_bass-015",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "multi_clip_bass-016",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "multi_clip_bass-017",
+      "split": "development",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "multi_clip_bass-018",
+      "split": "calibration",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "multi_clip_bass-019",
+      "split": "holdout",
+      "group": "multi_clip_bass",
+      "faults": [
+        "clipping",
+        "bass"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "multi_lr_phase-000",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "multi_lr_phase-001",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "multi_lr_phase-002",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "multi_lr_phase-003",
+      "split": "calibration",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "multi_lr_phase-004",
+      "split": "holdout",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "multi_lr_phase-005",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "multi_lr_phase-006",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "multi_lr_phase-007",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "multi_lr_phase-008",
+      "split": "calibration",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "multi_lr_phase-009",
+      "split": "holdout",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "multi_lr_phase-010",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 48000
+    },
+    {
+      "id": "multi_lr_phase-011",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 96000
+    },
+    {
+      "id": "multi_lr_phase-012",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 44100
+    },
+    {
+      "id": "multi_lr_phase-013",
+      "split": "calibration",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 48000
+    },
+    {
+      "id": "multi_lr_phase-014",
+      "split": "holdout",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 96000
+    },
+    {
+      "id": "multi_lr_phase-015",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "multi_lr_phase-016",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "multi_lr_phase-017",
+      "split": "development",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "multi_lr_phase-018",
+      "split": "calibration",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "multi_lr_phase-019",
+      "split": "holdout",
+      "group": "multi_lr_phase",
+      "faults": [
+        "lr_imbalance",
+        "phase"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "dc-000",
+      "split": "development",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "dc-001",
+      "split": "development",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "dc-002",
+      "split": "development",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "dc-003",
+      "split": "calibration",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "dc-004",
+      "split": "holdout",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "dc-005",
+      "split": "development",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "dc-006",
+      "split": "development",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "dc-007",
+      "split": "development",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "dc-008",
+      "split": "calibration",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "dc-009",
+      "split": "holdout",
+      "group": "dc",
+      "faults": [
+        "dc"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    },
+    {
+      "id": "resonance-000",
+      "split": "development",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 44100
+    },
+    {
+      "id": "resonance-001",
+      "split": "development",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 48000
+    },
+    {
+      "id": "resonance-002",
+      "split": "development",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 96000
+    },
+    {
+      "id": "resonance-003",
+      "split": "calibration",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 44100
+    },
+    {
+      "id": "resonance-004",
+      "split": "holdout",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 48000
+    },
+    {
+      "id": "resonance-005",
+      "split": "development",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 1,
+      "sr": 96000
+    },
+    {
+      "id": "resonance-006",
+      "split": "development",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 2,
+      "sr": 44100
+    },
+    {
+      "id": "resonance-007",
+      "split": "development",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 3,
+      "sr": 48000
+    },
+    {
+      "id": "resonance-008",
+      "split": "calibration",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 4,
+      "sr": 96000
+    },
+    {
+      "id": "resonance-009",
+      "split": "holdout",
+      "group": "resonance",
+      "faults": [
+        "resonance"
+      ],
+      "confounder": null,
+      "severity": 5,
+      "sr": 44100
+    }
+  ]
+}

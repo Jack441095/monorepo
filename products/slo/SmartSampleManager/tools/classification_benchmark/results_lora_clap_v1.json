@@ -1,0 +1,42 @@
+{
+  "results": {
+    "A frozen CLAP + sklearn probe": [
+      67.9245283018868,
+      66.98113207547169,
+      66.79245283018868
+    ],
+    "B frozen CLAP + trained head (CONTROL)": [
+      70.75471698113208,
+      70.18867924528301,
+      70.56603773584905
+    ],
+    "C LoRA CLAP + trained head": [
+      72.45283018867924,
+      72.45283018867924,
+      71.32075471698113
+    ]
+  },
+  "lora_minus_control_pp": 1.5723270440251582,
+  "per_seed_delta": [
+    1.6981132075471663,
+    2.2641509433962312,
+    0.7547169811320771
+  ],
+  "epochs": 20,
+  "folds": 5,
+  "seeds": 3,
+  "rank": 8,
+  "n_files": 530,
+  "classes": [
+    "Clap",
+    "Crash",
+    "Drum Loop",
+    "Foley",
+    "Hi-Hat",
+    "Kick",
+    "Other/none",
+    "Percussion",
+    "Percussion Loop",
+    "Snare"
+  ]
+}

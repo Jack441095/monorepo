@@ -1,0 +1,14 @@
+{
+    // NITE Submit Swift package settings.
+    // IMPORTANT: open THIS folder (Nite_Submit) as the VS Code workspace, or
+    // add it as a workspace folder — SourceKit-LSP resolves the package from
+    // the workspace root and cannot find Package.swift if only the parent
+    // "Audio_Engineering_Company" folder is open.
+    "swift.autoGenerateLaunchConfigurations": true,
+    "swift.disableAutoResolve": false,
+    "swift.backgroundCompilation": false,
+    "sourcekit-lsp.serverPath": "/usr/bin/sourcekit-lsp",
+    "files.associations": {
+        "*.swift": "swift"
+    }
+}
