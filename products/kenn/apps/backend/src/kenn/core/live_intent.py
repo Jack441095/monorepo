@@ -644,6 +644,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         "confidence": 0.0,
         "missing_fields": [],
         "ambiguity": [],
+        "follow_up": [],
         "confirmation_required": False,
     }
     if not text:
@@ -1246,9 +1247,15 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         if eq_band_request or eq_band_tuning_match or eq_band_tuning_absolute_match:
             # The request also names EQ frequency/gain tuning. Insertion and
             # tuning are separate guarded proposals: the tuning step can only
-            # be bound once the device exists in a fresh snapshot, so say so
-            # instead of silently dropping the second half of the request.
-            base["ambiguity"].append(
+            # be bound once the device exists in a fresh snapshot, so record
+            # it as non-blocking follow-up instead of silently dropping the
+            # second half of the request. `ambiguity` stays reserved for
+            # blockers; the command layer surfaces `follow_up` in its answer.
+            follow_up = base.get("follow_up")
+            if not isinstance(follow_up, list):
+                follow_up = []
+                base["follow_up"] = follow_up
+            follow_up.append(
                 "EQ frequency/gain tuning was also requested; it needs a second proposal after "
                 f"{insert_device_name} exists on the track. Confirm the insertion first, then request the tuning."
             )

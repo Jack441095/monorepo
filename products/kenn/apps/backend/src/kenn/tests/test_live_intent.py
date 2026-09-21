@@ -925,11 +925,14 @@ def test_compound_insert_and_boost_keeps_tuning_visible() -> None:
     assert result["action"] == "insert_device"
     assert result["track"] == {"index": 2, "name": "Vocal"}
     assert result["device"] == {"name": "EQ Eight"}
-    assert any("tuning" in item for item in result["ambiguity"])
+    assert result["ambiguity"] == []
+    assert result["missing_fields"] == []
+    assert any("tuning" in item for item in result["follow_up"])
 
     plain = parse_request("Add EQ Eight to track 3.", eq_snapshot())
     assert plain["action"] == "insert_device"
     assert plain["ambiguity"] == []
+    assert plain["follow_up"] == []
 
 
 def test_spoken_hundreds_and_spelled_out_units_normalize() -> None:
