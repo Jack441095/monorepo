@@ -890,3 +890,60 @@ def test_vague_eq_setting_request_requires_parameter_and_band_side() -> None:
     assert result["action"] == "set_eq_band_gain"
     assert "eq_parameter" in result["missing_fields"]
     assert any("2A" in item and "2B" in item for item in result["ambiguity"])
+
+
+def test_eq_boost_verbs_yield_positive_gain_while_cuts_stay_negative() -> None:
+    boosted = parse_request("boost band 2A by 3 dB at 500 Hz on track 4", eq_snapshot())
+    assert boosted["action"] == "set_eq_band_gain"
+    assert boosted["eq_band"] == "2A"
+    assert boosted["frequency_hz"] == 500.0
+    assert boosted["desired_value"] == 3.0
+    assert boosted["relative"] is True
+
+    cut = parse_request("cut band 2A by 3 dB at 500 Hz on track 4", eq_snapshot())
+    assert cut["action"] == "set_eq_band_gain"
+    assert cut["desired_value"] == -3.0
+
+    raised = parse_request("raise the gain by 2 dB at 250 Hz on track 4", eq_snapshot())
+    assert raised["action"] == "set_eq_band_gain"
+    assert raised["desired_value"] == 2.0
+    assert raised["frequency_hz"] == 250.0
+
+
+def test_eq_frequency_first_boost_resolves_without_a_named_band() -> None:
+    result = parse_request("boost 500 Hz by 3 dB on track 4", eq_snapshot())
+    assert result["action"] == "set_eq_band_gain"
+    assert result["track"] == {"index": 3, "name": "4-Audio"}
+    assert result["frequency_hz"] == 500.0
+    assert result["desired_value"] == 3.0
+    assert result["relative"] is True
+    assert "eq_band" not in result
+
+
+def test_compound_insert_and_boost_keeps_tuning_visible() -> None:
+    result = parse_request("Add EQ Eight to track 3 and boost 500 Hz by 3 dB.", eq_snapshot())
+    assert result["action"] == "insert_device"
+    assert result["track"] == {"index": 2, "name": "Vocal"}
+    assert result["device"] == {"name": "EQ Eight"}
+    assert any("tuning" in item for item in result["ambiguity"])
+
+    plain = parse_request("Add EQ Eight to track 3.", eq_snapshot())
+    assert plain["action"] == "insert_device"
+    assert plain["ambiguity"] == []
+
+
+def test_spoken_hundreds_and_spelled_out_units_normalize() -> None:
+    from kenn.core.live_intent import _normalize_spoken_numbers
+
+    assert (
+        _normalize_spoken_numbers("boost five hundred hertz by three decibels")
+        == "boost 500 hertz by 3 decibels"
+    )
+    result = parse_request(
+        "On track three, boost five hundred hertz by three decibels.",
+        eq_snapshot(),
+    )
+    assert result["action"] == "set_eq_band_gain"
+    assert result["track"] == {"index": 2, "name": "Vocal"}
+    assert result["frequency_hz"] == 500.0
+    assert result["desired_value"] == 3.0

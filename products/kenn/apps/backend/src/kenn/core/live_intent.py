@@ -241,23 +241,38 @@ _DEVICE_SETUP_TRAILING = re.compile(
     re.I,
 )
 _INSPECT_DEVICE_PARAMETERS = re.compile(r"\b(?:show|list|inspect|display|what(?:\s+are|\s+is)?)\b.*\b(?:parameters|settings|controls)\b", re.I)
+_EQ_GAIN_VERB_INNER = (
+    r"reduce|lower|decrease|cut|attenuate|back\s+off|turn\s+down"
+    r"|boost|increase|raise|lift|add|apply|push\s+up|turn\s+up|bring\s+up"
+)
+_EQ_BOOST_WORD = re.compile(
+    r"\b(?:boost|increase|raise|lift|apply|push\s+up|turn\s+up|bring\s+up)\b",
+    re.I,
+)
+_EQ_HZ_UNIT = r"(?:hz|hertz)"
+_EQ_DB_UNIT = r"(?:d?b|decibels?)"
 _EQ_BAND_GAIN = re.compile(
-    r"\b(?:reduce|lower|decrease|cut|attenuate)\b.*?"
+    r"\b(?:" + _EQ_GAIN_VERB_INNER + r")\b.*?"
     r"\b(?:amplitude|level|gain|volume)\b.*?\bby\s+" + _NUMBER
-    + r"\s*d?b\b.*?\b(?:at|around)\s+" + _NUMBER + r"\s*hz\b"
+    + r"\s*" + _EQ_DB_UNIT + r"\b.*?\b(?:at|around)\s+" + _NUMBER + r"\s*" + _EQ_HZ_UNIT + r"\b"
     + r"(?:.*?\bband\s*(\d+)\s*([ab])\b)?",
     re.I,
 )
+_EQ_BAND_GAIN_FREQ_FIRST = re.compile(
+    r"\b(?:" + _EQ_GAIN_VERB_INNER + r")\b.*?"
+    + _NUMBER + r"\s*" + _EQ_HZ_UNIT + r"\b.*?\bby\s+" + _NUMBER + r"\s*" + _EQ_DB_UNIT + r"\b",
+    re.I,
+)
 _EQ_BAND_SHORT_GAIN = re.compile(
-    r"\b(?:reduce|lower|decrease|cut|attenuate)\b.*?"
-    r"\bband\s*(\d+)\s*([ab])\b.*?\bby\s+" + _NUMBER + r"\s*d?b\b"
-    r".*?\b(?:at|around)\s+" + _NUMBER + r"\s*hz\b",
+    r"\b(?:" + _EQ_GAIN_VERB_INNER + r")\b.*?"
+    r"\bband\s*(\d+)\s*([ab])\b.*?\bby\s+" + _NUMBER + r"\s*" + _EQ_DB_UNIT + r"\b"
+    r".*?\b(?:at|around)\s+" + _NUMBER + r"\s*" + _EQ_HZ_UNIT + r"\b",
     re.I,
 )
 _EQ_BAND_ONLY_GAIN = re.compile(
-    r"\b(?:reduce|lower|decrease|cut|attenuate)\b.*?"
+    r"\b(?:" + _EQ_GAIN_VERB_INNER + r")\b.*?"
     r"\beq(?:ualizer)?(?:\s+eight)?\b.*?\bband\s*(\d+)\s*([ab])?\b.*?"
-    r"\bby\s+" + _NUMBER + r"\s*d?b\b",
+    r"\bby\s+" + _NUMBER + r"\s*" + _EQ_DB_UNIT + r"\b",
     re.I,
 )
 _EQ_BAND_UNTYPED_SETTING = re.compile(
@@ -270,25 +285,25 @@ _EQ_BAND_ABSOLUTE_GAIN = re.compile(
     r"\b(?:set|change|adjust|modify)\b.*?"
     r"\b(?:eq(?:ualizer)?(?:\s+eight)?|eq\s*8)\b.*?"
     r"(?:\bband\s*)?(\d+)\s*(?:gain\s*)?([ab])\s*"
-    r"(?:\bgain\b\s*)?(?:to|at)\s*" + _NUMBER + r"\s*d?b\b",
+    r"(?:\bgain\b\s*)?(?:to|at)\s*" + _NUMBER + r"\s*" + _EQ_DB_UNIT + r"\b",
     re.I,
 )
 _EQ_BAND_TUNING_GAIN = re.compile(
     r"\b(?:set|move|retune|tune|change)\b.*?"
     r"\b(?:eq(?:ualizer)?(?:\s+eight)?|eq\s*8)\b.*?"
     r"\bband\s*(\d+)\s*([ab])\b.*?"
-    r"\b(?:to|at)\s+" + _NUMBER + r"\s*hz\b.*?"
-    r"\b(?:reduce|lower|decrease|cut|attenuate)\b.*?"
-    r"\b(?:gain|amplitude|level)\b.*?\bby\s+" + _NUMBER + r"\s*d?b\b",
+    r"\b(?:to|at)\s+" + _NUMBER + r"\s*" + _EQ_HZ_UNIT + r"\b.*?"
+    r"\b(?:" + _EQ_GAIN_VERB_INNER + r")\b.*?"
+    r"\b(?:gain|amplitude|level)\b.*?\bby\s+" + _NUMBER + r"\s*" + _EQ_DB_UNIT + r"\b",
     re.I,
 )
 _EQ_BAND_TUNING_GAIN_ABSOLUTE = re.compile(
     r"\b(?:set|move|retune|tune|change|adjust)\b.*?"
     r"\b(?:eq(?:ualizer)?(?:\s+eight)?|eq\s*8)\b.*?"
     r"\bband\s*(\d+)\s*([ab])\b.*?"
-    r"\b(?:frequency|freq)\b\s*(?:to|at|=)?\s*" + _NUMBER + r"\s*hz\b.*?"
+    r"\b(?:frequency|freq)\b\s*(?:to|at|=)?\s*" + _NUMBER + r"\s*" + _EQ_HZ_UNIT + r"\b.*?"
     r"\b(?:and\s+)?(?:set\s+)?(?:gain|amplitude|level)\b\s*(?:to|at|=)\s*"
-    + _NUMBER + r"\s*d?b\b",
+    + _NUMBER + r"\s*" + _EQ_DB_UNIT + r"\b",
     re.I,
 )
 _EQ_DEVICE_REFERENCE = re.compile(
@@ -319,15 +334,38 @@ _SPOKEN_NUMBER_VALUES = {
 }
 _SPOKEN_NUMBER_WORD = "(?:" + "|".join(_SPOKEN_NUMBER_VALUES) + ")"
 _SPOKEN_NUMBER_CONTEXT = re.compile(
-    r"\b(?P<sign>minus|negative)?\s*(?P<first>" + _SPOKEN_NUMBER_WORD + r")"
-    r"(?:\s+(?P<second>" + _SPOKEN_NUMBER_WORD + r"))?"
-    r"(?=\s*(?:db|hz|%|percent\b|ms|milliseconds?\b|:1|left\b|right\b))",
+    r"(?P<sign>\b(?:minus|negative)\s+)?(?P<first>\b(?:" + "|".join(_SPOKEN_NUMBER_VALUES) + r")\b)"
+    r"(?:\s+(?P<hundred>hundred))?"
+    r"(?:\s+(?P<second>\b(?:" + "|".join(_SPOKEN_NUMBER_VALUES) + r")\b))?"
+    r"(?=\s*(?:dbs?|decibels?|hz|hertz|khz|kilohertz|%|percent\b|ms|milliseconds?\b|:1|left\b|right\b))",
     re.I,
 )
 _SPOKEN_SIGNED_DIGIT = re.compile(
     r"\b(?P<sign>minus|negative)\s+(?P<number>-?(?:\d+(?:\.\d+)?|\.\d+))",
     re.I,
 )
+
+
+def _eq_gain_signed(matched_text: str, magnitude: float) -> float:
+    """Apply boost/cut direction to an EQ gain magnitude.
+
+    Boost-family verbs (boost, increase, raise, ...) yield a positive change;
+    everything else keeps the historical cut convention (negative). The match
+    is scoped to the already-matched EQ clause so unrelated words elsewhere
+    in the request cannot flip the sign.
+    """
+    magnitude = abs(float(magnitude))
+    if _EQ_BOOST_WORD.search(matched_text or ""):
+        return magnitude
+    return -magnitude
+
+
+def _spoken_hundred_value(first: int, hundred: str | None, second: int) -> int:
+    if hundred:
+        return first * 100 + second
+    if first >= 20 and 0 <= second < 10:
+        return first + second
+    return first
 
 
 def _normalize_spoken_numbers(text: str) -> str:
@@ -342,7 +380,7 @@ def _normalize_spoken_numbers(text: str) -> str:
         first = _SPOKEN_NUMBER_VALUES[match.group("first").lower()]
         second_text = match.group("second")
         second = _SPOKEN_NUMBER_VALUES[second_text.lower()] if second_text else 0
-        value = first + second if first >= 20 and second < 10 else first
+        value = _spoken_hundred_value(first, match.group("hundred"), second)
         if match.group("sign"):
             value = -value
         return str(value)
@@ -702,20 +740,23 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     insert_device_name = _insert_device_name(lower) if _ADD_DEVICE.search(lower) else None
     add_device_match = insert_device_name is not None
     inspect_device_parameters_match = _INSPECT_DEVICE_PARAMETERS.search(lower)
-    eq_band_match = _EQ_BAND_GAIN.search(lower)
-    eq_band_short_match = _EQ_BAND_SHORT_GAIN.search(lower)
-    eq_band_only_match = _EQ_BAND_ONLY_GAIN.search(lower)
-    eq_band_untyped_match = _EQ_BAND_UNTYPED_SETTING.search(lower)
-    eq_band_absolute_match = _EQ_BAND_ABSOLUTE_GAIN.search(lower)
-    eq_band_tuning_match = _EQ_BAND_TUNING_GAIN.search(lower)
-    eq_band_tuning_absolute_match = _EQ_BAND_TUNING_GAIN_ABSOLUTE.search(lower)
+    eq_band_match = _EQ_BAND_GAIN.search(numeric_text)
+    eq_band_freq_first_match = None
+    if eq_band_match is None:
+        eq_band_freq_first_match = _EQ_BAND_GAIN_FREQ_FIRST.search(numeric_text)
+    eq_band_short_match = _EQ_BAND_SHORT_GAIN.search(numeric_text)
+    eq_band_only_match = _EQ_BAND_ONLY_GAIN.search(numeric_text)
+    eq_band_untyped_match = _EQ_BAND_UNTYPED_SETTING.search(numeric_text)
+    eq_band_absolute_match = _EQ_BAND_ABSOLUTE_GAIN.search(numeric_text)
+    eq_band_tuning_match = _EQ_BAND_TUNING_GAIN.search(numeric_text)
+    eq_band_tuning_absolute_match = _EQ_BAND_TUNING_GAIN_ABSOLUTE.search(numeric_text)
     eq_device_reference = _EQ_DEVICE_REFERENCE.search(lower)
     eq_device_index = None
     if eq_device_reference:
         # Device numbers in user commands are one-based; Live indices remain
         # zero-based in the typed intent and proposal.
         eq_device_index = int(eq_device_reference.group(1)) - 1
-    eq_band_request = eq_band_match or eq_band_short_match or eq_band_only_match
+    eq_band_request = eq_band_match or eq_band_freq_first_match or eq_band_short_match or eq_band_only_match
     if any(cue in lower for cue in ("list my tracks", "what tracks", "show my tracks", "show the tracks")):
         base.update({"action": "inspect_tracks", "confidence": 0.99})
         return base
@@ -1071,7 +1112,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                 base["device"] = {"name": "EQ Eight", **({"index": eq_device_index} if eq_device_index is not None else {})}
                 base["parameter"] = {"name": "Gain"}
                 match = eq_band_tuning_match or eq_band_tuning_absolute_match
-                base["desired_value"] = float(match.group(4)) if eq_band_tuning_absolute_match else -abs(float(match.group(4)))
+                base["desired_value"] = float(match.group(4)) if eq_band_tuning_absolute_match else _eq_gain_signed(match.group(0), match.group(4))
                 base["relative"] = eq_band_tuning_absolute_match is None
                 base["unit"] = "dB"
                 base["frequency_hz"] = float(match.group(3))
@@ -1081,20 +1122,25 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                 base["device"] = {"name": "EQ Eight", **({"index": eq_device_index} if eq_device_index is not None else {})}
                 base["parameter"] = {"name": "Gain"}
                 if eq_band_match:
-                    base["desired_value"] = -abs(float(eq_band_match.group(1)))
+                    base["desired_value"] = _eq_gain_signed(eq_band_match.group(0), eq_band_match.group(1))
                     base["relative"] = True
                     base["unit"] = "dB"
                     base["frequency_hz"] = float(eq_band_match.group(2))
                     if eq_band_match.group(3) and eq_band_match.group(4):
                         base["eq_band"] = f"{int(eq_band_match.group(3))}{eq_band_match.group(4).upper()}"
+                elif eq_band_freq_first_match:
+                    base["desired_value"] = _eq_gain_signed(eq_band_freq_first_match.group(0), eq_band_freq_first_match.group(2))
+                    base["relative"] = True
+                    base["unit"] = "dB"
+                    base["frequency_hz"] = float(eq_band_freq_first_match.group(1))
                 elif eq_band_short_match:
-                    base["desired_value"] = -abs(float(eq_band_short_match.group(3)))
+                    base["desired_value"] = _eq_gain_signed(eq_band_short_match.group(0), eq_band_short_match.group(3))
                     base["relative"] = True
                     base["unit"] = "dB"
                     base["frequency_hz"] = float(eq_band_short_match.group(4))
                     base["eq_band"] = f"{int(eq_band_short_match.group(1))}{eq_band_short_match.group(2).upper()}"
                 else:
-                    base["desired_value"] = -abs(float(eq_band_only_match.group(3)))
+                    base["desired_value"] = _eq_gain_signed(eq_band_only_match.group(0), eq_band_only_match.group(3))
                     base["relative"] = True
                     base["unit"] = "dB"
                     base["eq_band_number"] = int(eq_band_only_match.group(1))
@@ -1147,7 +1193,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             "action": "set_eq_band_tuning_gain",
             "device": {"name": "EQ Eight", **({"index": eq_device_index} if eq_device_index is not None else {})},
             "parameter": {"name": "Gain"},
-            "desired_value": float(match.group(4)) if eq_band_tuning_absolute_match else -abs(float(match.group(4))),
+            "desired_value": float(match.group(4)) if eq_band_tuning_absolute_match else _eq_gain_signed(match.group(0), match.group(4)),
             "relative": eq_band_tuning_absolute_match is None,
             "unit": "dB",
             "frequency_hz": float(match.group(3)),
@@ -1179,7 +1225,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             "action": "set_eq_band_gain",
             "device": {"name": "EQ Eight", **({"index": eq_device_index} if eq_device_index is not None else {})},
             "parameter": {"name": "Gain"},
-            "desired_value": -abs(float(eq_band_short_match.group(3))),
+            "desired_value": _eq_gain_signed(eq_band_short_match.group(0), eq_band_short_match.group(3)),
             "relative": True,
             "unit": "dB",
             "frequency_hz": float(eq_band_short_match.group(4)),
@@ -1197,6 +1243,15 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             "confirmation_required": True,
             "confidence": 0.95,
         })
+        if eq_band_request or eq_band_tuning_match or eq_band_tuning_absolute_match:
+            # The request also names EQ frequency/gain tuning. Insertion and
+            # tuning are separate guarded proposals: the tuning step can only
+            # be bound once the device exists in a fresh snapshot, so say so
+            # instead of silently dropping the second half of the request.
+            base["ambiguity"].append(
+                "EQ frequency/gain tuning was also requested; it needs a second proposal after "
+                f"{insert_device_name} exists on the track. Confirm the insertion first, then request the tuning."
+            )
         return base
 
     if eq_band_request:
@@ -1205,7 +1260,10 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             "action": "set_eq_band_gain",
             "device": {"name": "EQ Eight", **({"index": eq_device_index} if eq_device_index is not None else {})},
             "parameter": {"name": "Gain"},
-            "desired_value": -abs(float(eq_band_match.group(1) if eq_band_match else eq_band_only_match.group(3))),
+            "desired_value": _eq_gain_signed(
+                (eq_band_match or eq_band_freq_first_match or eq_band_only_match).group(0),
+                eq_band_match.group(1) if eq_band_match else (eq_band_freq_first_match.group(2) if eq_band_freq_first_match else eq_band_only_match.group(3)),
+            ),
             "relative": True,
             "unit": "dB",
             "confirmation_required": True,
@@ -1215,6 +1273,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             base["frequency_hz"] = float(eq_band_match.group(2))
             if eq_band_match.group(3) and eq_band_match.group(4):
                 base["eq_band"] = f"{int(eq_band_match.group(3))}{eq_band_match.group(4).upper()}"
+        elif eq_band_freq_first_match:
+            base["frequency_hz"] = float(eq_band_freq_first_match.group(1))
         else:
             base["eq_band_number"] = int(eq_band_only_match.group(1))
             if eq_band_only_match.group(2):
