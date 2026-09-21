@@ -1497,6 +1497,47 @@ def test_eq_band_gain_confirmation_is_idempotent_and_undoable() -> None:
     assert fake.writes[-1] == ("eq_gain", 3, 0, 12, 0.0)
 
 
+def test_eq_band_boost_applies_positive_gain_and_undoes() -> None:
+    fake = FakeLive()
+    service = _service(fake)
+    planned = handle_command(
+        "boost amplitude by 3 dB at 250 Hz on track 4",
+        session_id="command-eq-boost",
+        service=service,
+    )
+    assert planned["status"] == "confirmation_required"
+    proposal = planned["proposal"]
+    assert proposal["eq_band"] == "1A"
+    assert proposal["frequency_hz"] == 250.0
+    assert proposal["after"] == 3.0
+    assert fake.writes == []
+
+    applied = handle_command(
+        "boost amplitude by 3 dB at 250 Hz on track 4",
+        session_id="command-eq-boost",
+        service=service,
+        proposal=proposal,
+        confirm_token=proposal["confirmation_token"],
+        idempotency_key=proposal["id"],
+    )
+    assert applied["status"] == "applied"
+    assert applied["receipt"]["verified"] is True
+    assert fake.eq_gain == 3.0
+
+    undo = service.propose_undo(applied["receipt"], session_id="command-eq-boost-undo")
+    assert undo["ok"] is True
+    undo_proposal = undo["proposal"]
+    undone = service.execute_device_action(
+        undo_proposal,
+        confirm_token=undo_proposal["confirmation_token"],
+        session_id="command-eq-boost-undo",
+        idempotency_key=undo_proposal["id"],
+    )
+    assert undone["ok"] is True
+    assert undone["receipt"]["verified"] is True
+    assert fake.eq_gain == 0.0
+
+
 def test_eq_band_tuning_and_gain_is_one_confirmed_transaction_and_undoable() -> None:
     fake = FakeLive()
     service = _service(fake)
