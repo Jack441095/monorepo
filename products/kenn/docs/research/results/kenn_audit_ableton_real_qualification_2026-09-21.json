@@ -1,7 +1,9 @@
 {
-  "captured_at": 1790006865.6767612,
+  "backend": "ableton-control-deck-mcp",
+  "captured_at": 1790013406.85058,
   "checks": {
-    "connected": false,
+    "backend_match": true,
+    "connected": true,
     "read_only_probe": true,
     "track_identity_fields": true
   },
@@ -12,16 +14,98 @@
     "A deterministic_mock result is harness evidence only and is never real-Live evidence."
   ],
   "mode": "real",
-  "runtime_ms": 64.512,
+  "required_backend": "ableton-control-deck-mcp",
+  "runtime_ms": 3450.419,
   "schema": "kenn.ableton_qualification.v1",
-  "session_version": "85b11aa6e4f9f4eea1c00d9d344ecb80230f348baf700bfab0d790e6fc03c7b1",
+  "session_version": "0128be2b47afddc9f3f997d8c6b86bcd93e471dafe1d29db4a269dd8ea2296a7",
   "snapshot": {
-    "error": "No standard AbletonOSC response; select AbletonOSC in Live's Control Surface settings.",
-    "host": "127.0.0.1",
-    "port": 11000,
-    "scenes": [],
-    "status": "offline",
-    "tracks": []
+    "backend": "ableton-control-deck-mcp",
+    "host": "stdio",
+    "is_playing": false,
+    "master_track": null,
+    "port": null,
+    "return_tracks": [],
+    "scenes": [
+      {
+        "index": 0,
+        "name": ""
+      },
+      {
+        "index": 1,
+        "name": ""
+      },
+      {
+        "index": 2,
+        "name": ""
+      },
+      {
+        "index": 3,
+        "name": ""
+      },
+      {
+        "index": 4,
+        "name": ""
+      },
+      {
+        "index": 5,
+        "name": ""
+      },
+      {
+        "index": 6,
+        "name": ""
+      },
+      {
+        "index": 7,
+        "name": ""
+      }
+    ],
+    "selected_track_index": 0,
+    "signature_denominator": 4,
+    "signature_numerator": 4,
+    "status": "connected",
+    "tempo": 120,
+    "tracks": [
+      {
+        "armed": false,
+        "devices": [],
+        "index": 0,
+        "muted": false,
+        "name": "1-MIDI",
+        "pan": 0,
+        "soloed": false,
+        "volume": 0.8500000238418579
+      },
+      {
+        "armed": false,
+        "devices": [],
+        "index": 1,
+        "muted": false,
+        "name": "2-MIDI",
+        "pan": 0,
+        "soloed": false,
+        "volume": 0.8500000238418579
+      },
+      {
+        "armed": false,
+        "devices": [],
+        "index": 2,
+        "muted": false,
+        "name": "3-Audio",
+        "pan": 0,
+        "soloed": false,
+        "volume": 0.8500000238418579
+      },
+      {
+        "armed": false,
+        "devices": [],
+        "index": 3,
+        "muted": false,
+        "name": "4-Audio",
+        "pan": 0,
+        "soloed": false,
+        "volume": 0.8500000238418579
+      }
+    ]
   },
-  "status": "blocked"
+  "status": "passed"
 }
