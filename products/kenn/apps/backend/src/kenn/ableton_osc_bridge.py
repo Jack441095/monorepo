@@ -1887,8 +1887,15 @@ class AbletonOSCClient:
 
 # Do not claim UDP 11001 during module import. This makes CLI tools and test
 # runners safe to import while a companion process is already running; the
-# production singleton binds lazily on its first exchange.
-live_client = AbletonOSCClient(defer_bind=True, enable_circuit_breaker=True)
+# production singleton binds lazily on its first exchange.  Operators can
+# explicitly select the read-only Control Deck MCP backend; a bad MCP
+# configuration fails closed and never silently falls back to OSC.
+from kenn.core.live_backend_factory import create_live_backend
+
+
+live_client = create_live_backend(
+    lambda: AbletonOSCClient(defer_bind=True, enable_circuit_breaker=True)
+)
 
 
 __all__ = [

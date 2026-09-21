@@ -24,6 +24,27 @@ def test_snapshot_qualification_uses_the_companion_endpoint(monkeypatch) -> None
     assert calls == ["http://kenn:8090"]
 
 
+def test_snapshot_qualification_can_require_the_mcp_backend(monkeypatch) -> None:
+    monkeypatch.setattr(
+        snapshot_runner,
+        "_real_snapshot",
+        lambda endpoint: {
+            "status": "connected",
+            "backend": "ableton-control-deck-mcp",
+            "tracks": [{"index": 0, "name": "Drums"}],
+        },
+    )
+    matched = snapshot_runner.qualify(
+        "real", "http://kenn:8090", "ableton-control-deck-mcp"
+    )
+    mismatched = snapshot_runner.qualify("real", "http://kenn:8090", "osc")
+
+    assert matched["status"] == "passed"
+    assert matched["checks"]["backend_match"] is True
+    assert mismatched["status"] == "blocked"
+    assert mismatched["checks"]["backend_match"] is False
+
+
 def test_qualification_runner_uses_command_status_and_completes_undo(monkeypatch) -> None:
     state = {"value": 0.0}
     calls: list[tuple[str, dict]] = []

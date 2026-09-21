@@ -2,7 +2,25 @@
 
 ## No Live connection
 
-Report `offline`/`dispatched`, confirm Live is open, confirm `AbletonOSC` is selected after restart, check `GET /api/ableton/capabilities` for the explicit endpoint contract, check UDP 127.0.0.1:11000 and response port 11001, and retry a read-only snapshot. A second post-hardening companion launch exits with status 2 and the active owner's PID before serving HTTP; stop only that exact KENN instance before retrying. For older builds that report `Address already in use` for UDP 11001, use `lsof -nP -iUDP:11001` to identify the exact owner. Never kill an unidentified process or broadly match process names. Do not claim a write succeeded.
+First inspect `KENN_LIVE_BACKEND` and `GET /api/ableton/capabilities`.
+
+For `control-deck-mcp`, report `offline`, confirm Live is open, confirm `Control
+Deck` is selected after restart, and run the configured
+`KENN_LIVE_MCP_COMMAND` directly to expose its startup error. Confirm
+`KENN_LIVE_MCP_CWD` still points at the built Control Deck checkout. Do not
+change the backend to OSC as a workaround: an explicitly selected MCP backend
+fails closed. KENN's Control Deck adapter is read-only until real-Live
+qualification is recorded, even though the upstream provider advertises write
+tools.
+
+For `osc`, report `offline`/`dispatched`, confirm Live is open, confirm
+`AbletonOSC` is selected after restart, check UDP 127.0.0.1:11000 and response
+port 11001, and retry a read-only snapshot. A second post-hardening companion
+launch exits with status 2 and the active owner's PID before serving HTTP; stop
+only that exact KENN instance before retrying. For older builds that report
+`Address already in use` for UDP 11001, use `lsof -nP -iUDP:11001` to identify
+the exact owner. Never kill an unidentified process or broadly match process
+names. Do not claim a write succeeded.
 
 ## Stale or ambiguous proposal
 
