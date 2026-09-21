@@ -24,7 +24,7 @@ import time
 from copy import deepcopy
 from typing import Any
 
-from kenn.core.device_units import display_to_raw, normalize_unit
+from kenn.core.device_units import display_to_raw, find_profile, normalize_unit, raw_to_display
 from kenn.core.live_action_service import (
     BUS_ORGANIZATION_PROPOSAL_SCHEMA,
     BUS_ORGANIZATION_RECEIPT_SCHEMA,
@@ -589,6 +589,27 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
                         candidate_value += float(exact_parameter.get("value"))
                     except (TypeError, ValueError):
                         return {"ok": False, "error": "The Live capability profile has no usable current value for a relative device change."}
+                else:
+                    # Absolute display-unit values (dB, Hz) convert through
+                    # an evidence-backed profile when one exists, mirroring
+                    # the deterministic resolver. Without a profile the
+                    # legacy raw passthrough applies and the range check
+                    # below decides.
+                    absolute_profile = find_profile(
+                        device_name=observed_name,
+                        parameter_name=str(exact_parameter.get("name", "")),
+                        unit=unit,
+                    )
+                    if absolute_profile is not None:
+                        converted, conversion_error = display_to_raw(
+                            device_name=observed_name,
+                            parameter_name=str(exact_parameter.get("name", "")),
+                            value=requested_value,
+                            unit=unit,
+                        )
+                        if conversion_error:
+                            return {"ok": False, "error": conversion_error}
+                        candidate_value = float(converted)
                 try:
                     minimum = float(exact_parameter.get("min"))
                     maximum = float(exact_parameter.get("max"))
@@ -1458,7 +1479,36 @@ def _resolve_device_parameter(
         return {"ok": False, "clarification": "Live returned a non-finite device value, so I will not create a proposal."}
     unit = normalize_unit(intent.get("unit"))
     if intent.get("relative"):
-        if unit.lower() == "db":
+        relative_profile = find_profile(
+            device_name=device_name,
+            parameter_name=str(parameter.get("name", "")),
+            unit=unit,
+        )
+        if relative_profile is not None and relative_profile.mapping in {"table", "log"}:
+            # Tabulated/logarithmic displays have no meaningful raw delta:
+            # resolve the signed display change against the current raw
+            # value through a display round-trip instead.
+            current_display, display_error = raw_to_display(
+                device_name=device_name,
+                parameter_name=str(parameter.get("name", "")),
+                raw=current,
+                unit=unit,
+            )
+            if display_error:
+                return {"ok": False, "clarification": display_error}
+            absolute_display = float(current_display) + float(requested_value)
+            converted_value, conversion_error = display_to_raw(
+                device_name=device_name,
+                parameter_name=str(parameter.get("name", "")),
+                value=absolute_display,
+                unit=unit,
+            )
+            if conversion_error:
+                return {"ok": False, "clarification": conversion_error}
+            requested_value = float(converted_value)
+        elif unit.lower() == "db" and relative_profile is None:
+            # Legacy raw==dB passthrough for unmapped parameters (e.g. EQ
+            # band gains whose raw values already read in dB).
             requested_value = current + requested_value
         else:
             converted_delta, conversion_error = display_to_raw(
@@ -1481,6 +1531,25 @@ def _resolve_device_parameter(
         if conversion_error:
             return {"ok": False, "clarification": conversion_error}
         requested_value = float(converted_value)
+    else:
+        # Absolute display-unit values (dB, Hz) convert through an
+        # evidence-backed profile when one exists. Without a profile the
+        # legacy raw passthrough applies and Live's own range check decides.
+        profile = find_profile(
+            device_name=device_name,
+            parameter_name=str(parameter.get("name", "")),
+            unit=unit,
+        )
+        if profile is not None:
+            converted_value, conversion_error = display_to_raw(
+                device_name=device_name,
+                parameter_name=str(parameter.get("name", "")),
+                value=requested_value,
+                unit=unit,
+            )
+            if conversion_error:
+                return {"ok": False, "clarification": conversion_error}
+            requested_value = float(converted_value)
     result = service.propose_device_action(
         track_index=int(track["index"]),
         device_index=int(device_index),

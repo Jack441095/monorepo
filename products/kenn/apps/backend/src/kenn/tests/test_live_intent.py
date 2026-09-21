@@ -950,3 +950,28 @@ def test_spoken_hundreds_and_spelled_out_units_normalize() -> None:
     assert result["track"] == {"index": 2, "name": "Vocal"}
     assert result["frequency_hz"] == 500.0
     assert result["desired_value"] == 3.0
+
+
+def test_kilohertz_device_values_normalize_to_hertz() -> None:
+    snapshot = {
+        "status": "connected",
+        "tracks": [{"index": 0, "name": "T1", "devices": [{"index": 0, "name": "Auto Filter"}]}],
+    }
+    result = parse_request("Set Auto Filter Frequency to 1 kHz on track 1.", snapshot)
+    assert result["action"] == "set_device_parameter"
+    assert result["desired_value"] == 1000.0
+    assert result["unit"] == "hz"
+
+
+def test_spelled_out_decibel_unit_parses_on_device_parameters() -> None:
+    snapshot = {
+        "status": "connected",
+        "tracks": [
+            {"index": 0, "name": "T1", "devices": []},
+            {"index": 1, "name": "T2", "devices": [{"index": 0, "name": "Compressor"}]},
+        ],
+    }
+    result = parse_request("Set Compressor Threshold to eighteen decibels on track 2.", snapshot)
+    assert result["action"] == "set_device_parameter"
+    assert result["desired_value"] == 18.0
+    assert result["unit"] == "db"
