@@ -90,3 +90,63 @@ def test_roar_drive_db_and_drywet_mapping() -> None:
     )
     assert error_dw is None
     assert raw_dw == approx(0.50)
+
+
+def test_compressor_threshold_table_matches_measured_live_points() -> None:
+    assert find_profile("Compressor", "Threshold", "dB") is not None
+    raw, error = display_to_raw(
+        device_name="Compressor", parameter_name="Threshold",
+        value=-18.0, unit="dB",
+    )
+    assert error is None
+    assert raw == approx(0.4, abs=1e-9)
+    raw_mid, error_mid = display_to_raw(
+        device_name="Compressor", parameter_name="Threshold",
+        value=-17.0, unit="decibels",
+    )
+    assert error_mid is None
+    assert 0.4 < raw_mid < 0.45
+
+
+def test_compressor_threshold_rejects_values_outside_measured_table() -> None:
+    raw, error = display_to_raw(
+        device_name="Compressor", parameter_name="Threshold",
+        value=-70.0, unit="dB",
+    )
+    assert raw is None
+    assert "outside the qualified range" in (error or "")
+
+
+def test_auto_filter_frequency_log_mapping_matches_measured_live_points() -> None:
+    assert find_profile("Auto Filter", "Frequency", "hz") is not None
+    raw, error = display_to_raw(
+        device_name="Auto Filter", parameter_name="Frequency",
+        value=1000.0, unit="Hz",
+    )
+    assert error is None
+    assert raw == approx(0.5663233347786729, rel=1e-6)
+    raw_edge, error_edge = display_to_raw(
+        device_name="Auto Filter", parameter_name="Frequency",
+        value=20.0, unit="hertz",
+    )
+    assert error_edge is None
+    assert raw_edge == approx(0.0, abs=1e-9)
+
+
+def test_auto_filter_frequency_rejects_subsonic_requests() -> None:
+    raw, error = display_to_raw(
+        device_name="Auto Filter", parameter_name="Frequency",
+        value=5.0, unit="hz",
+    )
+    assert raw is None
+    assert "outside the qualified range" in (error or "")
+
+
+def test_saturator_drive_db_mapping_is_linear_and_measured() -> None:
+    assert find_profile("Saturator", "Drive", "dB") is not None
+    raw, error = display_to_raw(
+        device_name="Saturator", parameter_name="Drive",
+        value=4.0, unit="dB",
+    )
+    assert error is None
+    assert raw == approx(0.5555555555555556, rel=1e-9)

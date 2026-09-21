@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from kenn.core.live_action_service import LiveActionService
+from kenn.core.device_units import raw_to_display
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA, RECIPE_RECEIPT_SCHEMA
 import kenn.core.live_command as live_command_module
 from kenn.core.live_command import handle_command, validate_llm_plan
@@ -27,7 +28,11 @@ class FakeLive:
             "scenes": [{"index": 0, "name": "Intro"}, {"index": 1, "name": "Chorus"}],
         }
         self.writes: list[tuple] = []
-        self.threshold = -12.0
+        # Production AbletonOSC reports Compressor Threshold raw-normalized
+        # (measured real-Live 2026-09-21: raw 0.55 reads "-12 dB", range
+        # 0.0..1.0). The double keeps raw domain so display conversions
+        # resolve exactly as they do against Live.
+        self.threshold = 0.55
         self.eq_gain = 0.0
         self.frequency_value = 250.0
         self.frequency_display = "250 Hz"
@@ -187,7 +192,7 @@ class FakeLive:
         return {
             "success": True,
             "device_name": "Compressor",
-            "parameters": [{"index": 0, "name": "Threshold", "value": self.threshold, "min": -60.0, "max": 0.0}],
+            "parameters": [{"index": 0, "name": "Threshold", "value": self.threshold, "min": 0.0, "max": 1.0}],
         }
 
     def set_device_parameter(self, track_index: int, device_index: int, parameter_index: int, value: float) -> bool:
@@ -214,6 +219,13 @@ class FakeLive:
             return {"success": True, "value_string": self.frequency_display}
         if track_index == 3 and device_index == 0 and parameter_index == 12:
             return {"success": True, "value_string": f"{self.eq_gain:g} dB"}
+        if track_index == 2 and device_index == 0 and parameter_index == 0:
+            display, error = raw_to_display(
+                device_name="Compressor", parameter_name="Threshold",
+                raw=self.threshold, unit="db",
+            )
+            if error is None:
+                return {"success": True, "value_string": f"{display:g} dB"}
         return {"success": False, "error": "test double has no display metadata"}
 
     def insert_device_with_result(self, track_index: int, device_name: str, insertion_index: int) -> dict:
@@ -1084,9 +1096,9 @@ def test_device_parameter_inspection_is_read_only_and_returns_ranges() -> None:
     assert result["parameters"] == [{
         "index": 0,
         "name": "Threshold",
-        "value": -12.0,
-        "min": -60.0,
-        "max": 0.0,
+        "value": 0.55,
+        "min": 0.0,
+        "max": 1.0,
     }]
 
 
@@ -1341,8 +1353,8 @@ def test_device_parameter_reconciles_a_mutation_when_the_osc_ack_is_missing() ->
     assert applied["status"] == "applied"
     assert applied["receipt"]["verified"] is True
     assert applied["receipt"]["write_acknowledgement"] == "unacknowledged_write_reconciled"
-    assert fake.threshold == -14.0
-    assert fake.writes == [("threshold", 2, 0, 0, -14.0)]
+    assert fake.threshold == 0.5
+    assert fake.writes == [("threshold", 2, 0, 0, 0.5)]
 
 
 def test_eq_insertion_refuses_duplicate_and_never_writes() -> None:
@@ -1538,6 +1550,47 @@ def test_eq_band_boost_applies_positive_gain_and_undoes() -> None:
     assert fake.eq_gain == 0.0
 
 
+def test_compressor_threshold_display_db_converts_to_measured_raw() -> None:
+    """Absolute -18 dB must resolve to raw 0.4 (measured real-Live table)."""
+    fake = FakeLive()
+    service = _service(fake)
+    planned = handle_command(
+        "Set Compressor Threshold to -18 dB on track 3",
+        session_id="command-threshold-display",
+        service=service,
+    )
+    assert planned["status"] == "confirmation_required"
+    proposal = planned["proposal"]
+    assert proposal["after"] == 0.4
+    assert fake.writes == []
+    applied = handle_command(
+        "Set Compressor Threshold to -18 dB on track 3",
+        session_id="command-threshold-display",
+        service=service,
+        proposal=proposal,
+        confirm_token=proposal["confirmation_token"],
+        idempotency_key=proposal["id"],
+    )
+    assert applied["status"] == "applied"
+    assert applied["receipt"]["verified"] is True
+    assert applied["receipt"]["readback_display"] == "-18 dB"
+    assert fake.threshold == 0.4
+    assert fake.writes == [("threshold", 2, 0, 0, 0.4)]
+
+    undo = service.propose_undo(applied["receipt"], session_id="command-threshold-display-undo")
+    assert undo["ok"] is True
+    undo_proposal = undo["proposal"]
+    undone = service.execute_device_action(
+        undo_proposal,
+        confirm_token=undo_proposal["confirmation_token"],
+        session_id="command-threshold-display-undo",
+        idempotency_key=undo_proposal["id"],
+    )
+    assert undone["ok"] is True
+    assert undone["receipt"]["verified"] is True
+    assert fake.threshold == 0.55
+
+
 def test_eq_band_tuning_and_gain_is_one_confirmed_transaction_and_undoable() -> None:
     fake = FakeLive()
     service = _service(fake)
@@ -1703,7 +1756,7 @@ def test_existing_device_parameter_uses_current_value_for_relative_change() -> N
     service = _service(fake)
     planned = handle_command("lower the Vocal Compressor threshold by 2 dB", session_id="command-device", service=service)
     assert planned["status"] == "confirmation_required"
-    assert planned["proposal"]["after"] == -14.0
+    assert planned["proposal"]["after"] == 0.5
     assert fake.writes == []
 
     applied = handle_command(
@@ -1715,7 +1768,7 @@ def test_existing_device_parameter_uses_current_value_for_relative_change() -> N
         idempotency_key=planned["proposal"]["id"],
     )
     assert applied["status"] == "applied"
-    assert fake.threshold == -14.0
+    assert fake.threshold == 0.5
 
 
 def test_llm_plan_must_bind_to_the_current_snapshot() -> None:
@@ -1869,7 +1922,7 @@ def test_llm_planner_receives_target_device_capabilities_and_exact_profile_is_en
     out_of_range = {**valid, "value": -80.0}
     checked = validate_llm_plan(out_of_range, enriched)
     assert checked["ok"] is False
-    assert "capability range" in checked["error"]
+    assert "qualified range" in checked["error"]
 
     unsupported_unit = {**valid, "value": 10.0, "unit": "ms"}
     checked = validate_llm_plan(unsupported_unit, enriched)
@@ -2015,8 +2068,8 @@ def test_natural_recipe_resolves_existing_device_parameter_without_writing_befor
     assert planned["proposal"]["steps"][0]["action"] == "set_mute"
     assert planned["proposal"]["steps"][1]["action"] == "set_device_parameter"
     assert planned["proposal"]["steps"][1]["parameter"] == "Threshold"
-    assert planned["proposal"]["steps"][1]["before"] == -12.0
-    assert planned["proposal"]["steps"][1]["after"] == -14.0
+    assert planned["proposal"]["steps"][1]["before"] == 0.55
+    assert planned["proposal"]["steps"][1]["after"] == 0.5
     assert fake.writes == []
 
     applied = handle_command(
@@ -2030,8 +2083,8 @@ def test_natural_recipe_resolves_existing_device_parameter_without_writing_befor
     assert applied["status"] == "applied"
     assert applied["receipt"]["verified"] is True
     assert fake.state["tracks"][0]["muted"] is True
-    assert fake.threshold == -14.0
-    assert fake.writes == [("mute", 0, True), ("threshold", 2, 0, 0, -14.0)]
+    assert fake.threshold == 0.5
+    assert fake.writes == [("mute", 0, True), ("threshold", 2, 0, 0, 0.5)]
 
 
 def test_natural_send_recipe_applies_and_undoes_with_exact_return_identity() -> None:

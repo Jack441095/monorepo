@@ -475,7 +475,7 @@ def _generic_device_parameter_match(text: str, device_name: str) -> dict[str, st
     tail = text[device_match.end():]
     match = re.search(
         r"\s+(?:the\s+)?(?P<parameter>[a-z0-9][a-z0-9]*(?:[ /_-]+[a-z0-9][a-z0-9]*){0,3}?)"
-        r"\s+(?P<verb>to|by)\s+" + _NUMBER + r"\s*(?P<unit>db|hz|%|percent|ms|milliseconds?|:1)?(?=\s|$|on\b)",
+        r"\s+(?P<verb>to|by)\s+" + _NUMBER + r"\s*(?P<unit>db|dbs|decibels?|hz|hertz|khz|kilohertz|%|percent|ms|milliseconds?|:1)?(?=\s|$|on\b)",
         tail,
         re.I,
     )
@@ -491,7 +491,7 @@ def _generic_device_parameter_match(text: str, device_name: str) -> dict[str, st
     # where the track phrase sits between the parameter and numeric value.
     match = re.search(
         r"\s+(?:the\s+)?(?P<parameter>[a-z0-9][a-z0-9]*(?:[ /_-]+[a-z0-9][a-z0-9]*){0,3}?)"
-        r"\s+on\s+.+?\s+(?P<verb>to|by)\s+" + _NUMBER + r"\s*(?P<unit>db|hz|%|percent|ms|milliseconds?|:1)?(?=\s|$)",
+        r"\s+on\s+.+?\s+(?P<verb>to|by)\s+" + _NUMBER + r"\s*(?P<unit>db|dbs|decibels?|hz|hertz|khz|kilohertz|%|percent|ms|milliseconds?|:1)?(?=\s|$)",
         tail,
         re.I,
     )
@@ -513,7 +513,7 @@ def _generic_device_parameter_match(text: str, device_name: str) -> dict[str, st
         re.I,
     )
     suffix_match = re.search(
-        r"\s+(?P<verb>to|by)\s+" + _NUMBER + r"\s*(?P<unit>db|hz|%|percent|ms|milliseconds?|:1)?(?=\s|$)",
+        r"\s+(?P<verb>to|by)\s+" + _NUMBER + r"\s*(?P<unit>db|dbs|decibels?|hz|hertz|khz|kilohertz|%|percent|ms|milliseconds?|:1)?(?=\s|$)",
         tail,
         re.I,
     )
@@ -1442,8 +1442,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         else:
             base.update({"mode": "inspect", "action": "inspect_device_parameters", "confirmation_required": False, "confidence": 0.99})
         return base
-    delta_match = re.search(r"\b(lower|reduce|decrease|raise|increase|boost)\b.*?\b(threshold|ratio|attack|release|frequency|gain|q)\b.*?by\s+" + _NUMBER + r"\s*(db|hz|%|ms|milliseconds?|:1)?", lower)
-    set_match = re.search(r"\bset\b.*?\b(threshold|ratio|attack|release|frequency|gain|q)\b.*?to\s+" + _NUMBER + r"\s*(db|hz|%|ms|milliseconds?|:1)?", lower)
+    delta_match = re.search(r"\b(lower|reduce|decrease|raise|increase|boost)\b.*?\b(threshold|ratio|attack|release|frequency|gain|q)\b.*?by\s+" + _NUMBER + r"\s*(db|dbs|decibels?|hz|hertz|khz|kilohertz|%|percent|ms|milliseconds?|:1)?", lower)
+    set_match = re.search(r"\bset\b.*?\b(threshold|ratio|attack|release|frequency|gain|q)\b.*?to\s+" + _NUMBER + r"\s*(db|dbs|decibels?|hz|hertz|khz|kilohertz|%|percent|ms|milliseconds?|:1)?", lower)
     if device is not None and (delta_match or set_match):
         match = delta_match or set_match
         relative = delta_match is not None
@@ -1451,6 +1451,15 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         parameter_name = (delta_match.group(2) if delta_match else set_match.group(1)).title()
         amount = float(delta_match.group(3) if delta_match else set_match.group(2))
         requested_unit = (delta_match.group(4) if delta_match else set_match.group(3)) or "value"
+        if str(requested_unit).lower() in {"khz", "kilohertz"}:
+            amount = amount * 1000.0
+            requested_unit = "hz"
+        elif str(requested_unit).lower() in {"dbs", "decibel", "decibels"}:
+            requested_unit = "db"
+        elif str(requested_unit).lower() == "hertz":
+            requested_unit = "hz"
+        elif str(requested_unit).lower() == "percent":
+            requested_unit = "%"
         display_error = _display_unit_error(
             device_name=device[1], parameter_name=parameter_name, value=amount,
             unit=requested_unit, relative=relative,
@@ -1493,6 +1502,15 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             unit = generic_match["unit"] or ("dB" if relative else "value")
             if str(unit).lower() == "percent":
                 unit = "%"
+            if str(unit).lower() in {"khz", "kilohertz"}:
+                # Live frequency displays use Hz; kilo-hertz is scaled here so
+                # every downstream resolver sees canonical Hz values.
+                amount = amount * 1000.0
+                unit = "hz"
+            elif str(unit).lower() in {"dbs", "decibel", "decibels"}:
+                unit = "db"
+            elif str(unit).lower() == "hertz":
+                unit = "hz"
             parameter_name = generic_match["parameter"].strip().title()
             display_error = _display_unit_error(
                 device_name=device[1], parameter_name=parameter_name, value=amount,
