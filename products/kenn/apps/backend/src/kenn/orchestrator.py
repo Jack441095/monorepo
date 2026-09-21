@@ -411,7 +411,7 @@ _ABLETON_WRITE_INTENT_RE = re.compile(
 
 
 def _dispatch_ableton(**kwargs: Any) -> Dict[str, Any]:
-    """Dispatch to the Ableton OSC controller.
+    """Dispatch to the configured Ableton Live backend.
 
     Route write-shaped chat requests through the same canonical command
     gateway used by the HTTP and MCP surfaces.  This keeps ordinary chat in
@@ -489,8 +489,8 @@ def _dispatch_ableton(**kwargs: Any) -> Dict[str, Any]:
             "message": (
                 header
                 + "\n".join(track_lines) + "\n\n"
-                "I can adjust any track's volume, pan, or device parameters. "
-                "Just tell me what you'd like to change."
+                "I can inspect the session and prepare only the changes supported by the selected backend. "
+                "Any enabled change still requires an exact confirmation."
             ),
             "result": result,
         }
@@ -499,9 +499,8 @@ def _dispatch_ableton(**kwargs: Any) -> Dict[str, Any]:
         "agent": "ableton_controller",
         "status": "disconnected",
         "message": (
-            "I tried to connect to Ableton Live but couldn't reach the OSC bridge. "
-            "Make sure Ableton is running with LiveOSC enabled on port 11000, "
-            "and I'll be able to query and control your session."
+            "I tried to connect to Ableton Live but the selected Live backend did not return a fresh snapshot. "
+            "Check that Ableton and the configured provider are running, then try again."
         ),
         "result": result,
     }

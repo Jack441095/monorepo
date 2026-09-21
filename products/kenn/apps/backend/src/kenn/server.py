@@ -74,6 +74,7 @@ from kenn.core.evidence import (
 from kenn.core.endpoint_policy import endpoint_policy
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.live_command import handle_command
+from kenn.core.live_session_questions import answer_live_session_question
 from kenn.core.live_receipt_journal import list_receipts, record_receipt
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
 from kenn.core.audiogen_midi import artifact_from_event_payload
@@ -670,6 +671,16 @@ class Handler(BaseHTTPRequestHandler):
         devices are routed here, and the command gateway can only inspect or
         clarify on this path; it cannot create or execute a mutation.
         """
+        session_result = answer_live_session_question(question)
+        if session_result is not None:
+            session_result.update({
+                "route": "ableton_live_inspection",
+                "found": session_result.get("status") == "inspected",
+                "answer_mode": "live_inspection",
+                "sources": [],
+            })
+            return session_result
+
         lower = str(question or "").strip().lower()
         inspection_cue = (
             "track" in lower

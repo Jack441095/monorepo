@@ -723,6 +723,41 @@ def test_ask_track_inventory_uses_read_only_live_gateway(running_server: str, mo
     assert body["devices"][0]["name"] == "EQ Eight"
 
 
+def test_ask_session_fact_uses_read_only_live_gateway(running_server: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    import kenn.server as server_module
+
+    def fake_session_answer(question: str) -> dict:
+        assert question == "What is the current tempo and time signature?"
+        return {
+            "schema": "kenn.ableton_session_answer.v1",
+            "status": "inspected",
+            "changed": False,
+            "answer": "The current tempo is 120 BPM and the time signature is 4/4.",
+            "intent": {"action": "inspect_tempo_signature"},
+            "tempo": 120.0,
+            "signature_numerator": 4,
+            "signature_denominator": 4,
+        }
+
+    monkeypatch.setattr(server_module, "answer_live_session_question", fake_session_answer)
+    request = urllib.request.Request(
+        f"{running_server}/api/ask",
+        data=json.dumps({
+            "question": "What is the current tempo and time signature?",
+            "session_id": "plugin-session-fact",
+        }).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        body = json.loads(response.read())
+
+    assert body["route"] == "ableton_live_inspection"
+    assert body["answer_mode"] == "live_inspection"
+    assert body["found"] is True
+    assert body["tempo"] == 120.0
+
+
 def test_knowledge_ask_cites_real_live_track_evidence_when_session_id_given(
     running_server: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
