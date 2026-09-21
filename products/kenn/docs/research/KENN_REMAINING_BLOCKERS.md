@@ -5,11 +5,11 @@
 | Blocker | Evidence now | Why it blocks | Unblock proof |
 |---|---|---|---|
 | Real Ableton offline | Real read-only qualification returned AbletonOSC offline | No real mutation/readback/undo reliability claim is valid | Versioned real-host read-only and disposable mutation receipts |
-| Browser qualification missing | Hosted core and native matrices are green; frontend install, audit, tests and build also pass locally | Browser-level startup, fallback, proposal and recovery behavior remain unqualified | Browser E2E on supported hosts with failure-only traces |
-| Retrieval assets missing | The clean checkout is configured for BM25-only fallback, but has no approved lexical corpus/index; the embedding index and runtime assets are also absent, so the active mode is unavailable | Lexical and semantic behavior, latency and quality are unmeasured | Approved versioned corpus and indexes, retrieval gold set and quality/latency report |
+| Browser and hosted CI qualification | Fresh `npm ci`, zero-vulnerability audit, tests and build passed locally | Browser behavior and the newly added hosted workflows have not yet produced remote receipts | Green core/native workflows plus browser E2E on supported hosts |
+| Semantic retrieval assets missing | `embeddings.npy` absent; BM25 fallback warning | Intended semantic behavior, latency and quality are unmeasured | Rebuilt versioned index, retrieval gold set and quality/latency report |
 | Ableton manual not indexed | Grounding audit reports zero manual chunks | Advice cannot be claimed manual-grounded | Licensed/approved corpus ingestion plus citation/answer evaluation |
 | Duplicate divergent KENN trees remain locally | canonical, legacy, product-root and standalone copies differ; only the canonical tree is in the reviewed source boundary | Local operators can still edit the wrong runtime | Owner-approved archive/retention action after backup; keep import-path CI |
-| Native promotion evidence incomplete | Hosted macOS and Windows wheel builds, import checks, fallback checks and parity tests pass | Distributability is established for the tested runners, but release integrity and representative-corpus promotion evidence remain incomplete | Signed and hashed artifacts plus approved-corpus parity, performance and sanitizer evidence |
+| Native packaging not reproducible | Local extension exists and matches a fresh build, but no clean-clone wheel matrix was proven | Local success does not establish distributability | CI-built signed/hashed artifacts for supported ABI/architectures |
 | Full realtime proof incomplete | Release plugin tests pass, but the performance test is a kernel and the build is not TSan | Data races/deadline failure may remain in full callback | TSan/control-thread suite and full callback deadline matrix |
 
 ## Capability blockers
@@ -20,19 +20,6 @@
 - Open-ended coproducer behavior: the 111/111 result covers deterministic parser vocabulary. It does not establish reference resolution, musical judgment or model generalization.
 - Restart durability: confirmation/proposal semantics fail closed, but seamless durable recovery of in-flight action state is not proven.
 - Security and tenancy: local-only defaults and CORS were tightened, but authentication, multi-user isolation, secret handling and threat modeling are not production-qualified.
-
-## Implementation-ready next steps
-
-| Work item | First owned change | Completion evidence |
-|---|---|---|
-| Durable action state | Persist proposals, confirmations, idempotency keys and receipts from `core/live_action_service.py`, `core/confirmation.py`, `core/idempotency_bounds.py` and `core/receipt_contract.py` in one versioned store with expiry and project/session identity. | Restart tests prove replay rejection, confirmation expiry, receipt continuity and fail-closed behavior without duplicate mutation. |
-| Startup reconciliation | Add an explicit uncertain-action ledger and startup reconciler that compares the last precondition, intended mutation and fresh Live readback before enabling further writes. | Crash-at-each-boundary tests end in reconciled success, safe inverse proposal or a visible blocked state; none silently retry. |
-| Real-host Live qualification | Bring AbletonOSC online for the existing read-only qualifier, then use an explicitly authorized disposable set for one bounded action at a time. | Sanitized receipts cover proposal, confirmation, fresh precondition, mutation, readback, exact identity-bound undo and second readback. |
-| Authorized retrieval index | Ingest only an approved corpus through `retrieval/corpus_ingest.py`, build versioned lexical and embedding artifacts, and bind model and source digests in the manifest. | BM25 and hybrid evaluation report recall, ranking, citations, cold/warm latency and failure behavior; health reports hybrid only with both index and model loaded. |
-| AudioGen handoff | Connect the existing typed artifact contract to a production-owned generator endpoint, validate the artifact, and route insertion through the normal Live proposal path. | A generation-to-artifact-to-disposable-Live receipt proves target identity, readback and undo; invalid or missing artifacts fail closed. |
-| SLO handoff | Define the production manifest, model identity, taxonomy, confidence/OOD thresholds and search contract consumed by the existing `core/slo_*` adapters. | Versioned fixtures prove manifest validation, representative and OOD classification, search handoff and visible unavailable-state behavior. |
-| Browser E2E | Add a supported browser runner for startup, health/fallback display, chat, proposal confirmation, stale-state rejection and offline recovery. | The clean hosted run publishes repeatable browser results with screenshots or traces retained only on failure. |
-| Native promotion gate | Run Python/native parity and performance on an approved representative corpus, including malformed files, p95/p99 latency, same-process RSS/copies and sanitizer coverage. | Promotion requires declared numerical tolerances, at least 3x p95 end-to-end gain, clean sanitizers and reproducible wheels; otherwise Python remains the diagnosed fallback. |
 
 ## Explicitly rejected shortcuts
 
