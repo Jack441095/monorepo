@@ -88,6 +88,33 @@ def _write_wav_file(path: str, audio: np.ndarray, sample_rate: int) -> Optional[
     return None
 
 
+def _clip_serialized_events(events: list[Dict[str, Any]], clip_beats: float) -> list[Dict[str, Any]]:
+    """Keep the JSON MIDI contract inside the declared clip window.
+
+    The realtime renderer can harmlessly ignore an event that lands exactly at
+    the section boundary, but a downstream clip importer needs a strict
+    half-open window.  Normalize the producer payload once at this boundary so
+    every consumer sees the same bounded event list.
+    """
+    bounded: list[Dict[str, Any]] = []
+    for event in events:
+        try:
+            start = float(event.get("start_beats", 0.0))
+            duration = float(event.get("duration_beats", 0.0))
+        except (TypeError, ValueError):
+            continue
+        if not (0.0 <= start < float(clip_beats)):
+            continue
+        duration = min(duration, float(clip_beats) - start)
+        if duration <= 0.0:
+            continue
+        if duration != float(event.get("duration_beats", 0.0)):
+            event = dict(event)
+            event["duration_beats"] = round(duration, 4)
+        bounded.append(event)
+    return bounded
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Generate and play one random-seed chorus loop (default 8 bars) for an emotion, then exit.",
@@ -253,6 +280,7 @@ def main() -> int:
 
     out_ev = [_serialize_event_for_json(ev) for ev in list(events or [])]
     out_ev = [x for x in out_ev if x is not None]
+    out_ev = _clip_serialized_events(out_ev, float(bars) * 4.0)
     ok = True
     if not bool(args.no_play) and play_err is not None:
         ok = False
