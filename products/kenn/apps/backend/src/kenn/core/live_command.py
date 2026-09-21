@@ -1094,9 +1094,16 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
     if kind == "device_insertion":
         before_devices = ", ".join(item.get("name", "") for item in proposal.get("before_devices", []) if isinstance(item, dict)) or "no devices"
         after_devices = ", ".join(item.get("name", "") for item in proposal.get("after_devices", []) if isinstance(item, dict)) or "no devices"
+        follow_up = response.get("intent") or {}
+        follow_up_notes = follow_up.get("follow_up") if isinstance(follow_up, dict) else None
+        follow_up_text = (
+            " " + " ".join(str(note).strip() for note in follow_up_notes if str(note).strip())
+            if isinstance(follow_up_notes, list) and any(str(note).strip() for note in follow_up_notes)
+            else ""
+        )
         response.update({
             "status": "confirmation_required",
-            "answer": f"I can append {proposal.get('device_name', 'the device')} to '{target}'. Current devices: {before_devices}. After confirmation: {after_devices}. Nothing has changed. Confirm this exact proposal to apply it.",
+            "answer": f"I can append {proposal.get('device_name', 'the device')} to '{target}'. Current devices: {before_devices}. After confirmation: {after_devices}. Nothing has changed. Confirm this exact proposal to apply it.{follow_up_text}",
             "proposal": proposal,
             "confirmation_required": True,
             "proposal_kind": kind,

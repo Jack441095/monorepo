@@ -218,6 +218,10 @@ class AbletonOSCClient:
         self._max_missed_heartbeats: int = 2
         self._last_successful_heartbeat: float = 0.0
         self._circuit_breaker_enabled: bool = enable_circuit_breaker
+        # A fresh client starts "disconnected" before any datagram has been
+        # exchanged. The breaker must not mistake first contact for an outage:
+        # it short-circuits only after at least one real attempt was made.
+        self._transport_attempted = False
         self._watchdog_thread: Optional[Thread] = None
         self._watchdog_stop_event: Optional[Event] = None
         self._watchdog_lock = Lock()
@@ -226,6 +230,19 @@ class AbletonOSCClient:
         self._cached_session_state_include_mixer: Optional[bool] = None
         self._cached_session_state_include_meters: Optional[bool] = None
         self._cache_ttl_seconds: float = 1.5
+
+    def _note_transport_success(self) -> None:
+        """Record that Live answered, whatever the high-level call decides.
+
+        Any genuine AbletonOSC reply proves the transport is alive. Without
+        this, a breaker-enabled client would stay "disconnected" through a
+        multi-batch snapshot even while every reply arrives, because only
+        ping()/probe() previously marked success.
+        """
+        with self._watchdog_lock:
+            self._missed_heartbeats = 0
+            self._last_successful_heartbeat = time.monotonic()
+            self._connection_state = "connected"
 
     def _bind_socket(self) -> bool:
         if self._bound:
@@ -358,6 +375,7 @@ class AbletonOSCClient:
         request_id = self._next_request_id(address)
         try:
             self.socket.sendto(encode_message(address, args or []), (self.host, self.send_port))
+            self._transport_attempted = True
             return request_id
         except (OSError, OSCProtocolError) as exc:
             logger.error("Failed to send AbletonOSC message %s: %s", address, exc)
@@ -404,7 +422,12 @@ class AbletonOSCClient:
         timeout: Optional[float] = None,
         bypass_circuit_breaker: bool = False,
     ) -> tuple[Optional[int], Optional[Dict[str, Any]]]:
-        if self._circuit_breaker_enabled and not bypass_circuit_breaker and self.connection_state == "disconnected":
+        if (
+            self._circuit_breaker_enabled
+            and not bypass_circuit_breaker
+            and self._transport_attempted
+            and self.connection_state == "disconnected"
+        ):
             return None, None
         with self._exchange_lock:
             started = time.monotonic()
@@ -415,6 +438,8 @@ class AbletonOSCClient:
             response = self._receive_response(address, timeout or self.query_timeout)
             self._request_addresses.pop(request_id, None)
             self._record_exchange(address=address, request_id=request_id, response=response, started=started)
+            if response is not None:
+                self._note_transport_success()
             return request_id, response
 
     def _send_only(self, address: str, args: Optional[List[Any]] = None) -> bool:
@@ -464,7 +489,12 @@ class AbletonOSCClient:
         """
         if not requests:
             return []
-        if self._circuit_breaker_enabled and not bypass_circuit_breaker and self.connection_state == "disconnected":
+        if (
+            self._circuit_breaker_enabled
+            and not bypass_circuit_breaker
+            and self._transport_attempted
+            and self.connection_state == "disconnected"
+        ):
             return [None] * len(requests)
         with self._exchange_lock:
             started = time.monotonic()
@@ -547,6 +577,8 @@ class AbletonOSCClient:
                         "response_ok": any(response is not None for response in responses),
                         "round_trip_ms": round((time.monotonic() - started) * 1000.0, 3),
                     }
+                    if any(response is not None for response in responses):
+                        self._note_transport_success()
             else:
                 for item in sent:
                     self._request_addresses.pop(item["id"], None)
@@ -764,6 +796,9 @@ class AbletonOSCClient:
             ("/live/song/get/track_names", None),
         ])
         if not num_tracks_args or names is None:
+            with self._watchdog_lock:
+                self._missed_heartbeats += 1
+                self._connection_state = "disconnected"
             return {
                 "status": "offline",
                 "host": self.host,
@@ -902,6 +937,13 @@ class AbletonOSCClient:
         self._cached_session_state_time = time.monotonic()
         self._cached_session_state_include_mixer = include_mixer
         self._cached_session_state_include_meters = include_meters
+        # A complete snapshot proves Live is reachable, exactly like a probe.
+        # Without this, a breaker-enabled client would stay "disconnected"
+        # forever even while every query succeeds.
+        with self._watchdog_lock:
+            self._missed_heartbeats = 0
+            self._last_successful_heartbeat = time.monotonic()
+            self._connection_state = "connected"
         return result
 
     def query_session_topology(self) -> Dict[str, Any]:

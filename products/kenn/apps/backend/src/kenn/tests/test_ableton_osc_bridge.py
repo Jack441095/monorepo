@@ -1103,3 +1103,77 @@ def test_watchdog_background_thread() -> None:
         client.close()
         stop.set()
         thread.join(timeout=3)
+
+
+def test_breaker_enabled_first_snapshot_connects_without_prior_probe() -> None:
+    """A fresh breaker-enabled client must attempt first contact.
+
+    Regression: the breaker mistook the initial "disconnected" state for a
+    known outage and short-circuited every query, so a newly started
+    companion reported Live offline forever until something called
+    ping()/probe_connection() first.
+    """
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server.bind(("127.0.0.1", 0))
+    port = server.getsockname()[1]
+    state = {"volume": 0.5}
+    stop = threading.Event()
+
+    def serve() -> None:
+        server.settimeout(2.0)
+        try:
+            while not stop.is_set():
+                try:
+                    raw, address = server.recvfrom(65507)
+                except socket.timeout:
+                    continue
+                for path, args in decode_packet(raw):
+                    response = _track_query_response(path, args, state)
+                    if response is not None:
+                        _reply(server, address, path, response)
+        finally:
+            server.close()
+
+    thread = threading.Thread(target=serve, daemon=True)
+    thread.start()
+    client = AbletonOSCClient(
+        send_port=port, recv_port=0, defer_bind=True, enable_circuit_breaker=True
+    )
+    try:
+        assert client.connection_state == "disconnected"
+        snapshot = client.query_session_state(include_mixer=False, force_refresh=True)
+        assert snapshot["status"] == "connected"
+        assert [track["name"] for track in snapshot["tracks"]] == ["Vocal"]
+        assert client.connection_state == "connected"
+        again = client.query_session_state(include_mixer=False, force_refresh=True)
+        assert again["status"] == "connected"
+    finally:
+        client.close()
+        stop.set()
+        thread.join(timeout=3)
+
+
+def test_breaker_still_fast_fails_after_a_genuine_failure() -> None:
+    """One full timeout against a dead endpoint, then fast failure."""
+    dead_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    dead_send.bind(("127.0.0.1", 0))
+    dead_send_port = dead_send.getsockname()[1]
+    dead_send.close()
+    client = AbletonOSCClient(
+        send_port=dead_send_port,
+        recv_port=0,
+        defer_bind=True,
+        enable_circuit_breaker=True,
+        query_timeout=0.2,
+    )
+    try:
+        assert client.query_session_state(
+            include_mixer=False, force_refresh=True
+        )["status"] == "offline"
+        start = time.monotonic()
+        assert client.query_session_state(
+            include_mixer=False, force_refresh=True
+        )["status"] == "offline"
+        assert time.monotonic() - start < 0.15
+    finally:
+        client.close()
