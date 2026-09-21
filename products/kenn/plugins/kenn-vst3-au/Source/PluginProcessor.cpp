@@ -1281,4 +1281,3 @@ bool KENNMixAssistantAudioProcessor::syncWebParameters()
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new KENNMixAssistantAudioProcessor(); }
-

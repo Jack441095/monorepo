@@ -1,0 +1,58 @@
+{
+  "run_date": "2026-09-20",
+  "source_manifest": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/manifest.json",
+  "validation_summary": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/VALIDATION_SUMMARY.json",
+  "source_license_status": "TODO-vendor-pack",
+  "existing_validation_tracks": 7,
+  "existing_validation_statuses": {
+    "ok": 7
+  },
+  "available_source_wav_stem_counts": [
+    15,
+    18,
+    19,
+    22,
+    44,
+    62
+  ],
+  "requested_stem_counts": [
+    1,
+    8,
+    16,
+    32,
+    64
+  ],
+  "existing_validation_exact_requested_count_coverage": {
+    "1": false,
+    "8": false,
+    "16": false,
+    "32": false,
+    "64": false
+  },
+  "deterministic_no_copy_selection_manifest": "products/kenn/docs/research/results/phase4_testing_assets_stem_matrix.json",
+  "selection_counts_available_from_al_james": [
+    1,
+    8,
+    16,
+    32
+  ],
+  "selection_count_64_available": false,
+  "matrix_render_safety_coverage": {
+    "1": true,
+    "8": true,
+    "16": true,
+    "32": true,
+    "64": false
+  },
+  "matrix_render_advisory_quality_coverage": {
+    "1": false,
+    "8": false,
+    "16": false,
+    "32": false,
+    "64": false
+  },
+  "rerendered_in_this_turn": false,
+  "perceptual_listening_complete": false,
+  "release_rights_cleared": false,
+  "decision": "technical-evidence-only"
+}

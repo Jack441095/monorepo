@@ -46,7 +46,7 @@ def runtime_state_counts() -> dict[str, int]:
         return {
             "pending_proposals": len(_PROPOSALS_BY_TOKEN),
             "action_receipts": len(_RECEIPTS),
-            "pending_proposals_limit": 11_000,
+            "pending_proposals_limit": 10_000,
             "action_receipts_limit": 10_000,
         }
 
@@ -185,4 +185,3 @@ def _text(proposal: dict[str, Any]) -> str:
         str(proposal.get(key, ""))
         for key in ("action", "track_index", "track_name", "before", "after", "session_version")
     )
-

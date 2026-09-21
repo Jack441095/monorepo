@@ -63,4 +63,3 @@ def test_synthesize_invalid_rack():
     res = synthesize_rack_proposal("non_existent_rack", track_index=0)
     assert res["ok"] is False
     assert "Unknown rack template" in res["error"]
-

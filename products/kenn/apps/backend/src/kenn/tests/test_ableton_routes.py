@@ -59,4 +59,3 @@ def test_handle_ableton_capabilities_success():
     code, data = handle_ableton_capabilities(client)
     assert code == 200
     assert data["available"] is True
-

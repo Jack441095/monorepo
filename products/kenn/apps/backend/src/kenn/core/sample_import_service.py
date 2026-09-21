@@ -51,9 +51,9 @@ def _reserve_idempotency(key: str) -> bool:
 
 def _finish_idempotency(key: str) -> None:
     with _ACTION_LOCK:
+        prune_if_needed(_USED_IDEMPOTENCY_KEYS)
         _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
         _USED_IDEMPOTENCY_KEYS.add(key)
-        prune_if_needed(_USED_IDEMPOTENCY_KEYS)
 
 
 def _find_track(state: dict[str, Any], track_index: int, track_name: str) -> tuple[dict[str, Any] | None, str | None]:

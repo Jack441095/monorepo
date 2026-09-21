@@ -86,3 +86,55 @@ def test_post_rack_build(v040_test_server):
         assert data["proposal"]["requires_confirmation"] is True
         assert data["proposal"]["confirmation_token"].startswith("rack_")
 
+
+def _post_json(base: str, path: str, payload: dict) -> tuple[int, dict]:
+    request = urllib.request.Request(
+        f"{base}{path}",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=3.0) as response:
+            return response.status, json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        return exc.code, json.loads(exc.read().decode("utf-8"))
+
+
+def test_post_midi_bassline_matches_frontend_contract(v040_test_server):
+    status, data = _post_json(
+        v040_test_server,
+        "/api/midi/bassline",
+        {"scale": "F:minor", "style": "rolling_16th", "bars": 2},
+    )
+    assert status == 200
+    assert data["ok"] is True
+    assert data["notes"]
+    assert all(0 <= note["pitch"] <= 127 for note in data["notes"])
+    assert all(note["start_time"] + note["duration"] <= 8.0 for note in data["notes"])
+
+
+def test_post_midi_groove_matches_frontend_contract(v040_test_server):
+    status, data = _post_json(
+        v040_test_server,
+        "/api/midi/groove",
+        {
+            "notes": [{"pitch": 41, "start_time": 0.25, "duration": 0.2, "velocity": 100}],
+            "template": "lofi_swing",
+            "swing_pct": 35,
+            "laidback_ms": 6,
+            "jitter_pct": 15,
+        },
+    )
+    assert status == 200
+    assert data["ok"] is True
+    assert len(data["notes"]) == 1
+
+
+def test_post_midi_detect_scale_rejects_invalid_pitch(v040_test_server):
+    status, data = _post_json(
+        v040_test_server,
+        "/api/midi/detect_scale",
+        {"notes": [{"pitch": 999, "duration": 1.0, "velocity": 100}]},
+    )
+    assert status == 400
+    assert data["ok"] is False

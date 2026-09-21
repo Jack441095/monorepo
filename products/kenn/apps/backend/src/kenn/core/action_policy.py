@@ -74,4 +74,3 @@ class AutonomousSafetyEvaluator:
                 return False, f"Volume delta {delta:.3f} exceeds maximum autonomous threshold {cls.MAX_GAIN_DELTA_NORMALIZED:.3f} (~3.0 dB)."
 
         return True, "Action approved within autonomous safety envelope."
-

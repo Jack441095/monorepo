@@ -100,4 +100,3 @@ def test_arrangement_sections_and_harmonics():
     assert harmonics["root_note"] == "F#"
     assert harmonics["scale_name"] == "Minor"
     assert harmonics["key_signature"] == "F# Minor"
-

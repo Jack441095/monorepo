@@ -52,4 +52,3 @@ def handle_post_audition_delta(handler: Any, payload: dict[str, Any]) -> None:
 
     res = calculate_loudness_matched_gain_delta(float(dry_lufs), float(wet_lufs))
     handler.send_json(200, {"ok": True, **res})
-

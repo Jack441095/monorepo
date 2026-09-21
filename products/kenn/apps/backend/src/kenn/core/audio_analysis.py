@@ -38,6 +38,12 @@ class AudioAnalysisError(ValueError):
     """Raised when the input is not a bounded, supported PCM WAV."""
 
 
+class _DecodedChannels(list[list[float]]):
+    """Channel container carrying whether the opt-in native decoder ran."""
+
+    native: bool = False
+
+
 def _db(value: float, *, floor: float = -120.0) -> float:
     if value <= 0.0:
         return floor
@@ -45,7 +51,7 @@ def _db(value: float, *, floor: float = -120.0) -> float:
 
 
 def _rms(values: list[float]) -> float:
-    if not values:
+    if len(values) == 0:
         return 0.0
     return math.sqrt(sum(value * value for value in values) / len(values))
 
@@ -98,6 +104,23 @@ def _decode(payload: bytes) -> tuple[list[list[float]], int, int, int]:
         raise AudioAnalysisError("audio payload is empty")
     if len(payload) > MAX_INPUT_BYTES:
         raise AudioAnalysisError(f"audio payload exceeds {MAX_INPUT_BYTES} bytes")
+
+    try:
+        from .native_fft import decode_pcm
+
+        native_result = decode_pcm(payload)
+    except (ImportError, OSError, RuntimeError, TypeError, ValueError):
+        native_result = None
+    if native_result is not None:
+        channels = _DecodedChannels(native_result["channels"])
+        channels.native = True
+        return (
+            channels,
+            int(native_result["sample_rate"]),
+            int(native_result["channel_count"]),
+            int(native_result["bit_depth"]),
+        )
+
     try:
         channels, sample_width, sample_rate, raw, audio_format = _parse_wav(payload)
     except Exception as exc:
@@ -247,40 +270,98 @@ def _spectral_measurement(
     starts = _window_starts(len(samples), n)
     window = [0.5 - 0.5 * math.cos(2.0 * math.pi * index / (n - 1)) for index in range(n)]
     window_sum = sum(window)
-    powers = [0.0] * (n // 2 + 1)
+    implementation = "python-reference"
+    native_input_copied: bool | None = None
+    native_result: dict[str, Any] | None = None
+    native_window_rms: list[float] | None = None
+    native_ltas_band_levels: list[float] | None = None
+    native_peaks: list[dict[str, Any]] | None = None
+    native_window_peaks: list[list[dict[str, Any]]] | None = None
+    try:
+        from .native_fft import spectral_powers
+
+        native_result = spectral_powers(samples, n, sample_rate, include_ltas=include_ltas)
+    except (ImportError, OSError, RuntimeError, TypeError, ValueError):
+        # The native module is optional and must never make the reference path
+        # unavailable. The benchmark and parity tests explicitly exercise both
+        # branches via KENN_DSP_NATIVE=0/1.
+        native_result = None
+
+    if native_result is not None:
+        native_n = int(native_result.get("fft_size", n))
+        if native_n != n:
+            native_result = None
+        else:
+            n = native_n
+            starts = [int(value) for value in native_result["window_starts"]]
+            powers = [float(value) for value in native_result["powers"][0].tolist()]
+            native_windows = native_result["window_powers"].tolist()
+            window_power_rows = [[float(value) for value in row] for row in native_windows]
+            if "window_rms" in native_result:
+                native_window_rms = [float(value) for value in native_result["window_rms"].tolist()]
+            if include_ltas and "ltas_band_levels" in native_result:
+                native_ltas_band_levels = [float(value) for value in native_result["ltas_band_levels"].tolist()]
+            if "dominant_peaks" in native_result and "window_dominant_peaks" in native_result:
+                native_peaks = [dict(peak) for peak in native_result["dominant_peaks"]]
+                native_window_peaks = [
+                    [dict(peak) for peak in window_peaks]
+                    for window_peaks in native_result["window_dominant_peaks"]
+                ]
+            window_sum = float(native_result["window_sum"])
+            implementation = str(native_result.get("backend") or "cpp-native")
+            native_input_copied = bool(native_result.get("copied", False))
+
+    if native_result is None:
+        powers = [0.0] * (n // 2 + 1)
+        window_power_rows: list[list[float]] = []
+        for start in starts:
+            source_segment = samples[start : start + n]
+            segment = source_segment
+            if len(segment) < n:
+                segment = segment + [0.0] * (n - len(segment))
+            spectrum = _fft([segment[index] * window[index] for index in range(n)])
+            window_powers = [
+                (value.real ** 2 + value.imag ** 2)
+                for value in spectrum[: n // 2 + 1]
+            ]
+            window_power_rows.append(window_powers)
+            for index, value in enumerate(window_powers):
+                powers[index] += value
+        powers = [value / len(starts) for value in powers]
+
     localized_windows: list[dict[str, Any]] = []
-    for start in starts:
+    for window_index, (start, window_powers) in enumerate(zip(starts, window_power_rows)):
         source_segment = samples[start : start + n]
-        segment = source_segment
-        if len(segment) < n:
-            segment = segment + [0.0] * (n - len(segment))
-        spectrum = _fft([segment[index] * window[index] for index in range(n)])
-        window_powers = [
-            (value.real ** 2 + value.imag ** 2)
-            for value in spectrum[: n // 2 + 1]
-        ]
-        for index, value in enumerate(window_powers):
-            powers[index] += value
         end = min(len(samples), start + n)
-        localized_windows.append({
-            "start_seconds": round(start / sample_rate, 6),
-            "end_seconds": round(end / sample_rate, 6),
-            "rms_dbfs": round(_db(_rms(source_segment)), 3),
-            "dominant_peaks": _dominant_peaks(
+        rms = (
+            native_window_rms[window_index]
+            if native_window_rms is not None and window_index < len(native_window_rms)
+            else _rms(source_segment)
+        )
+        localized_peaks = (
+            native_window_peaks[window_index][:MAX_LOCALIZED_PEAKS]
+            if native_window_peaks is not None and window_index < len(native_window_peaks)
+            else _dominant_peaks(
                 window_powers,
                 sample_rate,
                 n,
                 window_sum,
                 limit=MAX_LOCALIZED_PEAKS,
-            ),
+            )
+        )
+        localized_windows.append({
+            "start_seconds": round(start / sample_rate, 6),
+            "end_seconds": round(end / sample_rate, 6),
+            "rms_dbfs": round(_db(rms), 3),
+            "dominant_peaks": localized_peaks,
         })
-    powers = [value / len(starts) for value in powers]
 
     def frequency(index: float) -> float:
         return index * sample_rate / n
 
-    peaks = _dominant_peaks(powers, sample_rate, n, window_sum)
+    peaks = native_peaks if native_peaks is not None else _dominant_peaks(powers, sample_rate, n, window_sum)
 
+    native_band_levels = native_result.get("band_energy_dbfs") if native_result is not None else None
     bands = {
         "low": (20.0, 250.0),
         "low_mid": (250.0, 500.0),
@@ -288,20 +369,28 @@ def _spectral_measurement(
         "upper_mid": (2000.0, 6000.0),
         "high": (6000.0, min(20000.0, sample_rate / 2.0)),
     }
-    band_levels: dict[str, float] = {}
-    for name, (low, high) in bands.items():
-        total = 0.0
-        for index in range(1, len(powers)):
-            hz = frequency(index)
-            if low <= hz < high:
-                multiplier = 1.0 if index in (0, len(powers) - 1) else 2.0
-                total += powers[index] * multiplier
-        band_rms = math.sqrt(total / (n * n))
-        band_levels[name] = round(_db(band_rms), 2)
+    if native_band_levels is not None:
+        band_levels = {
+            name: round(float(native_band_levels[name]), 2)
+            for name in bands
+        }
+    else:
+        band_levels = {}
+        for name, (low, high) in bands.items():
+            total = 0.0
+            for index in range(1, len(powers)):
+                hz = frequency(index)
+                if low <= hz < high:
+                    multiplier = 1.0 if index in (0, len(powers) - 1) else 2.0
+                    total += powers[index] * multiplier
+            band_rms = math.sqrt(total / (n * n))
+            band_levels[name] = round(_db(band_rms), 2)
 
     measurement = {
         "fft_size": n,
         "window": "hann",
+        "implementation": implementation,
+        "native_input_copied": native_input_copied,
         "windows_averaged": len(starts),
         "time_localized_windows": localized_windows,
         "bin_width_hz": round(sample_rate / n, 6),
@@ -309,12 +398,15 @@ def _spectral_measurement(
         "band_energy_dbfs": band_levels,
     }
     if include_ltas:
-        measurement["ltas_40_band_relative_db"] = _ltas_40_band_relative_db(powers, sample_rate, n)
+        measurement["ltas_40_band_relative_db"] = _ltas_40_band_relative_db(
+            powers, sample_rate, n, native_levels=native_ltas_band_levels,
+        )
     return measurement
 
 
 def _ltas_40_band_relative_db(
     powers: list[float], sample_rate: int, fft_size: int,
+    *, native_levels: list[float] | None = None,
 ) -> list[dict[str, Any]]:
     """A bounded 40-band log LTAS, normalised to the nearest 1 kHz band.
 
@@ -331,19 +423,26 @@ def _ltas_40_band_relative_db(
     edges = [lower * (ratio ** index) for index in range(LTAS_BAND_COUNT + 1)]
     raw: list[dict[str, Any]] = []
     for index, (low, high) in enumerate(zip(edges, edges[1:])):
-        values = []
-        for bin_index in range(1, len(powers)):
-            hz = bin_index * sample_rate / fft_size
-            if low <= hz < high:
-                values.append(powers[bin_index])
-        if not values:
-            continue
+        if native_levels is not None:
+            level = native_levels[index] if index < len(native_levels) else float("nan")
+            if not math.isfinite(level):
+                continue
+            level_db = float(level)
+        else:
+            values = []
+            for bin_index in range(1, len(powers)):
+                hz = bin_index * sample_rate / fft_size
+                if low <= hz < high:
+                    values.append(powers[bin_index])
+            if not values:
+                continue
+            level_db = _db(math.sqrt(sum(values) / len(values)))
         raw.append({
             "index": index,
             "low_hz": round(low, 3),
             "high_hz": round(high, 3),
             "center_hz": round(math.sqrt(low * high), 3),
-            "level_db": _db(math.sqrt(sum(values) / len(values))),
+            "level_db": level_db,
         })
     if not raw:
         return []
@@ -460,23 +559,62 @@ def analyze_wav(
             "receipt_id": f"receipt-{uuid.uuid4().hex}",
         }
 
+    native_channel_metrics: dict[str, Any] | None = None
+    try:
+        from .native_fft import channel_metrics
+
+        native_channel_metrics = channel_metrics(channels)
+    except (ImportError, OSError, RuntimeError, TypeError, ValueError):
+        # Native summary statistics are optional; the Python loops remain the
+        # oracle and fallback for every unsupported or unavailable build.
+        native_channel_metrics = None
+
     duration = len(channels[0]) / sample_rate
-    mono = [(sum(channel[index] for channel in channels) / channel_count) for index in range(len(channels[0]))]
-    rms_values = [_rms(channel) for channel in channels]
-    peaks = [max((abs(value) for value in channel), default=0.0) for channel in channels]
-    sample_peak = max(peaks, default=0.0)
-    rms = sum(rms_values) / len(rms_values) if rms_values else 0.0
-    clip_count = sum(1 for channel in channels for value in channel if abs(value) >= CLIP_THRESHOLD)
-    clip_runs = 0
-    for channel in channels:
-        in_run = False
-        for value in channel:
-            clipped = abs(value) >= CLIP_THRESHOLD
-            if clipped and not in_run:
-                clip_runs += 1
-            in_run = clipped
-    silence_percentage = 100.0 * sum(1 for value in mono if abs(value) < SILENCE_THRESHOLD) / max(1, len(mono))
-    dc_offsets = [sum(channel) / len(channel) for channel in channels]
+    if getattr(channels, "native", False):
+        # NumPy is already required by the native wheel. Keep this branch
+        # opt-in so the reference path remains standard-library-only.
+        import numpy as np
+
+        mono = channels[0] if channel_count == 1 else (channels[0] + channels[1]) * np.float32(0.5)
+    else:
+        mono = [(sum(channel[index] for channel in channels) / channel_count) for index in range(len(channels[0]))]
+    if native_channel_metrics is None:
+        rms_values = [_rms(channel) for channel in channels]
+        peaks = [max((abs(value) for value in channel), default=0.0) for channel in channels]
+        sample_peak = max(peaks, default=0.0)
+        rms = sum(rms_values) / len(rms_values) if rms_values else 0.0
+        clip_count = sum(1 for channel in channels for value in channel if abs(value) >= CLIP_THRESHOLD)
+        clip_runs = 0
+        for channel in channels:
+            in_run = False
+            for value in channel:
+                clipped = abs(value) >= CLIP_THRESHOLD
+                if clipped and not in_run:
+                    clip_runs += 1
+                in_run = clipped
+        silence_percentage = 100.0 * sum(1 for value in mono if abs(value) < SILENCE_THRESHOLD) / max(1, len(mono))
+        dc_offsets = [sum(channel) / len(channel) for channel in channels]
+    elif channel_count == 1:
+        summary = native_channel_metrics
+        rms_values = [float(summary["rms"])]
+        peaks = [float(summary["peak"])]
+        sample_peak = peaks[0]
+        rms = rms_values[0]
+        clip_count = int(summary["clipped_sample_count"])
+        clip_runs = int(summary["clipped_run_count"])
+        silence_percentage = float(summary["silence_percentage"])
+        dc_offsets = [float(summary["dc_offset"])]
+    else:
+        left_summary = native_channel_metrics["left"]
+        right_summary = native_channel_metrics["right"]
+        rms_values = [float(left_summary["rms"]), float(right_summary["rms"])]
+        peaks = [float(left_summary["peak"]), float(right_summary["peak"])]
+        sample_peak = max(peaks)
+        rms = sum(rms_values) / len(rms_values)
+        clip_count = int(left_summary["clipped_sample_count"]) + int(right_summary["clipped_sample_count"])
+        clip_runs = int(left_summary["clipped_run_count"]) + int(right_summary["clipped_run_count"])
+        silence_percentage = float(native_channel_metrics["mono_silence_percentage"])
+        dc_offsets = [float(left_summary["dc_offset"]), float(right_summary["dc_offset"])]
     metrics: dict[str, Any] = {
         "duration_seconds": round(duration, 6),
         "sample_rate_hz": sample_rate,
@@ -495,16 +633,23 @@ def analyze_wav(
     if channel_count == 2:
         left, right = channels
         left_db, right_db = _db(rms_values[0]), _db(rms_values[1])
-        mid = [(left[index] + right[index]) * 0.5 for index in range(len(left))]
-        side = [(left[index] - right[index]) * 0.5 for index in range(len(left))]
-        mid_rms = _rms(mid)
-        side_rms = _rms(side)
-        mono_rms = _rms([(left[index] + right[index]) * 0.5 for index in range(len(left))])
+        if native_channel_metrics is None:
+            mid = [(left[index] + right[index]) * 0.5 for index in range(len(left))]
+            side = [(left[index] - right[index]) * 0.5 for index in range(len(left))]
+            mid_rms = _rms(mid)
+            side_rms = _rms(side)
+            mono_rms = _rms([(left[index] + right[index]) * 0.5 for index in range(len(left))])
+            correlation = _correlation(left, right)
+        else:
+            mid_rms = float(native_channel_metrics["mono_rms"])
+            side_rms = float(native_channel_metrics["side_rms"])
+            mono_rms = mid_rms
+            correlation = float(native_channel_metrics["correlation"])
         metrics.update({
             "left_rms_dbfs": round(left_db, 3),
             "right_rms_dbfs": round(right_db, 3),
             "left_right_rms_difference_db": round(abs(left_db - right_db), 3),
-            "correlation": round(_correlation(left, right), 5) if _correlation(left, right) is not None else None,
+            "correlation": round(correlation, 5) if correlation is not None else None,
             "stereo_width_ratio": round(side_rms / mid_rms, 5) if mid_rms else None,
             "stereo_width_db": round(_db(side_rms / mid_rms), 3) if mid_rms else None,
             "mono_sum_rms_dbfs": round(_db(mono_rms), 3),

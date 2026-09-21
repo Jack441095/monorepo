@@ -1,0 +1,118 @@
+{
+  "schema": "kenn.dsp_benchmark.v1",
+  "benchmark_version": "kenn.audio_analysis.benchmark.v2",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "candidate": "python-stdlib-reference",
+  "build_type": "python-reference",
+  "compiler_flags": [],
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "resource_limits": {
+    "max_input_bytes": 157286400,
+    "fft_windows_cap": 4,
+    "audio_retained": false
+  },
+  "fixture": {
+    "kind": "external_wav",
+    "generator": null,
+    "long_seconds": 10.0,
+    "workers": 2,
+    "repeats": 10,
+    "include_ltas": true,
+    "sources": [
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/42_BackingVox01.wav",
+        "sha256": "09cc99f54986265e9448b374e7b959d3d6c979d4e84ece8dbfa54d8ce2c6b272",
+        "bytes": 1167567,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 388971,
+          "duration_seconds": 8.820204
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "label": "42_BackingVox01",
+      "bytes": 1167567,
+      "sha256": "09cc99f54986265e9448b374e7b959d3d6c979d4e84ece8dbfa54d8ce2c6b272",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 8.820204,
+      "sample_rate_hz": 44100,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 10,
+      "warmups": 3,
+      "samples_ms": [
+        478.723,
+        475.732,
+        472.571,
+        506.682,
+        476.206,
+        473.933,
+        473.644,
+        470.796,
+        508.511,
+        478.26
+      ],
+      "mean_ms": 481.506,
+      "p50_ms": 475.969,
+      "p95_ms": 507.688,
+      "p99_ms": 508.346,
+      "max_ms": 508.511,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 388971,
+        "duration_seconds": 8.820204
+      }
+    }
+  ],
+  "concurrency": {
+    "workers": 2,
+    "elapsed_ms": 970.731,
+    "all_ok": true,
+    "all_complete": true
+  },
+  "stage_samples_ms": [
+    {
+      "stage": "complete_request",
+      "samples_ms": [
+        478.723,
+        475.732,
+        472.571,
+        506.682,
+        476.206,
+        473.933,
+        473.644,
+        470.796,
+        508.511,
+        478.26
+      ]
+    }
+  ],
+  "peak_rss_bytes": 105480192,
+  "elapsed_ms": 7267.539,
+  "numerical_comparison": {
+    "status": "not_applicable",
+    "reference": "self"
+  },
+  "selected_simd_backend": "python-stdlib",
+  "qualified": true,
+  "passed": true,
+  "limitations": [
+    "No perceptual, LUFS, LRA, true-peak, or real-mix quality claim is made."
+  ]
+}

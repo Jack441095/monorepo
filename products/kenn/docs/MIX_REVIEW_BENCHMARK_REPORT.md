@@ -1,6 +1,6 @@
 # KENN Mix Review Qualification & Evaluation Report
 
-**Date**: 2026-09-06
+**Date**: 2026-09-21
 
 **Engine**: `mix-review/core/local_engine.py` (`ANALYSIS_VERSION = "kenn.mix_review.local_engine.v1"`)
 
@@ -25,8 +25,9 @@ All documented release thresholds pass.
 | **Recall** | $\ge 98.0\%$ | **100.0%** | **PASSED** |
 | **F1 Score** | $\ge 98.0\%$ | **100.0%** | **PASSED** |
 | **False-Positive Rate** | $\le 1.0\%$ | **0.0%** | **PASSED** |
-| **Mean Analysis Latency** | $< 100.0\text{ ms}$ | **24.47 ms** | **PASSED** |
-| **Max Analysis Latency** | $< 500.0\text{ ms}$ | **25.92 ms** | **PASSED** |
+| **Steady-State Mean Analysis Latency** | $< 100.0\text{ ms}$ | **4.39 ms** | **PASSED** |
+| **Cold Start Analysis Latency** | $< 500.0\text{ ms}$ | **6.10 ms** | **PASSED** |
+| **Cold-Inclusive Max Analysis Latency** | $< 500.0\text{ ms}$ | **13.51 ms** | **PASSED** |
 | **Corrupted-Input Recovery** | **100.0%** (0 crashes) | **100.0%** | **PASSED** |
 
 ---
@@ -35,14 +36,14 @@ All documented release thresholds pass.
 
 | Test Case Name | Expected Faults | Detected Faults | Latency | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **Clean Reference Track** | None (Clean) | None (Clean) | 25.92 ms | **PASSED** |
-| **Hard Digital Clipping Fault** | clipping, loudness_estimate, true_peak_intersample, calibrated_lufs_bs1770, headroom | clipping, loudness_estimate, true_peak_intersample, calibrated_lufs_bs1770, headroom | 25.08 ms | **PASSED** |
-| **Low Headroom Peak Hot Fault** | clipping, loudness_estimate, true_peak_intersample, calibrated_lufs_bs1770, headroom | clipping, loudness_estimate, true_peak_intersample, calibrated_lufs_bs1770, headroom | 24.46 ms | **PASSED** |
-| **Silence Truncation Fault** | silence_or_truncation | silence_or_truncation | 22.31 ms | **PASSED** |
-| **Channel Imbalance (L/R RMS offset)** | calibrated_lufs_bs1770, phase_polarity_mono_compatibility, channel_imbalance, loudness_estimate | calibrated_lufs_bs1770, phase_polarity_mono_compatibility, channel_imbalance, loudness_estimate | 24.21 ms | **PASSED** |
-| **180-deg Phase Polarity Inversion** | phase_polarity_mono_compatibility, calibrated_lufs_bs1770, loudness_estimate | phase_polarity_mono_compatibility, calibrated_lufs_bs1770, loudness_estimate | 24.56 ms | **PASSED** |
-| **DC Offset Shift (+0.08 bias)** | calibrated_lufs_bs1770, dc_offset, loudness_estimate | calibrated_lufs_bs1770, dc_offset, loudness_estimate | 23.85 ms | **PASSED** |
-| **Hot Loudness Proxy Overflow** | calibrated_lufs_bs1770, loudness_estimate | calibrated_lufs_bs1770, loudness_estimate | 25.41 ms | **PASSED** |
+| **Clean Reference Track** | None (Clean) | None (Clean) | 3.1 ms | **PASSED** |
+| **Hard Digital Clipping Fault** | headroom, clipping, loudness_estimate, true_peak_intersample, calibrated_lufs_bs1770 | headroom, clipping, loudness_estimate, true_peak_intersample, calibrated_lufs_bs1770 | 3.19 ms | **PASSED** |
+| **Low Headroom Peak Hot Fault** | headroom, clipping, loudness_estimate, true_peak_intersample, calibrated_lufs_bs1770 | headroom, clipping, loudness_estimate, true_peak_intersample, calibrated_lufs_bs1770 | 3.11 ms | **PASSED** |
+| **Silence Truncation Fault** | silence_or_truncation | silence_or_truncation | 13.51 ms | **PASSED** |
+| **Channel Imbalance (L/R RMS offset)** | calibrated_lufs_bs1770, phase_polarity_mono_compatibility, channel_imbalance, loudness_estimate | calibrated_lufs_bs1770, phase_polarity_mono_compatibility, channel_imbalance, loudness_estimate | 3.02 ms | **PASSED** |
+| **180-deg Phase Polarity Inversion** | calibrated_lufs_bs1770, phase_polarity_mono_compatibility, loudness_estimate | calibrated_lufs_bs1770, phase_polarity_mono_compatibility, loudness_estimate | 3.02 ms | **PASSED** |
+| **DC Offset Shift (+0.08 bias)** | calibrated_lufs_bs1770, loudness_estimate, dc_offset | calibrated_lufs_bs1770, loudness_estimate, dc_offset | 3.03 ms | **PASSED** |
+| **Hot Loudness Proxy Overflow** | calibrated_lufs_bs1770, loudness_estimate | calibrated_lufs_bs1770, loudness_estimate | 3.1 ms | **PASSED** |
 
 ---
 

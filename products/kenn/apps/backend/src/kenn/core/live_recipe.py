@@ -37,9 +37,9 @@ _LOCK = Lock()
 
 def _mark_used(key: str) -> None:
     """Call under _LOCK: record a finished key and keep the set bounded."""
+    prune_if_needed(_USED_IDEMPOTENCY_KEYS)
     _USED_IDEMPOTENCY_KEYS.add(key)
     _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
-    prune_if_needed(_USED_IDEMPOTENCY_KEYS)
 
 
 def _recipe_text(recipe: dict[str, Any]) -> str:

@@ -344,4 +344,3 @@ class SubjectiveTranslator:
                 f"Please confirm to apply."
             ),
         }
-

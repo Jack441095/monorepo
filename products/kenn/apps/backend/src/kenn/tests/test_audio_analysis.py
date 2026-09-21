@@ -173,3 +173,23 @@ def test_32_bit_float_wav_is_supported_in_audio_analysis() -> None:
     assert report["spectral"]["status"] == "complete"
     assert any(abs(peak["frequency_hz"] - 440.0) < 44100 / 16384 for peak in report["spectral"]["dominant_peaks"])
 
+
+def test_native_peak_and_ltas_reports_match_reference(monkeypatch) -> None:
+    from kenn.core import native_fft
+
+    payload = wav([sine(2.0, 440.0),], 48000)
+    native_report = analyze_wav(payload, filename="native-parity.wav", include_ltas=True)
+    monkeypatch.setattr(native_fft, "decode_pcm", lambda _payload: None)
+    monkeypatch.setattr(native_fft, "channel_metrics", lambda _channels: None)
+    monkeypatch.setattr(native_fft, "spectral_powers", lambda *_args, **_kwargs: None)
+    reference_report = analyze_wav(payload, filename="native-parity.wav", include_ltas=True)
+
+    native_spectral = dict(native_report["spectral"])
+    reference_spectral = dict(reference_report["spectral"])
+    native_spectral.pop("implementation", None)
+    reference_spectral.pop("implementation", None)
+    native_spectral.pop("native_input_copied", None)
+    reference_spectral.pop("native_input_copied", None)
+    assert native_spectral == reference_spectral
+    assert native_report["metrics"] == reference_report["metrics"]
+    assert native_report["findings"] == reference_report["findings"]

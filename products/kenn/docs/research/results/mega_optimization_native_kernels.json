@@ -1,0 +1,67 @@
+{
+  "candidate": "cpp-native",
+  "fixture": {
+    "float32_sha256": "d44fe9e6a54c456ab3205bbcae38fdfb9927731a7dedb6602030429db8987c39",
+    "frames": 480000,
+    "kind": "deterministic_synthetic",
+    "sample_rate_hz": 48000,
+    "seconds": 10.0
+  },
+  "kernels": {
+    "masking_band_energy": {
+      "backend": "cpp-accelerate",
+      "fft_size": 4096,
+      "frame_count": 233,
+      "hop": 2048,
+      "mean_ms": 1.8742,
+      "p50_ms": 1.8755,
+      "p95_ms": 1.9274,
+      "samples_ms": [
+        1.9211,
+        1.7916,
+        1.874,
+        1.8771,
+        1.8354,
+        1.918,
+        1.8442,
+        1.9231,
+        1.8271,
+        1.9309
+      ]
+    },
+    "spectral_power": {
+      "backend": "cpp-accelerate",
+      "fft_size": 16384,
+      "mean_ms": 1.0752,
+      "p50_ms": 1.0639,
+      "p95_ms": 1.1638,
+      "samples_ms": [
+        1.0704,
+        1.2297,
+        1.0593,
+        1.0833,
+        1.0474,
+        1.07,
+        1.0685,
+        1.0456,
+        1.0409,
+        1.037
+      ],
+      "window_count": 4
+    }
+  },
+  "limitations": [
+    "Kernel timing only; not an end-to-end request measurement.",
+    "Synthetic noise exercises runtime and memory behavior, not perceptual quality.",
+    "Compare against the complete-request benchmark before promoting a backend."
+  ],
+  "machine": {
+    "machine": "arm64",
+    "python": "3.13.7",
+    "release": "27.0.0",
+    "system": "Darwin"
+  },
+  "qualified": true,
+  "schema": "kenn.dsp_native_kernel_benchmark.v1",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7"
+}

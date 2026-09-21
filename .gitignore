@@ -1,140 +1,74 @@
-# OS-generated metadata must not appear as source changes.
+# NITE DSP umbrella repo — this repo holds business/product documentation and
+# links each product's own repo in as a submodule. Build output, dependency
+# caches, virtualenvs, and generated artifacts are deliberately excluded:
+# they are large, fully regenerable, and each product repo manages its own.
+
+# OS / editor noise
 .DS_Store
 ._*
-
-# Local AI/editor agent metadata (never product source)
-.claude/
-**/.claude/
-.cursor/
-**/.cursor/
-.codex/
-**/.codex/
-.windsurf/
-**/.windsurf/
-.continue/
-**/.continue/
-.roo/
-**/.roo/
-.junie/
-**/.junie/
-.amazonq/
-**/.amazonq/
-.aider*
-**/.aider*
-.mcp.json
-**/.mcp.json
-AGENTS.md
-**/AGENTS.md
-CLAUDE.md
-**/CLAUDE.md
-GEMINI.md
-**/GEMINI.md
-.github/copilot-instructions.md
-**/copilot-instructions.md
+.vscode/*.log
 
 # Python
 __pycache__/
-*.py[cod]
-*.pyo
-*.pyd
+*.pyc
 .venv/
 venv/
-.pytest_cache/
-.ruff_cache/
 *.egg-info/
-dist/
+
+# Build systems / dependency fetch caches (JUCE, Eigen, dr_libs, node, etc.)
 build/
-.coverage
-htmlcov/
-
-# Node
+build-*/
+_build/
+_cache/
+_deps/
+*.o
+*.a
+*.so
+*.pyd
+*.dll
+*.dylib
 node_modules/
-.next/
-.vercel/
-out/
 
-# Environment / secrets — never commit real values
-.env
-.env.local
-.env.production
-.env.production.local
-.env.staging
-.env.*.local
-*.pem
-*.key
-secret.key
+# Local Mix Review uploads are operator data, not repository fixtures.
+audio-technology/audio-analysis/audio_analysis/agents/MixReview/data/mix_reviews/uploads/
 
-# Audio and large media — use asset storage instead
-*.wav
-*.mp3
-*.aiff
-*.aif
-*.flac
-*.ogg
-*.m4a
-*.opus
-
-# Release archives and build artifacts
-*.tar.gz
-*.zip
-*.tar
-*.tgz
-artifacts/release/
-dist/
-
-# Model / ML artifacts
-*.pt
-*.pth
-*.ckpt
-*.safetensors
-*.onnx
-*.onnx.data
-*.bin
-*.npy
-*.npz
-training_data/
-tmp/
-
-# Worktrees — managed by git, not source
-workspace/worktrees/
+# Pure build/cache scratch space — not source, not final reports
 workspace/builds/
 workspace/caches/
+workspace/worktrees/
 workspace/tmp/
-workspace/evidence/
-workspace/review/
 
-# Local model/artifact directories — keep manifests and code, not model weights.
-**/artifacts/models/
-
-# Fixtures / test audio (large binary blobs)
-fixtures/blind_test_audio/
-fixtures/cache/
-fixtures/cache_kick_length/
-fixtures/cache_readonly_safety/
-fixtures/cache_rt_stress/
-fixtures/real_samples_test/
-fixtures/test_reese/
-fixtures/test_suburban/
-fixtures/test_suburban_clean/
-
-# Swift build outputs
-.build/
-*.o
+# Large binary/model/media artifacts that don't belong in git
+*.safetensors
+*.pkl
 *.dmg
-*.pkg
-*.app/
-
-# Databases and runtime state
-*.db
-*.sqlite
+*.tar.gz
+*.zip
 *.sqlite3
-.runtime/
+*.sqlite
+*.wav
+*.pack
 
-# Toolchain downloads
-**/toolchain/node-*/
-**/*.tar.xz
+# Toolchains vendored into validation runs
+**/toolchain/
 
-# Misc
+# Raw build logs — no lasting value, can be large
 *.log
-crash_recovery_results.json
-*.jsonl
+
+# Sensitive real-document corpus pending privacy review (see
+# NITE_DSP_REPOSITORY_OWNERSHIP_AUDIT_V1.md) — excluded here as a second
+# layer of protection on top of nite-submit's own .gitignore.
+**/real_validation_corpus/
+
+# Legacy/superseded repos, already fully backed up on their own branches of
+# github.com/Jack441095/Nite_DSP_01 (ux/slo-v3-premium-product,
+# web/nitedsp-world-class-v3) — kept on disk for reference, not re-linked
+# here since they're dead branches, not active work.
+archive/legacy-layout/slo-ux-v3/
+archive/legacy-layout/web-v3/
+
+# Empty placeholder repos (zero commits) left over from a prior estate
+# audit snapshot — nothing to protect.
+validation/audits/estate-protection-v1/snapshots/empty_repos/
+research/audio/lab/
+research/product-experience/Nite_DSP_Product_Experience_RnD/

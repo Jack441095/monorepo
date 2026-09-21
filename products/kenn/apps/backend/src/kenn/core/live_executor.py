@@ -215,12 +215,13 @@ class LiveExecutor:
             if res.get("ok"):
                 undone_count += 1
 
+        total = len(restore_steps)
         return {
-            "ok": True,
-            "status": "undone",
+            "ok": undone_count == total,
+            "status": "undone" if undone_count == total else "partially_undone",
             "batch_id": batch_undo_payload.get("batch_id"),
             "undone_steps": undone_count,
-            "total_steps": len(restore_steps),
+            "total_steps": total,
         }
 
     def apply_proposal(

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import io
 import math
+import os
 import struct
 import uuid
 import wave
@@ -228,6 +229,38 @@ def validate_wav_upload(payload: bytes, filename: str, *, label: str = "Local mi
 
 
 def _decode_channels(payload: bytes) -> tuple[list[array], int, int]:
+    # The Mix Review engine keeps its audited Python decoder as the default,
+    # but can opt into the same native PCM decoder used by the spectral path.
+    # This avoids the Python integer-to-float64 decode pass on large uploads;
+    # the native loudness path can keep these float32 channels end-to-end.
+    # The exact parser/error fallback remains in place when the optional wheel
+    # is absent or rejects the container.
+    if os.environ.get("KENN_DSP_MIX_REVIEW_DECODE_NATIVE", "0").strip().lower() in {
+        "1", "true", "on", "yes",
+    }:
+        try:
+            from kenn.core.native_fft import decode_pcm
+
+            native_result = decode_pcm(payload)
+        except (ImportError, OSError, RuntimeError, TypeError, ValueError):
+            native_result = None
+        if native_result is not None and _np is not None:
+            try:
+                native_channels = native_result["channels"]
+                native_rate = int(native_result["sample_rate"])
+                native_count = int(native_result["channel_count"])
+                if native_count in (1, 2) and native_rate > 0 and len(native_channels) == native_count:
+                    channels = [
+                        _np.asarray(channel, dtype=_np.float32, order="C")
+                        for channel in native_channels
+                    ]
+                    if channels and all(channel.ndim == 1 and channel.size for channel in channels):
+                        if all(channel.shape == channels[0].shape for channel in channels[1:]):
+                            return channels, native_rate, native_count
+            except (KeyError, TypeError, ValueError):
+                # Fall through to the stable Python parser below.
+                pass
+
     channels, sampwidth, framerate, raw, audio_format = _parse_wav(payload)
 
     if sampwidth == 2:
@@ -1046,6 +1079,57 @@ def _calibrated_loudness_and_true_peak(
         # pyloudnorm's gating blocks are 400 ms; shorter audio has no
         # well-defined integrated loudness under BS.1770.
         return None, "audio is shorter than the 400 ms BS.1770 gating block"
+    native_loudness_enabled = os.environ.get("KENN_DSP_LOUDNESS_NATIVE", "0").strip().lower() in {
+        "1", "true", "on", "yes",
+    }
+    # Native decoding already produced contiguous float32 channels. Keep that
+    # representation for the native loudness call so it does not immediately
+    # widen the whole upload back to float64; retain the float64 arrays above
+    # as the exact Python oracle/fallback.
+    native_arrays = arrays
+    if native_loudness_enabled and all(
+        isinstance(channel, _np.ndarray) and channel.dtype == _np.float32
+        for channel in channel_data
+    ):
+        native_arrays = [_np.ravel(_np.asarray(channel, dtype=_np.float32)) for channel in channel_data]
+    # pyloudnorm's LRA path appends 1.5 s of silence and requires a signal
+    # longer than its 3 s short-term block. Keep the opt-in candidate on the
+    # same abstention boundary when the pyloudnorm oracle is installed.
+    pyloudnorm_lra_compatible = not (
+        _pyln is not None
+        and _resample_poly is not None
+        and len(arrays[0]) + int(1.5 * framerate) <= int(3.0 * framerate)
+    )
+    if native_loudness_enabled and pyloudnorm_lra_compatible:
+        try:
+            from kenn.core.native_fft import loudness_metrics
+
+            native_result = loudness_metrics(native_arrays, framerate)
+        except (ImportError, OSError, RuntimeError, TypeError, ValueError):
+            native_result = None
+        if native_result is not None:
+            native_integrated = native_result.get("integrated_lufs")
+            if isinstance(native_integrated, (int, float)) and math.isfinite(float(native_integrated)):
+                native_lra = native_result.get("loudness_range_lu")
+                native_true_peak = native_result.get("true_peak_dbtp")
+                true_peak_dbtp = (
+                    float(native_true_peak)
+                    if isinstance(native_true_peak, (int, float)) and math.isfinite(float(native_true_peak))
+                    else (
+                        _pyloudnorm_true_peak_dbtp(arrays)
+                        if _resample_poly is not None
+                        else _numpy_true_peak_dbtp(arrays)
+                    )
+                )
+                return {
+                    "integrated_lufs": round(float(native_integrated), 2),
+                    "loudness_range_lu": round(float(native_lra), 2)
+                    if isinstance(native_lra, (int, float)) and math.isfinite(float(native_lra))
+                    else None,
+                    "true_peak_dbtp": round(float(true_peak_dbtp), 2)
+                    if true_peak_dbtp is not None and math.isfinite(true_peak_dbtp)
+                    else None,
+                }, None
     if _pyln is not None and _resample_poly is not None:
         return _pyloudnorm_measurements(arrays, framerate)
     integrated, lra = _numpy_integrated_lufs_and_lra(arrays, framerate)
@@ -1074,12 +1158,7 @@ def _pyloudnorm_measurements(
         meter = _pyln.Meter(framerate)
         integrated_lufs = meter.integrated_loudness(stacked)
         loudness_range = meter.loudness_range(stacked)
-        true_peak_dbtp = float("-inf")
-        for channel in channel_data:
-            oversampled = _resample_poly(channel, up=TRUE_PEAK_OVERSAMPLE_FACTOR, down=1)
-            channel_peak = float(_np.max(_np.abs(oversampled))) if oversampled.size else 0.0
-            if channel_peak > 0:
-                true_peak_dbtp = max(true_peak_dbtp, 20.0 * math.log10(channel_peak))
+        true_peak_dbtp = _pyloudnorm_true_peak_dbtp(channel_data)
     except Exception as exc:  # pragma: no cover - defensive: never let a metering edge case crash the review
         return None, f"pyloudnorm/scipy raised on this input: {exc}"
     if not math.isfinite(integrated_lufs):
@@ -1087,8 +1166,24 @@ def _pyloudnorm_measurements(
     return {
         "integrated_lufs": round(float(integrated_lufs), 2),
         "loudness_range_lu": round(float(loudness_range), 2) if math.isfinite(loudness_range) else None,
-        "true_peak_dbtp": round(float(true_peak_dbtp), 2) if math.isfinite(true_peak_dbtp) else None,
+        "true_peak_dbtp": round(float(true_peak_dbtp), 2)
+        if true_peak_dbtp is not None and math.isfinite(float(true_peak_dbtp))
+        else None,
     }, None
+
+
+def _pyloudnorm_true_peak_dbtp(arrays: list[Any]) -> float | None:
+    """Fallback true-peak implementation for older native wheels."""
+    if _np is None or _resample_poly is None:
+        return None
+    peak_dbtp: float | None = None
+    for channel in arrays:
+        oversampled = _resample_poly(channel, up=TRUE_PEAK_OVERSAMPLE_FACTOR, down=1)
+        channel_peak = float(_np.max(_np.abs(oversampled))) if oversampled.size else 0.0
+        if channel_peak > 0.0:
+            value = 20.0 * math.log10(channel_peak)
+            peak_dbtp = value if peak_dbtp is None else max(peak_dbtp, value)
+    return peak_dbtp
 
 
 def _technical_rating(findings: list[dict[str, Any]]) -> str:

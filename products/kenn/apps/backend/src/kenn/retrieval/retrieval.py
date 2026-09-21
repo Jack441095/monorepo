@@ -7,6 +7,7 @@ using a local sentence-transformer model (all-MiniLM-L6-v2, 384 dim).
 from __future__ import annotations
 
 import json
+import logging
 import math
 import os
 import re
@@ -36,6 +37,8 @@ _embedding_model = None
 _embedding_model_error: str | None = None
 _embedding_index: np.ndarray | None = None  # shape (num_chunks, 384)
 _embedding_index_version: str = ""
+_embedding_index_error: str | None = None
+logger = logging.getLogger(__name__)
 
 
 def _get_embedding_model():
@@ -72,32 +75,97 @@ def reset_embedding_model() -> None:
 
 def load_embedding_index() -> np.ndarray | None:
     """Load the pre-computed embedding matrix from disk."""
-    global _embedding_index, _embedding_index_version
+    global _embedding_index, _embedding_index_version, _embedding_index_error
     if _embedding_index is not None:
         return _embedding_index
     version_id = active_version_id(INDEX_DIR)
     embeddings_path = active_artifact_path("embeddings.npy", INDEX_DIR)
     if not embeddings_path.exists():
-        print(f"WARNING: embedding index {embeddings_path} does not exist -- "
-              f"retrieval will silently fall back to BM25-only until this is rebuilt")
+        _embedding_index_error = f"embedding index does not exist: {embeddings_path}"
+        logger.warning(
+            "%s; retrieval mode is explicitly BM25-only until the index is rebuilt",
+            _embedding_index_error,
+        )
         _embedding_index = None
         _embedding_index_version = version_id
         return None
     try:
         _embedding_index = np.load(str(embeddings_path), allow_pickle=False)
         _embedding_index_version = version_id
+        _embedding_index_error = None
     except Exception as exc:
-        print(f"WARNING: embedding index {embeddings_path} exists but failed to load ({exc!r}) -- "
-              f"retrieval will silently fall back to BM25-only until this is fixed")
+        _embedding_index_error = f"embedding index failed to load: {exc!r}"
+        logger.warning(
+            "%s; retrieval mode is explicitly BM25-only until the index is repaired",
+            _embedding_index_error,
+        )
         return None
     return _embedding_index
 
 
 def unload_embedding_index() -> None:
     """Free the embedding index from memory (e.g. after index rebuild)."""
-    global _embedding_index, _embedding_index_version
+    global _embedding_index, _embedding_index_version, _embedding_index_error
     _embedding_index = None
     _embedding_index_version = ""
+    _embedding_index_error = None
+
+
+def retrieval_status(index_dir: Path | None = None) -> dict:
+    """Return a side-effect-free description of the effective retrieval mode.
+
+    The status deliberately does not load the embedding model. A semantic
+    index on disk is only a configured capability; hybrid retrieval is marked
+    active after both the index and model have actually loaded in this
+    process. This prevents health responses from claiming semantic retrieval
+    merely because a filename exists.
+    """
+    selected_dir = Path(index_dir) if index_dir is not None else INDEX_DIR
+    version_dir = active_version_dir(selected_dir)
+    artifact_dir = version_dir or selected_dir
+    chunks_path = artifact_dir / "chunks.jsonl"
+    terms_path = artifact_dir / "terms.json"
+    embeddings_path = artifact_dir / "embeddings.npy"
+    lexical_available = chunks_path.is_file() and terms_path.is_file()
+    semantic_index_available = embeddings_path.is_file()
+
+    if not lexical_available:
+        active_mode = "unavailable"
+        fallback_reason = "lexical_index_missing"
+    elif not semantic_index_available:
+        active_mode = "bm25_only"
+        fallback_reason = "embedding_index_missing"
+    elif _embedding_index_error:
+        active_mode = "bm25_only"
+        fallback_reason = "embedding_index_load_failed"
+    elif _embedding_model_error:
+        active_mode = "bm25_only"
+        fallback_reason = "embedding_model_unavailable"
+    elif _embedding_index is not None and _embedding_model is not None:
+        active_mode = "hybrid"
+        fallback_reason = None
+    else:
+        active_mode = "bm25_only"
+        fallback_reason = "semantic_runtime_not_warmed"
+
+    return {
+        "schema": "kenn.retrieval_status.v1",
+        "available": lexical_available,
+        "active_mode": active_mode,
+        "configured_mode": "hybrid" if semantic_index_available else "bm25_only",
+        "lexical_index_available": lexical_available,
+        "semantic_index_available": semantic_index_available,
+        "semantic_model_state": (
+            "ready"
+            if _embedding_model is not None
+            else "unavailable"
+            if _embedding_model_error
+            else "not_loaded"
+        ),
+        "degraded": active_mode != "hybrid",
+        "fallback_reason": fallback_reason,
+        "index_version": version_dir.name if version_dir is not None else "legacy",
+    }
 
 
 def update_embedding_index(new_chunks: list[dict]) -> np.ndarray:
@@ -376,8 +444,20 @@ TOPIC_CONFLICTS: dict[str, tuple[str, ...]] = {
 }
 
 
+@lru_cache(maxsize=8192)
+def _tokenize_cached(text: str) -> tuple[str, ...]:
+    """Tokenize immutable text once per process.
+
+    Chat ranking revisits the same query and chunk text across BM25 scoring,
+    reranking, intent guards, and answer formatting.  Returning a tuple keeps
+    the cache value immutable while the public wrapper preserves the original
+    list return type for callers that rely on it.
+    """
+    return tuple(word.lower() for word in WORD_RE.findall(text) if word.lower() not in STOPWORDS)
+
+
 def tokenize(text: str) -> list[str]:
-    return [word.lower() for word in WORD_RE.findall(text) if word.lower() not in STOPWORDS]
+    return list(_tokenize_cached(str(text)))
 
 
 def normalized_text(text: str) -> str:
@@ -420,7 +500,8 @@ def term_matches(text: str, term: str) -> bool:
     return needle in lowered
 
 
-def query_topics(query: str) -> list[str]:
+@lru_cache(maxsize=4096)
+def _query_topics_cached(query: str) -> tuple[str, ...]:
     lowered = query.lower()
     ableton_link_intent = any(
         term_matches(lowered, phrase)
@@ -437,7 +518,12 @@ def query_topics(query: str) -> list[str]:
             continue
         if any(term_matches(lowered, term) for term in terms):
             topics.append(topic)
-    return topics
+    return tuple(topics)
+
+
+def query_topics(query: str) -> list[str]:
+    """Return topic labels while reusing the process-local classifier result."""
+    return list(_query_topics_cached(str(query)))
 
 
 def hard_negative_cache_key_for(path: Path) -> tuple[str, int, int]:

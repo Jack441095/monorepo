@@ -1,0 +1,29 @@
+{
+  "schema": "kenn.universal_plugin_build.v1",
+  "run_date": "2026-09-21",
+  "build_directory": "products/kenn/build/plugins/kenn-vst3-au",
+  "configuration": "Release",
+  "cmake_option": "KENN_BUILD_UNIVERSAL=ON",
+  "bundles": {
+    "vst3": {
+      "path": "KENNMixAssistant_artefacts/Release/VST3/KENN Mix Assistant.vst3",
+      "architectures": ["x86_64", "arm64"],
+      "moduleinfo_present": true
+    },
+    "au": {
+      "path": "KENNMixAssistant_artefacts/Release/AU/KENN Mix Assistant.component",
+      "architectures": ["x86_64", "arm64"]
+    }
+  },
+  "ctest": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "note": "Live-bound integration checks skip explicitly when AbletonOSC is unavailable."
+  },
+  "packaging_preflight": {
+    "status": "blocked-credentials-only",
+    "missing": ["Developer ID identity", "notarytool keychain profile"]
+  },
+  "host_loading": "not_run"
+}

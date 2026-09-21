@@ -140,4 +140,3 @@ def test_audiogen_groove_and_bassline_generation():
     # Offbeats at index 1 and 3 should be shifted later by swing and laidback pocket
     assert swung[1]["start_time"] > 0.25
     assert swung[3]["start_time"] > 0.75
-

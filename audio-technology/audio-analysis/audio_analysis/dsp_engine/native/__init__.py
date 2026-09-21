@@ -225,7 +225,7 @@ def _load_reverb():
     if path is None:
         return None, None
     _reverb_lib = ctypes.CDLL(str(path))
-    
+
     comb_fn = _reverb_lib.lbcf_comb_filter
     comb_fn.restype = None
     comb_fn.argtypes = [
@@ -236,7 +236,7 @@ def _load_reverb():
         ctypes.c_double,                  # damping
         ctypes.POINTER(ctypes.c_double),  # y_out
     ]
-    
+
     allpass_fn = _reverb_lib.allpass_filter
     allpass_fn.restype = None
     allpass_fn.argtypes = [
@@ -246,7 +246,7 @@ def _load_reverb():
         ctypes.c_double,                  # g
         ctypes.POINTER(ctypes.c_double),  # y_out
     ]
-    
+
     _comb_fn, _allpass_fn = comb_fn, allpass_fn
     return _comb_fn, _allpass_fn
 
@@ -692,9 +692,3 @@ def native_rolling_median_mad_threshold(flux, radius: int, min_floor: float, mad
        ctypes.c_double(min_floor), ctypes.c_double(mad_multiplier),
        out.ctypes.data_as(dbl))
     return out
-
-
-
-
-
-

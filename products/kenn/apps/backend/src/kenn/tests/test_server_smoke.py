@@ -74,6 +74,9 @@ def test_health_endpoint_responds(running_server: str) -> None:
         body = json.loads(response.read())
     assert body["ok"] is True
     assert body["app"] == "KENN"
+    retrieval = body["subsystems"]["knowledge_index"]
+    assert retrieval["schema"] == "kenn.retrieval_status.v1"
+    assert retrieval["active_mode"] in {"unavailable", "bm25_only", "hybrid"}
 
 
 def test_session_outcome_summary_endpoint_returns_aggregate_only(running_server: str) -> None:

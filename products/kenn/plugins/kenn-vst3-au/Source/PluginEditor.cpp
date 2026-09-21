@@ -314,7 +314,6 @@ KENNMixAssistantAudioProcessorEditor::KENNMixAssistantAudioProcessorEditor(KENNM
                           &askButton, &liveCommandButton, &inspectLiveControlsButton, &automixButton, &applySafeTargetButton,
                           &undoTargetButton, &copyAutoMixLinkButton, &confirmLiveProposalButton,
                           &cancelLiveProposalButton, &undoLiveCommandButton,
-                          &masterSpotifyButton, &matchRefButton, &autoGainTrimButton })
                           &masterSpotifyButton, &matchRefButton, &autoGainTrimButton,
                           &arrangeTransitionsButton, &packageStemsButton })
     {
@@ -762,4 +761,3 @@ void KENNMixAssistantAudioProcessorEditor::timerCallback()
         juce::Thread::launch([safeThis, job] { if (safeThis == nullptr) return; juce::String result; bool complete = false; const bool ok = safeThis->kennProcessor.fetchAutoMixStatus(job, result, complete); juce::MessageManager::callAsync([safeThis, ok, complete, job, result] { if (safeThis != nullptr) { if (ok) safeThis->status.setText(result, juce::dontSendNotification); if (complete) { if (result.startsWithIgnoreCase("AutoMix complete")) safeThis->completedAutoMixJob = job; safeThis->activeAutoMixJob.clear(); } } }); });
     }
 }
-

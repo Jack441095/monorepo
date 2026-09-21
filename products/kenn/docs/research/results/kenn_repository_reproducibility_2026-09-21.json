@@ -1,0 +1,108 @@
+{
+  "schema": "kenn.repository_reproducibility.v1",
+  "recorded_at": "2026-09-21T16:28:50+01:00",
+  "baseline_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "canonical_source_revision": "f118fda61da6f72b39b97b13828c7e4fd9fcc284",
+  "branch": "kenn-production-hardening",
+  "evidence_classification": "verified_with_external_blockers",
+  "canonical_backend": "products/kenn/apps/backend/src/kenn",
+  "inventory": {
+    "reviewable_untracked_product_files_before_commit": 1033,
+    "reviewable_untracked_product_bytes_before_commit": 22138893,
+    "shared_native_source_files": 13,
+    "categories": {
+      "apps_backend": 388,
+      "apps_frontend": 78,
+      "apps_desktop": 5,
+      "apps_legacy_web": 8,
+      "packages": 50,
+      "plugins": 27,
+      "integrations": 57,
+      "tooling": 200,
+      "docs": 213,
+      "assets": 2
+    }
+  },
+  "symlinks": [
+    {
+      "path": "products/kenn/source",
+      "target": "apps/backend/src/kenn",
+      "target_exists": true
+    },
+    {
+      "path": "products/kenn/vst3-plugin",
+      "target": "plugins/kenn-vst3-au",
+      "target_exists": true
+    }
+  ],
+  "excluded_local_roots": [
+    "products/kenn/kenn",
+    "products/kenn/runtime/legacy",
+    "products/kenn/standalone",
+    "audio-technology/audio-analysis/audio_analysis/agents/MixReview/data/mix_reviews/uploads"
+  ],
+  "duplicate_diff_observations": {
+    "runtime_legacy": {
+      "one_sided_entries": 47,
+      "differing_files": 63
+    },
+    "product_root_kenn": {
+      "one_sided_entries": 346,
+      "differing_files": 100
+    },
+    "standalone_snapshot": {
+      "one_sided_entries": 585,
+      "differing_files": 339
+    }
+  },
+  "remote_divergence_before_publish": {
+    "local_only_commits": 376,
+    "remote_only_commits": 141,
+    "direct_main_push_safe": false
+  },
+  "clean_checkout": {
+    "status": "passed",
+    "source_revision": "f118fda61da6f72b39b97b13828c7e4fd9fcc284",
+    "hardening_revision": "5647a85",
+    "platform": "macOS ARM64",
+    "python": {
+      "requirements_install": "passed",
+      "tests_passed": 1170,
+      "tests_skipped": 121,
+      "warnings": 4
+    },
+    "scoped_chat": {
+      "tests_passed": 38,
+      "tests_skipped": 1,
+      "skip_reason": "approved local retrieval index is intentionally not committed",
+      "indexed_developer_environment": "39 passed"
+    },
+    "mix_review": {
+      "tests_passed": 64
+    },
+    "automix": {
+      "product_tests_passed": 4,
+      "package_tests_passed": 4
+    },
+    "research_receipts_validated": 50,
+    "frontend": {
+      "npm_ci": "passed",
+      "audit_vulnerabilities": 0,
+      "tests_passed": 5,
+      "production_build": "passed",
+      "transformed_modules": 131
+    },
+    "native": {
+      "fft_poc_ctest": "2/2 passed",
+      "automix_kernel_ctest": "1/1 passed",
+      "juce_plugin_configure_build": "passed",
+      "juce_plugin_ctest": "9/9 passed"
+    },
+    "limitations": [
+      "approved retrieval corpus is local-only",
+      "real Ableton qualification requires an external Live host",
+      "fresh JUCE configure required dependency network access",
+      "clean backend skips corpus-, model-, and generated-index-dependent tests"
+    ]
+  }
+}

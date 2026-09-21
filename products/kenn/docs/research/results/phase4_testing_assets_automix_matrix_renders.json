@@ -1,0 +1,140 @@
+{
+  "run_date": "2026-09-20",
+  "pipeline_source": "origin/main f4a90d2c603b56f6088d7e0d2c8f2bd7f402c8f1 Audio_Too/scripts/automix_local.py",
+  "source_license_status": "TODO-vendor-pack",
+  "selection_manifest": "products/kenn/docs/research/results/phase4_testing_assets_stem_matrix.json",
+  "renders": [
+    {
+      "stem_count": 1,
+      "project_id": "matrix-1",
+      "source_track": "al_james",
+      "source_files": [
+        {
+          "relative_path": "al_james/01_Kick.wav",
+          "sha256": "b4da0c2a024397d476956b1d5dbd7489719b212a3121d1064cf83b8161be2e70"
+        }
+      ],
+      "source_duration_seconds": 198.862948,
+      "output_duration_seconds": 191.46913832199547,
+      "output_wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate": 44100,
+        "frames": 8443789,
+        "bytes": 50662778,
+        "sha256": "e8d4d71509cce12a471e8476112161a9e3836c3e27662ba15f207d287d2f2b2a"
+      },
+      "quality_gate": {
+        "passed": true,
+        "safety_passed": true,
+        "hard_failures": [],
+        "technical_score": 55,
+        "minimum_score": 65,
+        "advisory_score_passed": false,
+        "true_peak_dbtp": -1.2999994292014192,
+        "phase_correlation": 0.9999999999999125,
+        "measured_lufs": -14.69,
+        "target_lufs": -14.0,
+        "crest_factor_db": 2.554899578731724
+      },
+      "status": "safety-pass-advisory-fail"
+    },
+    {
+      "stem_count": 8,
+      "project_id": "matrix-8",
+      "source_track": "al_james",
+      "source_file_count": 8,
+      "source_selection": "selection_manifest matrix entry for stem_count=8",
+      "source_duration_seconds": 198.862948,
+      "output_duration_seconds": 191.46913832199547,
+      "output_wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate": 44100,
+        "frames": 8443789,
+        "bytes": 50662778,
+        "sha256": "6ce22630202b054257732a568fd05493bd65a6473c4b1378cf7d141b7da61594"
+      },
+      "quality_gate": {
+        "passed": true,
+        "safety_passed": true,
+        "hard_failures": [],
+        "technical_score": 20,
+        "minimum_score": 65,
+        "advisory_score_passed": false,
+        "true_peak_dbtp": -1.2689962910789276,
+        "phase_correlation": 0.8333556446939281,
+        "measured_lufs": -13.97,
+        "target_lufs": -14.0,
+        "crest_factor_db": 15.745790986083769
+      },
+      "status": "safety-pass-advisory-fail"
+    },
+    {
+      "stem_count": 16,
+      "project_id": "matrix-16",
+      "source_track": "al_james",
+      "source_file_count": 16,
+      "source_selection": "selection_manifest matrix entry for stem_count=16",
+      "source_duration_seconds": 198.862948,
+      "output_duration_seconds": 191.46913832199547,
+      "output_wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate": 44100,
+        "frames": 8443789,
+        "bytes": 50662778,
+        "sha256": "ada738b165385c57e2626314950f2bb0ef6ee7939dcced5edaf124174fec6e08"
+      },
+      "quality_gate": {
+        "passed": true,
+        "safety_passed": true,
+        "hard_failures": [],
+        "technical_score": 25,
+        "minimum_score": 65,
+        "advisory_score_passed": false,
+        "true_peak_dbtp": -1.151708834862371,
+        "phase_correlation": 0.8467678029897282,
+        "measured_lufs": -14.03,
+        "target_lufs": -14.0,
+        "crest_factor_db": 16.43819827337837
+      },
+      "status": "safety-pass-advisory-fail"
+    },
+    {
+      "stem_count": 32,
+      "project_id": "matrix-32",
+      "source_track": "al_james",
+      "source_file_count": 32,
+      "source_selection": "selection_manifest matrix entry for stem_count=32",
+      "source_duration_seconds": 198.862948,
+      "output_duration_seconds": 197.7305215419501,
+      "output_wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate": 44100,
+        "frames": 8719916,
+        "bytes": 52319540,
+        "sha256": "c0b3720aad5c6e0c2e0e3a92fe68249ee2c2bac04d7db6cc50287ff2b10da7a7"
+      },
+      "quality_gate": {
+        "passed": true,
+        "safety_passed": true,
+        "hard_failures": [],
+        "technical_score": 30,
+        "minimum_score": 65,
+        "advisory_score_passed": false,
+        "true_peak_dbtp": -1.9409221608783676,
+        "phase_correlation": 0.3663611659024824,
+        "measured_lufs": -14.02,
+        "target_lufs": -14.0,
+        "crest_factor_db": 13.697706156800681
+      },
+      "status": "safety-pass-advisory-fail"
+    }
+  ],
+  "completed_counts": [1, 8, 16, 32],
+  "pending_counts": [],
+  "unavailable_counts": [64],
+  "perceptual_listening_complete": false
+}

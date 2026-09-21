@@ -1,0 +1,153 @@
+{
+  "schema": "kenn.dsp_real_mix_comparison.v1",
+  "candidate": "cpp-scalar-nanobind",
+  "fixture_root": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets",
+  "cases": [
+    {
+      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav",
+      "reference_ms": 13870.92491700605,
+      "native_ms": 13962.141832998896,
+      "speedup": 0.9934668393227994,
+      "reference_implementation": "python-reference",
+      "native_implementation": "cpp-scalar",
+      "issues": [],
+      "issue_count": 0,
+      "both_complete": true,
+      "ignored_differences": [
+        "/analysis_timestamp: '2026-09-20T22:11:22.347373+00:00' != '2026-09-20T22:11:36.229695+00:00'",
+        "/receipt_id: 'receipt-d637f284e94c46afae1e03c49a0fef45' != 'receipt-3e91082daee64450b09895bcba7e428c'",
+        "/runtime_ms: 13596.803 != 13718.691"
+      ]
+    },
+    {
+      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/al_james/al_james/mixdown_v1.wav",
+      "reference_ms": 10120.488333996036,
+      "native_ms": 10165.523999996367,
+      "speedup": 0.9955697644311944,
+      "reference_implementation": "python-reference",
+      "native_implementation": "cpp-scalar",
+      "issues": [],
+      "issue_count": 0,
+      "both_complete": true,
+      "ignored_differences": [
+        "/analysis_timestamp: '2026-09-20T22:11:50.233153+00:00' != '2026-09-20T22:12:00.353948+00:00'",
+        "/receipt_id: 'receipt-63332c80eebd45468e249dd03df83e81' != 'receipt-7d9cd68bd75a47b98d08cfeb8faa123b'",
+        "/runtime_ms: 9918.101 != 9978.346"
+      ]
+    },
+    {
+      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/amyhelmandthehandsomestrangers_rescueme/amyhelmandthehandsomestrangers_rescueme/mixdown_v1.wav",
+      "reference_ms": 13281.638624997868,
+      "native_ms": 13078.987792003318,
+      "speedup": 1.0154943819978526,
+      "reference_implementation": "python-reference",
+      "native_implementation": "cpp-scalar",
+      "issues": [],
+      "issue_count": 0,
+      "both_complete": true,
+      "ignored_differences": [
+        "/analysis_timestamp: '2026-09-20T22:12:10.596509+00:00' != '2026-09-20T22:12:23.878448+00:00'",
+        "/receipt_id: 'receipt-1a5090aa7fe6418188a8524e6c6839ed' != 'receipt-2a0544a419464aec88ea8f82a8dec0e7'",
+        "/runtime_ms: 13020.811 != 12832.676"
+      ]
+    },
+    {
+      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/angeloboltini_fragments/angeloboltini_fragments/mixdown_v1.wav",
+      "reference_ms": 9011.540291998244,
+      "native_ms": 9050.265624995518,
+      "speedup": 0.9957210832696093,
+      "reference_implementation": "python-reference",
+      "native_implementation": "cpp-scalar",
+      "issues": [],
+      "issue_count": 0,
+      "both_complete": true,
+      "ignored_differences": [
+        "/analysis_timestamp: '2026-09-20T22:12:37.000615+00:00' != '2026-09-20T22:12:46.012521+00:00'",
+        "/receipt_id: 'receipt-934573c34aae4cb285bf34ed00fe27a4' != 'receipt-3bc0821abf434c1a84554d3096536411'",
+        "/runtime_ms: 8837.649 != 8881.43"
+      ]
+    },
+    {
+      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/atlantisbound_itwasmyfaultforwaiting/atlantisbound_itwasmyfaultforwaiting/mixdown_v1.wav",
+      "reference_ms": 12185.24674999935,
+      "native_ms": 12248.455834000197,
+      "speedup": 0.9948394242623315,
+      "reference_implementation": "python-reference",
+      "native_implementation": "cpp-scalar",
+      "issues": [],
+      "issue_count": 0,
+      "both_complete": true,
+      "ignored_differences": [
+        "/analysis_timestamp: '2026-09-20T22:12:55.135657+00:00' != '2026-09-20T22:13:07.321407+00:00'",
+        "/receipt_id: 'receipt-575ba3f92b8841ecad50946cfe060ece' != 'receipt-426696a609464aeb8b09b0cec0381bfc'",
+        "/runtime_ms: 11918.226 != 12017.981"
+      ]
+    },
+    {
+      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/dream_of_you/dream_of_you/mixdown_v1.wav",
+      "reference_ms": 4191.5239580048365,
+      "native_ms": 4173.291375002009,
+      "speedup": 1.0043688737172871,
+      "reference_implementation": "python-reference",
+      "native_implementation": "cpp-scalar",
+      "issues": [],
+      "issue_count": 0,
+      "both_complete": true,
+      "ignored_differences": [
+        "/analysis_timestamp: '2026-09-20T22:13:19.579259+00:00' != '2026-09-20T22:13:23.771104+00:00'",
+        "/receipt_id: 'receipt-009387761bd64afc8acda7e716e7be32' != 'receipt-8b6c5dae76dc4453b2f7ea21e84c97c8'",
+        "/runtime_ms: 4109.469 != 4095.162"
+      ]
+    },
+    {
+      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/reggueton_pop/reggueton_pop/mixdown_v1.wav",
+      "reference_ms": 7285.608833997685,
+      "native_ms": 7339.916083998105,
+      "speedup": 0.9926011075087334,
+      "reference_implementation": "python-reference",
+      "native_implementation": "cpp-scalar",
+      "issues": [],
+      "issue_count": 0,
+      "both_complete": true,
+      "ignored_differences": [
+        "/analysis_timestamp: '2026-09-20T22:13:27.991591+00:00' != '2026-09-20T22:13:35.277457+00:00'",
+        "/receipt_id: 'receipt-716284f1c279426fb020a7cccc17c437' != 'receipt-f09387a894f74fa2ae7c7b74879e74d0'",
+        "/runtime_ms: 7144.892 != 7204.012"
+      ]
+    },
+    {
+      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/stranger/stranger-validate/mixdown_v1.wav",
+      "reference_ms": 10439.899416000117,
+      "native_ms": 10453.206999998656,
+      "speedup": 0.9987269376758213,
+      "reference_implementation": "python-reference",
+      "native_implementation": "cpp-scalar",
+      "issues": [],
+      "issue_count": 0,
+      "both_complete": true,
+      "ignored_differences": [
+        "/analysis_timestamp: '2026-09-20T22:13:42.680965+00:00' != '2026-09-20T22:13:53.121159+00:00'",
+        "/receipt_id: 'receipt-52abb52d70db49edab295c7bb0d91cb3' != 'receipt-1e634a5f8d244c4599ceb8f1ea77c9f0'",
+        "/runtime_ms: 10245.725 != 10258.569"
+      ]
+    }
+  ],
+  "all_parity_pass": true,
+  "mean_speedup": 0.9988485515232036,
+  "limitations": [
+    "Testing-assets manifest records license as TODO-vendor-pack; this is internal evidence only, not a redistribution or release-rights claim.",
+    "Single cold process per in-process backend switch; repeat count is 1."
+  ],
+  "parity_policy": {
+    "ignored_fields": [
+      "analysis_timestamp",
+      "receipt_id",
+      "runtime_ms"
+    ],
+    "numeric_tolerance": {
+      "absolute": 2e-05,
+      "relative": 2e-05
+    }
+  },
+  "timing_status": "historical pre-cleanup in-process parity timing; use phase4_testing_assets_post_cleanup_summary.json for current complete-request timing"
+}

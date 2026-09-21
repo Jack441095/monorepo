@@ -1,0 +1,49 @@
+{
+  "captured_at": 1789999778.153821,
+  "checks": {
+    "connected": true,
+    "read_only_probe": true,
+    "track_identity_fields": true
+  },
+  "evidence_kind": "deterministic_mock",
+  "host_os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "limitations": [
+    "This probe is read-only and does not qualify mutation, readback, native undo, or crash recovery.",
+    "A deterministic_mock result is harness evidence only and is never real-Live evidence."
+  ],
+  "mode": "mock",
+  "runtime_ms": 41.246,
+  "schema": "kenn.ableton_qualification.v1",
+  "session_version": "b8a9171bac646e78f156fd4e50c6b51a28675d5ce61589aa0b3c63e56e41b0e6",
+  "snapshot": {
+    "host": "mock",
+    "is_playing": false,
+    "port": 0,
+    "scenes": [],
+    "status": "connected",
+    "tempo": 120.0,
+    "tracks": [
+      {
+        "armed": false,
+        "devices": [],
+        "index": 0,
+        "muted": false,
+        "name": "Vocal",
+        "pan": 0.0,
+        "soloed": false,
+        "volume": 0.5
+      },
+      {
+        "armed": false,
+        "devices": [],
+        "index": 1,
+        "muted": false,
+        "name": "Drum Bus",
+        "pan": 0.0,
+        "soloed": false,
+        "volume": 0.7
+      }
+    ]
+  },
+  "status": "passed"
+}

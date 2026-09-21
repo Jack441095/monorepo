@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import logging
 import sqlite3
-from typing import Any
+from collections import Counter
+from typing import Any, Iterable
 
 from kenn.knowledge.reasoning import _get_conn, init_db
 
@@ -60,26 +61,41 @@ def get_source_trust(source_name: str) -> float:
 
 def record_citation(source_name: str) -> None:
     """Increment citation count and slightly boost trust (capped at 1.0)."""
-    name = source_name.strip()
-    if not name:
+    record_citations((source_name,))
+
+
+def record_citations(source_names: Iterable[str]) -> None:
+    """Record several citations in one initialized SQLite transaction.
+
+    Chat answers commonly cite several chunks from the same source.  The old
+    per-source path initialized the schema and opened three connections for
+    every citation.  Grouping names preserves one-count-per-citation and the
+    same +0.01 capped trust update while making the common batch operation
+    proportional to one database setup.
+    """
+    counts = Counter(
+        name.strip() for name in source_names
+        if isinstance(name, str) and name.strip()
+    )
+    if not counts:
         return
     try:
         init_db()
-        current_score = get_source_trust(name)
-        new_score = min(1.0, current_score + 0.01)
         with _get_conn() as conn:
-            conn.execute(
-                """
-                INSERT INTO source_trust (source_name, trust_score, corrections_count, citations_count)
-                VALUES (?, ?, 0, 1)
-                ON CONFLICT(source_name) DO UPDATE SET
-                    citations_count = citations_count + 1,
-                    trust_score = MIN(1.0, trust_score + 0.01)
-                """,
-                (name, new_score)
-            )
+            for name, count in counts.items():
+                default_score = get_source_default_trust(name)
+                conn.execute(
+                    """
+                    INSERT INTO source_trust (source_name, trust_score, corrections_count, citations_count)
+                    VALUES (?, ?, 0, ?)
+                    ON CONFLICT(source_name) DO UPDATE SET
+                        citations_count = citations_count + excluded.citations_count,
+                        trust_score = MIN(1.0, trust_score + (0.01 * excluded.citations_count))
+                    """,
+                    (name, default_score, count),
+                )
     except (sqlite3.Error, OSError) as e:
-        logger.warning(f"Failed to record citation for {name}: {e}")
+        logger.warning(f"Failed to record citations: {e}")
 
 
 def record_correction(source_name: str) -> None:

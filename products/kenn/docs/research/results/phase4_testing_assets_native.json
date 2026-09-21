@@ -1,0 +1,385 @@
+{
+  "schema": "kenn.dsp_benchmark.v1",
+  "benchmark_version": "kenn.audio_analysis.benchmark.v2",
+  "source_revision": "ffea0c7c970172dd6bf2afd78142f475c41198e4",
+  "candidate": "cpp-scalar-nanobind",
+  "build_type": "reference",
+  "compiler_flags": [],
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "resource_limits": {
+    "max_input_bytes": 157286400,
+    "fft_windows_cap": 4,
+    "audio_retained": false
+  },
+  "fixture": {
+    "kind": "external_wav",
+    "generator": null,
+    "long_seconds": 10.0,
+    "workers": 1,
+    "repeats": 1,
+    "sources": [
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav",
+        "sha256": "1aff8ca03a9c6aa535ed217db42ea8955bccbf04975306cd3f42c23ae09e8c5c",
+        "bytes": 69827174,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 11637855,
+          "duration_seconds": 263.896939
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/al_james/al_james/mixdown_v1.wav",
+        "sha256": "2192e2c25dc588f16fd5f71cdcd5c47fe4781ff762b0893c21b13b1889a2d28f",
+        "bytes": 52619180,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 8769856,
+          "duration_seconds": 198.862948
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/amyhelmandthehandsomestrangers_rescueme/amyhelmandthehandsomestrangers_rescueme/mixdown_v1.wav",
+        "sha256": "95942f6f332ddc78781c77e9599c18314d1cd2d3f9d9031c597c427a54794c16",
+        "bytes": 68066174,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 11344355,
+          "duration_seconds": 257.24161
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/angeloboltini_fragments/angeloboltini_fragments/mixdown_v1.wav",
+        "sha256": "a355db5fc344b3f3798703d295c791a9b50914e2b121d6d699be1f9a9709c169",
+        "bytes": 46893014,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 7815495,
+          "duration_seconds": 177.222109
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/atlantisbound_itwasmyfaultforwaiting/atlantisbound_itwasmyfaultforwaiting/mixdown_v1.wav",
+        "sha256": "b18edf1f849d4c1642805fe8cd1a4b45059d3d60c9cbf446d2b17193c87748b3",
+        "bytes": 63390290,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 10565041,
+          "duration_seconds": 239.570091
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/dream_of_you/dream_of_you/mixdown_v1.wav",
+        "sha256": "caf45abc11440f01c40a8f200b850de486650247ee466df7d351087c7ea56c75",
+        "bytes": 21390872,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 3565138,
+          "duration_seconds": 80.842132
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/reggueton_pop/reggueton_pop/mixdown_v1.wav",
+        "sha256": "5d5ad17f5ab3c43d12261cf83f58507ea695366243ecd1a904b7a4798457daaa",
+        "bytes": 37836872,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 6306138,
+          "duration_seconds": 142.996327
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/stranger/stranger-validate/mixdown_v1.wav",
+        "sha256": "4cffabb62958a3576291b6ed89264198cd41214a8f2db4f4ccaa0936077989f8",
+        "bytes": 54300536,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 44100,
+          "frames": 9050082,
+          "duration_seconds": 205.217279
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "label": "mixdown_v1",
+      "bytes": 69827174,
+      "sha256": "1aff8ca03a9c6aa535ed217db42ea8955bccbf04975306cd3f42c23ae09e8c5c",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 263.896939,
+      "sample_rate_hz": 44100,
+      "implementation": "cpp-scalar",
+      "native_input_copied": true,
+      "runs": 1,
+      "samples_ms": [
+        11888.247
+      ],
+      "mean_ms": 11888.247,
+      "p50_ms": 11888.247,
+      "p95_ms": 11888.247,
+      "p99_ms": 11888.247,
+      "max_ms": 11888.247,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 11637855,
+        "duration_seconds": 263.896939
+      }
+    },
+    {
+      "label": "al_james_mixdown_v1",
+      "bytes": 52619180,
+      "sha256": "2192e2c25dc588f16fd5f71cdcd5c47fe4781ff762b0893c21b13b1889a2d28f",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 198.862948,
+      "sample_rate_hz": 44100,
+      "implementation": "cpp-scalar",
+      "native_input_copied": true,
+      "runs": 1,
+      "samples_ms": [
+        8791.229
+      ],
+      "mean_ms": 8791.229,
+      "p50_ms": 8791.229,
+      "p95_ms": 8791.229,
+      "p99_ms": 8791.229,
+      "max_ms": 8791.229,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 8769856,
+        "duration_seconds": 198.862948
+      }
+    },
+    {
+      "label": "amyhelmandthehandsomestrangers_rescueme_mixdown_v1",
+      "bytes": 68066174,
+      "sha256": "95942f6f332ddc78781c77e9599c18314d1cd2d3f9d9031c597c427a54794c16",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 257.24161,
+      "sample_rate_hz": 44100,
+      "implementation": "cpp-scalar",
+      "native_input_copied": true,
+      "runs": 1,
+      "samples_ms": [
+        11313.051
+      ],
+      "mean_ms": 11313.051,
+      "p50_ms": 11313.051,
+      "p95_ms": 11313.051,
+      "p99_ms": 11313.051,
+      "max_ms": 11313.051,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 11344355,
+        "duration_seconds": 257.24161
+      }
+    },
+    {
+      "label": "angeloboltini_fragments_mixdown_v1",
+      "bytes": 46893014,
+      "sha256": "a355db5fc344b3f3798703d295c791a9b50914e2b121d6d699be1f9a9709c169",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 177.222109,
+      "sample_rate_hz": 44100,
+      "implementation": "cpp-scalar",
+      "native_input_copied": true,
+      "runs": 1,
+      "samples_ms": [
+        7813.074
+      ],
+      "mean_ms": 7813.074,
+      "p50_ms": 7813.074,
+      "p95_ms": 7813.074,
+      "p99_ms": 7813.074,
+      "max_ms": 7813.074,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 7815495,
+        "duration_seconds": 177.222109
+      }
+    },
+    {
+      "label": "atlantisbound_itwasmyfaultforwaiting_mixdown_v1",
+      "bytes": 63390290,
+      "sha256": "b18edf1f849d4c1642805fe8cd1a4b45059d3d60c9cbf446d2b17193c87748b3",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 239.570091,
+      "sample_rate_hz": 44100,
+      "implementation": "cpp-scalar",
+      "native_input_copied": true,
+      "runs": 1,
+      "samples_ms": [
+        10555.511
+      ],
+      "mean_ms": 10555.511,
+      "p50_ms": 10555.511,
+      "p95_ms": 10555.511,
+      "p99_ms": 10555.511,
+      "max_ms": 10555.511,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 10565041,
+        "duration_seconds": 239.570091
+      }
+    },
+    {
+      "label": "dream_of_you_mixdown_v1",
+      "bytes": 21390872,
+      "sha256": "caf45abc11440f01c40a8f200b850de486650247ee466df7d351087c7ea56c75",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 80.842132,
+      "sample_rate_hz": 44100,
+      "implementation": "cpp-scalar",
+      "native_input_copied": true,
+      "runs": 1,
+      "samples_ms": [
+        3564.818
+      ],
+      "mean_ms": 3564.818,
+      "p50_ms": 3564.818,
+      "p95_ms": 3564.818,
+      "p99_ms": 3564.818,
+      "max_ms": 3564.818,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 3565138,
+        "duration_seconds": 80.842132
+      }
+    },
+    {
+      "label": "reggueton_pop_mixdown_v1",
+      "bytes": 37836872,
+      "sha256": "5d5ad17f5ab3c43d12261cf83f58507ea695366243ecd1a904b7a4798457daaa",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 142.996327,
+      "sample_rate_hz": 44100,
+      "implementation": "cpp-scalar",
+      "native_input_copied": true,
+      "runs": 1,
+      "samples_ms": [
+        6318.193
+      ],
+      "mean_ms": 6318.193,
+      "p50_ms": 6318.193,
+      "p95_ms": 6318.193,
+      "p99_ms": 6318.193,
+      "max_ms": 6318.193,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 6306138,
+        "duration_seconds": 142.996327
+      }
+    },
+    {
+      "label": "stranger_mixdown_v1",
+      "bytes": 54300536,
+      "sha256": "4cffabb62958a3576291b6ed89264198cd41214a8f2db4f4ccaa0936077989f8",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 205.217279,
+      "sample_rate_hz": 44100,
+      "implementation": "cpp-scalar",
+      "native_input_copied": true,
+      "runs": 1,
+      "samples_ms": [
+        9088.743
+      ],
+      "mean_ms": 9088.743,
+      "p50_ms": 9088.743,
+      "p95_ms": 9088.743,
+      "p99_ms": 9088.743,
+      "max_ms": 9088.743,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 44100,
+        "frames": 9050082,
+        "duration_seconds": 205.217279
+      }
+    }
+  ],
+  "concurrency": {
+    "workers": 1,
+    "elapsed_ms": 11637.801,
+    "all_ok": true,
+    "all_complete": true
+  },
+  "stage_samples_ms": [
+    {
+      "stage": "complete_request",
+      "samples_ms": [
+        11888.247,
+        8791.229,
+        11313.051,
+        7813.074,
+        10555.511,
+        3564.818,
+        6318.193,
+        9088.743
+      ]
+    }
+  ],
+  "peak_rss_bytes": 4420141056,
+  "elapsed_ms": 81288.386,
+  "numerical_comparison": {
+    "status": "not_applicable",
+    "reference": "self"
+  },
+  "selected_simd_backend": "cpp-scalar",
+  "qualified": true,
+  "passed": true,
+  "limitations": [
+    "No perceptual, LUFS, LRA, true-peak, or real-mix quality claim is made."
+  ]
+}

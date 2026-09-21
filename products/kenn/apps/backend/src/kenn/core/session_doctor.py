@@ -404,5 +404,3 @@ class SessionDoctor:
         }
 
         return {"ok": True, "audit_summary": audit_report.summary, "proposal": proposal}
-
-

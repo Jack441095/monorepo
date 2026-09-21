@@ -1279,4 +1279,3 @@ class Tier2Tier3ControlMixin:
             "timings": timer.as_ms(),
         }
         return {"ok": True, "receipt": receipt}
-

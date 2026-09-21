@@ -90,4 +90,3 @@ def test_roar_drive_db_and_drywet_mapping() -> None:
     )
     assert error_dw is None
     assert raw_dw == approx(0.50)
-

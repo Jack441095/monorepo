@@ -1,0 +1,22 @@
+{
+  "schema": "kenn.audiogen_symbolic_benchmark.v1",
+  "date": "2026-09-21",
+  "notes": 32,
+  "repeats": 200,
+  "artifact_ok": true,
+  "artifact_digest": "sha256:6e4bff2a2b5f38f9ac43c10b1cf395a125a4bcadc84a193990f3149c02e78599",
+  "generation_artifact_p50_ms": 0.118834,
+  "generation_artifact_p95_ms": 0.138667,
+  "midi_import_p50_ms": 0.0265,
+  "midi_import_p95_ms": 0.028417,
+  "deterministic_note_digest": "4824d187c5fd7db4917115b37f6db05929d219f75fc7cb2292f806edb373546e",
+  "verification": {
+    "kenn_audiogen_midi_tests": "163 passed",
+    "actual_audiogen_bridge": "qualified separately from the shared collaboration checkout; see kenn_slo_audiogen_integration.json",
+    "ableton_osc_round_trip": "not run; Ableton is unavailable"
+  },
+  "limitations": [
+    "This receipt measures the local KENN symbolic MIDI engine and artifact boundary; the producer-model receipt is recorded separately.",
+    "It does not establish end-to-end AudioGen generation, OSC transport, or Ableton insertion latency."
+  ]
+}

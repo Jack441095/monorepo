@@ -1,0 +1,34 @@
+{
+  "schema": "kenn.dsp_masking_benchmark.v1",
+  "run_date": "2026-09-21",
+  "status": "qualified-opt-in-no-release-promotion",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "source_state": "working-tree changes on top of source_revision",
+  "fixture": {
+    "generator": "deterministic sine PCM16 WAV stems",
+    "seconds": 5.0,
+    "sample_rate_hz": 48000,
+    "stems": 8,
+    "sha256": "af781b12a532b10ca7a781ae5915f41b11a8793d5a36020db6525ebfa55f60ed"
+  },
+  "native": {
+    "implementation": "cpp-accelerate",
+    "mean_ms": 13.127,
+    "p50_ms": 13.179,
+    "p95_ms": 13.388,
+    "max_ms": 13.427,
+    "finding_count": 9,
+    "findings_sha256": "88e333154ba1b7196e4ee70010a1a63a16d786dd3c6594124c45f06e4251bc2d"
+  },
+  "reference": {
+    "implementation": "python-numpy-reference",
+    "mean_ms": 32.994,
+    "p50_ms": 32.977,
+    "p95_ms": 33.332,
+    "max_ms": 33.397,
+    "finding_count": 9,
+    "findings_sha256": "88e333154ba1b7196e4ee70010a1a63a16d786dd3c6594124c45f06e4251bc2d"
+  },
+  "speedup_mean": 2.5137,
+  "parity": "exact-findings-digest"
+}

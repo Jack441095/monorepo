@@ -1,0 +1,38 @@
+{
+  "schema": "kenn.slo_audiogen_integration.v1",
+  "date": "2026-09-21",
+  "kenn_boundary": {
+    "tests": 163,
+    "bridge_loaded": true,
+    "producer_root": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo-collab/Audio_Too/studio/audiogen/audiogen",
+    "producer_seeds": [20260921, 20260922, 20260923, 20260924, 20260925],
+    "producer_p50_ms": 870.52,
+    "producer_p95_ms": 922.287,
+    "producer_successes": 5,
+    "artifact_successes": 5,
+    "producer_boundary_fix": "main_llm.py now emits a strict half-open clip window and clips a final duration to the remaining window",
+    "ableton_osc_round_trip": "not run; Ableton Live unavailable"
+  },
+  "slo": {
+    "batch_sweep": {
+      "chosen_min_max": "16/32",
+      "chosen_ms_per_file": "25.51-26.25",
+      "chosen_rss_mb": "1409-1465",
+      "old_32_64_ms_per_file": 28.63,
+      "old_32_64_rss_mb": 1979
+    },
+    "rt_deadline_stress": {
+      "iterations": 2000,
+      "deadline_misses": 0,
+      "tracked_allocations": 0
+    },
+    "qualification_tests": [
+      "TestRtDeadlineStress",
+      "TestPathIndexIntegrity",
+      "TestUmapEligibility",
+      "TestDuplicateDetection"
+    ]
+  },
+  "status": "integration_boundary_qualified;_ableton_and_slo_manifest_pending",
+  "commit_created": false
+}

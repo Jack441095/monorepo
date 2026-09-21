@@ -121,4 +121,3 @@ class BetaTelemetryHarness:
             "issues_found": issues_found,
             "critical_count": critical_count,
         })
-

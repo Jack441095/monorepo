@@ -1,0 +1,25 @@
+[build-system]
+requires = ["scikit-build-core>=0.9", "nanobind>=2.4"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "kenn-dsp-native"
+version = "0.1.0"
+description = "Optional native DSP kernels for KENN"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3"]
+
+[tool.scikit-build]
+wheel.packages = []
+sdist.include = [
+  "CMakeLists.txt",
+  "fft_core.hpp",
+  "automix_bindings.hpp",
+  "automix_bindings.cpp",
+  "loudness_bindings.hpp",
+  "loudness_bindings.cpp",
+  "kenn_dsp_native.cpp",
+  "pyproject.toml",
+  "../../../../../audio-technology/audio-analysis/audio_analysis/dsp_engine/native/*.cpp",
+  "../../../../../audio-technology/audio-analysis/audio_analysis/dsp_engine/native/*.h",
+]

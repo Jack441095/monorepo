@@ -1,0 +1,63 @@
+{
+  "run_date": "2026-09-20",
+  "source_commit": "f4a90d2c603b56f6088d7e0d2c8f2bd7f402c8f1",
+  "source_root": "audio-technology/audio-analysis/audio_analysis/dsp_engine/native",
+  "recovered_origin_files": [
+    "AudioToo_DSP.h",
+    "__init__.py",
+    "eq_kernel.cpp",
+    "limiter_kernel.cpp",
+    "phase_correlation_kernel.cpp",
+    "reverb_full_kernel.cpp",
+    "reverb_kernel.cpp",
+    "saturator_kernel.cpp",
+    "smooth_envelope_kernel.cpp",
+    "transient_threshold_kernel.cpp"
+  ],
+  "added_build_files": [
+    "CMakeLists.txt",
+    "README.md"
+  ],
+  "compiler": "clang++",
+  "compiler_flags": [
+    "-std=c++17",
+    "-O3",
+    "-fPIC",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "standalone_compile": "pass",
+  "static_archive_link": "pass",
+  "cmake_build": "pass",
+  "universal_macos_archive": "pass",
+  "ctypes_loader_import": "pass",
+  "kernel_invocation_smoke": "pass",
+  "cmake_ctest_link_runtime_smoke": "pass",
+  "cmake_ctest_smoke_run_date": "2026-09-21",
+  "cmake_ctest_smoke_exports": [
+    "biquad_sos_filter",
+    "limiter_gain_envelope",
+    "schroeder_reverb",
+    "saturator_waveshape",
+    "direct_cross_correlation",
+    "smooth_attack_release",
+    "gate_envelope",
+    "rolling_median_mad_threshold"
+  ],
+  "sanitizer_ctest_smoke": "pass-local-macos-arm64",
+  "sanitizer_ctest_smoke_run_date": "2026-09-21",
+  "macos_kernel_loader_smoke": {
+    "limiter": true,
+    "eq": true,
+    "reverb": true,
+    "smooth_envelope": true,
+    "reverb_full": true,
+    "saturator": true,
+    "phase_correlation": true,
+    "transient_threshold": true
+  },
+  "runtime_dispatch_integrated": false,
+  "full_request_requalified": false,
+  "release_decision": "recovered-source-only"
+}

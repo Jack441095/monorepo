@@ -37,4 +37,3 @@
 ## 4. User Inquiries & Incident Reporting
 
 For privacy questions or data handling concerns, please contact the KENN release maintainer or file an issue in the repository queue.
-

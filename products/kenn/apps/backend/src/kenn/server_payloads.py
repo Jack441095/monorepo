@@ -488,4 +488,3 @@ def public_audiogen_history(items: list[dict]) -> list[dict]:
         for item in items
         if isinstance(item, dict)
     ]
-

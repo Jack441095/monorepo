@@ -1,0 +1,57 @@
+{
+  "schema": "kenn.dsp.synthetic_stem_matrix_smoke.v1",
+  "run_date": "2026-09-21",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "source_state": "working-tree changes on top of source_revision",
+  "status": "pass-synthetic-harness-only",
+  "fixture_policy": {
+    "kind": "generated-internal",
+    "audio_retained": false,
+    "sample_rate_hz": 48000,
+    "duration_seconds": 0.5,
+    "channels": 2,
+    "stem_counts": [1, 8, 16, 32, 64]
+  },
+  "fixtures_sha256": {
+    "1": "56cf65209db7a582bb3c5f759bf4efacbf932516107fbe7d2d9669625921cd67",
+    "8": "9366b67482d0f91bb3ccb8a73b56a2531ac19680af3e6b432bce1f01a93cb953",
+    "16": "c707f254766166f53b734a233df36fd0adc343cffcc99c18c7219a0bdebd0f80",
+    "32": "e71436b973857f94cd50c594e6e1714ed8c5fdcb95ce6c14bdebca7af763d0cc",
+    "64": "d4092ff32a0c2e7ab5bdaaafd61576237005b52b8e4368d76c92446458314568"
+  },
+  "reference": {
+    "candidate": "python-stdlib-reference",
+    "passed": true,
+    "mean_ms_by_stem_count": {
+      "1": 109.488,
+      "8": 110.008,
+      "16": 110.143,
+      "32": 109.937,
+      "64": 110.854
+    },
+    "concurrency": {"workers": 2, "all_ok": true, "all_complete": true}
+  },
+  "native": {
+    "candidate": "cpp-accelerate-nanobind",
+    "passed": true,
+    "mean_ms_by_stem_count": {
+      "1": 171.339,
+      "8": 26.121,
+      "16": 26.326,
+      "32": 26.705,
+      "64": 26.768
+    },
+    "concurrency": {"workers": 2, "all_ok": true, "all_complete": true}
+  },
+  "parity": {
+    "status": "contract-pass",
+    "same_fixture_hashes": true,
+    "all_cases_ok": true,
+    "all_cases_complete": true
+  },
+  "limitations": [
+    "Generated tones validate request plumbing and scaling only.",
+    "This is not perceptual, real-mix, or AutoMix render evidence.",
+    "It does not clear rights, Windows/DAW, or signing qualification gates."
+  ]
+}

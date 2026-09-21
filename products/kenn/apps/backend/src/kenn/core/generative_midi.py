@@ -6,6 +6,7 @@ for direct insertion into Ableton Live clips via AbletonOSC.
 
 from __future__ import annotations
 
+import math
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -42,12 +43,117 @@ PROGRESSIONS = {
     "ambient_i_vi": [1, 6],
 }
 
+MAX_MIDI_NOTES = 4096
+MAX_SEQUENCE_STEPS = 4096
+MAX_CLIP_LENGTH_BEATS = 4096.0
+MAX_BARS = 256
+
+
+def _integer(value: Any, name: str, *, minimum: int, maximum: int) -> int:
+    if isinstance(value, bool):
+        raise ValueError(f"{name} must be an integer between {minimum} and {maximum}")
+    try:
+        converted = int(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{name} must be an integer between {minimum} and {maximum}") from exc
+    if isinstance(value, float) and not value.is_integer():
+        raise ValueError(f"{name} must be an integer between {minimum} and {maximum}")
+    if not minimum <= converted <= maximum:
+        raise ValueError(f"{name} must be between {minimum} and {maximum}")
+    return converted
+
+
+def _finite_number(
+    value: Any,
+    name: str,
+    *,
+    minimum: float | None = None,
+    maximum: float | None = None,
+    minimum_exclusive: bool = False,
+) -> float:
+    if isinstance(value, bool):
+        raise ValueError(f"{name} must be a finite number")
+    try:
+        converted = float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{name} must be a finite number") from exc
+    if not math.isfinite(converted):
+        raise ValueError(f"{name} must be a finite number")
+    if minimum is not None and (
+        converted <= minimum if minimum_exclusive else converted < minimum
+    ):
+        qualifier = "greater than" if minimum_exclusive else "at least"
+        raise ValueError(f"{name} must be {qualifier} {minimum:g}")
+    if maximum is not None and converted > maximum:
+        raise ValueError(f"{name} must be at most {maximum:g}")
+    return converted
+
+
+def _root_and_scale(root: Any, scale_name: Any) -> tuple[str, str]:
+    if not isinstance(root, str) or not root.strip():
+        raise ValueError("root must be a non-empty note name")
+    clean_root = root.strip().capitalize()
+    if clean_root not in NOTE_OFFSETS:
+        raise ValueError(f"unsupported root note: {root!r}")
+    if not isinstance(scale_name, str) or not scale_name.strip():
+        raise ValueError("scale_name must be a non-empty string")
+    clean_scale = scale_name.strip().lower()
+    if clean_scale not in SCALE_INTERVALS:
+        raise ValueError(f"unsupported scale: {scale_name!r}")
+    return clean_root, clean_scale
+
+
+def _validated_notes(
+    notes: Any,
+    *,
+    clip_length: float | None = None,
+    preserve_extra: bool = True,
+) -> List[Dict[str, Any]]:
+    """Return bounded, canonical MIDI notes or reject the complete payload."""
+    if not isinstance(notes, list):
+        raise ValueError("notes must be a list")
+    if len(notes) > MAX_MIDI_NOTES:
+        raise ValueError(f"notes may contain at most {MAX_MIDI_NOTES} entries")
+    result: List[Dict[str, Any]] = []
+    for index, raw in enumerate(notes):
+        if not isinstance(raw, dict):
+            raise ValueError(f"note {index} must be an object")
+        pitch = _integer(raw.get("pitch"), f"note {index} pitch", minimum=0, maximum=127)
+        velocity = _integer(raw.get("velocity", 100), f"note {index} velocity", minimum=1, maximum=127)
+        start = _finite_number(raw.get("start_time", 0.0), f"note {index} start_time", minimum=0.0)
+        duration = _finite_number(
+            raw.get("duration", 1.0),
+            f"note {index} duration",
+            minimum=0.0,
+            minimum_exclusive=True,
+            maximum=MAX_CLIP_LENGTH_BEATS,
+        )
+        if start > MAX_CLIP_LENGTH_BEATS:
+            raise ValueError(f"note {index} start_time exceeds {MAX_CLIP_LENGTH_BEATS:g} beats")
+        if clip_length is not None and start + duration > clip_length + 1e-9:
+            raise ValueError(f"note {index} extends beyond the {clip_length:g}-beat clip length")
+        item = dict(raw) if preserve_extra else {}
+        item.update({
+            "pitch": pitch,
+            "start_time": round(start, 6),
+            "duration": round(duration, 6),
+            "velocity": velocity,
+            "mute": bool(raw.get("mute", False)),
+        })
+        if "probability" in raw:
+            item["probability"] = _finite_number(
+                raw["probability"], f"note {index} probability", minimum=0.0, maximum=1.0
+            )
+        result.append(item)
+    return result
+
 
 def get_scale_pitches(root: str = "C", scale_name: str = "minor", octave: int = 3) -> List[int]:
     """Generate all MIDI pitch numbers for the specified scale across octaves."""
-    clean_root = root.strip().capitalize()
-    offset = NOTE_OFFSETS.get(clean_root, 0)
-    intervals = SCALE_INTERVALS.get(scale_name.lower(), SCALE_INTERVALS["minor"])
+    clean_root, clean_scale = _root_and_scale(root, scale_name)
+    octave = _integer(octave, "octave", minimum=-1, maximum=9)
+    offset = NOTE_OFFSETS[clean_root]
+    intervals = SCALE_INTERVALS[clean_scale]
     base_midi = (octave + 1) * 12 + offset
     pitches = []
     for oct_offset in (-1, 0, 1, 2):
@@ -69,22 +175,36 @@ def generate_chord_progression(
     seed: Optional[int] = None,
 ) -> List[Dict[str, Any]]:
     """Generate a scale-aware chord progression note array formatted for AbletonOSC."""
-    if seed is not None:
-        random.seed(seed)
-
-    clean_root = root.strip().capitalize()
-    offset = NOTE_OFFSETS.get(clean_root, 0)
-    intervals = SCALE_INTERVALS.get(scale_name.lower(), SCALE_INTERVALS["minor"])
+    rng = random.Random(seed)
+    clean_root, clean_scale = _root_and_scale(root, scale_name)
+    octave = _integer(octave, "octave", minimum=-1, maximum=9)
+    beats_per_chord = _finite_number(
+        beats_per_chord,
+        "beats_per_chord",
+        minimum=0.05,
+        minimum_exclusive=True,
+        maximum=MAX_CLIP_LENGTH_BEATS,
+    )
+    offset = NOTE_OFFSETS[clean_root]
+    intervals = SCALE_INTERVALS[clean_scale]
     base_midi = (octave + 1) * 12 + offset
 
     degrees = PROGRESSIONS.get(progression) if isinstance(progression, str) else progression
     if not degrees:
         degrees = [1, 5, 6, 4]
+    if not isinstance(degrees, list) or len(degrees) > MAX_MIDI_NOTES // 3:
+        raise ValueError("progression must be a bounded list of scale degrees")
+    clean_degrees = [
+        _integer(degree, f"progression degree {index}", minimum=1, maximum=128)
+        for index, degree in enumerate(degrees)
+    ]
+    if len(clean_degrees) * beats_per_chord > MAX_CLIP_LENGTH_BEATS:
+        raise ValueError(f"generated progression exceeds {MAX_CLIP_LENGTH_BEATS:g} beats")
 
     notes: List[Dict[str, Any]] = []
     current_time = 0.0
 
-    for deg in degrees:
+    for deg in clean_degrees:
         deg_idx = (deg - 1) % len(intervals)
         root_pitch = base_midi + intervals[deg_idx]
 
@@ -114,7 +234,9 @@ def generate_chord_progression(
 
         base_vel = 88
         for p in pitches:
-            vel = base_vel + (random.randint(-6, 6) if humanize_velocity else 0)
+            if not 0 <= p <= 127:
+                raise ValueError("octave and voicing produce a MIDI pitch outside 0..127")
+            vel = base_vel + (rng.randint(-6, 6) if humanize_velocity else 0)
             vel = max(1, min(127, vel))
             notes.append({
                 "pitch": p,
@@ -126,14 +248,16 @@ def generate_chord_progression(
             })
         current_time += beats_per_chord
 
-    return notes
+    return _validated_notes(notes, clip_length=len(clean_degrees) * beats_per_chord)
 
 
 def bjorklund(steps: int, pulses: int) -> List[int]:
     """Bjorklund Euclidean rhythm algorithm."""
-    if pulses <= 0:
+    steps = _integer(steps, "steps", minimum=1, maximum=MAX_SEQUENCE_STEPS)
+    pulses = _integer(pulses, "pulses", minimum=0, maximum=steps)
+    if pulses == 0:
         return [0] * steps
-    if pulses >= steps:
+    if pulses == steps:
         return [1] * steps
 
     pattern: List[List[int]] = []
@@ -177,7 +301,18 @@ def generate_euclidean_rhythm(
     accent_first_hit: bool = True,
 ) -> List[Dict[str, Any]]:
     """Generate a Euclidean rhythm sequence."""
+    pitch = _integer(pitch, "pitch", minimum=0, maximum=127)
+    base_velocity = _integer(base_velocity, "base_velocity", minimum=1, maximum=127)
+    step_duration_beats = _finite_number(
+        step_duration_beats,
+        "step_duration_beats",
+        minimum=0.0,
+        minimum_exclusive=True,
+        maximum=MAX_CLIP_LENGTH_BEATS,
+    )
     pattern = bjorklund(steps, hits)
+    if len(pattern) * step_duration_beats > MAX_CLIP_LENGTH_BEATS:
+        raise ValueError(f"generated rhythm exceeds {MAX_CLIP_LENGTH_BEATS:g} beats")
     notes: List[Dict[str, Any]] = []
     first = True
     for i, active in enumerate(pattern):
@@ -192,7 +327,7 @@ def generate_euclidean_rhythm(
                 "probability": 1.0,
             })
             first = False
-    return notes
+    return _validated_notes(notes, clip_length=len(pattern) * step_duration_beats)
 
 
 def generate_drum_pattern(
@@ -203,6 +338,10 @@ def generate_drum_pattern(
     ghost_velocity: int = 65,
 ) -> List[Dict[str, Any]]:
     """Generate multi-voice Drum Rack patterns (Kick=36, Snare=38, Clap=39, Hat=42)."""
+    bars = _integer(bars, "bars", minimum=1, maximum=MAX_BARS)
+    _finite_number(bpm, "bpm", minimum=1.0, maximum=1000.0)
+    accent_velocity = _integer(accent_velocity, "accent_velocity", minimum=1, maximum=127)
+    ghost_velocity = _integer(ghost_velocity, "ghost_velocity", minimum=1, maximum=127)
     notes: List[Dict[str, Any]] = []
     total_beats = bars * 4.0
     clean_genre = genre.lower()
@@ -263,7 +402,12 @@ def generate_drum_pattern(
                 t = bar_start + (step * 0.5)
                 notes.append({"pitch": 42, "start_time": round(t, 3), "duration": 0.2, "velocity": ghost_velocity, "mute": False, "probability": 1.0})
 
-    return sorted(notes, key=lambda n: (n["start_time"], n["pitch"]))
+    for note in notes:
+        note["velocity"] = max(1, min(127, int(note["velocity"])))
+    return sorted(
+        _validated_notes(notes, clip_length=total_beats),
+        key=lambda n: (n["start_time"], n["pitch"]),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -287,8 +431,8 @@ def detect_scale_from_notes(notes: List[Dict[str, Any]] | List[int]) -> Dict[str
     Returns:
         Dict with top detected scale, confidence score (0-1), and candidate rankings.
     """
-    import math
-
+    if not isinstance(notes, list):
+        raise ValueError("notes must be a list")
     if not notes:
         return {
             "root": "C",
@@ -299,23 +443,38 @@ def detect_scale_from_notes(notes: List[Dict[str, Any]] | List[int]) -> Dict[str
             "out_of_scale_notes": [],
         }
 
-    # Build pitch class duration-weighted histogram
+    if len(notes) > MAX_MIDI_NOTES:
+        raise ValueError(f"notes may contain at most {MAX_MIDI_NOTES} entries")
+
+    # Build pitch class duration-weighted histogram.
     histogram = [0.0] * 12
     total_weight = 0.0
 
-    for item in notes:
+    normalized: list[tuple[int, float, float | None]] = []
+    for index, item in enumerate(notes):
         if isinstance(item, dict):
-            pitch = int(item.get("pitch", 60))
-            duration = float(item.get("duration", 1.0))
-            velocity = float(item.get("velocity", 100))
+            pitch = _integer(item.get("pitch"), f"note {index} pitch", minimum=0, maximum=127)
+            duration = _finite_number(
+                item.get("duration", 1.0),
+                f"note {index} duration",
+                minimum=0.0,
+                minimum_exclusive=True,
+                maximum=MAX_CLIP_LENGTH_BEATS,
+            )
+            velocity = _integer(item.get("velocity", 100), f"note {index} velocity", minimum=1, maximum=127)
             weight = duration * (velocity / 100.0)
+            start_time = _finite_number(
+                item.get("start_time", 0.0), f"note {index} start_time", minimum=0.0
+            )
         else:
-            pitch = int(item)
+            pitch = _integer(item, f"note {index} pitch", minimum=0, maximum=127)
             weight = 1.0
+            start_time = None
 
         pc = pitch % 12
         histogram[pc] += weight
         total_weight += weight
+        normalized.append((pitch, weight, start_time))
 
     if total_weight <= 0:
         total_weight = 1.0
@@ -360,13 +519,12 @@ def detect_scale_from_notes(notes: List[Dict[str, Any]] | List[int]) -> Dict[str
     scale_pitches = get_scale_pitches(root=best_root, scale_name=best_scale, octave=3)
     valid_pitch_classes = {p % 12 for p in scale_pitches}
     out_of_scale = []
-    for item in notes:
-        p = item.get("pitch") if isinstance(item, dict) else item
-        if p is not None and (p % 12) not in valid_pitch_classes:
+    for pitch, _weight, start_time in normalized:
+        if (pitch % 12) not in valid_pitch_classes:
             out_of_scale.append({
-                "pitch": p,
-                "pitch_name": _PITCH_NAMES[p % 12],
-                "time": item.get("start_time", 0.0) if isinstance(item, dict) else None,
+                "pitch": pitch,
+                "pitch_name": _PITCH_NAMES[pitch % 12],
+                "time": start_time,
             })
 
     return {
@@ -417,6 +575,11 @@ def apply_audiogen_groove(
     notes: List[Dict[str, Any]],
     groove_name: str = "lofi_swing",
     seed: Optional[int] = None,
+    *,
+    groove_template: str | None = None,
+    swing_pct: float | None = None,
+    laidback_ms: float | None = None,
+    velocity_jitter_pct: float | None = None,
 ) -> List[Dict[str, Any]]:
     """Apply AudioGen micro-timing swing, laidback offset, and velocity humanization.
 
@@ -424,16 +587,34 @@ def apply_audiogen_groove(
         notes: List of note dicts with 'pitch', 'start_time', 'duration', 'velocity'.
         groove_name: Profile name ('lofi_swing', 'hiphop_boombap', 'edm_shuffle', 'acoustic_human', 'straight').
     """
-    if seed is not None:
-        random.seed(seed)
-
-    profile = GROOVE_PROFILES.get(groove_name.lower(), GROOVE_PROFILES["straight"])
-    swing = profile["swing_ratio"]
-    laidback = profile["laidback_beats"]
-    v_jitter = profile["velocity_jitter"]
+    canonical = _validated_notes(notes)
+    rng = random.Random(seed)
+    selected_name = groove_template if groove_template is not None else groove_name
+    if not isinstance(selected_name, str):
+        raise ValueError("groove_name must be a string")
+    profile = GROOVE_PROFILES.get(selected_name.lower(), GROOVE_PROFILES["straight"])
+    if swing_pct is None:
+        swing = float(profile["swing_ratio"])
+    else:
+        swing_amount = _finite_number(swing_pct, "swing_pct", minimum=0.0, maximum=100.0)
+        swing = 0.5 + (swing_amount / 100.0) * 0.25
+    if laidback_ms is None:
+        laidback = float(profile["laidback_beats"])
+    else:
+        # The endpoint has no tempo argument. Its documented millisecond
+        # control is converted at the conventional 120 BPM preview tempo.
+        laidback = _finite_number(laidback_ms, "laidback_ms", minimum=-100.0, maximum=100.0) / 500.0
+    if velocity_jitter_pct is None:
+        jitter_pct = None
+        v_jitter = int(profile["velocity_jitter"])
+    else:
+        jitter_pct = _finite_number(
+            velocity_jitter_pct, "velocity_jitter_pct", minimum=0.0, maximum=100.0
+        )
+        v_jitter = 0
 
     humanized: List[Dict[str, Any]] = []
-    for n in notes:
+    for n in canonical:
         item = dict(n)
         start = float(item.get("start_time", 0.0))
         vel = int(item.get("velocity", 90))
@@ -449,18 +630,19 @@ def apply_audiogen_groove(
             offset += swing_offset
 
         # Micro-jitter (+- 2ms)
-        timing_jitter = (random.random() - 0.5) * 0.005
+        timing_jitter = (rng.random() - 0.5) * 0.005
         new_start = max(0.0, round(start + offset + timing_jitter, 3))
 
         # Velocity dynamics jitter
-        vel_delta = random.randint(-v_jitter, v_jitter)
+        jitter_units = round(vel * jitter_pct / 100.0) if jitter_pct is not None else v_jitter
+        vel_delta = rng.randint(-jitter_units, jitter_units)
         new_vel = max(1, min(127, vel + vel_delta))
 
         item["start_time"] = new_start
         item["velocity"] = new_vel
         humanized.append(item)
 
-    return sorted(humanized, key=lambda x: (x["start_time"], x["pitch"]))
+    return sorted(_validated_notes(humanized), key=lambda x: (x["start_time"], x["pitch"]))
 
 
 # ---------------------------------------------------------------------------
@@ -474,16 +656,36 @@ def generate_audiogen_bassline(
     bars: int = 4,
     octave: int = 1,  # Sub/bass register (MIDI 24-36)
     groove: str = "straight",
+    root_pitch: int | None = None,
 ) -> List[Dict[str, Any]]:
     """Synthesize scale-locked basslines using AudioGen register clamping and rhythmic topologies."""
-    clean_root = root.strip().capitalize()
-    offset = NOTE_OFFSETS.get(clean_root, 0)
-    intervals = SCALE_INTERVALS.get(scale_name.lower(), SCALE_INTERVALS["minor"])
-    base_pitch = (octave + 1) * 12 + offset  # Octave 1 C = 24
+    clean_root, clean_scale = _root_and_scale(root, scale_name)
+    bars = _integer(bars, "bars", minimum=1, maximum=MAX_BARS)
+    octave = _integer(octave, "octave", minimum=-1, maximum=9)
+    offset = NOTE_OFFSETS[clean_root]
+    _ = SCALE_INTERVALS[clean_scale]
+    base_pitch = (
+        _integer(root_pitch, "root_pitch", minimum=0, maximum=115)
+        if root_pitch is not None
+        else (octave + 1) * 12 + offset
+    )
 
     root_pitch = base_pitch
     fifth_pitch = base_pitch + 7
     octave_pitch = base_pitch + 12
+
+    if octave_pitch > 127:
+        raise ValueError("octave or root_pitch produces a bassline outside MIDI range")
+
+    style_aliases = {
+        "rolling_16th": "driving",
+        "syncopated_groove": "bouncy",
+        "sub_punch": "sustained",
+        "offbeat_stab": "bouncy",
+    }
+    style = style_aliases.get(str(style).lower(), str(style).lower())
+    if style not in {"bouncy", "driving", "sustained", "drone"}:
+        raise ValueError(f"unsupported bassline style: {style!r}")
 
     notes: List[Dict[str, Any]] = []
 
@@ -520,5 +722,4 @@ def generate_audiogen_bassline(
     if groove != "straight":
         notes = apply_audiogen_groove(notes, groove_name=groove)
 
-    return notes
-
+    return _validated_notes(notes, clip_length=bars * 4.0)

@@ -1,0 +1,38 @@
+{
+  "schema": "kenn.dsp_ltas_benchmark.v1",
+  "run_date": "2026-09-21",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "source_state": "working-tree changes on top of source_revision",
+  "fixture": {
+    "generator": "deterministic 440 Hz mono PCM16 WAV",
+    "seconds": 10.0,
+    "sample_rate_hz": 48000,
+    "repeats": 5,
+    "workers": 2,
+    "include_ltas": true
+  },
+  "native": {
+    "implementation": "cpp-accelerate",
+    "samples_ms": [33.965, 5.152, 5.075, 5.136, 5.182],
+    "p50_ms": 5.152,
+    "p95_ms": 28.208,
+    "concurrency_elapsed_ms": 7.821
+  },
+  "reference": {
+    "implementation": "python-reference",
+    "samples_ms": [254.33, 255.959, 254.038, 255.026, 253.183],
+    "p50_ms": 254.33,
+    "p95_ms": 255.772,
+    "concurrency_elapsed_ms": 506.535
+  },
+  "parity": {
+    "ltas_rows": 40,
+    "pink_noise_rows": 40,
+    "status": "exact"
+  },
+  "limitations": [
+    "Synthetic PCM fixture only",
+    "First-call import/setup overhead is visible in the first sample",
+    "No perceptual, rights-cleared, or release-host claim"
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "candidate": "cpp-native",
+  "fixture": {
+    "float32_sha256": "d44fe9e6a54c456ab3205bbcae38fdfb9927731a7dedb6602030429db8987c39",
+    "frames": 480000,
+    "kind": "deterministic_synthetic",
+    "sample_rate_hz": 48000,
+    "seconds": 10.0
+  },
+  "kernels": {
+    "masking_band_energy": {
+      "backend": "cpp-accelerate",
+      "fft_size": 4096,
+      "frame_count": 233,
+      "hop": 2048,
+      "mean_ms": 7.2655,
+      "p50_ms": 6.1818,
+      "p95_ms": 13.5656,
+      "samples_ms": [
+        5.5007,
+        5.5415,
+        5.33,
+        7.6828,
+        7.5336,
+        16.0142,
+        13.4367,
+        11.5498,
+        6.6958,
+        5.7258,
+        5.9207,
+        6.1913,
+        5.7558,
+        5.8407,
+        6.3388,
+        6.4842,
+        6.6348,
+        6.0547,
+        6.1723,
+        4.9049
+      ]
+    },
+    "spectral_power": {
+      "backend": "cpp-accelerate",
+      "fft_size": 16384,
+      "mean_ms": 3.5845,
+      "p50_ms": 3.5751,
+      "p95_ms": 4.159,
+      "samples_ms": [
+        3.9824,
+        4.1797,
+        4.158,
+        4.1134,
+        3.8335,
+        2.9919,
+        3.1768,
+        3.5722,
+        3.6646,
+        3.9472,
+        3.6877,
+        3.578,
+        3.6386,
+        3.2244,
+        3.477,
+        3.159,
+        3.5112,
+        3.3158,
+        3.1895,
+        3.2902
+      ],
+      "window_count": 4
+    }
+  },
+  "limitations": [
+    "Kernel timing only; not an end-to-end request measurement.",
+    "Synthetic noise exercises runtime and memory behavior, not perceptual quality.",
+    "Compare against the complete-request benchmark before promoting a backend."
+  ],
+  "machine": {
+    "machine": "arm64",
+    "python": "3.13.7",
+    "release": "27.0.0",
+    "system": "Darwin"
+  },
+  "qualified": true,
+  "schema": "kenn.dsp_native_kernel_benchmark.v1",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7"
+}

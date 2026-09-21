@@ -132,4 +132,3 @@ def audit_manifest(payload: dict[str, Any]) -> dict[str, Any]:
         "control_supervision_allowed": False,
         "source_revision_policy": "pin an immutable Hub revision before any staging",
     }
-

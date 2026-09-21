@@ -1,0 +1,53 @@
+{
+  "schema": "kenn.dsp.native_bulk_metrics_receipt.v1",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "source_state": "working-tree changes on top of source_revision",
+  "status": "qualified-opt-in-no-release-promotion",
+  "backend": ["cpp-accelerate", "cpp-native-bulk-channel-metrics"],
+  "portable_scalar_fallback_smoke": "pass (KENN_USE_ACCELERATE=OFF)",
+  "host": {
+    "system": "macOS",
+    "architecture": "arm64",
+    "compiler": "AppleClang 21.0.0.21000334",
+    "python": "3.13",
+    "build_type": "Release"
+  },
+  "fixture_set": "testing-assets/_automix_out eight canonical stereo mixdowns",
+  "reference": "KENN_DSP_NATIVE=0",
+  "native": "KENN_DSP_NATIVE=1",
+  "parity": {
+    "status": "pass",
+    "tolerance": {"absolute": 0.00002, "relative": 0.00002},
+    "differences_after_dynamic_receipt_fields": 0
+  },
+  "timing_ms": {
+    "native_sum": 62560.126,
+    "reference_sum": 119624.933,
+    "native_mean": 7820.01575,
+    "reference_mean": 14953.116625,
+    "native_reference_ratio": 0.5229689533,
+    "speedup_percent": 47.7031
+  },
+  "peak_rss_bytes": {
+    "native": 2469937152,
+    "reference": 3888594944,
+    "native_reference_ratio": 0.6351747064,
+    "change_percent": -36.4825
+  },
+  "cases": [
+    {"fixture": "ae_mere_humsafar", "native_ms": 10721.5, "reference_ms": 20276.616},
+    {"fixture": "al_james", "native_ms": 8060.773, "reference_ms": 15125.356},
+    {"fixture": "amyhelmandthehandsomestrangers_rescueme", "native_ms": 10127.528, "reference_ms": 19721.661},
+    {"fixture": "angeloboltini_fragments", "native_ms": 7047.992, "reference_ms": 13406.592},
+    {"fixture": "atlantisbound_itwasmyfaultforwaiting", "native_ms": 9558.12, "reference_ms": 18218.735},
+    {"fixture": "dream_of_you", "native_ms": 3210.308, "reference_ms": 6261.338},
+    {"fixture": "reggueton_pop", "native_ms": 5682.071, "reference_ms": 10965.058},
+    {"fixture": "stranger", "native_ms": 8151.834, "reference_ms": 15649.577}
+  ],
+  "decision": "Keep KENN_DSP_NATIVE opt-in until rights-cleared, cross-platform, and host qualification complete.",
+  "limitations": [
+    "The supplied manifest remains TODO-vendor-pack and is internal evidence only.",
+    "This qualifies the complete WAV analysis request, not the full AutoMix render pipeline.",
+    "Windows wheel/host validation and macOS signing/notarization remain open."
+  ]
+}

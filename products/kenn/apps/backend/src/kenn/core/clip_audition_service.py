@@ -95,9 +95,9 @@ def _reserve(key: str) -> bool:
 
 def _finish(key: str) -> None:
     with _ACTION_LOCK:
+        prune_if_needed(_USED_IDEMPOTENCY_KEYS)
         _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
         _USED_IDEMPOTENCY_KEYS.add(key)
-        prune_if_needed(_USED_IDEMPOTENCY_KEYS)
 
 
 class ClipAuditionActionService:

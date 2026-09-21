@@ -103,4 +103,3 @@ def handle_osc_undo(
         idempotency_key=str(payload.get("idempotency_key", "")),
     )
     return (200 if result.get("ok") else 409), result
-

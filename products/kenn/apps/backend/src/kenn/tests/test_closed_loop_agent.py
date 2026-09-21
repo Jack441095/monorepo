@@ -56,4 +56,3 @@ def test_closed_loop_session_executes_with_world_model(monkeypatch):
     assert "world_model" in result
     assert result["world_model"]["total_tracks"] == 2
     assert "history" in result
-

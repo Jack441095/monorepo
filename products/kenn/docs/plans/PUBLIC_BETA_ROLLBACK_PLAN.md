@@ -40,4 +40,3 @@ export KENN_CHAT_INDEX_DIR="<LOCAL_VOLUME>/Shenrendao/KENN/apps/backend/src/kenn
 # 3. Restart server
 ./scripts/start_server.sh
 ```
-

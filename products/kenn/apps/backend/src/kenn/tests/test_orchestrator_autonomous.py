@@ -72,4 +72,3 @@ def test_orchestrator_dispatch_autonomous_producer(orchestrator, mock_clashing_s
     assert "perception" in phases
     assert "diagnosis" in phases
     assert "synthesis" in phases
-

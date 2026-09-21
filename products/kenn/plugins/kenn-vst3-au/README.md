@@ -103,11 +103,14 @@ track/device/parameter names and inspected ranges from the current Ableton
 session, while **Control Live** remains the only route that can create a
 mutation proposal.
 
-On macOS, the default CMake configuration produces universal `arm64` and
-`x86_64` VST3/AU bundles. Building AU requires full Xcode (not Command Line
-Tools alone). Local development uses an ad-hoc signature; distributing outside
-this machine still requires your Apple Developer ID signing and notarization
-workflow.
+On macOS, pass `-DKENN_BUILD_UNIVERSAL=ON` to produce universal `arm64` and
+`x86_64` VST3/AU bundles; the default developer build targets the host
+architecture. On Windows, the same CMake project configures the VST3 target
+only because Audio Unit is a macOS format. Building AU requires full Xcode
+(not Command Line Tools alone).
+Local development uses an ad-hoc or unsigned bundle depending on the JUCE/Xcode
+toolchain; distributing outside this machine still requires your Apple
+Developer ID signing and notarization workflow.
 
 The repository's release packager makes that workflow explicit and fail-closed:
 

@@ -97,4 +97,3 @@ KENN's deterministic ReAct deliberation pipeline executes the following stages:
 ## 6. Conclusion & Next Milestones
 
 KENN v0.2.0 demonstrates full compliance with closed-beta field requirements. The plug-in runs deterministically, respects producer workflows, guarantees hearing and hardware safety, and delivers immediate value within Ableton Live 12 Suite.
-

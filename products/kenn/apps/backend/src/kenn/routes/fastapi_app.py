@@ -38,10 +38,21 @@ app = FastAPI(
 )
 
 # CORS
+_DEFAULT_ALLOWED_ORIGINS = (
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+    "http://127.0.0.1:8090",
+    "http://localhost:8090",
+)
+_allowed_origins = tuple(
+    origin.strip().rstrip("/")
+    for origin in os.environ.get("KENN_ALLOWED_ORIGINS", ",".join(_DEFAULT_ALLOWED_ORIGINS)).split(",")
+    if origin.strip() and origin.strip() != "*"
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=list(_allowed_origins),
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -87,11 +98,14 @@ class ReferenceMatchRequest(BaseModel):
 
 @app.get("/api/health")
 async def health():
+    from kenn.retrieval.retrieval import retrieval_status
+
     return {
         "status": "ok",
         "service": "kenn",
         "version": "1.0.0",
         "daw": "Ableton Live 12",
+        "subsystems": {"retrieval": retrieval_status()},
     }
 
 
@@ -177,4 +191,3 @@ async def reference_preset_endpoint(review_id: str):
         media_type="application/octet-stream",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
-

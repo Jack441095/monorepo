@@ -1,0 +1,154 @@
+{
+  "schema": "kenn.dsp_benchmark.v1",
+  "benchmark_version": "kenn.audio_analysis.benchmark.v2",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "candidate": "python-stdlib-reference",
+  "build_type": "python-reference",
+  "compiler_flags": [],
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "resource_limits": {
+    "max_input_bytes": 157286400,
+    "fft_windows_cap": 4,
+    "audio_retained": false
+  },
+  "fixture": {
+    "kind": "synthetic",
+    "generator": "deterministic 440 Hz mono PCM16 WAV",
+    "long_seconds": 10.0,
+    "workers": 4,
+    "repeats": 10,
+    "include_ltas": true,
+    "sources": []
+  },
+  "cases": [
+    {
+      "label": "long_48khz",
+      "bytes": 960044,
+      "sha256": "04a5f27a0831e49e5fb04900eccb41f56abbf5b2250baf0a89020cb40817224e",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 10.0,
+      "sample_rate_hz": 48000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 10,
+      "warmups": 3,
+      "samples_ms": [
+        438.467,
+        445.474,
+        440.592,
+        441.847,
+        442.471,
+        440.451,
+        436.779,
+        439.815,
+        437.526,
+        439.762
+      ],
+      "mean_ms": 440.318,
+      "p50_ms": 440.133,
+      "p95_ms": 444.122,
+      "p99_ms": 445.203,
+      "max_ms": 445.474,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 48000,
+        "frames": 480000,
+        "duration_seconds": 10.0
+      }
+    },
+    {
+      "label": "high_rate_96khz",
+      "bytes": 384044,
+      "sha256": "357668295d8b0538f583245617d1f437883f0b0bedd57e45b8cfca9679c8f40e",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 2.0,
+      "sample_rate_hz": 96000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 10,
+      "warmups": 3,
+      "samples_ms": [
+        280.156,
+        281.526,
+        276.367,
+        277.202,
+        277.078,
+        275.205,
+        279.337,
+        277.946,
+        278.494,
+        277.769
+      ],
+      "mean_ms": 278.108,
+      "p50_ms": 277.858,
+      "p95_ms": 280.909,
+      "p99_ms": 281.403,
+      "max_ms": 281.526,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 96000,
+        "frames": 192000,
+        "duration_seconds": 2.0
+      }
+    }
+  ],
+  "concurrency": {
+    "workers": 4,
+    "elapsed_ms": 1767.952,
+    "all_ok": true,
+    "all_complete": true
+  },
+  "stage_samples_ms": [
+    {
+      "stage": "complete_request",
+      "samples_ms": [
+        438.467,
+        445.474,
+        440.592,
+        441.847,
+        442.471,
+        440.451,
+        436.779,
+        439.815,
+        437.526,
+        439.762,
+        280.156,
+        281.526,
+        276.367,
+        277.202,
+        277.078,
+        275.205,
+        279.337,
+        277.946,
+        278.494,
+        277.769
+      ]
+    }
+  ],
+  "peak_rss_bytes": 213057536,
+  "elapsed_ms": 11302.835,
+  "numerical_comparison": {
+    "status": "not_applicable",
+    "reference": "self"
+  },
+  "selected_simd_backend": "python-stdlib",
+  "qualified": true,
+  "passed": true,
+  "limitations": [
+    "Synthetic PCM fixtures measure bounded runtime behavior only.",
+    "No perceptual, LUFS, LRA, true-peak, or real-mix quality claim is made."
+  ]
+}

@@ -64,4 +64,3 @@ def handle_post_racks_synthesize(handler: Any, payload: dict[str, Any]) -> None:
             "variations": prop_res.get("variations", []),
             "answer": f"Proposed {prop_res.get('rack_name')} on track {track_index + 1}. Please confirm.",
         })
-

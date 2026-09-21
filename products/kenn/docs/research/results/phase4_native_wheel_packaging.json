@@ -1,0 +1,30 @@
+{
+  "schema": "kenn.native_wheel_packaging.v1",
+  "run_date": "2026-09-21",
+  "target": "products/kenn/tooling/native/dsp_core",
+  "build_command": "make -C products/kenn native-wheel NATIVE_PYTHON=/private/tmp/kenn-nanobind-venv.bhNmdO/bin/python NATIVE_BUILD_DIR=<temporary-build-dir>",
+  "build_isolation": false,
+  "cmake_executable": "/opt/homebrew/bin/cmake",
+  "wheel": {
+    "filename": "kenn_dsp_native-0.1.0-cp313-cp313-macosx_27_0_arm64.whl",
+    "platform": "macOS arm64",
+    "extension": "kenn/core/_kenn_dsp_native.cpython-313-darwin.so",
+    "extension_present": true,
+    "exports": ["spectral_power", "masking_band_energy", "mono_metrics", "stereo_metrics", "automix"],
+    "spectral_optional_outputs": ["ltas_band_levels", "dominant_peaks", "window_dominant_peaks"]
+  },
+  "status": "pass-local-macos-arm64",
+  "verification": {
+    "wheel_build": "pass",
+    "native_smoke": "pass",
+    "native_disabled_reference_fallback": "pass",
+    "portable_core_ctest": "pass",
+    "recovered_automix_kernel_ctest": "pass"
+  },
+  "remaining_scope": [
+    "Windows x64 wheel and host validation",
+    "supported-host DAW loading",
+    "Developer ID signing and notarization"
+  ],
+  "fix": "Make native-wheel now passes CMAKE_EXECUTABLE so scikit-build-core cannot select an incompatible stale system CMake."
+}

@@ -292,4 +292,3 @@ def handle_mix_reference_json(handler: Any, mix_review: Any) -> None:
         import traceback
         traceback.print_exc()
         handler.send_json(500, {"error": f"Reference comparison failed: {exc}"})
-

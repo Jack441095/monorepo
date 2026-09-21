@@ -34,4 +34,3 @@ def test_zero_audio_privacy_guard():
     corrupt_audio_prompt = "Here is audio data: \x00\x01\x00\x02\x00\x03"
     with pytest.raises(ValueError, match="Zero-Audio Privacy Policy"):
         router.route(corrupt_audio_prompt)
-

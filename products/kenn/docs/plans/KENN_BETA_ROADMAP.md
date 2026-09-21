@@ -178,4 +178,3 @@ Package 11: Final Beta Qualification & Sign-Off
 | Hallucinated Action Parameters | Parameters fetched exclusively from Live LOM (`get_device_parameters`), not LLM memory. |
 | Stale Session Context | Expiring proposal timestamps (TTL 300s) and Live session versioning. |
 | Malicious / Adversarial Injection | XML data wrapping, strict request schema validation, HMAC token signing. |
-

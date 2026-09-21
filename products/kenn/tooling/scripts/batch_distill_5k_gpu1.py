@@ -221,4 +221,3 @@ if __name__ == "__main__":
     parser.add_argument("--max", type=int, default=100, help="Maximum number of notes to generate in this pass (default: 100)")
     args = parser.parse_args()
     run_pipeline(max_notes=args.max)
-

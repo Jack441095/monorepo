@@ -151,4 +151,3 @@ def test_master_limiter_safety_lock(action_service, mock_client):
     assert receipt["ceiling_dbfs"] == -0.3
     assert receipt["safety_enforced"] is True
     mock_client.send.assert_called_with("/live/master/enforce_safety_limiter", [-0.3])
-

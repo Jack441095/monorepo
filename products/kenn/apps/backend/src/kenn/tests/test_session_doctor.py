@@ -114,5 +114,3 @@ def test_session_doctor_flags_multi_stem_summing_overload():
     report = SessionDoctor.audit(session_state)
     overload_issues = [i for i in report.issues if i.code == "MULTI_STEM_SUMMING_OVERLOAD"]
     assert len(overload_issues) >= 3
-
-

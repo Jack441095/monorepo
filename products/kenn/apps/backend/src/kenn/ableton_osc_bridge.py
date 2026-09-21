@@ -469,10 +469,16 @@ class AbletonOSCClient:
         with self._exchange_lock:
             started = time.monotonic()
             pending: list[dict[str, Any]] = []
-            for address, args in requests:
+            for request_index, (address, args) in enumerate(requests):
                 request_id = self.send_command(address, args)
                 if request_id is not None:
-                    pending.append({"id": request_id, "address": address, "args": list(args or [])})
+                    pending.append({
+                        "id": request_id,
+                        "index": request_index,
+                        "address": address,
+                        "args": list(args or []),
+                    })
+            sent = list(pending)
 
             responses: list[Optional[Dict[str, Any]]] = [None] * len(requests)
             if len(pending) == len(requests):
@@ -499,43 +505,37 @@ class AbletonOSCClient:
                             ]
                             if not candidates:
                                 continue
-                            # AbletonOSC normally echoes the request indices.
-                            # Prefer that exact identity; if an older script
-                            # omits the echo, fall back to arrival order for
-                            # that address without guessing across addresses.
-                            match = next(
-                                (
-                                    item for item in candidates
-                                    if item["args"]
-                                    and len(response_args) >= len(item["args"])
-                                    and response_args[: len(item["args"])] == item["args"]
-                                ),
-                                candidates[0],
-                            )
-                            request_index = next(
-                                index
-                                for index, item in enumerate(requests)
-                                if item[0] == match["address"]
-                                and list(item[1] or []) == match["args"]
-                                and responses[index] is None
-                            )
-                            responses[request_index] = {
+                            # AbletonOSC has no transport request id. Indexed
+                            # replies normally echo their request arguments;
+                            # accept a response only when that echo identifies
+                            # one request, or the address itself is unique.
+                            # Arrival-order attribution can apply track N's
+                            # value to track M and is therefore forbidden.
+                            echoed = [
+                                item for item in candidates
+                                if item["args"]
+                                and len(response_args) >= len(item["args"])
+                                and response_args[: len(item["args"])] == item["args"]
+                            ]
+                            if len(echoed) == 1:
+                                match = echoed[0]
+                            elif len(candidates) == 1:
+                                match = candidates[0]
+                            else:
+                                logger.warning(
+                                    "Ignoring ambiguous AbletonOSC batch reply for %s; "
+                                    "request arguments were not echoed",
+                                    response_address,
+                                )
+                                continue
+                            responses[match["index"]] = {
                                 "address": response_address,
                                 "args": list(response_args),
                             }
                             pending.remove(match)
                 finally:
-                    for item in pending:
+                    for item in sent:
                         self._request_addresses.pop(item["id"], None)
-                    for request_id, item in enumerate(requests):
-                        if responses[request_id] is not None:
-                            # The local exchange id is not exposed in the
-                            # response, so remove the matching address entry
-                            # if it is still present.
-                            for stored_id, stored_address in list(self._request_addresses.items()):
-                                if stored_address == item[0]:
-                                    self._request_addresses.pop(stored_id, None)
-                                    break
                     self.last_exchange = {
                         "transport": "abletonosc",
                         "address": "batch",
@@ -548,11 +548,8 @@ class AbletonOSCClient:
                         "round_trip_ms": round((time.monotonic() - started) * 1000.0, 3),
                     }
             else:
-                for address, _ in requests:
-                    self._request_addresses.pop(next(
-                        (request_id for request_id, stored_address in self._request_addresses.items() if stored_address == address),
-                        -1,
-                    ), None)
+                for item in sent:
+                    self._request_addresses.pop(item["id"], None)
             return responses
 
     def _query_many(self, requests: list[tuple[str, Optional[List[Any]]]]) -> list[Optional[list[Any]]]:
@@ -909,7 +906,7 @@ class AbletonOSCClient:
 
     def query_session_topology(self) -> Dict[str, Any]:
         """Return a fresh track/device identity snapshot without mixer reads."""
-        return self.query_session_state(include_mixer=False)
+        return self.query_session_state(include_mixer=False, force_refresh=True)
 
     def get_scene_names(self) -> List[str]:
         """Read exact scene names/count without the full mixer/transport batch.

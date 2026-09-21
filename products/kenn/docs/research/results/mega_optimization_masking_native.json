@@ -1,0 +1,25 @@
+{
+  "schema": "kenn.dsp_masking_benchmark.v1",
+  "candidate": "native",
+  "fixture": {
+    "generator": "deterministic sine PCM16 WAV stems",
+    "seconds": 30.0,
+    "sample_rate_hz": 48000,
+    "stems": 8,
+    "sha256": "0677e176e65885ad7c64f1239e28447a6cd7e4de8bcbfc884547417722a980ca"
+  },
+  "repeats": 3,
+  "implementation": "cpp-accelerate",
+  "ok": true,
+  "finding_count": 9,
+  "findings_sha256": "4414fb1250c1ce60f0b4f8e99f7964142e9f117bbde10f517197bbe7be1d7cac",
+  "samples_ms": [
+    55.252,
+    55.409,
+    54.984
+  ],
+  "mean_ms": 55.215,
+  "p50_ms": 55.252,
+  "p95_ms": 55.394,
+  "max_ms": 55.409
+}

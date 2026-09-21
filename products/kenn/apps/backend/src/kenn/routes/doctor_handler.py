@@ -129,4 +129,3 @@ def handle_post_doctor_remediate(handler: Any, payload: dict[str, Any]) -> None:
             })
     except Exception as e:
         handler.send_json(500, {"ok": False, "error": str(e)})
-

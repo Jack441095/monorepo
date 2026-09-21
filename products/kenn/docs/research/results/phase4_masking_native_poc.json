@@ -1,0 +1,30 @@
+{
+  "schema": "kenn.dsp_native_poc.v1",
+  "candidate": "cpp-scalar-masking-band-energy",
+  "fixture": {
+    "generator": "deterministic mono PCM16 sine stems",
+    "seconds": 5.0,
+    "sample_rate_hz": 48000,
+    "stems": 8
+  },
+  "parity": {
+    "python_backend": "python-numpy-reference",
+    "native_backend": "cpp-scalar",
+    "shape": [
+      116,
+      7
+    ],
+    "max_absolute_error": 2.842170943040401e-14,
+    "findings_equal": true
+  },
+  "performance": {
+    "python_ms_mean": 4.211799999757204,
+    "native_ms_mean": 13.146433400106616,
+    "native_speedup_vs_python": 0.3203758670943441
+  },
+  "decision": "no-go-portable-scalar",
+  "limitations": [
+    "Synthetic fixture only; not a real AutoMix project.",
+    "NumPy FFT is faster than this portable scalar implementation on the qualification host."
+  ]
+}

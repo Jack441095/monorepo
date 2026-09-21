@@ -116,4 +116,3 @@ def test_track_masking_matrix_and_carving_proposals():
     # Strict Hardware Safety Policy check: cut must be <= 3.0 dB
     assert -3.0 <= prop["suggested_cut_db"] < 0.0
     assert prop["proposed_osc_mutation"]["gain_delta_db"] >= -3.0
-

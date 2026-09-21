@@ -1,0 +1,111 @@
+{
+  "schema": "kenn.dsp_benchmark.v1",
+  "benchmark_version": "kenn.audio_analysis.benchmark.v2",
+  "source_revision": "ffea0c7c970172dd6bf2afd78142f475c41198e4",
+  "candidate": "python-stdlib-reference",
+  "build_type": "reference",
+  "compiler_flags": [],
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "resource_limits": {
+    "max_input_bytes": 157286400,
+    "fft_windows_cap": 4,
+    "audio_retained": false
+  },
+  "fixture": {
+    "generator": "deterministic 440 Hz mono PCM16 WAV",
+    "long_seconds": 5.0,
+    "workers": 2,
+    "repeats": 5
+  },
+  "cases": [
+    {
+      "label": "long_48khz",
+      "bytes": 480044,
+      "sha256": "04bfe3f707b27b3fb1a6057e856ab777115b4fb5fcbdba58c9df78ff324dd354",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 5.0,
+      "sample_rate_hz": 48000,
+      "runs": 5,
+      "samples_ms": [
+        165.482,
+        165.793,
+        165.658,
+        161.813,
+        163.084
+      ],
+      "mean_ms": 164.366,
+      "p50_ms": 165.482,
+      "p95_ms": 165.766,
+      "p99_ms": 165.788,
+      "max_ms": 165.793
+    },
+    {
+      "label": "high_rate_96khz",
+      "bytes": 384044,
+      "sha256": "357668295d8b0538f583245617d1f437883f0b0bedd57e45b8cfca9679c8f40e",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 2.0,
+      "sample_rate_hz": 96000,
+      "runs": 5,
+      "samples_ms": [
+        147.728,
+        147.889,
+        148.118,
+        147.659,
+        148.078
+      ],
+      "mean_ms": 147.894,
+      "p50_ms": 147.889,
+      "p95_ms": 148.11,
+      "p99_ms": 148.116,
+      "max_ms": 148.118
+    }
+  ],
+  "concurrency": {
+    "workers": 2,
+    "elapsed_ms": 324.988,
+    "all_ok": true,
+    "all_complete": true
+  },
+  "stage_samples_ms": [
+    {
+      "stage": "complete_request",
+      "samples_ms": [
+        165.482,
+        165.793,
+        165.658,
+        161.813,
+        163.084,
+        147.728,
+        147.889,
+        148.118,
+        147.659,
+        148.078
+      ]
+    }
+  ],
+  "peak_rss_bytes": 75923456,
+  "elapsed_ms": 1955.784,
+  "numerical_comparison": {
+    "status": "not_applicable",
+    "reference": "self"
+  },
+  "selected_simd_backend": "python-stdlib",
+  "qualified": true,
+  "passed": true,
+  "limitations": [
+    "Synthetic PCM fixtures measure bounded runtime behavior only.",
+    "No perceptual, LUFS, LRA, true-peak, or real-mix quality claim is made."
+  ]
+}

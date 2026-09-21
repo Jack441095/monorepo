@@ -637,7 +637,18 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.send_cors_headers()
         self.end_headers()
-        self.wfile.write(body)
+        self._write_body(body)
+
+    def _write_body(self, body: bytes, *, flush: bool = False) -> bool:
+        """Write a response body without turning a client disconnect into a server error."""
+        try:
+            self.wfile.write(body)
+            if flush:
+                self.wfile.flush()
+            return True
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            self.close_connection = True
+            return False
 
     def handle_safe_live_action(self, action: str, payload: dict) -> None:
         """Handle the only supported HTTP Live mutation path."""
@@ -728,7 +739,7 @@ class Handler(BaseHTTPRequestHandler):
         if filename:
             self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
         self.end_headers()
-        self.wfile.write(body)
+        self._write_body(body)
 
     def enforce_rate_limit(self, scope: str) -> bool:
         allowed, retry_after = rate_allowed(client_key(self), scope)
@@ -743,7 +754,7 @@ class Handler(BaseHTTPRequestHandler):
             "error": "Too many requests. Please wait before trying again.",
             "retry_after_seconds": retry_after,
         }
-        self.wfile.write(json.dumps(payload, indent=2).encode("utf-8"))
+        self._write_body(json.dumps(payload, indent=2).encode("utf-8"))
         return False
 
     def do_OPTIONS(self) -> None:
@@ -771,8 +782,9 @@ class Handler(BaseHTTPRequestHandler):
             # is already in progress.
             subsystems: dict[str, Any] = {"abletonosc": _cached_ableton_health()}
             try:
-                index_pointer = ROOT / "data" / "index" / "CURRENT"
-                subsystems["knowledge_index"] = {"available": index_pointer.exists()}
+                from kenn.retrieval.retrieval import retrieval_status
+
+                subsystems["knowledge_index"] = retrieval_status()
             except Exception as exc:
                 subsystems["knowledge_index"] = {"available": False, "error": str(exc)}
             try:
@@ -901,8 +913,10 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 # Send initial snapshot event
                 initial_status = guardian.get_status()
-                self.wfile.write(f"event: status\ndata: {json.dumps(initial_status)}\n\n".encode("utf-8"))
-                self.wfile.flush()
+                self._write_body(
+                    f"event: status\ndata: {json.dumps(initial_status)}\n\n".encode("utf-8"),
+                    flush=True,
+                )
             except Exception:
                 return
             return
@@ -2667,8 +2681,10 @@ class Handler(BaseHTTPRequestHandler):
                     question, limit=limit, history=history, session_id=session_id,
                     plugin_session_id=plugin_session_id, correlation_id=correlation_id,
                 ):
-                    self.wfile.write(f"data: {json.dumps(chunk)}\n\n".encode("utf-8"))
-                    self.wfile.flush()
+                    if not self._write_body(
+                        f"data: {json.dumps(chunk)}\n\n".encode("utf-8"), flush=True
+                    ):
+                        return
                     if chunk.get("event") == "token":
                         accumulated_answer += chunk.get("token", "")
                     elif chunk.get("event") == "metadata":
@@ -2706,11 +2722,11 @@ class Handler(BaseHTTPRequestHandler):
                         question,
                         contracted_metadata,
                     )
-                self.wfile.write(
+                if not self._write_body(
                     f"data: {json.dumps({'event': 'metadata', 'data': contracted_metadata})}\n\n".encode("utf-8")
-                )
-                self.wfile.write(b'data: {"event": "done"}\n\n')
-                self.wfile.flush()
+                ):
+                    return
+                self._write_body(b'data: {"event": "done"}\n\n', flush=True)
                 self.close_connection = True
                 return
             else:
@@ -3171,7 +3187,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self.send_response(404)
                 self.end_headers()
-                self.wfile.write(b"Not found")
+                self._write_body(b"Not found")
                 return
         body = target.read_bytes()
         content_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
@@ -3179,7 +3195,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(body)
+        self._write_body(body)
 
     def serve_portfolio_audio(self, path: str) -> None:
         filename = Path(path).name

@@ -1,0 +1,29 @@
+{
+  "run_date": "2026-09-21",
+  "status": "qualified-opt-in-no-release-promotion",
+  "backend": "cpp-automix-nanobind",
+  "kernels": [
+    "limiter_gain_envelope",
+    "biquad_sos_filter",
+    "direct_cross_correlation",
+    "smooth_attack_release",
+    "gate_envelope",
+    "rolling_median_mad_threshold"
+  ],
+  "checks": {
+    "cmake_release_accelerate": "pass",
+    "cmake_release_scalar": "pass",
+    "wheel_build": "pass",
+    "isolated_wheel_smoke": "pass",
+    "native_binding_smoke": "pass",
+    "backend_native_tests": "10 passed",
+    "backend_reference_tests": "10 passed",
+    "reference_fallback_smoke": "pass"
+  },
+  "promotion_blockers": [
+    "active AutoMix worker sources are absent from this checkout",
+    "complete-request AutoMix parity/performance is not measured",
+    "testing-assets manifest is TODO-vendor-pack",
+    "Windows wheel and DAW host validation remain external gates"
+  ]
+}

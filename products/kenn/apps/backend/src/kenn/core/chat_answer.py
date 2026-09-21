@@ -2573,7 +2573,7 @@ def _critique_and_save_trace(
 ) -> str:
     """Helper to run self-critique, record citations, and save reasoning trace."""
     try:
-        from kenn.knowledge import query_reasoning_traces, post_answer_critique, record_citation
+        from kenn.knowledge import query_reasoning_traces, post_answer_critique, record_citations
         past_reasoning_traces = query_reasoning_traces(query)
         critique_result = post_answer_critique(
             query,
@@ -2596,9 +2596,11 @@ def _critique_and_save_trace(
 
         # Record source citations to update dynamic trust scores
         if not weak_match:
-            for _, chunk in (results or []):
-                if chunk.get("source"):
-                    record_citation(chunk["source"])
+            record_citations(
+                chunk["source"]
+                for _, chunk in (results or [])
+                if chunk.get("source")
+            )
     except Exception as e:
         import logging
         logging.getLogger("kenn.core.chat_answer").warning(f"Self-critique / trust score processing failed: {e}")

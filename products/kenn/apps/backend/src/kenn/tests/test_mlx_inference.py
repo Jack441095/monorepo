@@ -90,4 +90,3 @@ def test_mlx_prompt_cache_generation():
     res = engine.generate(prompt, max_tokens=15, prompt_cache=cache)
     assert len(res["text"]) > 0
     assert res["engine"] == "apple_silicon_mlx"
-
