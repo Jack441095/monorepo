@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <JuceHeader.h>
-#include "../../common/AudioTooRealtimeCore.h"
+#include "../../../packages/common/AudioTooRealtimeCore.h"
 
 // Numerical accuracy & reference parity test for AudioTooRealtimeCore.
 // Tests peak dBFS, RMS, crest factor, correlation, clipping counter, and the

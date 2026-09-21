@@ -372,5 +372,3 @@ __all__ = [
     "generate_spectral_carving_proposals",
     "compute_dynamic_sidechain_ducking",
 ]
-
-

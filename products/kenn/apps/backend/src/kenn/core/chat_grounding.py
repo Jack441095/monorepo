@@ -704,4 +704,3 @@ def mode_signature(mode: str, confidence: str = "medium") -> dict[str, str]:
         },
     }
     return signatures.get(mode, signatures["quick_fix"])
-

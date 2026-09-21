@@ -37,4 +37,3 @@ The automated security test suite [chat/tests/test_security_and_abuse.py](file:/
 7. Memory-only audio safety
 
 **Verification Status**: PASSED (7/7 tests)
-

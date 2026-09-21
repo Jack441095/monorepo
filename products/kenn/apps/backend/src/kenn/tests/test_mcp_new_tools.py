@@ -45,4 +45,3 @@ def test_mcp_session_doctor():
     assert data["ok"] is True
     assert "track_count" in data
     assert "summary" in data
-

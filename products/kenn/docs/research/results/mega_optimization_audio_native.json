@@ -1,0 +1,144 @@
+{
+  "schema": "kenn.dsp_benchmark.v1",
+  "benchmark_version": "kenn.audio_analysis.benchmark.v2",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "candidate": "cpp-accelerate-nanobind",
+  "build_type": "reference",
+  "compiler_flags": [],
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "resource_limits": {
+    "max_input_bytes": 157286400,
+    "fft_windows_cap": 4,
+    "audio_retained": false
+  },
+  "fixture": {
+    "kind": "external_wav",
+    "generator": null,
+    "long_seconds": 10.0,
+    "workers": 4,
+    "repeats": 2,
+    "include_ltas": true,
+    "sources": [
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/organized_sample_library/Minimal_Audio_Full/FX/Foley/Atmosphere - Emergent - C - 78 BPM.wav",
+        "sha256": "97638107a543af2bd423e33dbf0e0ac9968b957edf902f19823c7eaa8adfebfa",
+        "bytes": 14178506,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 48000,
+          "frames": 2363077,
+          "duration_seconds": 49.230771
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/organized_sample_library/Minimal_Audio_Full/FX/Foley/Atmosphere - Mysteria.wav",
+        "sha256": "c01f7a0dc1023ea0efdb44a14e930fcac3454c39571f8f2a650d10284151eab8",
+        "bytes": 14700958,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 96000,
+          "frames": 2450140,
+          "duration_seconds": 25.522292
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "label": "Atmosphere - Emergent - C - 78 BPM",
+      "bytes": 14178506,
+      "sha256": "97638107a543af2bd423e33dbf0e0ac9968b957edf902f19823c7eaa8adfebfa",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 49.230771,
+      "sample_rate_hz": 48000,
+      "implementation": "cpp-accelerate",
+      "native_input_copied": false,
+      "runs": 2,
+      "samples_ms": [
+        103.262,
+        24.04
+      ],
+      "mean_ms": 63.651,
+      "p50_ms": 63.651,
+      "p95_ms": 99.301,
+      "p99_ms": 102.47,
+      "max_ms": 103.262,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 48000,
+        "frames": 2363077,
+        "duration_seconds": 49.230771
+      }
+    },
+    {
+      "label": "Atmosphere - Mysteria",
+      "bytes": 14700958,
+      "sha256": "c01f7a0dc1023ea0efdb44a14e930fcac3454c39571f8f2a650d10284151eab8",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 25.522292,
+      "sample_rate_hz": 96000,
+      "implementation": "cpp-accelerate",
+      "native_input_copied": false,
+      "runs": 2,
+      "samples_ms": [
+        26.129,
+        25.02
+      ],
+      "mean_ms": 25.574,
+      "p50_ms": 25.574,
+      "p95_ms": 26.073,
+      "p99_ms": 26.117,
+      "max_ms": 26.129,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 96000,
+        "frames": 2450140,
+        "duration_seconds": 25.522292
+      }
+    }
+  ],
+  "concurrency": {
+    "workers": 4,
+    "elapsed_ms": 34.872,
+    "all_ok": true,
+    "all_complete": true
+  },
+  "stage_samples_ms": [
+    {
+      "stage": "complete_request",
+      "samples_ms": [
+        103.262,
+        24.04,
+        26.129,
+        25.02
+      ]
+    }
+  ],
+  "peak_rss_bytes": 177291264,
+  "elapsed_ms": 264.812,
+  "numerical_comparison": {
+    "status": "not_applicable",
+    "reference": "self"
+  },
+  "selected_simd_backend": "cpp-accelerate",
+  "qualified": true,
+  "passed": true,
+  "limitations": [
+    "No perceptual, LUFS, LRA, true-peak, or real-mix quality claim is made."
+  ]
+}

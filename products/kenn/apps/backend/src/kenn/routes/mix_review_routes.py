@@ -103,4 +103,3 @@ def handle_reference_preset_download(
         return 200, adv_bytes, f"Reference_Match_{clean_id}.adv"
     except Exception:
         return 500, None, ""
-

@@ -38,7 +38,7 @@ void schroeder_reverb(
     }
 
     const double* right_src = right ? right : left;
-    
+
     // Thread-local scratch buffers to guarantee zero heap allocation churn on repeated passes
     thread_local std::vector<double> mono_input;
     thread_local std::vector<double> combs_out;

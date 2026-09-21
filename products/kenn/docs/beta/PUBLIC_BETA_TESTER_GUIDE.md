@@ -48,4 +48,3 @@ Welcome to the KENN Public Beta! KENN is an evidence-grounded mix engineering as
 - After receiving an answer or mix review, rate the response using the 1⭐ to 5⭐ rating buttons in the sidebar.
 - Enter optional comments and click **Submit Feedback**.
 - If you encounter a bug or unexpected behavior, please submit a report with the `request_id` displayed on your receipt.
-

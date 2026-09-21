@@ -1,0 +1,61 @@
+{
+  "case_count": 6,
+  "cases_sha256": "d124c390fafe5479f58a09a9f4894293ef4ba6e267e2483eb17e6a74ecd63e68",
+  "failed": 0,
+  "generated_at": "2026-09-21T14:09:40.838192+00:00",
+  "limitations": [
+    "Synthetic Live snapshots verify evidence separation; they do not replace real-Live qualification."
+  ],
+  "passed": 6,
+  "privacy": {
+    "stores_answers": false,
+    "stores_live_names": false,
+    "stores_questions": false
+  },
+  "qualified": true,
+  "rows": [
+    {
+      "failures": [],
+      "id": "vocal-deessing-live-evidence",
+      "passed": true,
+      "session_evidence_count": 1,
+      "source_count": 3
+    },
+    {
+      "failures": [],
+      "id": "bass-compression-live-evidence",
+      "passed": true,
+      "session_evidence_count": 1,
+      "source_count": 3
+    },
+    {
+      "failures": [],
+      "id": "drum-punch-live-evidence",
+      "passed": true,
+      "session_evidence_count": 1,
+      "source_count": 3
+    },
+    {
+      "failures": [],
+      "id": "synth-saturation-live-evidence",
+      "passed": true,
+      "session_evidence_count": 1,
+      "source_count": 3
+    },
+    {
+      "failures": [],
+      "id": "offline-never-claims-session-evidence",
+      "passed": true,
+      "session_evidence_count": 0,
+      "source_count": 3
+    },
+    {
+      "failures": [],
+      "id": "multi-role-question-never-guesses-track",
+      "passed": true,
+      "session_evidence_count": 0,
+      "source_count": 3
+    }
+  ],
+  "schema": "kenn.session_grounded_advice_benchmark.v1"
+}

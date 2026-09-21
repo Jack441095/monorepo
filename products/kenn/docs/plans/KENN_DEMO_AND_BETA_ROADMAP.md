@@ -178,4 +178,3 @@ Distribute to 15-20 trusted music producers, mixing engineers, and sound designe
 1. **Step 1**: Assemble `assets/demo/KENN_Live12_Demo.als` with the standard 4-track template.
 2. **Step 2**: Test the 4-act demo sequence using `scripts/demo_plugin_live.py`.
 3. **Step 3**: Verify the embedded VST3 plugin inside Ableton Live 12.
-

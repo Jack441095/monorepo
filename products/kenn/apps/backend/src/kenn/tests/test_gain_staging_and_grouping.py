@@ -227,4 +227,3 @@ def test_handle_command_natural_language_bus_organization() -> None:
     assert exec_res["status"] == "applied"
     assert exec_res["changed"] is True
     assert exec_res["receipt"]["verified"] is True
-

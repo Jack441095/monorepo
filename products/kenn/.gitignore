@@ -57,6 +57,9 @@ _deps/
 dist/
 *.o
 *.a
+*.so
+*.pyd
+*.dll
 *.dylib
 node_modules/
 
@@ -130,3 +133,15 @@ research/product-experience/Nite_DSP_Product_Experience_RnD/
 # Local frontend dependencies and output
 apps/frontend/node_modules/
 apps/frontend/dist/
+
+# Local migration/reference snapshots. The active implementation lives under
+# apps/, packages/, plugins/, integrations/, and tooling/.
+/kenn/
+/runtime/legacy/
+/standalone/
+
+# Retired local launch surfaces are empty or generated in this checkout.
+/desktop_companion/
+/remote_script/
+/scripts/
+/tests/

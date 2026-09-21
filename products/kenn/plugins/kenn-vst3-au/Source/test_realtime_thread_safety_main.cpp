@@ -7,7 +7,7 @@
 #include <vector>
 
 #include <JuceHeader.h>
-#include "../../common/AudioTooRealtimeCore.h"
+#include "../../../packages/common/AudioTooRealtimeCore.h"
 
 // Stress-tests AudioTooRealtimeCore's real concurrency contract: one
 // "audio thread" continuously calling analyse() (as processBlock() does)

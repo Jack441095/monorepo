@@ -212,4 +212,3 @@ KENN_PORT=8095 python3 apps/backend/src/kenn/server.py
 **Q: Where can I review my action logs and receipts?**
 
 **A:** Action receipts and rollbacks are saved in your session journal at `~/.kenn/receipts/` or displayed directly in the KENN Web Hub.
-

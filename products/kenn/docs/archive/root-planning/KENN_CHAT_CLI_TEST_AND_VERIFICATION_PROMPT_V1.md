@@ -145,4 +145,3 @@ ACCEPTANCE CRITERIA
 [x] CLI provides full interactive dialogue, session memory, and markdown logging.
 ================================================================================
 ```
-

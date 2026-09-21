@@ -15,6 +15,15 @@ endif()
 
 project(KENNMixAssistant VERSION 0.1.0 LANGUAGES C CXX)
 
+if (WIN32)
+    # Audio Unit is a macOS format. Keep the Windows job focused on the
+    # supported VST3 artifact instead of asking JUCE to configure an AU target
+    # that cannot load on Windows.
+    set(KENN_PLUGIN_FORMATS VST3)
+else()
+    set(KENN_PLUGIN_FORMATS VST3 AU)
+endif()
+
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build" FORCE)
 endif()
@@ -48,7 +57,7 @@ juce_add_plugin(KENNMixAssistant
     COPY_PLUGIN_AFTER_BUILD FALSE
     PLUGIN_MANUFACTURER_CODE AECO
     PLUGIN_CODE KnMa
-    FORMATS VST3 AU
+    FORMATS ${KENN_PLUGIN_FORMATS}
     PRODUCT_NAME "KENN Mix Assistant")
 
 juce_generate_juce_header(KENNMixAssistant)

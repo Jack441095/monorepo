@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <JuceHeader.h>
-#include "../../common/AudioTooRealtimeCore.h"
+#include "../../../packages/common/AudioTooRealtimeCore.h"
 
 // Reproducible micro-benchmark for the code that runs from a plug-in's
 // processBlock().  It deliberately exercises the complete analyse() path,

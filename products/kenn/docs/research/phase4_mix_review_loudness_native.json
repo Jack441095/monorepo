@@ -1,0 +1,83 @@
+{
+  "candidate": "cpp-native-decode-k-weighting-truepeak-opt-in",
+  "fixture": {
+    "bytes": 1920044,
+    "kind": "deterministic_synthetic_stereo_pcm16",
+    "sample_rate_hz": 48000,
+    "seconds": 10.0,
+    "sha256": "5e6545d28a2ea8f39e6b5600bf603850cc7c848412dc27baba359307b4ae61b7"
+  },
+  "limitations": [
+    "The C++ candidate replaces K-weighted loudness/LRA and true peak with the same audited FIR contract.",
+    "Synthetic timing is not a perceptual or real-mix quality claim.",
+    "The candidate remains opt-in until cross-platform and real-corpus evidence is available."
+  ],
+  "machine": {
+    "machine": "arm64",
+    "python": "3.13.7",
+    "release": "27.0.0",
+    "system": "Darwin"
+  },
+  "native": {
+    "mean_ms": 13.539,
+    "p50_ms": 13.58,
+    "p95_ms": 13.763,
+    "samples_ms": [
+      13.6,
+      13.634,
+      13.513,
+      13.604,
+      13.596,
+      13.606,
+      13.514,
+      13.567,
+      13.663,
+      13.763,
+      13.621,
+      13.589,
+      13.57,
+      13.198,
+      13.245,
+      13.392,
+      13.427,
+      13.457,
+      13.343,
+      13.886
+    ]
+  },
+  "parity": {
+    "finding_families_equal": true,
+    "integrated_lufs_delta_db": 0.0,
+    "loudness_range_delta_lu": 0.0,
+    "true_peak_equal": true
+  },
+  "qualified": true,
+  "reference": {
+    "mean_ms": 80.769,
+    "p50_ms": 81.705,
+    "p95_ms": 82.686,
+    "samples_ms": [
+      81.737,
+      80.595,
+      82.686,
+      82.767,
+      81.673,
+      82.618,
+      82.476,
+      82.115,
+      82.365,
+      81.785,
+      79.653,
+      82.549,
+      81.806,
+      80.26,
+      78.789,
+      78.025,
+      78.03,
+      77.815,
+      78.86,
+      78.776
+    ]
+  },
+  "schema": "kenn.dsp_mix_review_native_benchmark.v1"
+}

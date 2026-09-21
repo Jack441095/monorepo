@@ -1,0 +1,27 @@
+{
+  "schema": "kenn.dsp_profile.v1",
+  "run_date": "2026-09-21",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "candidate": "cpp-native-opt-in",
+  "fixture": {
+    "generator": "deterministic 440 Hz mono PCM16 WAV",
+    "seconds": 10.0,
+    "sample_rate_hz": 48000,
+    "repeats": 10
+  },
+  "total_profiled_ms": 105.805,
+  "stages": {
+    "analyze_wav": {"calls": 10, "exclusive_ms": 2.292, "cumulative_ms": 105.805},
+    "_decode": {"calls": 10, "exclusive_ms": 0.026, "cumulative_ms": 39.648},
+    "decode_pcm": {"calls": 10, "exclusive_ms": 3.814, "cumulative_ms": 39.408},
+    "_spectral_measurement": {"calls": 10, "exclusive_ms": 30.120, "cumulative_ms": 55.598},
+    "spectral_powers": {"calls": 10, "exclusive_ms": 5.876, "cumulative_ms": 5.965},
+    "_dominant_peaks": {"calls": 50, "exclusive_ms": 9.065, "cumulative_ms": 11.145}
+  },
+  "dominant_stage": "_spectral_measurement",
+  "interpretation": "The native decoder and spectral kernels now dominate the bounded request boundary; retained Python work is peak selection and report orchestration. Complete-request benchmarks remain the adoption gate.",
+  "limitations": [
+    "cProfile includes first-call NumPy import overhead.",
+    "This is synthetic runtime evidence, not perceptual or rights-cleared corpus evidence."
+  ]
+}

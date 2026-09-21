@@ -115,4 +115,3 @@ def test_compare_mix_to_reference_full_pipeline():
     raw_adv = base64.b64decode(result["eq8_preset_adv_base64"])
     xml_str = gzip.decompress(raw_adv).decode("utf-8")
     assert "Eq8Band" in xml_str
-

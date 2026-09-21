@@ -1,0 +1,507 @@
+{
+  "schema": "kenn.dsp_benchmark.v1",
+  "benchmark_version": "kenn.audio_analysis.benchmark.v2",
+  "source_revision": "ffea0c7c970172dd6bf2afd78142f475c41198e4",
+  "candidate": "python-stdlib-reference",
+  "build_type": "reference",
+  "compiler_flags": [],
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "resource_limits": {
+    "max_input_bytes": 157286400,
+    "fft_windows_cap": 4,
+    "audio_retained": false
+  },
+  "fixture": {
+    "kind": "external_wav",
+    "generator": null,
+    "long_seconds": 10.0,
+    "workers": 4,
+    "repeats": 3,
+    "sources": [
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_01.wav",
+        "sha256": "5e609b4ebb567682cf01ef4c4d6c4c8934f9b0b1b4762bd29e1ed5fc10a6e5c2",
+        "bytes": 38444,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 19200,
+          "duration_seconds": 0.6
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_02.wav",
+        "sha256": "1c56f6aeb6b522d2da1b0d897cc14b63288a7566dad1038dc4c04f3ee6dace4a",
+        "bytes": 32044,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 16000,
+          "duration_seconds": 0.5
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_03.wav",
+        "sha256": "ef7d6710c02377b3137bb3e1f6d37d43282bad3ca34b3ebf2dd8ff04a8bcb496",
+        "bytes": 96044,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 48000,
+          "duration_seconds": 1.5
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_04.wav",
+        "sha256": "4c053577a1a455b1adb59f02b87c903b878ba2b93bf827ad45062c319cf68fc3",
+        "bytes": 19244,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 9600,
+          "duration_seconds": 0.3
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_05.wav",
+        "sha256": "a1f660865bfd826efe08762716a8e41fe702ccc21c60fd8fd4886715ed03ca27",
+        "bytes": 96044,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 48000,
+          "duration_seconds": 1.5
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_06.wav",
+        "sha256": "59655dd94a823a2be831963efe21e4f15b44c7fd6b3fb160b4de1d8703e8f9da",
+        "bytes": 32044,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 16000,
+          "duration_seconds": 0.5
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_07.wav",
+        "sha256": "4eb53c501cd44ba5120a7868eb595baf309aa5d3422ce6420bd63615453319b6",
+        "bytes": 64044,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 32000,
+          "duration_seconds": 1.0
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_08.wav",
+        "sha256": "01016d6ddc3afea79afce871530268c52943a40cff127387eb6d7fae5ddd0af7",
+        "bytes": 320044,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 160000,
+          "duration_seconds": 5.0
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_09.wav",
+        "sha256": "e9bfc74e2001efe68be193ec8d8da0dfa14f65cec63a769022e13c483fad254e",
+        "bytes": 256044,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 128000,
+          "duration_seconds": 4.0
+        }
+      },
+      {
+        "path": "Audio_Too/tests/fixtures/blind_test_audio/anonymous_sample_10.wav",
+        "sha256": "16b845acfed3d6b9640b946339f49ceb3a8d1093073953bf0e047abe330244cc",
+        "bytes": 25644,
+        "wav": {
+          "channels": 1,
+          "sample_width_bytes": 2,
+          "sample_rate_hz": 32000,
+          "frames": 12800,
+          "duration_seconds": 0.4
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "label": "anonymous_sample_01",
+      "bytes": 38444,
+      "sha256": "5e609b4ebb567682cf01ef4c4d6c4c8934f9b0b1b4762bd29e1ed5fc10a6e5c2",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 0.6,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        56.396,
+        58.039,
+        55.554
+      ],
+      "mean_ms": 56.663,
+      "p50_ms": 56.396,
+      "p95_ms": 57.875,
+      "p99_ms": 58.007,
+      "max_ms": 58.039,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 19200,
+        "duration_seconds": 0.6
+      }
+    },
+    {
+      "label": "anonymous_sample_02",
+      "bytes": 32044,
+      "sha256": "1c56f6aeb6b522d2da1b0d897cc14b63288a7566dad1038dc4c04f3ee6dace4a",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 0.5,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        30.744,
+        30.752,
+        30.679
+      ],
+      "mean_ms": 30.725,
+      "p50_ms": 30.744,
+      "p95_ms": 30.751,
+      "p99_ms": 30.752,
+      "max_ms": 30.752,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 16000,
+        "duration_seconds": 0.5
+      }
+    },
+    {
+      "label": "anonymous_sample_03",
+      "bytes": 96044,
+      "sha256": "ef7d6710c02377b3137bb3e1f6d37d43282bad3ca34b3ebf2dd8ff04a8bcb496",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 1.5,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        82.301,
+        80.036,
+        79.592
+      ],
+      "mean_ms": 80.643,
+      "p50_ms": 80.036,
+      "p95_ms": 82.074,
+      "p99_ms": 82.256,
+      "max_ms": 82.301,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 48000,
+        "duration_seconds": 1.5
+      }
+    },
+    {
+      "label": "anonymous_sample_04",
+      "bytes": 19244,
+      "sha256": "4c053577a1a455b1adb59f02b87c903b878ba2b93bf827ad45062c319cf68fc3",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 0.3,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        30.537,
+        30.849,
+        30.842
+      ],
+      "mean_ms": 30.743,
+      "p50_ms": 30.842,
+      "p95_ms": 30.848,
+      "p99_ms": 30.849,
+      "max_ms": 30.849,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 9600,
+        "duration_seconds": 0.3
+      }
+    },
+    {
+      "label": "anonymous_sample_05",
+      "bytes": 96044,
+      "sha256": "a1f660865bfd826efe08762716a8e41fe702ccc21c60fd8fd4886715ed03ca27",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 1.5,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        81.204,
+        81.74,
+        81.476
+      ],
+      "mean_ms": 81.473,
+      "p50_ms": 81.476,
+      "p95_ms": 81.714,
+      "p99_ms": 81.735,
+      "max_ms": 81.74,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 48000,
+        "duration_seconds": 1.5
+      }
+    },
+    {
+      "label": "anonymous_sample_06",
+      "bytes": 32044,
+      "sha256": "59655dd94a823a2be831963efe21e4f15b44c7fd6b3fb160b4de1d8703e8f9da",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 0.5,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        33.605,
+        33.363,
+        33.474
+      ],
+      "mean_ms": 33.481,
+      "p50_ms": 33.474,
+      "p95_ms": 33.592,
+      "p99_ms": 33.602,
+      "max_ms": 33.605,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 16000,
+        "duration_seconds": 0.5
+      }
+    },
+    {
+      "label": "anonymous_sample_07",
+      "bytes": 64044,
+      "sha256": "4eb53c501cd44ba5120a7868eb595baf309aa5d3422ce6420bd63615453319b6",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 1.0,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        57.452,
+        57.301,
+        57.475
+      ],
+      "mean_ms": 57.41,
+      "p50_ms": 57.452,
+      "p95_ms": 57.473,
+      "p99_ms": 57.475,
+      "max_ms": 57.475,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 32000,
+        "duration_seconds": 1.0
+      }
+    },
+    {
+      "label": "anonymous_sample_08",
+      "bytes": 320044,
+      "sha256": "01016d6ddc3afea79afce871530268c52943a40cff127387eb6d7fae5ddd0af7",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 5.0,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        141.54,
+        140.652,
+        139.558
+      ],
+      "mean_ms": 140.584,
+      "p50_ms": 140.652,
+      "p95_ms": 141.452,
+      "p99_ms": 141.523,
+      "max_ms": 141.54,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 160000,
+        "duration_seconds": 5.0
+      }
+    },
+    {
+      "label": "anonymous_sample_09",
+      "bytes": 256044,
+      "sha256": "e9bfc74e2001efe68be193ec8d8da0dfa14f65cec63a769022e13c483fad254e",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 4.0,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        128.281,
+        127.415,
+        127.591
+      ],
+      "mean_ms": 127.763,
+      "p50_ms": 127.591,
+      "p95_ms": 128.212,
+      "p99_ms": 128.268,
+      "max_ms": 128.281,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 128000,
+        "duration_seconds": 4.0
+      }
+    },
+    {
+      "label": "anonymous_sample_10",
+      "bytes": 25644,
+      "sha256": "16b845acfed3d6b9640b946339f49ceb3a8d1093073953bf0e047abe330244cc",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 0.4,
+      "sample_rate_hz": 32000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 3,
+      "samples_ms": [
+        29.65,
+        29.622,
+        29.717
+      ],
+      "mean_ms": 29.663,
+      "p50_ms": 29.65,
+      "p95_ms": 29.71,
+      "p99_ms": 29.715,
+      "max_ms": 29.717,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 32000,
+        "frames": 12800,
+        "duration_seconds": 0.4
+      }
+    }
+  ],
+  "concurrency": {
+    "workers": 4,
+    "elapsed_ms": 221.087,
+    "all_ok": true,
+    "all_complete": true
+  },
+  "stage_samples_ms": [
+    {
+      "stage": "complete_request",
+      "samples_ms": [
+        56.396,
+        58.039,
+        55.554,
+        30.744,
+        30.752,
+        30.679,
+        82.301,
+        80.036,
+        79.592,
+        30.537,
+        30.849,
+        30.842,
+        81.204,
+        81.74,
+        81.476,
+        33.605,
+        33.363,
+        33.474,
+        57.452,
+        57.301,
+        57.475,
+        141.54,
+        140.652,
+        139.558,
+        128.281,
+        127.415,
+        127.591,
+        29.65,
+        29.622,
+        29.717
+      ]
+    }
+  ],
+  "peak_rss_bytes": 48791552,
+  "elapsed_ms": 2235.322,
+  "numerical_comparison": {
+    "status": "not_applicable",
+    "reference": "self"
+  },
+  "selected_simd_backend": "python-stdlib",
+  "qualified": true,
+  "passed": true,
+  "limitations": [
+    "No perceptual, LUFS, LRA, true-peak, or real-mix quality claim is made."
+  ]
+}

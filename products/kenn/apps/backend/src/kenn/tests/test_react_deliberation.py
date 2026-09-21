@@ -56,4 +56,3 @@ def test_react_deliberate_offline_snapshot():
 
     assert result["ok"] is False
     assert result["status"] == "offline"
-

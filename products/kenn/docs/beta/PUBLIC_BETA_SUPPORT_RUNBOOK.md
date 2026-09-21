@@ -40,4 +40,3 @@ docker-compose restart kenn-api
 pkill -f "python3 apps/backend/src/kenn/server.py" || true
 ./scripts/start_server.sh &
 ```
-

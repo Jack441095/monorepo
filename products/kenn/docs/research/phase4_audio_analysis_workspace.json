@@ -1,0 +1,132 @@
+{
+  "schema": "kenn.dsp_benchmark.v1",
+  "benchmark_version": "kenn.audio_analysis.benchmark.v2",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "candidate": "cpp-accelerate-nanobind",
+  "build_type": "reference",
+  "compiler_flags": [],
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "resource_limits": {
+    "max_input_bytes": 157286400,
+    "fft_windows_cap": 4,
+    "audio_retained": false
+  },
+  "fixture": {
+    "kind": "synthetic",
+    "generator": "deterministic 440 Hz mono PCM16 WAV",
+    "long_seconds": 10.0,
+    "workers": 2,
+    "repeats": 5,
+    "include_ltas": true,
+    "sources": []
+  },
+  "cases": [
+    {
+      "label": "long_48khz",
+      "bytes": 960044,
+      "sha256": "04a5f27a0831e49e5fb04900eccb41f56abbf5b2250baf0a89020cb40817224e",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 10.0,
+      "sample_rate_hz": 48000,
+      "implementation": "cpp-accelerate",
+      "native_input_copied": false,
+      "runs": 5,
+      "samples_ms": [
+        31.782,
+        4.072,
+        3.979,
+        4.001,
+        3.929
+      ],
+      "mean_ms": 9.553,
+      "p50_ms": 4.001,
+      "p95_ms": 26.24,
+      "p99_ms": 30.673,
+      "max_ms": 31.782,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 48000,
+        "frames": 480000,
+        "duration_seconds": 10.0
+      }
+    },
+    {
+      "label": "high_rate_96khz",
+      "bytes": 384044,
+      "sha256": "357668295d8b0538f583245617d1f437883f0b0bedd57e45b8cfca9679c8f40e",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 2.0,
+      "sample_rate_hz": 96000,
+      "implementation": "cpp-accelerate",
+      "native_input_copied": false,
+      "runs": 5,
+      "samples_ms": [
+        3.316,
+        3.341,
+        3.312,
+        3.342,
+        3.356
+      ],
+      "mean_ms": 3.334,
+      "p50_ms": 3.341,
+      "p95_ms": 3.353,
+      "p99_ms": 3.356,
+      "max_ms": 3.356,
+      "wav": {
+        "channels": 1,
+        "sample_width_bytes": 2,
+        "sample_rate_hz": 96000,
+        "frames": 192000,
+        "duration_seconds": 2.0
+      }
+    }
+  ],
+  "concurrency": {
+    "workers": 2,
+    "elapsed_ms": 5.525,
+    "all_ok": true,
+    "all_complete": true
+  },
+  "stage_samples_ms": [
+    {
+      "stage": "complete_request",
+      "samples_ms": [
+        31.782,
+        4.072,
+        3.979,
+        4.001,
+        3.929,
+        3.316,
+        3.341,
+        3.312,
+        3.342,
+        3.356
+      ]
+    }
+  ],
+  "peak_rss_bytes": 48119808,
+  "elapsed_ms": 172.576,
+  "numerical_comparison": {
+    "status": "not_applicable",
+    "reference": "self"
+  },
+  "selected_simd_backend": "cpp-accelerate",
+  "qualified": true,
+  "passed": true,
+  "limitations": [
+    "Synthetic PCM fixtures measure bounded runtime behavior only.",
+    "No perceptual, LUFS, LRA, true-peak, or real-mix quality claim is made."
+  ]
+}

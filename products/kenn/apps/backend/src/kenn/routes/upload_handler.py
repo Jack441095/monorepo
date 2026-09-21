@@ -195,4 +195,3 @@ def handle_stem_separate_upload(handler: Any, stem_separation_bridge: Any) -> No
         handler.send_json(400, result)
         return
     handler.send_json(200, {"ok": True, "job_id": result["job"]["id"], "status": result["job"]["status"]})
-

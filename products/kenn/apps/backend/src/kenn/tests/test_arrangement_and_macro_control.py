@@ -177,4 +177,3 @@ def test_read_clip_notes() -> None:
     assert notes_state["success"] is True
     assert len(notes_state["notes"]) == 1
     assert notes_state["notes"][0]["pitch"] == 36
-

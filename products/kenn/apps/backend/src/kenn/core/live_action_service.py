@@ -316,11 +316,14 @@ class LiveActionService(Tier2Tier3ControlMixin):
 
     def snapshot(self, *, include_mixer: bool = True) -> dict[str, Any]:
         try:
-            state = self.client.query_session_state(include_mixer=include_mixer)
+            state = self.client.query_session_state(include_mixer=include_mixer, force_refresh=True)
         except TypeError:
             # Keep injected legacy test doubles and older bridge clients
             # compatible while the production client adopts the split read.
-            state = self.client.query_session_state()
+            try:
+                state = self.client.query_session_state(include_mixer=include_mixer)
+            except TypeError:
+                state = self.client.query_session_state()
         if not isinstance(state, dict) or state.get("status") in {"offline", "dispatched"}:
             try:
                 from kenn.mixing_doctor import get_latest_session_state
@@ -4078,5 +4081,3 @@ __all__ = [
     "MASTER_LIMITER_LOCK_PROPOSAL_SCHEMA",
     "MASTER_LIMITER_LOCK_RECEIPT_SCHEMA",
 ]
-
-

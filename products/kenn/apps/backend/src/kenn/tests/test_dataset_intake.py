@@ -50,4 +50,3 @@ def test_evaluation_lane_cannot_be_used_as_training() -> None:
     candidate["use_classification"] = "research_only"
     with pytest.raises(DatasetManifestError, match="evaluation lane must be evaluation_only"):
         audit_manifest({**payload, "candidates": [candidate]})
-

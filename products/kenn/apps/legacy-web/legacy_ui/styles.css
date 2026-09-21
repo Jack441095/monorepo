@@ -1526,4 +1526,3 @@ input[type="file"] {
 }
 .speak-btn:hover { border-color: var(--blue); color: var(--text); }
 .speak-btn:disabled { opacity: 0.5; cursor: default; }
-

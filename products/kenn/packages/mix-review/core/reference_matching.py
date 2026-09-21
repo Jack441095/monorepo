@@ -452,4 +452,3 @@ def compare_mix_to_reference(
         "recommendations": recommendations,
         "eq8_preset_adv_base64": preset_b64,
     }
-

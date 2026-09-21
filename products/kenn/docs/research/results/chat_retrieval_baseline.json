@@ -1,0 +1,857 @@
+{
+  "corpus_sha256": "8f219e2215bdd9376483237105931307a48dd3631dd55fe270eef6414d449a5f",
+  "cutoff": 4,
+  "decision": {
+    "baseline": "bm25",
+    "candidate": "hybrid",
+    "deploy_candidate": false,
+    "learned_reranker": "not_evaluated_missing_model_artifact",
+    "no_quality_regression": false
+  },
+  "fixture_count": 58,
+  "generated_at": "2026-09-21T13:23:33.708575+00:00",
+  "index_version": "v-7d6075b1fc02",
+  "modes": {
+    "bm25": {
+      "rows": [
+        {
+          "error": null,
+          "hit": true,
+          "id": "sidechain-bass-disappears",
+          "latency_ms": 17.988,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "sidechain-release-time",
+          "latency_ms": 21.823,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "sidechain-pumping-attack-release",
+          "latency_ms": 20.789,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "streaming-loudness",
+          "latency_ms": 8.811,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "client-stem-handoff",
+          "latency_ms": 18.297,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "reference-track-level-match",
+          "latency_ms": 18.604,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "group-bus-workflow",
+          "latency_ms": 14.396,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "filter-cutoff-automation",
+          "latency_ms": 14.394,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mixing-chain-order",
+          "latency_ms": 12.397,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "arrangement-energy-transitions",
+          "latency_ms": 18.918,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-deessing",
+          "latency_ms": 13.82,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "reverb-delay-depth-mud",
+          "latency_ms": 23.63,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "phase-polarity-mono",
+          "latency_ms": 10.749,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "drum-parallel-compression",
+          "latency_ms": 11.574,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mastering-prep-headroom",
+          "latency_ms": 8.872,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "noise-cleanup-room-tone",
+          "latency_ms": 8.116,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "next-step-mix-diagnosis",
+          "latency_ms": 13.384,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "eq-before-after-compression",
+          "latency_ms": 20.371,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mix-bus-compression-before-after-eq",
+          "latency_ms": 22.341,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "spectral-reference-slope",
+          "latency_ms": 12.434,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-width-without-mud",
+          "latency_ms": 28.362,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-width-without-mud-feedback-phrasing",
+          "latency_ms": 11.579,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "stereo-width-mono",
+          "latency_ms": 19.079,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-depth-delay-reverb",
+          "latency_ms": 15.586,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "kick-bass-balance-phase",
+          "latency_ms": 18.032,
+          "rank": 4
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "drum-punch-transients",
+          "latency_ms": 15.905,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "thin-vocal-body",
+          "latency_ms": 19.017,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "harsh-vocal-fix",
+          "latency_ms": 14.589,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "boxy-vocal-correction",
+          "latency_ms": 7.257,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "boxy-vocal-not-drum-parallel",
+          "latency_ms": 16.082,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mix-translation-checks",
+          "latency_ms": 18.883,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "operator-fm-bass",
+          "latency_ms": 8.87,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "arrangement-view-shortcuts",
+          "latency_ms": 17.026,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "groove-pool-quantization",
+          "latency_ms": 15.981,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "client-preview-mp3-export",
+          "latency_ms": 17.858,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mastering-stereo-width-checks",
+          "latency_ms": 11.258,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-tuning-comping-workflow",
+          "latency_ms": 9.314,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-doubles-adlibs-throws",
+          "latency_ms": 20.223,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "drum-layering-kick-snare",
+          "latency_ms": 12.315,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "drum-bus-saturation-transients",
+          "latency_ms": 20.117,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "arrangement-build-ups-drops-tension",
+          "latency_ms": 16.78,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mix-review-metrics-interpretation",
+          "latency_ms": 14.038,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mode-mastering-safety",
+          "latency_ms": 10.246,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mode-mix-diagnosis",
+          "latency_ms": 14.09,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "adversarial-typo-sidechain",
+          "latency_ms": 12.482,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "ambiguous-lufs-target",
+          "latency_ms": 8.982,
+          "rank": 6
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mono-risk-haas-vocal-width",
+          "latency_ms": 15.67,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "feedback-08bb6907-how-do-i-fix-boxy-vocals",
+          "latency_ms": 7.75,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "feedback-8d9abea4-how-do-i-make-vocals-wide-without-mud",
+          "latency_ms": 11.976,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "feedback-da456d17-how-do-i-make-vocals-wide-without-mud",
+          "latency_ms": 11.899,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "bass-compression-not-vocals",
+          "latency_ms": 10.49,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "warp-mode-transient-smearing",
+          "latency_ms": 10.429,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "ambiguity-harsh-thin-vocal-recording-vs-mix",
+          "latency_ms": 17.117,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "ambiguity-harsh-vocal-nothing-on-it",
+          "latency_ms": 15.514,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "ambiguity-thin-vocal-eq-vs-recording",
+          "latency_ms": 22.732,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "diagnosis-vocal-buried-in-mix",
+          "latency_ms": 15.876,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "subjective-mix-lacks-depth",
+          "latency_ms": 21.183,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "objective-clipping-not-a-style-choice",
+          "latency_ms": 5.97,
+          "rank": 1
+        }
+      ],
+      "summary": {
+        "cases": 58,
+        "max_latency_ms": 28.362,
+        "median_latency_ms": 15.052,
+        "mrr": 0.8175,
+        "recall_at_4": 0.9655,
+        "top1": 0.7069
+      }
+    },
+    "hybrid": {
+      "rows": [
+        {
+          "error": null,
+          "hit": false,
+          "id": "sidechain-bass-disappears",
+          "latency_ms": 5.895,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "sidechain-release-time",
+          "latency_ms": 16.883,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "sidechain-pumping-attack-release",
+          "latency_ms": 15.736,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "streaming-loudness",
+          "latency_ms": 4.091,
+          "rank": 4
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "client-stem-handoff",
+          "latency_ms": 13.377,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "reference-track-level-match",
+          "latency_ms": 13.269,
+          "rank": 8
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "group-bus-workflow",
+          "latency_ms": 9.91,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "filter-cutoff-automation",
+          "latency_ms": 8.7,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mixing-chain-order",
+          "latency_ms": 8.506,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "arrangement-energy-transitions",
+          "latency_ms": 13.552,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-deessing",
+          "latency_ms": 9.714,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "reverb-delay-depth-mud",
+          "latency_ms": 17.35,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "phase-polarity-mono",
+          "latency_ms": 5.973,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "drum-parallel-compression",
+          "latency_ms": 6.781,
+          "rank": 8
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mastering-prep-headroom",
+          "latency_ms": 4.434,
+          "rank": 4
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "noise-cleanup-room-tone",
+          "latency_ms": 3.57,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "next-step-mix-diagnosis",
+          "latency_ms": 8.662,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "eq-before-after-compression",
+          "latency_ms": 14.761,
+          "rank": 9
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "mix-bus-compression-before-after-eq",
+          "latency_ms": 16.039,
+          "rank": 9
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "spectral-reference-slope",
+          "latency_ms": 7.059,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-width-without-mud",
+          "latency_ms": 21.636,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-width-without-mud-feedback-phrasing",
+          "latency_ms": 7.708,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "stereo-width-mono",
+          "latency_ms": 14.819,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-depth-delay-reverb",
+          "latency_ms": 11.782,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "kick-bass-balance-phase",
+          "latency_ms": 13.527,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "drum-punch-transients",
+          "latency_ms": 12.026,
+          "rank": 4
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "thin-vocal-body",
+          "latency_ms": 14.462,
+          "rank": 10
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "harsh-vocal-fix",
+          "latency_ms": 9.998,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "boxy-vocal-correction",
+          "latency_ms": 3.862,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "boxy-vocal-not-drum-parallel",
+          "latency_ms": 11.126,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mix-translation-checks",
+          "latency_ms": 14.226,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "operator-fm-bass",
+          "latency_ms": 4.482,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "arrangement-view-shortcuts",
+          "latency_ms": 12.488,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "groove-pool-quantization",
+          "latency_ms": 12.009,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "client-preview-mp3-export",
+          "latency_ms": 13.376,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mastering-stereo-width-checks",
+          "latency_ms": 6.951,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-tuning-comping-workflow",
+          "latency_ms": 5.491,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "vocal-doubles-adlibs-throws",
+          "latency_ms": 15.637,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "drum-layering-kick-snare",
+          "latency_ms": 7.177,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "drum-bus-saturation-transients",
+          "latency_ms": 15.636,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "arrangement-build-ups-drops-tension",
+          "latency_ms": 12.466,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mix-review-metrics-interpretation",
+          "latency_ms": 9.301,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mode-mastering-safety",
+          "latency_ms": 5.817,
+          "rank": 3
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mode-mix-diagnosis",
+          "latency_ms": 9.293,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "adversarial-typo-sidechain",
+          "latency_ms": 8.142,
+          "rank": 9
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "ambiguous-lufs-target",
+          "latency_ms": 4.325,
+          "rank": 8
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "mono-risk-haas-vocal-width",
+          "latency_ms": 10.474,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "feedback-08bb6907-how-do-i-fix-boxy-vocals",
+          "latency_ms": 3.831,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "feedback-8d9abea4-how-do-i-make-vocals-wide-without-mud",
+          "latency_ms": 7.528,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "feedback-da456d17-how-do-i-make-vocals-wide-without-mud",
+          "latency_ms": 7.411,
+          "rank": 1
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "bass-compression-not-vocals",
+          "latency_ms": 5.685,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "warp-mode-transient-smearing",
+          "latency_ms": 5.737,
+          "rank": 8
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "ambiguity-harsh-thin-vocal-recording-vs-mix",
+          "latency_ms": 12.638,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "ambiguity-harsh-vocal-nothing-on-it",
+          "latency_ms": 10.514,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "ambiguity-thin-vocal-eq-vs-recording",
+          "latency_ms": 16.962,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": false,
+          "id": "diagnosis-vocal-buried-in-mix",
+          "latency_ms": 11.251,
+          "rank": null
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "subjective-mix-lacks-depth",
+          "latency_ms": 16.497,
+          "rank": 2
+        },
+        {
+          "error": null,
+          "hit": true,
+          "id": "objective-clipping-not-a-style-choice",
+          "latency_ms": 2.265,
+          "rank": 2
+        }
+      ],
+      "summary": {
+        "cases": 58,
+        "max_latency_ms": 21.636,
+        "median_latency_ms": 9.954,
+        "mrr": 0.4399,
+        "recall_at_4": 0.6379,
+        "top1": 0.2759
+      }
+    }
+  },
+  "privacy": {
+    "stores_questions": false,
+    "stores_source_text": false
+  },
+  "schema": "kenn.retrieval_mode_comparison.v1"
+}

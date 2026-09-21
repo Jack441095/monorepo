@@ -1,0 +1,33 @@
+{
+  "schema": "kenn.audit.before_after.v1",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "dirty_worktree": true,
+  "host": {"os": "macOS 27.0", "arch": "arm64", "cpu": "Apple M3", "memory_bytes": 17179869184, "python": "3.13.7"},
+  "build": {"native": "Release C++20 AppleClang 21.0.0 with Accelerate/nanobind", "reference": "Python stdlib/NumPy reference"},
+  "method": {"warmups": 3, "repetitions": 10, "workers": 4, "include_ltas": true},
+  "synthetic_48khz_10s": {
+    "input_sha256": "04a5f27a0831e49e5fb04900eccb41f56abbf5b2250baf0a89020cb40817224e",
+    "reference_ms": {"p50": 440.133, "p95": 444.122, "p99": 445.203},
+    "native_ms": {"p50": 43.830, "p95": 111.735, "p99": 114.300},
+    "speedup": {"p50": 10.0418, "p95": 3.9748, "p99": 3.8950}
+  },
+  "real_24bit_44khz_8_82s": {
+    "input_sha256": "09cc99f54986265e9448b374e7b959d3d6c979d4e84ece8dbfa54d8ce2c6b272",
+    "reference_ms": {"p50": 475.969, "p95": 507.688, "p99": 508.346},
+    "native_ms": {"p50": 8.300, "p95": 8.659, "p99": 8.707},
+    "speedup_p50": 57.3457
+  },
+  "memory": {"reference_peak_rss_bytes": 213057536, "native_peak_rss_bytes": 54149120, "reduction_percent": 74.5847},
+  "concurrency": {"reference_ms": 1767.952, "native_ms": 112.385, "speedup": 15.7312},
+  "mix_review": {"reference_p50_ms": 165.780, "native_p50_ms": 146.338, "speedup": 1.1329, "parity": true, "decision": "keep opt-in"},
+  "parity": {"native_smoke": "passed", "backend_suite": "1275 passed, 12 skipped", "native_input_copied": false},
+  "receipts": [
+    "kenn_audit_audio_reference_2026-09-21.json",
+    "kenn_audit_audio_native_2026-09-21.json",
+    "kenn_audit_real_asset_reference_2026-09-21.json",
+    "kenn_audit_real_asset_native_2026-09-21.json",
+    "kenn_audit_mix_review_native_2026-09-21.json",
+    "kenn_audit_native_kernels_2026-09-21.json"
+  ],
+  "limitations": ["Separate-process RSS is not an allocation trace.", "Synthetic fixtures are not perceptual evidence.", "Real Live, model-provider, AudioGen and SLO end-to-end latency were not available."]
+}

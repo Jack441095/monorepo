@@ -24,4 +24,3 @@ This template defines the standard 5-track Ableton Live 12 layout used for the o
 5. **Track 5: MIDI Composer** (`Empty MIDI Track`)
    - Empty clip slots.
    - Purpose: Demonstrates KENN Generative MIDI tools (16-step Euclidean rhythms and diatonic chord progressions created directly into Live 12 clip slots).
-

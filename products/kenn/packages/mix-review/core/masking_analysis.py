@@ -127,8 +127,33 @@ def _mono_from_wav(payload: bytes) -> tuple[Any, int]:
     return mono, framerate
 
 
-def _band_energy_over_time(signal: Any, framerate: int) -> Any:
+def _native_band_energy(signal: Any, framerate: int) -> tuple[Any, str] | None:
+    """Use the optional KENN native kernel when it is loadable."""
+    try:
+        from kenn.core import native_fft
+
+        result = native_fft.masking_band_energy(
+            signal,
+            framerate,
+            fft_size=FFT_WINDOW,
+            hop=FFT_HOP,
+        )
+    except (AttributeError, ImportError, OSError, RuntimeError, TypeError, ValueError):
+        return None
+    if not result or "energy" not in result:
+        return None
+    return (
+        _np.asarray(result["energy"], dtype=float),
+        str(result.get("backend") or "cpp-native"),
+    )
+
+
+def _band_energy_over_time_with_backend(signal: Any, framerate: int) -> tuple[Any, str]:
     """Return an (n_frames, n_bands) array of per-band RMS magnitude."""
+    native = _native_band_energy(signal, framerate)
+    if native is not None:
+        return native
+
     n_frames = 1 + max(0, (len(signal) - FFT_WINDOW) // FFT_HOP)
     freqs = _np.fft.rfftfreq(FFT_WINDOW, 1.0 / framerate)
     band_index = [
@@ -143,7 +168,12 @@ def _band_energy_over_time(signal: Any, framerate: int) -> Any:
         spectrum = _np.abs(_np.fft.rfft(frame * window))
         for band, idx in enumerate(band_index):
             out[i, band] = float(_np.sqrt(_np.mean(spectrum[idx] ** 2))) if len(idx) else 0.0
-    return out
+    return out, "python-numpy-reference"
+
+
+def _band_energy_over_time(signal: Any, framerate: int) -> Any:
+    """Return an (n_frames, n_bands) array of per-band RMS magnitude."""
+    return _band_energy_over_time_with_backend(signal, framerate)[0]
 
 
 def _to_dbfs(magnitude: Any) -> Any:
@@ -210,7 +240,13 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
         }
     truncated_labels = [label for label, (mono, _fr) in decoded.items() if len(mono) > shortest]
 
-    band_energy = {label: _band_energy_over_time(mono[:shortest], framerate) for label, (mono, _fr) in decoded.items()}
+    band_energy_with_backend = {
+        label: _band_energy_over_time_with_backend(mono[:shortest], framerate)
+        for label, (mono, _fr) in decoded.items()
+    }
+    band_energy = {label: item[0] for label, item in band_energy_with_backend.items()}
+    implementations = {item[1] for item in band_energy_with_backend.values()}
+    implementation = implementations.pop() if len(implementations) == 1 else "mixed"
     band_energy_db = {label: _to_dbfs(energy) for label, energy in band_energy.items()}
 
     findings: list[dict[str, Any]] = []
@@ -273,6 +309,7 @@ def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
         "analyzed_seconds": round(overlap_seconds, 2),
         "truncated_stems": truncated_labels,
         "bands": [{"name": name, "low_hz": lo, "high_hz": hi} for name, lo, hi in MASKING_BANDS],
+        "implementation": implementation,
         "findings": findings,
         "limitations": limitations,
         "evidence": _evidence_packet(

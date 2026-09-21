@@ -1,0 +1,27 @@
+{
+  "run_date": "2026-09-20",
+  "candidate": "temporary-zero-lag-pearson-cpp",
+  "source_fixture_root": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out",
+  "cases": [
+    {
+      "fixture": "dream_of_you/mixdown_v1.wav",
+      "sha256": "caf45abc11440f01c40a8f200b850de486650247ee466df7d351087c7ea56c75",
+      "duration_seconds": 80.842132,
+      "python_ms": 3566.103,
+      "native_ms": 3243.985,
+      "improvement_percent": 9.027715371840388
+    },
+    {
+      "fixture": "ae_mere_humsafar/mixdown_v1.wav",
+      "sha256": "1aff8ca03a9c6aa535ed217db42ea8955bccbf04975306cd3f42c23ae09e8c5c",
+      "duration_seconds": 263.896939,
+      "python_ms": 11811.109,
+      "native_ms": 10617.583,
+      "improvement_percent": 10.105778154587782
+    }
+  ],
+  "complete_request_gate_percent": 25.0,
+  "decision": "no-go",
+  "production_flag_added": false,
+  "reference_duplicate_correlation_call_removed": true
+}

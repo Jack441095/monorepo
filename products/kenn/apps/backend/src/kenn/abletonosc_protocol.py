@@ -11,6 +11,10 @@ import math
 import struct
 from typing import Any
 
+MAX_OSC_PACKET_BYTES = 65_507
+MAX_OSC_BUNDLE_DEPTH = 8
+MAX_OSC_ELEMENTS = 4096
+
 
 class OSCProtocolError(ValueError):
     """Raised when an OSC datagram cannot be decoded safely."""
@@ -99,8 +103,17 @@ def _decode_message(data: bytes) -> tuple[str, list[Any]]:
     return address, values
 
 
-def decode_packet(data: bytes) -> list[tuple[str, list[Any]]]:
-    """Decode an OSC message or bundle into address/argument pairs."""
+def _decode_packet(
+    data: bytes,
+    *,
+    depth: int,
+    state: dict[str, int],
+) -> list[tuple[str, list[Any]]]:
+    if depth > MAX_OSC_BUNDLE_DEPTH:
+        raise OSCProtocolError(f"OSC bundle nesting exceeds {MAX_OSC_BUNDLE_DEPTH}")
+    state["elements"] += 1
+    if state["elements"] > MAX_OSC_ELEMENTS:
+        raise OSCProtocolError(f"OSC packet contains more than {MAX_OSC_ELEMENTS} elements")
     if data.startswith(b"#bundle\x00"):
         if len(data) < 16:
             raise OSCProtocolError("OSC bundle is truncated")
@@ -113,10 +126,28 @@ def decode_packet(data: bytes) -> list[tuple[str, list[Any]]]:
             offset += 4
             if size < 0 or offset + size > len(data):
                 raise OSCProtocolError("OSC bundle element is truncated")
-            messages.extend(decode_packet(data[offset : offset + size]))
+            messages.extend(_decode_packet(data[offset : offset + size], depth=depth + 1, state=state))
             offset += size
         return messages
     return [_decode_message(data)]
 
 
-__all__ = ["OSCProtocolError", "decode_packet", "encode_message"]
+def decode_packet(data: bytes) -> list[tuple[str, list[Any]]]:
+    """Decode one bounded OSC message or bundle into address/argument pairs."""
+    if not isinstance(data, bytes):
+        raise OSCProtocolError("OSC packet must be bytes")
+    if not data:
+        raise OSCProtocolError("OSC packet is empty")
+    if len(data) > MAX_OSC_PACKET_BYTES:
+        raise OSCProtocolError(f"OSC packet exceeds {MAX_OSC_PACKET_BYTES} bytes")
+    return _decode_packet(data, depth=0, state={"elements": 0})
+
+
+__all__ = [
+    "MAX_OSC_BUNDLE_DEPTH",
+    "MAX_OSC_ELEMENTS",
+    "MAX_OSC_PACKET_BYTES",
+    "OSCProtocolError",
+    "decode_packet",
+    "encode_message",
+]

@@ -157,4 +157,3 @@ def test_live_meter_fusion(mock_clashing_session):
     baseline = loop.capture_baseline("test-sess", mock_clashing_session, meters=mock_meters)
     assert baseline.track_energies[0] == [0.5] * 40
     assert baseline.track_energies[1] == [0.2] * 40
-

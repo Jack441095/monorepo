@@ -1,0 +1,43 @@
+{
+  "task": "chat optimization pass",
+  "date": "2026-09-21",
+  "environment": {
+    "python": "3.13",
+    "llm": "disabled",
+    "embedding_index": "missing; BM25 fallback",
+    "queries": 4,
+    "iterations": 60
+  },
+  "baseline_after_cache_only": {
+    "p50_ms": 28.271417,
+    "p95_ms": 40.405334,
+    "source_digest": "3a3d7eb2cef08ea9"
+  },
+  "optimized": {
+    "p50_ms": 14.837333,
+    "p95_ms": 30.320501,
+    "source_digest": "3a3d7eb2cef08ea9"
+  },
+  "improvement": {
+    "p50_percent": 47.5,
+    "p95_percent": 25.0,
+    "retrieval_source_parity": true
+  },
+  "changes": [
+    "Bounded immutable caches for tokenization, query-topic classification, and normalized terms.",
+    "Batched per-answer citation trust updates in one SQLite transaction."
+  ],
+  "validation": {
+    "focused_tests": "11 passed",
+    "chat_and_retrieval_suite": "82 passed, 2 pre-existing evaluation failures",
+    "compileall": "passed",
+    "git_diff_check": "passed"
+  },
+  "known_baseline_failures": [
+    "bass-processing missing answer term sidechain",
+    "reverb-send missing answer term return",
+    "group-bus-workflow missing expected source",
+    "wwise-mobile-ambience-memory abstention mismatch"
+  ],
+  "native_decision": "No C++ retrieval path added: the active chat workload is small-string ranking and SQLite bookkeeping; measured wins came from process-local caching and batched persistence, while the embedding index is unavailable for a quality-safe native candidate."
+}

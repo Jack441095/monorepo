@@ -14,7 +14,7 @@ mkdir -p "${USER_AGENTS_DIR}"
 launchctl bootout "gui/${UID_NUM}/com.shenrendao.kenn.companion" 2>/dev/null || true
 
 sed \
-  -e "s#<KENN_REPO_ROOT>#${PRODUCT_ROOT}#g" \
+  -e "s#<WORKSPACE_ROOT>/Nite-DSP-Operations/Shenrendao/KENN#${PRODUCT_ROOT}#g" \
   -e "s#<USER_HOME>#${HOME}#g" \
   "${PLIST_SRC}" > "${TARGET_PLIST}"
 echo "[*] Installed plist to: ${TARGET_PLIST}"

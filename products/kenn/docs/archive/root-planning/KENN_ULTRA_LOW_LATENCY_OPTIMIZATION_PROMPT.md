@@ -150,4 +150,3 @@ VERIFICATION & BENCHMARK SUITE:
    Run: `pytest apps/backend/src/kenn/tests/ -v`
    Ensure all 40/40 Ableton capabilities, safety guardrails, and grounding tests pass 100%.
 ================================================================================
-

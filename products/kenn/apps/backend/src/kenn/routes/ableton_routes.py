@@ -61,4 +61,3 @@ def handle_ableton_capabilities(live_client: Any | None) -> tuple[int, dict[str,
             "verified_features": {},
             "supported_parameters": {},
         }
-

@@ -215,4 +215,3 @@ def build_acoustic_guidance_prompt(query: str) -> str:
             f"- '{r.descriptor}': Target ~{freq_str} ({r.filter_type}, {gain_str} {q_str}). {r.explanation}"
         )
     return "\n".join(lines)
-

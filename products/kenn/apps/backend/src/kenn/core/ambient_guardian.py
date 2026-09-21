@@ -147,4 +147,3 @@ def get_ambient_guardian() -> AmbientStudioGuardian:
     if _guardian is None:
         _guardian = AmbientStudioGuardian()
     return _guardian
-

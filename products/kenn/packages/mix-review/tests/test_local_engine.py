@@ -440,5 +440,3 @@ def test_extensible_wav_format_supported() -> None:
     report = local_engine.analyze_wav(payload, filename="extensible.wav")
     assert report["ok"] is True
     assert report["metrics"]["peak_dbfs"] is not None
-
-

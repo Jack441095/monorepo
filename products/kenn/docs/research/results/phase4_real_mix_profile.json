@@ -1,0 +1,33 @@
+{
+  "schema": "kenn.dsp.real_mix_profile.v1",
+  "status": "prioritization-only",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "source_state": "working-tree changes on top of source_revision",
+  "fixture": "testing-assets/_automix_out/ae_mere_humsafar/mixdown_v1.wav",
+  "fixture_bytes": 69827174,
+  "environment": {
+    "native": "disabled",
+    "system": "macOS",
+    "architecture": "arm64",
+    "python": "3.13"
+  },
+  "complete_request_ms": 54668.87,
+  "profiled_python_calls": 267953925,
+  "stages": {
+    "decode": {"exclusive_ms": 8209.0, "cumulative_ms": 10316.0},
+    "rms": {"calls": 9, "cumulative_ms": 8234.0},
+    "correlation": {"exclusive_ms": 114.0, "cumulative_ms": 7874.0},
+    "spectral_measurement": {"exclusive_ms": 24.0, "cumulative_ms": 187.0},
+    "fft": {"calls": 4, "exclusive_ms": 130.0, "cumulative_ms": 130.0}
+  },
+  "interpretation": {
+    "next_native_target": "PCM decode plus bulk channel statistics/correlation",
+    "fft_is_current_bottleneck": false,
+    "reason": "The complete request spends far more time in Python decode and per-sample summary loops than in FFT after the native spectral slice."
+  },
+  "limitations": [
+    "This is one representative supplied mix and cProfile adds observer overhead.",
+    "The supplied asset manifest remains TODO-vendor-pack and is internal evidence only.",
+    "The next target requires a separate parity and complete-corpus benchmark before promotion."
+  ]
+}

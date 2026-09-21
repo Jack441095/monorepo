@@ -13,6 +13,18 @@ def test_fastapi_health():
     assert data["status"] == "ok"
     assert data["service"] == "kenn"
     assert "Ableton Live" in data["daw"]
+    retrieval = data["subsystems"]["retrieval"]
+    assert retrieval["schema"] == "kenn.retrieval_status.v1"
+    assert retrieval["active_mode"] in {"unavailable", "bm25_only", "hybrid"}
+
+
+def test_fastapi_cors_allows_local_frontend_only():
+    allowed = client.get("/api/health", headers={"Origin": "http://127.0.0.1:5173"})
+    assert allowed.headers["access-control-allow-origin"] == "http://127.0.0.1:5173"
+
+    untrusted = client.get("/api/health", headers={"Origin": "https://untrusted.example"})
+    assert "access-control-allow-origin" not in untrusted.headers
+    assert "access-control-allow-credentials" not in untrusted.headers
 
 
 def test_fastapi_openapi_spec():

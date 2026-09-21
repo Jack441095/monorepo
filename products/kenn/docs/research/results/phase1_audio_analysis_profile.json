@@ -1,0 +1,46 @@
+{
+  "schema": "kenn.dsp_profile.v1",
+  "source_revision": "ffea0c7c970172dd6bf2afd78142f475c41198e4",
+  "candidate": "python-stdlib-reference",
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "fixture": {
+    "generator": "deterministic 440 Hz mono PCM16 WAV",
+    "seconds": 2.0,
+    "sample_rate_hz": 48000,
+    "bytes": 192044
+  },
+  "repeats": 5,
+  "total_profiled_ms": 1002.32,
+  "stages": {
+    "analyze_wav": {
+      "calls": 5,
+      "exclusive_ms": 100.34,
+      "cumulative_ms": 1002.32
+    },
+    "_decode": {
+      "calls": 5,
+      "exclusive_ms": 52.639,
+      "cumulative_ms": 74.603
+    },
+    "_spectral_measurement": {
+      "calls": 5,
+      "exclusive_ms": 66.389,
+      "cumulative_ms": 485.918
+    },
+    "_fft": {
+      "calls": 20,
+      "exclusive_ms": 370.959,
+      "cumulative_ms": 371.001
+    }
+  },
+  "dominant_stage": "_fft",
+  "native_poc_candidate": "fft",
+  "interpretation": "The FFT is the first native POC candidate: it is the largest exclusive hot function inside spectral measurement. cProfile stage totals overlap by design, so complete-request benchmarks remain the adoption gate."
+}

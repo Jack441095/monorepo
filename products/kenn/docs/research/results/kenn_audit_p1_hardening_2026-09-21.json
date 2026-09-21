@@ -1,0 +1,33 @@
+{
+  "schema": "kenn.audit.p1_hardening.v1",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "dirty_worktree": true,
+  "platform": {"os": "macOS 27.0", "architecture": "arm64", "cpu": "Apple M3"},
+  "changes": [
+    "bounded generative MIDI input and output validation",
+    "repaired frontend MIDI groove and bassline handler contracts",
+    "ambiguous AbletonOSC batch replies fail closed",
+    "fresh topology and mutation snapshots",
+    "bounded OSC packet, bundle depth, and element decoding",
+    "bounded fail-closed confirmation replay registry",
+    "client-disconnect-safe HTTP body and stream writes"
+  ],
+  "verification": {
+    "backend_full": {"passed": 1275, "skipped": 12, "failed": 0, "seconds": 69.25},
+    "p1_plus_server_smoke": {"passed": 49, "failed": 0, "seconds": 4.82},
+    "transport_and_action_focus": {"passed": 87, "failed": 0, "seconds": 33.07},
+    "frontend_vitest": {"files_passed": 1, "tests_passed": 5, "failed": 0},
+    "frontend_build": {"status": "passed", "modules_transformed": 131},
+    "python_compileall": "passed"
+  },
+  "frontend_runtime": {
+    "node": "/Users/Ganders4/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "node_version": "v24.19.0",
+    "node_architecture": "arm64"
+  },
+  "limitations": [
+    "Ableton Live and AbletonOSC remained offline, so transport fixes are qualified by simulation rather than a real Live set.",
+    "Frontend used existing node_modules; clean npm ci and browser E2E remain release gates.",
+    "The repository was already dirty and most canonical KENN source remains untracked."
+  ]
+}

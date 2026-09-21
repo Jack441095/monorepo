@@ -592,4 +592,3 @@ def set_plugin_parameters(session_id: str, updates: dict[str, Any]) -> dict[str,
         "parameters": applied,
         "message": f"Parameters {list(applied.keys())} queued for host synchronization.",
     }
-

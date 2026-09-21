@@ -10,6 +10,7 @@ from kenn.knowledge.reasoning import (
 from kenn.knowledge.trust_scores import (
     get_source_trust,
     record_citation,
+    record_citations,
     record_correction,
     set_source_trust,
     list_source_trust,
@@ -31,6 +32,3 @@ from kenn.knowledge.maintenance_scheduler import (
     run_scheduled_maintenance,
     list_maintenance_runs,
 )
-
-
-

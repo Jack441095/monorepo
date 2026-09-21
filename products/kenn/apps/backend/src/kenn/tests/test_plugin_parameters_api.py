@@ -87,4 +87,3 @@ def test_batch_set_plugin_parameters():
     popped = pop_pending_parameter_updates(session_id)
     assert popped["pending_updates"]["target_lufs"] == -16.0
     assert popped["pending_updates"]["assistant_mode"] == "auto"
-

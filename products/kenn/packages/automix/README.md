@@ -41,4 +41,3 @@ receipt = run_approved_local_automix(
 
 Without `approved=True`, the adapter returns an `awaiting_human_approval`
 receipt and does not call the engine.
-

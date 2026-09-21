@@ -1,31 +1,43 @@
-# KENN product boundary
+# KENN
 
-This directory is the canonical, single-repository KENN product. The active
-UX/backend/plugin implementation is organized by product responsibility; the
-pre-existing monorepo runtime is retained under `runtime/legacy/` for audited
-compatibility work while callers are migrated to the active backend.
+`products/kenn` is the canonical KENN product boundary in this monorepo. The
+active implementation is self-contained here; the former `Audio_Too` tree is a
+preserved reference only and is not a runtime dependency.
 
 ## Canonical layout
 
-- `apps/backend/` — active Python backend and SLO classification hook.
-- `apps/frontend/` — active Vue/TypeScript UX.
-- `apps/desktop/` and `apps/legacy-web/` — desktop and served-web surfaces.
-- `packages/` — chat, mix-review, automix, and shared packages.
-- `plugins/` and `integrations/` — VST3/AU and Ableton boundaries.
-- `tooling/` — build, evaluation, and verification scripts.
-- `docs/` — architecture, handoff, runbooks, and product documentation.
-- `runtime/legacy/` — preserved historical runtime and tests; do not add new
-  active product code here without recording a migration decision.
+- `apps/backend/src/kenn/` — active Python backend, analysis, retrieval, and
+  SLO integration;
+- `apps/frontend/` — active web UI;
+- `apps/desktop/` — desktop companion sources;
+- `packages/chat/`, `packages/mix-review/`, and `packages/automix/` — product
+  boundaries and local contracts;
+- `plugins/kenn-vst3-au/` — JUCE VST3/AU source;
+- `packages/common/` — shared native headers and evidence schema;
+- `tooling/` — benchmarks, evaluation, and verification;
+- `runtime/legacy/` — preserved compatibility runtime; do not add new active
+  code there without a migration decision;
+- `docs/` — architecture, research, beta, and handoff documentation.
 
-The active backend import root is `apps/backend/src/kenn`. Backend ownership
-and migration rules are recorded in `BACKEND_OWNERSHIP.md`.
+The compatibility links `source/` and `vst3-plugin/` point into these active
+paths so older local commands fail clearly or continue to resolve without
+depending on `Audio_Too`.
 
 ## Data boundary
 
-Only reviewed, tracked source and documentation belong here. Keep credentials,
-local databases, generated indexes, build output, model weights, agent
-metadata, and unreviewed/licensed corpora local.
+Only reviewed source and documentation belong in the canonical product tree.
+Keep credentials, local databases, generated indexes, model weights, build
+output, and unreviewed/licensed corpora out of the active source boundary.
 
-This cleanup is reviewed on `cleanup/kenn-final-organization`; `main` remains
-unchanged until the CI and ownership review are complete. The former focused
-repository remains preserved separately as a rollback/reference point.
+See `BACKEND_OWNERSHIP.md` for the single active import root and reconciliation
+rules.
+
+## Native DSP status
+
+The C++/nanobind spectral path is available behind `KENN_DSP_NATIVE=1` and
+remains opt-in because the refreshed supplied eight-mix corpus measured
+`0.98962x`
+end-to-end versus Python. Historical AutoMix kernels have been recovered as a
+standalone archive for requalification, but are not yet wired into the active
+worker. Evidence and next gates are tracked in
+`docs/research/CPP_DSP_PHASE4_RELEASE_QUALIFICATION.md`.

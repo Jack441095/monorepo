@@ -180,7 +180,7 @@ def warm_index() -> None:
             print("  [✓] CoreML ONNX embedding graph compiled & pre-warmed.")
     except Exception as exc:
         print(f"  WARNING: embedding index/model warm-up failed ({exc!r}) -- "
-              f"retrieval will silently fall back to BM25-only for this process's lifetime")
+              f"retrieval mode is explicitly BM25-only for this process's lifetime")
 
 
 def route_memory_cache_key() -> tuple[str, int, int]:
@@ -352,7 +352,8 @@ def has_manual_subject_overlap(query: str, chunk: dict) -> bool:
     return any(re.search(rf"\b{re.escape(term)}\b", body) for term in subject_terms)
 
 
-def normalized_terms(text: str) -> set[str]:
+@lru_cache(maxsize=4096)
+def _normalized_terms_cached(text: str) -> frozenset[str]:
     terms = set(tokenize(text))
     out = set(terms)
     for term in terms:
@@ -366,7 +367,12 @@ def normalized_terms(text: str) -> set[str]:
             out.add(term[:-2])
         if len(term) > 3 and term.endswith("s"):
             out.add(term[:-1])
-    return out
+    return frozenset(out)
+
+
+def normalized_terms(text: str) -> set[str]:
+    """Return normalized lexical terms with a bounded process-local cache."""
+    return set(_normalized_terms_cached(str(text)))
 
 
 def chunk_search_terms(chunk: dict) -> set[str]:
@@ -375,16 +381,16 @@ def chunk_search_terms(chunk: dict) -> set[str]:
         if chunk.get("tags")
         else " ".join(extract_tags(chunk.get("text", "")))
     )
-    return normalized_terms(
+    return set(_normalized_terms_cached(
         " ".join(str(chunk.get(key, "")) for key in ("title", "source", "text") if chunk.get(key))
         + " "
         + tag_text
-    )
+    ))
 
 
 def query_intent_terms(query: str) -> set[str]:
     """Important exact-intent words that should be visible in matched notes."""
-    terms = normalized_terms(query)
+    terms = _normalized_terms_cached(str(query))
     topics = set(query_topics(query))
     guarded: set[str] = set()
     for topic in topics:
@@ -394,14 +400,14 @@ def query_intent_terms(query: str) -> set[str]:
 
 def note_query_affinity(query: str, chunk: dict) -> int:
     """Prefer notes whose title/tags match the user's exact words, not just broad topics."""
-    query_terms = normalized_terms(query)
+    query_terms = _normalized_terms_cached(str(query))
     if not query_terms:
         return 0
-    title_terms = normalized_terms(f"{chunk.get('title', '')} {chunk.get('source', '')}")
+    title_terms = _normalized_terms_cached(f"{chunk.get('title', '')} {chunk.get('source', '')}")
     tag_terms: set[str] = set()
     tags = chunk["tags"] if chunk.get("tags") else extract_tags(chunk.get("text", ""))
     for tag in tags:
-        tag_terms.update(normalized_terms(tag))
+        tag_terms.update(_normalized_terms_cached(str(tag)))
     title_hits = query_terms & title_terms
     tag_hits = query_terms & tag_terms
     score = (3 * len(title_hits)) + (2 * len(tag_hits))
@@ -410,7 +416,7 @@ def note_query_affinity(query: str, chunk: dict) -> int:
     # example, "converter", "fader", or "chord voicing"). Add a bounded body
     # contribution so a directly answering note can outrank a broadly related
     # workflow without allowing long notes to dominate by repetition.
-    body_terms = normalized_terms(str(chunk.get("text") or ""))
+    body_terms = _normalized_terms_cached(str(chunk.get("text") or ""))
     body_hits = query_terms & body_terms
     score += min(8, len(body_hits))
     query_lower = query.lower()

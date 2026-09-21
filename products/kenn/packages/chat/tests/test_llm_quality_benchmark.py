@@ -129,4 +129,3 @@ def test_llm_system_prompt_benchmark():
     print("=" * 80)
 
     assert passed == total
-

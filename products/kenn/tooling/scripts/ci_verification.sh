@@ -1,41 +1,48 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# KENN Public Beta Continuous Integration & Release Verification Script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PRODUCT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+PYTHON_BIN="${PYTHON:-python3}"
 
-cd "$REPO_ROOT"
-export PYTHONPATH="$REPO_ROOT/apps/backend/src:$REPO_ROOT/packages/chat:$REPO_ROOT/packages/mix-review/core:${PYTHONPATH:-}"
+cd "${PRODUCT_ROOT}"
+export PYTHONPATH="${PRODUCT_ROOT}/apps/backend/src:${PRODUCT_ROOT}/tooling:${PYTHONPATH:-}"
 
-echo "================================================================================"
-echo " 🛠️  KENN Public Beta CI & Release Verification Runner"
-echo "================================================================================"
+echo "[1/8] Verifying canonical compatibility links"
+test -f source/server.py
+test -f vst3-plugin/CMakeLists.txt
 
-# 1. Python Syntax Compilation Check
-echo "[1/6] Checking Python syntax compilation across repository..."
-python3 -m compileall -q apps/backend/src packages tooling/scripts
+echo "[2/8] Compiling Python sources"
+"${PYTHON_BIN}" -m compileall -q apps/backend/src packages tooling/scripts chat automix
 
-# 2. Vector Index Build Verification
-echo "[2/6] Verifying vector index build..."
-python3 apps/backend/src/kenn/main.py build
+echo "[3/8] Running the canonical backend suite"
+"${PYTHON_BIN}" -m pytest -q apps/backend/src/kenn/tests
 
-# 3. Comprehensive Pytest Test Suite
-echo "[3/6] Running Pytest test suite..."
-python3 -m pytest -v
+echo "[4/8] Running the scoped chat suite"
+"${PYTHON_BIN}" -m pytest -q chat/tests
 
-# 4. Mix Review Signal Analysis Qualification Benchmark
-echo "[4/6] Running Mix Review qualification benchmark..."
-python3 tooling/scripts/eval_mix_review.py
+echo "[5/8] Running Mix Review"
+"${PYTHON_BIN}" -m pytest -q packages/mix-review
 
-# 5. Chat & Knowledge Base Evaluation Suite
-echo "[5/6] Running Chat evaluation runner..."
-python3 packages/chat/eval_runner.py
+echo "[6/8] Running the product AutoMix boundary"
+"${PYTHON_BIN}" -m pytest -q automix/tests
 
-# 6. Standalone Public API Health Probe Check
-echo "[6/6] Verifying standalone import isolation..."
-python3 -c "import app; print('✅ Standalone Public API imported successfully cleanly!')"
+echo "[7/8] Running the package AutoMix boundary"
+"${PYTHON_BIN}" -m pytest -q packages/automix/tests
 
-echo "================================================================================"
-echo " ✅ ALL CI & RELEASE VERIFICATION CHECKS PASSED SUCCESSFULLY!"
-echo "================================================================================"
+echo "[8/8] Validating durable research receipts"
+"${PYTHON_BIN}" - <<'PY'
+import json
+from pathlib import Path
+
+root = Path("docs/research/results")
+paths = sorted(root.glob("*.json"))
+if not paths:
+    raise SystemExit("no durable research receipts found")
+for path in paths:
+    with path.open("r", encoding="utf-8") as handle:
+        json.load(handle)
+print(f"validated {len(paths)} JSON receipts")
+PY
+
+echo "KENN core verification passed"

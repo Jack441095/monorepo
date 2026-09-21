@@ -214,9 +214,9 @@ def _valid_digest(value: str) -> bool:
 
 def _finish_idempotency(key: str) -> None:
     with _ACTION_LOCK:
+        prune_if_needed(_USED_IDEMPOTENCY_KEYS)
         _USED_IDEMPOTENCY_KEYS.add(key)
         _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
-        prune_if_needed(_USED_IDEMPOTENCY_KEYS)
 
 
 def _reserve_idempotency(key: str) -> bool:
@@ -286,6 +286,12 @@ class MidiClipActionService:
         canonical, error = _canonical_notes(notes)
         if error or canonical is None:
             return {"ok": False, "error": error or "invalid MIDI notes"}
+        for offset, note in enumerate(canonical):
+            if note["start_time"] + note["duration"] > length + 1e-9:
+                return {
+                    "ok": False,
+                    "error": f"note {offset} extends beyond the {length:g}-beat clip length",
+                }
         digest = _text(source_artifact_sha256, 128).lower()
         if digest and not _valid_digest(digest):
             return {"ok": False, "error": "source_artifact_sha256 must be sha256: plus 64 hexadecimal characters"}
@@ -989,4 +995,3 @@ __all__ = [
     "NOTE_NAME_TO_INT",
     "INT_TO_NOTE_NAME",
 ]
-

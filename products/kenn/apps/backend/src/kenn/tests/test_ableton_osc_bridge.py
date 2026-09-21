@@ -1103,4 +1103,3 @@ def test_watchdog_background_thread() -> None:
         client.close()
         stop.set()
         thread.join(timeout=3)
-

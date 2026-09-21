@@ -1,0 +1,34 @@
+{
+  "schema": "kenn.dsp_peak_report_benchmark.v1",
+  "run_date": "2026-09-21",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "source_state": "working-tree changes on top of source_revision",
+  "fixture": {
+    "generator": "deterministic 440 Hz mono PCM16 WAV",
+    "seconds": 10.0,
+    "sample_rate_hz": 48000,
+    "repeats": 5,
+    "workers": 2
+  },
+  "native": {
+    "implementation": "cpp-accelerate",
+    "samples_ms": [35.285, 4.061, 4.06, 3.957, 3.967],
+    "p50_ms": 4.06,
+    "mean_ms": 10.266,
+    "dominant_peak_python_calls": 0
+  },
+  "reference": {
+    "implementation": "python-reference",
+    "samples_ms": [241.548, 243.165, 241.981, 244.677, 239.003],
+    "p50_ms": 241.981,
+    "mean_ms": 242.075,
+    "dominant_peak_python_calls": 25
+  },
+  "parity": {
+    "metrics": "exact",
+    "findings": "exact",
+    "dominant_peaks": "exact",
+    "localized_peaks": "exact",
+    "ltas": "exact"
+  }
+}

@@ -332,4 +332,3 @@ def propose_maintenance() -> list[dict[str, Any]]:
         logger.warning(f"Failed to detect coverage gaps: {e}")
 
     return proposals
-

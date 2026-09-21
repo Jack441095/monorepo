@@ -18,6 +18,7 @@ from threading import Lock
 
 DEFAULT_TTL_SECONDS = 300
 MAX_TTL_SECONDS = 3600
+MAX_USED_TOKENS = 10_000
 _PROCESS_SECRET = secrets.token_bytes(32)
 _USED_TOKENS: set[str] = set()
 _TOKEN_LOCK = Lock()
@@ -101,6 +102,10 @@ def consume_confirmation(
                 expired.add(used)
         _USED_TOKENS.difference_update(expired)
         if token in _USED_TOKENS:
+            return False
+        # Never evict a still-live consumed token: that would make replay
+        # possible. Saturation therefore fails closed until tokens expire.
+        if len(_USED_TOKENS) >= MAX_USED_TOKENS:
             return False
         _USED_TOKENS.add(token)
     return True

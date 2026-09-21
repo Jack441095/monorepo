@@ -186,4 +186,3 @@ def test_read_realtime_meters():
     assert meters["track_index"] == 0
     assert meters["output_meter_left"] == 0.85
     assert meters["output_meter_right"] == 0.82
-

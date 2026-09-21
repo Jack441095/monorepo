@@ -342,4 +342,3 @@ To guarantee stability, KENN is partitioned into five distinct architectural pla
    - Run `python3 scripts/demo_plugin_live.py` against running Ableton Live 12 instance to capture end-to-end demo video.
 3. **Package Universal macOS Installer**:
    - Build `KENN_Mix_Assistant_v0.1.0.pkg` with VST3, AU, companion runner, and automatic Remote Script installer for closed beta rollout.
-

@@ -137,4 +137,3 @@ def detect_genre_from_query(query: str) -> Optional[str]:
                 return genre_key
 
     return None
-

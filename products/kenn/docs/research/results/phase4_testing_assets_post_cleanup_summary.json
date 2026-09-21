@@ -1,0 +1,23 @@
+{
+  "schema": "kenn.dsp_real_mix_timing_refresh.v1",
+  "run_date": "2026-09-20",
+  "reference_receipt": "phase4_testing_assets_reference.json",
+  "native_receipt": "phase4_testing_assets_native.json",
+  "cleanup": "single-call stereo correlation calculation",
+  "cases": [
+    {"fixture": "ae_mere_humsafar", "reference_ms": 11495.215, "native_ms": 11888.247, "speed_ratio": 0.9669412164},
+    {"fixture": "al_james", "reference_ms": 8770.886, "native_ms": 8791.229, "speed_ratio": 0.9976865864},
+    {"fixture": "amyhelmandthehandsomestrangers_rescueme", "reference_ms": 11189.559, "native_ms": 11313.051, "speed_ratio": 0.9890824057},
+    {"fixture": "angeloboltini_fragments", "reference_ms": 7752.797, "native_ms": 7813.074, "speed_ratio": 0.9922895331},
+    {"fixture": "atlantisbound_itwasmyfaultforwaiting", "reference_ms": 10464.138, "native_ms": 10555.511, "speed_ratio": 0.9913441478},
+    {"fixture": "dream_of_you", "reference_ms": 3620.743, "native_ms": 3564.818, "speed_ratio": 1.0156884344},
+    {"fixture": "reggueton_pop", "reference_ms": 6322.803, "native_ms": 6318.193, "speed_ratio": 1.0007294299},
+    {"fixture": "stranger", "reference_ms": 8997.001, "native_ms": 9088.743, "speed_ratio": 0.9899067623}
+  ],
+  "reference_mean_ms": 8576.64275,
+  "native_mean_ms": 8666.60825,
+  "mean_speed_ratio": 0.9896219746,
+  "mean_improvement_percent": -1.0490049235,
+  "parity_status": "pass-inherited-from-phase4-testing-assets-parity",
+  "decision": "keep-python-default-and-native-opt-in"
+}

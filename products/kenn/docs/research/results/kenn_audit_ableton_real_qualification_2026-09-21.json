@@ -1,0 +1,27 @@
+{
+  "captured_at": 1790006865.6767612,
+  "checks": {
+    "connected": false,
+    "read_only_probe": true,
+    "track_identity_fields": true
+  },
+  "evidence_kind": "real_live",
+  "host_os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "limitations": [
+    "This probe is read-only and does not qualify mutation, readback, native undo, or crash recovery.",
+    "A deterministic_mock result is harness evidence only and is never real-Live evidence."
+  ],
+  "mode": "real",
+  "runtime_ms": 64.512,
+  "schema": "kenn.ableton_qualification.v1",
+  "session_version": "85b11aa6e4f9f4eea1c00d9d344ecb80230f348baf700bfab0d790e6fc03c7b1",
+  "snapshot": {
+    "error": "No standard AbletonOSC response; select AbletonOSC in Live's Control Surface settings.",
+    "host": "127.0.0.1",
+    "port": 11000,
+    "scenes": [],
+    "status": "offline",
+    "tracks": []
+  },
+  "status": "blocked"
+}

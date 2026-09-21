@@ -58,4 +58,3 @@ def test_conversational_surgical_masking_remediation():
     assert prop["schema"] == "kenn.surgical_masking_remediation.v1"
     assert "predicted_metrics" in prop
     assert "masking_reduction_percent" in prop["predicted_metrics"]
-

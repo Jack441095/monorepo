@@ -62,4 +62,3 @@ def test_build_system_prompt_incorporates_acoustic_guidance():
     assert "Acoustic Translation Guidance:" in sys_prompt
     assert "'harsh': Target ~3500 Hz" in sys_prompt
     assert "'sibilant': Target ~7000 Hz" in sys_prompt
-

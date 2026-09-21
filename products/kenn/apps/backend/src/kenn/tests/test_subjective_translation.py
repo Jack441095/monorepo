@@ -173,4 +173,3 @@ def test_vocal_cut_through_recipe_undo_formulation(mock_session_snapshot):
     assert undo_steps[0]["after"] == 0.72
     assert undo_steps[1]["track_name"] == "Supersaw Synth"
     assert undo_steps[1]["after"] == 0.78
-

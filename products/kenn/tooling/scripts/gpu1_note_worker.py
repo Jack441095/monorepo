@@ -85,4 +85,3 @@ def call_model(text: str, source_name: str) -> str:
             last_error = f"{type(exc).__name__}: {exc}"
             time.sleep(5 * (attempt + 1))
     raise RuntimeError(f"Generation failed after retries: {last_error}")
-

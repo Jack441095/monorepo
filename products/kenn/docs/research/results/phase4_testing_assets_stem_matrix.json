@@ -1,0 +1,441 @@
+{
+  "schema": "kenn.testing_assets.stem_count_matrix.v1",
+  "manifest": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/manifest.json",
+  "manifest_version": 1,
+  "track": "al_james",
+  "available_wav_stems": 62,
+  "requested_stem_counts": [
+    1,
+    8,
+    16,
+    32
+  ],
+  "selection_policy": "lexicographic manifest path prefix; no audio copied",
+  "source_license_statuses": [
+    "TODO-vendor-pack"
+  ],
+  "rights_cleared_required": false,
+  "rights_cleared": false,
+  "files_verified": true,
+  "matrix": [
+    {
+      "stem_count": 1,
+      "files": [
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/01_Kick.wav",
+          "relative_path": "al_james/01_Kick.wav",
+          "sha256": "b4da0c2a024397d476956b1d5dbd7489719b212a3121d1064cf83b8161be2e70",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        }
+      ]
+    },
+    {
+      "stem_count": 8,
+      "files": [
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/01_Kick.wav",
+          "relative_path": "al_james/01_Kick.wav",
+          "sha256": "b4da0c2a024397d476956b1d5dbd7489719b212a3121d1064cf83b8161be2e70",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/02_Snare1.wav",
+          "relative_path": "al_james/02_Snare1.wav",
+          "sha256": "52ef41577c9bd3e6aa3b95dd95ca73f0334fdbf69cc03f85deaced9cf84e389d",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/03_Snare2.wav",
+          "relative_path": "al_james/03_Snare2.wav",
+          "sha256": "797b9b7e45e720363063224aca576cb46bf72e894ff7bf5b8f022e52d0bb939c",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/04_Snare3.wav",
+          "relative_path": "al_james/04_Snare3.wav",
+          "sha256": "91f135f0fd9ca81f3179283a09fef200cc0083059a428463cbbe4fc0b380fb7b",
+          "size_bytes": 23842824,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/05_Sidestick.wav",
+          "relative_path": "al_james/05_Sidestick.wav",
+          "sha256": "42f909ba981997072e0dc3d8fb8ceb487d7ff8753f3f2d9e3d5af72e14b46b8b",
+          "size_bytes": 12306291,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/06_Claps.wav",
+          "relative_path": "al_james/06_Claps.wav",
+          "sha256": "2780e831068752453da22f3c191688b36ee92dee907387618535c31e1076d2a1",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/07_HiHat1.wav",
+          "relative_path": "al_james/07_HiHat1.wav",
+          "sha256": "ffefff42fef1c2f4011782fb0c3558eceea3368baa6c0291b4811faedbf12c5b",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/08_HiHat2.wav",
+          "relative_path": "al_james/08_HiHat2.wav",
+          "sha256": "072304333edba9c4f2fd91b16e4c0d1e3c5334040ed6ca80e707379398c885dc",
+          "size_bytes": 20766414,
+          "license": "TODO-vendor-pack"
+        }
+      ]
+    },
+    {
+      "stem_count": 16,
+      "files": [
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/01_Kick.wav",
+          "relative_path": "al_james/01_Kick.wav",
+          "sha256": "b4da0c2a024397d476956b1d5dbd7489719b212a3121d1064cf83b8161be2e70",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/02_Snare1.wav",
+          "relative_path": "al_james/02_Snare1.wav",
+          "sha256": "52ef41577c9bd3e6aa3b95dd95ca73f0334fdbf69cc03f85deaced9cf84e389d",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/03_Snare2.wav",
+          "relative_path": "al_james/03_Snare2.wav",
+          "sha256": "797b9b7e45e720363063224aca576cb46bf72e894ff7bf5b8f022e52d0bb939c",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/04_Snare3.wav",
+          "relative_path": "al_james/04_Snare3.wav",
+          "sha256": "91f135f0fd9ca81f3179283a09fef200cc0083059a428463cbbe4fc0b380fb7b",
+          "size_bytes": 23842824,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/05_Sidestick.wav",
+          "relative_path": "al_james/05_Sidestick.wav",
+          "sha256": "42f909ba981997072e0dc3d8fb8ceb487d7ff8753f3f2d9e3d5af72e14b46b8b",
+          "size_bytes": 12306291,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/06_Claps.wav",
+          "relative_path": "al_james/06_Claps.wav",
+          "sha256": "2780e831068752453da22f3c191688b36ee92dee907387618535c31e1076d2a1",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/07_HiHat1.wav",
+          "relative_path": "al_james/07_HiHat1.wav",
+          "sha256": "ffefff42fef1c2f4011782fb0c3558eceea3368baa6c0291b4811faedbf12c5b",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/08_HiHat2.wav",
+          "relative_path": "al_james/08_HiHat2.wav",
+          "sha256": "072304333edba9c4f2fd91b16e4c0d1e3c5334040ed6ca80e707379398c885dc",
+          "size_bytes": 20766414,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/09_HiHat3.wav",
+          "relative_path": "al_james/09_HiHat3.wav",
+          "sha256": "52db338df90665caa882a48972e7a6c16052274c83faf31aea34e844dd8385b0",
+          "size_bytes": 20235999,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/10_Ride1.wav",
+          "relative_path": "al_james/10_Ride1.wav",
+          "sha256": "bc545851ec127ff28ea87b2fcdae8bba914a28f7e4bf9740c569f1b1cbbcb151",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/11_Ride2.wav",
+          "relative_path": "al_james/11_Ride2.wav",
+          "sha256": "adc6713b913d33ef75502539979778254843351f36137b88933cdb9d24241e83",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/12_Tom1.wav",
+          "relative_path": "al_james/12_Tom1.wav",
+          "sha256": "dfc7a4b032a0b2263d3cfeb6075f869c6ff8d4ea6ac537cb0af86dd1f9a97230",
+          "size_bytes": 24001947,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/13_Tom2.wav",
+          "relative_path": "al_james/13_Tom2.wav",
+          "sha256": "437212315f8d0356f6423a4305b7bb6d93b35cab9387063df6a3375d8980809e",
+          "size_bytes": 20739894,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/14_Tom3.wav",
+          "relative_path": "al_james/14_Tom3.wav",
+          "sha256": "ea7a5acb08769a55c452d1138d2675d08210b5a570fc1835b19a91af2959e147",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/15_Tom4.wav",
+          "relative_path": "al_james/15_Tom4.wav",
+          "sha256": "3248f9f695741d56009731caf92fab798b1b41909b21053f033fb06717119448",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/16_Tom5.wav",
+          "relative_path": "al_james/16_Tom5.wav",
+          "sha256": "50cc4dc084c23f021dbc0dc70e6da0e93709c8e4537821d39cd396328d6db066",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        }
+      ]
+    },
+    {
+      "stem_count": 32,
+      "files": [
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/01_Kick.wav",
+          "relative_path": "al_james/01_Kick.wav",
+          "sha256": "b4da0c2a024397d476956b1d5dbd7489719b212a3121d1064cf83b8161be2e70",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/02_Snare1.wav",
+          "relative_path": "al_james/02_Snare1.wav",
+          "sha256": "52ef41577c9bd3e6aa3b95dd95ca73f0334fdbf69cc03f85deaced9cf84e389d",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/03_Snare2.wav",
+          "relative_path": "al_james/03_Snare2.wav",
+          "sha256": "797b9b7e45e720363063224aca576cb46bf72e894ff7bf5b8f022e52d0bb939c",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/04_Snare3.wav",
+          "relative_path": "al_james/04_Snare3.wav",
+          "sha256": "91f135f0fd9ca81f3179283a09fef200cc0083059a428463cbbe4fc0b380fb7b",
+          "size_bytes": 23842824,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/05_Sidestick.wav",
+          "relative_path": "al_james/05_Sidestick.wav",
+          "sha256": "42f909ba981997072e0dc3d8fb8ceb487d7ff8753f3f2d9e3d5af72e14b46b8b",
+          "size_bytes": 12306291,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/06_Claps.wav",
+          "relative_path": "al_james/06_Claps.wav",
+          "sha256": "2780e831068752453da22f3c191688b36ee92dee907387618535c31e1076d2a1",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/07_HiHat1.wav",
+          "relative_path": "al_james/07_HiHat1.wav",
+          "sha256": "ffefff42fef1c2f4011782fb0c3558eceea3368baa6c0291b4811faedbf12c5b",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/08_HiHat2.wav",
+          "relative_path": "al_james/08_HiHat2.wav",
+          "sha256": "072304333edba9c4f2fd91b16e4c0d1e3c5334040ed6ca80e707379398c885dc",
+          "size_bytes": 20766414,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/09_HiHat3.wav",
+          "relative_path": "al_james/09_HiHat3.wav",
+          "sha256": "52db338df90665caa882a48972e7a6c16052274c83faf31aea34e844dd8385b0",
+          "size_bytes": 20235999,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/10_Ride1.wav",
+          "relative_path": "al_james/10_Ride1.wav",
+          "sha256": "bc545851ec127ff28ea87b2fcdae8bba914a28f7e4bf9740c569f1b1cbbcb151",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/11_Ride2.wav",
+          "relative_path": "al_james/11_Ride2.wav",
+          "sha256": "adc6713b913d33ef75502539979778254843351f36137b88933cdb9d24241e83",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/12_Tom1.wav",
+          "relative_path": "al_james/12_Tom1.wav",
+          "sha256": "dfc7a4b032a0b2263d3cfeb6075f869c6ff8d4ea6ac537cb0af86dd1f9a97230",
+          "size_bytes": 24001947,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/13_Tom2.wav",
+          "relative_path": "al_james/13_Tom2.wav",
+          "sha256": "437212315f8d0356f6423a4305b7bb6d93b35cab9387063df6a3375d8980809e",
+          "size_bytes": 20739894,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/14_Tom3.wav",
+          "relative_path": "al_james/14_Tom3.wav",
+          "sha256": "ea7a5acb08769a55c452d1138d2675d08210b5a570fc1835b19a91af2959e147",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/15_Tom4.wav",
+          "relative_path": "al_james/15_Tom4.wav",
+          "sha256": "3248f9f695741d56009731caf92fab798b1b41909b21053f033fb06717119448",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/16_Tom5.wav",
+          "relative_path": "al_james/16_Tom5.wav",
+          "sha256": "50cc4dc084c23f021dbc0dc70e6da0e93709c8e4537821d39cd396328d6db066",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/17_Cymbal1Reverse.wav",
+          "relative_path": "al_james/17_Cymbal1Reverse.wav",
+          "sha256": "170e462ac9e0ae49ed00eea4afc5a7d83087a0c4680ab72fcef4ec771b605870",
+          "size_bytes": 53059920,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/18_Cymbal2.wav",
+          "relative_path": "al_james/18_Cymbal2.wav",
+          "sha256": "87ff8d98ba148c71c46a611945c8e3cf8cd0bf668bdebf64a264bb9505eab8f8",
+          "size_bytes": 25964484,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/19_Cymbal3.wav",
+          "relative_path": "al_james/19_Cymbal3.wav",
+          "sha256": "91a8ce36ceed53ea247e9ddacd77cbd0f78f002255df54559768dec90e7e11ab",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/20_Loop.wav",
+          "relative_path": "al_james/20_Loop.wav",
+          "sha256": "de0dee18415426e76081b25f688853232d4d6a0bd81f28edbb206695ab4475b3",
+          "size_bytes": 3183144,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/21_Tambourine.wav",
+          "relative_path": "al_james/21_Tambourine.wav",
+          "sha256": "4188eaa7311e9041c7fcd7db88b0f4b071927f4840469219ed63c65b6ff7537d",
+          "size_bytes": 53059920,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/22_Bass.wav",
+          "relative_path": "al_james/22_Bass.wav",
+          "sha256": "5fbee896fb0757ded450f0c65959a2c79c02665688264f1c88476a768db12067",
+          "size_bytes": 26530287,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/23_Piano1Reverse.wav",
+          "relative_path": "al_james/23_Piano1Reverse.wav",
+          "sha256": "e41d12a31e795e21dd00b55433ef363a2a2de8925d9e6f0b977a20d1a10a7de7",
+          "size_bytes": 6508890,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/24_Piano2.wav",
+          "relative_path": "al_james/24_Piano2.wav",
+          "sha256": "969df9e1d1a8bf0de67545117eb351aed5ba4ef74dbc0ec8467fc708ad99f899",
+          "size_bytes": 53059920,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/25_SchoolBell.wav",
+          "relative_path": "al_james/25_SchoolBell.wav",
+          "sha256": "cf96885c0587172e6ad528f29903a46cbd708327893c4ba24dffa570e4381b8c",
+          "size_bytes": 27264000,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/26_ElecGtr1.wav",
+          "relative_path": "al_james/26_ElecGtr1.wav",
+          "sha256": "b2d36e5202afb67447334424585662345815e535fe92580e35d314f15e09f4c0",
+          "size_bytes": 53059920,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/27_ElecGtr2MIDI.wav",
+          "relative_path": "al_james/27_ElecGtr2MIDI.wav",
+          "sha256": "163b5a4208bafdf691a6fe8a581a3b0e161417ffc47a0a5aecda146b04c51fd7",
+          "size_bytes": 27264000,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/28_ElecGtr3MIDI.wav",
+          "relative_path": "al_james/28_ElecGtr3MIDI.wav",
+          "sha256": "cfef0a05c9205f45cc3a735913c4421ef67096784116251379c182b5d048d41c",
+          "size_bytes": 41903466,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/29_ElecGtr4.wav",
+          "relative_path": "al_james/29_ElecGtr4.wav",
+          "sha256": "178a35a6734554c5f1ff13b7935421c453566cde2135294e816c1cf18cc5d679",
+          "size_bytes": 53059920,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/30_ElecGtr5.wav",
+          "relative_path": "al_james/30_ElecGtr5.wav",
+          "sha256": "fbd93da02bb022b141d785380b808a764ee081396b2fade3767c6a30726da45b",
+          "size_bytes": 53059920,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/31_AcGtr1.wav",
+          "relative_path": "al_james/31_AcGtr1.wav",
+          "sha256": "3414fb77efea51ffce92e0e330b56b0b921acc3a2efd81878d5a9b828ae3e359",
+          "size_bytes": 41744340,
+          "license": "TODO-vendor-pack"
+        },
+        {
+          "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/32_AcGtr2.wav",
+          "relative_path": "al_james/32_AcGtr2.wav",
+          "sha256": "9c95c3d99769c10f03eba35f1c37ec1f142da19372e207fc2efcdb3939497eaf",
+          "size_bytes": 53059920,
+          "license": "TODO-vendor-pack"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+name: KENN native DSP package
+
+on:
+  push:
+    paths:
+      - "products/kenn/tooling/native/dsp_core/**"
+      - "products/kenn/tooling/native/dsp_core/automix_bindings.cpp"
+      - "products/kenn/tooling/native/dsp_core/automix_bindings.hpp"
+      - "products/kenn/apps/backend/src/kenn/core/audio_analysis.py"
+      - "products/kenn/apps/backend/src/kenn/core/native_fft.py"
+      - "products/kenn/apps/backend/src/kenn/tests/test_audio_analysis.py"
+      - "products/kenn/tooling/scripts/test_native_dsp.py"
+      - "products/kenn/tooling/scripts/benchmark_masking_native.py"
+      - "products/kenn/tooling/scripts/benchmark_audio_analysis.py"
+      - "products/kenn/tooling/scripts/benchmark_mix_review_native.py"
+      - "products/kenn/packages/mix-review/core/local_engine.py"
+      - "products/kenn/packages/mix-review/core/masking_analysis.py"
+      - "products/kenn/plugins/kenn-vst3-au/**"
+      - "audio-technology/audio-analysis/audio_analysis/dsp_engine/native/**"
+      - ".github/workflows/kenn-dsp-native.yml"
+  pull_request:
+    paths:
+      - "products/kenn/tooling/native/dsp_core/**"
+      - "products/kenn/tooling/native/dsp_core/automix_bindings.cpp"
+      - "products/kenn/tooling/native/dsp_core/automix_bindings.hpp"
+      - "products/kenn/apps/backend/src/kenn/core/audio_analysis.py"
+      - "products/kenn/apps/backend/src/kenn/core/native_fft.py"
+      - "products/kenn/apps/backend/src/kenn/tests/test_audio_analysis.py"
+      - "products/kenn/tooling/scripts/test_native_dsp.py"
+      - "products/kenn/tooling/scripts/benchmark_masking_native.py"
+      - "products/kenn/tooling/scripts/benchmark_audio_analysis.py"
+      - "products/kenn/tooling/scripts/benchmark_mix_review_native.py"
+      - "products/kenn/packages/mix-review/core/local_engine.py"
+      - "products/kenn/packages/mix-review/core/masking_analysis.py"
+      - "products/kenn/plugins/kenn-vst3-au/**"
+      - "audio-technology/audio-analysis/audio_analysis/dsp_engine/native/**"
+      - ".github/workflows/kenn-dsp-native.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-core-sanitizers:
+    name: Portable DSP core CTest + sanitizers (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, ubuntu-24.04]
+    steps:
+      - name: Check out KENN
+        uses: actions/checkout@v5
+
+      - name: Configure portable core with ASan/UBSan
+        shell: bash
+        run: >-
+          cmake -S products/kenn/tooling/native/fft_poc
+          -B build/kenn-fft-poc-sanitize
+          -DCMAKE_BUILD_TYPE=Debug
+          -DBUILD_TESTING=ON
+          '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer'
+          '-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined'
+
+      - name: Build portable core sanitizer target
+        shell: bash
+        run: cmake --build build/kenn-fft-poc-sanitize --parallel 2
+
+      - name: Run portable core sanitizer CTest
+        shell: bash
+        env:
+          ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1
+        run: ctest --test-dir build/kenn-fft-poc-sanitize --output-on-failure
+
+      - name: Configure recovered AutoMix kernels with ASan/UBSan
+        shell: bash
+        run: >-
+          cmake -S audio-technology/audio-analysis/audio_analysis/dsp_engine/native
+          -B build/automix-kernels-sanitize
+          -DCMAKE_BUILD_TYPE=Debug
+          -DBUILD_TESTING=ON
+          '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer'
+          '-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined'
+
+      - name: Build recovered AutoMix kernel sanitizer target
+        shell: bash
+        run: cmake --build build/automix-kernels-sanitize --parallel 2
+
+      - name: Run recovered AutoMix kernel sanitizer CTest
+        shell: bash
+        env:
+          ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1
+        run: ctest --test-dir build/automix-kernels-sanitize --output-on-failure
+
+  wheel:
+    name: Build native wheel (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, windows-2022]
+    steps:
+      - name: Check out KENN
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install native build dependencies
+        run: python -m pip install --upgrade pip nanobind scikit-build-core cmake ninja numpy scipy pyloudnorm
+
+      - name: Build recovered AutoMix kernel archive
+        shell: bash
+        run: >-
+          cmake -S audio-technology/audio-analysis/audio_analysis/dsp_engine/native
+          -B build/automix-kernels -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+
+      - name: Compile recovered AutoMix kernels
+        shell: bash
+        run: cmake --build build/automix-kernels --config Release --parallel 2
+
+      - name: Run recovered AutoMix kernel smoke
+        shell: bash
+        run: >-
+          ctest --test-dir build/automix-kernels
+          --build-config Release --output-on-failure
+
+      - name: Build wheel
+        shell: bash
+        env:
+          CMAKE_EXECUTABLE: cmake
+        run: |
+          set -o pipefail
+          mkdir -p build/native-wheel
+          python -m pip wheel --no-deps --no-build-isolation \
+            products/kenn/tooling/native/dsp_core \
+            --wheel-dir build/native-wheel \
+            2>&1 | tee build/native-wheel-build.log
+
+      - name: Summarize Windows wheel build failure
+        if: failure() && matrix.os == 'windows-2022'
+        shell: bash
+        run: |
+          grep -E 'fatal error|error [A-Z][0-9]+|CMake Error|FAILED:|build stopped' \
+            build/native-wheel-build.log \
+            | head -n 20 \
+            | sed 's/%/%25/g; s/\r/%0D/g; s/^/::error::/' \
+            || true
+
+      - name: Verify wheel contains the extension
+        shell: python
+        run: |
+          import glob
+          import sys
+          import zipfile
+
+          wheels = glob.glob("build/native-wheel/*.whl")
+          if len(wheels) != 1:
+              raise SystemExit(f"expected exactly one wheel, found {wheels}")
+          with zipfile.ZipFile(wheels[0]) as archive:
+              entries = archive.namelist()
+          if not any(entry.startswith("kenn/core/_kenn_dsp_native") for entry in entries):
+              raise SystemExit("native extension is missing from the wheel")
+          print(wheels[0])
+
+      - name: Install and import wheel extension
+        shell: bash
+        run: |
+          python -m pip install --no-deps build/native-wheel/*.whl
+          python products/kenn/tooling/scripts/test_native_dsp.py
+
+      - name: Verify native-disabled reference fallback
+        shell: bash
+        run: >-
+          env KENN_DSP_NATIVE=0
+          PYTHONPATH=products/kenn/apps/backend/src
+          python products/kenn/tooling/scripts/test_native_fallback.py
+
+      - name: Verify opt-in Mix Review native parity
+        shell: bash
+        env:
+          KENN_DSP_NATIVE: "1"
+          KENN_DSP_LOUDNESS_NATIVE: "1"
+          KENN_DSP_MIX_REVIEW_DECODE_NATIVE: "1"
+          PYTHONPATH: products/kenn/apps/backend/src
+        run: >-
+          python products/kenn/tooling/scripts/benchmark_mix_review_native.py
+          --seconds 2 --repeats 2
+
+  plugin-windows:
+    name: Build KENN VST3 (Windows)
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - name: Check out KENN
+        uses: actions/checkout@v5
+
+      - name: Configure Windows VST3
+        shell: bash
+        run: >-
+          cmake -S products/kenn/plugins/kenn-vst3-au
+          -B build/kenn-vst3-au-windows -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compile Windows VST3
+        shell: bash
+        run: >-
+          cmake --build build/kenn-vst3-au-windows --config Release
+          --parallel 2 --target KENNMixAssistant_VST3
+
+      - name: Verify Windows VST3 bundle
+        shell: pwsh
+        run: |
+          $bundle = "build/kenn-vst3-au-windows/KENNMixAssistant_artefacts/Release/VST3/KENN Mix Assistant.vst3"
+          if (-not (Test-Path -LiteralPath $bundle)) {
+            throw "Windows VST3 bundle was not produced: $bundle"
+          }
+          Write-Host "Verified $bundle"

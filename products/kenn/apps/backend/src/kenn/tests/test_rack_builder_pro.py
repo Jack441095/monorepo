@@ -65,4 +65,3 @@ def test_synthesize_pro_racks_proposals():
         assert len(p["steps"]) == 10
         assert len(p["chains"]) >= 1
         assert len(p["variations"]) >= 2
-

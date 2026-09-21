@@ -22,10 +22,11 @@
 // a different alpha_rel, computed at 4x the sample rate) -- Limiter.apply()
 // wires this kernel into both true_peak modes, not only true_peak=False.
 
+#include <cmath>
 #include <cstddef>
 #include <deque>
 #include <utility>
-#include <cmath>
+#include <vector>
 
 extern "C" {
 

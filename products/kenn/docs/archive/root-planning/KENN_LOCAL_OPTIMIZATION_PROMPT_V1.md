@@ -198,4 +198,3 @@ TASKS TO EXECUTE:
 Produce a structured report showing the measured latency before and after optimization.
 ================================================================================
 ```
-

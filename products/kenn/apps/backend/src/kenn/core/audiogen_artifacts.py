@@ -208,12 +208,16 @@ def _canonical_midi_notes(raw_notes: Any) -> tuple[list[dict[str, Any]], list[st
             continue
         if not 0 <= pitch <= 127:
             errors.append(f"MIDI note {offset} pitch must be between 0 and 127.")
+            continue
         if not math.isfinite(start_time) or start_time < 0:
             errors.append(f"MIDI note {offset} start_time must be finite and non-negative.")
+            continue
         if not math.isfinite(duration) or duration <= 0:
             errors.append(f"MIDI note {offset} duration must be finite and greater than zero.")
+            continue
         if not 1 <= velocity <= 127:
             errors.append(f"MIDI note {offset} velocity must be between 1 and 127.")
+            continue
         notes.append({
             "pitch": pitch,
             "start_time": start_time,

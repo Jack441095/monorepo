@@ -752,6 +752,8 @@ async def add_request_id_middleware(request: Request, call_next: Any) -> Any:
 
 @app.get("/health")
 def health(request: Request) -> dict[str, Any]:
+    from kenn.retrieval.retrieval import retrieval_status
+
     req_id = getattr(request.state, "request_id", "unknown")
     return {
         "ok": True,
@@ -761,6 +763,7 @@ def health(request: Request) -> dict[str, Any]:
         "schema_version": "kenn.public_api.v1",
         "request_id": req_id,
         "scope": "public_beta",
+        "retrieval": retrieval_status(),
         "features": {
             "chat": True,
             "mix_review": True,

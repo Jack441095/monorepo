@@ -45,4 +45,3 @@ This report documents the offline evaluation of KENN's chat engine and knowledge
 
 * **QA Lead Verification**: 100% of held-out evaluation probes passed cleanly.
 * **Product Owner Recommendation**: Chat & Knowledge-Base Qualified for Public Beta.
-

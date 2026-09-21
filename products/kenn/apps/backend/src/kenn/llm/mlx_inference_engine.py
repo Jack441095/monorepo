@@ -382,4 +382,3 @@ class MLXInferenceEngine:
 
 
 __all__ = ["MLXInferenceEngine", "DEFAULT_MLX_MODEL"]
-

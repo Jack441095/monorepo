@@ -1,0 +1,144 @@
+{
+  "schema": "kenn.dsp_benchmark.v1",
+  "benchmark_version": "kenn.audio_analysis.benchmark.v2",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "candidate": "python-stdlib-reference",
+  "build_type": "reference",
+  "compiler_flags": [],
+  "machine": {
+    "system": "Darwin",
+    "release": "27.0.0",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.7",
+    "cpu_count": 8
+  },
+  "resource_limits": {
+    "max_input_bytes": 157286400,
+    "fft_windows_cap": 4,
+    "audio_retained": false
+  },
+  "fixture": {
+    "kind": "external_wav",
+    "generator": null,
+    "long_seconds": 10.0,
+    "workers": 4,
+    "repeats": 2,
+    "include_ltas": true,
+    "sources": [
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/organized_sample_library/Minimal_Audio_Full/FX/Foley/Atmosphere - Emergent - C - 78 BPM.wav",
+        "sha256": "97638107a543af2bd423e33dbf0e0ac9968b957edf902f19823c7eaa8adfebfa",
+        "bytes": 14178506,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 48000,
+          "frames": 2363077,
+          "duration_seconds": 49.230771
+        }
+      },
+      {
+        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/organized_sample_library/Minimal_Audio_Full/FX/Foley/Atmosphere - Mysteria.wav",
+        "sha256": "c01f7a0dc1023ea0efdb44a14e930fcac3454c39571f8f2a650d10284151eab8",
+        "bytes": 14700958,
+        "wav": {
+          "channels": 2,
+          "sample_width_bytes": 3,
+          "sample_rate_hz": 96000,
+          "frames": 2450140,
+          "duration_seconds": 25.522292
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "label": "Atmosphere - Emergent - C - 78 BPM",
+      "bytes": 14178506,
+      "sha256": "97638107a543af2bd423e33dbf0e0ac9968b957edf902f19823c7eaa8adfebfa",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 49.230771,
+      "sample_rate_hz": 48000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 2,
+      "samples_ms": [
+        2405.372,
+        2432.621
+      ],
+      "mean_ms": 2418.996,
+      "p50_ms": 2418.996,
+      "p95_ms": 2431.259,
+      "p99_ms": 2432.349,
+      "max_ms": 2432.621,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 48000,
+        "frames": 2363077,
+        "duration_seconds": 49.230771
+      }
+    },
+    {
+      "label": "Atmosphere - Mysteria",
+      "bytes": 14700958,
+      "sha256": "c01f7a0dc1023ea0efdb44a14e930fcac3454c39571f8f2a650d10284151eab8",
+      "within_input_limit": true,
+      "ok": true,
+      "analysis_status": "complete",
+      "duration_seconds": 25.522292,
+      "sample_rate_hz": 96000,
+      "implementation": "python-reference",
+      "native_input_copied": null,
+      "runs": 2,
+      "samples_ms": [
+        2472.593,
+        2487.374
+      ],
+      "mean_ms": 2479.984,
+      "p50_ms": 2479.984,
+      "p95_ms": 2486.635,
+      "p99_ms": 2487.226,
+      "max_ms": 2487.374,
+      "wav": {
+        "channels": 2,
+        "sample_width_bytes": 3,
+        "sample_rate_hz": 96000,
+        "frames": 2450140,
+        "duration_seconds": 25.522292
+      }
+    }
+  ],
+  "concurrency": {
+    "workers": 4,
+    "elapsed_ms": 9659.967,
+    "all_ok": true,
+    "all_complete": true
+  },
+  "stage_samples_ms": [
+    {
+      "stage": "complete_request",
+      "samples_ms": [
+        2405.372,
+        2432.621,
+        2472.593,
+        2487.374
+      ]
+    }
+  ],
+  "peak_rss_bytes": 2560655360,
+  "elapsed_ms": 19509.604,
+  "numerical_comparison": {
+    "status": "not_applicable",
+    "reference": "self"
+  },
+  "selected_simd_backend": "python-stdlib",
+  "qualified": true,
+  "passed": true,
+  "limitations": [
+    "No perceptual, LUFS, LRA, true-peak, or real-mix quality claim is made."
+  ]
+}

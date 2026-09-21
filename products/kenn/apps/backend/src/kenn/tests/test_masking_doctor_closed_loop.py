@@ -72,4 +72,3 @@ def test_formulate_surgical_remediation_phase_and_fader_overload():
     metrics = prop["predicted_metrics"]
     assert metrics["headroom_reclaimed_db"] >= 0.8
     assert metrics["mono_correlation_delta"] > 0.0
-

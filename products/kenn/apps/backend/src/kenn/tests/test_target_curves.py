@@ -67,4 +67,3 @@ def test_loudness_matched_gain_delta():
     clamped_res = calculate_loudness_matched_gain_delta(dry_lufs=-14.0, wet_lufs=-4.0, max_compensation_db=6.0)
     assert clamped_res["clamped"] is True
     assert clamped_res["gain_adjustment_db"] == -6.0
-

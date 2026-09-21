@@ -1,0 +1,44 @@
+{
+  "schema": "kenn.dsp.accelerate_backend_receipt.v1",
+  "source_revision": "3667e0e996c976e96110afa32e5e1f5a0163ffc7",
+  "source_state": "working-tree changes on top of source_revision",
+  "status": "parity-pass-no-promotion",
+  "backend": "cpp-accelerate",
+  "host": {
+    "system": "macOS",
+    "architecture": "arm64",
+    "compiler": "AppleClang 21.0.0.21000334",
+    "build_type": "Release"
+  },
+  "fixture_set": "testing-assets/_automix_out eight canonical stereo mixdowns",
+  "reference": "KENN_DSP_NATIVE=0",
+  "native": "KENN_DSP_NATIVE=1 with Apple Accelerate/vDSP",
+  "parity": {
+    "status": "pass",
+    "tolerance": {"absolute": 0.00002, "relative": 0.00002},
+    "differences_after_dynamic_receipt_fields": 0
+  },
+  "timing_ms": {
+    "native_sum": 119687.634,
+    "reference_sum": 119411.924,
+    "native_mean": 14960.95425,
+    "reference_mean": 14926.4905,
+    "native_reference_ratio": 1.0023088984,
+    "decision": "do-not-promote"
+  },
+  "cases": [
+    {"fixture": "ae_mere_humsafar", "native_ms": 20737.511, "reference_ms": 20250.757},
+    {"fixture": "al_james", "native_ms": 15291.796, "reference_ms": 15033.929},
+    {"fixture": "amyhelmandthehandsomestrangers_rescueme", "native_ms": 19456.495, "reference_ms": 19798.411},
+    {"fixture": "angeloboltini_fragments", "native_ms": 13418.348, "reference_ms": 13427.371},
+    {"fixture": "atlantisbound_itwasmyfaultforwaiting", "native_ms": 18181.661, "reference_ms": 18184.05},
+    {"fixture": "dream_of_you", "native_ms": 6148.037, "reference_ms": 6224.748},
+    {"fixture": "reggueton_pop", "native_ms": 10841.351, "reference_ms": 10909.999},
+    {"fixture": "stranger", "native_ms": 15612.435, "reference_ms": 15582.659}
+  ],
+  "limitations": [
+    "The supplied manifest remains TODO-vendor-pack and is internal evidence only.",
+    "This pass measures complete-request latency once per fixture; it is not a rights or host qualification.",
+    "The reference remains the default because vDSP did not improve the complete request."
+  ]
+}

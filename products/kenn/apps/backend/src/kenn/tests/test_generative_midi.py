@@ -49,4 +49,3 @@ def test_generate_drum_pattern_trap():
     assert 36 in pitches
     assert 39 in pitches
     assert 42 in pitches
-

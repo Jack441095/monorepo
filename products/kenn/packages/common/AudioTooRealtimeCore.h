@@ -43,8 +43,18 @@ public:
 
     void reset(double newSampleRate)
     {
-        sampleRate.store(newSampleRate); peak.store(0.0f); energy.store(0.0); samples.store(0);
+        const auto rate = juce::jmax(1.0, newSampleRate);
+        sampleRate.store(rate); peak.store(0.0f); energy.store(0.0); samples.store(0);
         correlation.store(1.0f); width.store(0.0f); low.store(0.0f); mid.store(0.0f); high.store(0.0f); transient.store(0.0f); clipped.store(0);
+        lowAlpha = 1.0f - std::exp((float) (-2.0 * juce::MathConstants<double>::pi * 250.0 / rate));
+        midAlpha = 1.0f - std::exp((float) (-2.0 * juce::MathConstants<double>::pi * 2500.0 / rate));
+        for (size_t band = 0; band < spectrumBandCount; ++band)
+        {
+            const auto lowCutoff = spectrumBands[band].lowHz;
+            const auto highCutoff = juce::jmin(spectrumBands[band].highHz, (float) (rate * 0.45));
+            spectrumLowAlpha[band] = 1.0f - std::exp((float) (-2.0 * juce::MathConstants<double>::pi * lowCutoff / rate));
+            spectrumHighAlpha[band] = 1.0f - std::exp((float) (-2.0 * juce::MathConstants<double>::pi * highCutoff / rate));
+        }
         lowState = midState = previousMono = 0.0f;
         spectrumLowStates.fill(0.0f);
         spectrumHighStates.fill(0.0f);
@@ -57,18 +67,6 @@ public:
         if (count <= 0 || buffer.getNumChannels() == 0) return;
         const auto* left = buffer.getReadPointer(0);
         const auto* right = buffer.getNumChannels() > 1 ? buffer.getReadPointer(1) : left;
-        const auto rate = juce::jmax(1.0, sampleRate.load());
-        const float lowAlpha = 1.0f - std::exp((float) (-2.0 * juce::MathConstants<double>::pi * 250.0 / rate));
-        const float midAlpha = 1.0f - std::exp((float) (-2.0 * juce::MathConstants<double>::pi * 2500.0 / rate));
-        std::array<float, spectrumBandCount> spectrumLowAlpha {};
-        std::array<float, spectrumBandCount> spectrumHighAlpha {};
-        for (size_t band = 0; band < spectrumBandCount; ++band)
-        {
-            const auto lowCutoff = spectrumBands[band].lowHz;
-            const auto highCutoff = juce::jmin(spectrumBands[band].highHz, (float) (rate * 0.45));
-            spectrumLowAlpha[band] = 1.0f - std::exp((float) (-2.0 * juce::MathConstants<double>::pi * lowCutoff / rate));
-            spectrumHighAlpha[band] = 1.0f - std::exp((float) (-2.0 * juce::MathConstants<double>::pi * highCutoff / rate));
-        }
         float blockPeak = 0.0f; double totalEnergy = 0.0, ll = 0.0, rr = 0.0, lr = 0.0, midSide = 0.0, side = 0.0;
         double lowE = 0.0, midE = 0.0, highE = 0.0, differenceEnergy = 0.0;
         std::array<double, spectrumBandCount> spectrumBlockEnergy {};
@@ -140,6 +138,9 @@ private:
     }};
     std::atomic<float> peak { 0 }, correlation { 1 }, width { 0 }, low { 0 }, mid { 0 }, high { 0 }, transient { 0 };
     std::atomic<double> energy { 0 }, sampleRate { 0 }; std::atomic<juce::int64> samples { 0 }; std::atomic<int> clipped { 0 };
+    float lowAlpha = 0.0f, midAlpha = 0.0f;
+    std::array<float, spectrumBandCount> spectrumLowAlpha {};
+    std::array<float, spectrumBandCount> spectrumHighAlpha {};
     float lowState = 0.0f, midState = 0.0f, previousMono = 0.0f;
     std::array<float, spectrumBandCount> spectrumLowStates {};
     std::array<float, spectrumBandCount> spectrumHighStates {};
