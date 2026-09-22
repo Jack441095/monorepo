@@ -49,6 +49,27 @@
               </li>
             </ul>
 
+            <div v-if="message.findings?.length" class="chat-message__findings" aria-label="Mix advice findings">
+              <article
+                v-for="(finding, index) in message.findings"
+                :key="`${finding.title}-${index}`"
+                class="advice-finding"
+                :data-severity="finding.severity"
+              >
+                <div class="advice-finding__header">
+                  <span class="advice-finding__badge">{{ severityLabel(finding.severity) }}</span>
+                  <strong>{{ finding.title }}</strong>
+                  <span v-if="finding.confidence != null" class="advice-finding__confidence">
+                    {{ Math.round(finding.confidence * 100) }}% confidence
+                  </span>
+                </div>
+                <p>{{ finding.detail }}</p>
+                <p v-if="finding.listeningTest" class="advice-finding__test">
+                  <strong>Try this:</strong> {{ finding.listeningTest }}
+                </p>
+              </article>
+            </div>
+
             <!-- DAW Action Proposal Card -->
             <KennActionCard
               v-if="'proposal' in message && message.proposal"
@@ -57,6 +78,7 @@
               :receipt="message.receipt"
               :error-message="message.actionError"
               @apply="applyMessageProposal(message.id)"
+              @reject="rejectMessageProposal(message.id)"
               @undo="undoMessageProposal(message.id)"
             />
 
@@ -100,7 +122,7 @@ import { useKenn } from '../composables/useKenn'
 import KennActionCard from './KennActionCard.vue'
 
 const { t } = useI18n()
-const { messages, sending, sendMessage, applyMessageProposal, undoMessageProposal } = useKenn()
+const { messages, sending, sendMessage, applyMessageProposal, undoMessageProposal, rejectMessageProposal } = useKenn()
 
 const listRef = ref<HTMLElement | null>(null)
 /** 贴底跟随；用户上翻后暂停，滚回底部附近再恢复 */
@@ -147,6 +169,12 @@ onMounted(() => {
 
 function onSuggestion(text: string) {
   void sendMessage(text)
+}
+
+function severityLabel(severity: string) {
+  if (severity === 'critical') return 'High'
+  if (severity === 'warning') return 'Check'
+  return 'Info'
 }
 </script>
 
@@ -272,6 +300,12 @@ function onSuggestion(text: string) {
     margin-top: 0.04rem;
   }
 
+  &__findings {
+    display: grid;
+    gap: 0.08rem;
+    margin-top: 0.12rem;
+  }
+
   &__source-meta {
     color: var(--muted-text);
   }
@@ -308,6 +342,52 @@ function onSuggestion(text: string) {
       opacity: 0.55;
       cursor: not-allowed;
     }
+  }
+}
+
+.advice-finding {
+  --advice-accent: #55b88a;
+  padding: 0.1rem 0.12rem;
+  border: 1px solid color-mix(in srgb, var(--advice-accent) 55%, transparent);
+  border-left: 0.035rem solid var(--advice-accent);
+  border-radius: 0.08rem;
+  background: color-mix(in srgb, var(--advice-accent) 8%, var(--surface-bg));
+  transition: transform 0.18s ease, border-color 0.18s ease;
+
+  &[data-severity='warning'] { --advice-accent: #e6a23c; }
+  &[data-severity='critical'] { --advice-accent: #ef6461; }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.07rem;
+    flex-wrap: wrap;
+  }
+
+  &__badge {
+    padding: 0.015rem 0.055rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--advice-accent) 20%, transparent);
+    color: var(--advice-accent);
+    font-size: 0.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__confidence {
+    margin-left: auto;
+    color: var(--muted-text);
+    font-size: 0.1rem;
+  }
+
+  p {
+    margin: 0.07rem 0 0;
+    font-size: 0.12rem;
+  }
+
+  &__test {
+    color: var(--muted-text);
   }
 }
 </style>

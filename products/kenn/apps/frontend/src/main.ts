@@ -8,6 +8,9 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { useLocaleStore } from './composables/useLocale.ts'
 
+// The studio surface defaults to a projector-friendly Ableton-style theme.
+document.documentElement.dataset.theme ||= 'dark'
+
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 

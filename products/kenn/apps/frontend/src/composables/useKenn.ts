@@ -6,6 +6,7 @@ import {
   fetchKennSessionCard,
   type KennActionProposal,
   type KennActionReceipt,
+  type KennAdviceFinding,
   type KennSessionTrack,
   type KennSource,
 } from '../api/kenn'
@@ -23,12 +24,13 @@ export type KennAssistantMessage = {
   text?: string
   steps?: string[]
   notes?: Array<{ label: string; text: string }>
+  findings?: KennAdviceFinding[]
   sources?: KennSource[]
   suggestions?: string[]
   followUp?: string
   proposal?: KennActionProposal
   receipt?: KennActionReceipt
-  actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'error'
+  actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'rejected' | 'error'
   actionError?: string
 }
 
@@ -44,6 +46,7 @@ export type KennProjectInfo = {
   references: string[]
   connected: boolean
   sessionStatus: string
+  trackCount: number
 }
 
 const MOCK_MESSAGES: KennChatMessage[] = [
@@ -82,6 +85,7 @@ const MOCK_PROJECT: KennProjectInfo = {
   references: ['Ableton Reference Manual', 'Low-End Mix Guide'],
   connected: true,
   sessionStatus: 'connected',
+  trackCount: 1,
 }
 
 const EMPTY_PROJECT: KennProjectInfo = {
@@ -94,6 +98,7 @@ const EMPTY_PROJECT: KennProjectInfo = {
   references: [],
   connected: false,
   sessionStatus: '',
+  trackCount: 0,
 }
 
 function newId(prefix: string) {
@@ -130,8 +135,9 @@ function mapSessionToProject(
     const raw = rawSession || {}
     const bpm = raw.tempo != null ? `${raw.tempo}` : '120'
     const key = raw.scale_name ? `${raw.scale_name}` : '—'
+    const sessionName = String(raw.session_name ?? raw.set_name ?? raw.name ?? '').trim()
     return {
-      name: 'Ableton Live Session',
+      name: sessionName || 'Ableton Live Session',
       daw: 'Ableton Live 12',
       bpm,
       key,
@@ -140,6 +146,7 @@ function mapSessionToProject(
       references: [],
       connected: true,
       sessionStatus: 'connected',
+      trackCount: tracks.length,
     }
   }
   return {
@@ -156,11 +163,12 @@ function sleep(ms: number) {
   })
 }
 
-const useMock = ref(false)
-const messages = shallowRef<KennChatMessage[]>([...MOCK_MESSAGES])
-const project = ref<KennProjectInfo>({ ...MOCK_PROJECT })
+const useMock = ref(import.meta.env.VITE_KENN_USE_MOCK === '1')
+const messages = shallowRef<KennChatMessage[]>(useMock.value ? [...MOCK_MESSAGES] : [])
+const project = ref<KennProjectInfo>(useMock.value ? { ...MOCK_PROJECT } : { ...EMPTY_PROJECT })
 const sending = ref(false)
 const error = ref('')
+const lastActionAt = ref<Date | null>(null)
 const sessionId = getOrCreateSessionId()
 
 export async function refreshSessionCard() {
@@ -213,7 +221,7 @@ async function sendMessage(text: string) {
             : m.text || (m.steps || []).join('\n') || '',
       }))
 
-    const { answer, suggestions, sources, proposal } = await askKenn({
+    const { answer, suggestions, sources, findings, proposal } = await askKenn({
       question,
       sessionId,
       history: history.slice(0, -1),
@@ -226,6 +234,7 @@ async function sendMessage(text: string) {
         text: answer,
         suggestions: suggestions.length ? suggestions : undefined,
         sources: sources.length ? sources : undefined,
+        findings: findings.length ? findings : undefined,
         proposal: proposal || undefined,
         actionStatus: proposal ? 'pending' : undefined,
       },
@@ -275,6 +284,7 @@ async function applyMessageProposal(messageId: string) {
     }
     msg.receipt = res.receipt
     msg.actionStatus = 'applied'
+    lastActionAt.value = new Date()
     messages.value = [...messages.value]
     await refreshSessionCard()
   } catch (e) {
@@ -301,6 +311,7 @@ async function undoMessageProposal(messageId: string) {
       throw new Error(res.error || res.answer || 'Undo could not be completed.')
     }
     msg.actionStatus = 'undone'
+    lastActionAt.value = new Date()
     messages.value = [...messages.value]
     await refreshSessionCard()
   } catch (e) {
@@ -310,6 +321,15 @@ async function undoMessageProposal(messageId: string) {
   }
 }
 
+function rejectMessageProposal(messageId: string) {
+  const msg = messages.value.find((m) => m.id === messageId) as KennAssistantMessage | undefined
+  if (!msg?.proposal || msg.actionStatus === 'applied') return
+  msg.actionStatus = 'rejected'
+  msg.actionError = undefined
+  lastActionAt.value = new Date()
+  messages.value = [...messages.value]
+}
+
 export function useKenn() {
   return {
     useMock: computed(() => useMock.value),
@@ -317,9 +337,11 @@ export function useKenn() {
     project,
     sending,
     error,
+    lastActionAt,
     sendMessage,
     refreshSessionCard,
     applyMessageProposal,
     undoMessageProposal,
+    rejectMessageProposal,
   }
 }
