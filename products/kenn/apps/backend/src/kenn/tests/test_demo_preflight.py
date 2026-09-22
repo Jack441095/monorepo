@@ -67,6 +67,36 @@ def test_transport_failure_is_plain_english_without_errno_or_runtime_type() -> N
     assert "Errno" not in result.detail
 
 
+def test_ping_retries_one_transient_over_budget_sample() -> None:
+    class TransientPingPreflight(FakePreflight):
+        ping_latencies = iter([104.9, 42.0])
+
+        def _request(self, path, payload=None, *, timeout=2.0):
+            if path == "/api/ableton/ping":
+                return {"ok": True, "connected": True}, next(self.ping_latencies)
+            return super()._request(path, payload, timeout=timeout)
+
+    result = TransientPingPreflight("http://kenn.test", expected_tracks=[]).run(["ableton_ping"])[0]
+
+    assert result.passed is True
+    assert result.detail == "Ableton connected; ping 42.0ms (attempt 2/3)"
+
+
+def test_ping_fails_when_every_connected_sample_misses_budget() -> None:
+    class SlowPingPreflight(FakePreflight):
+        ping_latencies = iter([130.0, 115.0, 125.0])
+
+        def _request(self, path, payload=None, *, timeout=2.0):
+            if path == "/api/ableton/ping":
+                return {"ok": True, "connected": True}, next(self.ping_latencies)
+            return super()._request(path, payload, timeout=timeout)
+
+    result = SlowPingPreflight("http://kenn.test", expected_tracks=[]).run(["ableton_ping"])[0]
+
+    assert result.passed is False
+    assert result.detail == "Fastest of 3 connected OSC pings was 115.0ms; demo budget is under 100ms."
+
+
 def test_unexpected_preflight_exception_does_not_leak_raw_details() -> None:
     runner = DemoPreflight("http://kenn.test", expected_tracks=[])
 
