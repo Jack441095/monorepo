@@ -353,6 +353,52 @@ def test_command_boundary_converts_unhandled_timeout_to_safe_plain_english() -> 
     assert "raw socket" not in str(result)
 
 
+def test_unknown_command_lists_supported_demo_capabilities() -> None:
+    result = handle_command(
+        "make it sound like a purple spaceship",
+        session_id="unknown-command",
+        service=_service(FakeLive()),
+        allow_llm=False,
+    )
+
+    assert result["status"] == "clarification_required"
+    assert result["changed"] is False
+    assert result["answer"].startswith("I'm not sure what you're asking.")
+    assert "track volume/pan/mute/solo" in result["answer"]
+    assert "exact undo" in result["answer"]
+
+
+def test_missing_eq_names_devices_visible_on_the_target_track() -> None:
+    fake = FakeLive()
+    fake.state["tracks"][1]["devices"] = [{"index": 0, "name": "Compressor"}]
+
+    result = handle_command(
+        "boost 3 dB at 200 Hz on the Bass EQ",
+        session_id="missing-eq",
+        service=_service(fake),
+        allow_llm=False,
+    )
+
+    assert result["status"] == "clarification_required"
+    assert result["changed"] is False
+    assert "I can't find EQ Eight" in result["answer"]
+    assert "Here's what I can see: Compressor" in result["answer"]
+    assert "nothing changed" in result["answer"].lower()
+
+
+def test_out_of_range_device_value_reports_verified_safe_range() -> None:
+    result = handle_command(
+        "set the Vocal Compressor threshold to -70 dB",
+        session_id="unsafe-threshold",
+        service=_service(FakeLive()),
+        allow_llm=False,
+    )
+
+    assert result["status"] == "clarification_required"
+    assert result["changed"] is False
+    assert result["answer"] == "That value is outside the safe range. The verified range for Threshold is -57.2 to 6 dB."
+
+
 def test_again_and_it_resolve_through_real_command_path() -> None:
     fake = FakeLive()
     service = _service(fake)
@@ -1985,7 +2031,7 @@ def test_llm_planner_receives_target_device_capabilities_and_exact_profile_is_en
     out_of_range = {**valid, "value": -80.0}
     checked = validate_llm_plan(out_of_range, enriched)
     assert checked["ok"] is False
-    assert "qualified range" in checked["error"]
+    assert "outside the safe range" in checked["error"]
 
     unsupported_unit = {**valid, "value": 10.0, "unit": "ms"}
     checked = validate_llm_plan(unsupported_unit, enriched)

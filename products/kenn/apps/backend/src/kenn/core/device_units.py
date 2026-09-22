@@ -121,7 +121,14 @@ def display_to_raw(*, device_name: str, parameter_name: str, value: float, unit:
         if profile.display_min <= 0.0 or profile.display_max <= profile.display_min:
             return None, "The qualified logarithmic profile has an invalid range."
         if numeric < profile.display_min or numeric > profile.display_max:
-            return None, f"That displayed value is outside the qualified range {profile.display_min:g}..{profile.display_max:g} {profile.display_unit}."
+            display_unit = {"db": "dB", "hz": "Hz", "khz": "kHz"}.get(
+                profile.display_unit.lower(), profile.display_unit
+            )
+            return None, (
+                "That value is outside the safe range. "
+                f"The verified range for {profile.parameter_name} is "
+                f"{profile.display_min:g} to {profile.display_max:g} {display_unit}."
+            )
         fraction = log(numeric / profile.display_min) / log(profile.display_max / profile.display_min)
         return profile.raw_min + fraction * (profile.raw_max - profile.raw_min), None
     if relative:
@@ -139,7 +146,14 @@ def _table_lookup(profile: DeviceUnitProfile, numeric: float, relative: bool) ->
         return None, "The qualified table profile has too few calibration points."
     displays = [pair[0] for pair in pairs]
     if numeric < displays[0] or numeric > displays[-1]:
-        return None, f"That displayed value is outside the qualified range {displays[0]:g}..{displays[-1]:g} {profile.display_unit}."
+        display_unit = {"db": "dB", "hz": "Hz", "khz": "kHz"}.get(
+            profile.display_unit.lower(), profile.display_unit
+        )
+        return None, (
+            "That value is outside the safe range. "
+            f"The verified range for {profile.parameter_name} is "
+            f"{displays[0]:g} to {displays[-1]:g} {display_unit}."
+        )
     for left, right in zip(pairs, pairs[1:]):
         if left[0] <= numeric <= right[0]:
             if right[0] == left[0]:

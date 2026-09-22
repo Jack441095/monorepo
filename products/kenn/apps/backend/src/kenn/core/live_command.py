@@ -1646,7 +1646,18 @@ def _resolve_eq_band_gain(
             user_number = requested_device_index + 1
             return {"ok": False, "clarification": f"EQ Eight device {user_number} is not present on track '{track.get('name', '')}'; choose an exact existing device. Nothing changed."}
     if len(eq_devices) == 0:
-        return {"ok": False, "clarification": f"Track '{track.get('name', '')}' has no existing EQ Eight. Add one manually first; nothing changed."}
+        visible = ", ".join(
+            str(item.get("name", "")).strip()
+            for item in devices
+            if str(item.get("name", "")).strip()
+        ) or "no devices"
+        return {
+            "ok": False,
+            "clarification": (
+                f"I can see track '{track.get('name', '')}', but I can't find EQ Eight on it. "
+                f"Here's what I can see: {visible}. Add EQ Eight first, then retry; nothing changed."
+            ),
+        }
     if requested_device_index is None and len(eq_devices) > 1:
         return {"ok": False, "clarification": f"Track '{track.get('name', '')}' has multiple EQ Eight devices. Choose the exact one; nothing changed."}
 
@@ -1843,8 +1854,20 @@ def _resolve_eq_band_tuning_gain(
             user_number = requested_device_index + 1
             return {"ok": False, "clarification": f"EQ Eight device {user_number} is not present on track '{track.get('name', '')}'; choose an exact existing device. Nothing changed."}
     if len(eq_devices) != 1:
-        detail = "no existing EQ Eight" if not eq_devices else "multiple EQ Eight devices"
-        return {"ok": False, "clarification": f"Track '{track.get('name', '')}' has {detail}; choose one exact device first. Nothing changed."}
+        if not eq_devices:
+            visible = ", ".join(
+                str(item.get("name", "")).strip()
+                for item in devices
+                if str(item.get("name", "")).strip()
+            ) or "no devices"
+            return {
+                "ok": False,
+                "clarification": (
+                    f"I can see track '{track.get('name', '')}', but I can't find EQ Eight on it. "
+                    f"Here's what I can see: {visible}. Add EQ Eight first, then retry; nothing changed."
+                ),
+            }
+        return {"ok": False, "clarification": f"Track '{track.get('name', '')}' has multiple EQ Eight devices; choose one exact device first. Nothing changed."}
     device = eq_devices[0]
     device_index = int(device.get("index", -1))
     band = str(intent.get("eq_band", "")).strip().upper()
@@ -2405,6 +2428,13 @@ def _handle_command_impl(
         response.update({"status": "refused", "answer": intent.get("error", "That Live action is disabled.")})
         return response
     if intent.get("missing_fields") or intent.get("ambiguity"):
+        if intent.get("action") is None:
+            return _clarification(
+                response,
+                intent,
+                "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, "
+                "qualified device controls, sends, mix advice, change history, and exact undo.",
+            )
         if intent.get("action") in {"insert_device", "insert_device_with_parameter"}:
             device_name = str((intent.get("device") or {}).get("name") or "the device")
             return _clarification(response, intent, f"Which exact Live track should receive {device_name}? I will not change the set until the target is exact.")

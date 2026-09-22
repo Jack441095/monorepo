@@ -935,6 +935,24 @@ def test_eq_frequency_first_boost_resolves_without_a_named_band() -> None:
     assert "eq_band" not in result
 
 
+@pytest.mark.parametrize(
+    ("command", "frequency_hz"),
+    [
+        ("boost 3 dB at 200 Hz on the Bass EQ", 200.0),
+        ("boost 3 dB at 5 kHz on Bass", 5000.0),
+    ],
+)
+def test_compact_eq_boost_demo_phrasing_resolves(command: str, frequency_hz: float) -> None:
+    result = parse_request(command, eq_snapshot())
+
+    assert result["action"] == "set_eq_band_gain"
+    assert result["track"] == {"index": 1, "name": "Bass"}
+    assert result["desired_value"] == 3.0
+    assert result["frequency_hz"] == frequency_hz
+    assert result["relative"] is True
+    assert result["confirmation_required"] is True
+
+
 def test_compound_insert_and_boost_keeps_tuning_visible() -> None:
     result = parse_request("Add EQ Eight to track 3 and boost 500 Hz by 3 dB.", eq_snapshot())
     assert result["action"] == "insert_device"

@@ -439,7 +439,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
             except (TypeError, ValueError):
                 return {"ok": False, "error": f"{action} requires a numeric value."}
             if not math.isfinite(value) or not valid_range[0] <= value <= valid_range[1]:
-                return {"ok": False, "error": f"{action} value is outside valid range {valid_range}."}
+                return {
+                    "ok": False,
+                    "error": (
+                        "That value is outside the safe range. "
+                        f"The range for {action.replace('_', ' ')} is {valid_range[0]:g} to {valid_range[1]:g}."
+                    ),
+                }
         before = track.get(field)
         if before is None:
             return {"ok": False, "error": f"Live snapshot has no readable '{field}' value for this track."}
@@ -2404,7 +2410,14 @@ class LiveActionService(Tier2Tier3ControlMixin):
             return {"ok": False, "error": "Device proposal indices and values must be finite and non-negative."}
         valid_range = proposal.get("valid_range") or []
         if len(valid_range) == 2 and not float(valid_range[0]) <= requested <= float(valid_range[1]):
-            return {"ok": False, "error": "Device proposal value is outside the inspected Live parameter range."}
+            return {
+                "ok": False,
+                "error": (
+                    "That value is outside the safe range. "
+                    f"Live reports a range of {float(valid_range[0]):g} to {float(valid_range[1]):g} "
+                    f"for {proposal.get('parameter', proposal.get('parameter_name', 'this parameter'))}."
+                ),
+            }
         key = str(idempotency_key or proposal.get("id") or "").strip()
         if not key:
             return {"ok": False, "error": "An idempotency key is required for a Live device mutation."}

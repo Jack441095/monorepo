@@ -114,7 +114,7 @@ def test_compressor_threshold_rejects_values_outside_measured_table() -> None:
         value=-70.0, unit="dB",
     )
     assert raw is None
-    assert "outside the qualified range" in (error or "")
+    assert error == "That value is outside the safe range. The verified range for Threshold is -57.2 to 6 dB."
 
 
 def test_auto_filter_frequency_log_mapping_matches_measured_live_points() -> None:
@@ -139,7 +139,7 @@ def test_auto_filter_frequency_rejects_subsonic_requests() -> None:
         value=5.0, unit="hz",
     )
     assert raw is None
-    assert "outside the qualified range" in (error or "")
+    assert error == "That value is outside the safe range. The verified range for Frequency is 20 to 20000 Hz."
 
 
 def test_saturator_drive_db_mapping_is_linear_and_measured() -> None:
