@@ -6,6 +6,7 @@ from copy import deepcopy
 
 import pytest
 
+from kenn.core.live_command import handle_command
 from kenn.core.live_session_questions import answer_live_session_question
 
 
@@ -56,13 +57,15 @@ class Service:
         ("Describe this Live Set.", "4 tracks"),
     ],
 )
-def test_common_session_questions_use_fresh_read_only_snapshot(question: str, expected: str) -> None:
+def test_common_session_questions_use_command_path_with_fresh_read_only_snapshot(question: str, expected: str) -> None:
     client = SessionLive()
-    result = answer_live_session_question(question, service=Service(client))
+    result = handle_command(question, session_id="session-qa", service=Service(client))
 
     assert result is not None
     assert result["status"] == "inspected"
     assert result["changed"] is False
+    assert result["route"] == "ableton_command"
+    assert result["answer_mode"] == "session_question"
     assert expected.casefold() in result["answer"].casefold()
     assert client.reads == 1
 

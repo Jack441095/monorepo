@@ -40,6 +40,7 @@ from kenn.core.clip_duplication_service import ClipDuplicationActionService, PRO
 from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHEMA as CLIP_RENAME_PROPOSAL_SCHEMA
 from kenn.core.live_intent import parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
+from kenn.core.live_session_questions import answer_live_session_question
 from kenn.core.subjective_translator import SubjectiveTranslator
 
 
@@ -2054,6 +2055,20 @@ def handle_command(
         response.update({"status": "invalid", "answer": "Tell me what to inspect or change in Ableton."})
         return response
     live = service or LiveActionService()
+
+    # Session questions are grounded, read-only inspections.  Resolve them
+    # before taking a topology snapshot for intent parsing, but never let a
+    # question-shaped command replace an explicit proposal execution.
+    if proposal is None and llm_plan is None and recipe_steps is None:
+        session_answer = answer_live_session_question(clean_command, service=live)
+        if session_answer is not None:
+            response.update(session_answer)
+            response.update({
+                "route": "ableton_command",
+                "answer_mode": "session_question",
+                "changed": False,
+            })
+            return response
 
     if proposal is not None:
         execution_started = time.monotonic()
