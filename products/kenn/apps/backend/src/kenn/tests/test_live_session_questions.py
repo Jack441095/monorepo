@@ -94,6 +94,24 @@ def test_unrelated_chat_is_not_hijacked() -> None:
     assert client.reads == 0
 
 
+def test_track_count_uses_fresh_song_probe_without_full_snapshot() -> None:
+    class CountProbeLive(SessionLive):
+        def probe_connection(self):
+            return {"status": "connected", "track_count": 4, "track_names": ["1-MIDI", "2-MIDI", "3-Audio", "4-Audio"]}
+
+        def query_session_state(self, **_kwargs):
+            raise AssertionError("track count should not request devices or mixer state")
+
+    result = answer_live_session_question(
+        "How many tracks are there?",
+        service=Service(CountProbeLive()),
+    )
+
+    assert result["status"] == "inspected"
+    assert result["track_count"] == 4
+    assert result["answer"] == "The current Live Set has 4 tracks."
+
+
 def _seed_change_journal(tmp_path, monkeypatch: pytest.MonkeyPatch) -> LiveActionService:
     monkeypatch.setattr(live_receipt_journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
     service = LiveActionService(SessionLive())
