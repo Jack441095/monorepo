@@ -40,11 +40,13 @@ class DemoPreflight:
         *,
         expected_tracks: list[str],
         required_devices: dict[str, list[str]] | None = None,
+        required_returns: dict[str, list[str]] | None = None,
         allow_mutations: bool = False,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.expected_tracks = expected_tracks
         self.required_devices = required_devices or {}
+        self.required_returns = required_returns or {}
         self.allow_mutations = allow_mutations
         self._session: dict[str, Any] | None = None
 
@@ -179,7 +181,35 @@ class DemoPreflight:
         parameters = body.get("parameters") if isinstance(body, dict) else None
         if body.get("success") is not True or not isinstance(parameters, list) or not parameters:
             raise RuntimeError("EQ Eight is visible but its parameters did not resolve.")
-        return f"one exact EQ Eight resolved on Bass ({len(parameters)} parameters)"
+        if self.required_returns:
+            return_body, _ = self._request("/api/ableton/osc/return-tracks")
+            if return_body.get("ok") is not True or not isinstance(return_body.get("return_tracks"), list):
+                raise RuntimeError("Live did not provide readable return-track identity for the demo fixture.")
+            returns = return_body["return_tracks"]
+            for return_name, expected_devices in self.required_returns.items():
+                matches = [
+                    item for item in returns
+                    if isinstance(item, dict) and str(item.get("name") or "") == return_name
+                ]
+                if len(matches) != 1:
+                    raise RuntimeError(
+                        f"The demo fixture must contain exactly one return track named '{return_name}'; "
+                        f"found {len(matches)}."
+                    )
+                visible = [
+                    str(item.get("name") or "") if isinstance(item, dict) else str(item)
+                    for item in matches[0].get("devices") or []
+                ]
+                missing = [name for name in expected_devices if name not in visible]
+                if missing:
+                    raise RuntimeError(
+                        f"I can see return track '{return_name}', but it is missing: {', '.join(missing)}. "
+                        f"Visible devices: {', '.join(visible) or 'none'}."
+                    )
+        return (
+            f"one exact EQ Eight resolved on Bass ({len(parameters)} parameters); "
+            f"{len(self.required_returns)} required return chain(s) verified"
+        )
 
     def audio_analysis(self) -> str:
         from kenn.core.audio_analysis import analyze_wav
@@ -217,14 +247,35 @@ class DemoPreflight:
         target = -0.2 if current >= 0 else 0.2
         session_id = f"demo-preflight-undo-{uuid.uuid4().hex}"
         command = f"pan track 1 {target:g}"
-        planned, _ = self._request("/api/ableton/command", {"session_id": session_id, "command": command, "deterministic_only": True})
+        # A timed-out mutating request is ambiguous: Live may have applied it
+        # even though the client stopped waiting. Keep the supervised probe's
+        # transport timeout above the bounded OSC write/readback path so the
+        # exact inverse is always requested from a known receipt.
+        mutation_timeout = 8.0
+        planned, _ = self._request(
+            "/api/ableton/command",
+            {"session_id": session_id, "command": command, "deterministic_only": True},
+            timeout=mutation_timeout,
+        )
         proposal = planned.get("proposal") or {}
-        applied, _ = self._request("/api/ableton/command", {"session_id": session_id, "proposal": proposal, "confirm_token": proposal.get("confirmation_token"), "idempotency_key": proposal.get("action_id")})
+        applied, _ = self._request(
+            "/api/ableton/command",
+            {"session_id": session_id, "proposal": proposal, "confirm_token": proposal.get("confirmation_token"), "idempotency_key": proposal.get("action_id")},
+            timeout=mutation_timeout,
+        )
         if applied.get("status") != "applied" or (applied.get("receipt") or {}).get("verified") is not True:
             raise RuntimeError("Reversible pan probe did not apply with verified readback.")
-        undo, _ = self._request("/api/ableton/command", {"session_id": session_id, "command": "undo", "deterministic_only": True})
+        undo, _ = self._request(
+            "/api/ableton/command",
+            {"session_id": session_id, "command": "undo", "deterministic_only": True},
+            timeout=mutation_timeout,
+        )
         inverse = undo.get("proposal") or {}
-        reverted, _ = self._request("/api/ableton/command", {"session_id": session_id, "proposal": inverse, "confirm_token": inverse.get("confirmation_token"), "idempotency_key": inverse.get("action_id")})
+        reverted, _ = self._request(
+            "/api/ableton/command",
+            {"session_id": session_id, "proposal": inverse, "confirm_token": inverse.get("confirmation_token"), "idempotency_key": inverse.get("action_id")},
+            timeout=mutation_timeout,
+        )
         if reverted.get("status") != "applied" or (reverted.get("receipt") or {}).get("verified") is not True:
             raise RuntimeError("Undo proposal did not restore the original value with verified readback.")
         return "set + exact undo round-trip verified"
@@ -243,7 +294,7 @@ class DemoPreflight:
         return [self._check(name, checks[name]) for name in selected]
 
 
-def load_fixture(path: Path) -> tuple[list[str], dict[str, list[str]]]:
+def load_fixture(path: Path) -> tuple[list[str], dict[str, list[str]], dict[str, list[str]]]:
     """Load the bounded demo-set contract used by preflight."""
     payload = json.loads(path.read_text(encoding="utf-8"))
     tracks = payload.get("tracks") if isinstance(payload, dict) else None
@@ -263,7 +314,21 @@ def load_fixture(path: Path) -> tuple[list[str], dict[str, list[str]]]:
             raise ValueError(f"Track '{name}' has an invalid required_devices list.")
         if devices:
             required[name] = [str(value).strip() for value in devices]
-    return names, required
+    return_items = payload.get("required_returns") or []
+    if not isinstance(return_items, list):
+        raise ValueError("The demo fixture has an invalid required_returns list.")
+    required_returns: dict[str, list[str]] = {}
+    for item in return_items:
+        if not isinstance(item, dict) or not str(item.get("name") or "").strip():
+            raise ValueError("Every required demo return needs a non-empty name.")
+        name = str(item["name"]).strip()
+        if name in required_returns:
+            raise ValueError(f"The demo fixture repeats return track name '{name}'.")
+        devices = item.get("required_devices") or []
+        if not isinstance(devices, list) or any(not str(value).strip() for value in devices):
+            raise ValueError(f"Return track '{name}' has an invalid required_devices list.")
+        required_returns[name] = [str(value).strip() for value in devices]
+    return names, required, required_returns
 
 
 def main() -> int:
@@ -275,12 +340,13 @@ def main() -> int:
     parser.add_argument("--allow-mutations", action="store_true")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
-    fixture_tracks, required_devices = load_fixture(args.fixture)
+    fixture_tracks, required_devices, required_returns = load_fixture(args.fixture)
     expected_tracks = args.expected_track or fixture_tracks
     runner = DemoPreflight(
         args.url,
         expected_tracks=expected_tracks,
         required_devices=required_devices,
+        required_returns=required_returns,
         allow_mutations=args.allow_mutations,
     )
     selected = args.check or list(runner.checks())
