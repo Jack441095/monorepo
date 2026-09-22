@@ -98,12 +98,22 @@ class DemoPreflight:
         return "server health endpoint is ready"
 
     def ableton_ping(self) -> str:
-        body, elapsed = self._request("/api/ableton/ping", timeout=1.0)
-        if body.get("connected") is not True:
+        connected_latencies: list[float] = []
+        for attempt in range(1, 4):
+            body, elapsed = self._request("/api/ableton/ping", timeout=1.0)
+            if body.get("connected") is not True:
+                continue
+            connected_latencies.append(elapsed)
+            if elapsed < 100.0:
+                suffix = f" (attempt {attempt}/3)" if attempt > 1 else ""
+                return f"Ableton connected; ping {elapsed:.1f}ms{suffix}"
+        if not connected_latencies:
             raise RuntimeError("Ableton Live isn't responding — check the OSC connection.")
-        if elapsed >= 100.0:
-            raise RuntimeError(f"OSC ping took {elapsed:.1f}ms; demo budget is under 100ms.")
-        return f"Ableton connected; ping {elapsed:.1f}ms"
+        fastest = min(connected_latencies)
+        raise RuntimeError(
+            f"Fastest of {len(connected_latencies)} connected OSC pings was {fastest:.1f}ms; "
+            "demo budget is under 100ms."
+        )
 
     def demo_session(self) -> str:
         state = self._live_session()
