@@ -1,0 +1,60 @@
+{
+ "ok": true,
+ "receipt": {
+  "schema": "kenn.ableton_action_receipt.v1",
+  "receipt_id": "receipt-7977fbd0fe2847a89bd20bee660f1979",
+  "action_id": "proposal-a0a404e0e8cd4738ba84e6cb6f228bcf",
+  "action": "set_device_parameter",
+  "idempotency_key": "proposal-a0a404e0e8cd4738ba84e6cb6f228bcf",
+  "status": "applied",
+  "verified": true,
+  "timestamp": 1790028430.2619011,
+  "target": {
+   "target": "ableton_device",
+   "track_index": 2,
+   "track_name": "3-Audio",
+   "device_index": 0,
+   "device_name": "EQ Eight",
+   "parameter_index": 42,
+   "parameter": "4 Gain B"
+  },
+  "parameter_name": "4 Gain B",
+  "unit": "dB",
+  "before": 3.0,
+  "requested": 0.0,
+  "readback": 0.0,
+  "readback_display": "0.00 dB",
+  "write_acknowledgement": "confirmed",
+  "before_value": 3.0,
+  "requested_value": 0.0,
+  "readback_value": 0.0,
+  "write_exchange": {
+   "transport": "abletonosc",
+   "address": "/live/device/set/parameter/value",
+   "request_id": 217,
+   "response_id": null,
+   "response_address": null,
+   "response_ok": false,
+   "round_trip_ms": 0.056
+  },
+  "readback_exchange": {
+   "transport": "abletonosc",
+   "address": "batch",
+   "request_id": null,
+   "response_id": null,
+   "response_address": "/live/device/get/parameters/name",
+   "response_ok": true,
+   "round_trip_ms": 45.447
+  },
+  "undo_payload": {
+   "target": "ableton_device",
+   "track_index": 2,
+   "track_name": "3-Audio",
+   "device_index": 0,
+   "device_name": "EQ Eight",
+   "parameter_index": 42,
+   "parameter_name": "4 Gain B",
+   "restore_value": 3.0
+  }
+ }
+}

@@ -1,0 +1,811 @@
+{
+ "schema": "kenn.ableton_glm_qualification.v1",
+ "captured_at": 1790032000.0,
+ "evidence_kind": "real_live",
+ "origin_main": "1e2b7f6aed3aa536bdab49fc3d6d312a88304fac",
+ "branch": "kenn-qual-glm-eq-intent",
+ "commits": [
+  "3194f0d",
+  "b4eb3f6",
+  "e5e357d",
+  "3dc80bb"
+ ],
+ "worktree": "workspace/worktrees/kenn/qual-glm",
+ "transport_boundary": {
+  "selected_backend": "osc (explicit fallback; KENN_LIVE_BACKEND default)",
+  "mcp_backend_state": "read_only_by_construction; provider unavailable (no ARM64 node runtime, no Control Deck dist build); writes fail closed; allowlist enforced; no silent OSC fallback on misconfiguration",
+  "mcp_provider_identity": "ableton-control-deck (Control_Deck Remote Script installed in Live User Library; MCP server process absent)",
+  "mcp_command": null,
+  "backend_timeout_seconds": 8.0,
+  "live_connection": "AbletonOSC UDP 127.0.0.1:11000/11001",
+  "live_set_identity": "disposable default set: 4 tracks (1-MIDI, 2-MIDI, 3-Audio, 4-Audio), 120 BPM 4/4, stopped, no devices at baseline",
+  "live_edition": "Ableton Live 12 Suite (installed at /Applications/Ableton Live 12 Suite.app, PID 36389)",
+  "osc_client": "products/kenn/apps/backend/src/kenn/ableton_osc_bridge.py (worktree code + first-contact breaker repair)",
+  "chat_surface": "POST /api/ableton/command (deterministic_snapshot_boundary planner; LLM disabled)",
+  "daw_control_flag": "KENN_ALLOW_DAW_CONTROL=1 for the swap window only; default-deny otherwise (403 verified)"
+ },
+ "safety": {
+  "baseline": "recorded 2026-09-21 (4 tracks, no devices, vol 0.85, 120 BPM, stopped); final state identical",
+  "authorization": "disposable-test + companion-swap approved by operator mid-task",
+  "transport": "stopped throughout (is_playing False on every readback)",
+  "fixture_gap": "required 5-track project (Drums/Bass/Synth/Vocal/FX Return, duplicates, clips) not built: track creation is append-only without undo; covered as remaining manual step"
+ },
+ "matrix_record_counts": {
+  "matrix-results.json": 51,
+  "matrix2-results.json": 33,
+  "matrix3-results.json": 13,
+  "matrix4-results.json": 13
+ },
+ "section_verdicts": {
+  "A_connection_session_understanding": {
+   "verdict": "fail",
+   "detail": "7/8 understanding questions clarify-fail; only narrow inspect patterns (devices-on-track, what-is-on-track) answer. No session describe/count/tempo/selected/duplicates Q&A on the command gateway."
+  },
+  "B_exact_EQ_command": {
+   "verdict": "pass",
+   "detail": "Insert EQ Eight on track 3 (index 2, identity-bound, verified readback) + band 4B auto-selected at 500 Hz with +3.00 dB measured readback; exact receipt; gain undo verified 0.00 dB; insertion undo verified, baseline restored. Repeated +2 dB adjust verified 2.00 dB. Duplicate-insert guard refuses. Spoken-number and band-less variants clarify safely."
+  },
+  "C_stock_effects": {
+   "verdict": "partial",
+   "detail": "Insert+undo pass for Compressor, Auto Filter, Saturator, EQ Eight. Threshold -18 dB, cutoff 1 kHz, Drive +4 dB, Hybrid Reverb 15%, Echo 10% all applied with measured display readbacks and verified undos after unit-profile qualification. Utility Gain blocked (endpoint exposes 0..+35 dB only; reductions below 0 dB impossible). Limiter: no exact stock name (honest clarify). Bypass/move/remove: unqualified/refused-by-boundary, all fail-closed with clear messages."
+  },
+  "D_mixer_transport": {
+   "verdict": "partial",
+   "detail": "Volume/pan/mute/unmute/solo apply+undo verified with receipts. Tempo control missing from intent layer (fail-closed clarify). No change-history surface ('What did you change?' clarifies)."
+  },
+  "E_multiturn_context": {
+   "verdict": "fail",
+   "detail": "Command gateway is stateless per call: 'it'/'that'/correction references do not resolve; no conversation memory on this surface. All E items clarify-failed safely (no wrong-track writes)."
+  },
+  "F_ambiguity_identity": {
+   "verdict": "pass",
+   "detail": "Missing referents, unknown tracks/devices/params, out-of-range values all fail closed with specific messages. Duplicate-name and stale-state (rename/reorder/delete between proposal and confirm) paths are guarded in code; live duplicate-name fixture absent (blocked-fixture, unit-covered)."
+  },
+  "G_invalid_unsupported": {
+   "verdict": "pass",
+   "detail": "Nonexistent track/device/parameter, out-of-range volume, MCP-unavailable (offline probe + allowlist + write fail-closed), repeat submission (second confirm rejected as already-executed) all behave correctly. Timeout/malformed-response/partial-mutation paths unit-covered; live chaos not run."
+  },
+  "H_undo_recovery": {
+   "verdict": "partial",
+   "detail": "Every applied mutation undone via identity-bound receipts with verified readbacks; insertion removal verified; restart drops pending proposals (409 fail-closed) while receipt journal persists. Live-restart and 5-track-fixture recovery remain manual."
+  },
+  "musical_intelligence": {
+   "verdict": "fail",
+   "detail": "Open-ended mix requests clarify-fail on the command gateway (no analysis/recommendation path on this surface). No audio/MIDI/arrangement reasoning wired to chat."
+  },
+  "chat_quality": {
+   "verdict": "partial",
+   "detail": "Producer-concise answers; exact proposals; honest clarification; no fabricated hearing claims observed. Gaps: /api/ask 500s without retrieval index (blocked-env); no session Q&A; no change history; rate limiter (60 mutations/60s/IP) tripped during fast scripted runs with 429s."
+  }
+ },
+ "record_verdicts": {
+  "matrix-results.json::baseline": {
+   "result": "record",
+   "verdict": "record",
+   "ms": null,
+   "note": "tracks=[(0, '1-MIDI', []), (1, '2-MIDI', []), (2, '3-Audio', []), (3, '4-Audio', [])] tempo=120.0 playing=False"
+  },
+  "matrix-results.json::A: Are you connected to Ableton?": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 188.7,
+   "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::A: Describe this Live Set.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.7,
+   "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::A: How many tracks are there?": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 198.7,
+   "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::A: What is track 3?": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 204.0,
+   "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No supported Ableton action/value was recognized."
+  },
+  "matrix-results.json::A: List the devices on track 3.": {
+   "result": "inspected",
+   "verdict": "pass-non-mutating",
+   "ms": 196.3,
+   "note": "answer=Track '3-Audio' has 0 device(s): no devices."
+  },
+  "matrix-results.json::A: What is the current tempo and time signature?": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.3,
+   "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::A: Which track is selected?": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.5,
+   "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: track not found in the current Live snapshot"
+  },
+  "matrix-results.json::A: Which tracks have duplicate names?": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.0,
+   "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: track not found in the current Live snapshot"
+  },
+  "matrix-results.json::C-insert: Compressor@track2": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 917.3,
+   "note": "devices-now=[{'index': 0, 'name': 'Compressor'}] receipt=receipt-4e195284c5d5430084e653e47a8e841f verified=True"
+  },
+  "matrix-results.json::C-undo-insert: Compressor@track2": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 601.2,
+   "note": "devices-after=[]"
+  },
+  "matrix-results.json::C-insert: AutoFilter@track3": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 814.5,
+   "note": "devices-now=[{'index': 0, 'name': 'Auto Filter'}] receipt=receipt-90603c59b03c488cada07bdf9c97f013 verified=True"
+  },
+  "matrix-results.json::C-undo-insert: AutoFilter@track3": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 598.3,
+   "note": "devices-after=[]"
+  },
+  "matrix-results.json::C-insert: Saturator@track3": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 855.7,
+   "note": "devices-now=[{'index': 0, 'name': 'Saturator'}] receipt=receipt-9bd45c2d049849c585b15b5c23928d87 verified=True"
+  },
+  "matrix-results.json::C-undo-insert: Saturator@track3": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 598.9,
+   "note": "devices-after=[]"
+  },
+  "matrix-results.json::C-insert: HybridReverb@track4": {
+   "result": "clarify-or-fail",
+   "verdict": "fail-closed",
+   "ms": 191.9,
+   "note": "I could not prepare that multi-step Live request safely: Step 1: natural recipes currently support track controls, play/stop, send levels, and exact existing-de"
+  },
+  "matrix-results.json::C-insert: Echo@track4": {
+   "result": "clarify-or-fail",
+   "verdict": "fail-closed",
+   "ms": 194.2,
+   "note": "I could not prepare that multi-step Live request safely: Step 1: natural recipes currently support track controls, play/stop, send levels, and exact existing-de"
+  },
+  "matrix-results.json::C-honest-fail: Add Utility to track 3 and reduce the ga": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.4,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: The request names a device parameter, but no matching device name exists in the Live sna"
+  },
+  "matrix-results.json::C-honest-fail: Add a limiter to the master and set the ": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.0,
+   "note": "I could not prepare that multi-step Live request safely: Step 1: No track name or number was found in the current Live snapshot.; Step 2: No track name or numbe"
+  },
+  "matrix-results.json::D: volume": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 805.0,
+   "note": "answer=Live change applied and verified. receipt=receipt-16e294d1a4ed464982b99269646a0111 verified=True"
+  },
+  "matrix-results.json::D-undo: volume": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 800.1,
+   "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-058536c315cc46df9e1734248cb8"
+  },
+  "matrix-results.json::D: pan": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 802.3,
+   "note": "answer=Live change applied and verified. receipt=receipt-2b86c72817064645a7657c8cf325d19f verified=True"
+  },
+  "matrix-results.json::D-undo: pan": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 798.7,
+   "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-a76325fa2b554a5b9e6fc2d99bc2"
+  },
+  "matrix-results.json::D: mute": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 798.7,
+   "note": "answer=Live change applied and verified. receipt=receipt-2b8412d7cbb54f7f87f9b10f9e31f347 verified=True"
+  },
+  "matrix-results.json::D-undo: mute": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 796.2,
+   "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-b67096de534045acbc57ca50d00d"
+  },
+  "matrix-results.json::D: unmute": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 804.0999999999999,
+   "note": "answer=Live change applied and verified. receipt=receipt-67ea138ef38b442b939320ec8f68f8e2 verified=True"
+  },
+  "matrix-results.json::D-undo: unmute": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 795.0,
+   "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-a942538558264f91be05d0d0a9d1"
+  },
+  "matrix-results.json::D: solo": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 804.3,
+   "note": "answer=Live change applied and verified. receipt=receipt-356830879235497f9e7f0e55987ccc0f verified=True"
+  },
+  "matrix-results.json::D-undo: solo": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 797.0999999999999,
+   "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-4a0d5ec82e35406eb0b6e22696b0"
+  },
+  "matrix-results.json::D: tempo124": {
+   "result": "clarify-or-fail",
+   "verdict": "fail-closed",
+   "ms": 193.8,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::D: what-changed": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 199.9,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::E1: What is on track 3?": {
+   "result": "inspected",
+   "verdict": "pass-non-mutating",
+   "ms": 200.4,
+   "note": "Track '3-Audio' has 0 device(s): no devices."
+  },
+  "matrix-results.json::E2: Add EQ Eight to it.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.0,
+   "note": "Which exact Live track should receive EQ Eight? I will not change the set until the target is exact."
+  },
+  "matrix-results.json::E3: Boost 500 Hz by 3 dB.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 199.2,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::E4: Make that 2 dB instead.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.1,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::E5: Actually put it at 650 Hz.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.6,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::E6: What have you changed?": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 199.2,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::E7: Undo the last change.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.2,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::E8: Undo the EQ work.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 204.1,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::E-corr1: Add a compressor to the bass.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 197.1,
+   "note": "Which exact Live track should receive Compressor? I will not change the set until the target is exact."
+  },
+  "matrix-results.json::E-corr2: No, I meant the synth.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 198.6,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::E-corr3: Set its threshold to -20 dB.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 200.5,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix-results.json::F/G: Turn it down.": {
+   "result": null,
+   "verdict": "blocked-infra",
+   "ms": 0.9,
+   "note": "Too many requests. Please wait before trying again."
+  },
+  "matrix-results.json::F/G: Fix the vocals.": {
+   "result": null,
+   "verdict": "blocked-infra",
+   "ms": 0.6,
+   "note": "Too many requests. Please wait before trying again."
+  },
+  "matrix-results.json::F/G: Add EQ to the synth.": {
+   "result": null,
+   "verdict": "blocked-infra",
+   "ms": 0.5,
+   "note": "Too many requests. Please wait before trying again."
+  },
+  "matrix-results.json::F/G: Boost 500 Hz by 3 dB on track 9.": {
+   "result": null,
+   "verdict": "blocked-infra",
+   "ms": 0.4,
+   "note": "Too many requests. Please wait before trying again."
+  },
+  "matrix-results.json::F/G: Add a Phasertron to track 1.": {
+   "result": null,
+   "verdict": "blocked-infra",
+   "ms": 0.6,
+   "note": "Too many requests. Please wait before trying again."
+  },
+  "matrix-results.json::F/G: Set Compressor Smurbulence to 5 on track 1.": {
+   "result": null,
+   "verdict": "blocked-infra",
+   "ms": 0.5,
+   "note": "Too many requests. Please wait before trying again."
+  },
+  "matrix-results.json::F/G: Set track 1 volume to 5.0.": {
+   "result": null,
+   "verdict": "blocked-infra",
+   "ms": 0.5,
+   "note": "Too many requests. Please wait before trying again."
+  },
+  "matrix-results.json::MUS: suggest-3": {
+   "result": null,
+   "verdict": "blocked-infra",
+   "ms": 0.5,
+   "note": "None"
+  },
+  "matrix-results.json::final": {
+   "result": "record",
+   "verdict": "record",
+   "ms": null,
+   "note": "tracks=[(0, '1-MIDI', []), (1, '2-MIDI', []), (2, '3-Audio', []), (3, '4-Audio', [])] tempo=120.0 playing=False"
+  },
+  "matrix2-results.json::C2-insert: Compressor-threshold@T2": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 817.9,
+   "note": "receipt=receipt-b31a9c8df4b54cb8b9361c0cffb90d5a track=1"
+  },
+  "matrix2-results.json::C2-param: Compressor-threshold@T2": {
+   "result": "clarify-or-fail",
+   "verdict": "fail-closed",
+   "ms": 396.3,
+   "note": "Proposed value -18.0 is outside valid range [0.0, 1.0] for 'Threshold'."
+  },
+  "matrix2-results.json::C2-undo-insert: Compressor-threshold@T2": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 590.4,
+   "note": "devices-after=[]"
+  },
+  "matrix2-results.json::C2-insert: AutoFilter-cutoff@T3": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 784.5999999999999,
+   "note": "receipt=receipt-eef772fbb7b6425b8f5a9de4b19481f6 track=2"
+  },
+  "matrix2-results.json::C2-param: AutoFilter-cutoff@T3": {
+   "result": "clarify-or-fail",
+   "verdict": "fail-closed",
+   "ms": 397.9,
+   "note": "Proposed value 1000.0 is outside valid range [0.0, 1.0] for 'Frequency'."
+  },
+  "matrix2-results.json::C2-undo-insert: AutoFilter-cutoff@T3": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 592.2,
+   "note": "devices-after=[]"
+  },
+  "matrix2-results.json::C2-insert: Saturator-drive@T3": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 801.3,
+   "note": "receipt=receipt-336ed9cd65204eeb860b9fc01debc1e3 track=2"
+  },
+  "matrix2-results.json::C2-param: Saturator-drive@T3": {
+   "result": "clarify-or-fail",
+   "verdict": "fail-closed",
+   "ms": 305.9,
+   "note": "Proposed value 4.0 is outside valid range [0.0, 1.0] for 'Drive'."
+  },
+  "matrix2-results.json::C2-undo-insert: Saturator-drive@T3": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 592.2,
+   "note": "devices-after=[]"
+  },
+  "matrix2-results.json::C2-insert: HybridReverb-dw@T4": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 828.6999999999999,
+   "note": "receipt=receipt-1ec335fa31094b55a8e009faf936f480 track=3"
+  },
+  "matrix2-results.json::C2-param: HybridReverb-dw@T4": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 899.3,
+   "note": "answer=Live change applied and verified. observed=15 % receipt=receipt-4c93c4405689482b97e1cbf2c8ac4225 verified=True"
+  },
+  "matrix2-results.json::C2-undo-param: HybridReverb-dw@T4": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 996.1,
+   "note": "50 %"
+  },
+  "matrix2-results.json::C2-undo-insert: HybridReverb-dw@T4": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 592.9,
+   "note": "devices-after=[]"
+  },
+  "matrix2-results.json::C2-insert: Echo-dw@T4": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 801.0,
+   "note": "receipt=receipt-550dcd8cd0fe4e52ab939689a8fe195e track=3"
+  },
+  "matrix2-results.json::C2-param: Echo-dw@T4": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 993.2,
+   "note": "answer=Live change applied and verified. observed=10 % receipt=receipt-4132bb598f564764981d15c96020e3d7 verified=True"
+  },
+  "matrix2-results.json::C2-undo-param: Echo-dw@T4": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 991.1,
+   "note": "50 %"
+  },
+  "matrix2-results.json::C2-undo-insert: Echo-dw@T4": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 598.1,
+   "note": "devices-after=[]"
+  },
+  "matrix2-results.json::C2-bmr: Bypass the Compressor on track 2.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 197.5,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: Device enable, bypass, mute, solo, and arm controls are not in the qualified a"
+  },
+  "matrix2-results.json::C2-bmr: Remove the effect you just added.": {
+   "result": "refused",
+   "verdict": "fail-closed",
+   "ms": 194.2,
+   "note": "Deleting, removing, overwriting, and replacing Live content are disabled by the KENN assistant boundary."
+  },
+  "matrix2-results.json::C2-bmr-cleanup": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 592.5,
+   "note": "compressor removed"
+  },
+  "matrix2-results.json::FG: Turn it down.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 194.5,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix2-results.json::FG: Fix the vocals.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 196.4,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix2-results.json::FG: Add EQ to the synth.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 195.1,
+   "note": "Which exact Live track should receive EQ Eight? I will not change the set until the target is exact."
+  },
+  "matrix2-results.json::FG: Boost 500 Hz by 3 dB on track 9.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 198.2,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: Track 9 is not present in the current Live snapshot."
+  },
+  "matrix2-results.json::FG: Add a Phasertron to track 1.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 195.0,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No supported Ableton action/value was recognized."
+  },
+  "matrix2-results.json::FG: Set Compressor Smurbulence to 5 on track 1.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 199.2,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No supported Ableton action/value was recognized."
+  },
+  "matrix2-results.json::FG: Set track 1 volume to 5.0.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 402.3,
+   "note": "set_volume value is outside valid range (0.0, 1.0)."
+  },
+  "matrix2-results.json::FG: Set the tempo to 124 BPM.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 190.3,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix2-results.json::FG: What did you change?": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 198.9,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix2-results.json::G-repeat": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 397.5,
+   "note": "first=applied second=failed This action request was already executed or is already in progress."
+  },
+  "matrix2-results.json::G-repeat-cleanup": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 785.0,
+   "note": "unmuted"
+  },
+  "matrix2-results.json::MUS-suggest": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 189.3,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix2-results.json::final2": {
+   "result": "record",
+   "verdict": "record",
+   "ms": null,
+   "note": "tracks=[(0, '1-MIDI', []), (1, '2-MIDI', []), (2, '3-Audio', []), (3, '4-Audio', [])] tempo=120.0 playing=False"
+  },
+  "matrix3-results.json::U-insert: Compressor-threshold": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 879.3,
+   "note": "receipt=receipt-a1d528997b1a44ca8070ece00d6a5a56"
+  },
+  "matrix3-results.json::U-param: Compressor-threshold": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 990.8,
+   "note": "expect=-18.0 dB measured=-18.0 dB within_tol=True receipt=receipt-b7b66d2bc064478084db3c8f81081711 readback=-18.0 dB"
+  },
+  "matrix3-results.json::U-undo-param: Compressor-threshold": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 995.2,
+   "note": "0.00 dB"
+  },
+  "matrix3-results.json::U-undo-insert: Compressor-threshold": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 590.3,
+   "note": "devices-after=[]"
+  },
+  "matrix3-results.json::U-insert: AutoFilter-cutoff": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 771.0,
+   "note": "receipt=receipt-a97144c20e21495db47b04ef18467df6"
+  },
+  "matrix3-results.json::U-param: AutoFilter-cutoff": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 992.0,
+   "note": "expect=1.00 kHz measured=1.00 kHz within_tol=True receipt=receipt-d4b39b6e97a04560b9179bc0e9f64479 readback=1.00 kHz"
+  },
+  "matrix3-results.json::U-undo-param: AutoFilter-cutoff": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 990.6,
+   "note": "10.0 kHz"
+  },
+  "matrix3-results.json::U-undo-insert: AutoFilter-cutoff": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 593.6,
+   "note": "devices-after=[]"
+  },
+  "matrix3-results.json::U-insert: Saturator-drive": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 837.7,
+   "note": "receipt=receipt-e01bd6c31b454d439e6c862f083a0968"
+  },
+  "matrix3-results.json::U-param: Saturator-drive": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 996.0999999999999,
+   "note": "expect=4.0 dB measured=4.0 dB within_tol=True receipt=receipt-9cee1542e0cf48edb9700e70f8676dab readback=4.0 dB"
+  },
+  "matrix3-results.json::U-undo-param: Saturator-drive": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 994.3,
+   "note": "0.0 dB"
+  },
+  "matrix3-results.json::U-undo-insert: Saturator-drive": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 592.6,
+   "note": "devices-after=[]"
+  },
+  "matrix3-results.json::final3": {
+   "result": "record",
+   "verdict": "record",
+   "ms": null,
+   "note": "tracks=[(0, '1-MIDI', []), (1, '2-MIDI', []), (2, '3-Audio', []), (3, '4-Audio', [])] tempo=120.0 playing=False"
+  },
+  "matrix4-results.json::VAR: Put an EQ Eight on the synth and add 3 dB at 5": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 257.4,
+   "note": "I could not prepare that multi-step Live request safely: Step 1: No track name or number was found in the current Live snapshot.; Step 2: No track nam"
+  },
+  "matrix4-results.json::VAR: Boost 500 Hz by 3 dB.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 203.3,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix4-results.json::VAR: Give the synth a small presence boost at 500 H": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 210.0,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix4-results.json::DUP: propose-first": {
+   "result": "confirmation_required",
+   "verdict": "pass-non-mutating",
+   "ms": 204.8,
+   "note": "I can append EQ Eight to '3-Audio'. Current devices: no devices. After confirmation: EQ Eight. Nothing has changed. Conf"
+  },
+  "matrix4-results.json::DUP: apply-first": {
+   "result": "applied",
+   "verdict": "pass",
+   "ms": 1605.4,
+   "note": "verified=True"
+  },
+  "matrix4-results.json::DUP: second-insert": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 127.0,
+   "note": "Track '3-Audio' already contains EQ Eight; choose the exact existing device instead."
+  },
+  "matrix4-results.json::DUP: adjust-2db-propose": {
+   "result": "confirmation_required",
+   "verdict": "pass-non-mutating",
+   "ms": 497.8,
+   "note": "band=4B after=2.0 I can set 4 Gain B on '3-Audio' -> EQ Eight (device 1) from 0 dB to 2 dB. Nothing has changed. Confi"
+  },
+  "matrix4-results.json::DUP: adjust-2db-apply": {
+   "result": "applied",
+   "verdict": "pass",
+   "ms": 421.6,
+   "note": "readback=2.00 dB verified=True"
+  },
+  "matrix4-results.json::DUP: undo-gain": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 1016.0,
+   "note": "0.00 dB"
+  },
+  "matrix4-results.json::DUP: Move the EQ before the compressor.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 130.3,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot."
+  },
+  "matrix4-results.json::DUP: Bypass the EQ on track 3.": {
+   "result": "clarification_required",
+   "verdict": "fail-closed",
+   "ms": 134.1,
+   "note": "I need one more exact detail before I can prepare a safe Live proposal: Device enable, bypass, mute, solo, and arm controls are not in the qualified a"
+  },
+  "matrix4-results.json::DUP: undo-insert": {
+   "result": "pass",
+   "verdict": "pass",
+   "ms": 600.0,
+   "note": "devices-after=[]"
+  },
+  "matrix4-results.json::RESTART: pre-restart-propose": {
+   "result": "confirmation_required",
+   "verdict": "pass-non-mutating",
+   "ms": 421.2,
+   "note": "token=v1.6ab1b49b...."
+  }
+ },
+ "latency_ms": {
+  "n": 106,
+  "p50": 396.9,
+  "max": 1605.4,
+  "notes": "Per-call HTTP round trips incl. Live OSC read/write+readback. Propose ~104-180ms; confirmed executions ~450-760ms incl. verification. Scripted runs hit the 60-mutations/60s/IP limiter (429) when unpaced."
+ },
+ "defects_fixed": [
+  {
+   "id": "QLM-01",
+   "title": "EQ boost verbs unrecognized; compound insert+tune silently dropped tuning",
+   "repair": "boost/increase/raise verb family with direction-aware sign; frequency-first pattern; follow_up channel surfaced in proposal answers",
+   "tests": [
+    "test_live_intent.py (+6)",
+    "test_live_command.py (+2)"
+   ]
+  },
+  {
+   "id": "QLM-02",
+   "title": "Spoken hundreds/spelled-out units never normalized ('five hundred hertz'/'three decibels')",
+   "repair": "hundred handling, hertz/decibel/kHz lookahead, spacing-preserving replacement",
+   "tests": [
+    "test_live_intent.py"
+   ]
+  },
+  {
+   "id": "QLM-03",
+   "title": "Fresh breaker-enabled OSC client reported Live offline forever (first contact blocked; multi-batch snapshots starved)",
+   "repair": "attempt-once semantics, transport-success state updates, first-contact + fast-fail regression tests",
+   "tests": [
+    "test_ableton_osc_bridge.py (+2)"
+   ]
+  },
+  {
+   "id": "QLM-04",
+   "title": "Display-unit params (Threshold dB, Filter Hz, Drive dB) compared against raw ranges",
+   "repair": "measured table/log/linear evidence-backed profiles; conversion on deterministic + LLM + relative paths with round-trips; raw-domain test doubles",
+   "tests": [
+    "test_device_units.py (+5)",
+    "test_live_command.py (updated)"
+   ]
+  },
+  {
+   "id": "QLM-05",
+   "title": "kHz/spelled-out units lost in device-parameter parsing",
+   "repair": "khz/kilohertz/decibel/hertz alternations + Hz normalization on both intent paths",
+   "tests": [
+    "test_live_intent.py (+2)"
+   ]
+  }
+ ],
+ "known_open": [
+  "tempo intent missing",
+  "change-history surface missing",
+  "multi-turn anaphora unsupported on command gateway",
+  "session Q&A unimplemented",
+  "Utility Gain floor (0..35 dB endpoint)",
+  "Limiter exact-name gap",
+  "move/bypass/remove device actions unqualified-or-refused",
+  "/api/ask 500 without retrieval index",
+  "MCP mutations disabled by design + provider absent",
+  "5-track duplicate/clip fixture absent"
+ ],
+ "limitations": [
+  "Mutations ran over the OSC fallback transport, not the selectable MCP backend (MCP is read-only by construction and its provider was absent).",
+  "Deterministic fake-based coverage stands in for timeout/malformed-response/partial-mutation chaos; live chaos not run.",
+  "Duplicate-name/rename/reorder/delete-between-confirm races are code-guarded and unit-covered, not live-fired (fixture absent).",
+  "No mock results are presented as real-Live behavior; every pass above names its Live readback."
+ ]
+}

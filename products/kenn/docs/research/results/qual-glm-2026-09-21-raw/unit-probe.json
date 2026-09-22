@@ -1,0 +1,187 @@
+{
+ "probes": [
+  {
+   "device": "Compressor",
+   "parameter": "Threshold",
+   "steps": [
+    {
+     "set_raw": 0.0,
+     "send_ok": true,
+     "read_raw": 0.0,
+     "display": "-inf dB"
+    },
+    {
+     "set_raw": 0.25,
+     "send_ok": true,
+     "read_raw": 0.25,
+     "display": "-28.8 dB"
+    },
+    {
+     "set_raw": 0.5,
+     "send_ok": true,
+     "read_raw": 0.5,
+     "display": "-14.0 dB"
+    },
+    {
+     "set_raw": 0.75,
+     "send_ok": true,
+     "read_raw": 0.75,
+     "display": "-4.00 dB"
+    },
+    {
+     "set_raw": 1.0,
+     "send_ok": true,
+     "read_raw": 1.0,
+     "display": "6.00 dB"
+    }
+   ],
+   "insert": {
+    "success": true,
+    "track_index": 2,
+    "device_index": 0,
+    "device_name": "Compressor"
+   },
+   "devices_after_insert": [
+    {
+     "index": 0,
+     "name": "Compressor"
+    }
+   ],
+   "param_index": 1,
+   "raw_min": 0.0,
+   "raw_max": 1.0,
+   "raw_start": 0.8500000238418579,
+   "display_start": "0.00 dB",
+   "display_restored": "0.00 dB",
+   "devices_after_remove": []
+  },
+  {
+   "device": "Auto Filter",
+   "parameter": "Frequency",
+   "steps": [
+    {
+     "set_raw": 0.0,
+     "send_ok": true,
+     "read_raw": 0.0,
+     "display": "20.0 Hz"
+    },
+    {
+     "set_raw": 0.25,
+     "send_ok": true,
+     "read_raw": 0.25,
+     "display": "112 Hz"
+    },
+    {
+     "set_raw": 0.5,
+     "send_ok": true,
+     "read_raw": 0.5,
+     "display": "632 Hz"
+    },
+    {
+     "set_raw": 0.75,
+     "send_ok": true,
+     "read_raw": 0.7500000596046448,
+     "display": "3.56 kHz"
+    },
+    {
+     "set_raw": 1.0,
+     "send_ok": true,
+     "read_raw": 1.0,
+     "display": "20.0 kHz"
+    }
+   ],
+   "insert": {
+    "success": true,
+    "track_index": 2,
+    "device_index": 0,
+    "device_name": "Auto Filter"
+   },
+   "devices_after_insert": [
+    {
+     "index": 0,
+     "name": "Auto Filter"
+    }
+   ],
+   "param_index": 1,
+   "raw_min": 0.0,
+   "raw_max": 1.0,
+   "raw_start": 0.8996566534042358,
+   "display_start": "10.0 kHz",
+   "display_restored": "10.0 kHz",
+   "devices_after_remove": []
+  },
+  {
+   "device": "Saturator",
+   "parameter": "Drive",
+   "steps": [
+    {
+     "set_raw": 0.0,
+     "send_ok": true,
+     "read_raw": 0.0,
+     "display": "-36 dB"
+    },
+    {
+     "set_raw": 0.25,
+     "send_ok": true,
+     "read_raw": 0.25,
+     "display": "-18 dB"
+    },
+    {
+     "set_raw": 0.5,
+     "send_ok": true,
+     "read_raw": 0.5,
+     "display": "0.0 dB"
+    },
+    {
+     "set_raw": 0.75,
+     "send_ok": true,
+     "read_raw": 0.75,
+     "display": "18 dB"
+    },
+    {
+     "set_raw": 1.0,
+     "send_ok": true,
+     "read_raw": 1.0,
+     "display": "36 dB"
+    }
+   ],
+   "insert": {
+    "success": true,
+    "track_index": 2,
+    "device_index": 0,
+    "device_name": "Saturator"
+   },
+   "devices_after_insert": [
+    {
+     "index": 0,
+     "name": "Saturator"
+    }
+   ],
+   "param_index": 1,
+   "raw_min": 0.0,
+   "raw_max": 1.0,
+   "raw_start": 0.5,
+   "display_start": "0.0 dB",
+   "display_restored": "0.0 dB",
+   "devices_after_remove": []
+  },
+  {
+   "device": "Utility",
+   "parameter": "Gain",
+   "steps": [],
+   "insert": {
+    "success": true,
+    "track_index": 2,
+    "device_index": 0,
+    "device_name": "Utility"
+   },
+   "devices_after_insert": [
+    {
+     "index": 0,
+     "name": "Utility"
+    }
+   ],
+   "note": "parameter 'Gain' not present; inventory=['Device On', 'Left Inv', 'Right Inv', 'Channel Mode', 'Stereo Width', 'Mono', 'Bass Mono', 'Bass Freq', 'Balance', 'Output', 'Mute', 'DC Filter']"
+  }
+ ]
+}

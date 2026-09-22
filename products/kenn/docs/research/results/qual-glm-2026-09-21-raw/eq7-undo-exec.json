@@ -1,0 +1,47 @@
+{
+ "ok": true,
+ "receipt": {
+  "schema": "kenn.ableton_action_receipt.v1",
+  "receipt_id": "receipt-f3781eaf08df4649a75ff27f67b25e7b",
+  "action_id": "action-16948286fcce4605a3e046c55baec8dd",
+  "action": "remove_device",
+  "idempotency_key": "action-16948286fcce4605a3e046c55baec8dd",
+  "status": "applied",
+  "verified": true,
+  "timestamp": 1790028434.362118,
+  "target": {
+   "target": "ableton_track",
+   "track_index": 2,
+   "track_name": "3-Audio",
+   "device_index": 0,
+   "device_name": "EQ Eight"
+  },
+  "before_devices": [
+   {
+    "position": 0,
+    "index": 0,
+    "name": "EQ Eight"
+   }
+  ],
+  "requested_devices": [],
+  "readback_devices": [],
+  "write_exchange": {
+   "transport": "abletonosc",
+   "address": "/live/track/delete_device",
+   "request_id": 246,
+   "response_id": null,
+   "response_address": null,
+   "response_ok": false,
+   "round_trip_ms": 0.055
+  },
+  "readback_exchange": {
+   "transport": "abletonosc",
+   "address": "batch",
+   "request_id": null,
+   "response_id": null,
+   "response_address": "/live/track/get/num_devices",
+   "response_ok": true,
+   "round_trip_ms": 62.762
+  }
+ }
+}
