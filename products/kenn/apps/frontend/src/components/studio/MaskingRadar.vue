@@ -5,7 +5,7 @@
       <div class="masking-radar__title-group">
         <h3 class="masking-radar__title">Session Doctor & 40-Band Masking Radar</h3>
         <span class="masking-radar__badge" :data-severity="issuesSeverity">
-          {{ auditReport ? `${auditReport.issues_found} Conflicts Detected` : 'Scanning Session…' }}
+          {{ auditError ? 'Analysis unavailable' : auditReport ? `${auditReport.issues_found} Conflicts Detected` : 'Scanning Session…' }}
         </span>
       </div>
       <div class="masking-radar__actions">
@@ -28,13 +28,14 @@
             <path d="M20 20V15H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             <path d="M20 9C19 6.5 16.5 4.5 13.5 4.1C9.5 3.5 5.8 5.7 4.5 9.5M4 15C5 17.5 7.5 19.5 10.5 19.9C14.5 20.5 18.2 18.3 19.5 14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          {{ loading ? 'Auditing…' : 'Scan Live Live 12' }}
+          {{ loading ? 'Auditing…' : 'Scan Ableton Live 12' }}
         </button>
       </div>
     </div>
+    <p v-if="auditError" class="masking-radar__error" role="status">{{ auditError }}</p>
 
     <!-- Main Visual Split: Left 40-Band ERB Spectrum, Right Collision Matrix -->
-    <div class="masking-radar__body">
+    <div v-if="!auditError" class="masking-radar__body">
       <!-- 40-Band ERB Spectrum Canvas -->
       <div class="masking-radar__spectrum-pane">
         <div class="masking-radar__pane-label">
@@ -65,7 +66,7 @@
           <span class="masking-radar__count">{{ issues.length }} active</span>
         </div>
 
-        <div v-if="issues.length === 0" class="masking-radar__empty">
+        <div v-if="issues.length === 0 && !auditError" class="masking-radar__empty">
           <svg viewBox="0 0 24 24" fill="none" class="masking-radar__empty-icon">
             <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
@@ -167,6 +168,7 @@ const selectedGenre = ref('edm')
 const remediatingCode = ref<string | null>(null)
 const executingRemedy = ref(false)
 const activeProposal = ref<DoctorRemediationProposal | null>(null)
+const auditError = ref('')
 
 const canvasContainer = ref<HTMLDivElement | null>(null)
 const spectrumCanvas = ref<HTMLCanvasElement | null>(null)
@@ -184,37 +186,13 @@ const issuesSeverity = computed(() => {
 
 async function refreshAudit() {
   loading.value = true
+  auditError.value = ''
   try {
     const res = await fetchDoctorAudit()
     auditReport.value = res
   } catch {
-    // Fallback demonstration if live OSC offline
-    auditReport.value = {
-      ok: true,
-      track_count: 8,
-      issues_found: 2,
-      summary: 'Potential masking detected between Kick and Sub-bass, and slight mud in Low-Mids.',
-      issues: [
-        {
-          code: 'clash_sub_kick',
-          severity: 'high',
-          track_index: 1,
-          track_name: 'Kick Drum',
-          conflict_track_index: 2,
-          conflict_track_name: 'Sub Bass',
-          frequency_hz: 60,
-          description: 'Sub-bass fundamental overlaps with kick punch at 60 Hz causing low-end cancelation.',
-        },
-        {
-          code: 'mud_low_mids',
-          severity: 'medium',
-          track_index: 3,
-          track_name: 'Lead Synth',
-          frequency_hz: 280,
-          description: 'Accumulation of low-mid energy creating boxiness in the mix bus.',
-        },
-      ],
-    }
+    auditReport.value = null
+    auditError.value = 'Session analysis is unavailable because KENN or Live is offline. No findings were inferred.'
   } finally {
     loading.value = false
     drawSpectrum()
@@ -223,6 +201,7 @@ async function refreshAudit() {
 
 async function applyRemedy(issue: DoctorIssue) {
   remediatingCode.value = issue.code
+  auditError.value = ''
   try {
     const res = await remediateDoctorIssue({
       issueCode: issue.code,
@@ -231,8 +210,8 @@ async function applyRemedy(issue: DoctorIssue) {
     if (res.proposal) {
       activeProposal.value = res.proposal
     }
-  } catch (err) {
-    console.error('Failed to formulate remediation proposal', err)
+  } catch {
+    auditError.value = 'KENN could not prepare that remediation safely. Nothing changed in Live.'
   } finally {
     remediatingCode.value = null
   }
@@ -249,8 +228,8 @@ async function confirmRemedy() {
     })
     activeProposal.value = null
     await refreshAudit()
-  } catch (err) {
-    console.error('Failed to execute surgical remedy', err)
+  } catch {
+    auditError.value = 'The remediation was not verified, so KENN did not report it as applied. Inspect Live before retrying.'
   } finally {
     executingRemedy.value = false
   }
@@ -376,6 +355,16 @@ watch([selectedGenre], () => {
     gap: 0.12rem;
     padding-bottom: 0.1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &__error {
+    margin: 0;
+    padding: 0.08rem 0.12rem;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    border-radius: 0.06rem;
+    background: rgba(127, 29, 29, 0.18);
+    color: #fecaca;
+    font-size: 0.11rem;
   }
 
   &__title-group {
