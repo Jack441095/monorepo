@@ -21,6 +21,7 @@ from kenn.ableton_osc_bridge import AbletonOSCClient, live_client
 from kenn.core.confirmation import consume_confirmation, issue_confirmation
 from kenn.core.idempotency_bounds import prune_if_needed
 from kenn.core.receipt_contract import StageTimer, classify_retry_safety, resolve_correlation_id
+from kenn.core.live_receipt_journal import list_receipts
 from kenn.core.midi_clip_service import (
     MidiClipActionService,
     PROPOSAL_SCHEMA as MIDI_CLIP_PROPOSAL_SCHEMA,
@@ -334,6 +335,74 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 pass
             return {"status": "offline", "tracks": []}
         return state
+
+    def describe_recent_changes(self, limit: int = 10) -> dict[str, Any]:
+        """Return a bounded, human-readable view of the durable receipt journal."""
+        try:
+            bounded_limit = max(1, min(int(limit), 50))
+        except (TypeError, ValueError):
+            bounded_limit = 10
+        rows = list_receipts(limit=bounded_limit)
+        changes: list[dict[str, Any]] = []
+        for row in rows:
+            receipt = row.get("receipt") if isinstance(row, dict) else None
+            if not isinstance(receipt, dict):
+                continue
+            action = str(receipt.get("action") or receipt.get("schema") or "change")
+            target = receipt.get("target") if isinstance(receipt.get("target"), dict) else {}
+            track = str(target.get("track_name") or receipt.get("track_name") or "").strip()
+            device = str(target.get("device_name") or receipt.get("device_name") or "").strip()
+            parameter = str(target.get("parameter") or receipt.get("parameter_name") or "").strip()
+            before = receipt.get("before")
+            after = receipt.get("readback", receipt.get("requested"))
+            undo_available = bool(
+                receipt.get("undo_available")
+                if "undo_available" in receipt
+                else receipt.get("status") == "applied"
+                and receipt.get("verified") is True
+                and isinstance(receipt.get("undo_payload"), dict)
+            )
+            changes.append({
+                "receipt_id": str(receipt.get("receipt_id") or ""),
+                "action": action,
+                "track": track,
+                "device": device,
+                "parameter": parameter,
+                "before": before,
+                "after": after,
+                "timestamp": receipt.get("timestamp", row.get("recorded_at")),
+                "undo_available": undo_available,
+            })
+
+        if not changes:
+            return {
+                "status": "no_changes",
+                "answer": "I haven't made any changes to this session yet.",
+                "changes": [],
+                "changed": False,
+            }
+
+        lines: list[str] = []
+        for change in changes:
+            location = ""
+            if change["track"]:
+                location = f" on {change['track']}"
+            if change["device"]:
+                location += f" / {change['device']}"
+            if change["parameter"]:
+                location += f" / {change['parameter']}"
+            transition = ""
+            if change["before"] is not None or change["after"] is not None:
+                transition = f": {change['before']} → {change['after']}"
+            undo = "undoable" if change["undo_available"] else "not undoable"
+            label = change["action"].replace("_", " ")
+            lines.append(f"- {label}{location}{transition} ({undo})")
+        return {
+            "status": "inspected",
+            "answer": f"Here are my last {len(changes)} changes:\n" + "\n".join(lines),
+            "changes": changes,
+            "changed": False,
+        }
 
     def propose_track_action(
         self,

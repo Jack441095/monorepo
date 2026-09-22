@@ -21,6 +21,11 @@ def _question_kind(question: str) -> str | None:
     lower = " ".join(str(question or "").casefold().split())
     if not lower:
         return None
+    if (
+        re.search(r"\b(?:what did you change|what have you changed|show(?: me)? (?:the )?history|change history|recent changes)\b", lower)
+        or re.search(r"\bundo everything\b", lower)
+    ):
+        return "change_history"
     if "ableton" in lower and any(word in lower for word in ("connected", "connection", "online", "status")):
         return "connection"
     if re.search(r"\bhow many\s+(?:live\s+)?tracks?\b", lower):
@@ -49,6 +54,14 @@ def answer_live_session_question(
         return None
 
     live = service or LiveActionService()
+    if kind == "change_history":
+        result = live.describe_recent_changes(limit=10)
+        return {
+            "schema": "kenn.ableton_session_answer.v1",
+            "intent": {"action": "inspect_change_history"},
+            **result,
+            "changed": False,
+        }
     snapshot = live.snapshot(include_mixer=True)
     if snapshot.get("status") != "connected" or not isinstance(snapshot.get("tracks"), list):
         return {

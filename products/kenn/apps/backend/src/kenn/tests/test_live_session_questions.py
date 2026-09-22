@@ -6,6 +6,8 @@ from copy import deepcopy
 
 import pytest
 
+from kenn.core import live_receipt_journal
+from kenn.core.live_action_service import LiveActionService
 from kenn.core.live_command import handle_command
 from kenn.core.live_session_questions import answer_live_session_question
 
@@ -90,3 +92,60 @@ def test_unrelated_chat_is_not_hijacked() -> None:
 
     assert result is None
     assert client.reads == 0
+
+
+def _seed_change_journal(tmp_path, monkeypatch: pytest.MonkeyPatch) -> LiveActionService:
+    monkeypatch.setattr(live_receipt_journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    service = LiveActionService(SessionLive())
+    for index in range(12):
+        live_receipt_journal.record_receipt(
+            {
+                "schema": "kenn.ableton_action_receipt.v1",
+                "receipt_id": f"receipt-{index}",
+                "action": "set_volume",
+                "status": "applied",
+                "verified": True,
+                "target": {"track_name": f"Track {index}", "parameter": "volume"},
+                "before": round(index / 20, 2),
+                "readback": round((index + 1) / 20, 2),
+                "undo_payload": {"action": "set_volume"},
+                "undo_available": index != 11,
+                "timestamp": 1_700_000_000 + index,
+            },
+            session_id="history-test",
+        )
+    return service
+
+
+def test_describe_recent_changes_is_newest_first_bounded_and_shows_undo_status(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    service = _seed_change_journal(tmp_path, monkeypatch)
+
+    result = service.describe_recent_changes(limit=3)
+
+    assert [item["receipt_id"] for item in result["changes"]] == ["receipt-11", "receipt-10", "receipt-9"]
+    assert "Track 11" in result["answer"]
+    assert "not undoable" in result["answer"]
+    assert "undoable" in result["answer"]
+
+
+def test_describe_recent_changes_handles_empty_journal(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(live_receipt_journal, "JOURNAL_PATH", tmp_path / "missing.jsonl")
+
+    result = LiveActionService(SessionLive()).describe_recent_changes()
+
+    assert result["status"] == "no_changes"
+    assert result["changes"] == []
+    assert "haven't made any changes" in result["answer"]
+
+
+@pytest.mark.parametrize("question", ["What did you change?", "Show me the history", "Undo everything"])
+def test_change_history_uses_command_path_without_reading_live(question: str, tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    service = _seed_change_journal(tmp_path, monkeypatch)
+
+    result = handle_command(question, session_id="history-test", service=service)
+
+    assert result["status"] == "inspected"
+    assert result["intent"] == {"action": "inspect_change_history"}
+    assert result["answer_mode"] == "session_question"
+    assert len(result["changes"]) == 10
+    assert service.client.reads == 0

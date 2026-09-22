@@ -49,6 +49,7 @@ _RECEIPT_FIELDS = frozenset(
         "step_receipts",
         "undo_steps",
         "undo_payload",
+        "undo_available",
     }
 )
 
