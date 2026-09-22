@@ -1,0 +1,28 @@
+{
+  "schema": "kenn.demo_session_fixture.v1",
+  "session_name": "KENN Investor Demo",
+  "track_count": 8,
+  "tracks": [
+    {"name": "Kick", "role": "drums", "required_devices": []},
+    {"name": "Snare / Clap", "role": "drums", "required_devices": []},
+    {"name": "Hi-Hats", "role": "drums", "required_devices": []},
+    {"name": "Drum Bus", "role": "drums", "required_devices": ["Compressor"]},
+    {"name": "Bass", "role": "bass", "required_devices": ["EQ Eight"]},
+    {"name": "Synth", "role": "synth", "required_devices": []},
+    {"name": "Lead Vocal", "role": "vocals", "required_devices": ["Compressor"]},
+    {"name": "FX Print", "role": "fx", "required_devices": []}
+  ],
+  "required_returns": [
+    {"name": "A-Reverb", "required_devices": ["Hybrid Reverb"]}
+  ],
+  "analysis_cues": [
+    "Use original or royalty-free audio only.",
+    "Keep a deliberately hot low-end passage for the bounded masking/headroom discussion.",
+    "Keep one known near-ceiling passage and one stereo passage for listening-test demonstrations.",
+    "Restore this set from its template before every rehearsal."
+  ],
+  "limitations": [
+    "This manifest validates topology; it is not an Ableton .als file and contains no audio.",
+    "Audio findings must come from validated rendered/uploaded audio, not track names or this manifest."
+  ]
+}

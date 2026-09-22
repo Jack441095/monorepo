@@ -21,6 +21,7 @@ from typing import Any, Callable
 
 
 PRODUCT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_FIXTURE_PATH = PRODUCT_ROOT / "tooling" / "demo_session_fixture.json"
 sys.path.insert(0, str(PRODUCT_ROOT / "apps" / "backend" / "src"))
 
 
@@ -33,9 +34,17 @@ class CheckResult:
 
 
 class DemoPreflight:
-    def __init__(self, base_url: str, *, expected_tracks: list[str], allow_mutations: bool = False) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        *,
+        expected_tracks: list[str],
+        required_devices: dict[str, list[str]] | None = None,
+        allow_mutations: bool = False,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
         self.expected_tracks = expected_tracks
+        self.required_devices = required_devices or {}
         self.allow_mutations = allow_mutations
         self._session: dict[str, Any] | None = None
 
@@ -130,6 +139,25 @@ class DemoPreflight:
 
     def device_control(self) -> str:
         tracks = self._live_session().get("tracks") or []
+        if self.required_devices:
+            for track_name, expected_devices in self.required_devices.items():
+                track = next(
+                    (item for item in tracks if isinstance(item, dict) and str(item.get("name")) == track_name),
+                    None,
+                )
+                if track is None:
+                    raise RuntimeError(f"The demo fixture track '{track_name}' is not present.")
+                visible = [
+                    str(item.get("name") or "")
+                    for item in track.get("devices") or []
+                    if isinstance(item, dict)
+                ]
+                missing = [name for name in expected_devices if name not in visible]
+                if missing:
+                    raise RuntimeError(
+                        f"I can see '{track_name}', but it is missing: {', '.join(missing)}. "
+                        f"Visible devices: {', '.join(visible) or 'none'}."
+                    )
         matches = [
             (track, device)
             for track in tracks if isinstance(track, dict)
@@ -205,15 +233,46 @@ class DemoPreflight:
         return [self._check(name, checks[name]) for name in selected]
 
 
+def load_fixture(path: Path) -> tuple[list[str], dict[str, list[str]]]:
+    """Load the bounded demo-set contract used by preflight."""
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    tracks = payload.get("tracks") if isinstance(payload, dict) else None
+    if not isinstance(tracks, list) or not 8 <= len(tracks) <= 16:
+        raise ValueError("The demo fixture must define 8-16 named tracks.")
+    names: list[str] = []
+    required: dict[str, list[str]] = {}
+    for item in tracks:
+        if not isinstance(item, dict) or not str(item.get("name") or "").strip():
+            raise ValueError("Every demo fixture track needs a non-empty name.")
+        name = str(item["name"]).strip()
+        if name in names:
+            raise ValueError(f"The demo fixture repeats track name '{name}'.")
+        names.append(name)
+        devices = item.get("required_devices") or []
+        if not isinstance(devices, list) or any(not str(value).strip() for value in devices):
+            raise ValueError(f"Track '{name}' has an invalid required_devices list.")
+        if devices:
+            required[name] = [str(value).strip() for value in devices]
+    return names, required
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://127.0.0.1:8090")
     parser.add_argument("--expected-track", action="append", default=[])
+    parser.add_argument("--fixture", type=Path, default=DEFAULT_FIXTURE_PATH)
     parser.add_argument("--check", action="append", choices=list(DemoPreflight("", expected_tracks=[]).checks()))
     parser.add_argument("--allow-mutations", action="store_true")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
-    runner = DemoPreflight(args.url, expected_tracks=args.expected_track, allow_mutations=args.allow_mutations)
+    fixture_tracks, required_devices = load_fixture(args.fixture)
+    expected_tracks = args.expected_track or fixture_tracks
+    runner = DemoPreflight(
+        args.url,
+        expected_tracks=expected_tracks,
+        required_devices=required_devices,
+        allow_mutations=args.allow_mutations,
+    )
     selected = args.check or list(runner.checks())
     started = time.perf_counter()
     results = runner.run(selected)
