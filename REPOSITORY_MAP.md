@@ -15,11 +15,7 @@ NITE Submit, evaluation, shared services, and platform technology.
 
 ## Focused KENN collaboration repository
 
-The standalone KENN collaboration/release checkout is:
-
-`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/Shenrendao/KENN`
-
-GitHub: `Nite-DSP/colloidal-cyclone`
+GitHub: `Nite-DSP/kenn`
 
 Its `develop` branch is a focused, portable UX/backend surface. It is not a
 mirror of this monorepo and is not authoritative for cross-product platform

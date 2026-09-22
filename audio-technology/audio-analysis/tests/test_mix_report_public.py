@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-for _p in (REPO_ROOT / "business", REPO_ROOT / "business" / "app", REPO_ROOT / "studio" / "audio_analysis"):
+for _p in (REPO_ROOT / "server", REPO_ROOT / "server" / "app", REPO_ROOT / "studio" / "audio_analysis"):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
