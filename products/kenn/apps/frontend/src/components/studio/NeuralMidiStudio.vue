@@ -54,6 +54,8 @@
       </div>
     </div>
 
+    <p v-if="errorMessage" class="midi-studio__error" role="status">{{ errorMessage }}</p>
+
     <!-- Main Workspace Split: Top Piano Roll Canvas, Bottom Humanization Desk -->
     <div class="midi-studio__body">
       <!-- Piano Roll Display -->
@@ -152,7 +154,8 @@
           <button
             type="button"
             class="midi-studio__commit-btn"
-            :disabled="isCommitting || notes.length === 0"
+            :disabled="isCommitting || notes.length === 0 || !liveInsertionAvailable"
+            title="Live clip insertion is a preview-only roadmap feature"
             @click="commitToLiveClip"
           >
             <span v-if="isCommitting" class="midi-studio__spinner"></span>
@@ -160,7 +163,7 @@
               ✓ Injected into Live 12 Clip!
             </span>
             <span v-else>
-              Commit to Ableton Live 12 Clip
+              Preview Only — Live Insert Not Connected
             </span>
           </button>
         </div>
@@ -181,6 +184,8 @@ import {
 const isGenerating = ref(false)
 const isCommitting = ref(false)
 const committedSuccess = ref(false)
+const errorMessage = ref('')
+const liveInsertionAvailable = false
 
 const selectedScale = ref('F:minor')
 const selectedStyle = ref('rolling_16th')
@@ -192,26 +197,13 @@ const laidbackMs = ref(6)
 const jitterPct = ref(15)
 const targetTrackIndex = ref(1)
 
-const notes = ref<MidiNote[]>([
-  { pitch: 41, start_time: 0.0, duration: 0.45, velocity: 110 },
-  { pitch: 41, start_time: 0.5, duration: 0.4, velocity: 95 },
-  { pitch: 44, start_time: 1.0, duration: 0.45, velocity: 105 },
-  { pitch: 41, start_time: 1.5, duration: 0.35, velocity: 90 },
-  { pitch: 46, start_time: 2.0, duration: 0.45, velocity: 115 },
-  { pitch: 44, start_time: 2.5, duration: 0.4, velocity: 95 },
-  { pitch: 41, start_time: 3.0, duration: 0.9, velocity: 100 },
-])
+const notes = ref<MidiNote[]>([])
 
 const rollContainer = ref<HTMLDivElement | null>(null)
 const rollCanvas = ref<HTMLCanvasElement | null>(null)
 let resizeObserver: ResizeObserver | null = null
 
-const sessionTracks = ref<Array<{ index: number; name: string }>>([
-  { index: 0, name: 'Kick' },
-  { index: 1, name: 'Sub Bass' },
-  { index: 2, name: 'Reese Bass' },
-  { index: 3, name: 'Drums' },
-])
+const sessionTracks = ref<Array<{ index: number; name: string }>>([])
 
 const templates = [
   { id: 'lofi_swing' as const, label: 'Lo-Fi MPC Swing' },
@@ -243,6 +235,7 @@ function setTemplate(t: 'lofi_swing' | 'hiphop_boombap' | 'edm_shuffle') {
 
 async function generateBassline() {
   isGenerating.value = true
+  errorMessage.value = ''
   try {
     const res = await generateMidiBassline({
       scale: selectedScale.value,
@@ -253,8 +246,8 @@ async function generateBassline() {
       notes.value = res.notes
       await onGrooveParamChange()
     }
-  } catch (err) {
-    console.error('Bassline generation failed', err)
+  } catch {
+    errorMessage.value = 'Bassline generation is unavailable. Check the KENN server and try again.'
   } finally {
     isGenerating.value = false
     drawPianoRoll()
@@ -275,26 +268,14 @@ async function onGrooveParamChange() {
       notes.value = res.notes
       drawPianoRoll()
     }
-  } catch (err) {
-    console.error('Groove calculation failed', err)
+  } catch {
+    errorMessage.value = 'The groove preview could not be recalculated. Your previous notes are unchanged.'
   }
 }
 
 async function commitToLiveClip() {
-  isCommitting.value = true
   committedSuccess.value = false
-  try {
-    // Commit via KENN session live OSC clip injection
-    await new Promise((r) => setTimeout(r, 600))
-    committedSuccess.value = true
-    setTimeout(() => {
-      committedSuccess.value = false
-    }, 4000)
-  } catch (err) {
-    console.error('Commit to Live failed', err)
-  } finally {
-    isCommitting.value = false
-  }
+  errorMessage.value = 'Live clip insertion is not qualified yet. This panel is preview-only, so nothing was changed in Ableton.'
 }
 
 function drawPianoRoll() {
@@ -435,6 +416,16 @@ watch([selectedBars, notes], () => {
     gap: 0.12rem;
     padding-bottom: 0.1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &__error {
+    margin: 0;
+    padding: 0.08rem 0.12rem;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    border-radius: 0.06rem;
+    background: rgba(127, 29, 29, 0.18);
+    color: #fecaca;
+    font-size: 0.11rem;
   }
 
   &__title-group {

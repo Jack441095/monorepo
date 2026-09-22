@@ -27,6 +27,10 @@
       <p>Loading Pro Audio Effect Racks…</p>
     </div>
 
+    <div v-else-if="errorMessage" class="rack-gallery__error" role="status">
+      {{ errorMessage }}
+    </div>
+
     <div v-else class="rack-gallery__grid">
       <div
         v-for="rack in filteredRacks"
@@ -139,20 +143,12 @@ const racks = ref<ProRackDefinition[]>([])
 const activeFilter = ref('all')
 const applyingKey = ref<string | null>(null)
 const appliedStatus = reactive<Record<string, string>>({})
+const errorMessage = ref('')
 const targetTracks = reactive<Record<string, number>>({})
 const activeSnapshots = reactive<Record<string, string>>({})
 const customMacroValues = reactive<Record<string, Record<string, number>>>({})
 
-const sessionTracks = ref<Array<{ index: number; name: string }>>([
-  { index: 0, name: 'Kick' },
-  { index: 1, name: 'Sub Bass' },
-  { index: 2, name: 'Reese Bass' },
-  { index: 3, name: 'Snare / Clap' },
-  { index: 4, name: 'HiHats' },
-  { index: 5, name: 'Lead Vocal' },
-  { index: 6, name: 'Backing Vox' },
-  { index: 7, name: 'Synth Chords' },
-])
+const sessionTracks = ref<Array<{ index: number; name: string }>>([])
 
 const categories = [
   { id: 'all', label: 'All 12 Racks' },
@@ -209,6 +205,7 @@ function setMacroValue(rackKey: string, macroName: string, val: number) {
 async function synthesizeRack(rack: ProRackDefinition) {
   applyingKey.value = rack.key
   appliedStatus[rack.key] = ''
+  errorMessage.value = ''
   try {
     const trackIdx = targetTracks[rack.key] ?? 0
     const snap = getActiveSnapshot(rack.key)
@@ -223,8 +220,8 @@ async function synthesizeRack(rack: ProRackDefinition) {
         appliedStatus[rack.key] = ''
       }, 5000)
     }
-  } catch (err) {
-    console.error('Rack synthesis failed', err)
+  } catch {
+    errorMessage.value = 'KENN could not prepare that rack safely. Check the Live connection and try again; nothing changed.'
   } finally {
     applyingKey.value = null
   }
@@ -232,6 +229,7 @@ async function synthesizeRack(rack: ProRackDefinition) {
 
 onMounted(async () => {
   loading.value = true
+  errorMessage.value = ''
   try {
     const [rackList, sessionData] = await Promise.all([
       fetchProRacks(),
@@ -251,8 +249,10 @@ onMounted(async () => {
         name: t.name || `Track ${i + 1}`,
       }))
     }
-  } catch (err) {
-    console.error('Failed to load pro racks', err)
+  } catch {
+    racks.value = []
+    sessionTracks.value = []
+    errorMessage.value = 'Pro Racks are unavailable because KENN is offline. Start the server, then reopen this panel.'
   } finally {
     loading.value = false
   }
@@ -279,6 +279,15 @@ onMounted(async () => {
     gap: 0.12rem;
     padding-bottom: 0.1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &__error {
+    padding: 0.14rem;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    border-radius: 0.08rem;
+    background: rgba(127, 29, 29, 0.18);
+    color: #fecaca;
+    font-size: 0.12rem;
   }
 
   &__title-group {
