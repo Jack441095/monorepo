@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import urllib.error
+from pathlib import Path
 
-from scripts.demo_preflight import DemoPreflight
+from scripts.demo_preflight import DemoPreflight, load_fixture
 
 
 class FakePreflight(DemoPreflight):
@@ -72,3 +73,27 @@ def test_unexpected_preflight_exception_does_not_leak_raw_details() -> None:
     assert result.passed is False
     assert result.detail == "This preflight check could not complete safely — inspect the KENN server log, then retry."
     assert "raw parser internals" not in result.detail
+
+
+def test_default_demo_fixture_contract_is_named_and_device_bound() -> None:
+    fixture = Path(__file__).resolve().parents[5] / "tooling" / "demo_session_fixture.json"
+
+    tracks, devices = load_fixture(fixture)
+
+    assert len(tracks) == 8
+    assert tracks[:2] == ["Kick", "Snare / Clap"]
+    assert devices["Bass"] == ["EQ Eight"]
+    assert devices["Lead Vocal"] == ["Compressor"]
+
+
+def test_device_check_reports_exact_fixture_mismatch() -> None:
+    runner = FakePreflight(
+        "http://kenn.test",
+        expected_tracks=["Kick", "Bass"],
+        required_devices={"Bass": ["EQ Eight", "Saturator"]},
+    )
+
+    result = runner.run(["device_control"])[0]
+
+    assert result.passed is False
+    assert result.detail == "I can see 'Bass', but it is missing: Saturator. Visible devices: EQ Eight."
