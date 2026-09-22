@@ -49,6 +49,7 @@ from kenn.core.subjective_translator import SubjectiveTranslator
 
 
 COMMAND_SCHEMA = "kenn.ableton_command.v1"
+LATENCY_BUDGET_MS = {"parse": 50.0, "snapshot": 200.0, "execution": 100.0, "readback": 200.0, "total": 650.0}
 LLM_PLAN_SCHEMA = "kenn.ableton_llm_plan.v1"
 DEVICE_PARAMETER_ACTIONS = {"set_device_parameter"}
 TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "rename_track"}
@@ -2254,8 +2255,10 @@ def _handle_command_impl(
         snapshot = {**snapshot, "return_tracks": return_tracks}
     llm_metadata: dict[str, Any] = {"status": "not_used"}
     generated_plan: dict[str, Any] | None = None
+    parse_started = time.monotonic()
     deterministic_intent = parse_request(clean_command, snapshot)
     natural_recipe = parse_natural_recipe(clean_command, snapshot)
+    response.setdefault("latency", {})["parse_ms"] = round((time.monotonic() - parse_started) * 1000.0, 2)
     if natural_recipe is not None:
         response["llm"] = {"status": "not_used", "reason": "deterministic_natural_recipe"}
         response["intent"] = natural_recipe
@@ -2627,6 +2630,7 @@ def handle_command(
     allow_llm: bool = True,
 ) -> dict[str, Any]:
     """Fail-safe public boundary for command planning and execution."""
+    command_started = time.monotonic()
     try:
         result = _handle_command_impl(
             command,
@@ -2642,6 +2646,17 @@ def handle_command(
         )
         record_live_exchange(session_id=session_id, command=command, result=result)
         record_shadow_result(result)
+        total_ms = round((time.monotonic() - command_started) * 1000.0, 2)
+        latency = result.setdefault("latency", {})
+        lifecycle = result.get("lifecycle") if isinstance(result.get("lifecycle"), dict) else {}
+        latency.setdefault("snapshot_ms", float(lifecycle.get("snapshot_elapsed_ms", 0.0) or 0.0))
+        latency.setdefault("execution_ms", float(lifecycle.get("execution_elapsed_ms", 0.0) or 0.0))
+        latency["total_ms"] = total_ms
+        latency["budget_ms"] = dict(LATENCY_BUDGET_MS)
+        latency["budget_exceeded"] = [
+            stage for stage in ("parse", "snapshot", "execution", "total")
+            if float(latency.get(f"{stage}_ms", 0.0) or 0.0) > LATENCY_BUDGET_MS[stage]
+        ]
         return result
     except Exception as exc:
         message = str(exc).casefold()
@@ -2658,6 +2673,10 @@ def handle_command(
             "confirmation_required": False,
             "answer": answer,
             "error_code": error_code,
+            "latency": {
+                "total_ms": round((time.monotonic() - command_started) * 1000.0, 2),
+                "budget_ms": dict(LATENCY_BUDGET_MS),
+            },
         })
         _update_lifecycle(response, "failed", verification="not_verified")
         return response
