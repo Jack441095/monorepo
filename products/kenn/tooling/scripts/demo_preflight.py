@@ -158,18 +158,28 @@ class DemoPreflight:
                         f"I can see '{track_name}', but it is missing: {', '.join(missing)}. "
                         f"Visible devices: {', '.join(visible) or 'none'}."
                     )
-        matches = [
-            (track, device)
-            for track in tracks if isinstance(track, dict)
-            for device in track.get("devices") or [] if isinstance(device, dict) and str(device.get("name")) == "EQ Eight"
+        bass_matches = [
+            track for track in tracks
+            if isinstance(track, dict) and str(track.get("name")) == "Bass"
         ]
-        if not matches:
-            raise RuntimeError("I can't find EQ Eight in the demo session; load it on the bass track.")
-        track, device = matches[0]
+        if len(bass_matches) != 1:
+            raise RuntimeError("The demo fixture must contain exactly one track named 'Bass'.")
+        track = bass_matches[0]
+        matches = [
+            device for device in track.get("devices") or []
+            if isinstance(device, dict) and str(device.get("name")) == "EQ Eight"
+        ]
+        if len(matches) != 1:
+            raise RuntimeError(
+                "The Bass track must contain exactly one EQ Eight for the scripted control check; "
+                f"found {len(matches)}."
+            )
+        device = matches[0]
         body, _ = self._request(f"/api/ableton/osc/device-parameters?track_index={track['index']}&device_index={device.get('index', 0)}")
-        if body.get("success") is not True:
+        parameters = body.get("parameters") if isinstance(body, dict) else None
+        if body.get("success") is not True or not isinstance(parameters, list) or not parameters:
             raise RuntimeError("EQ Eight is visible but its parameters did not resolve.")
-        return f"EQ Eight resolved on {track.get('name', 'track')}"
+        return f"one exact EQ Eight resolved on Bass ({len(parameters)} parameters)"
 
     def audio_analysis(self) -> str:
         from kenn.core.audio_analysis import analyze_wav
