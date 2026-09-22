@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import urllib.error
+
 from scripts.demo_preflight import DemoPreflight
 
 
@@ -46,3 +48,27 @@ def test_undo_check_never_mutates_without_explicit_flag() -> None:
 
     assert result.passed is False
     assert "--allow-mutations" in result.detail
+
+
+def test_transport_failure_is_plain_english_without_errno_or_runtime_type() -> None:
+    runner = DemoPreflight("http://127.0.0.1:8090", expected_tracks=[])
+
+    result = runner._check(
+        "server_health",
+        lambda: (_ for _ in ()).throw(urllib.error.URLError(ConnectionRefusedError(61, "Connection refused"))),
+    )
+
+    assert result.passed is False
+    assert result.detail == "KENN isn't responding at http://127.0.0.1:8090 — start the server and retry."
+    assert "urlopen" not in result.detail
+    assert "Errno" not in result.detail
+
+
+def test_unexpected_preflight_exception_does_not_leak_raw_details() -> None:
+    runner = DemoPreflight("http://kenn.test", expected_tracks=[])
+
+    result = runner._check("latency", lambda: (_ for _ in ()).throw(ValueError("raw parser internals")))
+
+    assert result.passed is False
+    assert result.detail == "This preflight check could not complete safely — inspect the KENN server log, then retry."
+    assert "raw parser internals" not in result.detail

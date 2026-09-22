@@ -59,7 +59,21 @@ class DemoPreflight:
             detail = operation()
             return CheckResult(name, True, detail, round((time.perf_counter() - started) * 1000.0, 1))
         except Exception as exc:
-            return CheckResult(name, False, str(exc) or type(exc).__name__, round((time.perf_counter() - started) * 1000.0, 1))
+            return CheckResult(name, False, self._friendly_failure(exc), round((time.perf_counter() - started) * 1000.0, 1))
+
+    def _friendly_failure(self, exc: Exception) -> str:
+        """Return operator guidance without leaking transport/runtime details."""
+        if isinstance(exc, urllib.error.HTTPError):
+            return "A KENN endpoint reported that it is unavailable — check the server log, then retry."
+        if isinstance(exc, (urllib.error.URLError, ConnectionError)):
+            return f"KENN isn't responding at {self.base_url} — start the server and retry."
+        if isinstance(exc, (TimeoutError, OSError)) and "tim" in str(exc).casefold():
+            return "KENN did not respond within the demo timeout — check the server and Live connection."
+        if isinstance(exc, json.JSONDecodeError):
+            return "KENN returned an unreadable response — restart the server before the demo."
+        if isinstance(exc, RuntimeError) and str(exc).strip():
+            return str(exc).strip()
+        return "This preflight check could not complete safely — inspect the KENN server log, then retry."
 
     def _live_session(self) -> dict[str, Any]:
         if self._session is None:
