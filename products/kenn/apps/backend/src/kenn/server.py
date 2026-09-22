@@ -1247,8 +1247,6 @@ class Handler(BaseHTTPRequestHandler):
             })
             return
         if parsed.path == "/api/ableton/ping":
-            from kenn.routes.ableton_routes import handle_ableton_ping
-            live = None
             if AbletonOSCClient is not None:
                 try:
                     from kenn.ableton_osc_bridge import live_client
@@ -1268,13 +1266,8 @@ class Handler(BaseHTTPRequestHandler):
                     })
             else:
                 self.send_json(500, {"ok": False, "error": "Ableton client not available"})
-                from kenn.ableton_osc_bridge import live_client as live
-            code, payload = handle_ableton_ping(live)
-            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/watchdog":
-            from kenn.routes.ableton_routes import handle_ableton_watchdog
-            live = None
             if AbletonOSCClient is not None:
                 try:
                     from kenn.ableton_osc_bridge import live_client
@@ -1291,13 +1284,8 @@ class Handler(BaseHTTPRequestHandler):
                     })
             else:
                 self.send_json(500, {"ok": False, "error": "Ableton client not available"})
-                from kenn.ableton_osc_bridge import live_client as live
-            code, payload = handle_ableton_watchdog(live)
-            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/capabilities":
-            from kenn.routes.ableton_routes import handle_ableton_capabilities
-            live = None
             if AbletonOSCClient is not None:
                 try:
                     from kenn.ableton_osc_bridge import live_client
@@ -1313,9 +1301,6 @@ class Handler(BaseHTTPRequestHandler):
                     })
             else:
                 self.send_json(500, {"ok": False, "status": "error", "error": "Ableton client not available"})
-                from kenn.ableton_osc_bridge import live_client as live
-            code, payload = handle_ableton_capabilities(live)
-            self.send_json(code, payload)
             return
         if parsed.path == "/api/ableton/device-matrix":
             if AbletonOSCClient is not None:
