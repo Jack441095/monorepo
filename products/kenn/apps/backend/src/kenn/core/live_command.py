@@ -568,27 +568,63 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
                 except (TypeError, ValueError):
                     return {"ok": False, "error": "The LLM device value is not numeric enough for capability-range validation."}
                 candidate_value = requested_value
-                if unit in {"%", "ms", "ratio"}:
-                    converted, conversion_error = display_to_raw(
+                range_profile = None
+                parameter_name = str(exact_parameter.get("name", ""))
+                is_relative = bool(plan.get("relative", False))
+                if unit in {"%", "ms", "ratio"} or is_relative:
+                    evidence_profile = find_profile(
                         device_name=observed_name,
-                        parameter_name=str(exact_parameter.get("name", "")),
-                        value=requested_value,
+                        parameter_name=parameter_name,
                         unit=unit,
-                        relative=bool(plan.get("relative", False)),
                     )
-                    if conversion_error:
-                        return {"ok": False, "error": conversion_error}
-                    candidate_value = float(converted)
-                    if bool(plan.get("relative", False)):
+                    if is_relative and evidence_profile is not None and evidence_profile.mapping in {"table", "log"}:
+                        # Tabulated/logarithmic displays have no meaningful
+                        # raw delta: resolve the signed display change
+                        # against the current raw value through a display
+                        # round-trip, mirroring the deterministic resolver.
                         try:
-                            candidate_value += float(exact_parameter.get("value"))
+                            current_raw = float(exact_parameter.get("value"))
                         except (TypeError, ValueError):
-                            return {"ok": False, "error": "The Live capability profile has no usable current value for a relative percentage change."}
-                elif bool(plan.get("relative", False)):
-                    try:
-                        candidate_value += float(exact_parameter.get("value"))
-                    except (TypeError, ValueError):
-                        return {"ok": False, "error": "The Live capability profile has no usable current value for a relative device change."}
+                            return {"ok": False, "error": "The Live capability profile has no usable current value for a relative device change."}
+                        current_display, display_error = raw_to_display(
+                            device_name=observed_name,
+                            parameter_name=parameter_name,
+                            raw=current_raw,
+                            unit=unit,
+                        )
+                        if display_error:
+                            return {"ok": False, "error": display_error}
+                        converted, conversion_error = display_to_raw(
+                            device_name=observed_name,
+                            parameter_name=parameter_name,
+                            value=float(current_display) + requested_value,
+                            unit=unit,
+                        )
+                        if conversion_error:
+                            return {"ok": False, "error": conversion_error}
+                        candidate_value = float(converted)
+                        range_profile = evidence_profile
+                    elif is_relative or unit in {"%", "ms", "ratio"}:
+                        # Linear mappings support raw-delta conversion;
+                        # display_to_raw fails closed for anything without
+                        # an evidence-backed mapping.
+                        converted, conversion_error = display_to_raw(
+                            device_name=observed_name,
+                            parameter_name=parameter_name,
+                            value=requested_value,
+                            unit=unit,
+                            relative=is_relative,
+                        )
+                        if conversion_error:
+                            return {"ok": False, "error": conversion_error}
+                        candidate_value = float(converted)
+                        if is_relative:
+                            try:
+                                candidate_value += float(exact_parameter.get("value"))
+                            except (TypeError, ValueError):
+                                return {"ok": False, "error": "The Live capability profile has no usable current value for a relative change."}
+                        if evidence_profile is not None:
+                            range_profile = evidence_profile
                 else:
                     # Absolute display-unit values (dB, Hz) convert through
                     # an evidence-backed profile when one exists, mirroring
@@ -597,24 +633,31 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
                     # below decides.
                     absolute_profile = find_profile(
                         device_name=observed_name,
-                        parameter_name=str(exact_parameter.get("name", "")),
+                        parameter_name=parameter_name,
                         unit=unit,
                     )
                     if absolute_profile is not None:
                         converted, conversion_error = display_to_raw(
                             device_name=observed_name,
-                            parameter_name=str(exact_parameter.get("name", "")),
+                            parameter_name=parameter_name,
                             value=requested_value,
                             unit=unit,
                         )
                         if conversion_error:
                             return {"ok": False, "error": conversion_error}
                         candidate_value = float(converted)
-                try:
-                    minimum = float(exact_parameter.get("min"))
-                    maximum = float(exact_parameter.get("max"))
-                except (TypeError, ValueError):
-                    minimum = maximum = float("nan")
+                        range_profile = absolute_profile
+                if range_profile is not None:
+                    # The evidence-backed profile is authoritative for raw
+                    # ranges; a snapshot that carries display-unit min/max
+                    # must never gate a converted raw candidate.
+                    minimum, maximum = float(range_profile.raw_min), float(range_profile.raw_max)
+                else:
+                    try:
+                        minimum = float(exact_parameter.get("min"))
+                        maximum = float(exact_parameter.get("max"))
+                    except (TypeError, ValueError):
+                        minimum = maximum = float("nan")
                 if math.isfinite(minimum) and math.isfinite(maximum) and not minimum <= candidate_value <= maximum:
                     return {"ok": False, "error": f"The LLM device value is outside the current Live capability range [{minimum}, {maximum}]."}
         if action in {"set_eq_band_gain", "set_eq_band_tuning_gain"}:
