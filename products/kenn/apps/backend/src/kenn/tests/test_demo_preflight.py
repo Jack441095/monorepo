@@ -97,3 +97,23 @@ def test_device_check_reports_exact_fixture_mismatch() -> None:
 
     assert result.passed is False
     assert result.detail == "I can see 'Bass', but it is missing: Saturator. Visible devices: EQ Eight."
+
+
+def test_device_check_rejects_duplicate_eqs_on_scripted_bass_target() -> None:
+    class DuplicateEqPreflight(FakePreflight):
+        def _live_session(self):
+            state, _ = self._request("/api/ableton/osc/session?detail=topology")
+            bass = next(track for track in state["tracks"] if track["name"] == "Bass")
+            bass["devices"].append({"index": 1, "name": "EQ Eight"})
+            return state
+
+    runner = DuplicateEqPreflight(
+        "http://kenn.test",
+        expected_tracks=["Kick", "Bass"],
+        required_devices={"Bass": ["EQ Eight"]},
+    )
+
+    result = runner.run(["device_control"])[0]
+
+    assert result.passed is False
+    assert result.detail == "The Bass track must contain exactly one EQ Eight for the scripted control check; found 2."
