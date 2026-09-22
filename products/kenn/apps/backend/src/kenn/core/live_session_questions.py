@@ -12,6 +12,7 @@ import re
 from typing import Any
 
 from kenn.core.live_action_service import LiveActionService
+from kenn.core.live_session_advice import mix_advice_from_session
 
 
 _TRACK_NUMBER = re.compile(r"\btrack\s*#?\s*(\d+)\b", re.I)
@@ -26,6 +27,11 @@ def _question_kind(question: str) -> str | None:
         or re.search(r"\bundo everything\b", lower)
     ):
         return "change_history"
+    if re.search(
+        r"\b(?:how does my mix sound|check my low[ -]?end|any masking issues?|analy[sz]e my (?:session|mix)|mix advice|review my mix)\b",
+        lower,
+    ):
+        return "mix_advice"
     if "ableton" in lower and any(word in lower for word in ("connected", "connection", "online", "status")):
         return "connection"
     if re.search(r"\bhow many\s+(?:live\s+)?tracks?\b", lower):
@@ -70,6 +76,13 @@ def answer_live_session_question(
             "changed": False,
             "answer": "I cannot read a fresh Ableton Live snapshot from the selected backend right now.",
             "intent": {"action": f"inspect_{kind}"},
+        }
+
+    if kind == "mix_advice":
+        return {
+            "intent": {"action": "inspect_mix_advice"},
+            **mix_advice_from_session(service=live, snapshot=snapshot),
+            "changed": False,
         }
 
     tracks = [item for item in snapshot.get("tracks", []) if isinstance(item, dict)]
