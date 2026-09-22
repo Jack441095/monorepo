@@ -42,6 +42,8 @@ from kenn.core.live_intent import parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
 from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS
 from kenn.core.live_session_questions import answer_live_session_question
+from kenn.core.live_receipt_journal import list_receipts
+from kenn.core.session_context import preprocess_live_command, record_live_exchange
 from kenn.core.subjective_translator import SubjectiveTranslator
 
 
@@ -2071,6 +2073,24 @@ def _handle_command_impl(
             })
             return response
 
+        resolved_command, context_resolution = preprocess_live_command(
+            clean_command,
+            session_id=response["session_id"],
+        )
+        response["context_resolution"] = context_resolution
+        if resolved_command != clean_command:
+            response["resolved_command"] = resolved_command
+            clean_command = resolved_command
+        if context_resolution.get("resolution") == "undo_last_receipt":
+            rows = list_receipts(session_id=response["session_id"], limit=1)
+            receipt = rows[0].get("receipt") if rows and isinstance(rows[0], dict) else None
+            if not isinstance(receipt, dict):
+                return _clarification(response, {"action": "undo"}, "I don't have a verified change to undo in this session yet.")
+            undo = live.propose_undo(receipt, session_id=response["session_id"])
+            if undo.get("ok") and isinstance(undo.get("proposal"), dict):
+                return _proposal_response(response, undo["proposal"], kind="undo")
+            return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))
+
     if proposal is not None:
         execution_started = time.monotonic()
         schema = str(proposal.get("schema", ""))
@@ -2607,7 +2627,7 @@ def handle_command(
 ) -> dict[str, Any]:
     """Fail-safe public boundary for command planning and execution."""
     try:
-        return _handle_command_impl(
+        result = _handle_command_impl(
             command,
             session_id=session_id,
             service=service,
@@ -2619,6 +2639,8 @@ def handle_command(
             source_evidence=source_evidence,
             allow_llm=allow_llm,
         )
+        record_live_exchange(session_id=session_id, command=command, result=result)
+        return result
     except Exception as exc:
         message = str(exc).casefold()
         if isinstance(exc, TimeoutError) or "timed out" in message or "timeout" in message:
