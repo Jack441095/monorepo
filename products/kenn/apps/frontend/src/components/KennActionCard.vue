@@ -90,6 +90,14 @@
         </svg>
         Apply to Live 12
       </button>
+      <button
+        v-if="cardStatus === 'pending' || cardStatus === 'requires_confirmation' || cardStatus === 'error'"
+        type="button"
+        class="kenn-action-card__btn kenn-action-card__btn--reject"
+        @click="$emit('reject')"
+      >
+        Dismiss
+      </button>
 
       <button
         v-else-if="cardStatus === 'applying'"
@@ -126,6 +134,9 @@
           Restored to Original State
         </span>
       </div>
+      <div v-else-if="cardStatus === 'rejected'" class="kenn-action-card__applied-group">
+        <span class="kenn-action-card__undone-msg">Proposal Dismissed — No Changes Made</span>
+      </div>
     </div>
   </div>
 </template>
@@ -137,7 +148,7 @@ import type { KennActionProposal, KennActionReceipt } from '../api/kenn'
 const props = withDefaults(
   defineProps<{
     proposal: KennActionProposal
-    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'error'
+    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'rejected' | 'error'
     receipt?: KennActionReceipt
     errorMessage?: string
   }>(),
@@ -150,6 +161,7 @@ const props = withDefaults(
 
 defineEmits<{
   (e: 'apply'): void
+  (e: 'reject'): void
   (e: 'undo'): void
 }>()
 
@@ -243,6 +255,8 @@ const statusLabel = computed(() => {
       return 'Undoing...'
     case 'undone':
       return 'Reverted'
+    case 'rejected':
+      return 'Dismissed'
     case 'error':
       return 'Failed'
     default:
@@ -269,6 +283,11 @@ const statusLabel = computed(() => {
   &--undone {
     border-color: rgba(113, 113, 122, 0.4);
     opacity: 0.85;
+  }
+
+  &--rejected {
+    border-color: rgba(113, 113, 122, 0.4);
+    opacity: 0.82;
   }
 
   &--error {
@@ -463,6 +482,7 @@ const statusLabel = computed(() => {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 8px;
     padding-top: 8px;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
@@ -494,6 +514,17 @@ const statusLabel = computed(() => {
       color: #18181b;
       border: none;
       cursor: wait;
+    }
+
+    &--reject {
+      background: transparent;
+      color: #a1a1aa;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+
+      &:hover {
+        color: #f4f4f5;
+        border-color: rgba(255, 255, 255, 0.28);
+      }
     }
 
     &--undo {

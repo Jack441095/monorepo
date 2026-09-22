@@ -14,6 +14,14 @@ export type KennSource = {
   score?: number
 }
 
+export type KennAdviceFinding = {
+  title: string
+  severity: 'info' | 'warning' | 'critical'
+  confidence?: number
+  detail: string
+  listeningTest?: string
+}
+
 export type KennActionProposal = {
   schema?: string
   action: string
@@ -60,11 +68,88 @@ export type KennAskResult = {
   suggestions: string[]
   /** 检索来源；招呼类常为空 */
   sources: KennSource[]
+  /** Read-only mix/session findings; never grants mutation authority. */
+  findings: KennAdviceFinding[]
   /** DAW 变更提案 */
   proposal?: KennActionProposal
   confirmationToken?: string
   requiresConfirmation?: boolean
   raw: Record<string, unknown>
+}
+
+function normalizeSeverity(value: unknown): KennAdviceFinding['severity'] {
+  const severity = String(value ?? '').toLowerCase()
+  if (['critical', 'high', 'error'].includes(severity)) return 'critical'
+  if (['warning', 'warn', 'medium'].includes(severity)) return 'warning'
+  return 'info'
+}
+
+function normalizeConfidence(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined
+  return Math.max(0, Math.min(1, value > 1 ? value / 100 : value))
+}
+
+function findingFrom(raw: unknown): KennAdviceFinding | undefined {
+  if (!raw || typeof raw !== 'object') return undefined
+  const item = raw as Record<string, unknown>
+  const title = String(item.title ?? item.label ?? item.type ?? 'Listening check').trim()
+  const detail = String(
+    item.explanation ?? item.description ?? item.message ?? item.detail ?? item.reason ?? ''
+  ).trim()
+  const listeningTest = String(
+    item.suggested_listening_test ?? item.suggestedAction ?? item.fix_action ?? ''
+  ).trim()
+  if (!detail && !listeningTest) return undefined
+  return {
+    title: title.replace(/_/g, ' '),
+    severity: normalizeSeverity(item.severity),
+    confidence: normalizeConfidence(item.confidence),
+    detail: detail || listeningTest,
+    listeningTest: listeningTest || undefined,
+  }
+}
+
+/** Extract only known, bounded advisory collections from the chat contract. */
+export function parseAdviceFindings(data: Record<string, unknown>): KennAdviceFinding[] {
+  const collections: unknown[][] = []
+  const add = (value: unknown) => {
+    if (Array.isArray(value)) collections.push(value.slice(0, 6))
+  }
+
+  const toolResult = data.tool_result
+  if (toolResult && typeof toolResult === 'object') {
+    add((toolResult as Record<string, unknown>).findings)
+  }
+  const orchestration = data.orchestration
+  if (orchestration && typeof orchestration === 'object') {
+    const orch = orchestration as Record<string, unknown>
+    add(orch.findings)
+    const report = orch.report
+    if (report && typeof report === 'object') {
+      const reportData = report as Record<string, unknown>
+      const mixingDoctor = reportData.mixing_doctor as Record<string, unknown> | undefined
+      const projectHealth = reportData.project_health as Record<string, unknown> | undefined
+      const pluginBus = reportData.plugin_bus as Record<string, unknown> | undefined
+      add(mixingDoctor?.alerts)
+      add(projectHealth?.recommendations)
+      add(pluginBus?.recommendations)
+    }
+  }
+
+  const seen = new Set<string>()
+  const findings: KennAdviceFinding[] = []
+  for (const collection of collections) {
+    for (const raw of collection) {
+      const finding = findingFrom(raw)
+      if (!finding) continue
+      const key = `${finding.title.toLowerCase()}|${finding.detail.toLowerCase()}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      findings.push(finding)
+      if (findings.length >= 8) return findings
+    }
+  }
+  return findings
 }
 
 export type KennSessionTrack = {
@@ -186,6 +271,7 @@ export async function askKenn(params: {
     answer: answer || '(empty reply)',
     suggestions: parseSuggestions(data),
     sources: parseSources(data),
+    findings: parseAdviceFindings(data),
     proposal,
     confirmationToken: confirmationToken || undefined,
     requiresConfirmation: Boolean(data.requires_confirmation || proposal),

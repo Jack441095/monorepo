@@ -39,6 +39,7 @@
         </button>
         <div v-if="!sidebarStore.collapsed" class="home-layout__sidebar-inner">
           <AppHeader embedded class="home-layout__sidebar-header" />
+          <KennLiveStatus />
           <KennChatBody class="home-layout__sidebar-body" aria-label="KENN Chat Area" />
           <KennChatInput :disabled="sending" @send="onSend" />
         </div>
@@ -76,6 +77,7 @@ import AbletonWorkspace from '../../components/AbletonWorkspace.vue'
 import AppHeader from '../../components/AppHeader.vue'
 import KennChatBody from '../../components/KennChatBody.vue'
 import KennChatInput from '../../components/KennChatInput.vue'
+import KennLiveStatus from '../../components/KennLiveStatus.vue'
 
 const { t } = useI18n()
 const sidebarStore = useSidebarStore()
