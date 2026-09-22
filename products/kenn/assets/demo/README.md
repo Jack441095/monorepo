@@ -1,26 +1,32 @@
-# KENN Live 12 Demo Project Template
+# KENN Live 12 Investor Demo Set
 
-This template defines the standard 5-track Ableton Live 12 layout used for the official KENN Live Demonstration:
+`KENN_Live12_Demo.als` is the checked-in Ableton Live 12 topology fixture for
+the investor demo. Open this file before running `tooling/scripts/demo_preflight.py`.
 
-## Track Layout
+## Required topology
 
-1. **Track 1: Drums** (`Audio` or `DrumRack`)
-   - Kick, Snare, and Tops.
-   - Purpose: Rhythm backbone, provides kick transient reference for sidechaining.
+The set mirrors `tooling/demo_session_fixture.json`:
 
-2. **Track 2: Sub Bass** (`Drift` or `Analog` or `Wavetable`)
-   - Tuned sub-bass oscillator.
-   - Intentionally widened slightly or phase-offset in the demo state.
-   - Purpose: Demonstrates Session Doctor detection of sub-bass stereo widening / phase cancellation.
+1. Kick
+2. Snare / Clap
+3. Hi-Hats
+4. Drum Bus — Compressor
+5. Bass — EQ Eight
+6. Synth
+7. Lead Vocal — Compressor
+8. FX Print
 
-3. **Track 3: Synth Leads** (`Wavetable` or `Meld`)
-   - Bright synth chord/lead with 3.8 kHz resonance.
-   - Purpose: Demonstrates conversational insertion of `EQ Eight` with a narrow notch filter.
+Return `A-Reverb` includes Hybrid Reverb. The stock Reverb that precedes it is
+intentional and does not weaken the required-device check.
 
-4. **Track 4: Vocal Stem** (`Audio`)
-   - Vocal recording with proximity effect mud in the 180–300 Hz range.
-   - Purpose: Demonstrates Session Doctor mud detection and high-pass filtering.
+## Scope and rehearsal
 
-5. **Track 5: MIDI Composer** (`Empty MIDI Track`)
-   - Empty clip slots.
-   - Purpose: Demonstrates KENN Generative MIDI tools (16-step Euclidean rhythms and diatonic chord progressions created directly into Live 12 clip slots).
+This file proves a loadable, deterministic Live topology; it does not contain
+licensed or synthetic audio and must not be presented as evidence of audible
+mix quality. Use only original or royalty-free material for audio-analysis
+segments, and base every finding on the rendered or uploaded audio.
+
+Treat the checked-in set as the reset point. Work in a copy during rehearsal,
+then reopen this fixture before the next run. Run the preflight without
+`--allow-mutations` first; use that flag only when a disposable rehearsal copy
+is open and the exact undo probe is intended.

@@ -25,6 +25,8 @@ class FakePreflight(DemoPreflight):
             return {"write_boundary": {"confirmation_required": True, "readback_required": True}}, 2.0
         if path.startswith("/api/ableton/osc/device-parameters"):
             return {"success": True, "parameters": [{"index": 1, "name": "1 Gain A"}]}, 3.0
+        if path == "/api/ableton/osc/return-tracks":
+            return {"ok": True, "return_tracks": [{"index": 0, "name": "A-Reverb", "devices": ["Hybrid Reverb"]}]}, 3.0
         if path == "/api/ableton/command":
             return {"answer_mode": "session_question", "track_count": 8}, 40.0
         raise AssertionError(path)
@@ -78,12 +80,13 @@ def test_unexpected_preflight_exception_does_not_leak_raw_details() -> None:
 def test_default_demo_fixture_contract_is_named_and_device_bound() -> None:
     fixture = Path(__file__).resolve().parents[5] / "tooling" / "demo_session_fixture.json"
 
-    tracks, devices = load_fixture(fixture)
+    tracks, devices, returns = load_fixture(fixture)
 
     assert len(tracks) == 8
     assert tracks[:2] == ["Kick", "Snare / Clap"]
     assert devices["Bass"] == ["EQ Eight"]
     assert devices["Lead Vocal"] == ["Compressor"]
+    assert returns == {"A-Reverb": ["Hybrid Reverb"]}
 
 
 def test_device_check_reports_exact_fixture_mismatch() -> None:
@@ -117,3 +120,25 @@ def test_device_check_rejects_duplicate_eqs_on_scripted_bass_target() -> None:
 
     assert result.passed is False
     assert result.detail == "The Bass track must contain exactly one EQ Eight for the scripted control check; found 2."
+
+
+def test_device_check_reports_required_return_device_mismatch() -> None:
+    class WrongReturnPreflight(FakePreflight):
+        def _request(self, path, payload=None, *, timeout=2.0):
+            if path == "/api/ableton/osc/return-tracks":
+                return {"ok": True, "return_tracks": [{"index": 0, "name": "A-Reverb", "devices": ["Reverb"]}]}, 3.0
+            return super()._request(path, payload, timeout=timeout)
+
+    runner = WrongReturnPreflight(
+        "http://kenn.test",
+        expected_tracks=["Kick", "Bass"],
+        required_devices={"Bass": ["EQ Eight"]},
+        required_returns={"A-Reverb": ["Hybrid Reverb"]},
+    )
+
+    result = runner.run(["device_control"])[0]
+
+    assert result.passed is False
+    assert result.detail == (
+        "I can see return track 'A-Reverb', but it is missing: Hybrid Reverb. Visible devices: Reverb."
+    )
