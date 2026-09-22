@@ -337,6 +337,22 @@ def _service(fake: FakeLive) -> LiveActionService:
     return LiveActionService(fake)
 
 
+def test_command_boundary_converts_unhandled_timeout_to_safe_plain_english() -> None:
+    class TimedOutService:
+        client = object()
+
+        def snapshot(self, **_kwargs):
+            raise TimeoutError("raw socket timeout details")
+
+    result = handle_command("mute track 2", session_id="timeout", service=TimedOutService())
+
+    assert result["status"] == "failed"
+    assert result["changed"] is False
+    assert result["error_code"] == "ableton_timeout"
+    assert result["answer"] == "Ableton Live isn't responding — check the connection and try again."
+    assert "raw socket" not in str(result)
+
+
 def test_numbered_track_is_proposed_without_a_write_then_verified_on_confirm() -> None:
     fake = FakeLive()
     service = _service(fake)

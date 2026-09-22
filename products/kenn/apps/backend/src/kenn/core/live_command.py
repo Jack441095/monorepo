@@ -2032,7 +2032,7 @@ def _resolve_natural_recipe_steps(
     return resolved, ""
 
 
-def handle_command(
+def _handle_command_impl(
     command: str,
     *,
     session_id: str,
@@ -2583,7 +2583,59 @@ def handle_command(
         if result.get("ok"):
             return _proposal_response(response, result["proposal"], kind="device_parameter")
         return _clarification(response, intent, result.get("clarification", result.get("error", "I could not create a Live device proposal.")))
-    return _clarification(response, intent, "I understood the request, but that Ableton capability is not enabled yet.")
+    return _clarification(
+        response,
+        intent,
+        "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, "
+        "qualified device controls, sends, mix advice, change history, and exact undo.",
+    )
+
+
+def handle_command(
+    command: str,
+    *,
+    session_id: str,
+    service: LiveActionService | None = None,
+    proposal: dict[str, Any] | None = None,
+    confirm_token: str = "",
+    idempotency_key: str = "",
+    llm_plan: dict[str, Any] | None = None,
+    recipe_steps: list[dict[str, Any]] | None = None,
+    source_evidence: dict[str, Any] | None = None,
+    allow_llm: bool = True,
+) -> dict[str, Any]:
+    """Fail-safe public boundary for command planning and execution."""
+    try:
+        return _handle_command_impl(
+            command,
+            session_id=session_id,
+            service=service,
+            proposal=proposal,
+            confirm_token=confirm_token,
+            idempotency_key=idempotency_key,
+            llm_plan=llm_plan,
+            recipe_steps=recipe_steps,
+            source_evidence=source_evidence,
+            allow_llm=allow_llm,
+        )
+    except Exception as exc:
+        message = str(exc).casefold()
+        if isinstance(exc, TimeoutError) or "timed out" in message or "timeout" in message:
+            answer = "Ableton Live isn't responding — check the connection and try again."
+            error_code = "ableton_timeout"
+        else:
+            answer = "I couldn't complete that Ableton request safely. Nothing was changed; check the connection and try again."
+            error_code = "command_failed_safely"
+        response = _base_response(_clean_text(command, 4000), _clean_text(session_id, 128))
+        response.update({
+            "status": "failed",
+            "changed": False,
+            "confirmation_required": False,
+            "answer": answer,
+            "error_code": error_code,
+        })
+        _update_lifecycle(response, "failed", verification="not_verified")
+        return response
 
 
 __all__ = ["COMMAND_SCHEMA", "LLM_COMMAND_SYSTEM_PROMPT", "handle_command", "validate_llm_plan"]
