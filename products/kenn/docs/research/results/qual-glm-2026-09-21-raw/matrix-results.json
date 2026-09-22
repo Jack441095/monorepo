@@ -1,0 +1,357 @@
+[
+ {
+  "result": "record",
+  "note": "tracks=[(0, '1-MIDI', []), (1, '2-MIDI', []), (2, '3-Audio', []), (3, '4-Audio', [])] tempo=120.0 playing=False",
+  "test": "baseline",
+  "at": 1790028618.073745
+ },
+ {
+  "result": "clarification_required",
+  "ms": 188.7,
+  "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "A: Are you connected to Ableton?",
+  "at": 1790028618.263264
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.7,
+  "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "A: Describe this Live Set.",
+  "at": 1790028618.463949
+ },
+ {
+  "result": "clarification_required",
+  "ms": 198.7,
+  "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "A: How many tracks are there?",
+  "at": 1790028618.662664
+ },
+ {
+  "result": "clarification_required",
+  "ms": 204.0,
+  "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No supported Ableton action/value was recognized.",
+  "test": "A: What is track 3?",
+  "at": 1790028618.8666508
+ },
+ {
+  "result": "inspected",
+  "ms": 196.3,
+  "note": "answer=Track '3-Audio' has 0 device(s): no devices.",
+  "test": "A: List the devices on track 3.",
+  "at": 1790028619.0629802
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.3,
+  "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "A: What is the current tempo and time signature?",
+  "at": 1790028619.2633312
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.5,
+  "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: track not found in the current Live snapshot",
+  "test": "A: Which track is selected?",
+  "at": 1790028619.463845
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.0,
+  "note": "answer=I need one more exact detail before I can prepare a safe Live proposal: track not found in the current Live snapshot",
+  "test": "A: Which tracks have duplicate names?",
+  "at": 1790028619.663879
+ },
+ {
+  "result": "pass",
+  "ms": 917.3,
+  "note": "devices-now=[{'index': 0, 'name': 'Compressor'}] receipt=receipt-4e195284c5d5430084e653e47a8e841f verified=True",
+  "test": "C-insert: Compressor@track2",
+  "at": 1790028621.000903
+ },
+ {
+  "result": "pass",
+  "ms": 601.2,
+  "note": "devices-after=[]",
+  "test": "C-undo-insert: Compressor@track2",
+  "at": 1790028622.198543
+ },
+ {
+  "result": "pass",
+  "ms": 814.5,
+  "note": "devices-now=[{'index': 0, 'name': 'Auto Filter'}] receipt=receipt-90603c59b03c488cada07bdf9c97f013 verified=True",
+  "test": "C-insert: AutoFilter@track3",
+  "at": 1790028623.218709
+ },
+ {
+  "result": "pass",
+  "ms": 598.3,
+  "note": "devices-after=[]",
+  "test": "C-undo-insert: AutoFilter@track3",
+  "at": 1790028624.417801
+ },
+ {
+  "result": "pass",
+  "ms": 855.7,
+  "note": "devices-now=[{'index': 0, 'name': 'Saturator'}] receipt=receipt-9bd45c2d049849c585b15b5c23928d87 verified=True",
+  "test": "C-insert: Saturator@track3",
+  "at": 1790028625.499402
+ },
+ {
+  "result": "pass",
+  "ms": 598.9,
+  "note": "devices-after=[]",
+  "test": "C-undo-insert: Saturator@track3",
+  "at": 1790028626.700379
+ },
+ {
+  "result": "clarify-or-fail",
+  "ms": 191.9,
+  "note": "I could not prepare that multi-step Live request safely: Step 1: natural recipes currently support track controls, play/stop, send levels, and exact existing-de",
+  "test": "C-insert: HybridReverb@track4",
+  "at": 1790028626.893416
+ },
+ {
+  "result": "clarify-or-fail",
+  "ms": 194.2,
+  "note": "I could not prepare that multi-step Live request safely: Step 1: natural recipes currently support track controls, play/stop, send levels, and exact existing-de",
+  "test": "C-insert: Echo@track4",
+  "at": 1790028627.292543
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.4,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: The request names a device parameter, but no matching device name exists in the Live sna",
+  "test": "C-honest-fail: Add Utility to track 3 and reduce the ga",
+  "at": 1790028627.492946
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.0,
+  "note": "I could not prepare that multi-step Live request safely: Step 1: No track name or number was found in the current Live snapshot.; Step 2: No track name or numbe",
+  "test": "C-honest-fail: Add a limiter to the master and set the ",
+  "at": 1790028627.692996
+ },
+ {
+  "result": "pass",
+  "ms": 805.0,
+  "note": "answer=Live change applied and verified. receipt=receipt-16e294d1a4ed464982b99269646a0111 verified=True",
+  "test": "D: volume",
+  "at": 1790028628.4987829
+ },
+ {
+  "result": "pass",
+  "ms": 800.1,
+  "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-058536c315cc46df9e1734248cb8",
+  "test": "D-undo: volume",
+  "at": 1790028629.2990348
+ },
+ {
+  "result": "pass",
+  "ms": 802.3,
+  "note": "answer=Live change applied and verified. receipt=receipt-2b86c72817064645a7657c8cf325d19f verified=True",
+  "test": "D: pan",
+  "at": 1790028630.102262
+ },
+ {
+  "result": "pass",
+  "ms": 798.7,
+  "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-a76325fa2b554a5b9e6fc2d99bc2",
+  "test": "D-undo: pan",
+  "at": 1790028630.901074
+ },
+ {
+  "result": "pass",
+  "ms": 798.7,
+  "note": "answer=Live change applied and verified. receipt=receipt-2b8412d7cbb54f7f87f9b10f9e31f347 verified=True",
+  "test": "D: mute",
+  "at": 1790028631.7008882
+ },
+ {
+  "result": "pass",
+  "ms": 796.2,
+  "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-b67096de534045acbc57ca50d00d",
+  "test": "D-undo: mute",
+  "at": 1790028632.4971662
+ },
+ {
+  "result": "pass",
+  "ms": 804.0999999999999,
+  "note": "answer=Live change applied and verified. receipt=receipt-67ea138ef38b442b939320ec8f68f8e2 verified=True",
+  "test": "D: unmute",
+  "at": 1790028633.302063
+ },
+ {
+  "result": "pass",
+  "ms": 795.0,
+  "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-a942538558264f91be05d0d0a9d1",
+  "test": "D-undo: unmute",
+  "at": 1790028634.0971148
+ },
+ {
+  "result": "pass",
+  "ms": 804.3,
+  "note": "answer=Live change applied and verified. receipt=receipt-356830879235497f9e7f0e55987ccc0f verified=True",
+  "test": "D: solo",
+  "at": 1790028634.902154
+ },
+ {
+  "result": "pass",
+  "ms": 797.0999999999999,
+  "note": "{'ok': True, 'receipt': {'schema': 'kenn.ableton_action_receipt.v1', 'receipt_id': 'receipt-4a0d5ec82e35406eb0b6e22696b0",
+  "test": "D-undo: solo",
+  "at": 1790028635.6992671
+ },
+ {
+  "result": "clarify-or-fail",
+  "ms": 193.8,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "D: tempo124",
+  "at": 1790028635.8930838
+ },
+ {
+  "result": "clarification_required",
+  "ms": 199.9,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "D: what-changed",
+  "at": 1790028636.092958
+ },
+ {
+  "result": "inspected",
+  "ms": 200.4,
+  "note": "Track '3-Audio' has 0 device(s): no devices.",
+  "test": "E1: What is on track 3?",
+  "at": 1790028636.293355
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.0,
+  "note": "Which exact Live track should receive EQ Eight? I will not change the set until the target is exact.",
+  "test": "E2: Add EQ Eight to it.",
+  "at": 1790028636.493349
+ },
+ {
+  "result": "clarification_required",
+  "ms": 199.2,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "E3: Boost 500 Hz by 3 dB.",
+  "at": 1790028636.692568
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.1,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "E4: Make that 2 dB instead.",
+  "at": 1790028636.892656
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.6,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "E5: Actually put it at 650 Hz.",
+  "at": 1790028637.093312
+ },
+ {
+  "result": "clarification_required",
+  "ms": 199.2,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "E6: What have you changed?",
+  "at": 1790028637.2925088
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.2,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "E7: Undo the last change.",
+  "at": 1790028637.492754
+ },
+ {
+  "result": "clarification_required",
+  "ms": 204.1,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "E8: Undo the EQ work.",
+  "at": 1790028637.696934
+ },
+ {
+  "result": "clarification_required",
+  "ms": 197.1,
+  "note": "Which exact Live track should receive Compressor? I will not change the set until the target is exact.",
+  "test": "E-corr1: Add a compressor to the bass.",
+  "at": 1790028637.894042
+ },
+ {
+  "result": "clarification_required",
+  "ms": 198.6,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "E-corr2: No, I meant the synth.",
+  "at": 1790028638.092711
+ },
+ {
+  "result": "clarification_required",
+  "ms": 200.5,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "E-corr3: Set its threshold to -20 dB.",
+  "at": 1790028638.293256
+ },
+ {
+  "result": null,
+  "ms": 0.9,
+  "note": "Too many requests. Please wait before trying again.",
+  "test": "F/G: Turn it down.",
+  "at": 1790028638.294202
+ },
+ {
+  "result": null,
+  "ms": 0.6,
+  "note": "Too many requests. Please wait before trying again.",
+  "test": "F/G: Fix the vocals.",
+  "at": 1790028638.294822
+ },
+ {
+  "result": null,
+  "ms": 0.5,
+  "note": "Too many requests. Please wait before trying again.",
+  "test": "F/G: Add EQ to the synth.",
+  "at": 1790028638.2953331
+ },
+ {
+  "result": null,
+  "ms": 0.4,
+  "note": "Too many requests. Please wait before trying again.",
+  "test": "F/G: Boost 500 Hz by 3 dB on track 9.",
+  "at": 1790028638.295755
+ },
+ {
+  "result": null,
+  "ms": 0.6,
+  "note": "Too many requests. Please wait before trying again.",
+  "test": "F/G: Add a Phasertron to track 1.",
+  "at": 1790028638.2964008
+ },
+ {
+  "result": null,
+  "ms": 0.5,
+  "note": "Too many requests. Please wait before trying again.",
+  "test": "F/G: Set Compressor Smurbulence to 5 on track 1.",
+  "at": 1790028638.296876
+ },
+ {
+  "result": null,
+  "ms": 0.5,
+  "note": "Too many requests. Please wait before trying again.",
+  "test": "F/G: Set track 1 volume to 5.0.",
+  "at": 1790028638.297432
+ },
+ {
+  "result": null,
+  "ms": 0.5,
+  "note": "None",
+  "test": "MUS: suggest-3",
+  "at": 1790028638.298849
+ },
+ {
+  "result": "record",
+  "note": "tracks=[(0, '1-MIDI', []), (1, '2-MIDI', []), (2, '3-Audio', []), (3, '4-Audio', [])] tempo=120.0 playing=False",
+  "test": "final",
+  "at": 1790028638.499114
+ }
+]

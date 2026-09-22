@@ -1,0 +1,272 @@
+{
+ "probes": [
+  {
+   "device": "Compressor",
+   "parameter": "Threshold",
+   "index": 1,
+   "raw_min": 0.0,
+   "raw_max": 1.0,
+   "start_raw": 0.8500000238418579,
+   "start_display": "0.00 dB",
+   "table": [
+    {
+     "raw": 0.0,
+     "read_raw": 0.0,
+     "display": "-inf dB"
+    },
+    {
+     "raw": 0.05,
+     "read_raw": 0.05000000074505806,
+     "display": "-57.2 dB"
+    },
+    {
+     "raw": 0.1,
+     "read_raw": 0.10000000149011612,
+     "display": "-48.6 dB"
+    },
+    {
+     "raw": 0.15,
+     "read_raw": 0.15000000596046448,
+     "display": "-41.0 dB"
+    },
+    {
+     "raw": 0.2,
+     "read_raw": 0.20000000298023224,
+     "display": "-34.4 dB"
+    },
+    {
+     "raw": 0.25,
+     "read_raw": 0.25,
+     "display": "-28.8 dB"
+    },
+    {
+     "raw": 0.3,
+     "read_raw": 0.30000001192092896,
+     "display": "-24.2 dB"
+    },
+    {
+     "raw": 0.35,
+     "read_raw": 0.3499999940395355,
+     "display": "-20.6 dB"
+    },
+    {
+     "raw": 0.4,
+     "read_raw": 0.4000000059604645,
+     "display": "-18.0 dB"
+    },
+    {
+     "raw": 0.45,
+     "read_raw": 0.44999998807907104,
+     "display": "-16.0 dB"
+    },
+    {
+     "raw": 0.5,
+     "read_raw": 0.5,
+     "display": "-14.0 dB"
+    },
+    {
+     "raw": 0.55,
+     "read_raw": 0.550000011920929,
+     "display": "-12.0 dB"
+    },
+    {
+     "raw": 0.6,
+     "read_raw": 0.6000000238418579,
+     "display": "-10.0 dB"
+    },
+    {
+     "raw": 0.65,
+     "read_raw": 0.6499999761581421,
+     "display": "-8.00 dB"
+    },
+    {
+     "raw": 0.7,
+     "read_raw": 0.699999988079071,
+     "display": "-6.00 dB"
+    },
+    {
+     "raw": 0.75,
+     "read_raw": 0.75,
+     "display": "-4.00 dB"
+    },
+    {
+     "raw": 0.8,
+     "read_raw": 0.800000011920929,
+     "display": "-2.00 dB"
+    },
+    {
+     "raw": 0.85,
+     "read_raw": 0.8500000238418579,
+     "display": "0.00 dB"
+    },
+    {
+     "raw": 0.9,
+     "read_raw": 0.8999999761581421,
+     "display": "2.00 dB"
+    },
+    {
+     "raw": 0.95,
+     "read_raw": 0.949999988079071,
+     "display": "4.00 dB"
+    },
+    {
+     "raw": 1.0,
+     "read_raw": 1.0,
+     "display": "6.00 dB"
+    }
+   ],
+   "restored_display": "0.00 dB"
+  },
+  {
+   "device": "Auto Filter",
+   "parameter": "Frequency",
+   "index": 1,
+   "start_raw": 0.8996566534042358,
+   "start_display": "10.0 kHz",
+   "checks": [
+    {
+     "want_hz": 20.0,
+     "set_raw": 0.0,
+     "display": "20.0 Hz"
+    },
+    {
+     "want_hz": 112.0,
+     "set_raw": 0.2493960090020668,
+     "display": "112 Hz"
+    },
+    {
+     "want_hz": 632.0,
+     "set_raw": 0.4998956942061346,
+     "display": "632 Hz"
+    },
+    {
+     "want_hz": 1000.0,
+     "set_raw": 0.5663233347786729,
+     "display": "1.00 kHz"
+    },
+    {
+     "want_hz": 3560.0,
+     "set_raw": 0.7501400007696314,
+     "display": "3.56 kHz"
+    },
+    {
+     "want_hz": 20000.0,
+     "set_raw": 1.0,
+     "display": "20.0 kHz"
+    }
+   ],
+   "restored_display": "10.0 kHz"
+  },
+  {
+   "device": "Saturator",
+   "parameter": "Drive",
+   "index": 1,
+   "start_raw": 0.5,
+   "start_display": "0.0 dB",
+   "checks": [
+    {
+     "want_db": -36.0,
+     "set_raw": 0.0,
+     "display": "-36 dB"
+    },
+    {
+     "want_db": -18.0,
+     "set_raw": 0.25,
+     "display": "-18 dB"
+    },
+    {
+     "want_db": 0.0,
+     "set_raw": 0.5,
+     "display": "0.0 dB"
+    },
+    {
+     "want_db": 4.0,
+     "set_raw": 0.5555555555555556,
+     "display": "4.0 dB"
+    },
+    {
+     "want_db": 18.0,
+     "set_raw": 0.75,
+     "display": "18 dB"
+    },
+    {
+     "want_db": 36.0,
+     "set_raw": 1.0,
+     "display": "36 dB"
+    }
+   ],
+   "restored_display": "0.0 dB"
+  },
+  {
+   "device": "Utility",
+   "parameter": "Output",
+   "index": 9,
+   "raw_min": -1.0,
+   "raw_max": 1.0,
+   "start_raw": 0.0,
+   "start_display": "0.00 dB",
+   "inventory": [
+    "Device On",
+    "Left Inv",
+    "Right Inv",
+    "Channel Mode",
+    "Stereo Width",
+    "Mono",
+    "Bass Mono",
+    "Bass Freq",
+    "Balance",
+    "Output",
+    "Mute",
+    "DC Filter"
+   ],
+   "sweep": [
+    {
+     "raw": 0.0,
+     "read_raw": 0.0,
+     "display": "0.00 dB"
+    },
+    {
+     "raw": 0.125,
+     "read_raw": 0.125,
+     "display": "4.38 dB"
+    },
+    {
+     "raw": 0.25,
+     "read_raw": 0.2499999850988388,
+     "display": "8.75 dB"
+    },
+    {
+     "raw": 0.375,
+     "read_raw": 0.375,
+     "display": "13.1 dB"
+    },
+    {
+     "raw": 0.5,
+     "read_raw": 0.5,
+     "display": "17.5 dB"
+    },
+    {
+     "raw": 0.625,
+     "read_raw": 0.625,
+     "display": "21.9 dB"
+    },
+    {
+     "raw": 0.75,
+     "read_raw": 0.75,
+     "display": "26.2 dB"
+    },
+    {
+     "raw": 0.875,
+     "read_raw": 0.875,
+     "display": "30.6 dB"
+    },
+    {
+     "raw": 1.0,
+     "read_raw": 1.0,
+     "display": "35.0 dB"
+    }
+   ],
+   "restored_display": "0.00 dB"
+  }
+ ]
+}

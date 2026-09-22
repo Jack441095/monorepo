@@ -1,0 +1,47 @@
+{
+ "pending_proposal": {
+  "schema": "kenn.ableton_action_proposal.v1",
+  "action_id": "action-2aca8d0c58864106a1008f844ee62c36",
+  "action": "set_volume",
+  "operation": "set_volume",
+  "target": "ableton_track",
+  "track_index": 0,
+  "track_name": "1-MIDI",
+  "parameter": "volume",
+  "before": 0.8500000238418579,
+  "after": 0.5011872336272722,
+  "unit": "normalized",
+  "valid_range": [
+   0.0,
+   1.0
+  ],
+  "reason": "Explicit user request for set_volume on track '1-MIDI'.",
+  "evidence": [
+   "Current Live snapshot value: volume=0.8500000238418579.",
+   "Target identity: track 0 '1-MIDI'."
+  ],
+  "confidence": 1.0,
+  "risk": "local_mutation",
+  "requires_confirmation": true,
+  "timestamp": 1790030703.285343,
+  "session_version": "4537d6d8ff50fa111316bdd3a139e36b4cd8fa9e0cdca645031efcb00f5948bf",
+  "snapshot_exchange": {
+   "transport": "abletonosc",
+   "address": "batch",
+   "request_id": null,
+   "response_id": null,
+   "response_address": "/live/track/get/num_devices",
+   "response_ok": true,
+   "round_trip_ms": 107.202
+  },
+  "confirmation_token": "v1.6ab1b49b.482261ec.317a939a3a787edeab405e1bfcefb710",
+  "confirmation_meta": {
+   "service_id": "ableton_action",
+   "text": "set_volume|0|1-MIDI|0.8500000238418579|0.5011872336272722|4537d6d8ff50fa111316bdd3a139e36b4cd8fa9e0cdca645031efcb00f5948bf",
+   "expires_at": 1790031003,
+   "nonce": "482261ec",
+   "token": "v1.6ab1b49b.482261ec.317a939a3a787edeab405e1bfcefb710"
+  }
+ },
+ "command": "Set track 1 volume to -6 dB."
+}

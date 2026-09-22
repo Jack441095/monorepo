@@ -1,0 +1,93 @@
+[
+ {
+  "result": "clarification_required",
+  "ms": 257.4,
+  "note": "I could not prepare that multi-step Live request safely: Step 1: No track name or number was found in the current Live snapshot.; Step 2: No track nam",
+  "test": "VAR: Put an EQ Eight on the synth and add 3 dB at 5",
+  "at": 1790030668.544561
+ },
+ {
+  "result": "clarification_required",
+  "ms": 203.3,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "VAR: Boost 500 Hz by 3 dB.",
+  "at": 1790030670.749705
+ },
+ {
+  "result": "clarification_required",
+  "ms": 210.0,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "VAR: Give the synth a small presence boost at 500 H",
+  "at": 1790030672.966392
+ },
+ {
+  "result": "confirmation_required",
+  "ms": 204.8,
+  "note": "I can append EQ Eight to '3-Audio'. Current devices: no devices. After confirmation: EQ Eight. Nothing has changed. Conf",
+  "test": "DUP: propose-first",
+  "at": 1790030675.1726642
+ },
+ {
+  "result": "applied",
+  "ms": 1605.4,
+  "note": "verified=True",
+  "test": "DUP: apply-first",
+  "at": 1790030678.784014
+ },
+ {
+  "result": "clarification_required",
+  "ms": 127.0,
+  "note": "Track '3-Audio' already contains EQ Eight; choose the exact existing device instead.",
+  "test": "DUP: second-insert",
+  "at": 1790030680.915068
+ },
+ {
+  "result": "confirmation_required",
+  "ms": 497.8,
+  "note": "band=4B after=2.0 I can set 4 Gain B on '3-Audio' -> EQ Eight (device 1) from 0 dB to 2 dB. Nothing has changed. Confi",
+  "test": "DUP: adjust-2db-propose",
+  "at": 1790030683.4137511
+ },
+ {
+  "result": "applied",
+  "ms": 421.6,
+  "note": "readback=2.00 dB verified=True",
+  "test": "DUP: adjust-2db-apply",
+  "at": 1790030685.839324
+ },
+ {
+  "result": "pass",
+  "ms": 1016.0,
+  "note": "0.00 dB",
+  "test": "DUP: undo-gain",
+  "at": 1790030690.859915
+ },
+ {
+  "result": "clarification_required",
+  "ms": 130.3,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "DUP: Move the EQ before the compressor.",
+  "at": 1790030692.993443
+ },
+ {
+  "result": "clarification_required",
+  "ms": 134.1,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: Device enable, bypass, mute, solo, and arm controls are not in the qualified a",
+  "test": "DUP: Bypass the EQ on track 3.",
+  "at": 1790030695.130342
+ },
+ {
+  "result": "pass",
+  "ms": 600.0,
+  "note": "devices-after=[]",
+  "test": "DUP: undo-insert",
+  "at": 1790030700.860704
+ },
+ {
+  "result": "confirmation_required",
+  "ms": 421.2,
+  "note": "token=v1.6ab1b49b....",
+  "test": "RESTART: pre-restart-propose",
+  "at": 1790030703.287125
+ }
+]

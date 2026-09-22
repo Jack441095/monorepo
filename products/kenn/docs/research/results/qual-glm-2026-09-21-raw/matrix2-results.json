@@ -1,0 +1,232 @@
+[
+ {
+  "result": "pass",
+  "ms": 817.9,
+  "note": "receipt=receipt-b31a9c8df4b54cb8b9361c0cffb90d5a track=1",
+  "test": "C2-insert: Compressor-threshold@T2",
+  "at": 1790028887.144257
+ },
+ {
+  "result": "clarify-or-fail",
+  "ms": 396.3,
+  "note": "Proposed value -18.0 is outside valid range [0.0, 1.0] for 'Threshold'.",
+  "test": "C2-param: Compressor-threshold@T2",
+  "at": 1790028889.544655
+ },
+ {
+  "result": "pass",
+  "ms": 590.4,
+  "note": "devices-after=[]",
+  "test": "C2-undo-insert: Compressor-threshold@T2",
+  "at": 1790028895.349727
+ },
+ {
+  "result": "pass",
+  "ms": 784.5999999999999,
+  "note": "receipt=receipt-eef772fbb7b6425b8f5a9de4b19481f6 track=2",
+  "test": "C2-insert: AutoFilter-cutoff@T3",
+  "at": 1790028900.14414
+ },
+ {
+  "result": "clarify-or-fail",
+  "ms": 397.9,
+  "note": "Proposed value 1000.0 is outside valid range [0.0, 1.0] for 'Frequency'.",
+  "test": "C2-param: AutoFilter-cutoff@T3",
+  "at": 1790028902.543985
+ },
+ {
+  "result": "pass",
+  "ms": 592.2,
+  "note": "devices-after=[]",
+  "test": "C2-undo-insert: AutoFilter-cutoff@T3",
+  "at": 1790028908.350605
+ },
+ {
+  "result": "pass",
+  "ms": 801.3,
+  "note": "receipt=receipt-336ed9cd65204eeb860b9fc01debc1e3 track=2",
+  "test": "C2-insert: Saturator-drive@T3",
+  "at": 1790028913.154094
+ },
+ {
+  "result": "clarify-or-fail",
+  "ms": 305.9,
+  "note": "Proposed value 4.0 is outside valid range [0.0, 1.0] for 'Drive'.",
+  "test": "C2-param: Saturator-drive@T3",
+  "at": 1790028915.46483
+ },
+ {
+  "result": "pass",
+  "ms": 592.2,
+  "note": "devices-after=[]",
+  "test": "C2-undo-insert: Saturator-drive@T3",
+  "at": 1790028921.26661
+ },
+ {
+  "result": "pass",
+  "ms": 828.6999999999999,
+  "note": "receipt=receipt-1ec335fa31094b55a8e009faf936f480 track=3",
+  "test": "C2-insert: HybridReverb-dw@T4",
+  "at": 1790028926.104049
+ },
+ {
+  "result": "pass",
+  "ms": 899.3,
+  "note": "answer=Live change applied and verified. observed=15 % receipt=receipt-4c93c4405689482b97e1cbf2c8ac4225 verified=True",
+  "test": "C2-param: HybridReverb-dw@T4",
+  "at": 1790028932.1123211
+ },
+ {
+  "result": "pass",
+  "ms": 996.1,
+  "note": "50 %",
+  "test": "C2-undo-param: HybridReverb-dw@T4",
+  "at": 1790028937.113885
+ },
+ {
+  "result": "pass",
+  "ms": 592.9,
+  "note": "devices-after=[]",
+  "test": "C2-undo-insert: HybridReverb-dw@T4",
+  "at": 1790028942.9192882
+ },
+ {
+  "result": "pass",
+  "ms": 801.0,
+  "note": "receipt=receipt-550dcd8cd0fe4e52ab939689a8fe195e track=3",
+  "test": "C2-insert: Echo-dw@T4",
+  "at": 1790028947.7235909
+ },
+ {
+  "result": "pass",
+  "ms": 993.2,
+  "note": "answer=Live change applied and verified. observed=10 % receipt=receipt-4132bb598f564764981d15c96020e3d7 verified=True",
+  "test": "C2-param: Echo-dw@T4",
+  "at": 1790028953.8225422
+ },
+ {
+  "result": "pass",
+  "ms": 991.1,
+  "note": "50 %",
+  "test": "C2-undo-param: Echo-dw@T4",
+  "at": 1790028958.823315
+ },
+ {
+  "result": "pass",
+  "ms": 598.1,
+  "note": "devices-after=[]",
+  "test": "C2-undo-insert: Echo-dw@T4",
+  "at": 1790028964.54794
+ },
+ {
+  "result": "clarification_required",
+  "ms": 197.5,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: Device enable, bypass, mute, solo, and arm controls are not in the qualified a",
+  "test": "C2-bmr: Bypass the Compressor on track 2.",
+  "at": 1790028971.543971
+ },
+ {
+  "result": "refused",
+  "ms": 194.2,
+  "note": "Deleting, removing, overwriting, and replacing Live content are disabled by the KENN assistant boundary.",
+  "test": "C2-bmr: Remove the effect you just added.",
+  "at": 1790028973.7432818
+ },
+ {
+  "result": "pass",
+  "ms": 592.5,
+  "note": "compressor removed",
+  "test": "C2-bmr-cleanup",
+  "at": 1790028978.344982
+ },
+ {
+  "result": "clarification_required",
+  "ms": 194.5,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "FG: Turn it down.",
+  "at": 1790028980.5445602
+ },
+ {
+  "result": "clarification_required",
+  "ms": 196.4,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "FG: Fix the vocals.",
+  "at": 1790028982.7444632
+ },
+ {
+  "result": "clarification_required",
+  "ms": 195.1,
+  "note": "Which exact Live track should receive EQ Eight? I will not change the set until the target is exact.",
+  "test": "FG: Add EQ to the synth.",
+  "at": 1790028984.944821
+ },
+ {
+  "result": "clarification_required",
+  "ms": 198.2,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: Track 9 is not present in the current Live snapshot.",
+  "test": "FG: Boost 500 Hz by 3 dB on track 9.",
+  "at": 1790028987.1458719
+ },
+ {
+  "result": "clarification_required",
+  "ms": 195.0,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No supported Ableton action/value was recognized.",
+  "test": "FG: Add a Phasertron to track 1.",
+  "at": 1790028989.345727
+ },
+ {
+  "result": "clarification_required",
+  "ms": 199.2,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No supported Ableton action/value was recognized.",
+  "test": "FG: Set Compressor Smurbulence to 5 on track 1.",
+  "at": 1790028991.546432
+ },
+ {
+  "result": "clarification_required",
+  "ms": 402.3,
+  "note": "set_volume value is outside valid range (0.0, 1.0).",
+  "test": "FG: Set track 1 volume to 5.0.",
+  "at": 1790028993.953304
+ },
+ {
+  "result": "clarification_required",
+  "ms": 190.3,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "FG: Set the tempo to 124 BPM.",
+  "at": 1790028996.146461
+ },
+ {
+  "result": "clarification_required",
+  "ms": 198.9,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "FG: What did you change?",
+  "at": 1790028998.346494
+ },
+ {
+  "result": "pass",
+  "ms": 397.5,
+  "note": "first=applied second=failed This action request was already executed or is already in progress.",
+  "test": "G-repeat",
+  "at": 1790029005.160497
+ },
+ {
+  "result": "pass",
+  "ms": 785.0,
+  "note": "unmuted",
+  "test": "G-repeat-cleanup",
+  "at": 1790029009.954347
+ },
+ {
+  "result": "clarification_required",
+  "ms": 189.3,
+  "note": "I need one more exact detail before I can prepare a safe Live proposal: No track name or number was found in the current Live snapshot.",
+  "test": "MUS-suggest",
+  "at": 1790029012.146128
+ },
+ {
+  "result": "record",
+  "note": "tracks=[(0, '1-MIDI', []), (1, '2-MIDI', []), (2, '3-Audio', []), (3, '4-Audio', [])] tempo=120.0 playing=False",
+  "test": "final2",
+  "at": 1790029013.351649
+ }
+]

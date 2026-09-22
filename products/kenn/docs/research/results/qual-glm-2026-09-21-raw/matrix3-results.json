@@ -1,0 +1,92 @@
+[
+ {
+  "result": "pass",
+  "ms": 879.3,
+  "note": "receipt=receipt-a1d528997b1a44ca8070ece00d6a5a56",
+  "test": "U-insert: Compressor-threshold",
+  "at": 1790030288.009542
+ },
+ {
+  "result": "pass",
+  "ms": 990.8,
+  "note": "expect=-18.0 dB measured=-18.0 dB within_tol=True receipt=receipt-b7b66d2bc064478084db3c8f81081711 readback=-18.0 dB",
+  "test": "U-param: Compressor-threshold",
+  "at": 1790030294.106771
+ },
+ {
+  "result": "pass",
+  "ms": 995.2,
+  "note": "0.00 dB",
+  "test": "U-undo-param: Compressor-threshold",
+  "at": 1790030299.10754
+ },
+ {
+  "result": "pass",
+  "ms": 590.3,
+  "note": "devices-after=[]",
+  "test": "U-undo-insert: Compressor-threshold",
+  "at": 1790030304.910469
+ },
+ {
+  "result": "pass",
+  "ms": 771.0,
+  "note": "receipt=receipt-a97144c20e21495db47b04ef18467df6",
+  "test": "U-insert: AutoFilter-cutoff",
+  "at": 1790030309.708294
+ },
+ {
+  "result": "pass",
+  "ms": 992.0,
+  "note": "expect=1.00 kHz measured=1.00 kHz within_tol=True receipt=receipt-d4b39b6e97a04560b9179bc0e9f64479 readback=1.00 kHz",
+  "test": "U-param: AutoFilter-cutoff",
+  "at": 1790030315.806657
+ },
+ {
+  "result": "pass",
+  "ms": 990.6,
+  "note": "10.0 kHz",
+  "test": "U-undo-param: AutoFilter-cutoff",
+  "at": 1790030320.807443
+ },
+ {
+  "result": "pass",
+  "ms": 593.6,
+  "note": "devices-after=[]",
+  "test": "U-undo-insert: AutoFilter-cutoff",
+  "at": 1790030326.612929
+ },
+ {
+  "result": "pass",
+  "ms": 837.7,
+  "note": "receipt=receipt-e01bd6c31b454d439e6c862f083a0968",
+  "test": "U-insert: Saturator-drive",
+  "at": 1790030331.4580128
+ },
+ {
+  "result": "pass",
+  "ms": 996.0999999999999,
+  "note": "expect=4.0 dB measured=4.0 dB within_tol=True receipt=receipt-9cee1542e0cf48edb9700e70f8676dab readback=4.0 dB",
+  "test": "U-param: Saturator-drive",
+  "at": 1790030337.557
+ },
+ {
+  "result": "pass",
+  "ms": 994.3,
+  "note": "0.0 dB",
+  "test": "U-undo-param: Saturator-drive",
+  "at": 1790030342.5583081
+ },
+ {
+  "result": "pass",
+  "ms": 592.6,
+  "note": "devices-after=[]",
+  "test": "U-undo-insert: Saturator-drive",
+  "at": 1790030348.278979
+ },
+ {
+  "result": "record",
+  "note": "tracks=[(0, '1-MIDI', []), (1, '2-MIDI', []), (2, '3-Audio', []), (3, '4-Audio', [])] tempo=120.0 playing=False",
+  "test": "final3",
+  "at": 1790030349.285119
+ }
+]
