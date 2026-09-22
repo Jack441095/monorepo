@@ -65,4 +65,9 @@ SmartSampleManager/tools/classification_benchmark/*.pkl
 # receipts/ is ~1 GB of owner-review data; kept on disk, kept out of Git.
 SmartSampleManager/tools/classification_benchmark/receipts/
 SmartSampleManager/tools/classification_benchmark/mw_cache/
+
+# Classification plan/evidence packet outputs (2026-09-22 sweep). Derived
+# testing snapshots; the human-label/evidence manifests were archived to the
+# owner data home (Products/SLO) before removal. Regenerable or archived.
+SmartSampleManager/tools/classification_benchmark/*.jsonl
 __pycache__/
