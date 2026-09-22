@@ -35,6 +35,21 @@ def test_device_change_is_structured_without_executing() -> None:
     assert result["confirmation_required"] is True
 
 
+def test_insert_compressor_and_set_threshold_uses_qualified_atomic_setup_intent() -> None:
+    live_snapshot = snapshot()
+    live_snapshot["tracks"][0]["devices"] = []
+
+    result = parse_request("add a compressor to Vocal and set threshold to -20 dB", live_snapshot)
+
+    assert result["action"] == "insert_device_with_parameter"
+    assert result["track"] == {"index": 0, "name": "Vocal"}
+    assert result["device"] == {"name": "Compressor"}
+    assert result["parameter"] == {"name": "Threshold"}
+    assert result["desired_value"] == -20.0
+    assert result["unit"] == "dB"
+    assert result["confirmation_required"] is True
+
+
 def test_clip_duplication_resolves_two_exact_track_and_slot_endpoints() -> None:
     live_snapshot = {
         "status": "connected",
