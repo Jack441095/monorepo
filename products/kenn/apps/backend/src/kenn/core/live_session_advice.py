@@ -106,7 +106,7 @@ def _arrangement_advice(snapshot: dict[str, Any]) -> dict[str, Any]:
             "scope": evidence_scope,
         },
         "explanation": (
-            f"Audio was not available, so I could not measure tonal balance or masking. "
+            f"Audio was not available, so I could not measure tonal balance, clipping, or masking. "
             f"The arrangement pass sees {len(tracks)} tracks and an estimated {total_bars}-bar span."
         ),
         "suggested_listening_test": "Loop the densest transition, compare it with the preceding section at matched level, then check whether new elements or silence create a clear contrast.",

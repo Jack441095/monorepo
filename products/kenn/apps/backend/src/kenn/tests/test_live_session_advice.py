@@ -45,7 +45,14 @@ class AdviceLive:
 
 @pytest.mark.parametrize(
     "question",
-    ["How does my mix sound?", "Check my low end", "Any masking issues?", "Analyze my session"],
+    [
+        "How does my mix sound?",
+        "Check my low end",
+        "How does my low end sound?",
+        "Check the vocals for clipping.",
+        "Any masking issues?",
+        "Analyze my session",
+    ],
 )
 def test_mix_advice_falls_back_to_arrangement_without_claiming_audio_analysis(question: str) -> None:
     live = AdviceLive()

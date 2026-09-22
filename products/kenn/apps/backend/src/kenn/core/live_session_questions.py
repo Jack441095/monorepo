@@ -28,7 +28,7 @@ def _question_kind(question: str) -> str | None:
     ):
         return "change_history"
     if re.search(
-        r"\b(?:how does my mix sound|check my low[ -]?end|any masking issues?|analy[sz]e my (?:session|mix)|mix advice|review my mix)\b",
+        r"\b(?:how does my (?:mix|low[ -]?end) sound|check (?:my low[ -]?end|(?:the )?vocals? for clipping)|any masking issues?|analy[sz]e my (?:session|mix)|mix advice|review my mix)\b",
         lower,
     ):
         return "mix_advice"
@@ -40,12 +40,16 @@ def _question_kind(question: str) -> str | None:
         return "track_identity"
     if "tempo" in lower or "time signature" in lower or re.search(r"\bmeter\b", lower):
         return "tempo_signature"
-    if "selected track" in lower or ("which track" in lower and "selected" in lower):
+    if (
+        "selected track" in lower
+        or ("which track" in lower and "selected" in lower)
+        or re.search(r"\bwhat(?:'s| is) selected\b", lower)
+    ):
         return "selected_track"
     if (
         "duplicate" in lower
         and "name" in lower
-        and re.search(r"\b(?:which|what|are there|show|list|find|have|has)\b", lower)
+        and re.search(r"\b(?:which|what|any|are there|show|list|find|have|has)\b", lower)
     ):
         return "duplicate_names"
     if re.search(r"\b(?:describe|summari[sz]e)\b.*\b(?:live\s+set|ableton\s+session|session)\b", lower):

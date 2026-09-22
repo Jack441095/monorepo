@@ -19,6 +19,11 @@ The set mirrors `tooling/demo_session_fixture.json`:
 Return `A-Reverb` includes Hybrid Reverb. The stock Reverb that precedes it is
 intentional and does not weaken the required-device check.
 
+The Bass EQ has more than one band near 200 Hz. The investor-demo command must
+name the verified active band explicitly: `Boost amplitude by 3 dB at 200 Hz
+on track 5 band 2A.` See `docs/runbooks/KENN_INVESTOR_DEMO.md` for the canonical
+script.
+
 ## Scope and rehearsal
 
 This file proves a loadable, deterministic Live topology; it does not contain
