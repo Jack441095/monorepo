@@ -272,6 +272,12 @@ _EQ_BAND_GAIN_FREQ_FIRST = re.compile(
     + _NUMBER + r"\s*" + _EQ_HZ_UNIT + r"\b.*?\bby\s+" + _NUMBER + r"\s*" + _EQ_DB_UNIT + r"\b",
     re.I,
 )
+_EQ_BAND_COMPACT_GAIN = re.compile(
+    r"\b(?:" + _EQ_GAIN_VERB_INNER + r")\b\s*" + _NUMBER
+    + r"\s*" + _EQ_DB_UNIT + r"\b\s*(?:at|around)\s*" + _NUMBER
+    + r"\s*(khz|kilohertz|hz|hertz)\b",
+    re.I,
+)
 _EQ_BAND_SHORT_GAIN = re.compile(
     r"\b(?:" + _EQ_GAIN_VERB_INNER + r")\b.*?"
     r"\bband\s*(\d+)\s*([ab])\b.*?\bby\s+" + _NUMBER + r"\s*" + _EQ_DB_UNIT + r"\b"
@@ -761,6 +767,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     eq_band_freq_first_match = None
     if eq_band_match is None:
         eq_band_freq_first_match = _EQ_BAND_GAIN_FREQ_FIRST.search(numeric_text)
+    eq_band_compact_match = _EQ_BAND_COMPACT_GAIN.search(numeric_text)
     eq_band_short_match = _EQ_BAND_SHORT_GAIN.search(numeric_text)
     eq_band_only_match = _EQ_BAND_ONLY_GAIN.search(numeric_text)
     eq_band_untyped_match = _EQ_BAND_UNTYPED_SETTING.search(numeric_text)
@@ -773,7 +780,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         # Device numbers in user commands are one-based; Live indices remain
         # zero-based in the typed intent and proposal.
         eq_device_index = int(eq_device_reference.group(1)) - 1
-    eq_band_request = eq_band_match or eq_band_freq_first_match or eq_band_short_match or eq_band_only_match
+    eq_band_request = eq_band_match or eq_band_freq_first_match or eq_band_compact_match or eq_band_short_match or eq_band_only_match
     if any(cue in lower for cue in ("list my tracks", "what tracks", "show my tracks", "show the tracks")):
         base.update({"action": "inspect_tracks", "confidence": 0.99})
         return base
@@ -1151,6 +1158,13 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                     base["relative"] = True
                     base["unit"] = "dB"
                     base["frequency_hz"] = float(eq_band_freq_first_match.group(1))
+                elif eq_band_compact_match:
+                    base["desired_value"] = _eq_gain_signed(eq_band_compact_match.group(0), eq_band_compact_match.group(1))
+                    base["relative"] = True
+                    base["unit"] = "dB"
+                    base["frequency_hz"] = float(eq_band_compact_match.group(2)) * (
+                        1000.0 if eq_band_compact_match.group(3).lower() in {"khz", "kilohertz"} else 1.0
+                    )
                 elif eq_band_short_match:
                     base["desired_value"] = _eq_gain_signed(eq_band_short_match.group(0), eq_band_short_match.group(3))
                     base["relative"] = True
@@ -1280,14 +1294,21 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         return base
 
     if eq_band_request:
+        gain_match = eq_band_match or eq_band_freq_first_match or eq_band_compact_match or eq_band_only_match
+        gain_group = (
+            eq_band_match.group(1) if eq_band_match
+            else eq_band_freq_first_match.group(2) if eq_band_freq_first_match
+            else eq_band_compact_match.group(1) if eq_band_compact_match
+            else eq_band_only_match.group(3)
+        )
         base.update({
             "mode": "assist",
             "action": "set_eq_band_gain",
             "device": {"name": "EQ Eight", **({"index": eq_device_index} if eq_device_index is not None else {})},
             "parameter": {"name": "Gain"},
             "desired_value": _eq_gain_signed(
-                (eq_band_match or eq_band_freq_first_match or eq_band_only_match).group(0),
-                eq_band_match.group(1) if eq_band_match else (eq_band_freq_first_match.group(2) if eq_band_freq_first_match else eq_band_only_match.group(3)),
+                gain_match.group(0),
+                gain_group,
             ),
             "relative": True,
             "unit": "dB",
@@ -1300,6 +1321,10 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                 base["eq_band"] = f"{int(eq_band_match.group(3))}{eq_band_match.group(4).upper()}"
         elif eq_band_freq_first_match:
             base["frequency_hz"] = float(eq_band_freq_first_match.group(1))
+        elif eq_band_compact_match:
+            base["frequency_hz"] = float(eq_band_compact_match.group(2)) * (
+                1000.0 if eq_band_compact_match.group(3).lower() in {"khz", "kilohertz"} else 1.0
+            )
         else:
             base["eq_band_number"] = int(eq_band_only_match.group(1))
             if eq_band_only_match.group(2):
