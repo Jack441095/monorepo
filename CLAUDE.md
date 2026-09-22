@@ -4,10 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-The canonical NITE DSP engineering estate. Most platform directories are git submodules (mapped in `.git/config`; there is no root `.gitmodules` file), while the flagship product trees — `products/kenn`, `backend/`, `website/`, and `validation/` — are tracked directly in this repository. The machine-readable current-state file is `docs/NITE_DSP_STATE.json`; the operating-decision document is `docs/NITE_DSP_FOUNDER_MASTER_PLAN.md`.
+The canonical NITE DSP engineering estate. **Everything is tracked directly in this single repository** — there are no git submodules on `main` (no `.gitmodules`, no gitlinks; the `submodule.*` entries in `.git/config` are vestigial from the Sept 2026 consolidation). The machine-readable current-state file is `docs/NITE_DSP_STATE.json`; the operating-decision document is `docs/NITE_DSP_FOUNDER_MASTER_PLAN.md`.
 
-Submodule map (path → upstream repo, from `.git/config`):
-- `platform` → `monorepo` itself (nested), `Audio_Too` and `products/slo` → `slo.git` (different branches), `audio-technology/layer-alignment` → `layer-alignment.git`, `products/nite-submit` → `nite-submit.git`, `shared/design-system` → `design-system.git`, `autonomous-systems/platform-support` and `autonomous-systems/thursday` → their own repos, `research/experiments/telemetry` and `research/experiments/company-sim-lab` → their own repos, `products/kenn-evaluation` → `kenn-evaluation.git`.
+Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `products/nite-submit`, `products/kenn-evaluation`, `backend/`, `website/`, `shared/`, `Audio_Too/` (preserved legacy), `audio-technology/`, `autonomous-systems/`, `validation/`.
 
 **KENN lives here.** `products/kenn/` is the KENN source of truth, tracked directly in this monorepo (backend under `products/kenn/apps/backend`, tooling, plugins, docs). The former standalone repo (`Shenrendao/KENN`) was absorbed during the Sept 2026 consolidation; a frozen pre-monorepo snapshot is kept outside git under the local `Products/Kenn/archive/` data home.
 
@@ -15,7 +14,7 @@ Submodule map (path → upstream repo, from `.git/config`):
 
 - **Never add an AI attribution trailer to commits in this repo.** Commits here must not contain `Co-Authored-By: Claude ...` or similar (the `commit-metadata.yml` gate exists on the `kenn-production-hardening` branch; its script `tools/check_commit_metadata.py` is not currently present on `main` — re-add before re-enabling CI enforcement). This overrides the default Claude Code commit-attribution behavior — do not append `Co-Authored-By: Claude ...` when committing here.
 - New worktrees go under `workspace/worktrees/<project>/<task>/`; builds/caches go under `workspace/` or already-ignored project-local dirs.
-- `Audio_Too` is a preserved legacy boundary that was *not* bulk-migrated during the Sept 2026 cleanup — don't assume it mirrors `products/slo` just because both submodules point at the same `slo.git` repo (they track different branches).
+- `Audio_Too` is a preserved legacy boundary that was *not* bulk-migrated during the Sept 2026 cleanup — it overlaps heavily with `products/slo` (both descend from the SLO codebase) but is kept as a frozen reference; don't assume they mirror each other.
 - Owner audio and corpora are data, not source — kept outside this code estate entirely.
 
 ## Commands
