@@ -20,6 +20,9 @@ def test_missing_index_returns_empty_search_bundle(tmp_path, monkeypatch) -> Non
     terms = chat_retrieval.load_terms()
     assert terms["total_docs"] == 0
     assert chat_retrieval.search("compressor settings", [], terms) == []
+    # The monkeypatched paths are restored after this test; do not retain the
+    # empty bundle under the process-wide loader cache.
+    chat_retrieval.load_chunks.cache_clear()
 
 
 def test_startup_builds_notes_only_bm25_index_when_active_version_is_missing(tmp_path, monkeypatch) -> None:

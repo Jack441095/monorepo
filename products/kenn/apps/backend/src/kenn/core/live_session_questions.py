@@ -42,7 +42,11 @@ def _question_kind(question: str) -> str | None:
         return "tempo_signature"
     if "selected track" in lower or ("which track" in lower and "selected" in lower):
         return "selected_track"
-    if "duplicate" in lower and ("track" in lower or "name" in lower):
+    if (
+        "duplicate" in lower
+        and "name" in lower
+        and re.search(r"\b(?:which|what|are there|show|list|find|have|has)\b", lower)
+    ):
         return "duplicate_names"
     if re.search(r"\b(?:describe|summari[sz]e)\b.*\b(?:live\s+set|ableton\s+session|session)\b", lower):
         return "overview"
