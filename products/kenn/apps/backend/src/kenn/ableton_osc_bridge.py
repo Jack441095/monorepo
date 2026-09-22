@@ -823,6 +823,7 @@ class AbletonOSCClient:
             }
 
         batched_requests: list[tuple[str, Optional[List[Any]]]] = []
+        meter_requests: list[tuple[str, Optional[List[Any]]]] = []
         for track_index in range(count):
             batched_requests.extend([
                 ("/live/track/get/num_devices", [track_index]),
@@ -834,7 +835,7 @@ class AbletonOSCClient:
                     for osc_name in ("volume", "panning", "mute", "solo", "arm")
                 )
             if include_meters:
-                batched_requests.extend(
+                meter_requests.extend(
                     (f"/live/track/get/{osc_name}", [track_index])
                     for osc_name in ("output_meter_level", "output_meter_right")
                 )
@@ -850,6 +851,15 @@ class AbletonOSCClient:
                 ("/live/view/get/selected_track", None),
             ])
         batched_values = self._query_many(batched_requests)
+        # Meter packets are advisory and some AbletonOSC/Live combinations do
+        # not answer every channel.  Keeping them in the identity/mixer batch
+        # made the shared reply socket wait its full 750ms timeout, blocking
+        # pings and command planning behind optional telemetry.  Read meters
+        # separately with a short bounded window; missing values stay absent.
+        meter_values = [
+            self._response_args(response) if response is not None else None
+            for response in self._request_responses_many(meter_requests, timeout=0.1)
+        ]
         batch_index = 0
         tracks: list[dict[str, Any]] = []
         for track_index, track_name in enumerate(track_names):
@@ -897,17 +907,17 @@ class AbletonOSCClient:
                     value = _single_value(value_args or [], track_index) if value_args is not None else None
                     if value is not None:
                         track[key] = value
-            if include_meters:
-                for key, osc_name in (
-                    ("output_meter_level", "output_meter_level"),
-                    ("output_meter_right", "output_meter_right"),
-                ):
-                    value_args = batched_values[batch_index]
-                    batch_index += 1
+            tracks.append(track)
+
+        if include_meters:
+            meter_index = 0
+            for track_index, track in enumerate(tracks):
+                for key in ("output_meter_level", "output_meter_right"):
+                    value_args = meter_values[meter_index] if meter_index < len(meter_values) else None
+                    meter_index += 1
                     value = _single_value(value_args or [], track_index) if value_args is not None else None
                     if value is not None:
                         track[key] = value
-            tracks.append(track)
 
         scene_names = batched_values[batch_index] or [] if include_mixer else []
         tempo_args = batched_values[batch_index + 1] or [] if include_mixer else []

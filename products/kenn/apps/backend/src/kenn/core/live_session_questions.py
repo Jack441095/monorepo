@@ -72,6 +72,31 @@ def answer_live_session_question(
             **result,
             "changed": False,
         }
+    # Track count needs only the song-level count/name probe.  A forced full
+    # snapshot also asks every track for devices and mixer state; on real Live
+    # that can wait on unrelated optional endpoints for hundreds of
+    # milliseconds.  Keep the answer fresh without paying for data the
+    # question does not use.  Backends without a count-bearing probe fall
+    # through to the normal snapshot contract.
+    if kind == "track_count":
+        probe = getattr(getattr(live, "client", None), "probe_connection", None)
+        if callable(probe):
+            observation = probe()
+            count = observation.get("track_count") if isinstance(observation, dict) else None
+            if (
+                isinstance(observation, dict)
+                and observation.get("status") == "connected"
+                and isinstance(count, int)
+                and count >= 0
+            ):
+                return {
+                    "schema": "kenn.ableton_session_answer.v1",
+                    "status": "inspected",
+                    "changed": False,
+                    "intent": {"action": "inspect_track_count"},
+                    "answer": f"The current Live Set has {count} tracks.",
+                    "track_count": count,
+                }
     snapshot = live.snapshot(include_mixer=True)
     if snapshot.get("status") != "connected" or not isinstance(snapshot.get("tracks"), list):
         return {
