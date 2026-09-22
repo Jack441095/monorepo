@@ -3781,104 +3781,25 @@ class LiveActionService(Tier2Tier3ControlMixin):
         track_indices: list[int] | None = None,
         session_id: str,
     ) -> dict[str, Any]:
-        _cleanup_memory()
-        try:
-            state = self.snapshot()
-        except Exception as exc:
-            return {"ok": False, "error": f"Snapshot failed: {exc}"}
+        """Refuse grouping until member routing and exact undo are verifiable.
 
-        if state.get("status") != "connected":
-            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
-
-        tracks = [t for t in state.get("tracks", []) if isinstance(t, dict)]
-        if not tracks:
-            return {"ok": False, "error": "No tracks found in current Live snapshot."}
-
-        clean_type = str(group_type or "").strip().lower()
-        member_tracks = []
-        if track_indices is not None and len(track_indices) > 0:
-            track_map = {int(t["index"]): t for t in tracks if "index" in t}
-            for idx in track_indices:
-                if idx in track_map:
-                    member_tracks.append(track_map[idx])
-            bus_name = f"{clean_type.title()} Bus" if clean_type else "Group Bus"
-        else:
-            from kenn.core.track_classifier import classify_track_name
-            role_groups: dict[str, list[dict[str, Any]]] = {}
-            for t in tracks:
-                name = str(t.get("name", ""))
-                cls = classify_track_name(name)
-                role = cls.role
-                category = "other"
-                if role in {"kick", "snare", "drum_bus"}:
-                    category = "drums"
-                elif role in {"sub_bass", "bass_synth"}:
-                    category = "bass"
-                elif role in {"vocal_lead", "vocal_bg"}:
-                    category = "vocals"
-                elif role == "guitar":
-                    category = "guitars"
-                elif role in {"keys", "synth"}:
-                    category = "synths"
-                elif role == "fx_send":
-                    category = "fx"
-                role_groups.setdefault(category, []).append(t)
-
-            if clean_type and clean_type in role_groups:
-                selected_category = clean_type
-                member_tracks = role_groups[clean_type]
-            elif clean_type:
-                selected_category = clean_type
-                member_tracks = [t for t in tracks if clean_type in str(t.get("name", "")).lower()]
-                if not member_tracks:
-                    member_tracks = tracks
-            else:
-                for candidate in ["drums", "vocals", "bass", "synths", "guitars", "fx"]:
-                    if len(role_groups.get(candidate, [])) >= 1:
-                        selected_category = candidate
-                        member_tracks = role_groups[candidate]
-                        break
-                else:
-                    selected_category = "mix"
-                    member_tracks = tracks
-
-            bus_name = f"{selected_category.title()} Bus"
-
-        insertion_index = len(tracks)
-        proposal = {
-            "schema": BUS_ORGANIZATION_PROPOSAL_SCHEMA,
-            "action_id": f"action-bus-group-{uuid.uuid4().hex}",
-            "action": "group_tracks",
-            "operation": "group_tracks",
-            "target": "ableton_song_tracks",
-            "bus_name": bus_name,
-            "group_type": clean_type or "auto",
-            "member_tracks": [{"track_index": t["index"], "track_name": t.get("name", "")} for t in member_tracks],
-            "member_count": len(member_tracks),
-            "insertion_index": insertion_index,
-            "reason": f"Organize {len(member_tracks)} tracks into {bus_name}.",
-            "confidence": 1.0,
-            "risk": "structural_mutation",
-            "requires_confirmation": True,
-            "undo_available": False,
-            "undo_reason": "Deleting a created track is outside KENN's safe inverse boundary.",
-            "timestamp": time.time(),
-            "session_version": _state_version(state),
+        The old implementation appended and renamed a plain audio track. It
+        never placed the requested members inside a Live group or routed them
+        to a bus, so describing that write as grouping was misleading. Track
+        deletion also has no safe general inverse once a created track may
+        contain user material. Keep this method as an explicit capability
+        boundary instead of issuing a proposal for a partial mutation.
+        """
+        del group_type, track_indices, session_id
+        return {
+            "ok": False,
+            "error": (
+                "KENN cannot safely group or route tracks yet because Live does not expose the "
+                "member-routing readback and exact undo this workflow requires. Nothing changed. "
+                "I can gain-stage the tracks now, or you can create the group in Live first and "
+                "then ask me to adjust its verified controls."
+            ),
         }
-
-        confirmation_text = f"group_tracks:{bus_name}:{len(member_tracks)}:" + json.dumps(
-            [t["index"] for t in member_tracks], sort_keys=True
-        )
-        token, meta = issue_confirmation(
-            session_id=session_id,
-            service_id="ableton_action",
-            text=confirmation_text,
-            ttl_seconds=300,
-        )
-        proposal["confirmation_token"] = token
-        proposal["confirmation_meta"] = meta
-        _PROPOSALS_BY_TOKEN[token] = proposal
-        return {"ok": True, "proposal": proposal}
 
     def execute_track_grouping(
         self,
@@ -3889,87 +3810,14 @@ class LiveActionService(Tier2Tier3ControlMixin):
         idempotency_key: str = "",
         correlation_id: str = "",
     ) -> dict[str, Any]:
-        _cleanup_memory()
-        correlation_id = resolve_correlation_id(correlation_id or (proposal.get("correlation_id") if isinstance(proposal, dict) else None))
-        timer = StageTimer()
-        if not isinstance(proposal, dict) or proposal.get("schema") != BUS_ORGANIZATION_PROPOSAL_SCHEMA:
-            return {"ok": False, "error": "A valid KENN Ableton bus organization proposal is required."}
-        if not proposal.get("requires_confirmation") or not confirm_token:
-            return {"ok": False, "status": "requires_confirmation", "error": "Explicit confirmation is required before track grouping mutation."}
-        if str(proposal.get("confirmation_token", "")) != confirm_token:
-            return {"ok": False, "error": "Confirmation token is not bound to this exact proposal."}
-        key = idempotency_key.strip() or str(proposal.get("action_id", ""))
-        if not key:
-            return {"ok": False, "error": "An idempotency key is required."}
-        with _ACTION_LOCK:
-            if key in _USED_IDEMPOTENCY_KEYS or key in _IN_FLIGHT_IDEMPOTENCY_KEYS:
-                return {"ok": False, "error": "This action request was already executed or is already in progress.", "idempotency_key": key}
-            _IN_FLIGHT_IDEMPOTENCY_KEYS.add(key)
-
-        bus_name = str(proposal.get("bus_name", "Bus"))
-        member_tracks = proposal.get("member_tracks") or []
-        confirmation_text = f"group_tracks:{bus_name}:{len(member_tracks)}:" + json.dumps(
-            [t["track_index"] for t in member_tracks], sort_keys=True
-        )
-        if not consume_confirmation(confirm_token, session_id=session_id, service_id="ableton_action", text=confirmation_text):
-            with _ACTION_LOCK:
-                _IN_FLIGHT_IDEMPOTENCY_KEYS.discard(key)
-            return {"ok": False, "error": "Invalid, expired, mismatched, or already-used confirmation token."}
-
-        try:
-            state = self.snapshot()
-        except Exception as exc:
-            _finish_idempotency_key(key)
-            return {"ok": False, "error": f"Live snapshot failed before execution: {exc}"}
-        timer.mark("snapshot")
-
-        before_count = len(state.get("tracks", []))
-        try:
-            try:
-                write_ok = bool(self.client.create_audio_track(-1))
-            except TypeError:
-                write_ok = bool(self.client.create_audio_track())
-        except Exception as exc:
-            write_ok = False
-        timer.mark("mutation")
-
-        new_index = before_count
-        if write_ok:
-            try:
-                self.client.set_track_name(new_index, bus_name)
-            except Exception:
-                pass
-
-        try:
-            post_state = self.snapshot()
-        except Exception:
-            post_state = {}
-        timer.mark("readback")
-
-        post_tracks = post_state.get("tracks", [])
-        verified = len(post_tracks) > before_count and (
-            any(t.get("name") == bus_name for t in post_tracks) or write_ok
-        )
-
-        _finish_idempotency_key(key)
-        receipt = {
-            "schema": BUS_ORGANIZATION_RECEIPT_SCHEMA,
-            "receipt_id": f"receipt-bus-group-{uuid.uuid4().hex}",
-            "action": "group_tracks",
-            "status": "applied" if verified else "failed",
-            "verified": verified,
-            "bus_name": bus_name,
-            "track_index": new_index,
-            "member_tracks": member_tracks,
-            "timestamp": time.time(),
-            "correlation_id": correlation_id,
-            "stage_timings_ms": timer.as_ms(),
-            "undo": {"available": False},
+        del proposal, confirm_token, session_id, idempotency_key, correlation_id
+        return {
+            "ok": False,
+            "error": (
+                "This track-grouping proposal is no longer executable because it cannot verify "
+                "member routing or provide exact undo. Nothing changed; create a fresh request."
+            ),
         }
-        _RECEIPTS[receipt["receipt_id"]] = receipt
-        if not verified:
-            return {"ok": False, "error": "Failed to verify creation of bus track in Live.", "receipt": receipt}
-        return {"ok": True, "receipt": receipt}
 
     def execute_autonomous(
         self,

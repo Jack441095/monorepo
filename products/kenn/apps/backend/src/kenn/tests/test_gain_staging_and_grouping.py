@@ -9,8 +9,6 @@ from kenn.core.live_action_service import (
     LiveActionService,
     GAIN_STAGING_PROPOSAL_SCHEMA,
     GAIN_STAGING_RECEIPT_SCHEMA,
-    BUS_ORGANIZATION_PROPOSAL_SCHEMA,
-    BUS_ORGANIZATION_RECEIPT_SCHEMA,
 )
 from kenn.core.live_command import handle_command
 
@@ -147,31 +145,16 @@ def test_gain_staging_undo_restores_volumes() -> None:
     assert abs(state["tracks"][3]["volume"] - 0.80) < 1e-4
 
 
-def test_propose_and_execute_track_grouping() -> None:
+def test_track_grouping_refuses_instead_of_creating_an_unrouted_audio_track() -> None:
     fake = MultiTrackFakeLive()
     service = LiveActionService(fake)
 
-    # Group drums tracks (Kick & Snare)
     proposed = service.propose_track_grouping(group_type="drums", session_id="sess-group-1")
-    assert proposed["ok"] is True
-    prop = proposed["proposal"]
-    assert prop["schema"] == BUS_ORGANIZATION_PROPOSAL_SCHEMA
-    assert prop["bus_name"] == "Drums Bus"
-    assert len(prop["member_tracks"]) == 2  # Kick and Snare
-
-    # Execute track grouping
-    executed = service.execute(prop, confirm_token=prop["confirmation_token"], session_id="sess-group-1")
-    assert executed["ok"] is True
-    receipt = executed["receipt"]
-    assert receipt["schema"] == BUS_ORGANIZATION_RECEIPT_SCHEMA
-    assert receipt["status"] == "applied"
-    assert receipt["verified"] is True
-    assert receipt["bus_name"] == "Drums Bus"
-
-    # Verify a new track was appended and named Drums Bus
-    state = fake.query_session_state()
-    assert len(state["tracks"]) == 5
-    assert state["tracks"][4]["name"] == "Drums Bus"
+    assert proposed["ok"] is False
+    assert "member-routing readback and exact undo" in proposed["error"]
+    assert "Nothing changed" in proposed["error"]
+    assert fake.writes == []
+    assert len(fake.query_session_state()["tracks"]) == 4
 
 
 def test_handle_command_natural_language_gain_staging() -> None:
@@ -210,20 +193,10 @@ def test_handle_command_natural_language_bus_organization() -> None:
     fake = MultiTrackFakeLive()
     service = LiveActionService(fake)
 
-    # 1. Propose via natural language
     res = handle_command("organize tracks into buses", session_id="sess-nl-bus", service=service)
-    assert res["status"] == "confirmation_required"
-    prop = res["proposal"]
-    assert prop["schema"] == BUS_ORGANIZATION_PROPOSAL_SCHEMA
-
-    # 2. Confirm and execute
-    exec_res = handle_command(
-        "",
-        session_id="sess-nl-bus",
-        service=service,
-        proposal=prop,
-        confirm_token=prop["confirmation_token"],
-    )
-    assert exec_res["status"] == "applied"
-    assert exec_res["changed"] is True
-    assert exec_res["receipt"]["verified"] is True
+    assert res["status"] == "clarification_required"
+    assert res["changed"] is False
+    assert "cannot safely group or route tracks yet" in res["answer"]
+    assert "Nothing changed" in res["answer"]
+    assert "proposal" not in res
+    assert fake.writes == []
