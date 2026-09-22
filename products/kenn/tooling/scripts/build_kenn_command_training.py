@@ -52,7 +52,7 @@ def training_snapshot() -> dict[str, Any]:
                 "device_index": 0,
                 "device_name": "Compressor",
                 "parameters": [
-                    {"index": 0, "name": "Threshold", "value": -12.0, "min": -60.0, "max": 0.0},
+                    {"index": 0, "name": "Threshold", "value": 0.55, "min": 0.0, "max": 1.0},
                     {"index": 1, "name": "Ratio", "value": 4.0, "min": 1.0, "max": 20.0},
                 ],
             },
