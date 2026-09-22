@@ -10,7 +10,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 import time
+from collections import OrderedDict, deque
+from threading import Lock
 from typing import Any, Iterable
 
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
@@ -36,6 +39,10 @@ MAX_CONTEXT_AGE_SECONDS = 300.0
 MAX_PRODUCER_PREFERENCES = 32
 MAX_EPISODIC_OUTCOMES = 64
 MAX_AUDIO_CLASSIFICATIONS = 32
+MAX_LIVE_CONVERSATION_SESSIONS = 256
+MAX_LIVE_EXCHANGES = 10
+_LIVE_CONVERSATION_LOCK = Lock()
+_LIVE_CONVERSATIONS: OrderedDict[str, dict[str, Any]] = OrderedDict()
 
 
 def _text(value: Any, limit: int = MAX_TEXT) -> str:
@@ -701,7 +708,106 @@ def refresh_session_context_fingerprint(context: dict[str, Any]) -> dict[str, An
     return context
 
 
+def _live_conversation(session_id: str) -> dict[str, Any]:
+    key = _text(session_id, 128)
+    with _LIVE_CONVERSATION_LOCK:
+        state = _LIVE_CONVERSATIONS.get(key)
+        if state is None:
+            state = {
+                "exchanges": deque(maxlen=MAX_LIVE_EXCHANGES),
+                "last_track": "",
+                "last_device": "",
+                "last_parameter": "",
+                "last_command": "",
+                "last_action": "",
+                "last_receipt_id": "",
+                "confirmation_status": "none",
+                "current_topic": "",
+            }
+            _LIVE_CONVERSATIONS[key] = state
+        _LIVE_CONVERSATIONS.move_to_end(key)
+        while len(_LIVE_CONVERSATIONS) > MAX_LIVE_CONVERSATION_SESSIONS:
+            _LIVE_CONVERSATIONS.popitem(last=False)
+        return state
+
+
+def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict[str, Any]]:
+    """Resolve bounded anaphora from the last ten exchanges in one session."""
+    original = " ".join(str(command or "").split())
+    state = _live_conversation(session_id)
+    lower = original.casefold()
+    if lower in {"again", "do it again", "same again"} and state["last_command"]:
+        return str(state["last_command"]), {"resolution": "repeat_last_action", "original": original}
+    if re.fullmatch(r"(?:please\s+)?undo(?:\s+that|\s+it)?[.!]?", lower):
+        return "undo", {"resolution": "undo_last_receipt", "original": original}
+
+    resolved = original
+    entity = state["last_device"] or state["last_track"]
+    if entity and re.search(r"\b(?:it|that)\b", resolved, re.I):
+        resolved = re.sub(r"\b(?:it|that)\b", str(entity), resolved, count=1, flags=re.I)
+    if state["last_track"] and re.search(r"\b(?:louder|softer|quieter)\b", resolved, re.I):
+        known = str(state["last_track"]).casefold() in resolved.casefold()
+        if not known:
+            resolved = f"{resolved} on {state['last_track']}"
+    metadata = {"resolution": "anaphora" if resolved != original else "none", "original": original}
+    return resolved, metadata
+
+
+def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any]) -> None:
+    """Store a bounded conversational projection; never store confirmation tokens."""
+    if not isinstance(result, dict):
+        return
+    state = _live_conversation(session_id)
+    intent = result.get("intent") if isinstance(result.get("intent"), dict) else {}
+    proposal = result.get("proposal") if isinstance(result.get("proposal"), dict) else {}
+    receipt = result.get("receipt") if isinstance(result.get("receipt"), dict) else {}
+    track = intent.get("track") if isinstance(intent.get("track"), dict) else {}
+    device = intent.get("device") if isinstance(intent.get("device"), dict) else {}
+    parameter = intent.get("parameter") if isinstance(intent.get("parameter"), dict) else {}
+    track_name = str(track.get("name") or proposal.get("track_name") or (receipt.get("target") or {}).get("track_name") or "")
+    device_name = str(device.get("name") or proposal.get("device_name") or (receipt.get("target") or {}).get("device_name") or "")
+    parameter_name = str(parameter.get("name") or proposal.get("parameter_name") or (receipt.get("target") or {}).get("parameter_name") or "")
+    action = str(intent.get("action") or proposal.get("action") or receipt.get("action") or "")
+    status = str(result.get("status") or "")
+    with _LIVE_CONVERSATION_LOCK:
+        if track_name:
+            state["last_track"] = track_name[:128]
+        if device_name:
+            state["last_device"] = device_name[:128]
+        if parameter_name:
+            state["last_parameter"] = parameter_name[:128]
+        if action:
+            state["last_action"] = action[:128]
+            state["current_topic"] = action[:128]
+        if command and status not in {"invalid", "failed", "clarification_required"}:
+            state["last_command"] = _text(command, 4000)
+        if receipt.get("receipt_id"):
+            state["last_receipt_id"] = _text(receipt.get("receipt_id"), 128)
+        state["confirmation_status"] = (
+            "pending" if status in {"confirmation_required", "requires_confirmation"}
+            else "confirmed" if status == "applied"
+            else "rejected" if status in {"rejected", "invalid"}
+            else state["confirmation_status"]
+        )
+        state["exchanges"].append({
+            "command": _text(command, 4000),
+            "status": status[:64],
+            "action": action[:128],
+            "track": track_name[:128],
+            "device": device_name[:128],
+            "timestamp": time.time(),
+        })
+
+
+def live_conversation_context(session_id: str) -> dict[str, Any]:
+    """Return a copy suitable for diagnostics and tests."""
+    state = _live_conversation(session_id)
+    with _LIVE_CONVERSATION_LOCK:
+        return {**state, "exchanges": list(state["exchanges"])}
+
+
 __all__ = [
     "CONTEXT_BINDING_SCHEMA", "SCHEMA", "assistant_context_binding", "build_session_context",
+    "live_conversation_context", "preprocess_live_command", "record_live_exchange",
     "refresh_session_context_fingerprint", "safe_audio_job", "validate_session_context",
 ]

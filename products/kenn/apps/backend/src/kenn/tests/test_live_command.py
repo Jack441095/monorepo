@@ -353,6 +353,23 @@ def test_command_boundary_converts_unhandled_timeout_to_safe_plain_english() -> 
     assert "raw socket" not in str(result)
 
 
+def test_again_and_it_resolve_through_real_command_path() -> None:
+    fake = FakeLive()
+    service = _service(fake)
+    first = handle_command("mute track 2", session_id="command-context", service=service, allow_llm=False)
+    assert first["status"] == "confirmation_required"
+
+    repeated = handle_command("again", session_id="command-context", service=service, allow_llm=False)
+    assert repeated["status"] == "confirmation_required"
+    assert repeated["resolved_command"] == "mute track 2"
+    assert repeated["proposal"]["track_name"] == "Bass"
+
+    anaphora = handle_command("unmute it", session_id="command-context", service=service, allow_llm=False)
+    assert anaphora["status"] == "confirmation_required"
+    assert anaphora["resolved_command"] == "unmute Bass"
+    assert anaphora["proposal"]["track_name"] == "Bass"
+
+
 def test_numbered_track_is_proposed_without_a_write_then_verified_on_confirm() -> None:
     fake = FakeLive()
     service = _service(fake)
