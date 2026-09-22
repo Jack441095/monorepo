@@ -673,6 +673,10 @@ class Handler(BaseHTTPRequestHandler):
         """
         session_result = answer_live_session_question(question)
         if session_result is not None:
+            structured_intent = session_result.get("intent")
+            if isinstance(structured_intent, dict):
+                session_result["live_intent"] = structured_intent
+                session_result["intent"] = str(structured_intent.get("action") or "inspect")
             session_result.update({
                 "route": "ableton_live_inspection",
                 "found": session_result.get("status") == "inspected",
