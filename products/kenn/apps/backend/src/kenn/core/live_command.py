@@ -40,6 +40,7 @@ from kenn.core.clip_duplication_service import ClipDuplicationActionService, PRO
 from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHEMA as CLIP_RENAME_PROPOSAL_SCHEMA
 from kenn.core.live_intent import parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
+from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS
 from kenn.core.live_session_questions import answer_live_session_question
 from kenn.core.subjective_translator import SubjectiveTranslator
 
@@ -2638,4 +2639,4 @@ def handle_command(
         return response
 
 
-__all__ = ["COMMAND_SCHEMA", "LLM_COMMAND_SYSTEM_PROMPT", "handle_command", "validate_llm_plan"]
+__all__ = ["COMMAND_SCHEMA", "LLM_COMMAND_SYSTEM_PROMPT", "PROMOTION_THRESHOLDS", "handle_command", "validate_llm_plan"]
