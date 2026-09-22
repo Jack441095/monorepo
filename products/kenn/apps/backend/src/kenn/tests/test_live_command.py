@@ -370,6 +370,16 @@ def test_again_and_it_resolve_through_real_command_path() -> None:
     assert anaphora["proposal"]["track_name"] == "Bass"
 
 
+def test_command_response_exposes_stage_latency_against_demo_budget() -> None:
+    result = handle_command("mute track 2", session_id="command-latency", service=_service(FakeLive()), allow_llm=False)
+
+    assert result["latency"]["parse_ms"] < 50
+    assert result["latency"]["snapshot_ms"] < 200
+    assert result["latency"]["total_ms"] < 650
+    assert result["latency"]["budget_ms"]["total"] == 650.0
+    assert result["latency"]["budget_exceeded"] == []
+
+
 def test_numbered_track_is_proposed_without_a_write_then_verified_on_confirm() -> None:
     fake = FakeLive()
     service = _service(fake)
