@@ -2674,6 +2674,7 @@ def test_llm_shadow_mode_records_conflict_but_keeps_deterministic_authority(monk
 
     monkeypatch.setenv("KENN_LIVE_LLM_ENABLED", "1")
     monkeypatch.setenv("KENN_LIVE_LLM_MODE", "shadow")
+    monkeypatch.setattr(live_command_module, "record_shadow_result", lambda _result: True)
     monkeypatch.setattr(
         live_command_module,
         "_generate_llm_plan",

@@ -44,6 +44,7 @@ from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS
 from kenn.core.live_session_questions import answer_live_session_question
 from kenn.core.live_receipt_journal import list_receipts
 from kenn.core.session_context import preprocess_live_command, record_live_exchange
+from kenn.core.live_shadow_log import record_shadow_result
 from kenn.core.subjective_translator import SubjectiveTranslator
 
 
@@ -2640,6 +2641,7 @@ def handle_command(
             allow_llm=allow_llm,
         )
         record_live_exchange(session_id=session_id, command=command, result=result)
+        record_shadow_result(result)
         return result
     except Exception as exc:
         message = str(exc).casefold()
