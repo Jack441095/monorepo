@@ -36,9 +36,9 @@ def _question_kind(question: str) -> str | None:
         return "connection"
     if re.search(r"\bhow many\s+(?:live\s+)?tracks?\b", lower):
         return "track_count"
-    if _TRACK_NUMBER.search(lower) and re.search(r"\b(?:what|which)\s+(?:is|are)\s+(?:on\s+)?track\b|\bwhat(?:'s|s)\s+track\b", lower):
+    if _TRACK_NUMBER.search(lower) and re.search(r"\b(?:what|which)\s+(?:is|are)\s+track\b|\bwhat(?:'s|s)\s+track\b", lower):
         return "track_identity"
-    if "tempo" in lower or "time signature" in lower or "meter" in lower:
+    if "tempo" in lower or "time signature" in lower or re.search(r"\bmeter\b", lower):
         return "tempo_signature"
     if "selected track" in lower or ("which track" in lower and "selected" in lower):
         return "selected_track"

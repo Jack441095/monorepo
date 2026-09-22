@@ -451,6 +451,26 @@ def test_reverb_setup_command_binds_display_value_without_writing_before_confirm
     assert fake.writes == []
 
 
+def test_compressor_threshold_setup_is_confirmation_bound_without_writing() -> None:
+    fake = FakeLive()
+    fake.state["tracks"][2]["devices"] = []
+
+    planned = handle_command(
+        "add a compressor to Vocal and set threshold to -20 dB",
+        session_id="command-compressor-setup",
+        service=_service(fake),
+        allow_llm=False,
+    )
+
+    assert planned["status"] == "confirmation_required"
+    assert planned["proposal_kind"] == "device_setup"
+    assert planned["proposal"]["device_name"] == "Compressor"
+    assert planned["proposal"]["parameter_name"] == "Threshold"
+    assert planned["proposal"]["parameter_display_value"] == -20.0
+    assert 0.0 <= planned["proposal"]["parameter_after_value"] <= 1.0
+    assert fake.writes == []
+
+
 def test_reverb_setup_applies_parameter_after_insertion_and_supports_identity_bound_undo() -> None:
     fake = DeviceSetupLive()
     service = _service(fake)

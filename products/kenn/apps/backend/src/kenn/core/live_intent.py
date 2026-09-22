@@ -172,6 +172,15 @@ def _display_unit_error(*, device_name: str, parameter_name: str, value: float, 
         relative=relative,
     )
     return error
+
+
+def _device_setup_parameter(match: re.Match[str], device_name: str | None) -> tuple[str, str]:
+    parameter = str(match.group("parameter") or "").strip().casefold()
+    if parameter == "threshold" or device_name == "Compressor":
+        return "Threshold", "dB"
+    return ("Dry/Wet" if device_name == "Hybrid Reverb" else "Dry Wet"), "%"
+
+
 _DEVICE_CONTROL_REFERENCE = re.compile(
     r"\b(?:device|plugin|plug-in|effect|fx|eq(?:\s*8|\s+eight)?|compressor|reverb|echo|filter|saturator|drum\s+buss)\b",
     re.I,
@@ -224,20 +233,20 @@ _ADD_DEVICE = re.compile(
     re.I,
 )
 _DEVICE_SETUP = re.compile(
-    r"\b(?:add|append|insert|put|load)\s+"
-    r"(?P<device>hybrid\s+reverb|reverb|echo|delay)\s+"
+    r"\b(?:add|append|insert|put|load)\s+(?:an?\s+)?"
+    r"(?P<device>hybrid\s+reverb|reverb|echo|delay|compressor)\s+"
     r"(?:to|on)\s+(?P<track>.+?)\s+"
     r"(?:at|with|set\s+(?:the\s+)?)\s*"
-    r"(?P<value>-?(?:\d+(?:\.\d+)?|\.\d+))\s*(?P<unit>%|percent)\s+"
-    r"(?P<parameter>dry\s*[/ ]?\s*wet)\b",
+    r"(?P<value>-?(?:\d+(?:\.\d+)?|\.\d+))\s*(?P<unit>%|percent|db|decibels?)\s+"
+    r"(?P<parameter>dry\s*[/ ]?\s*wet|threshold)\b",
     re.I,
 )
 _DEVICE_SETUP_TRAILING = re.compile(
-    r"\b(?:add|append|insert|put|load)\s+"
-    r"(?P<device>hybrid\s+reverb|reverb|echo|delay)\s+"
+    r"\b(?:add|append|insert|put|load)\s+(?:an?\s+)?"
+    r"(?P<device>hybrid\s+reverb|reverb|echo|delay|compressor)\s+"
     r"(?:to|on)\s+(?P<track>.+?)\s+and\s+set\s+(?:the\s+)?"
-    r"(?P<parameter>dry\s*[/ ]?\s*wet)\s+(?:to|at)\s+"
-    r"(?P<value>-?(?:\d+(?:\.\d+)?|\.\d+))\s*(?P<unit>%|percent)(?:\b|$)",
+    r"(?P<parameter>dry\s*[/ ]?\s*wet|threshold)\s+(?:to|at)\s+"
+    r"(?P<value>-?(?:\d+(?:\.\d+)?|\.\d+))\s*(?P<unit>%|percent|db|decibels?)(?:\b|$)",
     re.I,
 )
 _INSPECT_DEVICE_PARAMETERS = re.compile(r"\b(?:show|list|inspect|display|what(?:\s+are|\s+is)?)\b.*\b(?:parameters|settings|controls)\b", re.I)
@@ -402,6 +411,8 @@ def _device_setup_name(value: str) -> str | None:
         return "Hybrid Reverb"
     if normalized in {"echo", "delay"}:
         return "Echo"
+    if normalized == "compressor":
+        return "Compressor"
     return None
 
 
@@ -547,6 +558,11 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     actions are rejected rather than guessed inside a recipe.
     """
     text = " ".join(str(query or "").strip().split())
+    # Insert-and-configure phrases contain an ``and set`` separator but map
+    # to one qualified, rollback-capable atomic proposal.  Let parse_request
+    # handle that primitive instead of splitting it into an unsafe recipe.
+    if _DEVICE_SETUP.search(text) or _DEVICE_SETUP_TRAILING.search(text):
+        return None
     segments = split_recipe_request(text)
     if not segments:
         return None
@@ -1094,11 +1110,12 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                 "confidence": 0.9,
             })
             if device_setup_match:
+                setup_parameter, setup_unit = _device_setup_parameter(device_setup_match, device_setup_name)
                 base["device"] = {"name": device_setup_name}
-                base["parameter"] = {"name": "Dry/Wet" if device_setup_name == "Hybrid Reverb" else "Dry Wet"}
+                base["parameter"] = {"name": setup_parameter}
                 base["desired_value"] = float(device_setup_match.group("value"))
                 base["relative"] = False
-                base["unit"] = "%"
+                base["unit"] = setup_unit
             elif rename_match:
                 base["desired_value"] = " ".join(rename_match.group(1).split()).strip()
                 base["unit"] = "string"
@@ -1158,14 +1175,15 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     base["track"] = {"index": track.get("index"), "name": track.get("name")}
 
     if device_setup_match:
+        setup_parameter, setup_unit = _device_setup_parameter(device_setup_match, device_setup_name)
         base.update({
             "mode": "assist",
             "action": "insert_device_with_parameter",
             "device": {"name": device_setup_name},
-            "parameter": {"name": "Dry/Wet" if device_setup_name == "Hybrid Reverb" else "Dry Wet"},
+            "parameter": {"name": setup_parameter},
             "desired_value": float(device_setup_match.group("value")),
             "relative": False,
-            "unit": "%",
+            "unit": setup_unit,
             "confirmation_required": True,
             "confidence": 0.98,
         })

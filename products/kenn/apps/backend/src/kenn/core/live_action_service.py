@@ -93,6 +93,7 @@ BUS_ORGANIZATION_RECEIPT_SCHEMA = "kenn.ableton_bus_organization_receipt.v1"
 DEVICE_INSERTION_ALLOWLIST = frozenset({"EQ Eight", "Glue Compressor", "Saturator", "Auto Filter", "Drum Buss", "Compressor", "Hybrid Reverb", "Echo"})
 DEVICE_INSERTION_ALLOWLIST = frozenset({"EQ Eight", "Glue Compressor", "Saturator", "Auto Filter", "Drum Buss", "Compressor", "Hybrid Reverb", "Echo", "Roar", "Multiband Dynamics"})
 DEVICE_SETUP_PARAMETER_ALLOWLIST = {
+    "Compressor": {"threshold": ("Threshold", "dB")},
     "Hybrid Reverb": {"drywet": ("Dry/Wet", "%")},
     "Echo": {"drywet": ("Dry Wet", "%")},
     "Roar": {"drive": ("Drive", "dB"), "drywet": ("Dry/Wet", "%"), "tone": ("Tone", "")},
@@ -1565,16 +1566,17 @@ class LiveActionService(Tier2Tier3ControlMixin):
         parameter_key = _device_setup_parameter_key(parameter_name)
         parameter_spec = DEVICE_SETUP_PARAMETER_ALLOWLIST.get(canonical_name, {}).get(parameter_key)
         if parameter_spec is None:
-            return {"ok": False, "error": f"KENN only supports a qualified Dry/Wet setup for {canonical_name}."}
+            supported = ", ".join(item[0] for item in DEVICE_SETUP_PARAMETER_ALLOWLIST.get(canonical_name, {}).values())
+            return {"ok": False, "error": f"KENN supports only these qualified setup controls for {canonical_name}: {supported or 'none'}."}
         canonical_parameter, expected_unit = parameter_spec
-        if str(parameter_unit or "").strip() != expected_unit:
-            return {"ok": False, "error": f"{canonical_name} {canonical_parameter} must be specified as a percentage."}
+        if str(parameter_unit or "").strip().casefold() != expected_unit.casefold():
+            return {"ok": False, "error": f"{canonical_name} {canonical_parameter} must be specified in {expected_unit}."}
         try:
             display_value = float(parameter_display_value)
         except (TypeError, ValueError):
             return {"ok": False, "error": "The device display value must be numeric."}
-        if not math.isfinite(display_value) or not 0.0 <= display_value <= 100.0:
-            return {"ok": False, "error": "Dry/Wet must be between 0% and 100%."}
+        if not math.isfinite(display_value):
+            return {"ok": False, "error": "The device display value must be finite."}
         from kenn.core.device_units import display_to_raw
 
         raw_value, conversion_error = display_to_raw(
@@ -1615,7 +1617,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "before_devices": before_devices,
             "after_devices": after_devices,
             "before_device_fingerprint": fingerprint,
-            "reason": f"Explicit user request to append {canonical_name} on '{track.get('name', '')}' and set {canonical_parameter} to {display_value:g}%.",
+            "reason": f"Explicit user request to append {canonical_name} on '{track.get('name', '')}' and set {canonical_parameter} to {display_value:g} {expected_unit}.",
             "evidence": [
                 f"Current Live device order: {[item['name'] for item in before_devices]!r}.",
                 f"Qualified control: {canonical_name} {canonical_parameter} ({expected_unit}).",
