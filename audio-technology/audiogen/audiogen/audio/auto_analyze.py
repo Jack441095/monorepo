@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-WEBSITE_DIR = ROOT / "business" / "app"
+WEBSITE_DIR = ROOT / "server" / "app"
 if str(WEBSITE_DIR) not in sys.path:
     sys.path.insert(0, str(WEBSITE_DIR))
 ANALYSIS_DIR = ROOT / "studio" / "audio_analysis"

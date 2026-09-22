@@ -48,6 +48,10 @@ workspace/tmp/
 *.sqlite
 *.wav
 *.pack
+*.onnx.data
+
+# SLO classifier weight headers (24 MB each, regenerable via model export)
+products/slo/SmartSampleManager/tools/classification_benchmark/AcousticClassifierWeights_*.h
 
 # Toolchains vendored into validation runs
 **/toolchain/

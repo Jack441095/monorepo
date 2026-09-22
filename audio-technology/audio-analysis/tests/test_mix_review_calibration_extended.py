@@ -27,8 +27,8 @@ import wave
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(ROOT / "business" / "app"))
-sys.path.insert(0, str(ROOT / "business" / "agents"))
+sys.path.insert(0, str(ROOT / "server" / "app"))
+sys.path.insert(0, str(ROOT / "server" / "agents"))
 sys.path.insert(0, str(ROOT / "studio" / "audio_analysis"))
 
 from audio_analysis.mix_review import mix_review
