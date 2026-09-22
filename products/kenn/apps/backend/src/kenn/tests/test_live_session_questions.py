@@ -83,6 +83,21 @@ def test_duplicate_names_are_reported_exactly() -> None:
     assert result["duplicate_track_names"] == ["3-Audio"]
 
 
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("What's selected?", "Track 4, '4-Audio'"),
+        ("Any duplicate track names?", "no duplicate track names"),
+    ],
+)
+def test_investor_demo_session_phrases_are_grounded(question: str, expected: str) -> None:
+    result = handle_command(question, session_id="demo-session-qa", service=Service(SessionLive()))
+
+    assert result["status"] == "inspected"
+    assert result["answer_mode"] == "session_question"
+    assert expected.casefold() in result["answer"].casefold()
+
+
 def test_unrelated_chat_is_not_hijacked() -> None:
     client = SessionLive()
     result = answer_live_session_question(

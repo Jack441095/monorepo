@@ -318,6 +318,23 @@ def test_focus_device_resolves_exact_device_on_numbered_track() -> None:
     assert result["confirmation_required"] is True
 
 
+def test_investor_demo_hard_left_pan_resolves_exact_named_track() -> None:
+    result = parse_request("Pan the Drum Bus hard left.", snapshot())
+
+    assert result["action"] == "set_pan"
+    assert result["track"] == {"index": 1, "name": "Drum Bus"}
+    assert result["desired_value"] == -1.0
+    assert result["confirmation_required"] is True
+
+
+def test_investor_demo_master_maximum_is_an_explicit_refusal() -> None:
+    result = parse_request("Set the master volume to maximum.", snapshot())
+
+    assert result["mode"] == "refuse"
+    assert result["action"] is None
+    assert "maximum output level" in result["error"]
+
+
 def test_focus_device_rejects_unknown_device_without_guessing() -> None:
     result = parse_request("select Reverb on track 4", eq_snapshot())
     assert result["action"] is None

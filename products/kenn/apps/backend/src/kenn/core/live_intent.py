@@ -209,6 +209,13 @@ _UNSUPPORTED_MASTER_CONTROL = re.compile(
     r"\b(?:mute|unmute|enable|disable|solo|unsolo|arm|disarm|turn\s+(?:on|off))\b",
     re.I,
 )
+_UNSAFE_MASTER_LEVEL = re.compile(
+    r"\b(?:set|raise|increase|boost|max(?:imize)?|turn\s+up)\b.{0,80}"
+    r"\b(?:master|main)(?:\s+track)?\b.{0,40}\b(?:volume|level|fader)\b"
+    r"|\b(?:master|main)(?:\s+track)?\b.{0,40}\b(?:volume|level|fader)\b.{0,80}"
+    r"\b(?:maximum|max|full|raise|increase|boost|turn\s+up)\b",
+    re.I,
+)
 _RENAME_TRACK = re.compile(
     r"\b(?:rename|name)\b.*?\b(?:to|as)\s+['\"]?([^'\"]+?)['\"]?\s*$",
     re.I,
@@ -686,6 +693,16 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         base.update({
             "mode": "refuse",
             "error": "Requests to bypass KENN's confirmation, policy, or instruction boundary are refused.",
+            "confidence": 0.99,
+        })
+        return base
+    if _UNSAFE_MASTER_LEVEL.search(text):
+        base.update({
+            "mode": "refuse",
+            "error": (
+                "Master-track level changes are outside KENN's qualified control boundary, "
+                "and I will not infer or apply a maximum output level. Nothing changed."
+            ),
             "confidence": 0.99,
         })
         return base
@@ -1431,12 +1448,20 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             r"\b(?:move|put|place)\b.*?" + _NUMBER + r"\s*(%|percent)?\s*(left|right)\b",
             lower,
         )
+        pan_hard_match = re.search(
+            r"\bpan\b.*?\b(?:hard|fully|all\s+the\s+way)\s+(left|right)\b",
+            lower,
+        )
         if volume_match:
             db = float(volume_match.group(1))
             base.update({"desired_value": 10 ** (db / 20.0), "unit": "normalized", "requested_unit": "dB", "absolute_value": db})
             action = "set_volume"
-        elif pan_match or pan_side_first_match or pan_amount_first_match:
-            if pan_match:
+        elif pan_hard_match or pan_match or pan_side_first_match or pan_amount_first_match:
+            if pan_hard_match:
+                side = pan_hard_match.group(1)
+                amount = -1.0 if side == "left" else 1.0
+                unit = None
+            elif pan_match:
                 amount = float(pan_match.group(1))
                 unit = pan_match.group(2)
                 side = pan_match.group(3)

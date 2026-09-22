@@ -77,19 +77,41 @@ Result: **10/10 consecutive passes**, zero partial successes counted.
 
 ## Automated regression
 
-The full backend suite completed after the implementation changes:
+The latest full backend suite completed after the investor-phrase hardening:
 
-`1360 passed, 5 skipped, 4 warnings in 72.18s`
+`1359 passed, 12 skipped, 4 warnings in 78.68s`
 
-The warnings are existing Python/SWIG and audio compatibility deprecations;
-there were no test failures.
+The skip count includes optional/environment-dependent coverage. The warnings
+are existing HTTP-test and audio compatibility deprecations; there were no
+test failures.
 
 ## Remaining demo gates
 
-- Reconcile the narrative step “Add an EQ Eight to the bass” with the fixture
-  contract that intentionally preloads exactly one Bass EQ Eight. Inserting a
-  duplicate and then referring to “the bass EQ” would be unsafe and ambiguous.
 - Add original or licensed-for-demo musical material and deliberate audible
   issues before claiming the audio-analysis acts are qualified.
 - Rehearse the complete scripted UI flow, deliberate fault recovery, reset,
   projector layout, and 8–12 minute timing ten consecutive times.
+
+## Narrative correction
+
+The canonical runbook now says `Focus EQ Eight on track 5` instead of inserting
+a duplicate device. The following command is also band-specific:
+
+`Boost amplitude by 3 dB at 200 Hz on track 5 band 2A.`
+
+Against the checked-in fixture, the focus request resolved exactly to Bass
+track index 4, EQ Eight device index 0, with the previously selected Drum Bus
+Compressor recorded in the proposal. The gain request resolved exactly to
+`2 Gain A`, from 0 dB to 3 dB.
+
+One bounded narrative rehearsal then confirmed both exact proposals. Live
+verified the Bass/EQ Eight selection, verified `2 Gain A` at 3 dB, generated a
+fresh inverse from `Undo that`, verified the inverse readback at 0 dB, and an
+independent reproposal observed 0 dB as the restored baseline. This is one
+successful sequence, not the required ten-run full-script qualification.
+
+The real-Live command surface also resolved the canonical read-only and safety
+phrases for track count, selected track, session overview, duplicate names,
+low-end advice, vocal-clipping advice, receipt history, destructive track
+deletion, and maximum master level. Vocal Compressor Output and hard-left Synth
+pan both stopped at exact confirmation proposals during this audit.
