@@ -3219,6 +3219,68 @@ class Handler(BaseHTTPRequestHandler):
         self.send_json(404, {"error": "Audio file not found."})
 
 
+def ensure_retrieval_index() -> dict[str, Any]:
+    """Report the active index and build a notes-only BM25 index when absent."""
+    from kenn.retrieval.build_index import NOTES_DIR, build_index
+    from kenn.retrieval.index_store import INDEX_DIR, active_version_dir
+
+    active = active_version_dir(INDEX_DIR)
+    if active is not None:
+        chunks_path = active / "chunks.jsonl"
+        try:
+            chunk_count = sum(1 for line in chunks_path.open("r", encoding="utf-8") if line.strip())
+        except OSError:
+            chunk_count = 0
+        state = {
+            "status": "loaded",
+            "version": active.name,
+            "chunk_count": chunk_count,
+            "embeddings": (active / "embeddings.npy").is_file(),
+        }
+        print(
+            "Retrieval index: "
+            f"{state['version']} ({state['chunk_count']} chunks, "
+            f"embeddings={'yes' if state['embeddings'] else 'no'})."
+        )
+        return state
+
+    print("Retrieval index: no active version; building a notes-only BM25 index.")
+    previous_skip = os.environ.get("KENN_SKIP_EMBEDDINGS")
+    os.environ["KENN_SKIP_EMBEDDINGS"] = "1"
+    try:
+        chunks = build_index(
+            pdf_dir=NOTES_DIR.parent / ".kenn-no-pdf-source",
+            notes_dir=NOTES_DIR,
+        )
+        active = active_version_dir(INDEX_DIR)
+        state = {
+            "status": "built",
+            "version": active.name if active is not None else "unavailable",
+            "chunk_count": len(chunks),
+            "embeddings": False,
+        }
+        print(f"Retrieval index: built {state['version']} with {state['chunk_count']} note chunks.")
+        return state
+    except BaseException as exc:
+        # Indexing is an advisory subsystem.  A missing source directory,
+        # contradiction gate, or filesystem failure must not prevent chat or
+        # Live control from starting in reduced-quality mode.
+        state = {
+            "status": "degraded",
+            "version": "unavailable",
+            "chunk_count": 0,
+            "embeddings": False,
+            "error": str(exc) or type(exc).__name__,
+        }
+        print(f"WARNING: retrieval index auto-build failed ({state['error']}); continuing without retrieval context.")
+        return state
+    finally:
+        if previous_skip is None:
+            os.environ.pop("KENN_SKIP_EMBEDDINGS", None)
+        else:
+            os.environ["KENN_SKIP_EMBEDDINGS"] = previous_skip
+
+
 def main() -> int:
     from log_setup import setup_server_logging
 
@@ -3238,12 +3300,8 @@ def main() -> int:
             demo_feedback.init_feedback_table()
         if mix_review:
             mix_review.init_reviews_table()
-        # warm_index() owns the version-aware index check and clear failure.
-        try:
-            warm_index()
-        except SystemExit as exc:
-            print(str(exc) or "Index not found. Run: python main.py build")
-            return 1
+        ensure_retrieval_index()
+        warm_index()
         # Clean up old sessions (>7 days) at startup
         try:
             from kenn.core.session_memory import delete_old_sessions

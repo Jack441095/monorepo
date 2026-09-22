@@ -31,16 +31,33 @@ _multipliers_cache: dict | None = None
 _multipliers_mtime: float = 0.0
 
 
+def _empty_terms() -> dict:
+    return {
+        "version": 3,
+        "total_docs": 0,
+        "avg_len": 1.0,
+        "lengths": [],
+        "term_counts": [],
+        "idf": {},
+        "inverted_index": {},
+    }
+
+
 @lru_cache(maxsize=1)
 def _load_index_bundle() -> tuple[list[dict], dict]:
     version_dir = active_version_dir(CHUNKS_PATH.parent)
     chunks_path = (version_dir / "chunks.jsonl") if version_dir else CHUNKS_PATH
     terms_path = (version_dir / "terms.json") if version_dir else TERMS_PATH
     if not chunks_path.exists() or not terms_path.exists():
-        raise SystemExit("Index not found. Run: python main.py build")
-    with chunks_path.open("r", encoding="utf-8") as handle:
-        chunks = [json.loads(line) for line in handle if line.strip()]
-    terms = json.loads(terms_path.read_text(encoding="utf-8"))
+        return [], _empty_terms()
+    try:
+        with chunks_path.open("r", encoding="utf-8") as handle:
+            chunks = [json.loads(line) for line in handle if line.strip()]
+        terms = json.loads(terms_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError):
+        return [], _empty_terms()
+    if not isinstance(terms, dict):
+        return [], _empty_terms()
     inverted = {}
     term_counts = terms.get("term_counts", [])
     for doc_idx, counts in enumerate(term_counts):
