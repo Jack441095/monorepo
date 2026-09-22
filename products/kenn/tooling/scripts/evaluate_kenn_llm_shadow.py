@@ -133,10 +133,14 @@ def _model_contract_gate(results: list[dict[str, Any]]) -> dict[str, Any]:
             blockers.append(f"{case_id}: model plan disagreed with deterministic interpretation")
         if not item.get("deterministic_contract_ok", False):
             blockers.append(f"{case_id}: deterministic fixture contract failed")
+    from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS
+
     return {
         "model_contract_passed": not blockers,
         "live_activation_allowed": False,
         "blockers": blockers,
+        "promotion_thresholds": PROMOTION_THRESHOLDS,
+        "promotion_stage": "shadow",
         "required_before_live_activation": [
             "complete model-contract shadow evaluation with every case accepted and matching",
             "independent human review of representative commands",

@@ -47,10 +47,14 @@ def _model_contract_gate(evaluation: dict[str, Any]) -> dict[str, Any]:
             blockers.append(f"{total - matches} holdout case(s) did not match deterministic interpretation")
         if int(counts.get("deterministic_contract_failures", 0) or 0):
             blockers.append("deterministic holdout contract failed")
+    from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS
+
     return {
         "model_contract_passed": not blockers,
         "live_activation_allowed": False,
         "blockers": blockers,
+        "promotion_thresholds": PROMOTION_THRESHOLDS,
+        "promotion_stage": "shadow",
         "required_before_live_activation": [
             "complete model-contract holdout acceptance and deterministic agreement",
             "independent human review of representative commands",
