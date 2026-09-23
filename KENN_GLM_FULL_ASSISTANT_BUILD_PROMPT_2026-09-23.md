@@ -6,6 +6,8 @@
 across many sessions: every session starts by reading the tracker, continues the
 first unticked item, and ticks items off as they land.
 
+**Tracker:** [`products/kenn/docs/plans/KENN_GLM_FULL_ASSISTANT_TRACKER.md`](products/kenn/docs/plans/KENN_GLM_FULL_ASSISTANT_TRACKER.md)
+
 ---
 
 ## Prompt
