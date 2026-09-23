@@ -740,6 +740,57 @@ def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict
         return str(state["last_command"]), {"resolution": "repeat_last_action", "original": original}
     if re.fullmatch(r"(?:please\s+)?undo(?:\s+that|\s+it)?[.!]?", lower):
         return "undo", {"resolution": "undo_last_receipt", "original": original}
+    if re.fullmatch(r"(?:no[,\s]+)?(?:the\s+)?other\s+one[.!]?", lower):
+        return original, {
+            "resolution": "correction_requires_clarification",
+            "original": original,
+            "reason": "other_one_is_not_an_exact_identity",
+        }
+
+    track_correction = re.fullmatch(
+        r"(?:no[,\s]+)?i\s+meant\s+(?:the\s+)?track\s+(?P<index>\d+)[.!]?",
+        original,
+        re.I,
+    )
+    if track_correction and state["last_command"]:
+        prior = str(state["last_command"])
+        replacement = f"track {int(track_correction.group('index'))}"
+        corrected, count = re.subn(r"\btrack\s+(?:number\s+)?\d+\b", replacement, prior, count=1, flags=re.I)
+        if not count and state["last_track"]:
+            named_target = rf"\b(?:the\s+)?{re.escape(str(state['last_track']))}(?:\s+track)?\b"
+            corrected, count = re.subn(named_target, replacement, prior, count=1, flags=re.I)
+        if count:
+            return corrected, {
+                "resolution": "corrected_track_target",
+                "original": original,
+                "corrected_target": replacement,
+            }
+
+    device_correction = re.fullmatch(
+        r"(?:no[,\s]+)?not\s+(?:the\s+)?(?P<old>[^,]{1,80}),\s*(?:use\s+|the\s+)?(?P<new>[^,.]{1,80})[.!]?",
+        original,
+        re.I,
+    )
+    if device_correction and state["last_command"] and state["last_device"]:
+        old = " ".join(device_correction.group("old").split())
+        previous_device = str(state["last_device"])
+        old_key = re.sub(r"[^a-z0-9]", "", old.casefold())
+        previous_key = re.sub(r"[^a-z0-9]", "", previous_device.casefold())
+        if old_key and (old_key == previous_key or old_key in previous_key or previous_key in old_key):
+            new_device = " ".join(device_correction.group("new").split())
+            corrected, count = re.subn(
+                re.escape(previous_device),
+                new_device,
+                str(state["last_command"]),
+                count=1,
+                flags=re.I,
+            )
+            if count:
+                return corrected, {
+                    "resolution": "corrected_device_target",
+                    "original": original,
+                    "corrected_target": new_device,
+                }
 
     resolved = original
     entity = state["last_device"] or state["last_track"]

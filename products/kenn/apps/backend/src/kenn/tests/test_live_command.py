@@ -556,7 +556,51 @@ def test_compressor_threshold_setup_is_confirmation_bound_without_writing() -> N
     assert planned["proposal"]["device_name"] == "Compressor"
     assert planned["proposal"]["parameter_name"] == "Threshold"
     assert planned["proposal"]["parameter_display_value"] == -20.0
+    assert "Threshold to -20 dB" in planned["answer"]
+    assert "-20%" not in planned["answer"]
     assert 0.0 <= planned["proposal"]["parameter_after_value"] <= 1.0
+    assert fake.writes == []
+
+
+def test_explicit_track_correction_is_replanned_through_the_gateway() -> None:
+    fake = FakeLive()
+    service = _service(fake)
+    session_id = "command-correct-track"
+
+    first = handle_command(
+        "mute track 2",
+        session_id=session_id,
+        service=service,
+        allow_llm=False,
+    )
+    corrected = handle_command(
+        "I meant track 3",
+        session_id=session_id,
+        service=service,
+        allow_llm=False,
+    )
+
+    assert first["proposal"]["track_name"] == "Bass"
+    assert corrected["status"] == "confirmation_required"
+    assert corrected["resolved_command"] == "mute track 3"
+    assert corrected["context_resolution"]["resolution"] == "corrected_track_target"
+    assert corrected["proposal"]["track_name"] == "Vocal"
+    assert fake.writes == []
+
+
+def test_other_one_requires_an_exact_identity_through_the_gateway() -> None:
+    fake = FakeLive()
+
+    result = handle_command(
+        "no, the other one",
+        session_id="command-other-one",
+        service=_service(fake),
+        allow_llm=False,
+    )
+
+    assert result["status"] == "clarification_required"
+    assert result["context_resolution"]["resolution"] == "correction_requires_clarification"
+    assert "Name the track or device" in result["answer"]
     assert fake.writes == []
 
 

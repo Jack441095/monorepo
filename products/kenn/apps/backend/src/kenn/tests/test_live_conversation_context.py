@@ -54,3 +54,55 @@ def test_bare_undo_is_marked_for_last_receipt_resolution() -> None:
 
     assert resolved == "undo"
     assert metadata["resolution"] == "undo_last_receipt"
+
+
+def test_explicit_track_correction_retargets_the_previous_command() -> None:
+    session_id = "context-correct-track"
+    record_live_exchange(
+        session_id=session_id,
+        command="mute track 2",
+        result={
+            "status": "confirmation_required",
+            "intent": {"action": "set_mute", "track": {"index": 1, "name": "Drums"}},
+        },
+    )
+
+    resolved, metadata = preprocess_live_command("I meant track 3", session_id=session_id)
+
+    assert resolved == "mute track 3"
+    assert metadata["resolution"] == "corrected_track_target"
+    assert metadata["corrected_target"] == "track 3"
+
+
+def test_explicit_device_correction_retargets_only_the_known_device() -> None:
+    session_id = "context-correct-device"
+    record_live_exchange(
+        session_id=session_id,
+        command="add Compressor to Vocals and set Threshold to -20 dB",
+        result={
+            "status": "confirmation_required",
+            "proposal": {
+                "action": "insert_device_with_parameter",
+                "track_name": "Vocals",
+                "device_name": "Compressor",
+                "parameter_name": "Threshold",
+            },
+        },
+    )
+
+    resolved, metadata = preprocess_live_command("not the compressor, the EQ", session_id=session_id)
+
+    assert resolved == "add EQ to Vocals and set Threshold to -20 dB"
+    assert metadata["resolution"] == "corrected_device_target"
+    assert metadata["corrected_target"] == "EQ"
+
+
+def test_other_one_is_never_guessed_from_context() -> None:
+    resolved, metadata = preprocess_live_command("no, the other one", session_id="context-other-one")
+
+    assert resolved == "no, the other one"
+    assert metadata == {
+        "resolution": "correction_requires_clarification",
+        "original": "no, the other one",
+        "reason": "other_one_is_not_an_exact_identity",
+    }
