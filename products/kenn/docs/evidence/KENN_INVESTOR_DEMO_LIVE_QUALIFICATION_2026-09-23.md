@@ -9,6 +9,20 @@ against real Live through the KENN HTTP and AbletonOSC control path.
 It does **not** claim that the complete 20-step investor narrative has passed
 or that the generated stems have been imported and rehearsed in Live ten times.
 
+## Current handoff status
+
+Documentation was reconciled with the implementation on 2026-09-23. The
+generated stems and analysis WAVs are present, and the disposable rehearsal set
+exists, but that set remains byte-identical to the checked-in reset fixture.
+The stems have not been imported. Live is stopped on the tracked reset fixture,
+so no confirmation-bound operation should be applied until the `.runtime`
+rehearsal path is visibly verified in Live.
+
+The next evidence-producing steps are: import and save the stems only in the
+disposable copy, repeat the mutating 11-check preflight, run the atomic-EQ
+qualifier with `--apply` on the empty Synth chain, and then complete the full
+20-step UI/recovery/projector rehearsal ten consecutive times.
+
 ## Environment
 
 - Ableton Live 12 Suite with AbletonOSC listening on UDP 11000/11001
