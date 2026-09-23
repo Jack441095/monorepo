@@ -32,7 +32,12 @@ copy and the full run passes the rehearsal gate.
       Browser, so the hash-verified visible copy is used)
 - [x] Drum Bus and its Compressor selected
 - [x] Mutating preflight 11/11 on the stem-loaded set
-- [ ] Operator saved the disposable set; untouched copy kept as reset point
+- [x] Operator saved the disposable set. Live saves a loose `.als` into a new
+      Project folder: the qualified set is
+      `.runtime/investor-demo-audio/KENN_Live12_Demo_Rehearsal-1 Project/`. The
+      read-only per-run reset point is `KENN_Live12_Demo_RESET Project/` (same
+      SHA-256). Ignore the earlier `KENN_Live12_Demo_Rehearsal Project/`; it
+      holds the abandoned hand-edited attempt with wrong names and missing devices.
 - [ ] Ten-run non-mutating script gate
 - [ ] Ten consecutive complete 20-step rehearsals
 
