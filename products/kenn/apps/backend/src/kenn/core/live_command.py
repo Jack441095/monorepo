@@ -2152,6 +2152,43 @@ def _handle_command_impl(
                 {"action": "correct_target"},
                 "I can correct the target, but 'the other one' is not an exact identity. Name the track or device you mean.",
             )
+        if context_resolution.get("resolution") == "contextual_direction_requires_value":
+            track_name = str(context_resolution.get("track") or "")
+            device_name = str(context_resolution.get("device") or "")
+            parameter_name = str(context_resolution.get("parameter") or "")
+            if parameter_name:
+                target = parameter_name
+                if device_name:
+                    target += f" on {device_name}"
+                if track_name:
+                    target += f" on {track_name}"
+                message = (
+                    f"I resolved this to {target}, but '{context_resolution.get('direction')}' is directional, "
+                    "not an exact control value. Give the exact value and unit you want; nothing changed."
+                )
+            elif context_resolution.get("target_kind") == "device" and device_name:
+                target = device_name + (f" on {track_name}" if track_name else "")
+                message = (
+                    f"I resolved this to {target}, but '{context_resolution.get('direction')}' does not name an exact "
+                    "device parameter. Name the parameter, exact value, and unit you want; nothing changed."
+                )
+            else:
+                target = track_name or "the last discussed track"
+                message = (
+                    f"I resolved this to {target}, but relative louder/softer fader moves are not yet qualified. "
+                    f"Give an absolute target such as 'set {target} volume to -6 dB'; nothing changed."
+                )
+            return _clarification(
+                response,
+                {
+                    "action": "clarify_contextual_direction",
+                    "track": {"name": track_name} if track_name else None,
+                    "device": {"name": device_name} if device_name else None,
+                    "parameter": {"name": parameter_name} if parameter_name else None,
+                    "missing_fields": ["exact_absolute_value"],
+                },
+                message,
+            )
 
     if proposal is not None:
         execution_started = time.monotonic()

@@ -793,13 +793,55 @@ def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict
                 }
 
     resolved = original
+    directional = re.search(r"\b(?P<direction>louder|softer|quieter)\b", resolved, re.I)
+    context_entities = {
+        "parameter": str(state["last_parameter"]),
+        "device": str(state["last_device"]),
+        "track": str(state["last_track"]),
+    }
+    mentioned_kinds = [
+        kind for kind in ("parameter", "device", "track")
+        if context_entities[kind] and context_entities[kind].casefold() in resolved.casefold()
+    ]
+    uses_pronoun = bool(re.search(r"\b(?:it|that)\b", resolved, re.I))
+    is_bare_direction = bool(re.fullmatch(
+        r"(?:make\s+)?(?:it\s+|that\s+)?(?:louder|softer|quieter)(?:\s+by\s+[-+]?\d+(?:\.\d+)?\s*(?:db|%)?)?[.!]?",
+        resolved,
+        re.I,
+    ))
+    if directional and (uses_pronoun or mentioned_kinds or is_bare_direction) and any(context_entities.values()):
+        target_kind = mentioned_kinds[0] if mentioned_kinds else next(
+            kind for kind in ("parameter", "device", "track") if context_entities[kind]
+        )
+        subject = context_entities[target_kind]
+        subject_parts = [subject]
+        if target_kind == "parameter" and state["last_device"]:
+            subject_parts.append(f"on {state['last_device']}")
+        if state["last_track"] and str(state["last_track"]).casefold() not in " ".join(subject_parts).casefold():
+            subject_parts.append(f"on {state['last_track']}")
+        subject_phrase = " ".join(subject_parts)
+        if re.search(r"\b(?:it|that)\b", resolved, re.I):
+            resolved = re.sub(r"\b(?:it|that)\b", subject_phrase, resolved, count=1, flags=re.I)
+        elif subject.casefold() not in resolved.casefold():
+            resolved = f"{resolved} on {subject_phrase}"
+        return resolved, {
+            "resolution": "contextual_direction_requires_value",
+            "original": original,
+            "direction": directional.group("direction").casefold(),
+            "target_kind": target_kind,
+            "track": str(state["last_track"]),
+            "device": str(state["last_device"]),
+            "parameter": str(state["last_parameter"]),
+            "relative_amount_provided": bool(re.search(
+                r"\bby\s+[-+]?\d+(?:\.\d+)?\s*(?:db|%)?\b",
+                original,
+                re.I,
+            )),
+        }
+
     entity = state["last_device"] or state["last_track"]
     if entity and re.search(r"\b(?:it|that)\b", resolved, re.I):
         resolved = re.sub(r"\b(?:it|that)\b", str(entity), resolved, count=1, flags=re.I)
-    if state["last_track"] and re.search(r"\b(?:louder|softer|quieter)\b", resolved, re.I):
-        known = str(state["last_track"]).casefold() in resolved.casefold()
-        if not known:
-            resolved = f"{resolved} on {state['last_track']}"
     metadata = {"resolution": "anaphora" if resolved != original else "none", "original": original}
     return resolved, metadata
 
@@ -815,16 +857,42 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
     track = intent.get("track") if isinstance(intent.get("track"), dict) else {}
     device = intent.get("device") if isinstance(intent.get("device"), dict) else {}
     parameter = intent.get("parameter") if isinstance(intent.get("parameter"), dict) else {}
-    track_name = str(track.get("name") or proposal.get("track_name") or (receipt.get("target") or {}).get("track_name") or "")
-    device_name = str(device.get("name") or proposal.get("device_name") or (receipt.get("target") or {}).get("device_name") or "")
-    parameter_name = str(parameter.get("name") or proposal.get("parameter_name") or (receipt.get("target") or {}).get("parameter_name") or "")
+    receipt_target = receipt.get("target") if isinstance(receipt.get("target"), dict) else {}
+    track_name = str(track.get("name") or proposal.get("track_name") or receipt_target.get("track_name") or "")
+    device_name = str(device.get("name") or proposal.get("device_name") or receipt_target.get("device_name") or "")
     action = str(intent.get("action") or proposal.get("action") or receipt.get("action") or "")
+    proposal_parameter = proposal.get("parameter")
+    if isinstance(proposal_parameter, dict):
+        proposal_parameter = proposal_parameter.get("name")
+    if not device_name:
+        # Track proposals use `parameter` for state labels such as "muted";
+        # those are not device parameters and must not become anaphora targets.
+        proposal_parameter = ""
+    receipt_parameter = receipt_target.get("parameter")
+    if isinstance(receipt_parameter, dict):
+        receipt_parameter = receipt_parameter.get("name")
+    if not device_name:
+        receipt_parameter = ""
+    parameter_name = str(
+        parameter.get("name")
+        or proposal.get("parameter_name")
+        or proposal_parameter
+        or receipt_target.get("parameter_name")
+        or receipt_parameter
+        or ""
+    )
     status = str(result.get("status") or "")
     with _LIVE_CONVERSATION_LOCK:
         if track_name:
             state["last_track"] = track_name[:128]
         if device_name:
+            if device_name != state["last_device"] and not parameter_name:
+                state["last_parameter"] = ""
             state["last_device"] = device_name[:128]
+        elif action in {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "rename_track", "focus_track"}:
+            # A newer track-level action supersedes an older device target.
+            state["last_device"] = ""
+            state["last_parameter"] = ""
         if parameter_name:
             state["last_parameter"] = parameter_name[:128]
         if action:
@@ -846,6 +914,7 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
             "action": action[:128],
             "track": track_name[:128],
             "device": device_name[:128],
+            "parameter": parameter_name[:128],
             "timestamp": time.time(),
         })
 

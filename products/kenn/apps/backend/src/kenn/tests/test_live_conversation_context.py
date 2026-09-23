@@ -30,8 +30,95 @@ def test_repeat_and_anaphora_resolve_from_last_discussed_entities() -> None:
     assert repeated_meta["resolution"] == "repeat_last_action"
 
     resolved, meta = preprocess_live_command("make it softer", session_id=session_id)
-    assert resolved == "make Compressor softer on Bass"
-    assert meta["resolution"] == "anaphora"
+    assert resolved == "make Threshold on Compressor on Bass softer"
+    assert meta["resolution"] == "contextual_direction_requires_value"
+    assert meta["target_kind"] == "parameter"
+    assert meta["parameter"] == "Threshold"
+    assert meta["device"] == "Compressor"
+    assert meta["track"] == "Bass"
+    assert meta["relative_amount_provided"] is False
+
+
+def test_device_proposal_parameter_alias_is_retained_for_follow_up_context() -> None:
+    session_id = "context-proposal-parameter"
+    record_live_exchange(
+        session_id=session_id,
+        command="set Compressor Output on Vocal to -3 dB",
+        result={
+            "status": "confirmation_required",
+            "proposal": {
+                "action": "set_device_parameter",
+                "track_name": "Vocal",
+                "device_name": "Compressor",
+                "parameter": "Output",
+            },
+        },
+    )
+
+    context = live_conversation_context(session_id)
+    resolved, metadata = preprocess_live_command("make it louder by 2 dB", session_id=session_id)
+
+    assert context["last_parameter"] == "Output"
+    assert context["exchanges"][-1]["parameter"] == "Output"
+    assert resolved == "make Output on Compressor on Vocal louder by 2 dB"
+    assert metadata["resolution"] == "contextual_direction_requires_value"
+    assert metadata["relative_amount_provided"] is True
+
+
+def test_newer_track_action_supersedes_an_older_device_parameter_target() -> None:
+    session_id = "context-newer-track-target"
+    record_live_exchange(
+        session_id=session_id,
+        command="set Compressor Output on Vocal to -3 dB",
+        result={
+            "status": "confirmation_required",
+            "proposal": {
+                "action": "set_device_parameter",
+                "track_name": "Vocal",
+                "device_name": "Compressor",
+                "parameter": "Output",
+            },
+        },
+    )
+    record_live_exchange(
+        session_id=session_id,
+        command="mute Bass",
+        result={
+            "status": "confirmation_required",
+            "intent": {"action": "set_mute", "track": {"name": "Bass"}},
+            "proposal": {"action": "set_mute", "track_name": "Bass", "parameter": "muted"},
+        },
+    )
+
+    context = live_conversation_context(session_id)
+    resolved, metadata = preprocess_live_command("make it louder", session_id=session_id)
+
+    assert context["last_device"] == ""
+    assert context["last_parameter"] == ""
+    assert resolved == "make Bass louder"
+    assert metadata["target_kind"] == "track"
+
+
+def test_explicit_different_directional_target_is_not_overridden_by_old_context() -> None:
+    session_id = "context-explicit-different-target"
+    record_live_exchange(
+        session_id=session_id,
+        command="set Compressor Output on Bass to -3 dB",
+        result={
+            "status": "confirmation_required",
+            "proposal": {
+                "action": "set_device_parameter",
+                "track_name": "Bass",
+                "device_name": "Compressor",
+                "parameter": "Output",
+            },
+        },
+    )
+
+    resolved, metadata = preprocess_live_command("make Vocal louder", session_id=session_id)
+
+    assert resolved == "make Vocal louder"
+    assert metadata["resolution"] == "none"
 
 
 def test_context_ring_buffer_keeps_only_last_ten_exchanges() -> None:
