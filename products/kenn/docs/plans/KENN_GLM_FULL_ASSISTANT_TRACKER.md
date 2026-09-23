@@ -56,6 +56,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [ ] One session model with a monotonic version and fingerprint
   - [ ] Proposals bound to the model version; stale proposals refused
 - [ ] **B3 Full-model Q&A** ("what's on the vocal bus?", "which tracks send to the reverb?", "what's the drum compressor threshold?")
+  > Code done 2026-09-23 (`core/live_world_questions.py`): contents of named tracks, returns and master (with rack chains), who sends to a return, named parameter values with Live's display string, mute/solo, and Live's scale setting (labelled as a setting, not a detected key). Track-number inventory stays on the existing route. 13 unit tests + 1 Playwright spec. Real-Live proof of return/master/parameter answers waits on the A3 deploy.
 
 ## Phase C — Language brain
 
@@ -148,4 +149,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | A1 UI-path harness: fake Live backend, chat-route gate, Playwright E2E | `683bb39` | `KENN_A1_UI_PATH_HARNESS_2026-09-23.md` |
 | 2026-09-23 | A2 defects: selection fix (code), pan centre, statement classifier, voice fake removed | `241abff` | tests + real-Live chat probes; 7/7 Playwright |
 | 2026-09-23 | A3 deploy tool, version endpoint, stale-script preflight check | `0d6da61` | 11 new tests; plan shows only view.py + application.py differ (both hot-reloadable) |
-| 2026-09-23 | B1 world model (code): returns/master/racks/automation-state reads, world-model route | (this commit) | 4 new tests; fake-backed route smoke |
+| 2026-09-23 | B1 world model (code): returns/master/racks/automation-state reads, world-model route | `e5d4b21` | 4 new tests; fake-backed route smoke |
+| 2026-09-23 | B3 world-model questions (code) | (this commit) | 13 unit tests; Playwright 8/8 |

@@ -46,6 +46,18 @@ def _call(client: Any, name: str, *args: Any) -> dict[str, Any]:
 def read_world_model(client: Any) -> dict[str, Any]:
     reader = getattr(client, "query_session_understanding", None) or client.query_session_state
     state = reader()
+    # An older Remote Script never answers the KENN reads; each would wait for
+    # the reply timeout. Probe once and skip the rest if it stays silent.
+    supported = {"kenn_reads": True}
+
+    def kenn_read(name: str, *args: Any) -> dict[str, Any]:
+        if not supported["kenn_reads"]:
+            return {"success": False, "error": "skipped: Remote Script lacks KENN reads"}
+        result = _call(client, name, *args)
+        if not result.get("success") and "does not answer" in str(result.get("error", "")):
+            supported["kenn_reads"] = False
+        return result
+
     if state.get("status") != "connected":
         return {"schema": WORLD_MODEL_SCHEMA, "status": state.get("status", "offline"),
                 "error": state.get("error", "Live is not connected.")}
@@ -54,7 +66,7 @@ def read_world_model(client: Any) -> dict[str, Any]:
     tracks = [dict(t) for t in state.get("tracks", []) if isinstance(t, dict)]
     device_trees_ok = True
     for track in tracks:
-        tree = _call(client, "get_device_tree", "track", int(track["index"]))
+        tree = kenn_read("get_device_tree", "track", int(track["index"]))
         if tree.get("success"):
             track["device_tree"] = tree.get("devices", [])
         else:
@@ -65,21 +77,21 @@ def read_world_model(client: Any) -> dict[str, Any]:
     for item in state.get("return_tracks") or []:
         entry = {"index": item.get("index"), "name": item.get("name"),
                  "devices": [d.get("name") if isinstance(d, dict) else d for d in item.get("devices") or []]}
-        mixer = _call(client, "get_bus_mixer", "return", int(item.get("index", -1)))
+        mixer = kenn_read("get_bus_mixer", "return", int(item.get("index", -1)))
         if mixer.get("success"):
             entry.update({k: mixer[k] for k in ("volume", "panning", "mute", "solo") if k in mixer})
         else:
             return_mixers_ok = False
-        tree = _call(client, "get_device_tree", "return", int(item.get("index", -1)))
+        tree = kenn_read("get_device_tree", "return", int(item.get("index", -1)))
         if tree.get("success"):
             entry["device_tree"] = tree.get("devices", [])
         returns.append(entry)
 
     master: dict[str, Any] | None = None
-    master_mixer = _call(client, "get_bus_mixer", "master", -1)
+    master_mixer = kenn_read("get_bus_mixer", "master", -1)
     if master_mixer.get("success"):
         master = {k: master_mixer[k] for k in ("name", "volume", "panning", "devices") if k in master_mixer}
-        tree = _call(client, "get_device_tree", "master", -1)
+        tree = kenn_read("get_device_tree", "master", -1)
         if tree.get("success"):
             master["device_tree"] = tree.get("devices", [])
 
@@ -89,6 +101,7 @@ def read_world_model(client: Any) -> dict[str, Any]:
         "device_trees": device_trees_ok and bool(tracks),
         "return_mixers": return_mixers_ok and bool(returns),
         "master": master is not None,
+        "kenn_reads": supported["kenn_reads"],
     })
 
     selection: dict[str, Any] = {"track_index": state.get("selected_track_index")}
