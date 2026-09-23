@@ -143,7 +143,7 @@ PORT = int(os.getenv("KENN_PORT", "8090"))
 # Imperative Live control phrasing that must reach the typed command gateway
 # rather than knowledge chat (e.g. "Focus EQ Eight on track 5", "Undo that.").
 _LIVE_IMPERATIVE_RE = re.compile(
-    r"^\s*(?:please\s+)?(?:set|pan|focus|boost|cut|raise|lower|turn|mute|unmute|solo|unsolo|center|centre|recenter|recentre|"
+    r"^\s*(?:please\s+)?(?:set|pan|focus|boost|cut|raise|lower|turn|mute|unmute|solo|unsolo|center|centre|recenter|recentre|create|make|"
     r"arm|disarm|insert|add|rename|remove|delete|undo|duplicate|group|gain[- ]stage|select)\b",
     re.I,
 )
@@ -716,6 +716,30 @@ class Handler(BaseHTTPRequestHandler):
             "sources": [],
         })
         return result
+
+    def _maybe_handle_midi_generation(self, question: str, session_id: str) -> dict | None:
+        """Turn "write a 4-bar chord progression in D minor" into a confirmable MIDI clip."""
+        from kenn.core.live_action_service import LiveActionService
+        from kenn.core.midi_generation_chat import generation_kind, propose_generated_clip
+
+        if generation_kind(question) is None:
+            return None
+        result = propose_generated_clip(question, session_id=session_id or "chat", service=LiveActionService())
+        if result is None:
+            return None
+        proposal = result.get("proposal") if isinstance(result.get("proposal"), dict) else None
+        token = str((proposal or {}).get("confirmation_token") or "")
+        return {
+            "ok": True,
+            **result,
+            "proposal": proposal,
+            "confirmation_token": token,
+            "requires_confirmation": proposal is not None,
+            "route": "ableton_controller",
+            "answer_mode": "live_command",
+            "found": True,
+            "sources": [],
+        }
 
     def _maybe_handle_live_command_from_chat(self, question: str, session_id: str) -> dict | None:
         """Give imperative Live requests the command gateway's exact answer.
@@ -2596,6 +2620,20 @@ class Handler(BaseHTTPRequestHandler):
                 correlation_id=self.request_id(),
             )
             self.send_json(200, live_inspection_reply)
+            return
+        generation_reply = self._maybe_handle_midi_generation(
+            question, str(payload.get("session_id", "")).strip()
+        )
+        if generation_reply is not None:
+            augmented = augment_payload(
+                generation_reply,
+                question=question,
+                session_id=str(payload.get("session_id", "")).strip(),
+                correlation_id=self.request_id(),
+            )
+            for key in ("proposal", "confirmation_token", "requires_confirmation"):
+                augmented[key] = generation_reply[key]
+            self.send_json(200, augmented)
             return
         live_command_reply = self._maybe_handle_live_command_from_chat(
             question, str(payload.get("session_id", "")).strip()

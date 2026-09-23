@@ -73,6 +73,7 @@ class FakeLiveBackend:
         }
         self._selected_device = dict(fixture.get("selected_device") or {"track_index": 0, "device_index": 0})
         self._world_fixture = copy.deepcopy(fixture.get("world") or {})
+        self._clips: dict[tuple[int, int], dict[str, Any]] = {}
         self.writes: list[tuple[Any, ...]] = []
 
     @staticmethod
@@ -272,10 +273,6 @@ class FakeLiveBackend:
         with self._lock:
             return [str(s.get("name", "")) for s in self._session.get("scenes", [])]
 
-    def get_track_has_midi_input(self, index: int) -> bool | None:
-        track = self._track(index)
-        return None if track is None else bool(track.get("has_midi_input", False))
-
     # --- writes ------------------------------------------------------------
 
     def _set_track_field(self, index: int, field: str, value: Any, label: str) -> bool:
@@ -371,6 +368,87 @@ class FakeLiveBackend:
             self.writes.append(("remove_device", int(track_index), int(device_index), str(device_name)))
             return {"success": True, "track_index": int(track_index), "device_index": int(device_index),
                     "device_name": str(device_name)}
+
+    # --- session clips --------------------------------------------------------
+
+    def _slot_ok(self, track_index: int, slot: int) -> bool:
+        return self._track(track_index) is not None and 0 <= int(slot) < len(self._session.get("scenes", []))
+
+    def get_track_has_midi_input(self, index: int) -> bool | None:
+        track = self._track(index)
+        return None if track is None else bool(track.get("has_midi_input", False))
+
+    def create_midi_track(self, insertion_index: int = -1) -> bool:
+        with self._lock:
+            tracks = self._session.setdefault("tracks", [])
+            index = len(tracks)
+            tracks.append({"index": index, "name": f"{index + 1}-MIDI", "volume": 0.85, "pan": 0.0,
+                           "muted": False, "soloed": False, "armed": False, "has_midi_input": True, "devices": []})
+            self.writes.append(("create_midi_track", index))
+            return True
+
+    def get_midi_clip_state(self, track_index: int, clip_slot_index: int) -> dict[str, Any]:
+        with self._lock:
+            if not self._slot_ok(track_index, clip_slot_index):
+                return {"success": False, "error": "No clip-slot response from AbletonOSC."}
+            clip = self._clips.get((int(track_index), int(clip_slot_index)))
+            base = {"success": True, "track_index": int(track_index), "clip_slot_index": int(clip_slot_index)}
+            if clip is None:
+                return {**base, "has_clip": False, "is_midi_clip": False, "length": 0.0, "notes": []}
+            return {**base, "has_clip": True, "is_midi_clip": clip["is_midi_clip"], "length": clip["length"],
+                    "notes": copy.deepcopy(clip["notes"])}
+
+    def get_clip_slot_state(self, track_index: int, clip_slot_index: int) -> dict[str, Any]:
+        state = self.get_midi_clip_state(track_index, clip_slot_index)
+        if state.get("success"):
+            clip = self._clips.get((int(track_index), int(clip_slot_index))) or {}
+            state["clip_name"] = clip.get("name", "")
+        return state
+
+    def create_midi_clip(self, track_index: int, clip_slot_index: int, length: float) -> bool:
+        with self._lock:
+            key = (int(track_index), int(clip_slot_index))
+            if not self._slot_ok(*key) or key in self._clips or not self.get_track_has_midi_input(track_index):
+                return False
+            self._clips[key] = {"name": "", "is_midi_clip": True, "length": float(length), "notes": []}
+            self.writes.append(("create_midi_clip", *key, float(length)))
+            return True
+
+    def add_midi_notes(self, track_index: int, clip_slot_index: int, notes: list[dict[str, Any]]) -> bool:
+        with self._lock:
+            clip = self._clips.get((int(track_index), int(clip_slot_index)))
+            if clip is None:
+                return False
+            clip["notes"].extend({"pitch": int(n["pitch"]), "start_time": float(n["start_time"]),
+                                  "duration": float(n["duration"]), "velocity": int(n.get("velocity", 100)),
+                                  "mute": bool(n.get("mute", False))} for n in notes)
+            self.writes.append(("add_midi_notes", int(track_index), int(clip_slot_index), len(notes)))
+            return True
+
+    def remove_all_midi_notes(self, track_index: int, clip_slot_index: int) -> bool:
+        with self._lock:
+            clip = self._clips.get((int(track_index), int(clip_slot_index)))
+            if clip is None:
+                return False
+            clip["notes"] = []
+            return True
+
+    def set_clip_name(self, track_index: int, clip_slot_index: int, name: str) -> bool:
+        with self._lock:
+            clip = self._clips.get((int(track_index), int(clip_slot_index)))
+            if clip is None:
+                return False
+            clip["name"] = str(name)
+            return True
+
+    def delete_clip_slot(self, track_index: int, clip_slot_index: int) -> bool:
+        with self._lock:
+            removed = self._clips.pop((int(track_index), int(clip_slot_index)), None)
+            if removed is not None:
+                self.writes.append(("delete_clip", int(track_index), int(clip_slot_index)))
+            return removed is not None
+
+    delete_clip = delete_clip_slot
 
     def start_playback(self) -> bool:
         with self._lock:

@@ -69,3 +69,16 @@ test('world-model questions answer returns and parameters in chat', async ({ pag
   await expect(await ask(page, "What's on the A-Reverb return?")).toContainText('Hybrid Reverb')
   await expect(await ask(page, "What's the threshold on the Drum Bus compressor?")).toContainText('Threshold is')
 })
+
+test('generate chords as a confirmable MIDI clip, then undo it', async ({ page }) => {
+  await openKenn(page)
+  const track = await ask(page, 'Create a MIDI track.')
+  await track.getByRole('button', { name: 'Apply to Live 12' }).click()
+  await expect(track).toContainText('Readback Verified')
+  const idea = await ask(page, 'Write a 4-bar chord progression in D minor')
+  await expect(idea).toContainText('chord progression in D minor')
+  await idea.getByRole('button', { name: 'Apply to Live 12' }).click()
+  await expect(idea).toContainText('Readback Verified')
+  await idea.getByRole('button', { name: 'Undo' }).click()
+  await expect(idea).toContainText('Restored to Original State')
+})
