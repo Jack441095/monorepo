@@ -15,7 +15,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 ## Waiting on owner
 
 - [ ] Demo rehearsals 2–10: owner-run, see `docs/evidence/KENN_INVESTOR_DEMO_REHEARSAL_LOG.md`
-- [ ] Decide whether to remove or label `kenn/speech/voice_copilot.py`, which simulates voice input
+- [ ] Restart Live once A3 deploys the updated AbletonOSC, so A2's return/master selection fix can be proven
 
 ## Phase A — Harden the foundation
 
@@ -32,10 +32,10 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [x] Fake-Live record/replay at the OSC boundary; CI runs without Live
   - [x] The 13-prompt demo script gate also runs through `/kenn/api/ask`: 10/10 on real Live, slowest 597.6 ms
 - [ ] **A2 Known defects**
-  - [ ] AbletonOSC `view.py`: selecting a return or master track no longer raises; KENN reports it
-  - [ ] "Pan the Synth center." proposes pan 0
-  - [ ] Statement-versus-request stage before retrieval (plain statements get a short acknowledgement)
-  - [ ] Simulated voice module removed or clearly labelled (owner decision above)
+  - [ ] AbletonOSC `view.py`: selecting a return or master track no longer raises; KENN reports it. **Code and tests done (2026-09-23); real-Live proof waits on A3 deploy + Live restart.**
+  - [x] "Pan the Synth center." proposes pan 0 (5 phrasings; centre frequency excluded; verified on real Live, 2026-09-23)
+  - [x] Statement-versus-request stage before retrieval: narration about KENN and typed card labels get short replies; problem statements and topics still reach chat (verified on real Live, 2026-09-23)
+  - [x] Simulated voice removed: the unreachable `process_audio_features` fake is deleted and the module is documented as text-only (2026-09-23)
 - [ ] **A3 Remote Script deploy tool**
   - [ ] `tooling/scripts/deploy_abletonosc.py`: diff, back up, copy, version stamp
   - [ ] `/live/kenn/version` endpoint; preflight fails on a stale script
@@ -115,6 +115,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 ## Phase I — Reliability and evaluation
 
+> Note (2026-09-23): one backend suite run showed 8 intermittent failures while the real-Live gate was running at the same time; two re-runs passed 1,448/1,448. Investigate under I3/I4.
+
 - [ ] **I1 Nightly real-Live regression** (top 50 commands + all recipes via the UI route; SLO report)
 - [ ] **I2 End-to-end benchmark** on the natural holdout, with a per-commit diff
 - [ ] **I3 Chaos suite:** Live killed mid-write, UDP drops, companion restart, stale or replayed tokens
@@ -142,4 +144,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | Date | Item | Commit | Evidence |
 |---|---|---|---|
 | 2026-09-23 | Tracker created from the build prompt | — | — |
-| 2026-09-23 | A1 UI-path harness: fake Live backend, chat-route gate, Playwright E2E | (this commit) | `KENN_A1_UI_PATH_HARNESS_2026-09-23.md` |
+| 2026-09-23 | A1 UI-path harness: fake Live backend, chat-route gate, Playwright E2E | `683bb39` | `KENN_A1_UI_PATH_HARNESS_2026-09-23.md` |
+| 2026-09-23 | A2 defects: selection fix (code), pan centre, statement classifier, voice fake removed | (this commit) | tests + real-Live chat probes; 7/7 Playwright |

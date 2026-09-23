@@ -197,3 +197,22 @@ def test_change_history_uses_command_path_without_reading_live(question: str, tm
     assert result["answer_mode"] == "session_question"
     assert len(result["changes"]) == 10
     assert service.client.reads == 0
+
+
+@pytest.mark.parametrize(
+    ("kind", "expected"),
+    [
+        ({"kind": "return", "index": 0, "name": "A-Reverb"}, "Return track 'A-Reverb' is selected."),
+        ({"kind": "master", "index": -1, "name": "Master"}, "The master track is selected."),
+    ],
+)
+def test_selected_return_or_master_track_is_reported_not_unavailable(kind: dict, expected: str) -> None:
+    live = SessionLive()
+    live.state["selected_track_index"] = None
+    live.state["selected_track_kind"] = kind
+
+    result = answer_live_session_question("What's selected?", service=Service(live))
+
+    assert result["status"] == "inspected"
+    assert result["answer"] == expected
+    assert result["track"]["kind"] == kind["kind"]

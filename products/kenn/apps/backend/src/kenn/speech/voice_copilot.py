@@ -1,10 +1,9 @@
-"""Sub-500ms Local Studio Voice Control & Speech-to-Intent Engine for KENN.
+"""Text-to-intent classification for spoken-style KENN commands.
 
-Provides hands-free voice interaction for mixing engineers in Apple Silicon Metal unified memory:
-1. Intent Classification (AUDIT_SESSION, UNMASK_TRACKS, CHECK_HEADROOM, APPLY_REMEDY, AUDITION_TOGGLE, ATOMIC_UNDO)
-2. Semantic Slot Extraction (target tracks, target frequency ranges, dB amounts)
-3. Sub-500ms End-to-End Latency Budget
-4. Direct integration into KENN's ReAct planner and execution controllers.
+This module classifies text only. KENN has no microphone or speech-recognition
+path yet: real voice input (push-to-talk -> local speech recognition -> the
+same /kenn/api/ask command path) is roadmap item H1. Nothing here may be
+presented as working voice control.
 """
 
 from __future__ import annotations
@@ -142,17 +141,6 @@ class VoiceCopilot:
             latency_ms=latency_ms,
         )
         self._last_intent = intent
-        return intent
-
-    def process_audio_features(self, audio_features: Any) -> VoiceIntent:
-        """Simulated sub-200ms front-end feature extractor calling intent classifier."""
-        t0 = time.perf_counter()
-        # Simulated fast local Whisper / Moonshine acoustic model decode
-        # In live deployment, receives streaming PCM/log-mel spectrogram frames from microphone
-        sample_query = "KENN, audit the session and check for low end masking"
-        intent = self.classify_intent(sample_query)
-        total_latency = round((time.perf_counter() - t0) * 1000.0 + 120.0, 2)  # +120ms MLX decode estimate
-        intent.latency_ms = total_latency
         return intent
 
 

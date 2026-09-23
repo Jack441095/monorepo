@@ -1557,10 +1557,20 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             r"\bpan\b.*?\b(?:hard|fully|all\s+the\s+way)\s+(left|right)\b",
             lower,
         )
+        # "Pan the Synth center" / "Centre the Synth": the one pan target with
+        # no number or side. Frequency wording is excluded so "centre
+        # frequency" never becomes a pan request.
+        pan_center_match = (
+            re.search(r"\bpan\b.*?\b(?:to\s+(?:the\s+)?)?(?:cent(?:er|re)(?:d)?|middle)\b", lower)
+            or re.match(r"\s*(?:please\s+)?(?:re)?cent(?:er|re)\s+(?:the\s+)?\S", lower)
+        ) if not re.search(r"\b(?:freq(?:uency)?|hz|khz|eq|band)\b", lower) else None
         if volume_match:
             db = float(volume_match.group(1))
             base.update({"desired_value": 10 ** (db / 20.0), "unit": "normalized", "requested_unit": "dB", "absolute_value": db})
             action = "set_volume"
+        elif pan_center_match and not (pan_hard_match or pan_match or pan_side_first_match or pan_amount_first_match):
+            base.update({"desired_value": 0.0, "unit": "normalized", "requested_unit": "normalized"})
+            action = "set_pan"
         elif pan_hard_match or pan_match or pan_side_first_match or pan_amount_first_match:
             if pan_hard_match:
                 side = pan_hard_match.group(1)
