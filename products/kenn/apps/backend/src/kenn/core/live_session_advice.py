@@ -110,7 +110,7 @@ def _low_end_finding(analysis: dict[str, Any]) -> dict[str, Any] | None:
     low_rms = band_levels.get("low")
     if deviation >= 3.0:
         explanation = (
-            f"The {float(strongest['center_hz']):g} Hz band is {deviation:.1f} dB above the "
+            f"The {int(float(strongest['center_hz']) + 0.5)} Hz band is {deviation:.1f} dB above the "
             "anchored pink-noise-style baseline, which is consistent with a low-end-heavy balance; "
             "that reference is diagnostic, not a mix target."
         )

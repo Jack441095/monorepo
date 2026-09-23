@@ -746,6 +746,7 @@ class Handler(BaseHTTPRequestHandler):
             "route": "ableton_controller",
             "orchestration": {"agent": "ableton_controller", "result": result},
             "answer_mode": "live_command",
+            "undo_of_receipt_id": str(result.get("undo_of_receipt_id") or ""),
             "found": True,
             "confidence": "high",
             "source_quality": "high",

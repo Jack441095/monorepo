@@ -312,6 +312,27 @@ def _eq_band_tuning_gain_text(proposal: dict[str, Any]) -> str:
     )
 
 
+def _receipt_supports_undo(receipt: dict[str, Any]) -> bool:
+    """Mirror propose_undo's dispatch so history labels match the Undo control."""
+    if "undo_available" in receipt:
+        return bool(receipt.get("undo_available"))
+    if receipt.get("status") != "applied" or receipt.get("verified") is not True:
+        return False
+    schema = receipt.get("schema")
+    if schema in {"kenn.ableton_recipe_receipt.v1", GAIN_STAGING_RECEIPT_SCHEMA, MIDI_CLIP_RECEIPT_SCHEMA}:
+        return True
+    if schema != RECEIPT_SCHEMA:
+        return False
+    action = str(receipt.get("action", ""))
+    undoable = (
+        set(SUPPORTED_TRACK_ACTIONS) | set(SUPPORTED_SEND_ACTIONS) | set(SUPPORTED_TRANSPORT_ACTIONS)
+        | set(SUPPORTED_SCENE_ACTIONS) | set(SUPPORTED_CLIP_ACTIONS) | set(SUPPORTED_LOCATOR_ACTIONS)
+        | set(SUPPORTED_VIEW_ACTIONS)
+        | {"set_device_parameter", "set_eq_band_tuning_gain", "insert_device", "insert_device_with_parameter"}
+    )
+    return action in undoable
+
+
 class LiveActionService(Tier2Tier3ControlMixin):
     def __init__(self, client: AbletonOSCClient | Any = None):
         self.client = client or live_client
@@ -359,13 +380,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             parameter = str(target.get("parameter") or receipt.get("parameter_name") or "").strip()
             before = receipt.get("before")
             after = receipt.get("readback", receipt.get("requested"))
-            undo_available = bool(
-                receipt.get("undo_available")
-                if "undo_available" in receipt
-                else receipt.get("status") == "applied"
-                and receipt.get("verified") is True
-                and isinstance(receipt.get("undo_payload"), dict)
-            )
+            undo_available = _receipt_supports_undo(receipt)
             changes.append({
                 "receipt_id": str(receipt.get("receipt_id") or ""),
                 "action": action,
