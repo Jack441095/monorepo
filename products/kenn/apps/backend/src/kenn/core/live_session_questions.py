@@ -61,6 +61,7 @@ def answer_live_session_question(
     question: str,
     *,
     service: LiveActionService | None = None,
+    session_id: str = "",
 ) -> dict[str, Any] | None:
     """Return one grounded, non-mutating session answer when recognized."""
     kind = _question_kind(question)
@@ -69,7 +70,7 @@ def answer_live_session_question(
 
     live = service or LiveActionService()
     if kind == "change_history":
-        result = live.describe_recent_changes(limit=10)
+        result = live.describe_recent_changes(limit=10, session_id=session_id)
         return {
             "schema": "kenn.ableton_session_answer.v1",
             "intent": {"action": "inspect_change_history"},

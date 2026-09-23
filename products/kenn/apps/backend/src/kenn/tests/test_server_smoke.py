@@ -726,7 +726,7 @@ def test_ask_track_inventory_uses_read_only_live_gateway(running_server: str, mo
 def test_ask_session_fact_uses_read_only_live_gateway(running_server: str, monkeypatch: pytest.MonkeyPatch) -> None:
     import kenn.server as server_module
 
-    def fake_session_answer(question: str) -> dict:
+    def fake_session_answer(question: str, session_id: str = "") -> dict:
         assert question == "What is the current tempo and time signature?"
         return {
             "schema": "kenn.ableton_session_answer.v1",
@@ -810,6 +810,48 @@ def test_ask_imperative_pan_uses_confirmation_bound_live_gateway(
     assert body["proposal"]["confirmation_token"]
     assert body["orchestration"]["result"]["changed"] is False
     assert fake.writes == 0
+
+
+def test_ask_routes_live_refusal_and_undo_but_not_unrecognised_imperatives(
+    running_server: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Demo steps 10 and 15 must get the Live gateway's answer, not RAG prose."""
+    import kenn.server as server_module
+
+    calls: list[str] = []
+
+    def fake_handle_command(command: str, *, session_id: str = "", **_kwargs) -> dict:
+        calls.append(command)
+        if command.startswith("Delete"):
+            return {"status": "refused", "answer": "Deleting Live content is disabled.", "intent": {"mode": "refuse"}}
+        if command.startswith("Undo"):
+            return {"status": "clarification_required", "answer": "Nothing to undo in this session yet.",
+                    "intent": {"action": "undo"}}
+        return {"status": "clarification_required", "answer": "gateway fallback", "intent": {"confidence": 0.2}}
+
+    monkeypatch.setattr(server_module, "handle_command", fake_handle_command)
+
+    def ask(question: str) -> dict:
+        request = urllib.request.Request(
+            f"{running_server}/api/ask",
+            data=json.dumps({"question": question, "session_id": "chat-route"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(request, timeout=10) as response:
+            return json.loads(response.read())
+
+    refused = ask("Delete track 3.")
+    assert refused["route"] == "ableton_controller"
+    assert refused["answer"] == "Deleting Live content is disabled."
+    assert refused["requires_confirmation"] is False and refused["proposal"] is None
+
+    undo = ask("Undo that.")
+    assert undo["answer"] == "Nothing to undo in this session yet."
+
+    knowledge = ask("Set up a good vocal chain for me")
+    assert knowledge.get("answer") != "gateway fallback"
+    assert calls == ["Delete track 3.", "Undo that.", "Set up a good vocal chain for me"]
 
 
 def test_knowledge_ask_cites_real_live_track_evidence_when_session_id_given(

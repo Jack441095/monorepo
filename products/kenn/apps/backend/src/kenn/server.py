@@ -7,6 +7,7 @@ import base64
 import json
 import mimetypes
 import os
+import re
 import secrets
 import sys
 import threading
@@ -138,6 +139,13 @@ PORTFOLIO_AUDIO_ROOT = RUNTIME_ROOT / "portfolio" / "audio"
 PORTFOLIO_AUDIO_ROOTS: list[Path] = [PORTFOLIO_AUDIO_ROOT]
 HOST = os.getenv("KENN_HOST", "127.0.0.1").strip() or "127.0.0.1"
 PORT = int(os.getenv("KENN_PORT", "8090"))
+# Imperative Live control phrasing that must reach the typed command gateway
+# rather than knowledge chat (e.g. "Focus EQ Eight on track 5", "Undo that.").
+_LIVE_IMPERATIVE_RE = re.compile(
+    r"^\s*(?:please\s+)?(?:set|pan|focus|boost|cut|raise|lower|turn|mute|unmute|solo|unsolo|"
+    r"arm|disarm|insert|add|rename|remove|delete|undo|duplicate|group|gain[- ]stage|select)\b",
+    re.I,
+)
 
 
 def _cached_ableton_health() -> dict[str, Any]:
@@ -671,7 +679,7 @@ class Handler(BaseHTTPRequestHandler):
         devices are routed here, and the command gateway can only inspect or
         clarify on this path; it cannot create or execute a mutation.
         """
-        session_result = answer_live_session_question(question)
+        session_result = answer_live_session_question(question, session_id=session_id)
         if session_result is not None:
             structured_intent = session_result.get("intent")
             if isinstance(structured_intent, dict):
@@ -709,42 +717,40 @@ class Handler(BaseHTTPRequestHandler):
         return result
 
     def _maybe_handle_live_command_from_chat(self, question: str, session_id: str) -> dict | None:
-        """Route natural language DAW mutation requests (mute, solo, volume, pan, etc.)
-        from chat into typed proposals with confirmation tokens.
+        """Give imperative Live requests the command gateway's exact answer.
+
+        Only a proposal, a refusal, or an undo outcome is taken over; any other
+        gateway result falls through so ordinary production questions keep
+        reaching the knowledge chat.
         """
-        lower = str(question or "").strip().lower()
-        command_verbs = (
-            "mute", "unmute", "solo", "unsolo", "volume", "pan", "arm", "disarm",
-            "fader", "rename track", "insert", "add eq", "eq 8", "eq eight",
-            "remove device", "delete device", "gain stage", "gain staging",
-            "group track", "group tracks",
-        )
-        if not any(v in lower for v in command_verbs):
+        if not _LIVE_IMPERATIVE_RE.match(str(question or "")):
             return None
         result = handle_command(question, session_id=session_id)
-        if result.get("status") in {"proposed", "planned", "confirmation_required"} and isinstance(result.get("proposal"), dict):
-            proposal = result["proposal"]
-            token = str(proposal.get("confirmation_token", "")).strip()
-            if token:
-                _PENDING_PROPOSALS[token] = proposal
-            answer = result.get("answer") or f"Proposed {proposal.get('action')}: {proposal.get('reason', '')}"
-            return {
-                "ok": True,
-                "answer": answer,
-                "requires_confirmation": True,
-                "confirmation_token": token,
-                "proposal": proposal,
-                "route": "ableton_command",
-                "found": True,
-                "confidence": "high",
-                "source_quality": "high",
-                "sources": [],
-                "suggestions": [
-                    f"Confirm {proposal.get('action')}",
-                    "Cancel",
-                ],
-            }
-        return None
+        intents = [result.get(key) for key in ("intent", "live_intent") if isinstance(result.get(key), dict)]
+        proposal = result.get("proposal") if isinstance(result.get("proposal"), dict) else None
+        token = str((proposal or {}).get("confirmation_token") or result.get("confirmation_token") or "").strip()
+        is_proposal = result.get("status") == "confirmation_required" and proposal is not None and bool(token)
+        is_refusal = result.get("status") == "refused"
+        is_undo = any(intent.get("action") == "undo" for intent in intents)
+        if not (is_proposal or is_refusal or is_undo):
+            return None
+        if is_proposal:
+            _PENDING_PROPOSALS[token] = proposal
+        return {
+            "ok": True,
+            "answer": result.get("answer") or "",
+            "requires_confirmation": is_proposal,
+            "confirmation_token": token if is_proposal else "",
+            "proposal": proposal if is_proposal else None,
+            "status": result.get("status"),
+            "route": "ableton_controller",
+            "orchestration": {"agent": "ableton_controller", "result": result},
+            "answer_mode": "live_command",
+            "found": True,
+            "confidence": "high",
+            "source_quality": "high",
+            "sources": [],
+        }
 
     def send_bytes(self, status: int, body: bytes, content_type: str, *, filename: str = "") -> None:
         self.send_response(status)
@@ -2571,23 +2577,18 @@ class Handler(BaseHTTPRequestHandler):
             )
             self.send_json(200, live_inspection_reply)
             return
-        # Skip _maybe_handle_live_command_from_chat — it duplicates the
-        # orchestrator's ableton_controller dispatch and adds a redundant
-        # 750ms OSC timeout.  The orchestrator handles the same queries
-        # via _dispatch_ableton → handle_command with identical logic.
-        live_command_reply = None
+        live_command_reply = self._maybe_handle_live_command_from_chat(
+            question, str(payload.get("session_id", "")).strip()
+        )
         if live_command_reply is not None:
-            prop = live_command_reply.get("proposal")
-            token = live_command_reply.get("confirmation_token", "")
             augmented = augment_payload(
                 live_command_reply,
                 question=question,
                 session_id=str(payload.get("session_id", "")).strip(),
                 correlation_id=self.request_id(),
             )
-            augmented["proposal"] = prop
-            augmented["confirmation_token"] = token
-            augmented["requires_confirmation"] = True
+            for key in ("proposal", "confirmation_token", "requires_confirmation"):
+                augmented[key] = live_command_reply[key]
             self.send_json(200, augmented)
             return
         checkpoint_reply = self._maybe_handle_checkpoint_reply(

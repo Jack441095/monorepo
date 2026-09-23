@@ -2147,7 +2147,9 @@ def _handle_command_impl(
     # before taking a topology snapshot for intent parsing, but never let a
     # question-shaped command replace an explicit proposal execution.
     if proposal is None and llm_plan is None and recipe_steps is None:
-        session_answer = answer_live_session_question(clean_command, service=live)
+        session_answer = answer_live_session_question(
+            clean_command, service=live, session_id=response["session_id"]
+        )
         if session_answer is not None:
             response.update(session_answer)
             response.update({

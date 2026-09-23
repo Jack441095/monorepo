@@ -13,7 +13,7 @@ UI: **http://127.0.0.1:8090/**. KENN's panel must read "Live connected" with 8 t
 
 | # | Date | Start | End | Mins | Steps passed /20 | Failed step + cause | Recovery drill | Projector | Pass |
 |---|------|-------|-----|------|------------------|---------------------|----------------|-----------|------|
-| 1 |  |  |  |  |  |  |  |  | [ ] |
+| 1 | 2026-09-23 | — | — | — | 5/20 | Step 6: UI Apply rejected every numeric proposal (token text 0.0 vs browser 0); chat route also sent steps 6, 8, 9, 10, 15, 16 to knowledge chat. Both fixed, see notes. | — | — | [ ] fail |
 | 2 |  |  |  |  |  |  |  |  | [ ] |
 | 3 |  |  |  |  |  |  |  |  | [ ] |
 | 4 |  |  |  |  |  |  |  |  | [ ] |
@@ -49,3 +49,17 @@ continue from step 8. Note the seconds from restart to usable.
 - [ ] 17 Pending proposal token explained · [ ] 18 Receipt journal shown
 - [ ] 19 Receipt Undo + readback verified
 - [ ] 20 Roadmap narration (labelled as roadmap)
+
+## Notes
+
+**Run 1 (failed at step 6), 2026-09-23.** Two defects that only the real UI path exposed. Codex's
+10/10 script gate calls `/api/ableton/command` directly, bypassing both.
+1. Confirmation tokens hashed `before`/`after` as Python text (`0.0`, `-1.0`), while the browser's
+   `JSON.stringify` echoes `0`/`-1`, so every numeric Apply was rejected as tampered. Fixed by
+   canonicalising numbers in `confirmation._request_hash`.
+2. `/kenn/api/ask` never sent steps 6, 8, 9, 10, 15 or 16 to the Live gateway (they got a knowledge
+   article, "need more direction", or a session dump). Fixed by routing imperative Live phrasing
+   through `handle_command` and keeping only proposals, refusals, and undo outcomes.
+Also: "What did you change?" now lists only the current session's receipts.
+Verified afterwards through the UI's own request shapes: steps 6–11, 15, 16 and the step-19 receipt
+undo all pass with verified readback.
