@@ -6,9 +6,8 @@ This record covers the checked-in Ableton Live 12 topology fixture, the full
 demo preflight, and one bounded two-step mutation recipe exercised repeatedly
 against real Live through the KENN HTTP and AbletonOSC control path.
 
-It does **not** claim that the complete 20-step investor narrative has passed,
-that the empty topology fixture is a polished mix, or that the audio-analysis
-segments have been rehearsed with original or royalty-free stems.
+It does **not** claim that the complete 20-step investor narrative has passed
+or that the generated stems have been imported and rehearsed in Live ten times.
 
 ## Environment
 
@@ -87,10 +86,34 @@ test failures.
 
 ## Remaining demo gates
 
-- Add original or licensed-for-demo musical material and deliberate audible
-  issues before claiming the audio-analysis acts are qualified.
+- Import the generated original stems into a disposable Live copy and verify
+  audible playback against the manifest-bound analysis renders.
 - Rehearse the complete scripted UI flow, deliberate fault recovery, reset,
   projector layout, and 8–12 minute timing ten consecutive times.
+
+## Original audio fixture evidence
+
+`tooling/scripts/build_investor_demo_audio.py` now deterministically renders
+`Neon Proof`, a 16-bar/32-second D-minor electronic composition. The generator
+uses no samples, external recordings, model weights, or third-party musical
+material. Its local manifest binds eight Live stems plus separate full-mix and
+isolated-vocal evidence WAVs by SHA-256 and labels them `generated-internal`.
+
+KENN's production analyzer measured the 48 kHz render as follows:
+
+- Full mix: -0.070 dBFS sample peak, -11.574 dBFS RMS, and a strongest low-band
+  deviation of +19.413 dB at 43.504 Hz against the anchored pink-noise-style
+  diagnostic baseline.
+- Isolated lead-vocal texture: -0.044 dBFS sample peak, 3,091 near-full-scale
+  samples across 314 runs, producing the bounded high-confidence clipping
+  finding.
+- The mix also produced informational masking and resonance hypotheses. These
+  remain listening prompts, not proof of a defect or an automatic processing
+  instruction.
+
+The preflight audio check now fails closed unless both files are present,
+rights-cleared under the expected manifest schema, hash-matched to their roles,
+and still contain the intended low-end and vocal-clipping cues.
 
 ## Narrative correction
 

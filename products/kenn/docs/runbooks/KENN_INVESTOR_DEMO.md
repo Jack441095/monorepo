@@ -12,19 +12,30 @@ not claim a ten-run investor-demo pass until the audio fixture, projector run,
 recovery drill, and all twenty steps have passed ten consecutive rehearsals.
 
 The checked-in `assets/demo/KENN_Live12_Demo.als` is a topology reset point,
-not a finished musical production. Acts 3 and 4 require a disposable rehearsal
-copy containing original or royalty-free audio with known, documented issues.
+not a finished musical production. The repository now includes a deterministic
+generator for the original `Neon Proof` demo composition, but the complete
+script remains unqualified until its stems are imported into a disposable Live
+copy and the full run passes the rehearsal gate.
 
 ## Before the room opens
 
-1. Open a disposable copy of `assets/demo/KENN_Live12_Demo.als` in Live 12.
-2. Select Drum Bus and its Compressor. This gives the device-focus action an
+1. Render the rights-clear audio fixture with `python3
+   tooling/scripts/build_investor_demo_audio.py --out-dir
+   .runtime/investor-demo-audio`.
+2. Open a disposable copy of `assets/demo/KENN_Live12_Demo.als` in Live 12 and
+   import the eight generated stems at bar 1 in manifest track order. Do not
+   overwrite the tracked reset fixture.
+3. Export the two manifest analysis paths before starting KENN:
+   `KENN_LIVE_AUDIO_CAPTURE_PATH=.runtime/investor-demo-audio/KENN_Demo_Mix_Analysis.wav`
+   and `KENN_LIVE_VOCAL_CAPTURE_PATH=.runtime/investor-demo-audio/KENN_Demo_Lead_Vocal_Analysis.wav`.
+4. Select Drum Bus and its Compressor. This gives the device-focus action an
    exact starting selection; a selected return track is not treated as an
    implicit regular-track target.
-3. Start AbletonOSC, the KENN backend, and the frontend.
-4. Run `tooling/scripts/demo_preflight.py` without mutations.
-5. Run it again with `--allow-mutations` only on the disposable copy.
-6. Confirm 11/11 checks pass, then reset and reselect Drum Bus before rehearsing.
+5. Start AbletonOSC, the KENN backend, and the frontend.
+6. Run `tooling/scripts/demo_preflight.py` without mutations. Its audio check
+   must verify both hashes, the low-end cue, and isolated-vocal clipping.
+7. Run it again with `--allow-mutations` only on the disposable copy.
+8. Confirm 11/11 checks pass, then reset and reselect Drum Bus before rehearsing.
 
 ## Twenty-step script
 

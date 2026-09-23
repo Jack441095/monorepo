@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+import math
+import struct
 import urllib.error
+import wave
 from pathlib import Path
 
 from scripts.demo_preflight import DemoPreflight, load_fixture
@@ -32,8 +37,40 @@ class FakePreflight(DemoPreflight):
         raise AssertionError(path)
 
 
-def test_read_only_preflight_checks_pass_with_clear_details(monkeypatch) -> None:
+def _demo_audio_fixture(tmp_path: Path) -> tuple[Path, Path]:
+    mix = tmp_path / "mix.wav"
+    vocal = tmp_path / "vocal.wav"
+    sample_rate = 8000
+    with wave.open(str(mix), "wb") as handle:
+        handle.setnchannels(2); handle.setsampwidth(2); handle.setframerate(sample_rate)
+        frames = []
+        for index in range(sample_rate):
+            value = int(32000 * math.sin(2 * math.pi * 55 * index / sample_rate))
+            frames.append(struct.pack("<hh", value, value))
+        handle.writeframes(b"".join(frames))
+    with wave.open(str(vocal), "wb") as handle:
+        handle.setnchannels(2); handle.setsampwidth(2); handle.setframerate(sample_rate)
+        frames = []
+        for index in range(sample_rate):
+            value = 32700 if index < 200 else int(12000 * math.sin(2 * math.pi * 440 * index / sample_rate))
+            frames.append(struct.pack("<hh", value, value))
+        handle.writeframes(b"".join(frames))
+    files = []
+    for role, path in (("analysis_mix", mix), ("analysis_vocal", vocal)):
+        files.append({"role": role, "path": path.name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    (tmp_path / "manifest.json").write_text(json.dumps({
+        "schema": "kenn.investor_demo_audio.v1",
+        "rights": {"status": "rights-cleared"},
+        "files": files,
+    }), encoding="utf-8")
+    return mix, vocal
+
+
+def test_read_only_preflight_checks_pass_with_clear_details(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setenv("KENN_ALLOW_DAW_CONTROL", "1")
+    mix, vocal = _demo_audio_fixture(tmp_path)
+    monkeypatch.setenv("KENN_LIVE_AUDIO_CAPTURE_PATH", str(mix))
+    monkeypatch.setenv("KENN_LIVE_VOCAL_CAPTURE_PATH", str(vocal))
     runner = FakePreflight("http://kenn.test", expected_tracks=["Kick", "Bass"])
 
     selected = [
@@ -44,6 +81,16 @@ def test_read_only_preflight_checks_pass_with_clear_details(monkeypatch) -> None
 
     assert all(item.passed for item in results)
     assert all(item.detail for item in results)
+
+
+def test_audio_analysis_fails_closed_without_manifest_bound_demo_evidence(monkeypatch) -> None:
+    monkeypatch.delenv("KENN_LIVE_AUDIO_CAPTURE_PATH", raising=False)
+    monkeypatch.delenv("KENN_LIVE_VOCAL_CAPTURE_PATH", raising=False)
+
+    result = FakePreflight("http://kenn.test", expected_tracks=[]).run(["audio_analysis"])[0]
+
+    assert result.passed is False
+    assert "Demo audio evidence is missing" in result.detail
 
 
 def test_undo_check_never_mutates_without_explicit_flag() -> None:
