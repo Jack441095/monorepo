@@ -14,11 +14,13 @@ class FakeGate(DemoScriptGate):
         command_interval_ms: float = 0.0,
         fail_command: str = "",
         slow_command: str = "",
+        route: str = "command",
     ) -> None:
         super().__init__(
             base_url,
             max_latency_ms=max_latency_ms,
             command_interval_ms=command_interval_ms,
+            route=route,
         )
         self.fail_command = fail_command
         self.slow_command = slow_command
@@ -158,3 +160,67 @@ def test_report_never_claims_full_demo_qualification(monkeypatch) -> None:
     assert report["full_demo_qualified"] is False
     assert report["mode"] == "non_mutating_contract_only"
     assert len(report["manual_steps"]) == 7
+
+
+def test_ask_route_validates_the_gateway_result_embedded_in_chat_replies(monkeypatch) -> None:
+    import io
+    import json as _json
+
+    import scripts.demo_script_gate as gate_module
+
+    replies = {
+        "/kenn/api/ask": {
+            "route": "ableton_controller", "status": "succeeded",
+            "orchestration": {"result": {"status": "refused", "changed": False}},
+        },
+    }
+
+    class Response(io.BytesIO):
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+    def fake_urlopen(request, timeout):
+        assert request.full_url.endswith("/kenn/api/ask")
+        assert _json.loads(request.data)["question"] == "Delete track 3."
+        return Response(_json.dumps(replies["/kenn/api/ask"]).encode())
+
+    monkeypatch.setattr(gate_module.urllib.request, "urlopen", fake_urlopen)
+    gate = DemoScriptGate("http://kenn.test", command_interval_ms=0.0, route="ask")
+
+    body, _elapsed = gate._command("Delete track 3.", session_id="ask-route")
+
+    assert body["status"] == "refused"
+    assert isinstance(body["latency"]["total_ms"], float)
+
+
+def test_ask_route_rebuilds_grounded_status_from_the_chat_envelope(monkeypatch) -> None:
+    import io
+    import json as _json
+
+    import scripts.demo_script_gate as gate_module
+
+    class Response(io.BytesIO):
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+    envelope = {"route": "ableton_live_inspection", "status": "succeeded", "found": True,
+                "intent": "inspect_track_count", "live_intent": {"action": "inspect_track_count"},
+                "answer_mode": "live_inspection", "changed": False, "answer": "8 tracks", "track_count": 8}
+    monkeypatch.setattr(gate_module.urllib.request, "urlopen",
+                        lambda request, timeout: Response(_json.dumps(envelope).encode()))
+    gate = DemoScriptGate("http://kenn.test", command_interval_ms=0.0, route="ask")
+
+    body, _elapsed = gate._command("How many tracks do I have?", session_id="ask-route")
+
+    assert body["status"] == "inspected"
+    assert body["intent"] == {"action": "inspect_track_count"}

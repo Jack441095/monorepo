@@ -41,6 +41,7 @@ class DemoPreflight:
         allow_mutations: bool = False,
     ) -> None:
         self.base_url = base_url.rstrip("/")
+        self.fake_backend = False
         self.expected_tracks = expected_tracks
         self.required_devices = required_devices or {}
         self.required_returns = required_returns or {}
@@ -137,6 +138,9 @@ class DemoPreflight:
         boundary = body.get("write_boundary") or {}
         if boundary.get("confirmation_required") is not True or boundary.get("readback_required") is not True:
             raise RuntimeError("Ableton capability report does not prove confirmation and readback enforcement.")
+        if body.get("transport") == "fake":
+            self.fake_backend = True
+            return "DAW control enabled with confirmation and readback (FAKE Live backend)"
         return "DAW control enabled with confirmation and readback"
 
     def session_qa(self) -> str:
@@ -417,14 +421,19 @@ def main() -> int:
     results = runner.run(selected)
     elapsed = time.perf_counter() - started
     if args.json:
-        print(json.dumps({"results": [asdict(item) for item in results], "elapsed_seconds": elapsed}, indent=2))
+        print(json.dumps({"results": [asdict(item) for item in results], "elapsed_seconds": elapsed,
+                          "fake_backend": runner.fake_backend}, indent=2))
     else:
         print("KENN Demo Pre-Flight Check\n" + "=" * 27)
         for item in results:
             symbol = "✓" if item.passed else "x"
             print(f"[{symbol}] {item.name}: {item.detail} ({item.elapsed_ms:.1f}ms)")
         passed = sum(item.passed for item in results)
-        print(f"\n{passed}/{len(results)} checks passed in {elapsed:.2f}s" + (" — ready for demo" if passed == len(results) and elapsed < 30 else ""))
+        verdict = ""
+        if passed == len(results) and elapsed < 30:
+            # A fake backend proves the software path only, never the demo room.
+            verdict = " — FAKE Live backend: not demo evidence" if runner.fake_backend else " — ready for demo"
+        print(f"\n{passed}/{len(results)} checks passed in {elapsed:.2f}s" + verdict)
     return 0 if all(item.passed for item in results) and elapsed < 30 else 1
 
 

@@ -19,11 +19,18 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 ## Phase A — Harden the foundation
 
-- [ ] **A1 UI-path test harness**
-  - [ ] Playwright set up with Homebrew Node; one smoke test that types in chat and reads the reply
-  - [ ] Tests for Apply, Undo, Dismiss and chat "Undo that." card states
-  - [ ] Fake-Live record/replay at the OSC boundary; CI runs without Live
-  - [ ] The 13-prompt demo script gate also runs through `/kenn/api/ask` (not only `/api/ableton/command`)
+- [x] **A1 UI-path test harness** (2026-09-23, evidence `docs/evidence/KENN_A1_UI_PATH_HARNESS_2026-09-23.md`)
+  > **Plan (2026-09-23):**
+  > 1. Record the real demo set once (`tooling/scripts/record_fake_live_fixture.py`) into a JSON fixture of tracks, returns, devices and parameters with display strings.
+  > 2. Add a `KENN_LIVE_BACKEND=fake` backend (`core/fake_live.py`) that replays the fixture statefully, with writes and readback.
+  > 3. Put the 13-prompt demo gate through `/kenn/api/ask`.
+  > 4. Add Playwright (system Chrome via `channel: 'chrome'`, no browser download) specs that drive the real UI against a companion started with the fake backend.
+  >
+  > Proof: specs pass locally without Live, and the gate passes against both real and fake Live.
+  - [x] Playwright set up with Homebrew Node; one smoke test that types in chat and reads the reply
+  - [x] Tests for Apply, Undo, Dismiss and chat "Undo that." card states (5/5 green)
+  - [x] Fake-Live record/replay at the OSC boundary; CI runs without Live
+  - [x] The 13-prompt demo script gate also runs through `/kenn/api/ask`: 10/10 on real Live, slowest 597.6 ms
 - [ ] **A2 Known defects**
   - [ ] AbletonOSC `view.py`: selecting a return or master track no longer raises; KENN reports it
   - [ ] "Pan the Synth center." proposes pan 0
@@ -135,3 +142,4 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | Date | Item | Commit | Evidence |
 |---|---|---|---|
 | 2026-09-23 | Tracker created from the build prompt | — | — |
+| 2026-09-23 | A1 UI-path harness: fake Live backend, chat-route gate, Playwright E2E | (this commit) | `KENN_A1_UI_PATH_HARNESS_2026-09-23.md` |

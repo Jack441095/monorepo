@@ -19,6 +19,9 @@ from typing import Any, Callable
 
 
 MAX_COMMAND_LATENCY_MS = 650.0
+# Stay under KENN's per-route budgets (server_rate_limit.RATE_LIMITS):
+# the command route allows 60/min and the chat route ("ask") 30/min.
+ROUTE_INTERVAL_MS = {"command": 1100.0, "ask": 2100.0}
 MANUAL_STEPS = {
     1: "Show the loaded Live set and connected status in the UI.",
     10: "Confirm and verify the EQ inverse against Live.",
@@ -51,7 +54,9 @@ def _require_read_only(body: dict[str, Any]) -> None:
 
 def _require_session_answer(body: dict[str, Any], action: str) -> None:
     _require_read_only(body)
-    if body.get("status") != "inspected" or body.get("answer_mode") != "session_question":
+    # The command gateway labels these "session_question"; the chat route
+    # (/kenn/api/ask) serves the same grounded answer as "live_inspection".
+    if body.get("status") != "inspected" or body.get("answer_mode") not in {"session_question", "live_inspection"}:
         raise ValueError("response was not a grounded session answer")
     if _intent_action(body) != action:
         raise ValueError(f"expected intent {action}")
@@ -155,6 +160,10 @@ def _bass_eq(body: dict[str, Any]) -> None:
 
 
 def _history(body: dict[str, Any]) -> None:
+    # History is scoped to the asking session, and this gate never confirms a
+    # change, so an honest "no changes yet" answer is the expected contract.
+    if body.get("status") == "no_changes":
+        body = {**body, "status": "inspected"}
     _require_session_answer(body, "inspect_change_history")
     if not isinstance(body.get("changes"), list):
         raise ValueError("change history did not return a structured list")
@@ -225,7 +234,11 @@ class DemoScriptGate:
         *,
         max_latency_ms: float = MAX_COMMAND_LATENCY_MS,
         command_interval_ms: float = 1100.0,
+        route: str = "command",
     ) -> None:
+        if route not in {"command", "ask"}:
+            raise ValueError("route must be 'command' or 'ask'")
+        self.route = route
         self.base_url = base_url.rstrip("/")
         self.max_latency_ms = max_latency_ms
         self.command_interval_ms = command_interval_ms
@@ -239,9 +252,14 @@ class DemoScriptGate:
         if wait_seconds:
             time.sleep(wait_seconds)
         self._last_command_started = time.monotonic()
-        payload = {"session_id": session_id, "command": command, "deterministic_only": True}
+        if self.route == "ask":
+            path = "/kenn/api/ask"
+            payload = {"session_id": session_id, "question": command, "stream": False}
+        else:
+            path = "/api/ableton/command"
+            payload = {"session_id": session_id, "command": command, "deterministic_only": True}
         request = urllib.request.Request(
-            self.base_url + "/api/ableton/command",
+            self.base_url + path,
             data=json.dumps(payload).encode("utf-8"),
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -251,7 +269,25 @@ class DemoScriptGate:
             body = json.loads(response.read())
             if response.status != 200:
                 raise RuntimeError("KENN returned a non-success response.")
-        return body, (time.perf_counter() - started) * 1000.0
+        elapsed_ms = (time.perf_counter() - started) * 1000.0
+        if self.route == "ask":
+            # A Live command answered in chat embeds the gateway's own result;
+            # validate that exact contract, and time the chat round trip.
+            orchestration = body.get("orchestration") if isinstance(body.get("orchestration"), dict) else {}
+            inner = orchestration.get("result")
+            if body.get("route") == "ableton_controller" and isinstance(inner, dict):
+                body = dict(inner)
+            elif body.get("route") == "ableton_live_inspection":
+                # The chat envelope replaces status with "succeeded" and flattens
+                # intent to a string; rebuild the gateway view from found/live_intent.
+                intent = body.get("live_intent") if isinstance(body.get("live_intent"), dict) else {
+                    "action": body.get("intent")
+                }
+                grounded = bool(body.get("found")) or intent.get("action") == "inspect_change_history"
+                body = {**body, "intent": intent, "status": "inspected" if grounded else body.get("status")}
+            if not isinstance((body.get("latency") or {}).get("total_ms"), (int, float)):
+                body = {**body, "latency": {"total_ms": elapsed_ms}}
+        return body, elapsed_ms
 
     @staticmethod
     def _friendly_failure(exc: Exception) -> str:
@@ -301,11 +337,13 @@ def run_gate(
     runs: int,
     max_latency_ms: float,
     command_interval_ms: float = 1100.0,
+    route: str = "command",
 ) -> dict[str, Any]:
     gate = DemoScriptGate(
         base_url,
         max_latency_ms=max_latency_ms,
         command_interval_ms=command_interval_ms,
+        route=route,
     )
     run_results: list[dict[str, Any]] = []
     for run_number in range(1, runs + 1):
@@ -339,8 +377,14 @@ def main() -> int:
     parser.add_argument(
         "--command-interval-ms",
         type=float,
-        default=1100.0,
+        default=None,
         help="Minimum interval between requests; the default stays below KENN's supervised API rate limit.",
+    )
+    parser.add_argument(
+        "--route",
+        choices=("command", "ask"),
+        default="command",
+        help="'ask' sends every prompt through /kenn/api/ask, the route the chat UI uses.",
     )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
@@ -348,6 +392,8 @@ def main() -> int:
         parser.error("--runs must be between 1 and 10")
     if args.max_latency_ms <= 0:
         parser.error("--max-latency-ms must be positive")
+    if args.command_interval_ms is None:
+        args.command_interval_ms = ROUTE_INTERVAL_MS[args.route]
     if args.command_interval_ms < 0:
         parser.error("--command-interval-ms must be non-negative")
 
@@ -356,6 +402,7 @@ def main() -> int:
         runs=args.runs,
         max_latency_ms=args.max_latency_ms,
         command_interval_ms=args.command_interval_ms,
+        route=args.route,
     )
     if args.json:
         print(json.dumps(report, indent=2))

@@ -1,0 +1,1525 @@
+{
+ "devices": {
+  "3:0": {
+   "device_name": "Compressor",
+   "parameters": [
+    {
+     "index": 0,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Device On",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 1,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Threshold",
+     "quantized": false,
+     "readable": true,
+     "value": 0.8500000238418579,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 2,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Ratio",
+     "quantized": false,
+     "readable": true,
+     "value": 0.5,
+     "value_display": "2.00 : 1"
+    },
+    {
+     "index": 3,
+     "max": 2.0,
+     "min": 1.0,
+     "name": "Expansion Ratio",
+     "quantized": false,
+     "readable": true,
+     "value": 1.149999976158142,
+     "value_display": "1 : 1.15"
+    },
+    {
+     "index": 4,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Attack",
+     "quantized": false,
+     "readable": true,
+     "value": 0.4000000059604645,
+     "value_display": "1.00 ms"
+    },
+    {
+     "index": 5,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Release",
+     "quantized": false,
+     "readable": true,
+     "value": 0.1569925993680954,
+     "value_display": "30.0 ms"
+    },
+    {
+     "index": 6,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Auto Release On/Off",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 7,
+     "max": 36.0,
+     "min": -36.0,
+     "name": "Output",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 8,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Makeup",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 9,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Dry/Wet",
+     "quantized": false,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "100 %"
+    },
+    {
+     "index": 10,
+     "max": 2.0,
+     "min": 0.0,
+     "name": "Model",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Peak"
+    },
+    {
+     "index": 11,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Env Mode",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "Log"
+    },
+    {
+     "index": 12,
+     "max": 18.0,
+     "min": 0.0,
+     "name": "Knee",
+     "quantized": false,
+     "readable": true,
+     "value": 6.0,
+     "value_display": "6.0 dB"
+    },
+    {
+     "index": 13,
+     "max": 2.0,
+     "min": 0.0,
+     "name": "LookAhead",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0 ms"
+    },
+    {
+     "index": 14,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C Listen",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 15,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C EQ On",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 16,
+     "max": 5.0,
+     "min": 0.0,
+     "name": "S/C EQ Type",
+     "quantized": true,
+     "readable": true,
+     "value": 5.0,
+     "value_display": "High pass"
+    },
+    {
+     "index": 17,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C EQ Freq",
+     "quantized": false,
+     "readable": true,
+     "value": 0.15782640874385834,
+     "value_display": "80.0 Hz"
+    },
+    {
+     "index": 18,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C EQ Q",
+     "quantized": false,
+     "readable": true,
+     "value": 0.40856707096099854,
+     "value_display": "0.71"
+    },
+    {
+     "index": 19,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "S/C EQ Gain",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 20,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C On",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 21,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C Gain",
+     "quantized": false,
+     "readable": true,
+     "value": 0.4000000059604645,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 22,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C Mix",
+     "quantized": false,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "100 %"
+    }
+   ],
+   "success": true
+  },
+  "4:0": {
+   "device_name": "EQ Eight",
+   "parameters": [
+    {
+     "index": 0,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Device On",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 1,
+     "max": 12.0,
+     "min": -12.0,
+     "name": "Output",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 2,
+     "max": 2.0,
+     "min": -2.0,
+     "name": "Scale",
+     "quantized": false,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "100 %"
+    },
+    {
+     "index": 3,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Adaptive Q",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 4,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "1 Filter On A",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 5,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "1 Filter Type A",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "High Pass 12dB"
+    },
+    {
+     "index": 6,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "1 Frequency A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0914127379655838,
+     "value_display": "20.2 Hz"
+    },
+    {
+     "index": 7,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "1 Gain A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 8,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "1 Q A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 9,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "1 Filter On B",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 10,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "1 Filter Type B",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "High Pass 12dB"
+    },
+    {
+     "index": 11,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "1 Frequency B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.3892475962638855,
+     "value_display": "200 Hz"
+    },
+    {
+     "index": 12,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "1 Gain B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 13,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "1 Q B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.3801652789115906,
+     "value_display": "0.72"
+    },
+    {
+     "index": 14,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "2 Filter On A",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 15,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "2 Filter Type A",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 16,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "2 Frequency A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.3892475962638855,
+     "value_display": "200 Hz"
+    },
+    {
+     "index": 17,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "2 Gain A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 18,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "2 Q A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 19,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "2 Filter On B",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 20,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "2 Filter Type B",
+     "quantized": true,
+     "readable": true,
+     "value": 2.0,
+     "value_display": "Low Shelf"
+    },
+    {
+     "index": 21,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "2 Frequency B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.3892475962638855,
+     "value_display": "200 Hz"
+    },
+    {
+     "index": 22,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "2 Gain B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 23,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "2 Q B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 24,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "3 Filter On A",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 25,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "3 Filter Type A",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 26,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "3 Frequency A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.5983683466911316,
+     "value_display": "1000 Hz"
+    },
+    {
+     "index": 27,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "3 Gain A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 28,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "3 Q A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 29,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "3 Filter On B",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 30,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "3 Filter Type B",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 31,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "3 Frequency B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.2991841733455658,
+     "value_display": "100.0 Hz"
+    },
+    {
+     "index": 32,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "3 Gain B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 33,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "3 Q B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 34,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "4 Filter On A",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 35,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "4 Filter Type A",
+     "quantized": true,
+     "readable": true,
+     "value": 5.0,
+     "value_display": "High Shelf"
+    },
+    {
+     "index": 36,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "4 Frequency A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.8074891567230225,
+     "value_display": "5.00 kHz"
+    },
+    {
+     "index": 37,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "4 Gain A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 38,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "4 Q A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 39,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "4 Filter On B",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 40,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "4 Filter Type B",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 41,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "4 Frequency B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.5083049535751343,
+     "value_display": "500 Hz"
+    },
+    {
+     "index": 42,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "4 Gain B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 43,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "4 Q B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 44,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "5 Filter On A",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 45,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "5 Filter Type A",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 46,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "5 Frequency A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.2991841733455658,
+     "value_display": "100.0 Hz"
+    },
+    {
+     "index": 47,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "5 Gain A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 48,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "5 Q A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 49,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "5 Filter On B",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 50,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "5 Filter Type B",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 51,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "5 Frequency B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.6884317994117737,
+     "value_display": "2.00 kHz"
+    },
+    {
+     "index": 52,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "5 Gain B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 53,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "5 Q B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 54,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "6 Filter On A",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 55,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "6 Filter Type A",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 56,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "6 Frequency A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.8975525498390198,
+     "value_display": "10.0 kHz"
+    },
+    {
+     "index": 57,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "6 Gain A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 58,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "6 Q A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 59,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "6 Filter On B",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 60,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "6 Filter Type B",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 61,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "6 Frequency B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.8975525498390198,
+     "value_display": "10.0 kHz"
+    },
+    {
+     "index": 62,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "6 Gain B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 63,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "6 Q B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 64,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "7 Filter On A",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 65,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "7 Filter Type A",
+     "quantized": true,
+     "readable": true,
+     "value": 3.0,
+     "value_display": "Bell"
+    },
+    {
+     "index": 66,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "7 Frequency A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.8074891567230225,
+     "value_display": "5.00 kHz"
+    },
+    {
+     "index": 67,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "7 Gain A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 68,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "7 Q A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 69,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "7 Filter On B",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 70,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "7 Filter Type B",
+     "quantized": true,
+     "readable": true,
+     "value": 5.0,
+     "value_display": "High Shelf"
+    },
+    {
+     "index": 71,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "7 Frequency B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.8074891567230225,
+     "value_display": "5.00 kHz"
+    },
+    {
+     "index": 72,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "7 Gain B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 73,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "7 Q B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 74,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "8 Filter On A",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 75,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "8 Filter Type A",
+     "quantized": true,
+     "readable": true,
+     "value": 6.0,
+     "value_display": "Low Pass 12dB"
+    },
+    {
+     "index": 76,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "8 Frequency A",
+     "quantized": false,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "22.0 kHz"
+    },
+    {
+     "index": 77,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "8 Gain A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 78,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "8 Q A",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    },
+    {
+     "index": 79,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "8 Filter On B",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 80,
+     "max": 7.0,
+     "min": 0.0,
+     "name": "8 Filter Type B",
+     "quantized": true,
+     "readable": true,
+     "value": 6.0,
+     "value_display": "Low Pass 12dB"
+    },
+    {
+     "index": 81,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "8 Frequency B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.9739260673522949,
+     "value_display": "18.0 kHz"
+    },
+    {
+     "index": 82,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "8 Gain B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 83,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "8 Q B",
+     "quantized": false,
+     "readable": true,
+     "value": 0.37666621804237366,
+     "value_display": "0.71"
+    }
+   ],
+   "success": true
+  },
+  "6:0": {
+   "device_name": "Compressor",
+   "parameters": [
+    {
+     "index": 0,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Device On",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "On"
+    },
+    {
+     "index": 1,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Threshold",
+     "quantized": false,
+     "readable": true,
+     "value": 0.8500000238418579,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 2,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Ratio",
+     "quantized": false,
+     "readable": true,
+     "value": 0.5,
+     "value_display": "2.00 : 1"
+    },
+    {
+     "index": 3,
+     "max": 2.0,
+     "min": 1.0,
+     "name": "Expansion Ratio",
+     "quantized": false,
+     "readable": true,
+     "value": 1.149999976158142,
+     "value_display": "1 : 1.15"
+    },
+    {
+     "index": 4,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Attack",
+     "quantized": false,
+     "readable": true,
+     "value": 0.4000000059604645,
+     "value_display": "1.00 ms"
+    },
+    {
+     "index": 5,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Release",
+     "quantized": false,
+     "readable": true,
+     "value": 0.1569925993680954,
+     "value_display": "30.0 ms"
+    },
+    {
+     "index": 6,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Auto Release On/Off",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 7,
+     "max": 36.0,
+     "min": -36.0,
+     "name": "Output",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 8,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Makeup",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 9,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Dry/Wet",
+     "quantized": false,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "100 %"
+    },
+    {
+     "index": 10,
+     "max": 2.0,
+     "min": 0.0,
+     "name": "Model",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Peak"
+    },
+    {
+     "index": 11,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "Env Mode",
+     "quantized": true,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "Log"
+    },
+    {
+     "index": 12,
+     "max": 18.0,
+     "min": 0.0,
+     "name": "Knee",
+     "quantized": false,
+     "readable": true,
+     "value": 6.0,
+     "value_display": "6.0 dB"
+    },
+    {
+     "index": 13,
+     "max": 2.0,
+     "min": 0.0,
+     "name": "LookAhead",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0 ms"
+    },
+    {
+     "index": 14,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C Listen",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 15,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C EQ On",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 16,
+     "max": 5.0,
+     "min": 0.0,
+     "name": "S/C EQ Type",
+     "quantized": true,
+     "readable": true,
+     "value": 5.0,
+     "value_display": "High pass"
+    },
+    {
+     "index": 17,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C EQ Freq",
+     "quantized": false,
+     "readable": true,
+     "value": 0.15782640874385834,
+     "value_display": "80.0 Hz"
+    },
+    {
+     "index": 18,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C EQ Q",
+     "quantized": false,
+     "readable": true,
+     "value": 0.40856707096099854,
+     "value_display": "0.71"
+    },
+    {
+     "index": 19,
+     "max": 15.0,
+     "min": -15.0,
+     "name": "S/C EQ Gain",
+     "quantized": false,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 20,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C On",
+     "quantized": true,
+     "readable": true,
+     "value": 0.0,
+     "value_display": "Off"
+    },
+    {
+     "index": 21,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C Gain",
+     "quantized": false,
+     "readable": true,
+     "value": 0.4000000059604645,
+     "value_display": "0.00 dB"
+    },
+    {
+     "index": 22,
+     "max": 1.0,
+     "min": 0.0,
+     "name": "S/C Mix",
+     "quantized": false,
+     "readable": true,
+     "value": 1.0,
+     "value_display": "100 %"
+    }
+   ],
+   "success": true
+  }
+ },
+ "normalised_to_reset": true,
+ "recorded_at": "2026-09-23T10:06:44+0100",
+ "return_tracks": [
+  {
+   "devices": [
+    "Reverb",
+    "Hybrid Reverb"
+   ],
+   "index": 0,
+   "name": "A-Reverb"
+  },
+  {
+   "devices": [
+    "Delay"
+   ],
+   "index": 1,
+   "name": "B-Delay"
+  }
+ ],
+ "schema": "kenn.fake_live_fixture.v1",
+ "selected_device": {
+  "device_index": 0,
+  "track_index": 3
+ },
+ "sends": {
+  "0": [
+   0.0,
+   0.0
+  ],
+  "1": [
+   0.0,
+   0.0
+  ],
+  "2": [
+   0.0,
+   0.0
+  ],
+  "3": [
+   0.0,
+   0.0
+  ],
+  "4": [
+   0.0,
+   0.0
+  ],
+  "5": [
+   0.0,
+   0.0
+  ],
+  "6": [
+   0.0,
+   0.0
+  ],
+  "7": [
+   0.0,
+   0.0
+  ]
+ },
+ "session": {
+  "host": "127.0.0.1",
+  "is_playing": false,
+  "master_track": null,
+  "port": 11000,
+  "return_tracks": [],
+  "root_note": 0,
+  "scale_name": "Major",
+  "scenes": [
+   {
+    "index": 0,
+    "name": ""
+   },
+   {
+    "index": 1,
+    "name": ""
+   },
+   {
+    "index": 2,
+    "name": ""
+   },
+   {
+    "index": 3,
+    "name": ""
+   },
+   {
+    "index": 4,
+    "name": ""
+   },
+   {
+    "index": 5,
+    "name": ""
+   },
+   {
+    "index": 6,
+    "name": ""
+   },
+   {
+    "index": 7,
+    "name": ""
+   }
+  ],
+  "selected_track_index": 3,
+  "signature_denominator": 4,
+  "signature_numerator": 4,
+  "status": "connected",
+  "tempo": 120.0,
+  "tracks": [
+   {
+    "armed": false,
+    "devices": [],
+    "index": 0,
+    "muted": false,
+    "name": "Kick",
+    "pan": 0.0,
+    "soloed": false,
+    "volume": 0.49999988079071045
+   },
+   {
+    "armed": false,
+    "devices": [],
+    "index": 1,
+    "muted": false,
+    "name": "Snare / Clap",
+    "pan": 0.0,
+    "soloed": false,
+    "volume": 0.49999988079071045
+   },
+   {
+    "armed": false,
+    "devices": [],
+    "index": 2,
+    "muted": false,
+    "name": "Hi-Hats",
+    "pan": 0.0,
+    "soloed": false,
+    "volume": 0.49999988079071045
+   },
+   {
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Compressor"
+     }
+    ],
+    "index": 3,
+    "muted": false,
+    "name": "Drum Bus",
+    "pan": 0.0,
+    "soloed": false,
+    "volume": 0.49999988079071045
+   },
+   {
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "EQ Eight"
+     }
+    ],
+    "index": 4,
+    "muted": false,
+    "name": "Bass",
+    "pan": 0.0,
+    "soloed": false,
+    "volume": 0.49999988079071045
+   },
+   {
+    "armed": false,
+    "devices": [],
+    "index": 5,
+    "muted": false,
+    "name": "Synth",
+    "pan": 0.0,
+    "soloed": false,
+    "volume": 0.49999988079071045
+   },
+   {
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Compressor"
+     }
+    ],
+    "index": 6,
+    "muted": false,
+    "name": "Lead Vocal",
+    "pan": 0.0,
+    "soloed": false,
+    "volume": 0.8500000238418579
+   },
+   {
+    "armed": false,
+    "devices": [],
+    "index": 7,
+    "muted": false,
+    "name": "FX Print",
+    "pan": 0.0,
+    "soloed": false,
+    "volume": 0.8500000238418579
+   }
+  ]
+ }
+}

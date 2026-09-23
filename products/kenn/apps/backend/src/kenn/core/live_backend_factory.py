@@ -34,10 +34,14 @@ def create_live_backend(
     selected = str(values.get(LIVE_BACKEND_ENV, "osc")).strip().casefold()
     if selected in {"osc", "abletonosc"}:
         return osc_factory()
+    if selected == "fake":
+        from kenn.core.fake_live import FakeLiveBackend
+
+        return FakeLiveBackend()
     if selected not in {"mcp", "control-deck", "control-deck-mcp"}:
         raise RuntimeError(
             f"Unsupported {LIVE_BACKEND_ENV} value '{selected}'. "
-            "Use 'osc' or 'control-deck-mcp'."
+            "Use 'osc', 'control-deck-mcp', or 'fake' (tests only)."
         )
 
     command_text = str(values.get(MCP_COMMAND_ENV, "")).strip()

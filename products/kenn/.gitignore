@@ -145,3 +145,7 @@ apps/frontend/dist/
 /remote_script/
 /scripts/
 /tests/
+
+# Playwright output
+apps/frontend/test-results/
+apps/frontend/playwright-report/
