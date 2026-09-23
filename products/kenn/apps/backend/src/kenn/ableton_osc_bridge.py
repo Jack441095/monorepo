@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import logging
 import socket
+import json
 import time
 from threading import Lock
 from threading import Event, Lock, Thread
@@ -115,6 +116,9 @@ READ_ENDPOINTS = (
     "/live/view/get/selected_track",
     "/live/view/get/selected_track_kind",
     "/live/kenn/version",
+    "/live/kenn/get/bus_mixer",
+    "/live/kenn/get/device_tree",
+    "/live/kenn/get/device_parameters",
     "/live/view/get/selected_device",
     "/live/view/get/selected_scene",
     "/live/track/get/meters",
@@ -1347,6 +1351,32 @@ class AbletonOSCClient:
         if int(track_index) < 0:
             return False
         return self._send_only("/live/view/set/selected_track", [int(track_index)])
+
+    def _kenn_json(self, address: str, args: list[Any]) -> dict[str, Any]:
+        values = self._query_args(address, args)
+        if not values:
+            return {"success": False, "error": "The running AbletonOSC does not answer this KENN read; deploy and reload it."}
+        try:
+            payload = json.loads(str(values[-1]))
+        except (TypeError, ValueError):
+            return {"success": False, "error": "AbletonOSC returned an unreadable KENN payload."}
+        if not isinstance(payload, dict):
+            return {"success": False, "error": "AbletonOSC returned an unexpected KENN payload."}
+        if payload.get("error"):
+            return {"success": False, **payload}
+        return {"success": True, **payload}
+
+    def get_bus_mixer(self, kind: str, index: int = -1) -> dict[str, Any]:
+        """Mixer and device names for a return track (``kind='return'``) or the master."""
+        return self._kenn_json("/live/kenn/get/bus_mixer", [str(kind), int(index)])
+
+    def get_device_tree(self, kind: str, index: int = -1) -> dict[str, Any]:
+        """Device chain for a track, return, or master, including rack chains (depth 3)."""
+        return self._kenn_json("/live/kenn/get/device_tree", [str(kind), int(index)])
+
+    def get_bus_device_parameters(self, kind: str, index: int, device_index: int) -> dict[str, Any]:
+        """Every parameter of one device with display string and automation state."""
+        return self._kenn_json("/live/kenn/get/device_parameters", [str(kind), int(index), int(device_index)])
 
     def get_remote_script_version(self) -> dict[str, Any]:
         """Deploy stamp of the running AbletonOSC (see tooling/scripts/deploy_abletonosc.py)."""

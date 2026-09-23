@@ -54,6 +54,23 @@ def main() -> int:
         for track in state.get("tracks", [])
     }
 
+    world: dict[str, dict] = {}
+
+    def keep(key: str, result: dict) -> None:
+        if isinstance(result, dict) and result.get("success"):
+            world[key] = {k: v for k, v in result.items() if k != "success"}
+
+    for track in state.get("tracks", []):
+        keep(f"device_tree:track:{int(track['index'])}", client.get_device_tree("track", int(track["index"])))
+    buses = [("return", int(r["index"]), len(r.get("devices") or [])) for r in returns] + [("master", -1, None)]
+    for kind, index, _count in buses:
+        mixer = client.get_bus_mixer(kind, index)
+        keep(f"bus_mixer:{kind}:{index}", mixer)
+        keep(f"device_tree:{kind}:{index}", client.get_device_tree(kind, index))
+        for device_index in range(len(mixer.get("devices") or [])):
+            keep(f"device_parameters:{kind}:{index}:{device_index}",
+                 client.get_bus_device_parameters(kind, index, device_index))
+
     if not args.as_is:
         for track in state.get("tracks", []):
             track["pan"] = 0.0
@@ -68,6 +85,7 @@ def main() -> int:
         "devices": devices,
         "sends": sends,
         "selected_device": {"track_index": DEMO_SELECTED_TRACK, "device_index": 0},
+        "world": world,
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(fixture, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8")
@@ -77,6 +95,7 @@ def main() -> int:
         "tracks": [t.get("name") for t in state.get("tracks", [])],
         "devices": {k: v.get("device_name") for k, v in devices.items()},
         "returns": [r.get("name") for r in returns],
+        "world_sections": sorted(world),
     }, indent=2))
     return 0
 

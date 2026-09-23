@@ -1330,6 +1330,15 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self.send_json(500, {"ok": False, "status": "error", "error": "Ableton client not available"})
             return
+        if parsed.path in {"/api/ableton/world-model", "/kenn/api/ableton/world-model"}:
+            try:
+                from kenn.ableton_osc_bridge import live_client
+                from kenn.core.live_world_model import read_world_model
+                model = read_world_model(live_client)
+                self.send_json(200 if model.get("status") == "connected" else 503, model)
+            except Exception as exc:
+                self.send_json(503, {"status": "error", "error": str(exc)})
+            return
         if parsed.path in {"/api/ableton/remote-script", "/kenn/api/ableton/remote-script"}:
             try:
                 from kenn.ableton_osc_bridge import live_client

@@ -43,13 +43,14 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 ## Phase B — Live world model
 
-- [ ] **B1 Read coverage**
-  - [ ] Return tracks and master (mixer, devices, selection)
-  - [ ] Groups (fold state, children) and routing in and out
-  - [ ] Racks and chains; all device parameters with display strings
-  - [ ] Session clips (name, length, loop, warp) and arrangement clips
-  - [ ] Scenes, locators, song key, scale and time signature
-  - [ ] Automation envelopes (read)
+- [ ] **B1 Read coverage** (code done 2026-09-23; real-Live proof needs the A3 deploy)
+  > `core/live_world_model.py` + `/api/ableton/world-model`: one evidence-only model with per-section availability and a fingerprint that ignores meters. New hot-reloadable reads in AbletonOSC `song.py`: `/live/kenn/get/bus_mixer`, `/live/kenn/get/device_tree` (rack chains, depth 3), `/live/kenn/get/device_parameters` (display strings + automation state). The fixture recorder captures them after deploy.
+  - [ ] Return tracks and master (mixer, devices, selection): code + fake tests done; real-Live proof pending
+  - [ ] Groups (fold state, children) and routing in and out: already read by `query_session_understanding`; now surfaced in the world model; real-Live proof pending
+  - [ ] Racks and chains; all device parameters with display strings: code done; real-Live proof pending
+  - [ ] Session clips (name, length, loop, warp) and arrangement clips: names/lengths/starts via understanding; loop/warp still to add
+  - [x] Scenes, locators, song key, scale and time signature (in the world model, from existing reads)
+  - [ ] Automation envelopes (read): per-parameter `automation_state` added; Live's API does not expose arrangement envelope points, so full envelope read is limited to clip envelopes (to do)
 - [ ] **B2 Change-driven state**
   - [ ] AbletonOSC listeners replace polling
   - [ ] One session model with a monotonic version and fingerprint
@@ -146,4 +147,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | Tracker created from the build prompt | — | — |
 | 2026-09-23 | A1 UI-path harness: fake Live backend, chat-route gate, Playwright E2E | `683bb39` | `KENN_A1_UI_PATH_HARNESS_2026-09-23.md` |
 | 2026-09-23 | A2 defects: selection fix (code), pan centre, statement classifier, voice fake removed | `241abff` | tests + real-Live chat probes; 7/7 Playwright |
-| 2026-09-23 | A3 deploy tool, version endpoint, stale-script preflight check | (this commit) | 11 new tests; plan shows only view.py + application.py differ (both hot-reloadable) |
+| 2026-09-23 | A3 deploy tool, version endpoint, stale-script preflight check | `0d6da61` | 11 new tests; plan shows only view.py + application.py differ (both hot-reloadable) |
+| 2026-09-23 | B1 world model (code): returns/master/racks/automation-state reads, world-model route | (this commit) | 4 new tests; fake-backed route smoke |
