@@ -39,7 +39,14 @@ copy and the full run passes the rehearsal gate.
    .runtime/investor-demo-audio`.
 2. Open a disposable copy of `assets/demo/KENN_Live12_Demo.als` in Live 12 and
    import the eight generated stems at bar 1 in manifest track order. Do not
-   overwrite the tracked reset fixture.
+   overwrite the tracked reset fixture. **Kick and Synth are MIDI tracks in the
+   fixture and cannot hold audio.** For each of them: select it, press Cmd-T to
+   add an audio track directly after it, drop the stem at bar 1, delete the
+   MIDI track, and rename the new track to exactly `Kick` / `Synth` (neither
+   MIDI track carries devices). Drop the other six stems onto the existing
+   lanes in Arrangement view, never into the empty area below the tracks,
+   because that creates new file-named tracks and breaks the fixture contract.
+   Save, then keep an untouched copy of this file as the per-run reset point.
 3. Export the two manifest analysis paths before starting KENN:
    `KENN_LIVE_AUDIO_CAPTURE_PATH=.runtime/investor-demo-audio/KENN_Demo_Mix_Analysis.wav`
    and `KENN_LIVE_VOCAL_CAPTURE_PATH=.runtime/investor-demo-audio/KENN_Demo_Lead_Vocal_Analysis.wav`.
