@@ -18,7 +18,6 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 - [ ] OK a `~/kenn_*` work folder on the GPU box (GPU 0, `/mnt/data`) for C6 LoRA training — text-only corpus, no audio
 
 - [ ] Demo rehearsals 2–10: owner-run, see `docs/evidence/KENN_INVESTOR_DEMO_REHEARSAL_LOG.md`
-- [ ] Say when Live is free, so I can run `deploy_abletonosc.py --apply --reload` (hot reload, no restart needed) and prove A2's selection fix and A3 on real Live
 
 ## Phase A — Harden the foundation
 
@@ -34,12 +33,12 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [x] Tests for Apply, Undo, Dismiss and chat "Undo that." card states (5/5 green)
   - [x] Fake-Live record/replay at the OSC boundary; CI runs without Live
   - [x] The 13-prompt demo script gate also runs through `/kenn/api/ask`: 10/10 on real Live, slowest 597.6 ms
-- [ ] **A2 Known defects**
-  - [ ] AbletonOSC `view.py`: selecting a return or master track no longer raises; KENN reports it. **Code and tests done (2026-09-23); real-Live proof waits on A3 deploy + Live restart.**
+- [x] **A2 Known defects** (2026-09-23)
+  - [x] AbletonOSC `view.py`: selecting a return or master track no longer raises; KENN reports it. Proven on real Live 2026-09-23 (382 ms, `KENN_WORLD_MODEL_REAL_LIVE_2026-09-23.md`)
   - [x] "Pan the Synth center." proposes pan 0 (5 phrasings; centre frequency excluded; verified on real Live, 2026-09-23)
   - [x] Statement-versus-request stage before retrieval: narration about KENN and typed card labels get short replies; problem statements and topics still reach chat (verified on real Live, 2026-09-23)
   - [x] Simulated voice removed: the unreachable `process_audio_features` fake is deleted and the module is documented as text-only (2026-09-23)
-- [ ] **A3 Remote Script deploy tool** (code done; first real deploy pending)
+- [x] **A3 Remote Script deploy tool** (first real deploy + hot reload 2026-09-23, no Live restart)
   - [x] `tooling/scripts/deploy_abletonosc.py`: plan by default; `--apply` backs up, copies, stamps; `--reload` hot-reloads via `/live/api/reload` and flags files that still need a restart (2026-09-23)
   - [x] `/live/kenn/version` endpoint (reloadable `application.py`), `/api/ableton/remote-script` route, and a `remote_script` preflight check that fails on a stale or unstamped script (2026-09-23). **First real deploy + reload waits for Live to be free.**
 - [ ] **A4 Demo gate 10/10** (owner-run; fix whatever it surfaces)
@@ -48,9 +47,9 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 - [ ] **B1 Read coverage** (code done 2026-09-23; real-Live proof needs the A3 deploy)
   > `core/live_world_model.py` + `/api/ableton/world-model`: one evidence-only model with per-section availability and a fingerprint that ignores meters. New hot-reloadable reads in AbletonOSC `song.py`: `/live/kenn/get/bus_mixer`, `/live/kenn/get/device_tree` (rack chains, depth 3), `/live/kenn/get/device_parameters` (display strings + automation state). The fixture recorder captures them after deploy.
-  - [ ] Return tracks and master (mixer, devices, selection): code + fake tests done; real-Live proof pending
-  - [ ] Groups (fold state, children) and routing in and out: already read by `query_session_understanding`; now surfaced in the world model; real-Live proof pending
-  - [ ] Racks and chains; all device parameters with display strings: code done; real-Live proof pending
+  - [x] Return tracks and master (mixer, devices, selection): proven on real Live 2026-09-23
+  - [x] Groups (fold state, children) and routing in and out: available on real Live 2026-09-23
+  - [x] Racks and chains; all device parameters with display strings: device trees + parameter reads proven on real Live 2026-09-23 (no rack in the demo set; chains covered by fake tests)
   - [ ] Session clips (name, length, loop, warp) and arrangement clips: names/lengths/starts via understanding; loop/warp still to add
   - [x] Scenes, locators, song key, scale and time signature (in the world model, from existing reads)
   - [ ] Automation envelopes (read): per-parameter `automation_state` added; Live's API does not expose arrangement envelope points, so full envelope read is limited to clip envelopes (to do)
@@ -58,8 +57,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [ ] AbletonOSC listeners replace polling. **Deferred:** pushes arrive on the same reply port and address as reads, so the shared socket could take a push for a pending read's reply. Needs a dedicated push port in the Remote Script first. Interim: 2 s cache plus invalidation on every KENN receipt.
   - [x] One session model with a monotonic version and fingerprint (`core/live_world_state.py`; version moves only when the fingerprint changes; invalidated on every receipt; cache keyed to the client object)
   - [x] Proposals bound to state; stale proposals refused: already enforced via `session_version` (`test_stale_state_is_rejected_before_write`, sends, undo, track creation); world answers now cite `world_model_version`
-- [ ] **B3 Full-model Q&A** ("what's on the vocal bus?", "which tracks send to the reverb?", "what's the drum compressor threshold?")
-  > Code done 2026-09-23 (`core/live_world_questions.py`): contents of named tracks, returns and master (with rack chains), who sends to a return, named parameter values with Live's display string, mute/solo, and Live's scale setting (labelled as a setting, not a detected key). Track-number inventory stays on the existing route. 13 unit tests + 1 Playwright spec. Real-Live proof of return/master/parameter answers waits on the A3 deploy.
+- [x] **B3 Full-model Q&A** ("what's on the vocal bus?", "which tracks send to the reverb?", "what's the drum compressor threshold?")
+  > Proven on real Live 2026-09-23 (7 questions, see evidence). Code: `core/live_world_questions.py`: contents of named tracks, returns and master (with rack chains), who sends to a return, named parameter values with Live's display string, mute/solo, and Live's scale setting (labelled as a setting, not a detected key). Track-number inventory stays on the existing route. 13 unit tests + 1 Playwright spec. Real-Live proof of return/master/parameter answers waits on the A3 deploy.
 
 ## Phase C — Language brain
 
@@ -161,4 +160,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | B2 versioned world state + receipt invalidation | `030593f` | 4 new tests; backend 1,479 |
 | 2026-09-23 | C1 schema-constrained planner decoding; bake-off harness; 100 candidate phrasings | `1e99d99` | 4 new tests; bake-off running |
 | 2026-09-23 | E2 loudness, true peak, LRA, key/tempo estimates; licence register | `a1cb848` | 6 new tests; chat gate on fake 1/1 incl. steps 12–13 |
-| 2026-09-23 | F1 MIDI ideas from chat (chords/drums/bass) as confirmable clips; MIDI-track phrasing fix | (this commit) | 9 unit tests; Playwright 9/9 |
+| 2026-09-23 | F1 MIDI ideas from chat (chords/drums/bass) as confirmable clips; MIDI-track phrasing fix | `f646979` | 9 unit tests; Playwright 9/9 |
+| 2026-09-23 | First real AbletonOSC deploy (hot reload); A2/B1/B3 proven on real Live; card names selected return | (this commit) | `KENN_WORLD_MODEL_REAL_LIVE_2026-09-23.md` |
