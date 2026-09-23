@@ -65,8 +65,10 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 - [x] **C1 Constrained decoding:** the planner's JSON is valid by construction (Ollama structured outputs; xgrammar or llguidance fallback)
   > Done 2026-09-23 — every bake-off reply was schema-valid JSON (`KENN_C2_PLANNER_BAKEOFF_MAC_2026-09-23.md`). Code: `llm_plan_json_schema()` (flat, shape-only: schema const, 28 allowed actions, field types, no unknown keys) sent as Ollama `response_format: json_schema`; schema calls skip the MLX path, which silently ignored `json_mode`. Per-action `anyOf` branches were tried and made qwen2.5:1.5b pick wrong actions and overrun its token cap, so meaning stays with `validate_llm_plan`. Awaiting bake-off numbers to tick.
-- [ ] **C2 Model bake-off** on this Mac: `qwen2.5:1.5b`, `qwen2.5:7b-instruct`, Qwen3.5-2B/4B, Phi-4-mini (accuracy, clarification, p95 latency, memory)
-  > Mac run 2026-09-23 (100 phrasings): rule-based parser 42% correct (clarify 20/21, ~1 ms); qwen2.5:1.5b 12% (p50 4.4 s); qwen2.5:7b 56% (p50 12.7 s, guesses instead of clarifying). GPU box run (accuracy only) on owner's choice: deepseek-r1:1.5b, deepseek-r1:7b, phi4-mini — in progress.
+- [x] **C2 Model bake-off** on this Mac: `qwen2.5:1.5b`, `qwen2.5:7b-instruct`, Qwen3.5-2B/4B, Phi-4-mini (accuracy, clarification, p95 latency, memory)
+  > Done 2026-09-23 (`KENN_C2_PLANNER_BAKEOFF_GPU_2026-09-23.md`). 124 cases, accuracy on GPU 0, latency on the Mac. **Winner: `qwen3.5:4b` with thinking off**: 67.7% correct, clarify 20/30, fewest wrong plans accepted; GPU p50 1.1 s; Mac (M3 16 GB, Live running) 64.5% correct, p50 10.3 s, p95 32.7 s, so not interactive on this Mac. Rule-based parser: 49.2%, clarify 30/30, instant. DeepSeek-R1 1.5B/7B: ≤4% in every thinking mode (tuned for maths reasoning; R1-7B targets the selected track). Thinking models through Ollama's /v1 route think until the token cap once a schema is set (0%); turning thinking off took qwen3.5 from 0 to 60–68%, and a 128-token budget added nothing but latency. Moving the request after the snapshot raised every model (qwen2.5:1.5b 10.5→27.4%, qwen3.5:4b 60.5→67.7%) and cut the Mac p50 from 18.6 to 10.3 s. Fixed on the way: bake-off read a persistent answer cache; cache key ignored the output contract.
+  - [ ] Production KENN turns thinking off for qwen3.5 (native `/api/chat` `think: false`, or the empty think-block prefill) before any promotion
+  - [ ] Compact plan output (57 tokens today, mostly JSON whitespace) to cut Mac generation time
   - [ ] Grow the rule-based parser for relative dB, focus, sends, slang (volume 1/12 today)
   - [ ] Planner emits user units (dB, %) and KENN converts; stop asking the model to normalize
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
@@ -76,6 +78,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [ ] propose-with-confirm → active with deterministic fallback
 - [ ] **C5 Planner over the world model** (bounded relevant slice only)
 - [ ] **C6 LoRA refresh** with mlx-lm, evaluated on the holdout
+  > Base per C2: qwen3.5:2b (fast, clarifies 1/30) or qwen3.5:4b (clarifies 20/30). Corpus: contract-correct, ≥ ⅓ clarify, no thinking, user units. Models already on the GPU box under `/mnt/data/kenn-bakeoff/ollama/models`.
 
 ## Phase D — Control breadth
 
@@ -166,4 +169,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | E2 loudness, true peak, LRA, key/tempo estimates; licence register | `a1cb848` | 6 new tests; chat gate on fake 1/1 incl. steps 12–13 |
 | 2026-09-23 | F1 MIDI ideas from chat (chords/drums/bass) as confirmable clips; MIDI-track phrasing fix | `f646979` | 9 unit tests; Playwright 9/9 |
 | 2026-09-23 | First real AbletonOSC deploy (hot reload); A2/B1/B3 proven on real Live; card names selected return | `2065b7f` | `KENN_WORLD_MODEL_REAL_LIVE_2026-09-23.md` |
-| 2026-09-23 | C1 ticked; C2 Mac bake-off results and parser baseline | (this commit) | `KENN_C2_PLANNER_BAKEOFF_MAC_2026-09-23.md` |
+| 2026-09-23 | C1 ticked; C2 Mac bake-off results and parser baseline | `62580f9` | `KENN_C2_PLANNER_BAKEOFF_MAC_2026-09-23.md` |
+| 2026-09-23 | C2 ticked: GPU bake-off, thinking modes, prompt order fix | (this commit) | `KENN_C2_PLANNER_BAKEOFF_GPU_2026-09-23.md` |

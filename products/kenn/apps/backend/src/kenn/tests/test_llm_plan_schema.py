@@ -58,3 +58,27 @@ def test_schema_constrained_calls_never_take_the_unconstrained_mlx_path(monkeypa
     llm_rewrite._chat_completion([{"role": "user", "content": "plan"}], task="command",
                                  json_mode=True, json_schema=llm_plan_json_schema())
     assert sent["response_format"]["type"] == "json_schema"
+
+
+def test_planner_prompt_puts_the_request_after_the_snapshot(monkeypatch) -> None:
+    # Consecutive commands must share the snapshot prefix so the model server
+    # can reuse its prompt cache; only the request at the end is new.
+    from kenn.core import live_command
+
+    monkeypatch.setenv("KENN_LIVE_LLM_ENABLED", "1")
+    monkeypatch.setattr(llm_rewrite, "is_enabled", lambda task="rewrite": True)
+    prompts = []
+
+    def fake_completion(messages, task="rewrite", **_kwargs):
+        prompts.append(messages[0]["content"])
+        return "{}", None
+
+    monkeypatch.setattr(llm_rewrite, "_chat_completion", fake_completion)
+    snapshot = {"tracks": [{"index": 0, "name": "Bass"}]}
+    live_command._generate_llm_plan("mute the bass", snapshot)
+    live_command._generate_llm_plan("solo the bass", snapshot)
+    first, second = [p for p in prompts if p.startswith("Return one command-plan")]
+    assert first.endswith("User request (untrusted input): mute the bass")
+    assert second.endswith("User request (untrusted input): solo the bass")
+    shared = first[: first.index("User request")]
+    assert second.startswith(shared) and '"name":"Bass"' in shared
