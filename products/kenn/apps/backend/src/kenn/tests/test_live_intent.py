@@ -765,7 +765,6 @@ def test_short_eq_and_trailing_device_setup_phrasing_are_typed() -> None:
     [
         ("solo the Bass and check the low end", "fresh post-solo capture"),
         ("create a return with reverb and send Vocal to it at -10 dB", "Create-return-and-send"),
-        ("add an EQ and boost 3 dB at 5 kHz on Bass", "Insert-and-tune EQ"),
         ("balance all the drums and call the group Drums", "Group-and-rename"),
     ],
 )
@@ -780,6 +779,36 @@ def test_unqualified_compound_workflows_never_degrade_to_a_partial_action(
     assert result["steps"] == []
     assert reason_fragment in result["ambiguity"][0]
     assert "nothing changed" in result["ambiguity"][0].casefold()
+
+
+def test_insert_and_tune_eq_requires_an_exact_band_instead_of_partial_insertion() -> None:
+    result = parse_natural_recipe("add an EQ to Bass and boost 3 dB at 5 kHz", eq_snapshot())
+    intent = parse_request("add an EQ to Bass and boost 3 dB at 5 kHz", eq_snapshot())
+
+    assert result is None
+    assert intent["action"] == "insert_eq_band_tuning_gain"
+    assert intent["track"] == {"index": 1, "name": "Bass"}
+    assert intent["missing_fields"] == ["eq_band"]
+    assert "will not choose a band" in intent["ambiguity"][0]
+    assert intent["confirmation_required"] is False
+
+
+def test_insert_and_tune_eq_with_exact_band_is_one_typed_atomic_intent() -> None:
+    intent = parse_request(
+        "add an EQ to Bass Synth and boost band 2A by 3 dB at 5 kHz",
+        {
+            "status": "connected",
+            "tracks": [{"index": 0, "name": "Bass Synth", "devices": []}],
+        },
+    )
+
+    assert intent["action"] == "insert_eq_band_tuning_gain"
+    assert intent["track"] == {"index": 0, "name": "Bass Synth"}
+    assert intent["device"] == {"name": "EQ Eight"}
+    assert intent["eq_band"] == "2A"
+    assert intent["frequency_hz"] == 5000.0
+    assert intent["desired_value"] == 3.0
+    assert intent["confirmation_required"] is True
 
 
 def test_named_track_focus_resolves_without_guessing_an_index() -> None:
