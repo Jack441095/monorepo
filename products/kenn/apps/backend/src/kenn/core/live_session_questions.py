@@ -114,7 +114,7 @@ def answer_live_session_question(
     if kind == "mix_advice":
         return {
             "intent": {"action": "inspect_mix_advice"},
-            **mix_advice_from_session(service=live, snapshot=snapshot),
+            **mix_advice_from_session(service=live, snapshot=snapshot, question=question),
             "changed": False,
         }
 

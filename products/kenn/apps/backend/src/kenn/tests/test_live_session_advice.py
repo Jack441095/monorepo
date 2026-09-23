@@ -14,8 +14,9 @@ from kenn.core.live_command import handle_command
 class AdviceLive:
     backend_name = "advice-test"
 
-    def __init__(self, capture: bytes | None = None) -> None:
+    def __init__(self, capture: bytes | None = None, vocal_capture: bytes | None = None) -> None:
         self.capture = capture
+        self.vocal_capture = vocal_capture
         self.reads = 0
         self.state = {
             "status": "connected",
@@ -42,6 +43,9 @@ class AdviceLive:
     def get_latest_audio_capture(self):
         return self.capture
 
+    def get_latest_vocal_capture(self):
+        return self.vocal_capture
+
 
 @pytest.mark.parametrize(
     "question",
@@ -64,9 +68,24 @@ def test_mix_advice_falls_back_to_arrangement_without_claiming_audio_analysis(qu
     assert result["advice_mode"] == "arrangement_fallback"
     assert result["advisory_only"] is True
     assert result["changed"] is False
-    assert "Audio was not available" in result["answer"]
+    unavailable = (
+        "isolated vocal capture was not available"
+        if "vocal" in question.casefold()
+        else "Audio was not available"
+    )
+    assert unavailable in result["answer"]
     assert result["findings"][0]["confidence"] == 0.35
     assert live.reads == 1
+
+
+def test_vocal_clipping_request_refuses_to_attribute_full_mix_capture() -> None:
+    live = AdviceLive(capture=b"RIFF-full-mix")
+
+    result = handle_command("Check the vocals for clipping.", session_id="advice", service=LiveActionService(live))
+
+    assert result["advice_mode"] == "arrangement_fallback"
+    assert result["analysis_scope"] == "vocal"
+    assert "isolated vocal capture was not available" in result["answer"]
 
 
 def test_mix_advice_formats_measured_findings_when_capture_is_available(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -97,3 +116,71 @@ def test_mix_advice_formats_measured_findings_when_capture_is_available(monkeypa
     assert "72% confidence" in result["answer"]
     assert "Solo the kick and bass" in result["answer"]
     assert result["changed"] is False
+
+
+def test_low_end_advice_surfaces_bounded_reference_measurement(monkeypatch: pytest.MonkeyPatch) -> None:
+    live = AdviceLive(capture=b"RIFF-mix")
+
+    def fake_analyze(_payload: bytes, **_kwargs):
+        return {
+            "ok": True,
+            "analysis_status": "complete",
+            "metrics": {"sample_peak_dbfs": -0.8, "rms_dbfs": -12.0},
+            "findings": [],
+            "spectral": {
+                "band_energy_dbfs": {"low": -9.5},
+                "pink_noise_reference": {
+                    "status": "complete",
+                    "bands": [
+                        {"center_hz": 62.5, "deviation_db": 5.2},
+                        {"center_hz": 125.0, "deviation_db": 3.1},
+                        {"center_hz": 1000.0, "deviation_db": 0.0},
+                    ],
+                },
+            },
+        }
+
+    monkeypatch.setattr(live_session_advice, "analyze_wav", fake_analyze)
+
+    result = handle_command("How does my low end sound?", session_id="advice", service=LiveActionService(live))
+
+    assert result["analysis_scope"] == "low_end"
+    assert result["findings"][0]["type"] == "possible_low_end_excess"
+    assert result["findings"][0]["evidence"]["low_band_rms_dbfs"] == -9.5
+    assert "62.5 Hz band is 5.2 dB above" in result["answer"]
+
+
+def test_vocal_capture_is_used_for_vocal_clipping_request(monkeypatch: pytest.MonkeyPatch) -> None:
+    live = AdviceLive(capture=b"RIFF-full-mix", vocal_capture=b"RIFF-vocal")
+
+    def fake_analyze(payload: bytes, **_kwargs):
+        assert payload == b"RIFF-vocal"
+        return {
+            "ok": True,
+            "analysis_status": "complete",
+            "metrics": {"sample_peak_dbfs": -0.1, "rms_dbfs": -13.0},
+            "findings": [
+                {
+                    "type": "possible_resonance",
+                    "severity": "informational",
+                    "confidence": 0.5,
+                    "explanation": "A narrow peak was measured.",
+                    "suggested_listening_test": "Sweep it in context.",
+                },
+                {
+                    "type": "clipping",
+                    "severity": "high",
+                    "confidence": 0.95,
+                    "explanation": "Near-full-scale sample runs were measured.",
+                    "suggested_listening_test": "Inspect the loudest phrase with a true-peak meter.",
+                },
+            ],
+        }
+
+    monkeypatch.setattr(live_session_advice, "analyze_wav", fake_analyze)
+
+    result = handle_command("Check the vocals for clipping.", session_id="advice", service=LiveActionService(live))
+
+    assert result["analysis_scope"] == "vocal"
+    assert result["findings"][0]["type"] == "clipping"
+    assert "isolated vocal capture" in result["answer"]

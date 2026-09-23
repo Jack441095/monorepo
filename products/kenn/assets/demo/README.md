@@ -24,12 +24,40 @@ name the verified active band explicitly: `Boost amplitude by 3 dB at 200 Hz
 on track 5 band 2A.` See `docs/runbooks/KENN_INVESTOR_DEMO.md` for the canonical
 script.
 
+## Original demo audio
+
+The tracked `.als` remains a small, deterministic topology reset point. Build
+the matching original composition locally (WAVs are intentionally git-ignored):
+
+```sh
+python3 tooling/scripts/build_investor_demo_audio.py \
+  --out-dir .runtime/investor-demo-audio
+```
+
+The generator renders eight 32-second stems in the exact track order above,
+a full-mix analysis render, an isolated vocal analysis render, and a manifest
+with SHA-256 hashes and a fail-closed rights statement. It uses no samples,
+external recordings, model weights, or third-party composition. Import the
+eight stems into a disposable copy of the Live fixture; never overwrite the
+tracked reset point.
+
+Start KENN with the manifest-bound analysis paths printed in
+`.runtime/investor-demo-audio/manifest.json`:
+
+```sh
+export KENN_LIVE_AUDIO_CAPTURE_PATH="$PWD/.runtime/investor-demo-audio/KENN_Demo_Mix_Analysis.wav"
+export KENN_LIVE_VOCAL_CAPTURE_PATH="$PWD/.runtime/investor-demo-audio/KENN_Demo_Lead_Vocal_Analysis.wav"
+```
+
+The mix contains documented low-end-heavy and near-clipping cues for the
+advisory demo. KENN still describes them as measured hypotheses, not a quality
+score or automatic EQ instruction.
+
 ## Scope and rehearsal
 
-This file proves a loadable, deterministic Live topology; it does not contain
-licensed or synthetic audio and must not be presented as evidence of audible
-mix quality. Use only original or royalty-free material for audio-analysis
-segments, and base every finding on the rendered or uploaded audio.
+The reset file alone proves topology, not audible mix quality. Audio claims are
+valid only when preflight verifies the generated manifest and hashes and the
+matching stems are present in the disposable rehearsal set.
 
 Treat the checked-in set as the reset point. Work in a copy during rehearsal,
 then reopen this fixture before the next run. Run the preflight without
