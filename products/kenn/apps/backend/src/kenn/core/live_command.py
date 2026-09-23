@@ -2174,6 +2174,7 @@ def _handle_command_impl(
                 return _clarification(response, {"action": "undo"}, "I don't have a verified change to undo in this session yet.")
             undo = live.propose_undo(receipt, session_id=response["session_id"])
             if undo.get("ok") and isinstance(undo.get("proposal"), dict):
+                response["undo_of_receipt_id"] = str(receipt.get("receipt_id") or "")
                 return _proposal_response(response, undo["proposal"], kind="undo")
             return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))
         if context_resolution.get("resolution") == "correction_requires_clarification":

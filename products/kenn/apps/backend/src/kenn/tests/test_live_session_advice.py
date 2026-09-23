@@ -179,7 +179,7 @@ def test_low_end_advice_surfaces_bounded_reference_measurement(monkeypatch: pyte
     assert result["analysis_scope"] == "low_end"
     assert result["findings"][0]["type"] == "possible_low_end_excess"
     assert result["findings"][0]["evidence"]["low_band_rms_dbfs"] == -9.5
-    assert "62.5 Hz band is 5.2 dB above" in result["answer"]
+    assert "63 Hz band is 5.2 dB above" in result["answer"]
 
 
 def test_vocal_capture_is_used_for_vocal_clipping_request(monkeypatch: pytest.MonkeyPatch) -> None:
