@@ -49,17 +49,17 @@ _REMOVE_LOCATOR = re.compile(
 )
 _CREATE_MIDI_TRACK = re.compile(
     r"^\s*(?:create|add|make)\s+(?:a\s+)?(?:new\s+)?midi\s+track\b"
-    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*$",
+    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
     re.I,
 )
 _CREATE_AUDIO_TRACK = re.compile(
     r"^\s*(?:create|add|make)\s+(?:an?\s+)?(?:new\s+)?audio\s+track\b"
-    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*$",
+    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
     re.I,
 )
 _CREATE_RETURN_TRACK = re.compile(
     r"^\s*(?:create|add|make)\s+(?:a\s+)?(?:new\s+)?return\s+track\b"
-    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*$",
+    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
     re.I,
 )
 _GAIN_STAGE = re.compile(

@@ -104,6 +104,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 ## Phase F — Creation
 
 - [ ] **F1 MIDI generation** (drums, bass, chords, arps, melody) in key and tempo; preview → approve → insert with undo
+  > Chat path done 2026-09-23 for **chords, drums, basslines** (`core/midi_generation_chat.py` on the existing generators + `MidiClipActionService`): stated key or Live's scale setting (never guessed), first MIDI track or the named one, first empty Session slot, deterministic seed so the preview is what is inserted, standard Apply/readback/Undo. Also fixed: "Create a MIDI track." (trailing full stop) was rejected by the parser. Open: arps and melody, audio preview, real-Live proof (the demo set has no MIDI track yet).
 - [ ] **F2 Audio-to-MIDI** (basic-pitch)
 - [ ] **F3 Generative audio evaluation** (Magenta RealTime, ACE-Step; licences recorded)
 
@@ -122,6 +123,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 ## Phase I — Reliability and evaluation
 
+> Note (2026-09-23): `core/live_world_model.py` is the raw evidence layer (exactly what Live reports); the older `core/session_world_model.py` is a semantic layer (inferred roles, band ownership, deltas) that can consume it. They are complementary, not duplicates.
 > Note (2026-09-23): one backend suite run showed 8 intermittent failures while the real-Live gate was running at the same time; two re-runs passed 1,448/1,448. Investigate under I3/I4.
 
 - [ ] **I1 Nightly real-Live regression** (top 50 commands + all recipes via the UI route; SLO report)
@@ -158,4 +160,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | B3 world-model questions (code) | `df88e4f` | 13 unit tests; Playwright 8/8 |
 | 2026-09-23 | B2 versioned world state + receipt invalidation | `030593f` | 4 new tests; backend 1,479 |
 | 2026-09-23 | C1 schema-constrained planner decoding; bake-off harness; 100 candidate phrasings | `1e99d99` | 4 new tests; bake-off running |
-| 2026-09-23 | E2 loudness, true peak, LRA, key/tempo estimates; licence register | (this commit) | 6 new tests; chat gate on fake 1/1 incl. steps 12–13 |
+| 2026-09-23 | E2 loudness, true peak, LRA, key/tempo estimates; licence register | `a1cb848` | 6 new tests; chat gate on fake 1/1 incl. steps 12–13 |
+| 2026-09-23 | F1 MIDI ideas from chat (chords/drums/bass) as confirmable clips; MIDI-track phrasing fix | (this commit) | 9 unit tests; Playwright 9/9 |
