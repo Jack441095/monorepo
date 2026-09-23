@@ -169,7 +169,7 @@ def records() -> list[dict[str, Any]]:
         ("clarify-11", "unsupported", "Create a MIDI track after Bass Synth", _plan("clarify", clarification="KENN currently appends MIDI tracks only; it will not insert one into the middle of the set.")),
     ]
     snapshot_text = json.dumps(training_snapshot(), ensure_ascii=True, sort_keys=True, separators=(",", ":"))
-    from kenn.core.live_command import LLM_COMMAND_SYSTEM_PROMPT
+    from kenn.core.live_command import LLM_COMMAND_SYSTEM_PROMPT, planner_user_prompt
 
     return [
         {
@@ -180,8 +180,11 @@ def records() -> list[dict[str, Any]]:
             "query": query,
             "messages": [
                 {"role": "system", "content": LLM_COMMAND_SYSTEM_PROMPT},
-                {"role": "user", "content": "Current Live snapshot (reference data):\n" + snapshot_text + "\nUser request: " + query},
-                {"role": "assistant", "content": json.dumps(plan, ensure_ascii=True, sort_keys=True, separators=(",", ":"))},
+                # Same user turn as production, so a fine-tune sees what it will serve.
+                {"role": "user", "content": planner_user_prompt(query, snapshot_text)},
+                # The model is not asked to write the schema constant; KENN stamps it.
+                {"role": "assistant", "content": json.dumps({k: v for k, v in plan.items() if k != "schema"},
+                                                            ensure_ascii=True, sort_keys=True, separators=(",", ":"))},
             ],
             "label": plan,
         }
