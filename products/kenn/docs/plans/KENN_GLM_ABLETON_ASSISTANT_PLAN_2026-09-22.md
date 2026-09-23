@@ -68,6 +68,9 @@ Tick items here in the same commit as the work that completes them.
 - [x] History undo labels follow the real undo rules (pan/focus now "undoable") (2026-09-23)
 - [x] Current Project card shows the selected track as focus and the full key ("C Major") (2026-09-23)
 - [ ] Chat parser cannot return a pan to centre ("Pan the Synth center.")
+- [ ] UI reuses one session ID from localStorage forever, so "What did you change?" mixes in earlier rehearsal runs; start a fresh session per page load
+- [ ] `kenn/speech/voice_copilot.py` simulates voice input (hard-coded sentence, invented +120 ms latency); label or remove before anyone demos it as real
+- [ ] AbletonOSC `view.py` `get_selected_track` raises when a return/master track is selected (1.2 s timeout in KENN)
 - [x] Chat undo marks the reverted card "Reverted" and removes its Undo button (2026-09-23)
 - [x] A refused stale undo shows a neutral "Not undone … Nothing changed" note, never Apply (2026-09-23)
 - [ ] Plain statements typed into chat get unrelated knowledge answers: retrieval rates them "high" confidence, so this needs a statement-vs-request check in the chat pipeline (after the demo; runbook forbids typing talk lines)
