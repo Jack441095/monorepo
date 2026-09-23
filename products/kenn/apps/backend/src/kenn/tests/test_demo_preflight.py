@@ -33,6 +33,21 @@ class FakePreflight(DemoPreflight):
         if path == "/api/ableton/osc/return-tracks":
             return {"ok": True, "return_tracks": [{"index": 0, "name": "A-Reverb", "devices": ["Hybrid Reverb"]}]}, 3.0
         if path == "/api/ableton/command":
+            command = str((payload or {}).get("command") or "")
+            if "low end" in command.casefold():
+                return {
+                    "status": "inspected", "changed": False,
+                    "advice_mode": "audio_analysis", "analysis_scope": "low_end",
+                    "findings": [{"type": "possible_low_end_excess"}],
+                    "analysis_source": {"sha256": hashlib.sha256((self._mix_path).read_bytes()).hexdigest()},
+                }, 40.0
+            if "vocal" in command.casefold():
+                return {
+                    "status": "inspected", "changed": False,
+                    "advice_mode": "audio_analysis", "analysis_scope": "vocal",
+                    "findings": [{"type": "clipping"}],
+                    "analysis_source": {"sha256": hashlib.sha256((self._vocal_path).read_bytes()).hexdigest()},
+                }, 40.0
             return {"answer_mode": "session_question", "track_count": 8}, 40.0
         raise AssertionError(path)
 
@@ -72,6 +87,8 @@ def test_read_only_preflight_checks_pass_with_clear_details(monkeypatch, tmp_pat
     monkeypatch.setenv("KENN_LIVE_AUDIO_CAPTURE_PATH", str(mix))
     monkeypatch.setenv("KENN_LIVE_VOCAL_CAPTURE_PATH", str(vocal))
     runner = FakePreflight("http://kenn.test", expected_tracks=["Kick", "Bass"])
+    runner._mix_path = mix
+    runner._vocal_path = vocal
 
     selected = [
         "ableton_ping", "demo_session", "server_health", "retrieval_index",

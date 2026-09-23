@@ -76,9 +76,10 @@ Result: **10/10 consecutive passes**, zero partial successes counted.
 
 ## Automated regression
 
-The latest full backend suite completed after the investor-phrase hardening:
+The latest full backend suite completed after the manifest-bound analysis-cache
+hardening:
 
-`1359 passed, 12 skipped, 4 warnings in 78.68s`
+`1386 passed, 5 skipped, 4 warnings in 78.51s`
 
 The skip count includes optional/environment-dependent coverage. The warnings
 are existing HTTP-test and audio compatibility deprecations; there were no
@@ -113,7 +114,11 @@ KENN's production analyzer measured the 48 kHz render as follows:
 
 The preflight audio check now fails closed unless both files are present,
 rights-cleared under the expected manifest schema, hash-matched to their roles,
-and still contain the intended low-end and vocal-clipping cues.
+and the actual chat-analysis responses bind themselves to those exact hashes
+while still containing the intended low-end and vocal-clipping cues. The check
+also warms a four-entry content-addressed analysis cache. In the measured Live
+runtime, repeat low-end and vocal requests fell from about 2.6 seconds each to
+190.63 ms and 207.82 ms respectively, both below the 650 ms command budget.
 
 ## Narrative correction
 

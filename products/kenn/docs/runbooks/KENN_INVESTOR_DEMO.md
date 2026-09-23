@@ -33,7 +33,9 @@ copy and the full run passes the rehearsal gate.
    implicit regular-track target.
 5. Start AbletonOSC, the KENN backend, and the frontend.
 6. Run `tooling/scripts/demo_preflight.py` without mutations. Its audio check
-   must verify both hashes, the low-end cue, and isolated-vocal clipping.
+   must verify both hashes against the actual chat-analysis responses, detect
+   the low-end and isolated-vocal clipping cues, and warm the bounded analysis
+   cache used by steps 12–13.
 7. Run it again with `--allow-mutations` only on the disposable copy.
 8. Confirm 11/11 checks pass, then reset and reselect Drum Bus before rehearsing.
 

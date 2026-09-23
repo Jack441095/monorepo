@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from copy import deepcopy
 
 import pytest
@@ -116,6 +117,37 @@ def test_mix_advice_formats_measured_findings_when_capture_is_available(monkeypa
     assert "72% confidence" in result["answer"]
     assert "Solo the kick and bass" in result["answer"]
     assert result["changed"] is False
+    assert result["analysis_source"] == {
+        "filename": "live-session-capture.wav",
+        "sha256": hashlib.sha256(b"RIFF-test").hexdigest(),
+        "cache_hit": False,
+    }
+
+
+def test_identical_capture_reuses_bounded_content_addressed_analysis(monkeypatch: pytest.MonkeyPatch) -> None:
+    payload = b"RIFF-cache-regression"
+    live = AdviceLive(capture=payload)
+    calls = 0
+
+    def fake_analyze(_payload: bytes, **_kwargs):
+        nonlocal calls
+        calls += 1
+        return {
+            "ok": True,
+            "analysis_status": "complete",
+            "metrics": {"sample_peak_dbfs": -1.0},
+            "findings": [],
+        }
+
+    monkeypatch.setattr(live_session_advice, "analyze_wav", fake_analyze)
+
+    first = handle_command("How does my mix sound?", session_id="cache-1", service=LiveActionService(live))
+    second = handle_command("How does my mix sound?", session_id="cache-2", service=LiveActionService(live))
+
+    assert calls == 1
+    assert first["analysis_source"]["cache_hit"] is False
+    assert second["analysis_source"]["cache_hit"] is True
+    assert second["analysis_source"]["sha256"] == hashlib.sha256(payload).hexdigest()
 
 
 def test_low_end_advice_surfaces_bounded_reference_measurement(monkeypatch: pytest.MonkeyPatch) -> None:
