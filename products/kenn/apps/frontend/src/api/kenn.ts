@@ -116,6 +116,10 @@ export function parseAdviceFindings(data: Record<string, unknown>): KennAdviceFi
     if (Array.isArray(value)) collections.push(value.slice(0, 6))
   }
 
+  // The direct Ableton command/session-question route returns its advisory
+  // evidence at the response root. Keep this explicit rather than walking
+  // arbitrary JSON, so debug or untrusted nested data never reaches the UI.
+  add(data.findings)
   const toolResult = data.tool_result
   if (toolResult && typeof toolResult === 'object') {
     add((toolResult as Record<string, unknown>).findings)
@@ -150,6 +154,11 @@ export function parseAdviceFindings(data: Record<string, unknown>): KennAdviceFi
     }
   }
   return findings
+}
+
+export function summarizeAdviceAnswer(answer: string, hasFindings: boolean): string {
+  if (!hasFindings) return answer
+  return answer.split('\n', 1)[0]?.trim() || 'I found measured evidence worth checking.'
 }
 
 export type KennSessionTrack = {

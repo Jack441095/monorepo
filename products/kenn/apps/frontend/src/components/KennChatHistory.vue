@@ -39,7 +39,9 @@
           <p v-if="message.role === 'user'" class="chat-message__text">{{ message.text }}</p>
 
           <template v-else>
-            <p v-if="message.text" class="chat-message__text">{{ message.text }}</p>
+            <p v-if="message.text" class="chat-message__text">
+              {{ assistantText(message.text, Boolean(message.findings?.length)) }}
+            </p>
             <ol v-if="message.steps?.length" class="chat-message__list chat-message__list--ordered">
               <li v-for="(step, index) in message.steps" :key="index">{{ step }}</li>
             </ol>
@@ -119,6 +121,7 @@
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useKenn } from '../composables/useKenn'
+import { summarizeAdviceAnswer } from '../api/kenn'
 import KennActionCard from './KennActionCard.vue'
 
 const { t } = useI18n()
@@ -176,6 +179,8 @@ function severityLabel(severity: string) {
   if (severity === 'warning') return 'Check'
   return 'Info'
 }
+
+const assistantText = summarizeAdviceAnswer
 </script>
 
 <style scoped lang="less">
