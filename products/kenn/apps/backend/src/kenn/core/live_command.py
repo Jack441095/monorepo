@@ -66,6 +66,53 @@ LLM_PLAN_FIELDS = frozenset({
 })
 
 
+LLM_PLAN_ACTIONS = frozenset(
+    TRACK_ACTIONS | TRACK_CREATION_ACTIONS | RETURN_TRACK_CREATION_ACTIONS | VIEW_ACTIONS | TRANSPORT_ACTIONS
+    | DEVICE_PARAMETER_ACTIONS | {
+        "inspect_tracks", "inspect_devices", "inspect_device_parameters", "clarify", "insert_device",
+        "insert_device_with_parameter", "duplicate_clip", "rename_clip", "set_send", "add_locator",
+        "remove_locator", "set_eq_band_gain", "set_eq_band_tuning_gain", "recipe",
+    }
+)
+_NULLABLE_INT = {"type": ["integer", "null"]}
+_NULLABLE_STR = {"type": ["string", "null"]}
+_NULLABLE_NUM = {"type": ["number", "null"]}
+
+
+def _plan_field_schema(field: str) -> dict[str, Any]:
+    if field == "value":
+        return {"type": ["number", "boolean", "string", "null"]}
+    if field == "relative":
+        return {"type": "boolean"}
+    if field == "frequency_hz":
+        return _NULLABLE_NUM
+    return _NULLABLE_INT if field.endswith("_index") else _NULLABLE_STR
+
+
+def llm_plan_json_schema() -> dict[str, Any]:
+    """JSON Schema for kenn.ableton_llm_plan.v1, used to constrain decoding.
+
+    Shape only: the schema constant, the allowed actions, field types, and no
+    unknown fields. Which fields each action may carry, and snapshot
+    grounding, stay with validate_llm_plan, which still runs on every plan.
+    (Per-action anyOf branches were tried and made qwen2.5:1.5b pick wrong
+    actions and run past its token cap, so the flat form is deliberate.)
+    """
+    def plan_object(actions: frozenset[str], with_steps: bool) -> dict[str, Any]:
+        properties: dict[str, Any] = {
+            "schema": {"type": "string", "const": LLM_PLAN_SCHEMA},
+            "action": {"type": "string", "enum": sorted(actions)},
+        }
+        for field in sorted(LLM_PLAN_FIELDS - {"schema", "action", "steps"}):
+            properties[field] = _plan_field_schema(field)
+        if with_steps:
+            properties["steps"] = {"type": ["array", "null"], "maxItems": 3,
+                                   "items": plan_object(actions - {"recipe"}, False)}
+        return {"type": "object", "properties": properties, "required": ["schema", "action"],
+                "additionalProperties": False}
+
+    return plan_object(LLM_PLAN_ACTIONS, True)
+
 LLM_COMMAND_SYSTEM_PROMPT = """You are the KENN Ableton command planner.
 Return exactly one JSON object and no prose. You may only describe an action;
 you must never claim that an action was executed.
@@ -191,10 +238,7 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
     if unknown_fields:
         return {"ok": False, "error": "The LLM plan contains unsupported fields: " + ", ".join(unknown_fields[:8])}
     action = _clean_text(plan.get("action"), 64)
-    allowed = TRACK_ACTIONS | TRACK_CREATION_ACTIONS | RETURN_TRACK_CREATION_ACTIONS | VIEW_ACTIONS | TRANSPORT_ACTIONS | DEVICE_PARAMETER_ACTIONS | {
-        "inspect_tracks", "inspect_devices", "inspect_device_parameters", "clarify", "insert_device", "insert_device_with_parameter", "duplicate_clip", "rename_clip", "set_send", "add_locator", "remove_locator", "set_eq_band_gain", "set_eq_band_tuning_gain", "recipe"
-    }
-    if action not in allowed:
+    if action not in LLM_PLAN_ACTIONS:
         return {"ok": False, "error": f"The LLM proposed unsupported Ableton action: {action or 'empty'}."}
     def _present(field: str) -> bool:
         value = plan.get(field)
@@ -794,6 +838,7 @@ def _generate_llm_plan(command: str, snapshot: dict[str, Any]) -> tuple[dict[str
             system_prompt=LLM_COMMAND_SYSTEM_PROMPT,
             answer_mode="command",
             json_mode=True,
+            json_schema=llm_plan_json_schema(),
         )
         candidate = _extract_json_object(content)
         checked = validate_llm_plan(candidate, snapshot)
@@ -817,6 +862,7 @@ def _generate_llm_plan(command: str, snapshot: dict[str, Any]) -> tuple[dict[str
                 system_prompt=LLM_COMMAND_SYSTEM_PROMPT,
                 answer_mode="command",
                 json_mode=True,
+                json_schema=llm_plan_json_schema(),
             )
             repaired_candidate = _extract_json_object(repaired_content)
             repaired_checked = validate_llm_plan(repaired_candidate, snapshot)
