@@ -66,7 +66,9 @@ def answer_live_session_question(
     """Return one grounded, non-mutating session answer when recognized."""
     kind = _question_kind(question)
     if kind is None:
-        return None
+        from kenn.core.live_world_questions import answer_world_question
+
+        return answer_world_question(question, (service or LiveActionService()).client)
 
     live = service or LiveActionService()
     if kind == "change_history":

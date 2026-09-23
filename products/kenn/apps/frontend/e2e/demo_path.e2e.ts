@@ -63,3 +63,9 @@ test('"Pan the Synth center." proposes pan centre and Dismiss changes nothing', 
   await reply.getByRole('button', { name: 'Dismiss' }).click()
   await expect(reply).toContainText('No Changes Made')
 })
+
+test('world-model questions answer returns and parameters in chat', async ({ page }) => {
+  await openKenn(page)
+  await expect(await ask(page, "What's on the A-Reverb return?")).toContainText('Hybrid Reverb')
+  await expect(await ask(page, "What's the threshold on the Drum Bus compressor?")).toContainText('Threshold is')
+})
