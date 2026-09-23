@@ -72,7 +72,7 @@
       <p v-if="proposal.reason" class="kenn-action-card__reason">
         {{ proposal.reason }}
       </p>
-      <p v-if="errorMessage" class="kenn-action-card__error">
+      <p v-if="errorMessage && cardStatus !== 'undo_refused'" class="kenn-action-card__error">
         {{ errorMessage }}
       </p>
     </div>
@@ -134,6 +134,9 @@
           Restored to Original State
         </span>
       </div>
+      <div v-else-if="cardStatus === 'undo_refused'" class="kenn-action-card__applied-group">
+        <span class="kenn-action-card__undone-msg">{{ errorMessage || 'Not undone. Nothing changed.' }}</span>
+      </div>
       <div v-else-if="cardStatus === 'rejected'" class="kenn-action-card__applied-group">
         <span class="kenn-action-card__undone-msg">Proposal Dismissed — No Changes Made</span>
       </div>
@@ -148,7 +151,7 @@ import type { KennActionProposal, KennActionReceipt } from '../api/kenn'
 const props = withDefaults(
   defineProps<{
     proposal: KennActionProposal
-    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'rejected' | 'error'
+    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
     receipt?: KennActionReceipt
     errorMessage?: string
   }>(),
@@ -255,6 +258,8 @@ const statusLabel = computed(() => {
       return 'Undoing...'
     case 'undone':
       return 'Reverted'
+    case 'undo_refused':
+      return 'Live 12 Synced'
     case 'rejected':
       return 'Dismissed'
     case 'error':

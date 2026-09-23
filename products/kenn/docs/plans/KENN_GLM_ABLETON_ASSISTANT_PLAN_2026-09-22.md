@@ -65,13 +65,13 @@ Tick items here in the same commit as the work that completes them.
 - [x] Ten-run non-mutating script gate on the stem-loaded set: 10/10, 130 prompts, slowest 398.6 ms (2026-09-23)
 - [x] UI Apply token mismatch fixed (browser JSON number formatting) (2026-09-23)
 - [x] Chat route sends demo steps 6, 8, 9, 10, 15, 16 to the Live gateway; history scoped to session (2026-09-23)
-- [ ] History labels pan/focus receipts "not undoable" although receipt Undo works (cosmetic, step 11)
-- [ ] Current Project card shows "Focus Track: Kick" and "Key: Major" without root (cosmetic)
+- [x] History undo labels follow the real undo rules (pan/focus now "undoable") (2026-09-23)
+- [x] Current Project card shows the selected track as focus and the full key ("C Major") (2026-09-23)
 - [ ] Chat parser cannot return a pan to centre ("Pan the Synth center.")
-- [ ] Chat undo (step 10) does not mark the step-9 card as undone; its Undo button stays live
-- [ ] A refused stale undo shows a red "Failed" card with an Apply button; should read "Already undone — nothing changed"
-- [ ] Plain statements typed into chat get unrelated knowledge answers (e.g. vocal-depth tips)
-- [ ] Low-end finding shows "43.504 Hz"; round for display
+- [x] Chat undo marks the reverted card "Reverted" and removes its Undo button (2026-09-23)
+- [x] A refused stale undo shows a neutral "Not undone … Nothing changed" note, never Apply (2026-09-23)
+- [ ] Plain statements typed into chat get unrelated knowledge answers: retrieval rates them "high" confidence, so this needs a statement-vs-request check in the chat pipeline (after the demo; runbook forbids typing talk lines)
+- [x] Low-end finding shows whole hertz ("44 Hz") (2026-09-23)
 - [ ] Ten consecutive complete 20-step rehearsals (reset, recovery drill, projector layout, 8–12 min timing): **1/10** (run 1 passed 9m11s, 2026-09-23)
 - [ ] Fix AbletonOSC `get_selected_track` crash when a return/master track is selected
 - [ ] Push local commits (awaiting owner go-ahead; triggers the public mirror)

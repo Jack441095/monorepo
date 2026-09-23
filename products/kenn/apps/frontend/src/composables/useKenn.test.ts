@@ -12,11 +12,13 @@ vi.mock('../api/kenn', () => ({
   }),
 }))
 
-import { askKenn, confirmKennAction } from '../api/kenn'
+import { askKenn, confirmKennAction, fetchKennSessionCard, undoKennAction } from '../api/kenn'
 import { useKenn } from './useKenn'
 
 const mockedAsk = vi.mocked(askKenn)
 const mockedConfirm = vi.mocked(confirmKennAction)
+const mockedUndo = vi.mocked(undoKennAction)
+const mockedSessionCard = vi.mocked(fetchKennSessionCard)
 
 describe('useKenn investor-facing failure states', () => {
   const kenn = useKenn()
@@ -70,5 +72,58 @@ describe('useKenn investor-facing failure states', () => {
 
     expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'rejected' })
     expect(kenn.lastActionAt.value).toBeNull()
+  })
+})
+
+describe('useKenn receipt and project state', () => {
+  const kenn = useKenn()
+
+  beforeEach(() => {
+    kenn.messages.value = []
+    mockedConfirm.mockReset()
+    mockedUndo.mockReset()
+  })
+
+  it('never re-offers Apply when a receipt undo is refused as stale', async () => {
+    kenn.messages.value = [{
+      id: 'eq', role: 'assistant', actionStatus: 'applied',
+      proposal: { action: 'set_device_parameter', track_name: 'Bass' },
+      receipt: { receipt_id: 'receipt-9', action: 'set_device_parameter', status: 'applied', verified: true },
+    }]
+    mockedUndo.mockRejectedValue(new Error('Live device parameter changed since the receipt; undo is stale.'))
+
+    await kenn.undoMessageProposal('eq')
+
+    expect(kenn.messages.value[0]).toMatchObject({
+      actionStatus: 'undo_refused',
+      actionError: 'Not undone: Live has changed since this action (it may already have been undone). Nothing changed.',
+    })
+  })
+
+  it('marks the reverted card undone when a chat undo proposal is applied', async () => {
+    kenn.messages.value = [
+      { id: 'eq', role: 'assistant', actionStatus: 'applied',
+        proposal: { action: 'set_device_parameter', track_name: 'Bass' }, receipt: { receipt_id: 'receipt-9', action: 'set_device_parameter', status: 'applied', verified: true } },
+      { id: 'undo', role: 'assistant', actionStatus: 'pending', undoOfReceiptId: 'receipt-9',
+        proposal: { action: 'set_device_parameter', track_name: 'Bass', confirmation_token: 'token' } },
+    ]
+    mockedConfirm.mockResolvedValue({ ok: true, status: 'applied', receipt: { receipt_id: 'receipt-10', action: 'set_device_parameter', status: 'applied', verified: true } })
+
+    await kenn.applyMessageProposal('undo')
+
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'undone' })
+    expect(kenn.messages.value[1]).toMatchObject({ actionStatus: 'applied' })
+  })
+
+  it('shows the selected track as focus and the full Live key', async () => {
+    mockedSessionCard.mockResolvedValueOnce({
+      ok: true, status: 'connected',
+      tracks: [{ index: 0, name: 'Kick' }, { index: 3, name: 'Drum Bus', devices: [{ name: 'Compressor' }] }],
+      raw: { session: { tempo: 120, root_note: 0, scale_name: 'Major', selected_track_index: 3 } },
+    })
+
+    await kenn.refreshSessionCard()
+
+    expect(kenn.project.value).toMatchObject({ focusTrack: 'Drum Bus', key: 'C Major', effects: ['Compressor'] })
   })
 })
