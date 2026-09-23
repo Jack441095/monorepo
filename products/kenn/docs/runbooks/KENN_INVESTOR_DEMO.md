@@ -4,6 +4,10 @@ This is the canonical operator script for the investor demo. It preserves
 KENN's proposal, confirmation, readback, receipt, and exact-undo boundary.
 Do not improvise mutation commands during a live showing.
 
+Review `KENN_INVESTOR_FAQ.md` before the showing and use its shipped-versus-
+roadmap answers for audience discussion. Do not type off-script mutation
+requests into the live demo.
+
 ## Qualification status
 
 The checked-in topology fixture, full preflight, and a bounded two-step Live
