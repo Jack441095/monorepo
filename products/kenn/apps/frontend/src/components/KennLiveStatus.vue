@@ -57,7 +57,7 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     gap: 0.07rem;
-    font-size: 0.12rem;
+    font-size: 0.13rem;
 
     button {
       margin-left: auto;
@@ -66,7 +66,7 @@ onBeforeUnmount(() => {
       background: transparent;
       color: var(--muted-text);
       font: inherit;
-      font-size: 0.1rem;
+      font-size: 0.11rem;
       cursor: pointer;
     }
   }
@@ -94,7 +94,7 @@ onBeforeUnmount(() => {
       min-width: 0;
       overflow: hidden;
       color: var(--text-color);
-      font-size: 0.11rem;
+      font-size: 0.12rem;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -103,7 +103,7 @@ onBeforeUnmount(() => {
       display: block;
       margin-bottom: 0.015rem;
       color: var(--muted-text);
-      font-size: 0.085rem;
+      font-size: 0.095rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }

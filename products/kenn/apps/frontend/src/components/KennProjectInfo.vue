@@ -108,7 +108,7 @@ const metaFields = computed(() => [
   }
 
   &__title {
-    font-size: 0.14rem;
+    font-size: 0.15rem;
     font-weight: 600;
     line-height: 1.2;
   }
@@ -136,7 +136,7 @@ const metaFields = computed(() => [
 
   &__hint {
     margin: 0;
-    font-size: 0.11rem;
+    font-size: 0.12rem;
     line-height: 1.35;
     color: var(--muted-text);
   }
@@ -153,7 +153,7 @@ const metaFields = computed(() => [
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.12rem;
-    font-size: 0.11rem;
+    font-size: 0.12rem;
     line-height: 1.35;
 
     dt {
@@ -178,7 +178,7 @@ const metaFields = computed(() => [
 
   &__section-title {
     margin: 0;
-    font-size: 0.11rem;
+    font-size: 0.12rem;
     font-weight: 600;
     color: var(--muted-text);
   }
@@ -193,7 +193,7 @@ const metaFields = computed(() => [
     padding: 0.04rem 0.08rem;
     border-radius: 0.06rem;
     background: var(--file-card-bg);
-    font-size: 0.11rem;
+    font-size: 0.12rem;
     line-height: 1.3;
     color: var(--text-color);
   }
@@ -201,7 +201,7 @@ const metaFields = computed(() => [
   &__list {
     margin: 0;
     padding-left: 0.16rem;
-    font-size: 0.11rem;
+    font-size: 0.12rem;
     line-height: 1.35;
     color: var(--text-color);
 

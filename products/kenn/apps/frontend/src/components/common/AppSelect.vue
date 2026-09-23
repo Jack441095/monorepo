@@ -309,11 +309,11 @@ onBeforeUnmount(() => {
   transition: background-color 0.15s;
 
   &:hover {
-    background: #f3f4f6;
+    background: var(--workspace-panel-muted);
   }
 
   &--active {
-    background: #f3f4f6;
+    background: var(--workspace-panel-muted);
     font-weight: 600;
   }
 }

@@ -80,7 +80,9 @@ function draw() {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-  ctx.fillStyle = '#f3f5f8'
+  ctx.fillStyle = getComputedStyle(parent || canvas)
+    .getPropertyValue('--workspace-panel-muted')
+    .trim() || '#f3f5f8'
   ctx.fillRect(0, 0, cssW, cssH)
   if (!props.peaks?.length) return
   drawWaveform(ctx, props.peaks, cssW, cssH)
@@ -106,7 +108,7 @@ watch(() => props.peaks, () => draw())
   height: 100%;
   min-height: 1.8rem;
   box-sizing: border-box;
-  background: #f3f5f8;
+  background: var(--workspace-panel-muted);
   border-radius: 0.08rem;
   overflow: hidden;
 

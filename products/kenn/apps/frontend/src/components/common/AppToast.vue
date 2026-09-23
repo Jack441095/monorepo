@@ -38,12 +38,12 @@ const { toasts } = useToastState()
   max-width: min(92vw, 4.8rem);
   padding: 0.1rem 0.18rem;
   border-radius: 0.08rem;
-  border: 1px solid var(--floating-border);
-  background: #fff;
+  border: 1px solid var(--toast-border);
+  background: var(--toast-bg);
   color: var(--text-color);
   font-size: 0.14rem;
   line-height: 1.4;
-  box-shadow: 0 0.1rem 0.28rem rgba(15, 23, 42, 0.14);
+  box-shadow: var(--toast-shadow);
   pointer-events: none;
 
   &[data-type='success'] {

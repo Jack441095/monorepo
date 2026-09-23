@@ -5,25 +5,25 @@
         type="button"
         class="kenn-quick-chip"
         :disabled="disabled"
-        @click="emit('send', 'add EQ 8 to channel 4')"
+        @click="emit('send', 'How many tracks do I have?')"
       >
-        <span class="kenn-chip-icon">⚡</span> add EQ 8 to channel 4
+        <span class="kenn-chip-icon">◉</span> Session count
       </button>
       <button
         type="button"
         class="kenn-quick-chip"
         :disabled="disabled"
-        @click="emit('send', 'What curve works best for 808s?')"
+        @click="emit('send', 'How does my low end sound?')"
       >
-        <span class="kenn-chip-icon">🎛️</span> 808 Curve
+        <span class="kenn-chip-icon">◒</span> Check low end
       </button>
       <button
         type="button"
         class="kenn-quick-chip"
         :disabled="disabled"
-        @click="emit('send', 'Check mix headroom and master bus')"
+        @click="emit('send', 'What did you change?')"
       >
-        <span class="kenn-chip-icon">📊</span> Mix Headroom
+        <span class="kenn-chip-icon">↶</span> Change history
       </button>
     </div>
     <div class="kenn-chat-input">
@@ -107,7 +107,7 @@ const onSend = () => {
   align-items: center;
   gap: 0.04rem;
   padding: 0.05rem 0.1rem;
-  font-size: 0.11rem;
+  font-size: 0.12rem;
   font-weight: 600;
   color: #3b82f6;
   background: rgba(59, 130, 246, 0.08);
@@ -129,7 +129,7 @@ const onSend = () => {
   }
 
   .kenn-chip-icon {
-    font-size: 0.11rem;
+    font-size: 0.12rem;
   }
 }
 
@@ -153,7 +153,7 @@ const onSend = () => {
     background: var(--input-bg);
     color: var(--input-text);
     box-shadow: var(--input-shadow);
-    font-size: 0.14rem;
+    font-size: 0.15rem;
     outline: none;
     transition: border-color 0.2s ease;
 

@@ -538,10 +538,10 @@ defineExpose({
   flex-direction: column;
   margin: 0;
   padding:0 0.12rem 0.12rem;
-  background: #fff;
+  background: var(--workspace-panel);
   border: 1px solid var(--floating-border);
   border-radius: 0.1rem;
-  box-shadow: 0 0.16rem 0.48rem rgba(15, 23, 42, 0.18);
+  box-shadow: var(--toast-shadow);
   overflow: hidden;
   pointer-events: auto;
   outline: none;
@@ -553,8 +553,8 @@ defineExpose({
     justify-content: space-between;
     gap: 0.1rem;
     padding: 0.08rem 0.08rem 0.08rem 0.12rem;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-    background: #fff;
+    border-bottom: 1px solid var(--floating-border);
+    background: var(--workspace-panel);
     cursor: grab;
     user-select: none;
     strong {
@@ -580,7 +580,7 @@ defineExpose({
     line-height: 1;
     cursor: pointer;
     &:hover {
-      background: #f3f4f6;
+      background: var(--workspace-panel-muted);
       color: var(--text-color);
     }
   }
