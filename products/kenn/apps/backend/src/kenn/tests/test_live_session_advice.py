@@ -216,3 +216,22 @@ def test_vocal_capture_is_used_for_vocal_clipping_request(monkeypatch: pytest.Mo
     assert result["analysis_scope"] == "vocal"
     assert result["findings"][0]["type"] == "clipping"
     assert "isolated vocal capture" in result["answer"]
+
+
+def test_audio_advice_reports_loudness_and_flags_true_peak_over_ceiling() -> None:
+    from kenn.core.live_session_advice import _audio_advice
+
+    analysis = {"ok": True, "findings": [{"type": "clipping", "severity": "high", "confidence": 0.95,
+                                           "explanation": "x", "suggested_listening_test": "y"}],
+                "loudness": {"integrated_lufs": -9.2, "true_peak_dbtp": 0.4, "loudness_range_lu": 5.0}}
+    result = _audio_advice(analysis, scope="vocal")
+    assert [f["type"] for f in result["findings"]] == ["clipping", "true_peak_over_ceiling"]
+    assert "Loudness: -9.2 LUFS integrated, true peak +0.4 dBTP, loudness range 5.0 LU." in result["answer"]
+
+
+def test_audio_advice_skips_true_peak_finding_under_the_ceiling() -> None:
+    from kenn.core.live_session_advice import _audio_advice
+
+    analysis = {"ok": True, "findings": [], "metrics": {}, "loudness": {"integrated_lufs": -14.0, "true_peak_dbtp": -1.5}}
+    result = _audio_advice(analysis, scope="mix")
+    assert result["findings"] == [] and "true peak -1.5 dBTP" in result["answer"]

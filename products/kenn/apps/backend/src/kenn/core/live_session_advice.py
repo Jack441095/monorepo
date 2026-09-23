@@ -36,6 +36,12 @@ def _analyze_cached(payload: bytes, *, filename: str) -> tuple[dict[str, Any], s
         include_pink_noise_reference=True,
     )
     if isinstance(analysis, dict) and analysis.get("ok"):
+        try:
+            from kenn.core.loudness_analysis import measure_loudness
+
+            analysis["loudness"] = measure_loudness(payload)
+        except Exception as exc:  # loudness is supplementary; never lose the core analysis
+            analysis["loudness"] = {"error": str(exc)[:200]}
         with _ANALYSIS_CACHE_LOCK:
             _ANALYSIS_CACHE[key] = deepcopy(analysis)
             _ANALYSIS_CACHE.move_to_end(key)
@@ -140,10 +146,46 @@ def _low_end_finding(analysis: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+# Most streaming platforms recommend a -1 dBTP ceiling so lossy encoding
+# does not create inter-sample clipping.
+TRUE_PEAK_CEILING_DBTP = -1.0
+
+
+def _true_peak_finding(analysis: dict[str, Any]) -> dict[str, Any] | None:
+    loudness = analysis.get("loudness") if isinstance(analysis.get("loudness"), dict) else {}
+    peak = loudness.get("true_peak_dbtp")
+    if not isinstance(peak, (int, float)) or peak <= TRUE_PEAK_CEILING_DBTP:
+        return None
+    return {
+        "type": "true_peak_over_ceiling",
+        "severity": "medium",
+        "confidence": 0.9,
+        "evidence": {"true_peak_dbtp": peak, "ceiling_dbtp": TRUE_PEAK_CEILING_DBTP,
+                     "integrated_lufs": loudness.get("integrated_lufs")},
+        "explanation": (f"True peak is {peak:+.1f} dBTP, above the {TRUE_PEAK_CEILING_DBTP:.0f} dBTP ceiling most "
+                        "streaming services recommend, so lossy encoding can add clipping."),
+        "suggested_listening_test": "Check the loudest passage on a true-peak meter and compare a limiter ceiling of -1 dBTP at matched loudness.",
+    }
+
+
+def _loudness_line(loudness: Any) -> str:
+    if not isinstance(loudness, dict) or loudness.get("integrated_lufs") is None:
+        return ""
+    parts = [f"{loudness['integrated_lufs']:.1f} LUFS integrated"]
+    if loudness.get("true_peak_dbtp") is not None:
+        parts.append(f"true peak {loudness['true_peak_dbtp']:+.1f} dBTP")
+    if loudness.get("loudness_range_lu") is not None:
+        parts.append(f"loudness range {loudness['loudness_range_lu']:.1f} LU")
+    return "Loudness: " + ", ".join(parts) + "."
+
+
 def _audio_advice(analysis: dict[str, Any], *, scope: str) -> dict[str, Any] | None:
     if not analysis.get("ok"):
         return None
     findings = [dict(item) for item in analysis.get("findings") or [] if isinstance(item, dict)]
+    true_peak = _true_peak_finding(analysis)
+    if true_peak is not None:
+        findings.append(true_peak)
     if scope == "low_end":
         low_end = _low_end_finding(analysis)
         if low_end is not None:
@@ -166,10 +208,14 @@ def _audio_advice(analysis: dict[str, Any], *, scope: str) -> dict[str, Any] | N
             f"Measured sample peak: {metrics.get('sample_peak_dbfs', 'unavailable')} dBFS; RMS: {metrics.get('rms_dbfs', 'unavailable')} dBFS.",
             "Level-match, check the densest section in mono, and treat this as evidence rather than a quality score.",
         ]
+    loudness_line = _loudness_line(analysis.get("loudness"))
+    if loudness_line:
+        lines.append(loudness_line)
     return {
         "schema": "kenn.ableton_mix_advice.v1",
         "status": "inspected",
         "advice_mode": "audio_analysis",
+        "loudness": analysis.get("loudness") or {},
         "answer": "\n".join(lines),
         "findings": findings,
         "metrics": analysis.get("metrics") or {},

@@ -95,7 +95,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 ## Phase E — Listening and analysis
 
 - [ ] **E1 Live capture path:** design chosen and proven (resample track, Max for Live device, or loopback; licence-checked)
-- [ ] **E2 Measurements:** LUFS-I/S/M and LRA (pyloudnorm); true peak (pyebur128); key and tempo (librosa)
+- [x] **E2 Measurements:** LUFS-I/S/M and LRA (pyloudnorm); true peak; key and tempo (librosa) — 2026-09-23
+  > `core/loudness_analysis.py`: BS.1770 loudness, EBU 3342 LRA (approximate), 4x-oversampled true peak via scipy (pyebur128 not installed), key via chroma + Krumhansl-Kessler with the relative key always reported, librosa tempo. Mix advice now ends with a loudness line and flags true peak above −1 dBTP; results cached by content hash with the core analysis (preflight warms it). Demo mix: −11.7 LUFS-I, −0.06 dBTP, LRA 6.5 LU, 119.7 BPM, key F major / relative D minor (composed in D minor). Key/tempo are not yet surfaced in chat. Licences recorded in `docs/research/THIRD_PARTY_LICENCES.md`.
 - [ ] **E3 Per-track capture and masking collision map** with confidence
 - [ ] **E4 Stem separation evaluation** (Demucs; weight licence verified first)
 - [ ] **E5 Advice → action:** every finding has a "Fix it" plan, plus a before-and-after re-measure
@@ -156,4 +157,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | B1 world model (code): returns/master/racks/automation-state reads, world-model route | `e5d4b21` | 4 new tests; fake-backed route smoke |
 | 2026-09-23 | B3 world-model questions (code) | `df88e4f` | 13 unit tests; Playwright 8/8 |
 | 2026-09-23 | B2 versioned world state + receipt invalidation | `030593f` | 4 new tests; backend 1,479 |
-| 2026-09-23 | C1 schema-constrained planner decoding; bake-off harness; 100 candidate phrasings | (this commit) | 4 new tests; bake-off running |
+| 2026-09-23 | C1 schema-constrained planner decoding; bake-off harness; 100 candidate phrasings | `1e99d99` | 4 new tests; bake-off running |
+| 2026-09-23 | E2 loudness, true peak, LRA, key/tempo estimates; licence register | (this commit) | 6 new tests; chat gate on fake 1/1 incl. steps 12–13 |
