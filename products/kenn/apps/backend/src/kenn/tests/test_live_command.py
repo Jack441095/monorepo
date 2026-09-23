@@ -627,6 +627,62 @@ def test_other_one_requires_an_exact_identity_through_the_gateway() -> None:
     assert fake.writes == []
 
 
+def test_contextual_louder_request_names_track_and_requires_absolute_value() -> None:
+    fake = FakeLive()
+    service = _service(fake)
+    session_id = "command-contextual-louder"
+
+    first = handle_command(
+        "mute the Bass",
+        session_id=session_id,
+        service=service,
+        allow_llm=False,
+    )
+    result = handle_command(
+        "make it louder",
+        session_id=session_id,
+        service=service,
+        allow_llm=False,
+    )
+
+    assert first["status"] == "confirmation_required"
+    assert result["status"] == "clarification_required"
+    assert result["changed"] is False
+    assert result["context_resolution"]["resolution"] == "contextual_direction_requires_value"
+    assert result["intent"]["track"]["name"] == "Bass"
+    assert result["intent"]["missing_fields"] == ["exact_absolute_value"]
+    assert "resolved this to Bass" in result["answer"]
+    assert "set Bass volume to -6 dB" in result["answer"]
+    assert "nothing changed" in result["answer"]
+    assert "proposal" not in result
+    assert fake.writes == []
+
+
+def test_contextual_relative_fader_request_is_not_guessed_or_written() -> None:
+    fake = FakeLive()
+    service = _service(fake)
+    session_id = "command-contextual-relative-fader"
+
+    handle_command(
+        "mute the Bass",
+        session_id=session_id,
+        service=service,
+        allow_llm=False,
+    )
+    result = handle_command(
+        "make it softer by 3 dB",
+        session_id=session_id,
+        service=service,
+        allow_llm=False,
+    )
+
+    assert result["status"] == "clarification_required"
+    assert result["context_resolution"]["relative_amount_provided"] is True
+    assert "relative louder/softer fader moves are not yet qualified" in result["answer"]
+    assert "proposal" not in result
+    assert fake.writes == []
+
+
 def test_solo_and_analyze_never_silently_degrades_to_solo_only() -> None:
     fake = FakeLive()
 
