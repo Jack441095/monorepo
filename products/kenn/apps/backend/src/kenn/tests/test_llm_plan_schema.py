@@ -91,3 +91,16 @@ def test_parsed_reply_gets_the_schema_constant_but_a_wrong_one_is_kept() -> None
     assert _stamp_plan_schema({"action": "set_mute"})["schema"] == LLM_PLAN_SCHEMA
     assert _stamp_plan_schema({"schema": "other", "action": "set_mute"})["schema"] == "other"
     assert _stamp_plan_schema(None) is None
+
+
+def test_compact_planner_prompt_is_opt_in_and_much_shorter(monkeypatch) -> None:
+    from kenn.core.live_command import (
+        LLM_COMMAND_SYSTEM_PROMPT, LLM_COMMAND_SYSTEM_PROMPT_COMPACT, planner_system_prompt,
+    )
+
+    monkeypatch.delenv("KENN_LLM_COMMAND_PROMPT", raising=False)
+    assert planner_system_prompt() == LLM_COMMAND_SYSTEM_PROMPT
+    monkeypatch.setenv("KENN_LLM_COMMAND_PROMPT", "compact")
+    assert planner_system_prompt() == LLM_COMMAND_SYSTEM_PROMPT_COMPACT
+    assert len(LLM_COMMAND_SYSTEM_PROMPT_COMPACT) * 8 < len(LLM_COMMAND_SYSTEM_PROMPT)
+    assert '"clarify"' in LLM_COMMAND_SYSTEM_PROMPT_COMPACT and "never guess" in LLM_COMMAND_SYSTEM_PROMPT_COMPACT

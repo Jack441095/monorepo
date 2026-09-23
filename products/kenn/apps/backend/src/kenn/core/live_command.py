@@ -204,6 +204,25 @@ display values; use action=clarify when the requested step is not listed.
 Use the corresponding exact values from the supplied snapshot, never the
 example's values when they differ."""
 
+# For a planner fine-tuned on KENN's corpus (C6), which learned the contract
+# from examples. The full prompt is 1,341 tokens (70% of a request); this one
+# cuts a request ~3x, so the Mac processes ~3x less prompt per command and a
+# LoRA fits in 16 GB. Opt in with KENN_LLM_COMMAND_PROMPT=compact; the
+# validator and the confirm/readback chain are unchanged.
+LLM_COMMAND_SYSTEM_PROMPT_COMPACT = """You are the KENN Ableton command planner.
+Return exactly one kenn.ableton_llm_plan.v1 JSON object and no prose. Only
+describe an action; never claim it was executed. Use exact track, device and
+parameter names and indices from the snapshot. If the request is vague, has no
+amount, names no clear target, or is unsupported, return action "clarify" with
+a short question; never guess."""
+
+
+def planner_system_prompt() -> str:
+    """The planner's system prompt: full by default, compact for a fine-tuned model."""
+    if os.getenv("KENN_LLM_COMMAND_PROMPT", "").strip().lower() == "compact":
+        return LLM_COMMAND_SYSTEM_PROMPT_COMPACT
+    return LLM_COMMAND_SYSTEM_PROMPT
+
 
 def _clean_text(value: Any, limit: int = 256) -> str:
     return " ".join(str(value or "").split())[:limit]
@@ -852,7 +871,7 @@ def _generate_llm_plan(command: str, snapshot: dict[str, Any]) -> tuple[dict[str
         content, usage = _chat_completion(
             [{"role": "user", "content": prompt}],
             task="command",
-            system_prompt=LLM_COMMAND_SYSTEM_PROMPT,
+            system_prompt=planner_system_prompt(),
             answer_mode="command",
             json_mode=True,
             json_schema=llm_plan_json_schema(),
@@ -876,7 +895,7 @@ def _generate_llm_plan(command: str, snapshot: dict[str, Any]) -> tuple[dict[str
             repaired_content, repair_usage = _chat_completion(
                 [{"role": "user", "content": repair_prompt}],
                 task="command",
-                system_prompt=LLM_COMMAND_SYSTEM_PROMPT,
+                system_prompt=planner_system_prompt(),
                 answer_mode="command",
                 json_mode=True,
                 json_schema=llm_plan_json_schema(),

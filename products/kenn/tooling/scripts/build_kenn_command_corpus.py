@@ -297,10 +297,15 @@ def _scenario_seed(seed: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, 
     return variant
 
 
-def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = False) -> list[dict[str, Any]]:
+def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = False,
+               prompt: str = "full") -> list[dict[str, Any]]:
     from build_kenn_command_training import _plan, evaluation_queries, normalize_query, plan_target, records
     from drafted_command_seeds import drafted_records
-    from kenn.core.live_command import LLM_COMMAND_SYSTEM_PROMPT, planner_user_prompt, validate_llm_plan
+    from kenn.core.live_command import (
+        LLM_COMMAND_SYSTEM_PROMPT, LLM_COMMAND_SYSTEM_PROMPT_COMPACT, planner_user_prompt, validate_llm_plan,
+    )
+
+    system_prompt = {"full": LLM_COMMAND_SYSTEM_PROMPT, "compact": LLM_COMMAND_SYSTEM_PROMPT_COMPACT}[prompt]
 
     if scenarios < 1 or scenarios > len(SCENARIO_TRACK_NAMES):
         raise ValueError(f"scenarios must be between 1 and {len(SCENARIO_TRACK_NAMES)}")
@@ -331,7 +336,7 @@ def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = Fal
                     "category": seed["category"],
                     "query": query,
                     "messages": [
-                        {"role": "system", "content": LLM_COMMAND_SYSTEM_PROMPT},
+                        {"role": "system", "content": system_prompt},
                         # Same user turn as production; the schema constant is stamped by KENN.
                         {"role": "user", "content": planner_user_prompt(query, snapshot_text)},
                         {"role": "assistant", "content": plan_target(label)},
@@ -347,9 +352,12 @@ def main() -> int:
     parser.add_argument("--scenarios", type=int, default=1, help="Distinct synthetic track-name snapshots to include (1-4)")
     parser.add_argument("--include-drafted", action="store_true",
                         help="add the drafted clarify seeds (drafted_command_seeds.py; owner review pending)")
+    parser.add_argument("--prompt", choices=("full", "compact"), default="full",
+                        help="system prompt in each record; 'compact' for a fine-tune served with KENN_LLM_COMMAND_PROMPT=compact")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
-    rows = build_rows(variants=args.variants, scenarios=args.scenarios, include_drafted=args.include_drafted)
+    rows = build_rows(variants=args.variants, scenarios=args.scenarios, include_drafted=args.include_drafted,
+                      prompt=args.prompt)
     from build_kenn_command_training import assert_no_holdout_overlap
 
     assert_no_holdout_overlap(rows)
@@ -363,6 +371,7 @@ def main() -> int:
         "scenarios": args.scenarios,
         "variants_per_seed": args.variants,
         "drafted_seeds_included": args.include_drafted,
+        "system_prompt": args.prompt,
         "output": str(output),
         "holdout_protection": "passed",
         "evidence_kind": "synthetic_training_data",
