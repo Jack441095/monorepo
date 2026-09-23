@@ -39,7 +39,8 @@ copy and the full run passes the rehearsal gate.
       SHA-256). Ignore the earlier `KENN_Live12_Demo_Rehearsal Project/`; it
       holds the abandoned hand-edited attempt with wrong names and missing devices.
 - [x] Ten-run non-mutating script gate: 10/10 on the saved stem-loaded set, slowest 398.6 ms
-- [ ] Ten consecutive complete 20-step rehearsals
+- [ ] Ten consecutive complete 20-step rehearsals (record each in
+      `docs/evidence/KENN_INVESTOR_DEMO_REHEARSAL_LOG.md`)
 
 ## Before the room opens
 
