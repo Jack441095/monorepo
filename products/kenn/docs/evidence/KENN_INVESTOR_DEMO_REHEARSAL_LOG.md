@@ -1,0 +1,49 @@
+# KENN Investor Demo — Rehearsal Log
+
+Gate: **ten consecutive** runs of all 20 steps in `docs/runbooks/KENN_INVESTOR_DEMO.md`,
+each 8–12 minutes, no raw errors, no stale or failed readback. Any failed run
+resets the count to zero; keep the failed row and note the cause.
+
+Reset point: `.runtime/investor-demo-audio/KENN_Live12_Demo_RESET Project/`
+(read-only). Rehearse in `KENN_Live12_Demo_Rehearsal-1 Project/`.
+
+## Runs
+
+| # | Date | Start | End | Mins | Steps passed /20 | Failed step + cause | Recovery drill | Projector | Pass |
+|---|------|-------|-----|------|------------------|---------------------|----------------|-----------|------|
+| 1 |  |  |  |  |  |  |  |  | [ ] |
+| 2 |  |  |  |  |  |  |  |  | [ ] |
+| 3 |  |  |  |  |  |  |  |  | [ ] |
+| 4 |  |  |  |  |  |  |  |  | [ ] |
+| 5 |  |  |  |  |  |  |  |  | [ ] |
+| 6 |  |  |  |  |  |  |  |  | [ ] |
+| 7 |  |  |  |  |  |  |  |  | [ ] |
+| 8 |  |  |  |  |  |  |  |  | [ ] |
+| 9 |  |  |  |  |  |  |  |  | [ ] |
+| 10 |  |  |  |  |  |  |  |  | [ ] |
+
+At least one of the ten runs must include the recovery drill, and at least one
+must be on the actual projector or large display.
+
+## Recovery drill (do once, inside a run)
+
+Between steps 7 and 8, stop the KENN companion (Ctrl-C in its terminal), ask
+`What's selected?`, and confirm KENN shows a plain-English connection message
+with no stack trace. Restart the companion, run `demo_preflight.py`, then
+continue from step 8. Note the seconds from restart to usable.
+
+## Step checklist (copy per run if useful)
+
+- [ ] 1 Live set + KENN connected status shown
+- [ ] 2 Track count · [ ] 3 Selected (Drum Bus) · [ ] 4 Describe · [ ] 5 Duplicates
+- [ ] 6 Compressor Output +3 dB on track 7, confirmed, readback shown
+- [ ] 7 Synth hard left, confirmed
+- [ ] 8 Focus EQ Eight on track 5, confirmed
+- [ ] 9 +3 dB at 200 Hz, band 2A, confirmed
+- [ ] 10 Undo, exact value restored
+- [ ] 11 "What did you change?" history shown
+- [ ] 12 Low end · [ ] 13 Vocal clipping · [ ] 14 Advice panel shown
+- [ ] 15 Delete refused · [ ] 16 Master max refused (not confirmed)
+- [ ] 17 Pending proposal token explained · [ ] 18 Receipt journal shown
+- [ ] 19 Receipt Undo + readback verified
+- [ ] 20 Roadmap narration (labelled as roadmap)
