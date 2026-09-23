@@ -7,6 +7,8 @@ resets the count to zero; keep the failed row and note the cause.
 Reset point: `.runtime/investor-demo-audio/KENN_Live12_Demo_RESET Project/`
 (read-only). Rehearse in `KENN_Live12_Demo_Rehearsal-1 Project/`.
 
+UI: **http://127.0.0.1:8090/**. KENN's panel must read "Live connected" with 8 tracks before step 1.
+
 ## Runs
 
 | # | Date | Start | End | Mins | Steps passed /20 | Failed step + cause | Recovery drill | Projector | Pass |
