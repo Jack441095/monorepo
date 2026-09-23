@@ -1,3 +1,6 @@
+import json
+import os
+
 import Live
 from typing import Tuple
 from .handler import AbletonOSCHandler
@@ -11,6 +14,19 @@ class ApplicationHandler(AbletonOSCHandler):
             application = Live.Application.get_application()
             return application.get_major_version(), application.get_minor_version()
         self.osc_server.add_handler("/live/application/get/version", get_version)
+
+        def get_kenn_version(_) -> Tuple:
+            # Written by KENN's deploy tool next to this module; read on every
+            # call so a hot reload or re-deploy is reflected immediately.
+            stamp_path = os.path.join(os.path.dirname(__file__), "kenn_deploy_stamp.json")
+            try:
+                with open(stamp_path, "r", encoding="utf-8") as handle:
+                    stamp = json.load(handle)
+            except (OSError, ValueError):
+                return ("unstamped", "", "")
+            return (str(stamp.get("content_hash", "")), str(stamp.get("git_commit", "")),
+                    str(stamp.get("deployed_at", "")))
+        self.osc_server.add_handler("/live/kenn/version", get_kenn_version)
         self.osc_server.send("/live/startup")
 
         def get_average_process_usage(_) -> Tuple:

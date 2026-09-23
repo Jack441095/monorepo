@@ -15,7 +15,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 ## Waiting on owner
 
 - [ ] Demo rehearsals 2–10: owner-run, see `docs/evidence/KENN_INVESTOR_DEMO_REHEARSAL_LOG.md`
-- [ ] Restart Live once A3 deploys the updated AbletonOSC, so A2's return/master selection fix can be proven
+- [ ] Say when Live is free, so I can run `deploy_abletonosc.py --apply --reload` (hot reload, no restart needed) and prove A2's selection fix and A3 on real Live
 
 ## Phase A — Harden the foundation
 
@@ -36,9 +36,9 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [x] "Pan the Synth center." proposes pan 0 (5 phrasings; centre frequency excluded; verified on real Live, 2026-09-23)
   - [x] Statement-versus-request stage before retrieval: narration about KENN and typed card labels get short replies; problem statements and topics still reach chat (verified on real Live, 2026-09-23)
   - [x] Simulated voice removed: the unreachable `process_audio_features` fake is deleted and the module is documented as text-only (2026-09-23)
-- [ ] **A3 Remote Script deploy tool**
-  - [ ] `tooling/scripts/deploy_abletonosc.py`: diff, back up, copy, version stamp
-  - [ ] `/live/kenn/version` endpoint; preflight fails on a stale script
+- [ ] **A3 Remote Script deploy tool** (code done; first real deploy pending)
+  - [x] `tooling/scripts/deploy_abletonosc.py`: plan by default; `--apply` backs up, copies, stamps; `--reload` hot-reloads via `/live/api/reload` and flags files that still need a restart (2026-09-23)
+  - [x] `/live/kenn/version` endpoint (reloadable `application.py`), `/api/ableton/remote-script` route, and a `remote_script` preflight check that fails on a stale or unstamped script (2026-09-23). **First real deploy + reload waits for Live to be free.**
 - [ ] **A4 Demo gate 10/10** (owner-run; fix whatever it surfaces)
 
 ## Phase B — Live world model
@@ -145,4 +145,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 |---|---|---|---|
 | 2026-09-23 | Tracker created from the build prompt | — | — |
 | 2026-09-23 | A1 UI-path harness: fake Live backend, chat-route gate, Playwright E2E | `683bb39` | `KENN_A1_UI_PATH_HARNESS_2026-09-23.md` |
-| 2026-09-23 | A2 defects: selection fix (code), pan centre, statement classifier, voice fake removed | (this commit) | tests + real-Live chat probes; 7/7 Playwright |
+| 2026-09-23 | A2 defects: selection fix (code), pan centre, statement classifier, voice fake removed | `241abff` | tests + real-Live chat probes; 7/7 Playwright |
+| 2026-09-23 | A3 deploy tool, version endpoint, stale-script preflight check | (this commit) | 11 new tests; plan shows only view.py + application.py differ (both hot-reloadable) |

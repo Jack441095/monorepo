@@ -1330,6 +1330,14 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self.send_json(500, {"ok": False, "status": "error", "error": "Ableton client not available"})
             return
+        if parsed.path in {"/api/ableton/remote-script", "/kenn/api/ableton/remote-script"}:
+            try:
+                from kenn.ableton_osc_bridge import live_client
+                version = live_client.get_remote_script_version()
+                self.send_json(200 if version.get("success") else 503, version)
+            except Exception as exc:
+                self.send_json(503, {"success": False, "error": str(exc)})
+            return
         if parsed.path == "/api/ableton/osc/session":
             try:
                 from kenn.ableton_osc_bridge import live_client
