@@ -1197,6 +1197,34 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
     if kind == "device_setup":
         before_devices = ", ".join(item.get("name", "") for item in proposal.get("before_devices", []) if isinstance(item, dict)) or "no devices"
         after_devices = ", ".join(item.get("name", "") for item in proposal.get("after_devices", []) if isinstance(item, dict)) or "no devices"
+        parameter_specs = proposal.get("parameter_specs")
+        if isinstance(parameter_specs, list):
+            def control_text(item: dict[str, Any]) -> str:
+                if item.get("unit") == "boolean":
+                    return f"{item.get('name', 'control')} on"
+                return f"{item.get('name', 'control')} to {float(item.get('display_value', 0.0)):g} {item.get('unit', '')}".rstrip()
+
+            controls = ", ".join(
+                control_text(item)
+                for item in parameter_specs if isinstance(item, dict)
+            )
+            response.update({
+                "status": "confirmation_required",
+                "answer": (
+                    f"I can append {proposal.get('device_name', 'the device')} to '{target}' and set {controls} "
+                    f"(current devices: {before_devices}; after: {after_devices}). Nothing has changed. "
+                    "Confirm this exact proposal to apply the complete setup with per-control readback verification."
+                ),
+                "proposal": proposal,
+                "confirmation_required": True,
+                "proposal_kind": kind,
+                "intent": {
+                    "action": proposal.get("operation"), "track": target,
+                    "device": proposal.get("device_name"), "eq_band": proposal.get("eq_band"),
+                    "parameters": parameter_specs,
+                },
+            })
+            return response
         parameter_value = float(proposal.get("parameter_display_value", 0.0))
         parameter_unit = str(proposal.get("parameter_unit", "")).strip()
         parameter_display = f"{parameter_value:g}{parameter_unit}" if parameter_unit == "%" else f"{parameter_value:g} {parameter_unit}".rstrip()
@@ -2593,7 +2621,7 @@ def _handle_command_impl(
         return _proposal_response(response, result["proposal"], kind="clip_rename") if result.get("ok") else _clarification(response, intent, result.get("error", "I could not create a safe clip-rename proposal."))
 
     track = _track_by_index(snapshot, int((intent.get("track") or {}).get("index")), str((intent.get("track") or {}).get("name", ""))) if intent.get("track") else None
-    if action in {"inspect_devices", "inspect_device_parameters", "set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "rename_track", "focus_track", "focus_device", "set_device_parameter", "set_eq_band_gain", "set_eq_band_tuning_gain", "insert_device", "insert_device_with_parameter"} and track is None:
+    if action in {"inspect_devices", "inspect_device_parameters", "set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "rename_track", "focus_track", "focus_device", "set_device_parameter", "set_eq_band_gain", "set_eq_band_tuning_gain", "insert_device", "insert_device_with_parameter", "insert_eq_band_tuning_gain"} and track is None:
         return _clarification(response, intent, "The requested Live track is no longer present. Refresh the snapshot and try again.")
     if action == "inspect_devices":
         return _inspect_devices(response, intent, track)
@@ -2615,6 +2643,19 @@ def _handle_command_impl(
         if result.get("ok"):
             return _proposal_response(response, result["proposal"], kind="device_setup")
         return _clarification(response, intent, result.get("error", "I could not create a safe device-setup proposal."))
+    if action == "insert_eq_band_tuning_gain":
+        result = live.propose_eq_band_setup_action(
+            track_index=int(track["index"]),
+            track_name=str(track.get("name", "")),
+            eq_band=str(intent.get("eq_band", "")),
+            frequency_hz=float(intent.get("frequency_hz")),
+            gain_db=float(intent.get("desired_value")),
+            session_id=response["session_id"],
+            observed_state=snapshot,
+        )
+        if result.get("ok"):
+            return _proposal_response(response, result["proposal"], kind="device_setup")
+        return _clarification(response, intent, result.get("error", "I could not create a safe EQ setup proposal."))
     if action == "insert_device":
         device = intent.get("device") or {}
         result = live.propose_device_insertion(

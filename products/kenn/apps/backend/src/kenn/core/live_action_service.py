@@ -251,6 +251,7 @@ def _device_setup_text(proposal: dict[str, Any]) -> str:
         for key in (
             "action", "track_index", "track_name", "device_name", "insertion_index",
             "parameter_name", "parameter_display_value", "parameter_unit",
+            "parameter_specs", "eq_band",
             "before_device_fingerprint",
         )
     )
@@ -1660,6 +1661,105 @@ class LiveActionService(Tier2Tier3ControlMixin):
         _PROPOSALS_BY_TOKEN[token] = proposal
         return {"ok": True, "proposal": proposal}
 
+    def propose_eq_band_setup_action(
+        self,
+        *,
+        track_index: int,
+        track_name: str,
+        eq_band: str,
+        frequency_hz: float,
+        gain_db: float,
+        session_id: str,
+        observed_state: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Prepare one atomic EQ Eight insertion plus exact band tuning."""
+        _cleanup_memory()
+        band = str(eq_band or "").strip().upper()
+        if not re.fullmatch(r"[1-8][AB]", band):
+            return {"ok": False, "error": "Name one exact EQ Eight band from 1A through 8B; nothing changed."}
+        try:
+            requested_frequency = float(frequency_hz)
+            requested_gain = float(gain_db)
+        except (TypeError, ValueError):
+            return {"ok": False, "error": "EQ frequency and gain must be numeric; nothing changed."}
+        if not math.isfinite(requested_frequency) or not 20.0 <= requested_frequency <= 20_000.0:
+            return {"ok": False, "error": "That EQ frequency is outside the safe range. Use 20 Hz to 20 kHz; nothing changed."}
+        if not math.isfinite(requested_gain) or not -15.0 <= requested_gain <= 15.0:
+            return {"ok": False, "error": "That EQ gain is outside the safe range. Use -15 to 15 dB; nothing changed."}
+
+        state = observed_state if isinstance(observed_state, dict) else self.snapshot(include_mixer=False)
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        track, error = _find_track(state, int(track_index), track_name)
+        if error or track is None:
+            return {"ok": False, "error": error or "Target Live track is unavailable."}
+        before_devices = _ordered_device_identities(track)
+        if any(item["name"].strip().casefold() == "eq eight" for item in before_devices):
+            return {"ok": False, "error": f"Track '{track.get('name', '')}' already contains EQ Eight; tune the exact existing device instead."}
+        insertion_index = len(before_devices)
+        after_devices = before_devices + [{"position": insertion_index, "index": insertion_index, "name": "EQ Eight"}]
+        fingerprint = hashlib.sha256(json.dumps(before_devices, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        parameter_specs = [
+            {
+                "role": "enable",
+                "name": f"{band[:-1]} Filter On {band[-1]}",
+                "display_value": 1.0,
+                "unit": "boolean",
+            },
+            {
+                "role": "frequency",
+                "name": f"{band[:-1]} Frequency {band[-1]}",
+                "display_value": requested_frequency,
+                "unit": "Hz",
+            },
+            {
+                "role": "gain",
+                "name": f"{band[:-1]} Gain {band[-1]}",
+                "display_value": requested_gain,
+                "unit": "dB",
+            },
+        ]
+        proposal = {
+            "schema": DEVICE_SETUP_PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "insert_device_with_parameter",
+            "operation": "insert_eq_band_tuning_gain",
+            "target": "ableton_track",
+            "track_index": int(track_index),
+            "track_name": str(track.get("name", "")),
+            "device_name": "EQ Eight",
+            "insertion_index": insertion_index,
+            "eq_band": band,
+            "parameter_specs": parameter_specs,
+            "before_devices": before_devices,
+            "after_devices": after_devices,
+            "before_device_fingerprint": fingerprint,
+            "reason": (
+                f"Explicit user request to append EQ Eight on '{track.get('name', '')}' and set "
+                f"band {band} to {requested_frequency:g} Hz / {requested_gain:g} dB."
+            ),
+            "evidence": [
+                f"Current Live device order: {[item['name'] for item in before_devices]!r}.",
+                f"Exact new control identities: {', '.join(item['name'] for item in parameter_specs)}.",
+                f"Target identity: track {track_index} '{track.get('name', '')}', append position {insertion_index}.",
+            ],
+            "confidence": 1.0,
+            "risk": "local_multi_step_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state, track=track),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(
+            session_id=session_id,
+            service_id="ableton_device_setup",
+            text=_device_setup_text(proposal),
+        )
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
     def execute_device_setup_action(
         self,
         proposal: dict[str, Any],
@@ -1788,6 +1888,18 @@ class LiveActionService(Tier2Tier3ControlMixin):
         if not isinstance(info, dict) or not info.get("success"):
             setup_error = f"Live device inspection failed after insertion: {info.get('error', 'unknown error') if isinstance(info, dict) else 'unknown error'}"
             return self._fail_device_setup_with_rollback(proposal, key, setup_error, before_devices, expected_devices, after_devices, parameter_before=None, correlation_id=correlation_id)
+        parameter_specs = proposal.get("parameter_specs")
+        if isinstance(parameter_specs, list):
+            return self._complete_multi_parameter_device_setup(
+                proposal,
+                key,
+                info,
+                before_devices,
+                expected_devices,
+                after_devices,
+                acknowledgement=acknowledgement,
+                correlation_id=correlation_id,
+            )
         matches = [item for item in (info.get("parameters") or []) if isinstance(item, dict) and str(item.get("name", "")) == parameter_name]
         if len(matches) != 1:
             setup_error = f"Live did not expose one exact '{parameter_name}' parameter on the inserted {proposal.get('device_name', 'device')}."
@@ -1858,6 +1970,209 @@ class LiveActionService(Tier2Tier3ControlMixin):
         _RECEIPTS[receipt["receipt_id"]] = receipt
         return {"ok": True, "receipt": receipt}
 
+    def _complete_multi_parameter_device_setup(
+        self,
+        proposal: dict[str, Any],
+        key: str,
+        info: dict[str, Any],
+        before_devices: Any,
+        expected_devices: Any,
+        after_devices: Any,
+        *,
+        acknowledgement: str,
+        correlation_id: str,
+    ) -> dict[str, Any]:
+        """Write and verify every exact control on one newly inserted device."""
+        specs = proposal.get("parameter_specs")
+        if not isinstance(specs, list) or not 2 <= len(specs) <= 3:
+            return self._fail_device_setup_with_rollback(
+                proposal, key, "The multi-control setup proposal is incomplete.",
+                before_devices, expected_devices, after_devices,
+                parameter_before=None, correlation_id=correlation_id,
+            )
+        parameters = [item for item in info.get("parameters", []) if isinstance(item, dict)]
+        resolved: list[dict[str, Any]] = []
+        before_values: dict[str, float] = {}
+        requested_values: dict[str, float] = {}
+        for spec in specs:
+            if not isinstance(spec, dict):
+                return self._fail_device_setup_with_rollback(
+                    proposal, key, "The multi-control setup contains an invalid parameter description.",
+                    before_devices, expected_devices, after_devices,
+                    parameter_before=before_values or None, correlation_id=correlation_id,
+                )
+            name = str(spec.get("name", ""))
+            matches = [item for item in parameters if str(item.get("name", "")) == name]
+            if len(matches) != 1:
+                return self._fail_device_setup_with_rollback(
+                    proposal, key, f"Live did not expose one exact '{name}' parameter on the inserted EQ Eight.",
+                    before_devices, expected_devices, after_devices,
+                    parameter_before=before_values or None, correlation_id=correlation_id,
+                )
+            parameter = matches[0]
+            try:
+                index = int(parameter["index"])
+                before = float(parameter["value"])
+                minimum = float(parameter.get("min"))
+                maximum = float(parameter.get("max"))
+                display_value = float(spec["display_value"])
+            except (KeyError, TypeError, ValueError):
+                return self._fail_device_setup_with_rollback(
+                    proposal, key, f"Live returned unreadable values for '{name}'.",
+                    before_devices, expected_devices, after_devices,
+                    parameter_before=before_values or None, correlation_id=correlation_id,
+                )
+            if str(spec.get("role")) == "frequency" and 0.0 <= minimum and maximum <= 1.000001:
+                requested = math.log(display_value / 10.0) / math.log(2200.0)
+            else:
+                requested = display_value
+            if (
+                index < 0
+                or not all(math.isfinite(value) for value in (before, minimum, maximum, requested))
+                or not minimum <= requested <= maximum
+            ):
+                return self._fail_device_setup_with_rollback(
+                    proposal, key, f"The requested value for '{name}' is outside Live's inspected range.",
+                    before_devices, expected_devices, after_devices,
+                    parameter_before=before_values or None, correlation_id=correlation_id,
+                )
+            resolved.append({"index": index, "name": name, "before": before, "requested": requested})
+            before_values[name] = before
+            requested_values[name] = requested
+
+        readbacks: dict[str, float] = {}
+        write_results: list[dict[str, Any]] = []
+        track_index = int(proposal["track_index"])
+        insertion_index = int(proposal["insertion_index"])
+        for item in resolved:
+            write_error = ""
+            try:
+                write_ok = bool(self.client.set_device_parameter(
+                    track_index, insertion_index, int(item["index"]), float(item["requested"])
+                ))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            try:
+                post_info = self.client.get_device_parameters(track_index, insertion_index)
+                matches = [
+                    parameter for parameter in (post_info.get("parameters") or [])
+                    if isinstance(parameter, dict)
+                    and int(parameter.get("index", -1)) == int(item["index"])
+                    and str(parameter.get("name", "")) == str(item["name"])
+                ] if isinstance(post_info, dict) and post_info.get("success") else []
+                readback = float(matches[0]["value"]) if len(matches) == 1 else None
+            except Exception as exc:
+                readback = None
+                write_error = write_error or str(exc)
+            verified = readback is not None and _values_match(readback, item["requested"])
+            write_results.append({
+                "parameter_index": item["index"],
+                "parameter_name": item["name"],
+                "before": item["before"],
+                "requested": item["requested"],
+                "readback": readback,
+                "verified": verified,
+                "write_acknowledgement": "confirmed" if write_ok else ("unacknowledged_write_reconciled" if verified else "not_confirmed"),
+                **({"write_error": write_error} if write_error else {}),
+            })
+            if readback is not None:
+                readbacks[str(item["name"])] = readback
+            if not verified:
+                detail = f"Live device setup did not verify '{item['name']}'."
+                if write_error:
+                    detail += f" {write_error}"
+                return self._fail_device_setup_with_rollback(
+                    proposal, key, detail, before_devices, expected_devices, after_devices,
+                    parameter_before=before_values, parameter_readback=readbacks,
+                    acknowledgement=acknowledgement, correlation_id=correlation_id,
+                )
+
+        try:
+            final_state = self.snapshot(include_mixer=False)
+            final_track, _ = _find_track(final_state, track_index, str(proposal.get("track_name", "")))
+            final_devices = _ordered_device_identities(final_track)
+        except Exception:
+            final_devices = []
+        if not _device_identities_match(expected_devices, final_devices):
+            return self._fail_device_setup_with_rollback(
+                proposal, key, "The device chain changed before multi-control setup verification completed.",
+                before_devices, expected_devices, final_devices,
+                parameter_before=before_values, parameter_readback=readbacks,
+                acknowledgement=acknowledgement, correlation_id=correlation_id,
+            )
+
+        try:
+            final_info = self.client.get_device_parameters(track_index, insertion_index)
+            final_parameters = final_info.get("parameters", []) if isinstance(final_info, dict) and final_info.get("success") else []
+            final_readbacks = {
+                str(item["name"]): float(next(
+                    parameter["value"]
+                    for parameter in final_parameters
+                    if isinstance(parameter, dict)
+                    and int(parameter.get("index", -1)) == int(item["index"])
+                    and str(parameter.get("name", "")) == str(item["name"])
+                ))
+                for item in resolved
+            }
+        except (KeyError, StopIteration, TypeError, ValueError):
+            final_readbacks = {}
+        if any(
+            name not in final_readbacks or not _values_match(final_readbacks[name], requested)
+            for name, requested in requested_values.items()
+        ):
+            return self._fail_device_setup_with_rollback(
+                proposal, key, "The complete EQ setup did not survive final per-control readback.",
+                before_devices, expected_devices, final_devices,
+                parameter_before=before_values, parameter_readback=final_readbacks,
+                acknowledgement=acknowledgement, correlation_id=correlation_id,
+            )
+        readbacks = final_readbacks
+
+        _finish_idempotency_key(key)
+        receipt = {
+            "schema": RECEIPT_SCHEMA,
+            "receipt_id": f"receipt-{uuid.uuid4().hex}",
+            "action_id": proposal.get("action_id"),
+            "action": "insert_device_with_parameter",
+            "operation": str(proposal.get("operation", "")),
+            "idempotency_key": key,
+            "status": "applied",
+            "verified": True,
+            "timestamp": time.time(),
+            "target": {
+                "target": "ableton_track",
+                "track_index": track_index,
+                "track_name": str(proposal.get("track_name", "")),
+                "device_name": str(proposal.get("device_name", "")),
+                "insertion_index": insertion_index,
+                "eq_band": str(proposal.get("eq_band", "")),
+                "parameters": [
+                    {"index": item["index"], "name": item["name"]}
+                    for item in resolved
+                ],
+            },
+            "before_devices": before_devices,
+            "requested_devices": expected_devices,
+            "readback_devices": final_devices,
+            "before": before_values,
+            "requested": requested_values,
+            "readback": readbacks,
+            "parameter_results": write_results,
+            "write_acknowledgement": acknowledgement,
+            "correlation_id": resolve_correlation_id(correlation_id),
+            "undo_payload": {
+                "action": "remove_device",
+                "track_index": track_index,
+                "track_name": str(proposal.get("track_name", "")),
+                "device_index": insertion_index,
+                "device_name": str(proposal.get("device_name", "")),
+                "expected_devices": final_devices,
+            },
+        }
+        _RECEIPTS[receipt["receipt_id"]] = receipt
+        return {"ok": True, "receipt": receipt}
+
     def _fail_device_setup_with_rollback(
         self,
         proposal: dict[str, Any],
@@ -1907,15 +2222,20 @@ class LiveActionService(Tier2Tier3ControlMixin):
         receipt = {
             "schema": RECEIPT_SCHEMA, "receipt_id": f"receipt-{uuid.uuid4().hex}",
             "action_id": proposal.get("action_id"), "action": "insert_device_with_parameter",
+            "operation": str(proposal.get("operation", "")),
             "idempotency_key": key, "status": status, "verified": False, "timestamp": time.time(),
             "target": {
                 "target": "ableton_track", "track_index": int(proposal["track_index"]),
                 "track_name": str(proposal.get("track_name", "")), "device_name": str(proposal.get("device_name", "")),
                 "insertion_index": int(proposal["insertion_index"]), "parameter_index": parameter_index,
                 "parameter_name": str(proposal.get("parameter_name", "")),
+                "eq_band": str(proposal.get("eq_band", "")),
+                "parameters": proposal.get("parameter_specs") or [],
             },
             "before_devices": before_devices, "requested_devices": expected_devices, "readback_devices": readback_devices,
-            "before": parameter_before, "requested": proposal.get("parameter_after_value"), "readback": parameter_readback,
+            "before": parameter_before,
+            "requested": proposal.get("parameter_specs") or proposal.get("parameter_after_value"),
+            "readback": parameter_readback,
             "parameter_before_value": parameter_before, "parameter_requested_value": proposal.get("parameter_after_value"),
             "parameter_display_value": proposal.get("parameter_display_value"), "parameter_unit": proposal.get("parameter_unit"),
             "write_acknowledgement": acknowledgement, "rollback": rollback, "error": error,

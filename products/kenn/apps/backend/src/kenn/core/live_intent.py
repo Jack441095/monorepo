@@ -358,6 +358,13 @@ _INSERT_EQ_TUNE_WORKFLOW = re.compile(
     r"\b(?:boost|cut|reduce|raise|set)\b.{0,80}\b(?:hz|khz|hertz|kilohertz)\b",
     re.I,
 )
+_INSERT_EQ_TUNE_VALUES = re.compile(
+    r"\b(?P<verb>boost|increase|raise|lift|cut|reduce|lower|decrease|attenuate)\b.*?"
+    r"(?P<gain>-?(?:\d+(?:\.\d+)?|\.\d+))\s*(?:db|decibels?)\b.*?"
+    r"\b(?:at|around)\s*(?P<frequency>\d+(?:\.\d+)?|\.\d+)\s*"
+    r"(?P<frequency_unit>khz|kilohertz|hz|hertz)\b",
+    re.I,
+)
 _GROUP_RENAME_WORKFLOW = re.compile(
     r"\b(?:balance|group|organize|bus)\b.{0,100}\b(?:drums?|vocals?|vox|bass|synths?|guitars?|fx)\b"
     r".{0,100}\b(?:call|name|rename)\b",
@@ -399,6 +406,24 @@ def _eq_gain_signed(matched_text: str, magnitude: float) -> float:
     if _EQ_BOOST_WORD.search(matched_text or ""):
         return magnitude
     return -magnitude
+
+
+def _insert_eq_tune_values(text: str) -> dict[str, Any] | None:
+    """Extract one exact new-EQ band assignment without choosing a band."""
+    if not _INSERT_EQ_TUNE_WORKFLOW.search(text):
+        return None
+    values = _INSERT_EQ_TUNE_VALUES.search(text)
+    if values is None:
+        return None
+    band = re.search(r"\bband\s*(\d+)\s*([ab])\b", text, re.I)
+    frequency = float(values.group("frequency"))
+    if values.group("frequency_unit").casefold() in {"khz", "kilohertz"}:
+        frequency *= 1000.0
+    return {
+        "gain_db": _eq_gain_signed(values.group(0), float(values.group("gain"))),
+        "frequency_hz": frequency,
+        "eq_band": f"{int(band.group(1))}{band.group(2).upper()}" if band else "",
+    }
 
 
 def _spoken_hundred_value(first: int, hundred: str | None, second: int) -> int:
@@ -602,11 +627,6 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
             "the requested send display-unit mapping must all be qualified first. Nothing changed.",
         ),
         (
-            _INSERT_EQ_TUNE_WORKFLOW,
-            "Insert-and-tune EQ is not one qualified rollback recipe yet. Name an existing EQ Eight and exact band, "
-            "or request insertion separately; nothing changed.",
-        ),
-        (
             _GROUP_RENAME_WORKFLOW,
             "Group-and-rename is not qualified because Live group-member routing and exact group deletion are not "
             "verified through KENN yet. Nothing changed.",
@@ -629,7 +649,7 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     # Insert-and-configure phrases contain an ``and set`` separator but map
     # to one qualified, rollback-capable atomic proposal.  Let parse_request
     # handle that primitive instead of splitting it into an unsafe recipe.
-    if _DEVICE_SETUP.search(text) or _DEVICE_SETUP_TRAILING.search(text):
+    if _DEVICE_SETUP.search(text) or _DEVICE_SETUP_TRAILING.search(text) or _insert_eq_tune_values(text):
         return None
     segments = split_recipe_request(text)
     if not segments:
@@ -832,6 +852,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     rename_match = _RENAME_TRACK.search(text)
     device_setup_match = _DEVICE_SETUP.search(numeric_text) or _DEVICE_SETUP_TRAILING.search(numeric_text)
     device_setup_name = _device_setup_name(device_setup_match.group("device")) if device_setup_match else None
+    insert_eq_tune = _insert_eq_tune_values(numeric_text)
     insert_device_name = _insert_device_name(lower) if _ADD_DEVICE.search(lower) else None
     add_device_match = insert_device_name is not None
     inspect_device_parameters_match = _INSPECT_DEVICE_PARAMETERS.search(lower)
@@ -1181,10 +1202,10 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     if not track_phrase and not track_reference_match:
         base["missing_fields"].append("track")
         base["ambiguity"].append("No track name or number was found in the current Live snapshot.")
-        if device_setup_match or rename_match or add_device_match or eq_band_request or eq_band_tuning_match or eq_band_tuning_absolute_match or inspect_device_parameters_match:
+        if device_setup_match or insert_eq_tune or rename_match or add_device_match or eq_band_request or eq_band_tuning_match or eq_band_tuning_absolute_match or inspect_device_parameters_match:
             base.update({
                 "mode": "assist",
-                "action": "insert_device_with_parameter" if device_setup_match else ("rename_track" if rename_match else ("insert_device" if add_device_match else ("set_eq_band_tuning_gain" if (eq_band_tuning_match or eq_band_tuning_absolute_match) else ("set_eq_band_gain" if eq_band_request else "inspect_device_parameters")))),
+                "action": "insert_device_with_parameter" if device_setup_match else ("insert_eq_band_tuning_gain" if insert_eq_tune else ("rename_track" if rename_match else ("insert_device" if add_device_match else ("set_eq_band_tuning_gain" if (eq_band_tuning_match or eq_band_tuning_absolute_match) else ("set_eq_band_gain" if eq_band_request else "inspect_device_parameters"))))),
                 "confirmation_required": True,
                 "confidence": 0.9,
             })
@@ -1195,6 +1216,16 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                 base["desired_value"] = float(device_setup_match.group("value"))
                 base["relative"] = False
                 base["unit"] = setup_unit
+            elif insert_eq_tune:
+                base["device"] = {"name": "EQ Eight"}
+                base["parameter"] = {"name": "Frequency + Gain"}
+                base["desired_value"] = insert_eq_tune["gain_db"]
+                base["frequency_hz"] = insert_eq_tune["frequency_hz"]
+                base["eq_band"] = insert_eq_tune["eq_band"]
+                base["unit"] = "dB"
+                if not insert_eq_tune["eq_band"]:
+                    base["missing_fields"].append("eq_band")
+                    base["ambiguity"].append("Name one exact new EQ Eight band such as 2A; KENN will not choose a band for you.")
             elif rename_match:
                 base["desired_value"] = " ".join(rename_match.group(1).split()).strip()
                 base["unit"] = "string"
@@ -1259,6 +1290,25 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         base["confidence"] = 0.2
         return base
     base["track"] = {"index": track.get("index"), "name": track.get("name")}
+
+    if insert_eq_tune:
+        base.update({
+            "mode": "assist",
+            "action": "insert_eq_band_tuning_gain",
+            "device": {"name": "EQ Eight"},
+            "parameter": {"name": "Frequency + Gain"},
+            "desired_value": insert_eq_tune["gain_db"],
+            "relative": False,
+            "unit": "dB",
+            "frequency_hz": insert_eq_tune["frequency_hz"],
+            "eq_band": insert_eq_tune["eq_band"],
+            "confirmation_required": bool(insert_eq_tune["eq_band"]),
+            "confidence": 0.98,
+        })
+        if not insert_eq_tune["eq_band"]:
+            base["missing_fields"].append("eq_band")
+            base["ambiguity"].append("Name one exact new EQ Eight band such as 2A; KENN will not choose a band for you.")
+        return base
 
     if device_setup_match:
         setup_parameter, setup_unit = _device_setup_parameter(device_setup_match, device_setup_name)

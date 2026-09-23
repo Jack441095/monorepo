@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import math
 
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.device_units import raw_to_display
@@ -34,6 +35,7 @@ class FakeLive:
         # resolve exactly as they do against Live.
         self.threshold = 0.55
         self.eq_gain = 0.0
+        self.eq_filter_on = 0.0
         self.frequency_value = 250.0
         self.frequency_display = "250 Hz"
         self.scene_triggered: dict[int, bool] = {}
@@ -176,22 +178,29 @@ class FakeLive:
 
     def get_device_parameters(self, track_index: int, device_index: int) -> dict:
         self.device_parameter_reads += 1
-        if track_index == 3 and any(
+        if 0 <= track_index < len(self.state["tracks"]) and any(
             isinstance(item, dict)
             and int(item.get("index", -1)) == device_index
             and str(item.get("name", "")).strip().lower() == "eq eight"
-            for item in self.state["tracks"][3]["devices"]
+            for item in self.state["tracks"][track_index]["devices"]
         ):
+            parameters = [
+                # Match the filtered-but-sparse shape returned by the
+                # production bridge: EQ Eight's visible controls keep
+                # their original Live parameter indices.
+                {"index": 11, "name": "1 Frequency A", "value": self.frequency_value, "value_display": self.frequency_display, "min": 20.0, "max": 20000.0},
+                {"index": 12, "name": "1 Gain A", "value": self.eq_gain, "min": -15.0, "max": 15.0},
+            ]
+            if track_index == 1:
+                parameters.extend([
+                    {"index": 20, "name": "2 Filter On A", "value": self.eq_filter_on, "min": 0.0, "max": 1.0},
+                    {"index": 21, "name": "2 Frequency A", "value": self.frequency_value, "value_display": self.frequency_display, "min": 20.0, "max": 20000.0},
+                    {"index": 22, "name": "2 Gain A", "value": self.eq_gain, "min": -15.0, "max": 15.0},
+                ])
             return {
                 "success": True,
                 "device_name": "EQ Eight",
-                "parameters": [
-                    # Match the filtered-but-sparse shape returned by the
-                    # production bridge: EQ Eight's visible controls keep
-                    # their original Live parameter indices.
-                    {"index": 11, "name": "1 Frequency A", "value": self.frequency_value, "value_display": self.frequency_display, "min": 20.0, "max": 20000.0},
-                    {"index": 12, "name": "1 Gain A", "value": self.eq_gain, "min": -15.0, "max": 15.0},
-                ],
+                "parameters": parameters,
             }
         return {
             "success": True,
@@ -200,13 +209,16 @@ class FakeLive:
         }
 
     def set_device_parameter(self, track_index: int, device_index: int, parameter_index: int, value: float) -> bool:
-        if track_index == 3 and any(
+        if 0 <= track_index < len(self.state["tracks"]) and any(
             isinstance(item, dict)
             and int(item.get("index", -1)) == device_index
             and str(item.get("name", "")).strip().lower() == "eq eight"
-            for item in self.state["tracks"][3]["devices"]
+            for item in self.state["tracks"][track_index]["devices"]
         ):
-            if parameter_index == 11:
+            if parameter_index == 20:
+                self.writes.append(("eq_filter_on", track_index, device_index, parameter_index, value))
+                self.eq_filter_on = value
+            elif parameter_index in {11, 21}:
                 self.writes.append(("eq_frequency", track_index, device_index, parameter_index, value))
                 self.frequency_value = value
                 self.frequency_display = f"{value:g} Hz"
@@ -583,6 +595,224 @@ def test_compressor_threshold_setup_is_confirmation_bound_without_writing() -> N
     assert "-20%" not in planned["answer"]
     assert 0.0 <= planned["proposal"]["parameter_after_value"] <= 1.0
     assert fake.writes == []
+
+
+def test_insert_eq_and_tune_exact_band_is_one_confirmation_bound_atomic_proposal() -> None:
+    fake = FakeLive()
+    service = _service(fake)
+    command = "add an EQ to Bass and boost band 2A by 3 dB at 5 kHz"
+
+    planned = handle_command(
+        command,
+        session_id="command-eq-atomic-setup",
+        service=service,
+        allow_llm=False,
+    )
+
+    assert planned["status"] == "confirmation_required"
+    assert planned["proposal_kind"] == "device_setup"
+    assert planned["proposal"]["operation"] == "insert_eq_band_tuning_gain"
+    assert planned["proposal"]["eq_band"] == "2A"
+    assert planned["proposal"]["parameter_specs"] == [
+        {"role": "enable", "name": "2 Filter On A", "display_value": 1.0, "unit": "boolean"},
+        {"role": "frequency", "name": "2 Frequency A", "display_value": 5000.0, "unit": "Hz"},
+        {"role": "gain", "name": "2 Gain A", "display_value": 3.0, "unit": "dB"},
+    ]
+    assert "complete setup with per-control readback verification" in planned["answer"]
+    assert fake.writes == []
+
+    applied = handle_command(
+        command,
+        session_id="command-eq-atomic-setup",
+        service=service,
+        proposal=planned["proposal"],
+        confirm_token=planned["proposal"]["confirmation_token"],
+        idempotency_key=planned["proposal"]["action_id"],
+        allow_llm=False,
+    )
+
+    assert applied["status"] == "applied"
+    assert applied["receipt"]["verified"] is True
+    assert all(item["verified"] for item in applied["receipt"]["parameter_results"])
+    assert fake.state["tracks"][1]["devices"] == [{"index": 0, "name": "EQ Eight"}]
+    assert fake.eq_filter_on == 1.0
+    assert fake.frequency_value == 5000.0
+    assert fake.eq_gain == 3.0
+
+    undo = service.propose_undo(applied["receipt"], session_id="command-eq-atomic-undo")
+    assert undo["ok"] is True
+    undone = handle_command(
+        "",
+        session_id="command-eq-atomic-undo",
+        service=service,
+        proposal=undo["proposal"],
+        confirm_token=undo["proposal"]["confirmation_token"],
+        idempotency_key=undo["proposal"]["action_id"],
+        allow_llm=False,
+    )
+    assert undone["status"] == "applied"
+    assert undone["receipt"]["verified"] is True
+    assert fake.state["tracks"][1]["devices"] == []
+
+
+def test_insert_eq_and_tune_without_band_never_degrades_to_partial_insertion() -> None:
+    fake = FakeLive()
+
+    result = handle_command(
+        "add an EQ to Bass and boost 3 dB at 5 kHz",
+        session_id="command-eq-setup-needs-band",
+        service=_service(fake),
+        allow_llm=False,
+    )
+
+    assert result["status"] == "clarification_required"
+    assert result["changed"] is False
+    assert result["intent"]["action"] == "insert_eq_band_tuning_gain"
+    assert "will not choose a band" in result["answer"]
+    assert "proposal" not in result
+    assert fake.writes == []
+
+
+def test_insert_eq_and_tune_rolls_back_inserted_device_when_second_control_fails() -> None:
+    class FailedGainLive(FakeLive):
+        def set_device_parameter(self, track_index: int, device_index: int, parameter_index: int, value: float) -> bool:
+            if parameter_index == 22:
+                self.writes.append(("eq_gain_failed", track_index, device_index, parameter_index, value))
+                return False
+            return super().set_device_parameter(track_index, device_index, parameter_index, value)
+
+    fake = FailedGainLive()
+    service = _service(fake)
+    command = "add an EQ to Bass and boost band 2A by 3 dB at 5 kHz"
+    planned = handle_command(
+        command,
+        session_id="command-eq-setup-rollback",
+        service=service,
+        allow_llm=False,
+    )
+    result = handle_command(
+        command,
+        session_id="command-eq-setup-rollback",
+        service=service,
+        proposal=planned["proposal"],
+        confirm_token=planned["proposal"]["confirmation_token"],
+        idempotency_key=planned["proposal"]["action_id"],
+        allow_llm=False,
+    )
+
+    assert result["status"] == "failed"
+    assert result["receipt"]["status"] == "failed_rolled_back"
+    assert result["changed"] is False
+    assert result["receipt"]["rollback"]["reverted"] is True
+    assert fake.state["tracks"][1]["devices"] == []
+    assert any(write[0] == "remove_device" for write in fake.writes)
+
+
+def test_insert_eq_and_tune_token_binds_every_control_value() -> None:
+    fake = FakeLive()
+    service = _service(fake)
+    command = "add an EQ to Bass and boost band 2A by 3 dB at 5 kHz"
+    planned = handle_command(
+        command,
+        session_id="command-eq-setup-token-binding",
+        service=service,
+        allow_llm=False,
+    )
+    tampered = deepcopy(planned["proposal"])
+    tampered["parameter_specs"][2]["display_value"] = 6.0
+
+    result = handle_command(
+        command,
+        session_id="command-eq-setup-token-binding",
+        service=service,
+        proposal=tampered,
+        confirm_token=planned["proposal"]["confirmation_token"],
+        idempotency_key=planned["proposal"]["action_id"],
+        allow_llm=False,
+    )
+
+    assert result["status"] == "failed"
+    assert "mismatched" in result["answer"]
+    assert fake.writes == []
+
+
+def test_insert_eq_and_tune_converts_frequency_after_inspecting_normalized_live_range() -> None:
+    class NormalizedEqLive(FakeLive):
+        def __init__(self) -> None:
+            super().__init__()
+            self.frequency_value = 0.3892475963
+
+        def get_device_parameters(self, track_index: int, device_index: int) -> dict:
+            info = super().get_device_parameters(track_index, device_index)
+            for parameter in info.get("parameters", []):
+                if parameter.get("name") == "2 Frequency A":
+                    parameter["min"] = 0.0
+                    parameter["max"] = 1.0
+            return info
+
+    fake = NormalizedEqLive()
+    service = _service(fake)
+    command = "add an EQ to Bass and boost band 2A by 3 dB at 5 kHz"
+    planned = handle_command(
+        command,
+        session_id="command-eq-setup-normalized",
+        service=service,
+        allow_llm=False,
+    )
+    result = handle_command(
+        command,
+        session_id="command-eq-setup-normalized",
+        service=service,
+        proposal=planned["proposal"],
+        confirm_token=planned["proposal"]["confirmation_token"],
+        idempotency_key=planned["proposal"]["action_id"],
+        allow_llm=False,
+    )
+
+    expected_raw = math.log(5000.0 / 10.0) / math.log(2200.0)
+    assert result["status"] == "applied"
+    assert abs(fake.frequency_value - expected_raw) < 1e-9
+    frequency_result = next(
+        item for item in result["receipt"]["parameter_results"]
+        if item["parameter_name"] == "2 Frequency A"
+    )
+    assert abs(frequency_result["readback"] - expected_raw) < 1e-9
+
+
+def test_insert_eq_and_tune_rolls_back_if_a_control_drifts_before_final_readback() -> None:
+    class DriftingEqLive(FakeLive):
+        def get_device_parameters(self, track_index: int, device_index: int) -> dict:
+            # One initial inspection plus one readback per written control
+            # precede the final all-control verification.
+            if self.device_parameter_reads == 4:
+                self.eq_gain = 0.0
+            return super().get_device_parameters(track_index, device_index)
+
+    fake = DriftingEqLive()
+    service = _service(fake)
+    command = "add an EQ to Bass and boost band 2A by 3 dB at 5 kHz"
+    planned = handle_command(
+        command,
+        session_id="command-eq-setup-final-drift",
+        service=service,
+        allow_llm=False,
+    )
+    result = handle_command(
+        command,
+        session_id="command-eq-setup-final-drift",
+        service=service,
+        proposal=planned["proposal"],
+        confirm_token=planned["proposal"]["confirmation_token"],
+        idempotency_key=planned["proposal"]["action_id"],
+        allow_llm=False,
+    )
+
+    assert result["status"] == "failed"
+    assert result["receipt"]["status"] == "failed_rolled_back"
+    assert result["receipt"]["rollback"]["reverted"] is True
+    assert result["receipt"]["operation"] == "insert_eq_band_tuning_gain"
+    assert len(result["receipt"]["target"]["parameters"]) == 3
+    assert fake.state["tracks"][1]["devices"] == []
 
 
 def test_explicit_track_correction_is_replanned_through_the_gateway() -> None:
