@@ -164,6 +164,9 @@ class FakeLiveBackend:
         ]
         return state
 
+    def get_remote_script_version(self) -> dict[str, Any]:
+        return {"success": True, "content_hash": "fake", "git_commit": "", "deployed_at": "", "backend": "fake"}
+
     def get_return_tracks(self) -> list[dict[str, Any]]:
         with self._lock:
             return copy.deepcopy(self._returns)

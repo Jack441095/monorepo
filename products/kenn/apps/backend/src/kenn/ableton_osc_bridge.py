@@ -114,6 +114,7 @@ READ_ENDPOINTS = (
     "/live/song/get/tempo",
     "/live/view/get/selected_track",
     "/live/view/get/selected_track_kind",
+    "/live/kenn/version",
     "/live/view/get/selected_device",
     "/live/view/get/selected_scene",
     "/live/track/get/meters",
@@ -1346,6 +1347,18 @@ class AbletonOSCClient:
         if int(track_index) < 0:
             return False
         return self._send_only("/live/view/set/selected_track", [int(track_index)])
+
+    def get_remote_script_version(self) -> dict[str, Any]:
+        """Deploy stamp of the running AbletonOSC (see tooling/scripts/deploy_abletonosc.py)."""
+        values = self._query_args("/live/kenn/version")
+        if not values:
+            return {"success": False, "error": "The running AbletonOSC has no KENN version endpoint; deploy and reload it."}
+        content_hash = str(values[0])
+        if content_hash == "unstamped":
+            return {"success": False, "error": "The running AbletonOSC was not installed by KENN's deploy tool."}
+        return {"success": True, "content_hash": content_hash,
+                "git_commit": str(values[1]) if len(values) > 1 else "",
+                "deployed_at": str(values[2]) if len(values) > 2 else ""}
 
     def get_selected_device(self) -> dict[str, Any]:
         """Read the exact selected track/device pair from Live's view."""

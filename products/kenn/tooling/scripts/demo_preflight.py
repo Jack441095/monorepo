@@ -290,6 +290,31 @@ class DemoPreflight:
 
         return "manifest hashes and chat-route sources verified; low-end excess and vocal clipping cues detected; analysis cache warmed"
 
+    def remote_script(self) -> str:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from abletonosc_bundle import bundle_hash
+
+        try:
+            body, _ = self._request("/api/ableton/remote-script")
+        except urllib.error.HTTPError as exc:
+            body = json.loads(exc.read() or b"{}")
+        if body.get("backend") == "fake":
+            self.fake_backend = True
+            return "FAKE Live backend: Remote Script version not applicable"
+        if not body.get("success"):
+            raise RuntimeError(
+                (body.get("error") or "Remote Script version unavailable.")
+                + " Run tooling/scripts/deploy_abletonosc.py --apply --reload."
+            )
+        expected = bundle_hash()
+        running = str(body.get("content_hash", ""))
+        if running != expected:
+            raise RuntimeError(
+                f"Live runs a stale AbletonOSC ({running[:10]}, deployed {body.get('deployed_at') or 'unknown'}); "
+                f"the repo expects {expected[:10]}. Run tooling/scripts/deploy_abletonosc.py --apply --reload."
+            )
+        return f"AbletonOSC {expected[:10]} (commit {body.get('git_commit') or '?'}) matches the repo"
+
     def frontend(self) -> str:
         request = urllib.request.Request(self.base_url + "/")
         with urllib.request.urlopen(request, timeout=2.0) as response:
@@ -349,7 +374,8 @@ class DemoPreflight:
 
     def checks(self) -> dict[str, Callable[[], str]]:
         return {
-            "ableton_ping": self.ableton_ping, "demo_session": self.demo_session,
+            "ableton_ping": self.ableton_ping, "remote_script": self.remote_script,
+            "demo_session": self.demo_session,
             "server_health": self.server_health, "retrieval_index": self.retrieval_index,
             "daw_control": self.daw_control, "session_qa": self.session_qa,
             "device_control": self.device_control, "audio_analysis": self.audio_analysis,

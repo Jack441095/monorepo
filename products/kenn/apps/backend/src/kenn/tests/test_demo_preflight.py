@@ -236,3 +236,30 @@ def test_device_check_reports_required_return_device_mismatch() -> None:
     assert result.detail == (
         "I can see return track 'A-Reverb', but it is missing: Hybrid Reverb. Visible devices: Reverb."
     )
+
+
+def _remote_script_runner(monkeypatch, body: dict):
+    from scripts.demo_preflight import DemoPreflight
+
+    runner = DemoPreflight("http://kenn.test", expected_tracks=[])
+    monkeypatch.setattr(runner, "_request", lambda path, *a, **k: (body, 1.0))
+    return runner
+
+
+def test_remote_script_check_fails_on_a_stale_deploy(monkeypatch) -> None:
+    runner = _remote_script_runner(monkeypatch, {"success": True, "content_hash": "0" * 64, "deployed_at": "then"})
+    result = runner._check("remote_script", runner.remote_script)
+    assert result.passed is False and "stale AbletonOSC" in result.detail
+
+
+def test_remote_script_check_explains_a_missing_endpoint(monkeypatch) -> None:
+    runner = _remote_script_runner(monkeypatch, {"success": False, "error": "no endpoint."})
+    result = runner._check("remote_script", runner.remote_script)
+    assert result.passed is False and "deploy_abletonosc.py --apply --reload" in result.detail
+
+
+def test_remote_script_check_passes_when_hash_matches(monkeypatch) -> None:
+    from scripts.abletonosc_bundle import bundle_hash
+
+    runner = _remote_script_runner(monkeypatch, {"success": True, "content_hash": bundle_hash(), "git_commit": "abc"})
+    assert runner._check("remote_script", runner.remote_script).passed is True
