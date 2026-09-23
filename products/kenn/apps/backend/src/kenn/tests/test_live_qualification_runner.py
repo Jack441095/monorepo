@@ -212,6 +212,7 @@ def test_device_calibration_sweep_restores_every_point_and_stays_a_candidate(mon
     assert result["status"] == "passed"
     assert result["mapping_candidate_only"] is True
     assert result["target_identity_stable"] is True
+    assert result["display_samples_complete"] is True
     assert result["samples"] == [
         {"requested_raw": 0.25, "display_after": "25 %"},
         {"requested_raw": 0.5, "display_after": "50 %"},
