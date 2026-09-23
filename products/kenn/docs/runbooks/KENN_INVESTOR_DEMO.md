@@ -38,6 +38,10 @@ copy and the full run passes the rehearsal gate.
    cache used by steps 12–13.
 7. Run it again with `--allow-mutations` only on the disposable copy.
 8. Confirm 11/11 checks pass, then reset and reselect Drum Bus before rehearsing.
+9. Run `python3 tooling/scripts/demo_script_gate.py --runs 10`. This exercises
+   the 13 non-mutating scripted prompt contracts and latency budgets. It cannot
+   confirm proposals or qualify the seven manual UI/mutation/presentation steps,
+   so a pass is supporting evidence rather than a complete rehearsal.
 
 ## Twenty-step script
 

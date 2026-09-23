@@ -412,17 +412,24 @@ class LiveActionService(Tier2Tier3ControlMixin):
         value: Any,
         session_id: str,
         track_name: str = "",
+        observed_state: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         _cleanup_memory()
         if action not in SUPPORTED_TRACK_ACTIONS:
             return {"ok": False, "error": f"Unsupported Live track action: {action}"}
-        state = self.snapshot()
+        field, unit, valid_range = SUPPORTED_TRACK_ACTIONS[action]
+        state = observed_state if isinstance(observed_state, dict) else self.snapshot()
+        observed_track, observed_error = _find_track(state, int(track_index), track_name)
+        if observed_error or observed_track is None or observed_track.get(field) is None:
+            # A topology-only command snapshot intentionally omits mixer
+            # values. Fall back to one mixer read rather than treating an
+            # omitted field as an unreadable Live control.
+            state = self.snapshot()
         if state.get("status") in {"offline", "dispatched"}:
             return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
         track, error = _find_track(state, int(track_index), track_name)
         if error or track is None:
             return {"ok": False, "error": error}
-        field, unit, valid_range = SUPPORTED_TRACK_ACTIONS[action]
         if unit == "boolean":
             if not isinstance(value, bool):
                 return {"ok": False, "error": f"{action} requires a boolean value."}
@@ -952,6 +959,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
         device_index: int | None = None,
         device_name: str = "",
         session_id: str,
+        observed_state: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Propose focusing one exact Live track or device and remember prior focus."""
         _cleanup_memory()
@@ -959,7 +967,12 @@ class LiveActionService(Tier2Tier3ControlMixin):
             return {"ok": False, "error": f"Unsupported Live view action: {action}"}
         if int(track_index) < 0:
             return {"ok": False, "error": "A non-negative track index is required."}
-        state = self.snapshot()
+        state = observed_state if isinstance(observed_state, dict) else self.snapshot()
+        if state.get("selected_track_index") is None:
+            # Topology-only snapshots omit view selection. Fetch one complete
+            # observation instead of turning an intentionally omitted field
+            # into a false clarification.
+            state = self.snapshot()
         if state.get("status") in {"offline", "dispatched"}:
             return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
         target, error = _find_track(state, int(track_index), track_name)
@@ -1443,6 +1456,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
         unit: str = "",
         track_name: str = "",
         observed_state: dict[str, Any] | None = None,
+        observed_parameter_info: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Build a device proposal only from an exact current Live target."""
         from kenn.core.live_control_planner import LiveControlPlanner
@@ -1473,6 +1487,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             parameter_name=parameter_name,
             unit=unit,
             track_name=str(track.get("name", "")),
+            observed_parameter_info=observed_parameter_info,
         )
 
     def propose_device_insertion(

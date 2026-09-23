@@ -76,10 +76,10 @@ Result: **10/10 consecutive passes**, zero partial successes counted.
 
 ## Automated regression
 
-The latest full backend suite completed after the manifest-bound analysis-cache
-hardening:
+The latest full backend suite completed after the script-contract and command
+latency hardening:
 
-`1386 passed, 5 skipped, 4 warnings in 78.51s`
+`1391 passed, 5 skipped, 4 warnings in 76.55s`
 
 The skip count includes optional/environment-dependent coverage. The warnings
 are existing HTTP-test and audio compatibility deprecations; there were no
@@ -143,3 +143,18 @@ phrases for track count, selected track, session overview, duplicate names,
 low-end advice, vocal-clipping advice, receipt history, destructive track
 deletion, and maximum master level. Vocal Compressor Output and hard-left Synth
 pan both stopped at exact confirmation proposals during this audit.
+
+## Non-mutating script-contract gate
+
+`tooling/scripts/demo_script_gate.py --runs 10` completed **10/10 consecutive
+passes** against the real AbletonOSC-backed demo session. It exercised 130
+read-only or proposal-only command requests across scripted steps 2–9, 11–13,
+15, and 16. No confirmation token was submitted and no Live mutation was sent.
+Every response matched its exact target/refusal/advice contract; the slowest
+reported command was 452.7 ms, below the 650 ms budget.
+
+The gate paces requests below the supervised HTTP rate limit and stops at the
+first contract or latency failure. It deliberately reports
+`full_demo_qualified=false`: steps 1, 10, 14, and 17–20 still require the real
+UI, confirmed mutation/readback/undo, receipt presentation, and roadmap
+narration. This evidence does not replace the remaining full rehearsal gate.

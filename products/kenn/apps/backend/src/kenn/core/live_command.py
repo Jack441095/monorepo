@@ -1627,6 +1627,7 @@ def _resolve_device_parameter(
         unit=unit,
         track_name=str(track.get("name", "")),
         observed_state=observed_state,
+        observed_parameter_info=info,
     )
     return result
 
@@ -1835,6 +1836,7 @@ def _resolve_eq_band_gain(
         unit="dB",
         track_name=str(track.get("name", "")),
         observed_state=observed_state,
+        observed_parameter_info=info,
     )
     if result.get("ok"):
         proposal = result.get("proposal") or {}
@@ -1950,7 +1952,19 @@ def _resolve_eq_band_tuning_gain(
     return result
 
 
-def _command_snapshot(service: LiveActionService) -> dict[str, Any]:
+def _command_needs_mixer_snapshot(command: str, llm_plan: dict[str, Any] | None = None) -> bool:
+    """Select one fresh mixer snapshot when the request plainly needs it."""
+    if isinstance(llm_plan, dict) and llm_plan.get("action") in TRACK_ACTIONS:
+        return True
+    normalized = " ".join(str(command or "").casefold().split())
+    return bool(re.search(
+        r"\b(?:pan|volume|mute|unmute|solo|unsolo|arm|disarm|louder|quieter|softer|focus|select)\b|"
+        r"\bturn\s+(?:up|down)\b",
+        normalized,
+    ))
+
+
+def _command_snapshot(service: LiveActionService, *, include_mixer: bool = False) -> dict[str, Any]:
     """Read only the fresh topology needed to resolve a command.
 
     Mixer/transport values are fetched by the operation that needs them. This
@@ -1958,7 +1972,7 @@ def _command_snapshot(service: LiveActionService) -> dict[str, Any]:
     execution-time full readback boundary.
     """
     try:
-        return service.snapshot(include_mixer=False)
+        return service.snapshot(include_mixer=include_mixer)
     except TypeError:
         # Compatibility for injected service doubles written before the split
         # snapshot API.
@@ -2262,12 +2276,13 @@ def _handle_command_impl(
         return _recipe_response(response, result["proposal"])
 
     snapshot_started = time.monotonic()
-    snapshot = _command_snapshot(live)
+    mixer_snapshot = _command_needs_mixer_snapshot(clean_command, llm_plan)
+    snapshot = _command_snapshot(live, include_mixer=mixer_snapshot)
     snapshot_observed_at = time.time()
     _update_lifecycle(
         response,
         "inspecting",
-        snapshot_kind="topology",
+        snapshot_kind="mixer" if mixer_snapshot else "topology",
         snapshot_observed_at=snapshot_observed_at,
         snapshot_elapsed_ms=round(max(0.0, time.monotonic() - snapshot_started) * 1000.0, 1),
         snapshot_age_ms=0.0,
@@ -2595,6 +2610,7 @@ def _handle_command_impl(
                 "device_name": str(intent["device"].get("name", "")),
             } if action == "focus_device" and intent.get("device") else {}),
             session_id=response["session_id"],
+            observed_state=snapshot,
         )
         if result.get("ok"):
             return _proposal_response(response, result["proposal"], kind="view")
@@ -2621,6 +2637,7 @@ def _handle_command_impl(
             track_name=str(track.get("name", "")),
             value=intent.get("desired_value"),
             session_id=response["session_id"],
+            observed_state=snapshot,
         )
         return _proposal_response(response, result["proposal"], kind="track") if result.get("ok") else _clarification(response, intent, result.get("error", "I could not create a Live proposal."))
     if action == "transport_play" or action == "transport_stop":
