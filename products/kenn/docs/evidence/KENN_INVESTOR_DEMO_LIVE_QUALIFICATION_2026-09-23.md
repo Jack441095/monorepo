@@ -248,3 +248,21 @@ imported yet.
   companion waits for its reply timeout. The Remote Script should answer that
   case explicitly; until then, the operator must never leave a return/master
   track selected.
+
+## Stem-loaded rehearsal set qualified (2026-09-23 09:00 BST)
+
+- Kick and Synth (MIDI in the fixture) were replaced by same-name audio tracks
+  and all eight manifest-identical stems were placed at beat 0 with readback by
+  `prepare_investor_demo_rehearsal_set.py --stem-dir "KENN Demo Audio" --apply`
+  through the new Places-allowlisted `/live/track/import_arrangement_audio`.
+  Live's Browser omits the `.runtime` Place, so the hash-verified visible copy
+  was used. Names, device chains, and one clip per track were verified.
+- Mutating preflight on the stem-loaded set: 11/11 in 2.85 s.
+- Saved by the operator to
+  `.runtime/investor-demo-audio/KENN_Live12_Demo_Rehearsal-1 Project/`; a
+  read-only reset copy is `KENN_Live12_Demo_RESET Project/` (identical hash).
+- Ten-run non-mutating script gate on the saved set: **10/10**, 130 prompts,
+  slowest 398.6 ms. An earlier attempt failed at step 3 after the Live
+  selection was changed outside KENN mid-gate; the proposal prompts were
+  re-tested and do not alter Live's selection.
+- Still not qualified: the ten complete 20-step UI rehearsals.

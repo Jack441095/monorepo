@@ -62,7 +62,7 @@ Tick items here in the same commit as the work that completes them.
 - [x] Kick and Synth converted to audio tracks; all eight stems placed at bar 1 via `prepare_investor_demo_rehearsal_set.py` (2026-09-23)
 - [x] Mutating preflight 11/11 on the stem-loaded disposable set (2026-09-23)
 - [x] Disposable set saved (`.runtime/investor-demo-audio/KENN_Live12_Demo_Rehearsal-1 Project/`); read-only reset copy kept as `KENN_Live12_Demo_RESET Project/` (2026-09-23)
-- [ ] Ten-run non-mutating script gate on the stem-loaded set
+- [x] Ten-run non-mutating script gate on the stem-loaded set: 10/10, 130 prompts, slowest 398.6 ms (2026-09-23)
 - [ ] Ten consecutive complete 20-step rehearsals (reset, recovery drill, projector layout, 8–12 min timing)
 - [ ] Fix AbletonOSC `get_selected_track` crash when a return/master track is selected
 - [ ] Push local commits (awaiting owner go-ahead; triggers the public mirror)
