@@ -21,6 +21,19 @@ generator for the original `Neon Proof` demo composition, but the complete
 script remains unqualified until its stems are imported into a disposable Live
 copy and the full run passes the rehearsal gate.
 
+### Current working handoff — 2026-09-23
+
+- The eight stems and both analysis WAVs have been rendered under
+  `.runtime/investor-demo-audio/`.
+- `KENN_Live12_Demo_Rehearsal.als` exists there and is still byte-identical to
+  the tracked reset fixture; no stems have been imported.
+- Live is currently stopped on the tracked reset fixture. Do not confirm any
+  proposal in that set.
+- Resume by opening the `.runtime` rehearsal copy and visibly verifying its
+  window URL before importing audio or running any mutation qualifier.
+- After import, run mutating preflight and the atomic-EQ qualifier with
+  `--apply`, then begin the ten-run complete rehearsal gate.
+
 ## Before the room opens
 
 1. Render the rights-clear audio fixture with `python3
