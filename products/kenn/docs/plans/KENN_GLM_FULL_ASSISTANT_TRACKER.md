@@ -14,6 +14,9 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 ## Waiting on owner
 
+- [ ] Review the 100 drafted phrasings in `tooling/data/natural_holdout_candidates.jsonl` (labels: explicit target+amount → action, vague → clarify); approved ones move into the curated holdout
+- [ ] OK a `~/kenn_*` work folder on the GPU box (GPU 0, `/mnt/data`) for C6 LoRA training — text-only corpus, no audio
+
 - [ ] Demo rehearsals 2–10: owner-run, see `docs/evidence/KENN_INVESTOR_DEMO_REHEARSAL_LOG.md`
 - [ ] Say when Live is free, so I can run `deploy_abletonosc.py --apply --reload` (hot reload, no restart needed) and prove A2's selection fix and A3 on real Live
 
@@ -61,9 +64,10 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 ## Phase C — Language brain
 
 - [ ] **C1 Constrained decoding:** the planner's JSON is valid by construction (Ollama structured outputs; xgrammar or llguidance fallback)
+  > Code done 2026-09-23: `llm_plan_json_schema()` (flat, shape-only: schema const, 28 allowed actions, field types, no unknown keys) sent as Ollama `response_format: json_schema`; schema calls skip the MLX path, which silently ignored `json_mode`. Per-action `anyOf` branches were tried and made qwen2.5:1.5b pick wrong actions and overrun its token cap, so meaning stays with `validate_llm_plan`. Awaiting bake-off numbers to tick.
 - [ ] **C2 Model bake-off** on this Mac: `qwen2.5:1.5b`, `qwen2.5:7b-instruct`, Qwen3.5-2B/4B, Phi-4-mini (accuracy, clarification, p95 latency, memory)
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
-  - [ ] ≥ 100 phrasings · [ ] ≥ 250 · [ ] ≥ 500 (slang, fragments, corrections, multi-intent)
+  - [ ] ≥ 100 phrasings · [ ] ≥ 250 · [ ] ≥ 500 (slang, fragments, corrections, multi-intent). Curated holdout: 24 (Codex). 100 drafted candidates in `tooling/data/natural_holdout_candidates.jsonl` await owner review before promotion.
 - [ ] **C4 Staged promotion** (owner sign-off per stage)
   - [ ] shadow → propose-with-confirm
   - [ ] propose-with-confirm → active with deterministic fallback
@@ -151,4 +155,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | A3 deploy tool, version endpoint, stale-script preflight check | `0d6da61` | 11 new tests; plan shows only view.py + application.py differ (both hot-reloadable) |
 | 2026-09-23 | B1 world model (code): returns/master/racks/automation-state reads, world-model route | `e5d4b21` | 4 new tests; fake-backed route smoke |
 | 2026-09-23 | B3 world-model questions (code) | `df88e4f` | 13 unit tests; Playwright 8/8 |
-| 2026-09-23 | B2 versioned world state + receipt invalidation | (this commit) | 4 new tests; backend 1,479 |
+| 2026-09-23 | B2 versioned world state + receipt invalidation | `030593f` | 4 new tests; backend 1,479 |
+| 2026-09-23 | C1 schema-constrained planner decoding; bake-off harness; 100 candidate phrasings | (this commit) | 4 new tests; bake-off running |

@@ -347,7 +347,8 @@ DEFAULT_MAX_TOKENS = 1200
 
 
 def _build_payload(
-    cfg: dict, messages: list[dict], *, stream: bool = False, answer_mode: str = "", json_mode: bool = False
+    cfg: dict, messages: list[dict], *, stream: bool = False, answer_mode: str = "", json_mode: bool = False,
+    json_schema: dict | None = None,
 ) -> dict:
     payload = {
         "model": cfg["model"],
@@ -359,7 +360,14 @@ def _build_payload(
         "max_tokens": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS),
         "stream": stream,
     }
-    if json_mode:
+    if json_schema is not None:
+        # Grammar-constrained decoding: the reply can only be this schema.
+        payload["temperature"] = 0.0
+        payload["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {"name": "kenn_structured_output", "schema": json_schema, "strict": True},
+        }
+    elif json_mode:
         payload["response_format"] = {"type": "json_object"}
     return payload
 
@@ -629,8 +637,13 @@ def _chat_completion(
     system_prompt: str | None = None,
     answer_mode: str = "",
     json_mode: bool = False,
+    json_schema: dict | None = None,
 ) -> tuple[str, LLMUsage]:
-    """Non-streaming chat completion. Returns (content, usage)."""
+    """Non-streaming chat completion. Returns (content, usage).
+
+    ``json_schema`` constrains decoding to that schema and skips the MLX path,
+    which cannot constrain its output.
+    """
     cfg = config(task)
     if system_prompt:
         messages = [{"role": "system", "content": system_prompt}] + [
@@ -647,7 +660,7 @@ def _chat_completion(
         return cached, usage
 
     # Prioritize Apple Silicon MLX native on-device inference when enabled and available
-    use_mlx = os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
+    use_mlx = json_schema is None and os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
     if use_mlx:
         try:
             from kenn.llm.mlx_inference_engine import MLXInferenceEngine
@@ -682,6 +695,7 @@ def _chat_completion(
         stream=False,
         answer_mode=answer_mode,
         json_mode=json_mode,
+        json_schema=json_schema,
     )
     headers = _build_headers(cfg)
     client = _get_client()
