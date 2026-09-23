@@ -72,6 +72,7 @@ class FakeLiveBackend:
             for send, value in enumerate(values)
         }
         self._selected_device = dict(fixture.get("selected_device") or {"track_index": 0, "device_index": 0})
+        self._world_fixture = copy.deepcopy(fixture.get("world") or {})
         self.writes: list[tuple[Any, ...]] = []
 
     @staticmethod
@@ -157,12 +158,64 @@ class FakeLiveBackend:
 
     def query_session_understanding(self) -> dict[str, Any]:
         state = self.query_session_state(include_meters=True)
+        returns = self.get_return_tracks()
         state["return_tracks"] = [
             {"index": item["index"], "name": item["name"],
              "devices": [{"index": i, "name": name} for i, name in enumerate(item.get("devices") or [])]}
-            for item in self.get_return_tracks()
+            for item in returns
         ]
+        with self._lock:
+            for track in state.get("tracks", []):
+                track["sends"] = [
+                    {"index": r["index"], "return_track_index": r["index"], "return_track_name": r["name"],
+                     "value": float(self._sends.get((int(track["index"]), int(r["index"])), 0.0))}
+                    for r in returns
+                ]
+        # Only what the fixture recorded; groups/routing/clips stay unavailable.
+        state["understanding_capabilities"] = {"return_tracks": True, "track_sends": True, "groups": False,
+                                               "routing": False, "session_clip_inventory": False,
+                                               "arrangement_clip_inventory": False}
+        state["read_only"] = True
         return state
+
+    def _world(self, key: str) -> dict[str, Any] | None:
+        entry = (self._world_fixture.get(key) if isinstance(self._world_fixture, dict) else None)
+        return copy.deepcopy(entry) if isinstance(entry, dict) else None
+
+    def get_bus_mixer(self, kind: str, index: int = -1) -> dict[str, Any]:
+        recorded = self._world(f"bus_mixer:{kind}:{int(index)}")
+        if recorded is None:
+            return {"success": False, "error": "Not in the fake Live fixture; re-record after deploying AbletonOSC."}
+        return {"success": True, **recorded}
+
+    def get_device_tree(self, kind: str, index: int = -1) -> dict[str, Any]:
+        recorded = self._world(f"device_tree:{kind}:{int(index)}")
+        if recorded is not None:
+            return {"success": True, **recorded}
+        if kind == "track":
+            with self._lock:
+                track = self._track(index)
+                if track is None:
+                    return {"success": False, "error": "No such track."}
+                return {"success": True, "kind": "track", "index": int(index), "devices": [
+                    {"name": d["name"], "class_name": "", "can_have_chains": False} for d in track.get("devices", [])
+                ]}
+        return {"success": False, "error": "Not in the fake Live fixture; re-record after deploying AbletonOSC."}
+
+    def get_bus_device_parameters(self, kind: str, index: int, device_index: int) -> dict[str, Any]:
+        if kind == "track":
+            info = self.get_device_parameters(index, device_index)
+            if not info.get("success"):
+                return info
+            for parameter in info["parameters"]:
+                parameter["value_display"] = self.get_device_parameter_value_string(
+                    index, device_index, parameter["index"])["value_string"]
+                parameter.setdefault("automation_state", 0)
+            return {"success": True, "kind": "track", "index": int(index), "device_index": int(device_index), **info}
+        recorded = self._world(f"device_parameters:{kind}:{int(index)}:{int(device_index)}")
+        if recorded is None:
+            return {"success": False, "error": "Not in the fake Live fixture; re-record after deploying AbletonOSC."}
+        return {"success": True, **recorded}
 
     def get_remote_script_version(self) -> dict[str, Any]:
         return {"success": True, "content_hash": "fake", "git_commit": "", "deployed_at": "", "backend": "fake"}

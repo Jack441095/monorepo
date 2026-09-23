@@ -135,6 +135,78 @@ class SongHandler(AbletonOSCHandler):
             return tuple([int(return_track_index)] + [device.name for device in track.devices])
         self.osc_server.add_handler("/live/song/get/return_track_devices", song_get_return_track_devices)
 
+        #--------------------------------------------------------------------------------
+        # KENN world-model reads (read-only, JSON payloads). AbletonOSC addresses
+        # only song.tracks by index, so returns, the master track, rack chains and
+        # parameter automation state need their own reads.
+        #--------------------------------------------------------------------------------
+        def _kenn_track(kind, index):
+            kind = str(kind)
+            if kind == "track":
+                return self.song.tracks[int(index)]
+            if kind == "return":
+                return self.song.return_tracks[int(index)]
+            if kind == "master":
+                return self.song.master_track
+            raise ValueError("kind must be track, return, or master")
+
+        def _kenn_device_node(device, depth):
+            node = {"name": str(device.name), "class_name": str(getattr(device, "class_name", "")),
+                    "can_have_chains": bool(getattr(device, "can_have_chains", False))}
+            if node["can_have_chains"] and depth < 3:
+                node["chains"] = [
+                    {"name": str(chain.name),
+                     "devices": [_kenn_device_node(inner, depth + 1) for inner in chain.devices]}
+                    for chain in device.chains
+                ]
+            return node
+
+        def kenn_get_bus_mixer(params):
+            kind, index = str(params[0]), int(params[1]) if len(params) > 1 else -1
+            try:
+                track = _kenn_track(kind, index)
+                mixer = track.mixer_device
+                payload = {"kind": kind, "index": index, "name": str(track.name),
+                           "volume": float(mixer.volume.value), "panning": float(mixer.panning.value),
+                           "devices": [str(device.name) for device in track.devices]}
+                if kind != "master":
+                    payload.update({"mute": bool(track.mute), "solo": bool(track.solo)})
+            except Exception as exc:
+                payload = {"kind": kind, "index": index, "error": str(exc)}
+            return (json.dumps(payload),)
+        self.osc_server.add_handler("/live/kenn/get/bus_mixer", kenn_get_bus_mixer)
+
+        def kenn_get_device_tree(params):
+            kind, index = str(params[0]), int(params[1]) if len(params) > 1 else -1
+            try:
+                track = _kenn_track(kind, index)
+                payload = {"kind": kind, "index": index,
+                           "devices": [_kenn_device_node(device, 0) for device in track.devices]}
+            except Exception as exc:
+                payload = {"kind": kind, "index": index, "error": str(exc)}
+            return (json.dumps(payload),)
+        self.osc_server.add_handler("/live/kenn/get/device_tree", kenn_get_device_tree)
+
+        def kenn_get_device_parameters(params):
+            kind, index, device_index = str(params[0]), int(params[1]), int(params[2])
+            try:
+                device = _kenn_track(kind, index).devices[device_index]
+                rows = []
+                for position, parameter in enumerate(device.parameters):
+                    rows.append({
+                        "index": position, "name": str(parameter.name),
+                        "value": float(parameter.value), "min": float(parameter.min), "max": float(parameter.max),
+                        "quantized": bool(parameter.is_quantized),
+                        "value_display": str(parameter.str_for_value(parameter.value)),
+                        "automation_state": int(getattr(parameter, "automation_state", 0)),
+                    })
+                payload = {"kind": kind, "index": index, "device_index": device_index,
+                           "device_name": str(device.name), "parameters": rows}
+            except Exception as exc:
+                payload = {"kind": kind, "index": index, "device_index": device_index, "error": str(exc)}
+            return (json.dumps(payload),)
+        self.osc_server.add_handler("/live/kenn/get/device_parameters", kenn_get_device_parameters)
+
         def song_set_return_track_name(params):
             return_track_index, name = params
             self.song.return_tracks[int(return_track_index)].name = str(name)
