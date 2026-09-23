@@ -16,6 +16,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 - [x] Pick the C6 base model: `qwen3.5:4b` (clarifies 20/30, Mac p50 6.7 s) or `qwen3:4b` (clarifies 2/30, Mac p50 4.5 s; needs clarify training). See the C2 GPU evidence addendum
   > Owner chose **qwen3.5:4b** on 2026-09-23 (safer: already clarifies; the latency gap should narrow once fine-tuning shortens the prompt). Fallback if its hybrid architecture has no LoRA tooling: qwen3:4b with a clarify-heavy corpus.
+- [ ] Review the 21 drafted clarify training seeds in `tooling/scripts/drafted_command_seeds.py` (C6)
 - [ ] Review the 100 drafted phrasings in `tooling/data/natural_holdout_candidates.jsonl` (labels: explicit target+amount → action, vague → clarify); approved ones move into the curated holdout
 - [x] OK a `~/kenn_*` work folder on the GPU box (GPU 0, `/mnt/data`) for C6 LoRA training — text-only corpus, no audio
   > Given 2026-09-23 ("Anything we need to do that requires a GPU", no server restarts). Using `/mnt/data/kenn-bakeoff/`: user-level Ollama 0.34.2 on GPU 0, loopback port 11437, no system install.
@@ -84,7 +85,11 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [ ] propose-with-confirm → active with deterministic fallback
 - [ ] **C5 Planner over the world model** (bounded relevant slice only)
 - [ ] **C6 LoRA refresh** with mlx-lm, evaluated on the holdout
-  > Base per C2: qwen3.5:2b (fast, clarifies 1/30) or qwen3.5:4b (clarifies 20/30). Corpus: contract-correct, ≥ ⅓ clarify, no thinking, user units. Models already on the GPU box under `/mnt/data/kenn-bakeoff/ollama/models`.
+  > Base per C2: qwen3.5:4b (owner's choice). **Run 1 done 2026-09-23** (`KENN_C6_LORA_PILOT_2026-09-23.md`). mlx-lm could not train it on the 16 GB M3, so training moved to GPU 0 on the box (17 min). Fine-tune + compact prompt: 68.5% correct vs 65.3% stock + full prompt; **clarify 30/30** (was 19/30); **wrong plans accepted 5** (was 15); but over-cautious on some clear commands (act 55/94 vs 62/94). Not ticked: run 2 and the Mac latency check are next.
+  - [x] Corpus: leak guard covers all evaluation holdouts; compact targets; drafted clarify seeds (owner review pending); compact prompt
+  - [x] Training pipeline: GPU box (standalone trainer, SHA-verified weights), full-checkpoint merge, GGUF, Ollama import
+  - [ ] Run 2: clarify share ~35%, more explicit-command and two-part variety; re-score on the 124 cases
+  - [ ] Mac latency of the Q4_K_M fine-tune with the compact prompt
 
 ## Phase D — Control breadth
 
@@ -176,4 +181,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | F1 MIDI ideas from chat (chords/drums/bass) as confirmable clips; MIDI-track phrasing fix | `f646979` | 9 unit tests; Playwright 9/9 |
 | 2026-09-23 | First real AbletonOSC deploy (hot reload); A2/B1/B3 proven on real Live; card names selected return | `2065b7f` | `KENN_WORLD_MODEL_REAL_LIVE_2026-09-23.md` |
 | 2026-09-23 | C1 ticked; C2 Mac bake-off results and parser baseline | `62580f9` | `KENN_C2_PLANNER_BAKEOFF_MAC_2026-09-23.md` |
-| 2026-09-23 | C2 ticked: GPU bake-off, thinking modes, prompt order fix | (this commit) | `KENN_C2_PLANNER_BAKEOFF_GPU_2026-09-23.md` |
+| 2026-09-23 | C2 ticked: GPU bake-off, thinking modes, prompt order fix | `e7b41af` | `KENN_C2_PLANNER_BAKEOFF_GPU_2026-09-23.md` |
+| 2026-09-23 | C6 run 1: qwen3.5:4b LoRA on GPU 0; clarify 30/30, 5 wrong plans accepted | (this commit) | `KENN_C6_LORA_PILOT_2026-09-23.md` |

@@ -61,3 +61,16 @@ def test_compact_corpus_uses_the_compact_system_prompt() -> None:
 
     rows = build_rows(variants=2, scenarios=1, prompt="compact")
     assert {row["messages"][0]["content"] for row in rows} == {LLM_COMMAND_SYSTEM_PROMPT_COMPACT}
+
+
+def test_lora_merge_maps_adapter_pairs_and_scale() -> None:
+    from scripts.merge_lora_into_checkpoint import lora_scale, pair_keys
+
+    keys = ["base_model.model.model.layers.0.mlp.up_proj.lora_A.weight",
+            "base_model.model.model.layers.0.mlp.up_proj.lora_B.weight"]
+    assert pair_keys(keys, "base_model.model.model.", "model.language_model.") == {
+        "model.language_model.layers.0.mlp.up_proj.weight": (keys[0], keys[1])}
+    with pytest.raises(ValueError, match="lora_B"):
+        pair_keys(keys[:1], "base_model.model.model.", "model.language_model.")
+    assert lora_scale({"r": 16, "lora_alpha": 32}) == 2.0
+    assert lora_scale({"r": 16, "lora_alpha": 32, "use_rslora": True}) == 8.0
