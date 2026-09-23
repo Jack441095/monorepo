@@ -63,7 +63,12 @@ copy and the full run passes the rehearsal gate.
 4. Select Drum Bus and its Compressor. This gives the device-focus action an
    exact starting selection; a selected return track is not treated as an
    implicit regular-track target.
-5. Start AbletonOSC, the KENN backend, and the frontend.
+5. Start the **full KENN companion** (not `run_ux_backend.py`, which skips the
+   Mixing Doctor loop that feeds the Live status panel), from `products/kenn`
+   with the step-3 variables and `KENN_ALLOW_DAW_CONTROL=1` exported:
+   `PYTHONPATH=apps/backend/src:tooling python3 apps/backend/src/kenn/server.py`.
+   The UI is **http://127.0.0.1:8090/** (the `/kenn/` prefix is API-only and
+   renders a blank page). Confirm the panel shows "Live connected" and 8 tracks.
 6. Run `tooling/scripts/demo_preflight.py` without mutations. Its audio check
    must verify both hashes against the actual chat-analysis responses, detect
    the low-end and isolated-vocal clipping cues, and warm the bounded analysis
