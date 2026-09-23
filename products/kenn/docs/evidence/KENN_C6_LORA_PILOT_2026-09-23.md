@@ -112,3 +112,32 @@ Profile of single calls with the snapshot changed before each command, as after 
   figures must state the machine's state.
 - **The fine-tune writes `"relative":false` in every plan** (3–4 tokens), because the training targets keep false
   values. That is harmless and could be trimmed in a later corpus.
+
+## Addendum: run 2 and dB volumes (2026-09-24)
+
+**Run 2** was the same recipe with fewer variants per clarify seed (`--clarify-variants 5`): 1,812 records, 36%
+clarify, 204 steps, 13 min, validation loss 1.79 → 0.0007.
+
+- **It scored worse: 48.4%.** It still asked when it should (30/30) but acted on only 30 of 94 clear commands.
+- **The raw replies explained it.** Run 2 wrote volume changes in user units (`"relative":true,"unit":"dB","value":3.0`
+  for "bring the bass up 3 dB").
+  - The old contract rejected those, and the repair pass turned them into clarifications.
+  - Run 1's "correct" volume plans held guessed values (0.707). The scorer checks the action and track, not the value.
+- **KENN now accepts dB volumes and converts them.** `validate_llm_plan` accepts `set_volume` in dB, absolute or
+  relative, and converts with the rule parser's own mapping (10^(dB/20); a relative change scales the snapshot
+  volume; results outside (0, 1] are rejected).
+
+Re-scored with the dB conversion (GPU, 124 cases):
+
+| | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted |
+|---|---|---|---|---|---|
+| Stock + full prompt | 65.3% | 19/30 | 62/94 | 13/24 | 15 |
+| **Run 1 + compact prompt** | **68.5%** | **30/30** | 55/94 | **15/24** | 5 |
+| Run 2 + compact prompt | 54.8% | 30/30 | 38/94 | 11/24 | 3 |
+
+- **Run 1 stays the best fine-tune.**
+- **The corpus is the bottleneck, not the clarify balance.** Two runs with a small data change differ by 17 points on
+  clear commands. There are only 37 reviewed action seeds, while the evaluation uses slang, fragments and colloquial
+  phrasings. Run 3 needs more varied examples of clear commands, especially mute/solo, device parameters, inserts
+  and two-part requests. Those would be new drafted seeds for owner review.
+- **The scorer does not check values.** A value-aware check needs expected values in the holdout.
