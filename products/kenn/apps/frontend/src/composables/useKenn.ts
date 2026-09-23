@@ -10,7 +10,7 @@ import {
   type KennSessionTrack,
   type KennSource,
 } from '../api/kenn'
-import { ApiError } from '../api/client'
+import { userFacingKennError } from '../api/client'
 
 export type KennUserMessage = {
   id: string
@@ -240,16 +240,14 @@ async function sendMessage(text: string) {
       },
     ]
   } catch (e) {
-    const msg =
-      e instanceof ApiError && e.message
-        ? e.message
-        : e instanceof Error
-          ? e.message
-          : 'KENN request failed'
+    const msg = userFacingKennError(
+      e,
+      "KENN couldn't complete that request safely. Nothing changed; try again.",
+    )
     error.value = msg
     messages.value = [
       ...messages.value,
-      { id: newId('assistant'), role: 'assistant', text: `Error: ${msg}` },
+      { id: newId('assistant'), role: 'assistant', text: msg },
     ]
   } finally {
     sending.value = false
@@ -258,7 +256,13 @@ async function sendMessage(text: string) {
 
 async function applyMessageProposal(messageId: string) {
   const msg = messages.value.find((m) => m.id === messageId) as KennAssistantMessage | undefined
-  if (!msg || !msg.proposal?.confirmation_token) return
+  if (!msg) return
+  if (!msg.proposal?.confirmation_token) {
+    msg.actionStatus = 'error'
+    msg.actionError = 'This proposal is missing its confirmation token. Ask KENN to prepare a fresh proposal; nothing changed.'
+    messages.value = [...messages.value]
+    return
+  }
 
   msg.actionStatus = 'applying'
   msg.actionError = undefined
@@ -289,7 +293,10 @@ async function applyMessageProposal(messageId: string) {
     await refreshSessionCard()
   } catch (e) {
     msg.actionStatus = 'pending'
-    msg.actionError = e instanceof Error ? e.message : 'Action failed to apply — tap Apply to retry.'
+    msg.actionError = userFacingKennError(
+      e,
+      'KENN could not verify that action. Check Live before retrying; KENN will not send another change automatically.',
+    )
     messages.value = [...messages.value]
   }
 }
@@ -316,7 +323,10 @@ async function undoMessageProposal(messageId: string) {
     await refreshSessionCard()
   } catch (e) {
     msg.actionStatus = 'error'
-    msg.actionError = e instanceof Error ? e.message : 'Action failed to undo'
+    msg.actionError = userFacingKennError(
+      e,
+      'KENN could not verify the undo. Inspect Live before retrying; no further action was sent.',
+    )
     messages.value = [...messages.value]
   }
 }
@@ -326,7 +336,6 @@ function rejectMessageProposal(messageId: string) {
   if (!msg?.proposal || msg.actionStatus === 'applied') return
   msg.actionStatus = 'rejected'
   msg.actionError = undefined
-  lastActionAt.value = new Date()
   messages.value = [...messages.value]
 }
 
