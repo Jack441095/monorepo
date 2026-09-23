@@ -12,6 +12,20 @@ export class ApiError extends Error {
   }
 }
 
+const INTERNAL_ERROR_MARKERS = /(?:traceback|stack trace|\bat\s+\S+\s*\(|errno|econn(?:refused|reset)|syntaxerror|typeerror|referenceerror|failed to fetch|networkerror)/i
+
+/** Convert failures into bounded copy suitable for the investor-facing chat. */
+export function userFacingKennError(error: unknown, fallback: string): string {
+  if (error instanceof ApiError) {
+    const message = error.message.replace(/\s+/g, ' ').trim()
+    if (message && message.length <= 320 && !INTERNAL_ERROR_MARKERS.test(message)) return message
+  }
+  if (error instanceof TypeError) {
+    return 'KENN is offline — check the local server and try again. Nothing changed.'
+  }
+  return fallback
+}
+
 /** 兼容后端 error / FastAPI detail 字段 */
 export function parseApiErrorMessage(data: unknown, fallback: string): string {
   if (!data || typeof data !== 'object') return fallback
