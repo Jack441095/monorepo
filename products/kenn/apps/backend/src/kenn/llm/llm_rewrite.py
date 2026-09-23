@@ -372,6 +372,43 @@ def _build_payload(
     return payload
 
 
+# Thinking models behind Ollama's OpenAI-compatible route ignore
+# ``reasoning_effort``/``think`` once a JSON schema is set, think until the
+# token cap and return no answer (C2 bake-off, 2026-09-23: qwen3.5 scored 0%).
+# Ollama's native /api/chat honours ``think: false`` with a schema for the
+# qwen3 family, so schema-constrained calls to those models go there.
+# DeepSeek-R1 is deliberately absent: it kept thinking even natively.
+_THINK_OFF_MODEL = re.compile(r"(?:^|/)qwen3", re.IGNORECASE)
+
+
+def _ollama_think_off(cfg: dict, json_schema: dict | None) -> bool:
+    """Whether this call must go to Ollama's native route with thinking off.
+
+    ``KENN_LLM_THINK=off`` forces it for any model (e.g. a fine-tuned qwen3.5
+    under its own name); ``KENN_LLM_THINK=on`` disables it.
+    """
+    if cfg.get("provider") != "ollama" or json_schema is None:
+        return False
+    setting = os.environ.get("KENN_LLM_THINK", "").strip().lower()
+    if setting in {"on", "1", "true", "yes"}:
+        return False
+    if setting in {"off", "0", "false", "no"}:
+        return True
+    return bool(_THINK_OFF_MODEL.search(str(cfg.get("model") or "")))
+
+
+def _build_native_ollama_payload(cfg: dict, messages: list[dict], *, answer_mode: str, json_schema: dict) -> dict:
+    return {
+        "model": cfg["model"],
+        "messages": messages,
+        "stream": False,
+        "think": False,
+        "format": json_schema,
+        "keep_alive": KEEP_ALIVE_DURATION,
+        "options": {"temperature": 0.0, "num_predict": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)},
+    }
+
+
 # ---------------------------------------------------------------------------
 # Dynamic system prompt builder
 # ---------------------------------------------------------------------------
@@ -697,14 +734,20 @@ def _chat_completion(
         except Exception:
             pass
 
-    payload = _build_payload(
-        cfg,
-        messages,
-        stream=False,
-        answer_mode=answer_mode,
-        json_mode=json_mode,
-        json_schema=json_schema,
-    )
+    native = _ollama_think_off(cfg, json_schema)
+    if native:
+        url = f"{_native_ollama_base(cfg['base_url'])}/api/chat"
+        payload = _build_native_ollama_payload(cfg, messages, answer_mode=answer_mode, json_schema=json_schema)
+    else:
+        url = f"{cfg['base_url']}/chat/completions"
+        payload = _build_payload(
+            cfg,
+            messages,
+            stream=False,
+            answer_mode=answer_mode,
+            json_mode=json_mode,
+            json_schema=json_schema,
+        )
     headers = _build_headers(cfg)
     client = _get_client()
     started = time.perf_counter()
@@ -721,7 +764,7 @@ def _chat_completion(
     for attempt in range(2):
         try:
             response = client.post(
-                f"{cfg['base_url']}/chat/completions",
+                url,
                 json=payload,
                 headers=headers,
                 # Found live 2026-08-10: this call never overrode the
@@ -749,15 +792,21 @@ def _chat_completion(
             raise ValueError(f"LLM request failed: {e}")
 
     elapsed_ms = int((time.perf_counter() - started) * 1000)
-    choices = data.get("choices") or []
-    if not choices:
-        raise ValueError("LLM returned no choices")
-    message = choices[0].get("message") or {}
+    if native:
+        message = data.get("message") or {}
+        prompt_tokens, completion_tokens = int(data.get("prompt_eval_count") or 0), int(data.get("eval_count") or 0)
+        usage_data = {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens,
+                      "total_tokens": prompt_tokens + completion_tokens}
+    else:
+        choices = data.get("choices") or []
+        if not choices:
+            raise ValueError("LLM returned no choices")
+        message = choices[0].get("message") or {}
+        usage_data = data.get("usage") or {}
     content = str(message.get("content") or "").strip()
     if not content:
         raise ValueError("LLM returned empty content")
 
-    usage_data = data.get("usage") or {}
     usage = LLMUsage(
         model=cfg["model"],
         provider=cfg["provider"],
