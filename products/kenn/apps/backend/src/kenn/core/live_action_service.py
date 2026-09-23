@@ -337,13 +337,16 @@ class LiveActionService(Tier2Tier3ControlMixin):
             return {"status": "offline", "tracks": []}
         return state
 
-    def describe_recent_changes(self, limit: int = 10) -> dict[str, Any]:
-        """Return a bounded, human-readable view of the durable receipt journal."""
+    def describe_recent_changes(self, limit: int = 10, *, session_id: str = "") -> dict[str, Any]:
+        """Return a bounded, human-readable view of the durable receipt journal.
+
+        A session_id scopes the view to that conversation's receipts.
+        """
         try:
             bounded_limit = max(1, min(int(limit), 50))
         except (TypeError, ValueError):
             bounded_limit = 10
-        rows = list_receipts(limit=bounded_limit)
+        rows = list_receipts(session_id=session_id, limit=bounded_limit)
         changes: list[dict[str, Any]] = []
         for row in rows:
             receipt = row.get("receipt") if isinstance(row, dict) else None

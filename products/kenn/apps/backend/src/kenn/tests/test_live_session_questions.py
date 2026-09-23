@@ -161,6 +161,21 @@ def test_describe_recent_changes_is_newest_first_bounded_and_shows_undo_status(t
     assert "undoable" in result["answer"]
 
 
+def test_describe_recent_changes_scopes_to_the_asking_session(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    service = _seed_change_journal(tmp_path, monkeypatch)
+    live_receipt_journal.record_receipt(
+        {"schema": "kenn.ableton_action_receipt.v1", "receipt_id": "receipt-demo", "action": "set_pan",
+         "status": "applied", "verified": True, "target": {"track_name": "Synth", "parameter": "pan"},
+         "before": 0.0, "readback": -1.0, "timestamp": 1_800_000_000},
+        session_id="demo-session",
+    )
+
+    scoped = service.describe_recent_changes(session_id="demo-session")
+
+    assert [item["receipt_id"] for item in scoped["changes"]] == ["receipt-demo"]
+    assert "Track" not in scoped["answer"]
+
+
 def test_describe_recent_changes_handles_empty_journal(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(live_receipt_journal, "JOURNAL_PATH", tmp_path / "missing.jsonl")
 

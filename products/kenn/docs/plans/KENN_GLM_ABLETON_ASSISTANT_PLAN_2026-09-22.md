@@ -63,7 +63,12 @@ Tick items here in the same commit as the work that completes them.
 - [x] Mutating preflight 11/11 on the stem-loaded disposable set (2026-09-23)
 - [x] Disposable set saved (`.runtime/investor-demo-audio/KENN_Live12_Demo_Rehearsal-1 Project/`); read-only reset copy kept as `KENN_Live12_Demo_RESET Project/` (2026-09-23)
 - [x] Ten-run non-mutating script gate on the stem-loaded set: 10/10, 130 prompts, slowest 398.6 ms (2026-09-23)
-- [ ] Ten consecutive complete 20-step rehearsals (reset, recovery drill, projector layout, 8–12 min timing)
+- [x] UI Apply token mismatch fixed (browser JSON number formatting) (2026-09-23)
+- [x] Chat route sends demo steps 6, 8, 9, 10, 15, 16 to the Live gateway; history scoped to session (2026-09-23)
+- [ ] History labels pan/focus receipts "not undoable" although receipt Undo works (cosmetic, step 11)
+- [ ] Current Project card shows "Focus Track: Kick" and "Key: Major" without root (cosmetic)
+- [ ] Chat parser cannot return a pan to centre ("Pan the Synth center.")
+- [ ] Ten consecutive complete 20-step rehearsals (reset, recovery drill, projector layout, 8–12 min timing); run 1 failed at step 6, count 0/10
 - [ ] Fix AbletonOSC `get_selected_track` crash when a return/master track is selected
 - [ ] Push local commits (awaiting owner go-ahead; triggers the public mirror)
 

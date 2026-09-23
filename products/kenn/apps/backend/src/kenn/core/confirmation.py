@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import os
+import re
 import secrets
 import time
 from threading import Lock
@@ -38,8 +39,20 @@ def _secret() -> bytes:
     return hmac.new(root, _PROCESS_SECRET, hashlib.sha256).digest()
 
 
+# Browser clients echo proposals through JSON.stringify, which drops a float's
+# trailing ".0" and formats small magnitudes differently from Python, so equal
+# numbers must hash equally. Word-adjacent digits (hex hashes, names) are left alone.
+_NUMBER = re.compile(r"(?<![\w.])-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(?![\w.])")
+
+
+def _canonical_number(match: re.Match[str]) -> str:
+    value = float(match.group(0))
+    return "0.0" if value == 0 else repr(value)
+
+
 def _request_hash(text: str) -> str:
-    return hashlib.sha256(text.strip().encode("utf-8")).hexdigest()
+    canonical = _NUMBER.sub(_canonical_number, text.strip())
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def _signature(session_id: str, service_id: str, text: str, expires_at: int, nonce: str) -> str:
