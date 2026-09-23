@@ -9,10 +9,10 @@ ever returned to a caller" rule). ``execute_import`` re-resolves the id back
 to an absolute path itself, immediately before sending it to AbletonOSC, so
 the path never needs to round-trip through an external caller.
 
-This service never replaces an existing clip, and it depends on a real
-``/live/browser/import_sample`` OSC endpoint added to the vendored
-AbletonOSC fork (see ``docs/ABLETON_ASSISTANT_CURRENT_STATE.md``'s
-2026-09-06 research entry for how that was found and proven live).
+This service never replaces an existing clip, and it depends on the real
+``/live/track/import_sample`` OSC endpoint added to the vendored AbletonOSC
+fork. The Remote Script retains Ableton's Browser Places as the file allowlist,
+then uses Live 12's exact ``ClipSlot.create_audio_clip`` API for the mutation.
 """
 
 from __future__ import annotations

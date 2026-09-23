@@ -220,16 +220,18 @@ class TrackHandler(AbletonOSCHandler):
                     "added as a Place in Live > Preferences > Library, and try again.",
                 )
 
+            # The Browser lookup above is the allowlist boundary: it proves the
+            # requested file belongs to a folder the operator explicitly added
+            # as a Place.  Use Live 12's exact ClipSlot API for the mutation.
+            # ``browser.load_item(item)`` depends on GUI focus and can silently
+            # miss the requested slot even after selecting the target track.
             try:
-                self.song.view.selected_track = track
-                browser.load_item(item)
+                slot.create_audio_clip(absolute_path)
             except Exception as exc:
                 return (clip_slot_index, False, "Load failed: %s" % exc)
 
-            # load_item() can invalidate the previously-fetched Track/ClipSlot
-            # Python references (their underlying object identity changes) --
-            # confirmed live 2026-09-06 during research for this feature. Every
-            # access after this point re-fetches fresh via the track index.
+            # Re-fetch after mutation because Live may invalidate object
+            # references when it creates the clip.
             fresh_track = self.song.tracks[int(track_index)]
             fresh_slot = fresh_track.clip_slots[clip_slot_index]
             if not fresh_slot.has_clip:

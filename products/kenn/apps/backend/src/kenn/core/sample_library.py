@@ -17,11 +17,11 @@ is opt-in only -- never invoked by the bulk scan or by ``search_samples``
 -- so the 28k-file library stays fast, and the result is honestly labelled
 as measured evidence, not a filename-derived tag.
 
-Importing a chosen sample into Live is a separate, currently blocked
-capability: neither AbletonOSC nor KENN's bridge exposes a way to load an
-audio file into a clip slot, so this module is read-only search/browse
-until that gap closes (mirrors the send/return-track control gap recorded
-in docs/ABLETONOSC_ROUTE.md).
+Importing a chosen sample into Live remains a separate, confirmation-gated
+capability. ``SampleImportService`` resolves an opaque id back to an approved
+path, and the vendored AbletonOSC endpoint creates the audio clip in one exact
+empty Session slot with readback. Search and browse in this module stay
+read-only.
 """
 
 from __future__ import annotations
