@@ -760,6 +760,28 @@ def test_short_eq_and_trailing_device_setup_phrasing_are_typed() -> None:
     assert setup["desired_value"] == 40.0
 
 
+@pytest.mark.parametrize(
+    ("command", "reason_fragment"),
+    [
+        ("solo the Bass and check the low end", "fresh post-solo capture"),
+        ("create a return with reverb and send Vocal to it at -10 dB", "Create-return-and-send"),
+        ("add an EQ and boost 3 dB at 5 kHz on Bass", "Insert-and-tune EQ"),
+        ("balance all the drums and call the group Drums", "Group-and-rename"),
+    ],
+)
+def test_unqualified_compound_workflows_never_degrade_to_a_partial_action(
+    command: str,
+    reason_fragment: str,
+) -> None:
+    result = parse_natural_recipe(command, snapshot())
+
+    assert result is not None
+    assert result["action"] == "recipe"
+    assert result["steps"] == []
+    assert reason_fragment in result["ambiguity"][0]
+    assert "nothing changed" in result["ambiguity"][0].casefold()
+
+
 def test_named_track_focus_resolves_without_guessing_an_index() -> None:
     result = parse_request("Select the Drum Bus track", snapshot())
 

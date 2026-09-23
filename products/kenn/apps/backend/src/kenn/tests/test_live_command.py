@@ -604,6 +604,23 @@ def test_other_one_requires_an_exact_identity_through_the_gateway() -> None:
     assert fake.writes == []
 
 
+def test_solo_and_analyze_never_silently_degrades_to_solo_only() -> None:
+    fake = FakeLive()
+
+    result = handle_command(
+        "solo the Bass and check the low end",
+        session_id="command-solo-analysis-guard",
+        service=_service(fake),
+        allow_llm=False,
+    )
+
+    assert result["status"] == "clarification_required"
+    assert result["intent"]["action"] == "recipe"
+    assert "fresh post-solo capture" in result["answer"]
+    assert "proposal" not in result
+    assert fake.writes == []
+
+
 def test_reverb_setup_applies_parameter_after_insertion_and_supports_identity_bound_undo() -> None:
     fake = DeviceSetupLive()
     service = _service(fake)

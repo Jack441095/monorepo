@@ -344,6 +344,25 @@ _RECIPE_TRACK_ACTIONS = frozenset({"set_volume", "set_pan", "set_mute", "set_sol
 _RECIPE_TRANSPORT_ACTIONS = frozenset({"transport_play", "transport_stop"})
 _RECIPE_DEVICE_ACTIONS = frozenset({"set_device_parameter"})
 _RECIPE_SEND_ACTIONS = frozenset({"set_send"})
+_SOLO_ANALYSIS_WORKFLOW = re.compile(
+    r"\b(?:solo|isolate)\b.{0,100}\b(?:check|analy[sz]e|inspect|listen\s+to)\b.{0,80}"
+    r"\b(?:low\s*end|mix|audio|spectrum|clipping|masking)\b",
+    re.I,
+)
+_CREATE_RETURN_SEND_WORKFLOW = re.compile(
+    r"\b(?:create|add|make)\b.{0,80}\breturn(?:\s+track)?\b.{0,120}\b(?:send|route)\b",
+    re.I,
+)
+_INSERT_EQ_TUNE_WORKFLOW = re.compile(
+    r"\b(?:add|append|insert|put|load)\b.{0,60}\beq(?:\s+eight|\s*8)?\b.{0,120}"
+    r"\b(?:boost|cut|reduce|raise|set)\b.{0,80}\b(?:hz|khz|hertz|kilohertz)\b",
+    re.I,
+)
+_GROUP_RENAME_WORKFLOW = re.compile(
+    r"\b(?:balance|group|organize|bus)\b.{0,100}\b(?:drums?|vocals?|vox|bass|synths?|guitars?|fx)\b"
+    r".{0,100}\b(?:call|name|rename)\b",
+    re.I,
+)
 
 _SPOKEN_NUMBER_VALUES = {
     "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4,
@@ -571,6 +590,42 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     actions are rejected rather than guessed inside a recipe.
     """
     text = " ".join(str(query or "").strip().split())
+    guarded_workflows = (
+        (
+            _SOLO_ANALYSIS_WORKFLOW,
+            "Solo-and-analyze requires a fresh post-solo capture plus verified restoration of the prior solo state; "
+            "that capture workflow is not qualified yet, so nothing changed.",
+        ),
+        (
+            _CREATE_RETURN_SEND_WORKFLOW,
+            "Create-return-and-send is not one exact-undo recipe yet: return deletion, inserted-device identity, and "
+            "the requested send display-unit mapping must all be qualified first. Nothing changed.",
+        ),
+        (
+            _INSERT_EQ_TUNE_WORKFLOW,
+            "Insert-and-tune EQ is not one qualified rollback recipe yet. Name an existing EQ Eight and exact band, "
+            "or request insertion separately; nothing changed.",
+        ),
+        (
+            _GROUP_RENAME_WORKFLOW,
+            "Group-and-rename is not qualified because Live group-member routing and exact group deletion are not "
+            "verified through KENN yet. Nothing changed.",
+        ),
+    )
+    for pattern, reason in guarded_workflows:
+        if pattern.search(text):
+            return {
+                "schema": "kenn.ableton_recipe_intent.v1",
+                "action": "recipe",
+                "mode": "assist",
+                "segments": [text],
+                "steps": [],
+                "step_intents": [],
+                "missing_fields": [],
+                "ambiguity": [reason],
+                "confirmation_required": False,
+                "confidence": 1.0,
+            }
     # Insert-and-configure phrases contain an ``and set`` separator but map
     # to one qualified, rollback-capable atomic proposal.  Let parse_request
     # handle that primitive instead of splitting it into an unsafe recipe.
