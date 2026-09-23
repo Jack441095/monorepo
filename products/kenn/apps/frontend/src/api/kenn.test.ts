@@ -1,7 +1,40 @@
 import { describe, expect, it } from 'vitest'
-import { parseAdviceFindings } from './kenn'
+import { parseAdviceFindings, summarizeAdviceAnswer } from './kenn'
+
+describe('summarizeAdviceAnswer', () => {
+  it('keeps one scope sentence when structured findings render below it', () => {
+    expect(summarizeAdviceAnswer('I analyzed the session capture.\n- High: clipping', true))
+      .toBe('I analyzed the session capture.')
+  })
+
+  it('preserves ordinary chat answers without findings', () => {
+    expect(summarizeAdviceAnswer('Line one\nLine two', false)).toBe('Line one\nLine two')
+  })
+})
 
 describe('parseAdviceFindings', () => {
+  it('renders direct session-advice findings from the response root', () => {
+    const findings = parseAdviceFindings({
+      answer_mode: 'session_question',
+      advice_mode: 'audio_analysis',
+      findings: [{
+        type: 'possible_low_end_excess',
+        severity: 'informational',
+        confidence: 0.65,
+        explanation: 'The measured low band is elevated against the diagnostic reference.',
+        suggested_listening_test: 'Alternate kick and bass in mono at matched level.',
+      }],
+    })
+
+    expect(findings).toEqual([{
+      title: 'possible low end excess',
+      severity: 'info',
+      confidence: 0.65,
+      detail: 'The measured low band is elevated against the diagnostic reference.',
+      listeningTest: 'Alternate kick and bass in mono at matched level.',
+    }])
+  })
+
   it('normalizes measured audio findings with listening tests', () => {
     const findings = parseAdviceFindings({
       tool_result: {
