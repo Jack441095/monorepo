@@ -16,17 +16,7 @@ echo "================================================================="
 echo "   KENN GPU 1 NOTE SYNCHRONIZER & INDEX BUILDER"
 echo "================================================================="
 
-# Setup Askpass credentials for non-interactive SSH
-ASKPASS_TMP="$(mktemp -t kenn_askpass.XXXXXX)"
-cat << 'EOF' > "$ASKPASS_TMP"
-#!/bin/sh
-echo "srd123456."
-EOF
-chmod +x "$ASKPASS_TMP"
-trap 'rm -f "$ASKPASS_TMP"' EXIT
-
-export SSH_ASKPASS="$ASKPASS_TMP"
-export SSH_ASKPASS_REQUIRE=force
+# Authentication is by SSH key. Never put a password in this repo.
 
 echo "[*] Syncing new notes from remote GPU 1 to local SSD..."
 rsync -avz --progress -e "ssh -o StrictHostKeyChecking=no -p ${REMOTE_PORT}" \

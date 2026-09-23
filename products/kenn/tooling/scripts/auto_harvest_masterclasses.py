@@ -43,22 +43,14 @@ def log(msg: str) -> None:
 
 def rsync_to_gpu() -> None:
     try:
-        askpass_script = Path("/tmp/kenn_askpass.sh")
-        if not askpass_script.exists():
-            askpass_script.write_text("#!/bin/sh\necho 'srd123456.'\n", encoding="utf-8")
-            askpass_script.chmod(0o755)
-
-        import os
-        env = os.environ.copy()
-        env["SSH_ASKPASS"] = str(askpass_script)
-        env["SSH_ASKPASS_REQUIRE"] = "force"
-
+        # Authentication is by SSH key (BatchMode fails fast instead of prompting).
+        # Never put a password in this repo.
         cmd = [
-            "rsync", "-avz", "-e", "ssh -p 2022 -o StrictHostKeyChecking=no",
+            "rsync", "-avz", "-e", "ssh -p 2022 -o BatchMode=yes -o StrictHostKeyChecking=no",
             str(OUT_DIR) + "/",
             "ubuntu@www.haoee.com:/mnt/data/kenn-notes-gpu1/transcripts/"
         ]
-        res = subprocess.run(cmd, env=env, capture_output=True, text=True, timeout=30)
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if res.returncode == 0:
             log("Synced newly harvested transcripts to GPU 1.")
         else:

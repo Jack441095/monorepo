@@ -149,3 +149,6 @@ apps/frontend/dist/
 # Playwright output
 apps/frontend/test-results/
 apps/frontend/playwright-report/
+
+# Runtime LLM answer cache
+apps/backend/data/
