@@ -8,7 +8,7 @@ from scripts.build_kenn_command_corpus import build_rows, scenario_snapshots
 from scripts.build_kenn_command_training import (
     _plan, assert_no_holdout_overlap, evaluation_queries, normalize_query, plan_target,
 )
-from scripts.drafted_command_seeds import DRAFTED_CLARIFY_SEEDS, SOURCE_KIND, drafted_records
+from scripts.drafted_command_seeds import DRAFTED_ACTION_SEEDS, DRAFTED_CLARIFY_SEEDS, SOURCE_KIND, drafted_records
 from scripts.train_kenn_command_lora_mlx import split_rows
 from kenn.core.live_command import validate_llm_plan
 
@@ -30,7 +30,7 @@ def test_targets_leave_out_nulls_and_the_schema_constant() -> None:
 def test_drafted_seeds_fill_scenario_names_validate_and_stay_labelled() -> None:
     for snapshot in scenario_snapshots():
         rows = drafted_records(snapshot, _plan)
-        assert len(rows) == len(DRAFTED_CLARIFY_SEEDS)
+        assert len(rows) == len(DRAFTED_CLARIFY_SEEDS) + len(DRAFTED_ACTION_SEEDS)
         assert all("{" not in row["query"] for row in rows)
         assert all(row["source_kind"] == SOURCE_KIND for row in rows)
         assert all(validate_llm_plan(row["label"], snapshot)["ok"] for row in rows)
@@ -74,3 +74,14 @@ def test_lora_merge_maps_adapter_pairs_and_scale() -> None:
         pair_keys(keys[:1], "base_model.model.model.", "model.language_model.")
     assert lora_scale({"r": 16, "lora_alpha": 32}) == 2.0
     assert lora_scale({"r": 16, "lora_alpha": 32, "use_rslora": True}) == 8.0
+
+
+def test_drafted_action_seeds_keep_their_wording_and_dB_volumes_convert() -> None:
+    rows = build_rows(variants=8, scenarios=1, include_drafted=True)
+    kill = [row for row in rows if row["source_record_id"] == "draft-mute-01"]
+    assert kill[0]["query"] == "Kill Drum Bus" and json.loads(kill[0]["messages"][2]["content"])["action"] == "set_mute"
+    relative = next(row for row in rows if row["source_record_id"] == "draft-vol-06")
+    snapshot = scenario_snapshots()[0]
+    checked = validate_llm_plan(relative["label"], snapshot)
+    assert checked["ok"] and checked["plan"]["unit"] == "normalized"
+    assert abs(checked["plan"]["value"] - 0.55 * 10 ** (3 / 20)) < 1e-6
