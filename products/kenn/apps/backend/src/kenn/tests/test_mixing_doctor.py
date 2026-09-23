@@ -115,6 +115,7 @@ def test_orchestrator_classifies_track_creation_for_command_gateway() -> None:
 
     assert classifier.classify("create a MIDI track") == "ableton_controller"
     assert classifier.classify("add Hybrid Reverb to the hi hat track") == "ableton_controller"
+    assert classifier.classify("Pan the Synth hard left.") == "ableton_controller"
     assert classifier.classify("how do I add EQ on track 4?") is None
 
 

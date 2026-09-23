@@ -758,6 +758,60 @@ def test_ask_session_fact_uses_read_only_live_gateway(running_server: str, monke
     assert body["tempo"] == 120.0
 
 
+def test_ask_imperative_pan_uses_confirmation_bound_live_gateway(
+    running_server: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The real chat surface must not answer a Live mutation with RAG prose."""
+    class PanFakeLive:
+        def __init__(self) -> None:
+            self.writes = 0
+
+        def query_session_state(self) -> dict:
+            return {
+                "status": "connected",
+                "tempo": 120.0,
+                "is_playing": False,
+                "tracks": [{
+                    "index": 0,
+                    "name": "Synth",
+                    "volume": 0.5,
+                    "pan": 0.0,
+                    "muted": False,
+                    "soloed": False,
+                    "armed": False,
+                    "devices": [],
+                }],
+            }
+
+        def set_track_pan(self, _index: int, _value: float) -> bool:
+            self.writes += 1
+            return True
+
+    fake = PanFakeLive()
+    monkeypatch.setattr("kenn.core.live_action_service.live_client", fake)
+
+    request = urllib.request.Request(
+        f"{running_server}/api/ask",
+        data=json.dumps({
+            "question": "Pan the Synth hard left.",
+            "session_id": "chat-pan-proposal",
+        }).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        body = json.loads(response.read())
+
+    assert body["route"] == "ableton_controller"
+    assert body["requires_confirmation"] is True
+    assert body["proposal"]["operation"] == "set_pan"
+    assert body["proposal"]["track_name"] == "Synth"
+    assert body["proposal"]["after"] == -1.0
+    assert body["proposal"]["confirmation_token"]
+    assert body["orchestration"]["result"]["changed"] is False
+    assert fake.writes == 0
+
+
 def test_knowledge_ask_cites_real_live_track_evidence_when_session_id_given(
     running_server: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:

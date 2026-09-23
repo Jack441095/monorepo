@@ -64,6 +64,12 @@ _AUDIOGEN_PATTERNS = [
 _ABLETON_PATTERNS = [
     re.compile(r"\b(ableton|session|daw)s?\b.*\b(show|status|state|tracks?|query|get)\b", re.I),
     re.compile(r"\b(set|adjust|change|tweak)\b.*\b(volume|pan|fader|level|send|dry|wet)\b.*\b(tracks?|ableton)?\b", re.I),
+    # Direct imperative form used by the investor demo and normal studio
+    # speech ("Pan the Synth hard left").  The older pattern above only
+    # accepted a leading set/adjust/change verb, so this safe typed command
+    # fell through to generic knowledge retrieval and produced an Auto Pan
+    # article instead of a confirmation-bound Live proposal.
+    re.compile(r"^\s*pan\b", re.I),
     re.compile(r"\btracks?\s*\d+\b.*\b(volume|pan|mute|solo|arm)\b", re.I),
     re.compile(r"\bshow\b.*\b(session|tracks?|projects?)\b", re.I),
     # Mute/solo/record-arm, either word order ("mute track 2" or "track 2
@@ -405,7 +411,8 @@ _ABLETON_WRITE_INTENT_RE = re.compile(
     r"|\bset_macro\b"
     r"|\bmacro\s*\d+\b.*\bto\s+\d"
     r"|\bcreate_scene\b"
-    r"|\b(?:create|add|new)\b.*\bscene\b",
+    r"|\b(?:create|add|new)\b.*\bscene\b"
+    r"|^\s*pan\b",
     re.I,
 )
 
