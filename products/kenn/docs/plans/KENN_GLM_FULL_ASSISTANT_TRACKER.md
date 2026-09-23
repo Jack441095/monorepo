@@ -51,10 +51,10 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [ ] Session clips (name, length, loop, warp) and arrangement clips: names/lengths/starts via understanding; loop/warp still to add
   - [x] Scenes, locators, song key, scale and time signature (in the world model, from existing reads)
   - [ ] Automation envelopes (read): per-parameter `automation_state` added; Live's API does not expose arrangement envelope points, so full envelope read is limited to clip envelopes (to do)
-- [ ] **B2 Change-driven state**
-  - [ ] AbletonOSC listeners replace polling
-  - [ ] One session model with a monotonic version and fingerprint
-  - [ ] Proposals bound to the model version; stale proposals refused
+- [ ] **B2 Change-driven state** (versioning + invalidation done 2026-09-23; listener pushes deferred, see note)
+  - [ ] AbletonOSC listeners replace polling. **Deferred:** pushes arrive on the same reply port and address as reads, so the shared socket could take a push for a pending read's reply. Needs a dedicated push port in the Remote Script first. Interim: 2 s cache plus invalidation on every KENN receipt.
+  - [x] One session model with a monotonic version and fingerprint (`core/live_world_state.py`; version moves only when the fingerprint changes; invalidated on every receipt; cache keyed to the client object)
+  - [x] Proposals bound to state; stale proposals refused: already enforced via `session_version` (`test_stale_state_is_rejected_before_write`, sends, undo, track creation); world answers now cite `world_model_version`
 - [ ] **B3 Full-model Q&A** ("what's on the vocal bus?", "which tracks send to the reverb?", "what's the drum compressor threshold?")
   > Code done 2026-09-23 (`core/live_world_questions.py`): contents of named tracks, returns and master (with rack chains), who sends to a return, named parameter values with Live's display string, mute/solo, and Live's scale setting (labelled as a setting, not a detected key). Track-number inventory stays on the existing route. 13 unit tests + 1 Playwright spec. Real-Live proof of return/master/parameter answers waits on the A3 deploy.
 
@@ -150,4 +150,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | A2 defects: selection fix (code), pan centre, statement classifier, voice fake removed | `241abff` | tests + real-Live chat probes; 7/7 Playwright |
 | 2026-09-23 | A3 deploy tool, version endpoint, stale-script preflight check | `0d6da61` | 11 new tests; plan shows only view.py + application.py differ (both hot-reloadable) |
 | 2026-09-23 | B1 world model (code): returns/master/racks/automation-state reads, world-model route | `e5d4b21` | 4 new tests; fake-backed route smoke |
-| 2026-09-23 | B3 world-model questions (code) | (this commit) | 13 unit tests; Playwright 8/8 |
+| 2026-09-23 | B3 world-model questions (code) | `df88e4f` | 13 unit tests; Playwright 8/8 |
+| 2026-09-23 | B2 versioned world state + receipt invalidation | (this commit) | 4 new tests; backend 1,479 |

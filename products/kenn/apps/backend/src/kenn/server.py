@@ -1333,8 +1333,9 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path in {"/api/ableton/world-model", "/kenn/api/ableton/world-model"}:
             try:
                 from kenn.ableton_osc_bridge import live_client
-                from kenn.core.live_world_model import read_world_model
-                model = read_world_model(live_client)
+                from kenn.core.live_world_state import world_state
+                refresh = str(parse_qs(parsed.query).get("refresh", [""])[0]).lower() in {"1", "true", "yes"}
+                model = world_state.current(live_client, force=refresh)
                 self.send_json(200 if model.get("status") == "connected" else 503, model)
             except Exception as exc:
                 self.send_json(503, {"status": "error", "error": str(exc)})

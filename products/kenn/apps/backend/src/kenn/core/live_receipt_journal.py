@@ -84,6 +84,10 @@ def record_receipt(receipt: dict[str, Any], *, session_id: str = "") -> bool:
     """Persist one non-secret receipt projection, keeping the newest records."""
     if not isinstance(receipt, dict) or not receipt.get("receipt_id"):
         return False
+    # Any receipt (even a failed one) means Live may have changed.
+    from kenn.core.live_world_state import invalidate_world_state
+
+    invalidate_world_state()
     row = _journal_row(receipt, session_id)
     try:
         with _JOURNAL_LOCK:
