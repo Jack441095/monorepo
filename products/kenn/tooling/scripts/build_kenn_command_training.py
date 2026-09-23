@@ -91,6 +91,17 @@ def training_snapshot() -> dict[str, Any]:
     return snapshot
 
 
+def plan_target(plan: dict[str, Any]) -> str:
+    """The assistant turn a model is trained to write for a plan label.
+
+    Null fields and the schema constant are left out: KENN stamps the schema,
+    the validator reads a missing field as null, and every token the model
+    does not write is latency saved on the Mac.
+    """
+    return json.dumps({k: v for k, v in plan.items() if k != "schema" and v is not None},
+                      ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+
+
 def _plan(action: str, **fields: Any) -> dict[str, Any]:
     return {
         "schema": "kenn.ableton_llm_plan.v1",
@@ -183,8 +194,7 @@ def records() -> list[dict[str, Any]]:
                 # Same user turn as production, so a fine-tune sees what it will serve.
                 {"role": "user", "content": planner_user_prompt(query, snapshot_text)},
                 # The model is not asked to write the schema constant; KENN stamps it.
-                {"role": "assistant", "content": json.dumps({k: v for k, v in plan.items() if k != "schema"},
-                                                            ensure_ascii=True, sort_keys=True, separators=(",", ":"))},
+                {"role": "assistant", "content": plan_target(plan)},
             ],
             "label": plan,
         }
@@ -192,11 +202,35 @@ def records() -> list[dict[str, Any]]:
     ]
 
 
+# The planner evaluation sets (C2/C6 bake-offs). Training must never contain
+# their phrasings, or a fine-tune's score would be measured on its own data.
+NATURAL_HOLDOUTS = (
+    REPO_ROOT / "tooling" / "data" / "natural_holdout.jsonl",
+    REPO_ROOT / "tooling" / "data" / "natural_holdout_candidates.jsonl",
+)
+
+
+def normalize_query(query: str) -> str:
+    """Case, spacing and trailing punctuation do not make a phrasing new."""
+    return " ".join(str(query).casefold().split()).rstrip(".!?")
+
+
+def evaluation_queries(holdout_path: Path = HOLDOUT_CASES) -> set[str]:
+    """Normalized queries from the shadow holdout and the natural holdouts."""
+    payload = json.loads(holdout_path.read_text(encoding="utf-8"))
+    queries = {str(item.get("query", "")) for item in payload if isinstance(item, dict)}
+    for path in NATURAL_HOLDOUTS:
+        if path.exists():
+            for line in path.read_text(encoding="utf-8").splitlines():
+                if line.strip():
+                    queries.add(str(json.loads(line).get("query", "")))
+    return {normalize_query(query) for query in queries if query}
+
+
 def assert_no_holdout_overlap(rows: list[dict[str, Any]], holdout_path: Path = HOLDOUT_CASES) -> None:
-    """Fail closed if a training query is copied into the shadow holdout."""
-    holdout_payload = json.loads(holdout_path.read_text(encoding="utf-8"))
-    holdout_queries = {str(item.get("query", "")) for item in holdout_payload if isinstance(item, dict)}
-    overlap = sorted({str(row.get("query", "")) for row in rows} & holdout_queries)
+    """Fail closed if a training query matches any evaluation phrasing."""
+    held_out = evaluation_queries(holdout_path)
+    overlap = sorted({str(row.get("query", "")) for row in rows if normalize_query(row.get("query", "")) in held_out})
     if overlap:
         raise ValueError(f"Training/holdout query leakage detected: {overlap}")
 

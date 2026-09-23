@@ -297,23 +297,24 @@ def _scenario_seed(seed: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, 
     return variant
 
 
-def build_rows(*, variants: int, scenarios: int = 1) -> list[dict[str, Any]]:
-    from build_kenn_command_training import HOLDOUT_CASES, records, training_snapshot
-    from kenn.core.live_command import LLM_COMMAND_SYSTEM_PROMPT, validate_llm_plan
+def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = False) -> list[dict[str, Any]]:
+    from build_kenn_command_training import _plan, evaluation_queries, normalize_query, plan_target, records
+    from drafted_command_seeds import drafted_records
+    from kenn.core.live_command import LLM_COMMAND_SYSTEM_PROMPT, planner_user_prompt, validate_llm_plan
 
     if scenarios < 1 or scenarios > len(SCENARIO_TRACK_NAMES):
         raise ValueError(f"scenarios must be between 1 and {len(SCENARIO_TRACK_NAMES)}")
-    holdout_payload = json.loads(HOLDOUT_CASES.read_text(encoding="utf-8"))
-    holdout_queries = {str(item.get("query", "")) for item in holdout_payload if isinstance(item, dict)}
+    held_out = evaluation_queries()
     rows: list[dict[str, Any]] = []
     for scenario_number, snapshot in enumerate(scenario_snapshots()[:scenarios], start=1):
         snapshot_text = json.dumps(snapshot, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
-        for seed in records():
+        seeds = records() + (drafted_records(snapshot, _plan) if include_drafted else [])
+        for seed in seeds:
             scenario_seed = _scenario_seed(seed, snapshot)
             for number, query in enumerate(_variants(scenario_seed, variants), start=1):
-                if query in holdout_queries:
+                if normalize_query(query) in held_out:
                     query = query + " in the current Live session"
-                    while query in holdout_queries:
+                    while normalize_query(query) in held_out:
                         query += " now"
                 label = dict(scenario_seed["label"])
                 record_id = f"s{scenario_number}-{seed['record_id']}-v{number:04d}"
@@ -324,14 +325,16 @@ def build_rows(*, variants: int, scenarios: int = 1) -> list[dict[str, Any]]:
                     "schema": SCHEMA,
                     "record_id": record_id,
                     "source_record_id": seed["record_id"],
+                    "source_kind": seed.get("source_kind", "reviewed_seed"),
                     "scenario": scenario_number,
                     "split": "synthetic_train",
                     "category": seed["category"],
                     "query": query,
                     "messages": [
                         {"role": "system", "content": LLM_COMMAND_SYSTEM_PROMPT},
-                        {"role": "user", "content": "Current Live snapshot (reference data):\n" + snapshot_text + "\nUser request: " + query},
-                        {"role": "assistant", "content": json.dumps(label, ensure_ascii=True, sort_keys=True, separators=(",", ":"))},
+                        # Same user turn as production; the schema constant is stamped by KENN.
+                        {"role": "user", "content": planner_user_prompt(query, snapshot_text)},
+                        {"role": "assistant", "content": plan_target(label)},
                     ],
                     "label": label,
                 })
@@ -342,9 +345,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--variants", type=int, default=8, help="Natural-language variants per reviewed seed record")
     parser.add_argument("--scenarios", type=int, default=1, help="Distinct synthetic track-name snapshots to include (1-4)")
+    parser.add_argument("--include-drafted", action="store_true",
+                        help="add the drafted clarify seeds (drafted_command_seeds.py; owner review pending)")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
-    rows = build_rows(variants=args.variants, scenarios=args.scenarios)
+    rows = build_rows(variants=args.variants, scenarios=args.scenarios, include_drafted=args.include_drafted)
     from build_kenn_command_training import assert_no_holdout_overlap
 
     assert_no_holdout_overlap(rows)
@@ -357,6 +362,7 @@ def main() -> int:
         "records": len(rows),
         "scenarios": args.scenarios,
         "variants_per_seed": args.variants,
+        "drafted_seeds_included": args.include_drafted,
         "output": str(output),
         "holdout_protection": "passed",
         "evidence_kind": "synthetic_training_data",

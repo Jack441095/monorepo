@@ -87,11 +87,18 @@ def main() -> int:
     parser.add_argument("--holdout", type=Path, default=DEFAULT_HOLDOUT)
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--out", type=Path, default=None)
+    parser.add_argument("--mlx-model", default=None,
+                        help="serve planner calls from this mlx-lm model in-process instead of an HTTP server")
+    parser.add_argument("--mlx-adapter", default=None, help="LoRA adapter directory for --mlx-model")
     parser.add_argument("--timeout", type=int, default=0,
                         help="per-call LLM timeout in seconds (AUDIO_TOO_LLM_TIMEOUT; KENN default 20)")
     args = parser.parse_args()
     if args.timeout:
         os.environ["AUDIO_TOO_LLM_TIMEOUT"] = str(args.timeout)
+    if args.mlx_model:
+        from mlx_planner_backend import install
+
+        install(args.mlx_model, args.mlx_adapter)
     cases = [json.loads(line) for line in args.holdout.read_text().splitlines() if line.strip()]
     if args.limit:
         cases = cases[: args.limit]
