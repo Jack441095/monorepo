@@ -24,6 +24,8 @@ def test_model_contract_gate_requires_acceptance_and_deterministic_match() -> No
     assert result["model_contract_passed"] is True
     assert result["live_activation_allowed"] is False
     assert result["blockers"] == []
+    assert result["promotion_assessment"]["eligible"] is False
+    assert result["promotion_assessment"]["metrics"]["comparisons"] == 1
     assert result["required_before_live_activation"]
 
 
@@ -73,3 +75,25 @@ def test_holdout_cases_have_a_passing_deterministic_contract() -> None:
                 "expected_clarification": case.get("expects_clarification"),
             })
     assert failures == []
+
+
+def test_natural_language_holdout_is_distinct_and_covers_required_axes() -> None:
+    root = Path(__file__).resolve().parents[5]
+    natural_path = root / "tooling" / "data" / "natural_holdout.jsonl"
+    cases = _load_cases(natural_path)
+    training_path = root / "apps" / "backend" / "src" / "kenn" / "training" / "ableton_command_training.jsonl"
+    training_queries = {
+        str(item.get("query", ""))
+        for item in _load_cases(training_path)
+    }
+
+    assert len(cases) >= 20
+    assert {str(item.get("category", "")) for item in cases} >= {
+        "incomplete",
+        "colloquial",
+        "ambiguous",
+        "multi_intent",
+        "mid_sentence_correction",
+    }
+    assert all(item.get("source_kind") == "curated_requirement_seed" for item in cases)
+    assert not ({str(item.get("query", "")) for item in cases} & training_queries)

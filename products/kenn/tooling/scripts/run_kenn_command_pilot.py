@@ -47,16 +47,42 @@ def _model_contract_gate(evaluation: dict[str, Any]) -> dict[str, Any]:
             blockers.append(f"{total - matches} holdout case(s) did not match deterministic interpretation")
         if int(counts.get("deterministic_contract_failures", 0) or 0):
             blockers.append("deterministic holdout contract failed")
-    from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS
+    from kenn.core.live_llm_promotion import (
+        PROMOTION_THRESHOLDS,
+        assess_promotion,
+        load_promotion_state,
+    )
+
+    state = load_promotion_state()
+    stage = str(state.get("stage") or "shadow")
+    if stage == "shadow":
+        total = int(counts.get("total", 0) or 0) if isinstance(counts, dict) else 0
+        accepted = int(counts.get("accepted_schema", 0) or 0) if isinstance(counts, dict) else 0
+        matches = int(counts.get("comparison_match", 0) or 0) if isinstance(counts, dict) else 0
+        metrics = {
+            "comparisons": int(result.get("comparisons", total) or total) if isinstance(result, dict) else total,
+            "observation_days": float(result.get("observation_days", 0.0) or 0.0) if isinstance(result, dict) else 0.0,
+            "schema_acceptance_rate": accepted / total if total else 0.0,
+            "deterministic_match_rate": matches / total if total else 0.0,
+        }
+    else:
+        metrics = {
+            "proposals": int(result.get("proposals", 0) or 0) if isinstance(result, dict) else 0,
+            "user_acceptance_rate": float(result.get("user_acceptance_rate", 0.0) or 0.0) if isinstance(result, dict) else 0.0,
+            "safety_violations": int(result.get("safety_violations", 0) or 0) if isinstance(result, dict) else 0,
+        }
+    promotion_assessment = assess_promotion(metrics, stage=stage)
 
     return {
         "model_contract_passed": not blockers,
         "live_activation_allowed": False,
         "blockers": blockers,
         "promotion_thresholds": PROMOTION_THRESHOLDS,
-        "promotion_stage": "shadow",
+        "promotion_stage": stage,
+        "promotion_assessment": promotion_assessment,
         "required_before_live_activation": [
             "complete model-contract holdout acceptance and deterministic agreement",
+            "satisfy the durable staged-promotion evidence thresholds",
             "independent human review of representative commands",
             "real-Live qualification on the guarded proposal/readback path",
         ],

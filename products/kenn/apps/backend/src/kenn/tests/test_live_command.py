@@ -2791,7 +2791,7 @@ def test_llm_shadow_mode_records_conflict_but_keeps_deterministic_authority(monk
     assert fake.writes == []
 
 
-def test_active_llm_mismatch_fails_closed_before_proposal(monkeypatch) -> None:
+def test_active_llm_mismatch_falls_back_to_deterministic_proposal(monkeypatch) -> None:
     fake = FakeLive()
     model_plan = {
         "schema": "kenn.ableton_llm_plan.v1",
@@ -2805,6 +2805,7 @@ def test_active_llm_mismatch_fails_closed_before_proposal(monkeypatch) -> None:
 
     monkeypatch.setenv("KENN_LIVE_LLM_ENABLED", "1")
     monkeypatch.setenv("KENN_LIVE_LLM_MODE", "active")
+    monkeypatch.setattr(live_command_module, "load_promotion_state", lambda: {"stage": "active"})
     monkeypatch.setattr(
         live_command_module,
         "_generate_llm_plan",
@@ -2813,11 +2814,69 @@ def test_active_llm_mismatch_fails_closed_before_proposal(monkeypatch) -> None:
 
     result = handle_command("mute track 2", session_id="command-llm-active-mismatch", service=_service(fake))
 
-    assert result["status"] == "invalid"
+    assert result["status"] == "confirmation_required"
     assert result["changed"] is False
-    assert result["llm"]["status"] == "rejected"
+    assert result["llm"]["status"] == "accepted"
     assert result["llm"]["comparison"]["status"] == "mismatch"
-    assert "proposal" not in result
+    assert result["llm"]["proposal_authority"] == "deterministic_fallback"
+    assert result["proposal"]["track_name"] == "Bass"
+    assert fake.writes == []
+
+
+def test_runtime_mode_cannot_leapfrog_reviewed_promotion_stage(monkeypatch) -> None:
+    fake = FakeLive()
+    conflicting_plan = {
+        "schema": "kenn.ableton_llm_plan.v1",
+        "action": "set_mute",
+        "track_index": 2,
+        "track_name": "Vocal",
+        "value": True,
+        "relative": False,
+        "unit": "boolean",
+    }
+    monkeypatch.setenv("KENN_LIVE_LLM_ENABLED", "1")
+    monkeypatch.setenv("KENN_LIVE_LLM_MODE", "active")
+    monkeypatch.setattr(live_command_module, "load_promotion_state", lambda: {"stage": "shadow"})
+    monkeypatch.setattr(
+        live_command_module,
+        "_generate_llm_plan",
+        lambda command, snapshot: (conflicting_plan, {"status": "accepted", "usage": {}}),
+    )
+
+    result = handle_command("mute track 2", session_id="command-llm-stage-cap", service=_service(fake))
+
+    assert result["status"] == "confirmation_required"
+    assert result["llm"]["mode"] == "shadow"
+    assert result["proposal"]["track_name"] == "Bass"
+    assert fake.writes == []
+
+
+def test_propose_stage_can_prepare_a_validated_model_only_intent(monkeypatch) -> None:
+    fake = FakeLive()
+    model_plan = {
+        "schema": "kenn.ableton_llm_plan.v1",
+        "action": "set_mute",
+        "track_index": 1,
+        "track_name": "Bass",
+        "value": True,
+        "relative": False,
+        "unit": "boolean",
+    }
+    monkeypatch.setenv("KENN_LIVE_LLM_ENABLED", "1")
+    monkeypatch.setenv("KENN_LIVE_LLM_MODE", "propose")
+    monkeypatch.setattr(live_command_module, "load_promotion_state", lambda: {"stage": "propose"})
+    monkeypatch.setattr(
+        live_command_module,
+        "_generate_llm_plan",
+        lambda command, snapshot: (model_plan, {"status": "accepted", "usage": {}}),
+    )
+
+    result = handle_command("kill the low-end channel", session_id="command-llm-propose", service=_service(fake))
+
+    assert result["status"] == "confirmation_required"
+    assert result["llm"]["mode"] == "propose"
+    assert result["llm"]["proposal_authority"] == "validated_model"
+    assert result["proposal"]["track_name"] == "Bass"
     assert fake.writes == []
 
 

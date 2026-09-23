@@ -98,9 +98,13 @@ def _fixture_snapshot() -> dict[str, Any]:
 
 
 def _load_cases(path: Path) -> list[dict[str, Any]]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    text = path.read_text(encoding="utf-8")
+    if path.suffix.casefold() == ".jsonl":
+        payload = [json.loads(line) for line in text.splitlines() if line.strip()]
+    else:
+        payload = json.loads(text)
     if not isinstance(payload, list) or not all(isinstance(item, dict) for item in payload):
-        raise ValueError(f"Expected a JSON list of case objects in {path}")
+        raise ValueError(f"Expected JSON/JSONL case objects in {path}")
     return payload
 
 
@@ -133,7 +137,20 @@ def _model_contract_gate(results: list[dict[str, Any]]) -> dict[str, Any]:
             blockers.append(f"{case_id}: model plan disagreed with deterministic interpretation")
         if not item.get("deterministic_contract_ok", False):
             blockers.append(f"{case_id}: deterministic fixture contract failed")
-    from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS
+    from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS, assess_promotion
+
+    total = len(results)
+    accepted = sum(item.get("llm_status") == "accepted" for item in results)
+    matches = sum(
+        isinstance(item.get("comparison"), dict) and item["comparison"].get("status") == "match"
+        for item in results
+    )
+    promotion_assessment = assess_promotion({
+        "comparisons": total,
+        "observation_days": 0.0,
+        "schema_acceptance_rate": accepted / total if total else 0.0,
+        "deterministic_match_rate": matches / total if total else 0.0,
+    })
 
     return {
         "model_contract_passed": not blockers,
@@ -141,6 +158,7 @@ def _model_contract_gate(results: list[dict[str, Any]]) -> dict[str, Any]:
         "blockers": blockers,
         "promotion_thresholds": PROMOTION_THRESHOLDS,
         "promotion_stage": "shadow",
+        "promotion_assessment": promotion_assessment,
         "required_before_live_activation": [
             "complete model-contract shadow evaluation with every case accepted and matching",
             "independent human review of representative commands",
@@ -181,6 +199,9 @@ def evaluate(*, model: str, cases_path: Path = DEFAULT_CASES, limit: int = 0) ->
         usage = metadata.get("usage") if isinstance(metadata, dict) else None
         llm_status = metadata.get("status") if isinstance(metadata, dict) else "unknown"
         error = metadata.get("reason", "") if isinstance(metadata, dict) else ""
+        plan_action = str(plan.get("action", "")) if isinstance(plan, dict) else ""
+        expected_plan_action = "clarify" if expected_action is None and expected_clarification else str(expected_action or "")
+        model_expected_ok = llm_status == "accepted" and plan_action == expected_plan_action
         results.append({
             "id": str(case.get("id", "")),
             "category": str(case.get("category", "")),
@@ -189,6 +210,8 @@ def evaluate(*, model: str, cases_path: Path = DEFAULT_CASES, limit: int = 0) ->
             "deterministic_needs_clarification": deterministic_needs_clarification,
             "expected_action": expected_action,
             "expected_clarification": expected_clarification,
+            "source_kind": str(case.get("source_kind", "synthetic_holdout")),
+            "model_expected_ok": model_expected_ok,
             "deterministic_contract_ok": deterministic.get("action") == expected_action and deterministic_needs_clarification == expected_clarification,
             "llm_status": llm_status,
             "plan": plan,
@@ -209,12 +232,14 @@ def evaluate(*, model: str, cases_path: Path = DEFAULT_CASES, limit: int = 0) ->
         "comparison_match": sum(item.get("status") == "match" for item in comparisons),
         "comparison_mismatch": sum(item.get("status") == "mismatch" for item in comparisons),
         "comparison_incomplete": sum(item.get("status") == "incomplete" for item in comparisons),
+        "model_expected_match": sum(bool(item.get("model_expected_ok")) for item in results),
         "failure_kinds": {
             kind: sum(item.get("failure_kind") == kind for item in results)
             for kind in sorted({item.get("failure_kind") for item in results if item.get("failure_kind")})
         },
     }
     model_contract_gate = _model_contract_gate(results)
+    natural_results = [item for item in results if item.get("source_kind") == "curated_requirement_seed"]
     return {
         "schema": SCHEMA,
         "evidence_kind": "local_model_shadow_only",
@@ -224,6 +249,18 @@ def evaluate(*, model: str, cases_path: Path = DEFAULT_CASES, limit: int = 0) ->
         "snapshot_tracks": len(snapshot["tracks"]),
         "counts": counts,
         "model_contract_gate": model_contract_gate,
+        "natural_language_holdout": {
+            "cases": len(natural_results),
+            "validator_acceptance_rate": round(
+                sum(item.get("llm_status") == "accepted" for item in natural_results) / len(natural_results),
+                4,
+            ) if natural_results else None,
+            "expected_action_rate": round(
+                sum(bool(item.get("model_expected_ok")) for item in natural_results) / len(natural_results),
+                4,
+            ) if natural_results else None,
+            "note": "Curated requirement seeds are not claimed as recorded producer transcripts.",
+        },
         "latency_ms": {
             "mean": round(statistics.mean(latencies), 3) if latencies else None,
             "median": round(statistics.median(latencies), 3) if latencies else None,
