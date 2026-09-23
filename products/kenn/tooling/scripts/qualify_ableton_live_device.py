@@ -245,12 +245,22 @@ def qualify(*, endpoint: str, track_index: int, device_index: int, parameter_nam
     final_match = next((item for item in final_parameters if isinstance(item, dict) and int(item.get("index", -1)) == parameter_index), None)
     restored = final_match.get("value") if final_match else None
     row["restored_readback"] = restored
+    display_restored_ok = (
+        display_before is None
+        or (
+            display_restored is not None
+            and " ".join(display_restored.split()).casefold()
+            == " ".join(display_before.split()).casefold()
+        )
+    )
+    row["display_restored_verified"] = display_restored_ok
     row["status"] = "passed" if (
         executed_ok
         and undo_executed.get("ok")
         and row["replay_rejected"]
         and restored is not None
         and abs(float(restored) - before) <= 1e-4
+        and display_restored_ok
     ) else "failed"
     if row["status"] == "failed":
         row["error"] = executed.get("error") or undo_executed.get("error") or "device restoration or replay check failed"
@@ -261,27 +271,136 @@ def qualify(*, endpoint: str, track_index: int, device_index: int, parameter_nam
     return row
 
 
+def qualify_sweep(
+    *,
+    endpoint: str,
+    track_index: int,
+    device_index: int,
+    parameter_name: str,
+    values: list[float],
+    session_id: str,
+    apply: bool = False,
+    interval_seconds: float = 10.0,
+) -> dict[str, Any]:
+    """Collect a bounded multi-point mapping candidate with restore per point."""
+    if not 2 <= len(values) <= 20:
+        raise ValueError("A calibration sweep requires 2-20 test values.")
+    normalized_values = [float(value) for value in values]
+    if len(set(normalized_values)) != len(normalized_values):
+        raise ValueError("Calibration sweep values must be unique.")
+    rows: list[dict[str, Any]] = []
+    expected_status = "passed" if apply else "proposal_ready"
+    for index, value in enumerate(normalized_values):
+        if index and interval_seconds > 0:
+            time.sleep(interval_seconds)
+        row = qualify(
+            endpoint=endpoint,
+            track_index=track_index,
+            device_index=device_index,
+            parameter_name=parameter_name,
+            value=value,
+            session_id=f"{session_id}-{index + 1}",
+            apply=apply,
+        )
+        rows.append(row)
+        if row.get("status") != expected_status:
+            break
+
+    complete = len(rows) == len(normalized_values) and all(
+        row.get("status") == expected_status for row in rows
+    )
+    targets = [row.get("target") for row in rows if isinstance(row.get("target"), dict)]
+    identities = {
+        (
+            target.get("track_index"), target.get("track_name"),
+            target.get("device_index"), target.get("device_name"),
+            target.get("parameter_index"), target.get("parameter_name"),
+        )
+        for target in targets
+    }
+    identity_stable = len(identities) == 1 and len(targets) == len(rows)
+    samples = [
+        {
+            "requested_raw": row.get("write", {}).get("requested"),
+            "display_after": row.get("display_after"),
+        }
+        for row in rows
+        if row.get("status") == "passed"
+    ]
+    display_complete = not apply or all(
+        str(row.get("display_after") or "").strip() for row in rows
+    )
+    status = expected_status if complete and identity_stable and display_complete else "failed"
+    return {
+        "schema": "kenn.ableton_real_device_calibration_sweep.v1",
+        "evidence_kind": "real_live" if apply else "proposal_only",
+        "status": status,
+        "changed": False,
+        "target_identity_stable": identity_stable,
+        "display_samples_complete": display_complete,
+        "requested_values": normalized_values,
+        "completed_points": len(rows),
+        "samples": samples,
+        "rows": rows,
+        "mapping_candidate_only": True,
+        "limitations": [
+            "Every applied sample is independently restored before the next sample starts.",
+            "This report never creates or promotes a DeviceUnitProfile automatically.",
+            "A human must review the raw/display pairs, mapping shape, receipt evidence, and Live version.",
+        ],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--endpoint", default="http://127.0.0.1:8090", help="KENN companion URL")
     parser.add_argument("--track-index", type=int, required=True)
     parser.add_argument("--device-index", type=int, required=True)
     parser.add_argument("--parameter-name", required=True)
-    parser.add_argument("--value", type=float, required=True)
+    parser.add_argument(
+        "--value",
+        type=float,
+        action="append",
+        required=True,
+        help="Raw Live test value; repeat 2-20 times for a restored calibration sweep.",
+    )
     parser.add_argument("--session-id", default=f"device-qualification-{int(time.time())}")
     parser.add_argument("--apply", action="store_true", help="perform the reversible qualification after proposal-only checks")
+    parser.add_argument(
+        "--interval-seconds",
+        type=float,
+        default=10.0,
+        help="Pause between sweep points to stay below the supervised HTTP rate limit.",
+    )
     args = parser.parse_args()
     if min(args.track_index, args.device_index) < 0:
         parser.error("track and device indices must be non-negative")
-    result = qualify(
-        endpoint=args.endpoint,
-        track_index=args.track_index,
-        device_index=args.device_index,
-        parameter_name=args.parameter_name,
-        value=args.value,
-        session_id=args.session_id,
-        apply=args.apply,
-    )
+    if args.interval_seconds < 0:
+        parser.error("--interval-seconds must be non-negative")
+    if len(args.value) == 1:
+        result = qualify(
+            endpoint=args.endpoint,
+            track_index=args.track_index,
+            device_index=args.device_index,
+            parameter_name=args.parameter_name,
+            value=args.value[0],
+            session_id=args.session_id,
+            apply=args.apply,
+        )
+    else:
+        try:
+            result = qualify_sweep(
+                endpoint=args.endpoint,
+                track_index=args.track_index,
+                device_index=args.device_index,
+                parameter_name=args.parameter_name,
+                values=args.value,
+                session_id=args.session_id,
+                apply=args.apply,
+                interval_seconds=args.interval_seconds,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
     print(json.dumps(result, indent=2, sort_keys=True, default=str))
     return 0 if result.get("status") == "passed" else (2 if result.get("status") == "blocked" else 1)
 

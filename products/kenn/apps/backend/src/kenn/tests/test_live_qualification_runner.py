@@ -180,6 +180,73 @@ def test_qualification_runner_records_targeted_display_evidence(monkeypatch) -> 
     assert result["target"]["display_before"] == "20 %"
     assert result["display_after"] == "35 %"
     assert result["display_restored"] == "20 %"
+    assert result["display_restored_verified"] is True
+
+
+def test_device_calibration_sweep_restores_every_point_and_stays_a_candidate(monkeypatch) -> None:
+    calls: list[tuple[float, str, bool]] = []
+
+    def fake_qualify(**kwargs):
+        value = float(kwargs["value"])
+        calls.append((value, str(kwargs["session_id"]), bool(kwargs["apply"])))
+        return {
+            "status": "passed",
+            "target": {
+                "track_index": 2, "track_name": "Drum Bus",
+                "device_index": 0, "device_name": "Drum Buss",
+                "parameter_index": 2, "parameter_name": "Drive",
+            },
+            "write": {"requested": value},
+            "display_after": f"{value * 100:g} %",
+            "display_restored_verified": True,
+        }
+
+    monkeypatch.setattr(runner, "qualify", fake_qualify)
+
+    result = runner.qualify_sweep(
+        endpoint="http://kenn", track_index=2, device_index=0,
+        parameter_name="Drive", values=[0.25, 0.5, 0.75],
+        session_id="sweep-test", apply=True, interval_seconds=0.0,
+    )
+
+    assert result["status"] == "passed"
+    assert result["mapping_candidate_only"] is True
+    assert result["target_identity_stable"] is True
+    assert result["samples"] == [
+        {"requested_raw": 0.25, "display_after": "25 %"},
+        {"requested_raw": 0.5, "display_after": "50 %"},
+        {"requested_raw": 0.75, "display_after": "75 %"},
+    ]
+    assert calls == [
+        (0.25, "sweep-test-1", True),
+        (0.5, "sweep-test-2", True),
+        (0.75, "sweep-test-3", True),
+    ]
+
+
+def test_device_calibration_sweep_stops_at_first_failed_restore(monkeypatch) -> None:
+    def fake_qualify(**kwargs):
+        value = float(kwargs["value"])
+        return {
+            "status": "failed" if value == 0.5 else "passed",
+            "target": {
+                "track_index": 0, "track_name": "Track",
+                "device_index": 0, "device_name": "Device",
+                "parameter_index": 1, "parameter_name": "Parameter",
+            },
+        }
+
+    monkeypatch.setattr(runner, "qualify", fake_qualify)
+
+    result = runner.qualify_sweep(
+        endpoint="http://kenn", track_index=0, device_index=0,
+        parameter_name="Parameter", values=[0.25, 0.5, 0.75],
+        session_id="failed-sweep", apply=True, interval_seconds=0.0,
+    )
+
+    assert result["status"] == "failed"
+    assert result["completed_points"] == 2
+    assert len(result["rows"]) == 2
 
 
 def test_device_qualification_is_proposal_only_by_default(monkeypatch) -> None:
