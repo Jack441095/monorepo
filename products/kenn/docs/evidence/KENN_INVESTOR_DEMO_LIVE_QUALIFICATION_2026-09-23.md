@@ -76,10 +76,13 @@ Result: **10/10 consecutive passes**, zero partial successes counted.
 
 ## Automated regression
 
-The latest full backend suite completed after the script-contract and command
-latency hardening:
+The latest full backend suite completed after the atomic-EQ, chat-routing, and
+frontend-polish work:
 
-`1393 passed, 5 skipped, 4 warnings in 77.01s`
+`1409 passed, 5 skipped, 4 warnings in 81.33s`
+
+The Vue frontend also completed all 18 Vitest checks and a production Vite
+build. These automated checks do not replace the manual projector rehearsal.
 
 The skip count includes optional/environment-dependent coverage. The warnings
 are existing HTTP-test and audio compatibility deprecations; there were no
@@ -158,3 +161,36 @@ first contract or latency failure. It deliberately reports
 `full_demo_qualified=false`: steps 1, 10, 14, and 17–20 still require the real
 UI, confirmed mutation/readback/undo, receipt presentation, and roadmap
 narration. This evidence does not replace the remaining full rehearsal gate.
+
+## Post-restart read-only preflight
+
+After restarting the companion with the manifest-bound analysis paths, the
+full preflight was run without `--allow-mutations`. Ten of eleven checks passed
+in 1.79 seconds: Ableton ping was 87.5 ms, the eight-track topology matched,
+the session question returned in 100.1 ms, the exact Bass EQ and required
+return chain resolved, the analysis cache was warmed, the frontend returned
+HTTP 200, and the command round-trip was 171.4 ms. The undo round-trip reported
+the expected explicit skip because no confirmed Live change was authorized.
+
+A subsequent warmed non-mutating script-contract run passed all thirteen
+covered prompts. Its slowest request was the proposal-only Compressor Output
+step at 411.5 ms wall time, below the 650 ms budget.
+
+## Atomic EQ and real chat-surface routing
+
+The additional compound command `add an EQ to Synth and boost band 2A by 3 dB
+at 5 kHz` now resolves to one confirmation token covering insertion, band
+enable, frequency, and gain. The service performs per-control readback,
+compensating removal on partial failure, a final all-control readback, and an
+identity-bound exact undo. A dedicated qualifier defaults to proposal-only and
+refuses to operate if the target chain is not empty. Its confirmed `--apply`
+path remains pending real-Live qualification on the disposable rehearsal set;
+no confirmed mutation was attempted for this update.
+
+The actual Vue chat route was also exercised with `Pan the Synth hard left.`
+after a companion restart. `/kenn/api/ask` returned the typed `set_pan`
+proposal for Synth at `-1.0`, `changed=false`, and a bound confirmation token.
+The UI rendered the proposal card, it was dismissed without applying, and the
+status bar continued to report `Last action: None yet`. This closes the earlier
+gap where the same sentence fell through to a generic Auto Pan knowledge
+answer while preserving the confirmation boundary.
