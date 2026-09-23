@@ -30,8 +30,9 @@ export type KennAssistantMessage = {
   followUp?: string
   proposal?: KennActionProposal
   receipt?: KennActionReceipt
-  actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'rejected' | 'error'
+  actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
   actionError?: string
+  undoOfReceiptId?: string
 }
 
 export type KennChatMessage = KennUserMessage | KennAssistantMessage
@@ -118,6 +119,8 @@ function getOrCreateSessionId(): string {
   }
 }
 
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
 function mapSessionToProject(
   tracks: KennSessionTrack[],
   status: string,
@@ -125,7 +128,9 @@ function mapSessionToProject(
 ): KennProjectInfo {
   const sessionStatus = status || ''
   if (sessionStatus === 'connected' && tracks.length) {
+    const selectedIndex = typeof rawSession?.selected_track_index === 'number' ? rawSession.selected_track_index : -1
     const focus =
+      tracks.find((t) => t.index === selectedIndex) ||
       tracks.find((t) => t.soloed) ||
       tracks.find((t) => t.armed) ||
       tracks[0]
@@ -134,7 +139,8 @@ function mapSessionToProject(
       .filter(Boolean)
     const raw = rawSession || {}
     const bpm = raw.tempo != null ? `${raw.tempo}` : '120'
-    const key = raw.scale_name ? `${raw.scale_name}` : '—'
+    const rootNote = typeof raw.root_note === 'number' ? NOTE_NAMES[((raw.root_note % 12) + 12) % 12] : ''
+    const key = raw.scale_name ? `${rootNote} ${raw.scale_name}`.trim() : '—'
     const sessionName = String(raw.session_name ?? raw.set_name ?? raw.name ?? '').trim()
     return {
       name: sessionName || 'Ableton Live Session',
@@ -221,7 +227,7 @@ async function sendMessage(text: string) {
             : m.text || (m.steps || []).join('\n') || '',
       }))
 
-    const { answer, suggestions, sources, findings, proposal } = await askKenn({
+    const { answer, suggestions, sources, findings, proposal, raw } = await askKenn({
       question,
       sessionId,
       history: history.slice(0, -1),
@@ -237,6 +243,7 @@ async function sendMessage(text: string) {
         findings: findings.length ? findings : undefined,
         proposal: proposal || undefined,
         actionStatus: proposal ? 'pending' : undefined,
+        undoOfReceiptId: proposal && raw?.undo_of_receipt_id ? String(raw.undo_of_receipt_id) : undefined,
       },
     ]
   } catch (e) {
@@ -288,6 +295,12 @@ async function applyMessageProposal(messageId: string) {
     }
     msg.receipt = res.receipt
     msg.actionStatus = 'applied'
+    if (msg.undoOfReceiptId) {
+      const reverted = messages.value.find(
+        (m) => m.role === 'assistant' && m.receipt?.receipt_id === msg.undoOfReceiptId,
+      ) as KennAssistantMessage | undefined
+      if (reverted) reverted.actionStatus = 'undone'
+    }
     lastActionAt.value = new Date()
     messages.value = [...messages.value]
     await refreshSessionCard()
@@ -322,11 +335,15 @@ async function undoMessageProposal(messageId: string) {
     messages.value = [...messages.value]
     await refreshSessionCard()
   } catch (e) {
-    msg.actionStatus = 'error'
-    msg.actionError = userFacingKennError(
-      e,
-      'KENN could not verify the undo. Inspect Live before retrying; no further action was sent.',
-    )
+    // Never fall back to 'error': that state re-offers Apply on an action that already ran.
+    msg.actionStatus = 'undo_refused'
+    const detail = e instanceof Error ? e.message : ''
+    msg.actionError = /stale|changed since/i.test(detail)
+      ? 'Not undone: Live has changed since this action (it may already have been undone). Nothing changed.'
+      : userFacingKennError(
+          e,
+          'KENN could not verify the undo. Inspect Live before retrying; no further action was sent.',
+        )
     messages.value = [...messages.value]
   }
 }
