@@ -223,3 +223,28 @@ shadow writes to a session-scoped temporary log. A focused test and the full
 1,410-test suite verified that the production evidence path remained absent.
 The durable promotion state was not changed and remains at `shadow`; no model
 stage was promoted from synthetic data.
+
+## Disposable rehearsal set — mutating qualification (2026-09-23 08:40 BST)
+
+Live's own log confirms the loaded document was
+`.runtime/investor-demo-audio/KENN_Live12_Demo_Rehearsal.als` (opened 08:19,
+no later load) before any confirmation was submitted. The file on disk is still
+byte-identical to the reset fixture (SHA-256 `ee15b701…1279`); no stems are
+imported yet.
+
+- **Atomic EQ `--apply`: passed.** Target Synth (track index 5), empty chain.
+  One confirmation covered insertion plus band 2A enable (1.0 → readback 1.0),
+  frequency (raw 0.8074891 → 0.8074892, i.e. 5 kHz), and gain (3.0 → 3.0), all
+  verified. Replay was rejected. Identity-bound undo verified; independent
+  readback showed Synth's chain restored to `[]`. It qualifies this one exact
+  transaction, not arbitrary devices/bands or Live's native Cmd-Z.
+- **Mutating preflight: 11/11 in 2.89 s**, including the set + exact-undo
+  round-trip (1,397.5 ms). Ping 84.7 ms, command round-trip 75.5 ms.
+- **Non-mutating script gate: 0/10, stopped at step 3.** The rehearsal set had
+  a return track selected rather than Drum Bus. This is the runbook's operator
+  precondition (select Drum Bus and its Compressor), not a contract regression.
+  The step took 1,219 ms because AbletonOSC's `/live/view/get/selected_track`
+  raises `ValueError` when the selection is a return or master track, so the
+  companion waits for its reply timeout. The Remote Script should answer that
+  case explicitly; until then, the operator must never leave a return/master
+  track selected.
