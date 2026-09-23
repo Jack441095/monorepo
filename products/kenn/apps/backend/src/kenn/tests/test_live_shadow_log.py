@@ -3,8 +3,17 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
+from kenn.core import live_shadow_log
 from kenn.core.live_shadow_log import record_shadow_result
+
+
+def test_suite_default_shadow_log_is_isolated_from_runtime_evidence() -> None:
+    runtime_default = Path(live_shadow_log.__file__).resolve().parents[1] / "data" / "live_llm_shadow.jsonl"
+
+    assert live_shadow_log.SHADOW_LOG_PATH != runtime_default
+    assert Path(live_shadow_log.SHADOW_LOG_PATH).name == "live_llm_shadow.jsonl"
 
 
 def test_only_shadow_results_are_persisted(tmp_path) -> None:

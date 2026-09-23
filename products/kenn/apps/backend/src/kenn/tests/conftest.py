@@ -1,5 +1,6 @@
 """Pytest configuration for apps/backend/src/kenn/tests to ensure source is in sys.path."""
 
+import os
 import sys
 from pathlib import Path
 
@@ -27,6 +28,33 @@ LOCAL_INDEX_TEST_MODULES = {
     "test_start_server_script.py",
     "test_support_diagnostics.py",
 }
+
+
+@pytest.fixture(scope="session", autouse=True)
+def isolate_live_shadow_evidence(tmp_path_factory: pytest.TempPathFactory):
+    """Never let model-shadow tests count as real promotion evidence.
+
+    Some command tests intentionally cap a requested active mode back to
+    shadow.  That exercises the production recorder, so an unisolated suite
+    used to append synthetic commands to ``kenn/data/live_llm_shadow.jsonl``.
+    Point both this process and any spawned test server at a session-scoped
+    temporary log, then restore the caller's environment on teardown.
+    """
+    from kenn.core import live_shadow_log
+
+    path = tmp_path_factory.mktemp("kenn-shadow-evidence") / "live_llm_shadow.jsonl"
+    old_path = live_shadow_log.SHADOW_LOG_PATH
+    old_env = os.environ.get("KENN_LIVE_LLM_SHADOW_LOG")
+    os.environ["KENN_LIVE_LLM_SHADOW_LOG"] = str(path)
+    live_shadow_log.SHADOW_LOG_PATH = path
+    try:
+        yield
+    finally:
+        live_shadow_log.SHADOW_LOG_PATH = old_path
+        if old_env is None:
+            os.environ.pop("KENN_LIVE_LLM_SHADOW_LOG", None)
+        else:
+            os.environ["KENN_LIVE_LLM_SHADOW_LOG"] = old_env
 
 
 def pytest_collection_modifyitems(config, items):
