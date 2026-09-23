@@ -21,18 +21,16 @@ generator for the original `Neon Proof` demo composition, but the complete
 script remains unqualified until its stems are imported into a disposable Live
 copy and the full run passes the rehearsal gate.
 
-### Current working handoff — 2026-09-23
+### Current working handoff — 2026-09-23 (08:40 BST)
 
-- The eight stems and both analysis WAVs have been rendered under
-  `.runtime/investor-demo-audio/`.
-- `KENN_Live12_Demo_Rehearsal.als` exists there and is still byte-identical to
-  the tracked reset fixture; no stems have been imported.
-- Live is currently stopped on the tracked reset fixture. Do not confirm any
-  proposal in that set.
-- Resume by opening the `.runtime` rehearsal copy and visibly verifying its
-  window URL before importing audio or running any mutation qualifier.
-- After import, run mutating preflight and the atomic-EQ qualifier with
-  `--apply`, then begin the ten-run complete rehearsal gate.
+- Live has the disposable `.runtime/.../KENN_Live12_Demo_Rehearsal.als` open;
+  it is still byte-identical to the reset fixture, with no stems imported.
+- On this set: atomic-EQ `--apply` passed and mutating preflight passed 11/11.
+- The script gate stopped at step 3 because a return track was selected.
+  Before rehearsing, select Drum Bus and its Compressor (before-the-room step 4).
+- Remaining: import the eight stems at bar 1 in manifest order, save this copy
+  only, re-run preflight and the script gate, then the ten complete 20-step
+  rehearsals, including reset, recovery drill, projector layout, and timing.
 
 ## Before the room opens
 
