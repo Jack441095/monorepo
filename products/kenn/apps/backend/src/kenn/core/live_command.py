@@ -238,6 +238,28 @@ def _track_by_index(snapshot: dict[str, Any], index: int, name: str = "") -> dic
     return matches[0]
 
 
+def _volume_db_to_normalized(plan: dict[str, Any], snapshot: dict[str, Any], track_index: int,
+                             track_name: str) -> dict[str, Any]:
+    """Convert a planner's dB volume into KENN's normalized value.
+
+    A model cannot know Live's fader value for "+3 dB", so the planner may say
+    it in dB and KENN converts with the same mapping as the rule parser
+    (normalized = 10^(dB/20), 1.0 = 0 dB). A relative change scales the
+    track's current snapshot volume. The plan keeps only contract fields.
+    """
+    db = float(plan["value"])
+    if plan.get("relative"):
+        current = (_track_by_index(snapshot, track_index, track_name) or {}).get("volume")
+        if isinstance(current, bool) or not isinstance(current, (int, float)) or not current > 0:
+            return {"ok": False, "error": "A relative dB volume change needs the track's current volume in the snapshot."}
+        value = float(current) * 10 ** (db / 20.0)
+    else:
+        value = 10 ** (db / 20.0)
+    if not 0.0 < value <= 1.0:
+        return {"ok": False, "error": "That dB volume is outside KENN's range (at most 0 dB)."}
+    return {"ok": True, "plan": dict(plan, value=round(value, 6), unit="normalized", relative=False)}
+
+
 def _return_track_by_index(snapshot: dict[str, Any], index: int, name: str = "") -> dict[str, Any] | None:
     return_tracks = [item for item in snapshot.get("return_tracks", []) if isinstance(item, dict)]
     matches = [item for item in return_tracks if item.get("index") == index]
@@ -548,6 +570,11 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
             if isinstance(plan.get("value"), bool) or not math.isfinite(float(plan.get("value"))):
                 return {"ok": False, "error": f"The LLM plan value for {action} must be finite numeric data."}
             unit = str(plan.get("unit") or "").strip().lower()
+            if action == "set_volume" and unit in {"db", "decibel", "decibels"}:
+                converted = _volume_db_to_normalized(plan, snapshot, track_index, track_name)
+                if not converted.get("ok"):
+                    return converted
+                plan, unit = converted["plan"], "normalized"
             if unit not in {"", "normalized"}:
                 return {"ok": False, "error": f"The LLM plan unit for {action} must be 'normalized'; user-facing units must be converted before planning."}
             value = float(plan.get("value"))

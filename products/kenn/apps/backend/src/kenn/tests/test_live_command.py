@@ -2322,8 +2322,15 @@ def test_llm_track_control_requires_normalized_numeric_values() -> None:
     }
     assert validate_llm_plan(valid, fake.state)["ok"] is True
 
+    # dB is converted by KENN (10^(dB/20), as the rule parser does); other
+    # user-facing units are still rejected.
     db_value = {**valid, "value": -6.0, "unit": "dB"}
     checked = validate_llm_plan(db_value, fake.state)
+    assert checked["ok"] is True
+    assert checked["plan"]["unit"] == "normalized" and abs(checked["plan"]["value"] - 10 ** (-6 / 20)) < 1e-6
+
+    percent_value = {**valid, "value": 50.0, "unit": "%"}
+    checked = validate_llm_plan(percent_value, fake.state)
     assert checked["ok"] is False
     assert "normalized" in checked["error"]
 
