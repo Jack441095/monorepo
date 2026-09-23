@@ -79,7 +79,7 @@ Result: **10/10 consecutive passes**, zero partial successes counted.
 The latest full backend suite completed after the script-contract and command
 latency hardening:
 
-`1391 passed, 5 skipped, 4 warnings in 76.55s`
+`1393 passed, 5 skipped, 4 warnings in 77.01s`
 
 The skip count includes optional/environment-dependent coverage. The warnings
 are existing HTTP-test and audio compatibility deprecations; there were no

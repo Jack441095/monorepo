@@ -184,6 +184,14 @@ reversible qualification write. The initial no-device run returned
 inserted through the UI, the `Output` qualification above returned
 `status: passed`.
 
+For a calibration candidate, repeat `--value` between 2 and 20 times. The
+runner processes each point as a separate confirmed write/readback/inverse
+lifecycle, verifies both raw and displayed restoration, and pauses between
+points to respect the supervised HTTP rate limit. It stops at the first failed
+restore and emits reviewable raw/display pairs, but deliberately does not add
+or promote a `DeviceUnitProfile`; mapping shape and Live-version evidence still
+require human review.
+
 ## Fresh current-runtime rerun — 2026-09-02
 
 The current Live process was confirmed running with `KENN_Bridge` bound to
