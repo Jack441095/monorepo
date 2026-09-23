@@ -12,7 +12,6 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from kenn.core.live_world_model import read_world_model
 
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 _WORD = re.compile(r"[a-z0-9]+")
@@ -84,7 +83,8 @@ def _device_lines(devices: list[dict[str, Any]], depth: int = 0) -> list[str]:
 def _base(kind: str, model: dict[str, Any]) -> dict[str, Any]:
     return {"schema": "kenn.ableton_session_answer.v1", "status": "inspected",
             "intent": {"action": f"inspect_{kind}"}, "changed": False,
-            "world_model_fingerprint": model.get("fingerprint"), "backend": model.get("backend")}
+            "world_model_fingerprint": model.get("fingerprint"), "world_model_version": model.get("version"),
+            "backend": model.get("backend")}
 
 
 def answer_world_question(question: str, client: Any) -> dict[str, Any] | None:
@@ -92,7 +92,9 @@ def answer_world_question(question: str, client: Any) -> dict[str, Any] | None:
     kind = _question_kind(lower)
     if kind is None:
         return None
-    model = read_world_model(client)
+    from kenn.core.live_world_state import world_state
+
+    model = world_state.current(client)
     if model.get("status") != "connected":
         return {"schema": "kenn.ableton_session_answer.v1", "status": "offline", "changed": False,
                 "intent": {"action": f"inspect_{kind}"},
