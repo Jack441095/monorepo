@@ -131,6 +131,12 @@ function mapSessionToProject(
       tracks.find((t) => t.soloed) ||
       tracks.find((t) => t.armed) ||
       tracks[0]
+    // A selected return or master track is not in `tracks`; name it rather
+    // than falling back to track 1.
+    const kind = rawSession?.selected_track_kind as { kind?: string; name?: string } | undefined
+    const busName = kind && (kind.kind === 'return' || kind.kind === 'master')
+      ? (kind.kind === 'master' ? 'Master' : String(kind.name || 'Return'))
+      : ''
     const effects = (focus?.devices || [])
       .map((d) => String(d?.name || '').trim())
       .filter(Boolean)
@@ -144,7 +150,7 @@ function mapSessionToProject(
       daw: 'Ableton Live 12',
       bpm,
       key,
-      focusTrack: String(focus?.name || '—'),
+      focusTrack: busName || String(focus?.name || '—'),
       effects,
       references: [],
       connected: true,

@@ -127,3 +127,18 @@ describe('useKenn receipt and project state', () => {
     expect(kenn.project.value).toMatchObject({ focusTrack: 'Drum Bus', key: 'C Major', effects: ['Compressor'] })
   })
 })
+
+
+describe('useKenn project card with a return selected', () => {
+  it('names the selected return track instead of falling back to track 1', async () => {
+    const kenn = useKenn()
+    mockedSessionCard.mockResolvedValueOnce({
+      ok: true, status: 'connected',
+      tracks: [{ index: 0, name: 'Kick' }],
+      raw: { session: { tempo: 120, root_note: 0, scale_name: 'Major', selected_track_index: null,
+                        selected_track_kind: { kind: 'return', index: 0, name: 'A-Reverb' } } },
+    })
+    await kenn.refreshSessionCard()
+    expect(kenn.project.value.focusTrack).toBe('A-Reverb')
+  })
+})
