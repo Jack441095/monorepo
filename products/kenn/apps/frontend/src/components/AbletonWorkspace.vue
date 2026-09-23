@@ -656,7 +656,7 @@ onMounted(() => {
 
 <style scoped lang="less">
 .mix-lab {
-  --mr-accent: #111111;
+  --mr-accent: var(--workspace-accent);
   --mr-ok: #1f8a5a;
   --mr-warn: #a05a28;
   --mr-bad: #c0392b;
@@ -667,7 +667,7 @@ onMounted(() => {
   min-height: 0;
   padding: 0.14rem 0.16rem 0.12rem;
   gap: 0.1rem;
-  background: #f7f8fa;
+  background: var(--workspace-bg);
   overflow: auto;
 
   /* Teleport 到 body 后脱离 .mix-lab，需在弹出根上自带色板 */
@@ -675,7 +675,7 @@ onMounted(() => {
   &__summary,
   &__score-col,
   &__view-pane {
-    --mr-accent: #111111;
+    --mr-accent: var(--workspace-accent);
     --mr-ok: #1f8a5a;
     --mr-warn: #a05a28;
     --mr-bad: #c0392b;
@@ -689,7 +689,7 @@ onMounted(() => {
     align-items: stretch;
     gap: 0.1rem;
     padding: 0.12rem;
-    background: #fff;
+    background: var(--workspace-panel);
     border: 1px solid var(--floating-border);
     border-radius: 0.1rem;
     overflow-x: auto;
@@ -729,7 +729,7 @@ onMounted(() => {
     min-height: var(--mr-card-h);
     height: var(--mr-card-h);
     padding: 0.06rem 0.1rem;
-    background: #f3f4f6;
+    background: var(--workspace-panel-muted);
     border-radius: 0.08rem;
     cursor: pointer;
     overflow: hidden;
@@ -766,7 +766,8 @@ onMounted(() => {
     padding: 0 0.12rem;
     border: 1px solid var(--input-border);
     border-radius: 0.08rem;
-    background: #fff;
+    background: var(--workspace-field);
+    color: var(--text-color);
     font-size: 0.14rem;
     white-space: nowrap;
     overflow: hidden;
@@ -775,7 +776,7 @@ onMounted(() => {
     transition: border-color 0.15s ease;
 
     &:focus {
-      border-color: rgba(17, 17, 17, 0.45);
+      border-color: color-mix(in srgb, var(--workspace-accent) 55%, transparent);
       outline: none;
       box-shadow: none;
     }
@@ -804,7 +805,7 @@ onMounted(() => {
     letter-spacing: 0.04em;
     padding: 0 0.1rem;
     border-radius: 0.08rem;
-    background: rgba(15, 23, 42, 0.06);
+    background: color-mix(in srgb, var(--text-color) 6%, transparent);
     color: var(--muted-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -819,7 +820,7 @@ onMounted(() => {
     }
     &[data-state='uploading'],
     &[data-state='processing'] {
-      background: rgba(17, 17, 17, 0.12);
+      background: color-mix(in srgb, var(--workspace-accent) 12%, transparent);
       color: var(--mr-accent);
     }
   }
@@ -837,7 +838,7 @@ onMounted(() => {
     border: none;
     border-radius: 0.08rem;
     background: var(--mr-accent);
-    color: #fff;
+    color: var(--workspace-accent-text);
     font-size: 0.14rem;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -863,7 +864,8 @@ onMounted(() => {
     padding: 0 0.1rem;
     border: 1px solid var(--floating-border);
     border-radius: 0.08rem;
-    background: #fff;
+    background: var(--workspace-panel);
+    color: var(--text-color);
     font-size: 0.14rem;
     cursor: pointer;
     white-space: nowrap;
@@ -913,7 +915,7 @@ onMounted(() => {
     flex-direction: column;
     gap: 0.08rem;
     padding: 0.12rem;
-    background: #fff;
+    background: var(--workspace-panel);
     border: 1px solid var(--floating-border);
     border-radius: 0.1rem;
   }
@@ -1023,7 +1025,7 @@ onMounted(() => {
 
   &__chip {
     border: 1px solid var(--floating-border);
-    background: #fff;
+    background: var(--workspace-panel);
     border-radius: 999px;
     padding: 0.06rem 0.12rem;
     font-size: 0.13rem;
@@ -1033,7 +1035,7 @@ onMounted(() => {
     &.is-active {
       background: var(--mr-accent);
       border-color: var(--mr-accent);
-      color: #fff;
+      color: var(--workspace-accent-text);
     }
   }
 
@@ -1080,7 +1082,7 @@ onMounted(() => {
 
   &__metric-card {
     padding: 0.12rem;
-    background: #f4f6f8;
+    background: var(--workspace-panel-muted);
     border-radius: 0.08rem;
     strong {
       display: block;
@@ -1122,7 +1124,7 @@ onMounted(() => {
   &__score-col {
     display: flex;
     flex-direction: column;
-    background: #fff;
+    background: var(--workspace-panel);
     border: 1px solid var(--floating-border);
     border-radius: 0.1rem;
     padding: 0.1rem 0.12rem;
@@ -1171,7 +1173,7 @@ onMounted(() => {
     flex-shrink: 0;
     margin-top: auto;
     padding-top: 0.1rem;
-    border-top: 1px solid rgba(15, 23, 42, 0.06);
+    border-top: 1px solid var(--floating-border);
     font-size: 0.12rem;
     color: var(--muted-text);
     line-height: 1.35;
@@ -1270,7 +1272,7 @@ onMounted(() => {
   &__modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(15, 23, 42, 0.45);
+    background: var(--workspace-overlay);
     backdrop-filter: blur(2px);
   }
 
@@ -1284,7 +1286,7 @@ onMounted(() => {
     min-width: 2.4rem;
     max-width: 80%;
     padding: 0.32rem 0.36rem 0.24rem;
-    background: #fff;
+    background: var(--workspace-panel);
     border: 1px solid var(--floating-border);
     border-radius: 0.12rem;
     box-shadow: 0 0.12rem 0.4rem rgba(15, 23, 42, 0.18);
@@ -1323,12 +1325,12 @@ onMounted(() => {
     padding: 0 0.18rem;
     border: 1px solid var(--floating-border);
     border-radius: 0.06rem;
-    background: #fff;
+    background: var(--workspace-panel);
     font-size: 0.13rem;
     color: var(--text-color);
     cursor: pointer;
     &:hover {
-      background: #f3f4f6;
+      background: var(--workspace-panel-muted);
     }
   }
 
@@ -1336,8 +1338,8 @@ onMounted(() => {
     width: 0.36rem;
     height: 0.36rem;
     margin-bottom: 0.04rem;
-    border: 0.03rem solid rgba(17, 17, 17, 0.12);
-    border-top-color: #111111;
+    border: 0.03rem solid color-mix(in srgb, var(--text-color) 12%, transparent);
+    border-top-color: var(--workspace-accent);
     border-radius: 50%;
     animation: mix-lab-spin 0.8s linear infinite;
   }

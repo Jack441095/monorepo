@@ -178,7 +178,7 @@ watch(() => props.timeline, () => redraw(), { deep: true })
     align-items: center;
     flex: 1;
     min-width: 0;
-    background: #f4f6f8;
+    background: var(--workspace-panel-muted);
     border-radius: 0.08rem;
     overflow: hidden;
     canvas {
@@ -213,8 +213,8 @@ watch(() => props.timeline, () => redraw(), { deep: true })
     width: 100%;
     height: 100%;
     aspect-ratio: 1 / 1;
-    background: #F4F6F8;
-    border: 1px solid rgba(17, 17, 17, 0.12);
+    background: var(--workspace-panel-muted);
+    border: 1px solid var(--floating-border);
     border-radius: 0.08rem;
     overflow: hidden;
     canvas {
@@ -234,7 +234,7 @@ watch(() => props.timeline, () => redraw(), { deep: true })
     text-align: center;
     font-size: 0.12rem;
     color: var(--muted-text);
-    background: #F4F6F8;
+    background: var(--workspace-panel-muted);
   }
 }
 </style>

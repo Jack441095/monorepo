@@ -130,7 +130,7 @@ const onSend = (message: string) => {
 
   &__sidebar {
     position: relative;
-    width: 4.5rem;
+    width: 5.2rem;
     flex-shrink: 0;
     min-height: 0;
     display: flex;

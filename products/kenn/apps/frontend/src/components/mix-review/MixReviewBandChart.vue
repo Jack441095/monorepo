@@ -172,7 +172,7 @@ watch(
     position: relative;
     flex: 1;
     min-height: 1.8rem;
-    background: #f4f6f8;
+    background: var(--workspace-panel-muted);
     border-radius: 0.08rem;
   }
 
@@ -251,7 +251,7 @@ watch(
 
   &__bar-wrap {
     height: 0.2rem;
-    background: rgba(15, 23, 42, 0.06);
+    background: color-mix(in srgb, var(--text-color) 6%, transparent);
     border-radius: 0.04rem;
     overflow: hidden;
 
@@ -276,7 +276,7 @@ watch(
     min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    background: #f4f6f8;
+    background: var(--workspace-panel-muted);
     border-radius: 0.08rem;
     canvas {
       display: block;
