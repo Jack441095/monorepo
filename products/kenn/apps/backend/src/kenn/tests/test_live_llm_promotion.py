@@ -56,4 +56,5 @@ def test_durable_transition_requires_eligibility_and_explicit_reviewer(tmp_path)
     promoted = record_promotion_assessment(metrics, path=path, approve_transition=True, reviewer="demo-owner")
     assert promoted["stage"] == "propose"
     assert promoted["transitioned"] is True
+    assert isinstance(promoted["stage_entered_at"], float)
     assert load_promotion_state(path)["history"][0]["reviewer"] == "demo-owner"

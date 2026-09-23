@@ -40,7 +40,7 @@ from kenn.core.clip_duplication_service import ClipDuplicationActionService, PRO
 from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHEMA as CLIP_RENAME_PROPOSAL_SCHEMA
 from kenn.core.live_intent import parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
-from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS
+from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS, load_promotion_state
 from kenn.core.live_session_questions import answer_live_session_question
 from kenn.core.live_receipt_journal import list_receipts
 from kenn.core.session_context import preprocess_live_command, record_live_exchange
@@ -1021,11 +1021,25 @@ def compare_llm_plan(plan: dict[str, Any], deterministic_intent: dict[str, Any])
 
 
 def _live_llm_mode() -> str:
-    """Return ``off``, ``shadow``, or ``active`` for Live command planning."""
-    configured = os.getenv("KENN_LIVE_LLM_MODE", "").strip().lower()
-    if configured in {"shadow", "active"}:
-        return configured
-    return "active" if _truthy(os.getenv("KENN_LIVE_LLM_ENABLED")) else "off"
+    """Return the requested mode capped by the reviewed durable stage.
+
+    Enabling the command model without an explicit mode starts in shadow.
+    An environment variable can request a less privileged mode, but cannot
+    leapfrog the stage recorded by the review-gated promotion workflow.
+    """
+    if not _truthy(os.getenv("KENN_LIVE_LLM_ENABLED")):
+        return "off"
+    configured = os.getenv("KENN_LIVE_LLM_MODE", "shadow").strip().lower() or "shadow"
+    if configured not in {"shadow", "propose", "active"}:
+        return "shadow"
+    try:
+        reviewed_stage = str(load_promotion_state().get("stage") or "shadow")
+    except Exception:
+        reviewed_stage = "shadow"
+    rank = {"shadow": 0, "propose": 1, "active": 2}
+    if reviewed_stage not in rank:
+        reviewed_stage = "shadow"
+    return configured if rank[configured] <= rank[reviewed_stage] else reviewed_stage
 
 
 def _base_response(command: str, session_id: str) -> dict[str, Any]:
@@ -2383,7 +2397,7 @@ def _handle_command_impl(
         mode = _live_llm_mode()
         planner_snapshot = (
             _llm_planner_snapshot(live, snapshot, deterministic_intent)
-            if mode in {"shadow", "active"} and _truthy(os.getenv("KENN_LIVE_LLM_ENABLED"))
+            if mode in {"shadow", "propose", "active"} and _truthy(os.getenv("KENN_LIVE_LLM_ENABLED"))
             else snapshot
         )
         generated, llm_metadata = _generate_llm_plan(clean_command, planner_snapshot)
@@ -2403,19 +2417,22 @@ def _handle_command_impl(
         else:
             if generated is not None:
                 comparison = compare_llm_plan(generated, deterministic_intent)
-                llm_metadata = {**llm_metadata, "mode": "active", "comparison": comparison}
-                if comparison.get("status") != "match":
-                    response.update({
-                        "status": "invalid",
-                        "answer": "The LLM plan was rejected because it does not exactly match KENN's deterministic interpretation. No Live proposal was created.",
-                        "changed": False,
-                    })
-                    _update_lifecycle(response, "llm_rejected", comparison=comparison)
-                    response["llm"] = {**llm_metadata, "status": "rejected"}
-                    response["intent"] = deterministic_intent
-                    return response
-                intent = _intent_from_llm_plan(generated)
+                deterministic_action = deterministic_intent.get("action")
+                deterministic_refusal = deterministic_intent.get("mode") == "refuse"
+                use_model = comparison.get("status") == "match" or (
+                    mode == "propose"
+                    and deterministic_action is None
+                    and not deterministic_refusal
+                )
+                llm_metadata = {
+                    **llm_metadata,
+                    "mode": mode,
+                    "comparison": comparison,
+                    "proposal_authority": "validated_model" if use_model else "deterministic_fallback",
+                }
+                intent = _intent_from_llm_plan(generated) if use_model else deterministic_intent
             else:
+                llm_metadata = {**llm_metadata, "mode": mode, "proposal_authority": "deterministic_fallback"}
                 intent = deterministic_intent
     response["llm"] = llm_metadata
     response["intent"] = intent

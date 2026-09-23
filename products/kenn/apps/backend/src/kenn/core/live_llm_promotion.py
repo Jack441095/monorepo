@@ -45,6 +45,7 @@ def load_promotion_state(path: Path | None = None) -> dict[str, Any]:
     return {
         "schema": "kenn.ableton_llm_promotion_state.v1",
         "stage": stage,
+        "stage_entered_at": payload.get("stage_entered_at"),
         "updated_at": payload.get("updated_at"),
         "last_assessment": payload.get("last_assessment"),
         "history": payload.get("history") if isinstance(payload.get("history"), list) else [],
@@ -118,6 +119,7 @@ def record_promotion_assessment(
             raise ValueError("An explicit reviewer identity is required to record a promotion transition.")
         previous = state["stage"]
         state["stage"] = str(assessment["next_stage"])
+        state["stage_entered_at"] = now
         state["history"].append({
             "from": previous,
             "to": state["stage"],

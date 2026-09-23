@@ -19,6 +19,9 @@ def test_model_contract_gate_fails_closed_after_training() -> None:
     })
     assert passed["model_contract_passed"] is True
     assert passed["live_activation_allowed"] is False
+    assert passed["promotion_stage"] == "shadow"
+    assert passed["promotion_assessment"]["eligible"] is False
+    assert passed["promotion_assessment"]["metrics"]["comparisons"] == 3
 
     failed = _model_contract_gate({
         "adapter_result": {

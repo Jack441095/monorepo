@@ -90,7 +90,6 @@ GAIN_STAGING_PROPOSAL_SCHEMA = "kenn.ableton_gain_staging_proposal.v1"
 GAIN_STAGING_RECEIPT_SCHEMA = "kenn.ableton_gain_staging_receipt.v1"
 BUS_ORGANIZATION_PROPOSAL_SCHEMA = "kenn.ableton_bus_organization_proposal.v1"
 BUS_ORGANIZATION_RECEIPT_SCHEMA = "kenn.ableton_bus_organization_receipt.v1"
-DEVICE_INSERTION_ALLOWLIST = frozenset({"EQ Eight", "Glue Compressor", "Saturator", "Auto Filter", "Drum Buss", "Compressor", "Hybrid Reverb", "Echo"})
 DEVICE_INSERTION_ALLOWLIST = frozenset({"EQ Eight", "Glue Compressor", "Saturator", "Auto Filter", "Drum Buss", "Compressor", "Hybrid Reverb", "Echo", "Roar", "Multiband Dynamics"})
 DEVICE_SETUP_PARAMETER_ALLOWLIST = {
     "Compressor": {"threshold": ("Threshold", "dB")},
