@@ -86,3 +86,29 @@ even at 700 tokens, and a single layer ran at about 14 s per step.
    and two-part requests), then re-score.
 2. **Mac latency** of the Q4_K_M fine-tune with the compact prompt (this document's addendum).
 3. **Owner review** of the 21 drafted clarify seeds and the 100 drafted evaluation phrasings.
+
+## Addendum: Mac latency (M3, 16 GB, after midnight, Live idle)
+
+The Q4_K_M fine-tune was copied to the Mac (SHA-256 verified) and created in Ollama with the stock settings.
+
+| Same first 40 cases, production path | Correct | p50 | p95 |
+|---|---|---|---|
+| Stock `qwen3.5:4b` + full prompt | 75.0% | 3.3 s | 11.6 s |
+| **Fine-tuned run 1 + compact prompt** | **90.0%** | 4.4 s | **7.5 s** |
+
+Profile of single calls with the snapshot changed before each command, as after an applied edit:
+
+| | First call after load (prompt) | Later calls (prompt) | Generation | Median total |
+|---|---|---|---|---|
+| Stock + full prompt (2,030 tokens) | 7.0 s | ~2.0 s | 30–44 tokens at ~24 tokens/s | 3.6 s |
+| Fine-tuned + compact prompt (780 tokens) | 2.1 s | ~2.1 s | 33–47 tokens at ~25 tokens/s | 3.6 s |
+
+- **On this Mac the compact prompt does not make later commands faster.** After any change to the prompt, Ollama
+  spends ~2 s re-processing this hybrid model's prompt, whether it is 780 or 2,030 tokens long. It only helps the
+  first command after the model loads (7.0 s → 2.1 s).
+- **The fine-tune's win on the Mac is accuracy and safety, not speed.**
+- **Load matters more than the model choice.** Generation ran at ~24 tokens/s here, against ~10 tokens/s earlier in
+  the evening with Live busy, so Mac latency swings more with load than with any choice in this document. Latency
+  figures must state the machine's state.
+- **The fine-tune writes `"relative":false` in every plan** (3–4 tokens), because the training targets keep false
+  values. That is harmless and could be trimmed in a later corpus.

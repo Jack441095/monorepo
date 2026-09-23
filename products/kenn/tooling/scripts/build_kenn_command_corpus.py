@@ -298,7 +298,7 @@ def _scenario_seed(seed: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, 
 
 
 def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = False,
-               prompt: str = "full") -> list[dict[str, Any]]:
+               prompt: str = "full", clarify_variants: int | None = None) -> list[dict[str, Any]]:
     from build_kenn_command_training import _plan, evaluation_queries, normalize_query, plan_target, records
     from drafted_command_seeds import drafted_records
     from kenn.core.live_command import (
@@ -316,7 +316,8 @@ def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = Fal
         seeds = records() + (drafted_records(snapshot, _plan) if include_drafted else [])
         for seed in seeds:
             scenario_seed = _scenario_seed(seed, snapshot)
-            for number, query in enumerate(_variants(scenario_seed, variants), start=1):
+            count = clarify_variants if clarify_variants and seed["label"]["action"] == "clarify" else variants
+            for number, query in enumerate(_variants(scenario_seed, count), start=1):
                 if normalize_query(query) in held_out:
                     query = query + " in the current Live session"
                     while normalize_query(query) in held_out:
@@ -352,12 +353,14 @@ def main() -> int:
     parser.add_argument("--scenarios", type=int, default=1, help="Distinct synthetic track-name snapshots to include (1-4)")
     parser.add_argument("--include-drafted", action="store_true",
                         help="add the drafted clarify seeds (drafted_command_seeds.py; owner review pending)")
+    parser.add_argument("--clarify-variants", type=int, default=None,
+                        help="variants per clarify seed (default: --variants); lower it to reduce the clarify share")
     parser.add_argument("--prompt", choices=("full", "compact"), default="full",
                         help="system prompt in each record; 'compact' for a fine-tune served with KENN_LLM_COMMAND_PROMPT=compact")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     rows = build_rows(variants=args.variants, scenarios=args.scenarios, include_drafted=args.include_drafted,
-                      prompt=args.prompt)
+                      prompt=args.prompt, clarify_variants=args.clarify_variants)
     from build_kenn_command_training import assert_no_holdout_overlap
 
     assert_no_holdout_overlap(rows)
@@ -372,6 +375,7 @@ def main() -> int:
         "variants_per_seed": args.variants,
         "drafted_seeds_included": args.include_drafted,
         "system_prompt": args.prompt,
+        "clarify_variants_per_seed": args.clarify_variants or args.variants,
         "output": str(output),
         "holdout_protection": "passed",
         "evidence_kind": "synthetic_training_data",
