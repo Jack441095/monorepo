@@ -14,6 +14,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 ## Waiting on owner
 
+- [ ] Pick the C6 base model: `qwen3.5:4b` (clarifies 20/30, Mac p50 6.7 s) or `qwen3:4b` (clarifies 2/30, Mac p50 4.5 s; needs clarify training). See the C2 GPU evidence addendum
 - [ ] Review the 100 drafted phrasings in `tooling/data/natural_holdout_candidates.jsonl` (labels: explicit target+amount → action, vague → clarify); approved ones move into the curated holdout
 - [x] OK a `~/kenn_*` work folder on the GPU box (GPU 0, `/mnt/data`) for C6 LoRA training — text-only corpus, no audio
   > Given 2026-09-23 ("Anything we need to do that requires a GPU", no server restarts). Using `/mnt/data/kenn-bakeoff/`: user-level Ollama 0.34.2 on GPU 0, loopback port 11437, no system install.
@@ -69,8 +70,10 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   > Done 2026-09-23 (`KENN_C2_PLANNER_BAKEOFF_GPU_2026-09-23.md`). 124 cases, accuracy on GPU 0, latency on the Mac. **Winner: `qwen3.5:4b` with thinking off**: 67.7% correct, clarify 20/30, fewest wrong plans accepted; GPU p50 1.1 s; Mac (M3 16 GB, Live running) 64.5% correct, p50 10.3 s, p95 32.7 s, so not interactive on this Mac. Rule-based parser: 49.2%, clarify 30/30, instant. DeepSeek-R1 1.5B/7B: ≤4% in every thinking mode (tuned for maths reasoning; R1-7B targets the selected track). Thinking models through Ollama's /v1 route think until the token cap once a schema is set (0%); turning thinking off took qwen3.5 from 0 to 60–68%, and a 128-token budget added nothing but latency. Moving the request after the snapshot raised every model (qwen2.5:1.5b 10.5→27.4%, qwen3.5:4b 60.5→67.7%) and cut the Mac p50 from 18.6 to 10.3 s. Fixed on the way: bake-off read a persistent answer cache; cache key ignored the output contract.
   - [x] Production KENN turns thinking off for qwen3.5 (native `/api/chat` `think: false`, or the empty think-block prefill) before any promotion
     > Done 2026-09-23: schema-constrained Ollama calls to qwen3-family models go to native `/api/chat` with `think: false` (`KENN_LLM_THINK=off|on` overrides). Proven on the Mac through the real planner, no proxy: qwen3.5:4b 8/8 accepted (was 0% on the /v1 route). Warm, the native route and the prefill are the same speed (5.9 s). DeepSeek-R1 excluded: it keeps thinking even natively.
-  - [ ] Mac latency: qwen3.5 is a hybrid model and reuses only part of the prompt cache across commands (~3.6 s re-evaluated per command vs ~0.09 s for qwen2.5). Test standard-transformer Qwen3 (1.7B/4B) as the C6 base
-  - [ ] Compact plan output (57 tokens today, mostly JSON whitespace) to cut Mac generation time
+  - [x] Mac latency: qwen3.5 is a hybrid model and reuses only part of the prompt cache across commands (~3.6 s re-evaluated per command vs ~0.09 s for qwen2.5). Test standard-transformer Qwen3 (1.7B/4B) as the C6 base
+    > Done 2026-09-23 (evidence addendum). Mac, same 40 cases: qwen3:4b p50 4.5 s vs qwen3.5:4b 6.7 s. Full GPU set: qwen3:4b 51.6% (clarify 2/30, 35 wrong plans accepted) vs qwen3.5:4b 66.1% (clarify 20/30, 15). qwen3:1.7b 19.4%. Owner picks the C6 base: qwen3.5:4b (safe, slower) or qwen3:4b (faster, must learn to clarify).
+  - [x] Compact plan output
+    > Done 2026-09-23: schema constant no longer decoded (KENN stamps it), ~12 of ~43 tokens saved; qwen3.5:4b 66.1% vs 67.7% before (within noise). Training generator shares `planner_user_prompt()` with production; corpus regenerated.
   - [ ] Grow the rule-based parser for relative dB, focus, sends, slang (volume 1/12 today)
   - [ ] Planner emits user units (dB, %) and KENN converts; stop asking the model to normalize
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
