@@ -2,12 +2,46 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
+import threading
+from collections import OrderedDict
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
 from kenn.core.arrangement_doctor import get_arrangement_doctor
 from kenn.core.audio_analysis import analyze_wav
+
+
+_ANALYSIS_CACHE_MAX_ENTRIES = 4
+_ANALYSIS_CACHE: OrderedDict[tuple[str, str], dict[str, Any]] = OrderedDict()
+_ANALYSIS_CACHE_LOCK = threading.RLock()
+
+
+def _analyze_cached(payload: bytes, *, filename: str) -> tuple[dict[str, Any], str, bool]:
+    """Analyze immutable audio once per content hash, with a small memory bound."""
+    digest = hashlib.sha256(payload).hexdigest()
+    key = (digest, Path(filename).suffix.casefold())
+    with _ANALYSIS_CACHE_LOCK:
+        cached = _ANALYSIS_CACHE.get(key)
+        if cached is not None:
+            _ANALYSIS_CACHE.move_to_end(key)
+            return deepcopy(cached), digest, True
+
+    analysis = analyze_wav(
+        payload,
+        filename=filename,
+        include_ltas=True,
+        include_pink_noise_reference=True,
+    )
+    if isinstance(analysis, dict) and analysis.get("ok"):
+        with _ANALYSIS_CACHE_LOCK:
+            _ANALYSIS_CACHE[key] = deepcopy(analysis)
+            _ANALYSIS_CACHE.move_to_end(key)
+            while len(_ANALYSIS_CACHE) > _ANALYSIS_CACHE_MAX_ENTRIES:
+                _ANALYSIS_CACHE.popitem(last=False)
+    return analysis, digest, False
 
 
 def _latest_audio(client: Any, *, scope: str) -> tuple[bytes, str] | None:
@@ -205,11 +239,16 @@ def mix_advice_from_session(
     if available is not None:
         payload, filename = available
         try:
-            analysis = analyze_wav(payload, filename=filename, include_ltas=True, include_pink_noise_reference=True)
+            analysis, digest, cache_hit = _analyze_cached(payload, filename=filename)
         except Exception:
             analysis = {}
         result = _audio_advice(analysis, scope=scope)
         if result is not None:
+            result["analysis_source"] = {
+                "filename": filename,
+                "sha256": digest,
+                "cache_hit": cache_hit,
+            }
             return result
     return _arrangement_advice(current, scope=scope)
 

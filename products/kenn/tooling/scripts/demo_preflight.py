@@ -219,8 +219,6 @@ class DemoPreflight:
         )
 
     def audio_analysis(self) -> str:
-        from kenn.core.audio_analysis import analyze_wav
-
         mix_path = Path(os.getenv("KENN_LIVE_AUDIO_CAPTURE_PATH", "")).expanduser()
         vocal_path = Path(os.getenv("KENN_LIVE_VOCAL_CAPTURE_PATH", "")).expanduser()
         if not mix_path.is_file() or not vocal_path.is_file():
@@ -254,35 +252,39 @@ class DemoPreflight:
             if digest != entry.get("sha256"):
                 raise RuntimeError(f"Demo audio hash check failed for {path.name}; rerender the fixture.")
 
-        mix = analyze_wav(
-            mix_path.read_bytes(), filename=mix_path.name,
-            include_ltas=True, include_pink_noise_reference=True,
+        commands = (
+            ("analysis_mix", "How does my low end sound?", "low_end", "possible_low_end_excess"),
+            ("analysis_vocal", "Check the vocals for clipping.", "vocal", "clipping"),
         )
-        vocal = analyze_wav(
-            vocal_path.read_bytes(), filename=vocal_path.name,
-            include_ltas=True, include_pink_noise_reference=True,
-        )
-        if mix.get("ok") is not True or vocal.get("ok") is not True:
-            raise RuntimeError("Audio analyzer rejected one of the manifest-bound demo renders.")
-        pink = ((mix.get("spectral") or {}).get("pink_noise_reference") or {})
-        low_bands = [
-            row for row in pink.get("bands") or []
-            if isinstance(row, dict)
-            and isinstance(row.get("center_hz"), (int, float))
-            and 20.0 <= float(row["center_hz"]) <= 250.0
-            and isinstance(row.get("deviation_db"), (int, float))
-        ]
-        strongest = max(low_bands, key=lambda row: float(row["deviation_db"]), default=None)
-        if strongest is None or float(strongest["deviation_db"]) < 3.0:
-            raise RuntimeError("Demo mix no longer contains the documented low-end-heavy analysis cue.")
-        vocal_types = {str(item.get("type")) for item in vocal.get("findings") or [] if isinstance(item, dict)}
-        if "clipping" not in vocal_types:
-            raise RuntimeError("Demo vocal no longer contains the documented clipping analysis cue.")
-        total_ms = float(mix.get("runtime_ms") or 0.0) + float(vocal.get("runtime_ms") or 0.0)
-        return (
-            f"manifest hashes verified; low-end cue {float(strongest['deviation_db']):.1f}dB at "
-            f"{float(strongest['center_hz']):g}Hz; vocal clipping detected ({total_ms:.1f}ms analysis)"
-        )
+        for role, command, expected_scope, expected_finding in commands:
+            body, _ = self._request(
+                "/api/ableton/command",
+                {
+                    "session_id": f"demo-preflight-{role}",
+                    "command": command,
+                    "deterministic_only": True,
+                },
+                timeout=8.0,
+            )
+            source = body.get("analysis_source") if isinstance(body.get("analysis_source"), dict) else {}
+            finding_types = {
+                str(item.get("type"))
+                for item in body.get("findings") or []
+                if isinstance(item, dict)
+            }
+            if (
+                body.get("status") != "inspected"
+                or body.get("advice_mode") != "audio_analysis"
+                or body.get("analysis_scope") != expected_scope
+                or body.get("changed") is not False
+            ):
+                raise RuntimeError(f"The {expected_scope} chat analysis route did not return bounded read-only advice.")
+            if source.get("sha256") != entries[role].get("sha256"):
+                raise RuntimeError(f"The {expected_scope} chat analysis did not use the manifest-bound demo render.")
+            if expected_finding not in finding_types:
+                raise RuntimeError(f"The {expected_scope} chat analysis no longer contains its documented demo cue.")
+
+        return "manifest hashes and chat-route sources verified; low-end excess and vocal clipping cues detected; analysis cache warmed"
 
     def frontend(self) -> str:
         request = urllib.request.Request(self.base_url + "/")
