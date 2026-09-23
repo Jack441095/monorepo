@@ -1368,7 +1368,8 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 from kenn.ableton_osc_bridge import live_client
                 version = live_client.get_remote_script_version()
-                self.send_json(200 if version.get("success") else 503, version)
+                # 200 either way: a 5xx body is sanitised, hiding the "deploy it" reason.
+                self.send_json(200, version)
             except Exception as exc:
                 self.send_json(503, {"success": False, "error": str(exc)})
             return
