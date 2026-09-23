@@ -106,10 +106,11 @@ between different requests.
    Production KENN must disable thinking itself before this can ship. Options:
    - call Ollama's native `/api/chat` with `think: false`, which works for qwen3.5 when set there;
    - or prefill the empty think block, as the proxy does.
-   Until then it stays behind the shadow flag.
+   Until then it stays behind the shadow flag. (Done the same evening with the native route; see the addendum.)
 2. **On this Mac, the LLM cannot be the interactive path** (p50 10 s). Keep the parser first and the LLM as a fallback,
    shown as "working it out…". Work to reduce latency:
-   - compact plan output (57 tokens today, mostly JSON whitespace);
+   - shorter plan output (done, see the addendum: the reply was already compact JSON; ~12 of ~43 tokens were the
+     schema constant, which KENN now stamps itself);
    - a smaller fine-tuned model (C6);
    - and/or the owner deciding whether a demo may use a remote planner. Only text would leave the Mac.
 3. **C6 fine-tune:**
@@ -133,3 +134,39 @@ KENN_BAKEOFF_BASE_URL=http://127.0.0.1:11439/v1 python3 tooling/scripts/planner_
 The 124-case file is `natural_holdout_candidates.jsonl` followed by `natural_holdout.jsonl`. Raw per-case results
 are in `.runtime/logs/bakeoff_gpu/` (v1 prompt) and `.runtime/logs/bakeoff_gpu/v2/` (v2 prompt); these are
 gitignored runtime logs.
+
+## Addendum: production thinking-off path, shorter output, Qwen3 (same evening)
+
+Three changes followed the bake-off:
+
+- **Production KENN now turns thinking off itself.** qwen3-family schema calls go to Ollama's native `/api/chat`
+  with `think: false`. The bake-off helper is no longer needed.
+- **The model no longer writes the plan schema constant.** It cost ~12 of a ~43-token reply; KENN stamps it after
+  decoding.
+- **The training generator builds the planner prompt with production's own function.**
+
+All rows below use that final code, through the production path:
+
+| Model | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted | GPU p50 |
+|---|---|---|---|---|---|---|
+| **qwen3.5:4b** | **66.1%** | **20/30** | 62/94 | **14/24** | **15** | 1.0 s |
+| qwen3:4b | 51.6% | 2/30 | 62/94 | 9/24 | 35 | 0.7 s |
+| qwen3:1.7b | 19.4% | 4/30 | 20/94 | 4/24 | 7 | 1.1 s |
+
+The next table is Mac latency on the first 40 cases, which are mostly explicit commands. The same 40 cases were run
+for both models:
+
+| Model | Correct (40) | p50 | p95 | Repairs |
+|---|---|---|---|---|
+| qwen3:4b | 77.5% | **4.5 s** | 16.8 s | 6 |
+| qwen3.5:4b | 75.0% | 6.7 s | 18.0 s | 1 |
+
+- **Qwen3 (a standard transformer) is faster on the Mac.** It reuses the prompt cache across commands; the hybrid
+  qwen3.5 re-processes ~3.6 s of prompt per new command.
+- **On explicit commands the two 4B models are equal (62/94).** qwen3:4b almost never asks when it should (2/30) and
+  accepts more than twice as many wrong plans. Its speed comes with the riskier failure pattern.
+- **The trade-off for C6:**
+  - qwen3.5:4b is safe now but slower.
+  - qwen3:4b is faster, but only acceptable if fine-tuning teaches it to clarify. The corpus would need a large share
+    of clarify examples, and the result must be measured on the 30 clarify cases before any promotion.
+- **Decision for the owner:** which base to fine-tune.
