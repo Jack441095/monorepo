@@ -62,9 +62,12 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 ## Phase C — Language brain
 
-- [ ] **C1 Constrained decoding:** the planner's JSON is valid by construction (Ollama structured outputs; xgrammar or llguidance fallback)
-  > Code done 2026-09-23: `llm_plan_json_schema()` (flat, shape-only: schema const, 28 allowed actions, field types, no unknown keys) sent as Ollama `response_format: json_schema`; schema calls skip the MLX path, which silently ignored `json_mode`. Per-action `anyOf` branches were tried and made qwen2.5:1.5b pick wrong actions and overrun its token cap, so meaning stays with `validate_llm_plan`. Awaiting bake-off numbers to tick.
+- [x] **C1 Constrained decoding:** the planner's JSON is valid by construction (Ollama structured outputs; xgrammar or llguidance fallback)
+  > Done 2026-09-23 — every bake-off reply was schema-valid JSON (`KENN_C2_PLANNER_BAKEOFF_MAC_2026-09-23.md`). Code: `llm_plan_json_schema()` (flat, shape-only: schema const, 28 allowed actions, field types, no unknown keys) sent as Ollama `response_format: json_schema`; schema calls skip the MLX path, which silently ignored `json_mode`. Per-action `anyOf` branches were tried and made qwen2.5:1.5b pick wrong actions and overrun its token cap, so meaning stays with `validate_llm_plan`. Awaiting bake-off numbers to tick.
 - [ ] **C2 Model bake-off** on this Mac: `qwen2.5:1.5b`, `qwen2.5:7b-instruct`, Qwen3.5-2B/4B, Phi-4-mini (accuracy, clarification, p95 latency, memory)
+  > Mac run 2026-09-23 (100 phrasings): rule-based parser 42% correct (clarify 20/21, ~1 ms); qwen2.5:1.5b 12% (p50 4.4 s); qwen2.5:7b 56% (p50 12.7 s, guesses instead of clarifying). GPU box run (accuracy only) on owner's choice: deepseek-r1:1.5b, deepseek-r1:7b, phi4-mini — in progress.
+  - [ ] Grow the rule-based parser for relative dB, focus, sends, slang (volume 1/12 today)
+  - [ ] Planner emits user units (dB, %) and KENN converts; stop asking the model to normalize
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
   - [ ] ≥ 100 phrasings · [ ] ≥ 250 · [ ] ≥ 500 (slang, fragments, corrections, multi-intent). Curated holdout: 24 (Codex). 100 drafted candidates in `tooling/data/natural_holdout_candidates.jsonl` await owner review before promotion.
 - [ ] **C4 Staged promotion** (owner sign-off per stage)
@@ -161,4 +164,5 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | C1 schema-constrained planner decoding; bake-off harness; 100 candidate phrasings | `1e99d99` | 4 new tests; bake-off running |
 | 2026-09-23 | E2 loudness, true peak, LRA, key/tempo estimates; licence register | `a1cb848` | 6 new tests; chat gate on fake 1/1 incl. steps 12–13 |
 | 2026-09-23 | F1 MIDI ideas from chat (chords/drums/bass) as confirmable clips; MIDI-track phrasing fix | `f646979` | 9 unit tests; Playwright 9/9 |
-| 2026-09-23 | First real AbletonOSC deploy (hot reload); A2/B1/B3 proven on real Live; card names selected return | (this commit) | `KENN_WORLD_MODEL_REAL_LIVE_2026-09-23.md` |
+| 2026-09-23 | First real AbletonOSC deploy (hot reload); A2/B1/B3 proven on real Live; card names selected return | `2065b7f` | `KENN_WORLD_MODEL_REAL_LIVE_2026-09-23.md` |
+| 2026-09-23 | C1 ticked; C2 Mac bake-off results and parser baseline | (this commit) | `KENN_C2_PLANNER_BAKEOFF_MAC_2026-09-23.md` |
