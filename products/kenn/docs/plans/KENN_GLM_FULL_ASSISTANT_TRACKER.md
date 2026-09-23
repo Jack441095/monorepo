@@ -15,7 +15,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 ## Waiting on owner
 
 - [ ] Review the 100 drafted phrasings in `tooling/data/natural_holdout_candidates.jsonl` (labels: explicit target+amount → action, vague → clarify); approved ones move into the curated holdout
-- [ ] OK a `~/kenn_*` work folder on the GPU box (GPU 0, `/mnt/data`) for C6 LoRA training — text-only corpus, no audio
+- [x] OK a `~/kenn_*` work folder on the GPU box (GPU 0, `/mnt/data`) for C6 LoRA training — text-only corpus, no audio
+  > Given 2026-09-23 ("Anything we need to do that requires a GPU", no server restarts). Using `/mnt/data/kenn-bakeoff/`: user-level Ollama 0.34.2 on GPU 0, loopback port 11437, no system install.
 
 - [ ] Demo rehearsals 2–10: owner-run, see `docs/evidence/KENN_INVESTOR_DEMO_REHEARSAL_LOG.md`
 

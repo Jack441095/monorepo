@@ -32,6 +32,8 @@ def _configure(model: str) -> None:
         "KENN_LLM_PROVIDER_COMMAND": "ollama",
         "KENN_LLM_BASE_URL_COMMAND": os.environ.get("KENN_BAKEOFF_BASE_URL", "http://127.0.0.1:11434/v1"),
         "KENN_LLM_MODEL_COMMAND": model,
+        # A measurement must never read a cached answer from an earlier run.
+        "KENN_LLM_CACHE": "0",
     })
 
 
@@ -85,7 +87,11 @@ def main() -> int:
     parser.add_argument("--holdout", type=Path, default=DEFAULT_HOLDOUT)
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--out", type=Path, default=None)
+    parser.add_argument("--timeout", type=int, default=0,
+                        help="per-call LLM timeout in seconds (AUDIO_TOO_LLM_TIMEOUT; KENN default 20)")
     args = parser.parse_args()
+    if args.timeout:
+        os.environ["AUDIO_TOO_LLM_TIMEOUT"] = str(args.timeout)
     cases = [json.loads(line) for line in args.holdout.read_text().splitlines() if line.strip()]
     if args.limit:
         cases = cases[: args.limit]
