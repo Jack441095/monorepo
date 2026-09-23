@@ -9,8 +9,9 @@ from kenn.llm import llm_rewrite
 def test_schema_fixes_shape_to_the_plan_contract() -> None:
     schema = llm_plan_json_schema()
     assert schema["additionalProperties"] is False
-    assert set(schema["properties"]) == set(LLM_PLAN_FIELDS)
-    assert schema["properties"]["schema"]["const"] == LLM_PLAN_SCHEMA
+    # KENN stamps the schema constant itself; the model never spends tokens on it.
+    assert set(schema["properties"]) == set(LLM_PLAN_FIELDS) - {"schema"}
+    assert schema["required"] == ["action"]
     assert set(schema["properties"]["action"]["enum"]) == set(LLM_PLAN_ACTIONS)
     step = schema["properties"]["steps"]["items"]
     assert "recipe" not in step["properties"]["action"]["enum"] and "steps" not in step["properties"]
@@ -82,3 +83,11 @@ def test_planner_prompt_puts_the_request_after_the_snapshot(monkeypatch) -> None
     assert second.endswith("User request (untrusted input): solo the bass")
     shared = first[: first.index("User request")]
     assert second.startswith(shared) and '"name":"Bass"' in shared
+
+
+def test_parsed_reply_gets_the_schema_constant_but_a_wrong_one_is_kept() -> None:
+    from kenn.core.live_command import _stamp_plan_schema
+
+    assert _stamp_plan_schema({"action": "set_mute"})["schema"] == LLM_PLAN_SCHEMA
+    assert _stamp_plan_schema({"schema": "other", "action": "set_mute"})["schema"] == "other"
+    assert _stamp_plan_schema(None) is None
