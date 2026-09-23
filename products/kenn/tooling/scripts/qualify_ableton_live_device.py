@@ -327,10 +327,10 @@ def qualify_sweep(
         for row in rows
         if row.get("status") == "passed"
     ]
-    display_complete = not apply or all(
+    display_complete = apply and all(
         str(row.get("display_after") or "").strip() for row in rows
     )
-    status = expected_status if complete and identity_stable and display_complete else "failed"
+    status = expected_status if complete and identity_stable and (not apply or display_complete) else "failed"
     return {
         "schema": "kenn.ableton_real_device_calibration_sweep.v1",
         "evidence_kind": "real_live" if apply else "proposal_only",
@@ -402,7 +402,7 @@ def main() -> int:
         except ValueError as exc:
             parser.error(str(exc))
     print(json.dumps(result, indent=2, sort_keys=True, default=str))
-    return 0 if result.get("status") == "passed" else (2 if result.get("status") == "blocked" else 1)
+    return 0 if result.get("status") in {"passed", "proposal_ready"} else (2 if result.get("status") == "blocked" else 1)
 
 
 if __name__ == "__main__":
