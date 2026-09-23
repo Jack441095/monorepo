@@ -78,6 +78,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
     > Done 2026-09-23: schema constant no longer decoded (KENN stamps it), ~12 of ~43 tokens saved; qwen3.5:4b 66.1% vs 67.7% before (within noise). Training generator shares `planner_user_prompt()` with production; corpus regenerated.
   - [ ] Grow the rule-based parser for relative dB, focus, sends, slang (volume 1/12 today)
   - [ ] Planner emits user units (dB, %) and KENN converts; stop asking the model to normalize
+    > Volume in dB done 2026-09-24: `validate_llm_plan` accepts `set_volume` with `unit: "dB"`, absolute or relative, and converts with the rule parser's mapping (10^(dB/20); relative scales the snapshot volume; outside (0, 1] or no current volume is rejected). Found via C6 run 2, which wrote "+3 dB" plans that the old contract rejected. Pan in % still to do.
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
   - [ ] ≥ 100 phrasings · [ ] ≥ 250 · [ ] ≥ 500 (slang, fragments, corrections, multi-intent). Curated holdout: 24 (Codex). 100 drafted candidates in `tooling/data/natural_holdout_candidates.jsonl` await owner review before promotion.
 - [ ] **C4 Staged promotion** (owner sign-off per stage)
