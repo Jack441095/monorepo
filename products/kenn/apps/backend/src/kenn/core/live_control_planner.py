@@ -278,10 +278,18 @@ class LiveControlPlanner:
         parameter_name: str = "",
         unit: str = "",
         track_name: str = "",
+        observed_parameter_info: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
         """Query current parameter state from Live, construct an ActionProposal, and issue an HMAC token."""
-        # 1. Fetch live parameters for the target device
-        params_info = self.osc_client.get_device_parameters(track_index, device_index)
+        # The command gateway may pass the exact parameter block it just read
+        # while resolving the request. Reusing that immutable observation
+        # avoids a redundant OSC round-trip before confirmation; execution
+        # still performs its own fresh stale-state check and readback.
+        params_info = (
+            observed_parameter_info
+            if isinstance(observed_parameter_info, dict)
+            else self.osc_client.get_device_parameters(track_index, device_index)
+        )
         if not params_info.get("success"):
             return {
                 "ok": False,

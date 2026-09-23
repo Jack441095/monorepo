@@ -44,8 +44,11 @@ class FakeLive:
         ]
         self.sends: dict[tuple[int, int], float] = {}
         self.selected_device = {"success": True, "track_index": 2, "device_index": 0}
+        self.device_parameter_reads = 0
+        self.snapshot_reads = 0
 
     def query_session_state(self):
+        self.snapshot_reads += 1
         return deepcopy(self.state)
 
     def get_current_song_time(self) -> float:
@@ -172,6 +175,7 @@ class FakeLive:
         return True
 
     def get_device_parameters(self, track_index: int, device_index: int) -> dict:
+        self.device_parameter_reads += 1
         if track_index == 3 and any(
             isinstance(item, dict)
             and int(item.get("index", -1)) == device_index
@@ -275,6 +279,25 @@ class UnacknowledgedInsertionLive(FakeLive):
         self.writes.append(("insert_device", track_index, insertion_index, device_name))
         self.state["tracks"][track_index]["devices"].append({"index": insertion_index, "name": device_name})
         return {"success": False, "error": "No response from AbletonOSC"}
+
+
+class SplitSnapshotLive(FakeLive):
+    """Model the production topology/mixer snapshot split."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.snapshot_modes: list[bool] = []
+
+    def query_session_state(self, *, include_mixer: bool = True, **_kwargs):
+        self.snapshot_reads += 1
+        self.snapshot_modes.append(include_mixer)
+        state = deepcopy(self.state)
+        if not include_mixer:
+            state.pop("selected_track_index", None)
+            for track in state["tracks"]:
+                for field in ("volume", "pan", "muted", "soloed", "armed"):
+                    track.pop(field, None)
+        return state
 
 
 class DeviceSetupLive(FakeLive):
@@ -832,6 +855,7 @@ def test_focus_track_command_is_proposed_and_verified() -> None:
     assert planned["proposal"]["track_index"] == 1
     assert planned["proposal"]["track_name"] == "Bass"
     assert planned["proposal"]["previous_track_index"] == 0
+    assert fake.snapshot_reads == 1
     assert fake.writes == []
 
     applied = handle_command(
@@ -848,6 +872,28 @@ def test_focus_track_command_is_proposed_and_verified() -> None:
     assert fake.writes == [("focus", 1)]
 
 
+def test_mixer_and_focus_commands_select_one_complete_snapshot_up_front() -> None:
+    pan_live = SplitSnapshotLive()
+    pan = handle_command(
+        "Pan the Bass hard left.",
+        session_id="command-split-pan",
+        service=_service(pan_live),
+    )
+    focus_live = SplitSnapshotLive()
+    focus = handle_command(
+        "Focus track 2.",
+        session_id="command-split-focus",
+        service=_service(focus_live),
+    )
+
+    assert pan["status"] == "confirmation_required"
+    assert pan["proposal"]["after"] == -1.0
+    assert pan_live.snapshot_modes == [True]
+    assert focus["status"] == "confirmation_required"
+    assert focus["proposal"]["track_name"] == "Bass"
+    assert focus_live.snapshot_modes == [True]
+
+
 def test_focus_device_command_is_proposed_and_verified() -> None:
     fake = FakeLive()
     planned = handle_command("focus EQ Eight on track 4", session_id="command-focus-device", service=_service(fake))
@@ -857,6 +903,7 @@ def test_focus_device_command_is_proposed_and_verified() -> None:
     assert planned["proposal"]["device_index"] == 0
     assert planned["proposal"]["previous_track_index"] == 2
     assert planned["proposal"]["previous_device_name"] == "Compressor"
+    assert fake.snapshot_reads == 1
     assert fake.writes == []
 
     applied = handle_command(
@@ -1732,6 +1779,7 @@ def test_compressor_threshold_display_db_converts_to_measured_raw() -> None:
     assert planned["status"] == "confirmation_required"
     proposal = planned["proposal"]
     assert proposal["after"] == 0.4
+    assert fake.device_parameter_reads == 1
     assert fake.writes == []
     applied = handle_command(
         "Set Compressor Threshold to -18 dB on track 3",
