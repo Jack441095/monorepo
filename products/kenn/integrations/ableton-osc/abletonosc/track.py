@@ -246,6 +246,48 @@ class TrackHandler(AbletonOSCHandler):
             "/live/track/import_sample", create_track_callback(track_import_sample, include_track_id=True)
         )
 
+        # Arrangement counterpart of import_sample, behind the same Places
+        # allowlist. Usage: /live/track/import_arrangement_audio <track_index>
+        # <start_beat> <absolute_path>. Refuses to overlap an existing clip.
+        def track_import_arrangement_audio(track, params: Tuple[Any]):
+            track_index, start_beat, absolute_path = params
+            start_beat = float(start_beat)
+            absolute_path = str(absolute_path)
+            if not track.has_audio_input:
+                return (start_beat, False, "Target track cannot hold audio clips.")
+            for clip in track.arrangement_clips:
+                if clip.start_time <= start_beat < clip.end_time:
+                    return (start_beat, False, "An arrangement clip already covers that position; import refused.")
+
+            browser = Live.Application.get_application().browser
+            try:
+                item = find_sample_item_by_path(list(browser.user_folders), absolute_path)
+            except Exception as exc:
+                return (start_beat, False, "Browser search failed: %s" % exc)
+            if item is None:
+                return (
+                    start_beat,
+                    False,
+                    "Could not find this sample in Ableton's browser. Make sure its folder is "
+                    "added as a Place in Live > Preferences > Library, and try again.",
+                )
+
+            try:
+                track.create_audio_clip(absolute_path, start_beat)
+            except Exception as exc:
+                return (start_beat, False, "Load failed: %s" % exc)
+
+            fresh_track = self.song.tracks[int(track_index)]
+            for clip in fresh_track.arrangement_clips:
+                if abs(clip.start_time - start_beat) < 1e-6:
+                    return (start_beat, True, str(clip.name))
+            return (start_beat, False, "Import did not create an arrangement clip.")
+
+        self.osc_server.add_handler(
+            "/live/track/import_arrangement_audio",
+            create_track_callback(track_import_arrangement_audio, include_track_id=True),
+        )
+
         def track_get_clip_names(track, _):
             return tuple(clip_slot.clip.name if clip_slot.clip else None for clip_slot in track.clip_slots)
 

@@ -25,7 +25,47 @@ the current runbook/evidence record supersede them for operational status.
 | Demo preflight/errors/latency | Done; mutating real-Live preflight passed 11/11 in 9.62 seconds and post-restart read-only preflight passed 10/11 with the mutation check explicitly skipped |
 | Frontend | Demo theme, Live status, action cards, advice rendering, errors, and projector-oriented layout polished; 18 tests and production build pass |
 | Fixture and audio | Eight-track reset fixture plus deterministic rights-clear stems and manifest-bound analysis WAVs are built |
-| Full investor rehearsal | Not done: stems are not yet imported into the disposable set; atomic-EQ `--apply`, recovery/projector drill, and ten complete 20-step rehearsals remain |
+| Full investor rehearsal | In progress: stems imported and set qualified on 2026-09-23 (see tracker below); ten complete 20-step rehearsals remain |
+
+### Progress tracker
+
+Tick items here in the same commit as the work that completes them.
+
+**Phase 1 — Conversational**
+- [x] 1.1 Session Q&A through the real command/chat path
+- [x] 1.2 Receipt-backed change history
+- [x] 1.3 LLM shadow infrastructure + `analyze_shadow_logs.py` (production stays `shadow`)
+- [x] 1.4 Retrieval graceful degradation + startup index build
+
+**Phase 2 — Capability**
+- [ ] 2.1 Device mapping sprint to 20+ profiles (currently 11 profiles across 8 devices)
+- [x] 2.2 Mix doctor in chat (low-end and vocal-clipping advice, read-only)
+- [ ] 2.3 Multi-step recipes: compressor, two-step, and atomic EQ done; return+send, group+rename, solo+analyze still guarded
+
+**Phase 3 — Trust the model**
+- [x] 3.1 Staged promotion thresholds and durable state (stage remains `shadow`)
+- [x] 3.2 Bounded ten-exchange multi-turn context
+- [ ] 3.3 Nightly real-Live regression + SLO report (no script yet)
+
+**Phase 4 — Product surface**
+- [x] 4.1 Frontend chat, proposal, receipt, and advice UI
+- [ ] 4.2 Knowledge base curation + semantic index (BM25-only today)
+- [ ] 4.3 Generative preview/approve/insert (roadmap)
+
+**Phase 5 — Demo readiness**
+- [x] 5.2 Eight-track reset fixture + rights-clear `Neon Proof` stems
+- [x] 5.3 Eleven-check preflight
+- [x] 5.4 Investor-facing error hardening
+- [x] 5.5 Latency budget reporting
+- [x] 5.6 Frontend demo polish
+- [x] Atomic-EQ `--apply` passed on the disposable set (2026-09-23)
+- [x] Kick and Synth converted to audio tracks; all eight stems placed at bar 1 via `prepare_investor_demo_rehearsal_set.py` (2026-09-23)
+- [x] Mutating preflight 11/11 on the stem-loaded disposable set (2026-09-23)
+- [ ] Disposable set saved by the operator, plus an untouched copy kept as the per-run reset point
+- [ ] Ten-run non-mutating script gate on the stem-loaded set
+- [ ] Ten consecutive complete 20-step rehearsals (reset, recovery drill, projector layout, 8–12 min timing)
+- [ ] Fix AbletonOSC `get_selected_track` crash when a return/master track is selected
+- [ ] Push local commits (awaiting owner go-ahead; triggers the public mirror)
 
 Latest automated baseline: `1410 passed, 5 skipped, 4 warnings` for the backend;
 18/18 frontend tests and the production build pass. The 13-prompt

@@ -21,16 +21,20 @@ generator for the original `Neon Proof` demo composition, but the complete
 script remains unqualified until its stems are imported into a disposable Live
 copy and the full run passes the rehearsal gate.
 
-### Current working handoff — 2026-09-23 (08:40 BST)
+### Release gate checklist (updated 2026-09-23)
 
-- Live has the disposable `.runtime/.../KENN_Live12_Demo_Rehearsal.als` open;
-  it is still byte-identical to the reset fixture, with no stems imported.
-- On this set: atomic-EQ `--apply` passed and mutating preflight passed 11/11.
-- The script gate stopped at step 3 because a return track was selected.
-  Before rehearsing, select Drum Bus and its Compressor (before-the-room step 4).
-- Remaining: import the eight stems at bar 1 in manifest order, save this copy
-  only, re-run preflight and the script gate, then the ten complete 20-step
-  rehearsals, including reset, recovery drill, projector layout, and timing.
+- [x] Stems rendered, hash-bound manifest written
+- [x] Disposable rehearsal copy opened in Live (not the tracked fixture)
+- [x] Atomic-EQ qualifier `--apply` passed on the disposable set
+- [x] Kick and Synth replaced by same-name audio tracks; eight stems placed at
+      bar 1 and read back (`prepare_investor_demo_rehearsal_set.py --stem-dir
+      "KENN Demo Audio" --apply`; the `.runtime` Place is hidden from Live's
+      Browser, so the hash-verified visible copy is used)
+- [x] Drum Bus and its Compressor selected
+- [x] Mutating preflight 11/11 on the stem-loaded set
+- [ ] Operator saved the disposable set; untouched copy kept as reset point
+- [ ] Ten-run non-mutating script gate
+- [ ] Ten consecutive complete 20-step rehearsals
 
 ## Before the room opens
 
