@@ -14,6 +14,8 @@ new dependency here when it is added.
 | soundfile | BSD-3-Clause | WAV decoding for measurements | pre-existing |
 | @playwright/test | Apache-2.0 | UI end-to-end tests (dev only; system Chrome, no bundled browser) | 2026-09-23 (A1) |
 | AbletonOSC (vendored fork) | MIT | Live Remote Script transport | pre-existing |
+| Qwen3.5-4B weights (`Qwen/Qwen3.5-4B`; 4-bit MLX conversion `mlx-community/Qwen3.5-4B-4bit`) | Apache-2.0 | C6 command-planner base for LoRA fine-tuning (owner's choice, C2) | 2026-09-23 (C6) |
+| mlx / mlx-lm | MIT | On-device LoRA training and evaluation on Apple Silicon | pre-existing |
 
 Deliberately avoided: Essentia (AGPL-3.0), aubio (GPL-3.0), libkeyfinder
 (GPL-3.0), madmom models (CC BY-NC-SA), pedalboard (GPL-3.0), MusicGen /
