@@ -106,16 +106,13 @@ function newId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-function getOrCreateSessionId(): string {
-  const key = 'kenn_session_id'
+// One session per page load: chat cards are not persisted across reloads, so
+// reusing a stored ID would surface receipts the visible chat no longer shows.
+function newSessionId(): string {
   try {
-    const existing = localStorage.getItem(key)
-    if (existing) return existing
-    const id = crypto.randomUUID()
-    localStorage.setItem(key, id)
-    return id
+    return crypto.randomUUID()
   } catch {
-    return `sess-${Date.now()}`
+    return newId('sess')
   }
 }
 
@@ -175,7 +172,7 @@ const project = ref<KennProjectInfo>(useMock.value ? { ...MOCK_PROJECT } : { ...
 const sending = ref(false)
 const error = ref('')
 const lastActionAt = ref<Date | null>(null)
-const sessionId = getOrCreateSessionId()
+const sessionId = newSessionId()
 
 export async function refreshSessionCard() {
   if (useMock.value) return
