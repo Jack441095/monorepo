@@ -68,7 +68,11 @@ Tick items here in the same commit as the work that completes them.
 - [ ] History labels pan/focus receipts "not undoable" although receipt Undo works (cosmetic, step 11)
 - [ ] Current Project card shows "Focus Track: Kick" and "Key: Major" without root (cosmetic)
 - [ ] Chat parser cannot return a pan to centre ("Pan the Synth center.")
-- [ ] Ten consecutive complete 20-step rehearsals (reset, recovery drill, projector layout, 8–12 min timing); run 1 failed at step 6, count 0/10
+- [ ] Chat undo (step 10) does not mark the step-9 card as undone; its Undo button stays live
+- [ ] A refused stale undo shows a red "Failed" card with an Apply button; should read "Already undone — nothing changed"
+- [ ] Plain statements typed into chat get unrelated knowledge answers (e.g. vocal-depth tips)
+- [ ] Low-end finding shows "43.504 Hz"; round for display
+- [ ] Ten consecutive complete 20-step rehearsals (reset, recovery drill, projector layout, 8–12 min timing): **1/10** (run 1 passed 9m11s, 2026-09-23)
 - [ ] Fix AbletonOSC `get_selected_track` crash when a return/master track is selected
 - [ ] Push local commits (awaiting owner go-ahead; triggers the public mirror)
 

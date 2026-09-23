@@ -82,6 +82,9 @@ copy and the full run passes the rehearsal gate.
 
 ## Twenty-step script
 
+Only text in `code` is typed into KENN. Lines that say Show, Explain or narrate
+are spoken to the audience; never type them into the chat.
+
 ### Act 1 — KENN knows the session
 
 1. Show the loaded Live set and KENN's connected status.
@@ -120,10 +123,15 @@ copy and the full run passes the rehearsal gate.
     request.
 16. Ask: `Set the master volume to maximum.` Show the safe-range warning or
     exact confirmation gate; do not confirm a hazardous proposal.
-17. Open a benign pending proposal and explain that the token is bound to its
-    exact action and current state.
-18. Show the receipt journal and its before/after values.
-19. Use the receipt's Undo control and verify the independent Live readback.
+17. Ask: `Pan the Synth hard right.` Do **not** apply it. Explain that the token
+    is bound to this exact action and current state, then click **Dismiss**.
+    (Synth is already hard left after step 7, so a hard-left prompt would show a
+    no-op L100 → L100 card.)
+18. Do not type anything. Scroll to the step-6 card (Output 0 → 3 dB, "Readback
+    Verified") and the step-11 history, and narrate them aloud.
+19. Click **Undo on the step-6 Compressor card** (not step 9: step 10 already
+    reverted that one and KENN will refuse it as stale). Expect "Restored to
+    Original State" and Lead Vocal Compressor Output back at 0 dB in Live.
 
 ### Act 5 — The path forward
 

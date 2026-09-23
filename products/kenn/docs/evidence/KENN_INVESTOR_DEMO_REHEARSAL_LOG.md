@@ -13,7 +13,7 @@ UI: **http://127.0.0.1:8090/**. KENN's panel must read "Live connected" with 8 t
 
 | # | Date | Start | End | Mins | Steps passed /20 | Failed step + cause | Recovery drill | Projector | Pass |
 |---|------|-------|-----|------|------------------|---------------------|----------------|-----------|------|
-| 1 | 2026-09-23 | — | — | — | 5/20 | Step 6: UI Apply rejected every numeric proposal (token text 0.0 vs browser 0); chat route also sent steps 6, 8, 9, 10, 15, 16 to knowledge chat. Both fixed, see notes. | — | — | [ ] fail |
+| 1 | 2026-09-23 | 09:28:35 | 09:37:46 | 9.2 | 20/20 | Operator slips only: typed the step-18 talk line into KENN (off-topic answer, no Live change); clicked Undo on the step-9 card first (KENN correctly refused the stale undo). | — | — | [x] |
 | 2 |  |  |  |  |  |  |  |  | [ ] |
 | 3 |  |  |  |  |  |  |  |  | [ ] |
 | 4 |  |  |  |  |  |  |  |  | [ ] |
@@ -52,7 +52,7 @@ continue from step 8. Note the seconds from restart to usable.
 
 ## Notes
 
-**Run 1 (failed at step 6), 2026-09-23.** Two defects that only the real UI path exposed. Codex's
+**Attempt before run 1 (failed at step 6, not counted), 2026-09-23.** Two defects that only the real UI path exposed. Codex's
 10/10 script gate calls `/api/ableton/command` directly, bypassing both.
 1. Confirmation tokens hashed `before`/`after` as Python text (`0.0`, `-1.0`), while the browser's
    `JSON.stringify` echoes `0`/`-1`, so every numeric Apply was rejected as tampered. Fixed by
