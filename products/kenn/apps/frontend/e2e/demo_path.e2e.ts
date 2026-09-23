@@ -48,3 +48,18 @@ test('destructive and master requests are refused without a proposal', async ({ 
   await expect(master).toContainText('Nothing changed')
   await expect(master.getByRole('button', { name: 'Apply to Live 12' })).toHaveCount(0)
 })
+
+test('a typed card label gets a short prompt, not a tutorial', async ({ page }) => {
+  await openKenn(page)
+  const reply = await ask(page, 'Try this')
+  await expect(reply).toContainText('label from one of my cards')
+  await expect(reply.getByRole('button', { name: 'Apply to Live 12' })).toHaveCount(0)
+})
+
+test('"Pan the Synth center." proposes pan centre and Dismiss changes nothing', async ({ page }) => {
+  await openKenn(page)
+  const reply = await ask(page, 'Pan the Synth center.')
+  await expect(reply).toContainText('Synth')
+  await reply.getByRole('button', { name: 'Dismiss' }).click()
+  await expect(reply).toContainText('No Changes Made')
+})

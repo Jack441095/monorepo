@@ -113,6 +113,7 @@ READ_ENDPOINTS = (
     "/live/song/get/scale_name",
     "/live/song/get/tempo",
     "/live/view/get/selected_track",
+    "/live/view/get/selected_track_kind",
     "/live/view/get/selected_device",
     "/live/view/get/selected_scene",
     "/live/track/get/meters",
@@ -927,6 +928,15 @@ class AbletonOSCClient:
         scale_name_args = batched_values[batch_index + 5] or [] if include_mixer else []
         playing_args = batched_values[batch_index + 6] or [] if include_mixer else []
         selected_args = batched_values[batch_index + 7] or [] if include_mixer else []
+        selected_index = selected_args[0] if selected_args else None
+        selected_kind = None
+        if isinstance(selected_index, (int, float)) and int(selected_index) < 0:
+            # The patched Remote Script answers -1 when a return or master
+            # track is selected; ask which one instead of reporting nothing.
+            selected_index = None
+            kind_args = self._query_args("/live/view/get/selected_track_kind")
+            if kind_args and len(kind_args) >= 3:
+                selected_kind = {"kind": str(kind_args[0]), "index": int(kind_args[1]), "name": str(kind_args[2])}
         result = {
             "status": "connected",
             "host": self.host,
@@ -939,7 +949,8 @@ class AbletonOSCClient:
             "root_note": root_note_args[0] if root_note_args else None,
             "scale_name": str(scale_name_args[0]) if scale_name_args else None,
             "is_playing": bool(playing_args[0]) if playing_args else None,
-            "selected_track_index": selected_args[0] if selected_args else None,
+            "selected_track_index": selected_index,
+            "selected_track_kind": selected_kind,
             "return_tracks": [],
             "master_track": None,
         }
@@ -1342,9 +1353,12 @@ class AbletonOSCClient:
         if not values or len(values) < 2:
             return {"success": False, "error": "AbletonOSC returned no exact selected device."}
         try:
-            return {"success": True, "track_index": int(values[0]), "device_index": int(values[1])}
+            track_index, device_index = int(values[0]), int(values[1])
         except (TypeError, ValueError):
             return {"success": False, "error": "AbletonOSC returned an invalid selected-device identity."}
+        if track_index < 0 or device_index < 0:
+            return {"success": False, "error": "No device on a regular track is selected in Live."}
+        return {"success": True, "track_index": track_index, "device_index": device_index}
 
     def set_selected_device(self, track_index: int, device_index: int) -> bool:
         """Focus one exact device in one exact Live track."""

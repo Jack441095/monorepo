@@ -75,6 +75,7 @@ from kenn.core.evidence import (
 from kenn.core.endpoint_policy import endpoint_policy
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.live_command import handle_command
+from kenn.core.request_classifier import classify_non_request, non_request_reply
 from kenn.core.live_session_questions import answer_live_session_question
 from kenn.core.live_receipt_journal import list_receipts, record_receipt
 from kenn.core.audiogen_artifacts import safe_artifact_metadata
@@ -142,7 +143,7 @@ PORT = int(os.getenv("KENN_PORT", "8090"))
 # Imperative Live control phrasing that must reach the typed command gateway
 # rather than knowledge chat (e.g. "Focus EQ Eight on track 5", "Undo that.").
 _LIVE_IMPERATIVE_RE = re.compile(
-    r"^\s*(?:please\s+)?(?:set|pan|focus|boost|cut|raise|lower|turn|mute|unmute|solo|unsolo|"
+    r"^\s*(?:please\s+)?(?:set|pan|focus|boost|cut|raise|lower|turn|mute|unmute|solo|unsolo|center|centre|recenter|recentre|"
     r"arm|disarm|insert|add|rename|remove|delete|undo|duplicate|group|gain[- ]stage|select)\b",
     re.I,
 )
@@ -2591,6 +2592,15 @@ class Handler(BaseHTTPRequestHandler):
             for key in ("proposal", "confirmation_token", "requires_confirmation"):
                 augmented[key] = live_command_reply[key]
             self.send_json(200, augmented)
+            return
+        non_request_kind = classify_non_request(question)
+        if non_request_kind is not None:
+            self.send_json(200, augment_payload(
+                non_request_reply(non_request_kind),
+                question=question,
+                session_id=str(payload.get("session_id", "")).strip(),
+                correlation_id=self.request_id(),
+            ))
             return
         checkpoint_reply = self._maybe_handle_checkpoint_reply(
             question, str(payload.get("session_id", "")).strip()

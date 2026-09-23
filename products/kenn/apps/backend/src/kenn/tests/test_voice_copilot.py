@@ -43,7 +43,9 @@ def test_voice_intent_end_to_end_latency():
     avg_latency = sum(latencies) / len(latencies)
     assert avg_latency < 10.0, f"Average intent parse latency {avg_latency:.2f}ms exceeds 10ms target"
 
-    # Test full simulated acoustic pipeline
-    pipeline_res = copilot.process_audio_features(b"dummy_pcm_frame")
-    assert pipeline_res.intent_type in copilot.INTENTS
-    assert pipeline_res.latency_ms <= 300.0, f"Pipeline latency {pipeline_res.latency_ms:.2f}ms exceeds 300ms budget"
+
+
+def test_voice_copilot_exposes_no_simulated_audio_pipeline() -> None:
+    from kenn.speech.voice_copilot import VoiceCopilot
+
+    assert not hasattr(VoiceCopilot, "process_audio_features")

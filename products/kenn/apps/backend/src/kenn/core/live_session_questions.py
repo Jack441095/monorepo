@@ -167,7 +167,14 @@ def answer_live_session_question(
     elif kind == "selected_track":
         selected_index = snapshot.get("selected_track_index")
         selected = next((item for item in tracks if item.get("index") == selected_index), None)
-        if selected is None:
+        other = snapshot.get("selected_track_kind") if isinstance(snapshot.get("selected_track_kind"), dict) else None
+        if selected is None and other and other.get("kind") in {"return", "master"}:
+            label = "the master track" if other["kind"] == "master" else f"return track '{other.get('name', '')}'"
+            payload.update({
+                "answer": f"{label[0].upper()}{label[1:]} is selected.",
+                "track": {"kind": other["kind"], "index": other.get("index"), "name": other.get("name", "")},
+            })
+        elif selected is None:
             payload.update({"status": "unavailable", "answer": "Live did not expose a selected track in the fresh snapshot."})
         else:
             number = tracks.index(selected) + 1
