@@ -54,3 +54,10 @@ def test_split_is_deterministic_and_keeps_both_sides_non_empty() -> None:
     assert (train, valid) == split_rows(rows, valid_fraction=0.1, seed=0)
     assert len(valid) == 2 and len(train) == 18
     assert split_rows(rows[:2], valid_fraction=0.9, seed=0)[0]
+
+
+def test_compact_corpus_uses_the_compact_system_prompt() -> None:
+    from kenn.core.live_command import LLM_COMMAND_SYSTEM_PROMPT_COMPACT
+
+    rows = build_rows(variants=2, scenarios=1, prompt="compact")
+    assert {row["messages"][0]["content"] for row in rows} == {LLM_COMMAND_SYSTEM_PROMPT_COMPACT}

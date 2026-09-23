@@ -65,7 +65,8 @@ def lora_command(args: argparse.Namespace, data_dir: Path) -> list[str]:
         "--num-layers", str(args.num_layers), "--batch-size", str(args.batch_size),
         "--iters", str(args.iters), "--learning-rate", str(args.learning_rate),
         "--max-seq-length", str(args.max_seq_length), "--steps-per-report", "5",
-        "--steps-per-eval", str(max(5, args.iters // 4)), "--save-every", str(args.iters),
+        "--steps-per-eval", str(max(5, args.iters // 4)), "--val-batches", str(args.val_batches),
+        "--save-every", str(max(1, args.iters // 4)),
         "--seed", str(args.seed), "--adapter-path", str(args.output / "adapter"),
     ]
 
@@ -81,6 +82,7 @@ def main() -> int:
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--max-seq-length", type=int, default=4096)
     parser.add_argument("--valid-fraction", type=float, default=0.1)
+    parser.add_argument("--val-batches", type=int, default=10)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--run", action="store_true", help="train (default is a dry run)")
     args = parser.parse_args()
@@ -97,7 +99,7 @@ def main() -> int:
         "base_model": args.base_model,
         "hyperparameters": {k: getattr(args, k) for k in
                             ("iters", "batch_size", "num_layers", "learning_rate", "max_seq_length",
-                             "valid_fraction", "seed")},
+                             "valid_fraction", "val_batches", "seed")},
         "holdout_protection": "passed",
         "provenance": _provenance(),
     }
