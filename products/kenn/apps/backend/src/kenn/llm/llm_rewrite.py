@@ -524,9 +524,15 @@ def cache_enabled() -> bool:
     return os.environ.get("KENN_LLM_CACHE", "1").strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _cache_key(cfg: dict, messages: list[dict[str, str]]) -> str:
+def _cache_key(cfg: dict, messages: list[dict[str, str]], output: dict | None = None) -> str:
+    # ``output`` carries the output contract (JSON mode, schema, answer mode):
+    # the same messages under a different contract must not share an answer.
+    # Plain calls pass nothing, so their existing keys are unchanged.
+    key: dict = {"model": cfg.get("model", ""), "messages": messages}
+    if output:
+        key["output"] = output
     blob = json.dumps(
-        {"model": cfg.get("model", ""), "messages": messages},
+        key,
         sort_keys=True,
         separators=(",", ":"),
     )
@@ -652,7 +658,9 @@ def _chat_completion(
     elif not any(m.get("role") == "system" for m in messages):
         messages = [{"role": "system", "content": build_system_prompt()}] + messages
 
-    cache_key = _cache_key(cfg, messages)
+    output = ({"json_mode": json_mode, "json_schema": json_schema, "answer_mode": answer_mode}
+              if (json_mode or json_schema is not None) else None)
+    cache_key = _cache_key(cfg, messages, output)
     cached = _cache_get(cache_key)
     if cached is not None:
         usage = _cached_usage(cfg, task, cached)
