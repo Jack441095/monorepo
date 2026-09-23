@@ -47,7 +47,8 @@ def _percent(value: float) -> str:
 def _cores(row: dict[str, Any]) -> list[str]:
     plan = row["label"]
     action = str(plan.get("action", ""))
-    if action == "clarify":
+    # Drafted seeds exist for their wording, so keep it instead of templating from the label.
+    if action == "clarify" or row.get("source_kind") == "claude_drafted_owner_review_pending":
         query = str(row["query"])
         return [
             query,
@@ -275,14 +276,20 @@ SCENARIO_TRACK_NAMES = (
 )
 
 
+SCENARIO_VOLUMES = (0.6, 0.55, 0.5, 0.45, 0.65)  # synthetic; +3 dB from any stays at or below 1.0
+
+
 def scenario_snapshots() -> list[dict[str, Any]]:
     from build_kenn_command_training import training_snapshot
 
     snapshots: list[dict[str, Any]] = []
     for names in SCENARIO_TRACK_NAMES:
         snapshot = copy.deepcopy(training_snapshot())
-        for track, name in zip(snapshot["tracks"], names):
+        for track, name, volume in zip(snapshot["tracks"], names, SCENARIO_VOLUMES):
             track["name"] = name
+            # Mixer state, as the production snapshot carries it; relative dB
+            # volume labels are validated against these values.
+            track.update({"volume": volume, "pan": 0.0, "muted": False, "soloed": False, "armed": False})
         snapshots.append(snapshot)
     return snapshots
 
