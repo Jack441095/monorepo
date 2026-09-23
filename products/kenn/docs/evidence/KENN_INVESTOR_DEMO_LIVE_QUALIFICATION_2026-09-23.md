@@ -79,7 +79,7 @@ Result: **10/10 consecutive passes**, zero partial successes counted.
 The latest full backend suite completed after the atomic-EQ, chat-routing, and
 frontend-polish work:
 
-`1409 passed, 5 skipped, 4 warnings in 81.33s`
+`1410 passed, 5 skipped, 4 warnings in 77.33s`
 
 The Vue frontend also completed all 18 Vitest checks and a production Vite
 build. These automated checks do not replace the manual projector rehearsal.
@@ -194,3 +194,18 @@ The UI rendered the proposal card, it was dismissed without applying, and the
 status bar continued to report `Last action: None yet`. This closes the earlier
 gap where the same sentence fell through to a generic Auto Pan knowledge
 answer while preserving the confirmation boundary.
+
+## Shadow-evidence integrity
+
+The promotion audit found that repeated full test runs had appended 31 copies
+of the same synthetic `mute track 2` conflict fixture to the default local
+shadow log. Every row had the same command and mismatch, no session or model
+provenance, and was produced by the promotion-stage cap test—not by studio use.
+The rows were excluded from promotion evidence and moved intact to the ignored,
+recoverable runtime quarantine.
+
+The backend test harness now redirects both in-process and spawned-server
+shadow writes to a session-scoped temporary log. A focused test and the full
+1,410-test suite verified that the production evidence path remained absent.
+The durable promotion state was not changed and remains at `shadow`; no model
+stage was promoted from synthetic data.
