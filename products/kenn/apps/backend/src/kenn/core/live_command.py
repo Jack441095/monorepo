@@ -1183,11 +1183,14 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
     if kind == "device_setup":
         before_devices = ", ".join(item.get("name", "") for item in proposal.get("before_devices", []) if isinstance(item, dict)) or "no devices"
         after_devices = ", ".join(item.get("name", "") for item in proposal.get("after_devices", []) if isinstance(item, dict)) or "no devices"
+        parameter_value = float(proposal.get("parameter_display_value", 0.0))
+        parameter_unit = str(proposal.get("parameter_unit", "")).strip()
+        parameter_display = f"{parameter_value:g}{parameter_unit}" if parameter_unit == "%" else f"{parameter_value:g} {parameter_unit}".rstrip()
         response.update({
             "status": "confirmation_required",
             "answer": (
                 f"I can append {proposal.get('device_name', 'the device')} to '{target}' and set "
-                f"{proposal.get('parameter_name', 'the parameter')} to {float(proposal.get('parameter_display_value', 0.0)):g}% "
+                f"{proposal.get('parameter_name', 'the parameter')} to {parameter_display} "
                 f"(current devices: {before_devices}; after: {after_devices}). Nothing has changed. "
                 "Confirm this exact proposal to apply it."
             ),
@@ -2115,6 +2118,12 @@ def _handle_command_impl(
             if undo.get("ok") and isinstance(undo.get("proposal"), dict):
                 return _proposal_response(response, undo["proposal"], kind="undo")
             return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))
+        if context_resolution.get("resolution") == "correction_requires_clarification":
+            return _clarification(
+                response,
+                {"action": "correct_target"},
+                "I can correct the target, but 'the other one' is not an exact identity. Name the track or device you mean.",
+            )
 
     if proposal is not None:
         execution_started = time.monotonic()
