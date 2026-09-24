@@ -126,7 +126,13 @@ The beta cannot start while KENN only runs from this Mac's checkout.
 - [ ] D1 wave 1 on real Live, same method as the fader law: Compressor (threshold, ratio, attack, release, makeup),
       EQ Eight (every band's frequency, gain, Q), Utility (gain, width), Limiter, Reverb/Hybrid Reverb, Delay/Echo;
       commands generated per parameter and run end to end (`e2e_demo_commands.py`)
-- [ ] Rule parser to ≥ 80% of the 124 cases with 0 wrong plans; the owner's review-page test commands all pass
+- [x] Rule parser to ≥ 80% of the 124 cases with 0 wrong plans; the owner's review-page test commands all pass
+  > 2026-09-24: **105/124 (84.7%)**, 0 wrong plans (was 80). General rules, tested on self-written phrasings rather than
+  > the evaluation set: insert verbs (stick/drop/throw a …), "new midi track", "return channel", "start the song",
+  > locators (drop/place), corrections ("no wait, … not the hats"), "call track N …", ordinals ("the fourth channel"),
+  > mute/solo slang (kill, nuke, out of the mix, on its own, just the …), terse pan and volume, focus verbs. Owner test
+  > commands 1/1; e2e 21/22 unchanged. Still asks: device parameters by name, sends without "send", two-part requests,
+  > terse dB without a direction ("kick -3 dB": absolute or relative?).
 - [ ] Advice → fix: each audio finding offers one confirmable change and re-measures after Apply
 - [ ] Notes for the last 4 devices (Instrument/MIDI/Audio Effect Rack, Drum Synth) and a small review of the 21 notes
       approved today
