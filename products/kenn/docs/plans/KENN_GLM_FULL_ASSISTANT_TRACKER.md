@@ -16,6 +16,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 - [x] Pick the C6 base model: `qwen3.5:4b` (clarifies 20/30, Mac p50 6.7 s) or `qwen3:4b` (clarifies 2/30, Mac p50 4.5 s; needs clarify training). See the C2 GPU evidence addendum
   > Owner chose **qwen3.5:4b** on 2026-09-23 (safer: already clarifies; the latency gap should narrow once fine-tuning shortens the prompt). Fallback if its hybrid architecture has no LoRA tooling: qwen3:4b with a clarify-heavy corpus.
+- [ ] Review drafts and write independent test commands on the review page: https://claude.ai/artifact/BcWAc8j1SoPTBLGCDkxbPS (decisions and new commands are saved there; Claude reads them back)
 - [ ] Review the drafted training seeds in `tooling/scripts/drafted_command_seeds.py` (C6: 21 clarify, 19 clear-command, 21 transport/rename/send/device/EQ/two-part)
 - [ ] Decide C4: promote a fine-tune (candidate: run 4, 83.1% on the Mac, p50 6.5 s) from shadow to propose-with-confirm, or wait for the independent evaluation
   > 2026-09-24: owner asked to promote run 4. The promotion gate (`live_llm_promotion.py`: ≥ 500 shadow comparisons over ≥ 14 days, ≥ 98% schema acceptance, ≥ 90% agreement with the rule parser) is not met and was not bypassed. Run 4 now runs in **background shadow** on the Mac companion (`KENN_LIVE_LLM_MODE=shadow`, `KENN_LLM_ENABLED_COMMAND=1`, model `kenn-c6-run4`, compact prompt, thinking off), so every real command adds gate evidence with no added latency. Changing the gate itself would be the owner's call.
