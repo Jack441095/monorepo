@@ -228,6 +228,43 @@ _UNSAFE_MASTER_LEVEL = re.compile(
     r"\b(?:maximum|max|full|raise|increase|boost|turn\s+up)\b",
     re.I,
 )
+# Master level without the word volume ("master to max", "crank the master",
+# "push the master fader all the way up"): master/main near a maximising word.
+_UNSAFE_MASTER_MAX = re.compile(
+    r"\b(?:master|main)(?:\s+(?:track|bus|fader|channel))?\b.{0,60}"
+    r"\b(?:max(?:imum|imise|imize)?|full|all\s+the\s+way|as\s+loud|crank(?:ed)?)\b"
+    r"|\b(?:max(?:imum|imise|imize)?|crank)\b.{0,60}\b(?:master|main)(?:\s+(?:track|bus|fader|channel))?\b",
+    re.I,
+)
+# Safety words checked with a one-letter typo allowance ("delte", "mastr"), so
+# a slip of the keyboard cannot turn a refusal into something else.
+_SAFETY_WORDS = ("delete", "remove", "erase", "overwrite", "replace", "destroy", "master")
+
+
+def _within_one_edit(word: str, target: str) -> bool:
+    """A missing letter or two swapped neighbours: the common keyboard slips.
+
+    Substitutions and extra letters are not allowed, so real words such as
+    "remote" or "removed" never read as "remove".
+    """
+    if len(word) == len(target) - 1:
+        return any(target[:i] + target[i + 1:] == word for i in range(len(target)))
+    if len(word) == len(target) and word != target:
+        return any(word == target[:i] + target[i + 1] + target[i] + target[i + 2:] for i in range(len(target) - 1))
+    return False
+
+
+def _safety_normalised(text: str) -> str:
+    """The text with near-miss safety words (4+ letters, one edit) spelt correctly."""
+    def fix(match: re.Match) -> str:
+        word = match.group(0)
+        lower = word.casefold()
+        if len(lower) < 4 or lower in _SAFETY_WORDS:
+            return word
+        return next((target for target in _SAFETY_WORDS if _within_one_edit(lower, target)), word)
+    return re.sub(r"[A-Za-z]+", fix, text)
+
+
 _RENAME_TRACK = re.compile(
     r"\b(?:rename|name)\b.*?\b(?:to|as)\s+['\"]?([^'\"]+?)['\"]?\s*$",
     re.I,
@@ -877,7 +914,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     if not text:
         base.update({"error": "A request is required.", "missing_fields": ["request"], "confidence": 1.0})
         return base
-    if _DESTRUCTIVE.search(text) and _REMOVE_LOCATOR.fullmatch(text) is None:
+    safety_text = _safety_normalised(text)
+    if _DESTRUCTIVE.search(safety_text) and _REMOVE_LOCATOR.fullmatch(text) is None:
         base.update({"mode": "refuse", "error": "Deleting, removing, overwriting, and replacing Live content are disabled by the KENN assistant boundary.", "confidence": 0.99})
         return base
     if _UNBOUNDED_EXECUTION.search(text):
@@ -894,7 +932,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             "confidence": 0.99,
         })
         return base
-    if _UNSAFE_MASTER_LEVEL.search(text):
+    if _UNSAFE_MASTER_LEVEL.search(safety_text) or _UNSAFE_MASTER_MAX.search(safety_text):
         base.update({
             "mode": "refuse",
             "error": (

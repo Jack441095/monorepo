@@ -77,8 +77,12 @@ The beta cannot start while KENN only runs from this Mac's checkout.
 ## Phase 2: Reliability and the qualification gate (weeks 1–2, overlaps Phase 1)
 
 - [ ] Idle-wake: retry the first read after long idle before reporting "offline"; test with Live idle 2+ hours
-- [ ] Refusals survive typos: destructive and master-level requests are refused even with a missing letter or odd wording
+- [x] Refusals survive typos: destructive and master-level requests are refused even with a missing letter or odd wording
       (fuzzy intent check before falling to knowledge answers)
+  > 2026-09-24: safety words allow one missing letter or swapped pair ("delte", "mastr"; real words like "remote" stay
+  > safe); master level refused without the word volume ("master to max", "crank the master"); the chat route forwards a
+  > slipped first verb ("et the master…") and put/bring/push/crank/take/kill. Checked through `/kenn/api/ask` on the
+  > real companion; 22 new tests; 124 cases unchanged (80, 0 wrong).
 - [ ] Companion restart keeps the audio-analysis cache warm (persist it) so a restart cannot break an answer
 - [ ] 24-hour soak with Live restarts, companion restarts and sleep/wake (`companion_soak` gate)
 - [ ] Regenerate stale evidence: `automated_suite`, `intelligence` (`--run-suite --run-intelligence`),
