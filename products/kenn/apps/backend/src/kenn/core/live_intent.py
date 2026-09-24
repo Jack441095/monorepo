@@ -150,6 +150,22 @@ _SEND_TRACK_FIRST = re.compile(r"\bsend\s+(?:the\s+)?(?P<track_name>[\w' /-]+?)\
 # "set the synth send to B-Delay at 10%" ("set" needs the word "send", so EQ and
 # device "set ... to ... at ..." commands never match)
 _SET_TRACK_SEND = re.compile(r"\bset\s+(?:the\s+)?(?P<track_name>[\w' /-]+?)(?:'s)?\s+send\s+" + _SEND_TAIL, re.I)
+# "synth to the delay at 20 percent": no word "send", so only accepted when the
+# destination names exactly one return track in the set (see _track_to_return_send).
+_TRACK_TO_RETURN = re.compile(
+    r"^\s*(?:(?:set|put|bring|route)\s+)?(?:the\s+)?(?P<track_name>[\w' /-]+?)\s+" + _SEND_TAIL + r"\s*[.!]?\s*$", re.I)
+
+
+def _track_to_return_send(lower: str, snapshot: Any) -> re.Match | None:
+    match = _TRACK_TO_RETURN.search(lower)
+    if not match:
+        return None
+    wanted = set(re.findall(r"[a-z0-9]+", match.group("return_name").casefold())) - {"the", "return", "track", "bus"}
+    returns = [r for r in ((snapshot or {}).get("return_tracks") or []) if isinstance(r, dict)]
+    hits = [r for r in returns if wanted and wanted <= set(re.findall(r"[a-z0-9]+", str(r.get("name", "")).casefold()))]
+    return match if len(hits) == 1 else None
+
+
 _MUTE_SEND = re.compile(
     r"\b(?:mute|turn\s+off|zero)\s+(?:the\s+)?(?P<return_name>[\w' -]+?)\s+send\b.*?\bon\s+"
     r"(?:(?:track|trk|channel|chan|ch)\s*#?\s*(?P<track_number>\d+)\b|(?:the\s+)?(?P<track_name>[\w' -]+?))\s*$",
@@ -493,6 +509,8 @@ _TRACK_NICKNAMES = (
     (re.compile(r"\b(?:vox|vocals|voc)\b", re.I), "vocal"),
     (re.compile(r"\bdrums\b", re.I), "drum"),
 )
+# The words _TRACK_NICKNAMES accepts, as plain words.
+_NICKNAME_WORDS = frozenset({"high", "hi", "hat", "hats", "hihat", "hihats", "vox", "vocals", "voc", "drums"})
 _GENERIC_TRACK_WORDS = {"track", "bus", "group", "the", "and", "audio", "midi", "return", "main", "channel"}
 # Words that name a *particular* track. "the Lead Vocal" must not resolve to a
 # "Backing Vocal" track just because both contain "vocal".
@@ -908,6 +926,46 @@ def _rewrite_common_phrasings(text: str) -> str:
     return text
 
 
+_FOCUS_DEVICE_BY_NAME = re.compile(
+    r"^\s*(?:show\s+me|open|focus|select|go\s+to|jump\s+to|take\s+me\s+to)\s+(?:the\s+)?(?P<phrase>.+?)\s*[.!]?\s*$",
+    re.I,
+)
+
+
+def _named_device_focus(text: str, tracks: list[dict[str, Any]]) -> tuple[dict[str, Any], dict[str, Any]] | None:
+    """"show me the bass eq", "open the compressor on the vocal": one device on one named track.
+
+    The device word must be a known device alias and exist on exactly one track
+    whose name covers every other word said; anything less falls through.
+    """
+    match = _FOCUS_DEVICE_BY_NAME.match(text)
+    if not match:
+        return None
+    phrase = match.group("phrase").casefold()
+    for canonical, pattern in _INSERT_DEVICE_ALIASES:
+        device_hit = re.search(rf"\b(?:{pattern}|comp)\b" if canonical == "Compressor" else rf"\b(?:{pattern})\b", phrase)
+        if not device_hit:
+            continue
+        rest = (phrase[:device_hit.start()] + " " + phrase[device_hit.end():])
+        rest = re.sub(r"\b(?:on|in|of|the|track|channel)\b", " ", rest)
+        said = set(re.findall(r"[a-z0-9]+", rest))
+        if not said:
+            return None
+        track, _candidates, error = _find_track(" ".join(rest.split()), tracks)
+        if error or track is None:
+            track_name = _nickname_track_name(" ".join(rest.split()), tracks)
+            track = next((t for t in tracks if t.get("name") == track_name), None) if track_name else None
+            if track is None:
+                return None
+        named = set(re.findall(r"[a-z0-9]+", str(track.get("name", "")).casefold()))
+        if not said - named <= _NICKNAME_WORDS:
+            return None  # an extra word ("... compressor ratio") means this is not just a focus request
+        devices = [d for d in (track.get("devices") or []) if isinstance(d, dict)
+                   and str(d.get("name", "")).casefold() == canonical.casefold()]
+        return (track, devices[0]) if len(devices) == 1 else None
+    return None
+
+
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
     text = _rewrite_common_phrasings(" ".join(str(query or "").strip().split()))
@@ -1099,6 +1157,18 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             "confidence": 0.98,
         })
         return base
+    named_device = _named_device_focus(text, tracks)
+    if named_device is not None:
+        focus_track, device = named_device
+        base.update({
+            "mode": "assist",
+            "action": "focus_device",
+            "track": {"index": focus_track.get("index"), "name": str(focus_track.get("name", ""))},
+            "device": {"index": int(device.get("index", 0)), "name": str(device.get("name", ""))},
+            "confirmation_required": True,
+            "confidence": 0.95,
+        })
+        return base
     focus_match = _FOCUS_TRACK.search(lower)
     if focus_match:
         track_number = int(focus_match.group(1))
@@ -1274,7 +1344,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     # extracts what the user asked for.
     mute_send_match = _MUTE_SEND.search(lower)
     send_match = (mute_send_match or _SET_SEND.search(lower) or _SEND_TRACK_FIRST.search(lower)
-                  or _SET_TRACK_SEND.search(lower))
+                  or _SET_TRACK_SEND.search(lower) or _track_to_return_send(lower, session_snapshot))
     if send_match:
         track_number_text = send_match.group("track_number")
         if track_number_text:

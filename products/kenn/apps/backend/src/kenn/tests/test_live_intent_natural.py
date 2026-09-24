@@ -176,3 +176,42 @@ def test_everyday_phrasings_that_must_not_act(query) -> None:
 def test_pan_amounts_in_terse_forms_are_percent() -> None:
     assert resolved("synth right 30", FAKE_SET)["desired_value"] == pytest.approx(0.3)
     assert resolved("bass hard left", FAKE_SET)["desired_value"] == -1.0
+
+
+@pytest.mark.parametrize("query, track, device", [
+    ("show me the bass eq", "Bass", "EQ Eight"),
+    ("open the compressor on the vocal", "Lead Vocal", "Compressor"),
+    ("focus the drum bus compressor", "Drum Bus", "Compressor"),
+    ("show me the vox comp", "Lead Vocal", "Compressor"),
+    ("open the drums compressor", "Drum Bus", "Compressor"),
+])
+def test_focus_a_device_by_name(query, track, device) -> None:
+    parsed = resolved(query, FAKE_SET)
+    assert parsed and parsed["action"] == "focus_device"
+    assert parsed["track"]["name"] == track and parsed["device"]["name"] == device
+
+
+@pytest.mark.parametrize("query", [
+    "focus the drum bus compressor ratio",  # an extra word: not just a focus
+    "jump to the bass compressor",          # the bass has no compressor
+    "open the eq on the kick",              # the kick has no EQ
+])
+def test_device_focus_by_name_needs_a_real_unique_device(query) -> None:
+    parsed = resolved(query, FAKE_SET)
+    assert not parsed or parsed["action"] != "focus_device"
+
+
+@pytest.mark.parametrize("query, track, value", [
+    ("synth to the delay at 20 percent", "Synth", 0.2),
+    ("put the snare to the reverb at 15%", "Snare / Clap", 0.15),
+])
+def test_send_to_a_named_return_without_the_word_send(query, track, value) -> None:
+    parsed = resolved(query, FAKE_SET)
+    assert parsed and parsed["action"] == "set_send" and parsed["track"]["name"] == track
+    assert parsed["desired_value"] == pytest.approx(value)
+
+
+@pytest.mark.parametrize("query", ["bass to the chorus at 20%", "set eq band 2 to 200 hz at 3 db", "kick to the delay at 20 dB"])
+def test_track_to_return_needs_a_real_return_and_a_percentage(query) -> None:
+    parsed = resolved(query, FAKE_SET)
+    assert not parsed or parsed["action"] != "set_send"
