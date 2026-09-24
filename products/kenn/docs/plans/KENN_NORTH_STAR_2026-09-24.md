@@ -119,6 +119,13 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > BM25-scale score at or below its rank so the top score that decides "I don't know" is unchanged. Recall@4 0.983
   > (was 0.966) and 0.736 (was 0.616); chat coverage 125/128 (was 124), abstention 43/44 unchanged; the other four
   > intelligence benchmarks identical. Next: a stronger embedding model, evaluated on the GPU box first.
+  > Embedding model test on the GPU box (downloaded there only, via the box's HF mirror; MIT licence; revisions and
+  > weight hashes recorded): recall@4 on the describe-it questions, hybrid / embeddings alone —
+  > MiniLM (current) **0.736** / 0.672; bge-small-en-v1.5 (133 MB) **0.760** / 0.728; bge-base-en-v1.5 (438 MB) 0.776 /
+  > **0.808**. All ≈ 0.98 on the original fixture. **Decision: keep MiniLM** — bge-small wins 3 of 125 questions, and
+  > even bge-base tops out near 0.81, so model size is not the route to 0.95. The gap is vocabulary: notes describe
+  > devices technically, producers describe goals. Next levers: a "Use it when…" line of goal phrasing per device note
+  > (tuned on half the questions, scored on the other half), then a cross-encoder reranker on the top 20.
 
 ### Stage 3 — Agentic co-producer (beta weeks 6–16)
 
