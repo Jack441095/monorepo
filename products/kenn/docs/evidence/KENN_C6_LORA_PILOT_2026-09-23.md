@@ -233,3 +233,23 @@ Scored with `--production-snapshot` (as the gateway):
 - **Neither run dominates.** With one seed per run, a few points either way is within noise.
 - **Next:** put the corpus's evidence-bearing device examples in balance with clarify, and use a fresh,
   independently written evaluation before choosing a model for C4.
+
+## Addendum: parameter evidence for device requests only; run 6 (2026-09-24)
+
+**Gateway change.** `_llm_planner_snapshot` used to attach a track's full parameter lists to *every* planner
+request on that track. "mute the bass" carried ~5,000 tokens because Bass has an EQ Eight (84 parameters), which
+costs seconds of prompt time on the Mac. Evidence is now attached only for device requests, meaning any of:
+
+- the parsed intent names a device or parameter;
+- the request uses device vocabulary (compressor, EQ, threshold, band 2A, Hz, width, ...);
+- the request names a device on that track.
+
+The corpus builder applies the same rule through the gateway's code. In the run 6 corpus, 966 of 3,432 records
+carry evidence (was 2,358), and the median record is 478 tokens (was 590).
+
+**Test hygiene.** Two server smoke tests that failed in full-suite runs were not machine load, as first noted.
+`test_planner_bakeoff` let `run()` write LLM settings into `os.environ`, and later tests then tried to reach a model
+and timed out. The test now keeps the environment clean; the suite is 1,542 passed.
+
+**Box access.** The GPU box drops rapid successive SSH connections. All box work now goes through one persistent
+multiplexed connection.
