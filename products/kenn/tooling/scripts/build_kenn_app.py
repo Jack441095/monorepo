@@ -36,6 +36,7 @@ EXCLUDED_REQUIREMENTS = ("pytest", "librosa")
 CODE_TREES = (
     "apps/backend/src/kenn",
     "packages/chat",
+    "packages/mix-review/core",  # KENN's own Mix Review engine (loaded by core/local_mix_review_service.py)
     "integrations/ableton-osc",
 )
 CODE_IGNORE = shutil.ignore_patterns(
@@ -113,12 +114,31 @@ def copy_data(kenn: Path, data_root: Path) -> dict[str, str]:
     return {"index_version": version}
 
 
+def build_dmg(app: Path, output: Path, manifest: dict) -> dict[str, str]:
+    """KENN.app plus an Applications link, as a compressed read-only disk image."""
+    version = manifest.get("source_git_commit", "")[:7] or "dev"
+    staging = output / "dmg-staging"
+    if staging.exists():
+        shutil.rmtree(staging)
+    staging.mkdir(parents=True)
+    _run(["ditto", str(app), str(staging / app.name)])  # ditto keeps the signature and extended attributes
+    (staging / "Applications").symlink_to("/Applications")
+    dmg = output / f"KENN-beta-{version}.dmg"
+    if dmg.exists():
+        dmg.unlink()
+    _run(["hdiutil", "create", "-volname", "KENN", "-srcfolder", str(staging), "-ov", "-format", "UDZO", str(dmg)],
+         stdout=subprocess.DEVNULL)
+    shutil.rmtree(staging)
+    return {"dmg": str(dmg), "dmg_mb": str(round(dmg.stat().st_size / 1e6, 1)), "dmg_sha256": _sha256(dmg)}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--runtime", type=Path, required=True, help=f"path to {RUNTIME_NAME}")
     parser.add_argument("--data-root", type=Path, required=True, help="KENN checkout holding the built index, notes, models and UI")
     parser.add_argument("--code-root", type=Path, default=KENN_ROOT)
     parser.add_argument("--output", type=Path, required=True, help="folder to write KENN.app into")
+    parser.add_argument("--dmg", action="store_true", help="also write a compressed drag-to-Applications disk image")
     args = parser.parse_args()
 
     app = args.output / "KENN.app"
@@ -139,7 +159,10 @@ def main() -> int:
     }
     (resources / "build_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     _run(["codesign", "--force", "--deep", "--sign", "-", str(app)], stdout=subprocess.DEVNULL)
-    print(json.dumps({"app": str(app), "python": str(python), "size_mb": round(size / 1e6, 1), **data}, indent=2))
+    result = {"app": str(app), "python": str(python), "size_mb": round(size / 1e6, 1), **data}
+    if args.dmg:
+        result.update(build_dmg(app, args.output, manifest))
+    print(json.dumps(result, indent=2))
     return 0
 
 
