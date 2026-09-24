@@ -225,7 +225,7 @@ def _loudness_line(loudness: Any) -> str:
     return "Loudness: " + ", ".join(parts) + "."
 
 
-def _audio_advice(analysis: dict[str, Any], *, scope: str) -> dict[str, Any] | None:
+def _audio_advice(analysis: dict[str, Any], *, scope: str, snapshot: dict[str, Any] | None = None) -> dict[str, Any] | None:
     if not analysis.get("ok"):
         return None
     findings = [dict(item) for item in analysis.get("findings") or [] if isinstance(item, dict)]
@@ -257,6 +257,11 @@ def _audio_advice(analysis: dict[str, Any], *, scope: str) -> dict[str, Any] | N
     loudness_line = _loudness_line(analysis.get("loudness"))
     if loudness_line:
         lines.append(loudness_line)
+    from kenn.core.advice_next_step import next_step, next_step_line
+
+    step = next_step(findings, snapshot, scope=scope)
+    if step:
+        lines.append(next_step_line(step))
     return {
         "schema": "kenn.ableton_mix_advice.v1",
         "status": "inspected",
@@ -269,6 +274,7 @@ def _audio_advice(analysis: dict[str, Any], *, scope: str) -> dict[str, Any] | N
         "analysis_scope": scope,
         "advisory_only": True,
         "changed": False,
+        "next_step": step,
     }
 
 
@@ -334,7 +340,7 @@ def mix_advice_from_session(
             analysis, digest, cache_hit = _analyze_cached(payload, filename=filename)
         except Exception:
             analysis = {}
-        result = _audio_advice(analysis, scope=scope)
+        result = _audio_advice(analysis, scope=scope, snapshot=current)
         if result is not None:
             result["analysis_source"] = {
                 "filename": filename,
