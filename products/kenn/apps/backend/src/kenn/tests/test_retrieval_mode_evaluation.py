@@ -101,3 +101,19 @@ def test_hybrid_fusion_ranks_an_embedding_only_note_without_changing_the_top_sco
     top_boosted = 10.0 + max(0.40 * 10.0, 3.0) * ((0.30 - 0.10) / 0.80) * 0.25
     assert results[0][0] == max(score for score, _chunk in results) == top_boosted  # "I don't know" threshold input unchanged
     assert [score for score, _chunk in results] == sorted((score for score, _chunk in results), reverse=True)
+
+
+def test_automix_engine_notes_only_lead_for_automix_questions(monkeypatch) -> None:
+    monkeypatch.setattr(retrieval, "load_source_feedback_scores", lambda: {})
+    monkeypatch.setattr(retrieval, "load_hard_negatives", lambda: ())
+    engine = {"kind": "note", "source": "automix-master-bus-glue-and-limiter.md",
+              "title": "AutoMix Master Bus Limiter Ceiling", "text": "Tags: limiter, ceiling, true peak, master"}
+    practical = {"kind": "note", "source": "true-peak-inter-sample-clipping.md",
+                 "title": "True Peak And Inter-Sample Clipping", "text": "Tags: limiter, ceiling, true peak, master"}
+    results = [(10.0, engine), (9.0, practical)]
+
+    everyday = retrieval.rerank_results("what ceiling should my limiter use", results)
+    about_automix = retrieval.rerank_results("what ceiling does automix set on the limiter", results)
+
+    assert everyday[0][1]["source"] == "true-peak-inter-sample-clipping.md"
+    assert about_automix[0][1]["source"] == "automix-master-bus-glue-and-limiter.md"
