@@ -1046,10 +1046,38 @@ def _missing_value_question(lower: str, track_name: str) -> tuple[str, str, str]
     return None
 
 
+_KILOHERTZ = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s*(?:khz|kilohertz|k)\b", re.I)
+_FREQUENCY_MENTION = re.compile(r"(?<![\w.])\d+(?:\.\d+)?\s*(?:hz|hertz)\b", re.I)
+
+
+def _normalize_kilohertz(text: str) -> str:
+    """"2k", "2 kHz", "1.5 kilohertz" -> "2000 Hz" etc., so every EQ rule sees one unit."""
+    return _KILOHERTZ.sub(lambda m: f"{float(m.group(1)) * 1000:g} Hz", text)
+
+
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
+    parsed = _parse_request_rules(query, session_snapshot)
+    if parsed.get("action") == "set_eq_band_gain" and not parsed.get("eq_band"):
+        band = re.search(r"\bband\s*(\d+)\s*([ab])\b", str(parsed.get("query") or ""), re.I)
+        if band:  # "cut 200 Hz on the bass by 3 dB, band 2A": the named band settles which one
+            parsed["eq_band"] = f"{int(band.group(1))}{band.group(2).upper()}"
+    if parsed.get("action") == "set_volume" and _FREQUENCY_MENTION.search(_normalize_kilohertz(str(parsed.get("query") or ""))):
+        # "cut 2k on the bass by 3 dB" names a frequency: an EQ change, never the track fader.
+        track = (parsed.get("track") or {}).get("name") or "the track"
+        frequency = _FREQUENCY_MENTION.search(_normalize_kilohertz(str(parsed.get("query") or ""))).group(0)
+        parsed.update({
+            "desired_value": None, "confirmation_required": False, "missing_fields": ["eq_band"],
+            "ambiguity": [f"That names a frequency ({frequency}), so it sounds like an EQ change on {track}, not its "
+                          f"fader. Say it as \"cut 3 dB at {frequency} on {track}\", or \"turn {track} down 3 dB\" "
+                          "for the fader."],
+        })
+    return parsed
+
+
+def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     text = _rewrite_common_phrasings(" ".join(str(query or "").strip().split()))
-    numeric_text = _normalize_spoken_numbers(text)
+    numeric_text = _normalize_kilohertz(_normalize_spoken_numbers(text))
     base = {
         "schema": "kenn.ableton_intent.v1",
         "query": text,

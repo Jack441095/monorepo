@@ -277,3 +277,31 @@ def test_terse_track_to_level_is_an_absolute_volume(query, track, db) -> None:
 def test_terse_level_rewrite_leaves_other_requests_alone(query) -> None:
     parsed = parse_request(query, FAKE_SET)
     assert parsed["action"] != "set_volume" or parsed["missing_fields"]
+
+
+@pytest.mark.parametrize("query, hz", [
+    ("cut 2k on the bass by 3 dB", 2000.0),          # was a -3 dB fader change on Bass: a wrong plan
+    ("cut 2 kHz on the bass by 3 dB", 2000.0),
+    ("cut 3 dB at 1.5 kilohertz on the bass", 1500.0),
+])
+def test_kilohertz_shorthand_is_an_eq_frequency(query, hz) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert parsed["action"] == "set_eq_band_gain"
+    assert parsed["frequency_hz"] == pytest.approx(hz) and parsed["desired_value"] == -3.0
+
+
+def test_a_named_band_settles_which_eq_band() -> None:
+    parsed = parse_request("cut 200 Hz on the bass by 3 dB, band 2A", FAKE_SET)
+    assert parsed["action"] == "set_eq_band_gain" and parsed["eq_band"] == "2A"
+
+
+def test_a_frequency_never_becomes_a_fader_change(monkeypatch) -> None:
+    from kenn.core import live_intent
+
+    # Whatever a future rule does, a request naming a frequency must not reach Live as a volume change.
+    monkeypatch.setattr(live_intent, "_parse_request_rules", lambda query, snapshot: {
+        "query": query, "action": "set_volume", "track": {"name": "Bass"}, "desired_value": 0.42,
+        "missing_fields": [], "ambiguity": [], "confirmation_required": True})
+    parsed = live_intent.parse_request("take the bass down 3 dB at 250 Hz", FAKE_SET)
+    assert parsed["desired_value"] is None and parsed["missing_fields"] and not parsed["confirmation_required"]
+    assert "250 Hz" in parsed["ambiguity"][0] and "EQ" in parsed["ambiguity"][0]
