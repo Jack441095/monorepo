@@ -259,6 +259,13 @@ final class KENNDesktopCompanion: NSObject, NSApplicationDelegate, WKNavigationD
 
     @objc private func openInBrowser() { NSWorkspace.shared.open(kennURL) }
 
+    // Setup checks plus "Save diagnostics for support", even when everything is already set up.
+    @objc private func openSupport() {
+        var components = URLComponents(url: kennURL.appendingPathComponent("setup"), resolvingAgainstBaseURL: false)!
+        components.queryItems = [URLQueryItem(name: "support", value: nil)]
+        webView.load(URLRequest(url: components.url!))
+    }
+
     private func refreshHealth() {
         health { [weak self] available in
             guard let self else { return }
@@ -310,11 +317,11 @@ final class KENNDesktopCompanion: NSObject, NSApplicationDelegate, WKNavigationD
 
 extension KENNDesktopCompanion: NSToolbarDelegate {
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.flexibleSpace, .space, .init("reloadKENN"), .init("start"), .init("browser"), .init("status")]
+        [.flexibleSpace, .space, .init("reloadKENN"), .init("start"), .init("browser"), .init("status"), .init("support")]
     }
 
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.init("start"), .init("reloadKENN"), .flexibleSpace, .init("status"), .init("browser")]
+        [.init("start"), .init("reloadKENN"), .flexibleSpace, .init("status"), .init("support"), .init("browser")]
     }
 
     func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier identifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
@@ -335,6 +342,11 @@ extension KENNDesktopCompanion: NSToolbarDelegate {
             item.image = NSImage(systemSymbolName: "safari", accessibilityDescription: item.label)
             item.target = self
             item.action = #selector(openInBrowser)
+        case "support":
+            item.label = "Setup & Support"
+            item.image = NSImage(systemSymbolName: "lifepreserver", accessibilityDescription: item.label)
+            item.target = self
+            item.action = #selector(openSupport)
         case "status":
             item.label = "Connecting..."
             item.image = NSImage(systemSymbolName: "circle.dotted", accessibilityDescription: item.label)

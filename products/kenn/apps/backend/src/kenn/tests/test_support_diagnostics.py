@@ -52,3 +52,47 @@ def test_support_diagnostics_detects_a_real_available_knowledge_index() -> None:
     real_repo_root = Path(__file__).resolve().parents[5]
     result = build_support_diagnostics(repo_root=real_repo_root)
     assert result["checks"]["knowledge_index_available"] is True
+
+
+def test_receipts_appear_only_as_counts(monkeypatch, tmp_path: Path) -> None:
+    import kenn.core.support_diagnostics as diagnostics
+
+    rows = [
+        {"receipt": {"action": "set_volume", "status": "applied", "verified": True, "timestamp": 1_790_000_000.0,
+                     "target": {"track_name": "Client Vocal Take 3"}, "before": 0.5, "requested": 0.7}},
+        {"receipt": {"action": "set_volume", "status": "applied", "verified": True, "timestamp": 1_790_000_060.0,
+                     "target": {"track_name": "Client Vocal Take 3"}, "rolled_back": True}},
+        {"receipt": {"action": "import_sample", "status": "failed", "verified": False,
+                     "error": "/Users/example/Samples/secret.wav not found"}},
+    ]
+    monkeypatch.setattr(diagnostics, "_recent_receipts", lambda: rows)
+    result = build_support_diagnostics(repo_root=tmp_path)
+    rendered = json.dumps(result)
+
+    assert result["receipts"]["count"] == 3
+    assert result["receipts"]["by_action"] == {"set_volume": 2, "import_sample": 1}
+    assert result["receipts"]["by_status"] == {"applied": 2, "failed": 1}
+    assert result["receipts"]["verified"] == 2 and result["receipts"]["rolled_back"] == 1
+    assert "Client Vocal" not in rendered and "secret.wav" not in rendered and "0.7" not in rendered
+
+
+def test_timings_are_numbers_only(tmp_path: Path) -> None:
+    from kenn.core import timing_stats
+
+    timing_stats.reset()
+    for milliseconds in (100.0, 200.0, 300.0, 400.0, 5000.0):
+        timing_stats.record("ask", milliseconds)
+    try:
+        timings = build_support_diagnostics(repo_root=tmp_path)["timings"]
+    finally:
+        timing_stats.reset()
+    assert timings == {"ask": {"count": 5, "p50_ms": 300.0, "p95_ms": 5000.0, "max_ms": 5000.0}}
+
+
+def test_saved_diagnostics_file_is_the_same_redacted_payload(tmp_path: Path) -> None:
+    from kenn.core.support_diagnostics import save_support_diagnostics
+
+    payload = build_support_diagnostics(repo_root=tmp_path)
+    saved = save_support_diagnostics(payload, tmp_path / "diagnostics")
+    assert saved.parent == tmp_path / "diagnostics" and saved.name.startswith("kenn-diagnostics-")
+    assert json.loads(saved.read_text(encoding="utf-8")) == json.loads(json.dumps(payload))

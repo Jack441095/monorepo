@@ -114,7 +114,8 @@ from kenn.core.sample_import_service import (
 )
 from kenn.core.audition_feedback import build_audition_feedback
 from kenn.core.audition_revision import validate_revision_brief
-from kenn.core.support_diagnostics import build_support_diagnostics
+from kenn.core import timing_stats
+from kenn.core.support_diagnostics import build_support_diagnostics, save_support_diagnostics
 from kenn.core.companion_instance import CompanionAlreadyRunning, CompanionInstanceLock
 
 try:
@@ -1935,6 +1936,8 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path not in {
             "/api/setup/install-remote-script",
             "/kenn/api/setup/install-remote-script",
+            "/api/support/diagnostics/save",
+            "/kenn/api/support/diagnostics/save",
             "/api/ask", "/api/feedback", "/api/session/feedback", "/api/mix-review-step",
             "/api/audiogen/generate", "/api/audiogen/render-song",
             "/api/session/clear", "/api/ableton/apply-repair", "/api/mix-version/save",
@@ -2033,6 +2036,26 @@ class Handler(BaseHTTPRequestHandler):
             )
         except (json.JSONDecodeError, ValueError):
             self.send_json(400, {"error": "Invalid JSON."})
+            return
+        if parsed.path in {"/api/support/diagnostics/save", "/kenn/api/support/diagnostics/save"}:
+            # Writes one redacted file into KENN's own data folder, for the tester to attach to a report.
+            if payload.get("confirm") is not True:
+                self.send_json(400, {"ok": False, "error": "Saving diagnostics needs an explicit confirm."})
+                return
+            cached_snapshot = None
+            try:
+                from kenn.mixing_doctor import get_latest_session_state
+                cached_snapshot = get_latest_session_state()
+            except Exception:
+                pass
+            directory = Path(os.environ.get("KENN_DIAGNOSTICS_DIR") or (REPO_ROOT / ".runtime" / "diagnostics")).expanduser()
+            try:
+                saved = save_support_diagnostics(
+                    build_support_diagnostics(live_snapshot=cached_snapshot, repo_root=REPO_ROOT), directory)
+            except OSError as exc:
+                self.send_json(500, {"ok": False, "error": f"KENN could not write the diagnostics file ({exc.strerror})."})
+                return
+            self.send_json(200, {"ok": True, "path": str(saved), "filename": saved.name})
             return
         if parsed.path in {"/api/setup/install-remote-script", "/kenn/api/setup/install-remote-script"}:
             # Writes into the user's Ableton User Library: only on an explicit confirm from the setup page.
@@ -2894,6 +2917,7 @@ class Handler(BaseHTTPRequestHandler):
                     result["confirmation_token"] = orch_proposal.get("confirmation_token", "")
                     result["requires_confirmation"] = True
                 _total_ms = (time.perf_counter() - _ask_t0) * 1000
+                timing_stats.record("ask", _total_ms)
                 _inner = result.get("timings_ms") or {}
                 result["timing"] = {
                     "total_ms": round(_total_ms, 1),

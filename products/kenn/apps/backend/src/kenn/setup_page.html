@@ -30,6 +30,9 @@
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   button[hidden] { display: none; }
   #message { color: var(--muted); font-size: 14px; min-height: 1.5em; margin-top: 12px; }
+  .support { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  .support button { margin-left: 8px; }
+  #diagnostics-message { color: var(--muted); font-size: 14px; margin-top: 8px; overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -43,6 +46,9 @@
     <button id="continue" class="primary" hidden>Open KENN</button>
   </div>
   <div id="message" role="status"></div>
+  <p class="support">Something not working?
+    <button id="diagnostics" type="button">Save diagnostics for support</button></p>
+  <div id="diagnostics-message" role="status"></div>
 </main>
 <script>
   const TITLES = {
@@ -81,7 +87,8 @@
     try {
       const response = await fetch("/api/setup/status");
       const status = await response.json();
-      if (firstCheck && status.ready) { window.location.replace("/"); return; }  // nothing to set up
+      // Nothing to set up: go straight in, unless opened for support (/setup?support).
+      if (firstCheck && status.ready && !new URLSearchParams(location.search).has("support")) { window.location.replace("/"); return; }
       firstCheck = false;
       render(status);
     } catch (error) {
@@ -106,6 +113,22 @@
     }
     $("install").disabled = false;
     refresh();
+  });
+
+  $("diagnostics").addEventListener("click", async () => {
+    $("diagnostics").disabled = true;
+    try {
+      const response = await fetch("/api/support/diagnostics/save", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: true }),
+      });
+      const result = await response.json();
+      $("diagnostics-message").textContent = result.ok
+        ? `Saved ${result.filename} to ${result.path.replace(/\/[^/]+$/, "")}. Attach it to your report. It holds counts and timings only: no track names, audio or file paths.`
+        : result.error;
+    } catch (error) {
+      $("diagnostics-message").textContent = "KENN could not save diagnostics. Restart KENN and try again.";
+    }
+    $("diagnostics").disabled = false;
   });
 
   refresh();
