@@ -1394,6 +1394,16 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 self.send_json(503, {"status": "error", "error": str(exc)})
             return
+        if parsed.path == "/setup":
+            # First-run page for the packaged app (kenn/core/live_setup.py does the work).
+            self.send_bytes(200, (Path(__file__).with_name("setup_page.html")).read_bytes(), "text/html; charset=utf-8")
+            return
+        if parsed.path in {"/api/setup/status", "/kenn/api/setup/status"}:
+            from kenn.ableton_osc_bridge import live_client
+            from kenn.core.live_setup import setup_status
+
+            self.send_json(200, setup_status(live_client))
+            return
         if parsed.path in {"/api/ableton/remote-script", "/kenn/api/ableton/remote-script"}:
             try:
                 from kenn.ableton_osc_bridge import live_client
@@ -1923,6 +1933,8 @@ class Handler(BaseHTTPRequestHandler):
             self.handle_ask_attachment()
             return
         if parsed.path not in {
+            "/api/setup/install-remote-script",
+            "/kenn/api/setup/install-remote-script",
             "/api/ask", "/api/feedback", "/api/session/feedback", "/api/mix-review-step",
             "/api/audiogen/generate", "/api/audiogen/render-song",
             "/api/session/clear", "/api/ableton/apply-repair", "/api/mix-version/save",
@@ -2021,6 +2033,16 @@ class Handler(BaseHTTPRequestHandler):
             )
         except (json.JSONDecodeError, ValueError):
             self.send_json(400, {"error": "Invalid JSON."})
+            return
+        if parsed.path in {"/api/setup/install-remote-script", "/kenn/api/setup/install-remote-script"}:
+            # Writes into the user's Ableton User Library: only on an explicit confirm from the setup page.
+            if payload.get("confirm") is not True:
+                self.send_json(400, {"ok": False, "error": "Installing AbletonOSC needs an explicit confirm."})
+                return
+            from kenn.core.live_setup import install_remote_script
+
+            result = install_remote_script()
+            self.send_json(200 if result.get("ok") else 500, result)
             return
         if parsed.path in {"/api/ableton/audition_delta", "/kenn/api/ableton/audition_delta"}:
             from kenn.routes.session_intelligence_handler import handle_post_audition_delta

@@ -270,7 +270,11 @@ final class KENNDesktopCompanion: NSObject, NSApplicationDelegate, WKNavigationD
         }
     }
 
-    private func loadKENN() { webView.load(URLRequest(url: kennURL)) }
+    private func loadKENN() {
+        // The beta app opens on the setup checks; that page goes straight on to KENN when all pass.
+        let url = bundledKENN != nil ? kennURL.appendingPathComponent("setup") : kennURL
+        webView.load(URLRequest(url: url))
+    }
 
     private func health(completion: @escaping (Bool) -> Void) {
         var request = URLRequest(url: kennURL.appendingPathComponent("api/health"))
