@@ -352,6 +352,7 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
         steps = plan.get("steps")
         if not isinstance(steps, list) or not 1 <= len(steps) <= 3:
             return {"ok": False, "error": "LLM recipes must contain between 1 and 3 typed steps."}
+        validated_steps = []
         for position, step in enumerate(steps, start=1):
             if not isinstance(step, dict):
                 return {"ok": False, "error": f"LLM recipe step {position} is not an object."}
@@ -362,7 +363,10 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
                 return {"ok": False, "error": f"LLM recipe step {position} is invalid: {checked.get('error', 'unknown error')}"}
             if child.get("action") in {"insert_device", "insert_device_with_parameter", "set_eq_band_gain", "set_eq_band_tuning_gain"}:
                 return {"ok": False, "error": "LLM recipes currently support only existing track, transport, send, and single device-parameter actions."}
-        return {"ok": True, "plan": dict(plan)}
+            # Keep the validated form (e.g. a dB volume converted to normalized),
+            # so what runs is exactly what was checked.
+            validated_steps.append({k: v for k, v in checked["plan"].items() if k != "schema"})
+        return {"ok": True, "plan": dict(plan, steps=validated_steps)}
     if action in TRANSPORT_ACTIONS | {"inspect_tracks"}:
         rejected = _reject(
             ("track_index", "track_name", "device_index", "device_name", "insertion_index", "parameter_index", "parameter_name", "value", "relative", "unit", "frequency_hz", "eq_band", "locator_name"),

@@ -82,6 +82,60 @@ DRAFTED_ACTION_SEEDS: tuple[tuple[str, str, str, int, dict[str, Any]], ...] = (
 )
 
 
+# Run 4: the command types with no reviewed seeds (transport, rename, recipe)
+# or only one or two (sends, device parameters, EQ). Device, parameter and EQ
+# labels copy the reviewed seeds' exact structures on the scenario tracks
+# ({t1} Compressor, {t3} Glue Compressor, {t4} Utility, {t2} EQ Eight). The
+# transport phrasings deliberately contrast with the mute ones ("Kill
+# playback" vs "Kill {t1}"), which run 3 confused.
+_COMP = {"device_index": 0, "device_name": "Compressor", "parameter_index": 0, "parameter_name": "Threshold"}
+_EQ = {"device_index": 0, "device_name": "EQ Eight", "frequency_hz": 250.0, "eq_band": "1A"}
+DRAFTED_GLOBAL_SEEDS: tuple[tuple[str, str, str], ...] = (
+    ("draft-play-01", "Hit play", "transport_play"),
+    ("draft-play-02", "Roll it from here", "transport_play"),
+    ("draft-play-03", "Start the song", "transport_play"),
+    ("draft-stop-01", "Kill playback", "transport_stop"),
+    ("draft-stop-02", "Stop the transport", "transport_stop"),
+    ("draft-stop-03", "Halt the song", "transport_stop"),
+)
+DRAFTED_TRACK_SEEDS: tuple[tuple[str, str, str, int, dict[str, Any]], ...] = (
+    ("draft-rename-01", "Rename {t2} to Low End", "rename_track", 2, {"value": "Low End"}),
+    ("draft-rename-02", "Call {t0} Hook Vox", "rename_track", 0, {"value": "Hook Vox"}),
+    ("draft-rename-03", "Change the name of {t3} to Verb Bus", "rename_track", 3, {"value": "Verb Bus"}),
+    ("draft-send-03", "{t0} to A-Reverb at 20%", "set_send", 0,
+     {"return_track_index": 0, "return_track_name": "A-Reverb", "value": 0.2, "unit": "normalized"}),
+    ("draft-send-04", "Put {t2} into B-Delay at 40%", "set_send", 2,
+     {"return_track_index": 1, "return_track_name": "B-Delay", "value": 0.4, "unit": "normalized"}),
+    ("draft-send-05", "No A-Reverb send on {t1}", "set_send", 1,
+     {"return_track_index": 0, "return_track_name": "A-Reverb", "value": 0.0, "unit": "normalized"}),
+    ("draft-comp-01", "Pull the {t1} Compressor threshold down 3 dB", "set_device_parameter", 1,
+     {**_COMP, "value": -3.0, "relative": True, "unit": "dB"}),
+    ("draft-comp-02", "{t1} Compressor threshold at -24 dB", "set_device_parameter", 1,
+     {**_COMP, "value": -24.0, "unit": "dB"}),
+    ("draft-glue-01", "Glue Compressor ratio 2:1 on {t3}", "set_device_parameter", 3,
+     {"device_index": 0, "device_name": "Glue Compressor", "parameter_index": 1, "parameter_name": "Ratio",
+      "value": 2.0, "unit": "ratio"}),
+    ("draft-width-01", "Utility stereo width on {t4} to 0.8", "set_device_parameter", 4,
+     {"device_index": 0, "device_name": "Utility", "parameter_index": 4, "parameter_name": "Stereo Width",
+      "value": 0.8, "unit": "value"}),
+    ("draft-eq-01", "Dip {t2} 3 dB at 250 Hz on band 1A", "set_eq_band_gain", 2,
+     {**_EQ, "value": -3.0, "relative": True, "unit": "dB"}),
+    ("draft-eq-02", "EQ Eight band 1A on {t2} to minus 2 dB", "set_eq_band_gain", 2,
+     {**_EQ, "value": -2.0, "unit": "dB"}),
+)
+# (record_id, query template, [(action, track index or None, fields), ...])
+DRAFTED_RECIPE_SEEDS: tuple[tuple[str, str, tuple[tuple[str, int | None, dict[str, Any]], ...]], ...] = (
+    ("draft-recipe-01", "Mute {t1} and solo {t2}",
+     (("set_mute", 1, {"value": True, "unit": "boolean"}), ("set_solo", 2, {"value": True, "unit": "boolean"}))),
+    ("draft-recipe-02", "Stop playback and unmute {t0}",
+     (("transport_stop", None, {}), ("set_mute", 0, {"value": False, "unit": "boolean"}))),
+    ("draft-recipe-03", "Pan {t3} hard right and drop it 2 dB",
+     (("set_pan", 3, {"value": 1.0, "unit": "normalized"}),
+      ("set_volume", 3, {"value": -2.0, "unit": "dB", "relative": True}))),
+    ("draft-recipe-04", "Solo {t0}, then hit play",
+     (("set_solo", 0, {"value": True, "unit": "boolean"}), ("transport_play", None, {}))),
+)
+
 def drafted_records(snapshot: dict[str, Any], plan: Any) -> list[dict[str, Any]]:
     """Seed rows in the reviewed seeds' shape, filled with this snapshot's track names."""
     names = {f"t{index}": track["name"] for index, track in enumerate(snapshot["tracks"][:5])}
@@ -93,9 +147,24 @@ def drafted_records(snapshot: dict[str, Any], plan: Any) -> list[dict[str, Any]]
     rows += [
         {"record_id": record_id, "category": "supported_control", "query": template.format(**names),
          "label": plan(action, track_index=index, track_name=names[f"t{index}"], **fields), "source_kind": SOURCE_KIND}
-        for record_id, template, action, index, fields in DRAFTED_ACTION_SEEDS
+        for record_id, template, action, index, fields in DRAFTED_ACTION_SEEDS + DRAFTED_TRACK_SEEDS
     ]
+    rows += [
+        {"record_id": record_id, "category": "supported_control", "query": template, "label": plan(action),
+         "source_kind": SOURCE_KIND}
+        for record_id, template, action in DRAFTED_GLOBAL_SEEDS
+    ]
+    for record_id, template, steps in DRAFTED_RECIPE_SEEDS:
+        step_plans = []
+        for action, index, fields in steps:
+            step = {"action": action, **fields}
+            if index is not None:
+                step.update(track_index=index, track_name=names[f"t{index}"])
+            step_plans.append(step)
+        rows.append({"record_id": record_id, "category": "multi_intent", "query": template.format(**names),
+                     "label": plan("recipe", steps=step_plans), "source_kind": SOURCE_KIND})
     return rows
 
 
-__all__ = ["DRAFTED_ACTION_SEEDS", "DRAFTED_CLARIFY_SEEDS", "SOURCE_KIND", "drafted_records"]
+__all__ = ["DRAFTED_ACTION_SEEDS", "DRAFTED_CLARIFY_SEEDS", "DRAFTED_GLOBAL_SEEDS", "DRAFTED_RECIPE_SEEDS",
+           "DRAFTED_TRACK_SEEDS", "SOURCE_KIND", "drafted_records"]

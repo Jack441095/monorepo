@@ -41,3 +41,15 @@ def test_unsafe_or_unconvertible_volumes_are_rejected(fields, message) -> None:
 def test_normalized_volume_is_unchanged() -> None:
     checked = validate_llm_plan(_plan(track_index=0, track_name="Kick", unit="normalized", value=0.7), SNAPSHOT)
     assert checked["ok"] and checked["plan"]["value"] == 0.7
+
+
+def test_recipe_steps_return_in_their_validated_converted_form() -> None:
+    recipe = {"schema": "kenn.ableton_llm_plan.v1", "action": "recipe", "steps": [
+        {"action": "set_mute", "track_index": 1, "track_name": "Bass", "value": True, "unit": "boolean"},
+        {"action": "set_volume", "track_index": 0, "track_name": "Kick", "value": -6.0, "unit": "dB"},
+    ]}
+    checked = validate_llm_plan(recipe, SNAPSHOT)
+    assert checked["ok"]
+    volume = checked["plan"]["steps"][1]
+    assert volume["unit"] == "normalized" and volume["value"] == pytest.approx(10 ** (-6 / 20), abs=1e-6)
+    assert "schema" not in volume and checked["plan"]["steps"][0]["value"] is True
