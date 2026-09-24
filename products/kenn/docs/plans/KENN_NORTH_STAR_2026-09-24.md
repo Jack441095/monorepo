@@ -115,6 +115,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > would be dropped as "not relevant"), and a re-run of the intelligence gate and review packet. Next levers: that
   > fusion change, a stronger embedding model than MiniLM (download/licence is an owner decision), "use it when…"
   > phrasing in device notes (checked on a held-out half so it isn't tuned to the fixture).
+  > Shipped on the branch the same evening (owner: "yes, in that order"): the fusion, with every result carrying the best
+  > BM25-scale score at or below its rank so the top score that decides "I don't know" is unchanged. Recall@4 0.983
+  > (was 0.966) and 0.736 (was 0.616); chat coverage 125/128 (was 124), abstention 43/44 unchanged; the other four
+  > intelligence benchmarks identical. Next: a stronger embedding model, evaluated on the GPU box first.
 
 ### Stage 3 — Agentic co-producer (beta weeks 6–16)
 
