@@ -69,16 +69,27 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > data: `kenn/app_entry.py` (`~/Library/Application Support/KENN`, `settings.json`). Checked from an empty environment:
   > healthy, hybrid retrieval, cited answers, UI served. 540 MB uncompressed (scipy, onnxruntime, sklearn, numpy, model);
   > trim later. Still to do: launch-by-double-click test with Live, Remote Script install, first-run check, DMG.
-- [ ] Installer puts AbletonOSC (KENN build, version-stamped) in the user's Live User Library and tells them to select it
+- [x] Installer puts AbletonOSC (KENN build, version-stamped) in the user's Live User Library and tells them to select it
       in Live's Control Surface settings
-- [ ] First-run check inside the app: the read-only preflight (Live connected, script version, knowledge index, audio
+  > 2026-09-24: `kenn/core/live_setup.py` + the app's **Set up KENN** page: finds the User Library from the newest
+  > Live's `Library.cfg`, installs the deploy tool's exact file list with a stamp, hides the previous copy in
+  > `.kenn-backups`, explicit confirm. Checked from the built bundle on this Mac.
+- [x] First-run check inside the app: the read-only preflight (Live connected, script version, knowledge index, audio
       analysis) with plain-English fixes
-- [ ] Uninstall and update path (update keeps receipts and settings)
-- [ ] Rewrite `docs/BETA_TESTER_GUIDE.md` to match what actually ships (remove the nonexistent `.pkg`, "autonomous"
+  > 2026-09-24: three checks (Live installed, AbletonOSC current, Live connected) with fixes; the app opens on
+  > `/setup` and goes straight in when all pass. Index and audio are verified by the build and the bundle smoke test.
+- [x] Uninstall and update path (update keeps receipts and settings)
+  > 2026-09-24: all user data lives in `~/Library/Application Support/KENN`, so replacing the app keeps it; steps in
+  > the tester guide. Setup offers an AbletonOSC update when the stamp differs.
+- [x] Rewrite `docs/BETA_TESTER_GUIDE.md` to match what actually ships (remove the nonexistent `.pkg`, "autonomous"
       wording and unshipped workflows)
+  > 2026-09-24: rewritten. The old guide also told testers to enable `KENN_Bridge` in a second slot, which shares port
+  > 11000 with AbletonOSC and would break the connection.
 - [ ] Sign and notarize (after the Developer ID decision); `package_macos_plugins.sh` pattern already exists
 - [ ] **Exit:** a clean macOS user account (or second Mac) goes from download to "Live connected, 8 tracks" on the demo set
       in under 15 minutes following only the guide
+  > Ready to try once the soak ends (the running dev companion holds ports 8090/11001): `build_kenn_app.py --dmg` →
+  > `workspace/builds/kenn-app/KENN-beta-<commit>.dmg`. Owner test on a second macOS user account.
 
 ## Phase 2: Reliability and the qualification gate (weeks 1–2, overlaps Phase 1)
 

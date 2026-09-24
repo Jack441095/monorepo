@@ -1,214 +1,90 @@
-# KENN Mix Assistant — Closed Beta Producer Onboarding Guide
+# KENN private beta: tester guide
 
-**Version:** 0.2.0-beta
+Thanks for testing KENN. This guide covers what the beta does, how to install it, and what to do when something
+goes wrong. It describes only what ships in this build.
 
-**Build:** Universal macOS (Apple Silicon M1/M2/M3/M4 & Intel x86_64)
+**Needs:** an Apple Silicon Mac (M1 or later) and Ableton Live 12 (Suite, Standard or Intro).
+Tested so far on Live 12.4.6 Suite; other Live 12 versions are expected to work but are not yet verified.
+Intel Macs and Live 11 are not supported.
 
-**Supported DAWs:** Ableton Live 11.1+ and Ableton Live 12+ (Suite recommended)
+## What KENN does in this beta
 
-**Security & Privacy:** Hardware-Grade Safety Guardrails · Zero-Audio Telemetry Guarantee
+1. **Knows your session.** Ask about your tracks, what's selected, your devices, returns and master, and what KENN
+   changed recently.
+2. **Changes Live safely.** Ask for a change ("bring the bass down 2 dB", "pan the synth hard left"). KENN shows
+   exactly what it will change and does nothing until you press **Apply to Live 12**. It then checks Live did it,
+   and every change can be undone.
+3. **Answers with sources.** Ask how a device or technique works; answers cite KENN's notes, which cover 74 of
+   Live 12's 78 built-in devices. When it doesn't know, it says so.
+4. **Listens to an exported mix.** Load a WAV of your mix (and optionally a reference) in the **Inputs** panel for a
+   review of loudness, true peak, clipping and balance.
+5. **Refuses risky requests.** It won't delete things, push your master level, or change anything you didn't Apply.
 
-**In-DAW GUI:** Native JUCE 8 WebBrowserComponent with bi-directional DAW parameter synchronization
+**Not in this beta:** the AI planner changing Live on its own, automatic mixing, audio generation and voice control.
 
-**Daemon:** Automated background LaunchAgent (`com.shenrendao.kenn.companion`)
+## Install (about 5 minutes)
 
+1. Open `KENN-beta-….dmg` and drag **KENN** into **Applications**.
+2. The first time only, **right-click KENN in Applications and choose Open**, then **Open** again. (This beta
+   build isn't notarized by Apple yet, so a normal double-click is blocked the first time.)
+3. KENN opens on **Set up KENN** with three checks:
+   - **Ableton Live 12 is installed**
+   - **KENN's AbletonOSC is in Live's User Library** — press **Install KENN's AbletonOSC**. KENN finds your User
+     Library automatically, including one on an external drive. An older copy is kept in a hidden backup folder.
+   - **Live is connected to KENN** — in Live, open **Settings → Link, Tempo & MIDI**. In a free **Control Surface**
+     slot choose **AbletonOSC**, with Input and Output set to **None**. If Live was already open when you installed,
+     quit and reopen Live.
+4. When all three are ticked, press **Open KENN**. Next time KENN goes straight in.
 
----
+Only select **AbletonOSC** for KENN. Don't also enable other KENN or OSC scripts: they use the same port and stop
+KENN connecting.
 
-## 1. Welcome to the Closed Beta
+## Things to try
 
-KENN Mix Assistant is an autonomous, on-device AI copilot and mix engineer built specifically for Ableton Live producers. Unlike generic LLMs that generate text disconnected from your session, KENN maintains an active **Semantic Session World Model** of your Ableton set, executes scale-aware generative MIDI, conducts 40-band ERB psychoacoustic mix audits, and applies reversible, confirmation-gated DAW mutations.
+| Ask | What happens |
+|---|---|
+| `How many tracks do I have?` / `What's selected?` / `Describe this session.` | Answers from your open set |
+| `Bring the bass down 2 dB` / `Put the kick at -12 dB` | A proposal in dB; nothing changes until Apply |
+| `Pan the synth 20% left` / `Mute the hats` | Proposal, Apply, then "Readback Verified" |
+| `Undo that` or the **Undo** button on a card | Puts the exact previous value back |
+| `What did you change?` | The recent changes, with before and after values |
+| `What does Note Echo do?` | A cited answer from KENN's notes |
+| A mix WAV in **Inputs** | Review of loudness, true peak, clipping and balance |
 
-With v0.2.0, KENN features an ultra-low-latency pipeline:
-- **Instant Fast-Path:** Conversational greetings and state routing in **< 15 ms**.
-- **Live OSC Topology:** Sub-millisecond (**< 0.2 ms**) Ableton session inspection.
-- **Apple Silicon Acceleration:** Apple MLX 4-bit local LLM inference (>100 tokens/sec) and CoreML ANE-accelerated vector embeddings.
-- **Embedded Web UI:** The native VST3 and AU plugins embed an interactive JUCE 8 `WebBrowserComponent` connecting directly to the local companion.
+## Your data stays on your Mac
 
----
+- KENN keeps its settings, chat history and change history in `~/Library/Application Support/KENN`.
+- Audio you load for a review is analysed on your Mac and not kept or sent anywhere.
+- This build sends nothing to any server: no AI service is switched on, and telemetry is off.
 
-## 2. System Requirements
+## Updating
 
-- **Operating System:** macOS 12 Monterey, macOS 13 Ventura, macOS 14 Sonoma, or macOS 15 Sequoia / macOS 26.
-- **Architecture:** Apple Silicon (arm64 native) or Intel (x86_64).
-- **DAW:** Ableton Live 11.1+ or Ableton Live 12+.
-- **Free Disk Space:** 500 MB (includes ONNX hybrid vector embeddings and local runtime).
-- **Network:** 100% on-device local companion runner (`127.0.0.1:8090`); zero audio ever leaves your machine.
+Quit KENN and replace **KENN** in Applications with the new version. Your settings and history are kept. If the new
+version ships a newer AbletonOSC, the setup page will offer an update the next time you open KENN.
 
----
+## Uninstalling
 
-## 3. Installation Options
+1. Quit KENN and drag it from Applications to the Bin.
+2. In Live, set the AbletonOSC **Control Surface** slot back to **None**.
+3. Optional: delete `AbletonOSC` and the hidden `.kenn-backups` folder from your User Library's `Remote Scripts`
+   folder, and delete `~/Library/Application Support/KENN` and `~/Library/Logs/KENN Desktop Companion`.
 
-### Option A: 1-Click Native Installer (Recommended)
-1. Double-click `dist/KENN_Mix_Assistant_v0.2.0.pkg` (SHA-256: `75835fd8bf4de0779ec1e792f3a20e6f6450c091e18bada6fb8e8f7410218e2e`).
-2. Follow the standard macOS installer prompts (requires admin authentication).
-3. The installer automatically deploys:
-   - **VST3 Plugin:** `/Library/Audio/Plug-Ins/VST3/KENN Mix Assistant.vst3`
-   - **Audio Unit:** `/Library/Audio/Plug-Ins/Components/KENN Mix Assistant.component`
-   - **Remote Scripts:** Links `KENN_Bridge` and `AbletonOSC` into `~/Music/Ableton/User Library/Remote Scripts/`.
-   - **Demo Session:** Installs `KENN_Live12_Demo.als` into your User Library.
-4. Enable the background companion LaunchAgent:
-   ```bash
-   bash scripts/install_launchagent.sh
-   ```
-   The companion daemon will automatically start at login, listening at `http://127.0.0.1:8090` with logs written to `~/Library/Logs/KENN/kenn_companion.log`.
+## When something goes wrong
 
-### Option B: Manual Installation
-If you prefer manual setup:
-1. Copy `KENN Mix Assistant.vst3` to `~/Library/Audio/Plug-Ins/VST3/`.
-2. Copy `KENN Mix Assistant.component` to `~/Library/Audio/Plug-Ins/Components/`.
-3. Copy `integrations/ableton-remote-script/KENN_Bridge` to `~/Music/Ableton/User Library/Remote Scripts/`.
-4. Install and load the LaunchAgent:
-   ```bash
-   cp source/launchd/com.shenrendao.kenn.companion.plist ~/Library/LaunchAgents/
-   launchctl load -w ~/Library/LaunchAgents/com.shenrendao.kenn.companion.plist
-   ```
+- **"Live is connected" stays unticked:** check AbletonOSC is selected as a Control Surface, then quit and reopen
+  Live. After a long idle, the first reply from Live can be slow; press **Check again**.
+- **KENN seems stuck:** quit and reopen KENN. Nothing in your set changes without Apply, so it's always safe to
+  restart.
+- **Reporting a problem:** tell us what you asked, what you expected and what happened. Attach these two logs:
+  `~/Library/Logs/KENN Desktop Companion/server.log` and
+  `~/Library/Application Support/KENN/runtime/logs/kenn.log`.
+  Feedback channel: _(to be confirmed)_
 
----
+## Known limitations in this build
 
-## 4. Ableton Live Configuration
-
-To allow KENN to read your session hierarchy and automate mixing workflows:
-
-1. Launch **Ableton Live 11** or **Ableton Live 12**.
-2. Open **Settings** (macOS: `Cmd + ,`), then navigate to the **Link / Tempo / MIDI** tab.
-3. Under **Control Surfaces**:
-   - **Slot 1:**
-     - *Control Surface:* Select **`AbletonOSC`**
-     - *Input / Output:* Set both to **`None`**
-   - **Slot 2:**
-     - *Control Surface:* Select **`KENN_Bridge`**
-     - *Input / Output:* Set both to **`None`**
-4. Close Settings. Ableton is now linked to KENN's local OSC bridge.
-
-### Port Topology Reference
-- **OSC Send Port (DAW -> Companion):** UDP `11000`
-- **OSC Receive Port (Companion -> DAW):** UDP `11001`
-- **Companion REST API & Web Hub:** HTTP `http://127.0.0.1:8090`
-
----
-
-## 5. Five Core Studio Workflows & Cheat-Sheet
-
-### Workflow 1: Grounded Knowledge Retrieval
-Ask KENN technical sound design, mixing, and routing questions. KENN retrieves exact parameters and macros from 3,415 artist masterclass chunks.
-
-*Producer Prompt Ideas:*
-- `"Virtual Riot fat rack multiband ott workflow macro"`
-- `"How should I set the attack and release on a glue compressor for a punchy drum bus?"`
-- `"What frequencies should I cut on synth pads to unmask lead vocals?"`
-
-### Workflow 2: Scale-Aware Generative MIDI
-Generate multi-voice chord progressions snapped to 16 musical modes, or Euclidean rhythms for complex percussion.
-
-*Producer Prompt Ideas:*
-- `"Generate a D Dorian 4-bar chord progression on Track 3"`
-- `"Generate a 16-step Euclidean rhythm with 5 hits on Track 2 (Kick)"`
-- `"Add a trap hi-hat pattern with 32nd note rolls on Track 4"`
-
-### Workflow 3: Autonomous Session Doctor & Psychoacoustics
-KENN audits your active Ableton set across 40 Glasberg & Moore ERB critical bands, flagging inter-sample peak risks, phase cancellations, and sub-bass panning errors.
-
-*Producer Prompt Ideas:*
-- `"Run session doctor on my mix"`
-- `"Check for mud between 200 Hz and 400 Hz on my synths and bass"`
-- `"Audit master bus headroom and stereo correlation"`
-
-### Workflow 4: Hardware-Guarded Parameter Adjustments
-KENN adheres to strict safety guardrails:
-- **Gain Clamping:** Parameter changes are capped at $\Delta \le \pm 3.0\text{ dB}$ (0.20 normalized limit).
-- **Master Bus Lock:** Master fader adjustments are strictly locked.
-- **Confirmation Gating:** KENN returns a cryptographic HMAC-SHA256 proposal token. Changes only execute when you confirm.
-
-*Producer Prompt Ideas:*
-- `"Set Track 2 volume to -6 dB"`
-- `"Add EQ Eight to Track 4 and boost 8 kHz by 2 dB"`
-- `"Freeze track 3 to save CPU"`
-
-### Workflow 5: 1-Click Zero-Risk Undo
-Every action generates an atomic readback receipt recording exact pre-state values. Click **Undo** in the plugin UI or issue:
-- `"Undo last change"`
-KENN reverses the change instantaneously with zero risk of session corruption.
-
----
-
-## 6. Menu Bar Companion & Tray Runner
-
-You can manage the background companion server and access quick actions directly from your macOS menu bar:
-
-```bash
-python3 scripts/kenn_tray.py --gui
-```
-
-**Tray Menu Features:**
-- **Status Indicator:** Shows live connection status to Ableton Live and KENN server.
-- **Open KENN Web Hub:** Launches `http://127.0.0.1:8090` in your default browser.
-- **Start / Stop KENN Server:** 1-click background process management.
-- **Open Live 12 Demo Project:** Loads `KENN_Live12_Demo.als` with pre-configured routing and stems.
-- **Install Live Remote Scripts:** Automatically verifies and updates your Ableton Remote Scripts.
-
----
-
-## 7. Zero-Audio Telemetry Guarantee
-
-Your music, stems, and creative ideas belong exclusively to you. KENN operates under a strict **Zero-Audio Telemetry Guarantee**:
-
-- **NEVER Transmitted:**
-  - Raw audio samples, buffers, or waveforms.
-  - Stems or bounced tracks.
-  - MIDI notes, pitches, or melodies.
-  - Project file names or lyrics.
-- **Anonymized Metrics Logged (Local Buffered):**
-  - Session startup / shutdown timestamps.
-  - Command latency and error codes (e.g., OSC timeout).
-  - Feature engagement counts (e.g., number of Session Doctor audits run).
-  - Stored locally in `~/.kenn/beta_telemetry.jsonl` (capped at 5 MB).
-- **Opt-Out:** Set `export KENN_TELEMETRY_OPT_OUT=1` in your shell to completely disable telemetry logging.
-
----
-
-## 8. Submitting Beta Feedback & Bug Reports
-
-We value your real-world mixing feedback! You can submit comments, feature requests, or bug reports in two ways:
-
-### Option 1: In-App Web Hub
-Open `http://127.0.0.1:8090` and click the **Feedback** button in the top navigation bar.
-
-### Option 2: Terminal Curl
-```bash
-curl -X POST http://127.0.0.1:8090/api/feedback \
-  -H "Content-Type: application/json" \
-  -d '{
-    "kind": "beta_tester_feedback",
-    "rating": "useful",
-    "comment": "Session Doctor caught a +0.35 sub pan collision instantly.",
-    "question": "Can KENN suggest sidechain curves for OTT?"
-  }'
-```
-
----
-
-## 9. Troubleshooting & FAQ
-
-**Q: KENN plugin says "Ableton OSC Offline".**
-
-**A:** Verify that `AbletonOSC` is selected as an active Control Surface in Ableton Live `Preferences > Link/Tempo/MIDI`. Then verify port 11000 is not blocked by a third-party firewall.
-
-**Q: Audio Unit is not showing up in Logic Pro or Ableton Live.**
-
-**A:** Run macOS Audio Unit cache reset:
-```bash
-killall -9 AudioComponentRegistrar
-auval -v aufx KnMa AECO
-```
-
-**Q: Companion server port conflict on 8090.**
-
-**A:** Change the port using the `KENN_PORT` environment variable:
-```bash
-KENN_PORT=8095 python3 apps/backend/src/kenn/server.py
-```
-
-**Q: Where can I review my action logs and receipts?**
-
-**A:** Action receipts and rollbacks are saved in your session journal at `~/.kenn/receipts/` or displayed directly in the KENN Web Hub.
+- KENN understands common phrasing, but not everything; when it isn't sure, it asks. Please send us phrasings it
+  misunderstood.
+- Device control in real units covers a starter set (EQ Eight band gain, Compressor, Saturator, Auto Filter and a
+  few more); other device parameters can be read but not yet set in real units.
+- KENN inserts only 10 audio effects so far, and no instruments or MIDI effects.
+- The download is large (~240 MB) because KENN runs entirely on your Mac.
