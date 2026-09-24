@@ -18,6 +18,7 @@ from threading import Lock
 from typing import Any
 
 from kenn.ableton_osc_bridge import AbletonOSCClient, live_client
+from kenn.core import volume_law
 from kenn.core.confirmation import consume_confirmation, issue_confirmation
 from kenn.core.idempotency_bounds import prune_if_needed
 from kenn.core.receipt_contract import StageTimer, classify_retry_safety, resolve_correlation_id
@@ -3899,14 +3900,16 @@ class LiveActionService(Tier2Tier3ControlMixin):
         if not raw_tracks:
             return {"ok": False, "error": "No tracks found in current Live snapshot."}
 
-        target_normalized = round(max(0.0, min(1.0, 0.85 * (10.0 ** (target_db / 35.0)))), 4)
+        # Live's fader law (volume_law); target_db is already bounded to -36..0 dB.
+        target_normalized = round(volume_law.db_to_raw(target_db) or volume_law.unity_raw(), 4)
 
         steps = []
         for t in raw_tracks:
             idx = int(t.get("index", 0))
             name = str(t.get("name") or f"Track {idx + 1}")
             vol = float(t.get("volume", 0.85))
-            before_db = round(35.0 * math.log10(max(1e-4, vol / 0.85)), 1) if vol > 0.0 else -70.0
+            shown_db = volume_law.raw_to_db(vol)
+            before_db = round(shown_db, 1) if shown_db is not None and math.isfinite(shown_db) else -70.0
             steps.append({
                 "track_index": idx,
                 "track_name": name,

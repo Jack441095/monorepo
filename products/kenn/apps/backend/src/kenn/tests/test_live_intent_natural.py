@@ -2,6 +2,7 @@
 
 import pytest
 
+from kenn.core import volume_law
 from kenn.core.live_intent import parse_request
 
 DEMO = {"status": "connected", "tracks": [
@@ -9,6 +10,11 @@ DEMO = {"status": "connected", "tracks": [
     {"index": 2, "name": "Hi-Hats", "volume": 0.5}, {"index": 3, "name": "Drum Bus", "volume": 0.5},
     {"index": 4, "name": "Bass", "volume": 0.5}, {"index": 6, "name": "Lead Vocal", "volume": 0.5},
 ]}
+
+
+def _fader(current: float, db: float) -> float:
+    """Live's fader value after a dB change from a raw fader value."""
+    return volume_law.db_to_raw(volume_law.raw_to_db(current) + db)
 
 
 def resolved(query, snapshot=DEMO):
@@ -29,7 +35,7 @@ def test_relative_db_on_nicknamed_tracks(query, track, db) -> None:
     parsed = resolved(query)
     assert parsed and parsed["action"] == "set_volume" and parsed["track"]["name"] == track
     assert parsed["requested_relative_db"] == db
-    assert parsed["desired_value"] == pytest.approx(0.5 * 10 ** (db / 20))
+    assert parsed["desired_value"] == pytest.approx(_fader(0.5, db))
 
 
 @pytest.mark.parametrize("query", [
@@ -59,7 +65,7 @@ def test_two_tracks_sharing_a_nickname_is_ambiguous() -> None:
 
 
 def test_existing_behaviour_is_unchanged() -> None:
-    assert resolved("set Bass volume to -6 dB")["desired_value"] == pytest.approx(10 ** (-6 / 20))
+    assert resolved("set Bass volume to -6 dB")["desired_value"] == pytest.approx(volume_law.db_to_raw(-6))
     assert resolved("mute the kick drum")["track"]["name"] == "Kick"
     assert resolved("add a reverb to the snare")["action"] == "insert_device"
     assert resolved("Append Hybrid Reverb to Lead Vocal and set Dry/Wet to 40%")["action"] == "insert_device_with_parameter"

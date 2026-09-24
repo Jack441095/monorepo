@@ -26,6 +26,7 @@ import time
 from copy import deepcopy
 from typing import Any
 
+from kenn.core import volume_law
 from kenn.core.device_units import display_to_raw, find_profile, normalize_unit, raw_to_display
 from kenn.core.live_action_service import (
     BUS_ORGANIZATION_PROPOSAL_SCHEMA,
@@ -246,21 +247,21 @@ def _volume_db_to_normalized(plan: dict[str, Any], snapshot: dict[str, Any], tra
                              track_name: str) -> dict[str, Any]:
     """Convert a planner's dB volume into KENN's normalized value.
 
-    A model cannot know Live's fader value for "+3 dB", so the planner may say
-    it in dB and KENN converts with the same mapping as the rule parser
-    (normalized = 10^(dB/20), 1.0 = 0 dB). A relative change scales the
-    track's current snapshot volume. The plan keeps only contract fields.
+    A model cannot know Live's fader value for "-3 dB", so the planner may say
+    it in dB and KENN converts with Live's fader law, the same mapping as the
+    rule parser (volume_law; raw 0.85 = 0 dB). A relative change is added to
+    the track's current level in dB. The plan keeps only contract fields.
     """
     db = float(plan["value"])
     if plan.get("relative"):
         current = (_track_by_index(snapshot, track_index, track_name) or {}).get("volume")
         if isinstance(current, bool) or not isinstance(current, (int, float)) or not current > 0:
             return {"ok": False, "error": "A relative dB volume change needs the track's current volume in the snapshot."}
-        value = float(current) * 10 ** (db / 20.0)
-    else:
-        value = 10 ** (db / 20.0)
-    if not 0.0 < value <= 1.0:
-        return {"ok": False, "error": "That dB volume is outside KENN's range (at most 0 dB)."}
+        current_db = volume_law.raw_to_db(float(current))
+        db = current_db + db if current_db is not None else math.nan
+    value = volume_law.db_to_raw(db) if db <= 0.0 else None
+    if value is None:
+        return {"ok": False, "error": f"That dB volume is outside KENN's range ({volume_law.law().min_db:g} dB to 0 dB)."}
     return {"ok": True, "plan": dict(plan, value=round(value, 6), unit="normalized", relative=False)}
 
 

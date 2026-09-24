@@ -207,6 +207,44 @@ class SongHandler(AbletonOSCHandler):
             return (json.dumps(payload),)
         self.osc_server.add_handler("/live/kenn/get/device_parameters", kenn_get_device_parameters)
 
+        def kenn_get_display_table(params):
+            """Live's own display string at evenly spaced values of one parameter.
+
+            Read-only: uses ``str_for_value`` and never writes the parameter.
+            target is ``volume``, ``pan``, ``send:<r>`` or ``device:<d>:<p>``.
+            Optional start/stop (fractions of the parameter's range) page a
+            fine table in chunks: macOS drops UDP replies over 9,216 bytes.
+            """
+            kind, index, target = str(params[0]), int(params[1]), str(params[2])
+            samples = max(2, min(200, int(params[3]) if len(params) > 3 else 101))
+            start = max(0.0, min(1.0, float(params[4]) if len(params) > 4 else 0.0))
+            stop = max(start, min(1.0, float(params[5]) if len(params) > 5 else 1.0))
+            try:
+                track = _kenn_track(kind, index)
+                if target == "volume":
+                    parameter = track.mixer_device.volume
+                elif target == "pan":
+                    parameter = track.mixer_device.panning
+                elif target.startswith("send:"):
+                    parameter = track.mixer_device.sends[int(target.split(":")[1])]
+                elif target.startswith("device:"):
+                    _, device_index, parameter_index = target.split(":")
+                    parameter = track.devices[int(device_index)].parameters[int(parameter_index)]
+                else:
+                    raise ValueError("target must be volume, pan, send:<r> or device:<d>:<p>")
+                low, high = float(parameter.min), float(parameter.max)
+                points = []
+                for step in range(samples):
+                    fraction = start + (stop - start) * step / (samples - 1)
+                    value = low + (high - low) * fraction
+                    points.append([round(value, 7), str(parameter.str_for_value(value))])
+                payload = {"kind": kind, "index": index, "target": target, "name": str(parameter.name),
+                           "min": low, "max": high, "points": points}
+            except Exception as exc:
+                payload = {"kind": kind, "index": index, "target": target, "error": str(exc)}
+            return (json.dumps(payload),)
+        self.osc_server.add_handler("/live/kenn/get/display_table", kenn_get_display_table)
+
         def song_set_return_track_name(params):
             return_track_index, name = params
             self.song.return_tracks[int(return_track_index)].name = str(name)

@@ -277,3 +277,13 @@ multiplexed connection.
   is weighted above coverage.
 
 Q4_K_M SHA-256: run 6 `81f49a8a6f5df992fc7207fed3218fdf84da3b27d4b52ee2169836998917cc5a`.
+
+## Addendum 2026-09-24: volume labels used the wrong fader maths
+
+KENN converted dB with 10^(dB/20), treating 1.0 as 0 dB. Live's fader puts 0 dB at 0.85 and +6 dB at 1.0.
+Two corpus seeds labelled absolute volume as fader values under that maths ("Set Bass Synth level to minus nine
+dB" → 0.355, "Bring the FX Return up to 0 dB" → 1.0), and their variants went into every run. A spot check of
+run 4 on the Mac: five of six volume commands came back in dB (converted correctly), but "set Drum Bus level to
+0 dB" came back as 1.0, which Live plays at +6 dB. The scores above compare actions and tracks, not values, so they
+stand; the value error is separate. The seeds now say dB and KENN converts with `core/volume_law.py`. Any future
+run needs a corpus rebuilt after this fix.

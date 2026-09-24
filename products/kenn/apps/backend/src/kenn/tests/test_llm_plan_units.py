@@ -2,11 +2,17 @@
 
 import pytest
 
+from kenn.core import volume_law
 from kenn.core.live_command import validate_llm_plan
 
 SNAPSHOT = {"tracks": [{"index": 0, "name": "Kick", "volume": 0.5},
                        {"index": 1, "name": "Bass", "volume": 0.9},
                        {"index": 2, "name": "Pad"}]}
+
+
+def _fader(current: float, db: float) -> float:
+    """Live's fader value after a dB change from a raw fader value."""
+    return volume_law.db_to_raw(volume_law.raw_to_db(current) + db)
 
 
 def _plan(**fields):
@@ -16,7 +22,7 @@ def _plan(**fields):
 def test_absolute_db_converts_like_the_rule_parser() -> None:
     checked = validate_llm_plan(_plan(track_index=0, track_name="Kick", unit="dB", value=-6.0), SNAPSHOT)
     assert checked["ok"]
-    assert checked["plan"]["value"] == pytest.approx(10 ** (-6 / 20), abs=1e-6)
+    assert checked["plan"]["value"] == pytest.approx(volume_law.db_to_raw(-6), abs=1e-6)
     assert checked["plan"]["unit"] == "normalized" and checked["plan"]["relative"] is False
 
 
@@ -24,7 +30,7 @@ def test_relative_db_scales_the_current_snapshot_volume() -> None:
     checked = validate_llm_plan(_plan(track_index=0, track_name="Kick", unit="dB", value=3.0, relative=True),
                                 SNAPSHOT)
     assert checked["ok"]
-    assert checked["plan"]["value"] == pytest.approx(0.5 * 10 ** (3 / 20), abs=1e-6)
+    assert checked["plan"]["value"] == pytest.approx(_fader(0.5, 3), abs=1e-6)
 
 
 @pytest.mark.parametrize("fields, message", [
@@ -51,7 +57,7 @@ def test_recipe_steps_return_in_their_validated_converted_form() -> None:
     checked = validate_llm_plan(recipe, SNAPSHOT)
     assert checked["ok"]
     volume = checked["plan"]["steps"][1]
-    assert volume["unit"] == "normalized" and volume["value"] == pytest.approx(10 ** (-6 / 20), abs=1e-6)
+    assert volume["unit"] == "normalized" and volume["value"] == pytest.approx(volume_law.db_to_raw(-6), abs=1e-6)
     assert "schema" not in volume and checked["plan"]["steps"][0]["value"] is True
 
 
