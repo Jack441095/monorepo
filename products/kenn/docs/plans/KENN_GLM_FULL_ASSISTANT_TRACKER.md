@@ -12,6 +12,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 - LLM stage: `shadow`.
 - Retrieval: BM25-only.
 
+**Beta:** the path to a private beta is in [`KENN_BETA_PLAN_2026-09-24.md`](KENN_BETA_PLAN_2026-09-24.md) (qualified gate 3/14 on 2026-09-24).
+
 ## Waiting on owner
 
 - [x] Pick the C6 base model: `qwen3.5:4b` (clarifies 20/30, Mac p50 6.7 s) or `qwen3:4b` (clarifies 2/30, Mac p50 4.5 s; needs clarify training). See the C2 GPU evidence addendum
