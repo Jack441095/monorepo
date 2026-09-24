@@ -57,6 +57,20 @@ def batches(rows: list[dict], size: int, pad_id: int, torch, device, order: list
         yield {"input_ids": ids.to(device), "attention_mask": mask.to(device), "labels": labels.to(device)}
 
 
+def target_loss(model, batch, torch):
+    """Loss over the answer tokens only, computing logits just for them.
+
+    With batch size 1 and no padding, everything after the prompt is the
+    target, i.e. the last n tokens, so ``logits_to_keep=n+1`` avoids a
+    (sequence x 248k-vocabulary) logits tensor for long evidence prompts.
+    """
+    labels = batch["labels"][0]
+    n = int((labels != -100).sum())
+    logits = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
+                   logits_to_keep=n + 1).logits[0, :-1].float()
+    return torch.nn.functional.cross_entropy(logits, batch["input_ids"][0, -n:])
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--base-model", required=True)
@@ -71,7 +85,11 @@ def main() -> int:
     parser.add_argument("--max-length", type=int, default=1024)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--no-merge", action="store_true")
+    parser.add_argument("--sparse-logits", action="store_true",
+                        help="batch size 1: compute logits for the answer tokens only (long prompts)")
     args = parser.parse_args()
+    if args.sparse_logits and args.batch_size != 1:
+        parser.error("--sparse-logits needs --batch-size 1")
 
     import torch
     from peft import LoraConfig, get_peft_model
@@ -107,7 +125,7 @@ def main() -> int:
         losses = []
         with torch.no_grad():
             for batch in batches(valid_rows, args.batch_size, pad_id, torch, device, list(range(len(valid_rows)))):
-                losses.append(float(model(**batch).loss))
+                losses.append(float(target_loss(model, batch, torch) if args.sparse_logits else model(**batch).loss))
         model.train()
         return sum(losses) / len(losses)
 
@@ -123,7 +141,7 @@ def main() -> int:
             group = micro[start:start + args.grad_accum]
             loss_sum = 0.0
             for batch in group:
-                loss = model(**batch).loss / len(group)
+                loss = (target_loss(model, batch, torch) if args.sparse_logits else model(**batch).loss) / len(group)
                 loss.backward()
                 loss_sum += float(loss)
             loss = torch.tensor(loss_sum)
@@ -146,7 +164,7 @@ def main() -> int:
     args.output.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(args.output / "adapter")
     manifest = {"schema": "kenn.ableton_command_lora_cuda_run.v1", "base_model": args.base_model,
-                "hyperparameters": {k: getattr(args, k) for k in ("epochs", "batch_size", "grad_accum", "learning_rate", "rank",
+                "hyperparameters": {k: getattr(args, k) for k in ("epochs", "batch_size", "grad_accum", "learning_rate", "rank", "sparse_logits",
                                                                   "max_length", "seed")},
                 "train_records": len(train_rows), "valid_records": len(valid_rows), "steps": total,
                 "seconds": round(time.time() - started, 1),

@@ -304,6 +304,78 @@ def _scenario_seed(seed: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, 
     return variant
 
 
+FIXTURE = REPO_ROOT / "apps" / "backend" / "src" / "kenn" / "core" / "fake_live_fixtures" / "investor_demo.json"
+
+
+def real_device_parameters() -> dict[str, list[dict[str, Any]]]:
+    """Parameter lists recorded from the owner's Live set, by device name (Compressor, EQ Eight)."""
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    devices: dict[str, list[dict[str, Any]]] = {}
+    for info in fixture["devices"].values():
+        devices.setdefault(str(info["device_name"]), [
+            {k: v for k, v in p.items() if k not in {"recorded_value", "recorded_display"}} for p in info["parameters"]
+        ])
+    return devices
+
+
+class _EvidenceService:
+    """Stands in for LiveActionService so production's _llm_planner_snapshot builds the evidence.
+
+    Devices recorded from Live get their real parameter lists; others keep the
+    synthetic training lists (training_snapshot's planner_capabilities).
+    """
+
+    def __init__(self, snapshot: dict[str, Any], real: dict[str, list[dict[str, Any]]],
+                 synthetic: dict[str, list[dict[str, Any]]]) -> None:
+        self.client = self
+        self._snapshot, self._real, self._synthetic = snapshot, real, synthetic
+
+    def get_device_parameters(self, track_index: int, device_index: int) -> dict[str, Any]:
+        track = next((t for t in self._snapshot["tracks"] if t.get("index") == track_index), None)
+        devices = (track or {}).get("devices") or []
+        if not 0 <= device_index < len(devices):
+            return {"success": False}
+        name = str(devices[device_index].get("name", ""))
+        parameters = self._real.get(name) or self._synthetic.get(name)
+        if parameters is None:
+            return {"success": False}
+        return {"success": True, "device_name": name, "parameters": copy.deepcopy(parameters)}
+
+
+def _real_parameter_indices(plan: dict[str, Any], real: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    """Point a label's parameter_index at the real Live index of the same-named parameter."""
+    plan = dict(plan)
+    if plan.get("steps"):
+        plan["steps"] = [_real_parameter_indices(step, real) for step in plan["steps"]]
+    parameters = real.get(str(plan.get("device_name") or ""))
+    if parameters and plan.get("parameter_name"):
+        wanted = str(plan["parameter_name"]).casefold()
+        match = next((p for p in parameters if str(p.get("name", "")).casefold() == wanted), None)
+        if match is not None:
+            plan["parameter_index"] = int(match["index"])
+    return plan
+
+
+def _production_snapshot(query: str, label: dict[str, Any], snapshot: dict[str, Any],
+                         real: dict[str, list[dict[str, Any]]], synthetic: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    """The snapshot the gateway would give the planner for this request.
+
+    Production attaches single-track parameter evidence for the track the rule
+    parser identifies; when the parser finds none, the label's own track is
+    used so that every device example is answerable.
+    """
+    from kenn.core.live_command import _llm_planner_snapshot
+    from kenn.core.live_intent import parse_request
+
+    base = {k: v for k, v in snapshot.items() if k != "planner_capabilities"}
+    target = (parse_request(query, base).get("track") or {}).get("index")
+    if target is None:
+        target = label.get("track_index")
+    if target is None:
+        return base
+    return _llm_planner_snapshot(_EvidenceService(base, real, synthetic), base, {"track": {"index": target}})
+
+
 def cap_per_action(rows: list[dict[str, Any]], cap: int) -> list[dict[str, Any]]:
     """Keep at most ``cap`` rows per action (clarify exempt), round-robin across seeds.
 
@@ -330,14 +402,20 @@ def cap_per_action(rows: list[dict[str, Any]], cap: int) -> list[dict[str, Any]]
 
 
 def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = False,
-               prompt: str = "full", clarify_variants: int | None = None) -> list[dict[str, Any]]:
-    from build_kenn_command_training import _plan, evaluation_queries, normalize_query, plan_target, records
+               prompt: str = "full", clarify_variants: int | None = None,
+               production_evidence: bool = False) -> list[dict[str, Any]]:
+    from build_kenn_command_training import (
+        _plan, evaluation_queries, normalize_query, plan_target, records, training_snapshot,
+    )
     from drafted_command_seeds import drafted_records
     from kenn.core.live_command import (
         LLM_COMMAND_SYSTEM_PROMPT, LLM_COMMAND_SYSTEM_PROMPT_COMPACT, planner_user_prompt, validate_llm_plan,
     )
 
     system_prompt = {"full": LLM_COMMAND_SYSTEM_PROMPT, "compact": LLM_COMMAND_SYSTEM_PROMPT_COMPACT}[prompt]
+    real = real_device_parameters() if production_evidence else {}
+    synthetic = {str(e["device_name"]): e["parameters"]
+                 for e in training_snapshot().get("planner_capabilities", {}).get("entries", [])}
 
     if scenarios < 1 or scenarios > len(SCENARIO_TRACK_NAMES):
         raise ValueError(f"scenarios must be between 1 and {len(SCENARIO_TRACK_NAMES)}")
@@ -356,7 +434,15 @@ def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = Fal
                         query += " now"
                 label = dict(scenario_seed["label"])
                 record_id = f"s{scenario_number}-{seed['record_id']}-v{number:04d}"
-                checked = validate_llm_plan(label, snapshot)
+                record_snapshot, record_text = snapshot, snapshot_text
+                if production_evidence:
+                    # What the gateway would send: single-track evidence, real
+                    # parameter indices where Live recorded them, 24,000-char bound.
+                    record_snapshot = _production_snapshot(query, label, snapshot, real, synthetic)
+                    label = _real_parameter_indices(label, real)
+                    record_text = json.dumps(record_snapshot, ensure_ascii=True, sort_keys=True,
+                                             separators=(",", ":"))[:24000]
+                checked = validate_llm_plan(label, record_snapshot)
                 if not checked.get("ok"):
                     raise ValueError(f"Invalid seed label {seed['record_id']} in scenario {scenario_number}: {checked.get('error')}")
                 rows.append({
@@ -371,10 +457,11 @@ def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = Fal
                     "messages": [
                         {"role": "system", "content": system_prompt},
                         # Same user turn as production; the schema constant is stamped by KENN.
-                        {"role": "user", "content": planner_user_prompt(query, snapshot_text)},
+                        {"role": "user", "content": planner_user_prompt(query, record_text)},
                         {"role": "assistant", "content": plan_target(label)},
                     ],
                     "label": label,
+                    **({"evidence": "production"} if production_evidence else {}),
                 })
     return rows
 
@@ -385,6 +472,8 @@ def main() -> int:
     parser.add_argument("--scenarios", type=int, default=1, help="Distinct synthetic track-name snapshots to include (1-4)")
     parser.add_argument("--include-drafted", action="store_true",
                         help="add the drafted clarify seeds (drafted_command_seeds.py; owner review pending)")
+    parser.add_argument("--production-evidence", action="store_true",
+                        help="per-record single-track parameter evidence as the gateway sends it, real Live indices")
     parser.add_argument("--max-per-action", type=int, default=0,
                         help="cap rows per action (clarify exempt), spread evenly across seeds; 0 = no cap")
     parser.add_argument("--clarify-variants", type=int, default=None,
@@ -394,7 +483,8 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     rows = build_rows(variants=args.variants, scenarios=args.scenarios, include_drafted=args.include_drafted,
-                      prompt=args.prompt, clarify_variants=args.clarify_variants)
+                      prompt=args.prompt, clarify_variants=args.clarify_variants,
+                      production_evidence=args.production_evidence)
     if args.max_per_action:
         rows = cap_per_action(rows, args.max_per_action)
     from build_kenn_command_training import assert_no_holdout_overlap
@@ -413,6 +503,7 @@ def main() -> int:
         "system_prompt": args.prompt,
         "clarify_variants_per_seed": args.clarify_variants or args.variants,
         "max_per_action": args.max_per_action or None,
+        "production_evidence": args.production_evidence,
         "output": str(output),
         "holdout_protection": "passed",
         "evidence_kind": "synthetic_training_data",
