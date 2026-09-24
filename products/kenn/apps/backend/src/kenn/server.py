@@ -142,11 +142,41 @@ HOST = os.getenv("KENN_HOST", "127.0.0.1").strip() or "127.0.0.1"
 PORT = int(os.getenv("KENN_PORT", "8090"))
 # Imperative Live control phrasing that must reach the typed command gateway
 # rather than knowledge chat (e.g. "Focus EQ Eight on track 5", "Undo that.").
+_LIVE_IMPERATIVE_VERBS = (
+    "set", "pan", "focus", "boost", "cut", "raise", "lower", "turn", "mute", "unmute", "solo", "unsolo", "center",
+    "centre", "recenter", "recentre", "create", "make", "arm", "disarm", "insert", "add", "rename", "remove", "delete",
+    "undo", "duplicate", "group", "select", "put", "bring", "push", "pull", "crank", "drop", "nudge", "tuck", "take",
+    "kill", "max",
+)
 _LIVE_IMPERATIVE_RE = re.compile(
-    r"^\s*(?:please\s+)?(?:set|pan|focus|boost|cut|raise|lower|turn|mute|unmute|solo|unsolo|center|centre|recenter|recentre|create|make|"
-    r"arm|disarm|insert|add|rename|remove|delete|undo|duplicate|group|gain[- ]stage|select)\b",
+    r"^\s*(?:please\s+)?(?:" + "|".join(_LIVE_IMPERATIVE_VERBS) + r"|gain[- ]stage)\b",
     re.I,
 )
+
+
+# Ordinary words one letter away from a verb ("an" for "pan", "am" for "arm").
+_COMMON_SHORT_WORDS = frozenset({"an", "am", "as", "at", "ad", "ma", "pa", "se", "un", "ut", "mat", "ake", "ran", "ut"})
+
+
+def _is_live_imperative(question: str) -> bool:
+    """Imperative Live phrasing, allowing a slip in the first word ("et the master…").
+
+    A first word one letter short of a command verb ("et" for "set") or with two
+    neighbouring letters swapped still counts; the gateway only takes over for
+    a proposal, a refusal or an undo, so anything else still reaches chat.
+    """
+    text = str(question or "")
+    if _LIVE_IMPERATIVE_RE.match(text):
+        return True
+    match = re.match(r"^\s*(?:please\s+)?([A-Za-z]+)\b", text)
+    if not match or len(match.group(1)) < 2:
+        return False
+    from kenn.core.live_intent import _within_one_edit
+
+    first = match.group(1).casefold()
+    if first in _COMMON_SHORT_WORDS:
+        return False
+    return any(_within_one_edit(first, verb) for verb in _LIVE_IMPERATIVE_VERBS if len(verb) >= 3)
 
 
 def _cached_ableton_health() -> dict[str, Any]:
@@ -748,7 +778,7 @@ class Handler(BaseHTTPRequestHandler):
         gateway result falls through so ordinary production questions keep
         reaching the knowledge chat.
         """
-        if not _LIVE_IMPERATIVE_RE.match(str(question or "")):
+        if not _is_live_imperative(question):
             return None
         result = handle_command(question, session_id=session_id)
         intents = [result.get(key) for key in ("intent", "live_intent") if isinstance(result.get(key), dict)]
