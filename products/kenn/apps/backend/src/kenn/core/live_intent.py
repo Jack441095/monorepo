@@ -411,7 +411,7 @@ _COUPLE_OF_DB = re.compile(r"\b(?:a\s+)?couple\s+(?:of\s+)?(?=(?:dbs?|decibels?)
 # Device, EQ, send and pan wording is excluded: those have their own parsers.
 _RELATIVE_VOLUME_EXCLUDE = re.compile(
     r"\b(?:hz|khz|eq|band|threshold|ratio|attack|release|knee|makeup|send|sends|reverb|delay|echo|"
-    r"compressor|comp|gain|pan|left|right|width|dry|wet|drive|q)\b", re.I)
+    r"compressor|comp|gain|output|pan|left|right|width|dry|wet|drive|q)\b", re.I)
 _RELATIVE_VOLUME_AMOUNT = re.compile(r"(?<![\w.])([+-]?\d+(?:\.\d+)?)\s*(?:dbs?|decibels?)\b", re.I)
 _RELATIVE_VOLUME_DOWN = re.compile(
     r"\b(?:down|back|lower|drop|cut|reduce|decrease|quieter|softer|pull|tuck|trim|duck|off)\b", re.I)
@@ -1667,6 +1667,10 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             # target is required, and arbitrary parameter changes still use
             # the device-specific path below.
             volume_match = re.search(r"\bbring\b.*?\b(?:to|at)\s+" + _NUMBER + r"\s*db\b", lower)
+        if volume_match is None and not _RELATIVE_VOLUME_EXCLUDE.search(lower):
+            # "Put the kick at minus 12 dB", "set the snare to -10 dB": the same
+            # narrow shape (explicit dB target) with no device, send or pan words.
+            volume_match = re.search(r"\b(?:put|set|sit|pull|push|drop|turn)\b.*?\b(?:to|at)\s+" + _NUMBER + r"\s*db\b", lower)
         pan_match = re.search(
             r"pan\b.*?\b(?:track|trk|channel|chan|ch)\s*#?\s*\d+\s+"
             + _NUMBER

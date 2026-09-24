@@ -91,3 +91,23 @@ def test_track_first_send_phrasing(query, track, value) -> None:
 def test_send_without_a_level_or_out_of_range_still_asks() -> None:
     assert resolved("send the vocal to the reverb") is None
     assert resolved("send the hats to B-Delay at 150%") is None
+
+
+@pytest.mark.parametrize("query, track, db", [
+    ("put the kick at minus 12 dB", "Kick", -12.0),
+    ("set the snare to -10 dB", "Snare / Clap", -10.0),
+])
+def test_absolute_db_without_the_word_volume(query, track, db) -> None:
+    parsed = resolved(query)
+    assert parsed and parsed["action"] == "set_volume" and parsed["track"]["name"] == track
+    assert parsed["desired_value"] == pytest.approx(volume_law.db_to_raw(db))
+
+
+@pytest.mark.parametrize("query", [
+    "set the snare compressor output to 3 dB",   # device wording keeps the device path
+    "put the bass send to -6 dB",                # sends are not track volume
+    "Bass to -9",                                 # no unit: still asks
+])
+def test_absolute_db_shape_does_not_take_device_send_or_unitless_requests(query) -> None:
+    parsed = resolved(query)
+    assert not parsed or parsed["action"] != "set_volume"
