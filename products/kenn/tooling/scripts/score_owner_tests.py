@@ -22,7 +22,7 @@ KENN_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(KENN_ROOT / "apps" / "backend" / "src"))
 
 
-def load_tests(source: Path) -> list[dict[str, Any]]:
+def load_tests(source: Path, kind: str = "owner_written") -> list[dict[str, Any]]:
     if source.is_dir():
         rows = []
         for path in sorted(source.rglob("*.json")):
@@ -30,12 +30,17 @@ def load_tests(source: Path) -> list[dict[str, Any]]:
             rows.append(doc.get("data", doc))
     else:
         rows = [json.loads(line) for line in source.read_text(encoding="utf-8").splitlines() if line.strip()]
-    return [r for r in rows if r.get("source", "owner_written") == "owner_written" and r.get("query")]
+    return [r for r in rows if r.get("source", "owner_written") == kind and r.get("query")]
 
 
 def rule_parser_result(query: str, snapshot: dict[str, Any]) -> dict[str, Any]:
-    from kenn.core.live_intent import parse_request
+    from kenn.core.live_intent import parse_natural_recipe, parse_request
 
+    # As the gateway does: a supported multi-step request is a recipe first.
+    recipe = parse_natural_recipe(query, snapshot)
+    if recipe is not None:
+        ok = not recipe.get("ambiguity") and bool(recipe.get("steps") or recipe.get("step_intents"))
+        return {"action": "recipe" if ok else "clarify", "track": None, "detail": recipe.get("ambiguity") or ""}
     parsed = parse_request(query, snapshot)
     unresolved = bool(parsed.get("missing_fields") or parsed.get("ambiguity")) or not parsed.get("action")
     return {"action": "clarify" if unresolved else parsed.get("action"),
@@ -64,12 +69,14 @@ def matches(expected: dict[str, Any], action: str | None, track: str | None) -> 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("source", type=Path, help="exported tests directory or JSONL file")
+    parser.add_argument("source_path", type=Path, help="exported tests directory or JSONL file")
     parser.add_argument("--model", help="also score this Ollama planner model (e.g. kenn-c6-run4)")
     parser.add_argument("--compact-prompt", action="store_true", help="use the compact planner prompt (fine-tunes)")
+    parser.add_argument("--source", default="owner_written",
+                        help="which commands to score: owner_written (independent) or claude_written")
     args = parser.parse_args()
 
-    tests = load_tests(args.source)
+    tests = load_tests(args.source_path, args.source)
     from kenn.core.fake_live import FakeLiveBackend
 
     fake = FakeLiveBackend()
@@ -114,7 +121,7 @@ def main() -> int:
         print(f"\nRule parser: {sum(r['rule']['pass'] for r in results)}/{total}"
               + (f" · {args.model}: {sum(r['model']['pass'] for r in results)}/{total}" if args.model else ""))
     else:
-        print("No owner-written tests found.")
+        print(f"No {args.source} tests found.")
     return 0
 
 
