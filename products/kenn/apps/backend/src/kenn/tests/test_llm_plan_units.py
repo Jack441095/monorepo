@@ -53,3 +53,20 @@ def test_recipe_steps_return_in_their_validated_converted_form() -> None:
     volume = checked["plan"]["steps"][1]
     assert volume["unit"] == "normalized" and volume["value"] == pytest.approx(10 ** (-6 / 20), abs=1e-6)
     assert "schema" not in volume and checked["plan"]["steps"][0]["value"] is True
+
+
+@pytest.mark.parametrize("query, expected", [
+    ("mute the bass", False), ("pan the bass left 20", False), ("solo the drum bus", False),
+    ("cut 200 Hz on the bass by 3 dB, band 2A", True), ("boost band 2A on the bass eq by 2 dB", True),
+    ("set the drum bus compressor threshold to -12 dB", True), ("what's on the bass EQ Eight?", True),
+])
+def test_parameter_evidence_only_for_device_requests(query, expected) -> None:
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.live_command import _llm_planner_snapshot
+    from kenn.core.live_intent import parse_request
+
+    fake = FakeLiveBackend()
+    snapshot = fake.query_session_state()
+    enriched = _llm_planner_snapshot(LiveActionService(fake), snapshot, parse_request(query, snapshot))
+    assert ("planner_capabilities" in enriched) is expected
