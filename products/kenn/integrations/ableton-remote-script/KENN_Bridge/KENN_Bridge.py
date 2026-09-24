@@ -1042,7 +1042,6 @@ class KENN_Bridge(ControlSurface):
             insertion_index = int(args[2])
         except (IndexError, TypeError, ValueError):
             return {"success": False, "error": "Typed device insertion requires track, device, and insertion indices."}
-                if device_name not in ALLOWED_INSERT_DEVICES:
         if device_name not in ALLOWED_INSERT_DEVICES:
             return {
                 "success": False,
