@@ -1002,6 +1002,41 @@ def _named_device_focus(text: str, tracks: list[dict[str, Any]]) -> tuple[dict[s
     return None
 
 
+_BARE_DB = re.compile(r"(?<![\w.])([+-]?\d+(?:\.\d+)?)\s*dbs?\b", re.I)
+_LOUDER = re.compile(r"\b(?:louder|up|raise|boost|lift|bump)\b", re.I)
+_QUIETER = re.compile(r"\b(?:quieter|softer|down|lower|reduce|tuck|back)\b", re.I)
+_VALUE_QUESTION_EXCLUDE = re.compile(
+    r"\b(?:hz|khz|eq|band|threshold|ratio|attack|release|send|sends|reverb|delay|echo|compressor|gain|q|drive|"
+    r"dry|wet|width|filter|cutoff|resonance)\b", re.I)
+
+
+def _missing_value_question(lower: str, track_name: str) -> tuple[str, str, str] | None:
+    """(action, missing field, question) for a clear request that lacks one value."""
+    if _VALUE_QUESTION_EXCLUDE.search(lower):
+        return None
+    db = _BARE_DB.search(lower)
+    louder, quieter = bool(_LOUDER.search(lower)), bool(_QUIETER.search(lower))
+    if db and not (louder or quieter) and not re.search(r"\b(?:to|at|by)\b", lower):
+        amount = float(db.group(1))
+        size = f"{abs(amount):g}"
+        direction = "quieter" if amount < 0 else "louder"
+        verb = "down" if amount < 0 else "up"
+        return ("set_volume", "absolute_or_relative",
+                f"Do you want {track_name} at {amount:g} dB, or {size} dB {direction} than it is now? "
+                f"Say \"set {track_name} to {amount:g} dB\" or \"turn {track_name} {verb} {size} dB\".")
+    if not db and (louder or quieter) and not (louder and quieter) and not re.search(r"\d", lower) \
+            and re.search(r"\b(?:louder|quieter|softer|turn|bring|make|volume|level|up|down)\b", lower):
+        verb = "up" if louder else "down"
+        return ("set_volume", "amount",
+                f"By how much? For example \"turn {track_name} {verb} 2 dB\" or \"set {track_name} to -6 dB\".")
+    side = re.search(r"\bpan\b.*?\b(left|right)\b", lower)
+    if side and not re.search(r"\d|\b(?:hard|fully|all\s+the\s+way|cent(?:er|re)|middle)\b", lower):
+        where = side.group(1)
+        return ("set_pan", "amount",
+                f"How far {where}? For example \"pan {track_name} 30% {where}\" or \"pan {track_name} hard {where}\".")
+    return None
+
+
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
     text = _rewrite_common_phrasings(" ".join(str(query or "").strip().split()))
@@ -1965,6 +2000,15 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             base.update({"desired_value": normalized, "unit": "normalized", "requested_unit": "%" if unit else "normalized"})
             action = "set_pan"
 
+    if action is None and track:
+        # A recognisable request missing one value: ask exactly for it instead of the generic reply.
+        name = str(track.get("name") or "the track")
+        question = _missing_value_question(lower, name)
+        if question:
+            base.update(action=question[0])
+            base["missing_fields"].append(question[1])
+            base["ambiguity"].append(question[2])
+            return base
     if action and _SECOND_ACTION.search(lower):
         # "solo the bass and turn it up 2 dB": proposing only the first part
         # would silently drop the rest. Supported two-step requests are

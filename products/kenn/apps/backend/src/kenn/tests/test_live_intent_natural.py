@@ -241,3 +241,15 @@ def test_plain_and_needs_two_clear_halves(query) -> None:
     from kenn.core.live_intent import parse_natural_recipe
 
     assert parse_natural_recipe(query, FAKE_SET) is None
+
+
+@pytest.mark.parametrize("query, action, phrase", [
+    ("kick -3 dB", "set_volume", "Do you want Kick at -3 dB, or 3 dB quieter"),
+    ("make the bass louder", "set_volume", "By how much?"),
+    ("turn the vocal down", "set_volume", "turn Lead Vocal down 2 dB"),
+    ("pan the synth left", "set_pan", "How far left?"),
+])
+def test_a_missing_value_gets_a_precise_question(query, action, phrase) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert parsed["action"] == action and parsed["missing_fields"]
+    assert any(phrase in text for text in parsed["ambiguity"])
