@@ -159,6 +159,11 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > 2026-09-24: run 7 trained on the box (GPU 0) with dB labels: volume values fixed, but "bass" solos Drum Bus, so it
   > stays in shadow (not promoted). Run 8 corpus ready (confusable track names + exact-track contrast rows); training next.
 - [ ] **Exit:** every command in the tester guide works on a fresh demo set and on one real project
+  > 2026-09-24, real Live (demo set) through the chat route: 10/11. "Bring the bass down 2 dB" answered "not sure": the
+  > gateway took a topology-only snapshot (no fader values) for wording without "volume"/"turn up/down", so the relative
+  > change had nothing to start from. Fixed (`d902c4f`: any dB or up/down wording reads the mixer, plus a re-read when the
+  > parser reports a missing current volume). The demo backend now drops mixer values from topology reads as real Live
+  > does, and `test_tester_guide_commands.py` runs the guide's commands end to end. Re-check on real Live after the soak.
 
 ## Phase 4: Human evidence (weeks 3–4, needs people)
 
