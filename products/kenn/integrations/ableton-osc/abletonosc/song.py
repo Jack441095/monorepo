@@ -245,6 +245,34 @@ class SongHandler(AbletonOSCHandler):
             return (json.dumps(payload),)
         self.osc_server.add_handler("/live/kenn/get/display_table", kenn_get_display_table)
 
+        def kenn_get_view_state(params):
+            """Read-only: which Live views are visible and each track's selected device.
+
+            Device focus (song.view.select_device) depends on Live's view
+            state, so a failed focus readback needs this to be diagnosed.
+            """
+            try:
+                app_view = Live.Application.get_application().view
+                views = {}
+                for name in ("Browser", "Arranger", "Session", "Detail", "Detail/Clip", "Detail/DeviceChain"):
+                    try:
+                        views[name] = bool(app_view.is_view_visible(name))
+                    except Exception as exc:
+                        views[name] = "error: %s" % exc
+                selected = self.song.view.selected_track
+                tracks = []
+                for position, track in enumerate(self.song.tracks):
+                    device = track.view.selected_device
+                    tracks.append({"index": position, "name": str(track.name),
+                                   "selected_device": str(device.name) if device is not None else None})
+                payload = {"views": views, "focused_document_view": str(getattr(app_view, "focused_document_view", "")),
+                           "selected_track": str(selected.name) if selected is not None else None,
+                           "tracks": tracks}
+            except Exception as exc:
+                payload = {"error": str(exc)}
+            return (json.dumps(payload),)
+        self.osc_server.add_handler("/live/kenn/get/view_state", kenn_get_view_state)
+
         def song_set_return_track_name(params):
             return_track_index, name = params
             self.song.return_tracks[int(return_track_index)].name = str(name)

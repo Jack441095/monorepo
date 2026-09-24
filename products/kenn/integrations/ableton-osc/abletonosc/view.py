@@ -58,7 +58,12 @@ class ViewHandler(AbletonOSCHandler):
             set_selected_scene((params[1],))
 
         def set_selected_device(params: Optional[Tuple] = ()):
-            device = self.song.tracks[params[0]].devices[params[1]]
+            track = self.song.tracks[params[0]]
+            device = track.devices[params[1]]
+            # With Live's device view (Detail/DeviceChain) hidden, select_device
+            # alone leaves the selection unchanged (Live 12.4.6, 2026-09-24);
+            # selecting the track first makes it take effect either way.
+            self.song.view.selected_track = track
             self.song.view.select_device(device)
             return params[0], params[1]
 
