@@ -4,7 +4,8 @@
 Keeps long test runs off the owner's Mac and gives a clean, reproducible record:
 
 1. ``git archive`` of the commit (products/kenn, shared, Audio_Too and the audio-technology it links to): the box
-   has no GitHub access. The tree is committed into a throwaway local repo, since some tests read ``git HEAD``;
+   has no GitHub access. The tree is committed into a throwaway local repo (on top of an empty base commit), since some tests
+   read ``git HEAD`` and its parent;
 2. KENN's git-ignored runtime data (active knowledge index, notes, embedding model) from the
    main checkout, uploaded only when it changed, so data-dependent tests run instead of skipping;
 3. a Python 3.12 virtual environment under ``/mnt/data/kenn-bakeoff/ci`` built from
@@ -103,7 +104,8 @@ def main() -> int:
     targets = " ".join(TARGETS)
     script = f"""set -e
 cd {run_dir} && rm -rf tree && mkdir tree && tar xzf code.tgz -C tree
-(cd tree && git init -q && git add -A && git -c user.name=box -c user.email=box@localhost commit -qm "{commit}")
+(cd tree && git init -q && export GIT_AUTHOR_NAME=box GIT_AUTHOR_EMAIL=box@localhost GIT_COMMITTER_NAME=box \\
+  GIT_COMMITTER_EMAIL=box@localhost && git commit -q --allow-empty -m base && git add -A && git commit -qm "{commit}")
 PKG=tree/products/kenn/apps/backend/src/kenn
 cp -r {REMOTE}/data/data {REMOTE}/data/Training_Data_Notes $PKG/ && mkdir -p $PKG/artifacts/models && cp -r {REMOTE}/data/artifacts/models/minilm $PKG/artifacts/models/
 if [ "$(cat {REMOTE}/venv/.req 2>/dev/null)" != "{req_digest}" ]; then
