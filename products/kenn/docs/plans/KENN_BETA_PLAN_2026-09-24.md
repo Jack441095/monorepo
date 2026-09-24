@@ -69,6 +69,8 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > data: `kenn/app_entry.py` (`~/Library/Application Support/KENN`, `settings.json`). Checked from an empty environment:
   > healthy, hybrid retrieval, cited answers, UI served. 540 MB uncompressed (scipy, onnxruntime, sklearn, numpy, model);
   > trim later. Still to do: launch-by-double-click test with Live, Remote Script install, first-run check, DMG.
+  > Later the same day: unused packages and test suites pruned (91 MB), DMG 207 MB; every build now runs a smoke test
+  > on the bundle (health, hybrid retrieval, setup status, cited answer, Mix Review) and fails if any check fails.
 - [x] Installer puts AbletonOSC (KENN build, version-stamped) in the user's Live User Library and tells them to select it
       in Live's Control Surface settings
   > 2026-09-24: `kenn/core/live_setup.py` + the app's **Set up KENN** page: finds the User Library from the newest

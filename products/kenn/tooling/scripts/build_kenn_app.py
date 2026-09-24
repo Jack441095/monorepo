@@ -21,10 +21,19 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
+import math
+import os
 import shutil
+import socket
+import struct
 import subprocess
 import tarfile
+import tempfile
+import time
+import urllib.request
+import wave
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -90,6 +99,98 @@ def install_python(resources: Path, runtime: Path) -> Path:
 RUNTIME_SCRIPTS = ("log_setup.py", "repo_python.py", "abletonosc_bundle.py")
 
 
+# Installed but never imported by the app: pip, Hugging Face download tooling (pulled in by
+# tokenizers) and uvicorn's optional speedups (the app serves HTTP with the standard library).
+PRUNE_PACKAGES = ("pip", "huggingface_hub", "hf_xet", "uvloop", "httptools", "watchfiles", "websockets")
+
+
+def prune_python(resources: Path) -> int:
+    """Remove unused packages and test suites from site-packages; returns bytes saved."""
+    site = next((resources / "python" / "lib").glob("python3.*")) / "site-packages"
+    doomed = [site / name for name in PRUNE_PACKAGES if (site / name).is_dir()]
+    doomed += [p for name in PRUNE_PACKAGES for p in site.glob(f"{name}-*.dist-info")]
+    doomed += [p for p in site.rglob("*") if p.is_dir() and p.name in {"tests", "test"}]
+    saved = 0
+    for path in doomed:
+        if path.exists():
+            saved += sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+            shutil.rmtree(path)
+    return saved
+
+
+def _free_port() -> int:
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        return probe.getsockname()[1]
+
+
+def _sine_wav(seconds: float = 2.0, rate: int = 44100) -> bytes:
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as handle:
+        handle.setnchannels(2)
+        handle.setsampwidth(2)
+        handle.setframerate(rate)
+        frames = bytearray()
+        for n in range(int(seconds * rate)):
+            value = int(8000 * math.sin(2 * math.pi * 110 * n / rate))
+            frames += struct.pack("<hh", value, value)
+        handle.writeframes(bytes(frames))
+    return buffer.getvalue()
+
+
+def smoke_test(app: Path) -> dict[str, str]:
+    """Start the bundled KENN with an empty environment and exercise its main paths."""
+    resources = app / "Contents" / "Resources"
+    port = _free_port()
+    with tempfile.TemporaryDirectory(prefix="kenn-app-smoke-") as data:
+        environment = {
+            "HOME": os.environ.get("HOME", "/tmp"), "PATH": "/usr/bin:/bin", "PYTHONNOUSERSITE": "1",
+            "PYTHONPATH": f"{resources}/kenn/apps/backend/src:{resources}/kenn/packages/chat",
+            "KENN_DATA_ROOT": data, "KENN_PORT": str(port),
+        }
+        server = subprocess.Popen(
+            [str(resources / "python" / "bin" / "python3"), str(resources / "kenn/apps/backend/src/kenn/app_entry.py")],
+            env=environment, cwd=data, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+        )
+        base = f"http://127.0.0.1:{port}"
+        try:
+            for _ in range(120):
+                try:
+                    health = json.load(urllib.request.urlopen(f"{base}/api/health", timeout=2))
+                    break
+                except OSError:
+                    if server.poll() is not None:
+                        raise SystemExit("Smoke test: KENN exited during start-up:\n" + server.stderr.read().decode()[-2000:])
+                    time.sleep(1)
+            else:
+                raise SystemExit("Smoke test: KENN did not answer /api/health within 120 s.")
+            mode = health.get("subsystems", {}).get("knowledge_index", {}).get("active_mode")
+            setup = json.load(urllib.request.urlopen(f"{base}/api/setup/status", timeout=10))
+            ask = urllib.request.Request(f"{base}/kenn/api/ask", method="POST", headers={"Content-Type": "application/json"},
+                                         data=json.dumps({"session_id": "smoke", "question": "What does Note Echo do?",
+                                                          "stream": False}).encode())
+            answer = json.load(urllib.request.urlopen(ask, timeout=120))
+            boundary = "kennsmoke"
+            body = (f"--{boundary}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"smoke.wav\"\r\n"
+                    f"Content-Type: audio/wav\r\n\r\n").encode() + _sine_wav() + f"\r\n--{boundary}--\r\n".encode()
+            review_request = urllib.request.Request(f"{base}/api/mix-review", method="POST", data=body,
+                                                    headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
+            review = json.load(urllib.request.urlopen(review_request, timeout=120))
+        finally:
+            server.terminate()
+            server.wait(timeout=30)
+    checks = {
+        "health": bool(health.get("ok")),
+        "hybrid_retrieval": mode == "hybrid",
+        "setup_status": setup.get("schema") == "kenn.setup_status.v1",
+        "cited_answer": bool(answer.get("answer")) and bool(answer.get("sources")),
+        "mix_review": review.get("ok") is True,
+    }
+    if not all(checks.values()):
+        raise SystemExit(f"Smoke test failed: {checks}")
+    return {"smoke_test": "passed: " + ", ".join(checks)}
+
+
 def copy_code(kenn: Path, code_root: Path) -> None:
     for relative in CODE_TREES:
         shutil.copytree(code_root / relative, kenn / relative, ignore=CODE_IGNORE)
@@ -148,8 +249,11 @@ def main() -> int:
     build_launcher(app)
     resources.mkdir(parents=True, exist_ok=True)
     python = install_python(resources, args.runtime)
+    pruned = prune_python(resources)
     copy_code(kenn, args.code_root)
     data = copy_data(kenn, args.data_root)
+    data.update(smoke_test(app))
+    data["pruned_mb"] = str(round(pruned / 1e6, 1))
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=args.code_root, capture_output=True, text=True).stdout.strip()
     size = sum(p.stat().st_size for p in app.rglob("*") if p.is_file())
     manifest = {
