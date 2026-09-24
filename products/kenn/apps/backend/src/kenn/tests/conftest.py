@@ -46,6 +46,9 @@ def isolate_live_shadow_evidence(tmp_path_factory: pytest.TempPathFactory):
     old_path = live_shadow_log.SHADOW_LOG_PATH
     old_env = os.environ.get("KENN_LIVE_LLM_SHADOW_LOG")
     os.environ["KENN_LIVE_LLM_SHADOW_LOG"] = str(path)
+    # Audio analyses in tests stay out of the real on-disk analysis cache too.
+    old_cache = os.environ.get("KENN_ANALYSIS_CACHE_DIR")
+    os.environ["KENN_ANALYSIS_CACHE_DIR"] = str(tmp_path_factory.mktemp("kenn-analysis-cache"))
     live_shadow_log.SHADOW_LOG_PATH = path
     try:
         yield
@@ -55,6 +58,10 @@ def isolate_live_shadow_evidence(tmp_path_factory: pytest.TempPathFactory):
             os.environ.pop("KENN_LIVE_LLM_SHADOW_LOG", None)
         else:
             os.environ["KENN_LIVE_LLM_SHADOW_LOG"] = old_env
+        if old_cache is None:
+            os.environ.pop("KENN_ANALYSIS_CACHE_DIR", None)
+        else:
+            os.environ["KENN_ANALYSIS_CACHE_DIR"] = old_cache
 
 
 def pytest_collection_modifyitems(config, items):

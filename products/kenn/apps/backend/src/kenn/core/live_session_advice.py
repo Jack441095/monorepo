@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import threading
 from collections import OrderedDict
@@ -17,10 +18,46 @@ from kenn.core.audio_analysis import analyze_wav
 _ANALYSIS_CACHE_MAX_ENTRIES = 4
 _ANALYSIS_CACHE: OrderedDict[tuple[str, str], dict[str, Any]] = OrderedDict()
 _ANALYSIS_CACHE_LOCK = threading.RLock()
+# Measured results (never audio) also persist by content hash, so a companion
+# restart does not turn the next audio answer into a multi-second re-analysis.
+_DISK_CACHE_MAX_FILES = 16
+
+
+def _disk_cache_dir() -> Path:
+    configured = os.environ.get("KENN_ANALYSIS_CACHE_DIR", "").strip()
+    return Path(configured) if configured else Path(__file__).resolve().parents[1] / "data" / "analysis_cache"
+
+
+def _disk_cache_path(key: tuple[str, str]) -> Path:
+    digest, suffix = key
+    return _disk_cache_dir() / f"{digest}{suffix or '.bin'}.json"
+
+
+def _read_disk_cache(key: tuple[str, str]) -> dict[str, Any] | None:
+    try:
+        cached = json.loads(_disk_cache_path(key).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return cached if isinstance(cached, dict) and cached.get("ok") else None
+
+
+def _write_disk_cache(key: tuple[str, str], analysis: dict[str, Any]) -> None:
+    try:
+        folder = _disk_cache_dir()
+        folder.mkdir(parents=True, exist_ok=True)
+        path = _disk_cache_path(key)
+        temp = path.with_suffix(".tmp")
+        temp.write_text(json.dumps(analysis), encoding="utf-8")
+        os.replace(temp, path)
+        entries = sorted(folder.glob("*.json"), key=lambda item: item.stat().st_mtime)
+        for stale in entries[:-_DISK_CACHE_MAX_FILES]:
+            stale.unlink(missing_ok=True)
+    except (OSError, TypeError, ValueError):
+        pass  # the cache is an optimisation; an unserialisable result just is not persisted
 
 
 def _analyze_cached(payload: bytes, *, filename: str) -> tuple[dict[str, Any], str, bool]:
-    """Analyze immutable audio once per content hash, with a small memory bound."""
+    """Analyze immutable audio once per content hash (memory, then disk)."""
     digest = hashlib.sha256(payload).hexdigest()
     key = (digest, Path(filename).suffix.casefold())
     with _ANALYSIS_CACHE_LOCK:
@@ -28,6 +65,14 @@ def _analyze_cached(payload: bytes, *, filename: str) -> tuple[dict[str, Any], s
         if cached is not None:
             _ANALYSIS_CACHE.move_to_end(key)
             return deepcopy(cached), digest, True
+    from_disk = _read_disk_cache(key)
+    if from_disk is not None:
+        with _ANALYSIS_CACHE_LOCK:
+            _ANALYSIS_CACHE[key] = deepcopy(from_disk)
+            _ANALYSIS_CACHE.move_to_end(key)
+            while len(_ANALYSIS_CACHE) > _ANALYSIS_CACHE_MAX_ENTRIES:
+                _ANALYSIS_CACHE.popitem(last=False)
+        return from_disk, digest, True
 
     analysis = analyze_wav(
         payload,
@@ -47,6 +92,7 @@ def _analyze_cached(payload: bytes, *, filename: str) -> tuple[dict[str, Any], s
             _ANALYSIS_CACHE.move_to_end(key)
             while len(_ANALYSIS_CACHE) > _ANALYSIS_CACHE_MAX_ENTRIES:
                 _ANALYSIS_CACHE.popitem(last=False)
+        _write_disk_cache(key, analysis)
     return analysis, digest, False
 
 
