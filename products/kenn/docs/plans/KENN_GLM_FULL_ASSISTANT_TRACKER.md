@@ -109,6 +109,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 ## Phase D — Control breadth
 
 - [ ] **D1 Device qualification factory**
+  > Coverage map 2026-09-24 (`KENN_DEVICE_COVERAGE_2026-09-24.md`, page https://claude.ai/artifact/XqhrDvQ8kDmzJwhpuNq2d9, `tooling/scripts/device_coverage.py`): Live 12.4.6 Suite has 78 devices. KENN knows 53 (own note) + 16 (mentioned), sees all 78, inserts 10 audio effects, sets 12 measured parameters on 9 devices. Qualify device by device (capture parameters from Live, measure units, generate per-parameter commands, run `e2e_demo_commands.py`); first wave: EQ Eight, Compressor, Utility, Limiter, Reverb/Hybrid Reverb, Delay/Echo.
   - [ ] Batch sweep → mapping fit → draft `DeviceUnitProfile` + evidence transcript
   - [ ] Owner sign-off queue
   - [ ] 20 profiles · [ ] 40 profiles · [ ] 60 profiles
