@@ -1,0 +1,122 @@
+# KENN private beta: plan from the current state
+
+**Written:** 2026-09-24 · **Owner:** Jack · Tick items in the same commit as the work, with the date and the evidence.
+
+This plan supersedes the beta parts of `KENN_BETA_SPRINT_PLAN_2026-09-06.md`, `KENN_BETA_PLUS_PLAN_2026-09-07.md`,
+`KENN_BETA_ROADMAP.md` and `BETA_SCOPE.md` (whose 1 Sept scope, chat and Mix Review only with no Live control, no longer
+describes KENN). The GLM tracker (`KENN_GLM_FULL_ASSISTANT_TRACKER.md`) stays the log for the wider programme.
+
+## What the beta is
+
+**Who:** 5–10 invited producers on macOS with Ableton Live 12 Suite, supervised (onboarding call, feedback channel).
+Not public.
+
+**The promise** (everything else is off or labelled experimental):
+
+1. **Knows your session.** Tracks, selection, devices, returns and master, change history, with freshness shown.
+2. **Controls Live safely.** Proposes a bounded change, waits for Apply, writes, reads it back, keeps an undoable
+   receipt. Mixer (volume in real dB, pan, mute, solo, arm, sends), device focus, the measured device parameters,
+   inserting the 10 allowlisted audio effects.
+3. **Answers with sources.** Cited answers from KENN's approved notes (74 of Live's 78 devices), and it says when it does
+   not know.
+4. **Listens to a render.** Loudness, true peak, clipping and low-end findings from an exported mix or stem, clearly
+   separated from Live state.
+5. **Never surprises you.** No write without Apply; delete, master level and destructive requests refused; everything
+   undoable.
+
+**Out of the beta:** the AI planner writing to Live (stays in shadow, collecting evidence), AutoMix, audio generation,
+voice, arbitrary plug-in control, silent saves.
+
+## Where KENN is today (measured 2026-09-24)
+
+| Area | State |
+|---|---|
+| Tests | Backend 1,592 passed, 5 skipped |
+| Demo gate | 2 owner runs passed (run 1; today's run pending its 8–12 min timing), plus one agent run; need 10 |
+| Live control | Verified apply → readback → undo on real Live; fader law measured; device focus fixed today |
+| Language | Rule parser 80/124 (64.5%) with 0 wrong plans; typos can slip past refusals ("et the master volume…") |
+| Knowledge | 74/78 devices with an approved note; BM25 index, retrieval fixture recall@4 0.966 |
+| AI planner | Run 4 fine-tune in background shadow; promotion gate (500 comparisons / 14 days) not met |
+| Qualified beta gate | **3/14** (`qualify_internal_beta.py --profile qualified`): see Phase 2 |
+| Install | **Not ready.** The tester guide's `.pkg` does not exist; setup needs this Mac's paths, a terminal and env vars |
+| Known defect | `KENN_Bridge` Remote Script in the User Library fails to load (IndentationError, line 888) at every Live start |
+| Idle wake | First Live read after hours idle returned "offline", then recovered |
+
+## Decisions needed from you (before Phase 1 ends)
+
+- [ ] **Confirm the promise above** as the beta scope (it replaces `BETA_SCOPE.md`).
+- [ ] **Distribution.** Signed and notarized app/installer needs an Apple Developer ID (£79/year, your account). Without it,
+      testers must bypass Gatekeeper by hand. Recommendation: buy it.
+- [ ] **Testers.** Names or a shortlist of 5–10; at least 3 bring their own real projects (needed for the pilot gate).
+- [ ] **Two independent reviewers** for the human-review packet (people who did not write KENN's answers).
+- [ ] **Feedback channel** (BB-3): e.g. a private Discord channel or a form. Recommendation: one channel plus an
+      in-app "send diagnostics" button.
+- [ ] **Diagnostics consent.** What testers' KENN may send back (recommend: receipts and timings only, never audio).
+- [ ] **`Audio_Too` dependency** (BB-1): Mix Review still reads a Thursday-owned branch. Vendor the three qualified
+      detectors into KENN, or drop Mix Review from the beta and keep the new loudness/true-peak path.
+
+## Phase 1: Make it installable (week 1) — biggest gap
+
+The beta cannot start while KENN only runs from this Mac's checkout.
+
+- [ ] Fix or remove the broken `KENN_Bridge` Remote Script so Live starts clean
+- [ ] One companion bundle: KENN backend + UI as a macOS app (`apps/desktop/macos/build_macos_app.sh`) with its own
+      Python runtime, no repo paths, no env vars (DAW control, capture paths and model settings become app settings)
+- [ ] Installer puts AbletonOSC (KENN build, version-stamped) in the user's Live User Library and tells them to select it
+      in Live's Control Surface settings
+- [ ] First-run check inside the app: the read-only preflight (Live connected, script version, knowledge index, audio
+      analysis) with plain-English fixes
+- [ ] Uninstall and update path (update keeps receipts and settings)
+- [ ] Rewrite `docs/BETA_TESTER_GUIDE.md` to match what actually ships (remove the nonexistent `.pkg`, "autonomous"
+      wording and unshipped workflows)
+- [ ] Sign and notarize (after the Developer ID decision); `package_macos_plugins.sh` pattern already exists
+- [ ] **Exit:** a clean macOS user account (or second Mac) goes from download to "Live connected, 8 tracks" on the demo set
+      in under 15 minutes following only the guide
+
+## Phase 2: Reliability and the qualification gate (weeks 1–2, overlaps Phase 1)
+
+- [ ] Idle-wake: retry the first read after long idle before reporting "offline"; test with Live idle 2+ hours
+- [ ] Refusals survive typos: destructive and master-level requests are refused even with a missing letter or odd wording
+      (fuzzy intent check before falling to knowledge answers)
+- [ ] Companion restart keeps the audio-analysis cache warm (persist it) so a restart cannot break an answer
+- [ ] 24-hour soak with Live restarts, companion restarts and sleep/wake (`companion_soak` gate)
+- [ ] Regenerate stale evidence: `automated_suite`, `intelligence` (`--run-suite --run-intelligence`),
+      `planner_bakeoff` (missing input `chat/evals/ableton_deliberative_adversarial.json`), `real_live_assistant`
+      (lifecycle/replay check failing), `artifacts` (five named docs missing)
+- [ ] Refresh the human-review packet against the current index (`human_review` is stale after today's rebuild)
+- [ ] **Exit:** gate shows every engineering gate passing; only human, pilot and distribution gates left
+
+## Phase 3: Fill the capability gaps testers will hit first (weeks 2–3)
+
+- [ ] D1 wave 1 on real Live, same method as the fader law: Compressor (threshold, ratio, attack, release, makeup),
+      EQ Eight (every band's frequency, gain, Q), Utility (gain, width), Limiter, Reverb/Hybrid Reverb, Delay/Echo;
+      commands generated per parameter and run end to end (`e2e_demo_commands.py`)
+- [ ] Rule parser to ≥ 80% of the 124 cases with 0 wrong plans; the owner's review-page test commands all pass
+- [ ] Advice → fix: each audio finding offers one confirmable change and re-measures after Apply
+- [ ] Notes for the last 4 devices (Instrument/MIDI/Audio Effect Rack, Drum Synth) and a small review of the 21 notes
+      approved today
+- [ ] Planner: rebuild the C6 corpus with dB volume labels, train run 7, keep in shadow; revisit promotion when the
+      gate's 500 comparisons / 14 days are met (likely during the beta itself)
+- [ ] **Exit:** every command in the tester guide works on a fresh demo set and on one real project
+
+## Phase 4: Human evidence (weeks 3–4, needs people)
+
+- [ ] Finish demo rehearsals 3–10 (at least one with the recovery drill, one on the projector)
+- [ ] Two reviewers score the refreshed 100-case packet; adjudicate (`human_review` gate)
+- [ ] Real-mix listening set with consent, two reviewers (`real_mix` gate)
+- [ ] Supervised pilot: 10 sessions across 3 real projects with you watching; zero unauthorised writes, false receipts,
+      lost undos or crashes (`supervised_pilot` gate)
+- [ ] **Exit:** `qualify_internal_beta.py --profile qualified --check-live` returns 14/14
+
+## Phase 5: Launch the beta (end of week 4)
+
+- [ ] Known-limitations page and support runbook shipped with the app
+- [ ] Feedback channel live; diagnostics button sends receipts and timings only
+- [ ] Rollback: previous app version and previous knowledge index one click away
+- [ ] Invite the first 3 testers; onboarding call each; widen to 10 after a clean first week
+- [ ] Weekly: triage feedback, re-run the gate, publish a short changelog
+
+## Order of work while you are away or busy
+
+Claude can do without you: Phase 1 (except signing), Phase 2 in full, Phase 3 engineering, evidence regeneration.
+Needs you: the decisions list, signing credentials, rehearsals, reviewers, testers, pilot sessions.
