@@ -149,7 +149,13 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > when both halves are clear ("mute the hats and the snare", "solo the bass and turn it up 2 dB"; e2e apply → verify →
   > exact undo 3/3): **112/124 (90.3%)**, 0 wrong plans. Still asks: device parameters by name, pan without an amount,
   > terse dB without a direction ("kick -3 dB": absolute or relative?).
-- [ ] Advice → fix: each audio finding offers one confirmable change and re-measures after Apply
+- [x] Advice → fix: each audio finding offers one confirmable change and re-measures after Apply
+  > 2026-09-24, owner's call: keep it simple for the beta. Each audio review ends with **one next step to say**
+  > (`core/advice_next_step.py`): "turn the Bass down 1 dB" for heavy low end when exactly one bass/sub track exists,
+  > "turn the Lead Vocal down 3 dB" for vocal clipping (with the export-vs-recording caveat), otherwise a question that
+  > gets a cited answer ("how do I keep my master under -1 dBTP?"). Commands are offered only if they parse to a clean
+  > proposal, so they still go proposal → Apply → readback → Undo; KENN never changes the master. Re-measuring = export
+  > again and ask again. In chat audio advice now; Mix Review's own panel (Vue frontend) not yet.
 - [ ] Notes for the last 4 devices (Instrument/MIDI/Audio Effect Rack, Drum Synth) and a small review of the 21 notes
       approved today
   > 2026-09-24: 3 of 4 — Instrument, MIDI and Audio Effect Rack notes approved (77/78 devices). Drum Synth has no
