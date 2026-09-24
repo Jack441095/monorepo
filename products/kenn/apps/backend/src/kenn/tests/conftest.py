@@ -72,3 +72,13 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if Path(str(item.fspath)).name in LOCAL_INDEX_TEST_MODULES:
             item.add_marker(marker)
+
+
+@pytest.fixture(autouse=True)
+def reset_live_seen_connected():
+    """Each test starts as a fresh process: no offline-read retry (and its sleep) carried over."""
+    from kenn.core import live_action_service
+
+    live_action_service._LIVE_SEEN_CONNECTED = False
+    yield
+    live_action_service._LIVE_SEEN_CONNECTED = False

@@ -334,6 +334,10 @@ def _receipt_supports_undo(receipt: dict[str, Any]) -> bool:
     return action in undoable
 
 
+# Set once any snapshot in this process reads a connected Live (see snapshot()).
+_LIVE_SEEN_CONNECTED = False
+
+
 class LiveActionService(Tier2Tier3ControlMixin):
     def __init__(self, client: AbletonOSCClient | Any = None):
         self.client = client or live_client
@@ -357,11 +361,13 @@ class LiveActionService(Tier2Tier3ControlMixin):
         state = self._read_session_state(include_mixer)
         # Retry only a Live that answered earlier in this process (waking
         # after idle); a Live that was never reached still reports offline at once.
-        if isinstance(state, dict) and state.get("status") == "offline" and getattr(self, "_seen_connected", False):
+        # The flag is process-wide: the server builds a service per request.
+        global _LIVE_SEEN_CONNECTED
+        if isinstance(state, dict) and state.get("status") == "offline" and _LIVE_SEEN_CONNECTED:
             time.sleep(self.SNAPSHOT_RETRY_DELAY_S)
             state = self._read_session_state(include_mixer)
         if isinstance(state, dict) and state.get("status") == "connected":
-            self._seen_connected = True
+            _LIVE_SEEN_CONNECTED = True
         if not isinstance(state, dict) or state.get("status") in {"offline", "dispatched"}:
             try:
                 from kenn.mixing_doctor import get_latest_session_state
