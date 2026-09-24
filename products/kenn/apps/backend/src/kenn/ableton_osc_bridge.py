@@ -120,6 +120,7 @@ READ_ENDPOINTS = (
     "/live/kenn/get/device_tree",
     "/live/kenn/get/device_parameters",
     "/live/kenn/get/display_table",
+    "/live/kenn/get/view_state",
     "/live/view/get/selected_device",
     "/live/view/get/selected_scene",
     "/live/track/get/meters",
@@ -1384,6 +1385,10 @@ class AbletonOSCClient:
         """Live's display string at evenly spaced values of one parameter (read-only, str_for_value)."""
         return self._kenn_json("/live/kenn/get/display_table",
                                [str(kind), int(index), str(target), int(samples), float(start), float(stop)])
+
+    def get_view_state(self) -> dict[str, Any]:
+        """Visible Live views and each track's selected device (read-only diagnostic)."""
+        return self._kenn_json("/live/kenn/get/view_state", [])
 
     def get_remote_script_version(self) -> dict[str, Any]:
         """Deploy stamp of the running AbletonOSC (see tooling/scripts/deploy_abletonosc.py)."""
