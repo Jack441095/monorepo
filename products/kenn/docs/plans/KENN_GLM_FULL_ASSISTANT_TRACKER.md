@@ -89,8 +89,11 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   > Base per C2: qwen3.5:4b (owner's choice). **Run 1 done 2026-09-23** (`KENN_C6_LORA_PILOT_2026-09-23.md`). mlx-lm could not train it on the 16 GB M3, so training moved to GPU 0 on the box (17 min). Fine-tune + compact prompt: 68.5% correct vs 65.3% stock + full prompt; **clarify 30/30** (was 19/30); **wrong plans accepted 5** (was 15); but over-cautious on some clear commands (act 55/94 vs 62/94). Not ticked: run 2 and the Mac latency check are next.
   - [x] Corpus: leak guard covers all evaluation holdouts; compact targets; drafted clarify seeds (owner review pending); compact prompt
   - [x] Training pipeline: GPU box (standalone trainer, SHA-verified weights), full-checkpoint merge, GGUF, Ollama import
-  - [ ] Run 2: clarify share ~35%, more explicit-command and two-part variety; re-score on the 124 cases
-  - [ ] Mac latency of the Q4_K_M fine-tune with the compact prompt
+  - [x] Run 2: clarify share ~35%, more explicit-command and two-part variety; re-score on the 124 cases
+    > Run 2 (36% clarify): 54.8%, over-asked; found the dB-volume contract gap (fixed). Run 3 (19 drafted clear-command seeds, mixer state in snapshots): **72.6%**, clarify 29/30, curated 16/24, best so far, but 13 wrong plans accepted (play/stop learned as mute). See the C6 evidence addenda.
+  - [ ] Run 4: drafted seeds for transport, rename, sends, device parameters, EQ, two-part requests; per-action balancing; gate on wrong plans accepted
+  - [x] Mac latency of the Q4_K_M fine-tune with the compact prompt
+    > Run 1 on the M3 (Live idle): 90% on the first 40 cases vs 75% stock; median 3.6 s per command for both, since this hybrid model re-processes ~2 s of prompt per command whatever its length.
 
 ## Phase D — Control breadth
 
