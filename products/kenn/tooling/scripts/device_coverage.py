@@ -2,7 +2,8 @@
 """Build KENN's Ableton Live device coverage map from the installed Live and KENN's code.
 
 For every device Live ships (read from the Live app's own device folders):
-  knows   - KENN's knowledge notes cover it (a dedicated note, or mentions)
+  knows   - KENN's knowledge notes cover it (a dedicated note, a draft awaiting owner
+            review, or mentions)
   sees    - KENN can read it in a set (generic parameter reads work for any device)
   inserts - KENN may add a new instance (DEVICE_INSERTION_ALLOWLIST), and whether
             the instant rule parser recognises its name
@@ -77,8 +78,15 @@ def knowledge(device: str, ableton_notes: dict[str, str], device_slugs: set[str]
             break
     pattern = re.compile(rf"(?<![\w-]){re.escape(device)}(?![\w-])")
     mentions = sorted(name for name, text in ableton_notes.items() if pattern.search(text))
-    level = "note" if covering else ("mentioned" if mentions else "none")
+    approved = [n for n in covering if not _is_draft(ableton_notes[n])]
+    level = "note" if approved else "draft" if covering else ("mentioned" if mentions else "none")
     return {"level": level, "notes": sorted(covering), "mentions": len(mentions)}
+
+
+def _is_draft(text: str) -> bool:
+    """A note awaiting owner review (Status: Draft...); KENN's index leaves these out."""
+    status = next((line.split(":", 1)[1].strip() for line in text.splitlines() if line.lower().startswith("status:")), "")
+    return status.casefold().startswith("draft")
 
 
 def main() -> int:
@@ -116,6 +124,7 @@ def main() -> int:
         "live_version": live_version(args.live_app), "devices": len(rows),
         "by_category": {c: len(n) for c, n in devices.items()},
         "knows_note": sum(r["knows"]["level"] == "note" for r in rows),
+        "knows_draft_note": sum(r["knows"]["level"] == "draft" for r in rows),
         "knows_mentioned": sum(r["knows"]["level"] == "mentioned" for r in rows),
         "knows_none": sum(r["knows"]["level"] == "none" for r in rows),
         "sees": len(rows), "inserts": sum(r["inserts"] for r in rows),
@@ -128,7 +137,7 @@ def main() -> int:
 
     lines = [f"| Device | Category | Knows | Sees | Inserts | Sets in real units |", "|---|---|---|---|---|---|"]
     for r in sorted(rows, key=lambda r: (CATEGORIES.index(r["category"]), r["device"])):
-        knows = {"note": "own note", "mentioned": f"mentioned in {r['knows']['mentions']} notes",
+        knows = {"note": "own note", "draft": "own note (draft, owner review)", "mentioned": f"mentioned in {r['knows']['mentions']} notes",
                  "none": "—"}[r["knows"]["level"]]
         inserts = ("yes" + ("" if r["insert_by_name_in_rule_parser"] else " (AI planner only)")) if r["inserts"] else "—"
         lines.append(f"| {r['device']} | {r['category']} | {knows} | yes | {inserts} | {', '.join(r['sets']) or '—'} |")

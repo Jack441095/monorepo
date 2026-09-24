@@ -16,6 +16,12 @@ Shareable page: https://claude.ai/artifact/XqhrDvQ8kDmzJwhpuNq2d9 (private; shar
 | **Inserts** | can add a new one | 10, all audio effects. The rule parser recognises 8 by name; Roar and Multiband Dynamics are AI-planner only |
 | **Sets** | changes a setting in real units | 9 devices, 12 measured parameters |
 
+## Update, later on 2026-09-24: 21 draft device notes
+
+Drafted on the box's GPU 1 notes model (, ) from each device's section of the Live 12 Reference Manual, one note per device, marked **Status: Draft (owner review pending)**: the 7 uncovered devices that have manual sections (Align Delay, Grain Delay, Envelope MIDI, MIDI Monitor, MPE Control, Note Echo, Shaper MIDI) and the 14 mention-only devices (Operator, Simpler, Sampler, EQ Eight, Electric, Tension, Amp, Auto Pan-Tremolo, Envelope Follower, LFO, Overdrive, Shaper, Expression Control, Random). The EQ Eight note also carries Live's own parameter layout and ranges, read from Live 12.4.6 (read-only) and appended verbatim, not model-written. Spot checks against the manual found the notes faithful but thin, with the odd loose name (Align Delay's "Delay slider" is "Delay Left"); one doubtful EQ Eight "mistake" was removed. KENN's retrieval index leaves Draft notes out, so none of this reaches answers until the owner changes a note's status to Approved and the index is rebuilt and promoted.
+
+Now: **53 own note, 21 draft note, 2 mentioned (Instrument Rack, MIDI Effect Rack), 2 none (Drum Synth, which has no section in this manual PDF; Audio Effect Rack).** The shareable page above still shows the morning figures.
+
 ## Gaps
 
 - **Knowledge.** 9 devices are not covered at all: Drum Synth, Align Delay, Audio Effect Rack, Grain Delay, Envelope MIDI, MIDI Monitor, MPE Control, Note Echo, Shaper MIDI. 16 are only mentioned in passing, including Operator, Simpler, Sampler, EQ Eight, Electric and Tension.
@@ -34,21 +40,21 @@ Shareable page: https://claude.ai/artifact/XqhrDvQ8kDmzJwhpuNq2d9 (private; shar
 | Drum Rack | Instruments | own note | yes | — | — |
 | Drum Sampler | Instruments | own note | yes | — | — |
 | Drum Synth | Instruments | — | yes | — | — |
-| Electric | Instruments | mentioned in 1 notes | yes | — | — |
+| Electric | Instruments | own note (draft, owner review) | yes | — | — |
 | External Instrument | Instruments | own note | yes | — | — |
 | Impulse | Instruments | own note | yes | — | — |
 | Instrument Rack | Instruments | mentioned in 3 notes | yes | — | — |
 | Meld | Instruments | own note | yes | — | — |
-| Operator | Instruments | mentioned in 3 notes | yes | — | — |
-| Sampler | Instruments | mentioned in 4 notes | yes | — | — |
-| Simpler | Instruments | mentioned in 2 notes | yes | — | — |
-| Tension | Instruments | mentioned in 1 notes | yes | — | — |
+| Operator | Instruments | own note (draft, owner review) | yes | — | — |
+| Sampler | Instruments | own note (draft, owner review) | yes | — | — |
+| Simpler | Instruments | own note (draft, owner review) | yes | — | — |
+| Tension | Instruments | own note (draft, owner review) | yes | — | — |
 | Wavetable | Instruments | own note | yes | — | — |
-| Align Delay | Audio Effects | — | yes | — | — |
-| Amp | Audio Effects | mentioned in 2 notes | yes | — | — |
+| Align Delay | Audio Effects | own note (draft, owner review) | yes | — | — |
+| Amp | Audio Effects | own note (draft, owner review) | yes | — | — |
 | Audio Effect Rack | Audio Effects | — | yes | — | — |
 | Auto Filter | Audio Effects | own note | yes | yes | Resonance (%), Frequency (Hz) |
-| Auto Pan-Tremolo | Audio Effects | mentioned in 1 notes | yes | — | — |
+| Auto Pan-Tremolo | Audio Effects | own note (draft, owner review) | yes | — | — |
 | Auto Shift | Audio Effects | own note | yes | — | — |
 | Beat Repeat | Audio Effects | own note | yes | — | — |
 | Cabinet | Audio Effects | own note | yes | — | — |
@@ -59,22 +65,22 @@ Shareable page: https://claude.ai/artifact/XqhrDvQ8kDmzJwhpuNq2d9 (private; shar
 | Delay | Audio Effects | own note | yes | — | — |
 | Drum Buss | Audio Effects | own note | yes | yes | Drive (%) |
 | Dynamic Tube | Audio Effects | own note | yes | — | — |
-| EQ Eight | Audio Effects | mentioned in 7 notes | yes | yes | band gain (dB, on an existing tuned band) |
+| EQ Eight | Audio Effects | own note (draft, owner review) | yes | yes | band gain (dB, on an existing tuned band) |
 | EQ Three | Audio Effects | own note | yes | — | — |
 | Echo | Audio Effects | own note | yes | yes | Dry Wet (%) |
-| Envelope Follower | Audio Effects | mentioned in 2 notes | yes | — | — |
+| Envelope Follower | Audio Effects | own note (draft, owner review) | yes | — | — |
 | Erosion | Audio Effects | own note | yes | — | — |
 | External Audio Effect | Audio Effects | own note | yes | — | — |
 | Filter Delay | Audio Effects | own note | yes | — | — |
 | Gate | Audio Effects | own note | yes | — | — |
 | Glue Compressor | Audio Effects | own note | yes | yes | Attack (ms), Ratio (ratio) |
-| Grain Delay | Audio Effects | — | yes | — | — |
+| Grain Delay | Audio Effects | own note (draft, owner review) | yes | — | — |
 | Hybrid Reverb | Audio Effects | own note | yes | yes | Dry/Wet (%) |
-| LFO | Audio Effects | mentioned in 15 notes | yes | — | — |
+| LFO | Audio Effects | own note (draft, owner review) | yes | — | — |
 | Limiter | Audio Effects | own note | yes | — | — |
 | Looper | Audio Effects | own note | yes | — | — |
 | Multiband Dynamics | Audio Effects | own note | yes | yes (AI planner only) | — |
-| Overdrive | Audio Effects | mentioned in 2 notes | yes | — | — |
+| Overdrive | Audio Effects | own note (draft, owner review) | yes | — | — |
 | Pedal | Audio Effects | own note | yes | — | — |
 | Phaser-Flanger | Audio Effects | own note | yes | — | — |
 | Redux | Audio Effects | own note | yes | — | — |
@@ -82,7 +88,7 @@ Shareable page: https://claude.ai/artifact/XqhrDvQ8kDmzJwhpuNq2d9 (private; shar
 | Reverb | Audio Effects | own note | yes | — | — |
 | Roar | Audio Effects | own note | yes | yes (AI planner only) | Drive (dB), Dry/Wet (%) |
 | Saturator | Audio Effects | own note | yes | yes | Drive (dB) |
-| Shaper | Audio Effects | mentioned in 2 notes | yes | — | — |
+| Shaper | Audio Effects | own note (draft, owner review) | yes | — | — |
 | Shifter | Audio Effects | own note | yes | — | — |
 | Spectral Resonator | Audio Effects | own note | yes | — | — |
 | Spectral Time | Audio Effects | own note | yes | — | — |
@@ -94,15 +100,15 @@ Shareable page: https://claude.ai/artifact/XqhrDvQ8kDmzJwhpuNq2d9 (private; shar
 | Arpeggiator | MIDI Effects | own note | yes | — | — |
 | CC Control | MIDI Effects | own note | yes | — | — |
 | Chord | MIDI Effects | own note | yes | — | — |
-| Envelope MIDI | MIDI Effects | — | yes | — | — |
-| Expression Control | MIDI Effects | mentioned in 3 notes | yes | — | — |
+| Envelope MIDI | MIDI Effects | own note (draft, owner review) | yes | — | — |
+| Expression Control | MIDI Effects | own note (draft, owner review) | yes | — | — |
 | MIDI Effect Rack | MIDI Effects | mentioned in 1 notes | yes | — | — |
-| MIDI Monitor | MIDI Effects | — | yes | — | — |
-| MPE Control | MIDI Effects | — | yes | — | — |
-| Note Echo | MIDI Effects | — | yes | — | — |
+| MIDI Monitor | MIDI Effects | own note (draft, owner review) | yes | — | — |
+| MPE Control | MIDI Effects | own note (draft, owner review) | yes | — | — |
+| Note Echo | MIDI Effects | own note (draft, owner review) | yes | — | — |
 | Note Length | MIDI Effects | own note | yes | — | — |
 | Pitch | MIDI Effects | own note | yes | — | — |
-| Random | MIDI Effects | mentioned in 7 notes | yes | — | — |
+| Random | MIDI Effects | own note (draft, owner review) | yes | — | — |
 | Scale | MIDI Effects | own note | yes | — | — |
-| Shaper MIDI | MIDI Effects | — | yes | — | — |
+| Shaper MIDI | MIDI Effects | own note (draft, owner review) | yes | — | — |
 | Velocity | MIDI Effects | own note | yes | — | — |
