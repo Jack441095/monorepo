@@ -10,8 +10,8 @@
           "inspect_live"
         ],
         "schema": "kenn.session_context.v1",
-        "session_id": "live-assistant-qualification-2026-09-24b",
-        "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+        "session_id": "live-assistant-qualification-2026-09-24c",
+        "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
         "track_count": 8,
         "transport_status": "connected"
       },
@@ -34,14 +34,14 @@
           "rationale": "To ensure the target track is correctly identified and to gather necessary information about its current configuration before making any changes.",
           "reason": "",
           "schema": "kenn.assistant_next_step.v1",
-          "session_id": "live-assistant-qualification-2026-09-24b",
+          "session_id": "live-assistant-qualification-2026-09-24c",
           "step_id": "step-1",
-          "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
+          "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
           "task_status": "active"
         },
         "ok": true,
         "planner_source": "model_sketch",
-        "planning_latency_ms": 9638.757,
+        "planning_latency_ms": 9184.262,
         "schema": "kenn.planned_assistant_task.v1",
         "task": {
           "completed_step_ids": [],
@@ -61,23 +61,23 @@
             "profile": "sha256:1a094c79e6431ac6c83098f5e1e00d0a94aedb58ffde0d5763d7de49ba2854de",
             "schema": "kenn.assistant_context_binding.v1",
             "services": "sha256:1486babaa17aafd8dbcbdff764925124a6ba9fe0fef317c38f49c6d1dc904ba9",
-            "session_id": "live-assistant-qualification-2026-09-24b"
+            "session_id": "live-assistant-qualification-2026-09-24c"
           },
           "context_rebindings": [],
-          "created_at": "2026-09-24T12:00:52.506Z",
+          "created_at": "2026-09-24T12:05:06.146Z",
           "current_step_id": "step-1",
           "evidence": [],
           "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
           "plan": {
             "assumptions": [],
-            "created_at": "2026-09-24T12:00:52.505Z",
+            "created_at": "2026-09-24T12:05:06.145Z",
             "execution_authorized": false,
             "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
             "model_id": "Qwen3-4B-input-bound-v6",
             "model_provider": "transformers",
             "schema": "kenn.deliberative_plan.v1",
-            "session_id": "live-assistant-qualification-2026-09-24b",
-            "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+            "session_id": "live-assistant-qualification-2026-09-24c",
+            "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
             "status": "ready",
             "steps": [
               {
@@ -114,10 +114,10 @@
             "unknowns": []
           },
           "schema": "kenn.assistant_task.v1",
-          "session_id": "live-assistant-qualification-2026-09-24b",
+          "session_id": "live-assistant-qualification-2026-09-24c",
           "status": "active",
-          "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
-          "updated_at": "2026-09-24T12:00:52.506Z"
+          "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
+          "updated_at": "2026-09-24T12:05:06.146Z"
         }
       },
       "stage": "planned"
@@ -139,9 +139,9 @@
           "rationale": "Based on the inspection, a volume adjustment can be proposed as a reversible change to the specified track.",
           "reason": "",
           "schema": "kenn.assistant_next_step.v1",
-          "session_id": "live-assistant-qualification-2026-09-24b",
+          "session_id": "live-assistant-qualification-2026-09-24c",
           "step_id": "step-2",
-          "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
+          "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
           "task_status": "active"
         },
         "ok": true,
@@ -165,31 +165,31 @@
             "profile": "sha256:1a094c79e6431ac6c83098f5e1e00d0a94aedb58ffde0d5763d7de49ba2854de",
             "schema": "kenn.assistant_context_binding.v1",
             "services": "sha256:1486babaa17aafd8dbcbdff764925124a6ba9fe0fef317c38f49c6d1dc904ba9",
-            "session_id": "live-assistant-qualification-2026-09-24b"
+            "session_id": "live-assistant-qualification-2026-09-24c"
           },
           "context_rebindings": [],
-          "created_at": "2026-09-24T12:00:52.506Z",
+          "created_at": "2026-09-24T12:05:06.146Z",
           "current_step_id": "step-2",
           "evidence": [
             {
               "evidence_schema": "kenn.session_context.v1",
-              "recorded_at": "2026-09-24T12:00:53.176Z",
+              "recorded_at": "2026-09-24T12:05:06.853Z",
               "schema": "kenn.assistant_step_evidence.v1",
-              "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+              "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
               "step_id": "step-1"
             }
           ],
           "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
           "plan": {
             "assumptions": [],
-            "created_at": "2026-09-24T12:00:52.505Z",
+            "created_at": "2026-09-24T12:05:06.145Z",
             "execution_authorized": false,
             "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
             "model_id": "Qwen3-4B-input-bound-v6",
             "model_provider": "transformers",
             "schema": "kenn.deliberative_plan.v1",
-            "session_id": "live-assistant-qualification-2026-09-24b",
-            "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+            "session_id": "live-assistant-qualification-2026-09-24c",
+            "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
             "status": "ready",
             "steps": [
               {
@@ -226,10 +226,10 @@
             "unknowns": []
           },
           "schema": "kenn.assistant_task.v1",
-          "session_id": "live-assistant-qualification-2026-09-24b",
+          "session_id": "live-assistant-qualification-2026-09-24c",
           "status": "active",
-          "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
-          "updated_at": "2026-09-24T12:00:53.176Z"
+          "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
+          "updated_at": "2026-09-24T12:05:06.853Z"
         }
       },
       "stage": "observed"
@@ -253,9 +253,9 @@
             "rationale": "Based on the inspection, a volume adjustment can be proposed as a reversible change to the specified track.",
             "reason": "",
             "schema": "kenn.assistant_next_step.v1",
-            "session_id": "live-assistant-qualification-2026-09-24b",
+            "session_id": "live-assistant-qualification-2026-09-24c",
             "step_id": "step-2",
-            "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
+            "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
             "task_status": "waiting_for_confirmation"
           },
           "ok": true,
@@ -279,25 +279,25 @@
               "profile": "sha256:1a094c79e6431ac6c83098f5e1e00d0a94aedb58ffde0d5763d7de49ba2854de",
               "schema": "kenn.assistant_context_binding.v1",
               "services": "sha256:1486babaa17aafd8dbcbdff764925124a6ba9fe0fef317c38f49c6d1dc904ba9",
-              "session_id": "live-assistant-qualification-2026-09-24b"
+              "session_id": "live-assistant-qualification-2026-09-24c"
             },
             "context_rebindings": [],
-            "created_at": "2026-09-24T12:00:52.506Z",
+            "created_at": "2026-09-24T12:05:06.146Z",
             "current_step_id": "step-2",
             "evidence": [
               {
                 "evidence_schema": "kenn.session_context.v1",
-                "recorded_at": "2026-09-24T12:00:53.176Z",
+                "recorded_at": "2026-09-24T12:05:06.853Z",
                 "schema": "kenn.assistant_step_evidence.v1",
-                "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+                "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
                 "step_id": "step-1"
               },
               {
                 "action": "set_volume",
-                "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+                "action_id": "action-7a55d20448154df083af000a13078b8d",
                 "evidence_schema": "kenn.ableton_action_proposal.v1",
                 "progress_only": true,
-                "recorded_at": "2026-09-24T12:00:54.469Z",
+                "recorded_at": "2026-09-24T12:05:08.349Z",
                 "schema": "kenn.assistant_step_evidence.v1",
                 "status": "confirmation_required",
                 "step_id": "step-2"
@@ -306,14 +306,14 @@
             "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
             "plan": {
               "assumptions": [],
-              "created_at": "2026-09-24T12:00:52.505Z",
+              "created_at": "2026-09-24T12:05:06.145Z",
               "execution_authorized": false,
               "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
               "model_id": "Qwen3-4B-input-bound-v6",
               "model_provider": "transformers",
               "schema": "kenn.deliberative_plan.v1",
-              "session_id": "live-assistant-qualification-2026-09-24b",
-              "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+              "session_id": "live-assistant-qualification-2026-09-24c",
+              "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
               "status": "ready",
               "steps": [
                 {
@@ -350,10 +350,10 @@
               "unknowns": []
             },
             "schema": "kenn.assistant_task.v1",
-            "session_id": "live-assistant-qualification-2026-09-24b",
+            "session_id": "live-assistant-qualification-2026-09-24c",
             "status": "waiting_for_confirmation",
-            "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
-            "updated_at": "2026-09-24T12:00:54.469Z"
+            "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
+            "updated_at": "2026-09-24T12:05:08.349Z"
           }
         },
         "changed": false,
@@ -369,7 +369,9 @@
           "track": "Hi-Hats"
         },
         "latency": {
-          "budget_exceeded": [],
+          "budget_exceeded": [
+            "snapshot"
+          ],
           "budget_ms": {
             "execution": 100.0,
             "parse": 50.0,
@@ -378,19 +380,19 @@
             "total": 650.0
           },
           "execution_ms": 0.0,
-          "parse_ms": 6.63,
-          "snapshot_ms": 197.6,
-          "total_ms": 209.82
+          "parse_ms": 1.74,
+          "snapshot_ms": 397.3,
+          "total_ms": 400.97
         },
         "lifecycle": {
-          "elapsed_ms": 209.5,
-          "observed_at": 1790251253.3889222,
+          "elapsed_ms": 400.4,
+          "observed_at": 1790251507.256642,
           "snapshot_age_ms": 0.0,
-          "snapshot_elapsed_ms": 197.6,
+          "snapshot_elapsed_ms": 397.3,
           "snapshot_kind": "mixer",
-          "snapshot_observed_at": 1790251253.381566,
+          "snapshot_observed_at": 1790251507.253772,
           "stage": "proposal_ready",
-          "started_at": 1790251253.179382,
+          "started_at": 1790251506.856282,
           "target": {
             "device_name": "",
             "parameter": "volume",
@@ -404,13 +406,13 @@
         "planner": "deterministic_snapshot_boundary",
         "proposal": {
           "action": "set_volume",
-          "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+          "action_id": "action-7a55d20448154df083af000a13078b8d",
           "after": 0.8,
           "before": 0.49999988079071045,
           "confidence": 1.0,
           "confirmation_meta": {
-            "expires_at": 1790251553,
-            "nonce": "b1b16df8",
+            "expires_at": 1790251807,
+            "nonce": "df8284f6",
             "service_id": "ableton_action",
             "text": "set_volume|2|Hi-Hats|0.49999988079071045|0.8|d8a877e24f547650b00114d033c70a0ffe227ae7a752b363019c2de37d1b09aa"
           },
@@ -431,11 +433,11 @@
             "response_address": "/live/track/get/num_devices",
             "response_id": null,
             "response_ok": true,
-            "round_trip_ms": 130.197,
+            "round_trip_ms": 100.326,
             "transport": "abletonosc"
           },
           "target": "ableton_track",
-          "timestamp": 1790251253.388833,
+          "timestamp": 1790251507.256444,
           "track_index": 2,
           "track_name": "Hi-Hats",
           "unit": "normalized",
@@ -447,7 +449,7 @@
         "proposal_kind": "track",
         "route": "ableton_command",
         "schema": "kenn.ableton_command.v1",
-        "session_id": "live-assistant-qualification-2026-09-24b",
+        "session_id": "live-assistant-qualification-2026-09-24c",
         "status": "confirmation_required"
       },
       "stage": "proposal"
@@ -469,9 +471,9 @@
             "rationale": "",
             "reason": "Task is completed.",
             "schema": "kenn.assistant_next_step.v1",
-            "session_id": "live-assistant-qualification-2026-09-24b",
+            "session_id": "live-assistant-qualification-2026-09-24c",
             "step_id": "",
-            "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
+            "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
             "task_status": "completed"
           },
           "ok": true,
@@ -496,35 +498,35 @@
               "profile": "sha256:1a094c79e6431ac6c83098f5e1e00d0a94aedb58ffde0d5763d7de49ba2854de",
               "schema": "kenn.assistant_context_binding.v1",
               "services": "sha256:1486babaa17aafd8dbcbdff764925124a6ba9fe0fef317c38f49c6d1dc904ba9",
-              "session_id": "live-assistant-qualification-2026-09-24b"
+              "session_id": "live-assistant-qualification-2026-09-24c"
             },
             "context_rebindings": [],
-            "created_at": "2026-09-24T12:00:52.506Z",
+            "created_at": "2026-09-24T12:05:06.146Z",
             "current_step_id": "",
             "evidence": [
               {
                 "evidence_schema": "kenn.session_context.v1",
-                "recorded_at": "2026-09-24T12:00:53.176Z",
+                "recorded_at": "2026-09-24T12:05:06.853Z",
                 "schema": "kenn.assistant_step_evidence.v1",
-                "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+                "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
                 "step_id": "step-1"
               },
               {
                 "action": "set_volume",
-                "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+                "action_id": "action-7a55d20448154df083af000a13078b8d",
                 "evidence_schema": "kenn.ableton_action_proposal.v1",
                 "progress_only": true,
-                "recorded_at": "2026-09-24T12:00:54.469Z",
+                "recorded_at": "2026-09-24T12:05:08.349Z",
                 "schema": "kenn.assistant_step_evidence.v1",
                 "status": "confirmation_required",
                 "step_id": "step-2"
               },
               {
                 "action": "set_volume",
-                "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+                "action_id": "action-7a55d20448154df083af000a13078b8d",
                 "evidence_schema": "kenn.ableton_action_receipt.v1",
-                "receipt_id": "receipt-c6527a2b8bed45b9b21e298129c5bc98",
-                "recorded_at": "2026-09-24T12:00:55.863Z",
+                "receipt_id": "receipt-8ce8d63f22f4400ab8fdeeab474cc5f2",
+                "recorded_at": "2026-09-24T12:05:09.750Z",
                 "schema": "kenn.assistant_step_evidence.v1",
                 "status": "applied",
                 "step_id": "step-2",
@@ -534,14 +536,14 @@
             "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
             "plan": {
               "assumptions": [],
-              "created_at": "2026-09-24T12:00:52.505Z",
+              "created_at": "2026-09-24T12:05:06.145Z",
               "execution_authorized": false,
               "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
               "model_id": "Qwen3-4B-input-bound-v6",
               "model_provider": "transformers",
               "schema": "kenn.deliberative_plan.v1",
-              "session_id": "live-assistant-qualification-2026-09-24b",
-              "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+              "session_id": "live-assistant-qualification-2026-09-24c",
+              "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
               "status": "ready",
               "steps": [
                 {
@@ -578,10 +580,10 @@
               "unknowns": []
             },
             "schema": "kenn.assistant_task.v1",
-            "session_id": "live-assistant-qualification-2026-09-24b",
+            "session_id": "live-assistant-qualification-2026-09-24c",
             "status": "completed",
-            "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
-            "updated_at": "2026-09-24T12:00:55.863Z"
+            "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
+            "updated_at": "2026-09-24T12:05:09.750Z"
           }
         },
         "changed": true,
@@ -591,10 +593,10 @@
           "ok": true,
           "receipt": {
             "action": "set_volume",
-            "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+            "action_id": "action-7a55d20448154df083af000a13078b8d",
             "before": 0.49999988079071045,
-            "correlation_id": "corr-bac169953c0649b1b76d6c695436cc0d",
-            "idempotency_key": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+            "correlation_id": "corr-fb5fdd9608274a2db121fd998dfa2166",
+            "idempotency_key": "action-7a55d20448154df083af000a13078b8d",
             "readback": 0.800000011920929,
             "readback_exchange": {
               "address": "batch",
@@ -602,18 +604,18 @@
               "response_address": "/live/track/get/num_devices",
               "response_id": null,
               "response_ok": true,
-              "round_trip_ms": 90.197,
+              "round_trip_ms": 112.619,
               "transport": "abletonosc"
             },
-            "receipt_id": "receipt-c6527a2b8bed45b9b21e298129c5bc98",
+            "receipt_id": "receipt-8ce8d63f22f4400ab8fdeeab474cc5f2",
             "requested": 0.8,
             "retry_safe": "safe",
             "schema": "kenn.ableton_action_receipt.v1",
             "stage_timings_ms": {
-              "readback": 201.565,
-              "snapshot": 174.782,
-              "total": 376.446,
-              "write": 0.099
+              "readback": 200.539,
+              "snapshot": 190.972,
+              "total": 391.668,
+              "write": 0.157
             },
             "status": "applied",
             "target": {
@@ -622,17 +624,17 @@
               "track_index": 2,
               "track_name": "Hi-Hats"
             },
-            "timestamp": 1790251254.859931,
+            "timestamp": 1790251508.754673,
             "undo": {
               "proposal": {
                 "action": "set_volume",
-                "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+                "action_id": "action-7a55d20448154df083af000a13078b8d",
                 "after": 0.49999988079071045,
                 "before": 0.8,
                 "confidence": 1.0,
                 "confirmation_meta": {
-                  "expires_at": 1790251553,
-                  "nonce": "b1b16df8",
+                  "expires_at": 1790251807,
+                  "nonce": "df8284f6",
                   "service_id": "ableton_action",
                   "text": "set_volume|2|Hi-Hats|0.49999988079071045|0.8|d8a877e24f547650b00114d033c70a0ffe227ae7a752b363019c2de37d1b09aa"
                 },
@@ -653,11 +655,11 @@
                   "response_address": "/live/track/get/num_devices",
                   "response_id": null,
                   "response_ok": true,
-                  "round_trip_ms": 130.197,
+                  "round_trip_ms": 100.326,
                   "transport": "abletonosc"
                 },
                 "target": "ableton_track",
-                "timestamp": 1790251253.388833,
+                "timestamp": 1790251507.256444,
                 "track_index": 2,
                 "track_name": "Hi-Hats",
                 "unit": "normalized",
@@ -671,11 +673,11 @@
             "write_acknowledgement": "confirmed",
             "write_exchange": {
               "address": "/live/track/set/volume",
-              "request_id": 8420,
+              "request_id": 19250,
               "response_address": null,
               "response_id": null,
               "response_ok": false,
-              "round_trip_ms": 0.056,
+              "round_trip_ms": 0.075,
               "transport": "abletonosc"
             }
           }
@@ -691,26 +693,26 @@
             "snapshot": 200.0,
             "total": 650.0
           },
-          "execution_ms": 376.6,
+          "execution_ms": 391.8,
           "snapshot_ms": 0.0,
-          "total_ms": 376.64
+          "total_ms": 391.87
         },
         "lifecycle": {
-          "elapsed_ms": 376.6,
-          "execution_elapsed_ms": 376.6,
-          "observed_at": 1790251254.8599832,
+          "elapsed_ms": 391.8,
+          "execution_elapsed_ms": 391.8,
+          "observed_at": 1790251508.754747,
           "stage": "verified",
-          "started_at": 1790251254.483403,
+          "started_at": 1790251508.362923,
           "verification": "readback_verified"
         },
         "ok": true,
         "planner": "deterministic_snapshot_boundary",
         "receipt": {
           "action": "set_volume",
-          "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+          "action_id": "action-7a55d20448154df083af000a13078b8d",
           "before": 0.49999988079071045,
-          "correlation_id": "corr-bac169953c0649b1b76d6c695436cc0d",
-          "idempotency_key": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+          "correlation_id": "corr-fb5fdd9608274a2db121fd998dfa2166",
+          "idempotency_key": "action-7a55d20448154df083af000a13078b8d",
           "readback": 0.800000011920929,
           "readback_exchange": {
             "address": "batch",
@@ -718,18 +720,18 @@
             "response_address": "/live/track/get/num_devices",
             "response_id": null,
             "response_ok": true,
-            "round_trip_ms": 90.197,
+            "round_trip_ms": 112.619,
             "transport": "abletonosc"
           },
-          "receipt_id": "receipt-c6527a2b8bed45b9b21e298129c5bc98",
+          "receipt_id": "receipt-8ce8d63f22f4400ab8fdeeab474cc5f2",
           "requested": 0.8,
           "retry_safe": "safe",
           "schema": "kenn.ableton_action_receipt.v1",
           "stage_timings_ms": {
-            "readback": 201.565,
-            "snapshot": 174.782,
-            "total": 376.446,
-            "write": 0.099
+            "readback": 200.539,
+            "snapshot": 190.972,
+            "total": 391.668,
+            "write": 0.157
           },
           "status": "applied",
           "target": {
@@ -738,17 +740,17 @@
             "track_index": 2,
             "track_name": "Hi-Hats"
           },
-          "timestamp": 1790251254.859931,
+          "timestamp": 1790251508.754673,
           "undo": {
             "proposal": {
               "action": "set_volume",
-              "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+              "action_id": "action-7a55d20448154df083af000a13078b8d",
               "after": 0.49999988079071045,
               "before": 0.8,
               "confidence": 1.0,
               "confirmation_meta": {
-                "expires_at": 1790251553,
-                "nonce": "b1b16df8",
+                "expires_at": 1790251807,
+                "nonce": "df8284f6",
                 "service_id": "ableton_action",
                 "text": "set_volume|2|Hi-Hats|0.49999988079071045|0.8|d8a877e24f547650b00114d033c70a0ffe227ae7a752b363019c2de37d1b09aa"
               },
@@ -769,11 +771,11 @@
                 "response_address": "/live/track/get/num_devices",
                 "response_id": null,
                 "response_ok": true,
-                "round_trip_ms": 130.197,
+                "round_trip_ms": 100.326,
                 "transport": "abletonosc"
               },
               "target": "ableton_track",
-              "timestamp": 1790251253.388833,
+              "timestamp": 1790251507.256444,
               "track_index": 2,
               "track_name": "Hi-Hats",
               "unit": "normalized",
@@ -787,17 +789,17 @@
           "write_acknowledgement": "confirmed",
           "write_exchange": {
             "address": "/live/track/set/volume",
-            "request_id": 8420,
+            "request_id": 19250,
             "response_address": null,
             "response_id": null,
             "response_ok": false,
-            "round_trip_ms": 0.056,
+            "round_trip_ms": 0.075,
             "transport": "abletonosc"
           }
         },
         "route": "ableton_command",
         "schema": "kenn.ableton_command.v1",
-        "session_id": "live-assistant-qualification-2026-09-24b",
+        "session_id": "live-assistant-qualification-2026-09-24c",
         "status": "applied"
       },
       "stage": "applied"
@@ -810,7 +812,7 @@
         "confirmation_required": false,
         "execution": {
           "error": "This action request was already executed or is already in progress.",
-          "idempotency_key": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+          "idempotency_key": "action-7a55d20448154df083af000a13078b8d",
           "ok": false
         },
         "http_status": 409,
@@ -823,23 +825,23 @@
             "snapshot": 200.0,
             "total": 650.0
           },
-          "execution_ms": 0.1,
+          "execution_ms": 0.0,
           "snapshot_ms": 0.0,
-          "total_ms": 0.1
+          "total_ms": 0.08
         },
         "lifecycle": {
           "elapsed_ms": 0.1,
-          "execution_elapsed_ms": 0.1,
-          "observed_at": 1790251255.866849,
+          "execution_elapsed_ms": 0.0,
+          "observed_at": 1790251509.753269,
           "stage": "failed",
-          "started_at": 1790251255.866768,
+          "started_at": 1790251509.753213,
           "verification": "not_verified"
         },
         "ok": false,
         "planner": "deterministic_snapshot_boundary",
         "route": "ableton_command",
         "schema": "kenn.ableton_command.v1",
-        "session_id": "live-assistant-qualification-2026-09-24b",
+        "session_id": "live-assistant-qualification-2026-09-24c",
         "status": "failed"
       },
       "stage": "replay"
@@ -851,13 +853,13 @@
         "ok": true,
         "proposal": {
           "action": "set_volume",
-          "action_id": "action-051994e091ba49c9a8bf1b5533dd7a1c",
+          "action_id": "action-23ebecb116304305a1df7d7342267937",
           "after": 0.49999988079071045,
           "before": 0.800000011920929,
           "confidence": 1.0,
           "confirmation_meta": {
-            "expires_at": 1790251556,
-            "nonce": "7508d5f1",
+            "expires_at": 1790251810,
+            "nonce": "584b22cd",
             "service_id": "ableton_action",
             "text": "set_volume|2|Hi-Hats|0.800000011920929|0.49999988079071045|dec7591233f0e270d6e56d2273347f8e49b4cba790d5c8dcf6f7959eab32e825"
           },
@@ -878,11 +880,11 @@
             "response_address": "/live/track/get/num_devices",
             "response_id": null,
             "response_ok": true,
-            "round_trip_ms": 105.061,
+            "round_trip_ms": 114.191,
             "transport": "abletonosc"
           },
           "target": "ableton_track",
-          "timestamp": 1790251256.46504,
+          "timestamp": 1790251510.155244,
           "track_index": 2,
           "track_name": "Hi-Hats",
           "unit": "normalized",
@@ -901,10 +903,10 @@
         "ok": true,
         "receipt": {
           "action": "set_volume",
-          "action_id": "action-051994e091ba49c9a8bf1b5533dd7a1c",
+          "action_id": "action-23ebecb116304305a1df7d7342267937",
           "before": 0.800000011920929,
-          "correlation_id": "corr-ceee38dc21e346efa60ad5749a181fa8",
-          "idempotency_key": "action-051994e091ba49c9a8bf1b5533dd7a1c",
+          "correlation_id": "corr-2857692015c24877ae09abeaa25d36d6",
+          "idempotency_key": "action-23ebecb116304305a1df7d7342267937",
           "readback": 0.49999988079071045,
           "readback_exchange": {
             "address": "batch",
@@ -912,18 +914,18 @@
             "response_address": "/live/track/get/num_devices",
             "response_id": null,
             "response_ok": true,
-            "round_trip_ms": 111.467,
+            "round_trip_ms": 111.14,
             "transport": "abletonosc"
           },
-          "receipt_id": "receipt-9d42309b5f3c450893f3c802bf4c5a46",
+          "receipt_id": "receipt-361e0825f0334496a1883497997b0e8d",
           "requested": 0.49999988079071045,
           "retry_safe": "safe",
           "schema": "kenn.ableton_action_receipt.v1",
           "stage_timings_ms": {
-            "readback": 201.009,
-            "snapshot": 295.426,
-            "total": 496.537,
-            "write": 0.102
+            "readback": 204.081,
+            "snapshot": 191.169,
+            "total": 395.331,
+            "write": 0.08
           },
           "status": "applied",
           "target": {
@@ -932,17 +934,17 @@
             "track_index": 2,
             "track_name": "Hi-Hats"
           },
-          "timestamp": 1790251256.964352,
+          "timestamp": 1790251510.552802,
           "undo": {
             "proposal": {
               "action": "set_volume",
-              "action_id": "action-051994e091ba49c9a8bf1b5533dd7a1c",
+              "action_id": "action-23ebecb116304305a1df7d7342267937",
               "after": 0.800000011920929,
               "before": 0.49999988079071045,
               "confidence": 1.0,
               "confirmation_meta": {
-                "expires_at": 1790251556,
-                "nonce": "7508d5f1",
+                "expires_at": 1790251810,
+                "nonce": "584b22cd",
                 "service_id": "ableton_action",
                 "text": "set_volume|2|Hi-Hats|0.800000011920929|0.49999988079071045|dec7591233f0e270d6e56d2273347f8e49b4cba790d5c8dcf6f7959eab32e825"
               },
@@ -963,11 +965,11 @@
                 "response_address": "/live/track/get/num_devices",
                 "response_id": null,
                 "response_ok": true,
-                "round_trip_ms": 105.061,
+                "round_trip_ms": 114.191,
                 "transport": "abletonosc"
               },
               "target": "ableton_track",
-              "timestamp": 1790251256.46504,
+              "timestamp": 1790251510.155244,
               "track_index": 2,
               "track_name": "Hi-Hats",
               "unit": "normalized",
@@ -981,11 +983,11 @@
           "write_acknowledgement": "confirmed",
           "write_exchange": {
             "address": "/live/track/set/volume",
-            "request_id": 8994,
+            "request_id": 19742,
             "response_address": null,
             "response_id": null,
             "response_ok": false,
-            "round_trip_ms": 0.059,
+            "round_trip_ms": 0.056,
             "transport": "abletonosc"
           }
         },
@@ -1001,8 +1003,8 @@
           "inspect_live"
         ],
         "schema": "kenn.session_context.v1",
-        "session_id": "live-assistant-qualification-2026-09-24b",
-        "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+        "session_id": "live-assistant-qualification-2026-09-24c",
+        "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
         "track_count": 8,
         "transport_status": "connected"
       },
@@ -1010,22 +1012,22 @@
     }
   ],
   "evidence_kind": "real_live",
-  "final_snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
-  "initial_snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+  "final_snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
+  "initial_snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
   "limitations": [
     "This qualifies one supervised reversible assistant action on a disposable set.",
     "It does not authorize autonomous or destructive operation."
   ],
   "plan": {
     "assumptions": [],
-    "created_at": "2026-09-24T12:00:52.505Z",
+    "created_at": "2026-09-24T12:05:06.145Z",
     "execution_authorized": false,
     "goal": "Inspect track 3 in the selected disposable set, then prepare the requested reversible volume adjustment",
     "model_id": "Qwen3-4B-input-bound-v6",
     "model_provider": "transformers",
     "schema": "kenn.deliberative_plan.v1",
-    "session_id": "live-assistant-qualification-2026-09-24b",
-    "snapshot_fingerprint": "sha256:7c29cba10d5608633d47942caa6425e0e139e374fda65018a20c613b8acdc914",
+    "session_id": "live-assistant-qualification-2026-09-24c",
+    "snapshot_fingerprint": "sha256:6a9ae1b6d9daf09e34ed17cdd93487a58f0c8179315ce9c15b9d1db17ae48bdd",
     "status": "ready",
     "steps": [
       {
@@ -1067,13 +1069,13 @@
   "planner_transport_sha256": "03fad368346e8ccd2435f5ace542d9dddea2552cfd960533650d9b51f4addbab",
   "proposal": {
     "action": "set_volume",
-    "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+    "action_id": "action-7a55d20448154df083af000a13078b8d",
     "after": 0.8,
     "before": 0.49999988079071045,
     "confidence": 1.0,
     "confirmation_meta": {
-      "expires_at": 1790251553,
-      "nonce": "b1b16df8",
+      "expires_at": 1790251807,
+      "nonce": "df8284f6",
       "service_id": "ableton_action",
       "text": "set_volume|2|Hi-Hats|0.49999988079071045|0.8|d8a877e24f547650b00114d033c70a0ffe227ae7a752b363019c2de37d1b09aa"
     },
@@ -1094,11 +1096,11 @@
       "response_address": "/live/track/get/num_devices",
       "response_id": null,
       "response_ok": true,
-      "round_trip_ms": 130.197,
+      "round_trip_ms": 100.326,
       "transport": "abletonosc"
     },
     "target": "ableton_track",
-    "timestamp": 1790251253.388833,
+    "timestamp": 1790251507.256444,
     "track_index": 2,
     "track_name": "Hi-Hats",
     "unit": "normalized",
@@ -1111,16 +1113,16 @@
   "restored_exactly": true,
   "runner_sha256": "1a6a0b060914f6e98613e73c90b3a25f0a17ce3029792f1ab7f64b8df1176449",
   "schema": "kenn.real_live_assistant_task_qualification.v1",
-  "session_id": "live-assistant-qualification-2026-09-24b",
-  "source_git_commit": "4c15561ccf65cd2a9838da8532c7900d98d0746e",
+  "session_id": "live-assistant-qualification-2026-09-24c",
+  "source_git_commit": "ca7b446c707c87c785c3d13836a0294e4ddf05bc",
   "status": "passed",
-  "task_id": "task-be56b1f738ae41ccac0c27e2448d85df",
+  "task_id": "task-7cac3248b0b2481881fd9d3d2a62fa3e",
   "undo_receipt": {
     "action": "set_volume",
-    "action_id": "action-051994e091ba49c9a8bf1b5533dd7a1c",
+    "action_id": "action-23ebecb116304305a1df7d7342267937",
     "before": 0.800000011920929,
-    "correlation_id": "corr-ceee38dc21e346efa60ad5749a181fa8",
-    "idempotency_key": "action-051994e091ba49c9a8bf1b5533dd7a1c",
+    "correlation_id": "corr-2857692015c24877ae09abeaa25d36d6",
+    "idempotency_key": "action-23ebecb116304305a1df7d7342267937",
     "readback": 0.49999988079071045,
     "readback_exchange": {
       "address": "batch",
@@ -1128,18 +1130,18 @@
       "response_address": "/live/track/get/num_devices",
       "response_id": null,
       "response_ok": true,
-      "round_trip_ms": 111.467,
+      "round_trip_ms": 111.14,
       "transport": "abletonosc"
     },
-    "receipt_id": "receipt-9d42309b5f3c450893f3c802bf4c5a46",
+    "receipt_id": "receipt-361e0825f0334496a1883497997b0e8d",
     "requested": 0.49999988079071045,
     "retry_safe": "safe",
     "schema": "kenn.ableton_action_receipt.v1",
     "stage_timings_ms": {
-      "readback": 201.009,
-      "snapshot": 295.426,
-      "total": 496.537,
-      "write": 0.102
+      "readback": 204.081,
+      "snapshot": 191.169,
+      "total": 395.331,
+      "write": 0.08
     },
     "status": "applied",
     "target": {
@@ -1148,17 +1150,17 @@
       "track_index": 2,
       "track_name": "Hi-Hats"
     },
-    "timestamp": 1790251256.964352,
+    "timestamp": 1790251510.552802,
     "undo": {
       "proposal": {
         "action": "set_volume",
-        "action_id": "action-051994e091ba49c9a8bf1b5533dd7a1c",
+        "action_id": "action-23ebecb116304305a1df7d7342267937",
         "after": 0.800000011920929,
         "before": 0.49999988079071045,
         "confidence": 1.0,
         "confirmation_meta": {
-          "expires_at": 1790251556,
-          "nonce": "7508d5f1",
+          "expires_at": 1790251810,
+          "nonce": "584b22cd",
           "service_id": "ableton_action",
           "text": "set_volume|2|Hi-Hats|0.800000011920929|0.49999988079071045|dec7591233f0e270d6e56d2273347f8e49b4cba790d5c8dcf6f7959eab32e825"
         },
@@ -1179,11 +1181,11 @@
           "response_address": "/live/track/get/num_devices",
           "response_id": null,
           "response_ok": true,
-          "round_trip_ms": 105.061,
+          "round_trip_ms": 114.191,
           "transport": "abletonosc"
         },
         "target": "ableton_track",
-        "timestamp": 1790251256.46504,
+        "timestamp": 1790251510.155244,
         "track_index": 2,
         "track_name": "Hi-Hats",
         "unit": "normalized",
@@ -1197,20 +1199,20 @@
     "write_acknowledgement": "confirmed",
     "write_exchange": {
       "address": "/live/track/set/volume",
-      "request_id": 8994,
+      "request_id": 19742,
       "response_address": null,
       "response_id": null,
       "response_ok": false,
-      "round_trip_ms": 0.059,
+      "round_trip_ms": 0.056,
       "transport": "abletonosc"
     }
   },
   "write_receipt": {
     "action": "set_volume",
-    "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+    "action_id": "action-7a55d20448154df083af000a13078b8d",
     "before": 0.49999988079071045,
-    "correlation_id": "corr-bac169953c0649b1b76d6c695436cc0d",
-    "idempotency_key": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+    "correlation_id": "corr-fb5fdd9608274a2db121fd998dfa2166",
+    "idempotency_key": "action-7a55d20448154df083af000a13078b8d",
     "readback": 0.800000011920929,
     "readback_exchange": {
       "address": "batch",
@@ -1218,18 +1220,18 @@
       "response_address": "/live/track/get/num_devices",
       "response_id": null,
       "response_ok": true,
-      "round_trip_ms": 90.197,
+      "round_trip_ms": 112.619,
       "transport": "abletonosc"
     },
-    "receipt_id": "receipt-c6527a2b8bed45b9b21e298129c5bc98",
+    "receipt_id": "receipt-8ce8d63f22f4400ab8fdeeab474cc5f2",
     "requested": 0.8,
     "retry_safe": "safe",
     "schema": "kenn.ableton_action_receipt.v1",
     "stage_timings_ms": {
-      "readback": 201.565,
-      "snapshot": 174.782,
-      "total": 376.446,
-      "write": 0.099
+      "readback": 200.539,
+      "snapshot": 190.972,
+      "total": 391.668,
+      "write": 0.157
     },
     "status": "applied",
     "target": {
@@ -1238,17 +1240,17 @@
       "track_index": 2,
       "track_name": "Hi-Hats"
     },
-    "timestamp": 1790251254.859931,
+    "timestamp": 1790251508.754673,
     "undo": {
       "proposal": {
         "action": "set_volume",
-        "action_id": "action-2c1a3cce48fa473f9060ea29f1229ee7",
+        "action_id": "action-7a55d20448154df083af000a13078b8d",
         "after": 0.49999988079071045,
         "before": 0.8,
         "confidence": 1.0,
         "confirmation_meta": {
-          "expires_at": 1790251553,
-          "nonce": "b1b16df8",
+          "expires_at": 1790251807,
+          "nonce": "df8284f6",
           "service_id": "ableton_action",
           "text": "set_volume|2|Hi-Hats|0.49999988079071045|0.8|d8a877e24f547650b00114d033c70a0ffe227ae7a752b363019c2de37d1b09aa"
         },
@@ -1269,11 +1271,11 @@
           "response_address": "/live/track/get/num_devices",
           "response_id": null,
           "response_ok": true,
-          "round_trip_ms": 130.197,
+          "round_trip_ms": 100.326,
           "transport": "abletonosc"
         },
         "target": "ableton_track",
-        "timestamp": 1790251253.388833,
+        "timestamp": 1790251507.256444,
         "track_index": 2,
         "track_name": "Hi-Hats",
         "unit": "normalized",
@@ -1287,11 +1289,11 @@
     "write_acknowledgement": "confirmed",
     "write_exchange": {
       "address": "/live/track/set/volume",
-      "request_id": 8420,
+      "request_id": 19250,
       "response_address": null,
       "response_id": null,
       "response_ok": false,
-      "round_trip_ms": 0.056,
+      "round_trip_ms": 0.075,
       "transport": "abletonosc"
     }
   }

@@ -7,7 +7,7 @@
     "python3 tooling/scripts/evaluate_arrangement_intelligence.py"
   ],
   "details": "Hard cases 15/15; hybrid recall@4 0.9655; corpus hashes match; session-grounded advice 6/6; assistant recovery 8/8 with 7/7 safety cases; arrangement intelligence 4/4.",
-  "generated_at": "2026-09-24T11:58:15.027965+00:00",
+  "generated_at": "2026-09-24T12:04:36.927441+00:00",
   "passed": true,
   "schema": "kenn.intelligence_qualification.v1",
   "source_sha256": "f6c3a108d3e94519eee8f8c3bc4f34bfec8539cae41eb827049d76a894578fd8"
