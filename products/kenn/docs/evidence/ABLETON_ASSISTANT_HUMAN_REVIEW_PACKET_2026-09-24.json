@@ -8650,7 +8650,7 @@
   ],
   "engine": "KENN/apps/backend/src/kenn (repository-owned, read-only evaluation path)",
   "evidence_kind": "human_review_packet",
-  "generated_at": "2026-09-24T11:58:06.675768+00:00",
+  "generated_at": "2026-09-24T12:03:10.065766+00:00",
   "human_review": "pending",
   "independent_reviewers_required": 2,
   "instructions": [
@@ -8679,7 +8679,7 @@
     },
     "generator_sha256": "23234da239d1124afbb479d720506e42078f6071da4d78da2671366fab3ac2df",
     "questions_sha256": "8f219e2215bdd9376483237105931307a48dd3631dd55fe270eef6414d449a5f",
-    "source_revision": "e628af9dd07ecbdc8892ad585eeecd7c23f0aff3"
+    "source_revision": "aa7c190820b0862efe2fd27e3811fbbb022d94d2"
   },
   "release_thresholds": {
     "critical_criteria": [
