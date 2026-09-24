@@ -8,7 +8,10 @@ from scripts.build_kenn_command_corpus import build_rows, scenario_snapshots
 from scripts.build_kenn_command_training import (
     _plan, assert_no_holdout_overlap, evaluation_queries, normalize_query, plan_target,
 )
-from scripts.drafted_command_seeds import DRAFTED_ACTION_SEEDS, DRAFTED_CLARIFY_SEEDS, SOURCE_KIND, drafted_records
+from scripts.drafted_command_seeds import (
+    DRAFTED_ACTION_SEEDS, DRAFTED_CLARIFY_SEEDS, DRAFTED_GLOBAL_SEEDS, DRAFTED_RECIPE_SEEDS, DRAFTED_TRACK_SEEDS,
+    SOURCE_KIND, drafted_records,
+)
 from scripts.train_kenn_command_lora_mlx import split_rows
 from kenn.core.live_command import validate_llm_plan
 
@@ -30,14 +33,15 @@ def test_targets_leave_out_nulls_and_the_schema_constant() -> None:
 def test_drafted_seeds_fill_scenario_names_validate_and_stay_labelled() -> None:
     for snapshot in scenario_snapshots():
         rows = drafted_records(snapshot, _plan)
-        assert len(rows) == len(DRAFTED_CLARIFY_SEEDS) + len(DRAFTED_ACTION_SEEDS)
+        assert len(rows) == (len(DRAFTED_CLARIFY_SEEDS) + len(DRAFTED_ACTION_SEEDS) + len(DRAFTED_TRACK_SEEDS)
+                             + len(DRAFTED_GLOBAL_SEEDS) + len(DRAFTED_RECIPE_SEEDS))
         assert all("{" not in row["query"] for row in rows)
         assert all(row["source_kind"] == SOURCE_KIND for row in rows)
         assert all(validate_llm_plan(row["label"], snapshot)["ok"] for row in rows)
 
 
 def test_corpus_with_drafted_seeds_is_leak_free_and_at_least_a_third_clarify() -> None:
-    rows = build_rows(variants=8, scenarios=4, include_drafted=True)
+    rows = build_rows(variants=8, scenarios=4, include_drafted=True, clarify_variants=10)
     assert_no_holdout_overlap(rows)
     clarify = sum(row["label"]["action"] == "clarify" for row in rows)
     assert clarify * 3 >= len(rows)
@@ -85,3 +89,14 @@ def test_drafted_action_seeds_keep_their_wording_and_dB_volumes_convert() -> Non
     checked = validate_llm_plan(relative["label"], snapshot)
     assert checked["ok"] and checked["plan"]["unit"] == "normalized"
     assert abs(checked["plan"]["value"] - 0.55 * 10 ** (3 / 20)) < 1e-6
+
+
+def test_cap_per_action_spreads_across_seeds_and_exempts_clarify() -> None:
+    from scripts.build_kenn_command_corpus import cap_per_action
+
+    rows = ([{"label": {"action": "set_mute"}, "source_record_id": f"m{seed}", "n": n} for seed in (1, 2) for n in range(10)]
+            + [{"label": {"action": "clarify"}, "source_record_id": "c", "n": n} for n in range(30)])
+    capped = cap_per_action(rows, 6)
+    mutes = [row for row in capped if row["label"]["action"] == "set_mute"]
+    assert len(mutes) == 6 and {row["source_record_id"] for row in mutes} == {"m1", "m2"}
+    assert sum(row["label"]["action"] == "clarify" for row in capped) == 30

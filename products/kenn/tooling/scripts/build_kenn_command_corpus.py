@@ -304,6 +304,31 @@ def _scenario_seed(seed: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, 
     return variant
 
 
+def cap_per_action(rows: list[dict[str, Any]], cap: int) -> list[dict[str, Any]]:
+    """Keep at most ``cap`` rows per action (clarify exempt), round-robin across seeds.
+
+    One over-represented action teaches the model a shortcut: in run 3, 224
+    mute examples against few transport ones taught "stop" as mute.
+    """
+    by_action: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    for row in rows:
+        by_action.setdefault(row["label"]["action"], {}).setdefault(row["source_record_id"], []).append(row)
+    kept: set[int] = set()
+    for action, seeds in by_action.items():
+        groups = [list(group) for group in seeds.values()]
+        total = sum(len(group) for group in groups)
+        if action == "clarify" or total <= cap:
+            kept.update(id(row) for group in groups for row in group)
+            continue
+        taken = 0
+        while taken < cap:
+            for group in groups:
+                if group and taken < cap:
+                    kept.add(id(group.pop(0)))
+                    taken += 1
+    return [row for row in rows if id(row) in kept]
+
+
 def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = False,
                prompt: str = "full", clarify_variants: int | None = None) -> list[dict[str, Any]]:
     from build_kenn_command_training import _plan, evaluation_queries, normalize_query, plan_target, records
@@ -360,6 +385,8 @@ def main() -> int:
     parser.add_argument("--scenarios", type=int, default=1, help="Distinct synthetic track-name snapshots to include (1-4)")
     parser.add_argument("--include-drafted", action="store_true",
                         help="add the drafted clarify seeds (drafted_command_seeds.py; owner review pending)")
+    parser.add_argument("--max-per-action", type=int, default=0,
+                        help="cap rows per action (clarify exempt), spread evenly across seeds; 0 = no cap")
     parser.add_argument("--clarify-variants", type=int, default=None,
                         help="variants per clarify seed (default: --variants); lower it to reduce the clarify share")
     parser.add_argument("--prompt", choices=("full", "compact"), default="full",
@@ -368,6 +395,8 @@ def main() -> int:
     args = parser.parse_args()
     rows = build_rows(variants=args.variants, scenarios=args.scenarios, include_drafted=args.include_drafted,
                       prompt=args.prompt, clarify_variants=args.clarify_variants)
+    if args.max_per_action:
+        rows = cap_per_action(rows, args.max_per_action)
     from build_kenn_command_training import assert_no_holdout_overlap
 
     assert_no_holdout_overlap(rows)
@@ -383,6 +412,7 @@ def main() -> int:
         "drafted_seeds_included": args.include_drafted,
         "system_prompt": args.prompt,
         "clarify_variants_per_seed": args.clarify_variants or args.variants,
+        "max_per_action": args.max_per_action or None,
         "output": str(output),
         "holdout_protection": "passed",
         "evidence_kind": "synthetic_training_data",
