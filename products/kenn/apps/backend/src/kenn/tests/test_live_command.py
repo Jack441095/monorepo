@@ -2402,10 +2402,12 @@ def test_llm_device_focus_plan_requires_exact_device_identity() -> None:
 
 def test_llm_planner_receives_target_device_capabilities_and_exact_profile_is_enforced() -> None:
     fake = FakeLive()
+    # Evidence is attached for device requests only (a device or parameter
+    # in the parsed intent, or device words in the request).
     enriched = live_command_module._llm_planner_snapshot(
         _service(fake),
         fake.state,
-        {"track": {"index": 2, "name": "Vocal"}},
+        {"track": {"index": 2, "name": "Vocal"}, "query": "Set the Vocal compressor threshold to -20 dB"},
     )
 
     entries = enriched["planner_capabilities"]["entries"]

@@ -368,12 +368,13 @@ def _production_snapshot(query: str, label: dict[str, Any], snapshot: dict[str, 
     from kenn.core.live_intent import parse_request
 
     base = {k: v for k, v in snapshot.items() if k != "planner_capabilities"}
-    target = (parse_request(query, base).get("track") or {}).get("index")
-    if target is None:
-        target = label.get("track_index")
-    if target is None:
-        return base
-    return _llm_planner_snapshot(_EvidenceService(base, real, synthetic), base, {"track": {"index": target}})
+    intent = parse_request(query, base)
+    if (intent.get("track") or {}).get("index") is None:
+        if label.get("track_index") is None:
+            return base
+        intent = {**intent, "track": {"index": label.get("track_index")}}
+    # The gateway's own rule decides whether this request gets parameter evidence.
+    return _llm_planner_snapshot(_EvidenceService(base, real, synthetic), base, intent)
 
 
 def cap_per_action(rows: list[dict[str, Any]], cap: int) -> list[dict[str, Any]]:

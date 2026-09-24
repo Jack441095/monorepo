@@ -819,6 +819,28 @@ def _extract_json_object(content: str) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
+_DEVICE_REQUEST_WORDS = re.compile(
+    r"\b(?:device|devices|plugin|plug-in|effect|fx chain|chain|rack|compressor|comp|glue|eq|equali[sz]er|"
+    r"reverb|delay|echo|utility|limiter|saturator|filter|threshold|ratio|attack|release|knee|makeup|"
+    r"gain|band|\d+\s*[ab]\b|hz|khz|frequency|freq|q|width|dry/?wet|wet|drive|output|parameter|param)\b",
+    re.IGNORECASE,
+)
+
+
+def _needs_parameter_evidence(deterministic_intent: dict[str, Any], track: dict[str, Any]) -> bool:
+    """Whether a request is about a device or its settings, so parameter evidence helps."""
+    if not isinstance(deterministic_intent, dict):
+        return False
+    if deterministic_intent.get("device") or deterministic_intent.get("parameter"):
+        return True
+    query = str(deterministic_intent.get("query") or "")
+    if _DEVICE_REQUEST_WORDS.search(query):
+        return True
+    lowered = query.casefold()
+    return any(str(device.get("name", "")).casefold() in lowered
+               for device in track.get("devices") or [] if isinstance(device, dict) and device.get("name"))
+
+
 def _llm_planner_snapshot(
     service: LiveActionService,
     snapshot: dict[str, Any],
@@ -842,6 +864,10 @@ def _llm_planner_snapshot(
     tracks = [item for item in snapshot.get("tracks", []) if isinstance(item, dict)]
     track = next((item for item in tracks if int(item.get("index", -1)) == track_index), None)
     if track is None or not hasattr(service.client, "get_device_parameters"):
+        return snapshot
+    if not _needs_parameter_evidence(deterministic_intent, track):
+        # A track's full parameter lists can be ~5,000 tokens (EQ Eight has
+        # 84 parameters); "mute the bass" should not carry them.
         return snapshot
     planner = {
         "schema": "kenn.ableton_planner_capabilities.v1",
