@@ -86,7 +86,7 @@ def install_python(resources: Path, runtime: Path) -> Path:
 
 
 # Helper modules the server imports from tooling/scripts at runtime (server.py puts that folder on sys.path).
-RUNTIME_SCRIPTS = ("log_setup.py", "repo_python.py")
+RUNTIME_SCRIPTS = ("log_setup.py", "repo_python.py", "abletonosc_bundle.py")
 
 
 def copy_code(kenn: Path, code_root: Path) -> None:

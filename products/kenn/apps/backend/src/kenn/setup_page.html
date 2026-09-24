@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set up KENN</title>
+<style>
+  :root { --bg: #f6f5f2; --panel: #ffffff; --text: #1d1c1a; --muted: #6b6760; --line: #e3e0da;
+          --ok: #1f7a4d; --todo: #a35a00; --accent: #2d4bd6; --accent-text: #ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141412; --panel: #1d1c1a; --text: #efece6; --muted: #a39e94; --line: #34322e;
+            --ok: #5fcf96; --todo: #f0a950; --accent: #7b93ff; --accent-text: #0e1020; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+  main { max-width: 620px; margin: 0 auto; padding: 48px 20px; }
+  h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  p.lead { color: var(--muted); margin: 0 0 28px; }
+  ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  li { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px;
+       display: grid; grid-template-columns: 28px 1fr; gap: 4px 12px; }
+  .mark { font-size: 18px; line-height: 24px; grid-row: span 2; }
+  .ok .mark { color: var(--ok); } .todo .mark { color: var(--todo); }
+  .title { font-weight: 600; }
+  .fix, .detail { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+  .actions { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  button { font: inherit; border-radius: 8px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--line);
+           background: var(--panel); color: var(--text); }
+  button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button[hidden] { display: none; }
+  #message { color: var(--muted); font-size: 14px; min-height: 1.5em; margin-top: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Set up KENN</h1>
+  <p class="lead">KENN talks to Ableton Live through a small Remote Script. Three checks, then you're ready.</p>
+  <ol id="checks" aria-live="polite"></ol>
+  <div class="actions">
+    <button id="install" class="primary" hidden>Install KENN's AbletonOSC</button>
+    <button id="recheck">Check again</button>
+    <button id="continue" class="primary" hidden>Open KENN</button>
+  </div>
+  <div id="message" role="status"></div>
+</main>
+<script>
+  const TITLES = {
+    live_installed: "Ableton Live 12 is installed",
+    remote_script: "KENN's AbletonOSC is in Live's User Library",
+    live_connected: "Live is connected to KENN",
+  };
+  const $ = (id) => document.getElementById(id);
+
+  function render(status) {
+    const list = $("checks");
+    list.replaceChildren();
+    for (const check of status.checks) {
+      const item = document.createElement("li");
+      item.className = check.ok ? "ok" : "todo";
+      const mark = document.createElement("span");
+      mark.className = "mark";
+      mark.textContent = check.ok ? "✓" : "○";
+      mark.setAttribute("aria-label", check.ok ? "Done" : "To do");
+      const title = document.createElement("span");
+      title.className = "title";
+      title.textContent = TITLES[check.id] || check.id;
+      const note = document.createElement("span");
+      note.className = check.ok ? "detail" : "fix";
+      note.textContent = check.ok ? check.detail : check.fix;
+      item.append(mark, title, note);
+      list.append(item);
+    }
+    const script = status.checks.find((check) => check.id === "remote_script");
+    $("install").hidden = !script || script.ok;
+    $("continue").hidden = !status.ready;
+  }
+
+  let firstCheck = true;
+  async function refresh() {
+    try {
+      const response = await fetch("/api/setup/status");
+      const status = await response.json();
+      if (firstCheck && status.ready) { window.location.replace("/"); return; }  // nothing to set up
+      firstCheck = false;
+      render(status);
+    } catch (error) {
+      $("message").textContent = "KENN is still starting. Checking again in a moment…";
+      setTimeout(refresh, 2000);
+    }
+  }
+
+  $("recheck").addEventListener("click", () => { $("message").textContent = ""; refresh(); });
+  $("continue").addEventListener("click", () => { window.location.href = "/"; });
+  $("install").addEventListener("click", async () => {
+    $("install").disabled = true;
+    $("message").textContent = "Installing…";
+    try {
+      const response = await fetch("/api/setup/install-remote-script", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: true }),
+      });
+      const result = await response.json();
+      $("message").textContent = result.ok ? `Installed. ${result.next_step}` : result.error;
+    } catch (error) {
+      $("message").textContent = "The install did not complete. Check again, or restart KENN.";
+    }
+    $("install").disabled = false;
+    refresh();
+  });
+
+  refresh();
+  setInterval(refresh, 5000);
+</script>
+</body>
+</html>
