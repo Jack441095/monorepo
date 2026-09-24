@@ -1055,6 +1055,43 @@ def _normalize_kilohertz(text: str) -> str:
     return _KILOHERTZ.sub(lambda m: f"{float(m.group(1)) * 1000:g} Hz", text)
 
 
+_SINGLE_TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"}
+_TONE_WORDS = re.compile(r"\b(?:high|low|top|bottom)\s+end\b|\b(?:highs|lows|mids|low[- ]mids|treble|brightness|"
+                         r"muddiness|mud|boom|harshness|sibilance|air|presence)\b", re.I)
+_SECTION_SCOPE = re.compile(r"\b(?:in|during|for|through)\s+(?:the\s+)?(?:first\s+|second\s+|last\s+|final\s+)?"
+                            r"(?:verse|chorus|hook|drop|intro|outro|bridge|breakdown|build(?:[- ]?up)?|pre[- ]?chorus|"
+                            r"section|middle\s+eight)s?\b", re.I)
+
+
+def _single_track_change_question(parsed: dict[str, Any], snapshot: dict[str, Any] | None) -> str:
+    """A question instead of a proposal when a one-track mixer change reads as something else.
+
+    Two named tracks ("the bass 3 dB below the kick"), tone words ("the hats' high end") or a song section
+    ("in the verse") mean the fader change KENN would make is not what was asked for.
+    """
+    if parsed.get("action") not in _SINGLE_TRACK_ACTIONS or parsed.get("missing_fields") or parsed.get("ambiguity"):
+        return ""
+    query = str(parsed.get("query") or "")
+    lowered = query.casefold()
+    target = (parsed.get("track") or {}).get("name") if isinstance(parsed.get("track"), dict) else None
+    named = [str(t.get("name")) for t in (snapshot or {}).get("tracks") or [] if isinstance(t, dict) and t.get("name")
+             and re.search(rf"(?<![\w-]){re.escape(str(t['name']).casefold())}(?![\w-])", lowered)]
+    if len(set(named)) >= 2:
+        return (f"That mentions {', '.join(sorted(set(named)))}. Which single track should change, and by how much? "
+                "For example \"turn the Bass down 3 dB\".")
+    tone = _TONE_WORDS.search(query)
+    if tone and not any(tone.group(0).casefold() in str(name).casefold() for name in named):
+        return (f"\"{tone.group(0)}\" sounds like an EQ change on {target or 'that track'}, not its fader. Say which "
+                f"frequency, for example \"cut 3 dB at 8 kHz on {target or 'the hats'}\", or \"turn {target or 'it'} "
+                "down 3 dB\" for the whole track.")
+    section = _SECTION_SCOPE.search(query)
+    if section:
+        return (f"KENN can't change only {section.group(0)} yet (that needs automation); this would change "
+                f"{target or 'the track'} for the whole song. Say it without \"{section.group(0)}\" to change the "
+                "whole track.")
+    return ""
+
+
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
     parsed = _parse_request_rules(query, session_snapshot)
@@ -1062,6 +1099,11 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         band = re.search(r"\bband\s*(\d+)\s*([ab])\b", str(parsed.get("query") or ""), re.I)
         if band:  # "cut 200 Hz on the bass by 3 dB, band 2A": the named band settles which one
             parsed["eq_band"] = f"{int(band.group(1))}{band.group(2).upper()}"
+    question = _single_track_change_question(parsed, session_snapshot)
+    if question:
+        parsed.update({"desired_value": None, "confirmation_required": False,
+                       "missing_fields": [*parsed.get("missing_fields", []), "clarification"], "ambiguity": [question]})
+        return parsed
     if parsed.get("action") == "set_volume" and _FREQUENCY_MENTION.search(_normalize_kilohertz(str(parsed.get("query") or ""))):
         # "cut 2k on the bass by 3 dB" names a frequency: an EQ change, never the track fader.
         track = (parsed.get("track") or {}).get("name") or "the track"

@@ -305,3 +305,22 @@ def test_a_frequency_never_becomes_a_fader_change(monkeypatch) -> None:
     parsed = live_intent.parse_request("take the bass down 3 dB at 250 Hz", FAKE_SET)
     assert parsed["desired_value"] is None and parsed["missing_fields"] and not parsed["confirmation_required"]
     assert "250 Hz" in parsed["ambiguity"][0] and "EQ" in parsed["ambiguity"][0]
+
+
+@pytest.mark.parametrize("query, phrase", [
+    ("lower the bass by 3 dB below the kick", "Which single track"),   # was a -3 dB change on the Kick
+    ("drop the hats high end by 3 dB", "sounds like an EQ change"),     # was a fader cut on Hi-Hats
+    ("bring the kick down 3 dB in the verse", "needs automation"),      # would change the whole song
+    ("turn the synth down 2 dB during the drop", "needs automation"),
+])
+def test_a_mixer_change_that_means_something_else_asks_first(query, phrase) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert parsed["desired_value"] is None and not parsed["confirmation_required"]
+    assert any(phrase in text for text in parsed["ambiguity"])
+
+
+@pytest.mark.parametrize("query", ["turn the drums down 3 dB", "Bring the bass down 2 dB", "mute the hats",
+                                   "pan the synth 20% left", "solo the bass"])
+def test_plain_mixer_changes_are_not_second_guessed(query) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert parsed["confirmation_required"] and not parsed["ambiguity"]
