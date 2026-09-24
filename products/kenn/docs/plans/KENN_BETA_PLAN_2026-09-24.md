@@ -169,6 +169,10 @@ The beta cannot start while KENN only runs from this Mac's checkout.
 
 - [ ] Known-limitations page and support runbook shipped with the app
 - [ ] Feedback channel live; diagnostics button sends receipts and timings only
+  > 2026-09-24: diagnostics half done — **Setup & Support** (app toolbar) → **Save diagnostics for support** writes one
+  > redacted file (receipt counts by action and outcome, answer timings p50/p95, versions; no track names, values,
+  > questions, audio or paths) to `~/Library/Application Support/KENN/diagnostics`. It saves rather than sends until the
+  > feedback channel is chosen. Click-test in the rebuilt app after the soak.
 - [ ] Rollback: previous app version and previous knowledge index one click away
 - [ ] Invite the first 3 testers; onboarding call each; widen to 10 after a clean first week
 - [ ] Weekly: triage feedback, re-run the gate, publish a short changelog
