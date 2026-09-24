@@ -43,3 +43,20 @@ def test_nothing_concrete_means_no_step() -> None:
     assert next_step([{"type": "possible_resonance"}], SET, scope="mix") is None
     assert next_step_line(None) == ""
     assert next_step_line(next_step([LOW_END], SET, scope="low_end")).startswith('Next step you can say: "turn the Bass')
+
+
+def test_mix_review_gets_one_question_for_its_most_severe_mapped_flag() -> None:
+    from kenn.core.advice_next_step import mix_review_next_step, with_mix_review_next_step
+
+    review = {"flags": [
+        {"fault_family": "loudness_estimate", "severity": "low", "label": "Loudness Estimate"},
+        {"fault_family": "headroom", "severity": "medium", "label": "Headroom"},
+        {"fault_family": "dc_offset", "severity": "high", "label": "DC Offset"},  # no checked question: skipped
+    ]}
+    assert mix_review_next_step(review)["say"] == "how do I keep my master under -1 dBTP?"
+    annotated = with_mix_review_next_step(review)
+    assert annotated["advice"][-1].startswith('Next, you could ask KENN: "how do I keep my master under -1 dBTP?"')
+    assert "load the new file in Inputs" in annotated["advice"][-1]
+    assert "advice" not in review  # the stored review is not changed
+    assert with_mix_review_next_step({"flags": [{"fault_family": "dc_offset", "severity": "high"}]}) == {
+        "flags": [{"fault_family": "dc_offset", "severity": "high"}]}

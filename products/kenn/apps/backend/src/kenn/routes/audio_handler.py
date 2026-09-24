@@ -206,6 +206,10 @@ def handle_mix_review(handler: Any, mix_review: Any) -> None:
         except Exception:
             project_id = ""
         result = mix_review.handle_multipart_review(content_type, body, project_id_override=project_id)
+        if isinstance(result.get("review"), dict):
+            from kenn.core.advice_next_step import with_mix_review_next_step
+
+            result = {**result, "review": with_mix_review_next_step(result["review"])}
         handler.send_json(200 if result.get("ok") else 400, result)
     except Exception as exc:
         handler.send_json(500, {"error": f"Mix review upload failed: {exc}"})

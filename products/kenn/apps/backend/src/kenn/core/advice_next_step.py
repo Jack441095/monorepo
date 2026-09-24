@@ -71,11 +71,51 @@ def next_step(findings: list[dict[str, Any]], snapshot: dict[str, Any] | None, *
     return None
 
 
-def next_step_line(step: dict[str, str] | None) -> str:
+def next_step_line(step: dict[str, str] | None, remeasure: str = REMEASURE) -> str:
     if not step:
         return ""
-    lead = "Next step you can say" if step["kind"] == "command" else "Next, you could ask"
-    return f"{lead}: \"{step['say']}\". {step['why']} {REMEASURE}"
+    lead = "Next step you can say" if step["kind"] == "command" else "Next, you could ask KENN"
+    return f"{lead}: \"{step['say']}\". {step['why']} {remeasure}"
 
 
-__all__ = ["REMEASURE", "next_step", "next_step_line"]
+# Mix Review looks at a whole render, so its findings can't name one track: its next step is always a question.
+# Each question was checked to get a practical, cited answer from KENN's notes; families without one get no step.
+_MIX_REVIEW_QUESTIONS = (
+    ("clipping", "how do I stop my mix clipping on export?"),
+    ("true_peak_intersample", "how do I keep my master under -1 dBTP?"),
+    ("headroom", "how do I keep my master under -1 dBTP?"),
+    ("phase_polarity_mono_compatibility", "how do I check my mix in mono?"),
+    ("silence_or_truncation", "why does my export cut off or have silence?"),
+    ("calibrated_lufs_bs1770", "how loud should my mix be for streaming?"),
+    ("loudness_estimate", "how loud should my mix be for streaming?"),
+)
+_SEVERITY = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+
+
+def mix_review_next_step(review: dict[str, Any]) -> dict[str, str] | None:
+    flags = [f for f in (review or {}).get("flags") or [] if isinstance(f, dict)]
+    order = {family: position for position, (family, _q) in enumerate(_MIX_REVIEW_QUESTIONS)}
+    questions = dict(_MIX_REVIEW_QUESTIONS)
+    ranked = sorted((f for f in flags if f.get("fault_family") in questions),
+                    key=lambda f: (_SEVERITY.get(str(f.get("severity")), 4), order[f["fault_family"]]))
+    if not ranked:
+        return None
+    flag = ranked[0]
+    return {"kind": "question", "say": questions[flag["fault_family"]],
+            "why": f"Mix Review measured the whole render ({str(flag.get('label') or flag['fault_family']).lower()}), "
+                   "so this is about the mix and master rather than one track."}
+
+
+def with_mix_review_next_step(review: dict[str, Any]) -> dict[str, Any]:
+    """A copy of a Mix Review result carrying its next step; the stored review itself is not changed."""
+    step = mix_review_next_step(review)
+    if not step:
+        return review
+    annotated = dict(review)
+    annotated["next_step"] = step
+    annotated["advice"] = [*(annotated.get("advice") or []),
+                           next_step_line(step, "To measure again, export and load the new file in Inputs.")]
+    return annotated
+
+
+__all__ = ["REMEASURE", "mix_review_next_step", "next_step", "next_step_line", "with_mix_review_next_step"]
