@@ -1,0 +1,29 @@
+{"query": "turn the reverb send on the synth down 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "synth send A down 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "lower the delay on the vocal by 2 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn the bass eq low end down 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "cut the lows on the bass", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn the compressor threshold on the drum bus down 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "bring the drum bus compressor makeup down 2 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn the synth reverb down", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "make the vocal less wide", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "lower the bass by 3 dB below the kick", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "pan the bass down", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn the master down 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "master bus down 2 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "bring the kick down 3 dB in the verse", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "reduce the snare attack by 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "drop the hats high end by 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "take 3 dB off the bass at 80", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "bass -3 at 80 hz", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn the gain on the kick down 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "lower the kick's utility gain 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn everything down 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "mute the reverb", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "solo the delay return", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn the reverb return down 3 dB", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "bring the vocal forward", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "sit the bass lower in the mix", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn the synth down 2 dB during the drop", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
+{"query": "turn the drums down 3 dB", "expected_action": "set_volume", "expected_track": "Drum Bus", "expected_delta_db": -3, "source": "claude_written"}
+{"query": "cut 2k on the bass by 3 dB", "expected_action": "set_eq_band_gain", "expected_track": "Bass", "source": "claude_written"}
