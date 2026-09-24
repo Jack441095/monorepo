@@ -34,7 +34,7 @@ from kenn.core.ollama_deliberative import (  # noqa: E402
 
 
 SCHEMA = "kenn.real_live_assistant_task_qualification.v1"
-DEFAULT_PLANNER_BAKEOFF = ROOT / "evaluation" / "results" / "KENN_DELIBERATIVE_MODEL_BAKEOFF.json"
+DEFAULT_PLANNER_BAKEOFF = ROOT / "tooling" / "evaluation" / "results" / "KENN_DELIBERATIVE_MODEL_BAKEOFF.json"
 DEFAULT_TRANSFORMERS_TRANSPORT = ROOT / "tooling" / "scripts" / "serve_transformers_ollama_compat.py"
 _SECRET_FIELDS = {"confirmation_token", "confirm_token", "token"}
 
