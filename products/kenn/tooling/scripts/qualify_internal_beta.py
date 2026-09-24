@@ -114,11 +114,11 @@ def _read(path: Path) -> str:
 
 def _required_files_gate() -> Gate:
     paths = [
-        REPO_ROOT / "docs" / "ABLETON_ASSISTANT_READINESS_REPORT.md",
-        REPO_ROOT / "docs" / "ABLETON_ASSISTANT_UPGRADE_PLAN.md",
-        REPO_ROOT / "docs" / "ABLETON_ASSISTANT_CURRENT_STATE.md",
-        REPO_ROOT / "docs" / "ABLETON_ASSISTANT_SUPPORT_RUNBOOK.md",
-        REPO_ROOT / "docs" / "ABLETON_ASSISTANT_ROLLBACK_PLAN.md",
+        REPO_ROOT / "docs" / "reports" / "ABLETON_ASSISTANT_READINESS_REPORT.md",
+        REPO_ROOT / "docs" / "plans" / "ABLETON_ASSISTANT_UPGRADE_PLAN.md",
+        REPO_ROOT / "docs" / "reports" / "ABLETON_ASSISTANT_CURRENT_STATE.md",
+        REPO_ROOT / "docs" / "runbooks" / "ABLETON_ASSISTANT_SUPPORT_RUNBOOK.md",
+        REPO_ROOT / "docs" / "plans" / "ABLETON_ASSISTANT_ROLLBACK_PLAN.md",
         REPO_ROOT / "docs" / "ABLETON_ASSISTANT_TESTER_GUIDE.md",
         REPO_ROOT / "tooling" / "scripts" / "install_abletonosc.py",
         REPO_ROOT / "integrations" / "ableton-osc" / "__init__.py",
