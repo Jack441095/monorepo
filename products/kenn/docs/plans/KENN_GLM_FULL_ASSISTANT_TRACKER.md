@@ -91,7 +91,10 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [x] Training pipeline: GPU box (standalone trainer, SHA-verified weights), full-checkpoint merge, GGUF, Ollama import
   - [x] Run 2: clarify share ~35%, more explicit-command and two-part variety; re-score on the 124 cases
     > Run 2 (36% clarify): 54.8%, over-asked; found the dB-volume contract gap (fixed). Run 3 (19 drafted clear-command seeds, mixer state in snapshots): **72.6%**, clarify 29/30, curated 16/24, best so far, but 13 wrong plans accepted (play/stop learned as mute). See the C6 evidence addenda.
-  - [ ] Run 4: drafted seeds for transport, rename, sends, device parameters, EQ, two-part requests; per-action balancing; gate on wrong plans accepted
+  - [x] Run 4: drafted seeds for transport, rename, sends, device parameters, EQ, two-part requests; per-action balancing; gate on wrong plans accepted
+    > **84.7%** correct (stock 65.3%), clarify 29/30, curated 19/24, wrong plans accepted 5 (gate met). EQ 0/3, device parameters 2/5, two-part 1/3 remain. Optimistic: the drafted seeds were written after seeing the evaluation's categories.
+  - [ ] Fresh evaluation set written by someone other than the author of the training data (owner), for a clean score
+  - [ ] Run 5: EQ band/frequency and device-parameter coverage; two-part requests
   - [x] Mac latency of the Q4_K_M fine-tune with the compact prompt
     > Run 1 on the M3 (Live idle): 90% on the first 40 cases vs 75% stock; median 3.6 s per command for both, since this hybrid model re-processes ~2 s of prompt per command whatever its length.
 

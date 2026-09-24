@@ -167,3 +167,39 @@ state in the training snapshots.
   - drafted seeds for transport, rename, sends, device parameters, EQ and two-part (recipe) requests;
   - per-action balancing in the corpus builder;
   - the same 124-case check, with "wrong plans accepted" as the promotion gate.
+
+## Addendum: run 4, balanced corpus (2026-09-24)
+
+Run 4 added drafted seeds for the command types with no or few reviewed seeds. All are owner review pending, and
+all labels validate in all four scenarios.
+
+- **Seeds:** transport play/stop (contrasted with mute: "Kill playback" vs "Kill {track}"), rename, sends, device
+  parameters, EQ and two-part recipes.
+- **Balance:** `--max-per-action 160` caps every action except clarify, round-robin across seeds.
+- **Corpus:** 3,432 records, 38% clarify.
+- **Training:** 387 steps, 25 min, peak 14.6 GB; validation loss 1.93 → 0.0003.
+
+| GPU, 124 cases | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted |
+|---|---|---|---|---|---|
+| Stock + full prompt | 65.3% | 19/30 | 62/94 | 13/24 | 15 |
+| Run 1 | 68.5% | 30/30 | 55/94 | 15/24 | 5 |
+| Run 3 | 72.6% | 29/30 | 61/94 | 16/24 | 13 |
+| **Run 4** | **84.7%** | 29/30 | **76/94** | **19/24** | **5** |
+
+- **Newly solved:** transport 4/4, rename 3/3 and sends 3/3 (all 0 before). Mute, pan, volume, slang, fragments and
+  vague amounts are near-perfect.
+- **The mute shortcut is gone:** wrong plans accepted fell back to 5, as low as run 1.
+- **Still weak:**
+  - EQ 0/3: rejected for inexact band, frequency or device fields.
+  - Device parameters 2/5.
+  - Two-part requests 1/3.
+- **Caveat: pattern-level contamination.** Runs 3 and 4's drafted seeds were written after seeing which categories
+  and failure types the 124-case set exercises. Their wording and track names differ, and the guard blocks exact
+  matches, but the 84.7% is still optimistic. A clean number needs a fresh evaluation set written by someone other
+  than the author of the training data.
+
+**Serving fix found on the way.** `validate_llm_plan` checked each recipe step on a copy but returned the original
+steps, so after the dB change a "-2 dB" volume step would have reached the executor unconverted. Validated recipes
+now carry the converted steps, with a test.
+
+Q4_K_M GGUF: SHA-256 `187b2a9a85021637dfbcead95b9c010454fe1908e204a275fecbd36552c2c1e7`.
