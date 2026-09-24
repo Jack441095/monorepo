@@ -494,7 +494,7 @@ def _plugin_distribution_gate(archive: Path, host_report: Path | None = None) ->
 # fixed 2026-09-06 after --run-suite reported 84 errors that were entirely
 # from such a folder, not from this repository's own tests.
 _SUITE_TARGETS = ("apps/backend/src/kenn/tests", "chat/tests", "mix-review/tests", "automix/tests")
-_SUITE_COMMAND_DISPLAY = "python3 -m pytest " + " ".join(_SUITE_TARGETS) + " -q"
+_SUITE_COMMAND_DISPLAY = "python3 -m pytest <target> -q, one process per target: " + ", ".join(_SUITE_TARGETS)
 
 _DURABLE_QUALIFICATION_REPORTS = {
     "evaluation/results/KENN_AUTOMATED_SUITE_QUALIFICATION.json",
@@ -604,24 +604,33 @@ def _automated_gate(run_suite: bool, receipt_path: Path | None = None) -> Gate:
         if existing_pythonpath:
             import_paths.append(existing_pythonpath)
         environment["PYTHONPATH"] = os.pathsep.join(import_paths)
-        completed = subprocess.run(
-            [sys.executable, "-m", "pytest", *_SUITE_TARGETS, "-q"],
-            cwd=REPO_ROOT,
-            env=environment,
-            capture_output=True,
-            text=True,
-            timeout=900,
-            check=False,
-        )
+        # One pytest process per target: mix-review/ puts Audio_Too's packages
+        # first on sys.path, whose names (audio_analysis, ...) shadow KENN's own
+        # modules, so a shared process fails tests that pass on their own.
+        runs = [
+            (target, subprocess.run(
+                [sys.executable, "-m", "pytest", target, "-q"],
+                cwd=REPO_ROOT,
+                env=environment,
+                capture_output=True,
+                text=True,
+                timeout=900,
+                check=False,
+            ))
+            for target in _SUITE_TARGETS
+        ]
     except (OSError, subprocess.TimeoutExpired) as exc:
         return _gate("automated_suite", "Automated regression suite", "fail", ("pilot", "qualified"), [_SUITE_COMMAND_DISPLAY], f"Suite execution failed: {exc}")
     # pytest's real summary line ("N passed...") is the last line of stdout,
     # but a stray warning (e.g. an interpreter-shutdown DeprecationWarning)
     # can land on stderr after it -- naively taking the very last combined
     # line picked up that warning instead of the actual result summary.
-    stdout_lines = completed.stdout.strip().splitlines()
-    summary = stdout_lines[-1] if stdout_lines else (completed.stderr.strip().splitlines() or ["no pytest summary"])[-1]
-    passed = completed.returncode == 0
+    def _summary(completed: Any) -> str:
+        stdout_lines = completed.stdout.strip().splitlines()
+        return stdout_lines[-1] if stdout_lines else (completed.stderr.strip().splitlines() or ["no pytest summary"])[-1]
+
+    summary = "; ".join(f"{target}: {_summary(completed)}" for target, completed in runs)
+    passed = all(completed.returncode == 0 for _target, completed in runs)
     if receipt_path is not None:
         _write_qualification_receipt(receipt_path, {
             "schema": "kenn.automated_suite_qualification.v1",
