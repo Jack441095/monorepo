@@ -786,6 +786,42 @@ def split_recipe_request(text: str) -> list[str]:
     return parts if len(parts) > 1 else []
 
 
+_AND_SPLIT = re.compile(r"\s*,?\s+and\s+(?!then\b)", re.I)
+_LEADING_VERB = re.compile(r"^\s*(?P<verb>(?:un)?mute|(?:un)?solo|pan|arm|disarm|kill|nuke)\b", re.I)
+
+
+def _clean_intent(segment: str, snapshot: dict[str, Any]) -> dict[str, Any] | None:
+    intent = parse_request(segment, snapshot)
+    ok = intent.get("action") and not intent.get("missing_fields") and not intent.get("ambiguity") \
+        and intent.get("mode") != "refuse"
+    return intent if ok else None
+
+
+def _split_plain_and(text: str, snapshot: dict[str, Any]) -> list[str]:
+    """Two changes joined by a plain "and", accepted only when both halves are clear.
+
+    "mute the hats and the snare" repeats the verb; "solo the bass and turn it up
+    2 dB" resolves "it" to the first track. If either half would not parse on
+    its own, return nothing and let the single-command path ask as before.
+    """
+    parts = _AND_SPLIT.split(text.strip().rstrip(".!"))
+    if len(parts) != 2:
+        return []
+    first, second = parts[0].strip(), parts[1].strip()
+    first_intent = _clean_intent(first, snapshot)
+    if first_intent is None:
+        return []
+    verb = _LEADING_VERB.match(first)
+    if re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?$", second, re.I) and verb:
+        second = f"{verb.group('verb')} {second}"  # "... and the snare"
+    track_name = str((first_intent.get("track") or {}).get("name") or "")
+    if track_name:
+        second = re.sub(r"\b(?:it|that)\b", f"the {track_name}", second, count=1)
+    if _clean_intent(second, snapshot) is None:
+        return []
+    return [first, second]
+
+
 def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any] | None:
     """Parse a small natural-language recipe into typed, non-executable steps.
 
@@ -831,7 +867,7 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     # handle that primitive instead of splitting it into an unsafe recipe.
     if _DEVICE_SETUP.search(text) or _DEVICE_SETUP_TRAILING.search(text) or _insert_eq_tune_values(text):
         return None
-    segments = split_recipe_request(text)
+    segments = split_recipe_request(text) or _split_plain_and(text, session_snapshot or {})
     if not segments:
         return None
     if len(segments) > 3:
@@ -1853,7 +1889,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             pan_side_first_match = re.search(r"\b(left|right)\s+" + _NUMBER + r"\s*(%|percent)?\s*[.!]?\s*$", lower)
             if pan_side_first_match is None:
                 pan_amount_first_match = re.search(
-                    r"\b(?:roll|shift|nudge|stick|move|put|place|throw)\b.*?" + _NUMBER
+                    r"\b(?:roll|shift|nudge|stick|move|put|place|throw|park|sit)\b.*?" + _NUMBER
                     + r"\s*(%|percent)\s*(?:to\s+the\s+)?(left|right)\b", lower)
         # "Pan the Synth center" / "Centre the Synth": the one pan target with
         # no number or side. Frequency wording is excluded so "centre

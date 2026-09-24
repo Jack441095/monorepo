@@ -215,3 +215,29 @@ def test_send_to_a_named_return_without_the_word_send(query, track, value) -> No
 def test_track_to_return_needs_a_real_return_and_a_percentage(query) -> None:
     parsed = resolved(query, FAKE_SET)
     assert not parsed or parsed["action"] != "set_send"
+
+
+@pytest.mark.parametrize("query, steps", [
+    ("mute the hats and the snare", [("set_mute", "Hi-Hats"), ("set_mute", "Snare / Clap")]),
+    ("solo the bass and turn it up 2 dB", [("set_solo", "Bass"), ("set_volume", "Bass")]),
+    ("mute the kick and solo the bass", [("set_mute", "Kick"), ("set_solo", "Bass")]),
+    ("Solo the Drum Bus, then park the Vocal twenty percent right.", [("set_solo", "Drum Bus"), ("set_pan", "Lead Vocal")]),
+])
+def test_two_part_requests_become_recipes(query, steps) -> None:
+    from kenn.core.live_intent import parse_natural_recipe
+
+    recipe = parse_natural_recipe(query, FAKE_SET)
+    assert recipe and not recipe.get("ambiguity")
+    assert [(step["action"], step["track_name"]) for step in recipe["steps"]] == steps
+
+
+@pytest.mark.parametrize("query", [
+    "pan the synth left and the FX print right",               # how far? each half must be clear
+    "set eq frequency to 200 hz and gain to 3 dB on track 5",  # one EQ command, not two
+    "mute the kick and make it louder",                         # "louder" by how much?
+    "rock and roll",
+])
+def test_plain_and_needs_two_clear_halves(query) -> None:
+    from kenn.core.live_intent import parse_natural_recipe
+
+    assert parse_natural_recipe(query, FAKE_SET) is None
