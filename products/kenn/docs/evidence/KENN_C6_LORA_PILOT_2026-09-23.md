@@ -309,3 +309,29 @@ after the volume fix, so every volume label is in dB (160/160) and KENN converts
 - **Decision:** run 7 is not promoted to shadow; run 4 stays (shadow only, no writes). Run 8 should keep the dB labels
   and add contrast seeds for overlapping track names ("bass" vs "Drum Bus"), and the scorer should check values
   (expected dB for volume cases), not only actions and tracks.
+
+## Addendum: run 8, confusable track names (2026-09-24)
+
+Run 7's recipe plus a fifth scenario whose track names overlap ("Bass DI", "Perc Bus", "Lead Vox", "Vox Bus", "Keys")
+and opt-in exact-track contrast rows (`--include-contrast`; rows repeating an evaluation phrasing dropped). 3,752
+records (3,377 train / 375 valid), no holdout phrasing among the training prompts; 423 steps, 28 min on GPU 0,
+validation loss 1.89 → 0.0003.
+
+| GPU, 124 cases | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted |
+|---|---|---|---|---|---|
+| Run 7, plain | 78.2% | 29/30 | 68/94 | 17/24 | 4 |
+| Run 8, plain | 60.5% | 29/30 | 46/94 | 14/24 | 3 |
+| Run 7, production evidence | 82.3% | 29/30 | 73/94 | 18/24 | 4 |
+| Run 8, production evidence | 69.4% | 29/30 | 57/94 | 15/24 | 3 |
+
+- **Regression:** 36 plain-mode plans rejected with "must include the exact current Live track name". Run 8 picks the
+  right track index but leaves out `track_name` on the demo set ("mute the hats" → `track_index 2`, no name), with or
+  without the output schema; on training prompts it includes the name. Every training plan carries `track_name` in
+  the same key order as run 7, so the data doesn't explain it. The validator is right to reject it: the name is the
+  cross-check on the index, so KENN must not fill it in.
+- **Values (new check):** the 16-command value probe (`tooling/data/value_probe.jsonl`: absolute and relative dB,
+  pan amounts) is scored as the final fader value KENN would write, via Live's fader law. Run 7 **16/16**, run 8
+  15/16, rule parser 15/16 ("Bass to -9" has no unit, so it asks).
+- **Decision:** run 8 is not promoted. Run 4 stays in shadow. Before run 9: validate on demo-style snapshots (not only
+  the training distribution), and try fewer steps or a lower merge scale (both runs reached validation loss ≈ 0.0003,
+  which suggests memorisation).
