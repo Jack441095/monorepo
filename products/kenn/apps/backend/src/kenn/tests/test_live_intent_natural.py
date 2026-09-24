@@ -63,3 +63,25 @@ def test_existing_behaviour_is_unchanged() -> None:
     assert resolved("mute the kick drum")["track"]["name"] == "Kick"
     assert resolved("add a reverb to the snare")["action"] == "insert_device"
     assert resolved("Append Hybrid Reverb to Lead Vocal and set Dry/Wet to 40%")["action"] == "insert_device_with_parameter"
+
+
+def test_take_the_solo_or_mute_off_means_off() -> None:
+    assert resolved("take the solo off the lead vocal")["desired_value"] is False
+    assert resolved("take the mute off the kick")["desired_value"] is False
+    assert resolved("solo the lead vocal")["desired_value"] is True
+
+
+@pytest.mark.parametrize("query, track, value", [
+    ("send the lead vocal to A-Reverb at 25%", "Lead Vocal", 0.25),
+    ("set the kick send to B-Delay at 10%", "Kick", 0.10),
+    ("send the vocal to the reverb at 30%", "Lead Vocal", 0.30),
+])
+def test_track_first_send_phrasing(query, track, value) -> None:
+    parsed = resolved(query)
+    assert parsed and parsed["action"] == "set_send" and parsed["track"]["name"] == track
+    assert parsed["desired_value"] == pytest.approx(value)
+
+
+def test_send_without_a_level_or_out_of_range_still_asks() -> None:
+    assert resolved("send the vocal to the reverb") is None
+    assert resolved("send the hats to B-Delay at 150%") is None

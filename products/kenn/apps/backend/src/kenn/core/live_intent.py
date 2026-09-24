@@ -137,6 +137,16 @@ _SET_SEND = re.compile(
     r"\s+\bto\s+(?P<value>-?(?:\d+(?:\.\d+)?|\.\d+))\s*(?P<percent>%|percent\b)?",
     re.I,
 )
+# Track-first orders: "send the lead vocal to A-Reverb at 25%", "set the synth
+# send to B-Delay at 10%". Same named groups as _SET_SEND (track_number never
+# participates here).
+_SEND_TAIL = (r"to\s+(?:the\s+)?(?P<return_name>[\w' -]+?)\s+(?:at|to)\s+(?P<value>-?(?:\d+(?:\.\d+)?|\.\d+))"
+              r"\s*(?P<percent>%|percent\b)?(?P<track_number>(?!))?")
+# "send the lead vocal to A-Reverb at 25%" (the verb is "send")
+_SEND_TRACK_FIRST = re.compile(r"\bsend\s+(?:the\s+)?(?P<track_name>[\w' /-]+?)\s+" + _SEND_TAIL, re.I)
+# "set the synth send to B-Delay at 10%" ("set" needs the word "send", so EQ and
+# device "set ... to ... at ..." commands never match)
+_SET_TRACK_SEND = re.compile(r"\bset\s+(?:the\s+)?(?P<track_name>[\w' /-]+?)(?:'s)?\s+send\s+" + _SEND_TAIL, re.I)
 _MUTE_SEND = re.compile(
     r"\b(?:mute|turn\s+off|zero)\s+(?:the\s+)?(?P<return_name>[\w' -]+?)\s+send\b.*?\bon\s+"
     r"(?:(?:track|trk|channel|chan|ch)\s*#?\s*(?P<track_number>\d+)\b|(?:the\s+)?(?P<track_name>[\w' -]+?))\s*$",
@@ -586,6 +596,11 @@ def _find_track(phrase: str, tracks: list[dict[str, Any]]) -> tuple[dict[str, An
         return contained[0], [], None
     if len(contained) > 1:
         return None, contained, "ambiguous track name"
+    # Nicknames ("vocal" -> Lead Vocal, "hats" -> Hi-Hats), with the same guard
+    # against a qualifier that names a different track.
+    nickname = _nickname_track_name(phrase, tracks)
+    if nickname:
+        return next(t for t in tracks if str(t.get("name", "")).strip() == nickname), [], None
     return None, [], "track not found in the current Live snapshot"
 
 
@@ -1172,7 +1187,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     # fresh snapshot, by LiveActionService.propose_send_action -- this only
     # extracts what the user asked for.
     mute_send_match = _MUTE_SEND.search(lower)
-    send_match = mute_send_match or _SET_SEND.search(lower)
+    send_match = (mute_send_match or _SET_SEND.search(lower) or _SEND_TRACK_FIRST.search(lower)
+                  or _SET_TRACK_SEND.search(lower))
     if send_match:
         track_number_text = send_match.group("track_number")
         if track_number_text:
@@ -1600,7 +1616,9 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     mute_off = re.search(
         r"\b(?:unmute|un[- ]?silence)\b|"
         r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:mute|silence)\b|"
-        r"\b(?:turn|switch)\s+(?:mute|silence)\s+off\b",
+        r"\b(?:turn|switch)\s+(?:mute|silence)\s+off\b|"
+        # "take the mute off the kick": the noun-first order means off, not on.
+        r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?(?:mute|silence)\s+off\b",
         lower,
     )
     if mute_off or re.search(r"\b(?:mute|silence)\b", lower):
@@ -1610,7 +1628,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         solo_off = re.search(
             r"\b(?:unsolo|un[- ]?isolate)\b|"
             r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:solo|isolation)\b|"
-            r"\b(?:turn|switch)\s+solo\s+off\b",
+            r"\b(?:turn|switch)\s+solo\s+off\b|"
+            r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?solo\s+off\b",
             lower,
         )
         if solo_off or re.search(r"\b(?:solo|isolate)\b", lower):
