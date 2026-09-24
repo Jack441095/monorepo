@@ -1,0 +1,4 @@
+{"query": "Bring the bass down 2 dB", "expected_action": "set_volume", "expected_track": "Bass", "expected_delta_db": -2, "source": "tester_guide"}
+{"query": "Put the kick at -12 dB", "expected_action": "set_volume", "expected_track": "Kick", "expected_db": -12, "source": "tester_guide"}
+{"query": "Pan the synth 20% left", "expected_action": "set_pan", "expected_track": "Synth", "expected_pan": -0.2, "source": "tester_guide"}
+{"query": "Mute the hats", "expected_action": "set_mute", "expected_track": "Hi-Hats", "source": "tester_guide"}
