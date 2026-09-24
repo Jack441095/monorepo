@@ -59,7 +59,8 @@ voice, arbitrary plug-in control, silent saves.
 
 The beta cannot start while KENN only runs from this Mac's checkout.
 
-- [ ] Fix or remove the broken `KENN_Bridge` Remote Script so Live starts clean
+- [x] Fix or remove the broken `KENN_Bridge` Remote Script so Live starts clean
+  > 2026-09-24: a duplicated, mis-indented line (repo line 1045; installed copy line 888) fixed in the repo; new test compiles all 46 Remote Script files. The installed copy was moved to `User Library/Remote Scripts/.backups_2026-09-24/`: KENN does not use it and it listens on port 11000 like AbletonOSC, so the beta installer must not ship it.
 - [ ] One companion bundle: KENN backend + UI as a macOS app (`apps/desktop/macos/build_macos_app.sh`) with its own
       Python runtime, no repo paths, no env vars (DAW control, capture paths and model settings become app settings)
 - [ ] Installer puts AbletonOSC (KENN build, version-stamped) in the user's Live User Library and tells them to select it
