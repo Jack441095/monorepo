@@ -1294,6 +1294,27 @@ def _format_value(value: Any, unit: str = "") -> str:
     return f"{rendered} {unit}".strip()
 
 
+def _format_volume(value: Any) -> str:
+    """A track fader value as the dB Live shows (volume_law), keeping the raw value."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return _format_value(value, "normalized")
+    db = volume_law.raw_to_db(float(value))
+    if db is None:
+        return _format_value(value, "normalized")
+    shown = "-inf dB" if math.isinf(db) else f"{db:.1f} dB"
+    return f"{shown} (fader {_format_value(value)})"
+
+
+def _format_pan(value: Any) -> str:
+    """A pan value (-1..1) as Live's panner reads it: centre, or N% left/right."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return _format_value(value, "normalized")
+    percent = round(abs(float(value)) * 100)
+    if percent == 0:
+        return "centre"
+    return f"{percent}% {'left' if value < 0 else 'right'}"
+
+
 def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, kind: str) -> dict[str, Any]:
     _update_lifecycle(
         response,
@@ -1607,6 +1628,10 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
     unit = str(proposal.get("unit", ""))
     before = _format_value(proposal.get("before"), unit)
     after = _format_value(proposal.get("after"), unit)
+    if parameter == "volume" and unit == "normalized":
+        before, after = _format_volume(proposal.get("before")), _format_volume(proposal.get("after"))
+    elif parameter == "pan" and unit == "normalized":
+        before, after = _format_pan(proposal.get("before")), _format_pan(proposal.get("after"))
     before_display = str(proposal.get("before_display") or "").strip()
     if before_display and unit == "value":
         before = f"raw {_format_value(proposal.get('before'))} (Live displays {before_display})"
