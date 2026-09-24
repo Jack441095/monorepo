@@ -1,8 +1,8 @@
 {
   "command": "python3 -m pytest <target> -q, one process per target: apps/backend/src/kenn/tests, chat/tests, mix-review/tests, automix/tests",
-  "generated_at": "2026-09-24T11:29:57.752115+00:00",
+  "generated_at": "2026-09-24T12:04:28.979456+00:00",
   "passed": true,
   "schema": "kenn.automated_suite_qualification.v1",
-  "source_sha256": "fb5bcd00c5142c3b72cd4c96d1b26318836e79babe686f79be49a5a02af1cae1",
-  "summary": "apps/backend/src/kenn/tests: 1665 passed, 5 skipped, 5 warnings in 69.34s (0:01:09); chat/tests: 39 passed in 0.50s; mix-review/tests: 12 passed in 0.59s; automix/tests: 4 passed in 0.02s"
+  "source_sha256": "f6c3a108d3e94519eee8f8c3bc4f34bfec8539cae41eb827049d76a894578fd8",
+  "summary": "apps/backend/src/kenn/tests: 1665 passed, 5 skipped, 5 warnings in 74.64s (0:01:14); chat/tests: 39 passed in 1.12s; mix-review/tests: 12 passed in 0.63s; automix/tests: 4 passed in 0.02s"
 }
