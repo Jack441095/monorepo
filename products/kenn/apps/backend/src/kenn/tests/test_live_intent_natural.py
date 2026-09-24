@@ -111,3 +111,17 @@ def test_absolute_db_without_the_word_volume(query, track, db) -> None:
 def test_absolute_db_shape_does_not_take_device_send_or_unitless_requests(query) -> None:
     parsed = resolved(query)
     assert not parsed or parsed["action"] != "set_volume"
+
+
+@pytest.mark.parametrize("query, track", [
+    ("Select the Drum Bus", "Drum Bus"), ("focus the bass.", "Bass"), ("select the vocal", "Lead Vocal"),
+])
+def test_focus_a_track_by_name_without_the_word_track(query, track) -> None:
+    parsed = resolved(query)
+    assert parsed and parsed["action"] == "focus_track" and parsed["track"]["name"] == track
+
+
+@pytest.mark.parametrize("query", ["focus the drum bus compressor", "focus on the low end", "select all clips"])
+def test_bare_name_focus_needs_every_word_in_one_track_name(query) -> None:
+    parsed = resolved(query)
+    assert not parsed or parsed["action"] != "focus_track"

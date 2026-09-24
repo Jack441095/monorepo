@@ -86,6 +86,7 @@ _FOCUS_TRACK_NAME = re.compile(
     r"(?P<show_name>.+?)\s*$",
     re.I,
 )
+_FOCUS_TRACK_BARE_NAME = re.compile(r"^\s*(?:select|focus|follow)\s+(?:the\s+)?(?P<name>[^.!?]+?)\s*[.!]?\s*$", re.I)
 _ORDINAL_TRACK = re.compile(
     r"\b(?P<ordinal>first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last)\s+"
     r"(?:visible\s+)?(?:track|trk|channel|chan|ch)\b",
@@ -1049,9 +1050,20 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         })
         return base
     focus_named_match = _FOCUS_TRACK_NAME.match(text)
+    if focus_named_match is None:
+        # "Select the Drum Bus" / "Focus the bass.": the word "track" left out.
+        # Only when the words name exactly one track, so "focus on the low end"
+        # keeps its old route.
+        bare = _FOCUS_TRACK_BARE_NAME.match(text)
+        if bare:
+            candidate, _bare_candidates, bare_error = _find_track(" ".join(bare.group("name").split()).strip(" '\""), tracks)
+            said = set(re.findall(r"[a-z0-9]+", bare.group("name").casefold())) - {"track", "the"}
+            named = set(re.findall(r"[a-z0-9]+", str((candidate or {}).get("name", "")).casefold()))
+            if not bare_error and candidate is not None and said and said <= named:
+                focus_named_match = bare
     if focus_named_match:
         requested_track_name = " ".join(
-            str(focus_named_match.group("name") or focus_named_match.group("show_name") or "").split()
+            str(focus_named_match.groupdict().get("name") or focus_named_match.groupdict().get("show_name") or "").split()
         ).strip(" '\"")
         focus_track, _candidates, focus_error = _find_track(requested_track_name, tracks)
         if focus_error or focus_track is None:
