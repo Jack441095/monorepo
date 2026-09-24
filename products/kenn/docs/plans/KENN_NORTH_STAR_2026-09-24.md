@@ -105,6 +105,16 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 - [ ] Contradiction checks and source tiers (manual and measured data above notes, notes above general advice)
 - [ ] **Gate:** retrieval recall@4 ≥ 0.95 on a fixture grown to ≥ 300 questions; answer accuracy ≥ 90% on a
       parameter-level quiz scored by reviewers; no uncited factual claims in a 100-answer audit
+  > 2026-09-24 baseline: fixture now 128 + 125 = 253 questions. The new 125 (`evals/device_purpose_retrieval_cases.json`,
+  > Claude-drafted, pending owner review) describe what a producer wants without naming the device ("line up two mics
+  > a few ms out of time" → Align Delay). Recall@4: **0.62** hybrid, 0.60 BM25 (0.51 counting only the device note) —
+  > against 0.966 on the original fixture, where questions usually name the topic. Cause: hybrid only re-scores BM25's
+  > top 60, so embeddings can't bring in a note the keywords missed. Experiment (not shipped): union of BM25 and
+  > embedding candidates with reciprocal-rank fusion, embedding weight 2 → **0.74** on the new set and **0.983** on the
+  > original (no regression). Shipping it needs abstention to stop relying on BM25-scale scores (an embedding-only hit
+  > would be dropped as "not relevant"), and a re-run of the intelligence gate and review packet. Next levers: that
+  > fusion change, a stronger embedding model than MiniLM (download/licence is an owner decision), "use it when…"
+  > phrasing in device notes (checked on a held-out half so it isn't tuned to the fixture).
 
 ### Stage 3 — Agentic co-producer (beta weeks 6–16)
 
