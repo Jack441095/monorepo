@@ -131,8 +131,9 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > the evaluation set: insert verbs (stick/drop/throw a …), "new midi track", "return channel", "start the song",
   > locators (drop/place), corrections ("no wait, … not the hats"), "call track N …", ordinals ("the fourth channel"),
   > mute/solo slang (kill, nuke, out of the mix, on its own, just the …), terse pan and volume, focus verbs. Owner test
-  > commands 1/1; e2e 21/22 unchanged. Still asks: device parameters by name, sends without "send", two-part requests,
-  > terse dB without a direction ("kick -3 dB": absolute or relative?).
+  > commands 1/1; e2e 21/22 unchanged. Then device focus by name ("show me the bass eq") and sends to a named return
+  > without the word send ("synth to the delay at 20 percent"): **109/124 (87.9%)**, 0 wrong plans. Still asks: device
+  > parameters by name, two-part requests, terse dB without a direction ("kick -3 dB": absolute or relative?).
 - [ ] Advice → fix: each audio finding offers one confirmable change and re-measures after Apply
 - [ ] Notes for the last 4 devices (Instrument/MIDI/Audio Effect Rack, Drum Synth) and a small review of the 21 notes
       approved today
