@@ -266,6 +266,11 @@ def save_embedding_index(embeddings: np.ndarray) -> None:
                 manifest_metadata = build_metadata
         except (OSError, json.JSONDecodeError):
             manifest_metadata = None
+    # The embeddings come from the model on disk now, not from whatever was
+    # present when the BM25 build ran (a BM25-only build records blank hashes).
+    from kenn.retrieval.onnx_embedder import embedding_model_identity
+
+    manifest_metadata = {**(manifest_metadata or {}), "embedding_model": embedding_model_identity()}
     promote_index(chunks, terms, embeddings, index_dir=INDEX_DIR, manifest_metadata=manifest_metadata)
     global _embedding_index, _embedding_index_version
     _embedding_index = embeddings
