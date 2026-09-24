@@ -16,7 +16,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 
 - [x] Pick the C6 base model: `qwen3.5:4b` (clarifies 20/30, Mac p50 6.7 s) or `qwen3:4b` (clarifies 2/30, Mac p50 4.5 s; needs clarify training). See the C2 GPU evidence addendum
   > Owner chose **qwen3.5:4b** on 2026-09-23 (safer: already clarifies; the latency gap should narrow once fine-tuning shortens the prompt). Fallback if its hybrid architecture has no LoRA tooling: qwen3:4b with a clarify-heavy corpus.
-- [ ] Review the 21 drafted clarify training seeds in `tooling/scripts/drafted_command_seeds.py` (C6)
+- [ ] Review the drafted training seeds in `tooling/scripts/drafted_command_seeds.py` (C6: 21 clarify, 19 clear-command, 21 transport/rename/send/device/EQ/two-part)
+- [ ] Decide C4: promote a fine-tune (candidate: run 4, 83.1% on the Mac, p50 6.5 s) from shadow to propose-with-confirm, or wait for the independent evaluation
 - [ ] Review the 100 drafted phrasings in `tooling/data/natural_holdout_candidates.jsonl` (labels: explicit target+amount → action, vague → clarify); approved ones move into the curated holdout
 - [x] OK a `~/kenn_*` work folder on the GPU box (GPU 0, `/mnt/data`) for C6 LoRA training — text-only corpus, no audio
   > Given 2026-09-23 ("Anything we need to do that requires a GPU", no server restarts). Using `/mnt/data/kenn-bakeoff/`: user-level Ollama 0.34.2 on GPU 0, loopback port 11437, no system install.
@@ -96,7 +97,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [ ] Fresh evaluation set written by someone other than the author of the training data (owner), for a clean score
   - [x] Run 5: EQ band/frequency and device-parameter coverage; two-part requests
     > Production-shaped evidence (single track, real Live indices). 82.3% correct; EQ 3/3 (was 0/3), same-action two-part 3/3, **2 wrong plans accepted** (safest yet); but device parameters 1/5 and inserts over-asked, curated 15/24. Run 4 stays best overall (84.7%, Mac 83.1%, p50 6.5 s).
-  - [ ] Latency: the gateway attaches a track's full parameter list to *every* request on that track ("mute the bass" becomes a ~5,000-token prompt because Bass has an EQ Eight). Attach evidence only for device requests, then rebuild the corpus to match.
+  - [x] Latency: the gateway attaches a track's full parameter list to *every* request on that track ("mute the bass" becomes a ~5,000-token prompt because Bass has an EQ Eight). Attach evidence only for device requests, then rebuild the corpus to match.
+    > Done 2026-09-24 (gateway rule + corpus). Run 6 trained to match: GPU 82.3%, Mac 79.0% (p50 6.7 s). Runs 4–6 all within 82–85%: diminishing returns; next progress needs the independent evaluation, owner-reviewed data and the C4 decision. Candidate for C4: run 4.
   - [x] Mac latency of the Q4_K_M fine-tune with the compact prompt
     > Run 1 on the M3 (Live idle): 90% on the first 40 cases vs 75% stock; median 3.6 s per command for both, since this hybrid model re-processes ~2 s of prompt per command whatever its length.
 

@@ -253,3 +253,27 @@ and timed out. The test now keeps the environment clean; the suite is 1,542 pass
 
 **Box access.** The GPU box drops rapid successive SSH connections. All box work now goes through one persistent
 multiplexed connection.
+
+**Run 6 results** (run 5's corpus under the device-only evidence rule; 387 steps, 55 min):
+
+| 124 cases, production-style scoring | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted | p50 |
+|---|---|---|---|---|---|---|
+| Run 4 (GPU) | **84.7%** | 29/30 | **76/94** | **19/24** | 6 | 1.08 s |
+| Run 5 (GPU) | 82.3% | 29/30 | 73/94 | 15/24 | **2** | 1.18 s |
+| Run 6 (GPU) | 82.3% | 29/30 | 73/94 | 18/24 | 6 | 0.92 s |
+| Run 6 (Mac, Q4_K_M) | 79.0% | 29/30 | 69/94 | 17/24 | 4 | 6.71 s (p95 18.0 s, 15 repairs) |
+
+- **Corpus tweaks have hit diminishing returns.** Runs 4–6 sit within 82–85%, and with one seed per run those gaps
+  are within noise. Each tweak fixes one category and disturbs another: run 6 keeps EQ 3/3 but newly mistakes
+  mute/solo for rename in 3 cases.
+- **No measurable Mac difference from the evidence rule here.** Run 4's Mac check used the plain harness (no
+  evidence at all), so it cannot show the rule's gain over the old attach-everything behaviour. Mac p50 is 6.5–6.7 s
+  either way.
+- **What limits progress now is not training:**
+  - an evaluation written independently of the training data;
+  - owner review of the drafted seeds and evaluation phrasings;
+  - the C4 promotion decision.
+- **Recommended candidate:** run 4 (best overall and on curated cases). Run 5 is the safest if wrong plans accepted
+  is weighted above coverage.
+
+Q4_K_M SHA-256: run 6 `81f49a8a6f5df992fc7207fed3218fdf84da3b27d4b52ee2169836998917cc5a`.
