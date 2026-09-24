@@ -39,8 +39,13 @@ def running_server():
         pytest.skip("Knowledge index not built -- run `python3 apps/backend/src/kenn/main.py build` first.")
 
     import os
+    import socket
 
-    os.environ["KENN_PORT"] = "8099"
+    # A free port, not a fixed one: 8099 may already be taken (a shared test machine, another checkout's server).
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        probe.bind(("127.0.0.1", 0))
+        port = probe.getsockname()[1]
+    os.environ["KENN_PORT"] = str(port)
     os.environ["KENN_HOST"] = "127.0.0.1"
     # This suite proves the standalone deterministic server and its local
     # contracts. Keep optional model generation out of the smoke path so an
@@ -50,12 +55,12 @@ def running_server():
 
     import kenn.server as server_module
 
-    httpd = server_module.ThreadingHTTPServer(("127.0.0.1", 8099), server_module.Handler)
+    httpd = server_module.ThreadingHTTPServer(("127.0.0.1", port), server_module.Handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
     time.sleep(0.5)
     try:
-        yield "http://127.0.0.1:8099"
+        yield f"http://127.0.0.1:{port}"
     finally:
         httpd.shutdown()
         httpd.server_close()
