@@ -17,9 +17,11 @@ local or hosted LLM can be swapped without changing the safety contract.
 from __future__ import annotations
 
 import json
+import logging
 import math
 import os
 import re
+import threading
 import time
 from copy import deepcopy
 from typing import Any
@@ -50,6 +52,8 @@ from kenn.core.subjective_translator import SubjectiveTranslator
 
 COMMAND_SCHEMA = "kenn.ableton_command.v1"
 LATENCY_BUDGET_MS = {"parse": 50.0, "snapshot": 200.0, "execution": 100.0, "readback": 200.0, "total": 650.0}
+logger = logging.getLogger(__name__)
+
 LLM_PLAN_SCHEMA = "kenn.ableton_llm_plan.v1"
 DEVICE_PARAMETER_ACTIONS = {"set_device_parameter"}
 TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "rename_track"}
@@ -1179,6 +1183,54 @@ def _live_llm_mode() -> str:
     if reviewed_stage not in rank:
         reviewed_stage = "shadow"
     return configured if rank[configured] <= rank[reviewed_stage] else reviewed_stage
+
+
+_SHADOW_WORKER = None
+_SHADOW_PENDING = 0
+_SHADOW_LOCK = threading.Lock()
+SHADOW_MAX_PENDING = 4
+
+
+def _run_background_shadow(command: str, snapshot: dict[str, Any], deterministic_intent: dict[str, Any],
+                           session_id: str) -> None:
+    global _SHADOW_PENDING
+    try:
+        generated, llm_metadata = _generate_llm_plan(command, snapshot)
+        record_shadow_result({
+            "command": command,
+            "session_id": session_id,
+            "status": "shadow_background",
+            "intent": deterministic_intent,
+            "llm": {
+                **llm_metadata,
+                "mode": "shadow",
+                "background": True,
+                **({"plan": generated, "comparison": compare_llm_plan(generated, deterministic_intent)}
+                   if generated is not None else {}),
+            },
+        })
+    except Exception as exc:  # observational: never let a shadow failure surface
+        logger.warning("Background shadow planning failed: %s", exc)
+    finally:
+        with _SHADOW_LOCK:
+            _SHADOW_PENDING -= 1
+
+
+def _submit_background_shadow(command: str, snapshot: dict[str, Any], deterministic_intent: dict[str, Any],
+                              session_id: str) -> bool:
+    """Queue one shadow planning call on a single worker; skip when the backlog is full."""
+    global _SHADOW_WORKER, _SHADOW_PENDING
+    with _SHADOW_LOCK:
+        if _SHADOW_PENDING >= SHADOW_MAX_PENDING:
+            return False
+        if _SHADOW_WORKER is None:
+            from concurrent.futures import ThreadPoolExecutor
+
+            _SHADOW_WORKER = ThreadPoolExecutor(max_workers=1, thread_name_prefix="kenn-shadow")
+        _SHADOW_PENDING += 1
+    _SHADOW_WORKER.submit(_run_background_shadow, command, deepcopy(snapshot), deepcopy(deterministic_intent),
+                          session_id)
+    return True
 
 
 def _base_response(command: str, session_id: str) -> dict[str, Any]:
@@ -2622,9 +2674,22 @@ def _handle_command_impl(
             if mode in {"shadow", "propose", "active"} and _truthy(os.getenv("KENN_LIVE_LLM_ENABLED"))
             else snapshot
         )
-        generated, llm_metadata = _generate_llm_plan(clean_command, planner_snapshot)
-        generated_plan = generated
-        if mode == "shadow":
+        if mode == "shadow" and not _truthy(os.getenv("KENN_LIVE_LLM_SHADOW_INLINE")):
+            # Shadow is observational, so it must not add the model's latency
+            # (seconds on a laptop) to the user's command. Everything that
+            # reads Live has already happened above; the background worker
+            # only calls the model and logs the comparison.
+            submitted = _submit_background_shadow(clean_command, planner_snapshot, deterministic_intent, session_id)
+            llm_metadata = {"status": "deferred" if submitted else "skipped_busy", "mode": "shadow_background"}
+            intent = deterministic_intent
+            generated = generated_plan = None
+            mode = "shadow_background"
+        else:
+            generated, llm_metadata = _generate_llm_plan(clean_command, planner_snapshot)
+            generated_plan = generated
+        if mode == "shadow_background":
+            pass
+        elif mode == "shadow":
             # The model is observational in this mode.  The deterministic
             # parser remains the only source of the intent sent to Live.
             llm_metadata = {

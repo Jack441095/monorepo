@@ -3122,6 +3122,9 @@ def test_typed_llm_plan_cannot_bypass_deterministic_refusal() -> None:
 
 
 def test_llm_shadow_mode_records_conflict_but_keeps_deterministic_authority(monkeypatch) -> None:
+    # Inline shadow, so the comparison is in the response; background shadow
+    # is covered in test_live_shadow_background.py.
+    monkeypatch.setenv("KENN_LIVE_LLM_SHADOW_INLINE", "1")
     fake = FakeLive()
     model_plan = {
         "schema": "kenn.ableton_llm_plan.v1",
@@ -3184,6 +3187,9 @@ def test_active_llm_mismatch_falls_back_to_deterministic_proposal(monkeypatch) -
 
 
 def test_runtime_mode_cannot_leapfrog_reviewed_promotion_stage(monkeypatch) -> None:
+    # Inline shadow, so the comparison is in the response; background shadow
+    # is covered in test_live_shadow_background.py.
+    monkeypatch.setenv("KENN_LIVE_LLM_SHADOW_INLINE", "1")
     fake = FakeLive()
     conflicting_plan = {
         "schema": "kenn.ableton_llm_plan.v1",

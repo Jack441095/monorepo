@@ -212,7 +212,13 @@ def config(task: str = "rewrite") -> dict:
             os.environ.get("KENN_LLM_MODEL", "").strip()
             or os.environ.get("AUDIO_TOO_LLM_MODEL", "gpt-4o-mini").strip()
         )
-    enabled = truthy("KENN_LLM_ENABLED") if "KENN_LLM_ENABLED" in os.environ else truthy("AUDIO_TOO_LLM_ENABLED")
+    # A per-task switch (e.g. KENN_LLM_ENABLED_COMMAND) enables one task alone,
+    # so the Live command planner can run in shadow without also turning on
+    # chat rewriting, routing and paraphrasing. Unset, the global switch rules.
+    if f"KENN_LLM_ENABLED{suffix}" in os.environ:
+        enabled = truthy(f"KENN_LLM_ENABLED{suffix}")
+    else:
+        enabled = truthy("KENN_LLM_ENABLED") if "KENN_LLM_ENABLED" in os.environ else truthy("AUDIO_TOO_LLM_ENABLED")
     api_key = (
         os.environ.get(f"KENN_LLM_API_KEY{suffix}", "").strip()
         or os.environ.get(f"AUDIO_TOO_LLM_API_KEY{suffix}", "").strip()
