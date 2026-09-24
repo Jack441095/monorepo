@@ -274,6 +274,9 @@ SCENARIO_TRACK_NAMES = (
     ("Main Vocal", "Drum Group", "Sub Bass", "Effects Return", "Print Master"),
     ("Lead Voice", "Rhythm Bus", "Low Synth", "FX Return", "Master Print"),
     ("Vocal Lead", "Drums", "Bass", "FX", "Master Print"),
+    # Confusable names (C6 run 8): run 7 solo'd "Drum Bus" for "solo the bass" because no
+    # scenario held two similar-looking names; these differ from the evaluation set's names.
+    ("Bass DI", "Perc Bus", "Lead Vox", "Vox Bus", "Keys"),
 )
 
 
@@ -405,11 +408,11 @@ def cap_per_action(rows: list[dict[str, Any]], cap: int) -> list[dict[str, Any]]
 
 def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = False,
                prompt: str = "full", clarify_variants: int | None = None,
-               production_evidence: bool = False) -> list[dict[str, Any]]:
+               production_evidence: bool = False, include_contrast: bool = False) -> list[dict[str, Any]]:
     from build_kenn_command_training import (
         _plan, evaluation_queries, normalize_query, plan_target, records, training_snapshot,
     )
-    from drafted_command_seeds import drafted_records
+    from drafted_command_seeds import contrast_records, drafted_records
     from kenn.core.live_command import (
         LLM_COMMAND_SYSTEM_PROMPT, LLM_COMMAND_SYSTEM_PROMPT_COMPACT, planner_user_prompt, validate_llm_plan,
     )
@@ -425,11 +428,14 @@ def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = Fal
     rows: list[dict[str, Any]] = []
     for scenario_number, snapshot in enumerate(scenario_snapshots()[:scenarios], start=1):
         snapshot_text = json.dumps(snapshot, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
-        seeds = records() + (drafted_records(snapshot, _plan) if include_drafted else [])
+        seeds = (records() + (drafted_records(snapshot, _plan) if include_drafted else [])
+                 + (contrast_records(snapshot, _plan) if include_contrast else []))
         for seed in seeds:
             scenario_seed = _scenario_seed(seed, snapshot)
             count = clarify_variants if clarify_variants and seed["label"]["action"] == "clarify" else variants
             for number, query in enumerate(_variants(scenario_seed, count), start=1):
+                if normalize_query(query) in held_out and seed["record_id"].startswith("draft-contrast"):
+                    continue  # a contrast lesson that repeats an evaluation phrasing is dropped, not reworded
                 if normalize_query(query) in held_out:
                     query = query + " in the current Live session"
                     while normalize_query(query) in held_out:
@@ -474,6 +480,8 @@ def main() -> int:
     parser.add_argument("--scenarios", type=int, default=1, help="Distinct synthetic track-name snapshots to include (1-4)")
     parser.add_argument("--include-drafted", action="store_true",
                         help="add the drafted clarify seeds (drafted_command_seeds.py; owner review pending)")
+    parser.add_argument("--include-contrast", action="store_true",
+                        help="add exact-track contrast lessons for similar names (drafted_command_seeds.contrast_records)")
     parser.add_argument("--production-evidence", action="store_true",
                         help="per-record single-track parameter evidence as the gateway sends it, real Live indices")
     parser.add_argument("--max-per-action", type=int, default=0,
@@ -486,7 +494,7 @@ def main() -> int:
     args = parser.parse_args()
     rows = build_rows(variants=args.variants, scenarios=args.scenarios, include_drafted=args.include_drafted,
                       prompt=args.prompt, clarify_variants=args.clarify_variants,
-                      production_evidence=args.production_evidence)
+                      production_evidence=args.production_evidence, include_contrast=args.include_contrast)
     if args.max_per_action:
         rows = cap_per_action(rows, args.max_per_action)
     from build_kenn_command_training import assert_no_holdout_overlap

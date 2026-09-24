@@ -136,6 +136,37 @@ DRAFTED_RECIPE_SEEDS: tuple[tuple[str, str, tuple[tuple[str, int | None, dict[st
      (("set_solo", 0, {"value": True, "unit": "boolean"}), ("transport_play", None, {}))),
 )
 
+def contrast_records(snapshot: dict[str, Any], plan: Any) -> list[dict[str, Any]]:
+    """Exact-track lessons for sets with similar names (C6 run 8).
+
+    Each track by full name, and by each single word of its name: a word that
+    names exactly one track acts on it; a word shared by two tracks ("vox" in
+    "Lead Vox" and "Vox Bus") must ask which one.
+    """
+    tracks = snapshot["tracks"][:5]
+    rows: list[dict[str, Any]] = []
+    for position, track in enumerate(tracks):
+        name = str(track["name"])
+        words = [w for w in name.lower().split() if len(w) > 2]
+        for verb, action, value in (("Solo", "set_solo", True), ("Mute", "set_mute", True)):
+            rows.append({"record_id": f"draft-contrast-{verb.lower()}-{position}-full", "category": "supported_control",
+                         "query": f"{verb} the {name}", "source_kind": SOURCE_KIND,
+                         "label": plan(action, track_index=position, track_name=name, value=value, unit="boolean")})
+            for word in words:
+                owners = [t for t in tracks if word in str(t["name"]).lower().split()]
+                record = {"record_id": f"draft-contrast-{verb.lower()}-{position}-{word}", "category": "supported_control",
+                          "query": f"{verb} the {word}", "source_kind": SOURCE_KIND}
+                if len(owners) == 1:
+                    record["label"] = plan(action, track_index=position, track_name=name, value=value, unit="boolean")
+                else:
+                    record["category"] = "ambiguity"
+                    record["label"] = plan("clarify", clarification=f"Which track do you mean: "
+                                           + " or ".join(str(t["name"]) for t in owners) + "?")
+                if not any(r["query"] == record["query"] for r in rows):
+                    rows.append(record)
+    return rows
+
+
 def drafted_records(snapshot: dict[str, Any], plan: Any) -> list[dict[str, Any]]:
     """Seed rows in the reviewed seeds' shape, filled with this snapshot's track names."""
     names = {f"t{index}": track["name"] for index, track in enumerate(snapshot["tracks"][:5])}
@@ -166,5 +197,5 @@ def drafted_records(snapshot: dict[str, Any], plan: Any) -> list[dict[str, Any]]
     return rows
 
 
-__all__ = ["DRAFTED_ACTION_SEEDS", "DRAFTED_CLARIFY_SEEDS", "DRAFTED_GLOBAL_SEEDS", "DRAFTED_RECIPE_SEEDS",
+__all__ = ["contrast_records", "DRAFTED_ACTION_SEEDS", "DRAFTED_CLARIFY_SEEDS", "DRAFTED_GLOBAL_SEEDS", "DRAFTED_RECIPE_SEEDS",
            "DRAFTED_TRACK_SEEDS", "SOURCE_KIND", "drafted_records"]
