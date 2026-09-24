@@ -943,6 +943,11 @@ _ORDINAL_CHANNEL = re.compile(
 _CORRECTION_LEAD = re.compile(r"^\s*(?:no\s+wait|no|wait|sorry|actually|oops)\s*[,.!:;-]\s*", re.I)
 _CORRECTION_TAIL = re.compile(r",?\s+(?:not|instead\s+of)\s+the\s+[\w\s/'-]+?\s*[.!]?\s*$", re.I)
 _CALL_TRACK = re.compile(r"^\s*call\s+(track\s+\d+)\s+['\"]?(.+?)['\"]?\s*[.!]?\s*$", re.I)
+_TERSE_LEVEL = re.compile(
+    r"^\s*(?!(?:set|put|bring|turn|send|pan|make|move|drop|push|pull|get|take|mute|solo|arm|rename|call)\b)"
+    r"(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,3}?)\s+(?:to|at)\s+(?P<amount>(?:minus\s+|[-+])?\d+(?:\.\d+)?)\s*dbs?\s*[.!]?\s*$",
+    re.I)
+_TERSE_LEVEL_EXCLUDE = re.compile(r"\b(?:send|sends|reverb|delay|echo|eq|band|gain|threshold|makeup|output|input)\b", re.I)
 
 
 def _rewrite_common_phrasings(text: str) -> str:
@@ -950,7 +955,8 @@ def _rewrite_common_phrasings(text: str) -> str:
 
     "the second channel" -> "track 2"; a correction ("no wait, mute the snare
     not the hats") keeps only the new instruction; "call track 8 Sweeps" is a
-    rename. Nothing here changes what a request means.
+    rename; "kick to -12 dB" is "set kick to -12 dB" (only with the unit said:
+    a bare "kick to -9" still asks). Nothing here changes what a request means.
     """
     text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
     corrected = _CORRECTION_LEAD.sub("", text)
@@ -959,6 +965,9 @@ def _rewrite_common_phrasings(text: str) -> str:
     call = _CALL_TRACK.match(text)
     if call:
         text = f"rename {call.group(1)} to {call.group(2)}"
+    level = _TERSE_LEVEL.match(text)
+    if level and not _TERSE_LEVEL_EXCLUDE.search(level.group("name")):
+        text = f"set {level.group('name')} to {level.group('amount')} dB"  # "kick to -12 dB": an absolute level
     return text
 
 
