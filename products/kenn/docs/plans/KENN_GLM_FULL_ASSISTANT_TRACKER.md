@@ -207,3 +207,12 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 | 2026-09-23 | C1 ticked; C2 Mac bake-off results and parser baseline | `62580f9` | `KENN_C2_PLANNER_BAKEOFF_MAC_2026-09-23.md` |
 | 2026-09-23 | C2 ticked: GPU bake-off, thinking modes, prompt order fix | `e7b41af` | `KENN_C2_PLANNER_BAKEOFF_GPU_2026-09-23.md` |
 | 2026-09-23 | C6 run 1: qwen3.5:4b LoRA on GPU 0; clarify 30/30, 5 wrong plans accepted | (this commit) | `KENN_C6_LORA_PILOT_2026-09-23.md` |
+| 2026-09-24 | Volume in real dB: Live 12.4.6 fader law measured (0 dB = 0.85, +6 dB = 1.0); all dB conversions through `volume_law` | `af22ef3`, `2477643` | `core/live_volume_law.json` |
+| 2026-09-24 | Device focus fixed (select the track before `select_device`); demo step 8 device focus; owner rehearsal 20/20 | `53bde0a`, `c8b78f0` | Rehearsal log |
+| 2026-09-24 | Beta plan written; safety refusals survive typos; audio cache survives restarts; idle-wake retry | `d2016ac`–`e628af9` | `KENN_BETA_PLAN_2026-09-24.md` |
+| 2026-09-24 | Qualified beta gate 3/14 → 8/14 (all engineering gates): hybrid retrieval (MiniLM, recall@4 0.966), planner bake-off re-run, real-Live assistant task, suite per target | `4c15561`–`ef27425` | `tooling/evaluation/results/` |
+| 2026-09-24 | 24 device notes drafted on the GPU notes model, reviewed against the manual, approved (74/78 → 77/78 devices) | (data, git-ignored) | `KENN_DEVICE_COVERAGE_2026-09-24.md` |
+| 2026-09-24 | Long-term plan: north star (hybrid brain, five staged gates) | `5e9fc19` | `KENN_NORTH_STAR_2026-09-24.md` |
+| 2026-09-24 | Beta app: `KENN.app` + DMG (207 MB), bundled Python, Set up KENN page (AbletonOSC install), smoke-tested builds, new tester guide | `7e597df`–`ca3279d` | `build_kenn_app.py` |
+| 2026-09-24 | Rule parser 80 → 112/124 (90.3%), 0 wrong plans: everyday phrasings, device focus by name, sends to a named return, "and" recipes, precise questions | `0807e9b`–`321668c` | tests in `test_live_intent_natural.py` |
+| 2026-09-24 | D1 read-only device measurement tool (ready for the post-soak wave) | `293f90b` | `measure_device_parameters.py` |
