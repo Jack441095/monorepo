@@ -5,10 +5,9 @@ converts through a table of Live's own display strings (``str_for_value`` on
 the mixer volume parameter, read-only) written by
 ``tooling/scripts/measure_live_volume_law.py`` to ``live_volume_law.json``.
 
-Until that table exists, KENN uses the Compressor Threshold table measured on
-real Live on 2026-09-21 (device_units.py). It has the same range as the fader
-(-inf..+6 dB, raw 0.85 = 0 dB), but that it shares the fader's taper is an
-assumption, so ``law().measured`` is False and the source says so.
+Without that table, KENN falls back to the Compressor Threshold table measured
+on real Live on 2026-09-21 (device_units.py), flagged ``measured=False``. The
+fader measurement (Live 12.4.6, 2026-09-24) matched it at all 20 points.
 """
 
 from __future__ import annotations
@@ -59,7 +58,7 @@ def parse_db(text: str) -> float | None:
 def clean_points(samples: list[tuple[float, str]]) -> list[tuple[float, float]]:
     """(raw, display) samples to strictly ascending (raw, dB) points.
 
-    Live shows one decimal, so neighbouring raw values share a display; each
+    Live rounds its display, so neighbouring raw values can share one; each
     run of equal displays becomes one point at the run's middle raw value.
     """
     runs: list[list[float]] = []
