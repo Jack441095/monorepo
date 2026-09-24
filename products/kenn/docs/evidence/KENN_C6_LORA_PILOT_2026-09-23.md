@@ -141,3 +141,29 @@ Re-scored with the dB conversion (GPU, 124 cases):
   phrasings. Run 3 needs more varied examples of clear commands, especially mute/solo, device parameters, inserts
   and two-part requests. Those would be new drafted seeds for owner review.
 - **The scorer does not check values.** A value-aware check needs expected values in the holdout.
+
+## Addendum: run 3, drafted clear-command seeds (2026-09-24)
+
+Run 3 added 19 drafted clear-command seeds in varied idioms (mute/unmute, solo/unsolo, volume in dB, pan) and mixer
+state in the training snapshots.
+
+- **Corpus:** 2,684 records, 34% clarify, mute examples 224 (was ~55).
+- **Training:** 302 steps, 20 min, peak 14.5 GB; validation loss 1.79 → 0.0003.
+
+| GPU, 124 cases | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted |
+|---|---|---|---|---|---|
+| Stock + full prompt | 65.3% | 19/30 | 62/94 | 13/24 | 15 |
+| Run 1 + compact prompt | 68.5% | **30/30** | 55/94 | 15/24 | **5** |
+| **Run 3 + compact prompt** | **72.6%** | 29/30 | 61/94 | **16/24** | 13 |
+
+- **Where the new seeds landed, run 3 fixed things.** Mute 5/5, pan 8/8, volume 11/12, slang 4/4, colloquial 4/4,
+  fragments 3/3, vague amount 9/9. Over-asking fell to 7 cases (from 23 in run 1).
+- **It also learned a dangerous shortcut.** Transport commands became mute (play/stop → `set_mute` in 5 cases);
+  224 mute examples outweighed the few transport ones.
+- **Still at 0 for run 3:** transport, rename, sends, device parameters, EQ, two-part requests.
+- **Wrong plans accepted rose from 5 to 13**, so run 3 is more accurate but less safe than run 1.
+- **Lesson: balance across every action matters, not just more examples.**
+- **Run 4 needs:**
+  - drafted seeds for transport, rename, sends, device parameters, EQ and two-part (recipe) requests;
+  - per-action balancing in the corpus builder;
+  - the same 124-case check, with "wrong plans accepted" as the promotion gate.
