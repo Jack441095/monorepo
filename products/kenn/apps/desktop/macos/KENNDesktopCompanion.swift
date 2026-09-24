@@ -105,8 +105,53 @@ final class KENNDesktopCompanion: NSObject, NSApplicationDelegate, WKNavigationD
         return [root.path, root.appendingPathComponent("runtime/legacy").path]
     }
 
+    /// The self-contained beta app: Resources/python (bundled CPython) and
+    /// Resources/kenn (KENN in its repository layout), built by build_kenn_app.py.
+    private var bundledKENN: (python: URL, root: URL)? {
+        guard let resources = Bundle.main.resourceURL else { return nil }
+        let python = resources.appendingPathComponent("python/bin/python3")
+        let root = resources.appendingPathComponent("kenn")
+        let entry = root.appendingPathComponent("apps/backend/src/kenn/app_entry.py")
+        guard FileManager.default.isExecutableFile(atPath: python.path),
+              FileManager.default.isReadableFile(atPath: entry.path) else { return nil }
+        return (python, root)
+    }
+
+    private func launchBundledServer(python: URL, root: URL) {
+        // The bundle is read-only: KENN writes under Application Support (see app_entry.py).
+        let dataFolder = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Application Support/KENN", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dataFolder, withIntermediateDirectories: true)
+        let task = Process()
+        task.executableURL = python
+        task.arguments = [root.appendingPathComponent("apps/backend/src/kenn/app_entry.py").path]
+        task.currentDirectoryURL = dataFolder
+        var environment = ProcessInfo.processInfo.environment
+        environment["PYTHONPATH"] = [
+            root.appendingPathComponent("apps/backend/src").path,
+            root.appendingPathComponent("packages/chat").path
+        ].joined(separator: ":")
+        environment["PYTHONNOUSERSITE"] = "1"
+        environment.removeValue(forKey: "PYTHONHOME")
+        task.environment = environment
+        attachLog(named: "server.log", to: task)
+        task.terminationHandler = { [weak self] _ in
+            DispatchQueue.main.async { self?.serverProcess = nil }
+        }
+        do {
+            try task.run()
+            serverProcess = task
+            setStatus("Starting KENN...", image: "arrow.clockwise.circle")
+            waitForServer(remainingAttempts: 60)
+        } catch {
+            setStatus("Could not start KENN: \(error.localizedDescription)", image: "exclamationmark.triangle.fill")
+        }
+    }
+
     @objc private func startOrConnect() {
-        ensureAutomixWorker()
+        if bundledKENN == nil {
+            ensureAutomixWorker()  // AutoMix is a developer-checkout feature, not part of the beta app
+        }
         health { [weak self] available in
             guard let self else { return }
             if available {
@@ -120,6 +165,10 @@ final class KENNDesktopCompanion: NSObject, NSApplicationDelegate, WKNavigationD
 
     private func launchServer() {
         guard serverProcess == nil || serverProcess?.isRunning == false else { return }
+        if let bundled = bundledKENN {
+            launchBundledServer(python: bundled.python, root: bundled.root)
+            return
+        }
         guard let root = repositoryRoot, let script = serverScript(in: root) else {
             setStatus("Choose a KENN repository to start the local companion", image: "exclamationmark.triangle.fill")
             return

@@ -63,6 +63,12 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > 2026-09-24: a duplicated, mis-indented line (repo line 1045; installed copy line 888) fixed in the repo; new test compiles all 46 Remote Script files. The installed copy was moved to `User Library/Remote Scripts/.backups_2026-09-24/`: KENN does not use it and it listens on port 11000 like AbletonOSC, so the beta installer must not ship it.
 - [ ] One companion bundle: KENN backend + UI as a macOS app (`apps/desktop/macos/build_macos_app.sh`) with its own
       Python runtime, no repo paths, no env vars (DAW control, capture paths and model settings become app settings)
+  > 2026-09-24 progress: `tooling/scripts/build_kenn_app.py` builds `KENN.app` (arm64) in ~40 s: Swift launcher with a
+  > bundled mode, standalone CPython 3.13.15 (python-build-standalone, SHA-256 pinned), runtime packages, KENN in its repo
+  > layout, and the active index, notes, embedding model, UI and native DSP module from the main checkout. Settings and
+  > data: `kenn/app_entry.py` (`~/Library/Application Support/KENN`, `settings.json`). Checked from an empty environment:
+  > healthy, hybrid retrieval, cited answers, UI served. 540 MB uncompressed (scipy, onnxruntime, sklearn, numpy, model);
+  > trim later. Still to do: launch-by-double-click test with Live, Remote Script install, first-run check, DMG.
 - [ ] Installer puts AbletonOSC (KENN build, version-stamped) in the user's Live User Library and tells them to select it
       in Live's Control Surface settings
 - [ ] First-run check inside the app: the read-only preflight (Live connected, script version, knowledge index, audio
