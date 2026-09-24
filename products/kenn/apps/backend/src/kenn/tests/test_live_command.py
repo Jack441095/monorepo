@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from copy import deepcopy
 import math
 
@@ -1180,6 +1182,24 @@ def test_mixer_and_focus_commands_select_one_complete_snapshot_up_front() -> Non
     assert focus["proposal"]["track_name"] == "Bass"
     assert focus_live.snapshot_modes == [True]
 
+
+
+@pytest.mark.parametrize("command, delta_db", [
+    ("Bring the bass down 2 dB", -2.0), ("bass up 1.5 dB", 1.5), ("take the bass back a couple of dB", -2.0),
+])
+def test_relative_level_changes_read_the_mixer_whatever_the_wording(command, delta_db) -> None:
+    """Regression (real Live, 24 Sept): the tester guide's first example got a topology-only snapshot with no fader
+    values, so the relative change could not be computed and KENN answered "I'm not sure what you're asking"."""
+    from kenn.core import volume_law
+
+    live = SplitSnapshotLive()
+    result = handle_command(command, session_id=f"command-relative-{delta_db}", service=_service(live))
+
+    assert result["status"] == "confirmation_required"
+    assert result["proposal"]["track_name"] == "Bass"
+    expected = volume_law.db_to_raw(volume_law.raw_to_db(0.5) + delta_db)
+    assert result["proposal"]["after"] == pytest.approx(expected, abs=1e-4)
+    assert live.snapshot_modes[-1] is True
 
 def test_focus_device_command_is_proposed_and_verified() -> None:
     fake = FakeLive()

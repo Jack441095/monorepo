@@ -2202,9 +2202,11 @@ def _command_needs_mixer_snapshot(command: str, llm_plan: dict[str, Any] | None 
     if isinstance(llm_plan, dict) and llm_plan.get("action") in TRACK_ACTIONS:
         return True
     normalized = " ".join(str(command or "").casefold().split())
+    # Relative level changes need the current fader value: "bring the bass down 2 dB" has none of the control
+    # words, so any dB amount or up/down wording also reads the mixer (one more read, never a wrong answer).
     return bool(re.search(
-        r"\b(?:pan|volume|mute|unmute|solo|unsolo|arm|disarm|louder|quieter|softer|focus|select)\b|"
-        r"\bturn\s+(?:up|down)\b",
+        r"\b(?:pan|volume|mute|unmute|solo|unsolo|arm|disarm|louder|quieter|softer|focus|select|level|fader)\b|"
+        r"\bturn\s+(?:up|down)\b|\d\s*dbs?\b|\b(?:up|down|lower|raise|boost|cut|drop|reduce|tuck)\b",
         normalized,
     ))
 
@@ -2603,6 +2605,13 @@ def _handle_command_impl(
     generated_plan: dict[str, Any] | None = None
     parse_started = time.monotonic()
     deterministic_intent = parse_request(clean_command, snapshot)
+    if not mixer_snapshot and "current_volume" in (deterministic_intent.get("missing_fields") or []):
+        # The fast topology read has no fader values; a relative change the wording check above missed still works.
+        mixer_snapshot = True
+        snapshot = {**_command_snapshot(live, include_mixer=True),
+                    **({"scenes": snapshot["scenes"]} if "scenes" in snapshot and "scene" in clean_command.lower() else {}),
+                    **({"return_tracks": snapshot["return_tracks"]} if "return_tracks" in snapshot else {})}
+        deterministic_intent = parse_request(clean_command, snapshot)
     natural_recipe = parse_natural_recipe(clean_command, snapshot)
     response.setdefault("latency", {})["parse_ms"] = round((time.monotonic() - parse_started) * 1000.0, 2)
     if natural_recipe is not None:
