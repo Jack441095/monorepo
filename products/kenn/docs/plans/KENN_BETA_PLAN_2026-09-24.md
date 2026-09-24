@@ -87,10 +87,19 @@ The beta cannot start while KENN only runs from this Mac's checkout.
 - [x] Companion restart keeps the audio-analysis cache warm (persist it) so a restart cannot break an answer
   > 2026-09-24: measured results (never audio) persist by content hash in `kenn/data/analysis_cache/` (16 files max; `KENN_ANALYSIS_CACHE_DIR` overrides; tests isolated). After a companion restart with no preflight, demo steps 12–13 answered in 0.2–0.4 s (cold: 3.2 s) and the gate passed.
 - [ ] 24-hour soak with Live restarts, companion restarts and sleep/wake (`companion_soak` gate)
+  > Gate needs 24 h on one companion process and ≥ 1 Live disconnect/reconnect: run overnight when no code is being deployed; owner quits and reopens Live once.
 - [ ] Regenerate stale evidence: `automated_suite`, `intelligence` (`--run-suite --run-intelligence`),
       `planner_bakeoff` (missing input `chat/evals/ableton_deliberative_adversarial.json`), `real_live_assistant`
       (lifecycle/replay check failing), `artifacts` (five named docs missing)
+  > 2026-09-24 progress — gate 4/14 → with suite: **artifacts** pass (gate now looks in docs/reports|plans|runbooks);
+  > **planner_bakeoff** pass (re-run on the box, GPU 0: 3 repeats × both sealed suites all passed, mean 2.6 s);
+  > **automated_suite** fixed (Mix Review imports Audio_Too's `server/app` and `shared/nite_core` again; each suite target
+  > runs in its own process because Audio_Too packages shadowed KENN modules) — passes on re-run.
+  > Blocked on owner: **intelligence** needs hybrid retrieval (MiniLM embedding model, ~90 MB pinned download, not yet
+  > approved); **real_live_assistant** needs the box's planner server (running since 9 Sept) restarted with the repo
+  > version of `serve_transformers_ollama_compat.py` (only a `--cuda-devices` flag differs) — box rule: no restarts.
 - [ ] Refresh the human-review packet against the current index (`human_review` is stale after today's rebuild)
+  > Packet builder works (100 cases, 3 s). Build the final packet after the embedding decision, since it binds the active index.
 - [ ] **Exit:** gate shows every engineering gate passing; only human, pilot and distribution gates left
 
 ## Phase 3: Fill the capability gaps testers will hit first (weeks 2–3)
