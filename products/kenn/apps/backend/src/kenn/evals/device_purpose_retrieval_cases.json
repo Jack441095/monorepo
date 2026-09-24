@@ -1,0 +1,1790 @@
+{
+ "schema": "kenn.retrieval_cases.v1",
+ "note": "Questions describe what a producer wants without naming the device; each expects the device's note in the top results. Claude-drafted 2026-09-24, pending owner review. Separate from questions.json so the qualified intelligence gate's fixture is unchanged. Scoring uses source_any_include (the device note, or a chunk whose title names the device); source_must_include keeps the strict note-only target.",
+ "cases": [
+  {
+   "id": "device-purpose-001",
+   "question": "how do I line up two mics that are a few milliseconds out of time",
+   "source_must_include": [
+    "align-delay"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "align-delay",
+    "align delay"
+   ]
+  },
+  {
+   "id": "device-purpose-002",
+   "question": "delay one track by a number of samples so it lines up with the others",
+   "source_must_include": [
+    "align-delay"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "align-delay",
+    "align delay"
+   ]
+  },
+  {
+   "id": "device-purpose-003",
+   "question": "I want my DI guitar to sound like it went through a real guitar amp",
+   "source_must_include": [
+    "amp-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "amp-device",
+    "amp effect",
+    "amp device"
+   ]
+  },
+  {
+   "id": "device-purpose-004",
+   "question": "which built-in effect emulates a guitar amplifier head",
+   "source_must_include": [
+    "amp-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "amp-device",
+    "amp effect",
+    "amp device"
+   ]
+  },
+  {
+   "id": "device-purpose-005",
+   "question": "virtual subtractive synth with two oscillators and two filters in Live",
+   "source_must_include": [
+    "analog-"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "analog-",
+    "analog synth",
+    "ableton analog"
+   ]
+  },
+  {
+   "id": "device-purpose-006",
+   "question": "turn a held chord into a rhythmic pattern of single notes",
+   "source_must_include": [
+    "arpeggiator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "arpeggiator",
+    "arpeggiat"
+   ]
+  },
+  {
+   "id": "device-purpose-007",
+   "question": "how can I make my chord play up and down automatically",
+   "source_must_include": [
+    "arpeggiator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "arpeggiator",
+    "arpeggiat"
+   ]
+  },
+  {
+   "id": "device-purpose-008",
+   "question": "how do I make a filter sweep move with an LFO",
+   "source_must_include": [
+    "auto-filter"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "auto-filter",
+    "auto filter"
+   ]
+  },
+  {
+   "id": "device-purpose-009",
+   "question": "my pad needs a resonant low pass that opens and closes on its own",
+   "source_must_include": [
+    "auto-filter"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "auto-filter",
+    "auto filter"
+   ]
+  },
+  {
+   "id": "device-purpose-010",
+   "question": "how do I make a sound bounce between left and right speakers in time",
+   "source_must_include": [
+    "auto-pan"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "auto-pan",
+    "auto pan"
+   ]
+  },
+  {
+   "id": "device-purpose-011",
+   "question": "create a tremolo effect that pulses the volume to the beat",
+   "source_must_include": [
+    "auto-pan"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "auto-pan",
+    "auto pan"
+   ]
+  },
+  {
+   "id": "device-purpose-012",
+   "question": "how do I tune a vocal in real time inside Live",
+   "source_must_include": [
+    "auto-shift"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "auto-shift",
+    "auto shift"
+   ]
+  },
+  {
+   "id": "device-purpose-013",
+   "question": "hard tuned robotic vocal effect with formant tracking",
+   "source_must_include": [
+    "auto-shift"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "auto-shift",
+    "auto shift"
+   ]
+  },
+  {
+   "id": "device-purpose-014",
+   "question": "make a stutter fill by repeating a slice of the drums",
+   "source_must_include": [
+    "beat-repeat"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "beat-repeat",
+    "beat repeat"
+   ]
+  },
+  {
+   "id": "device-purpose-015",
+   "question": "glitchy repeated vocal chops at the end of a phrase",
+   "source_must_include": [
+    "beat-repeat"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "beat-repeat",
+    "beat repeat"
+   ]
+  },
+  {
+   "id": "device-purpose-016",
+   "question": "commit a MIDI track to audio so I can edit it as a waveform",
+   "source_must_include": [
+    "bounce-to-audio"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "bounce-to-audio",
+    "freeze-flatten-bounce",
+    "bounce"
+   ]
+  },
+  {
+   "id": "device-purpose-017",
+   "question": "speaker cab impulse response for a bass or guitar DI",
+   "source_must_include": [
+    "cabinet-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "cabinet-device",
+    "cabinet"
+   ]
+  },
+  {
+   "id": "device-purpose-018",
+   "question": "send MIDI continuous controller messages to external gear from a clip",
+   "source_must_include": [
+    "cc-control"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "cc-control",
+    "cc control"
+   ]
+  },
+  {
+   "id": "device-purpose-019",
+   "question": "simple three band console style EQ with a fixed high pass",
+   "source_must_include": [
+    "channel-eq"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "channel-eq",
+    "channel eq"
+   ]
+  },
+  {
+   "id": "device-purpose-020",
+   "question": "thicken and widen a synth pad with modulated delay lines",
+   "source_must_include": [
+    "chorus-ensemble"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "chorus-ensemble",
+    "chorus ensemble"
+   ]
+  },
+  {
+   "id": "device-purpose-021",
+   "question": "how do I get a classic ensemble string chorus sound",
+   "source_must_include": [
+    "chorus-ensemble"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "chorus-ensemble",
+    "chorus ensemble"
+   ]
+  },
+  {
+   "id": "device-purpose-022",
+   "question": "automation that only plays with a particular clip rather than the timeline",
+   "source_must_include": [
+    "clip-envelopes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "clip-envelopes",
+    "clip envelope"
+   ]
+  },
+  {
+   "id": "device-purpose-023",
+   "question": "synth that sounds like struck mallets and marimbas",
+   "source_must_include": [
+    "collision"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "collision",
+    "collision"
+   ]
+  },
+  {
+   "id": "device-purpose-024",
+   "question": "record several vocal takes and pick the best parts of each",
+   "source_must_include": [
+    "comping-and-take-lanes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "comping-and-take-lanes",
+    "comping",
+    "take lanes"
+   ]
+  },
+  {
+   "id": "device-purpose-025",
+   "question": "how do I build a comp from multiple recorded passes",
+   "source_must_include": [
+    "comping-and-take-lanes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "comping-and-take-lanes",
+    "comping",
+    "take lanes"
+   ]
+  },
+  {
+   "id": "device-purpose-026",
+   "question": "what do peak rms and expand detection modes do on the stock compressor",
+   "source_must_include": [
+    "compressor-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "compressor-device",
+    "compressor"
+   ]
+  },
+  {
+   "id": "device-purpose-027",
+   "question": "how do I set up lookahead and sidechain filtering on a compressor",
+   "source_must_include": [
+    "compressor-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "compressor-device",
+    "compressor"
+   ]
+  },
+  {
+   "id": "device-purpose-028",
+   "question": "extract the melody from a recorded audio clip into notes",
+   "source_must_include": [
+    "converting-audio-to-midi"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "converting-audio-to-midi",
+    "audio to midi"
+   ]
+  },
+  {
+   "id": "device-purpose-029",
+   "question": "turn a drum loop recording into a MIDI pattern",
+   "source_must_include": [
+    "converting-audio-to-midi"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "converting-audio-to-midi",
+    "audio to midi"
+   ]
+  },
+  {
+   "id": "device-purpose-030",
+   "question": "make a drum hit ring at a musical pitch",
+   "source_must_include": [
+    "corpus-resonators"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "corpus-resonators",
+    "corpus",
+    "resonator"
+   ]
+  },
+  {
+   "id": "device-purpose-031",
+   "question": "my laptop CPU meter is maxing out, how do I reduce the load",
+   "source_must_include": [
+    "cpu-management-and-freezing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "cpu-management-and-freezing",
+    "freez",
+    "cpu"
+   ]
+  },
+  {
+   "id": "device-purpose-032",
+   "question": "how do I freeze a track to save processing",
+   "source_must_include": [
+    "cpu-management-and-freezing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "cpu-management-and-freezing",
+    "freez",
+    "cpu"
+   ]
+  },
+  {
+   "id": "device-purpose-033",
+   "question": "control a eurorack modular synth with control voltage from Live",
+   "source_must_include": [
+    "cv-tools"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "cv-tools",
+    "cv tools"
+   ]
+  },
+  {
+   "id": "device-purpose-034",
+   "question": "tracks drift out of time when I add plugins, what compensates for that",
+   "source_must_include": [
+    "device-delay-compensation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "device-delay-compensation",
+    "delay compensation"
+   ]
+  },
+  {
+   "id": "device-purpose-035",
+   "question": "analog modeled synth with morphing oscillators introduced in 11.3",
+   "source_must_include": [
+    "drift"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "drift",
+    "drift"
+   ]
+  },
+  {
+   "id": "device-purpose-036",
+   "question": "add weight and punch to my drum group with one device",
+   "source_must_include": [
+    "drum-buss"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "drum-buss",
+    "drum buss"
+   ]
+  },
+  {
+   "id": "device-purpose-037",
+   "question": "one shot drum sample player with transient shaping",
+   "source_must_include": [
+    "drum-sampler"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "drum-sampler",
+    "drum sampler"
+   ]
+  },
+  {
+   "id": "device-purpose-038",
+   "question": "tube preamp warmth with dynamic bias",
+   "source_must_include": [
+    "dynamic-tube"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "dynamic-tube",
+    "dynamic tube"
+   ]
+  },
+  {
+   "id": "device-purpose-039",
+   "question": "tape style delay with ping pong and a noise and wobble character",
+   "source_must_include": [
+    "echo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "echo-device",
+    "ableton echo",
+    "echo device",
+    "echo effect"
+   ]
+  },
+  {
+   "id": "device-purpose-040",
+   "question": "vintage analog delay with a ducking option so repeats sit behind the vocal",
+   "source_must_include": [
+    "echo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "echo-device",
+    "ableton echo",
+    "echo device",
+    "echo effect"
+   ]
+  },
+  {
+   "id": "device-purpose-041",
+   "question": "edit per note pitch bend and slide expression in the piano roll",
+   "source_must_include": [
+    "editing-mpe"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "editing-mpe",
+    "mpe"
+   ]
+  },
+  {
+   "id": "device-purpose-042",
+   "question": "realistic Rhodes style electric piano instrument",
+   "source_must_include": [
+    "electric-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "electric-device",
+    "electric piano",
+    "ableton electric"
+   ]
+  },
+  {
+   "id": "device-purpose-043",
+   "question": "use the loudness of one sound to move a knob on another device",
+   "source_must_include": [
+    "envelope-follower"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "envelope-follower",
+    "envelope follower"
+   ]
+  },
+  {
+   "id": "device-purpose-044",
+   "question": "ADSR modulator that is triggered by MIDI notes to control parameters",
+   "source_must_include": [
+    "envelope-midi"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "envelope-midi",
+    "envelope midi"
+   ]
+  },
+  {
+   "id": "device-purpose-045",
+   "question": "parametric equaliser with eight bands and mid side mode",
+   "source_must_include": [
+    "eq-eight"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "eq-eight",
+    "eq eight"
+   ]
+  },
+  {
+   "id": "device-purpose-046",
+   "question": "how do I cut just the side channel low end with an EQ",
+   "source_must_include": [
+    "eq-eight"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "eq-eight",
+    "eq eight"
+   ]
+  },
+  {
+   "id": "device-purpose-047",
+   "question": "DJ style three band kill EQ with crossover frequencies",
+   "source_must_include": [
+    "eq-three"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "eq-three",
+    "eq three"
+   ]
+  },
+  {
+   "id": "device-purpose-048",
+   "question": "add digital grit and radio distortion with filtered noise",
+   "source_must_include": [
+    "erosion"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "erosion",
+    "erosion"
+   ]
+  },
+  {
+   "id": "device-purpose-049",
+   "question": "map MPE pressure or slide to any parameter",
+   "source_must_include": [
+    "expression-control"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "expression-control",
+    "expression control"
+   ]
+  },
+  {
+   "id": "device-purpose-050",
+   "question": "send a track out to my hardware compressor and back into Live",
+   "source_must_include": [
+    "external-audio-effect"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "external-audio-effect",
+    "external audio effect"
+   ]
+  },
+  {
+   "id": "device-purpose-051",
+   "question": "play a hardware synth from a MIDI track and hear its audio return on the same track",
+   "source_must_include": [
+    "external-instrument"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "external-instrument",
+    "external instrument"
+   ]
+  },
+  {
+   "id": "device-purpose-052",
+   "question": "three independent delays each with their own band pass filter",
+   "source_must_include": [
+    "filter-delay"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "filter-delay",
+    "filter delay"
+   ]
+  },
+  {
+   "id": "device-purpose-053",
+   "question": "make clips trigger other clips automatically after they finish",
+   "source_must_include": [
+    "follow-actions"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "follow-actions",
+    "follow action"
+   ]
+  },
+  {
+   "id": "device-purpose-054",
+   "question": "randomly jump between clips in a scene for generative playback",
+   "source_must_include": [
+    "follow-actions"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "follow-actions",
+    "follow action"
+   ]
+  },
+  {
+   "id": "device-purpose-055",
+   "question": "exporting one shot sound effects for a game engine",
+   "source_must_include": [
+    "game-audio-asset-prep"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "game-audio-asset-prep",
+    "game audio"
+   ]
+  },
+  {
+   "id": "device-purpose-056",
+   "question": "SSL style bus compressor to glue a mix together",
+   "source_must_include": [
+    "glue-compressor"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "glue-compressor",
+    "glue compressor"
+   ]
+  },
+  {
+   "id": "device-purpose-057",
+   "question": "analog modeled bus compression for the drum group",
+   "source_must_include": [
+    "glue-compressor"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "glue-compressor",
+    "glue compressor"
+   ]
+  },
+  {
+   "id": "device-purpose-058",
+   "question": "granular delay with pitch randomisation for textures",
+   "source_must_include": [
+    "grain-delay"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "grain-delay",
+    "grain delay"
+   ]
+  },
+  {
+   "id": "device-purpose-059",
+   "question": "blend a convolution space with an algorithmic reverb tail",
+   "source_must_include": [
+    "hybrid-reverb"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "hybrid-reverb",
+    "hybrid reverb"
+   ]
+  },
+  {
+   "id": "device-purpose-060",
+   "question": "reverb that combines an impulse response with a generated tail",
+   "source_must_include": [
+    "hybrid-reverb"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "hybrid-reverb",
+    "hybrid reverb"
+   ]
+  },
+  {
+   "id": "device-purpose-061",
+   "question": "what is the difference between trigger gate toggle and repeat launch modes",
+   "source_must_include": [
+    "launching-clips"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "launching-clips",
+    "launch mode",
+    "launching clips"
+   ]
+  },
+  {
+   "id": "device-purpose-062",
+   "question": "modulate up to eight parameters with a low frequency oscillator",
+   "source_must_include": [
+    "lfo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "lfo-device",
+    "lfo device",
+    "ableton lfo"
+   ]
+  },
+  {
+   "id": "device-purpose-063",
+   "question": "brickwall peak limiting to stop clipping on a bus",
+   "source_must_include": [
+    "limiter-and-gate"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "limiter-and-gate",
+    "limiter",
+    "gate"
+   ]
+  },
+  {
+   "id": "device-purpose-064",
+   "question": "cut out background noise between snare hits",
+   "source_must_include": [
+    "limiter-and-gate"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "limiter-and-gate",
+    "limiter",
+    "gate"
+   ]
+  },
+  {
+   "id": "device-purpose-065",
+   "question": "keep tempo in sync with another laptop over wifi",
+   "source_must_include": [
+    "link-sync"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "link-sync",
+    "ableton link"
+   ]
+  },
+  {
+   "id": "device-purpose-066",
+   "question": "can I DJ with Ableton instead of Traktor",
+   "source_must_include": [
+    "live-djing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "live-djing",
+    "dj"
+   ]
+  },
+  {
+   "id": "device-purpose-067",
+   "question": "record and overdub loops live like a pedal",
+   "source_must_include": [
+    "looper"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "looper",
+    "looper"
+   ]
+  },
+  {
+   "id": "device-purpose-068",
+   "question": "loop pedal style recording that syncs to the song tempo",
+   "source_must_include": [
+    "looper"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "looper",
+    "looper"
+   ]
+  },
+  {
+   "id": "device-purpose-069",
+   "question": "build my own custom device inside Live",
+   "source_must_include": [
+    "max-for-live"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "max-for-live",
+    "max for live"
+   ]
+  },
+  {
+   "id": "device-purpose-070",
+   "question": "how do I get my keyboard controller working with Live",
+   "source_must_include": [
+    "midi-controller-setup"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "midi-controller-setup",
+    "midi controller"
+   ]
+  },
+  {
+   "id": "device-purpose-071",
+   "question": "why is my MIDI timing slightly off and jittery",
+   "source_must_include": [
+    "midi-fact-sheet-timing-jitter"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "midi-fact-sheet-timing-jitter",
+    "jitter",
+    "midi timing"
+   ]
+  },
+  {
+   "id": "device-purpose-072",
+   "question": "see which notes and velocities are coming in from my controller",
+   "source_must_include": [
+    "midi-monitor"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "midi-monitor",
+    "midi monitor"
+   ]
+  },
+  {
+   "id": "device-purpose-073",
+   "question": "generate new rhythm patterns with the MIDI generators",
+   "source_must_include": [
+    "midi-tools-transformations"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "midi-tools-transformations",
+    "transformation",
+    "generator"
+   ]
+  },
+  {
+   "id": "device-purpose-074",
+   "question": "strum a chord in the clip editor",
+   "source_must_include": [
+    "midi-tools-transformations"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "midi-tools-transformations",
+    "transformation",
+    "generator"
+   ]
+  },
+  {
+   "id": "device-purpose-075",
+   "question": "how much headroom should my tracks leave on the mixer meters",
+   "source_must_include": [
+    "mixing-and-gain-staging"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "mixing-and-gain-staging",
+    "gain staging",
+    "gain-staging"
+   ]
+  },
+  {
+   "id": "device-purpose-076",
+   "question": "what does the fader range and peak versus rms metering show",
+   "source_must_include": [
+    "mixing-and-gain-staging"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "mixing-and-gain-staging",
+    "gain staging",
+    "gain-staging"
+   ]
+  },
+  {
+   "id": "device-purpose-077",
+   "question": "reshape incoming MPE press and slide curves",
+   "source_must_include": [
+    "mpe-control"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "mpe-control",
+    "mpe control"
+   ]
+  },
+  {
+   "id": "device-purpose-078",
+   "question": "compress only the low end of a sound without touching the highs",
+   "source_must_include": [
+    "multiband-dynamics"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "multiband-dynamics",
+    "multiband dynamics"
+   ]
+  },
+  {
+   "id": "device-purpose-079",
+   "question": "upward and downward compression split into three bands",
+   "source_must_include": [
+    "multiband-dynamics"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "multiband-dynamics",
+    "multiband dynamics"
+   ]
+  },
+  {
+   "id": "device-purpose-080",
+   "question": "echo MIDI notes with decreasing velocity",
+   "source_must_include": [
+    "note-echo"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "note-echo",
+    "note echo"
+   ]
+  },
+  {
+   "id": "device-purpose-081",
+   "question": "four oscillator FM synthesis",
+   "source_must_include": [
+    "operator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "operator",
+    "operator"
+   ]
+  },
+  {
+   "id": "device-purpose-082",
+   "question": "how do I make a metallic bell using frequency modulation",
+   "source_must_include": [
+    "operator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "operator",
+    "operator"
+   ]
+  },
+  {
+   "id": "device-purpose-083",
+   "question": "guitar pedal style overdrive with a band pass filter controlled by an XY pad",
+   "source_must_include": [
+    "overdrive"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "overdrive",
+    "overdrive"
+   ]
+  },
+  {
+   "id": "device-purpose-084",
+   "question": "fuzz distortion stompbox emulation",
+   "source_must_include": [
+    "pedal-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "pedal-device",
+    "pedal"
+   ]
+  },
+  {
+   "id": "device-purpose-085",
+   "question": "jet plane sweep effect on a hi hat loop",
+   "source_must_include": [
+    "phaser-flanger"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "phaser-flanger",
+    "phaser",
+    "flanger"
+   ]
+  },
+  {
+   "id": "device-purpose-086",
+   "question": "notch sweep phasing effect on a guitar",
+   "source_must_include": [
+    "phaser-flanger"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "phaser-flanger",
+    "phaser",
+    "flanger"
+   ]
+  },
+  {
+   "id": "device-purpose-087",
+   "question": "transpose incoming MIDI notes by an octave",
+   "source_must_include": [
+    "pitch-and-note-length"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "pitch-and-note-length",
+    "pitch and note length",
+    "pitch midi"
+   ]
+  },
+  {
+   "id": "device-purpose-088",
+   "question": "map one knob to control several parameters at once",
+   "source_must_include": [
+    "racks-and-macros"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "racks-and-macros",
+    "macro"
+   ]
+  },
+  {
+   "id": "device-purpose-089",
+   "question": "switch between different sounds with a chain selector",
+   "source_must_include": [
+    "racks-and-chain-selectors"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "racks-and-chain-selectors",
+    "chain select"
+   ]
+  },
+  {
+   "id": "device-purpose-090",
+   "question": "randomise note pitches for variation",
+   "source_must_include": [
+    "random-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "random-device",
+    "random midi",
+    "ableton random"
+   ]
+  },
+  {
+   "id": "device-purpose-091",
+   "question": "bitcrush a drum loop to sound like an old 8 bit sampler",
+   "source_must_include": [
+    "redux"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "redux",
+    "redux"
+   ]
+  },
+  {
+   "id": "device-purpose-092",
+   "question": "reduce sample rate for a lo-fi aliasing effect",
+   "source_must_include": [
+    "redux"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "redux",
+    "redux"
+   ]
+  },
+  {
+   "id": "device-purpose-093",
+   "question": "multi stage saturation that can run in parallel or mid side",
+   "source_must_include": [
+    "roar"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "roar",
+    "roar"
+   ]
+  },
+  {
+   "id": "device-purpose-094",
+   "question": "heavy distortion with feedback and a compressor built in",
+   "source_must_include": [
+    "roar"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "roar",
+    "roar"
+   ]
+  },
+  {
+   "id": "device-purpose-095",
+   "question": "send several tracks into one group and change the output routing",
+   "source_must_include": [
+    "routing-and-submixing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "routing-and-submixing",
+    "routing"
+   ]
+  },
+  {
+   "id": "device-purpose-096",
+   "question": "what do the pre fx and post mixer tap points mean",
+   "source_must_include": [
+    "routing-and-submixing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "routing-and-submixing",
+    "routing"
+   ]
+  },
+  {
+   "id": "device-purpose-097",
+   "question": "multisampled instrument with velocity zones and key zones",
+   "source_must_include": [
+    "sampler-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "sampler-device",
+    "ableton sampler",
+    "sampler device"
+   ]
+  },
+  {
+   "id": "device-purpose-098",
+   "question": "soft clip my drums to shave the peaks",
+   "source_must_include": [
+    "saturator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "saturator",
+    "saturator"
+   ]
+  },
+  {
+   "id": "device-purpose-099",
+   "question": "add warm analog harmonics with a waveshaper",
+   "source_must_include": [
+    "saturator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "saturator",
+    "saturator"
+   ]
+  },
+  {
+   "id": "device-purpose-100",
+   "question": "force every note I play into a key",
+   "source_must_include": [
+    "scale-chord"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "scale-chord",
+    "scale",
+    "chord midi"
+   ]
+  },
+  {
+   "id": "device-purpose-101",
+   "question": "add harmony notes above each note I play",
+   "source_must_include": [
+    "scale-chord"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "scale-chord",
+    "scale",
+    "chord midi"
+   ]
+  },
+  {
+   "id": "device-purpose-102",
+   "question": "my loop clicks at the loop point in the game engine",
+   "source_must_include": [
+    "seamless-loop-clicks-wwise"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "seamless-loop-clicks-wwise",
+    "seamless loop",
+    "loop click"
+   ]
+  },
+  {
+   "id": "device-purpose-103",
+   "question": "draw a custom breakpoint envelope that modulates parameters",
+   "source_must_include": [
+    "shaper"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "shaper",
+    "shaper"
+   ]
+  },
+  {
+   "id": "device-purpose-104",
+   "question": "frequency shifting and ring modulation effect",
+   "source_must_include": [
+    "shifter"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "shifter",
+    "shifter"
+   ]
+  },
+  {
+   "id": "device-purpose-105",
+   "question": "play a single sample across the keyboard with a filter and envelope",
+   "source_must_include": [
+    "simpler"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "simpler",
+    "simpler"
+   ]
+  },
+  {
+   "id": "device-purpose-106",
+   "question": "freeze and smear audio in the frequency domain",
+   "source_must_include": [
+    "spectral"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "spectral",
+    "spectral time",
+    "spectral resonator"
+   ]
+  },
+  {
+   "id": "device-purpose-107",
+   "question": "see the frequency content of my mix in real time",
+   "source_must_include": [
+    "spectrum-analyzer"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "spectrum-analyzer",
+    "spectrum"
+   ]
+  },
+  {
+   "id": "device-purpose-108",
+   "question": "pull the vocal out of a finished song",
+   "source_must_include": [
+    "stem-separation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "stem-separation",
+    "stem separation"
+   ]
+  },
+  {
+   "id": "device-purpose-109",
+   "question": "split a stereo track into drums bass vocals and other",
+   "source_must_include": [
+    "stem-separation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "stem-separation",
+    "stem separation"
+   ]
+  },
+  {
+   "id": "device-purpose-110",
+   "question": "set up a default set with my routing and returns ready to go",
+   "source_must_include": [
+    "template-project"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "template-project",
+    "template"
+   ]
+  },
+  {
+   "id": "device-purpose-111",
+   "question": "make Live follow a live drummer's tempo",
+   "source_must_include": [
+    "tempo-follower"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "tempo-follower",
+    "tempo follower"
+   ]
+  },
+  {
+   "id": "device-purpose-112",
+   "question": "physical model of a bowed or plucked string",
+   "source_must_include": [
+    "tension"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "tension",
+    "tension"
+   ]
+  },
+  {
+   "id": "device-purpose-113",
+   "question": "check if my guitar is in tune",
+   "source_must_include": [
+    "tuner"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "tuner",
+    "tuner"
+   ]
+  },
+  {
+   "id": "device-purpose-114",
+   "question": "microtonal and non western scales across the whole project",
+   "source_must_include": [
+    "tuning-systems"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "tuning-systems",
+    "tuning system",
+    "microtun"
+   ]
+  },
+  {
+   "id": "device-purpose-115",
+   "question": "add swing to a stiff MIDI drum pattern",
+   "source_must_include": [
+    "using-grooves"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "using-grooves",
+    "groove"
+   ]
+  },
+  {
+   "id": "device-purpose-116",
+   "question": "apply the timing feel of a classic drum machine to my clips",
+   "source_must_include": [
+    "using-grooves"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "using-grooves",
+    "groove"
+   ]
+  },
+  {
+   "id": "device-purpose-117",
+   "question": "flip the polarity of one channel",
+   "source_must_include": [
+    "utility-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "utility-device",
+    "utility"
+   ]
+  },
+  {
+   "id": "device-purpose-118",
+   "question": "check my mix in mono and adjust stereo width",
+   "source_must_include": [
+    "utility-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "utility-device",
+    "utility"
+   ]
+  },
+  {
+   "id": "device-purpose-119",
+   "question": "compress the velocity range of incoming notes",
+   "source_must_include": [
+    "velocity-midi"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "velocity-midi",
+    "velocity midi",
+    "velocity effect"
+   ]
+  },
+  {
+   "id": "device-purpose-120",
+   "question": "add record crackle and turntable wobble",
+   "source_must_include": [
+    "vinyl-distortion"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "vinyl-distortion",
+    "vinyl distortion"
+   ]
+  },
+  {
+   "id": "device-purpose-121",
+   "question": "make a synth talk using my voice",
+   "source_must_include": [
+    "vocoder"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "vocoder",
+    "vocoder"
+   ]
+  },
+  {
+   "id": "device-purpose-122",
+   "question": "my drums sound smeared after time stretching",
+   "source_must_include": [
+    "warp-modes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "warp-modes",
+    "warp mode"
+   ]
+  },
+  {
+   "id": "device-purpose-123",
+   "question": "which warp mode should I use for a full mix",
+   "source_must_include": [
+    "warp-modes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "warp-modes",
+    "warp mode"
+   ]
+  },
+  {
+   "id": "device-purpose-124",
+   "question": "the kick clicks only after I warp it",
+   "source_must_include": [
+    "warped-kick-clicks"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "warped-kick-clicks",
+    "warped kick"
+   ]
+  },
+  {
+   "id": "device-purpose-125",
+   "question": "evolving digital textures by sweeping through wavetables",
+   "source_must_include": [
+    "wavetable"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "claude_drafted_owner_review_pending",
+   "source_any_include": [
+    "wavetable",
+    "wavetable"
+   ]
+  }
+ ]
+}
