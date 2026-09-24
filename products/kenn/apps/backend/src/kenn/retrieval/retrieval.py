@@ -1033,6 +1033,12 @@ def rerank_results(query: str, results: list[tuple[float, dict]]) -> list[tuple[
                 adjusted *= 0.68
         if chunk.get("kind") == "note":
             adjusted *= 1.08
+        # AutoMix's own decision-logic notes explain what AutoMix did; for everyday questions ("how do I keep my
+        # master under -1 dBTP?") they crowd out practical notes and show users internal names. Keep them for
+        # questions that are about AutoMix.
+        if (Path(str(chunk.get("source", ""))).name.lower().startswith("automix-")
+                and "automix" not in query_lower and "auto mix" not in query_lower):
+            adjusted *= 0.5
         for term in sorted(query_terms, key=len, reverse=True):
             if len(term) >= 5 and term in chunk_text:
                 adjusted *= 1.04
