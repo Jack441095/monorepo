@@ -394,6 +394,100 @@ _SPOKEN_SIGNED_DIGIT = re.compile(
 )
 
 
+_COUPLE_OF_DB = re.compile(r"\b(?:a\s+)?couple\s+(?:of\s+)?(?=(?:dbs?|decibels?)\b)", re.I)
+
+# Relative volume ("hats down 2 dB", "take 4 dB off the kick", "vox up 1.5 dB").
+# Device, EQ, send and pan wording is excluded: those have their own parsers.
+_RELATIVE_VOLUME_EXCLUDE = re.compile(
+    r"\b(?:hz|khz|eq|band|threshold|ratio|attack|release|knee|makeup|send|sends|reverb|delay|echo|"
+    r"compressor|comp|gain|pan|left|right|width|dry|wet|drive|q)\b", re.I)
+_RELATIVE_VOLUME_AMOUNT = re.compile(r"(?<![\w.])([+-]?\d+(?:\.\d+)?)\s*(?:dbs?|decibels?)\b", re.I)
+_RELATIVE_VOLUME_DOWN = re.compile(
+    r"\b(?:down|back|lower|drop|cut|reduce|decrease|quieter|softer|pull|tuck|trim|duck|off)\b", re.I)
+_RELATIVE_VOLUME_UP = re.compile(r"\b(?:up|raise|boost|louder|push|bump|increase|lift)\b", re.I)
+
+
+def _relative_volume_db(lower: str) -> float | None:
+    """A signed dB change for a relative level request, or None when not clearly one.
+
+    Needs an explicit dB amount and exactly one direction (or "by" with a
+    signed amount). "to"/"at" means an absolute level, handled elsewhere;
+    no direction ("kick -6 dB") or both directions stays ambiguous.
+    """
+    if _RELATIVE_VOLUME_EXCLUDE.search(lower):
+        return None
+    amount = _RELATIVE_VOLUME_AMOUNT.search(lower)
+    if amount is None or re.search(r"\b(?:to|at)\s+[+-]?\d", lower):
+        return None
+    value = float(amount.group(1))
+    down, up = bool(_RELATIVE_VOLUME_DOWN.search(lower)), bool(_RELATIVE_VOLUME_UP.search(lower))
+    if down and not up:
+        return -abs(value)
+    if up and not down:
+        return abs(value)
+    if not up and not down and re.search(r"\bby\s+[+-]\d", lower):
+        return value
+    return None
+
+
+_TRACK_NICKNAMES = (
+    (re.compile(r"\b(?:high|hi)[\s-]*hats?\b|\bhihats?\b", re.I), "hi hats"),
+    (re.compile(r"\b(?:vox|vocals|voc)\b", re.I), "vocal"),
+    (re.compile(r"\bdrums\b", re.I), "drum"),
+)
+_GENERIC_TRACK_WORDS = {"track", "bus", "group", "the", "and", "audio", "midi", "return", "main", "channel"}
+# Words that name a *particular* track. "the Lead Vocal" must not resolve to a
+# "Backing Vocal" track just because both contain "vocal".
+_TRACK_QUALIFIERS = {
+    "lead", "backing", "main", "harmony", "harmonies", "double", "doubles", "bgv", "bgvs", "adlib", "adlibs",
+    "sub", "top", "bottom", "room", "overhead", "overheads", "kick", "snare", "synth", "pad", "bass", "acoustic",
+    "electric", "rhythm", "clean", "dirty", "low", "string", "strings", "piano", "keys", "guitar", "fx", "print",
+    "chorus", "verse", "drum", "vocal", "hi", "clap",
+}
+_SECOND_ACTION = re.compile(
+    r"\b(?:and|then|also|plus)\s+(?:then\s+)?(?:turn|mute|unmute|solo|unsolo|pan|bring|set|push|pull|drop|raise|"
+    r"lower|boost|cut|tuck|arm|disarm|rename|add|insert|put|play|stop|start|make|take|nudge|bump|park|center|centre)\b",
+    re.I,
+)
+_VAGUE_EFFECT = re.compile(r"\b(?:some|more|less|a\s+bit\s+of|a\s+little|a\s+touch\s+of|a\s+splash\s+of)\s+(?:reverb|verb|delay|echo)\b", re.I)
+
+
+def _nickname_track_name(text: str, tracks: list[dict[str, Any]]) -> str:
+    """The one track a nickname points at ("hats" -> Hi-Hats, "vox" -> Lead Vocal), or ""."""
+    def normalize(value: str) -> str:
+        return " ".join(re.sub(r"[-/_&]+", " ", value.casefold()).split())
+
+    spoken = normalize(text)
+    for pattern, replacement in _TRACK_NICKNAMES:
+        spoken = pattern.sub(replacement, spoken)
+    # Capitalised words (not sentence-initial) are name-like qualifiers too.
+    capitalised = {w.casefold() for i, w in enumerate(re.findall(r"[A-Za-z]+", text)) if i and w[:1].isupper()}
+    tokens = spoken.split()
+    matched = []
+    for track in tracks:
+        name = str(track.get("name", "")).strip()
+        normalized = normalize(name)
+        name_words = set(normalized.split())
+        words = {w for w in name_words if len(w) >= 3 and w not in _GENERIC_TRACK_WORDS}
+        words |= {w[:-1] for w in words if w.endswith("s") and len(w) > 3}  # "hats" also answers to "hat"
+        if not name or not words:
+            continue
+
+        def fits(position: int) -> bool:
+            # Reject when the word before names a different track ("Lead" Vocal vs Backing Vocal).
+            previous = tokens[position - 1] if position > 0 else ""
+            return not previous or previous in name_words or not (previous in _TRACK_QUALIFIERS or previous in capitalised)
+
+        hit = any(
+            fits(i) for i, token in enumerate(tokens)
+            if token in words or (token.endswith("s") and token[:-1] in words)
+        )
+        if hit or re.search(rf"\b{re.escape(normalized)}\b", spoken):
+            matched.append(name)
+    # Two tracks sharing a nickname is ambiguous: KENN asks rather than picks.
+    return matched[0] if len(matched) == 1 else ""
+
+
 def _eq_gain_signed(matched_text: str, magnitude: float) -> float:
     """Apply boost/cut direction to an EQ gain magnitude.
 
@@ -452,6 +546,8 @@ def _normalize_spoken_numbers(text: str) -> str:
         return str(value)
 
     signed_digits = _SPOKEN_SIGNED_DIGIT.sub(lambda match: "-" + match.group("number"), text)
+    # "a couple of dB" is a studio idiom for 2 dB; "a touch" or "a bit" stay vague.
+    signed_digits = _COUPLE_OF_DB.sub("2 ", signed_digits)
     return _SPOKEN_NUMBER_CONTEXT.sub(replace, signed_digits)
 
 
@@ -499,6 +595,9 @@ def _extract_track_phrase(text: str, tracks: list[dict[str, Any]]) -> str:
     for name in names:
         if name.lower() in lowered:
             return name
+    nickname = _nickname_track_name(text, tracks)
+    if nickname:
+        return nickname
     match = re.search(r"(?:track|channel|chan|ch|vocal|bass|kick|guitar|drum\s+bus)\s+([\w][\w -]{0,50})", lowered)
     return match.group(1).strip() if match else ""
 
@@ -853,7 +952,9 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     device_setup_match = _DEVICE_SETUP.search(numeric_text) or _DEVICE_SETUP_TRAILING.search(numeric_text)
     device_setup_name = _device_setup_name(device_setup_match.group("device")) if device_setup_match else None
     insert_eq_tune = _insert_eq_tune_values(numeric_text)
-    insert_device_name = _insert_device_name(lower) if _ADD_DEVICE.search(lower) else None
+    # "some reverb on the snare" is vague (how much? insert or send?): ask, don't insert.
+    insert_device_name = (_insert_device_name(lower)
+                          if _ADD_DEVICE.search(lower) and not _VAGUE_EFFECT.search(lower) else None)
     add_device_match = insert_device_name is not None
     inspect_device_parameters_match = _INSPECT_DEVICE_PARAMETERS.search(lower)
     eq_band_match = _EQ_BAND_GAIN.search(numeric_text)
@@ -1564,9 +1665,28 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             re.search(r"\bpan\b.*?\b(?:to\s+(?:the\s+)?)?(?:cent(?:er|re)(?:d)?|middle)\b", lower)
             or re.match(r"\s*(?:please\s+)?(?:re)?cent(?:er|re)\s+(?:the\s+)?\S", lower)
         ) if not re.search(r"\b(?:freq(?:uency)?|hz|khz|eq|band)\b", lower) else None
+        relative_db = None if (volume_match or pan_match or pan_side_first_match or pan_amount_first_match
+                                   or pan_hard_match or pan_center_match) else _relative_volume_db(lower)
         if volume_match:
             db = float(volume_match.group(1))
             base.update({"desired_value": 10 ** (db / 20.0), "unit": "normalized", "requested_unit": "dB", "absolute_value": db})
+            action = "set_volume"
+        elif relative_db is not None:
+            # Same mapping as absolute levels (normalized = 10^(dB/20)), applied
+            # to the track's current snapshot volume; the proposal's stale-state
+            # check still guards against Live changing before Apply.
+            current = track.get("volume")
+            if isinstance(current, bool) or not isinstance(current, (int, float)) or not current > 0:
+                base["missing_fields"].append("current_volume")
+                base["ambiguity"].append("The current track volume is not in the Live snapshot, so a relative dB change cannot be computed.")
+                return base
+            target = float(current) * 10 ** (relative_db / 20.0)
+            if target > 1.0:
+                base["missing_fields"].append("valid_volume")
+                base["ambiguity"].append("That change would take the track above 0 dB, which KENN does not set.")
+                return base
+            base.update({"desired_value": target, "unit": "normalized", "requested_unit": "dB",
+                         "requested_relative_db": relative_db})
             action = "set_volume"
         elif pan_center_match and not (pan_hard_match or pan_match or pan_side_first_match or pan_amount_first_match):
             base.update({"desired_value": 0.0, "unit": "normalized", "requested_unit": "normalized"})
@@ -1600,6 +1720,13 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             base.update({"desired_value": normalized, "unit": "normalized", "requested_unit": "%" if unit else "normalized"})
             action = "set_pan"
 
+    if action and _SECOND_ACTION.search(lower):
+        # "solo the bass and turn it up 2 dB": proposing only the first part
+        # would silently drop the rest. Supported two-step requests are
+        # handled by parse_natural_recipe before this parser runs.
+        base["missing_fields"].append("single_action")
+        base["ambiguity"].append("This asks for more than one change. Say them one at a time, or join them with \"then\".")
+        return base
     if action:
         base.update({"mode": "assist", "action": action, "confirmation_required": True, "confidence": 0.95})
         return base
