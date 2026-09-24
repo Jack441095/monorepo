@@ -683,6 +683,27 @@ def test_support_diagnostics_is_redacted(running_server: str) -> None:
     assert "raw_live_snapshot" not in rendered.split("excluded_fields", 1)[0]
 
 
+
+def test_saving_diagnostics_needs_a_confirm_and_writes_one_redacted_file(running_server: str, monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("KENN_DIAGNOSTICS_DIR", str(tmp_path))
+
+    def post(body: dict) -> tuple[int, dict]:
+        request = urllib.request.Request(f"{running_server}/api/support/diagnostics/save", data=json.dumps(body).encode(),
+                                         headers={"Content-Type": "application/json"}, method="POST")
+        try:
+            with urllib.request.urlopen(request, timeout=10) as response:
+                return response.status, json.loads(response.read())
+        except urllib.error.HTTPError as error:
+            return error.code, json.loads(error.read())
+
+    status, body = post({})
+    assert status == 400 and body["ok"] is False and not list(tmp_path.iterdir())
+    status, body = post({"confirm": True})
+    assert status == 200 and body["ok"] is True
+    saved = json.loads((tmp_path / body["filename"]).read_text(encoding="utf-8"))
+    assert saved["schema"] == "kenn.support_diagnostics.v1"
+    assert saved["redactions"]["safe_to_attach_to_support_ticket"] is True
+
 def test_ask_endpoint_returns_grounded_answer(running_server: str) -> None:
     request = urllib.request.Request(
         f"{running_server}/api/ask",

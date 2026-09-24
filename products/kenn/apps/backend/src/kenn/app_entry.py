@@ -34,6 +34,7 @@ DATA_LOCATIONS = {
     "KENN_LIVE_LLM_PROMOTION_STATE": "live/live_llm_promotion.json",
     "KENN_ANALYSIS_CACHE_DIR": "analysis_cache",
     "KENN_MIX_OUTPUT_ROOT": "mix_outputs",
+    "KENN_DIAGNOSTICS_DIR": "diagnostics",
 }
 
 # settings.json key -> (environment variable, default for a beta tester build).
@@ -84,7 +85,7 @@ def prepare_environment(environ: MutableMapping[str, str] | None = None, data_ro
     environ.setdefault("KENN_DATA_ROOT", str(root))
     for variable, relative in DATA_LOCATIONS.items():
         environ.setdefault(variable, str(root / relative))
-    for folder in ("runtime", "chats", "live", "analysis_cache", "mix_outputs"):
+    for folder in ("runtime", "chats", "live", "analysis_cache", "mix_outputs", "diagnostics"):
         (root / folder).mkdir(parents=True, exist_ok=True)
     settings = load_settings(root)
     for key, (variable, _default) in SETTINGS.items():
