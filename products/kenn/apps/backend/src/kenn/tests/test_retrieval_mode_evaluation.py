@@ -47,6 +47,23 @@ def test_expected_source_rank_deduplicates_chunks_and_requires_each_source() -> 
     assert evaluation._rank(["missing"], results) is None
 
 
+
+def test_any_of_sources_counts_the_best_ranked_acceptable_source(tmp_path: Path) -> None:
+    cases = tmp_path / "cases.json"
+    cases.write_text(json.dumps({"cases": [{
+        "id": "purpose-1", "question": "line up two mics",
+        "source_must_include": ["align-delay"], "source_any_include": ["align-delay", "align delay"],
+    }]}), encoding="utf-8")
+    manual = [(9.0, {"source": "manual-pt17.md", "title": "Align Delay in Live 12"}),
+              (8.0, {"source": "ableton-align-delay-device.md", "title": "Ableton Align Delay"})]
+    neither = [(9.0, {"source": "unrelated.md", "title": "Unrelated"})]
+
+    receipt = evaluation.evaluate(cases_path=cases, cutoff=4,
+                                  searchers={"bm25": lambda _q, _l: manual, "hybrid": lambda _q, _l: neither})
+
+    assert receipt["modes"]["bm25"]["rows"][0]["rank"] == 1
+    assert receipt["modes"]["hybrid"]["rows"][0]["rank"] is None
+
 def test_reranker_prefers_exact_intent_title_and_normalizes_known_typos(monkeypatch) -> None:
     monkeypatch.setattr(retrieval, "load_source_feedback_scores", lambda: {})
     monkeypatch.setattr(retrieval, "load_hard_negatives", lambda: ())

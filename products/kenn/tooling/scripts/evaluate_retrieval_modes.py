@@ -97,7 +97,12 @@ def evaluate(
                 error = None
                 try:
                     results = searcher(str(case.get("question") or ""), max(cutoff * 4, 16))
-                    rank = _rank([str(term) for term in case["source_must_include"]], results)
+                    if case.get("source_any_include"):
+                        # Any one acceptable source counts (e.g. the device note or a manual chunk titled with it).
+                        ranks = [_rank([str(term)], results) for term in case["source_any_include"]]
+                        rank = min((r for r in ranks if r is not None), default=None)
+                    else:
+                        rank = _rank([str(term) for term in case["source_must_include"]], results)
                 except Exception as exc:
                     rank = None
                     error = f"{type(exc).__name__}: {exc}"[:256]
