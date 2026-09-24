@@ -7,7 +7,7 @@ gates pass, while reporting human review as pending. The ``qualified`` profile
 additionally requires complete independent human review, an explicit
 adjudication decision, a clean/reproducible source snapshot, and a verified
 Developer ID signed and notarized macOS plug-in archive, corpus-bound
-intelligence benchmarks, a reconnect-aware 24-hour soak receipt, and a
+intelligence benchmarks, a reconnect-aware 12-hour soak receipt, and a
 consented real-mix evaluation receipt.
 
 This command is read-only unless ``--output`` is used to write its report. It
@@ -52,6 +52,8 @@ DEFAULT_MATRIX = (
 )
 DEFAULT_PLUGIN_ARCHIVE = REPO_ROOT / "dist" / "KENN-Mix-Assistant-0.1.0-macOS.zip"
 DEFAULT_PLUGIN_HOST_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_PLUGIN_HOST_VALIDATION.json"
+# Owner decision 2026-09-24: 12 hours (was 24) so the Mac stays usable for work.
+SOAK_MIN_SECONDS = 12 * 3600
 DEFAULT_SOAK_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_COMPANION_24H_SOAK.json"
 DEFAULT_REAL_MIX_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_REAL_MIX_EVALUATION.json"
 DEFAULT_PILOT_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_SUPERVISED_PILOT_EVALUATION.json"
@@ -974,7 +976,7 @@ def _real_live_assistant_gate(path: Path, planner_bakeoff: Path = DEFAULT_PLANNE
 
 def _soak_gate(path: Path) -> Gate:
     if not path.is_file():
-        return _gate("companion_soak", "24-hour companion and Live reconnect soak", "pending", ("qualified",), [path], "A qualifying 24-hour reconnect-aware soak receipt is required.")
+        return _gate("companion_soak", "12-hour companion and Live reconnect soak", "pending", ("qualified",), [path], "A qualifying 12-hour reconnect-aware soak receipt is required.")
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         samples = data.get("samples", [])
@@ -992,7 +994,13 @@ def _soak_gate(path: Path) -> Gate:
         summary = data.get("summary", {})
         thresholds = data.get("thresholds", {})
         runtime_state = summary.get("runtime_state", {})
-        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, capture_output=True, text=True, check=True).stdout.strip()
+        # The receipt is committed after the soak, so its source may be HEAD's
+        # parent (same rule as the real-Live assistant evidence).
+        head_parts = subprocess.run(
+            ["git", "rev-list", "--parents", "-n", "1", "HEAD"], cwd=REPO_ROOT,
+            capture_output=True, text=True, check=True,
+        ).stdout.strip().split()
+        head, head_parents = head_parts[0], set(head_parts[1:])
         runner_digest = hashlib.sha256((REPO_ROOT / "tooling" / "scripts" / "soak_companion.py").read_bytes()).hexdigest()
         expected_count = int(data.get("expected_sample_count", 0))
         statuses = [str(sample.get("ableton_status") or "unknown") for sample in samples]
@@ -1047,7 +1055,7 @@ def _soak_gate(path: Path) -> Gate:
         max_outage = float(thresholds.get("max_ableton_outage_seconds", -1))
         valid = (
             data.get("schema") == "kenn.companion_soak.v1" and data.get("qualified") is True
-            and data.get("source_git_commit") == head
+            and data.get("source_git_commit") in ({head} | head_parents)
             and data.get("runner_sha256") == runner_digest
             and data.get("endpoint") == "http://127.0.0.1:8090"
             and type(data.get("pid")) is int and data["pid"] > 0
@@ -1055,8 +1063,8 @@ def _soak_gate(path: Path) -> Gate:
             and progress.get("completed_sample_count") == len(samples)
             and progress.get("expected_sample_count") == expected_count
             and [sample.get("index") for sample in samples] == list(range(len(samples)))
-            and observed_seconds >= 86400
-            and elapsed_seconds >= 86400
+            and observed_seconds >= SOAK_MIN_SECONDS
+            and elapsed_seconds >= SOAK_MIN_SECONDS
             and cadence_valid and samples_healthy
             and int(summary.get("error_samples", -1)) == 0
             and summary.get("rss_start_bytes") == rss_values[0]
@@ -1085,9 +1093,9 @@ def _soak_gate(path: Path) -> Gate:
             and statuses[-1] == "connected"
         )
     except (OSError, json.JSONDecodeError, KeyError, IndexError, TypeError, ValueError, subprocess.CalledProcessError) as exc:
-        return _gate("companion_soak", "24-hour companion and Live reconnect soak", "fail", ("qualified",), [path], f"Soak receipt is invalid: {exc}")
-    details = (f"Observed {elapsed_seconds / 3600:.2f} healthy wall-clock hours with bounded state, a reconnect, and connected final state on the exact source and harness revision." if valid else "Soak receipt does not prove exact-source, healthy 24-hour cadence, bounded memory/state, required reconnect/outage policy, and connected final state.")
-    return _gate("companion_soak", "24-hour companion and Live reconnect soak", "pass" if valid else "fail", ("qualified",), [path], details)
+        return _gate("companion_soak", "12-hour companion and Live reconnect soak", "fail", ("qualified",), [path], f"Soak receipt is invalid: {exc}")
+    details = (f"Observed {elapsed_seconds / 3600:.2f} healthy wall-clock hours with bounded state, a reconnect, and connected final state on the exact source and harness revision." if valid else "Soak receipt does not prove exact-source, healthy 12-hour cadence, bounded memory/state, required reconnect/outage policy, and connected final state.")
+    return _gate("companion_soak", "12-hour companion and Live reconnect soak", "pass" if valid else "fail", ("qualified",), [path], details)
 
 
 def _real_mix_gate(path: Path) -> Gate:
