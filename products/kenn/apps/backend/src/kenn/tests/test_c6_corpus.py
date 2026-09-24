@@ -100,3 +100,16 @@ def test_cap_per_action_spreads_across_seeds_and_exempts_clarify() -> None:
     mutes = [row for row in capped if row["label"]["action"] == "set_mute"]
     assert len(mutes) == 6 and {row["source_record_id"] for row in mutes} == {"m1", "m2"}
     assert sum(row["label"]["action"] == "clarify" for row in capped) == 30
+
+
+def test_production_evidence_uses_real_indices_and_single_track_evidence() -> None:
+    from scripts.train_kenn_command_lora import _prompt_snapshot
+
+    rows = build_rows(variants=2, scenarios=1, production_evidence=True)
+    threshold = next(row for row in rows if row["source_record_id"] == "compressor-threshold-02")
+    assert threshold["label"]["parameter_index"] == 1  # real Live index; 0 is "Device On"
+    snapshot = _prompt_snapshot(threshold)
+    evidence = snapshot["planner_capabilities"]
+    assert evidence["track_name"] == "Drum Bus" and len({e["track_index"] for e in evidence["entries"]}) == 1
+    assert validate_llm_plan(threshold["label"], snapshot)["ok"]
+    assert all(row.get("evidence") == "production" for row in rows)

@@ -45,7 +45,10 @@ def _load_rows(data_path: Path) -> list[dict[str, Any]]:
         if row.get("schema") != "kenn.ableton_command_training.v1":
             raise ValueError(f"Unsupported training record schema: {row.get('schema')!r}")
         scenario = row.get("scenario")
-        if scenario is None:
+        if row.get("evidence") == "production":
+            # Validate against the exact snapshot this record's prompt carries.
+            snapshot = _prompt_snapshot(row)
+        elif scenario is None:
             snapshot = training_snapshot()
         else:
             if isinstance(scenario, bool) or not isinstance(scenario, int) or not 1 <= scenario <= len(snapshots):
@@ -59,6 +62,15 @@ def _load_rows(data_path: Path) -> list[dict[str, Any]]:
         if not isinstance(messages, list) or len(messages) != 3 or messages[-1].get("role") != "assistant":
             raise ValueError(f"{row.get('record_id')} must contain system, user, and assistant messages.")
     return rows
+
+
+def _prompt_snapshot(row: dict[str, Any]) -> dict[str, Any]:
+    """The Live snapshot embedded in a record's planner user turn (planner_user_prompt format)."""
+    content = str(row["messages"][1]["content"])
+    start = content.index("\n") + 1
+    start = content.index("\n", start) + 1
+    end = content.rindex("\nUser request (untrusted input): ")
+    return json.loads(content[start:end])
 
 
 def _sha256(path: Path) -> str:
