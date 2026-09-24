@@ -81,3 +81,23 @@ def test_reranker_prefers_exact_intent_title_and_normalizes_known_typos(monkeypa
     ranked = retrieval.rerank_results("sidechane bas to kik", [(14.0, broad), (10.0, exact)])
 
     assert ranked[0][1]["source"] == "sidechain-bass-to-kick.md"
+
+
+def test_hybrid_fusion_ranks_an_embedding_only_note_without_changing_the_top_score(monkeypatch) -> None:
+    import numpy as np
+
+    chunks = [{"id": f"c{i}", "source": f"note-{i}.md", "title": f"Note {i}", "kind": "note"} for i in range(4)]
+    # Keywords find notes 0 and 1; the meaning of the question matches note 3, which the keywords missed.
+    monkeypatch.setattr(retrieval, "bm25_search", lambda *a, **k: [(10.0, chunks[0]), (8.0, chunks[1])])
+    monkeypatch.setattr(retrieval, "embed_text", lambda _q: np.zeros(3))
+    monkeypatch.setattr(retrieval, "cosine_similarity_scores", lambda _q, _i: np.array([0.30, 0.20, 0.10, 0.90]))
+    monkeypatch.setattr(retrieval, "rerank_results", lambda _q, results: results)
+    monkeypatch.setattr(retrieval, "expanded_query_terms", lambda _q: [])
+
+    results = retrieval.hybrid_search("line up two mics", chunks, {"idf": {}}, limit=4, embedding_index=np.zeros((4, 3)))
+    ranked = [chunk["id"] for _score, chunk in results]
+
+    assert ranked.index("c3") < 3  # was missing from the list entirely
+    top_boosted = 10.0 + max(0.40 * 10.0, 3.0) * ((0.30 - 0.10) / 0.80) * 0.25
+    assert results[0][0] == max(score for score, _chunk in results) == top_boosted  # "I don't know" threshold input unchanged
+    assert [score for score, _chunk in results] == sorted((score for score, _chunk in results), reverse=True)
