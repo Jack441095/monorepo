@@ -15,7 +15,7 @@ UI: **http://127.0.0.1:8090/**. KENN's panel must read "Live connected" with 8 t
 |---|------|-------|-----|------|------------------|---------------------|----------------|-----------|------|
 | 1 | 2026-09-23 | 09:28:35 | 09:37:46 | 9.2 | 20/20 | Operator slips only: typed the step-18 talk line into KENN (off-topic answer, no Live change); clicked Undo on the step-9 card first (KENN correctly refused the stale undo). | — | — | [x] |
 | 2 | 2026-09-23 | 09:47:52 | 09:54:44 | 6.9 | 20/20 (KENN correct) | Not counted: typed the "Try this" card label at step 14; applied the step-17 pan instead of dismissing; under 8 min. | — | — | [ ] not counted |
-| 3 |  |  |  |  |  |  |  |  | [ ] |
+| 3 | 2026-09-24 | — | — | not recorded | 20/20 (KENN correct) | Operator slips only, no Live change: typed the step-1 and step-14 talk lines (off-topic answers); a step-16 retype lost its first letter ("et the master volume…") and got mastering advice instead of the refusal (the first, correctly typed attempt was refused). Step 8 was the new device-focus card. Set reset afterwards and matched the pre-run snapshot. | — | — | [ ] pass pending times (8–12 min rule) |
 | 4 |  |  |  |  |  |  |  |  | [ ] |
 | 5 |  |  |  |  |  |  |  |  | [ ] |
 | 6 |  |  |  |  |  |  |  |  | [ ] |
