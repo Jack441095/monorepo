@@ -203,3 +203,33 @@ steps, so after the dB change a "-2 dB" volume step would have reached the execu
 now carry the converted steps, with a test.
 
 Q4_K_M GGUF: SHA-256 `187b2a9a85021637dfbcead95b9c010454fe1908e204a275fecbd36552c2c1e7`.
+
+## Addendum: run 5, production-shaped evidence (2026-09-24)
+
+Run 5 used run 4's balanced corpus rebuilt with `--production-evidence`.
+
+- **Evidence per record:** the evidence the gateway attaches, built by production's own `_llm_planner_snapshot`:
+  single-track, with the real Live parameter lists recorded from the owner's set (Compressor, EQ Eight).
+- **Labels:** point at real parameter indices (Compressor Threshold 1, not 0).
+- **Length:** prompts are bounded at 24,000 characters, as in production; up to ~5,000 tokens.
+- **Training:** batch 1 × accumulation 8 with loss on answer tokens only (`--sparse-logits`); 387 steps, 68 min,
+  peak 12.1 GB.
+
+**Mac check of run 4, same 124 cases, compact prompt:** 83.1% correct (GPU 84.7%), clarify 28/30, curated 18/24,
+6 wrong plans accepted; p50 6.5 s, p95 17.4 s, with 14 repairs. It ran alongside a test run.
+
+Scored with `--production-snapshot` (as the gateway):
+
+| GPU, 124 cases | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted | EQ | Two-part (same action) | Device params |
+|---|---|---|---|---|---|---|---|---|
+| Stock + full prompt | 65.3% | 20/30 | 61/94 | 14/24 | 17 | 0/3 | — | — |
+| Run 4 | **84.7%** | 29/30 | **76/94** | **19/24** | 6 | 0/3 | 1/3 | **3/5** |
+| Run 5 | 82.3% | 29/30 | 73/94 | 15/24 | **2** | **3/3** | **3/3** | 1/5 |
+
+- **Gains in run 5:** EQ went from 0/3 to 3/3 once the model saw production-shaped evidence. Same-action two-part
+  requests ("mute the hats and the snare") went to 3/3. Run 5 is the safest yet, with 2 wrong plans accepted.
+- **Losses in run 5:** it now asks too often on device parameters and inserts (8 over-asks). Curated fell to 15/24.
+  Cross-action two-part requests are 0/3.
+- **Neither run dominates.** With one seed per run, a few points either way is within noise.
+- **Next:** put the corpus's evidence-bearing device examples in balance with clarify, and use a fresh,
+  independently written evaluation before choosing a model for C4.

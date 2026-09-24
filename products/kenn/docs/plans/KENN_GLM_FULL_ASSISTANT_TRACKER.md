@@ -94,7 +94,9 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [x] Run 4: drafted seeds for transport, rename, sends, device parameters, EQ, two-part requests; per-action balancing; gate on wrong plans accepted
     > **84.7%** correct (stock 65.3%), clarify 29/30, curated 19/24, wrong plans accepted 5 (gate met). EQ 0/3, device parameters 2/5, two-part 1/3 remain. Optimistic: the drafted seeds were written after seeing the evaluation's categories.
   - [ ] Fresh evaluation set written by someone other than the author of the training data (owner), for a clean score
-  - [ ] Run 5: EQ band/frequency and device-parameter coverage; two-part requests
+  - [x] Run 5: EQ band/frequency and device-parameter coverage; two-part requests
+    > Production-shaped evidence (single track, real Live indices). 82.3% correct; EQ 3/3 (was 0/3), same-action two-part 3/3, **2 wrong plans accepted** (safest yet); but device parameters 1/5 and inserts over-asked, curated 15/24. Run 4 stays best overall (84.7%, Mac 83.1%, p50 6.5 s).
+  - [ ] Latency: the gateway attaches a track's full parameter list to *every* request on that track ("mute the bass" becomes a ~5,000-token prompt because Bass has an EQ Eight). Attach evidence only for device requests, then rebuild the corpus to match.
   - [x] Mac latency of the Q4_K_M fine-tune with the compact prompt
     > Run 1 on the M3 (Live idle): 90% on the first 40 cases vs 75% stock; median 3.6 s per command for both, since this hybrid model re-processes ~2 s of prompt per command whatever its length.
 
