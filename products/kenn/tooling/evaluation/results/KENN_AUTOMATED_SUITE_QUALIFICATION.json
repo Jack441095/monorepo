@@ -1,8 +1,8 @@
 {
-  "command": "python3 -m pytest source/kenn/tests chat/tests mix-review/tests automix/tests -q",
-  "generated_at": "2026-09-15T16:30:28.000000+00:00",
-  "passed": true,
+  "command": "python3 -m pytest apps/backend/src/kenn/tests chat/tests mix-review/tests automix/tests -q",
+  "generated_at": "2026-09-24T11:23:22.462345+00:00",
+  "passed": false,
   "schema": "kenn.automated_suite_qualification.v1",
-  "source_sha256": "895807737bb44a84404d441c5e8757896f105a1dcbe6978be198e34cf10f93af",
-  "summary": "1242 passed, 4 warnings in 98.53s (0:01:38)"
+  "source_sha256": "c0018ae0e20561cd6259e354f3c661c098faa333259a6ac01dec3fa58e0c4ee9",
+  "summary": "1 error in 1.85s"
 }

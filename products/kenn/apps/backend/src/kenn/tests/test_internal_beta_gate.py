@@ -342,8 +342,10 @@ def test_automated_gate_scopes_pytest_to_kenns_own_suite_only(monkeypatch) -> No
         stdout = "547 passed"
         stderr = ""
 
+    commands = []
+
     def fake_run(*args, **kwargs):
-        captured["args"] = args
+        commands.append(args[0])
         return Completed()
 
     monkeypatch.setattr(gate.subprocess, "run", fake_run)
@@ -351,9 +353,11 @@ def test_automated_gate_scopes_pytest_to_kenns_own_suite_only(monkeypatch) -> No
     result = gate._automated_gate(True)
 
     assert result.status == "pass"
-    command = captured["args"][0]
-    for target in ("apps/backend/src/kenn/tests", "chat/tests", "mix-review/tests", "automix/tests"):
-        assert target in command
+    # One process per target, so one project's sys.path cannot shadow another's modules.
+    targets = ("apps/backend/src/kenn/tests", "chat/tests", "mix-review/tests", "automix/tests")
+    assert len(commands) == len(targets)
+    for target, command in zip(targets, commands):
+        assert target in command and not any(other in command for other in targets if other != target)
 
 
 def test_automated_gate_prefers_stdout_summary_over_a_stray_stderr_warning(monkeypatch) -> None:
@@ -370,7 +374,8 @@ def test_automated_gate_prefers_stdout_summary_over_a_stray_stderr_warning(monke
 
     result = gate._automated_gate(True)
 
-    assert result.details == "547 passed, 5 warnings in 42.84s"
+    assert "547 passed, 5 warnings in 42.84s" in result.details
+    assert "DeprecationWarning" not in result.details
 
 
 def test_intelligence_gate_requires_an_explicit_run() -> None:

@@ -45,6 +45,8 @@ for import_root in (
     AUDIO_TOO_ROOT / "studio",
     AUDIO_TOO_ROOT / "studio" / "audio_analysis",
     AUDIO_TOO_ROOT / "business" / "app",
+    AUDIO_TOO_ROOT / "server" / "app",  # Audio_Too's business/app after the Sept 2026 restructure
+    REPO_ROOT / "shared",  # nite_core, imported by Audio_Too's server/app since the restructure
 ):
     if str(import_root) not in sys.path:
         sys.path.insert(0, str(import_root))
