@@ -1,0 +1,16 @@
+{"query": "set the Bass volume to -6 dB", "expected_action": "set_volume", "expected_track": "Bass", "expected_db": -6, "source": "claude_written"}
+{"query": "put the kick at minus 12 dB", "expected_action": "set_volume", "expected_track": "Kick", "expected_db": -12, "source": "claude_written"}
+{"query": "bring the lead vocal to -3 dB", "expected_action": "set_volume", "expected_track": "Lead Vocal", "expected_db": -3, "source": "claude_written"}
+{"query": "set Drum Bus level to 0 dB", "expected_action": "set_volume", "expected_track": "Drum Bus", "expected_db": 0, "source": "claude_written"}
+{"query": "Bass to -9", "expected_action": "set_volume", "expected_track": "Bass", "expected_db": -9, "source": "claude_written"}
+{"query": "bring the synth up to 0 dB", "expected_action": "set_volume", "expected_track": "Synth", "expected_db": 0, "source": "claude_written"}
+{"query": "FX print to -12 dB", "expected_action": "set_volume", "expected_track": "FX Print", "expected_db": -12, "source": "claude_written"}
+{"query": "hats down 2 dB", "expected_action": "set_volume", "expected_track": "Hi-Hats", "expected_delta_db": -2, "source": "claude_written"}
+{"query": "turn the snare up 3 dB", "expected_action": "set_volume", "expected_track": "Snare / Clap", "expected_delta_db": 3, "source": "claude_written"}
+{"query": "drop the bass by 4 dB", "expected_action": "set_volume", "expected_track": "Bass", "expected_delta_db": -4, "source": "claude_written"}
+{"query": "lower the lead vocal 1.5 dB", "expected_action": "set_volume", "expected_track": "Lead Vocal", "expected_delta_db": -1.5, "source": "claude_written"}
+{"query": "pan the synth 20% left", "expected_action": "set_pan", "expected_track": "Synth", "expected_pan": -0.2, "source": "claude_written"}
+{"query": "pan the bass hard right", "expected_action": "set_pan", "expected_track": "Bass", "expected_pan": 1.0, "source": "claude_written"}
+{"query": "pan the hats 30 percent right", "expected_action": "set_pan", "expected_track": "Hi-Hats", "expected_pan": 0.3, "source": "claude_written"}
+{"query": "pan the kick fully left", "expected_action": "set_pan", "expected_track": "Kick", "expected_pan": -1.0, "source": "claude_written"}
+{"query": "center the lead vocal", "expected_action": "set_pan", "expected_track": "Lead Vocal", "expected_pan": 0.0, "source": "claude_written"}

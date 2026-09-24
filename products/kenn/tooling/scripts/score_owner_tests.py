@@ -3,7 +3,10 @@
 
 Input is the review page's `tests` collection exported as JSON files (one
 document per file, e.g. ArtifactData with ``out_dir``) or a JSONL file with
-``query``, ``expected_action`` and optional ``expected_track``. Every command
+``query``, ``expected_action`` and optional ``expected_track``. Optional values are
+checked too, as the final fader value KENN would write: ``expected_db`` (absolute
+volume), ``expected_delta_db`` (relative to the track's current level) or
+``expected_pan`` (-1 left … 1 right). Every command
 runs through the rule parser (what KENN does today) and, with ``--model``,
 through the LLM planner on the demo snapshot the way the gateway calls it
 (parameter evidence for device requests). Nothing touches Live.
@@ -44,7 +47,27 @@ def rule_parser_result(query: str, snapshot: dict[str, Any]) -> dict[str, Any]:
     parsed = parse_request(query, snapshot)
     unresolved = bool(parsed.get("missing_fields") or parsed.get("ambiguity")) or not parsed.get("action")
     return {"action": "clarify" if unresolved else parsed.get("action"),
-            "track": (parsed.get("track") or {}).get("name"), "detail": parsed.get("ambiguity") or ""}
+            "track": (parsed.get("track") or {}).get("name"), "value": parsed.get("desired_value"),
+            "detail": parsed.get("ambiguity") or ""}
+
+
+VALUE_TOLERANCE = 0.005  # normalized; about 0.2 dB near 0 dB, 0.5% of pan
+
+
+def expected_value(test: dict[str, Any], snapshot: dict[str, Any]) -> float | None:
+    """The normalized value a correct plan writes, or None when the test doesn't pin one."""
+    from kenn.core import volume_law
+
+    if test.get("expected_pan") is not None:
+        return float(test["expected_pan"])
+    db = test.get("expected_db")
+    if test.get("expected_delta_db") is not None:
+        track = next((t for t in snapshot.get("tracks", []) if t.get("name") == test.get("expected_track")), None)
+        current = volume_law.raw_to_db(float(track["volume"])) if track and track.get("volume") else None
+        db = None if current is None else current + float(test["expected_delta_db"])
+        if db is None:
+            raise ValueError(f"{test['query']!r}: expected_delta_db needs expected_track with a volume in the snapshot")
+    return None if db is None else volume_law.db_to_raw(float(db))
 
 
 def describe_plan(plan: dict[str, Any] | None) -> str:
@@ -61,10 +84,15 @@ def describe_plan(plan: dict[str, Any] | None) -> str:
     return " · ".join(parts)
 
 
-def matches(expected: dict[str, Any], action: str | None, track: str | None) -> bool:
+def matches(expected: dict[str, Any], action: str | None, track: str | None, value: Any = None,
+            want: float | None = None) -> bool:
     if action != expected["expected_action"]:
         return False
-    return not expected.get("expected_track") or expected["expected_action"] == "clarify" or track == expected["expected_track"]
+    if expected.get("expected_track") and expected["expected_action"] != "clarify" and track != expected["expected_track"]:
+        return False
+    if want is None:
+        return True
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and abs(float(value) - want) <= VALUE_TOLERANCE
 
 
 def main() -> int:
@@ -97,21 +125,26 @@ def main() -> int:
     for test in tests:
         row = {"query": test["query"], "expected": test["expected_action"], "expected_track": test.get("expected_track"),
                "note": test.get("note")}
+        want = expected_value(test, snapshot)
+        row["want"] = want
         rule = rule_parser_result(test["query"], snapshot)
-        row["rule"] = {**rule, "pass": matches(test, rule["action"], rule["track"])}
+        row["rule"] = {**rule, "pass": matches(test, rule["action"], rule["track"], rule["value"], want)}
         if args.model:
             planner_snapshot = live_command._llm_planner_snapshot(service, snapshot, parse_request(test["query"], snapshot))
             plan, meta = live_command._generate_llm_plan(test["query"], planner_snapshot)
             row["model"] = {"status": meta.get("status"), "plan": plan, "summary": describe_plan(plan),
                             "error": meta.get("error") or meta.get("reason"),
-                            "pass": plan is not None and matches(test, plan.get("action"), plan.get("track_name"))}
+                            "pass": plan is not None and matches(test, plan.get("action"), plan.get("track_name"),
+                                                                 plan.get("value"), want)}
         results.append(row)
 
     for row in results:
         target = row["expected"] + (f" on {row['expected_track']}" if row["expected_track"] else "")
+        target += f" = {row['want']:.3f}" if row["want"] is not None else ""
         print(f"\n“{row['query']}”  → expected: {target}" + (f"  (note: {row['note']})" if row["note"] else ""))
         rule = row["rule"]
-        print(f"  rule parser: {'PASS' if rule['pass'] else 'FAIL'}  {rule['action']}" + (f" on {rule['track']}" if rule["track"] else ""))
+        print(f"  rule parser: {'PASS' if rule['pass'] else 'FAIL'}  {rule['action']}" + (f" on {rule['track']}" if rule["track"] else "")
+              + (f" = {rule['value']:.3f}" if isinstance(rule.get("value"), (int, float)) and not isinstance(rule["value"], bool) else ""))
         if "model" in row:
             model = row["model"]
             detail = model["summary"] or f"{model['status']}: {model['error']}"

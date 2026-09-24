@@ -253,3 +253,27 @@ def test_a_missing_value_gets_a_precise_question(query, action, phrase) -> None:
     parsed = parse_request(query, FAKE_SET)
     assert parsed["action"] == action and parsed["missing_fields"]
     assert any(phrase in text for text in parsed["ambiguity"])
+
+
+@pytest.mark.parametrize("query, track, db", [
+    ("FX print to -12 dB", "FX Print", -12.0),
+    ("kick to minus 6 dB", "Kick", -6.0),
+    ("the bass at -9 dB", "Bass", -9.0),
+    ("track 3 to -8 dB", "Hi-Hats", -8.0),
+])
+def test_terse_track_to_level_is_an_absolute_volume(query, track, db) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert parsed["action"] == "set_volume" and not parsed["missing_fields"]
+    assert parsed["track"]["name"] == track
+    assert parsed["desired_value"] == pytest.approx(volume_law.db_to_raw(db), abs=1e-4)
+
+
+@pytest.mark.parametrize("query", [
+    "Bass to -9",                            # no unit said: still a question
+    "synth send to -6 dB",                   # a send, not the fader
+    "send the synth to the delay at -6 dB",  # a send level
+    "master to -3 dB",                       # master level is never set from chat
+])
+def test_terse_level_rewrite_leaves_other_requests_alone(query) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert parsed["action"] != "set_volume" or parsed["missing_fields"]
