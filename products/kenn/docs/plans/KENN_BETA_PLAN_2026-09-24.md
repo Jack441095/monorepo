@@ -77,6 +77,7 @@ The beta cannot start while KENN only runs from this Mac's checkout.
 ## Phase 2: Reliability and the qualification gate (weeks 1–2, overlaps Phase 1)
 
 - [ ] Idle-wake: retry the first read after long idle before reporting "offline"; test with Live idle 2+ hours
+  > 2026-09-24: code done — a Live that answered earlier in the process gets one retry (0.4 s) before "offline"; a never-reached Live still reports offline at once (latency budget kept). Real 2-hour idle test still to do (fold into the soak).
 - [x] Refusals survive typos: destructive and master-level requests are refused even with a missing letter or odd wording
       (fuzzy intent check before falling to knowledge answers)
   > 2026-09-24: safety words allow one missing letter or swapped pair ("delte", "mastr"; real words like "remote" stay

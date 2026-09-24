@@ -338,16 +338,30 @@ class LiveActionService(Tier2Tier3ControlMixin):
     def __init__(self, client: AbletonOSCClient | Any = None):
         self.client = client or live_client
 
-    def snapshot(self, *, include_mixer: bool = True) -> dict[str, Any]:
+    # One retry before reporting offline: after hours idle, Live's first OSC
+    # reply can miss the read window while it wakes (seen 2026-09-24).
+    SNAPSHOT_RETRY_DELAY_S = 0.4
+
+    def _read_session_state(self, include_mixer: bool) -> Any:
         try:
-            state = self.client.query_session_state(include_mixer=include_mixer, force_refresh=True)
+            return self.client.query_session_state(include_mixer=include_mixer, force_refresh=True)
         except TypeError:
             # Keep injected legacy test doubles and older bridge clients
             # compatible while the production client adopts the split read.
             try:
-                state = self.client.query_session_state(include_mixer=include_mixer)
+                return self.client.query_session_state(include_mixer=include_mixer)
             except TypeError:
-                state = self.client.query_session_state()
+                return self.client.query_session_state()
+
+    def snapshot(self, *, include_mixer: bool = True) -> dict[str, Any]:
+        state = self._read_session_state(include_mixer)
+        # Retry only a Live that answered earlier in this process (waking
+        # after idle); a Live that was never reached still reports offline at once.
+        if isinstance(state, dict) and state.get("status") == "offline" and getattr(self, "_seen_connected", False):
+            time.sleep(self.SNAPSHOT_RETRY_DELAY_S)
+            state = self._read_session_state(include_mixer)
+        if isinstance(state, dict) and state.get("status") == "connected":
+            self._seen_connected = True
         if not isinstance(state, dict) or state.get("status") in {"offline", "dispatched"}:
             try:
                 from kenn.mixing_doctor import get_latest_session_state
