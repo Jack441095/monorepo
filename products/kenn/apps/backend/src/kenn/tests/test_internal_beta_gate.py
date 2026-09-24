@@ -657,7 +657,7 @@ def test_real_live_assistant_gate_rejects_incomplete_or_unbound_lifecycle(tmp_pa
         artifact.write_text(json.dumps(candidate), encoding="utf-8")
         assert gate._real_live_assistant_gate(artifact, planner).status == "fail"
 
-def test_soak_gate_accepts_a_24_hour_reconnect_receipt(tmp_path: Path) -> None:
+def test_soak_gate_accepts_a_long_reconnect_receipt(tmp_path: Path) -> None:
     receipt = tmp_path / "soak.json"
     started = datetime(2026, 9, 1, tzinfo=timezone.utc)
     runtime = {"pending_proposals": 0, "pending_proposals_limit": 11_000,
