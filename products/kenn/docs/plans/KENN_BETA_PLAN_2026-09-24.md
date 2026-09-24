@@ -97,6 +97,9 @@ The beta cannot start while KENN only runs from this Mac's checkout.
 
 - [ ] Idle-wake: retry the first read after long idle before reporting "offline"; test with Live idle 2+ hours
   > 2026-09-24: code done — a Live that answered earlier in the process gets one retry (0.4 s) before "offline"; a never-reached Live still reports offline at once (latency budget kept). Real 2-hour idle test still to do (fold into the soak).
+  > Later the same day the first soak found the real cause: the AbletonOSC client's circuit breaker opened after one
+  > missed reply and skipped every later read with no retry, so KENN showed Live "offline" for 4 hours while it was
+  > fine, until a probe. Now half-open: one real read every 5 s while "disconnected" (`a7bf41a`, regression test).
 - [x] Refusals survive typos: destructive and master-level requests are refused even with a missing letter or odd wording
       (fuzzy intent check before falling to knowledge answers)
   > 2026-09-24: safety words allow one missing letter or swapped pair ("delte", "mastr"; real words like "remote" stay
@@ -107,8 +110,10 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > 2026-09-24: measured results (never audio) persist by content hash in `kenn/data/analysis_cache/` (16 files max; `KENN_ANALYSIS_CACHE_DIR` overrides; tests isolated). After a companion restart with no preflight, demo steps 12–13 answered in 0.2–0.4 s (cold: 3.2 s) and the gate passed.
 - [ ] ~~24-hour~~ 12-hour soak with Live restarts, companion restarts and sleep/wake (`companion_soak` gate)
   > Gate needs 24 h on one companion process and ≥ 1 Live disconnect/reconnect: run overnight when no code is being deployed; owner quits and reopens Live once.
-  > 2026-09-24: owner cut it to **12 hours** so the Mac stays usable. **Running**, started ~15:00, ends ~03:00 Fri 25 Sep,
-  > bound to commit `ef27425` (no commits on the main checkout until it ends). Still needs one Live quit/reopen.
+  > 2026-09-24: owner cut it to **12 hours** so the Mac stays usable. First run (from ~15:00) invalid: the breaker bug
+  > above froze the reported Live status from 15:49. Fixed, branch merged into `main`, companion restarted, real-Live
+  > assistant task re-passed; **second run started 20:16, ends ~08:16 Fri 25 Sep**, bound to `c40532b` (no commits on
+  > `main` until it ends). Still needs one Live quit/reopen.
 - [x] Regenerate stale evidence: `automated_suite`, `intelligence` (`--run-suite --run-intelligence`),
       `planner_bakeoff` (missing input `chat/evals/ableton_deliberative_adversarial.json`), `real_live_assistant`
       (lifecycle/replay check failing), `artifacts` (five named docs missing)
