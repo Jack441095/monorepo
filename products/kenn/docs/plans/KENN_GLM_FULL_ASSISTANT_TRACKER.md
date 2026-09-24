@@ -148,6 +148,7 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 ## Phase G — Knowledge, memory and conversation
 
 - [ ] **G1 Owned knowledge base:** KENN-written device and workflow notes; MiniLM ONNX fetched; hybrid retrieval
+  > 2026-09-24: 21 draft device notes (7 uncovered + 14 mention-only devices, incl. EQ Eight with Live's measured parameter layout, Operator, Simpler, Sampler) drafted on the GPU 1 notes model from the Live 12 manual (`tooling/scripts/draft_device_notes_gpu.py`), Status Draft, so the index leaves them out until the owner approves. Coverage: 53 own, 21 draft, 2 mentioned, 2 none. See `docs/evidence/KENN_DEVICE_COVERAGE_2026-09-24.md`.
 - [ ] **G2 Project memory** (viewable and deletable in the UI)
 - [ ] **G3 Opt-in producer preferences** (cited, never silently applied)
 - [ ] **G4 Conversation policy:** clarify rather than guess, corrections, studio tone
