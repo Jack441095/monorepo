@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 import math
 
+from kenn.core import volume_law
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.device_units import raw_to_display
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA, RECIPE_RECEIPT_SCHEMA
@@ -2327,7 +2328,7 @@ def test_llm_track_control_requires_normalized_numeric_values() -> None:
     db_value = {**valid, "value": -6.0, "unit": "dB"}
     checked = validate_llm_plan(db_value, fake.state)
     assert checked["ok"] is True
-    assert checked["plan"]["unit"] == "normalized" and abs(checked["plan"]["value"] - 10 ** (-6 / 20)) < 1e-6
+    assert checked["plan"]["unit"] == "normalized" and abs(checked["plan"]["value"] - volume_law.db_to_raw(-6)) < 1e-6
 
     percent_value = {**valid, "value": 50.0, "unit": "%"}
     checked = validate_llm_plan(percent_value, fake.state)

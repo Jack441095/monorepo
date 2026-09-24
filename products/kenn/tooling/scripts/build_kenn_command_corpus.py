@@ -161,7 +161,8 @@ def _cores(row: dict[str, Any]) -> list[str]:
             f"Disarm {target_number}",
         ])
     if action == "set_volume":
-        requested = _db(float(value))
+        # Labels say dB (KENN converts with Live's fader law); older normalized labels still render.
+        requested = f"{float(value):g} dB" if str(plan.get("unit") or "").casefold() == "db" else _db(float(value))
         return [
             f"Set {target_name} level to {requested}",
             f"Set the volume on {target_number} to {requested}",

@@ -13,7 +13,13 @@ from scripts.drafted_command_seeds import (
     SOURCE_KIND, drafted_records,
 )
 from scripts.train_kenn_command_lora_mlx import split_rows
+from kenn.core import volume_law
 from kenn.core.live_command import validate_llm_plan
+
+
+def _fader(current: float, db: float) -> float:
+    """Live's fader value after a dB change from a raw fader value."""
+    return volume_law.db_to_raw(volume_law.raw_to_db(current) + db)
 
 
 def test_overlap_guard_covers_natural_holdouts_and_ignores_case_and_punctuation() -> None:
@@ -88,7 +94,7 @@ def test_drafted_action_seeds_keep_their_wording_and_dB_volumes_convert() -> Non
     snapshot = scenario_snapshots()[0]
     checked = validate_llm_plan(relative["label"], snapshot)
     assert checked["ok"] and checked["plan"]["unit"] == "normalized"
-    assert abs(checked["plan"]["value"] - 0.55 * 10 ** (3 / 20)) < 1e-6
+    assert abs(checked["plan"]["value"] - _fader(0.55, 3)) < 1e-6
 
 
 def test_cap_per_action_spreads_across_seeds_and_exempts_clarify() -> None:

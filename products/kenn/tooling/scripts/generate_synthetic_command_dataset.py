@@ -192,10 +192,12 @@ def generate_dataset(target_count: int = 5000, seed: int = 42) -> list[dict[str,
         idx = t["index"]
         name = t["name"]
         for db in db_values:
-            norm_val = round(10.0 ** (db / 20.0), 6)
+            if db > 0.0:
+                continue  # KENN does not set track volume above 0 dB
             for tmpl, rel in vol_templates[:4]:
                 q = tmpl.format(track=name, db=int(db) if db.is_integer() else db)
-                items.append((q, "supported_control", _plan("set_volume", track_index=idx, track_name=name, value=norm_val, relative=False, unit="normalized")))
+                # dB label: KENN converts with Live's fader law (core/volume_law.py).
+                items.append((q, "supported_control", _plan("set_volume", track_index=idx, track_name=name, value=db, relative=False, unit="dB")))
 
     # 5. Panning Variations
     pan_percentages = [-50, -35, -25, -15, 0, 15, 25, 35, 50]

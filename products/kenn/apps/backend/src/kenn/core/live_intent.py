@@ -11,6 +11,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from kenn.core import volume_law
 from kenn.core.device_units import display_to_raw, find_profile, normalize_unit
 
 
@@ -415,6 +416,13 @@ _RELATIVE_VOLUME_AMOUNT = re.compile(r"(?<![\w.])([+-]?\d+(?:\.\d+)?)\s*(?:dbs?|
 _RELATIVE_VOLUME_DOWN = re.compile(
     r"\b(?:down|back|lower|drop|cut|reduce|decrease|quieter|softer|pull|tuck|trim|duck|off)\b", re.I)
 _RELATIVE_VOLUME_UP = re.compile(r"\b(?:up|raise|boost|louder|push|bump|increase|lift)\b", re.I)
+
+
+def _volume_range_message(db: float | None) -> str:
+    if db is not None and db > 0.0:
+        return "That would take the track above 0 dB, which KENN does not set."
+    low = volume_law.law().min_db
+    return f"KENN sets track volume between {low:g} dB and 0 dB; mute the track to silence it."
 
 
 def _relative_volume_db(lower: str) -> float | None:
@@ -1687,22 +1695,32 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         relative_db = None if (volume_match or pan_match or pan_side_first_match or pan_amount_first_match
                                    or pan_hard_match or pan_center_match) else _relative_volume_db(lower)
         if volume_match:
+            # Live's fader law (volume_law), not 10^(dB/20): raw 0.85 is 0 dB.
             db = float(volume_match.group(1))
-            base.update({"desired_value": 10 ** (db / 20.0), "unit": "normalized", "requested_unit": "dB", "absolute_value": db})
+            target = volume_law.db_to_raw(db) if db <= 0.0 else None
+            if target is None:
+                base.update(action="set_volume")
+                base["missing_fields"].append("valid_volume")
+                base["ambiguity"].append(_volume_range_message(db))
+                return base
+            base.update({"desired_value": target, "unit": "normalized", "requested_unit": "dB", "absolute_value": db})
             action = "set_volume"
         elif relative_db is not None:
-            # Same mapping as absolute levels (normalized = 10^(dB/20)), applied
-            # to the track's current snapshot volume; the proposal's stale-state
-            # check still guards against Live changing before Apply.
+            # The track's current level in dB (Live's fader law) plus the
+            # change; the proposal's stale-state check still guards against
+            # Live changing before Apply.
             current = track.get("volume")
             if isinstance(current, bool) or not isinstance(current, (int, float)) or not current > 0:
                 base["missing_fields"].append("current_volume")
                 base["ambiguity"].append("The current track volume is not in the Live snapshot, so a relative dB change cannot be computed.")
                 return base
-            target = float(current) * 10 ** (relative_db / 20.0)
-            if target > 1.0:
+            current_db = volume_law.raw_to_db(float(current))
+            target_db = None if current_db is None else current_db + relative_db
+            target = volume_law.db_to_raw(target_db) if target_db is not None and target_db <= 0.0 else None
+            if target is None:
+                base.update(action="set_volume")
                 base["missing_fields"].append("valid_volume")
-                base["ambiguity"].append("That change would take the track above 0 dB, which KENN does not set.")
+                base["ambiguity"].append(_volume_range_message(target_db))
                 return base
             base.update({"desired_value": target, "unit": "normalized", "requested_unit": "dB",
                          "requested_relative_db": relative_db})

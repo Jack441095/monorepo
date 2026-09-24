@@ -1,5 +1,6 @@
 import pytest
 
+from kenn.core import volume_law
 from kenn.core.live_intent import parse_natural_recipe, parse_request, split_recipe_request
 
 
@@ -737,7 +738,7 @@ def test_spoken_numbers_and_ordinal_tracks_resolve_to_typed_controls() -> None:
     assert muted["action"] == "set_mute"
     assert muted["track"] == {"index": 1, "name": "Drums"}
     assert volume["action"] == "set_volume"
-    assert volume["desired_value"] == pytest.approx(10 ** (-9 / 20))
+    assert volume["desired_value"] == pytest.approx(volume_law.db_to_raw(-9))
     assert pan["action"] == "set_pan"
     assert pan["desired_value"] == -0.15
 
@@ -830,7 +831,7 @@ def test_volume_command_accepts_control_before_track_ordering() -> None:
     result = parse_request("Set the volume on track 4 to -6 dB", eq_snapshot())
     assert result["action"] == "set_volume"
     assert result["track"] == {"index": 3, "name": "4-Audio"}
-    assert result["desired_value"] == pytest.approx(10 ** (-6 / 20))
+    assert result["desired_value"] == pytest.approx(volume_law.db_to_raw(-6))
     assert result["requested_unit"] == "dB"
     assert result["confirmation_required"] is True
 
@@ -845,9 +846,9 @@ def test_common_absolute_level_phrasing_is_not_confused_with_device_parameters()
         "tracks": [{"index": 0, "name": "Bass Synth", "devices": []}],
     })
     assert brought["action"] == "set_volume"
-    assert brought["desired_value"] == pytest.approx(10 ** (-9 / 20))
+    assert brought["desired_value"] == pytest.approx(volume_law.db_to_raw(-9))
     assert set_at["action"] == "set_volume"
-    assert set_at["desired_value"] == pytest.approx(10 ** (-6 / 20))
+    assert set_at["desired_value"] == pytest.approx(volume_law.db_to_raw(-6))
 
 
 def test_out_of_range_pan_is_not_silently_clamped() -> None:
