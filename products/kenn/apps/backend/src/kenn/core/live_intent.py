@@ -32,12 +32,12 @@ _SAFETY_BYPASS = re.compile(
 _NUMERIC_TRACK = re.compile(r"\b(?:track|trk|channel|chan|ch)\s*#?\s*(\d+)\b", re.I)
 _NUMBERED_SCENE = re.compile(r"\b(?:play|launch|fire|trigger)\b.*?\bscene\s*#?\s*(\d+)\b", re.I)
 _LOCATOR_REQUEST = re.compile(
-    r"\b(?:add|create|set|remove|delete)\b.{0,80}\b(?:locator|cue\s+point|marker)\b"
+    r"\b(?:add|create|set|drop|place|put|remove|delete)\b.{0,80}\b(?:locator|cue\s+point|marker)\b"
     r"|\b(?:locator|cue\s+point|marker)\b.{0,80}\b(?:add|create|set|remove|delete)\b",
     re.I,
 )
 _ADD_LOCATOR = re.compile(
-    r"^\s*(?:add|create|set)\s+(?:a\s+)?(?:locator|cue\s+point|marker)\b"
+    r"^\s*(?:add|create|set|drop|place|put)\s+(?:a\s+)?(?:locator|cue\s+point|marker)\b"
     r"(?:\s+(?:called|named|label(?:ed|led)?|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?"
     r"(?:\s+(?:at|on)\s+(?:the\s+)?(?:current\s+position|cursor|playhead|song\s+position))?\s*$",
     re.I,
@@ -49,17 +49,17 @@ _REMOVE_LOCATOR = re.compile(
     re.I,
 )
 _CREATE_MIDI_TRACK = re.compile(
-    r"^\s*(?:create|add|make)\s+(?:a\s+)?(?:new\s+)?midi\s+track\b"
+    r"^\s*(?:(?:create|add|make)\s+(?:a\s+)?(?:new\s+)?|new\s+)midi\s+track\b"
     r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
     re.I,
 )
 _CREATE_AUDIO_TRACK = re.compile(
-    r"^\s*(?:create|add|make)\s+(?:an?\s+)?(?:new\s+)?audio\s+track\b"
+    r"^\s*(?:(?:create|add|make)\s+(?:an?\s+)?(?:new\s+)?|new\s+)audio\s+track\b"
     r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
     re.I,
 )
 _CREATE_RETURN_TRACK = re.compile(
-    r"^\s*(?:create|add|make)\s+(?:a\s+)?(?:new\s+)?return\s+track\b"
+    r"^\s*(?:(?:create|add|make)\s+(?:a\s+)?(?:new\s+)?|new\s+)return\s+(?:track|channel)\b"
     r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
     re.I,
 )
@@ -76,7 +76,7 @@ _GROUP_TRACKS = re.compile(
     re.I,
 )
 _FOCUS_TRACK = re.compile(
-    r"(?:\b(?:select|focus|follow)\b.*?|\b(?:show|open)\b(?:\s+me)?\s+(?:the\s+)?)(?:track|trk|channel|chan|ch)\s*#?\s*(\d+)\b",
+    r"(?:\b(?:select|focus|follow|go\s+to|jump\s+to|take\s+me\s+to)\b.*?|\b(?:show|open)\b(?:\s+me)?\s+(?:the\s+)?)(?:track|trk|channel|chan|ch)\s*#?\s*(\d+)\b",
     re.I,
 )
 _FOCUS_TRACK_NAME = re.compile(
@@ -86,7 +86,8 @@ _FOCUS_TRACK_NAME = re.compile(
     r"(?P<show_name>.+?)\s*$",
     re.I,
 )
-_FOCUS_TRACK_BARE_NAME = re.compile(r"^\s*(?:select|focus|follow)\s+(?:the\s+)?(?P<name>[^.!?]+?)\s*[.!]?\s*$", re.I)
+_FOCUS_TRACK_BARE_NAME = re.compile(
+    r"^\s*(?:select|focus|follow|go\s+to|jump\s+to|take\s+me\s+to|show\s+me)\s+(?:the\s+)?(?P<name>[^.!?]+?)\s*[.!]?\s*$", re.I)
 _ORDINAL_TRACK = re.compile(
     r"\b(?P<ordinal>first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last)\s+"
     r"(?:visible\s+)?(?:track|trk|channel|chan|ch)\b",
@@ -284,7 +285,8 @@ _INSERT_DEVICE_ALIASES = (
 # shadowed by the generic one; _insert_device_name below relies on
 # _INSERT_DEVICE_ALIASES iteration order for the same reason.
 _ADD_DEVICE = re.compile(
-    r"\b(?:add|append|insert|put|load)\b.*\b(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
+    r"\b(?:stick|drop|throw|slap|pop|chuck)\s+(?:a|an|another)\s+(?:new\s+)?(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
+    r"|\b(?:add|append|insert|put|load)\b.*\b(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
     r"|\b(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b.*\b(?:add|append|insert|put|load)\b",
     re.I,
 )
@@ -880,9 +882,35 @@ def _bool_value(text: str, positive: str) -> bool:
     return positive not in text.lower().split()
 
 
+_ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7,
+             "eighth": 8, "ninth": 9, "tenth": 10}
+_ORDINAL_CHANNEL = re.compile(
+    r"\b(?:the\s+)?(" + "|".join(_ORDINALS) + r")\s+(?:visible\s+)?(?:track|trk|channel|chan|ch)\b", re.I)
+_CORRECTION_LEAD = re.compile(r"^\s*(?:no\s+wait|no|wait|sorry|actually|oops)\s*[,.!:;-]\s*", re.I)
+_CORRECTION_TAIL = re.compile(r",?\s+(?:not|instead\s+of)\s+the\s+[\w\s/'-]+?\s*[.!]?\s*$", re.I)
+_CALL_TRACK = re.compile(r"^\s*call\s+(track\s+\d+)\s+['\"]?(.+?)['\"]?\s*[.!]?\s*$", re.I)
+
+
+def _rewrite_common_phrasings(text: str) -> str:
+    """Put a few everyday phrasings into forms the rules below already parse.
+
+    "the second channel" -> "track 2"; a correction ("no wait, mute the snare
+    not the hats") keeps only the new instruction; "call track 8 Sweeps" is a
+    rename. Nothing here changes what a request means.
+    """
+    text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
+    corrected = _CORRECTION_LEAD.sub("", text)
+    if corrected != text:
+        text = _CORRECTION_TAIL.sub("", corrected)
+    call = _CALL_TRACK.match(text)
+    if call:
+        text = f"rename {call.group(1)} to {call.group(2)}"
+    return text
+
+
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
-    text = " ".join(str(query or "").strip().split())
+    text = _rewrite_common_phrasings(" ".join(str(query or "").strip().split()))
     numeric_text = _normalize_spoken_numbers(text)
     base = {
         "schema": "kenn.ableton_intent.v1",
@@ -1095,7 +1123,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         bare = _FOCUS_TRACK_BARE_NAME.match(text)
         if bare:
             candidate, _bare_candidates, bare_error = _find_track(" ".join(bare.group("name").split()).strip(" '\""), tracks)
-            said = set(re.findall(r"[a-z0-9]+", bare.group("name").casefold())) - {"track", "the"}
+            said = set(re.findall(r"[a-z0-9]+", bare.group("name").casefold())) - {"track", "channel", "the"}
             named = set(re.findall(r"[a-z0-9]+", str((candidate or {}).get("name", "")).casefold()))
             if not bare_error and candidate is not None and said and said <= named:
                 focus_named_match = bare
@@ -1339,7 +1367,7 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             "no track-level action was inferred."
         )
         return base
-    if re.search(r"\b(play|start playback)\b", lower):
+    if re.search(r"\b(play|start playback|start\s+(?:the\s+)?(?:song|set|playback|playing)|hit\s+play)\b", lower):
         base.update({"mode": "assist", "action": "transport_play", "confirmation_required": True, "confidence": 0.99})
         return base
     if re.search(r"\b(stop playback|stop the session|stop)\b", lower):
@@ -1679,7 +1707,10 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?(?:mute|silence)\s+off\b",
         lower,
     )
-    if mute_off or re.search(r"\b(?:mute|silence)\b", lower):
+    # "kill the FX print", "nuke the hats", "take the kick out of the mix"; not "kill playback".
+    mute_slang = (re.search(r"\b(?:kill|nuke)\b|\bout\s+of\s+the\s+mix\b", lower)
+                  and not re.search(r"\b(?:playback|song|transport|everything|all)\b", lower))
+    if mute_off or re.search(r"\b(?:mute|silence)\b", lower) or mute_slang:
         action = "set_mute"
         base.update({"desired_value": not bool(mute_off), "unit": "boolean"})
     else:
@@ -1690,7 +1721,9 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?solo\s+off\b",
             lower,
         )
-        if solo_off or re.search(r"\b(?:solo|isolate)\b", lower):
+        # "the vocal on its own", "just the vocal please", "gimme only the bass".
+        solo_slang = re.search(r"\bon\s+(?:its|their)\s+own\b|^\s*(?:(?:gimme|give\s+me|let\s+me\s+hear)\s+)?(?:just|only)\s+the\b", lower)
+        if solo_off or re.search(r"\b(?:solo|isolate)\b", lower) or solo_slang:
             action = "set_solo"
             base.update({"desired_value": not bool(solo_off), "unit": "boolean"})
         else:
@@ -1720,7 +1753,9 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         if volume_match is None and not _RELATIVE_VOLUME_EXCLUDE.search(lower):
             # "Put the kick at minus 12 dB", "set the snare to -10 dB": the same
             # narrow shape (explicit dB target) with no device, send or pan words.
-            volume_match = re.search(r"\b(?:put|set|sit|pull|push|drop|turn)\b.*?\b(?:to|at)\s+" + _NUMBER + r"\s*db\b", lower)
+            volume_match = re.search(r"\b(?:put|set|sit|pull|push|drop|turn|tuck|lower|raise|take|move|nudge|get)\b.*?\b(?:to|at)\s+" + _NUMBER + r"\s*db\b", lower)
+            if volume_match is None:
+                volume_match = re.search(r"^\s*[a-z][\w\s/'-]*?\s+at\s+" + _NUMBER + r"\s*db\s*[.!?]?\s*$", lower)
         pan_match = re.search(
             r"pan\b.*?\b(?:track|trk|channel|chan|ch)\s*#?\s*\d+\s+"
             + _NUMBER
@@ -1739,6 +1774,17 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
             r"\bpan\b.*?\b(?:hard|fully|all\s+the\s+way)\s+(left|right)\b",
             lower,
         )
+        pan_free = not re.search(r"\b(?:db|hz|khz|send|sends|eq|band|reverb|delay|echo|compressor|threshold|volume|level)\b", lower)
+        if pan_hard_match is None and pan_free:
+            # "synth hard right", "stick the Drum Bus hard left".
+            pan_hard_match = re.search(r"\b(?:hard|fully|all\s+the\s+way)\s+(left|right)\s*[.!]?\s*$", lower)
+        if pan_free and not (pan_match or pan_side_first_match or pan_amount_first_match):
+            # "hats left 20", "roll track 2 20 percent to the left": a bare number is a percentage.
+            pan_side_first_match = re.search(r"\b(left|right)\s+" + _NUMBER + r"\s*(%|percent)?\s*[.!]?\s*$", lower)
+            if pan_side_first_match is None:
+                pan_amount_first_match = re.search(
+                    r"\b(?:roll|shift|nudge|stick|move|put|place|throw)\b.*?" + _NUMBER
+                    + r"\s*(%|percent)\s*(?:to\s+the\s+)?(left|right)\b", lower)
         # "Pan the Synth center" / "Centre the Synth": the one pan target with
         # no number or side. Frequency wording is excluded so "centre
         # frequency" never becomes a pan request.
@@ -1803,6 +1849,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                 amount = -abs(amount)
             elif side == "right":
                 amount = abs(amount)
+            if pan_side_first_match is not None and unit is None and abs(amount) > 1.0:
+                unit = "%"  # "hats left 20" means 20%
             normalized = amount / 100.0 if unit else amount
             if not -1.0 <= normalized <= 1.0:
                 base["ambiguity"].append("Pan value is outside the supported -1.0 to 1.0 range; no clamping was applied.")

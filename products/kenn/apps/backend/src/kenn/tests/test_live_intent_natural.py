@@ -125,3 +125,49 @@ def test_focus_a_track_by_name_without_the_word_track(query, track) -> None:
 def test_bare_name_focus_needs_every_word_in_one_track_name(query) -> None:
     parsed = resolved(query)
     assert not parsed or parsed["action"] != "focus_track"
+
+
+@pytest.mark.parametrize("query, action, track", [
+    ("slap a compressor on the snare", "insert_device", "Snare / Clap"),
+    ("throw an echo on the synth", "insert_device", "Synth"),
+    ("new audio track", "create_audio_track", None),
+    ("make a new return channel", "create_return_track", None),
+    ("start the set", "transport_play", None),
+    ("place a locator named Drop", "add_locator", None),
+    ("sorry, solo the bass not the kick", "set_solo", "Bass"),
+    ("call track 3 Tops", "rename_track", "Hi-Hats"),
+    ("nuke the snare", "set_mute", "Snare / Clap"),
+    ("take the synth out of the mix", "set_mute", "Synth"),
+    ("the bass on its own", "set_solo", "Bass"),
+    ("only the kick", "set_solo", "Kick"),
+    ("tuck the synth to -8 dB", "set_volume", "Synth"),
+    ("snare at -10 dB", "set_volume", "Snare / Clap"),
+    ("bass hard left", "set_pan", "Bass"),
+    ("synth right 30", "set_pan", "Synth"),
+    ("nudge track 6 15 percent to the right", "set_pan", "Synth"),
+    ("go to the snare", "focus_track", "Snare / Clap"),
+    ("show me the third channel", "focus_track", "Hi-Hats"),
+    ("take me to the fifth channel", "focus_track", "Bass"),
+])
+def test_everyday_phrasings(query, action, track) -> None:
+    parsed = resolved(query)
+    assert parsed and parsed["action"] == action
+    if track:
+        assert parsed["track"]["name"] == track
+
+
+@pytest.mark.parametrize("query", [
+    "drop the reverb send on the snare by 3 dB",  # a send change, not an insert
+    "kill playback",                              # transport, not a mute
+    "leave the vocal alone",                      # not a solo
+    "the left side sounds thin",                  # not a pan
+    "how do I kill the reverb tail?",             # a question
+    "jump to the bass compressor",                # device focus by name is not supported yet: ask
+])
+def test_everyday_phrasings_that_must_not_act(query) -> None:
+    assert resolved(query) is None
+
+
+def test_pan_amounts_in_terse_forms_are_percent() -> None:
+    assert resolved("synth right 30")["desired_value"] == pytest.approx(0.3)
+    assert resolved("bass hard left")["desired_value"] == -1.0
