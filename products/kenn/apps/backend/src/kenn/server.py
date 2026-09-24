@@ -1656,6 +1656,9 @@ class Handler(BaseHTTPRequestHandler):
                     result["recommendations"] = [
                         item.payload() for item in recommendations_from_mix_review(review)
                     ]
+                    from kenn.core.advice_next_step import with_mix_review_next_step
+
+                    result["review"] = with_mix_review_next_step(review)
                 self.send_json(200, result)
             except Exception as exc:
                 self.send_json(500, {"error": f"Failed to get mix review status: {exc}"})
