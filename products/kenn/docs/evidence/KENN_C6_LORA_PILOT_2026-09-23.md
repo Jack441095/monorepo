@@ -287,3 +287,25 @@ run 4 on the Mac: five of six volume commands came back in dB (converted correct
 0 dB" came back as 1.0, which Live plays at +6 dB. The scores above compare actions and tracks, not values, so they
 stand; the value error is separate. The seeds now say dB and KENN converts with `core/volume_law.py`. Any future
 run needs a corpus rebuilt after this fix.
+
+## Addendum: run 7, dB volume labels (2026-09-24)
+
+Run 7 is run 4's recipe (`--variants 8 --scenarios 4 --include-drafted --prompt compact --max-per-action 160`) rebuilt
+after the volume fix, so every volume label is in dB (160/160) and KENN converts with Live's measured fader law.
+3,168 records, 33% clarify; 357 steps, 24 min on GPU 0, validation loss 1.73 → 0.0005; Q4_K_M 2.78 GB.
+
+| GPU, 124 cases | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted |
+|---|---|---|---|---|---|
+| Run 4, plain | 84.7% | 29/30 | 76/94 | 19/24 | 5 |
+| Run 7, plain | 78.2% | 29/30 | 68/94 | 17/24 | 4 |
+| Run 4, production evidence | 84.7% | 29/30 | 76/94 | 19/24 | 6 |
+| Run 7, production evidence | 82.3% | 29/30 | 73/94 | 18/24 | 4 |
+
+- **Volume values fixed.** A 9-command volume probe: run 7 sets "0 dB" to 0.85 (0 dB in Live) in all three cases; run 4
+  sets all three to 1.0, which is **+6 dB**. The 124-case score compares actions and tracks only, so it never saw this.
+- **Better:** EQ 3/3 (run 4: 0/3), focus 5/6, insert 3/4.
+- **New and serious:** "solo the bass", "bass solo" and "unsolo the bass" resolve to **Drum Bus**: the right action on the
+  wrong track. Also weaker on mute (3/5), multi-step (0/3) and natural requests (4/7).
+- **Decision:** run 7 is not promoted to shadow; run 4 stays (shadow only, no writes). Run 8 should keep the dB labels
+  and add contrast seeds for overlapping track names ("bass" vs "Drum Bus"), and the scorer should check values
+  (expected dB for volume cases), not only actions and tracks.
