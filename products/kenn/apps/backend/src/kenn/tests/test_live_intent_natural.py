@@ -3,6 +3,7 @@
 import pytest
 
 from kenn.core import volume_law
+from kenn.core.fake_live import FakeLiveBackend
 from kenn.core.live_intent import parse_request
 
 DEMO = {"status": "connected", "tracks": [
@@ -127,6 +128,10 @@ def test_bare_name_focus_needs_every_word_in_one_track_name(query) -> None:
     assert not parsed or parsed["action"] != "focus_track"
 
 
+# The recorded demo set (all eight tracks, including Synth and FX Print).
+FAKE_SET = FakeLiveBackend().query_session_state()
+
+
 @pytest.mark.parametrize("query, action, track", [
     ("slap a compressor on the snare", "insert_device", "Snare / Clap"),
     ("throw an echo on the synth", "insert_device", "Synth"),
@@ -150,7 +155,7 @@ def test_bare_name_focus_needs_every_word_in_one_track_name(query) -> None:
     ("take me to the fifth channel", "focus_track", "Bass"),
 ])
 def test_everyday_phrasings(query, action, track) -> None:
-    parsed = resolved(query)
+    parsed = resolved(query, FAKE_SET)
     assert parsed and parsed["action"] == action
     if track:
         assert parsed["track"]["name"] == track
@@ -165,9 +170,9 @@ def test_everyday_phrasings(query, action, track) -> None:
     "jump to the bass compressor",                # device focus by name is not supported yet: ask
 ])
 def test_everyday_phrasings_that_must_not_act(query) -> None:
-    assert resolved(query) is None
+    assert resolved(query, FAKE_SET) is None
 
 
 def test_pan_amounts_in_terse_forms_are_percent() -> None:
-    assert resolved("synth right 30")["desired_value"] == pytest.approx(0.3)
-    assert resolved("bass hard left")["desired_value"] == -1.0
+    assert resolved("synth right 30", FAKE_SET)["desired_value"] == pytest.approx(0.3)
+    assert resolved("bass hard left", FAKE_SET)["desired_value"] == -1.0
