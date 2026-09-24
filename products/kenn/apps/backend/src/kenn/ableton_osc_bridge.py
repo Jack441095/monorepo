@@ -230,6 +230,10 @@ class AbletonOSCClient:
         # exchanged. The breaker must not mistake first contact for an outage:
         # it short-circuits only after at least one real attempt was made.
         self._transport_attempted = False
+        # Half-open breaker: while "disconnected", one real read is let through at most this often, so a single
+        # missed reply (Live busy or waking from idle) cannot cut KENN off from Live until someone runs a probe.
+        self._breaker_retry_seconds: float = 5.0
+        self._last_breaker_trial: float = 0.0
         self._watchdog_thread: Optional[Thread] = None
         self._watchdog_stop_event: Optional[Event] = None
         self._watchdog_lock = Lock()
@@ -238,6 +242,24 @@ class AbletonOSCClient:
         self._cached_session_state_include_mixer: Optional[bool] = None
         self._cached_session_state_include_meters: Optional[bool] = None
         self._cache_ttl_seconds: float = 1.5
+
+    def _breaker_blocks(self, bypass_circuit_breaker: bool) -> bool:
+        """True when the open breaker should skip this read without contacting Live."""
+        if not self._circuit_breaker_enabled or bypass_circuit_breaker or not self._transport_attempted:
+            return False
+        if self.connection_state != "disconnected":
+            return False
+        with self._watchdog_lock:
+            now = time.monotonic()
+            if now - self._last_breaker_trial >= self._breaker_retry_seconds:
+                self._last_breaker_trial = now
+                return False  # this request is the trial; a reply marks the connection live again
+        return True
+
+    def _note_transport_miss(self) -> None:
+        """Start the half-open breaker's wait from this unanswered request."""
+        with self._watchdog_lock:
+            self._last_breaker_trial = time.monotonic()
 
     def _note_transport_success(self) -> None:
         """Record that Live answered, whatever the high-level call decides.
@@ -370,6 +392,8 @@ class AbletonOSCClient:
             "response_ok": response is not None,
             "round_trip_ms": round((time.monotonic() - started) * 1000.0, 3),
         }
+        if response is None:
+            self._note_transport_miss()
 
     def _next_request_id(self, address: str) -> int:
         self._next_id += 1
@@ -430,12 +454,7 @@ class AbletonOSCClient:
         timeout: Optional[float] = None,
         bypass_circuit_breaker: bool = False,
     ) -> tuple[Optional[int], Optional[Dict[str, Any]]]:
-        if (
-            self._circuit_breaker_enabled
-            and not bypass_circuit_breaker
-            and self._transport_attempted
-            and self.connection_state == "disconnected"
-        ):
+        if self._breaker_blocks(bypass_circuit_breaker):
             return None, None
         with self._exchange_lock:
             started = time.monotonic()
@@ -497,12 +516,7 @@ class AbletonOSCClient:
         """
         if not requests:
             return []
-        if (
-            self._circuit_breaker_enabled
-            and not bypass_circuit_breaker
-            and self._transport_attempted
-            and self.connection_state == "disconnected"
-        ):
+        if self._breaker_blocks(bypass_circuit_breaker):
             return [None] * len(requests)
         with self._exchange_lock:
             started = time.monotonic()
@@ -587,6 +601,8 @@ class AbletonOSCClient:
                     }
                     if any(response is not None for response in responses):
                         self._note_transport_success()
+                    else:
+                        self._note_transport_miss()
             else:
                 for item in sent:
                     self._request_addresses.pop(item["id"], None)
