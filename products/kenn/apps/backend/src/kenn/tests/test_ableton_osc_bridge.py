@@ -1177,3 +1177,53 @@ def test_breaker_still_fast_fails_after_a_genuine_failure() -> None:
         assert time.monotonic() - start < 0.15
     finally:
         client.close()
+
+
+def test_open_breaker_lets_one_trial_read_through_and_recovers() -> None:
+    """Regression (2026-09-24 soak): one missed reply opened the breaker and every later read was skipped, so
+    KENN reported Live offline for 4 hours while Live was running, until someone pressed Test."""
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server.bind(("127.0.0.1", 0))
+    port = server.getsockname()[1]
+    answering = threading.Event()
+    stop = threading.Event()
+
+    def serve() -> None:
+        server.settimeout(0.2)
+        try:
+            while not stop.is_set():
+                try:
+                    raw, address = server.recvfrom(65507)
+                except socket.timeout:
+                    continue
+                if not answering.is_set():
+                    continue  # Live busy: the request goes unanswered
+                for path, _args in decode_packet(raw):
+                    if path == "/live/song/get/tempo":
+                        _reply(server, address, path, [120.0])
+        finally:
+            server.close()
+
+    thread = threading.Thread(target=serve, daemon=True)
+    thread.start()
+    client = AbletonOSCClient(host="127.0.0.1", send_port=port, recv_port=0, query_timeout=0.1,
+                              enable_circuit_breaker=True)
+    client._breaker_retry_seconds = 0.3
+    try:
+        for _ in range(2):
+            assert client.ping(timeout=0.05) is False
+        assert client.connection_state == "disconnected"
+
+        started = time.monotonic()
+        assert client._query_args("/live/song/get/tempo") is None  # still inside the wait: skipped, no timeout
+        assert time.monotonic() - started < 0.05
+
+        answering.set()
+        time.sleep(0.35)
+        assert client._query_args("/live/song/get/tempo") == [120.0]  # the trial read reaches Live
+        assert client.connection_state == "connected"
+        assert client._query_args("/live/song/get/tempo") == [120.0]
+    finally:
+        stop.set()
+        client.close()
+        thread.join(timeout=3)
