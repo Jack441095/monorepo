@@ -83,7 +83,8 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > safe); master level refused without the word volume ("master to max", "crank the master"); the chat route forwards a
   > slipped first verb ("et the master…") and put/bring/push/crank/take/kill. Checked through `/kenn/api/ask` on the
   > real companion; 22 new tests; 124 cases unchanged (80, 0 wrong).
-- [ ] Companion restart keeps the audio-analysis cache warm (persist it) so a restart cannot break an answer
+- [x] Companion restart keeps the audio-analysis cache warm (persist it) so a restart cannot break an answer
+  > 2026-09-24: measured results (never audio) persist by content hash in `kenn/data/analysis_cache/` (16 files max; `KENN_ANALYSIS_CACHE_DIR` overrides; tests isolated). After a companion restart with no preflight, demo steps 12–13 answered in 0.2–0.4 s (cold: 3.2 s) and the gate passed.
 - [ ] 24-hour soak with Live restarts, companion restarts and sleep/wake (`companion_soak` gate)
 - [ ] Regenerate stale evidence: `automated_suite`, `intelligence` (`--run-suite --run-intelligence`),
       `planner_bakeoff` (missing input `chat/evals/ableton_deliberative_adversarial.json`), `real_live_assistant`
