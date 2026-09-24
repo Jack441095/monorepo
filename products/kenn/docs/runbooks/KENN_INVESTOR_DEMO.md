@@ -99,7 +99,7 @@ are spoken to the audience; never type them into the chat.
    exact, profile-backed vocal gain control. Review the proposal, confirm it,
    and point out the verified readback.
 7. Ask: `Pan the Synth hard left.` Review and confirm the exact proposal.
-8. Ask: `Focus EQ Eight on track 5.` Review and confirm the selection proposal.
+8. Ask: `Focus EQ Eight on track 5.` Review and confirm the device-focus proposal (Bass, EQ Eight).
    The Bass EQ is intentionally preloaded; inserting a second EQ would violate
    the fixture contract and make the next command ambiguous.
 9. Ask: `Boost amplitude by 3 dB at 200 Hz on track 5 band 2A.` Review and

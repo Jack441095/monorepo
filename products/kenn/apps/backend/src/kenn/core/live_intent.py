@@ -102,7 +102,7 @@ _SPOKEN_TRACK_NUMBER = re.compile(
 )
 _FOCUS_DEVICE = re.compile(
     r"^\s*\b(?:select|focus|follow)\b\s+(?:the\s+)?(?:device\s+|plugin\s+)?(?P<device>.+?)\s+"
-    r"\b(?:on|in)\b\s+(?:the\s+)?(?:track|trk|channel|chan|ch)\s*#?\s*(?P<track_number>\d+)\s*$",
+    r"\b(?:on|in)\b\s+(?:the\s+)?(?:track|trk|channel|chan|ch)\s*#?\s*(?P<track_number>\d+)\s*[.!]?\s*$",
     re.I,
 )
 _STOP_CLIP_MENTION = re.compile(r"\bstop\b.*?\bclip\b", re.I)
