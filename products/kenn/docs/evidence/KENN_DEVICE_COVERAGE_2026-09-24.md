@@ -22,6 +22,12 @@ Drafted on the box's GPU 1 notes model (`kenn-notes-qwen3-4b-gpu1`, driver `/mnt
 
 Now: **53 own note, 21 draft note, 2 mentioned (Instrument Rack, MIDI Effect Rack), 2 none (Drum Synth, which has no section in this manual PDF; Audio Effect Rack).** The shareable page above still shows the morning figures.
 
+**Review and approval, same day (owner delegated review to Claude).** Every control name in the 21 notes was checked automatically against its manual section (all present), each "Common mistakes" claim was checked by hand against the manual, and six unsupported lines were removed (Tension "no sound", MIDI Monitor "only connected devices", Note Echo "loops indefinitely", Auto Pan-Tremolo "shared controls", Envelope Follower "Sidechain Mix", LFO "unsupported waveforms"); Align Delay's slider is now "Delay Left". All 21 are **Status: Approved** with a  line saying who reviewed them; titles and tags now carry the device category. Retrieval index rebuilt (BM25, as before) and promoted: , 3,323 chunks (was 3,218), 778 notes; previous  kept for rollback. The 58-question retrieval fixture scores identically before and after (recall@4 0.966, MRR 0.818). Live questions to KENN now cite the new notes (Align Delay, Note Echo, Random, EQ Eight, Sampler); "What is Tension" still finds arrangement tension first (ambiguous wording).
+
+Coverage now: **74 own note, 2 mentioned (Instrument Rack, MIDI Effect Rack), 2 none (Drum Synth, Audio Effect Rack).**
+
+Note:  and  are git-ignored (corpus and index are data), so the notes themselves are not in this repo. Copies: the owner's SSD (live),  (final) and  (model drafts) on the GPU box.
+
 ## Gaps
 
 - **Knowledge.** 9 devices are not covered at all: Drum Synth, Align Delay, Audio Effect Rack, Grain Delay, Envelope MIDI, MIDI Monitor, MPE Control, Note Echo, Shaper MIDI. 16 are only mentioned in passing, including Operator, Simpler, Sampler, EQ Eight, Electric and Tension.
@@ -40,21 +46,21 @@ Now: **53 own note, 21 draft note, 2 mentioned (Instrument Rack, MIDI Effect Rac
 | Drum Rack | Instruments | own note | yes | — | — |
 | Drum Sampler | Instruments | own note | yes | — | — |
 | Drum Synth | Instruments | — | yes | — | — |
-| Electric | Instruments | own note (draft, owner review) | yes | — | — |
+| Electric | Instruments | own note | yes | — | — |
 | External Instrument | Instruments | own note | yes | — | — |
 | Impulse | Instruments | own note | yes | — | — |
 | Instrument Rack | Instruments | mentioned in 3 notes | yes | — | — |
 | Meld | Instruments | own note | yes | — | — |
-| Operator | Instruments | own note (draft, owner review) | yes | — | — |
-| Sampler | Instruments | own note (draft, owner review) | yes | — | — |
-| Simpler | Instruments | own note (draft, owner review) | yes | — | — |
-| Tension | Instruments | own note (draft, owner review) | yes | — | — |
+| Operator | Instruments | own note | yes | — | — |
+| Sampler | Instruments | own note | yes | — | — |
+| Simpler | Instruments | own note | yes | — | — |
+| Tension | Instruments | own note | yes | — | — |
 | Wavetable | Instruments | own note | yes | — | — |
-| Align Delay | Audio Effects | own note (draft, owner review) | yes | — | — |
-| Amp | Audio Effects | own note (draft, owner review) | yes | — | — |
+| Align Delay | Audio Effects | own note | yes | — | — |
+| Amp | Audio Effects | own note | yes | — | — |
 | Audio Effect Rack | Audio Effects | — | yes | — | — |
 | Auto Filter | Audio Effects | own note | yes | yes | Resonance (%), Frequency (Hz) |
-| Auto Pan-Tremolo | Audio Effects | own note (draft, owner review) | yes | — | — |
+| Auto Pan-Tremolo | Audio Effects | own note | yes | — | — |
 | Auto Shift | Audio Effects | own note | yes | — | — |
 | Beat Repeat | Audio Effects | own note | yes | — | — |
 | Cabinet | Audio Effects | own note | yes | — | — |
@@ -65,22 +71,22 @@ Now: **53 own note, 21 draft note, 2 mentioned (Instrument Rack, MIDI Effect Rac
 | Delay | Audio Effects | own note | yes | — | — |
 | Drum Buss | Audio Effects | own note | yes | yes | Drive (%) |
 | Dynamic Tube | Audio Effects | own note | yes | — | — |
-| EQ Eight | Audio Effects | own note (draft, owner review) | yes | yes | band gain (dB, on an existing tuned band) |
+| EQ Eight | Audio Effects | own note | yes | yes | band gain (dB, on an existing tuned band) |
 | EQ Three | Audio Effects | own note | yes | — | — |
 | Echo | Audio Effects | own note | yes | yes | Dry Wet (%) |
-| Envelope Follower | Audio Effects | own note (draft, owner review) | yes | — | — |
+| Envelope Follower | Audio Effects | own note | yes | — | — |
 | Erosion | Audio Effects | own note | yes | — | — |
 | External Audio Effect | Audio Effects | own note | yes | — | — |
 | Filter Delay | Audio Effects | own note | yes | — | — |
 | Gate | Audio Effects | own note | yes | — | — |
 | Glue Compressor | Audio Effects | own note | yes | yes | Attack (ms), Ratio (ratio) |
-| Grain Delay | Audio Effects | own note (draft, owner review) | yes | — | — |
+| Grain Delay | Audio Effects | own note | yes | — | — |
 | Hybrid Reverb | Audio Effects | own note | yes | yes | Dry/Wet (%) |
-| LFO | Audio Effects | own note (draft, owner review) | yes | — | — |
+| LFO | Audio Effects | own note | yes | — | — |
 | Limiter | Audio Effects | own note | yes | — | — |
 | Looper | Audio Effects | own note | yes | — | — |
 | Multiband Dynamics | Audio Effects | own note | yes | yes (AI planner only) | — |
-| Overdrive | Audio Effects | own note (draft, owner review) | yes | — | — |
+| Overdrive | Audio Effects | own note | yes | — | — |
 | Pedal | Audio Effects | own note | yes | — | — |
 | Phaser-Flanger | Audio Effects | own note | yes | — | — |
 | Redux | Audio Effects | own note | yes | — | — |
@@ -88,7 +94,7 @@ Now: **53 own note, 21 draft note, 2 mentioned (Instrument Rack, MIDI Effect Rac
 | Reverb | Audio Effects | own note | yes | — | — |
 | Roar | Audio Effects | own note | yes | yes (AI planner only) | Drive (dB), Dry/Wet (%) |
 | Saturator | Audio Effects | own note | yes | yes | Drive (dB) |
-| Shaper | Audio Effects | own note (draft, owner review) | yes | — | — |
+| Shaper | Audio Effects | own note | yes | — | — |
 | Shifter | Audio Effects | own note | yes | — | — |
 | Spectral Resonator | Audio Effects | own note | yes | — | — |
 | Spectral Time | Audio Effects | own note | yes | — | — |
@@ -100,15 +106,15 @@ Now: **53 own note, 21 draft note, 2 mentioned (Instrument Rack, MIDI Effect Rac
 | Arpeggiator | MIDI Effects | own note | yes | — | — |
 | CC Control | MIDI Effects | own note | yes | — | — |
 | Chord | MIDI Effects | own note | yes | — | — |
-| Envelope MIDI | MIDI Effects | own note (draft, owner review) | yes | — | — |
-| Expression Control | MIDI Effects | own note (draft, owner review) | yes | — | — |
+| Envelope MIDI | MIDI Effects | own note | yes | — | — |
+| Expression Control | MIDI Effects | own note | yes | — | — |
 | MIDI Effect Rack | MIDI Effects | mentioned in 1 notes | yes | — | — |
-| MIDI Monitor | MIDI Effects | own note (draft, owner review) | yes | — | — |
-| MPE Control | MIDI Effects | own note (draft, owner review) | yes | — | — |
-| Note Echo | MIDI Effects | own note (draft, owner review) | yes | — | — |
+| MIDI Monitor | MIDI Effects | own note | yes | — | — |
+| MPE Control | MIDI Effects | own note | yes | — | — |
+| Note Echo | MIDI Effects | own note | yes | — | — |
 | Note Length | MIDI Effects | own note | yes | — | — |
 | Pitch | MIDI Effects | own note | yes | — | — |
-| Random | MIDI Effects | own note (draft, owner review) | yes | — | — |
+| Random | MIDI Effects | own note | yes | — | — |
 | Scale | MIDI Effects | own note | yes | — | — |
-| Shaper MIDI | MIDI Effects | own note (draft, owner review) | yes | — | — |
+| Shaper MIDI | MIDI Effects | own note | yes | — | — |
 | Velocity | MIDI Effects | own note | yes | — | — |
