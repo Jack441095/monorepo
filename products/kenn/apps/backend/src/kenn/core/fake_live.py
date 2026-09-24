@@ -112,7 +112,14 @@ class FakeLiveBackend:
         with self._lock:
             state = copy.deepcopy(self._session)
             state["return_tracks"] = copy.deepcopy(self._returns)
-            return state
+        if not include_mixer:
+            # As the real AbletonOSC client: a topology read carries no fader, pan, mute/solo/arm or selection
+            # values, so code that forgets to ask for the mixer fails here too, not only on real Live.
+            state.pop("selected_track_index", None)
+            for track in state.get("tracks") or []:
+                for field in ("volume", "pan", "muted", "soloed", "armed"):
+                    track.pop(field, None)
+        return state
 
     def ping(self, *, timeout: float = 0.5) -> bool:
         return True
