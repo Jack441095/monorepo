@@ -88,7 +88,8 @@ class FakeGate(DemoScriptGate):
                 "operation": "set_pan", "track_name": "Synth", "parameter": "pan", "after": -1.0,
             },
             "Focus EQ Eight on track 5.": {
-                "operation": "focus_track", "track_name": "Bass", "after": 4,
+                "operation": "focus_device", "track_name": "Bass", "device_name": "EQ Eight",
+                "after": {"track_index": 4, "device_index": 0},
             },
             "Boost amplitude by 3 dB at 200 Hz on track 5 band 2A.": {
                 "operation": "set_device_parameter", "track_name": "Bass", "device_name": "EQ Eight",

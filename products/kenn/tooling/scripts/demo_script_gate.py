@@ -136,7 +136,7 @@ def _synth_pan(body: dict[str, Any]) -> None:
 
 
 def _bass_focus(body: dict[str, Any]) -> None:
-    _require_proposal(body, operation="focus_track", track_name="Bass", after=4)
+    _require_proposal(body, operation="focus_device", track_name="Bass", device_name="EQ Eight")
 
 
 def _bass_eq(body: dict[str, Any]) -> None:
