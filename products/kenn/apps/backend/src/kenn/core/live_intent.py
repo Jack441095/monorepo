@@ -834,7 +834,9 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     live-side sparse-index and unit resolver. Device insertion and EQ band
     actions are rejected rather than guessed inside a recipe.
     """
-    text = " ".join(str(query or "").strip().split())
+    # Same tidy-up as single commands: "Can you solo the drum bus and the vocal at the same time?" didn't split, and
+    # the single-command parse then soloed only the Drum Bus.
+    text = _rewrite_common_phrasings(" ".join(str(query or "").strip().split()))
     guarded_workflows = (
         (
             _SOLO_ANALYSIS_WORKFLOW,
@@ -958,7 +960,16 @@ _TERSE_LEVEL_EXCLUDE = re.compile(r"\b(?:send|sends|reverb|delay|echo|eq|band|ga
 # resolve, so "synth off" works and "metronome off" still asks.
 _NAME = r"(?P<name>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}?)"
 _POLITE_TAIL = re.compile(r"\s*,?\s+(?:please|pls|plz|thanks|thank\s+you|cheers|mate)\s*[.!?]*\s*$", re.I)
-_POLITE_LEAD = re.compile(r"^\s*(?:yo|hey|ok|okay|right|please|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?)\s*[,!]?\s+(?=\w)", re.I)
+_POLITE_LEAD = re.compile(r"^\s*(?:yo|hey|ok|okay|right|please|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?"
+                          r"|i\s+(?:want|need|would\s+like|'d\s+like)\s+(?:you\s+)?to)\s*[,!]?\s+(?=\w)", re.I)
+# ", can you do that?", "for clarity", "so I can adjust it": asides after the request. Left in, they ended up in new
+# track names ("Synth Lead, can you do that?").
+_TRAILING_ASIDE = re.compile(r"\s*,?\s+(?:can\s+you\s+(?:do\s+that|help(?:\s+me)?(?:\s+with\s+that)?)|is\s+that\s+possible|"
+                             r"if\s+(?:you\s+can|possible)|for\s+clarity|for\s+me|at\s+the\s+same\s+time|together|simultaneously|so\s+(?:that\s+)?i\s+can\s+[^,]+|thanks?(?:\s+you)?)"
+                             r"\s*[?.!]*\s*$", re.I)
+# "how do I solo the vocal?" asks how, it doesn't ask KENN to do it; KENN's notes answer it.
+_HOW_TO_QUESTION = re.compile(r"^\s*(?:how\s+(?:do|can|would|should)\s+i|is\s+there\s+a\s+way\s+to|what(?:'s|\s+is)\s+the\s+"
+                              r"(?:best\s+)?way\s+to)\b", re.I)
 _A_DB = re.compile(r"\b(?:(?P<half>half\s+a)|an?)\s+(?:db|decibel)\b", re.I)
 _SIGNED_CHANGE = re.compile(rf"^\s*{_NAME}\s+(?P<sign>[+-])\s*(?P<amount>\d+(?:\.\d+)?)\s*(?:dbs?)?\s+relative\s*[.!]?\s*$"
                             rf"|^\s*{_NAME.replace('name', 'name2')}\s+\+\s*(?P<amount2>\d+(?:\.\d+)?)\s*dbs?\s*[.!]?\s*$", re.I)
@@ -1039,8 +1050,11 @@ _SEND_SAID_GO_TO = re.compile(
 
 
 def _rewrite_idioms(text: str) -> str:
+    if _HOW_TO_QUESTION.match(text):
+        return text
+    text = _TRAILING_ASIDE.sub("", _POLITE_TAIL.sub("", text))
     polite = _POLITE_LEAD.match(text)
-    text = _POLITE_LEAD.sub("", _POLITE_TAIL.sub("", text))
+    text = _POLITE_LEAD.sub("", text)
     if polite:
         text = text.rstrip(" ?")  # "can you solo the hats?" is a request, not a question
     if _COMP_SETTING.search(text):
@@ -1132,6 +1146,7 @@ def _rewrite_common_phrasings(text: str) -> str:
     corrected = _CORRECTION_LEAD.sub("", text)
     if corrected != text:
         text = _CORRECTION_TAIL.sub("", corrected)
+    text = re.sub(r"\b((?:re)?name\b.*?\bto)\s+just\s+", r"\1 ", text, flags=re.I)
     call = _CALL_TRACK.match(text)
     if call:
         text = f"rename {call.group(1)} to {call.group(2)}"
@@ -1280,6 +1295,11 @@ def _single_track_change_question(parsed: dict[str, Any], snapshot: dict[str, An
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
     parsed = _parse_request_rules(query, session_snapshot)
+    if _HOW_TO_QUESTION.match(str(query or "")):
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["how_to"],
+                       "ambiguity": ["That's a how-to question, so nothing changed. Ask it in chat and KENN explains the "
+                                     "steps, or say it as a request (\"solo the lead vocal\") and KENN prepares it."]})
+        return parsed
     if parsed.get("action") == "set_eq_band_gain" and not parsed.get("eq_band"):
         band = re.search(r"\bband\s*(\d+)\s*([ab])\b", str(parsed.get("query") or ""), re.I)
         if band:  # "cut 200 Hz on the bass by 3 dB, band 2A": the named band settles which one
@@ -2139,7 +2159,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
 
     action = None
     mute_off = re.search(
-        r"\b(?:unmute|un[- ]?silence)\b|"
+        r"\b(?:un-?mute|un[- ]?silence)\b|\b(?:turn|switch|take)\s+off\s+(?:the\s+)?mute\b|"
         r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:mute|silence)\b|"
         r"\b(?:turn|switch)\s+(?:mute|silence)\s+off\b|"
         # "take the mute off the kick": the noun-first order means off, not on.
@@ -2154,7 +2174,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         base.update({"desired_value": not bool(mute_off), "unit": "boolean"})
     else:
         solo_off = re.search(
-            r"\b(?:unsolo|un[- ]?isolate)\b|"
+            r"\b(?:un-?solo|un[- ]?isolate)\b|\b(?:turn|switch|take)\s+off\s+(?:the\s+)?solo\b|"
             r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:solo|isolation)\b|"
             r"\b(?:turn|switch)\s+solo\s+off\b|"
             r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?solo\s+off\b",
@@ -2167,7 +2187,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             base.update({"desired_value": not bool(solo_off), "unit": "boolean"})
         else:
             arm_off = re.search(
-                r"\bdisarm\b|"
+                r"\b(?:dis-?arm|un-?arm)\b|\b(?:turn|switch|take)\s+off\s+(?:the\s+)?(?:record[- ]?)?arm\b|"
                 r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:arm|record[- ]?enable|record[- ]?ready|record(?:ing)?)\b|"
                 r"\b(?:turn|switch)\s+(?:record[- ]?arm|arm)\s+off\b",
                 lower,
