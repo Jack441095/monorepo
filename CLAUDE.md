@@ -17,6 +17,27 @@ Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `pro
 - `Audio_Too` is a preserved legacy boundary that was *not* bulk-migrated during the Sept 2026 cleanup — it overlaps heavily with `products/slo` (both descend from the SLO codebase) but is kept as a frozen reference; don't assume they mirror each other.
 - Owner audio and corpora are data, not source — kept outside this code estate entirely.
 
+## Code and comment style
+
+Code should read like a careful human engineer on this team wrote it, not like generated output.
+
+- **Match the file you're in.** Naming, comment density, docstring format and idioms follow the surrounding code.
+  Don't introduce a new style into an old file.
+- **Comments explain why, not what.** Write them the way you'd explain it to a colleague: the reason, the gotcha,
+  the thing that bit us ("Live ignores this while the device view is hidden, so select the track first"). If the
+  code already says it, leave the comment out.
+- **Plain, specific English.** Short sentences, real names and numbers. Avoid filler and hype words ("robust",
+  "comprehensive", "seamlessly", "leverage", "ensure that", "it's important to note"), and don't open with "This
+  function…" or "Note:".
+- **No boilerplate.** No banner or divider comments (`# ---- Helpers ----`), no Args/Returns blocks that just repeat
+  the signature, no docstrings on obvious one-liners, no emoji.
+- **Don't over-engineer.** No defensive checks for things that can't happen, no wrapper layers or config options
+  nobody asked for. Handle the errors that really occur.
+- **Tests read like examples.** Name them for the behaviour they protect (`test_a_frequency_never_becomes_a_fader_change`);
+  a regression test says in one line what broke and when.
+- **Commit messages:** one plain line saying what changed and why it matters, like a person would write it. Never
+  mention AI or tools (see the attribution rule above).
+
 ## Commands
 
 The root `tools/` helper suite referenced by earlier versions of this file (`estate_check.sh`, `run_all_product_checks.sh`, `check_commit_metadata.py`, …) is **not currently present on `main`** — its only copies live on the `kenn-production-hardening` branch. Restore before relying on those commands.
