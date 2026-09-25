@@ -176,6 +176,7 @@ def smoke_test(app: Path) -> dict[str, str]:
             review_request = urllib.request.Request(f"{base}/api/mix-review", method="POST", data=body,
                                                     headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
             review = json.load(urllib.request.urlopen(review_request, timeout=120))
+            guide = urllib.request.urlopen(f"{base}/guide", timeout=10).read().decode("utf-8")
         finally:
             server.terminate()
             server.wait(timeout=30)
@@ -185,6 +186,7 @@ def smoke_test(app: Path) -> dict[str, str]:
         "setup_status": setup.get("schema") == "kenn.setup_status.v1",
         "cited_answer": bool(answer.get("answer")) and bool(answer.get("sources")),
         "mix_review": review.get("ok") is True,
+        "tester_guide": "Known limitations" in guide,
     }
     if not all(checks.values()):
         raise SystemExit(f"Smoke test failed: {checks}")
@@ -194,6 +196,13 @@ def smoke_test(app: Path) -> dict[str, str]:
 def copy_code(kenn: Path, code_root: Path) -> None:
     for relative in CODE_TREES:
         shutil.copytree(code_root / relative, kenn / relative, ignore=CODE_IGNORE)
+    # The app has no Markdown library, so the in-app tester guide (/guide) ships pre-rendered.
+    import markdown
+
+    guide = code_root / "docs" / "BETA_TESTER_GUIDE.md"
+    (kenn / "docs").mkdir(parents=True, exist_ok=True)
+    (kenn / "docs" / "BETA_TESTER_GUIDE.html").write_text(
+        markdown.markdown(guide.read_text(encoding="utf-8"), extensions=["tables"]), encoding="utf-8")
     (kenn / "tooling" / "scripts").mkdir(parents=True)
     for name in RUNTIME_SCRIPTS:
         shutil.copy2(code_root / "tooling" / "scripts" / name, kenn / "tooling" / "scripts" / name)

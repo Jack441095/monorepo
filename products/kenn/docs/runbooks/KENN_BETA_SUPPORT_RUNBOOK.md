@@ -1,85 +1,75 @@
-# KENN Internal Beta Support Runbook
+# KENN private beta: support runbook
 
-Scope: supporting the Mix Review CLI (`mix-review/adapter.py`) and Chat
-(`chat/app.py`) beta. AutoMix, desktop, and plugin surfaces are not in beta
--- if a tester reports an issue with one of those, the correct response is
-"not in this beta," not troubleshooting.
+For whoever answers tester reports. Testers follow `docs/BETA_TESTER_GUIDE.md`, which the app also shows at
+**Setup & Support → Read the tester guide**. Updated 2026-09-25 for the `KENN.app` beta (the old Mix Review CLI beta
+is gone).
 
-## Triage order
+## What's in the beta
 
-1. **Reproduce.** Ask for the exact command run and the full JSON output
-   (or error text). Run `python3 -m pytest mix-review/tests -v` yourself
-   first to confirm the baseline is healthy before investigating a
-   specific-file report.
-2. **Classify.**
-   - `status: "rejected"` -- input validation failure (bad path, wrong
-     format, wrong bit depth, too large). This is expected, correct
-     behaviour for unsupported input, not a bug, unless the file *should*
-     have been accepted (see below).
-   - `status: "failed"` -- the engine ran and raised an exception, or
-     returned `ok: false`. This is a real bug; get the full traceback if
-     possible (running the adapter directly, not swallowing stderr, will
-     show it) and file it against `mix-review/core/local_engine.py`.
-   - `status: "completed"` with a finding the tester disagrees with -- this
-     is calibration feedback, not a crash. Log it against the specific
-     `fault_family` for the qualification backlog (see GAP-01/GAP-07 in
-     the gap matrix); do not treat it as a defect to silently patch away
-     without evidence.
-3. **Check for a known issue.** Cross-reference `docs/KNOWN_ISSUES.md` and
-   `docs/KENN_BETA_GAP_MATRIX.md` before assuming something is new.
+Session questions, Live control through proposal → **Apply** → readback → **Undo** (mixer, device focus, the measured
+device parameters, inserting the 10 allowlisted audio effects), cited answers from KENN's notes, and Mix Review of an
+exported WAV. The AI planner, AutoMix, audio generation and voice are off. A report about those is "not in this beta",
+not a support case.
 
-## Common failure modes and what they mean
+## First reply to any report
 
-| Symptom | Likely cause | Action |
+Ask for three things:
+
+1. What they asked, what they expected, and what happened (the exact wording they typed matters).
+2. The diagnostics file: **Setup & Support → Save diagnostics for support**, saved in
+   `~/Library/Application Support/KENN/diagnostics`. It holds counts and timings only: kinds of changes and how they
+   ended, answer times, versions, knowledge index. No track names, values, questions, audio or paths.
+3. Their Live version and macOS version.
+
+Only ask for the full logs (`~/Library/Logs/KENN Desktop Companion/server.log`,
+`~/Library/Application Support/KENN/runtime/logs/kenn.log`) if the above doesn't explain it. They are fuller, so the
+tester should look through them before sending.
+
+## Common reports
+
+| Report | What it usually is | What to do |
 |---|---|---|
-| `"Unsupported bit depth"` error | 32-bit float WAV, or any non-16/24-bit PCM | Expected; not a bug. Ask the tester to export 16- or 24-bit PCM WAV. |
-| `"Unsupported channel count"` | Mono/stereo only supported | Expected; not a bug. |
-| `"could not be parsed as a valid WAV file"` | Corrupted, truncated, or non-WAV file (e.g. renamed MP3) | Expected; not a bug. Confirm the file plays correctly elsewhere first. |
-| Every finding shows `confidence: 0.0`, `"unknown"` | File is under 1 second, or mono for a stereo-only family | Expected abstention behaviour, not a bug. |
-| `status: "failed"` with a Python traceback | Real defect in `local_engine.py` | File a bug with the exact input file (or a minimal WAV that reproduces it) and full traceback. |
-| Import error / `RuntimeError` at startup mentioning `Audio_Too` | The tester is running with `KENN_MIX_REVIEW_ENGINE=audio_too_legacy` set (non-default legacy path) without a real checkout | Tell them to unset `KENN_MIX_REVIEW_ENGINE`; the default engine has no external dependency. |
-| `RuntimeError: KENN engine checkout not found` on `chat/app.py` startup | `apps/backend/src/kenn/data/index/` doesn't exist yet (gitignored, generated) | Run `python3 apps/backend/src/kenn/main.py build` first; see the tester guide. |
-| Chat returns `found: false` for a question that seems in-scope | Retrieval is BM25 (keyword) only right now, not semantic -- wording mismatch is the most common cause | Ask the tester to retry with more specific audio-engineering terminology; log the question either way as retrieval-quality feedback (GAP-03), not necessarily a bug. |
-| Chat's `answer` cites a source that doesn't actually support the claim | Possible retrieval/ranking defect | File against `apps/backend/src/kenn/retrieval/`, with the exact question and returned `sources`. |
-| Chat's `/health` shows `llm_enabled: true`, or an answer looks generated rather than templated | Should never happen -- `AUDIO_TOO_LLM_ENABLED` is forced to `"0"` in code | Treat as a critical safety bug, not a normal support case; escalate immediately. |
-| AutoMix, desktop app, or plugin doesn't work | Out of beta scope | Point to `docs/KENN_BETA_READINESS_REPORT.md`; not a support case. |
+| "Live is connected" never ticks | AbletonOSC not selected as a Control Surface, or Live was open during the install | Settings → Link, Tempo & MIDI → a free slot → **AbletonOSC**, Input/Output **None**; quit and reopen Live; **Check again** |
+| Connected, then KENN says Live is offline | Another OSC/KENN script in a second Control Surface slot (they share port 11000), or Live busy | Leave only AbletonOSC selected. Since 24 Sept KENN retries a quiet connection every 5 s; if it stays offline for more than a minute, get the diagnostics file |
+| "KENN didn't do what I asked" | Wording KENN doesn't handle, or it asked a question instead | Normal: it asks rather than guesses. Log the exact phrasing for the parser backlog; it is not a defect unless KENN **applied** the wrong change |
+| KENN applied the wrong change | A wrong plan: the most serious report | Get the exact wording and diagnostics the same day; the tester can **Undo** it. Add the phrasing to `tooling/data/adversarial_mixer_phrasings.jsonl` and fix it with a regression test before the next build |
+| An answer cites a source that doesn't support it | Retrieval or note problem | File with the exact question and the cited sources; check the note itself |
+| An answer shows code names (`generate_mix_plan()` and similar) | An internal AutoMix note reached an everyday answer (fixed 24 Sept) | Get the question; add it to the retrieval fixtures |
+| Mix Review rejects a file | Not 16/24-bit PCM WAV, not mono/stereo, too short, or corrupt | Expected. Ask for a 16- or 24-bit WAV export |
+| Mix Review's findings seem wrong on a real mix | Calibration, not a crash | Log against the finding's `fault_family` as real-mix evidence; don't patch it away from one example |
+| App won't open the first time | Unsigned beta build (Gatekeeper) | Right-click KENN in Applications → **Open** → **Open** |
+| KENN seems stuck | Companion hung or crashed | Quit and reopen KENN; nothing in Live changes without Apply, so restarting is always safe |
 
-## Diagnostics to collect
+## Things KENN must never do
 
-- Full JSON receipt (includes `receipt_id`, `timestamp`, `analysis_version`
-  for exact reproducibility).
-- `python3 --version` and OS.
-- Whether the input file plays correctly in another tool.
-- If `status: "failed"`: run the same file directly and capture stderr
-  (the CLI does not currently write a separate log file -- everything
-  needed is in stdout/stderr of the single command).
+Escalate straight away, same day, if a tester reports any of these. They are safety defects, not support cases:
+
+- a change reached Live without the tester pressing **Apply**;
+- a receipt says "verified" but Live shows something else;
+- **Undo** did not put the exact previous value back;
+- KENN changed the master level, deleted or overwrote anything;
+- anything was sent off the Mac (this build has no hosted AI and telemetry is off).
+
+Ask for the diagnostics file, the Live set if they're willing to share it, and the exact steps. Stop inviting new
+testers until it's understood.
 
 ## Data handling
 
-Mix Review never uploads or persists audio (`storage: "memory_only"`,
-`external_network: false` -- enforced by `contracts.receipt_errors`, not
-just convention). If a tester shares a receipt for support purposes, it
-contains a SHA-256 hash of their file and the measured evidence, not the
-audio itself, so receipts can be shared/logged without exposing the
-tester's actual mix.
+Audio loaded for a review is analysed on the tester's Mac and not kept: each review records
+`audio_retained: false` and keeps only its measurements (`storage: "metadata_only"`). Receipts and
+diagnostics contain hashes and counts, not audio, so they are safe to store with the ticket. Don't ask testers for
+their stems or projects unless a defect can't be reproduced otherwise, and then only with explicit consent.
 
-## Escalation
+## Fixing and shipping
 
-- **Engine defects** (`status: "failed"`, incorrect measurements against a
-  known-good synthetic case): file against `mix-review/core/local_engine.py`
-  with a reproducing test case added to
-  `mix-review/tests/test_local_engine.py`.
-- **False positives/negatives on real mixes**: log as calibration evidence
-  toward GAP-01/GAP-07 (real-mix benchmark), not as an immediate code
-  change -- a single disagreement is a data point, not proof of a bug, per
-  this repo's own "current evidence over anecdote" rule.
-- **Chat retrieval/citation issues**: file against
-  `apps/backend/src/kenn/retrieval/` or the specific note in
-  `apps/backend/src/kenn/Training_Data_Notes/`, with the exact question and returned
-  payload. Log toward GAP-03 (formal benchmark still pending).
-- **Anything about AutoMix, desktop, plugin server-backed features**: not
-  this beta's scope; redirect to the relevant gap-matrix entry.
+1. Reproduce with the demo set or a synthetic case; add a regression test named for the behaviour it protects.
+2. Run the suite (`tooling/scripts/run_tests_on_box.py` runs it on the GPU box in about 2 minutes).
+3. For Live control changes, re-run the tester-guide walkthrough on real Live and the real-Live assistant test.
+4. Rebuild the app (`tooling/scripts/build_kenn_app.py --dmg`; it smoke-tests the bundle) and send the new DMG with
+   a one-line changelog.
 
 ## Rollback
 
-If a change causes regressions, see `docs/KENN_BETA_ROLLBACK_PLAN.md`.
+Keep the previous DMG. A tester replaces KENN in Applications with the previous version; settings and history in
+`~/Library/Application Support/KENN` are kept. The knowledge index keeps its previous version on disk
+(`data/index/PREVIOUS`); `index_store.rollback_index()` switches back. See `docs/plans/ABLETON_ASSISTANT_ROLLBACK_PLAN.md`.
