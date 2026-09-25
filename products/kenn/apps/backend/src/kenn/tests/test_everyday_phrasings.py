@@ -126,3 +126,38 @@ def test_terse_session_shorthand(snapshot, request_text, action, track) -> None:
                                                 ("put a mark here for breakdown", "breakdown")])
 def test_shorthand_markers(snapshot, request_text, name) -> None:
     assert parse_request(request_text, snapshot)["locator_name"] == name
+
+
+@pytest.mark.parametrize("request_text, action, track", [
+    ("Could you dis-arm the drum bus track please?", "set_arm", "Drum Bus"),
+    ("I want to turn off the solo on the drum bus.", "set_solo", "Drum Bus"),
+    ("turn off the mute on the bass", "set_mute", "Bass"),
+    ("un-mute the kick", "set_mute", "Kick"),
+])
+def test_switching_something_off_never_switches_it_on(snapshot, request_text, action, track) -> None:
+    # Regression (third blind check, 25 Sept): "dis-arm" armed the track and "turn off the solo" soloed it.
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == action and parsed["track"]["name"] == track and parsed["desired_value"] is False
+
+
+@pytest.mark.parametrize("request_text", ["How do I solo the lead vocal track?", "Is there a way to solo the lead vocal track?"])
+def test_a_how_to_question_changes_nothing(snapshot, request_text) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] is None and parsed["missing_fields"] == ["how_to"]
+
+
+@pytest.mark.parametrize("request_text, new_name", [
+    ("I need to rename the synth track to Synth Lead, can you do that?", "Synth Lead"),
+    ("Can you rename the vocal track to 'Vox' for clarity?", "Vox"),
+    ("Can you rename the hats track to just Hats?", "Hats"),
+])
+def test_asides_do_not_end_up_in_a_new_name(snapshot, request_text, new_name) -> None:
+    assert parse_request(request_text, snapshot)["desired_value"] == new_name
+
+
+def test_two_tracks_at_the_same_time_are_both_changed(snapshot) -> None:
+    # Regression (third blind check): only the Drum Bus was soloed; the vocal was silently dropped.
+    from kenn.core.live_intent import parse_natural_recipe
+
+    recipe = parse_natural_recipe("Can you solo the drum bus and the vocal track at the same time?", snapshot)
+    assert recipe is not None and len(recipe["segments"]) == 2 and not recipe["ambiguity"]

@@ -2835,7 +2835,10 @@ def _handle_command_impl(
         if not result.get("ok"):
             return _clarification(response, natural_recipe, result.get("error", "I could not prepare that Live recipe."))
         return _recipe_response(response, result["proposal"])
-    if SubjectiveTranslator.can_translate(clean_command):
+    # A request the rules already understand exactly ("rename the vocal track to 'Vox' for clarity") is never a mix
+    # metaphor; "clarity" there once turned a rename into the vocal-unmasking recipe.
+    if SubjectiveTranslator.can_translate(clean_command) and not (
+            deterministic_intent.get("action") and not deterministic_intent.get("missing_fields")):
         subjective_res = SubjectiveTranslator.translate(clean_command, snapshot, response["session_id"], live)
         if subjective_res is not None:
             response["llm"] = {"status": "not_used", "reason": "subjective_translation"}
@@ -2975,7 +2978,7 @@ def _handle_command_impl(
         return response
     if intent.get("missing_fields") or intent.get("ambiguity"):
         if intent.get("action") is None and intent.get("ambiguity") and set(intent.get("missing_fields") or []) & {
-                "supported_unit_mapping", "device", "send_amount", "transport_target"}:
+                "supported_unit_mapping", "device", "send_amount", "transport_target", "how_to"}:
             # The parser knows exactly what's wrong ("Compressor Attack in ms isn't measured yet"); the generic
             # "not sure what you're asking" hid that from people who'd asked a perfectly clear question.
             return _clarification(response, intent, str(intent["ambiguity"][0]))

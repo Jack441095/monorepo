@@ -23,6 +23,7 @@ A "wrong" is the one that matters: press Apply on it and you get a change you di
 | `natural_holdout.jsonl` + `natural_holdout_candidates.jsonl` | 505 | 124 earlier + 381 drafted by Claude | Claude | development |
 | `natural_blind_qwen14b.jsonl` | 210 | Qwen3 14B (box), asked for varied producer wording | Claude, before scoring | blind, then development |
 | `natural_blind_qwen8b.jsonl` | 171 | Qwen3 8B (box), "typed in a hurry mid-session" | Claude, before scoring | blind, then development |
+| `natural_blind_qwen14b_beginner.jsonl` | 224 | Qwen3 14B, a beginner writing full polite sentences | Claude, before scoring | blind, then development |
 
 The Qwen labels were unreliable ("mute the kick" labelled `on: false`), so every row was relabelled by what a
 producer means, before any scoring. The rules:
@@ -45,6 +46,7 @@ training builder's exclusion list (`NATURAL_HOLDOUTS`).
 |---|---|---|---|
 | Qwen3 14B, 210 | **71.9%** (151) | 51 | 8 (7 real, 1 scorer bug) |
 | Qwen3 8B, 171 | **70.2%** (120) | 44 | 7 |
+| Qwen3 14B beginner, 224 (scored after the first two were fixed) | **65.6%** (147) | 63 | 14 |
 
 **After fixing what they found** (all three sets are now development data):
 
@@ -52,9 +54,12 @@ training builder's exclusion list (`NATURAL_HOLDOUTS`).
 |---|---|---|---|
 | 505 development | 95.4% | 23 | 0 |
 | Qwen3 14B, 210 | 94.3% | 12 | 0 |
-| Qwen3 8B, 171 | 79.5% | 35 | 0 |
+| Qwen3 8B, 171 | 96.5% | 6 | 0 |
+| Qwen3 14B beginner, 224 | 75.0% | 54 | 2 (both mixed requests: "I want to solo the synth. Can you go there?") |
 
-**Reading it straight:** on wording it hasn't seen, the rule parser gets about **70%** right. It reaches 95% once
+**Reading it straight:** on wording it hasn't seen, the rule parser gets about **70%** right. The third set was scored
+*after* the first two had been fixed and still came in at 65.6%: the fixes don't carry over to a different register
+(full polite sentences), which is the clearest sign that more rules alone won't reach 95%. It reaches 95% once
 it has been tuned on a set. Both blind sets landed within two points of each other, so ~70% is the real starting
 point, not a fluke. The rule parser alone won't reach the gate on fresh wording. The next step is the local planner
 where the rules ask; that measurement is in progress (below). Zero wrong plans on all three sets matters as much as
@@ -69,6 +74,15 @@ the 95%.
    track is now found only in the words before "to".
 3. "play the drums" / "stop the bass" **started or stopped the whole set**. Play and stop naming a track now ask
    ("did you mean solo/mute the drums, or the whole set?").
+
+The third (beginner) set found inverted values and more, all fixed with tests:
+
+4. "Could you **dis-arm** the drum bus?" **armed** it; "I want to **turn off the solo** on the drum bus" **soloed** it.
+5. "How do I solo the lead vocal?" / "Is there a way to solo…?" **soloed** it. How-to questions now change nothing.
+6. New names kept the rest of the sentence ("Synth Lead, can you do that?", "just Hats").
+7. "rename the vocal track to 'Vox' for clarity" became the **vocal-unmasking recipe** ("vocal … clarity"); the
+   subjective translator no longer fires when the rules already have an exact request.
+8. "solo the drum bus and the vocal track at the same time" soloed **only the Drum Bus**.
 
 The development set found three more, also fixed:
 
