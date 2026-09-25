@@ -23,6 +23,9 @@ Code should read like a careful human engineer on this team wrote it, not like g
 
 - **Match the file you're in.** Naming, comment density, docstring format and idioms follow the surrounding code.
   Don't introduce a new style into an old file.
+- **Comment like a person, not a generator.** Write comments in a natural, human voice: first person plural is fine
+  ("we read the mixer here because…"), dates and what bit us are welcome, and they should sound like the rest of
+  the file's comments. A reader shouldn't be able to tell which lines a tool wrote.
 - **Comments explain why, not what.** Write them the way you'd explain it to a colleague: the reason, the gotcha,
   the thing that bit us ("Live ignores this while the device view is hidden, so select the track first"). If the
   code already says it, leave the comment out.
