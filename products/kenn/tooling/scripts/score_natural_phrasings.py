@@ -131,8 +131,12 @@ def planner_fallback(case: dict[str, Any], want: Any, service: Any, snapshot: di
     if not plan or plan.get("action") == "clarify":
         got = {"action": "clarify", "track": None, "value": None}
     else:
-        got = {"action": plan.get("action"), "track": plan.get("track_name"), "device": plan.get("device_name"),
-               "value": plan.get("value"), "name": plan.get("new_track_name") or plan.get("locator_name")}
+        action = _SAME_READ.get(str(plan.get("action")), plan.get("action"))
+        # A rename plan carries the new name in "value"; reads (inspect_*) change nothing, as for the rules.
+        got = {"action": action, "track": plan.get("track_name"), "device": plan.get("device_name"),
+               "value": plan.get("value"), "read_only": str(action).startswith("inspect_"),
+               "name": plan.get("new_track_name") or plan.get("locator_name")
+               or (plan.get("value") if action == "rename_track" else None)}
     return {"got": got, "verdict": verdict(case, got, want), "status": meta.get("status")}
 
 
