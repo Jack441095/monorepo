@@ -86,7 +86,11 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 ### Stage 1 — Conversational KENN (beta weeks 1–6)
 
-- [ ] Brain decision made; provider added behind the model router with per-task switches (as `KENN_LLM_ENABLED_<TASK>`)
+- [x] Brain decision made — **owner, 25 Sept: local Qwen only** (option A). KENN stays fully on the Mac: no hosted model,
+      nothing sent off the machine. The existing Ollama provider behind the model router serves it
+      (`KENN_LLM_PROVIDER_<TASK>=ollama`, per-task switches `KENN_LLM_ENABLED_<TASK>`).
+- [ ] Choose the conversation model: compare local Qwen sizes on KENN's chat checks (quality on the GPU box, speed on
+      the Mac), then fine-tune the winner on KENN's notes and answer style on the box
 - [ ] Chat answers written by the brain from retrieved notes, with citations; templates stay as the offline fallback
 - [ ] One router: rule parser → local planner → brain; every route logged with timing
 - [ ] Multi-turn context: anaphora ("do that on the snare too"), corrections ("no, the other one"), clarifying questions
@@ -205,6 +209,6 @@ satisfaction, and hosted cost per tester.
 ## Decisions needed from you
 
 - [ ] Sign off this direction (hybrid brain, stages in this order)
-- [ ] Brain provider, monthly budget per tester, opt-in versus default
-- [ ] What may be sent to a hosted model (recommendation above)
+- [x] Brain provider: local Qwen only (owner, 25 Sept) — no hosted budget or opt-in needed
+- [x] What may be sent to a hosted model: nothing — no hosted model (owner, 25 Sept)
 - [ ] Whether Stage 2's craft notes should cover specific genres first (which?)
