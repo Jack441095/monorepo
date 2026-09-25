@@ -367,3 +367,22 @@ Evaluated with the GPU otherwise idle (9a's first plain pass ran while 9b traine
   copy (Q4_K_M, sha256 `ca8c18be…a720e`): 124 cases plain **84.7%** (bf16 on the box: 85.5%), 6 wrong plans accepted
   (bf16: 3), p50 4.8 s on the Mac during the soak. Quantisation costs some precision; any promotion evaluation must use
   the quantisation that would actually run.
+
+## Addendum: run 10, "sounds like a fader change" traps (2026-09-25)
+
+9b's corpus plus 14 drafted seeds whose right answer is a question: tone words, song sections, two tracks, sends
+phrased like faders, frequencies (worded differently from `tooling/data/adversarial_mixer_phrasings.jsonl`). 4,280
+records, 44% clarify (9b: ~33%); 482 steps on GPU 0.
+
+| GPU, 124 cases | Correct | Accepted | Act (94) | Wrong plans accepted | Traps | Values (16) |
+|---|---|---|---|---|---|---|
+| 9b, plain | **85.5%** | 96.8% | **77/94** | 3 | 17/29 | **16/16** |
+| 10, plain | 77.4% | 91.9% | 67/94 | **1** | **24/32** | 15/16 |
+| 9b, production evidence | **87.1%** | 99.2% | **79/94** | 3 | | |
+| 10, production evidence | 85.5% | 97.6% | 77/94 | **1** | | |
+
+- **Safer but asks too often.** Fewest wrong plans of any run and 7 more traps caught, but 10 fewer doable commands
+  carried out: the extra clarify share taught it to ask when it didn't need to. (Traps: 9b was scored on 29, run 10 on
+  32 after three were added; the extra three are "except" and "play from" requests.)
+- **Decision:** 9b stays in the shadow slot. Run 11 keeps the trap seeds at lower weight so the clarify share returns
+  to ~33%, aiming for run 10's safety with 9b's reach.
