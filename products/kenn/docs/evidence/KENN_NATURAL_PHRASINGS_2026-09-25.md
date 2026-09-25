@@ -68,13 +68,14 @@ Measured on what the rules asked about, using the gateway's own propose-stage te
 found no action. Since today, that test also excludes requests where the rules asked something specific ("how
 much?", "the whole set or the drums?").
 
-| Set | Rules only | Rules, then run 9b |
-|---|---|---|
-| Qwen3 14B, 210 | 94.3% right, 0 wrong | 87.1% right, **17 wrong** |
-| Qwen3 8B, 171 | 96.5% right, 0 wrong | 93.0% right, **7 wrong** |
+| Set | Rules only | Rules, then run 9b | Rules, then run 11 |
+|---|---|---|---|
+| Qwen3 14B, 210 | 94.3% right, 0 wrong | 87.1% right, **17 wrong** | 94.3% right, 2 wrong |
+| Qwen3 8B, 171 | 96.5% right, 0 wrong | 93.0% right, **7 wrong** | 95.3% right, 3 wrong |
+| Qwen3 14B beginner, 224 | 75.0% right, 2 wrong | not run | **89.3% right**, 7 wrong |
 
-Some of those "wrong" are reads the scorer counts strictly ("what's the name of the synth track?" → list tracks), or
-"comp" with no parameter read as the threshold. The rest are real guesses:
+Run 9b's list includes some reads the scorer counted strictly ("what's the name of the synth track?" → list tracks;
+fixed for the run 11 numbers) and "comp" with no parameter read as the threshold. The rest are real guesses:
 
 - "toggle hats" → arm
 - "can i hear the vocal without the synth" → **solo the Synth**
@@ -82,9 +83,20 @@ Some of those "wrong" are reads the scorer counts strictly ("what's the name of 
 - "slap the clap to the left" → hard left
 - renames by description ("the track with the compressor")
 
-So run 9b shouldn't move past shadow. The next planner (run 11 is the candidate) needs clarify examples for exactly
-these patterns ("toggle", "without", sends and pans with no amount, tracks described by their devices), and this
-check should run before any promotion.
+Run 11 is much safer and adds real coverage where the rules are weakest: +14 points on the beginner set. Its wrong
+plans:
+
+- "go to the track that has the bass" → **Drum Bus** (bass/bus)
+- "go to the track that has the delay" → Snare / Clap
+- return tracks created without the effect asked for ("a new return track for delay")
+- "comp" with no parameter → threshold
+- "make sure the drum bus is not selected" → select the Kick
+
+So run 9b shouldn't move past shadow. Run 11 is the better candidate: on fresh wording, rules then run 11 reach
+89–95% with a handful of wrong plans, against the rules' 75–96% with almost none. That is still short of "95% with
+zero wrong", so promotion is the owner's call. The next fine-tune should add clarify examples for exactly these
+patterns ("toggle", "without", sends and pans with no amount, tracks described by what's on them, a return "for
+delay"), and this check should run before any promotion.
 
 ## Wrong plans the blind sets found (all fixed, each with a regression test)
 
