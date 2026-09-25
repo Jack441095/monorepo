@@ -59,3 +59,25 @@ def test_the_same_track_or_two_tracks_ask_instead(say, follow_up) -> None:
 
 def test_a_follow_up_with_nothing_before_it_asks(say) -> None:
     assert say("same for the hats")["status"] == "clarification_required"
+
+
+@pytest.mark.parametrize("question, reply, track, after", [
+    ("make the bass louder", "3 dB", "Bass", volume_law.db_to_raw(volume_law.raw_to_db(0.5) + 3)),
+    ("make the bass louder", "by 3", "Bass", volume_law.db_to_raw(volume_law.raw_to_db(0.5) + 3)),
+    ("pan the synth left", "30%", "Synth", -0.3),       # regression: this once panned 30% right
+    ("pan the synth left", "hard", "Synth", -1.0),
+    ("pan the synth 20%", "left", "Synth", -0.2),
+    ("kick -3 dB", "at -3", "Kick", volume_law.db_to_raw(-3.0)),
+    ("kick -3 dB", "3 dB quieter", "Kick", volume_law.db_to_raw(volume_law.raw_to_db(0.5) - 3)),
+    ("mute", "the hats", "Hi-Hats", True),
+])
+def test_a_short_reply_finishes_the_request_kenn_asked_about(say, question, reply, track, after) -> None:
+    assert say(question)["status"] == "clarification_required"
+    result = say(reply)
+    assert result["status"] == "confirmation_required" and result["proposal"]["track_name"] == track
+    assert result["proposal"]["after"] == pytest.approx(after, abs=1e-3)
+
+
+def test_a_reply_is_not_joined_to_a_generic_not_sure(say) -> None:
+    assert say("fix the mix")["status"] == "clarification_required"
+    assert say("3 dB")["status"] == "clarification_required"

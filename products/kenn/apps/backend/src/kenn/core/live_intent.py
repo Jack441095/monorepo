@@ -2080,6 +2080,22 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
                 amount = float(pan_amount_first_match.group(1))
                 unit = pan_amount_first_match.group(2)
                 side = pan_amount_first_match.group(3)
+            if not side:
+                # "pan the synth left 30%" matched the amount with no side and used to pan right. Take the side from
+                # anywhere in the request; both sides named is a question.
+                sides = set(re.findall(r"\b(left|right)\b", lower))
+                if len(sides) > 1:
+                    base["ambiguity"].append("That names both left and right. Which side, and how far?")
+                    base["missing_fields"].append("pan_side")
+                    return base
+                side = next(iter(sides), None)
+                signed = amount < 0 or re.search(r"\+\s*\d", lower)  # "-0.4" is left and "+0.4" right, as in Live
+                if side is None and not pan_hard_match and amount > 0 and not signed:
+                    # "pan the synth 20%" names no side; it used to go right. Ask rather than guess.
+                    base["ambiguity"].append(f"Which side? For example \"pan {track.get('name') or 'it'} {abs(amount):g}"
+                                             f"{'%' if unit else ''} left\".")
+                    base["missing_fields"].append("pan_side")
+                    return base
             if side == "left":
                 amount = -abs(amount)
             elif side == "right":
