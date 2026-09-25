@@ -402,3 +402,11 @@ seeds (350 rows). 3,575 records; 403 steps on GPU 0.
   It still carries out fewer doable commands than 9b (70 vs 77), so it asks a little more than it needs to.
 - For promotion, not writing the wrong thing matters more than coverage, so **run 11 is the strongest candidate so
   far**; 9b stays in shadow until the owner approves a swap. Its Q4_K_M is kept on the box.
+
+## Shadow swap: run 9b → run 11 (25 Sept, owner approved)
+
+Why: on three fresh phrasing sets (`KENN_NATURAL_PHRASINGS_2026-09-25.md`), 9b as a fallback where the rules ask
+added 7–17 wrong plans per set; run 11 added 2–7 and got more right (beginner wording 75% → 89%). On the Mac:
+`kenn-c6-run11` from `c6-run11-q4km.gguf` (sha256 51bcf34d…), about 3–4 s per plan once loaded (26 s cold).
+Shadow is observation only; nothing about the promotion stage changed. It takes effect at the companion restart
+after soak #3, which runs on 9b to the end.
