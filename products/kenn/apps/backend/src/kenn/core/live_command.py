@@ -2236,8 +2236,12 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
     prior_track = prior.get("track") if isinstance(prior.get("track"), dict) else {}
     if track.get("index") == prior_track.get("index"):
         return None  # the same track again would apply the change twice; let it ask
-    name, flip = str(track.get("name")), bool(match.group("opposite"))
-    value = prior.get("desired_value")
+    return _repeat_on(prior, str(track.get("name")), flip=bool(match.group("opposite")))
+
+
+def _repeat_on(prior: dict[str, Any], name: str, *, flip: bool = False) -> str | None:
+    """The prior whole-track mixer change written out as a plain command for another track."""
+    action, value = prior.get("action"), prior.get("desired_value")
     if action == "set_volume":
         relative = prior.get("requested_relative_db")
         if isinstance(relative, (int, float)):
@@ -2254,6 +2258,44 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
         verb = {"set_mute": ("mute", "unmute"), "set_solo": ("solo", "unsolo"), "set_arm": ("arm", "disarm")}[action]
         return f"{verb[0] if on else verb[1]} {name}"
     return None
+
+
+# "no, I meant the snare", "sorry, the kick", "actually the vocal", "not the hats, the kick instead".
+_CORRECTION = re.compile(
+    r"^(?:(?:no|nope|sorry|oops|actually|wait)\b[\s,.!-]*)+(?:I\s+meant\s+)?(?P<target>.+?)(?:\s+instead)?\s*[.!?]*$"
+    r"|^(?:I\s+meant|not\s+the\s+[^,]+,)\s*(?P<target2>.+?)(?:\s+instead)?\s*[.!?]*$",
+    re.I,
+)
+
+
+def _correction_command(command: str, session_id: str, snapshot: dict[str, Any]) -> tuple[str, str] | None:
+    """ "no, I meant the snare" -> the last command written out for the snare, plus the track it replaces.
+
+    Same limits as a follow-up: whole-track mixer changes, one named track, not the same track. The old proposal
+    is simply never applied; if it already was, the caller says so and points at undo rather than undoing silently.
+    """
+    from kenn.core.session_context import live_conversation_context
+
+    match = _CORRECTION.match(command.strip())
+    if not match:
+        return None
+    target_text = match.group("target") or match.group("target2") or ""
+    # A bare track name, not a new instruction: "no, turn the bass up 3 dB" is a command in its own right.
+    if len(target_text.split()) > 4 or re.search(r"\d|\b(?:and|both|other)\b|,|&", target_text, re.I):
+        return None
+    prior_text = str(live_conversation_context(session_id).get("last_command") or "")
+    if not prior_text:
+        return None
+    prior = parse_request(prior_text, snapshot)
+    if prior.get("action") not in {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"} or prior.get("missing_fields"):
+        return None
+    target = parse_request(f"solo {target_text}", snapshot)
+    track = target.get("track") if isinstance(target.get("track"), dict) else None
+    prior_track = prior.get("track") if isinstance(prior.get("track"), dict) else {}
+    if not track or target.get("missing_fields") or target.get("ambiguity") or track.get("index") == prior_track.get("index"):
+        return None
+    corrected = _repeat_on(prior, str(track.get("name")))
+    return (corrected, str(prior_track.get("name") or "")) if corrected else None
 
 
 PENDING_QUESTION_SECONDS = 300
@@ -2713,7 +2755,17 @@ def _handle_command_impl(
         # too" into "do Bass on the snare too", which once repeated the change on the Bass.
         typed = str((response.get("context_resolution") or {}).get("original") or clean_command)
         follow_up = _follow_up_command(typed, response["session_id"], snapshot)
-        if follow_up:
+        correction = None if follow_up else _correction_command(typed, response["session_id"], snapshot)
+        if correction:
+            from kenn.core.session_context import live_conversation_context
+
+            response["resolved_command"], replaced = correction
+            response["context_resolution"] = {
+                "resolution": "correction", "original": typed, "replaces_track": replaced,
+                "previous_applied": live_conversation_context(response["session_id"]).get("confirmation_status") == "confirmed",
+            }
+            clean_command = correction[0]
+        elif follow_up:
             response["resolved_command"] = follow_up
             response["context_resolution"] = {"resolution": "follow_up", "original": typed}
             clean_command = follow_up
@@ -3158,6 +3210,11 @@ def handle_command(
             allow_llm=allow_llm,
         )
         # Remember what was actually planned, so "and the hats too" after a follow-up still has a real command to repeat.
+        resolution = result.get("context_resolution") if isinstance(result.get("context_resolution"), dict) else {}
+        if resolution.get("resolution") == "correction" and resolution.get("previous_applied") and result.get("proposal"):
+            # The first change already went through; a correction shouldn't quietly leave it there.
+            result["answer"] = (f"{result.get('answer') or ''} The change to {resolution.get('replaces_track')} is "
+                                "still applied; say \"undo\" if you want it reversed.").strip()
         record_live_exchange(session_id=session_id, command=str(result.get("resolved_command") or command), result=result)
         record_shadow_result(result)
         total_ms = round((time.monotonic() - command_started) * 1000.0, 2)
