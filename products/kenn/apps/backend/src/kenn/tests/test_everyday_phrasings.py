@@ -79,3 +79,34 @@ def test_a_rename_finds_the_track_before_the_new_name(snapshot) -> None:
     parsed = parse_request("rename the track with no devices to main synth", snapshot)
     assert parsed["action"] is None or (parsed["track"] or {}).get("name") != "Synth"
     assert parse_request("rename the synth to Bass Two", snapshot)["track"]["name"] == "Synth"
+
+
+@pytest.mark.parametrize("request_text, track, db", [
+    ("set hats to -6", "Hi-Hats", -6), ("make the clap -12", "Snare / Clap", -12),
+    ("could you bring the drums bus down to -20?", "Drum Bus", -20), ("turn the kick down to -16", "Kick", -16),
+])
+def test_a_negative_bare_number_after_a_verb_is_a_fader_level(snapshot, request_text, track, db) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == "set_volume" and parsed["track"]["name"] == track
+    assert parsed["desired_value"] == pytest.approx(volume_law.db_to_raw(db), abs=0.005)
+
+
+@pytest.mark.parametrize("request_text", ["set the kick to 12", "turn the kick down -3", "set the synth pan to -20"])
+def test_numbers_that_are_not_clearly_a_fader_level_still_ask(snapshot, request_text) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert not (parsed["action"] == "set_volume" and not parsed["missing_fields"]), parsed
+
+
+@pytest.mark.parametrize("request_text, name", [
+    ("put a loc called 'chorus' at the head.", "chorus"), ("mark this point as 'breakdown' please.", "breakdown"),
+    ("add a locator here, name it 'hook 2'", "hook 2"),
+])
+def test_locator_wordings_name_the_locator(snapshot, request_text, name) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == "add_locator" and parsed["locator_name"] == name
+
+
+def test_comp_means_compressor_only_next_to_a_compressor_setting(snapshot) -> None:
+    parsed = parse_request("set the drum bus comp threshold to -20 db", snapshot)
+    assert parsed["action"] == "set_device_parameter" and parsed["device"]["name"] == "Compressor"
+    assert parse_request("vocal comp needs work", snapshot)["action"] is None
