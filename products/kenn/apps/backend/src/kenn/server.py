@@ -668,6 +668,17 @@ class Handler(BaseHTTPRequestHandler):
         super().end_headers()
 
     def send_json(self, status: int, payload: dict) -> None:
+        started = getattr(self, "_ask_started", None)
+        if started is not None:
+            self._ask_started = None  # keep-alive reuses this handler for the next request
+            try:
+                from kenn.core import route_log
+
+                route_log.record(str(payload.get("route") or payload.get("answer_mode") or f"status_{status}"),
+                                 (time.perf_counter() - started) * 1000, brain=bool(payload.get("llm_enhanced")),
+                                 proposal=bool(payload.get("proposal")))
+            except Exception:
+                pass  # timing is diagnostic; it must never cost the reply
         error_id = self.request_id()
         if status >= 500:
             self.structured_log("server_error", status=status)
@@ -1394,6 +1405,11 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(200 if model.get("status") == "connected" else 503, model)
             except Exception as exc:
                 self.send_json(503, {"status": "error", "error": str(exc)})
+            return
+        if parsed.path == "/guide":
+            from kenn.core.tester_guide import guide_html
+
+            self.send_bytes(200, guide_html().encode("utf-8"), "text/html; charset=utf-8")
             return
         if parsed.path == "/setup":
             # First-run page for the packaged app (kenn/core/live_setup.py does the work).
@@ -2686,6 +2702,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(400, {"error": "Question is required."})
             return
         _ask_t0 = time.perf_counter()
+        # send_json logs which route answered and how long it took, whichever of the exits below replies.
+        self._ask_started = _ask_t0
         if not self.enforce_rate_limit("ask"):
             return
         live_inspection_reply = self._maybe_handle_live_inspection(

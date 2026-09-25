@@ -14,7 +14,7 @@ Intel Macs and Live 11 are not supported.
 2. **Changes Live safely.** Ask for a change ("bring the bass down 2 dB", "pan the synth hard left"). KENN shows
    exactly what it will change and does nothing until you press **Apply to Live 12**. It then checks Live did it,
    and every change can be undone.
-3. **Answers with sources.** Ask how a device or technique works; answers cite KENN's notes, which cover 74 of
+3. **Answers with sources.** Ask how a device or technique works; answers cite KENN's notes, which cover 77 of
    Live 12's 78 built-in devices. When it doesn't know, it says so.
 4. **Listens to an exported mix.** Load a WAV of your mix (and optionally a reference) in the **Inputs** panel for a
    review of loudness, true peak, clipping and balance.
@@ -47,6 +47,9 @@ KENN connecting.
 | `Bring the bass down 2 dB` / `Put the kick at -12 dB` | A proposal in dB; nothing changes until Apply |
 | `Pan the synth 20% left` / `Mute the hats` | Proposal, Apply, then "Readback Verified" |
 | `Undo that` or the **Undo** button on a card | Puts the exact previous value back |
+| After a change: `Do that on the snare too` / `Same for the hats` / `Do the opposite on the vocal` | The same change on another track, as a new proposal |
+| Wrong track? `No, I meant the snare` / `Sorry, the kick` | Moves the change to the track you meant; if you'd already applied it, KENN says so and you can say `undo` |
+| When KENN asks "By how much?" or "Which side?", just answer: `3 dB`, `30%`, `left` | Finishes the request you started |
 | `What did you change?` | The recent changes, with before and after values |
 | `What does Note Echo do?` | A cited answer from KENN's notes |
 | A mix WAV in **Inputs** | Review of loudness, true peak, clipping and balance |
@@ -87,6 +90,9 @@ version ships a newer AbletonOSC, the setup page will offer an update the next t
 
 - KENN understands common phrasing, but not everything; when it isn't sure, it asks. Please send us phrasings it
   misunderstood.
+- Follow-ups ("do that on the snare too") repeat track volume, pan, mute, solo and arm changes and device settings
+  (the device must be on that track too); two tracks at once ("the snare and the kick") aren't repeated yet, so KENN
+  asks. Corrections work the same way; "no, the other one" still asks you to name the track.
 - Device control in real units covers a starter set (EQ Eight band gain, Compressor, Saturator, Auto Filter and a
   few more); other device parameters can be read but not yet set in real units.
 - KENN inserts only 10 audio effects so far, and no instruments or MIDI effects.

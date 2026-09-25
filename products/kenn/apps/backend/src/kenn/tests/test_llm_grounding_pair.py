@@ -97,3 +97,23 @@ def test_typed_specialist_measurement_can_ground_generated_answer() -> None:
 
     assert result["accepted"] is True
     assert result["unsupported_measurements"] == []
+
+
+def test_a_chat_answer_that_claims_it_changed_the_set_is_thrown_away() -> None:
+    # Only the Live command path changes the set, after Apply. A brain answer saying it did is a false receipt.
+    for claim in (
+        "I've added a reverb return and set the send to 15%.",
+        "I have lowered the Bass by 2 dB.",
+        "Done! The return is now 100% wet.",
+        "I’ve just muted the hats for you.",
+    ):
+        result = validate(claim + "\n\n" + PARAPHRASE)
+        assert result["accepted"] is False, claim
+        assert result["claims_live_change"] is True
+
+
+def test_advice_in_the_first_person_is_not_mistaken_for_a_change() -> None:
+    advice = PARAPHRASE.replace("Short answer:", "Short answer: I'd set up a return for this, and I'd cut the lows.")
+    result = validate(advice)
+    assert result["claims_live_change"] is False
+    assert result["accepted"] is True

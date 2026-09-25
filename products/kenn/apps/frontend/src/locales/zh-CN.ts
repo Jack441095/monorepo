@@ -84,6 +84,7 @@ export default {
     emptyMetrics: '分析完成后显示指标',
     criticalFlags: '关键问题',
     auditSummary: 'AI 审计摘要',
+    askKenn: '问 KENN',
     overallScore: '综合评分',
     referenceComparison: '参考轨对比（差值）',
     comparisonDelta: 'RMS 差 {rms} dB · Crest 差 {crest} dB',

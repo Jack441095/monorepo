@@ -25,7 +25,9 @@ from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
 _VOCAL_PATTERNS = re.compile(
     r"\b(vocal|vox|vocals)\b.*\b(cut\s+through|buried|unmask|stand\s+out|clarity|clearer)\b"
     r"|\b(make|help)\b.*\b(vocal|vox|vocals)\b.*\b(cut|heard|clear|through)\b"
-    r"|\b(bring|push)\b.*\b(vocal|vox|vocals)\b.*\b(forward|front|up)\b",
+    # "bring the vocal forward" is a mix request; "bring the vocal up a hair" is a fader move on the vocal alone.
+    # "up" used to be here and turned that into a recipe that also cut the Synth (found by the 505-phrasing check).
+    r"|\b(bring|push)\b.*\b(vocal|vox|vocals)\b.*\b(forward|front)\b",
     re.I,
 )
 

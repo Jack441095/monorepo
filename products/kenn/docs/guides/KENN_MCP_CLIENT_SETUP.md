@@ -219,7 +219,7 @@ qualified across Live reads, parameter changes, pan, compound EQ, insertion,
 replay rejection, and receipt undo. `create_live_proposal`'s natural-language
 path additionally reaches send/return-track control, scene launch, clip-slot
 stop, clip audition, and sample import -- see
-`docs/ABLETON_LIVE_SUPPORT_MATRIX.json` for the exact qualified scope; none of
+`docs/evidence/ABLETON_LIVE_SUPPORT_MATRIX.json` for the exact qualified scope; none of
 these need their own dedicated MCP tool since they go through the same
 generic proposal path as everything else here. Deliberate real ambiguous-write
 recovery remains a separate qualification gate.

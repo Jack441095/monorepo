@@ -39,27 +39,29 @@ _LOCATOR_REQUEST = re.compile(
 _ADD_LOCATOR = re.compile(
     r"^\s*(?:add|create|set|drop|place|put)\s+(?:a\s+)?(?:locator|cue\s+point|marker)\b"
     r"(?:\s+(?:called|named|label(?:ed|led)?|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?"
-    r"(?:\s+(?:at|on)\s+(?:the\s+)?(?:current\s+position|cursor|playhead|song\s+position))?\s*$",
+    r"(?:\s+(?:(?:at|on)\s+(?:the\s+)?(?:current\s+position|cursor|playhead|song\s+position)|(?:right\s+)?here|now))?"
+    r"\s*[.!]?\s*$",
     re.I,
 )
 _REMOVE_LOCATOR = re.compile(
     r"^\s*(?:remove|delete)\s+(?:the\s+)?(?:locator|cue\s+point|marker)\b"
     r"(?:\s+(?:called|named|label(?:ed|led)?|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?"
-    r"(?:\s+(?:at|on)\s+(?:the\s+)?(?:current\s+position|cursor|playhead|song\s+position))?\s*$",
+    r"(?:\s+(?:(?:at|on)\s+(?:the\s+)?(?:current\s+position|cursor|playhead|song\s+position)|(?:right\s+)?here|now))?"
+    r"\s*[.!]?\s*$",
     re.I,
 )
 _CREATE_MIDI_TRACK = re.compile(
-    r"^\s*(?:(?:create|add|make)\s+(?:a\s+)?(?:new\s+)?|new\s+)midi\s+track\b"
-    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
+    r"^\s*(?:(?:create|add|make|spin\s+up|set\s+up|give\s+me|(?:i\s+)?need|i'?d\s+like)\s+(?:an?\s+|another\s+)?(?:new\s+|fresh\s+|empty\s+|blank\s+)?|new\s+)midi\s+track\b"
+    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?|\s+for\s+(?:the\s+)?[\w'-]+(?:\s+[\w'-]+)?)?\s*[.!]?\s*$",
     re.I,
 )
 _CREATE_AUDIO_TRACK = re.compile(
-    r"^\s*(?:(?:create|add|make)\s+(?:an?\s+)?(?:new\s+)?|new\s+)audio\s+track\b"
-    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
+    r"^\s*(?:(?:create|add|make|spin\s+up|set\s+up|give\s+me|(?:i\s+)?need|i'?d\s+like)\s+(?:an?\s+|another\s+)?(?:new\s+|fresh\s+|empty\s+|blank\s+)?|new\s+)audio\s+track\b"
+    r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?|\s+for\s+(?:the\s+)?[\w'-]+(?:\s+[\w'-]+)?)?\s*[.!]?\s*$",
     re.I,
 )
 _CREATE_RETURN_TRACK = re.compile(
-    r"^\s*(?:(?:create|add|make)\s+(?:a\s+)?(?:new\s+)?|new\s+)return\s+(?:track|channel)\b"
+    r"^\s*(?:(?:create|add|make|spin\s+up|set\s+up|give\s+me|(?:i\s+)?need|i'?d\s+like)\s+(?:an?\s+|another\s+)?(?:new\s+|fresh\s+|empty\s+|blank\s+)?|new\s+)return(?:\s+(?:track|channel))?\b"
     r"(?:\s+(?:called|named|with\s+name)\s+['\"]?(?P<name>[^'\"]+?)['\"]?)?\s*[.!]?\s*$",
     re.I,
 )
@@ -87,7 +89,7 @@ _FOCUS_TRACK_NAME = re.compile(
     re.I,
 )
 _FOCUS_TRACK_BARE_NAME = re.compile(
-    r"^\s*(?:select|focus|follow|go\s+to|jump\s+to|take\s+me\s+to|show\s+me)\s+(?:the\s+)?(?P<name>[^.!?]+?)\s*[.!]?\s*$", re.I)
+    r"^\s*(?:select|focus(?:\s+on)?|follow|highlight|go\s+to|jump\s+to|move\s+to|take\s+me\s+to|show\s+me)\s+(?:the\s+)?(?P<name>[^.!?]+?)\s*[.!]?\s*$", re.I)
 _ORDINAL_TRACK = re.compile(
     r"\b(?P<ordinal>first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last)\s+"
     r"(?:visible\s+)?(?:track|trk|channel|chan|ch)\b",
@@ -190,8 +192,8 @@ def _display_unit_error(*, device_name: str, parameter_name: str, value: float, 
         return None
     if find_profile(device_name, parameter_name, normalized) is None:
         return (
-            "That Live display unit is not safely mapped to a raw parameter value yet. "
-            "Inspect the exact parameter profile or specify an explicit raw value; nothing will change."
+            f"I can't set {device_name} {parameter_name} to {value:g}{' ms' if normalized == 'ms' else ':1'} yet: that "
+            "control hasn't been measured in Live, so I can't be sure which setting gives that value. Nothing changed."
         )
     _, error = display_to_raw(
         device_name=device_name,
@@ -288,7 +290,7 @@ _RENAME_TRACK = re.compile(
 )
 _INSERT_DEVICE_ALIASES = (
     ("Glue Compressor", r"glue\s+compressor"),
-    ("Auto Filter", r"auto\s+filter"),
+    ("Auto Filter", r"auto\s+filter|filter"),
     ("Drum Buss", r"drum\s+buss"),
     ("Saturator", r"saturator"),
     ("EQ Eight", r"eq(?:ualizer)?(?:\s+eight)?|eq\s*8"),
@@ -301,8 +303,8 @@ _INSERT_DEVICE_ALIASES = (
 # shadowed by the generic one; _insert_device_name below relies on
 # _INSERT_DEVICE_ALIASES iteration order for the same reason.
 _ADD_DEVICE = re.compile(
-    r"\b(?:stick|drop|throw|slap|pop|chuck)\s+(?:a|an|another)\s+(?:new\s+)?(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
-    r"|\b(?:add|append|insert|put|load)\b.*\b(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
+    r"\b(?:stick|drop|throw|slap|pop|chuck)\s+(?:a|an|another)\s+(?:new\s+)?(?:glue\s+compressor|auto\s+filter|filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
+    r"|\b(?:add|append|insert|put|load)\b.*\b(?:glue\s+compressor|auto\s+filter|filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
     r"|\b(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b.*\b(?:add|append|insert|put|load)\b",
     re.I,
 )
@@ -471,7 +473,7 @@ _RELATIVE_VOLUME_EXCLUDE = re.compile(
 _RELATIVE_VOLUME_AMOUNT = re.compile(r"(?<![\w.])([+-]?\d+(?:\.\d+)?)\s*(?:dbs?|decibels?)\b", re.I)
 _RELATIVE_VOLUME_DOWN = re.compile(
     r"\b(?:down|back|lower|drop|cut|reduce|decrease|quieter|softer|pull|tuck|trim|duck|off)\b", re.I)
-_RELATIVE_VOLUME_UP = re.compile(r"\b(?:up|raise|boost|louder|push|bump|increase|lift)\b", re.I)
+_RELATIVE_VOLUME_UP = re.compile(r"\b(?:up|raise|boost|louder|hotter|push|bump|increase|lift|add)\b", re.I)
 
 
 def _volume_range_message(db: float | None) -> str:
@@ -508,9 +510,11 @@ _TRACK_NICKNAMES = (
     (re.compile(r"\b(?:high|hi)[\s-]*hats?\b|\bhihats?\b", re.I), "hi hats"),
     (re.compile(r"\b(?:vox|vocals|voc)\b", re.I), "vocal"),
     (re.compile(r"\bdrums\b", re.I), "drum"),
+    (re.compile(r"\bdrumbuss?\b", re.I), "drum bus"),
 )
 # The words _TRACK_NICKNAMES accepts, as plain words.
-_NICKNAME_WORDS = frozenset({"high", "hi", "hat", "hats", "hihat", "hihats", "vox", "vocals", "voc", "drums"})
+_NICKNAME_WORDS = frozenset({"high", "hi", "hat", "hats", "hihat", "hihats", "vox", "vocals", "voc", "drums", "drumbus",
+                             "drumbuss"})
 _GENERIC_TRACK_WORDS = {"track", "bus", "group", "the", "and", "audio", "midi", "return", "main", "channel"}
 # Words that name a *particular* track. "the Lead Vocal" must not resolve to a
 # "Backing Vocal" track just because both contain "vocal".
@@ -830,7 +834,9 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     live-side sparse-index and unit resolver. Device insertion and EQ band
     actions are rejected rather than guessed inside a recipe.
     """
-    text = " ".join(str(query or "").strip().split())
+    # Same tidy-up as single commands: "Can you solo the drum bus and the vocal at the same time?" didn't split, and
+    # the single-command parse then soloed only the Drum Bus.
+    text = _rewrite_common_phrasings(" ".join(str(query or "").strip().split()))
     guarded_workflows = (
         (
             _SOLO_ANALYSIS_WORKFLOW,
@@ -949,6 +955,183 @@ _TERSE_LEVEL = re.compile(
     re.I)
 _TERSE_LEVEL_EXCLUDE = re.compile(r"\b(?:send|sends|reverb|delay|echo|eq|band|gain|threshold|makeup|output|input)\b", re.I)
 
+# Everyday phrasings found by the 505-phrasing check (tooling/data/natural_holdout_candidates.jsonl). Each one is
+# anchored to the whole request and rewritten into a form the rules already parse; the track name still has to
+# resolve, so "synth off" works and "metronome off" still asks.
+_NAME = r"(?P<name>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}?)"
+_POLITE_TAIL = re.compile(r"\s*,?\s+(?:please|pls|plz|thanks|thank\s+you|cheers|mate)\s*[.!?]*\s*$", re.I)
+_POLITE_LEAD = re.compile(r"^\s*(?:yo|hey|ok|okay|right|please|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?"
+                          r"|i\s+(?:want|need|would\s+like|'d\s+like)\s+(?:you\s+)?to)\s*[,!]?\s+(?=\w)", re.I)
+# ", can you do that?", "for clarity", "so I can adjust it": asides after the request. Left in, they ended up in new
+# track names ("Synth Lead, can you do that?").
+_TRAILING_ASIDE = re.compile(r"\s*,?\s+(?:can\s+you\s+(?:do\s+that|help(?:\s+me)?(?:\s+with\s+that)?)|is\s+that\s+possible|"
+                             r"if\s+(?:you\s+can|possible)|for\s+clarity|for\s+me|at\s+the\s+same\s+time|together|simultaneously|so\s+(?:that\s+)?i\s+can\s+[^,]+|thanks?(?:\s+you)?)"
+                             r"\s*[?.!]*\s*$", re.I)
+# "how do I solo the vocal?" asks how, it doesn't ask KENN to do it; KENN's notes answer it.
+_HOW_TO_QUESTION = re.compile(r"^\s*(?:how\s+(?:do|can|would|should)\s+i|is\s+there\s+a\s+way\s+to|what(?:'s|\s+is)\s+the\s+"
+                              r"(?:best\s+)?way\s+to)\b", re.I)
+_A_DB = re.compile(r"\b(?:(?P<half>half\s+a)|an?)\s+(?:db|decibel)\b", re.I)
+_SIGNED_CHANGE = re.compile(rf"^\s*{_NAME}\s+(?P<sign>[+-])\s*(?P<amount>\d+(?:\.\d+)?)\s*(?:dbs?)?\s+relative\s*[.!]?\s*$"
+                            rf"|^\s*{_NAME.replace('name', 'name2')}\s+\+\s*(?P<amount2>\d+(?:\.\d+)?)\s*dbs?\s*[.!]?\s*$", re.I)
+_UNITLESS_CHANGE = re.compile(rf"^\s*{_NAME}\s+(?P<direction>up|down)\s+(?P<amount>\d+(?:\.\d+)?)\s*[.!]?\s*$"
+                              rf"|^\s*(?P<verb>lower|raise|drop|cut|boost|reduce|up)\s+{_NAME.replace('name', 'name2')}\s+(?:by\s+)?"
+                              r"(?P<amount2>\d+(?:\.\d+)?)\s*[.!]?\s*$", re.I)
+_HARD_PAN_ON = re.compile(rf"^\s*(?:hard|fully)\s+(?P<side>left|right)\s+(?:on|for)\s+{_NAME}\s*[.!]?\s*$", re.I)
+_VOL_ON = re.compile(rf"^\s*set\s+(?:the\s+)?(?:vol|volume|level)\s+(?:to\s+)?(?P<amount>(?:minus\s+|-)\d+(?:\.\d+)?)\s*(?:dbs?)?\s+"
+                     rf"(?:on|for)\s+{_NAME}\s*[.!]?\s*$", re.I)
+# "drum bus comp thres -12", "comp lead vocal thres -12", "voc comp thres down 2"
+_TERSE_THRESHOLD = re.compile(
+    rf"^\s*(?:(?:set|change)\s+)?(?:(?:the\s+)?{_NAME}\s+(?:comp|compressor)|(?:comp|compressor)\s+{_NAME.replace('name', 'name2')})\s+"
+    r"(?:thres|thresh|threshold)\s+(?:(?P<direction>up|down)\s+(?P<change>\d+(?:\.\d+)?)|(?:to\s+)?(?P<amount>-?\d+(?:\.\d+)?))"
+    r"\s*(?:dbs?)?\s*[.!]?\s*$", re.I)
+# A negative bare number on a fader is a dB level ("fx print at -15", "kick fader to minus 10"); a bare "kick to -9"
+# without "at" or "fader" still asks, as before.
+_UNITLESS_LEVEL = re.compile(rf"^\s*{_NAME}\s+(?:fader\s+(?:to|at)|at|fader)\s+(?P<amount>(?:minus\s+|-)\d+(?:\.\d+)?)"
+                             r"\s*(?:dbs?)?\s*[.!]?\s*$", re.I)
+_BARE_PAN = re.compile(rf"^\s*{_NAME}\s+(?P<amount>\d+(?:\.\d+)?)\s*(?:%|percent)\s+(?:to\s+the\s+)?(?P<side>left|right)"
+                       r"\s*[.!]?\s*$", re.I)
+_LR_PAN = re.compile(rf"^\s*{_NAME}\s+(?P<side>[lr])\s*(?P<amount>\d{{1,3}})\s*[.!]?\s*$", re.I)
+_CENTRE_PAN = re.compile(rf"^\s*(?:put\s+)?{_NAME}\s+(?:in\s+the\s+middle|dead\s+cent(?:er|re)|(?:back\s+)?to\s+the\s+"
+                         r"(?:cent(?:er|re)|middle))\s*[.!]?\s*$|^\s*re-?(?P<verb>cent(?:er|re))\b", re.I)
+_MUTE_IDIOM = re.compile(rf"^\s*(?:(?:turn|switch|shut|cut)\s+{_NAME}\s+(?:off|out)|{_NAME.replace('name', 'name2')}\s+off"
+                         rf"|lose\s+{_NAME.replace('name', 'name3')})\s*[.!]?\s*$", re.I)
+_UNMUTE_IDIOM = re.compile(rf"^\s*(?:turn|switch|bring|put)\s+{_NAME}\s+back\s+(?:on|in)\s*[.!]?\s*$", re.I)
+_NOT_A_TRACK_NAME = re.compile(r"\b(?:it|that|this|them|everything|all|solo|arm|record|mute|metronome|click|loop|"
+                               r"playback|transport|song|master|plugin|device|effect|fx)\s*$|^(?:the\s+)?(?:it|that|this)\b"
+                               r"|\b(?:pan|comp|compressor|ratio|attack|release|tempo|bpm|pitch|transpose|key|swing)\b", re.I)
+# A negative bare number as a fader target is dB (Live shows faders in dB): "set hats to -6", "turn the kick down to
+# -16", "make the clap -12". A verb is required, so a bare "kick to -9" still asks, and positive numbers still ask.
+_NEGATIVE = r"(?P<amount>(?:minus\s+|-)\d+(?:\.\d+)?)\s*(?:dbs?)?(?:\s+again)?\s*[.!?]?\s*$"
+_VERB_LEVEL = re.compile(rf"^\s*(?:set|put|bring|turn|drop|pull|push|get|take)\s+{_NAME}(?:\s+(?:down|up|back))?\s+(?:to|at)\s+"
+                         + _NEGATIVE + rf"|^\s*make\s+{_NAME.replace('name', 'name2')}\s+(?:(?:to|at)\s+)?"
+                         + _NEGATIVE.replace("amount", "amount2"), re.I)
+_PAN_NEUTRAL = re.compile(rf"^\s*(?:set|put|bring|move)\s+{_NAME}\s+(?:to\s+pan\s+(?:neutral|cent(?:er|re)|middle)|(?:back\s+)?in(?:to)?\s+"
+                          r"the\s+(?:cent(?:er|re)|middle)|(?:back\s+)?to\s+(?:the\s+)?(?:cent(?:er|re)|middle))\s*[.!?]?\s*$", re.I)
+_SEND_LETTER_AFTER = re.compile(rf"^\s*(?:set\s+)?{_NAME}(?:'s)?\s+send\s+(?P<ret>[ab])\s+(?:to|at)\s+(?P<value>\d+(?:\.\d+)?)\s*"
+                                r"(?:%|percent)\s*[.!?]?\s*$", re.I)
+_LOCATOR_NOUN = r"(?:loc|locator|marker|mark|cue(?:\s+point)?)"
+_LOCATOR_POSITION = (r"(?:\s+(?:(?:right\s+)?here|now|at\s+now|at\s+(?:the\s+|this\s+|current\s+|the\s+current\s+)?"
+                     r"(?:head|playhead|spot|point|position|cursor|song\s+position|time)))?")
+_LOCATOR_SAID = re.compile(
+    rf"^\s*(?:add|create|set|drop|place|put)\s+(?:a\s+)?(?:new\s+)?{_LOCATOR_NOUN}{_LOCATOR_POSITION}\s*,?\s+"
+    r"(?:called|named|name\s+it|with\s+(?:the\s+)?name|label(?:l?ed)?|for)\s+['\"\u2018\u2019]?(?P<locator>[^'\"\u2018\u2019]+?)['\"\u2018\u2019]?"
+    + _LOCATOR_POSITION + r"\s*[.!]?\s*$"
+    r"|^\s*(?:mark\s+(?:this\s+(?:point|spot|time|position|bit|moment)|now|here)\s+as|marker\s+(?:now|here)\s+(?:for|called))\s+"
+    r"['\"\u2018\u2019]?(?P<locator2>[^'\"\u2018\u2019]+?)"
+    r"['\"\u2018\u2019]?\s*[.!]?\s*$", re.I)
+_CALL_TRACK_THE = re.compile(rf"^\s*call\s+{_NAME}\s+track\s+(?:the\s+)?(?P<new>[\w' -]+?)\s*[.!]?\s*$", re.I)
+_COMP_SETTING = re.compile(r"\b(?:threshold|ratio|attack|release|output|makeup|knee)\b", re.I)
+
+
+# "snare reverb send 30%", "set the synth's delay send to 15%", "send A on the synth to 20%": the send said the
+# producer's way round, rewritten into "send the snare to the reverb at 30%", which the send rules check against
+# the set's return tracks.
+_SEND_SAID_TRACK_FIRST = re.compile(
+    r"^\s*(?:(?:set|put|make)\s+)?(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)(?:'s)?\s+"
+    r"(?P<ret>reverb|verb|delay|return\s+[ab]|[ab])\s+send\s+(?:(?:to|at)\s+)?(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!]?\s*$",
+    re.I)
+_SEND_SAID_LETTER_FIRST = re.compile(
+    r"^\s*(?:set\s+)?send\s+(?P<ret>[ab])\s+on\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+(?:to|at)\s+"
+    r"(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!]?\s*$", re.I)
+
+
+# "put 40% of the bass on reverb", "add 25% of the drums bus to delay", "make the vox go to a-reverb at 50%".
+_SEND_SAID_PORTION = re.compile(
+    r"^\s*(?:(?:can|could)\s+you\s+)?(?:put|add|send|give)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s+of\s+(?:the\s+)?"
+    r"(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+(?:on|to|into)\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+[\w-]+)?)\s*[.!?]?\s*$", re.I)
+_SEND_SAID_AMOUNT_FIRST = re.compile(
+    r"^\s*(?:put|send|add)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)?\s+(?:on|to|into)\s+(?:the\s+)?(?P<ret>reverb|verb|delay)\s+"
+    r"(?:for|on|from)\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s*[.!?]?\s*$"
+    r"|^\s*(?P<ret2>reverb|verb|delay)\s+(?P<value2>\d+(?:\.\d+)?)\s*(?:%|percent)?\s+on\s+(?:the\s+)?"
+    r"(?P<name2>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s*[.!?]?\s*$", re.I)
+_SEND_SAID_GO_TO = re.compile(
+    r"^\s*make\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+go\s+to\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+[\w-]+)?)\s+"
+    r"at\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!?]?\s*$", re.I)
+
+
+def _rewrite_idioms(text: str) -> str:
+    if _HOW_TO_QUESTION.match(text):
+        return text
+    text = _TRAILING_ASIDE.sub("", _POLITE_TAIL.sub("", text))
+    polite = _POLITE_LEAD.match(text)
+    text = _POLITE_LEAD.sub("", text)
+    if polite:
+        text = text.rstrip(" ?")  # "can you solo the hats?" is a request, not a question
+    if _COMP_SETTING.search(text):
+        # "comp" is also a comped take; only next to a compressor setting is it the Compressor.
+        text = re.sub(r"\bcomp\b", "compressor", text, flags=re.I)
+    text = _A_DB.sub(lambda m: "0.5 dB" if m.group("half") else "1 dB", text)
+
+    def name(match: re.Match[str], group: str = "name") -> str | None:
+        found = match.group(group)
+        return None if not found or _NOT_A_TRACK_NAME.search(found) or _TERSE_LEVEL_EXCLUDE.search(found) else found
+
+    if (m := _LOCATOR_SAID.match(text)):
+        return f"add a locator called {(m.group('locator') or m.group('locator2')).strip()}"
+    if (m := _CALL_TRACK_THE.match(text)) and name(m):
+        return f"rename {m.group('name')} to {m.group('new')}"
+    if (m := _VERB_LEVEL.match(text)):
+        group = "name" if m.group("name") else "name2"
+        if name(m, group):
+            return f"set {m.group(group)} to {m.group('amount' if group == 'name' else 'amount2')} dB"
+    if (m := _PAN_NEUTRAL.match(text)) and name(m):
+        return f"centre {m.group('name')}"
+    if (m := _SEND_LETTER_AFTER.match(text)) and name(m):
+        return f"send the {m.group('name')} to the {m.group('ret').lower()} at {m.group('value')}%"
+    if (m := _SEND_SAID_AMOUNT_FIRST.match(text)):
+        group = "name" if m.group("name") else "name2"
+        if name(m, group):
+            ret = (m.group("ret") or m.group("ret2")).lower()
+            value = m.group("value") or m.group("value2")
+            if float(value) <= 100:
+                return f"send the {m.group(group)} to the {'reverb' if ret == 'verb' else ret} at {value}%"
+    if (m := _SEND_SAID_PORTION.match(text) or _SEND_SAID_GO_TO.match(text)) and name(m):
+        return f"send the {m.group('name')} to the {m.group('ret')} at {m.group('value')}%"
+    if (m := _SEND_SAID_TRACK_FIRST.match(text) or _SEND_SAID_LETTER_FIRST.match(text)) and name(m):
+        ret = m.group("ret").lower().replace("return ", "")
+        ret = "reverb" if ret == "verb" else ret
+        return f"send the {m.group('name')} to the {ret} at {m.group('value')}%"
+    if (m := _SIGNED_CHANGE.match(text)):
+        if m.group("name") and name(m):
+            return f"turn {m.group('name')} {'up' if m.group('sign') == '+' else 'down'} {m.group('amount')} dB"
+        if m.group("name2") and name(m, "name2"):
+            return f"turn {m.group('name2')} up {m.group('amount2')} dB"
+    if (m := _UNITLESS_CHANGE.match(text)):
+        if m.group("name") and name(m):
+            return f"turn {m.group('name')} {m.group('direction')} {m.group('amount')} dB"
+        if m.group("name2") and name(m, "name2"):
+            up = m.group("verb").lower() in {"raise", "boost", "up"}
+            return f"turn {m.group('name2')} {'up' if up else 'down'} {m.group('amount2')} dB"
+    if (m := _HARD_PAN_ON.match(text)) and name(m):
+        return f"pan {m.group('name')} hard {m.group('side').lower()}"
+    if (m := _VOL_ON.match(text)) and name(m):
+        return f"set {m.group('name')} to {m.group('amount')} dB"
+    if (m := _TERSE_THRESHOLD.match(text)):
+        track = m.group("name") or m.group("name2")
+        if track and not _NOT_A_TRACK_NAME.search(track):
+            if m.group("direction"):
+                verb = "raise" if m.group("direction").lower() == "up" else "lower"
+                return f"{verb} the {track} compressor threshold by {m.group('change')} dB"
+            return f"set the {track} compressor threshold to {m.group('amount')} dB"
+    if (m := _UNITLESS_LEVEL.match(text)) and name(m):
+        return f"set {m.group('name')} to {m.group('amount')} dB"
+    if (m := _BARE_PAN.match(text)) and name(m):
+        return f"pan {m.group('name')} {m.group('amount')}% {m.group('side').lower()}"
+    if (m := _LR_PAN.match(text)) and name(m):
+        return f"pan {m.group('name')} {m.group('amount')}% {'left' if m.group('side').lower() == 'l' else 'right'}"
+    if (m := _CENTRE_PAN.match(text)):
+        if m.group("verb"):
+            return re.sub(r"^\s*re-?", "", text)  # "re-centre the bass" is "centre the bass"
+        if name(m):
+            return f"centre {m.group('name')}"
+    if (m := _MUTE_IDIOM.match(text)):
+        found = next((g for g in ("name", "name2", "name3") if m.group(g)), None)
+        if found and name(m, found):
+            return f"mute {m.group(found)}"
+    if (m := _UNMUTE_IDIOM.match(text)) and name(m):
+        return f"unmute {m.group('name')}"
+    return text
+
 
 def _rewrite_common_phrasings(text: str) -> str:
     """Put a few everyday phrasings into forms the rules below already parse.
@@ -959,9 +1142,11 @@ def _rewrite_common_phrasings(text: str) -> str:
     a bare "kick to -9" still asks). Nothing here changes what a request means.
     """
     text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
+    text = _rewrite_idioms(text)
     corrected = _CORRECTION_LEAD.sub("", text)
     if corrected != text:
         text = _CORRECTION_TAIL.sub("", corrected)
+    text = re.sub(r"\b((?:re)?name\b.*?\bto)\s+just\s+", r"\1 ", text, flags=re.I)
     call = _CALL_TRACK.match(text)
     if call:
         text = f"rename {call.group(1)} to {call.group(2)}"
@@ -972,7 +1157,7 @@ def _rewrite_common_phrasings(text: str) -> str:
 
 
 _FOCUS_DEVICE_BY_NAME = re.compile(
-    r"^\s*(?:show\s+me|open|focus|select|go\s+to|jump\s+to|take\s+me\s+to)\s+(?:the\s+)?(?P<phrase>.+?)\s*[.!]?\s*$",
+    r"^\s*(?:show(?:\s+me)?|open|focus|select|go\s+to|jump\s+to|take\s+me\s+to)\s+(?:the\s+)?(?P<phrase>.+?)\s*[.!]?\s*$",
     re.I,
 )
 
@@ -1058,6 +1243,8 @@ def _normalize_kilohertz(text: str) -> str:
 _SINGLE_TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"}
 _TONE_WORDS = re.compile(r"\b(?:high|low|top|bottom)\s+end\b|\b(?:highs|lows|mids|low[- ]mids|treble|brightness|"
                          r"muddiness|mud|boom|harshness|sibilance|air|presence)\b", re.I)
+_EXCEPT = re.compile(r"\b(?:except|apart\s+from|other\s+than|all\s+but|everything\s+but|but\s+not)\b", re.I)
+_PLAY_FROM = re.compile(r"\b(?:play|start|go)\b.*?\bfrom\s+(?:the\s+)?(?P<where>[\w\s-]+?)\s*[.!]?\s*$", re.I)
 _SECTION_SCOPE = re.compile(r"\b(?:in|during|for|through)\s+(?:the\s+)?(?:first\s+|second\s+|last\s+|final\s+)?"
                             r"(?:verse|chorus|hook|drop|intro|outro|bridge|breakdown|build(?:[- ]?up)?|pre[- ]?chorus|"
                             r"section|middle\s+eight)s?\b", re.I)
@@ -1069,13 +1256,26 @@ def _single_track_change_question(parsed: dict[str, Any], snapshot: dict[str, An
     Two named tracks ("the bass 3 dB below the kick"), tone words ("the hats' high end") or a song section
     ("in the verse") mean the fader change KENN would make is not what was asked for.
     """
-    if parsed.get("action") not in _SINGLE_TRACK_ACTIONS or parsed.get("missing_fields") or parsed.get("ambiguity"):
+    if parsed.get("missing_fields") or parsed.get("ambiguity"):
+        return ""
+    if parsed.get("action") == "transport_play":
+        start = _PLAY_FROM.search(str(parsed.get("query") or ""))
+        if start:
+            # "play from the chorus" used to start from wherever the playhead was, silently dropping "from the chorus".
+            return (f"KENN can only start playback from where the playhead is, not from {start.group('where')}. Move the "
+                    "playhead there in Live, then say \"play\".")
+        return ""
+    if parsed.get("action") not in _SINGLE_TRACK_ACTIONS:
         return ""
     query = str(parsed.get("query") or "")
     lowered = query.casefold()
     target = (parsed.get("track") or {}).get("name") if isinstance(parsed.get("track"), dict) else None
     named = [str(t.get("name")) for t in (snapshot or {}).get("tracks") or [] if isinstance(t, dict) and t.get("name")
              and re.search(rf"(?<![\w-]){re.escape(str(t['name']).casefold())}(?![\w-])", lowered)]
+    if _EXCEPT.search(query):
+        # "mute everything except the kick" used to mute the kick: the one track the producer wanted left alone.
+        return (f"KENN changes one track at a time for now, so it can't do \"{_EXCEPT.search(query).group(0)} …\". "
+                "Name the track to change, for example \"mute the snare\".")
     if len(set(named)) >= 2:
         return (f"That mentions {', '.join(sorted(set(named)))}. Which single track should change, and by how much? "
                 "For example \"turn the Bass down 3 dB\".")
@@ -1095,6 +1295,11 @@ def _single_track_change_question(parsed: dict[str, Any], snapshot: dict[str, An
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
     parsed = _parse_request_rules(query, session_snapshot)
+    if _HOW_TO_QUESTION.match(str(query or "")):
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["how_to"],
+                       "ambiguity": ["That's a how-to question, so nothing changed. Ask it in chat and KENN explains the "
+                                     "steps, or say it as a request (\"solo the lead vocal\") and KENN prepares it."]})
+        return parsed
     if parsed.get("action") == "set_eq_band_gain" and not parsed.get("eq_band"):
         band = re.search(r"\bband\s*(\d+)\s*([ab])\b", str(parsed.get("query") or ""), re.I)
         if band:  # "cut 200 Hz on the bass by 3 dB, band 2A": the named band settles which one
@@ -1253,6 +1458,18 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
     # "some reverb on the snare" is vague (how much? insert or send?): ask, don't insert.
     insert_device_name = (_insert_device_name(lower)
                           if _ADD_DEVICE.search(lower) and not _VAGUE_EFFECT.search(lower) else None)
+    sounds_like_send = (re.search(r"\bsends?\b|\d\s*(?:%|percent)|\b\d+\s+(?:on|to|into)\s+(?:the\s+)?(?:reverb|delay|verb)\b",
+                                  lower) and not device_setup_match and not re.search(r"\b(?:dry|wet|mix)\b", lower))
+    if insert_device_name and sounds_like_send:
+        # "put 40% of the bass on reverb", "add a reverb send to the vocal" are sends, and used to insert a Reverb on
+        # the track. With an amount the send rules below take it; without one, ask. "at 25% dry wet" is still an
+        # insert with a setting.
+        insert_device_name = None
+        if not re.search(r"\d", lower):
+            base["missing_fields"].append("send_amount")
+            base["ambiguity"].append("That sounds like a send. How much? For example \"send the vocal to the reverb at "
+                                     "20%\". Nothing changed.")
+            return base
     add_device_match = insert_device_name is not None
     inspect_device_parameters_match = _INSPECT_DEVICE_PARAMETERS.search(lower)
     eq_band_match = _EQ_BAND_GAIN.search(numeric_text)
@@ -1273,7 +1490,8 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         # zero-based in the typed intent and proposal.
         eq_device_index = int(eq_device_reference.group(1)) - 1
     eq_band_request = eq_band_match or eq_band_freq_first_match or eq_band_compact_match or eq_band_short_match or eq_band_only_match
-    if any(cue in lower for cue in ("list my tracks", "what tracks", "show my tracks", "show the tracks")):
+    if any(cue in lower for cue in ("list my tracks", "what tracks", "show my tracks", "show the tracks")) or re.search(
+            r"^\s*(?:list|show(?:\s+me)?)\s+(?:all\s+)?(?:of\s+)?(?:the|my)\s+tracks\b", lower):
         base.update({"action": "inspect_tracks", "confidence": 0.99})
         return base
     focus_device_match = _FOCUS_DEVICE.match(text)
@@ -1574,8 +1792,15 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         for device in (track.get("devices") if isinstance(track.get("devices"), list) else [])
         if isinstance(device, dict) and str(device.get("name") or "").strip()
     ]
+    # Words inside a track's own name aren't a device reference: "mute the FX Print" is the track called FX Print,
+    # and it used to be refused as "device mute" because of the "fx".
+    without_track_names = lower
+    for track in tracks:
+        name = str(track.get("name") or "").strip().lower()
+        if name:
+            without_track_names = re.sub(rf"(?<!\w){re.escape(name)}(?!\w)", " ", without_track_names)
     if _UNSUPPORTED_DEVICE_CONTROL.search(lower) and (
-        _DEVICE_CONTROL_REFERENCE.search(lower)
+        _DEVICE_CONTROL_REFERENCE.search(without_track_names)
         or any(
             re.search(rf"(?<!\w){re.escape(name)}(?!\w)", text, re.I)
             for name in mentioned_devices
@@ -1587,17 +1812,31 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             "no track-level action was inferred."
         )
         return base
-    if re.search(r"\b(play|start playback|start\s+(?:the\s+)?(?:song|set|playback|playing)|hit\s+play)\b", lower):
+    transport_word = re.search(r"^\s*(?:play|stop|start|pause)\s+(?:the\s+)?(?P<what>.+?)\s*[.!?]?\s*$", lower)
+    if transport_word and not re.search(r"\b(?:song|set|session|track|playback|playing|beat|it|music|everything)\b",
+                                        transport_word.group("what")) and _extract_track_phrase(transport_word.group("what"), tracks):
+        # "play the drums", "stop the bass": Live's transport plays and stops the whole set, never one track. Starting
+        # or stopping everything isn't what was asked, so ask which is meant.
+        what = transport_word.group("what")
+        base["missing_fields"].append("transport_target")
+        base["ambiguity"].append(f"Play and stop run the whole set, not one track. Did you mean to solo or mute {what}, "
+                                 "or start/stop the whole set? Nothing changed.")
+        return base
+    if re.search(r"\b(play|start playback|start\s+(?:the\s+)?(?:song|set|playback|playing)|hit\s+play)\b"
+                 r"|^\s*(?:let'?s\s+(?:hear\s+it|jam)|can\s+we\s+start|let'?s\s+go)\s*[.!?]?\s*$", lower):
         base.update({"mode": "assist", "action": "transport_play", "confirmation_required": True, "confidence": 0.99})
         return base
-    if re.search(r"\b(stop playback|stop the session|stop)\b", lower):
+    if re.search(r"\b(stop playback|stop the session|stop)\b|^\s*pause(?:\s+(?:it|playback|the\s+song))?\s*[.!]?\s*$", lower):
         base.update({"mode": "assist", "action": "transport_stop", "confirmation_required": True, "confidence": 0.99})
         return base
 
-    track_phrase = _extract_track_phrase(text, tracks)
-    numbered_match = _NUMERIC_TRACK.search(text)
-    ordinal_match = _ORDINAL_TRACK.search(text)
-    spoken_track_match = _SPOKEN_TRACK_NUMBER.search(text)
+    # The new name isn't where the track is named: "rename the track with no devices to main synth" once renamed the
+    # Synth because "synth" is in the new name.
+    track_text = text[:rename_match.start(1)] if rename_match else text
+    track_phrase = _extract_track_phrase(track_text, tracks)
+    numbered_match = _NUMERIC_TRACK.search(track_text)
+    ordinal_match = _ORDINAL_TRACK.search(track_text)
+    spoken_track_match = _SPOKEN_TRACK_NUMBER.search(track_text)
     track_reference_match = numbered_match or ordinal_match or spoken_track_match
     track = None
     ambiguous = []
@@ -1905,7 +2144,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
     if (
         lower.startswith(("what devices", "show devices", "list devices"))
         or "devices on" in lower
-        or re.search(r"\b(?:show|list|inspect|display|what)\b.*\b(?:chain|processors?|devices?)\b", lower)
+        or re.search(r"\b(?:show|list|inspect|display|what)\b.*\b(?:chain|processors?|devices?|plugins?|plug-ins?)\b", lower)
         or re.search(r"\bwhat(?:'s| is| are|s)\s+on\s+(?:the\s+)?track\b", lower)
     ):
         base.update({"action": "inspect_devices", "confidence": 0.99})
@@ -1920,7 +2159,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
 
     action = None
     mute_off = re.search(
-        r"\b(?:unmute|un[- ]?silence)\b|"
+        r"\b(?:un-?mute|un[- ]?silence)\b|\b(?:turn|switch|take)\s+off\s+(?:the\s+)?mute\b|"
         r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:mute|silence)\b|"
         r"\b(?:turn|switch)\s+(?:mute|silence)\s+off\b|"
         # "take the mute off the kick": the noun-first order means off, not on.
@@ -1935,21 +2174,21 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         base.update({"desired_value": not bool(mute_off), "unit": "boolean"})
     else:
         solo_off = re.search(
-            r"\b(?:unsolo|un[- ]?isolate)\b|"
+            r"\b(?:un-?solo|un[- ]?isolate)\b|\b(?:turn|switch|take)\s+off\s+(?:the\s+)?solo\b|"
             r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:solo|isolation)\b|"
             r"\b(?:turn|switch)\s+solo\s+off\b|"
             r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?solo\s+off\b",
             lower,
         )
         # "the vocal on its own", "just the vocal please", "gimme only the bass".
-        solo_slang = re.search(r"\bon\s+(?:its|their)\s+own\b|^\s*(?:(?:gimme|give\s+me|let\s+me\s+hear)\s+)?(?:just|only)\s+the\b", lower)
+        solo_slang = re.search(r"\bon\s+(?:its|their)\s+own\b|\bhear\b.*\b(?:alone|by\s+itself)\s*[.!]?\s*$|^\s*(?:(?:gimme|give\s+me|let\s+me\s+hear)\s+)?(?:just|only)\s+the\b", lower)
         if solo_off or re.search(r"\b(?:solo|isolate)\b", lower) or solo_slang:
             action = "set_solo"
             base.update({"desired_value": not bool(solo_off), "unit": "boolean"})
         else:
             arm_off = re.search(
-                r"\bdisarm\b|"
-                r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:arm|record[- ]?enable|record[- ]?ready)\b|"
+                r"\b(?:dis-?arm|un-?arm)\b|\b(?:turn|switch|take)\s+off\s+(?:the\s+)?(?:record[- ]?)?arm\b|"
+                r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:arm|record[- ]?enable|record[- ]?ready|record(?:ing)?)\b|"
                 r"\b(?:turn|switch)\s+(?:record[- ]?arm|arm)\s+off\b",
                 lower,
             )
@@ -2065,6 +2304,22 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
                 amount = float(pan_amount_first_match.group(1))
                 unit = pan_amount_first_match.group(2)
                 side = pan_amount_first_match.group(3)
+            if not side:
+                # "pan the synth left 30%" matched the amount with no side and used to pan right. Take the side from
+                # anywhere in the request; both sides named is a question.
+                sides = set(re.findall(r"\b(left|right)\b", lower))
+                if len(sides) > 1:
+                    base["ambiguity"].append("That names both left and right. Which side, and how far?")
+                    base["missing_fields"].append("pan_side")
+                    return base
+                side = next(iter(sides), None)
+                signed = amount < 0 or re.search(r"\+\s*\d", lower)  # "-0.4" is left and "+0.4" right, as in Live
+                if side is None and not pan_hard_match and amount > 0 and not signed:
+                    # "pan the synth 20%" names no side; it used to go right. Ask rather than guess.
+                    base["ambiguity"].append(f"Which side? For example \"pan {track.get('name') or 'it'} {abs(amount):g}"
+                                             f"{'%' if unit else ''} left\".")
+                    base["missing_fields"].append("pan_side")
+                    return base
             if side == "left":
                 amount = -abs(amount)
             elif side == "right":
@@ -2109,7 +2364,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
     device = next(((index, name) for index, name in device_candidates if name and name.lower() in lower), None)
     if device is None and re.search(r"\b(?:threshold|ratio|attack|release|frequency|gain|q)\b", lower):
         base["missing_fields"].append("device")
-        base["ambiguity"].append("The request names a device parameter, but no matching device name exists in the Live snapshot.")
+        base["ambiguity"].append("I couldn't find that device on the track. Name the device as it appears in Live.")
         return base
     if device is not None:
         base["device"] = {"index": device[0], "name": device[1]}

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
 import uuid
 from threading import Lock
@@ -172,7 +173,16 @@ def _resolve_return_track_by_name(
         return exact[0], None
     if len(exact) > 1:
         return None, f"More than one return track is named {name!r}; specify the exact return-track index."
-    substring = [rt for rt in return_tracks if lowered in str(rt.get("name", "")).strip().lower()]
+    if re.fullmatch(r"[a-l]", lowered):
+        # "send A", "send B": Live letters sends by the return's position, whatever it's called. A substring match
+        # would find the "a" in "B-Delay" too.
+        by_letter = [rt for rt in return_tracks if rt.get("index") == ord(lowered) - ord("a")]
+        if len(by_letter) == 1:
+            return by_letter[0], None
+    # "b delay" for "B-Delay": compare words, not punctuation.
+    words = " ".join(re.findall(r"[a-z0-9]+", lowered))
+    substring = [rt for rt in return_tracks
+                 if words and words in " ".join(re.findall(r"[a-z0-9]+", str(rt.get("name", "")).lower()))]
     if len(substring) == 1:
         return substring[0], None
     if len(substring) > 1:

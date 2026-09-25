@@ -16,7 +16,8 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = "kenn.supervised_pilot_evaluation.v1"
 LOG_SCHEMA = "kenn.supervised_pilot_session.v1"
-DEFAULT_MATRIX = REPO_ROOT / "docs" / "ABLETON_LIVE_SUPPORT_MATRIX.json"
+# The matrix lives with the other evidence; docs/ABLETON_LIVE_SUPPORT_MATRIX.json never existed.
+DEFAULT_MATRIX = REPO_ROOT / "docs" / "evidence" / "ABLETON_LIVE_SUPPORT_MATRIX.json"
 SHA256_RE = re.compile(r"sha256:[0-9a-f]{64}")
 COMMIT_RE = re.compile(r"[0-9a-f]{40}")
 PREFLIGHT_FIELDS = (

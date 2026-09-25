@@ -324,3 +324,35 @@ def test_a_mixer_change_that_means_something_else_asks_first(query, phrase) -> N
 def test_plain_mixer_changes_are_not_second_guessed(query) -> None:
     parsed = parse_request(query, FAKE_SET)
     assert parsed["confirmation_required"] and not parsed["ambiguity"]
+
+
+@pytest.mark.parametrize("query, phrase", [
+    ("mute everything except the kick", "one track at a time"),   # used to mute the kick, the one to leave alone
+    ("solo all but the vocal", "one track at a time"),
+    ("play from the chorus", "where the playhead is"),             # used to play from wherever the playhead was
+    ("play from the top", "where the playhead is"),
+])
+def test_requests_kenn_cannot_do_as_asked_get_a_question(query, phrase) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert not parsed["confirmation_required"] and any(phrase in text for text in parsed["ambiguity"])
+
+
+@pytest.mark.parametrize("query", ["play", "start the song", "mute the kick"])
+def test_plain_transport_and_mute_still_propose(query) -> None:
+    assert parse_request(query, FAKE_SET)["confirmation_required"]
+
+
+@pytest.mark.parametrize("query, value", [
+    ("pan the synth left 30%", -0.3),                # used to pan right: the side before the amount was ignored
+    ("pan synth left by 30 percent", -0.3),
+    ("pan the synth to the left 30%", -0.3),
+    ("Pan Drum Bus -0.4", -0.4),                      # a signed value says the side, as in Live
+])
+def test_the_pan_side_is_read_wherever_it_is_said(query, value) -> None:
+    assert parse_request(query, FAKE_SET)["desired_value"] == pytest.approx(value)
+
+
+@pytest.mark.parametrize("query", ["pan the synth 20%", "pan the synth left then right 20%"])
+def test_a_pan_without_one_clear_side_asks(query) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert "pan_side" in parsed["missing_fields"] and not parsed["confirmation_required"]

@@ -27,3 +27,6 @@
 {"query": "turn the synth down 2 dB during the drop", "expected_action": "clarify", "source": "claude_written", "note": "sounds like a fader change, means something else"}
 {"query": "turn the drums down 3 dB", "expected_action": "set_volume", "expected_track": "Drum Bus", "expected_delta_db": -3, "source": "claude_written"}
 {"query": "cut 2k on the bass by 3 dB", "expected_action": "set_eq_band_gain", "expected_track": "Bass", "source": "claude_written"}
+{"query": "mute everything except the kick", "expected_action": "clarify", "source": "claude_written", "note": "all-but request; KENN changes one track at a time"}
+{"query": "solo all but the vocal", "expected_action": "clarify", "source": "claude_written", "note": "all-but request; KENN changes one track at a time"}
+{"query": "play from the chorus", "expected_action": "clarify", "source": "claude_written", "note": "KENN can only play from the playhead"}

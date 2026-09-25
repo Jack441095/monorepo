@@ -241,6 +241,23 @@ def _echoes_prompt_instructions(answer: str) -> bool:
     return any(phrase in lowered for phrase in _PROMPT_INSTRUCTION_ECHO_PHRASES)
 
 
+# A chat answer is advice; only the Live command path changes the set, and only after Apply. A model that writes
+# "I've turned the bass down 2 dB" is handing the user a receipt for something that never happened, so that answer
+# is thrown away and the template is used. Checked against 122 Qwen answers from the Stage 1 comparison: no false
+# hits ("I'd cut", "you'll want to set" are advice and don't match).
+_LIVE_CHANGE_CLAIM_RE = re.compile(
+    r"\bI(?:'ve|\u2019ve| have| just)\s+(?:just\s+|now\s+|gone ahead and\s+)?"
+    r"(?:turned|set|muted|unmuted|soloed|unsoloed|panned|lowered|raised|boosted|cut|added|inserted|loaded|applied|"
+    r"changed|adjusted|renamed|created|removed|deleted|moved|made)\b"
+    r"|^\s*done[.!,:\u2014-]",
+    re.I | re.M,
+)
+
+
+def claims_live_change(answer: str) -> bool:
+    return bool(_LIVE_CHANGE_CLAIM_RE.search(answer))
+
+
 def generated_answer_validation(
     query: str,
     results: list[tuple[float, dict]],
@@ -329,7 +346,10 @@ def generated_answer_validation(
     fabricated_sources = sorted(cited_filenames - displayed_filenames)
     punts_to_sources = _punts_to_sources(answer)
     echoes_prompt = _echoes_prompt_instructions(answer)
+    claims_change = claims_live_change(answer)
     warnings = []
+    if claims_change:
+        warnings.append("generated answer claims it changed the Live set")
     if unsupported_measurements:
         warnings.append("generated answer introduced unsupported measurements")
     if fabricated_sources:
@@ -352,6 +372,7 @@ def generated_answer_validation(
         "fabricated_sources": fabricated_sources,
         "punts_to_sources": punts_to_sources,
         "echoes_prompt_instructions": echoes_prompt,
+        "claims_live_change": claims_change,
         "evidence_overlap": round(overlap, 3),
         "grounding": grounding,
         "quality": quality,
