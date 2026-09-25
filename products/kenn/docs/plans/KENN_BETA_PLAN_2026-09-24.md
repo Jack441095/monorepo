@@ -114,6 +114,10 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > above froze the reported Live status from 15:49. Fixed, branch merged into `main`, companion restarted, real-Live
   > assistant task re-passed; **second run started 20:16, ends ~08:16 Fri 25 Sep**, bound to `c40532b` (no commits on
   > `main` until it ends). Still needs one Live quit/reopen.
+  > 25 Sept: run 2 ran clean for ~11 h, then the Mac slept on low battery at 07:06 and shut down (67 samples short, and
+  > no Live reconnect yet), so it doesn't count. **Run 3 started 12:42, ends ~00:42 Sat**, on the final code
+  > (`98581b2`: last night's fixes, index `v-4fd17ceb264f` with the rack notes, rebuilt review packet). Before it
+  > started: tester-guide walkthrough 13/13 and the real-Live assistant test passed on real Live.
 - [x] Regenerate stale evidence: `automated_suite`, `intelligence` (`--run-suite --run-intelligence`),
       `planner_bakeoff` (missing input `chat/evals/ableton_deliberative_adversarial.json`), `real_live_assistant`
       (lifecycle/replay check failing), `artifacts` (five named docs missing)
@@ -183,7 +187,10 @@ The beta cannot start while KENN only runs from this Mac's checkout.
 
 ## Phase 5: Launch the beta (end of week 4)
 
-- [ ] Known-limitations page and support runbook shipped with the app
+- [x] Known-limitations page and support runbook shipped with the app
+  > 2026-09-25: the tester guide, known limitations included, opens inside the app (`/guide`, linked from Setup &
+  > Support; the build pre-renders it). `docs/runbooks/KENN_BETA_SUPPORT_RUNBOOK.md` rewritten for the app beta:
+  > first reply, common reports, the "must never happen" list, fixing and shipping, rollback.
 - [ ] Feedback channel live; diagnostics button sends receipts and timings only
   > 2026-09-24: diagnostics half done — **Setup & Support** (app toolbar) → **Save diagnostics for support** writes one
   > redacted file (receipt counts by action and outcome, answer timings p50/p95, versions; no track names, values,
