@@ -363,3 +363,7 @@ Evaluated with the GPU otherwise idle (9a's first plain pass ran while 9b traine
 - **Decision:** 9b is the best candidate for the shadow slot (replacing run 4). Swapping the shadow model is the
   owner's call; promotion to writes still goes only through `live_llm_promotion.py`. Box copies removed after
   evaluation (the runs had filled `/mnt/data` overnight); 9b's Q4_K_M kept (2.6 GB).
+- **Shadow deployment (owner OK, 25 Sept):** 9b replaces run 4 in the companion's shadow slot. The Mac runs the 4-bit
+  copy (Q4_K_M, sha256 `ca8c18be…a720e`): 124 cases plain **84.7%** (bf16 on the box: 85.5%), 6 wrong plans accepted
+  (bf16: 3), p50 4.8 s on the Mac during the soak. Quantisation costs some precision; any promotion evaluation must use
+  the quantisation that would actually run.
