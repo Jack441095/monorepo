@@ -670,3 +670,9 @@ Sources:
 
 **Best:** [ ] template  [ ] 8B  [ ] 14B
 
+
+## Decision (25 Sept)
+
+**Qwen3 8B.** The owner delegated the choice. 8B matched 14B on the content checks, is a third faster, and needs about
+half the memory (5 GB against 9 GB), which matters on a 16 GB Mac that is also running Live. The side-by-side
+answers above are still worth a read for tone before the style fine-tune.
