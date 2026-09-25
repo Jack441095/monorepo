@@ -44,7 +44,9 @@ def _isolate(model: str | None) -> None:
     for name in ("KENN_LIVE_LLM_ENABLED", "KENN_LLM_ENABLED", "KENN_LLM_ENABLED_COMMAND", "KENN_LIVE_LLM_MODE"):
         os.environ.pop(name, None)
     if model:
-        os.environ.update({"KENN_LLM_ENABLED_COMMAND": "1", "KENN_LLM_PROVIDER_COMMAND": "ollama",
+        # Enables the planner call below; the gateway still runs with allow_llm=False and the stage stays as reviewed.
+        os.environ.update({"KENN_LIVE_LLM_ENABLED": "1", "KENN_LLM_ENABLED": "1", "KENN_LLM_ENABLED_COMMAND": "1",
+                           "KENN_LLM_PROVIDER_COMMAND": "ollama",
                            "KENN_LLM_MODEL_COMMAND": model, "KENN_LLM_THINK": "off", "KENN_LLM_CACHE": "0"})
 
 
@@ -159,7 +161,12 @@ def main() -> int:
                "expected": case["expected_action"], "expected_track": case.get("expected_track"),
                "want": want, "got": got, "verdict": verdict(case, got, want),
                "answer": "" if result.get("proposal") else str(result.get("answer") or "")[:160]}
-        if args.model and got["action"] == "clarify":
+        intent = result.get("intent") if isinstance(result.get("intent"), dict) else {}
+        # The same test the gateway uses in propose mode: the planner only gets requests where the rules found no
+        # action, didn't refuse, and didn't ask something specific.
+        planner_may_answer = (not intent.get("action") and intent.get("mode") != "refuse"
+                              and not set(intent.get("missing_fields") or []) - {"action", "track"})
+        if args.model and got["action"] == "clarify" and planner_may_answer:
             row["planner"] = planner_fallback(case, want, service, snapshot)
         rows.append(row)
 
@@ -182,15 +189,16 @@ def main() -> int:
     print(f"\n{total} phrasings (rule path): right {counts['right']} ({100 * counts['right'] / total:.1f}%), "
           f"asked {counts['asked']}, wrong {counts['wrong']}")
     if args.model:
-        fallback = collections.Counter(row["planner"]["verdict"] for row in rows if "planner" in row)
+        # Where the rules asked, the planner's answer replaces theirs: it can turn an "asked" into a right plan, or a
+        # correct question ("which track?") into a wrong plan.
+        final = collections.Counter(row["planner"]["verdict"] if "planner" in row else row["verdict"] for row in rows)
         for row in rows:
             if "planner" in row and row["planner"]["verdict"] == "wrong":
                 got = row["planner"]["got"]
                 print(f"  planner wrong | {row['query']:56} | want {row['expected']} {row['expected_track'] or ''}"
                       f" | got {got['action']} {got['track'] or ''} {'' if got['value'] is None else got['value']}")
-        right = counts["right"] + fallback["right"]
-        print(f"rules then {args.model} where the rules asked: right {right} ({100 * right / total:.1f}%), "
-              f"planner added {fallback['right']} right and {fallback['wrong']} wrong, still asked {fallback['asked']}")
+        print(f"rules, then {args.model} where the rules asked: right {final['right']} "
+              f"({100 * final['right'] / total:.1f}%), asked {final['asked']}, wrong {final['wrong']}")
     if args.out:
         args.out.write_text(json.dumps({"schema": "kenn.natural_phrasing_score.v1", "model": args.model,
                                         "counts": dict(counts), "rows": rows}, indent=1) + "\n", encoding="utf-8")

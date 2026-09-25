@@ -3267,6 +3267,27 @@ def test_propose_stage_can_prepare_a_validated_model_only_intent(monkeypatch) ->
     assert fake.writes == []
 
 
+def test_propose_stage_model_cannot_answer_a_specific_question_by_guessing(monkeypatch) -> None:
+    # "play the bass": the rules ask whether the whole set or the bass alone is meant. A planner answering
+    # "transport_play" would start the whole song, the guess the blind phrasing check caught (25 Sept).
+    fake = FakeLive()
+    monkeypatch.setenv("KENN_LIVE_LLM_ENABLED", "1")
+    monkeypatch.setenv("KENN_LIVE_LLM_MODE", "propose")
+    monkeypatch.setattr(live_command_module, "load_promotion_state", lambda: {"stage": "propose"})
+    monkeypatch.setattr(
+        live_command_module,
+        "_generate_llm_plan",
+        lambda command, snapshot: ({"schema": "kenn.ableton_llm_plan.v1", "action": "transport_play"},
+                                   {"status": "accepted", "usage": {}}),
+    )
+
+    result = handle_command("play the bass", session_id="command-llm-specific-question", service=_service(fake))
+
+    assert result["status"] == "clarification_required"
+    assert result["llm"]["proposal_authority"] == "deterministic_fallback"
+    assert fake.writes == []
+
+
 def test_llm_plan_gets_one_structural_repair_attempt(monkeypatch) -> None:
     class Usage:
         def __init__(self, latency_ms: int) -> None:
