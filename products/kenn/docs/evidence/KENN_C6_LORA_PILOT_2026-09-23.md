@@ -386,3 +386,19 @@ records, 44% clarify (9b: ~33%); 482 steps on GPU 0.
   32 after three were added; the extra three are "except" and "play from" requests.)
 - **Decision:** 9b stays in the shadow slot. Run 11 keeps the trap seeds at lower weight so the clarify share returns
   to ~33%, aiming for run 10's safety with 9b's reach.
+
+## Addendum: run 11, trap seeds at lower weight (2026-09-25)
+
+Run 10's corpus with `--clarify-variants 5`, bringing the clarify share back to 33% (9b: ~35%) while keeping the trap
+seeds (350 rows). 3,575 records; 403 steps on GPU 0.
+
+| GPU, 124 cases | Correct | Clarify (30) | Act (94) | Wrong plans accepted | Traps | Values (16) |
+|---|---|---|---|---|---|---|
+| 9b, plain / evidence | **85.5% / 87.1%** | 29 / 29 | **77 / 79** | 3 / 3 | 17/29 | 16/16 |
+| 10, plain / evidence | 77.4% / 85.5% | 29 / 29 | 67 / 77 | 1 / 1 | 24/32 | 15/16 |
+| **11, plain / evidence** | 80.6% / 83.9% | **30 / 30** | 70 / 74 | **0 / 0** | **29/32** | **16/16** |
+
+- **First run with no wrong plan accepted**, in either mode, and every clarification case answered with a question.
+  It still carries out fewer doable commands than 9b (70 vs 77), so it asks a little more than it needs to.
+- For promotion, not writing the wrong thing matters more than coverage, so **run 11 is the strongest candidate so
+  far**; 9b stays in shadow until the owner approves a swap. Its Q4_K_M is kept on the box.
