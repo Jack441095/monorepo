@@ -110,3 +110,19 @@ def test_comp_means_compressor_only_next_to_a_compressor_setting(snapshot) -> No
     parsed = parse_request("set the drum bus comp threshold to -20 db", snapshot)
     assert parsed["action"] == "set_device_parameter" and parsed["device"]["name"] == "Compressor"
     assert parse_request("vocal comp needs work", snapshot)["action"] is None
+
+
+@pytest.mark.parametrize("request_text, action, track", [
+    ("lower synth 3", "set_volume", "Synth"), ("hard left on vox", "set_pan", "Lead Vocal"),
+    ("move clap to centre", "set_pan", "Snare / Clap"), ("set vol -10 on kick", "set_volume", "Kick"),
+    ("drum bus comp thres -12", "set_device_parameter", "Drum Bus"), ("voc comp thres down 2", "set_device_parameter", "Lead Vocal"),
+])
+def test_terse_session_shorthand(snapshot, request_text, action, track) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == action and parsed["track"]["name"] == track and not parsed["missing_fields"]
+
+
+@pytest.mark.parametrize("request_text, name", [("mark now as intro", "intro"), ("marker now for drop", "drop"),
+                                                ("put a mark here for breakdown", "breakdown")])
+def test_shorthand_markers(snapshot, request_text, name) -> None:
+    assert parse_request(request_text, snapshot)["locator_name"] == name

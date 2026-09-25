@@ -89,7 +89,7 @@ _FOCUS_TRACK_NAME = re.compile(
     re.I,
 )
 _FOCUS_TRACK_BARE_NAME = re.compile(
-    r"^\s*(?:select|focus|follow|highlight|go\s+to|jump\s+to|move\s+to|take\s+me\s+to|show\s+me)\s+(?:the\s+)?(?P<name>[^.!?]+?)\s*[.!]?\s*$", re.I)
+    r"^\s*(?:select|focus(?:\s+on)?|follow|highlight|go\s+to|jump\s+to|move\s+to|take\s+me\s+to|show\s+me)\s+(?:the\s+)?(?P<name>[^.!?]+?)\s*[.!]?\s*$", re.I)
 _ORDINAL_TRACK = re.compile(
     r"\b(?P<ordinal>first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last)\s+"
     r"(?:visible\s+)?(?:track|trk|channel|chan|ch)\b",
@@ -962,7 +962,17 @@ _POLITE_LEAD = re.compile(r"^\s*(?:yo|hey|ok|okay|right|please|(?:can|could|woul
 _A_DB = re.compile(r"\b(?:(?P<half>half\s+a)|an?)\s+(?:db|decibel)\b", re.I)
 _SIGNED_CHANGE = re.compile(rf"^\s*{_NAME}\s+(?P<sign>[+-])\s*(?P<amount>\d+(?:\.\d+)?)\s*(?:dbs?)?\s+relative\s*[.!]?\s*$"
                             rf"|^\s*{_NAME.replace('name', 'name2')}\s+\+\s*(?P<amount2>\d+(?:\.\d+)?)\s*dbs?\s*[.!]?\s*$", re.I)
-_UNITLESS_CHANGE = re.compile(rf"^\s*{_NAME}\s+(?P<direction>up|down)\s+(?P<amount>\d+(?:\.\d+)?)\s*[.!]?\s*$", re.I)
+_UNITLESS_CHANGE = re.compile(rf"^\s*{_NAME}\s+(?P<direction>up|down)\s+(?P<amount>\d+(?:\.\d+)?)\s*[.!]?\s*$"
+                              rf"|^\s*(?P<verb>lower|raise|drop|cut|boost|reduce|up)\s+{_NAME.replace('name', 'name2')}\s+(?:by\s+)?"
+                              r"(?P<amount2>\d+(?:\.\d+)?)\s*[.!]?\s*$", re.I)
+_HARD_PAN_ON = re.compile(rf"^\s*(?:hard|fully)\s+(?P<side>left|right)\s+(?:on|for)\s+{_NAME}\s*[.!]?\s*$", re.I)
+_VOL_ON = re.compile(rf"^\s*set\s+(?:the\s+)?(?:vol|volume|level)\s+(?:to\s+)?(?P<amount>(?:minus\s+|-)\d+(?:\.\d+)?)\s*(?:dbs?)?\s+"
+                     rf"(?:on|for)\s+{_NAME}\s*[.!]?\s*$", re.I)
+# "drum bus comp thres -12", "comp lead vocal thres -12", "voc comp thres down 2"
+_TERSE_THRESHOLD = re.compile(
+    rf"^\s*(?:(?:set|change)\s+)?(?:(?:the\s+)?{_NAME}\s+(?:comp|compressor)|(?:comp|compressor)\s+{_NAME.replace('name', 'name2')})\s+"
+    r"(?:thres|thresh|threshold)\s+(?:(?P<direction>up|down)\s+(?P<change>\d+(?:\.\d+)?)|(?:to\s+)?(?P<amount>-?\d+(?:\.\d+)?))"
+    r"\s*(?:dbs?)?\s*[.!]?\s*$", re.I)
 # A negative bare number on a fader is a dB level ("fx print at -15", "kick fader to minus 10"); a bare "kick to -9"
 # without "at" or "fader" still asks, as before.
 _UNITLESS_LEVEL = re.compile(rf"^\s*{_NAME}\s+(?:fader\s+(?:to|at)|at|fader)\s+(?P<amount>(?:minus\s+|-)\d+(?:\.\d+)?)"
@@ -985,17 +995,18 @@ _VERB_LEVEL = re.compile(rf"^\s*(?:set|put|bring|turn|drop|pull|push|get|take)\s
                          + _NEGATIVE + rf"|^\s*make\s+{_NAME.replace('name', 'name2')}\s+(?:(?:to|at)\s+)?"
                          + _NEGATIVE.replace("amount", "amount2"), re.I)
 _PAN_NEUTRAL = re.compile(rf"^\s*(?:set|put|bring|move)\s+{_NAME}\s+(?:to\s+pan\s+(?:neutral|cent(?:er|re)|middle)|(?:back\s+)?in(?:to)?\s+"
-                          r"the\s+(?:cent(?:er|re)|middle))\s*[.!?]?\s*$", re.I)
+                          r"the\s+(?:cent(?:er|re)|middle)|(?:back\s+)?to\s+(?:the\s+)?(?:cent(?:er|re)|middle))\s*[.!?]?\s*$", re.I)
 _SEND_LETTER_AFTER = re.compile(rf"^\s*(?:set\s+)?{_NAME}(?:'s)?\s+send\s+(?P<ret>[ab])\s+(?:to|at)\s+(?P<value>\d+(?:\.\d+)?)\s*"
                                 r"(?:%|percent)\s*[.!?]?\s*$", re.I)
-_LOCATOR_NOUN = r"(?:loc|locator|marker|cue(?:\s+point)?)"
-_LOCATOR_POSITION = (r"(?:\s+(?:(?:right\s+)?here|now|at\s+(?:the\s+|this\s+|current\s+|the\s+current\s+)?"
+_LOCATOR_NOUN = r"(?:loc|locator|marker|mark|cue(?:\s+point)?)"
+_LOCATOR_POSITION = (r"(?:\s+(?:(?:right\s+)?here|now|at\s+now|at\s+(?:the\s+|this\s+|current\s+|the\s+current\s+)?"
                      r"(?:head|playhead|spot|point|position|cursor|song\s+position|time)))?")
 _LOCATOR_SAID = re.compile(
     rf"^\s*(?:add|create|set|drop|place|put)\s+(?:a\s+)?(?:new\s+)?{_LOCATOR_NOUN}{_LOCATOR_POSITION}\s*,?\s+"
-    r"(?:called|named|name\s+it|with\s+(?:the\s+)?name|label(?:l?ed)?)\s+['\"\u2018\u2019]?(?P<locator>[^'\"\u2018\u2019]+?)['\"\u2018\u2019]?"
+    r"(?:called|named|name\s+it|with\s+(?:the\s+)?name|label(?:l?ed)?|for)\s+['\"\u2018\u2019]?(?P<locator>[^'\"\u2018\u2019]+?)['\"\u2018\u2019]?"
     + _LOCATOR_POSITION + r"\s*[.!]?\s*$"
-    r"|^\s*mark\s+this\s+(?:point|spot|time|position|bit|moment)\s+as\s+['\"\u2018\u2019]?(?P<locator2>[^'\"\u2018\u2019]+?)"
+    r"|^\s*(?:mark\s+(?:this\s+(?:point|spot|time|position|bit|moment)|now|here)\s+as|marker\s+(?:now|here)\s+(?:for|called))\s+"
+    r"['\"\u2018\u2019]?(?P<locator2>[^'\"\u2018\u2019]+?)"
     r"['\"\u2018\u2019]?\s*[.!]?\s*$", re.I)
 _CALL_TRACK_THE = re.compile(rf"^\s*call\s+{_NAME}\s+track\s+(?:the\s+)?(?P<new>[\w' -]+?)\s*[.!]?\s*$", re.I)
 _COMP_SETTING = re.compile(r"\b(?:threshold|ratio|attack|release|output|makeup|knee)\b", re.I)
@@ -1071,8 +1082,23 @@ def _rewrite_idioms(text: str) -> str:
             return f"turn {m.group('name')} {'up' if m.group('sign') == '+' else 'down'} {m.group('amount')} dB"
         if m.group("name2") and name(m, "name2"):
             return f"turn {m.group('name2')} up {m.group('amount2')} dB"
-    if (m := _UNITLESS_CHANGE.match(text)) and name(m):
-        return f"turn {m.group('name')} {m.group('direction')} {m.group('amount')} dB"
+    if (m := _UNITLESS_CHANGE.match(text)):
+        if m.group("name") and name(m):
+            return f"turn {m.group('name')} {m.group('direction')} {m.group('amount')} dB"
+        if m.group("name2") and name(m, "name2"):
+            up = m.group("verb").lower() in {"raise", "boost", "up"}
+            return f"turn {m.group('name2')} {'up' if up else 'down'} {m.group('amount2')} dB"
+    if (m := _HARD_PAN_ON.match(text)) and name(m):
+        return f"pan {m.group('name')} hard {m.group('side').lower()}"
+    if (m := _VOL_ON.match(text)) and name(m):
+        return f"set {m.group('name')} to {m.group('amount')} dB"
+    if (m := _TERSE_THRESHOLD.match(text)):
+        track = m.group("name") or m.group("name2")
+        if track and not _NOT_A_TRACK_NAME.search(track):
+            if m.group("direction"):
+                verb = "raise" if m.group("direction").lower() == "up" else "lower"
+                return f"{verb} the {track} compressor threshold by {m.group('change')} dB"
+            return f"set the {track} compressor threshold to {m.group('amount')} dB"
     if (m := _UNITLESS_LEVEL.match(text)) and name(m):
         return f"set {m.group('name')} to {m.group('amount')} dB"
     if (m := _BARE_PAN.match(text)) and name(m):
