@@ -160,8 +160,12 @@ def answer_live_session_question(
         denominator = snapshot.get("signature_denominator")
         tempo_text = f"{float(tempo):g} BPM" if isinstance(tempo, (int, float)) else "an unavailable tempo"
         signature_text = f"{numerator}/{denominator}" if numerator is not None and denominator is not None else "an unavailable time signature"
+        answer = f"The current tempo is {tempo_text} and the time signature is {signature_text}."
+        if re.search(r"\b(?:set|change|make|put|speed\s+up|slow\s+down|raise|lower|increase|decrease)\b|\bto\s+\d", question, re.I):
+            # "set the tempo to 128" used to get only the current tempo, which reads as if KENN had done it.
+            answer = f"KENN can't change the tempo or time signature yet; set them in Live. {answer}"
         payload.update({
-            "answer": f"The current tempo is {tempo_text} and the time signature is {signature_text}.",
+            "answer": answer,
             "tempo": tempo,
             "signature_numerator": numerator,
             "signature_denominator": denominator,

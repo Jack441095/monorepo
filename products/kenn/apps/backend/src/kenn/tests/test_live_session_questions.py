@@ -216,3 +216,15 @@ def test_selected_return_or_master_track_is_reported_not_unavailable(kind: dict,
     assert result["status"] == "inspected"
     assert result["answer"] == expected
     assert result["track"]["kind"] == kind["kind"]
+
+
+@pytest.mark.parametrize("question", ["Set the tempo to 128", "Speed up the tempo"])
+def test_a_tempo_change_request_says_kenn_cannot_do_it(question) -> None:
+    # Used to answer only "The current tempo is …", which reads as if KENN had changed it.
+    result = answer_live_session_question(question, service=Service(SessionLive()))
+    assert result["answer"].startswith("KENN can't change the tempo")
+
+
+def test_a_tempo_question_just_gets_the_tempo() -> None:
+    result = answer_live_session_question("What tempo is this?", service=Service(SessionLive()))
+    assert result["answer"].startswith("The current tempo is")
