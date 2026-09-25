@@ -676,3 +676,19 @@ Sources:
 **Qwen3 8B.** The owner delegated the choice. 8B matched 14B on the content checks, is a third faster, and needs about
 half the memory (5 GB against 9 GB), which matters on a 16 GB Mac that is also running Live. The side-by-side
 answers above are still worth a read for tone before the style fine-tune.
+
+## Style fine-tune tried and dropped (25 Sept)
+
+A LoRA on Qwen3-8B (box GPU 0, 7 minutes, val loss 0.57 → 0.27) trained on 345 answers KENN's own gate had accepted,
+for 595 questions written from 300 notes (questions close to the test set removed;
+`tooling/scripts/build_brain_style_corpus.py`). On the 84 chat questions:
+
+| | Passed | Model answer used (passed) | p50 | p95 |
+|---|---|---|---|---|
+| Template | 79 | — | 0.15 s | 0.28 s |
+| Plain Qwen3 8B | 77 | **40 (38)** | **2.7 s** | **3.4 s** |
+| 8B + style LoRA | 77 | 36 (34) | 3.1 s | 9.7 s |
+
+Worse on both counts: the model's answer was used less often, and the slowest answers tripled (it learned to write
+longer). Training on answers the same model already writes teaches it nothing new. **Plain 8B stays.** A fine-tune is
+worth another go only with better targets: answers the owner has reviewed, or ones from a stronger model.
