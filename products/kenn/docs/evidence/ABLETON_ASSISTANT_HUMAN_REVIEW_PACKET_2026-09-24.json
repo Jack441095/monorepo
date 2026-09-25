@@ -100,7 +100,7 @@
             "kind": "note",
             "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
             "page": 0,
-            "score": 843.631,
+            "score": 1416.453,
             "source": "harsh-vocal-fix.md",
             "title": "Harsh Vocal Fix",
             "trust_score": 1.0
@@ -109,18 +109,18 @@
             "kind": "note",
             "label": "Vocal De-Essing And Sibilance (vocal-deessing-and-sibilance.md)",
             "page": 0,
-            "score": 810.822,
+            "score": 907.983,
             "source": "vocal-deessing-and-sibilance.md",
             "title": "Vocal De-Essing And Sibilance",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Vocal EQ: Carving Sibilance, Resonance & Air with iZotope Neutron (izotope-how-to-eq-vocals-pt2.md)",
+            "label": "Vocal Mixing Basics (vocal-mixing-basics.md)",
             "page": 0,
-            "score": 342.79,
-            "source": "izotope-how-to-eq-vocals-pt2.md",
-            "title": "Vocal EQ: Carving Sibilance, Resonance & Air with iZotope Neutron",
+            "score": 368.491,
+            "source": "vocal-mixing-basics.md",
+            "title": "Vocal Mixing Basics",
             "trust_score": 1.0
           }
         ]
@@ -268,27 +268,27 @@
             "kind": "note",
             "label": "Boxy Vocal Correction (boxy-vocal-correction.md)",
             "page": 0,
-            "score": 297.69,
+            "score": 498.077,
             "source": "boxy-vocal-correction.md",
             "title": "Boxy Vocal Correction",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Vocal Tuning And Comping Workflow (vocal-tuning-comping-workflow.md)",
+            "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
             "page": 0,
-            "score": 167.526,
-            "source": "vocal-tuning-comping-workflow.md",
-            "title": "Vocal Tuning And Comping Workflow",
+            "score": 232.972,
+            "source": "harsh-vocal-fix.md",
+            "title": "Harsh Vocal Fix",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
+            "label": "Vocal Width Without Mud (vocal-width-without-mud.md)",
             "page": 0,
-            "score": 205.254,
-            "source": "harsh-vocal-fix.md",
-            "title": "Harsh Vocal Fix",
+            "score": 188.197,
+            "source": "vocal-width-without-mud.md",
+            "title": "Vocal Width Without Mud",
             "trust_score": 1.0
           }
         ]
@@ -437,27 +437,27 @@
             "kind": "note",
             "label": "Ableton Auto Filter Device (ableton-auto-filter-device.md)",
             "page": 0,
-            "score": 612.631,
+            "score": 1002.968,
             "source": "ableton-auto-filter-device.md",
             "title": "Ableton Auto Filter Device",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "EQ Versus Filter \u2014 What Is The Difference (eq-vs-filter-difference.md)",
+            "label": "Ableton EQ Eight (Audio Effect) (ableton-eq-eight-device.md)",
             "page": 0,
-            "score": 217.055,
-            "source": "eq-vs-filter-difference.md",
-            "title": "EQ Versus Filter \u2014 What Is The Difference",
+            "score": 195.361,
+            "source": "ableton-eq-eight-device.md",
+            "title": "Ableton EQ Eight (Audio Effect)",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Using Auto Filter Notch for Sound Design (using-auto-filter-notch-for-sound-design.md)",
+            "label": "EQ Versus Filter \u2014 What Is The Difference (eq-vs-filter-difference.md)",
             "page": 0,
-            "score": 183.944,
-            "source": "using-auto-filter-notch-for-sound-design.md",
-            "title": "Using Auto Filter Notch for Sound Design",
+            "score": 195.361,
+            "source": "eq-vs-filter-difference.md",
+            "title": "EQ Versus Filter \u2014 What Is The Difference",
             "trust_score": 1.0
           }
         ]
@@ -522,7 +522,7 @@
       },
       "question": "Listen to my vocal and tell me exactly what is wrong with it.",
       "response": {
-        "answer": "I haven't actually heard your audio -- there's no file or Mix Review result attached to this chat yet, so what follows is general guidance based on the symptom you described, not an analysis of your track. Upload your file and I'll run it through Mix Review for real measurements:\n\nI would troubleshoot the sound in this order.\n\u2192 Let's trace the symptom.\n\nSymptom and likely cause:\nComp the best performance before heavy tuning. Fix timing and obvious pitch problems first, then tune only as much as the style needs. A natural vocal usually comes from good take selection, not from forcing one weak take into shape.\n\nTry this in your session:\n1. Organise takes and mark the strongest phrases before editing.\n2. Build a comp from emotion, timing, tone, and lyric clarity, not just perfect pitch.\n3. Clean breaths, clicks, and bad edits before detailed tuning.\n4. Tune exposed notes more carefully than buried doubles or stacks.\n5. Keep transitions between tuned notes smooth unless the genre wants a hard tuned sound.\n\nListening check:\nBypass and compare at matched loudness; the change should solve the symptom without making another range worse.\n\nDiagnosis boundary:\nStart from the audible symptom, change one variable at a time, and verify at matched loudness before adding another processor.\n\nAvoid these common production mistakes:\nAvoid processing the loudest-looking problem first if the real issue is masking, arrangement, or level balance.\n\n\u2192 Try that change, then tell me if the symptom shifted or stayed. That tells us what to try next.\n\nYou could also ask:\n- Should I comp vocals before tuning?\n- How much vocal tuning is too much?",
+        "answer": "I haven't actually heard your audio -- there's no file or Mix Review result attached to this chat yet, so what follows is general guidance based on the symptom you described, not an analysis of your track. Upload your file and I'll run it through Mix Review for real measurements:\n\nI would troubleshoot the sound in this order.\n\u2192 Let's trace the symptom.\n\nSymptom and likely cause:\nHarsh vocals usually need targeted control, not a blanket dark EQ \u2014 and the source of the harshness matters more than the fix. It can come from the recording (a bright/cheap mic, a performer too close and off-axis, a harsh-sounding room, a loud take driving the mic's electronics) or from the mix (sibilance, upper-mid bite, distortion, or over-compression exaggerating existing harmonics). Find which one it is before reaching for a de-esser or a cut.\n\nTry this in your session:\n1. Bypass every vocal plugin and listen to the dry recording on its own \u2014 if it's already harsh with nothing on it, the cause is upstream of the mix (mic choice, mic distance/angle, performance, or room) and no amount of EQ will fully fix it; consider whether a re-take, different mic, or re-amp is realistically faster than chasing it in the mix.\n2. If the dry vocal is fine and harshness only appears with processing, isolate which stage introduces it: bypass compression, then saturation/exciters, one at a time, and compare against the dry take.\n3. If S and T sounds jump out specifically, use de-essing around the sibilant range rather than a broad cut.\n4. If words bark or stab across the whole upper-mid range, try dynamic EQ in the upper mids rather than a static wide cut.\n5. Check compression attack/release \u2014 fast attack with a short release can push consonants forward and read as harsh even when the tonal balance is fine.\n\nListening check:\nBypass and compare at matched loudness; the change should solve the symptom without making another range worse.\n\nDiagnosis boundary:\nStart from the audible symptom, change one variable at a time, and verify at matched loudness before adding another processor.\n\nAvoid these common production mistakes:\nAvoid processing the loudest-looking problem first if the real issue is masking, arrangement, or level balance.\n\n\u2192 Try that change, then tell me if the symptom shifted or stayed. That tells us what to try next.\n\nYou could also ask:\n- Why does my vocal sound harsh after compression?\n- Should I use de-essing or EQ on vocals?",
         "confidence": "high",
         "found": true,
         "intent": "troubleshooting",
@@ -531,29 +531,29 @@
         "sources": [
           {
             "kind": "note",
+            "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
+            "page": 0,
+            "score": 203.834,
+            "source": "harsh-vocal-fix.md",
+            "title": "Harsh Vocal Fix",
+            "trust_score": 1.0
+          },
+          {
+            "kind": "note",
+            "label": "Boxy Vocal Correction (boxy-vocal-correction.md)",
+            "page": 0,
+            "score": 197.869,
+            "source": "boxy-vocal-correction.md",
+            "title": "Boxy Vocal Correction",
+            "trust_score": 1.0
+          },
+          {
+            "kind": "note",
             "label": "Vocal Tuning And Comping Workflow (vocal-tuning-comping-workflow.md)",
             "page": 0,
-            "score": 197.734,
+            "score": 197.869,
             "source": "vocal-tuning-comping-workflow.md",
             "title": "Vocal Tuning And Comping Workflow",
-            "trust_score": 1.0
-          },
-          {
-            "kind": "note",
-            "label": "Vocal Doubles Adlibs And Throws (vocal-doubles-adlibs-throws.md)",
-            "page": 0,
-            "score": 171.382,
-            "source": "vocal-doubles-adlibs-throws.md",
-            "title": "Vocal Doubles Adlibs And Throws",
-            "trust_score": 1.0
-          },
-          {
-            "kind": "note",
-            "label": "Vocal De-Essing And Sibilance (vocal-deessing-and-sibilance.md)",
-            "page": 0,
-            "score": 189.648,
-            "source": "vocal-deessing-and-sibilance.md",
-            "title": "Vocal De-Essing And Sibilance",
             "trust_score": 1.0
           }
         ]
@@ -629,7 +629,7 @@
             "kind": "note",
             "label": "Bass Compression (Standard, Not Sidechained) (bass-compression-standard.md)",
             "page": 0,
-            "score": 428.495,
+            "score": 429.076,
             "source": "bass-compression-standard.md",
             "title": "Bass Compression (Standard, Not Sidechained)",
             "trust_score": 1.0
@@ -638,18 +638,18 @@
             "kind": "note",
             "label": "Sidechain Bass To Kick (sidechain-bass-to-kick.md)",
             "page": 0,
-            "score": 252.565,
+            "score": 252.886,
             "source": "sidechain-bass-to-kick.md",
             "title": "Sidechain Bass To Kick",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Ableton Compressor Device (ableton-compressor-device.md)",
+            "label": "Mixing Bass Guitar (mixing-bass-guitar.md)",
             "page": 0,
-            "score": 245.293,
-            "source": "ableton-compressor-device.md",
-            "title": "Ableton Compressor Device",
+            "score": 242.78,
+            "source": "mixing-bass-guitar.md",
+            "title": "Mixing Bass Guitar",
             "trust_score": 1.0
           }
         ]
@@ -729,7 +729,7 @@
             "kind": "note",
             "label": "Clipping And Digital Distortion \u2014 Fixing And Preventing (clipping-and-distortion-fixing.md)",
             "page": 0,
-            "score": 21.451,
+            "score": 21.474,
             "source": "clipping-and-distortion-fixing.md",
             "title": "Clipping And Digital Distortion \u2014 Fixing And Preventing",
             "trust_score": 1.0
@@ -738,7 +738,7 @@
             "kind": "note",
             "label": "Mix Review Low Headroom And Clipping Repair (mix-review-low-headroom-clipping-repair.md)",
             "page": 0,
-            "score": 20.896,
+            "score": 20.918,
             "source": "mix-review-low-headroom-clipping-repair.md",
             "title": "Mix Review Low Headroom And Clipping Repair",
             "trust_score": 1.0
@@ -747,7 +747,7 @@
             "kind": "note",
             "label": "Transparent Clipping with Oversampling and Ceiling Control (baphometrix-ctz-PR1o5LQzEB0-pt5.md)",
             "page": 0,
-            "score": 20.807,
+            "score": 20.918,
             "source": "baphometrix-ctz-PR1o5LQzEB0-pt5.md",
             "title": "Transparent Clipping with Oversampling and Ceiling Control",
             "trust_score": 1.0
@@ -956,7 +956,7 @@
             "kind": "note",
             "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
             "page": 0,
-            "score": 599.256,
+            "score": 800.402,
             "source": "harsh-vocal-fix.md",
             "title": "Harsh Vocal Fix",
             "trust_score": 1.0
@@ -965,7 +965,7 @@
             "kind": "note",
             "label": "Vocal De-Essing And Sibilance (vocal-deessing-and-sibilance.md)",
             "page": 0,
-            "score": 509.991,
+            "score": 514.587,
             "source": "vocal-deessing-and-sibilance.md",
             "title": "Vocal De-Essing And Sibilance",
             "trust_score": 1.0
@@ -974,7 +974,7 @@
             "kind": "note",
             "label": "Vocal Mixing Basics (vocal-mixing-basics.md)",
             "page": 0,
-            "score": 381.642,
+            "score": 419.733,
             "source": "vocal-mixing-basics.md",
             "title": "Vocal Mixing Basics",
             "trust_score": 1.0
@@ -1123,7 +1123,7 @@
             "kind": "note",
             "label": "Vocal Width Without Mud (vocal-width-without-mud.md)",
             "page": 0,
-            "score": 1176.329,
+            "score": 1414.387,
             "source": "vocal-width-without-mud.md",
             "title": "Vocal Width Without Mud",
             "trust_score": 1.0
@@ -1132,18 +1132,18 @@
             "kind": "note",
             "label": "Reverb Delay Depth Without Mud (reverb-delay-depth-without-mud.md)",
             "page": 0,
-            "score": 385.883,
+            "score": 664.362,
             "source": "reverb-delay-depth-without-mud.md",
             "title": "Reverb Delay Depth Without Mud",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Vocal Doubles Adlibs And Throws (vocal-doubles-adlibs-throws.md)",
+            "label": "Synth Layering Without Muddiness (synth-layering-without-muddiness.md)",
             "page": 0,
-            "score": 295.875,
-            "source": "vocal-doubles-adlibs-throws.md",
-            "title": "Vocal Doubles Adlibs And Throws",
+            "score": 353.302,
+            "source": "synth-layering-without-muddiness.md",
+            "title": "Synth Layering Without Muddiness",
             "trust_score": 1.0
           }
         ]
@@ -1303,27 +1303,27 @@
             "kind": "note",
             "label": "Boxy Vocal Correction (boxy-vocal-correction.md)",
             "page": 0,
-            "score": 297.69,
+            "score": 498.077,
             "source": "boxy-vocal-correction.md",
             "title": "Boxy Vocal Correction",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Vocal Tuning And Comping Workflow (vocal-tuning-comping-workflow.md)",
+            "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
             "page": 0,
-            "score": 167.526,
-            "source": "vocal-tuning-comping-workflow.md",
-            "title": "Vocal Tuning And Comping Workflow",
+            "score": 232.972,
+            "source": "harsh-vocal-fix.md",
+            "title": "Harsh Vocal Fix",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
+            "label": "Vocal Width Without Mud (vocal-width-without-mud.md)",
             "page": 0,
-            "score": 205.254,
-            "source": "harsh-vocal-fix.md",
-            "title": "Harsh Vocal Fix",
+            "score": 188.197,
+            "source": "vocal-width-without-mud.md",
+            "title": "Vocal Width Without Mud",
             "trust_score": 1.0
           }
         ]
@@ -1450,7 +1450,7 @@
             "kind": "note",
             "label": "Vocal EQ: Carving Sibilance, Resonance & Air with iZotope Neutron (izotope-how-to-eq-vocals-pt2.md)",
             "page": 0,
-            "score": 962.006,
+            "score": 962.889,
             "source": "izotope-how-to-eq-vocals-pt2.md",
             "title": "Vocal EQ: Carving Sibilance, Resonance & Air with iZotope Neutron",
             "trust_score": 1.0
@@ -1459,7 +1459,7 @@
             "kind": "note",
             "label": "Vocal EQ Workflow: Carving Sibilance, Resonance & Air (izotope-how-to-eq-vocals-pt1.md)",
             "page": 0,
-            "score": 877.903,
+            "score": 962.889,
             "source": "izotope-how-to-eq-vocals-pt1.md",
             "title": "Vocal EQ Workflow: Carving Sibilance, Resonance & Air",
             "trust_score": 1.0
@@ -1468,7 +1468,7 @@
             "kind": "note",
             "label": "Vocal Mixing Basics (vocal-mixing-basics.md)",
             "page": 0,
-            "score": 654.683,
+            "score": 655.162,
             "source": "vocal-mixing-basics.md",
             "title": "Vocal Mixing Basics",
             "trust_score": 1.0
@@ -1677,7 +1677,7 @@
             "kind": "note",
             "label": "Thin Vocal Body (thin-vocal-body.md)",
             "page": 0,
-            "score": 2427.875,
+            "score": 2430.06,
             "source": "thin-vocal-body.md",
             "title": "Thin Vocal Body",
             "trust_score": 1.0
@@ -1686,18 +1686,18 @@
             "kind": "note",
             "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
             "page": 0,
-            "score": 2259.513,
+            "score": 2261.667,
             "source": "harsh-vocal-fix.md",
             "title": "Harsh Vocal Fix",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Vocal EQ: Carving Sibilance, Resonance & Air with iZotope Neutron (izotope-how-to-eq-vocals-pt2.md)",
+            "label": "Vocal EQ Workflow: Carving Sibilance, Resonance & Air (izotope-how-to-eq-vocals-pt1.md)",
             "page": 0,
-            "score": 962.101,
-            "source": "izotope-how-to-eq-vocals-pt2.md",
-            "title": "Vocal EQ: Carving Sibilance, Resonance & Air with iZotope Neutron",
+            "score": 1006.558,
+            "source": "izotope-how-to-eq-vocals-pt1.md",
+            "title": "Vocal EQ Workflow: Carving Sibilance, Resonance & Air",
             "trust_score": 1.0
           }
         ]
@@ -1772,7 +1772,7 @@
             "kind": "note",
             "label": "Vocal Width Without Mud (vocal-width-without-mud.md)",
             "page": 0,
-            "score": 1176.329,
+            "score": 1414.387,
             "source": "vocal-width-without-mud.md",
             "title": "Vocal Width Without Mud",
             "trust_score": 1.0
@@ -1781,18 +1781,18 @@
             "kind": "note",
             "label": "Reverb Delay Depth Without Mud (reverb-delay-depth-without-mud.md)",
             "page": 0,
-            "score": 385.883,
+            "score": 664.362,
             "source": "reverb-delay-depth-without-mud.md",
             "title": "Reverb Delay Depth Without Mud",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Vocal Doubles Adlibs And Throws (vocal-doubles-adlibs-throws.md)",
+            "label": "Synth Layering Without Muddiness (synth-layering-without-muddiness.md)",
             "page": 0,
-            "score": 295.875,
-            "source": "vocal-doubles-adlibs-throws.md",
-            "title": "Vocal Doubles Adlibs And Throws",
+            "score": 353.302,
+            "source": "synth-layering-without-muddiness.md",
+            "title": "Synth Layering Without Muddiness",
             "trust_score": 1.0
           }
         ]
@@ -1954,7 +1954,7 @@
             "kind": "note",
             "label": "Boxy Vocal Correction (boxy-vocal-correction.md)",
             "page": 0,
-            "score": 600.019,
+            "score": 948.422,
             "source": "boxy-vocal-correction.md",
             "title": "Boxy Vocal Correction",
             "trust_score": 1.0
@@ -1963,18 +1963,18 @@
             "kind": "note",
             "label": "Drum Parallel Compression (drum-parallel-compression.md)",
             "page": 0,
-            "score": 647.059,
+            "score": 1118.651,
             "source": "drum-parallel-compression.md",
             "title": "Drum Parallel Compression",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "AutoMix Compression Ratios Per Instrument (automix-compression-ratios.md)",
+            "label": "Drum Bus Saturation And Transients (drum-bus-saturation-transients.md)",
             "page": 0,
-            "score": 471.618,
-            "source": "automix-compression-ratios.md",
-            "title": "AutoMix Compression Ratios Per Instrument",
+            "score": 646.705,
+            "source": "drum-bus-saturation-transients.md",
+            "title": "Drum Bus Saturation And Transients",
             "trust_score": 1.0
           }
         ]
@@ -2257,27 +2257,27 @@
             "kind": "note",
             "label": "Mastering For Streaming Loudness (mastering-streaming-loudness.md)",
             "page": 0,
-            "score": 233.78,
+            "score": 276.751,
             "source": "mastering-streaming-loudness.md",
             "title": "Mastering For Streaming Loudness",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Mastering for Streaming Services: LUFS, True Peak & Headroom (izotope-mastering-for-streaming-platforms-pt2.md)",
+            "label": "mastering for streaming: lufs, true peak, and headroom (izotope-mastering-for-streaming-platforms-pt1.md)",
             "page": 0,
-            "score": 351.642,
-            "source": "izotope-mastering-for-streaming-platforms-pt2.md",
-            "title": "Mastering for Streaming Services: LUFS, True Peak & Headroom",
+            "score": 351.952,
+            "source": "izotope-mastering-for-streaming-platforms-pt1.md",
+            "title": "mastering for streaming: lufs, true peak, and headroom",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "mastering for streaming: lufs, true peak, and headroom (izotope-mastering-for-streaming-platforms-pt1.md)",
+            "label": "Mastering for Streaming Services: LUFS, True Peak & Headroom (izotope-mastering-for-streaming-platforms-pt2.md)",
             "page": 0,
-            "score": 322.437,
-            "source": "izotope-mastering-for-streaming-platforms-pt1.md",
-            "title": "mastering for streaming: lufs, true peak, and headroom",
+            "score": 351.952,
+            "source": "izotope-mastering-for-streaming-platforms-pt2.md",
+            "title": "Mastering for Streaming Services: LUFS, True Peak & Headroom",
             "trust_score": 1.0
           }
         ]
@@ -2434,7 +2434,7 @@
             "kind": "note",
             "label": "Sidechain Bass To Kick (sidechain-bass-to-kick.md)",
             "page": 0,
-            "score": 742.534,
+            "score": 759.008,
             "source": "sidechain-bass-to-kick.md",
             "title": "Sidechain Bass To Kick",
             "trust_score": 1.0
@@ -2443,7 +2443,7 @@
             "kind": "note",
             "label": "Should A Kick Be In Key With The Bass (kick-tuning-with-bass.md)",
             "page": 0,
-            "score": 379.115,
+            "score": 379.54,
             "source": "kick-tuning-with-bass.md",
             "title": "Should A Kick Be In Key With The Bass",
             "trust_score": 1.0
@@ -2452,7 +2452,7 @@
             "kind": "note",
             "label": "Kick Bass Balance And Phase (kick-bass-balance-phase.md)",
             "page": 0,
-            "score": 355.85,
+            "score": 356.504,
             "source": "kick-bass-balance-phase.md",
             "title": "Kick Bass Balance And Phase",
             "trust_score": 1.0
@@ -2589,27 +2589,27 @@
             "kind": "note",
             "label": "Sidechain Bass To Kick (sidechain-bass-to-kick.md)",
             "page": 0,
-            "score": 896.143,
+            "score": 828.972,
             "source": "sidechain-bass-to-kick.md",
             "title": "Sidechain Bass To Kick",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Making A House Beat (house-beat-production.md)",
+            "label": "808 Translation On Small Speakers (808-translation-small-speakers.md)",
             "page": 0,
-            "score": 454.831,
-            "source": "house-beat-production.md",
-            "title": "Making A House Beat",
+            "score": 397.869,
+            "source": "808-translation-small-speakers.md",
+            "title": "808 Translation On Small Speakers",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "AutoMix Compression Ratios Per Instrument (automix-compression-ratios.md)",
+            "label": "Sidechain Ducking in Clip-to-Zero Mixes (baphometrix-ctz-TdiCDayFMa8-pt1.md)",
             "page": 0,
-            "score": 441.273,
-            "source": "automix-compression-ratios.md",
-            "title": "AutoMix Compression Ratios Per Instrument",
+            "score": 247.291,
+            "source": "baphometrix-ctz-TdiCDayFMa8-pt1.md",
+            "title": "Sidechain Ducking in Clip-to-Zero Mixes",
             "trust_score": 1.0
           }
         ]
@@ -2691,7 +2691,7 @@
             "kind": "note",
             "label": "Stereo Width And Mono Compatibility (stereo-width-mono-compatibility.md)",
             "page": 0,
-            "score": 1692.596,
+            "score": 2118.013,
             "source": "stereo-width-mono-compatibility.md",
             "title": "Stereo Width And Mono Compatibility",
             "trust_score": 1.0
@@ -2700,7 +2700,7 @@
             "kind": "note",
             "label": "Vocal Width Without Mud (vocal-width-without-mud.md)",
             "page": 0,
-            "score": 1270.303,
+            "score": 1271.463,
             "source": "vocal-width-without-mud.md",
             "title": "Vocal Width Without Mud",
             "trust_score": 1.0
@@ -2709,7 +2709,7 @@
             "kind": "note",
             "label": "Stereo Imaging And Width (stereo-imaging-width.md)",
             "page": 0,
-            "score": 1017.559,
+            "score": 1265.347,
             "source": "stereo-imaging-width.md",
             "title": "Stereo Imaging And Width",
             "trust_score": 1.0
@@ -2791,7 +2791,7 @@
             "kind": "note",
             "label": "Vocal Buried In The Mix (vocal-buried-in-mix.md)",
             "page": 0,
-            "score": 723.947,
+            "score": 969.344,
             "source": "vocal-buried-in-mix.md",
             "title": "Vocal Buried In The Mix",
             "trust_score": 1.0
@@ -2800,7 +2800,7 @@
             "kind": "note",
             "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
             "page": 0,
-            "score": 589.62,
+            "score": 681.79,
             "source": "harsh-vocal-fix.md",
             "title": "Harsh Vocal Fix",
             "trust_score": 1.0
@@ -2809,7 +2809,7 @@
             "kind": "note",
             "label": "Vocal Sitting In The Mix (vocal-sit-in-mix.md)",
             "page": 0,
-            "score": 430.978,
+            "score": 614.041,
             "source": "vocal-sit-in-mix.md",
             "title": "Vocal Sitting In The Mix",
             "trust_score": 1.0
@@ -2968,7 +2968,7 @@
             "kind": "note",
             "label": "Sidechain Bass To Kick (sidechain-bass-to-kick.md)",
             "page": 0,
-            "score": 585.475,
+            "score": 677.073,
             "source": "sidechain-bass-to-kick.md",
             "title": "Sidechain Bass To Kick",
             "trust_score": 1.0
@@ -2977,7 +2977,7 @@
             "kind": "note",
             "label": "FabFilter Compressor Attack/Release Control Workflow (fabfilter-learn-compression-basic-compressor-controls-pt1.md)",
             "page": 0,
-            "score": 611.03,
+            "score": 611.816,
             "source": "fabfilter-learn-compression-basic-compressor-controls-pt1.md",
             "title": "FabFilter Compressor Attack/Release Control Workflow",
             "trust_score": 1.0
@@ -2986,7 +2986,7 @@
             "kind": "note",
             "label": "Sidechain Compression (sidechain-compression.md)",
             "page": 0,
-            "score": 528.902,
+            "score": 567.806,
             "source": "sidechain-compression.md",
             "title": "Sidechain Compression",
             "trust_score": 1.0
@@ -3124,7 +3124,7 @@
             "kind": "note",
             "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
             "page": 0,
-            "score": 465.458,
+            "score": 706.878,
             "source": "harsh-vocal-fix.md",
             "title": "Harsh Vocal Fix",
             "trust_score": 1.0
@@ -3133,7 +3133,7 @@
             "kind": "note",
             "label": "Vocal De-Essing And Sibilance (vocal-deessing-and-sibilance.md)",
             "page": 0,
-            "score": 405.317,
+            "score": 453.127,
             "source": "vocal-deessing-and-sibilance.md",
             "title": "Vocal De-Essing And Sibilance",
             "trust_score": 1.0
@@ -3142,7 +3142,7 @@
             "kind": "note",
             "label": "Vocal Mixing Basics (vocal-mixing-basics.md)",
             "page": 0,
-            "score": 301.443,
+            "score": 367.79,
             "source": "vocal-mixing-basics.md",
             "title": "Vocal Mixing Basics",
             "trust_score": 1.0
@@ -3295,7 +3295,7 @@
       },
       "question": "What release time should I use for sidechain compression on bass?",
       "response": {
-        "answer": "Here is the plain-English production version.\n\u2192 Hands-on. Live workflow:\n\nThe concept:\nCompressing a bass track on its own (not keyed from the kick) is about consistency, not ducking -- even out an inconsistent performance, keep the low end from jumping around in level, and add sustain or punch depending on the attack setting.\n\nWhy it works:\nThis is a different job from sidechain compression (see sidechain-bass-to-kick.md), which ducks the bass against the kick for rhythmic space. Standard compression here controls the bass's own dynamics -- an inconsistent take, string-to-string level differences, or a part that needs to sit more evenly in the mix. Both techniques are often used together: standard compression first to even out the performance, sidechain second (or a separate compressor) to carve space against the kick.\n\nTry it:\n1. Start with a moderate ratio (3:1 to 5:1) -- bass usually needs firmer control than a vocal, but not the aggressive 8:1+ ratios used for parallel/limiting duty.\n2. Set the attack based on what you want to keep: slower attack (10-30 ms) lets the pick/pluck transient through for definition; faster attack (0-5 ms) tames the transient for a smoother, more consistent tone.\n3. Set the release so gain reduction recovers before the next note -- too slow and the compressor \"pumps\" or dulls the following notes; use auto-release if the part's rhythm varies a lot.\n4. Set the threshold for 3-6 dB of gain reduction on the loudest notes only -- more than that starts flattening the natural dynamics between notes.\n\nLive safety:\nDuplicate or save the track first, make one device or routing change at a time, then A/B in Live before committing.\n\nLive check:\nTry the move on a duplicate track or blank Live Set, then A/B with the device or routing bypassed.\n\nAvoid these common production mistakes:\n- Reaching for a fast attack by default -- it kills the pluck/pick transient that gives bass its definition and audibility on small speakers.\n- Compressing so hard the natural note-to-note dynamics disappear, leaving a flat, lifeless bass line.\n- Confusing this with sidechain compression when the actual problem is kick/bass masking, not an inconsistent bass performance -- if the symptom is \"bass disappears when the kick hits,\" that's a sidechain problem, not a standard-compression one.\n\n\u2192 Try it on a duplicate track, then A/B. If this is not what you needed, I can walk through the routing or device setup.\n\nYou could also ask:\n- What ratio should I use for bass compression?\n- What attack time keeps bass punchy?",
+        "answer": "Here is the plain-English production version.\n\u2192 Hands-on. Live workflow:\n\nThe concept:\nUse a compressor on the bass (or bass bus) with the kick as the sidechain input so the bass ducks when the kick hits. Short attack and a release that breathes with the tempo keeps the sub clear without obvious pumping.\n\nWhy it works:\nKick/bass masking is the most common low-end problem clients describe. This note gives retrieval a direct workflow instead of generic compression manual text.\n\nTry it:\n1. Group bass layers to a bus if you have sub + mid bass tracks.\n2. Add Compressor to the bass bus; enable Sidechain, choose the kick track as the external source.\n3. Start around 4:1 ratio, attack 0\u20135 ms, release 80\u2013150 ms (adjust by ear and genre).\n4. Lower threshold until you see 2\u20136 dB gain reduction on kick hits only.\n\nLive safety:\nDuplicate or save the track first, make one device or routing change at a time, then A/B in Live before committing.\n\nLive check:\nTry the move on a duplicate track or blank Live Set, then A/B with the device or routing bypassed.\n\nAvoid these common production mistakes:\nAvoid changing several devices at once; make one move, listen, then continue.\n\n\u2192 Try it on a duplicate track, then A/B. If this is not what you needed, I can walk through the routing or device setup.\n\nYou could also ask:\n- How do I sidechain in Ableton?\n- Why does my bass disappear when the kick plays?",
         "confidence": "high",
         "found": true,
         "intent": "explain",
@@ -3304,27 +3304,27 @@
         "sources": [
           {
             "kind": "note",
-            "label": "Bass Compression (Standard, Not Sidechained) (bass-compression-standard.md)",
-            "page": 0,
-            "score": 927.197,
-            "source": "bass-compression-standard.md",
-            "title": "Bass Compression (Standard, Not Sidechained)",
-            "trust_score": 1.0
-          },
-          {
-            "kind": "note",
             "label": "Sidechain Bass To Kick (sidechain-bass-to-kick.md)",
             "page": 0,
-            "score": 890.053,
+            "score": 1017.123,
             "source": "sidechain-bass-to-kick.md",
             "title": "Sidechain Bass To Kick",
             "trust_score": 1.0
           },
           {
             "kind": "note",
+            "label": "Bass Compression (Standard, Not Sidechained) (bass-compression-standard.md)",
+            "page": 0,
+            "score": 928.465,
+            "source": "bass-compression-standard.md",
+            "title": "Bass Compression (Standard, Not Sidechained)",
+            "trust_score": 1.0
+          },
+          {
+            "kind": "note",
             "label": "Sidechain Compression (sidechain-compression.md)",
             "page": 0,
-            "score": 678.396,
+            "score": 858.641,
             "source": "sidechain-compression.md",
             "title": "Sidechain Compression",
             "trust_score": 1.0
@@ -3402,7 +3402,7 @@
             "kind": "note",
             "label": "Creating A Drop And Build-Up In EDM (edm-drop-and-buildup.md)",
             "page": 0,
-            "score": 295.009,
+            "score": 294.788,
             "source": "edm-drop-and-buildup.md",
             "title": "Creating A Drop And Build-Up In EDM",
             "trust_score": 1.0
@@ -3411,7 +3411,7 @@
             "kind": "note",
             "label": "Making A House Chorus Or Drop Feel Bigger (house-section-energy-arrangement.md)",
             "page": 0,
-            "score": 211.764,
+            "score": 233.455,
             "source": "house-section-energy-arrangement.md",
             "title": "Making A House Chorus Or Drop Feel Bigger",
             "trust_score": 1.0
@@ -3420,7 +3420,7 @@
             "kind": "note",
             "label": "Arrangement Build Ups Drops And Tension (arrangement-build-ups-drops-tension.md)",
             "page": 0,
-            "score": 210.639,
+            "score": 210.556,
             "source": "arrangement-build-ups-drops-tension.md",
             "title": "Arrangement Build Ups Drops And Tension",
             "trust_score": 1.0
@@ -3566,7 +3566,7 @@
       },
       "question": "Why does my mix sound flat and lack depth compared to reference tracks?",
       "response": {
-        "answer": "Diagnosis first:\nThe mix is described as flat or lacking front-to-back depth.\n\nWhat this is:\nDepth is partly an aesthetic choice, but level, arrangement, ambience, and dynamics relationships can be tested before adding more reverb.\n\nMost useful hypotheses to test:\nOrdered by plausible impact, ease of testing, and reversibility\u2014not certainty. Start with the first low-risk discriminator, then move on only if it does not explain the symptom.\n1. Everything is competing at a similar level and density \u2014 When every part is continuously present and similarly loud, the ear has few foreground/background cues; the resulting balance gives the ear little foreground/background contrast.\n   Test: Mute or lower supporting parts during the vocal or lead phrase, then compare at matched loudness with a suitable reference. If depth appears immediately, the first problem is balance, arrangement, or automation.\n   If confirmed: Create intentional foreground, midground, and background roles with level balance, density, and phrase-based automation.\n2. Ambience is masking rather than locating sources \u2014 Long or unfiltered shared reverbs can push all sources into the same cloudy plane instead of creating distance.\n   Test: Bypass each reverb/delay return, then reintroduce it one at a time with its return high-passed and shortened. Listen in context, not solo.\n   If confirmed: Use shorter, filtered, or selectively automated ambience; reserve longer tails for elements intended to sit behind the lead.\n3. Dynamics and transient contrast are too uniform \u2014 Heavy bus control or flattened source envelopes reduce near/far and punch/soft contrast.\n   Test: Level-match the mix with bus compression bypassed, and compare one foreground transient against its supporting layer.\n   If confirmed: Restore contrast with lighter bus control or source-level envelope/automation changes before widening everything.\n\nVerification:\nAt the same loudness, the lead should remain clearly foreground while supporting elements occupy believable positions without the mix becoming quieter or wetter overall.\n\nMost useful question:\nDoes the flatness come from the arrangement itself, or only after the bus processing and reverbs are enabled?\n\nSources:\n- [Mix Lacks Depth](/api/ableton/note?name=mix-lacks-depth.md) \u2014 Curated KENN guidance\n- [Mix Translation Checks](/api/ableton/note?name=mix-translation-checks.md) \u2014 Curated KENN guidance\n- [Adding Depth To A Mix](/api/ableton/note?name=depth-in-a-mix.md) \u2014 Curated KENN guidance\n\nYou could also ask:\n- Why does my mix sound flat compared to a reference track?\n- How do I make some elements sound further back without just adding reverb?",
+        "answer": "Diagnosis first:\nThe mix is described as flat or lacking front-to-back depth.\n\nWhat this is:\nDepth is partly an aesthetic choice, but level, arrangement, ambience, and dynamics relationships can be tested before adding more reverb.\n\nMost useful hypotheses to test:\nOrdered by plausible impact, ease of testing, and reversibility\u2014not certainty. Start with the first low-risk discriminator, then move on only if it does not explain the symptom.\n1. Everything is competing at a similar level and density \u2014 When every part is continuously present and similarly loud, the ear has few foreground/background cues; the resulting balance gives the ear little foreground/background contrast.\n   Test: Mute or lower supporting parts during the vocal or lead phrase, then compare at matched loudness with a suitable reference. If depth appears immediately, the first problem is balance, arrangement, or automation.\n   If confirmed: Create intentional foreground, midground, and background roles with level balance, density, and phrase-based automation.\n2. Ambience is masking rather than locating sources \u2014 Long or unfiltered shared reverbs can push all sources into the same cloudy plane instead of creating distance.\n   Test: Bypass each reverb/delay return, then reintroduce it one at a time with its return high-passed and shortened. Listen in context, not solo.\n   If confirmed: Use shorter, filtered, or selectively automated ambience; reserve longer tails for elements intended to sit behind the lead.\n3. Dynamics and transient contrast are too uniform \u2014 Heavy bus control or flattened source envelopes reduce near/far and punch/soft contrast.\n   Test: Level-match the mix with bus compression bypassed, and compare one foreground transient against its supporting layer.\n   If confirmed: Restore contrast with lighter bus control or source-level envelope/automation changes before widening everything.\n\nVerification:\nAt the same loudness, the lead should remain clearly foreground while supporting elements occupy believable positions without the mix becoming quieter or wetter overall.\n\nMost useful question:\nDoes the flatness come from the arrangement itself, or only after the bus processing and reverbs are enabled?\n\nSources:\n- [Mix Lacks Depth](/api/ableton/note?name=mix-lacks-depth.md) \u2014 Curated KENN guidance\n- [Adding Depth To A Mix](/api/ableton/note?name=depth-in-a-mix.md) \u2014 Curated KENN guidance\n- [Mixing To A Reference Track](/api/ableton/note?name=mixing-to-reference-track.md) \u2014 Curated KENN guidance\n\nYou could also ask:\n- Why does my mix sound flat compared to a reference track?\n- How do I make some elements sound further back without just adding reverb?",
         "confidence": "high",
         "found": true,
         "intent": "troubleshooting",
@@ -3577,27 +3577,27 @@
             "kind": "note",
             "label": "Mix Lacks Depth (mix-lacks-depth.md)",
             "page": 0,
-            "score": 1515.914,
+            "score": 1517.374,
             "source": "mix-lacks-depth.md",
             "title": "Mix Lacks Depth",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Mix Translation Checks (mix-translation-checks.md)",
+            "label": "Adding Depth To A Mix (depth-in-a-mix.md)",
             "page": 0,
-            "score": 722.945,
-            "source": "mix-translation-checks.md",
-            "title": "Mix Translation Checks",
+            "score": 556.99,
+            "source": "depth-in-a-mix.md",
+            "title": "Adding Depth To A Mix",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Adding Depth To A Mix (depth-in-a-mix.md)",
+            "label": "Mixing To A Reference Track (mixing-to-reference-track.md)",
             "page": 0,
-            "score": 640.525,
-            "source": "depth-in-a-mix.md",
-            "title": "Adding Depth To A Mix",
+            "score": 450.011,
+            "source": "mixing-to-reference-track.md",
+            "title": "Mixing To A Reference Track",
             "trust_score": 1.0
           }
         ]
@@ -3671,7 +3671,7 @@
             "kind": "note",
             "label": "Arrangement Energy And Transitions (arrangement-energy-and-transitions.md)",
             "page": 0,
-            "score": 263.065,
+            "score": 270.948,
             "source": "arrangement-energy-and-transitions.md",
             "title": "Arrangement Energy And Transitions",
             "trust_score": 1.0
@@ -3680,7 +3680,7 @@
             "kind": "note",
             "label": "Live Keyboard Shortcuts (Part 2) - Efficient Track and Arrangement Control (ableton12-live-keyboard-shortcuts-pt2.md)",
             "page": 0,
-            "score": 303.434,
+            "score": 342.166,
             "source": "ableton12-live-keyboard-shortcuts-pt2.md",
             "title": "Live Keyboard Shortcuts (Part 2) - Efficient Track and Arrangement Control",
             "trust_score": 1.0
@@ -3689,7 +3689,7 @@
             "kind": "note",
             "label": "Arrangement Build Ups Drops And Tension (arrangement-build-ups-drops-tension.md)",
             "page": 0,
-            "score": 240.137,
+            "score": 239.983,
             "source": "arrangement-build-ups-drops-tension.md",
             "title": "Arrangement Build Ups Drops And Tension",
             "trust_score": 1.0
@@ -3853,7 +3853,7 @@
             "kind": "note",
             "label": "Vocal Width Without Mud (vocal-width-without-mud.md)",
             "page": 0,
-            "score": 1176.329,
+            "score": 1414.387,
             "source": "vocal-width-without-mud.md",
             "title": "Vocal Width Without Mud",
             "trust_score": 1.0
@@ -3862,18 +3862,18 @@
             "kind": "note",
             "label": "Reverb Delay Depth Without Mud (reverb-delay-depth-without-mud.md)",
             "page": 0,
-            "score": 385.883,
+            "score": 664.362,
             "source": "reverb-delay-depth-without-mud.md",
             "title": "Reverb Delay Depth Without Mud",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Vocal Doubles Adlibs And Throws (vocal-doubles-adlibs-throws.md)",
+            "label": "Synth Layering Without Muddiness (synth-layering-without-muddiness.md)",
             "page": 0,
-            "score": 295.875,
-            "source": "vocal-doubles-adlibs-throws.md",
-            "title": "Vocal Doubles Adlibs And Throws",
+            "score": 353.302,
+            "source": "synth-layering-without-muddiness.md",
+            "title": "Synth Layering Without Muddiness",
             "trust_score": 1.0
           }
         ]
@@ -3949,7 +3949,7 @@
             "kind": "note",
             "label": "Arrangement View Shortcuts (arrangement-view-shortcuts.md)",
             "page": 0,
-            "score": 240.117,
+            "score": 240.329,
             "source": "arrangement-view-shortcuts.md",
             "title": "Arrangement View Shortcuts",
             "trust_score": 1.0
@@ -3958,7 +3958,7 @@
             "kind": "note",
             "label": "Live Keyboard Shortcuts (Part 2) - Efficient Track and Arrangement Control (ableton12-live-keyboard-shortcuts-pt2.md)",
             "page": 0,
-            "score": 155.354,
+            "score": 207.435,
             "source": "ableton12-live-keyboard-shortcuts-pt2.md",
             "title": "Live Keyboard Shortcuts (Part 2) - Efficient Track and Arrangement Control",
             "trust_score": 1.0
@@ -3967,7 +3967,7 @@
             "kind": "note",
             "label": "Ableton Live 12 - First Steps: Learn View & Info View Setup (ableton12-first-steps-pt1.md)",
             "page": 0,
-            "score": 202.511,
+            "score": 221.741,
             "source": "ableton12-first-steps-pt1.md",
             "title": "Ableton Live 12 - First Steps: Learn View & Info View Setup",
             "trust_score": 1.0
@@ -4126,27 +4126,27 @@
             "kind": "note",
             "label": "Ableton Warp Modes and Transient Smearing (ableton-warp-modes-and-transient-smearing.md)",
             "page": 0,
-            "score": 169.894,
+            "score": 196.108,
             "source": "ableton-warp-modes-and-transient-smearing.md",
             "title": "Ableton Warp Modes and Transient Smearing",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Fixing Clicks After Warping A Kick In Ableton (ableton-warped-kick-clicks.md)",
+            "label": "Ableton Live 12 Warp Modes and Transient Optimization (ableton12-warp-algorithms-and-transient-preservation.md)",
             "page": 0,
-            "score": 210.828,
-            "source": "ableton-warped-kick-clicks.md",
-            "title": "Fixing Clicks After Warping A Kick In Ableton",
+            "score": 186.72,
+            "source": "ableton12-warp-algorithms-and-transient-preservation.md",
+            "title": "Ableton Live 12 Warp Modes and Transient Optimization",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Ableton Live 12 Warp Modes and Transient Optimization (ableton12-warp-algorithms-and-transient-preservation.md)",
+            "label": "Fixing Clicks After Warping A Kick In Ableton (ableton-warped-kick-clicks.md)",
             "page": 0,
-            "score": 152.259,
-            "source": "ableton12-warp-algorithms-and-transient-preservation.md",
-            "title": "Ableton Live 12 Warp Modes and Transient Optimization",
+            "score": 215.202,
+            "source": "ableton-warped-kick-clicks.md",
+            "title": "Fixing Clicks After Warping A Kick In Ableton",
             "trust_score": 1.0
           }
         ]
@@ -4222,27 +4222,27 @@
             "kind": "note",
             "label": "Making A Sub Bass From Scratch (making-a-sub-bass.md)",
             "page": 0,
-            "score": 231.835,
+            "score": 232.1,
             "source": "making-a-sub-bass.md",
             "title": "Making A Sub Bass From Scratch",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Sub Bass Saturation (sub-bass-saturation.md)",
+            "label": "Bass Processing Basics (bass-processing-basics.md)",
             "page": 0,
-            "score": 177.249,
-            "source": "sub-bass-saturation.md",
-            "title": "Sub Bass Saturation",
+            "score": 221.472,
+            "source": "bass-processing-basics.md",
+            "title": "Bass Processing Basics",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Bass Processing Basics (bass-processing-basics.md)",
+            "label": "Sub Bass Saturation (sub-bass-saturation.md)",
             "page": 0,
-            "score": 156.983,
-            "source": "bass-processing-basics.md",
-            "title": "Bass Processing Basics",
+            "score": 177.478,
+            "source": "sub-bass-saturation.md",
+            "title": "Sub Bass Saturation",
             "trust_score": 1.0
           }
         ]
@@ -4393,27 +4393,27 @@
             "kind": "note",
             "label": "Client Preview MP3 Export (client-preview-mp3-export.md)",
             "page": 0,
-            "score": 3182.653,
+            "score": 3185.699,
             "source": "client-preview-mp3-export.md",
             "title": "Client Preview MP3 Export",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Deliver Final Mix To Client (deliver-final-mix-to-client.md)",
+            "label": "Jack Gandy Client Export Specifications (jack-export-specs.md)",
             "page": 0,
-            "score": 1020.09,
-            "source": "deliver-final-mix-to-client.md",
-            "title": "Deliver Final Mix To Client",
+            "score": 1219.891,
+            "source": "jack-export-specs.md",
+            "title": "Jack Gandy Client Export Specifications",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Client Stem Handoff Checklist (client-stem-handoff-checklist.md)",
+            "label": "Deliver Final Mix To Client (deliver-final-mix-to-client.md)",
             "page": 0,
-            "score": 994.459,
-            "source": "client-stem-handoff-checklist.md",
-            "title": "Client Stem Handoff Checklist",
+            "score": 1021.105,
+            "source": "deliver-final-mix-to-client.md",
+            "title": "Deliver Final Mix To Client",
             "trust_score": 1.0
           }
         ]
@@ -4561,7 +4561,7 @@
             "kind": "note",
             "label": "Export Stems For Mixing (export-stems-for-mixing.md)",
             "page": 0,
-            "score": 1238.507,
+            "score": 1696.218,
             "source": "export-stems-for-mixing.md",
             "title": "Export Stems For Mixing",
             "trust_score": 1.0
@@ -4570,7 +4570,7 @@
             "kind": "note",
             "label": "Client Stem Handoff Checklist (client-stem-handoff-checklist.md)",
             "page": 0,
-            "score": 1309.928,
+            "score": 1310.663,
             "source": "client-stem-handoff-checklist.md",
             "title": "Client Stem Handoff Checklist",
             "trust_score": 1.0
@@ -4579,7 +4579,7 @@
             "kind": "note",
             "label": "Deliver Final Mix To Client (deliver-final-mix-to-client.md)",
             "page": 0,
-            "score": 1008.656,
+            "score": 1087.319,
             "source": "deliver-final-mix-to-client.md",
             "title": "Deliver Final Mix To Client",
             "trust_score": 1.0
@@ -4729,27 +4729,27 @@
             "kind": "note",
             "label": "Clip Envelope Automation in Session View (ableton12-session-view-pt3.md)",
             "page": 0,
-            "score": 466.436,
+            "score": 489.927,
             "source": "ableton12-session-view-pt3.md",
             "title": "Clip Envelope Automation in Session View",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Max For Live Basics (ableton-max-for-live-basics.md)",
+            "label": "Clip Automation Basics (clip-automation-basics.md)",
             "page": 0,
-            "score": 139.787,
-            "source": "ableton-max-for-live-basics.md",
-            "title": "Max For Live Basics",
+            "score": 136.245,
+            "source": "clip-automation-basics.md",
+            "title": "Clip Automation Basics",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Clip Automation Basics (clip-automation-basics.md)",
+            "label": "Clip Envelopes In Ableton (ableton-clip-envelopes.md)",
             "page": 0,
-            "score": 136.15,
-            "source": "clip-automation-basics.md",
-            "title": "Clip Automation Basics",
+            "score": 119.888,
+            "source": "ableton-clip-envelopes.md",
+            "title": "Clip Envelopes In Ableton",
             "trust_score": 1.0
           }
         ]
@@ -4895,26 +4895,26 @@
             "kind": "note",
             "label": "Reducing CPU Load In Ableton (cpu-saving.md)",
             "page": 0,
-            "score": 357.078,
+            "score": 362.488,
             "source": "cpu-saving.md",
             "title": "Reducing CPU Load In Ableton",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Managing CPU and Disk Load in Ableton Live 12 (ableton12-computer-audio-latency-pt1.md)",
+            "label": "Managing CPU and Disk Load in Ableton Live 12 (ableton12-computer-audio-resources-and-strategies-pt1.md)",
             "page": 0,
-            "score": 125.307,
-            "source": "ableton12-computer-audio-latency-pt1.md",
+            "score": 207.05,
+            "source": "ableton12-computer-audio-resources-and-strategies-pt1.md",
             "title": "Managing CPU and Disk Load in Ableton Live 12",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Managing CPU and Disk Load in Ableton Live 12 (ableton12-computer-audio-resources-and-strategies-pt1.md)",
+            "label": "Managing CPU and Disk Load in Ableton Live 12 (ableton12-computer-audio-latency-pt1.md)",
             "page": 0,
-            "score": 122.537,
-            "source": "ableton12-computer-audio-resources-and-strategies-pt1.md",
+            "score": 125.335,
+            "source": "ableton12-computer-audio-latency-pt1.md",
             "title": "Managing CPU and Disk Load in Ableton Live 12",
             "trust_score": 1.0
           }
@@ -5062,7 +5062,7 @@
             "kind": "note",
             "label": "virtual riot delay test part 1: fade mode time stretch (virtual-riot-delay-test-pt1.md)",
             "page": 0,
-            "score": 564.496,
+            "score": 564.112,
             "source": "virtual-riot-delay-test-pt1.md",
             "title": "virtual riot delay test part 1: fade mode time stretch",
             "trust_score": 1.0
@@ -5071,18 +5071,18 @@
             "kind": "note",
             "label": "Virtual Riot Delay Fade Mode (virtual-riot-delay-fade-mode.md) \u2014 Virtual Riot",
             "page": 0,
-            "score": 431.821,
+            "score": 453.04,
             "source": "virtual-riot-delay-fade-mode.md",
             "title": "Virtual Riot Delay Fade Mode",
             "trust_score": 0.9
           },
           {
             "kind": "note",
-            "label": "Delay Effect Configuration in Ableton Live 12 (ableton12-live-audio-effect-reference-pt6.md)",
+            "label": "Delay Effect Configuration for Glitch and Chorus Textures (ableton12-live-audio-effects-ref-pt6.md)",
             "page": 0,
-            "score": 365.692,
-            "source": "ableton12-live-audio-effect-reference-pt6.md",
-            "title": "Delay Effect Configuration in Ableton Live 12",
+            "score": 365.223,
+            "source": "ableton12-live-audio-effects-ref-pt6.md",
+            "title": "Delay Effect Configuration for Glitch and Chorus Textures",
             "trust_score": 1.0
           }
         ]
@@ -5228,27 +5228,27 @@
             "kind": "note",
             "label": "Deliver Final Mix To Client (deliver-final-mix-to-client.md)",
             "page": 0,
-            "score": 2809.423,
+            "score": 2812.678,
             "source": "deliver-final-mix-to-client.md",
             "title": "Deliver Final Mix To Client",
             "trust_score": 1.0
           },
           {
-            "kind": "manual",
-            "label": "audio-too-workflow-checklist.pdf, page 2",
-            "page": 2,
-            "score": 325.154,
-            "source": "audio-too-workflow-checklist.pdf",
-            "title": "Audio_Too client workflow checklist",
-            "trust_score": 0.68
-          },
-          {
             "kind": "note",
             "label": "Client Preview MP3 Export (client-preview-mp3-export.md)",
             "page": 0,
-            "score": 446.16,
+            "score": 514.938,
             "source": "client-preview-mp3-export.md",
             "title": "Client Preview MP3 Export",
+            "trust_score": 1.0
+          },
+          {
+            "kind": "note",
+            "label": "Client Stem Handoff Checklist (client-stem-handoff-checklist.md)",
+            "page": 0,
+            "score": 417.96,
+            "source": "client-stem-handoff-checklist.md",
+            "title": "Client Stem Handoff Checklist",
             "trust_score": 1.0
           }
         ]
@@ -5399,7 +5399,7 @@
             "kind": "note",
             "label": "Drum Bus Saturation And Transients (drum-bus-saturation-transients.md)",
             "page": 0,
-            "score": 2196.695,
+            "score": 2378.148,
             "source": "drum-bus-saturation-transients.md",
             "title": "Drum Bus Saturation And Transients",
             "trust_score": 1.0
@@ -5408,7 +5408,7 @@
             "kind": "note",
             "label": "Jack Gandy Drum Bus Processing (jack-drum-bus-processing.md)",
             "page": 0,
-            "score": 1075.851,
+            "score": 1497.628,
             "source": "jack-drum-bus-processing.md",
             "title": "Jack Gandy Drum Bus Processing",
             "trust_score": 1.0
@@ -5417,7 +5417,7 @@
             "kind": "note",
             "label": "Drum Punch And Transient Control (drum-punch-transient-control.md)",
             "page": 0,
-            "score": 1041.953,
+            "score": 1157.213,
             "source": "drum-punch-transient-control.md",
             "title": "Drum Punch And Transient Control",
             "trust_score": 1.0
@@ -5491,38 +5491,38 @@
       },
       "question": "My mobile build runs out of audio memory when ambience and combat are active. What should I reduce first?",
       "response": {
-        "answer": "Here is the practical production version.\n\u2192 Quick move:\n\nHere is the recommended production technique:\nDelay repeats the signal with a distinct echo \u2014 it has rhythm and timing. Reverb simulates the diffuse reflections of a room \u2014 it creates space and distance. Use delay to add rhythmic interest and push a sound back in the mix; use reverb to place a sound in a physical space and add size. Many professional mixes use both together.\n\nTry this workflow in your next session:\n1. When to use delay: when you want a rhythmic effect (quarter-note delay on guitar, eighth-note on vocals), when you want controlled sense of space without diffuse tails, when you want a sound to feel big without washing out.\n2. When to use reverb: when you want a sound to feel like it is in a physical space (room, hall, chamber), when you want sustain and softening of attack, when you want multiple sounds to share a common acoustic environment.\n3. Tempo-sync delay: in Ableton's Echo, Delay, or Simple Delay, sync the time to musical subdivisions (1/4, 1/8, 1/8T). This keeps the echo rhythmically locked to the song and works especially well on guitars, vocals, and synth leads.\n4. Reverb pre-delay: the pre-delay setting on a reverb does what a short delay does \u2014 it pushes the reverb tail back from the dry sound by 10\u201350ms, making the dry signal feel clear and defined. This is why pre-delay is one of the most important reverb settings.\n5. Vocals: a common professional approach is a short slap delay (30\u201380ms, no feedback) plus a medium room reverb. The delay adds depth and weight; the reverb places the vocal in a space.\n6. Leads and solos: delay is usually more useful than reverb \u2014 it adds size and movement without obscuring the notes. Use reverb only lightly on leads or they will become washed out.\n\nCheck:\nMake the smallest useful change, then compare before/after at the same loudness.\n\nAvoid these common production mistakes:\nAvoid stacking fixes before you know whether the first one solved the problem.\n\nWhy this makes a difference in your mix:\nDelay and reverb are the primary tools for creating depth, space, and size in a mix. Knowing when to use each prevents washed-out, muddy mixes and helps every element feel placed in a coherent acoustic space.\n\n\u2192 Compare before/after at the same loudness. If this does not help, I can walk through a deeper approach.\n\nYou could also ask:\n- Should I use delay or reverb?\n- How do I create depth in a mix?",
+        "answer": "Here is the practical production version.\n\u2192 Quick move:\n\nHere is the recommended production technique:\nIf combat audio becomes messy, expensive, or drops sounds, profile voice count, priority, limits, CPU, memory, and streaming before changing the mix. Combat usually needs deliberate voice budgeting, not louder assets.\n\nTry this workflow in your next session:\n1. Capture heavy combat in the Wwise profiler on target hardware.\n2. Count simultaneous weapons, impacts, footsteps, UI, dialogue, music, ambience, reverb sends, and tails.\n3. Set voice limits and priority so critical cues win over repeated low-priority debris or tails.\n4. Use virtual voice behavior intentionally; do not let important one-shots silently virtualize.\n5. Shorten or trim long tails that stack during rapid actions.\n6. Review Random Containers that can trigger too many layers at once.\n\nCheck:\nMake the smallest useful change, then compare before/after at the same loudness.\n\nAvoid these common production mistakes:\nAvoid stacking fixes before you know whether the first one solved the problem.\n\nWhy this makes a difference in your mix:\nCombat is a stress test for implementation. KENN should recommend a profiler-led budget pass that preserves important gameplay feedback.\n\n\u2192 Compare before/after at the same loudness. If this does not help, I can walk through a deeper approach.\n\nYou could also ask:\n- Why do Wwise sounds drop during combat?\n- During heavy combat some Wwise sounds drop out. What should I inspect before making the assets louder?",
         "confidence": "high",
         "found": true,
         "intent": "general",
         "route": "production",
-        "source_quality": "high",
+        "source_quality": "low",
         "sources": [
           {
             "kind": "note",
-            "label": "Delay vs Reverb \u2014 How To Choose (delay-vs-reverb.md)",
+            "label": "Wwise Combat Sounds Drop Out Voice And Memory Budget (wwise-combat-voice-memory-budget.md) \u2014 Audiokinetic",
             "page": 0,
-            "score": 128.656,
-            "source": "delay-vs-reverb.md",
-            "title": "Delay vs Reverb \u2014 How To Choose",
+            "score": 0.0,
+            "source": "wwise-combat-voice-memory-budget.md",
+            "title": "Wwise Combat Sounds Drop Out Voice And Memory Budget",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Vocal Depth With Reverb And Delay (vocal-depth-reverb-delay.md)",
+            "label": "Wwise SoundBank Profiling And Optimization (wwise-soundbank-profiling-optimization.md) \u2014 Audiokinetic",
             "page": 0,
-            "score": 185.632,
-            "source": "vocal-depth-reverb-delay.md",
-            "title": "Vocal Depth With Reverb And Delay",
+            "score": 0.0,
+            "source": "wwise-soundbank-profiling-optimization.md",
+            "title": "Wwise SoundBank Profiling And Optimization",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Mix Lacks Depth (mix-lacks-depth.md)",
+            "label": "Game Audio Loudness Delivery (game-audio-loudness-delivery.md)",
             "page": 0,
-            "score": 99.496,
-            "source": "mix-lacks-depth.md",
-            "title": "Mix Lacks Depth",
+            "score": 0.0,
+            "source": "game-audio-loudness-delivery.md",
+            "title": "Game Audio Loudness Delivery",
             "trust_score": 1.0
           }
         ]
@@ -5598,27 +5598,27 @@
             "kind": "note",
             "label": "Drum Layering Kick And Snare (drum-layering-kick-snare.md)",
             "page": 0,
-            "score": 396.448,
+            "score": 396.855,
             "source": "drum-layering-kick-snare.md",
             "title": "Drum Layering Kick And Snare",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Virtual Riot Anthem Drums: Transient Layering and Phase Alignment (virtual-riot-anthem-drums-transient-layering.md)",
+            "label": "Match Reference Track Dynamics with Sampled Kicks and Snares (baphometrix-ctz-b2I8cjvhSog-pt2.md)",
             "page": 0,
-            "score": 324.946,
-            "source": "virtual-riot-anthem-drums-transient-layering.md",
-            "title": "Virtual Riot Anthem Drums: Transient Layering and Phase Alignment",
+            "score": 398.615,
+            "source": "baphometrix-ctz-b2I8cjvhSog-pt2.md",
+            "title": "Match Reference Track Dynamics with Sampled Kicks and Snares",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Match Reference Track Dynamics with Sampled Kicks and Snares (baphometrix-ctz-b2I8cjvhSog-pt2.md)",
+            "label": "Virtual Riot Anthem Drums: Transient Layering and Phase Alignment (virtual-riot-anthem-drums-transient-layering.md)",
             "page": 0,
-            "score": 239.38,
-            "source": "baphometrix-ctz-b2I8cjvhSog-pt2.md",
-            "title": "Match Reference Track Dynamics with Sampled Kicks and Snares",
+            "score": 325.251,
+            "source": "virtual-riot-anthem-drums-transient-layering.md",
+            "title": "Virtual Riot Anthem Drums: Transient Layering and Phase Alignment",
             "trust_score": 1.0
           }
         ]
@@ -5769,25 +5769,25 @@
             "kind": "note",
             "label": "Drum Parallel Compression (drum-parallel-compression.md)",
             "page": 0,
-            "score": 465.773,
+            "score": 552.804,
             "source": "drum-parallel-compression.md",
             "title": "Drum Parallel Compression",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Mixing Drums \u2014 Overview (mixing-drums-overview.md)",
+            "label": "Drum Punch And Transient Control (drum-punch-transient-control.md)",
             "page": 0,
-            "score": 292.409,
-            "source": "mixing-drums-overview.md",
-            "title": "Mixing Drums \u2014 Overview",
+            "score": 486.373,
+            "source": "drum-punch-transient-control.md",
+            "title": "Drum Punch And Transient Control",
             "trust_score": 1.0
           },
           {
             "kind": "note",
             "label": "Bus, Parallel, and Mix Bus Compression Techniques (fabfilter-learn-compression-compression-techniques-bus-parallel-and-mix-bus-pt1.md)",
             "page": 0,
-            "score": 350.564,
+            "score": 456.695,
             "source": "fabfilter-learn-compression-compression-techniques-bus-parallel-and-mix-bus-pt1.md",
             "title": "Bus, Parallel, and Mix Bus Compression Techniques",
             "trust_score": 1.0
@@ -5927,7 +5927,7 @@
       },
       "question": "How do I make drums punchier without over-compressing?",
       "response": {
-        "answer": "I would approach the session like this.\n\u2192 Hands-on. Live workflow:\n\nHere are the steps:\n1. Balance kick, snare, and hats before adding bus processing.\n2. If the drums lack attack, slow the compressor attack or reduce compression.\n3. If the drums lack sustain, use parallel compression and blend it underneath.\n4. Use saturation or soft clipping for density, but level-match when comparing.\n5. Shape individual samples before forcing the drum bus to solve everything.\n6. Check that reverb, room, or cymbal wash is not masking the transient.\n\nWhy this works:\nPunch is mostly contrast: fast attack against controlled sustain. Over-processing can make drums louder but less impactful.\n\nLive check:\nTry the move on a duplicate track or blank Live Set, then A/B with the device or routing bypassed.\n\nLive safety:\nDuplicate or save the track first, make one device or routing change at a time, then A/B in Live before committing.\n\nAvoid these common production mistakes:\nAvoid changing several devices at once; make one move, listen, then continue.\n\n\u2192 Try it on a duplicate track, then A/B. If this is not what you needed, I can walk through the routing or device setup.\n\nYou could also ask:\n- How do I make drums punchier?\n- When should I use parallel compression on drums?",
+        "answer": "I would approach the session like this.\n\u2192 Hands-on. Live workflow:\n\nHere are the steps:\n1. Set levels: bring all drum faders down, then bring up the kick first until it sits well against the bass. Add the snare next \u2014 it should balance with the kick without either dominating. Then add hi-hats, toms, and overheads.\n2. Pan drums to taste: kick and snare center, hi-hat slightly off-center (10\u201330%), toms spread left to right, overheads hard left and right (or LCR). Pan from the drummer's or audience's perspective \u2014 be consistent.\n3. Kick EQ: boost around 60\u201380 Hz for weight, cut 200\u2013400 Hz to reduce boxiness, boost 3\u20135 kHz for click/attack. High-pass below 30 Hz to remove sub-rumble.\n4. Snare EQ: boost 150\u2013200 Hz for body, cut 400\u2013800 Hz if boxy, boost 3\u20135 kHz for crack. Add a small presence boost around 8\u201310 kHz for snare wire sizzle.\n5. Hi-hat EQ: high-pass aggressively (300\u2013500 Hz) to remove bleed. Cut harsh frequencies around 3\u20136 kHz if sizzly. A small boost at 8\u201312 kHz adds air.\n6. Compress individual drums: kick and snare typically need fast attack (1\u201310 ms) and medium release (50\u2013150 ms) at 3\u20136 dB gain reduction. Hi-hats often need no compression.\n\nWhy this works:\nDrums are the rhythmic foundation of most mixes. If the drums sound weak, unfocused, or unbalanced, the entire mix suffers. Most drum mixing problems come from balance and EQ issues, not from missing plugins.\n\nLive check:\nTry the move on a duplicate track or blank Live Set, then A/B with the device or routing bypassed.\n\nLive safety:\nDuplicate or save the track first, make one device or routing change at a time, then A/B in Live before committing.\n\nAvoid these common production mistakes:\nAvoid changing several devices at once; make one move, listen, then continue.\n\n\u2192 Try it on a duplicate track, then A/B. If this is not what you needed, I can walk through the routing or device setup.\n\nYou could also ask:\n- How do I EQ a kick drum?\n- How do I compress drums?",
         "confidence": "high",
         "found": true,
         "intent": "steps",
@@ -5936,29 +5936,29 @@
         "sources": [
           {
             "kind": "note",
+            "label": "Mixing Drums \u2014 Overview (mixing-drums-overview.md)",
+            "page": 0,
+            "score": 562.686,
+            "source": "mixing-drums-overview.md",
+            "title": "Mixing Drums \u2014 Overview",
+            "trust_score": 1.0
+          },
+          {
+            "kind": "note",
             "label": "Drum Punch And Transient Control (drum-punch-transient-control.md)",
             "page": 0,
-            "score": 552.19,
+            "score": 628.455,
             "source": "drum-punch-transient-control.md",
             "title": "Drum Punch And Transient Control",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Drum Layering Kick And Snare (drum-layering-kick-snare.md)",
+            "label": "Drum Parallel Compression (drum-parallel-compression.md)",
             "page": 0,
-            "score": 541.449,
-            "source": "drum-layering-kick-snare.md",
-            "title": "Drum Layering Kick And Snare",
-            "trust_score": 1.0
-          },
-          {
-            "kind": "note",
-            "label": "Transient Shaping (transient-shaping.md)",
-            "page": 0,
-            "score": 584.415,
-            "source": "transient-shaping.md",
-            "title": "Transient Shaping",
+            "score": 628.455,
+            "source": "drum-parallel-compression.md",
+            "title": "Drum Parallel Compression",
             "trust_score": 1.0
           }
         ]
@@ -6105,27 +6105,27 @@
             "kind": "note",
             "label": "Drum Rack Basics (drum-rack-basics.md)",
             "page": 0,
-            "score": 387.1,
+            "score": 384.534,
             "source": "drum-rack-basics.md",
             "title": "Drum Rack Basics",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Drum Layering Kick And Snare (drum-layering-kick-snare.md)",
+            "label": "Ableton Drum Sampler One-Shot Workflow (ableton-drum-sampler-device.md)",
             "page": 0,
-            "score": 145.613,
-            "source": "drum-layering-kick-snare.md",
-            "title": "Drum Layering Kick And Snare",
+            "score": 144.562,
+            "source": "ableton-drum-sampler-device.md",
+            "title": "Ableton Drum Sampler One-Shot Workflow",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Virtual Riot Anthem Drums: Transient Layering and Phase Alignment (virtual-riot-anthem-drums-transient-layering.md)",
+            "label": "Impulse Drum Sampler Configuration and Workflow (ableton12-live-instruments-ref-pt6.md)",
             "page": 0,
-            "score": 122.941,
-            "source": "virtual-riot-anthem-drums-transient-layering.md",
-            "title": "Virtual Riot Anthem Drums: Transient Layering and Phase Alignment",
+            "score": 144.562,
+            "source": "ableton12-live-instruments-ref-pt6.md",
+            "title": "Impulse Drum Sampler Configuration and Workflow",
             "trust_score": 1.0
           }
         ]
@@ -6276,7 +6276,7 @@
             "kind": "note",
             "label": "EQ Before Or After Compression (eq-before-after-compression.md)",
             "page": 0,
-            "score": 2553.916,
+            "score": 3079.615,
             "source": "eq-before-after-compression.md",
             "title": "EQ Before Or After Compression",
             "trust_score": 1.0
@@ -6285,7 +6285,7 @@
             "kind": "note",
             "label": "Mix Bus EQ Compression Order (mix-bus-eq-compression-order.md)",
             "page": 0,
-            "score": 1941.241,
+            "score": 2610.978,
             "source": "mix-bus-eq-compression-order.md",
             "title": "Mix Bus EQ Compression Order",
             "trust_score": 1.0
@@ -6294,7 +6294,7 @@
             "kind": "note",
             "label": "EQ Eight Mixing Basics (eq-eight-mixing-basics.md)",
             "page": 0,
-            "score": 808.538,
+            "score": 1019.812,
             "source": "eq-eight-mixing-basics.md",
             "title": "EQ Eight Mixing Basics",
             "trust_score": 1.0
@@ -6443,7 +6443,7 @@
             "kind": "note",
             "label": "EQ Eight Mixing Basics (eq-eight-mixing-basics.md)",
             "page": 0,
-            "score": 461.302,
+            "score": 589.049,
             "source": "eq-eight-mixing-basics.md",
             "title": "EQ Eight Mixing Basics",
             "trust_score": 1.0
@@ -6452,7 +6452,7 @@
             "kind": "note",
             "label": "Ableton EQ Eight (Audio Effect) (ableton-eq-eight-device.md)",
             "page": 0,
-            "score": 441.427,
+            "score": 560.544,
             "source": "ableton-eq-eight-device.md",
             "title": "Ableton EQ Eight (Audio Effect)",
             "trust_score": 1.0
@@ -6461,7 +6461,7 @@
             "kind": "note",
             "label": "Jack Gandy Standard Mix-Bus Chain (jack-mix-bus-chain.md)",
             "page": 0,
-            "score": 400.394,
+            "score": 459.381,
             "source": "jack-mix-bus-chain.md",
             "title": "Jack Gandy Standard Mix-Bus Chain",
             "trust_score": 1.0
@@ -6610,7 +6610,7 @@
             "kind": "note",
             "label": "Export Stems For Mixing (export-stems-for-mixing.md)",
             "page": 0,
-            "score": 1383.437,
+            "score": 1385.252,
             "source": "export-stems-for-mixing.md",
             "title": "Export Stems For Mixing",
             "trust_score": 1.0
@@ -6619,7 +6619,7 @@
             "kind": "note",
             "label": "Client Stem Handoff Checklist (client-stem-handoff-checklist.md)",
             "page": 0,
-            "score": 344.031,
+            "score": 344.454,
             "source": "client-stem-handoff-checklist.md",
             "title": "Client Stem Handoff Checklist",
             "trust_score": 1.0
@@ -6628,7 +6628,7 @@
             "kind": "note",
             "label": "Exporting Stems And Mixdowns From Ableton (exporting-stems-and-mixdowns.md)",
             "page": 0,
-            "score": 332.096,
+            "score": 332.429,
             "source": "exporting-stems-and-mixdowns.md",
             "title": "Exporting Stems And Mixdowns From Ableton",
             "trust_score": 1.0
@@ -6783,27 +6783,27 @@
             "kind": "note",
             "label": "Filter Cutoff Automation (filter-cutoff-automation.md)",
             "page": 0,
-            "score": 850.242,
+            "score": 1375.702,
             "source": "filter-cutoff-automation.md",
             "title": "Filter Cutoff Automation",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "EQ Versus Filter \u2014 What Is The Difference (eq-vs-filter-difference.md)",
+            "label": "Ableton Auto Filter Device (ableton-auto-filter-device.md)",
             "page": 0,
-            "score": 382.361,
-            "source": "eq-vs-filter-difference.md",
-            "title": "EQ Versus Filter \u2014 What Is The Difference",
+            "score": 412.483,
+            "source": "ableton-auto-filter-device.md",
+            "title": "Ableton Auto Filter Device",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Making A Pad Sound From Scratch (pad-sound-design.md)",
+            "label": "EQ Versus Filter \u2014 What Is The Difference (eq-vs-filter-difference.md)",
             "page": 0,
-            "score": 338.669,
-            "source": "pad-sound-design.md",
-            "title": "Making A Pad Sound From Scratch",
+            "score": 382.572,
+            "source": "eq-vs-filter-difference.md",
+            "title": "EQ Versus Filter \u2014 What Is The Difference",
             "trust_score": 1.0
           }
         ]
@@ -6951,27 +6951,27 @@
             "kind": "note",
             "label": "Freeze, Flatten, and Bounce (freeze-flatten-bounce.md)",
             "page": 0,
-            "score": 538.758,
+            "score": 538.822,
             "source": "freeze-flatten-bounce.md",
             "title": "Freeze, Flatten, and Bounce",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Resampling In Ableton (resampling-in-ableton.md)",
+            "label": "Reducing CPU Load In Ableton (cpu-saving.md)",
             "page": 0,
-            "score": 198.095,
-            "source": "resampling-in-ableton.md",
-            "title": "Resampling In Ableton",
+            "score": 207.032,
+            "source": "cpu-saving.md",
+            "title": "Reducing CPU Load In Ableton",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Reducing CPU Load In Ableton (cpu-saving.md)",
+            "label": "Resampling In Ableton (resampling-in-ableton.md)",
             "page": 0,
-            "score": 155.827,
-            "source": "cpu-saving.md",
-            "title": "Reducing CPU Load In Ableton",
+            "score": 142.408,
+            "source": "resampling-in-ableton.md",
+            "title": "Resampling In Ableton",
             "trust_score": 1.0
           }
         ]
@@ -7119,27 +7119,27 @@
             "kind": "note",
             "label": "balancing, gain staging, and foundation in mixing (fabfilter-learn-mixing-mixing-a-song-where-to-start-pt1.md)",
             "page": 0,
-            "score": 506.388,
+            "score": 507.059,
             "source": "fabfilter-learn-mixing-mixing-a-song-where-to-start-pt1.md",
             "title": "balancing, gain staging, and foundation in mixing",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "iZotope mixing workflow: gain staging, bus routing, and static mix (izotope-how-to-mix-music-pt1.md)",
+            "label": "Ableton Live Mixing and Gain Staging (ableton-mixing-and-gain-staging.md)",
             "page": 0,
-            "score": 378.747,
-            "source": "izotope-how-to-mix-music-pt1.md",
-            "title": "iZotope mixing workflow: gain staging, bus routing, and static mix",
+            "score": 396.952,
+            "source": "ableton-mixing-and-gain-staging.md",
+            "title": "Ableton Live Mixing and Gain Staging",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Gain Staging Basics (gain-staging-basics.md)",
+            "label": "iZotope mixing workflow: gain staging, bus routing, and static mix (izotope-how-to-mix-music-pt1.md)",
             "page": 0,
-            "score": 438.782,
-            "source": "gain-staging-basics.md",
-            "title": "Gain Staging Basics",
+            "score": 379.365,
+            "source": "izotope-how-to-mix-music-pt1.md",
+            "title": "iZotope mixing workflow: gain staging, bus routing, and static mix",
             "trust_score": 1.0
           }
         ]
@@ -7289,27 +7289,27 @@
             "kind": "note",
             "label": "Groove Pool Quantization (groove-pool-quantization.md)",
             "page": 0,
-            "score": 411.183,
+            "score": 411.235,
             "source": "groove-pool-quantization.md",
             "title": "Groove Pool Quantization",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Groove Pool Parameter Adjustment and Clip Groove Application (ableton12-using-grooves-pt1.md)",
+            "label": "MIDI Clip Quantization and Groove in Ableton Live 12 (ableton12-midi-fact-sheet-pt2.md)",
             "page": 0,
-            "score": 242.041,
-            "source": "ableton12-using-grooves-pt1.md",
-            "title": "Groove Pool Parameter Adjustment and Clip Groove Application",
+            "score": 242.153,
+            "source": "ableton12-midi-fact-sheet-pt2.md",
+            "title": "MIDI Clip Quantization and Groove in Ableton Live 12",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Ableton Live Groove Pool and Swing (ableton-using-grooves.md)",
+            "label": "Groove Pool Parameter Adjustment and Clip Groove Application (ableton12-using-grooves-pt1.md)",
             "page": 0,
-            "score": 250.6,
-            "source": "ableton-using-grooves.md",
-            "title": "Ableton Live Groove Pool and Swing",
+            "score": 242.153,
+            "source": "ableton12-using-grooves-pt1.md",
+            "title": "Groove Pool Parameter Adjustment and Clip Groove Application",
             "trust_score": 1.0
           }
         ]
@@ -7458,27 +7458,27 @@
             "kind": "note",
             "label": "Bus Compression And Mix Glue (bus-compression-glue.md)",
             "page": 0,
-            "score": 213.524,
+            "score": 260.699,
             "source": "bus-compression-glue.md",
             "title": "Bus Compression And Mix Glue",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "equal loudness compensation with listen buses and ctz racks (baphometrix-ctz-CernKPIDEHY-pt2.md)",
+            "label": "Group Bus Workflow (group-bus-workflow.md)",
             "page": 0,
-            "score": 210.429,
-            "source": "baphometrix-ctz-CernKPIDEHY-pt2.md",
-            "title": "equal loudness compensation with listen buses and ctz racks",
+            "score": 210.595,
+            "source": "group-bus-workflow.md",
+            "title": "Group Bus Workflow",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "iZotope mixing workflow: gain staging, bus routing, and static mix (izotope-how-to-mix-music-pt1.md)",
+            "label": "equal loudness compensation with listen buses and ctz racks (baphometrix-ctz-CernKPIDEHY-pt2.md)",
             "page": 0,
-            "score": 238.564,
-            "source": "izotope-how-to-mix-music-pt1.md",
-            "title": "iZotope mixing workflow: gain staging, bus routing, and static mix",
+            "score": 210.595,
+            "source": "baphometrix-ctz-CernKPIDEHY-pt2.md",
+            "title": "equal loudness compensation with listen buses and ctz racks",
             "trust_score": 1.0
           }
         ]
@@ -7554,7 +7554,7 @@
             "kind": "note",
             "label": "Harsh Vocal Fix (harsh-vocal-fix.md)",
             "page": 0,
-            "score": 348.016,
+            "score": 482.907,
             "source": "harsh-vocal-fix.md",
             "title": "Harsh Vocal Fix",
             "trust_score": 1.0
@@ -7563,7 +7563,7 @@
             "kind": "note",
             "label": "Vocal De-Essing And Sibilance (vocal-deessing-and-sibilance.md)",
             "page": 0,
-            "score": 436.904,
+            "score": 453.64,
             "source": "vocal-deessing-and-sibilance.md",
             "title": "Vocal De-Essing And Sibilance",
             "trust_score": 1.0
@@ -7572,7 +7572,7 @@
             "kind": "note",
             "label": "Mixing Background And Harmony Vocals (mixing-background-vocals.md)",
             "page": 0,
-            "score": 363.522,
+            "score": 363.732,
             "source": "mixing-background-vocals.md",
             "title": "Mixing Background And Harmony Vocals",
             "trust_score": 1.0
@@ -7646,7 +7646,7 @@
             "kind": "note",
             "label": "Home Vocal Recording In Ableton (home-vocal-recording.md)",
             "page": 0,
-            "score": 513.77,
+            "score": 550.505,
             "source": "home-vocal-recording.md",
             "title": "Home Vocal Recording In Ableton",
             "trust_score": 1.0
@@ -7655,7 +7655,7 @@
             "kind": "note",
             "label": "Vocal Compression Chain (vocal-compression-chain.md)",
             "page": 0,
-            "score": 434.759,
+            "score": 651.871,
             "source": "vocal-compression-chain.md",
             "title": "Vocal Compression Chain",
             "trust_score": 1.0
@@ -7664,7 +7664,7 @@
             "kind": "note",
             "label": "Vocal Tuning And Comping Workflow (vocal-tuning-comping-workflow.md)",
             "page": 0,
-            "score": 347.179,
+            "score": 347.442,
             "source": "vocal-tuning-comping-workflow.md",
             "title": "Vocal Tuning And Comping Workflow",
             "trust_score": 1.0
@@ -7742,7 +7742,7 @@
             "kind": "note",
             "label": "Kick Bass Balance And Phase (kick-bass-balance-phase.md)",
             "page": 0,
-            "score": 558.984,
+            "score": 969.94,
             "source": "kick-bass-balance-phase.md",
             "title": "Kick Bass Balance And Phase",
             "trust_score": 1.0
@@ -7751,18 +7751,18 @@
             "kind": "note",
             "label": "Harmonics on Sub Bass for Small Speaker Audibility and Gluing Low End (baphometrix-ctz-x1ZNWl-xuh8-pt3.md)",
             "page": 0,
-            "score": 944.151,
+            "score": 818.979,
             "source": "baphometrix-ctz-x1ZNWl-xuh8-pt3.md",
             "title": "Harmonics on Sub Bass for Small Speaker Audibility and Gluing Low End",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Jack Gandy Low-End Phase Alignment (jack-low-end-phase-alignment.md)",
+            "label": "mastering kick and bass in noisia drops (7-things-learned-from-could-this-be-noisia-pt1.md)",
             "page": 0,
-            "score": 643.933,
-            "source": "jack-low-end-phase-alignment.md",
-            "title": "Jack Gandy Low-End Phase Alignment",
+            "score": 876.111,
+            "source": "7-things-learned-from-could-this-be-noisia-pt1.md",
+            "title": "mastering kick and bass in noisia drops",
             "trust_score": 1.0
           }
         ]
@@ -7894,7 +7894,7 @@
       },
       "question": "should I leave a limiter on before mastering",
       "response": {
-        "answer": "Here is the mastering-safe version.\n\u2192 Mastering checks:\n\nFor the final master, here is the direct advice:\nUse a clipper to shave fast transient peaks before the final limiter, then use the limiter for final loudness and true-peak control. If the clipper changes the punch or makes cymbals gritty, back it off and let the limiter do less dramatic work.\n\nFollow these checks before exporting your file:\n1. Put corrective EQ and broad tone shaping before loudness processing.\n2. Add a clipper before the limiter only if short peaks are making the limiter work too hard.\n3. Clip gently; listen for kick click, snare crack, vocal edge, and cymbal grit.\n4. Put the final limiter last and set output ceiling or true-peak ceiling for the delivery target.\n5. Compare loudness-matched bypasses so louder does not trick you into approving distortion.\n6. If the mix loses depth or punch, reduce clipping first, then limiter gain.\n\nMastering boundary:\nDo not chase loudness until balance, low end, harshness, true peak safety, and level-matched translation checks are under control.\n\nMastering check:\nLevel-match the before/after, check true peak and loudness, then listen quietly and on a small speaker.\n\nAvoid doing this during the final stage:\nAvoid chasing loudness before balance, low end, and harshness are already under control.\n\nThe technical reasoning behind these mastering levels:\nA limiter can flatten the whole master when it has to catch every transient. Gentle clipping can make loudness easier, but heavy clipping turns into audible distortion and can make the master smaller.\n\n\u2192 Level-match before/after, check true peak, then listen quietly and on a small speaker.\n\nYou could also ask:\n- Should a clipper go before a limiter?\n- How much clipping is safe in mastering?",
+        "answer": "Here is the mastering-safe version.\n\u2192 Mastering checks:\n\nFor the final master, here is the direct advice:\nPrepare a mix for mastering by exporting a clean stereo file with no clipping, no limiter used only for loudness, and enough headroom for processing. The mix should already sound balanced before mastering starts.\n\nFollow these checks before exporting your file:\n1. Remove any master limiter that is only there to make the mix louder.\n2. Leave creative mix bus processing on if it is part of the sound, but avoid clipping the output.\n3. Aim for peaks below 0 dBFS; around -6 dB peak headroom is a practical target, not a strict rule.\n4. Export at the project sample rate and use 24-bit WAV or 32-bit float WAV.\n5. Include a reference track and notes about the desired loudness, tone, and platform if relevant.\n6. Check the exported file from start to finish before sending it.\n\nMastering boundary:\nDo not chase loudness until balance, low end, harshness, true peak safety, and level-matched translation checks are under control.\n\nMastering check:\nLevel-match the before/after, check true peak and loudness, then listen quietly and on a small speaker.\n\nAvoid doing this during the final stage:\nAvoid chasing loudness before balance, low end, and harshness are already under control.\n\nThe technical reasoning behind these mastering levels:\nMastering cannot reliably fix a distorted, clipped, or unbalanced mix. Good prep gives the mastering stage room to enhance tone, translation, sequencing, and loudness.\n\n\u2192 Level-match before/after, check true peak, then listen quietly and on a small speaker.\n\nYou could also ask:\n- What format should I export for mastering?\n- How much headroom should I leave before mastering?",
         "confidence": "high",
         "found": true,
         "intent": "general",
@@ -7903,29 +7903,29 @@
         "sources": [
           {
             "kind": "note",
-            "label": "Mastering Clipper Vs Limiter (mastering-clipper-vs-limiter.md)",
-            "page": 0,
-            "score": 310.631,
-            "source": "mastering-clipper-vs-limiter.md",
-            "title": "Mastering Clipper Vs Limiter",
-            "trust_score": 1.0
-          },
-          {
-            "kind": "note",
             "label": "Mastering Prep And Headroom (mastering-prep-and-headroom.md)",
             "page": 0,
-            "score": 315.86,
+            "score": 400.863,
             "source": "mastering-prep-and-headroom.md",
             "title": "Mastering Prep And Headroom",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Jack Gandy Mastering Clipper Workflow (jack-mastering-clipper-use.md)",
+            "label": "Mastering Clipper Vs Limiter (mastering-clipper-vs-limiter.md)",
             "page": 0,
-            "score": 170.577,
-            "source": "jack-mastering-clipper-use.md",
-            "title": "Jack Gandy Mastering Clipper Workflow",
+            "score": 311.012,
+            "source": "mastering-clipper-vs-limiter.md",
+            "title": "Mastering Clipper Vs Limiter",
+            "trust_score": 1.0
+          },
+          {
+            "kind": "note",
+            "label": "Limiter Behavior and Transient Control in Digital Mastering (dan-worrall-s8JGUzZCynU-pt3.md)",
+            "page": 0,
+            "score": 185.236,
+            "source": "dan-worrall-s8JGUzZCynU-pt3.md",
+            "title": "Limiter Behavior and Transient Control in Digital Mastering",
             "trust_score": 1.0
           }
         ]
@@ -8001,27 +8001,27 @@
             "kind": "note",
             "label": "Mastering Stereo Width Checks (mastering-stereo-width-checks.md)",
             "page": 0,
-            "score": 744.426,
+            "score": 745.165,
             "source": "mastering-stereo-width-checks.md",
             "title": "Mastering Stereo Width Checks",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Stereo Width And Mono Compatibility (stereo-width-mono-compatibility.md)",
+            "label": "Stereo Imaging And Width (stereo-imaging-width.md)",
             "page": 0,
-            "score": 366.342,
-            "source": "stereo-width-mono-compatibility.md",
-            "title": "Stereo Width And Mono Compatibility",
+            "score": 419.416,
+            "source": "stereo-imaging-width.md",
+            "title": "Stereo Imaging And Width",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Stereo Imaging And Width (stereo-imaging-width.md)",
+            "label": "Stereo Width And Mono Compatibility (stereo-width-mono-compatibility.md)",
             "page": 0,
-            "score": 320.574,
-            "source": "stereo-imaging-width.md",
-            "title": "Stereo Imaging And Width",
+            "score": 392.357,
+            "source": "stereo-width-mono-compatibility.md",
+            "title": "Stereo Width And Mono Compatibility",
             "trust_score": 1.0
           }
         ]
@@ -8097,7 +8097,7 @@
             "kind": "note",
             "label": "Mix Bus EQ Compression Order (mix-bus-eq-compression-order.md)",
             "page": 0,
-            "score": 4220.491,
+            "score": 5262.0,
             "source": "mix-bus-eq-compression-order.md",
             "title": "Mix Bus EQ Compression Order",
             "trust_score": 1.0
@@ -8106,7 +8106,7 @@
             "kind": "note",
             "label": "EQ Before Or After Compression (eq-before-after-compression.md)",
             "page": 0,
-            "score": 3428.762,
+            "score": 4763.495,
             "source": "eq-before-after-compression.md",
             "title": "EQ Before Or After Compression",
             "trust_score": 1.0
@@ -8115,7 +8115,7 @@
             "kind": "note",
             "label": "Mix Bus Glue Compression (mix-bus-glue-compression.md)",
             "page": 0,
-            "score": 3366.49,
+            "score": 4264.99,
             "source": "mix-bus-glue-compression.md",
             "title": "Mix Bus Glue Compression",
             "trust_score": 1.0
@@ -8189,7 +8189,7 @@
             "kind": "note",
             "label": "Mix Bus Glue Compression (mix-bus-glue-compression.md)",
             "page": 0,
-            "score": 2180.759,
+            "score": 2329.614,
             "source": "mix-bus-glue-compression.md",
             "title": "Mix Bus Glue Compression",
             "trust_score": 1.0
@@ -8198,7 +8198,7 @@
             "kind": "note",
             "label": "Bus Compression And Mix Glue (bus-compression-glue.md)",
             "page": 0,
-            "score": 1195.31,
+            "score": 1196.523,
             "source": "bus-compression-glue.md",
             "title": "Bus Compression And Mix Glue",
             "trust_score": 1.0
@@ -8207,7 +8207,7 @@
             "kind": "note",
             "label": "Bus, Parallel, and Mix Bus Compression Techniques (fabfilter-learn-compression-compression-techniques-bus-parallel-and-mix-bus-pt1.md)",
             "page": 0,
-            "score": 1163.942,
+            "score": 1164.807,
             "source": "fabfilter-learn-compression-compression-techniques-bus-parallel-and-mix-bus-pt1.md",
             "title": "Bus, Parallel, and Mix Bus Compression Techniques",
             "trust_score": 1.0
@@ -8285,7 +8285,7 @@
             "kind": "note",
             "label": "Mix Review Metrics Interpretation (mix-review-metrics-interpretation.md)",
             "page": 0,
-            "score": 1834.871,
+            "score": 1836.227,
             "source": "mix-review-metrics-interpretation.md",
             "title": "Mix Review Metrics Interpretation",
             "trust_score": 1.0
@@ -8294,18 +8294,18 @@
             "kind": "note",
             "label": "Mix Review Revision Priorities (mix-review-revision-priorities.md)",
             "page": 0,
-            "score": 937.55,
+            "score": 1043.68,
             "source": "mix-review-revision-priorities.md",
             "title": "Mix Review Revision Priorities",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Mix Review Low Dynamics Repair (mix-review-low-dynamics-repair.md)",
+            "label": "Using iZotope Reference Tracks for Mix Balance & Dynamic Range (izotope-4-popular-mixing-reference-tracks-and-why-they-work-pt1.md)",
             "page": 0,
-            "score": 673.913,
-            "source": "mix-review-low-dynamics-repair.md",
-            "title": "Mix Review Low Dynamics Repair",
+            "score": 878.301,
+            "source": "izotope-4-popular-mixing-reference-tracks-and-why-they-work-pt1.md",
+            "title": "Using iZotope Reference Tracks for Mix Balance & Dynamic Range",
             "trust_score": 1.0
           }
         ]
@@ -8377,27 +8377,27 @@
             "kind": "note",
             "label": "Mix Revision Rounds (mix-revision-rounds.md)",
             "page": 0,
-            "score": 748.589,
+            "score": 749.349,
             "source": "mix-revision-rounds.md",
             "title": "Mix Revision Rounds",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Mix Review Low Headroom And Clipping Repair (mix-review-low-headroom-clipping-repair.md)",
+            "label": "Mix Review Revision Priorities (mix-review-revision-priorities.md)",
             "page": 0,
-            "score": 193.19,
-            "source": "mix-review-low-headroom-clipping-repair.md",
-            "title": "Mix Review Low Headroom And Clipping Repair",
+            "score": 193.404,
+            "source": "mix-review-revision-priorities.md",
+            "title": "Mix Review Revision Priorities",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Mix Review Revision Priorities (mix-review-revision-priorities.md)",
+            "label": "Mix Review Low Headroom And Clipping Repair (mix-review-low-headroom-clipping-repair.md)",
             "page": 0,
-            "score": 164.089,
-            "source": "mix-review-revision-priorities.md",
-            "title": "Mix Review Revision Priorities",
+            "score": 193.404,
+            "source": "mix-review-low-headroom-clipping-repair.md",
+            "title": "Mix Review Low Headroom And Clipping Repair",
             "trust_score": 1.0
           }
         ]
@@ -8473,27 +8473,27 @@
             "kind": "note",
             "label": "Mix Translation Checks (mix-translation-checks.md)",
             "page": 0,
-            "score": 1228.828,
+            "score": 1229.904,
             "source": "mix-translation-checks.md",
             "title": "Mix Translation Checks",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Mixing On Headphones (headphone-mixing.md)",
+            "label": "808 Translation On Small Speakers (808-translation-small-speakers.md)",
             "page": 0,
-            "score": 597.013,
-            "source": "headphone-mixing.md",
-            "title": "Mixing On Headphones",
+            "score": 673.272,
+            "source": "808-translation-small-speakers.md",
+            "title": "808 Translation On Small Speakers",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "808 Translation On Small Speakers (808-translation-small-speakers.md)",
+            "label": "Mixing On Headphones (headphone-mixing.md)",
             "page": 0,
-            "score": 532.063,
-            "source": "808-translation-small-speakers.md",
-            "title": "808 Translation On Small Speakers",
+            "score": 597.478,
+            "source": "headphone-mixing.md",
+            "title": "Mixing On Headphones",
             "trust_score": 1.0
           }
         ]
@@ -8569,7 +8569,7 @@
             "kind": "note",
             "label": "Mixing Chain Order (mixing-chain-order.md)",
             "page": 0,
-            "score": 311.612,
+            "score": 323.816,
             "source": "mixing-chain-order.md",
             "title": "Mixing Chain Order",
             "trust_score": 1.0
@@ -8578,18 +8578,18 @@
             "kind": "note",
             "label": "Mix Bus EQ Compression Order (mix-bus-eq-compression-order.md)",
             "page": 0,
-            "score": 489.379,
+            "score": 582.209,
             "source": "mix-bus-eq-compression-order.md",
             "title": "Mix Bus EQ Compression Order",
             "trust_score": 1.0
           },
           {
             "kind": "note",
-            "label": "Sends And Returns In Ableton (sends-and-returns-in-ableton.md)",
+            "label": "Next Step Mix Diagnosis (next-step-mix-diagnosis.md)",
             "page": 0,
-            "score": 162.582,
-            "source": "sends-and-returns-in-ableton.md",
-            "title": "Sends And Returns In Ableton",
+            "score": 226.849,
+            "source": "next-step-mix-diagnosis.md",
+            "title": "Next Step Mix Diagnosis",
             "trust_score": 1.0
           }
         ]
@@ -8650,7 +8650,7 @@
   ],
   "engine": "KENN/apps/backend/src/kenn (repository-owned, read-only evaluation path)",
   "evidence_kind": "human_review_packet",
-  "generated_at": "2026-09-24T12:03:10.065766+00:00",
+  "generated_at": "2026-09-25T11:15:56.378540+00:00",
   "human_review": "pending",
   "independent_reviewers_required": 2,
   "instructions": [
@@ -8667,19 +8667,19 @@
   "llm_enabled": false,
   "provenance": {
     "active_index": {
-      "chunk_count": 3323,
-      "content_sha256": "7a5d8c12e5bb",
+      "chunk_count": 3338,
+      "content_sha256": "4fd17ceb264f",
       "embedding_model": {
         "id": "Xenova/all-MiniLM-L6-v2",
         "model_sha256": "759c3cd2b7fe7e93933ad23c4c9181b7396442a2ed746ec7c1d46192c469c46e",
         "tokenizer_sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0"
       },
       "retrieval_mode": "hybrid",
-      "version_id": "v-7a5d8c12e5bb"
+      "version_id": "v-4fd17ceb264f"
     },
     "generator_sha256": "23234da239d1124afbb479d720506e42078f6071da4d78da2671366fab3ac2df",
     "questions_sha256": "8f219e2215bdd9376483237105931307a48dd3631dd55fe270eef6414d449a5f",
-    "source_revision": "aa7c190820b0862efe2fd27e3811fbbb022d94d2"
+    "source_revision": "0bd25d84b0f02d6ce70793a18486c5293d6e9c29"
   },
   "release_thresholds": {
     "critical_criteria": [
