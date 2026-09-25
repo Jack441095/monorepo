@@ -60,12 +60,15 @@ def outcome(result: dict[str, Any]) -> dict[str, Any]:
     if proposal:
         recipe = "recipe" in str(proposal.get("schema") or "") or proposal.get("steps")
         action = "recipe" if recipe else proposal.get("action") or proposal.get("operation")
+        after = proposal.get("after")
+        # A locator carries its name; a rename's "after" is the new track name.
+        name = proposal.get("locator_name") or (after if isinstance(after, str) else None)
         return {"action": action, "track": proposal.get("track_name"), "device": proposal.get("device_name"),
-                "value": proposal.get("after")}
+                "value": proposal.get("after"), "name": name}
     status = str(result.get("status") or "")
     intent = result.get("intent") if isinstance(result.get("intent"), dict) else {}
     if status in _ASKED or not intent.get("action") or intent.get("missing_fields"):
-        return {"action": "clarify", "track": None, "value": None}
+        return {"action": "clarify", "track": None, "value": None, "answer": str(result.get("answer") or "")[:400]}
     # Reads and view changes (inspect, focus) answer directly without a proposal.
     action = _SAME_READ.get(str(intent.get("action")), intent.get("action"))
     return {"action": action, "track": (intent.get("track") or {}).get("name"), "value": None, "read_only": True,
@@ -87,6 +90,8 @@ def expected_value(case: dict[str, Any], snapshot: dict[str, Any]) -> Any:
 def verdict(case: dict[str, Any], got: dict[str, Any], want: Any) -> str:
     expected = case["expected_action"]
     if got["action"] == "clarify":
+        if expected.startswith("focus_") and "already focused" in str(got.get("answer")):
+            return "right"  # "That track is already focused": nothing to do, and KENN says so
         return "right" if expected == "clarify" else "asked"
     if expected == "clarify":
         # "Asks" really means "proposes no change": an honest read-only answer ("KENN can't change the tempo yet;
@@ -101,6 +106,8 @@ def verdict(case: dict[str, Any], got: dict[str, Any], want: Any) -> str:
         named = got.get("read_only") and got["track"] is None and case["expected_track"] in str(got.get("answer"))
         if not named:
             return "wrong"
+    if case.get("expected_name") and got.get("name") != case["expected_name"]:
+        return "wrong"  # a locator or track given the wrong name ("Build here") is a wrong plan too
     if want is None:
         return "right"
     value = got["value"]
