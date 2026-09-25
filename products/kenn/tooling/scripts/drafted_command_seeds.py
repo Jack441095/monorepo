@@ -35,6 +35,13 @@ TONE = "That sounds like an EQ change, not the fader. Which frequency and how mu
 SECTION = "I can't change only part of the song yet; that needs automation. Say it without the section to change the whole track."
 RELATION = "Which single track should change, and by how much?"
 FREQUENCY = "That names a frequency, so it sounds like an EQ change, not the fader. Which band, or say it as an EQ cut?"
+# C6 run 12: what three blind phrasing sets (tooling/data/natural_blind_*.jsonl) caught run 9b and run 11 guessing at.
+# Worded differently from those sets, so the next blind set tests the pattern rather than the phrase.
+TOGGLE = "Toggle what: mute, solo or record arm?"
+EXCLUDE = "Should I mute the track you want out, or solo the one you want to hear?"
+DESCRIBED = "Which track do you mean? Name it; I won't pick a track from what's on it."
+RETURN_FOR = "I can add an empty return track, but not put an effect on it in the same step yet. Do you want the empty return?"
+HOW_TO = "That's a how-to question, so nothing changed. Say it as a request (for example \"mute the bass\") and I'll prepare it."
 
 # (record_id, category, query template, clarification)
 DRAFTED_CLARIFY_SEEDS: tuple[tuple[str, str, str, str], ...] = (
@@ -73,6 +80,18 @@ DRAFTED_CLARIFY_SEEDS: tuple[tuple[str, str, str, str], ...] = (
     ("draft-trap-send-02", "incomplete", "Turn the echo on {t4} down a bit", SEND),
     ("draft-trap-freq-01", "ambiguity", "{t1} down 3 dB around 250", FREQUENCY),
     ("draft-trap-freq-02", "ambiguity", "Scoop 4 dB out of {t0} near 400 Hz", FREQUENCY),
+    ("draft-trap-toggle-01", "ambiguity", "Flip {t1} over", TOGGLE),
+    ("draft-trap-toggle-02", "ambiguity", "Switch {t3} the other way", TOGGLE),
+    ("draft-trap-exclude-01", "ambiguity", "Let me listen to {t0} with {t2} taken out", EXCLUDE),
+    ("draft-trap-exclude-02", "ambiguity", "Everything except {t4} for a sec", EXCLUDE),
+    ("draft-trap-send-03", "incomplete", "Route {t1} into the echo return", SEND),
+    ("draft-trap-send-04", "incomplete", "Feed {t3} to A-Reverb", SEND),
+    ("draft-trap-described-01", "incomplete", "Solo whichever channel has the Compressor", DESCRIBED),
+    ("draft-trap-described-02", "incomplete", "Jump to the one with the reverb on it", DESCRIBED),
+    ("draft-trap-return-01", "ambiguity", "Spin up a reverb return for me", RETURN_FOR),
+    ("draft-trap-return-02", "ambiguity", "I want a return with a delay on it", RETURN_FOR),
+    ("draft-trap-howto-01", "ambiguity", "What's the way to mute {t2}?", HOW_TO),
+    ("draft-trap-howto-02", "ambiguity", "How would I pan {t0} left?", HOW_TO),
 )
 
 
