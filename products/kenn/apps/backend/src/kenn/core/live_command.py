@@ -2935,10 +2935,14 @@ def _handle_command_impl(
                 comparison = compare_llm_plan(generated, deterministic_intent)
                 deterministic_action = deterministic_intent.get("action")
                 deterministic_refusal = deterministic_intent.get("mode") == "refuse"
+                # When the rules asked something specific ("send how much?", "the whole set or just the drums?"),
+                # the model may not answer it by guessing; blind phrasing checks caught a planner doing exactly that.
+                specific_question = bool(set(deterministic_intent.get("missing_fields") or []) - {"action", "track"})
                 use_model = comparison.get("status") == "match" or (
                     mode == "propose"
                     and deterministic_action is None
                     and not deterministic_refusal
+                    and not specific_question
                 )
                 llm_metadata = {
                     **llm_metadata,
