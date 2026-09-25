@@ -324,3 +324,19 @@ def test_a_mixer_change_that_means_something_else_asks_first(query, phrase) -> N
 def test_plain_mixer_changes_are_not_second_guessed(query) -> None:
     parsed = parse_request(query, FAKE_SET)
     assert parsed["confirmation_required"] and not parsed["ambiguity"]
+
+
+@pytest.mark.parametrize("query, phrase", [
+    ("mute everything except the kick", "one track at a time"),   # used to mute the kick, the one to leave alone
+    ("solo all but the vocal", "one track at a time"),
+    ("play from the chorus", "where the playhead is"),             # used to play from wherever the playhead was
+    ("play from the top", "where the playhead is"),
+])
+def test_requests_kenn_cannot_do_as_asked_get_a_question(query, phrase) -> None:
+    parsed = parse_request(query, FAKE_SET)
+    assert not parsed["confirmation_required"] and any(phrase in text for text in parsed["ambiguity"])
+
+
+@pytest.mark.parametrize("query", ["play", "start the song", "mute the kick"])
+def test_plain_transport_and_mute_still_propose(query) -> None:
+    assert parse_request(query, FAKE_SET)["confirmation_required"]
