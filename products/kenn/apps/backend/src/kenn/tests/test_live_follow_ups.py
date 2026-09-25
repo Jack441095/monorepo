@@ -81,3 +81,25 @@ def test_a_short_reply_finishes_the_request_kenn_asked_about(say, question, repl
 def test_a_reply_is_not_joined_to_a_generic_not_sure(say) -> None:
     assert say("fix the mix")["status"] == "clarification_required"
     assert say("3 dB")["status"] == "clarification_required"
+
+
+def test_a_device_change_repeats_on_the_same_device_on_another_track(say) -> None:
+    first = say("set the compressor threshold on the drum bus to -20 dB")
+    result = say("do that on the lead vocal too")
+    assert result["status"] == "confirmation_required"
+    assert (result["proposal"]["track_name"], result["proposal"]["device_name"]) == ("Lead Vocal", "Compressor")
+    assert result["proposal"]["after"] == pytest.approx(first["proposal"]["after"])
+
+
+def test_the_opposite_of_a_relative_device_change_goes_the_other_way(say) -> None:
+    say("lower the drum bus compressor threshold by 3 dB")
+    result = say("do the opposite on the vocal")
+    assert result["proposal"]["track_name"] == "Lead Vocal"
+    assert result["proposal"]["after"] > result["proposal"]["before"]
+
+
+def test_a_track_without_the_device_gets_a_straight_answer(say) -> None:
+    say("set the compressor threshold on the drum bus to -20 dB")
+    result = say("and the kick")
+    assert result["status"] == "clarification_required"
+    assert "Kick doesn't have that device" in result["answer"]

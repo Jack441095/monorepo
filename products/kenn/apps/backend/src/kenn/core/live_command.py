@@ -2225,7 +2225,7 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
         return None
     prior = parse_request(prior_text, snapshot)
     action = prior.get("action")
-    if action not in {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"} or prior.get("missing_fields"):
+    if action not in _REPEATABLE_ACTIONS or prior.get("missing_fields"):
         return None
     if re.search(r"\band\b|,|&|\bboth\b", match.group("target"), re.I):
         return None  # "the snare and the kick" once changed only the kick; two tracks at once isn't a follow-up yet
@@ -2239,9 +2239,24 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
     return _repeat_on(prior, str(track.get("name")), flip=bool(match.group("opposite")))
 
 
+_REPEATABLE_ACTIONS = frozenset({"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "set_device_parameter"})
+_UNIT_TEXT = {"db": " dB", "hz": " Hz", "%": "%", "ms": " ms", "millisecond": " ms", "milliseconds": " ms", ":1": ":1"}
+
+
 def _repeat_on(prior: dict[str, Any], name: str, *, flip: bool = False) -> str | None:
-    """The prior whole-track mixer change written out as a plain command for another track."""
+    """The prior change written out as a plain command for another track."""
     action, value = prior.get("action"), prior.get("desired_value")
+    if action == "set_device_parameter":
+        # The device has to exist on the new track too; if it doesn't, the parser says so and asks.
+        device = (prior.get("device") or {}).get("name")
+        parameter = (prior.get("parameter") or {}).get("name")
+        if not device or not parameter or not isinstance(value, (int, float)):
+            return None
+        unit = _UNIT_TEXT.get(str(prior.get("unit") or "").lower(), "")
+        if prior.get("relative"):
+            change = -value if flip else value
+            return f"{'raise' if change > 0 else 'lower'} the {device} {parameter} on {name} by {abs(change):g}{unit}"
+        return None if flip else f"set the {device} {parameter} on {name} to {value:g}{unit}"
     if action == "set_volume":
         relative = prior.get("requested_relative_db")
         if isinstance(relative, (int, float)):
@@ -2287,7 +2302,7 @@ def _correction_command(command: str, session_id: str, snapshot: dict[str, Any])
     if not prior_text:
         return None
     prior = parse_request(prior_text, snapshot)
-    if prior.get("action") not in {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"} or prior.get("missing_fields"):
+    if prior.get("action") not in _REPEATABLE_ACTIONS or prior.get("missing_fields"):
         return None
     target = parse_request(f"solo {target_text}", snapshot)
     track = target.get("track") if isinstance(target.get("track"), dict) else None
@@ -2777,6 +2792,13 @@ def _handle_command_impl(
                 clean_command = completed
         # Re-parse either way: the mixer was just read, and an unresolved relative change needs its fader value.
         deterministic_intent = parse_request(clean_command, snapshot)
+        repeated = (response.get("context_resolution") or {}).get("resolution") in {"follow_up", "correction"}
+        if repeated and "device" in (deterministic_intent.get("missing_fields") or []):
+            track_name = str((deterministic_intent.get("track") or {}).get("name") or "That track")
+            return _clarification(
+                response, deterministic_intent,
+                f"{track_name} doesn't have that device, so I can't repeat the change there. Nothing changed.",
+            )
     if not mixer_snapshot and "current_volume" in (deterministic_intent.get("missing_fields") or []):
         # The fast topology read has no fader values; a relative change the wording check above missed still works.
         mixer_snapshot = True
