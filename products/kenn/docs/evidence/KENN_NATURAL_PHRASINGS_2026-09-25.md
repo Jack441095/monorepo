@@ -16,7 +16,7 @@ rule parser, corrections, recipes, the subjective translator. Nothing touches Li
 
 A "wrong" is the one that matters: press Apply on it and you get a change you didn't ask for.
 
-## The three sets
+## The sets
 
 | Set | Rows | Written by | Labelled by | Role |
 |---|---|---|---|---|
@@ -35,8 +35,8 @@ producer means, before any scoring. The rules:
 - A pan with no amount asks.
 - A request naming two things asks.
 
-Rows that also appear in the planner's training data were removed. The two blind files and the candidates are on the
-training builder's exclusion list (`NATURAL_HOLDOUTS`).
+Rows that also appear in the planner's training data were removed. All blind files and the candidates are on the training
+builder's exclusion list (`NATURAL_HOLDOUTS`).
 
 ## Results
 
@@ -48,22 +48,43 @@ training builder's exclusion list (`NATURAL_HOLDOUTS`).
 | Qwen3 8B, 171 | **70.2%** (120) | 44 | 7 |
 | Qwen3 14B beginner, 224 (scored after the first two were fixed) | **65.6%** (147) | 63 | 14 |
 
-**After fixing what they found** (all three sets are now development data):
+**After fixing what they found** (all these sets are now development data):
 
 | Set | Right | Asked | Wrong |
 |---|---|---|---|
-| 505 development | 95.4% | 23 | 0 |
+| 505 development | 96.0% | 20 | 0 |
 | Qwen3 14B, 210 | 94.3% | 12 | 0 |
 | Qwen3 8B, 171 | 96.5% | 6 | 0 |
 | Qwen3 14B beginner, 224 | 75.0% | 54 | 2 (both mixed requests: "I want to solo the synth. Can you go there?") |
 
-**Reading it straight:** on wording it hasn't seen, the rule parser gets about **70%** right. The third set was scored
-*after* the first two had been fixed and still came in at 65.6%: the fixes don't carry over to a different register
-(full polite sentences), which is the clearest sign that more rules alone won't reach 95%. It reaches 95% once
-it has been tuned on a set. Both blind sets landed within two points of each other, so ~70% is the real starting
-point, not a fluke. The rule parser alone won't reach the gate on fresh wording. The next step is the local planner
-where the rules ask; that measurement is in progress (below). Zero wrong plans on all three sets matters as much as
-the 95%.
+**Reading it straight:** on wording it hasn't seen, the rule parser gets **66–72%** right, three times over. The
+third set was scored *after* the first two had been fixed and still came in at 65.6%: the fixes don't carry over to
+a different register (full polite sentences). Tuned on a set, the rules reach ~95% on it, but more rules alone won't
+reach 95% on fresh wording. Zero wrong plans matters as much as the 95%, and every blind run found some.
+
+### The planner as a fallback (run 9b, the current shadow model)
+
+Measured on what the rules asked about, using the gateway's own propose-stage test: only requests where the rules
+found no action. Since today, that test also excludes requests where the rules asked something specific ("how
+much?", "the whole set or the drums?").
+
+| Set | Rules only | Rules, then run 9b |
+|---|---|---|
+| Qwen3 14B, 210 | 94.3% right, 0 wrong | 87.1% right, **17 wrong** |
+| Qwen3 8B, 171 | 96.5% right, 0 wrong | 93.0% right, **7 wrong** |
+
+Some of those "wrong" are reads the scorer counts strictly ("what's the name of the synth track?" → list tracks), or
+"comp" with no parameter read as the threshold. The rest are real guesses:
+
+- "toggle hats" → arm
+- "can i hear the vocal without the synth" → **solo the Synth**
+- "send the synth to reverb" → send at 100%
+- "slap the clap to the left" → hard left
+- renames by description ("the track with the compressor")
+
+So run 9b shouldn't move past shadow. The next planner (run 11 is the candidate) needs clarify examples for exactly
+these patterns ("toggle", "without", sends and pans with no amount, tracks described by their devices), and this
+check should run before any promotion.
 
 ## Wrong plans the blind sets found (all fixed, each with a regression test)
 
