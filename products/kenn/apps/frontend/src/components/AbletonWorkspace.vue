@@ -414,6 +414,15 @@
             <ul v-if="review?.advice?.length" class="mix-lab__card-foot mix-lab__advice">
               <li v-for="(line, i) in review.advice" :key="i">{{ line }}</li>
             </ul>
+            <button
+              v-if="review?.next_step"
+              type="button"
+              class="mix-lab__ask"
+              :disabled="sending"
+              @click="sendMessage(review.next_step.say)"
+            >
+              {{ t('mixReview.askKenn') }}: “{{ review.next_step.say }}”
+            </button>
           </div>
         </div>
       </FloatDetachable>
@@ -500,6 +509,7 @@ import ProRackGallery from './studio/ProRackGallery.vue'
 import NeuralMidiStudio from './studio/NeuralMidiStudio.vue'
 import SloClassificationPanel from './studio/SloClassificationPanel.vue'
 import { useMixReview } from '../composables/useMixReview'
+import { useKenn } from '../composables/useKenn'
 import { showToast } from '../composables/useToast'
 import { isLikelyMixAudio, MIX_REVIEW_AUDIO_ACCEPT } from '../utils/audioFormats'
 import type { MixReviewView } from '../utils/mixReviewTypes'
@@ -529,6 +539,8 @@ const {
   analyze,
   cancelAnalyze,
 } = useMixReview()
+// The review's suggested next step goes straight into the chat, as if the producer had typed it.
+const { sendMessage, sending } = useKenn()
 
 const tabs: Array<{ id: MixReviewView; labelKey: string }> = [
   { id: 'waveform', labelKey: 'mixReview.viewWaveform' },
@@ -1210,6 +1222,29 @@ onMounted(() => {
       strong {
         font-size: 0.14rem;
       }
+    }
+  }
+
+  &__ask {
+    align-self: flex-start;
+    margin: 0.08rem 0 0;
+    padding: 0.06rem 0.12rem;
+    border: 1px solid color-mix(in srgb, var(--text-color) 18%, transparent);
+    border-radius: 0.06rem;
+    background: color-mix(in srgb, var(--text-color) 6%, transparent);
+    color: var(--text-color);
+    font-size: 0.12rem;
+    line-height: 1.4;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--text-color) 12%, transparent);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
     }
   }
 

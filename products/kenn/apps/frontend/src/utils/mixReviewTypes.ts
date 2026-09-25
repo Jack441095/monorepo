@@ -138,6 +138,12 @@ export interface MixComparison {
   match_score?: number
 }
 
+export interface MixReviewNextStep {
+  kind: 'command' | 'question'
+  say: string
+  why?: string
+}
+
 export interface MixReview {
   id?: string
   title?: string
@@ -154,6 +160,8 @@ export interface MixReview {
   disclaimer?: string
   comparison?: MixComparison
   comparison_advice?: string[]
+  /** One question or command KENN suggests saying next (backend: core/advice_next_step.py). */
+  next_step?: MixReviewNextStep
   reference?: { filename?: string; name?: string; id?: string }
   /** Jack 报告：曲风识别 */
   mix_style?: { name?: string; genre?: string; label?: string; genre_key?: string }

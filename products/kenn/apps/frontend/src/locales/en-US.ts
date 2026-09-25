@@ -85,6 +85,7 @@ export default {
     emptyMetrics: 'Metrics appear after analysis',
     criticalFlags: 'Critical Flags',
     auditSummary: 'AI Audit Summary',
+    askKenn: 'Ask KENN',
     overallScore: 'Overall Score',
     referenceComparison: 'Reference Comparison (Delta)',
     comparisonDelta: 'RMS Δ {rms} dB · Crest Δ {crest} dB',

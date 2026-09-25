@@ -6,6 +6,7 @@ import type {
   MixReview,
   MixReviewFlag,
   MixReviewAction,
+  MixReviewNextStep,
 } from './mixReviewTypes'
 
 function asRecord(v: unknown): Record<string, unknown> | null {
@@ -38,6 +39,13 @@ function asActions(v: unknown): MixReviewAction[] {
 }
 
 /** 兼容 `{ review }` 包装，或直接返回 review 本体 */
+function asNextStep(value: unknown): MixReviewNextStep | undefined {
+  const step = asRecord(value)
+  const say = step ? asString(step.say) : undefined
+  if (!step || !say) return undefined
+  return { kind: step.kind === 'command' ? 'command' : 'question', say, why: asString(step.why) }
+}
+
 export function extractReviewPayload(raw: unknown): Record<string, unknown> | null {
   const root = asRecord(raw)
   if (!root) return null
@@ -97,6 +105,7 @@ export function normalizeMixReview(raw: unknown): MixReview {
     disclaimer: asString(review.disclaimer),
     comparison: comparison || undefined,
     comparison_advice: asAdvice(review.comparison_advice),
+    next_step: asNextStep(review.next_step),
     reference: asRecord(review.reference)
       ? (review.reference as MixReview['reference'])
       : undefined,
