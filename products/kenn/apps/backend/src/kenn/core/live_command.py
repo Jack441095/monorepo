@@ -2256,6 +2256,46 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
     return None
 
 
+PENDING_QUESTION_SECONDS = 300
+
+
+def _reply_to_question(reply: str, session_id: str, snapshot: dict[str, Any]) -> str | None:
+    """A short reply to KENN's last question ("By how much?" -> "3 dB") joined with the request it was about."""
+    from kenn.core.session_context import live_conversation_context
+
+    pending = live_conversation_context(session_id).get("pending_question")
+    answer = " ".join(reply.split()).strip(" .!?")
+    if not pending or time.time() - float(pending.get("at") or 0) > PENDING_QUESTION_SECONDS:
+        return None
+    if not answer or len(answer.split()) > 6:
+        return None
+    original, track = str(pending.get("command") or ""), str(pending.get("track") or "")
+    candidates: list[str] = []
+    if "absolute_or_relative" in pending.get("missing", []) and track:
+        # "kick -3 dB": KENN asked whether that's a level or a change; the reply says which.
+        amount = re.search(r"[-+]?\d+(?:\.\d+)?", original)
+        if amount:
+            size = float(amount.group(0))
+            if re.search(r"\b(?:at|to|set|exactly|level)\b", answer, re.I):
+                candidates.append(f"set {track} to {size:g} dB")
+            elif re.search(r"\b(?:quieter|softer|down|lower|less|louder|up|more|by)\b", answer, re.I):
+                up = bool(re.search(r"\b(?:louder|up|more)\b", answer, re.I))
+                candidates.append(f"turn {track} {'up' if up else 'down'} {abs(size):g} dB")
+    number_only = re.fullmatch(r"(?:by\s+)?([-+]?\d+(?:\.\d+)?)", answer, re.I)
+    if number_only and pending.get("action") == "set_volume":
+        answer = f"{number_only.group(1)} dB"  # "By how much?" for a fader is answered in dB
+    candidates += [f"{original} {answer}", f"{original} by {answer}"]
+    side = re.search(r"\b(left|right)\b", original, re.I)
+    if side:
+        candidates.append(original[:side.start()] + f"{answer} " + original[side.start():])  # "30%", "hard"
+    for candidate in candidates:
+        parsed = parse_request(candidate, snapshot)
+        if parsed.get("action") and parsed.get("confirmation_required") and not parsed.get("missing_fields") \
+                and not parsed.get("ambiguity"):
+            return candidate
+    return None
+
+
 def _command_needs_mixer_snapshot(command: str, llm_plan: dict[str, Any] | None = None) -> bool:
     """Select one fresh mixer snapshot when the request plainly needs it."""
     if isinstance(llm_plan, dict) and llm_plan.get("action") in TRACK_ACTIONS:
@@ -2677,6 +2717,12 @@ def _handle_command_impl(
             response["resolved_command"] = follow_up
             response["context_resolution"] = {"resolution": "follow_up", "original": typed}
             clean_command = follow_up
+        else:
+            completed = _reply_to_question(typed, response["session_id"], snapshot)
+            if completed:
+                response["resolved_command"] = completed
+                response["context_resolution"] = {"resolution": "answered_question", "original": typed}
+                clean_command = completed
         # Re-parse either way: the mixer was just read, and an unresolved relative change needs its fader value.
         deterministic_intent = parse_request(clean_command, snapshot)
     if not mixer_snapshot and "current_volume" in (deterministic_intent.get("missing_fields") or []):
