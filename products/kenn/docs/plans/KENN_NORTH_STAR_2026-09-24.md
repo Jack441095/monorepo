@@ -130,6 +130,15 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > throws it away and uses the template (no false hits on 122 real Qwen answers).
 - [ ] **Gate:** ≥ 95% correct on ≥ 500 natural phrasings (curated holdout grown from 24); human-review packet passes with
       two reviewers; p95 answer latency ≤ 4 s online; zero writes without Apply in shadow logs
+  > 25 Sept, phrasings (`docs/evidence/KENN_NATURAL_PHRASINGS_2026-09-25.md`): 505 phrasings now exist
+  > (Claude-drafted, labels need the owner). Through the whole gateway: **95.4% right, 0 wrong** on them, but only
+  > after tuning on them. Two fresh blind sets written by Qwen3 14B and 8B scored **71.9% and 70.2%** on first run,
+  > so ~70% is where the rules really stand on unseen wording. Six wrong plans found and fixed along the way
+  > (sends inserted as Reverb devices, "play the drums" stopping/starting the whole set, a rename picking the track
+  > from the new name, "vocal up a hair" also cutting the Synth). Run 9b as a fallback where the rules ask made
+  > things *less* safe: 18 wrong plans on one blind set, e.g. "can i hear the vocal without the synth" soloed the
+  > Synth. Not met; needs fresh blind wording each round, owner-checked labels, and a planner that asks rather than
+  > guesses.
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
