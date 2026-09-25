@@ -126,6 +126,13 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > even bge-base tops out near 0.81, so model size is not the route to 0.95. The gap is vocabulary: notes describe
   > devices technically, producers describe goals. Next levers: a "Use it when…" line of goal phrasing per device note
   > (tuned on half the questions, scored on the other half), then a cross-encoder reranker on the top 20.
+  > 25 Sept, reranker test on the GPU box (downloaded there only, deleted after; revisions and licences recorded): the
+  > fused search's top 20 re-scored per question. Recall@4 original / describe-it: today 0.983 / 0.744;
+  > ms-marco-MiniLM-L-6-v2 (Apache-2.0, ~90 MB) 0.966 / 0.800; **bge-reranker-base (MIT, ~1.1 GB fp32) 1.000 / 0.808**.
+  > Ceiling: the right note is in the top 20 for 100% / 87.2%, so reranking already captures most of what it can; the
+  > last 13% need better candidates (note wording). "Use it when…" drafts: 0.744 → 0.760, awaiting owner review.
+  > Shipping a reranker is a size/latency call (bge-reranker-base adds ~0.3–1 GB and ~1–2 s per answer on a Mac CPU,
+  > unmeasured on device yet) — owner decision.
 
 ### Stage 3 — Agentic co-producer (beta weeks 6–16)
 
