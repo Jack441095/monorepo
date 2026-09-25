@@ -107,6 +107,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > re-parsed against the current set, so "down 2 dB" applies from the new track's own level, and the result goes
   > through the normal parser and safety checks. The same track again, or two tracks at once, asks. Device-parameter
   > follow-ups and "no, the other one" still ask (next).
+  > Same day: answering KENN's own questions works — "make the bass louder" → "By how much?" → "3 dB"; "pan the synth
+  > left" → "30%" or "hard"; "kick -3 dB" → "at -3" (a level) or "3 dB quieter" (a change); "mute" → "the hats".
+  > Short replies only, within 5 minutes, joined to the pending request and parsed normally. Found on the way: "pan
+  > the synth left 30%" panned right (side before the amount was ignored) — fixed; a pan with no side now asks.
 - [ ] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
 - [ ] **Gate:** ≥ 95% correct on ≥ 500 natural phrasings (curated holdout grown from 24); human-review packet passes with
       two reviewers; p95 answer latency ≤ 4 s online; zero writes without Apply in shadow logs
