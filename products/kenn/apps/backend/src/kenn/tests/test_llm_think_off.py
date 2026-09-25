@@ -64,3 +64,23 @@ def test_native_call_sends_think_false_with_schema_and_parses_reply(monkeypatch)
     assert sent["payload"]["options"]["num_predict"] == llm_rewrite.MAX_TOKENS_BY_MODE["command"]
     assert content == '{"action":"set_mute"}'
     assert (usage.prompt_tokens, usage.completion_tokens, usage.total_tokens) == (2000, 12, 2012)
+
+
+def test_think_off_also_covers_prose_answers_from_a_local_brain(monkeypatch) -> None:
+    # Stage 1 (local Qwen brain): chat answers should not spend seconds thinking first.
+    monkeypatch.setenv("KENN_LLM_THINK", "off")
+    assert llm_rewrite._ollama_think_off(_cfg("qwen3:14b"), None)
+    payload = llm_rewrite._build_native_ollama_payload(_cfg("qwen3:14b"), [{"role": "user", "content": "hi"}],
+                                                       answer_mode="", json_schema=None)
+    assert payload["think"] is False and "format" not in payload and payload["options"]["temperature"] == 0.35
+
+
+def test_kenn_adds_the_sources_a_local_model_forgot() -> None:
+    # An 8B answer with every section but "Sources:" used to be discarded for the template.
+    results = [(9.0, {"source": "kick-bass-balance-phase.md"}), (8.0, {"source": "kick-bass-balance-phase.md"}),
+               (7.0, {"source": "sidechain-compression.md"})]
+    text = "Short answer: cut the overlap.\n\nTry this:\n1. Level-match.\n2. Check phase."
+    fixed = llm_rewrite._with_sources(text, results, lambda chunk: chunk["source"])
+    assert fixed.endswith("Sources:\n- kick-bass-balance-phase.md\n- sidechain-compression.md")
+    assert llm_rewrite.valid_structure(fixed)
+    assert llm_rewrite._with_sources(fixed, results, lambda chunk: chunk["source"]) == fixed

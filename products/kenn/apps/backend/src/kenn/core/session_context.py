@@ -723,6 +723,7 @@ def _live_conversation(session_id: str) -> dict[str, Any]:
                 "last_receipt_id": "",
                 "confirmation_status": "none",
                 "current_topic": "",
+                "pending_question": None,
             }
             _LIVE_CONVERSATIONS[key] = state
         _LIVE_CONVERSATIONS.move_to_end(key)
@@ -900,6 +901,14 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
             state["current_topic"] = action[:128]
         if command and status not in {"invalid", "failed", "clarification_required"}:
             state["last_command"] = _text(command, 4000)
+        # KENN asked for one specific missing detail ("By how much?", "Which track?"): keep the unfinished request so
+        # a short reply ("3 dB", "the hats") can finish it. The generic "not sure" (only the action missing) isn't kept.
+        missing = [str(field) for field in (intent.get("missing_fields") or [])]
+        if status == "clarification_required" and missing and missing != ["action"]:
+            state["pending_question"] = {"command": _text(command, 4000), "missing": missing, "action": action[:128],
+                                         "track": track_name[:128], "at": time.time()}
+        else:
+            state["pending_question"] = None
         if receipt.get("receipt_id"):
             state["last_receipt_id"] = _text(receipt.get("receipt_id"), 128)
         state["confirmation_status"] = (

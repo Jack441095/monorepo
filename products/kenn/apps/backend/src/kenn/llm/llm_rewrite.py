@@ -390,29 +390,34 @@ _THINK_OFF_MODEL = re.compile(r"(?:^|/)qwen3", re.IGNORECASE)
 def _ollama_think_off(cfg: dict, json_schema: dict | None) -> bool:
     """Whether this call must go to Ollama's native route with thinking off.
 
-    ``KENN_LLM_THINK=off`` forces it for any model (e.g. a fine-tuned qwen3.5
-    under its own name); ``KENN_LLM_THINK=on`` disables it.
+    ``KENN_LLM_THINK=off`` forces it for any model and for prose answers too (a local Qwen brain writing chat
+    answers should not spend seconds thinking first); ``KENN_LLM_THINK=on`` disables it. Unset, only
+    schema-constrained qwen3 calls use it.
     """
-    if cfg.get("provider") != "ollama" or json_schema is None:
+    if cfg.get("provider") != "ollama":
         return False
     setting = os.environ.get("KENN_LLM_THINK", "").strip().lower()
     if setting in {"on", "1", "true", "yes"}:
         return False
     if setting in {"off", "0", "false", "no"}:
         return True
-    return bool(_THINK_OFF_MODEL.search(str(cfg.get("model") or "")))
+    return json_schema is not None and bool(_THINK_OFF_MODEL.search(str(cfg.get("model") or "")))
 
 
-def _build_native_ollama_payload(cfg: dict, messages: list[dict], *, answer_mode: str, json_schema: dict) -> dict:
-    return {
+def _build_native_ollama_payload(cfg: dict, messages: list[dict], *, answer_mode: str, json_schema: dict | None) -> dict:
+    payload = {
         "model": cfg["model"],
         "messages": messages,
         "stream": False,
         "think": False,
-        "format": json_schema,
         "keep_alive": KEEP_ALIVE_DURATION,
-        "options": {"temperature": 0.0, "num_predict": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)},
+        # Same temperatures as the OpenAI-compatible route: exact for plans, a little freedom for prose.
+        "options": {"temperature": 0.0 if json_schema is not None else 0.35,
+                    "num_predict": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)},
     }
+    if json_schema is not None:
+        payload["format"] = json_schema
+    return payload
 
 
 # ---------------------------------------------------------------------------
@@ -1256,15 +1261,42 @@ def enhance_stream(
     )
 
     try:
+        streamed: list[str] = []
         for token, usage in chat_completion_stream(messages, "rewrite", answer_mode=answer_mode):
             if token:
+                streamed.append(token)
                 yield {"event": "token", "token": token}
             if usage and usage.total_tokens > 0:
+                if "sources:" not in "".join(streamed).lower():
+                    block = sources_block(results, source_label)
+                    if block:
+                        yield {"event": "token", "token": f"\n\n{block}"}
                 yield {"event": "llm_usage", "data": usage.to_dict()}
     except Exception as exc:
         print(f"WARNING: enhance_stream ended early on an unexpected error ({exc!r}) -- "
               f"caller sees a normally-terminated stream with no indication generation was cut short")
         return
+
+
+def sources_block(results: list[tuple[float, dict]], source_label, limit: int = 3) -> str:
+    """The notes this answer was written from, in the template's "Sources:" format."""
+    labels: list[str] = []
+    for _score, chunk in results:
+        label = str(source_label(chunk) or "").strip()
+        if label and label not in labels:
+            labels.append(label)
+        if len(labels) == limit:
+            break
+    return "Sources:\n" + "\n".join(f"- {label}" for label in labels) if labels else ""
+
+
+def _with_sources(text: str, results: list[tuple[float, dict]], source_label) -> str:
+    # A local model often writes a good answer but forgets the "Sources:" line, and the whole answer used to be
+    # thrown away for it. KENN knows exactly which notes it gave the model, so it adds them itself.
+    if "sources:" in text.lower():
+        return text
+    block = sources_block(results, source_label)
+    return f"{text.rstrip()}\n\n{block}" if block else text
 
 
 def build_context_block(results: list[tuple[float, dict]], source_label) -> str:
@@ -1326,7 +1358,7 @@ def enhance(
 
     text = re.sub(r"^#+\s*", "", text, flags=re.M).strip()
     from kenn.llm.linter import lint_response
-    text = lint_response(text, answer_mode)
+    text = _with_sources(lint_response(text, answer_mode), results, source_label)
     if not valid_response(text, answer_mode, route=route):
         return None
     return text

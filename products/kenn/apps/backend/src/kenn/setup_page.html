@@ -32,6 +32,7 @@
   #message { color: var(--muted); font-size: 14px; min-height: 1.5em; margin-top: 12px; }
   .support { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
   .support button { margin-left: 8px; }
+  .support + .support { border-top: 0; margin-top: 8px; padding-top: 0; }
   #diagnostics-message { color: var(--muted); font-size: 14px; margin-top: 8px; overflow-wrap: anywhere; }
 </style>
 </head>
@@ -46,6 +47,8 @@
     <button id="continue" class="primary" hidden>Open KENN</button>
   </div>
   <div id="message" role="status"></div>
+  <p class="support">New to the beta? <a href="/guide">Read the tester guide</a>: what KENN can do, what it can't
+    yet, and what to do when something goes wrong.</p>
   <p class="support">Something not working?
     <button id="diagnostics" type="button">Save diagnostics for support</button></p>
   <div id="diagnostics-message" role="status"></div>

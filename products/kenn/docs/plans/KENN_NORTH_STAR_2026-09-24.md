@@ -86,13 +86,64 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 ### Stage 1 — Conversational KENN (beta weeks 1–6)
 
-- [ ] Brain decision made; provider added behind the model router with per-task switches (as `KENN_LLM_ENABLED_<TASK>`)
+- [x] Brain decision made — **owner, 25 Sept: local Qwen only** (option A). KENN stays fully on the Mac: no hosted model,
+      nothing sent off the machine. The existing Ollama provider behind the model router serves it
+      (`KENN_LLM_PROVIDER_<TASK>=ollama`, per-task switches `KENN_LLM_ENABLED_<TASK>`).
+- [x] Choose the conversation model: compare local Qwen sizes on KENN's chat checks (quality on the GPU box, speed on
+      the Mac), then fine-tune the winner on KENN's notes and answer style on the box
+  > 25 Sept, **decided: Qwen3 8B** (owner delegated the choice). Same pass rate as 14B on KENN's checks (78/84; its own
+  > answers 40/42 vs 42/43), a third faster (p50 2.8 s vs 3.8 s; 14B's p95 was 4.96 s, over the 4 s target), and
+  > ~5 GB in memory vs ~9 GB, which matters on a 16 GB M3 running Live, KENN and the 2.8 GB planner. On the Mac as
+  > `kenn-brain-qwen3-8b`; Mac speed measured after the soak. A style LoRA trained on KENN's own accepted answers
+  > made things worse (model answer used 36/84 vs 40, p95 9.7 s vs 3.4 s), so plain 8B stays; see the review doc.
+  > 25 Sept, first comparison on KENN's real answer path (84 chat questions, box GPU 0, thinking off; tool
+  > `tooling/scripts/evaluate_chat_brain.py`): template 79/84 (0.16 s); Qwen3.5 4B 78/84, its answer used on 37
+  > (36 pass), p50 3.8 s; **Qwen3 8B 78/84, used on 42 (40 pass), p50 2.8 s**; **Qwen3 14B 78/84, used on 43 (42 pass),
+  > p50 3.8 s**. The model answers pass the same content checks as the template, so the choice is about how they read:
+  > side-by-side review for the owner in `docs/reviews/KENN_BRAIN_ANSWERS_REVIEW_2026-09-25.md`. Two fixes came out of
+  > it: the eval now bypasses KENN's semantic answer cache, and KENN adds the sources itself when a model's answer
+  > leaves out "Sources:" (good 8B answers were being thrown away for that). Next: speed of 8B on the owner's M3/16 GB
+  > (after the soak), then a KENN-style fine-tune of the winner on the box.
 - [ ] Chat answers written by the brain from retrieved notes, with citations; templates stay as the offline fallback
-- [ ] One router: rule parser → local planner → brain; every route logged with timing
+- [x] One router: rule parser → local planner → brain; every route logged with timing
+  > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
+  > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,
+  > whether the brain wrote the answer and whether a proposal came back to `runtime/logs/routes.jsonl` (no question
+  > text; last 5,000 requests). `tooling/scripts/route_latency_report.py` prints p50/p95 per route against the
+  > 4 s target.
 - [ ] Multi-turn context: anaphora ("do that on the snare too"), corrections ("no, the other one"), clarifying questions
-- [ ] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
+  > 25 Sept: follow-ups for whole-track mixer changes work in the rule path, without a model: "do that on the snare
+  > too", "same for the hats", "and the kick too", "now the vocal", "do the opposite on the vocal". The last command is
+  > re-parsed against the current set, so "down 2 dB" applies from the new track's own level, and the result goes
+  > through the normal parser and safety checks. The same track again, or two tracks at once, asks. Device-parameter
+  > follow-ups and "no, the other one" still ask (next).
+  > Same day: answering KENN's own questions works — "make the bass louder" → "By how much?" → "3 dB"; "pan the synth
+  > left" → "30%" or "hard"; "kick -3 dB" → "at -3" (a level) or "3 dB quieter" (a change); "mute" → "the hats".
+  > Short replies only, within 5 minutes, joined to the pending request and parsed normally. Found on the way: "pan
+  > the synth left 30%" panned right (side before the amount was ignored) — fixed; a pan with no side now asks.
+  > Same day: corrections — "no, I meant the snare", "sorry, the kick", "not the hats, the kick", "actually the
+  > vocal" — move the last whole-track change to the track meant, as a new proposal. If the first change was already
+  > applied it stays, and KENN says so and points at "undo". Device changes repeat too ("set the compressor
+  > threshold on the drum bus to -20 dB" → "do that on the vocal"); a track without that device gets a plain "Kick
+  > doesn't have that device". Still asks: "no, the other one", two tracks at once.
+- [x] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
+  > 25 Sept: checked. The brain writes prose only; it has no Live access. Live changes run only in
+  > `handle_command` with a confirmed proposal; a model plan must pass `validate_llm_plan` (typed actions, exact
+  > names from the current set, no hidden nested steps) and cannot override a rule-parser refusal (tests in
+  > `test_live_command.py`: typed plan must match, cannot bypass refusal, shadow keeps rule authority). One gap found
+  > and closed: a brain answer saying "I've turned the bass down" was a false receipt; the grounding gate now
+  > throws it away and uses the template (no false hits on 122 real Qwen answers).
 - [ ] **Gate:** ≥ 95% correct on ≥ 500 natural phrasings (curated holdout grown from 24); human-review packet passes with
       two reviewers; p95 answer latency ≤ 4 s online; zero writes without Apply in shadow logs
+  > 25 Sept, phrasings (`docs/evidence/KENN_NATURAL_PHRASINGS_2026-09-25.md`): 505 phrasings now exist
+  > (Claude-drafted, labels need the owner). Through the whole gateway: **95.4% right, 0 wrong** on them, but only
+  > after tuning on them. Two fresh blind sets written by Qwen3 14B and 8B scored **71.9% and 70.2%** on first run,
+  > so ~70% is where the rules really stand on unseen wording. Six wrong plans found and fixed along the way
+  > (sends inserted as Reverb devices, "play the drums" stopping/starting the whole set, a rename picking the track
+  > from the new name, "vocal up a hair" also cutting the Synth). Run 9b as a fallback where the rules ask made
+  > things *less* safe: 18 wrong plans on one blind set, e.g. "can i hear the vocal without the synth" soloed the
+  > Synth. Not met; needs fresh blind wording each round, owner-checked labels, and a planner that asks rather than
+  > guesses.
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
@@ -126,6 +177,16 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > even bge-base tops out near 0.81, so model size is not the route to 0.95. The gap is vocabulary: notes describe
   > devices technically, producers describe goals. Next levers: a "Use it when…" line of goal phrasing per device note
   > (tuned on half the questions, scored on the other half), then a cross-encoder reranker on the top 20.
+  > 25 Sept, reranker test on the GPU box (downloaded there only, deleted after; revisions and licences recorded): the
+  > fused search's top 20 re-scored per question. Recall@4 original / describe-it: today 0.983 / 0.744;
+  > ms-marco-MiniLM-L-6-v2 (Apache-2.0, ~90 MB) 0.966 / 0.800; **bge-reranker-base (MIT, ~1.1 GB fp32) 1.000 / 0.808**.
+  > Ceiling: the right note is in the top 20 for 100% / 87.2%, so reranking already captures most of what it can; the
+  > last 13% need better candidates (note wording). "Use it when…" drafts: 0.744 → 0.760, awaiting owner review.
+  > Shipping a reranker is a size/latency call (bge-reranker-base adds ~0.3–1 GB and ~1–2 s per answer on a Mac CPU,
+  > unmeasured on device yet) — owner decision.
+  > Fixture now **303 questions** (gate size reached): 128 original + 125 device-purpose + 50 technique-purpose
+  > (`evals/technique_purpose_retrieval_cases.json`, producer wording, overlapping notes all count). Today's hybrid on
+  > the technique set: recall@4 **0.84** (BM25 alone 0.64).
 
 ### Stage 3 — Agentic co-producer (beta weeks 6–16)
 
@@ -195,6 +256,6 @@ satisfaction, and hosted cost per tester.
 ## Decisions needed from you
 
 - [ ] Sign off this direction (hybrid brain, stages in this order)
-- [ ] Brain provider, monthly budget per tester, opt-in versus default
-- [ ] What may be sent to a hosted model (recommendation above)
+- [x] Brain provider: local Qwen only (owner, 25 Sept) — no hosted budget or opt-in needed
+- [x] What may be sent to a hosted model: nothing — no hosted model (owner, 25 Sept)
 - [ ] Whether Stage 2's craft notes should cover specific genres first (which?)

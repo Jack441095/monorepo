@@ -230,7 +230,7 @@ def test_unmapped_display_units_still_require_clarification() -> None:
     result = parse_request("set Reverb Decay Time to 1 ms on track 1", live_snapshot)
     assert result["action"] is None
     assert "supported_unit_mapping" in result["missing_fields"]
-    assert any("not safely mapped" in item for item in result["ambiguity"])
+    assert any("hasn't been measured in Live" in item for item in result["ambiguity"])
 
 
 def test_missing_or_duplicate_targets_never_default_to_track_zero() -> None:

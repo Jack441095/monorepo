@@ -207,6 +207,9 @@ def records() -> list[dict[str, Any]]:
 NATURAL_HOLDOUTS = (
     REPO_ROOT / "tooling" / "data" / "natural_holdout.jsonl",
     REPO_ROOT / "tooling" / "data" / "natural_holdout_candidates.jsonl",
+    REPO_ROOT / "tooling" / "data" / "natural_blind_qwen14b.jsonl",
+    REPO_ROOT / "tooling" / "data" / "natural_blind_qwen8b.jsonl",
+    REPO_ROOT / "tooling" / "data" / "natural_blind_qwen14b_beginner.jsonl",
 )
 
 

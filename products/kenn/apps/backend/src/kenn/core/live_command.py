@@ -2197,6 +2197,162 @@ def _resolve_eq_band_tuning_gain(
     return result
 
 
+_FOLLOW_UP = re.compile(
+    r"^(?:(?:and|also|now|plus|then)\s+)?"
+    r"(?:(?P<opposite>(?:do\s+)?the\s+opposite)\s+(?:on|to|for|with)\s+"
+    r"|(?:do\s+(?:that|the\s+same|it|this)|(?:the\s+)?same(?:\s+again)?)\s+(?:on|to|for|with)\s+)?"
+    r"(?P<target>.+?)(?:\s+(?:too|as\s+well|also))?\s*[.!?]*$",
+    re.I,
+)
+_FOLLOW_UP_MARKER = re.compile(r"^(?:and|also|now|plus|then)\b|\b(?:do\s+(?:that|the\s+same|it|this)|same|opposite)\b"
+                               r"|\b(?:too|as\s+well)\s*[.!?]*$", re.I)
+
+
+def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) -> str | None:
+    """ "do that on the snare too" -> the last command, written out for the snare.
+
+    The previous command is re-parsed against the current set, so a relative change ("down 2 dB") is applied
+    from the new track's own level, and the result goes back through the normal parser and its safety checks.
+    "the opposite" flips the direction. Only whole-track mixer changes are repeated; anything else asks.
+    """
+    from kenn.core.session_context import live_conversation_context
+
+    match = _FOLLOW_UP.match(command.strip())
+    if not match or not _FOLLOW_UP_MARKER.search(command):
+        return None
+    prior_text = str(live_conversation_context(session_id).get("last_command") or "")
+    if not prior_text:
+        return None
+    prior = parse_request(prior_text, snapshot)
+    action = prior.get("action")
+    if action not in _REPEATABLE_ACTIONS or prior.get("missing_fields"):
+        return None
+    if re.search(r"\band\b|,|&|\bboth\b", match.group("target"), re.I):
+        return None  # "the snare and the kick" once changed only the kick; two tracks at once isn't a follow-up yet
+    target = parse_request(f"solo {match.group('target')}", snapshot)
+    track = target.get("track") if isinstance(target.get("track"), dict) else None
+    if not track or target.get("missing_fields") or target.get("ambiguity"):
+        return None
+    prior_track = prior.get("track") if isinstance(prior.get("track"), dict) else {}
+    if track.get("index") == prior_track.get("index"):
+        return None  # the same track again would apply the change twice; let it ask
+    return _repeat_on(prior, str(track.get("name")), flip=bool(match.group("opposite")))
+
+
+_REPEATABLE_ACTIONS = frozenset({"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "set_device_parameter"})
+_UNIT_TEXT = {"db": " dB", "hz": " Hz", "%": "%", "ms": " ms", "millisecond": " ms", "milliseconds": " ms", ":1": ":1"}
+
+
+def _repeat_on(prior: dict[str, Any], name: str, *, flip: bool = False) -> str | None:
+    """The prior change written out as a plain command for another track."""
+    action, value = prior.get("action"), prior.get("desired_value")
+    if action == "set_device_parameter":
+        # The device has to exist on the new track too; if it doesn't, the parser says so and asks.
+        device = (prior.get("device") or {}).get("name")
+        parameter = (prior.get("parameter") or {}).get("name")
+        if not device or not parameter or not isinstance(value, (int, float)):
+            return None
+        unit = _UNIT_TEXT.get(str(prior.get("unit") or "").lower(), "")
+        if prior.get("relative"):
+            change = -value if flip else value
+            return f"{'raise' if change > 0 else 'lower'} the {device} {parameter} on {name} by {abs(change):g}{unit}"
+        return None if flip else f"set the {device} {parameter} on {name} to {value:g}{unit}"
+    if action == "set_volume":
+        relative = prior.get("requested_relative_db")
+        if isinstance(relative, (int, float)):
+            change = -relative if flip else relative
+            return f"turn {name} {'up' if change > 0 else 'down'} {abs(change):g} dB"
+        if flip or not isinstance(value, (int, float)):
+            return None  # the opposite of an absolute level isn't defined
+        return f"set {name} volume to {volume_law.raw_to_db(float(value)):g} dB"
+    if action == "set_pan" and isinstance(value, (int, float)):
+        pan = -float(value) if flip else float(value)
+        return f"center {name}" if abs(pan) < 1e-6 else f"pan {name} {abs(pan) * 100:g}% {'left' if pan < 0 else 'right'}"
+    if isinstance(value, bool):
+        on = (not value) if flip else value
+        verb = {"set_mute": ("mute", "unmute"), "set_solo": ("solo", "unsolo"), "set_arm": ("arm", "disarm")}[action]
+        return f"{verb[0] if on else verb[1]} {name}"
+    return None
+
+
+# "no, I meant the snare", "sorry, the kick", "actually the vocal", "not the hats, the kick instead".
+_CORRECTION = re.compile(
+    r"^(?:(?:no|nope|sorry|oops|actually|wait)\b[\s,.!-]*)+(?:I\s+meant\s+)?(?P<target>.+?)(?:\s+instead)?\s*[.!?]*$"
+    r"|^(?:I\s+meant|not\s+the\s+[^,]+,)\s*(?P<target2>.+?)(?:\s+instead)?\s*[.!?]*$",
+    re.I,
+)
+
+
+def _correction_command(command: str, session_id: str, snapshot: dict[str, Any]) -> tuple[str, str] | None:
+    """ "no, I meant the snare" -> the last command written out for the snare, plus the track it replaces.
+
+    Same limits as a follow-up: whole-track mixer changes, one named track, not the same track. The old proposal
+    is simply never applied; if it already was, the caller says so and points at undo rather than undoing silently.
+    """
+    from kenn.core.session_context import live_conversation_context
+
+    match = _CORRECTION.match(command.strip())
+    if not match:
+        return None
+    target_text = match.group("target") or match.group("target2") or ""
+    # A bare track name, not a new instruction: "no, turn the bass up 3 dB" is a command in its own right.
+    if len(target_text.split()) > 4 or re.search(r"\d|\b(?:and|both|other)\b|,|&", target_text, re.I):
+        return None
+    prior_text = str(live_conversation_context(session_id).get("last_command") or "")
+    if not prior_text:
+        return None
+    prior = parse_request(prior_text, snapshot)
+    if prior.get("action") not in _REPEATABLE_ACTIONS or prior.get("missing_fields"):
+        return None
+    target = parse_request(f"solo {target_text}", snapshot)
+    track = target.get("track") if isinstance(target.get("track"), dict) else None
+    prior_track = prior.get("track") if isinstance(prior.get("track"), dict) else {}
+    if not track or target.get("missing_fields") or target.get("ambiguity") or track.get("index") == prior_track.get("index"):
+        return None
+    corrected = _repeat_on(prior, str(track.get("name")))
+    return (corrected, str(prior_track.get("name") or "")) if corrected else None
+
+
+PENDING_QUESTION_SECONDS = 300
+
+
+def _reply_to_question(reply: str, session_id: str, snapshot: dict[str, Any]) -> str | None:
+    """A short reply to KENN's last question ("By how much?" -> "3 dB") joined with the request it was about."""
+    from kenn.core.session_context import live_conversation_context
+
+    pending = live_conversation_context(session_id).get("pending_question")
+    answer = " ".join(reply.split()).strip(" .!?")
+    if not pending or time.time() - float(pending.get("at") or 0) > PENDING_QUESTION_SECONDS:
+        return None
+    if not answer or len(answer.split()) > 6:
+        return None
+    original, track = str(pending.get("command") or ""), str(pending.get("track") or "")
+    candidates: list[str] = []
+    if "absolute_or_relative" in pending.get("missing", []) and track:
+        # "kick -3 dB": KENN asked whether that's a level or a change; the reply says which.
+        amount = re.search(r"[-+]?\d+(?:\.\d+)?", original)
+        if amount:
+            size = float(amount.group(0))
+            if re.search(r"\b(?:at|to|set|exactly|level)\b", answer, re.I):
+                candidates.append(f"set {track} to {size:g} dB")
+            elif re.search(r"\b(?:quieter|softer|down|lower|less|louder|up|more|by)\b", answer, re.I):
+                up = bool(re.search(r"\b(?:louder|up|more)\b", answer, re.I))
+                candidates.append(f"turn {track} {'up' if up else 'down'} {abs(size):g} dB")
+    number_only = re.fullmatch(r"(?:by\s+)?([-+]?\d+(?:\.\d+)?)", answer, re.I)
+    if number_only and pending.get("action") == "set_volume":
+        answer = f"{number_only.group(1)} dB"  # "By how much?" for a fader is answered in dB
+    candidates += [f"{original} {answer}", f"{original} by {answer}"]
+    side = re.search(r"\b(left|right)\b", original, re.I)
+    if side:
+        candidates.append(original[:side.start()] + f"{answer} " + original[side.start():])  # "30%", "hard"
+    for candidate in candidates:
+        parsed = parse_request(candidate, snapshot)
+        if parsed.get("action") and parsed.get("confirmation_required") and not parsed.get("missing_fields") \
+                and not parsed.get("ambiguity"):
+            return candidate
+    return None
+
+
 def _command_needs_mixer_snapshot(command: str, llm_plan: dict[str, Any] | None = None) -> bool:
     """Select one fresh mixer snapshot when the request plainly needs it."""
     if isinstance(llm_plan, dict) and llm_plan.get("action") in TRACK_ACTIONS:
@@ -2605,6 +2761,44 @@ def _handle_command_impl(
     generated_plan: dict[str, Any] | None = None
     parse_started = time.monotonic()
     deterministic_intent = parse_request(clean_command, snapshot)
+    if not deterministic_intent.get("action") and proposal is None:
+        if not mixer_snapshot:  # the previous command may need fader values (a relative dB change)
+            mixer_snapshot = True
+            snapshot = {**_command_snapshot(live, include_mixer=True),
+                        **({"return_tracks": snapshot["return_tracks"]} if "return_tracks" in snapshot else {})}
+        # Match the words the producer typed: the "that" -> last-track rewrite above turned "do that on the snare
+        # too" into "do Bass on the snare too", which once repeated the change on the Bass.
+        typed = str((response.get("context_resolution") or {}).get("original") or clean_command)
+        follow_up = _follow_up_command(typed, response["session_id"], snapshot)
+        correction = None if follow_up else _correction_command(typed, response["session_id"], snapshot)
+        if correction:
+            from kenn.core.session_context import live_conversation_context
+
+            response["resolved_command"], replaced = correction
+            response["context_resolution"] = {
+                "resolution": "correction", "original": typed, "replaces_track": replaced,
+                "previous_applied": live_conversation_context(response["session_id"]).get("confirmation_status") == "confirmed",
+            }
+            clean_command = correction[0]
+        elif follow_up:
+            response["resolved_command"] = follow_up
+            response["context_resolution"] = {"resolution": "follow_up", "original": typed}
+            clean_command = follow_up
+        else:
+            completed = _reply_to_question(typed, response["session_id"], snapshot)
+            if completed:
+                response["resolved_command"] = completed
+                response["context_resolution"] = {"resolution": "answered_question", "original": typed}
+                clean_command = completed
+        # Re-parse either way: the mixer was just read, and an unresolved relative change needs its fader value.
+        deterministic_intent = parse_request(clean_command, snapshot)
+        repeated = (response.get("context_resolution") or {}).get("resolution") in {"follow_up", "correction"}
+        if repeated and "device" in (deterministic_intent.get("missing_fields") or []):
+            track_name = str((deterministic_intent.get("track") or {}).get("name") or "That track")
+            return _clarification(
+                response, deterministic_intent,
+                f"{track_name} doesn't have that device, so I can't repeat the change there. Nothing changed.",
+            )
     if not mixer_snapshot and "current_volume" in (deterministic_intent.get("missing_fields") or []):
         # The fast topology read has no fader values; a relative change the wording check above missed still works.
         mixer_snapshot = True
@@ -2641,7 +2835,10 @@ def _handle_command_impl(
         if not result.get("ok"):
             return _clarification(response, natural_recipe, result.get("error", "I could not prepare that Live recipe."))
         return _recipe_response(response, result["proposal"])
-    if SubjectiveTranslator.can_translate(clean_command):
+    # A request the rules already understand exactly ("rename the vocal track to 'Vox' for clarity") is never a mix
+    # metaphor; "clarity" there once turned a rename into the vocal-unmasking recipe.
+    if SubjectiveTranslator.can_translate(clean_command) and not (
+            deterministic_intent.get("action") and not deterministic_intent.get("missing_fields")):
         subjective_res = SubjectiveTranslator.translate(clean_command, snapshot, response["session_id"], live)
         if subjective_res is not None:
             response["llm"] = {"status": "not_used", "reason": "subjective_translation"}
@@ -2741,10 +2938,14 @@ def _handle_command_impl(
                 comparison = compare_llm_plan(generated, deterministic_intent)
                 deterministic_action = deterministic_intent.get("action")
                 deterministic_refusal = deterministic_intent.get("mode") == "refuse"
+                # When the rules asked something specific ("send how much?", "the whole set or just the drums?"),
+                # the model may not answer it by guessing; blind phrasing checks caught a planner doing exactly that.
+                specific_question = bool(set(deterministic_intent.get("missing_fields") or []) - {"action", "track"})
                 use_model = comparison.get("status") == "match" or (
                     mode == "propose"
                     and deterministic_action is None
                     and not deterministic_refusal
+                    and not specific_question
                 )
                 llm_metadata = {
                     **llm_metadata,
@@ -2776,6 +2977,11 @@ def _handle_command_impl(
         response.update({"status": "refused", "answer": intent.get("error", "That Live action is disabled.")})
         return response
     if intent.get("missing_fields") or intent.get("ambiguity"):
+        if intent.get("action") is None and intent.get("ambiguity") and set(intent.get("missing_fields") or []) & {
+                "supported_unit_mapping", "device", "send_amount", "transport_target", "how_to"}:
+            # The parser knows exactly what's wrong ("Compressor Attack in ms isn't measured yet"); the generic
+            # "not sure what you're asking" hid that from people who'd asked a perfectly clear question.
+            return _clarification(response, intent, str(intent["ambiguity"][0]))
         if intent.get("action") is None:
             return _clarification(
                 response,
@@ -3037,7 +3243,13 @@ def handle_command(
             source_evidence=source_evidence,
             allow_llm=allow_llm,
         )
-        record_live_exchange(session_id=session_id, command=command, result=result)
+        # Remember what was actually planned, so "and the hats too" after a follow-up still has a real command to repeat.
+        resolution = result.get("context_resolution") if isinstance(result.get("context_resolution"), dict) else {}
+        if resolution.get("resolution") == "correction" and resolution.get("previous_applied") and result.get("proposal"):
+            # The first change already went through; a correction shouldn't quietly leave it there.
+            result["answer"] = (f"{result.get('answer') or ''} The change to {resolution.get('replaces_track')} is "
+                                "still applied; say \"undo\" if you want it reversed.").strip()
+        record_live_exchange(session_id=session_id, command=str(result.get("resolved_command") or command), result=result)
         record_shadow_result(result)
         total_ms = round((time.monotonic() - command_started) * 1000.0, 2)
         latency = result.setdefault("latency", {})

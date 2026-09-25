@@ -363,3 +363,71 @@ Evaluated with the GPU otherwise idle (9a's first plain pass ran while 9b traine
 - **Decision:** 9b is the best candidate for the shadow slot (replacing run 4). Swapping the shadow model is the
   owner's call; promotion to writes still goes only through `live_llm_promotion.py`. Box copies removed after
   evaluation (the runs had filled `/mnt/data` overnight); 9b's Q4_K_M kept (2.6 GB).
+- **Shadow deployment (owner OK, 25 Sept):** 9b replaces run 4 in the companion's shadow slot. The Mac runs the 4-bit
+  copy (Q4_K_M, sha256 `ca8c18be…a720e`): 124 cases plain **84.7%** (bf16 on the box: 85.5%), 6 wrong plans accepted
+  (bf16: 3), p50 4.8 s on the Mac during the soak. Quantisation costs some precision; any promotion evaluation must use
+  the quantisation that would actually run.
+
+## Addendum: run 10, "sounds like a fader change" traps (2026-09-25)
+
+9b's corpus plus 14 drafted seeds whose right answer is a question: tone words, song sections, two tracks, sends
+phrased like faders, frequencies (worded differently from `tooling/data/adversarial_mixer_phrasings.jsonl`). 4,280
+records, 44% clarify (9b: ~33%); 482 steps on GPU 0.
+
+| GPU, 124 cases | Correct | Accepted | Act (94) | Wrong plans accepted | Traps | Values (16) |
+|---|---|---|---|---|---|---|
+| 9b, plain | **85.5%** | 96.8% | **77/94** | 3 | 17/29 | **16/16** |
+| 10, plain | 77.4% | 91.9% | 67/94 | **1** | **24/32** | 15/16 |
+| 9b, production evidence | **87.1%** | 99.2% | **79/94** | 3 | | |
+| 10, production evidence | 85.5% | 97.6% | 77/94 | **1** | | |
+
+- **Safer but asks too often.** Fewest wrong plans of any run and 7 more traps caught, but 10 fewer doable commands
+  carried out: the extra clarify share taught it to ask when it didn't need to. (Traps: 9b was scored on 29, run 10 on
+  32 after three were added; the extra three are "except" and "play from" requests.)
+- **Decision:** 9b stays in the shadow slot. Run 11 keeps the trap seeds at lower weight so the clarify share returns
+  to ~33%, aiming for run 10's safety with 9b's reach.
+
+## Addendum: run 11, trap seeds at lower weight (2026-09-25)
+
+Run 10's corpus with `--clarify-variants 5`, bringing the clarify share back to 33% (9b: ~35%) while keeping the trap
+seeds (350 rows). 3,575 records; 403 steps on GPU 0.
+
+| GPU, 124 cases | Correct | Clarify (30) | Act (94) | Wrong plans accepted | Traps | Values (16) |
+|---|---|---|---|---|---|---|
+| 9b, plain / evidence | **85.5% / 87.1%** | 29 / 29 | **77 / 79** | 3 / 3 | 17/29 | 16/16 |
+| 10, plain / evidence | 77.4% / 85.5% | 29 / 29 | 67 / 77 | 1 / 1 | 24/32 | 15/16 |
+| **11, plain / evidence** | 80.6% / 83.9% | **30 / 30** | 70 / 74 | **0 / 0** | **29/32** | **16/16** |
+
+- **First run with no wrong plan accepted**, in either mode, and every clarification case answered with a question.
+  It still carries out fewer doable commands than 9b (70 vs 77), so it asks a little more than it needs to.
+- For promotion, not writing the wrong thing matters more than coverage, so **run 11 is the strongest candidate so
+  far**; 9b stays in shadow until the owner approves a swap. Its Q4_K_M is kept on the box.
+
+## Shadow swap: run 9b → run 11 (25 Sept, owner approved)
+
+Why: on three fresh phrasing sets (`KENN_NATURAL_PHRASINGS_2026-09-25.md`), 9b as a fallback where the rules ask
+added 7–17 wrong plans per set; run 11 added 2–7 and got more right (beginner wording 75% → 89%). On the Mac:
+`kenn-c6-run11` from `c6-run11-q4km.gguf` (sha256 51bcf34d…), about 3–4 s per plan once loaded (26 s cold).
+Shadow is observation only; nothing about the promotion stage changed. It takes effect at the companion restart
+after soak #3, which runs on 9b to the end.
+
+## Addendum: run 12, blind-set trap seeds (25 Sept) — not better, run 11 stays
+
+Run 11's recipe plus 12 drafted trap seeds for what the blind phrasing sets caught ("toggle", "hear X without Y",
+sends with no amount, tracks described by their devices, a return "for delay", how-to questions), worded differently
+from those sets. `--clarify-variants 4` kept the ask share at 33% (3,580 records); 403 steps on GPU 0, val loss
+1.85 → 0.0005.
+
+As the fallback where the rules ask (`score_natural_phrasings.py --model`, same scorer and rules as run 11):
+
+| Blind set | Run 11 | Run 12 |
+|---|---|---|
+| Qwen3 14B, 210 | 94.3% right, 2 wrong | 89.5% right, 13 wrong |
+| Qwen3 8B, 171 | 95.3% right, 3 wrong | 92.4% right, 8 wrong |
+| Qwen3 14B beginner, 224 | 89.3% right, 7 wrong | 89.3% right, 5 wrong |
+
+More wrong plans on two of three sets, some of them inverted: "pull back the bass" → unmute, "reduce fx print" →
+mute, "record audio for bass" → play, and "rename the track with the reverb return to Reverb Return" renamed the Kick.
+A validation loss near zero says it fitted its own synthetic phrasings rather than the pattern. **Run 11 stays in
+shadow.** Run 12's Q4_K_M is kept on the box for reference. More seeds of the same kind won't fix this; the next
+planner run needs varied real wording (tester phrasings once the beta starts) and an earlier stop.

@@ -66,6 +66,7 @@ def test_receipts_appear_only_as_counts(monkeypatch, tmp_path: Path) -> None:
                      "error": "/Users/example/Samples/secret.wav not found"}},
     ]
     monkeypatch.setattr(diagnostics, "_recent_receipts", lambda: rows)
+    monkeypatch.setattr(diagnostics, "_timings", lambda: {})  # other tests' answer timings would add their own numbers
     result = build_support_diagnostics(repo_root=tmp_path)
     rendered = json.dumps(result)
 
@@ -73,7 +74,8 @@ def test_receipts_appear_only_as_counts(monkeypatch, tmp_path: Path) -> None:
     assert result["receipts"]["by_action"] == {"set_volume": 2, "import_sample": 1}
     assert result["receipts"]["by_status"] == {"applied": 2, "failed": 1}
     assert result["receipts"]["verified"] == 2 and result["receipts"]["rolled_back"] == 1
-    assert "Client Vocal" not in rendered and "secret.wav" not in rendered and "0.7" not in rendered
+    assert "Client Vocal" not in rendered and "secret.wav" not in rendered
+    assert '"requested"' not in rendered and '"before"' not in rendered and '"target"' not in rendered
 
 
 def test_timings_are_numbers_only(tmp_path: Path) -> None:

@@ -135,13 +135,25 @@ privacy-safe session-outcome contract, then aggregate:
 ```bash
 python3 scripts/evaluate_supervised_pilot.py \
   --log /absolute/evidence/supervised-pilot-log.jsonl \
-  --matrix docs/ABLETON_LIVE_SUPPORT_MATRIX.json \
+  --matrix docs/evidence/ABLETON_LIVE_SUPPORT_MATRIX.json \
   --source-revision "$(git rev-parse HEAD)" \
   --output /absolute/evidence/supervised-pilot.json
 ```
 
 Do not add raw prompts, audio, or project names to the log. Each mutation must
 remain explicitly confirmed and receipt-backed.
+
+Recording one session, straight after it ends (each session needs at least one applied change and one undo):
+
+```bash
+python3 tooling/scripts/build_support_bundle.py --output ~/kenn-pilot/s01.zip
+python3 tooling/scripts/record_pilot_session.py --bundle ~/kenn-pilot/s01.zip \
+  --project "Tester A, song 1" --tester "Tester A" --started-at 2026-09-27T14:05:00+01:00
+```
+
+The recorder counts changes and receipts from the bundle, asks how many were undos, then walks through the
+pre-flight checklist, the safety questions and the tester's sign-off. Project and tester names are hashed on the spot
+and never written. It checks the log with the same evaluator as the gate and says what's missing if it won't count.
 
 ## 8. Signed plug-in distribution
 
