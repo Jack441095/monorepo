@@ -390,29 +390,34 @@ _THINK_OFF_MODEL = re.compile(r"(?:^|/)qwen3", re.IGNORECASE)
 def _ollama_think_off(cfg: dict, json_schema: dict | None) -> bool:
     """Whether this call must go to Ollama's native route with thinking off.
 
-    ``KENN_LLM_THINK=off`` forces it for any model (e.g. a fine-tuned qwen3.5
-    under its own name); ``KENN_LLM_THINK=on`` disables it.
+    ``KENN_LLM_THINK=off`` forces it for any model and for prose answers too (a local Qwen brain writing chat
+    answers should not spend seconds thinking first); ``KENN_LLM_THINK=on`` disables it. Unset, only
+    schema-constrained qwen3 calls use it.
     """
-    if cfg.get("provider") != "ollama" or json_schema is None:
+    if cfg.get("provider") != "ollama":
         return False
     setting = os.environ.get("KENN_LLM_THINK", "").strip().lower()
     if setting in {"on", "1", "true", "yes"}:
         return False
     if setting in {"off", "0", "false", "no"}:
         return True
-    return bool(_THINK_OFF_MODEL.search(str(cfg.get("model") or "")))
+    return json_schema is not None and bool(_THINK_OFF_MODEL.search(str(cfg.get("model") or "")))
 
 
-def _build_native_ollama_payload(cfg: dict, messages: list[dict], *, answer_mode: str, json_schema: dict) -> dict:
-    return {
+def _build_native_ollama_payload(cfg: dict, messages: list[dict], *, answer_mode: str, json_schema: dict | None) -> dict:
+    payload = {
         "model": cfg["model"],
         "messages": messages,
         "stream": False,
         "think": False,
-        "format": json_schema,
         "keep_alive": KEEP_ALIVE_DURATION,
-        "options": {"temperature": 0.0, "num_predict": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)},
+        # Same temperatures as the OpenAI-compatible route: exact for plans, a little freedom for prose.
+        "options": {"temperature": 0.0 if json_schema is not None else 0.35,
+                    "num_predict": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)},
     }
+    if json_schema is not None:
+        payload["format"] = json_schema
+    return payload
 
 
 # ---------------------------------------------------------------------------
