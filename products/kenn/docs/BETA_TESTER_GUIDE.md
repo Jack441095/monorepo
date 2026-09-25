@@ -90,9 +90,9 @@ version ships a newer AbletonOSC, the setup page will offer an update the next t
 
 - KENN understands common phrasing, but not everything; when it isn't sure, it asks. Please send us phrasings it
   misunderstood.
-- Follow-ups ("do that on the snare too") repeat track volume, pan, mute, solo and arm changes; device changes and
-  two tracks at once ("the snare and the kick") aren't repeated yet, so KENN asks. Corrections work the same way; "no, the
-  other one" still asks you to name the track.
+- Follow-ups ("do that on the snare too") repeat track volume, pan, mute, solo and arm changes and device settings
+  (the device must be on that track too); two tracks at once ("the snare and the kick") aren't repeated yet, so KENN
+  asks. Corrections work the same way; "no, the other one" still asks you to name the track.
 - Device control in real units covers a starter set (EQ Eight band gain, Compressor, Saturator, Auto Filter and a
   few more); other device parameters can be read but not yet set in real units.
 - KENN inserts only 10 audio effects so far, and no instruments or MIDI effects.

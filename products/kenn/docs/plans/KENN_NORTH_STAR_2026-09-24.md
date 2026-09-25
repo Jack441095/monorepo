@@ -118,8 +118,9 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > the synth left 30%" panned right (side before the amount was ignored) — fixed; a pan with no side now asks.
   > Same day: corrections — "no, I meant the snare", "sorry, the kick", "not the hats, the kick", "actually the
   > vocal" — move the last whole-track change to the track meant, as a new proposal. If the first change was already
-  > applied it stays, and KENN says so and points at "undo". "No, the other one" and device-parameter follow-ups
-  > still ask (next).
+  > applied it stays, and KENN says so and points at "undo". Device changes repeat too ("set the compressor
+  > threshold on the drum bus to -20 dB" → "do that on the vocal"); a track without that device gets a plain "Kick
+  > doesn't have that device". Still asks: "no, the other one", two tracks at once.
 - [x] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
   > 25 Sept: checked. The brain writes prose only; it has no Live access. Live changes run only in
   > `handle_command` with a confirmed proposal; a model plan must pass `validate_llm_plan` (typed actions, exact
