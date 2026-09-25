@@ -471,7 +471,7 @@ _RELATIVE_VOLUME_EXCLUDE = re.compile(
 _RELATIVE_VOLUME_AMOUNT = re.compile(r"(?<![\w.])([+-]?\d+(?:\.\d+)?)\s*(?:dbs?|decibels?)\b", re.I)
 _RELATIVE_VOLUME_DOWN = re.compile(
     r"\b(?:down|back|lower|drop|cut|reduce|decrease|quieter|softer|pull|tuck|trim|duck|off)\b", re.I)
-_RELATIVE_VOLUME_UP = re.compile(r"\b(?:up|raise|boost|louder|push|bump|increase|lift)\b", re.I)
+_RELATIVE_VOLUME_UP = re.compile(r"\b(?:up|raise|boost|louder|hotter|push|bump|increase|lift|add)\b", re.I)
 
 
 def _volume_range_message(db: float | None) -> str:
@@ -949,6 +949,66 @@ _TERSE_LEVEL = re.compile(
     re.I)
 _TERSE_LEVEL_EXCLUDE = re.compile(r"\b(?:send|sends|reverb|delay|echo|eq|band|gain|threshold|makeup|output|input)\b", re.I)
 
+# Everyday phrasings found by the 505-phrasing check (tooling/data/natural_holdout_candidates.jsonl). Each one is
+# anchored to the whole request and rewritten into a form the rules already parse; the track name still has to
+# resolve, so "synth off" works and "metronome off" still asks.
+_NAME = r"(?P<name>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}?)"
+_POLITE_TAIL = re.compile(r"\s*,?\s+(?:please|pls|plz|thanks|thank\s+you|cheers|mate)\s*[.!?]*\s*$", re.I)
+_POLITE_LEAD = re.compile(r"^\s*(?:yo|hey|ok|okay|right)\s*[,!]?\s+(?=\w)", re.I)
+_A_DB = re.compile(r"\b(?:(?P<half>half\s+a)|an?)\s+(?:db|decibel)\b", re.I)
+_SIGNED_CHANGE = re.compile(rf"^\s*{_NAME}\s+(?P<sign>[+-])\s*(?P<amount>\d+(?:\.\d+)?)\s*(?:dbs?)?\s+relative\s*[.!]?\s*$"
+                            rf"|^\s*{_NAME.replace('name', 'name2')}\s+\+\s*(?P<amount2>\d+(?:\.\d+)?)\s*dbs?\s*[.!]?\s*$", re.I)
+_UNITLESS_CHANGE = re.compile(rf"^\s*{_NAME}\s+(?P<direction>up|down)\s+(?P<amount>\d+(?:\.\d+)?)\s*[.!]?\s*$", re.I)
+# A negative bare number on a fader is a dB level ("fx print at -15", "kick fader to minus 10"); a bare "kick to -9"
+# without "at" or "fader" still asks, as before.
+_UNITLESS_LEVEL = re.compile(rf"^\s*{_NAME}\s+(?:fader\s+(?:to|at)|at|fader)\s+(?P<amount>(?:minus\s+|-)\d+(?:\.\d+)?)"
+                             r"\s*(?:dbs?)?\s*[.!]?\s*$", re.I)
+_BARE_PAN = re.compile(rf"^\s*{_NAME}\s+(?P<amount>\d+(?:\.\d+)?)\s*(?:%|percent)\s+(?:to\s+the\s+)?(?P<side>left|right)"
+                       r"\s*[.!]?\s*$", re.I)
+_LR_PAN = re.compile(rf"^\s*{_NAME}\s+(?P<side>[lr])\s*(?P<amount>\d{{1,3}})\s*[.!]?\s*$", re.I)
+_CENTRE_PAN = re.compile(rf"^\s*(?:put\s+)?{_NAME}\s+(?:in\s+the\s+middle|dead\s+cent(?:er|re)|(?:back\s+)?to\s+the\s+"
+                         r"(?:cent(?:er|re)|middle))\s*[.!]?\s*$|^\s*re-?(?P<verb>cent(?:er|re))\b", re.I)
+_MUTE_IDIOM = re.compile(rf"^\s*(?:(?:turn|switch|shut|cut)\s+{_NAME}\s+(?:off|out)|{_NAME.replace('name', 'name2')}\s+off"
+                         rf"|lose\s+{_NAME.replace('name', 'name3')})\s*[.!]?\s*$", re.I)
+_UNMUTE_IDIOM = re.compile(rf"^\s*(?:turn|switch|bring|put)\s+{_NAME}\s+back\s+(?:on|in)\s*[.!]?\s*$", re.I)
+_NOT_A_TRACK_NAME = re.compile(r"\b(?:it|that|this|them|everything|all|solo|arm|record|mute|metronome|click|loop|"
+                               r"playback|transport|song|master|plugin|device|effect|fx)\s*$|^(?:the\s+)?(?:it|that|this)\b", re.I)
+
+
+def _rewrite_idioms(text: str) -> str:
+    text = _POLITE_LEAD.sub("", _POLITE_TAIL.sub("", text))
+    text = _A_DB.sub(lambda m: "0.5 dB" if m.group("half") else "1 dB", text)
+
+    def name(match: re.Match[str], group: str = "name") -> str | None:
+        found = match.group(group)
+        return None if not found or _NOT_A_TRACK_NAME.search(found) or _TERSE_LEVEL_EXCLUDE.search(found) else found
+
+    if (m := _SIGNED_CHANGE.match(text)):
+        if m.group("name") and name(m):
+            return f"turn {m.group('name')} {'up' if m.group('sign') == '+' else 'down'} {m.group('amount')} dB"
+        if m.group("name2") and name(m, "name2"):
+            return f"turn {m.group('name2')} up {m.group('amount2')} dB"
+    if (m := _UNITLESS_CHANGE.match(text)) and name(m):
+        return f"turn {m.group('name')} {m.group('direction')} {m.group('amount')} dB"
+    if (m := _UNITLESS_LEVEL.match(text)) and name(m):
+        return f"set {m.group('name')} to {m.group('amount')} dB"
+    if (m := _BARE_PAN.match(text)) and name(m):
+        return f"pan {m.group('name')} {m.group('amount')}% {m.group('side').lower()}"
+    if (m := _LR_PAN.match(text)) and name(m):
+        return f"pan {m.group('name')} {m.group('amount')}% {'left' if m.group('side').lower() == 'l' else 'right'}"
+    if (m := _CENTRE_PAN.match(text)):
+        if m.group("verb"):
+            return re.sub(r"^\s*re-?", "", text)  # "re-centre the bass" is "centre the bass"
+        if name(m):
+            return f"centre {m.group('name')}"
+    if (m := _MUTE_IDIOM.match(text)):
+        found = next((g for g in ("name", "name2", "name3") if m.group(g)), None)
+        if found and name(m, found):
+            return f"mute {m.group(found)}"
+    if (m := _UNMUTE_IDIOM.match(text)) and name(m):
+        return f"unmute {m.group('name')}"
+    return text
+
 
 def _rewrite_common_phrasings(text: str) -> str:
     """Put a few everyday phrasings into forms the rules below already parse.
@@ -959,6 +1019,7 @@ def _rewrite_common_phrasings(text: str) -> str:
     a bare "kick to -9" still asks). Nothing here changes what a request means.
     """
     text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
+    text = _rewrite_idioms(text)
     corrected = _CORRECTION_LEAD.sub("", text)
     if corrected != text:
         text = _CORRECTION_TAIL.sub("", corrected)
@@ -1589,8 +1650,15 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         for device in (track.get("devices") if isinstance(track.get("devices"), list) else [])
         if isinstance(device, dict) and str(device.get("name") or "").strip()
     ]
+    # Words inside a track's own name aren't a device reference: "mute the FX Print" is the track called FX Print,
+    # and it used to be refused as "device mute" because of the "fx".
+    without_track_names = lower
+    for track in tracks:
+        name = str(track.get("name") or "").strip().lower()
+        if name:
+            without_track_names = re.sub(rf"(?<!\w){re.escape(name)}(?!\w)", " ", without_track_names)
     if _UNSUPPORTED_DEVICE_CONTROL.search(lower) and (
-        _DEVICE_CONTROL_REFERENCE.search(lower)
+        _DEVICE_CONTROL_REFERENCE.search(without_track_names)
         or any(
             re.search(rf"(?<!\w){re.escape(name)}(?!\w)", text, re.I)
             for name in mentioned_devices
