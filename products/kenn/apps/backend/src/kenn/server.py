@@ -1395,6 +1395,11 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 self.send_json(503, {"status": "error", "error": str(exc)})
             return
+        if parsed.path == "/guide":
+            from kenn.core.tester_guide import guide_html
+
+            self.send_bytes(200, guide_html().encode("utf-8"), "text/html; charset=utf-8")
+            return
         if parsed.path == "/setup":
             # First-run page for the packaged app (kenn/core/live_setup.py does the work).
             self.send_bytes(200, (Path(__file__).with_name("setup_page.html")).read_bytes(), "text/html; charset=utf-8")

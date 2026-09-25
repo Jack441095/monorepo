@@ -38,7 +38,10 @@ Escalate with KENN version, command, sanitized request, input hash, Live version
 
 ## Support diagnostics
 
-For a ticket, query the loopback-only redacted payload:
+In the app, the tester presses **Setup & Support → Save diagnostics for support**; it writes the same redacted payload
+(plus receipt counts and answer timings) to `~/Library/Application Support/KENN/diagnostics` for them to attach.
+
+From a terminal, query the loopback-only redacted payload:
 
 ```bash
 curl http://127.0.0.1:8090/api/support/diagnostics
@@ -50,7 +53,7 @@ payload together with a sanitized request ID; use the separate read-only Live
 probe for session-specific evidence.
 
 Create a shareable local archive with
-`python3 scripts/build_support_bundle.py --output /secure/support/kenn-support.zip`.
+`python3 tooling/scripts/build_support_bundle.py --output /secure/support/kenn-support.zip`.
 This performs an additional allow-list projection and excludes raw logs,
 session IDs, targets, names, paths, prompts, errors, audio, and confirmation
 material. It writes mode 0600 and does not upload the archive.

@@ -14,7 +14,7 @@ Intel Macs and Live 11 are not supported.
 2. **Changes Live safely.** Ask for a change ("bring the bass down 2 dB", "pan the synth hard left"). KENN shows
    exactly what it will change and does nothing until you press **Apply to Live 12**. It then checks Live did it,
    and every change can be undone.
-3. **Answers with sources.** Ask how a device or technique works; answers cite KENN's notes, which cover 74 of
+3. **Answers with sources.** Ask how a device or technique works; answers cite KENN's notes, which cover 77 of
    Live 12's 78 built-in devices. When it doesn't know, it says so.
 4. **Listens to an exported mix.** Load a WAV of your mix (and optionally a reference) in the **Inputs** panel for a
    review of loudness, true peak, clipping and balance.
