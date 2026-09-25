@@ -179,7 +179,10 @@ def _resolve_return_track_by_name(
         by_letter = [rt for rt in return_tracks if rt.get("index") == ord(lowered) - ord("a")]
         if len(by_letter) == 1:
             return by_letter[0], None
-    substring = [rt for rt in return_tracks if lowered in str(rt.get("name", "")).strip().lower()]
+    # "b delay" for "B-Delay": compare words, not punctuation.
+    words = " ".join(re.findall(r"[a-z0-9]+", lowered))
+    substring = [rt for rt in return_tracks
+                 if words and words in " ".join(re.findall(r"[a-z0-9]+", str(rt.get("name", "")).lower()))]
     if len(substring) == 1:
         return substring[0], None
     if len(substring) > 1:

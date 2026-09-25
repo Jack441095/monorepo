@@ -61,8 +61,9 @@ def outcome(result: dict[str, Any]) -> dict[str, Any]:
         recipe = "recipe" in str(proposal.get("schema") or "") or proposal.get("steps")
         action = "recipe" if recipe else proposal.get("action") or proposal.get("operation")
         after = proposal.get("after")
-        # A locator carries its name; a rename's "after" is the new track name.
-        name = proposal.get("locator_name") or (after if isinstance(after, str) else None)
+        # A locator carries its name; a rename's "after" is the new track name, a new track's is a dict.
+        name = proposal.get("locator_name") or (after if isinstance(after, str) else
+                                                (after or {}).get("name") if isinstance(after, dict) else None)
         return {"action": action, "track": proposal.get("track_name"), "device": proposal.get("device_name"),
                 "value": proposal.get("after"), "name": name}
     status = str(result.get("status") or "")

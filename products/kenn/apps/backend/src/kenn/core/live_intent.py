@@ -991,6 +991,15 @@ _SEND_SAID_LETTER_FIRST = re.compile(
     r"(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!]?\s*$", re.I)
 
 
+# "put 40% of the bass on reverb", "add 25% of the drums bus to delay", "make the vox go to a-reverb at 50%".
+_SEND_SAID_PORTION = re.compile(
+    r"^\s*(?:(?:can|could)\s+you\s+)?(?:put|add|send|give)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s+of\s+(?:the\s+)?"
+    r"(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+(?:on|to|into)\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+[\w-]+)?)\s*[.!?]?\s*$", re.I)
+_SEND_SAID_GO_TO = re.compile(
+    r"^\s*make\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+go\s+to\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+[\w-]+)?)\s+"
+    r"at\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!?]?\s*$", re.I)
+
+
 def _rewrite_idioms(text: str) -> str:
     text = _POLITE_LEAD.sub("", _POLITE_TAIL.sub("", text))
     text = _A_DB.sub(lambda m: "0.5 dB" if m.group("half") else "1 dB", text)
@@ -999,6 +1008,8 @@ def _rewrite_idioms(text: str) -> str:
         found = match.group(group)
         return None if not found or _NOT_A_TRACK_NAME.search(found) or _TERSE_LEVEL_EXCLUDE.search(found) else found
 
+    if (m := _SEND_SAID_PORTION.match(text) or _SEND_SAID_GO_TO.match(text)) and name(m):
+        return f"send the {m.group('name')} to the {m.group('ret')} at {m.group('value')}%"
     if (m := _SEND_SAID_TRACK_FIRST.match(text) or _SEND_SAID_LETTER_FIRST.match(text)) and name(m):
         ret = m.group("ret").lower().replace("return ", "")
         ret = "reverb" if ret == "verb" else ret
@@ -1349,6 +1360,18 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
     # "some reverb on the snare" is vague (how much? insert or send?): ask, don't insert.
     insert_device_name = (_insert_device_name(lower)
                           if _ADD_DEVICE.search(lower) and not _VAGUE_EFFECT.search(lower) else None)
+    sounds_like_send = (re.search(r"\bsends?\b|\d\s*(?:%|percent)", lower) and not device_setup_match
+                        and not re.search(r"\b(?:dry|wet|mix)\b", lower))
+    if insert_device_name and sounds_like_send:
+        # "put 40% of the bass on reverb", "add a reverb send to the vocal" are sends, and used to insert a Reverb on
+        # the track. With an amount the send rules below take it; without one, ask. "at 25% dry wet" is still an
+        # insert with a setting.
+        insert_device_name = None
+        if not re.search(r"\d\s*(?:%|percent)", lower):
+            base["missing_fields"].append("send_amount")
+            base["ambiguity"].append("That sounds like a send. How much? For example \"send the vocal to the reverb at "
+                                     "20%\". Nothing changed.")
+            return base
     add_device_match = insert_device_name is not None
     inspect_device_parameters_match = _INSPECT_DEVICE_PARAMETERS.search(lower)
     eq_band_match = _EQ_BAND_GAIN.search(numeric_text)
@@ -1699,10 +1722,13 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         base.update({"mode": "assist", "action": "transport_stop", "confirmation_required": True, "confidence": 0.99})
         return base
 
-    track_phrase = _extract_track_phrase(text, tracks)
-    numbered_match = _NUMERIC_TRACK.search(text)
-    ordinal_match = _ORDINAL_TRACK.search(text)
-    spoken_track_match = _SPOKEN_TRACK_NUMBER.search(text)
+    # The new name isn't where the track is named: "rename the track with no devices to main synth" once renamed the
+    # Synth because "synth" is in the new name.
+    track_text = text[:rename_match.start(1)] if rename_match else text
+    track_phrase = _extract_track_phrase(track_text, tracks)
+    numbered_match = _NUMERIC_TRACK.search(track_text)
+    ordinal_match = _ORDINAL_TRACK.search(track_text)
+    spoken_track_match = _SPOKEN_TRACK_NUMBER.search(track_text)
     track_reference_match = numbered_match or ordinal_match or spoken_track_match
     track = None
     ambiguous = []
