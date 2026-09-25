@@ -31,6 +31,10 @@ def test_can_translate_subjective_phrases():
     assert SubjectiveTranslator.can_translate("Compress the drum bus for punch") is True
     assert SubjectiveTranslator.can_translate("What is on track 2?") is False
     assert SubjectiveTranslator.can_translate("Mute track 1") is False
+    assert SubjectiveTranslator.can_translate("Bring the vocal forward") is True
+    # A level request on the vocal alone must never turn into a recipe that also moves another track.
+    assert SubjectiveTranslator.can_translate("bring the vocal up a hair") is False
+    assert SubjectiveTranslator.can_translate("push the vocal up 2 dB") is False
 
 
 def test_vocal_cut_through_formulates_unmasking_recipe(mock_session_snapshot):
