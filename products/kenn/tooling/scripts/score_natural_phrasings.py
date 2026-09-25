@@ -2,7 +2,9 @@
 """Score natural phrasings through the whole command gateway (Stage 1 gate: >= 95% correct on >= 500 phrasings).
 
 Each phrasing goes through ``handle_command`` on a fresh demo set, the same path the app uses (rule parser,
-corrections, recipes, and the planner when ``--model`` is given), so nothing touches Live. Every result is one of:
+corrections, recipes), so nothing touches Live. With ``--model``, every phrasing the rules asked about is also given
+to that planner model directly (as planner_bakeoff does), which shows what "rules first, planner when the rules ask"
+would add. That never changes KENN's own planner stage, which only the promotion review sets. Every result is one of:
 
   right      the proposal (or answer) has the expected action, track and value
   asked      KENN asked instead of acting on something it could have done: safe, but counts against the 95%
@@ -11,7 +13,7 @@ corrections, recipes, and the planner when ``--model`` is given), so nothing tou
 A wrong plan is the number that matters most: a producer who presses Apply on one gets a change they didn't ask for.
 
     score_natural_phrasings.py                        # both holdout files, rule path only
-    score_natural_phrasings.py --model kenn-c6-run9b  # with the local planner live, as when promoted
+    score_natural_phrasings.py --model kenn-c6-run9b  # plus the planner on what the rules asked about
 """
 
 from __future__ import annotations
@@ -42,9 +44,8 @@ def _isolate(model: str | None) -> None:
     for name in ("KENN_LIVE_LLM_ENABLED", "KENN_LLM_ENABLED", "KENN_LLM_ENABLED_COMMAND", "KENN_LIVE_LLM_MODE"):
         os.environ.pop(name, None)
     if model:
-        os.environ.update({"KENN_LIVE_LLM_ENABLED": "1", "KENN_LLM_ENABLED_COMMAND": "1", "KENN_LIVE_LLM_MODE": "live",
-                           "KENN_LLM_PROVIDER_COMMAND": "ollama", "KENN_LLM_MODEL_COMMAND": model,
-                           "KENN_LLM_THINK": "off", "KENN_LLM_CACHE": "0"})
+        os.environ.update({"KENN_LLM_ENABLED_COMMAND": "1", "KENN_LLM_PROVIDER_COMMAND": "ollama",
+                           "KENN_LLM_MODEL_COMMAND": model, "KENN_LLM_THINK": "off", "KENN_LLM_CACHE": "0"})
 
 
 def load(sources: list[Path]) -> list[dict[str, Any]]:
@@ -118,10 +119,25 @@ def verdict(case: dict[str, Any], got: dict[str, Any], want: Any) -> str:
     return "right" if ok else "wrong"
 
 
+def planner_fallback(case: dict[str, Any], want: Any, service: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
+    """What the planner would propose where the rules asked; a plan it can't validate counts as asking."""
+    from kenn.core import live_command
+    from kenn.core.live_intent import parse_request
+
+    planner_snapshot = live_command._llm_planner_snapshot(service, snapshot, parse_request(case["query"], snapshot))
+    plan, meta = live_command._generate_llm_plan(case["query"], planner_snapshot)
+    if not plan or plan.get("action") == "clarify":
+        got = {"action": "clarify", "track": None, "value": None}
+    else:
+        got = {"action": plan.get("action"), "track": plan.get("track_name"), "device": plan.get("device_name"),
+               "value": plan.get("value"), "name": plan.get("new_track_name") or plan.get("locator_name")}
+    return {"got": got, "verdict": verdict(case, got, want), "status": meta.get("status")}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("sources", nargs="*", type=Path, default=DEFAULT_SOURCES)
-    parser.add_argument("--model", help="enable this Ollama planner model in live mode")
+    parser.add_argument("--model", help="also ask this Ollama planner model wherever the rules asked")
     parser.add_argument("--show", choices=["wrong", "asked", "all", "none"], default="wrong")
     parser.add_argument("--out", type=Path, help="write every row as JSON")
     args = parser.parse_args()
@@ -135,14 +151,17 @@ def main() -> int:
     snapshot = FakeLiveBackend().query_session_state()
     rows = []
     for number, case in enumerate(cases):
-        result = handle_command(case["query"], session_id=f"phrasing-{number}",
-                                service=LiveActionService(FakeLiveBackend()), allow_llm=bool(args.model))
+        service = LiveActionService(FakeLiveBackend())
+        result = handle_command(case["query"], session_id=f"phrasing-{number}", service=service, allow_llm=False)
         got = outcome(result)
         want = expected_value(case, snapshot)
-        rows.append({"id": case.get("id"), "query": case["query"], "category": case.get("category"),
-                     "expected": case["expected_action"], "expected_track": case.get("expected_track"),
-                     "want": want, "got": got, "verdict": verdict(case, got, want),
-                     "answer": "" if result.get("proposal") else str(result.get("answer") or "")[:160]})
+        row = {"id": case.get("id"), "query": case["query"], "category": case.get("category"),
+               "expected": case["expected_action"], "expected_track": case.get("expected_track"),
+               "want": want, "got": got, "verdict": verdict(case, got, want),
+               "answer": "" if result.get("proposal") else str(result.get("answer") or "")[:160]}
+        if args.model and got["action"] == "clarify":
+            row["planner"] = planner_fallback(case, want, service, snapshot)
+        rows.append(row)
 
     counts = collections.Counter(row["verdict"] for row in rows)
     by_category: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
@@ -160,8 +179,18 @@ def main() -> int:
     for category, tally in sorted(by_category.items()):
         print(f"  {category:22} right {tally['right']:3}  asked {tally['asked']:3}  wrong {tally['wrong']:3}")
     total = len(rows)
-    print(f"\n{total} phrasings{' with ' + args.model if args.model else ' (rule path)'}: right {counts['right']} "
-          f"({100 * counts['right'] / total:.1f}%), asked {counts['asked']}, wrong {counts['wrong']}")
+    print(f"\n{total} phrasings (rule path): right {counts['right']} ({100 * counts['right'] / total:.1f}%), "
+          f"asked {counts['asked']}, wrong {counts['wrong']}")
+    if args.model:
+        fallback = collections.Counter(row["planner"]["verdict"] for row in rows if "planner" in row)
+        for row in rows:
+            if "planner" in row and row["planner"]["verdict"] == "wrong":
+                got = row["planner"]["got"]
+                print(f"  planner wrong | {row['query']:56} | want {row['expected']} {row['expected_track'] or ''}"
+                      f" | got {got['action']} {got['track'] or ''} {'' if got['value'] is None else got['value']}")
+        right = counts["right"] + fallback["right"]
+        print(f"rules then {args.model} where the rules asked: right {right} ({100 * right / total:.1f}%), "
+              f"planner added {fallback['right']} right and {fallback['wrong']} wrong, still asked {fallback['asked']}")
     if args.out:
         args.out.write_text(json.dumps({"schema": "kenn.natural_phrasing_score.v1", "model": args.model,
                                         "counts": dict(counts), "rows": rows}, indent=1) + "\n", encoding="utf-8")

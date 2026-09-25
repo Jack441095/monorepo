@@ -2971,7 +2971,7 @@ def _handle_command_impl(
         return response
     if intent.get("missing_fields") or intent.get("ambiguity"):
         if intent.get("action") is None and intent.get("ambiguity") and set(intent.get("missing_fields") or []) & {
-                "supported_unit_mapping", "device", "send_amount"}:
+                "supported_unit_mapping", "device", "send_amount", "transport_target"}:
             # The parser knows exactly what's wrong ("Compressor Attack in ms isn't measured yet"); the generic
             # "not sure what you're asking" hid that from people who'd asked a perfectly clear question.
             return _clarification(response, intent, str(intent["ambiguity"][0]))

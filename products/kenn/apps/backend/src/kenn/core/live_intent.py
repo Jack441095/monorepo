@@ -1017,6 +1017,11 @@ _SEND_SAID_LETTER_FIRST = re.compile(
 _SEND_SAID_PORTION = re.compile(
     r"^\s*(?:(?:can|could)\s+you\s+)?(?:put|add|send|give)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s+of\s+(?:the\s+)?"
     r"(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+(?:on|to|into)\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+[\w-]+)?)\s*[.!?]?\s*$", re.I)
+_SEND_SAID_AMOUNT_FIRST = re.compile(
+    r"^\s*(?:put|send|add)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)?\s+(?:on|to|into)\s+(?:the\s+)?(?P<ret>reverb|verb|delay)\s+"
+    r"(?:for|on|from)\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s*[.!?]?\s*$"
+    r"|^\s*(?P<ret2>reverb|verb|delay)\s+(?P<value2>\d+(?:\.\d+)?)\s*(?:%|percent)?\s+on\s+(?:the\s+)?"
+    r"(?P<name2>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s*[.!?]?\s*$", re.I)
 _SEND_SAID_GO_TO = re.compile(
     r"^\s*make\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+go\s+to\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+[\w-]+)?)\s+"
     r"at\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!?]?\s*$", re.I)
@@ -1048,6 +1053,13 @@ def _rewrite_idioms(text: str) -> str:
         return f"centre {m.group('name')}"
     if (m := _SEND_LETTER_AFTER.match(text)) and name(m):
         return f"send the {m.group('name')} to the {m.group('ret').lower()} at {m.group('value')}%"
+    if (m := _SEND_SAID_AMOUNT_FIRST.match(text)):
+        group = "name" if m.group("name") else "name2"
+        if name(m, group):
+            ret = (m.group("ret") or m.group("ret2")).lower()
+            value = m.group("value") or m.group("value2")
+            if float(value) <= 100:
+                return f"send the {m.group(group)} to the {'reverb' if ret == 'verb' else ret} at {value}%"
     if (m := _SEND_SAID_PORTION.match(text) or _SEND_SAID_GO_TO.match(text)) and name(m):
         return f"send the {m.group('name')} to the {m.group('ret')} at {m.group('value')}%"
     if (m := _SEND_SAID_TRACK_FIRST.match(text) or _SEND_SAID_LETTER_FIRST.match(text)) and name(m):
@@ -1400,14 +1412,14 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
     # "some reverb on the snare" is vague (how much? insert or send?): ask, don't insert.
     insert_device_name = (_insert_device_name(lower)
                           if _ADD_DEVICE.search(lower) and not _VAGUE_EFFECT.search(lower) else None)
-    sounds_like_send = (re.search(r"\bsends?\b|\d\s*(?:%|percent)", lower) and not device_setup_match
-                        and not re.search(r"\b(?:dry|wet|mix)\b", lower))
+    sounds_like_send = (re.search(r"\bsends?\b|\d\s*(?:%|percent)|\b\d+\s+(?:on|to|into)\s+(?:the\s+)?(?:reverb|delay|verb)\b",
+                                  lower) and not device_setup_match and not re.search(r"\b(?:dry|wet|mix)\b", lower))
     if insert_device_name and sounds_like_send:
         # "put 40% of the bass on reverb", "add a reverb send to the vocal" are sends, and used to insert a Reverb on
         # the track. With an amount the send rules below take it; without one, ask. "at 25% dry wet" is still an
         # insert with a setting.
         insert_device_name = None
-        if not re.search(r"\d\s*(?:%|percent)", lower):
+        if not re.search(r"\d", lower):
             base["missing_fields"].append("send_amount")
             base["ambiguity"].append("That sounds like a send. How much? For example \"send the vocal to the reverb at "
                                      "20%\". Nothing changed.")
@@ -1753,6 +1765,16 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             "Device enable, bypass, mute, solo, and arm controls are not in the qualified action set; "
             "no track-level action was inferred."
         )
+        return base
+    transport_word = re.search(r"^\s*(?:play|stop|start|pause)\s+(?:the\s+)?(?P<what>.+?)\s*[.!?]?\s*$", lower)
+    if transport_word and not re.search(r"\b(?:song|set|session|track|playback|playing|beat|it|music|everything)\b",
+                                        transport_word.group("what")) and _extract_track_phrase(transport_word.group("what"), tracks):
+        # "play the drums", "stop the bass": Live's transport plays and stops the whole set, never one track. Starting
+        # or stopping everything isn't what was asked, so ask which is meant.
+        what = transport_word.group("what")
+        base["missing_fields"].append("transport_target")
+        base["ambiguity"].append(f"Play and stop run the whole set, not one track. Did you mean to solo or mute {what}, "
+                                 "or start/stop the whole set? Nothing changed.")
         return base
     if re.search(r"\b(play|start playback|start\s+(?:the\s+)?(?:song|set|playback|playing)|hit\s+play)\b"
                  r"|^\s*(?:let'?s\s+(?:hear\s+it|jam)|can\s+we\s+start|let'?s\s+go)\s*[.!?]?\s*$", lower):
