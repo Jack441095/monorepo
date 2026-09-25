@@ -1261,15 +1261,42 @@ def enhance_stream(
     )
 
     try:
+        streamed: list[str] = []
         for token, usage in chat_completion_stream(messages, "rewrite", answer_mode=answer_mode):
             if token:
+                streamed.append(token)
                 yield {"event": "token", "token": token}
             if usage and usage.total_tokens > 0:
+                if "sources:" not in "".join(streamed).lower():
+                    block = sources_block(results, source_label)
+                    if block:
+                        yield {"event": "token", "token": f"\n\n{block}"}
                 yield {"event": "llm_usage", "data": usage.to_dict()}
     except Exception as exc:
         print(f"WARNING: enhance_stream ended early on an unexpected error ({exc!r}) -- "
               f"caller sees a normally-terminated stream with no indication generation was cut short")
         return
+
+
+def sources_block(results: list[tuple[float, dict]], source_label, limit: int = 3) -> str:
+    """The notes this answer was written from, in the template's "Sources:" format."""
+    labels: list[str] = []
+    for _score, chunk in results:
+        label = str(source_label(chunk) or "").strip()
+        if label and label not in labels:
+            labels.append(label)
+        if len(labels) == limit:
+            break
+    return "Sources:\n" + "\n".join(f"- {label}" for label in labels) if labels else ""
+
+
+def _with_sources(text: str, results: list[tuple[float, dict]], source_label) -> str:
+    # A local model often writes a good answer but forgets the "Sources:" line, and the whole answer used to be
+    # thrown away for it. KENN knows exactly which notes it gave the model, so it adds them itself.
+    if "sources:" in text.lower():
+        return text
+    block = sources_block(results, source_label)
+    return f"{text.rstrip()}\n\n{block}" if block else text
 
 
 def build_context_block(results: list[tuple[float, dict]], source_label) -> str:
@@ -1331,7 +1358,7 @@ def enhance(
 
     text = re.sub(r"^#+\s*", "", text, flags=re.M).strip()
     from kenn.llm.linter import lint_response
-    text = lint_response(text, answer_mode)
+    text = _with_sources(lint_response(text, answer_mode), results, source_label)
     if not valid_response(text, answer_mode, route=route):
         return None
     return text
