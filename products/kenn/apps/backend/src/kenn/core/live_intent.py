@@ -190,8 +190,8 @@ def _display_unit_error(*, device_name: str, parameter_name: str, value: float, 
         return None
     if find_profile(device_name, parameter_name, normalized) is None:
         return (
-            "That Live display unit is not safely mapped to a raw parameter value yet. "
-            "Inspect the exact parameter profile or specify an explicit raw value; nothing will change."
+            f"I can't set {device_name} {parameter_name} to {value:g}{' ms' if normalized == 'ms' else ':1'} yet: that "
+            "control hasn't been measured in Live, so I can't be sure which setting gives that value. Nothing changed."
         )
     _, error = display_to_raw(
         device_name=device_name,
@@ -2140,7 +2140,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
     device = next(((index, name) for index, name in device_candidates if name and name.lower() in lower), None)
     if device is None and re.search(r"\b(?:threshold|ratio|attack|release|frequency|gain|q)\b", lower):
         base["missing_fields"].append("device")
-        base["ambiguity"].append("The request names a device parameter, but no matching device name exists in the Live snapshot.")
+        base["ambiguity"].append("I couldn't find that device on the track. Name the device as it appears in Live.")
         return base
     if device is not None:
         base["device"] = {"index": device[0], "name": device[1]}
