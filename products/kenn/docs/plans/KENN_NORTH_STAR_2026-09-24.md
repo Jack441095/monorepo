@@ -116,6 +116,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > left" → "30%" or "hard"; "kick -3 dB" → "at -3" (a level) or "3 dB quieter" (a change); "mute" → "the hats".
   > Short replies only, within 5 minutes, joined to the pending request and parsed normally. Found on the way: "pan
   > the synth left 30%" panned right (side before the amount was ignored) — fixed; a pan with no side now asks.
+  > Same day: corrections — "no, I meant the snare", "sorry, the kick", "not the hats, the kick", "actually the
+  > vocal" — move the last whole-track change to the track meant, as a new proposal. If the first change was already
+  > applied it stays, and KENN says so and points at "undo". "No, the other one" and device-parameter follow-ups
+  > still ask (next).
 - [x] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
   > 25 Sept: checked. The brain writes prose only; it has no Live access. Live changes run only in
   > `handle_command` with a confirmed proposal; a model plan must pass `validate_llm_plan` (typed actions, exact
