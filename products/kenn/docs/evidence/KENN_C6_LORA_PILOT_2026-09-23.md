@@ -335,3 +335,31 @@ validation loss 1.89 → 0.0003.
 - **Decision:** run 8 is not promoted. Run 4 stays in shadow. Before run 9: validate on demo-style snapshots (not only
   the training distribution), and try fewer steps or a lower merge scale (both runs reached validation loss ≈ 0.0003,
   which suggests memorisation).
+
+## Addendum: run 9, ablation of run 8's two changes (2026-09-25)
+
+Run 8 added two things at once (a confusable-names scenario and exact-track contrast rows) and regressed. Run 9 splits
+them, same settings as runs 7 and 8 (1 epoch, batch 2 × 4, lr 2e-4, rank 16), GPU 0:
+**9a** = run 7 + contrast rows (3,168 records); **9b** = run 7 + confusable-names scenario, no contrast rows (3,720).
+Evaluated with the GPU otherwise idle (9a's first plain pass ran while 9b trained, at 12.6 s p50, and was repeated).
+
+| GPU, 124 cases | Correct | Accepted | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted |
+|---|---|---|---|---|---|---|
+| Run 7, plain | 78.2% | 84.7% | 29/30 | 68/94 | 17/24 | 4 |
+| Run 9a, plain | 75.0% | 86.3% | 29/30 | 64/94 | 18/24 | 5 |
+| **Run 9b, plain** | **85.5%** | **96.8%** | 29/30 | **77/94** | 18/24 | **3** |
+| Run 7, production evidence | 82.3% | 88.7% | 29/30 | 73/94 | 18/24 | 4 |
+| Run 9a, production evidence | 82.3% | 96.0% | 28/30 | 74/94 | 19/24 | 5 |
+| **Run 9b, production evidence** | **87.1%** | **99.2%** | 29/30 | **79/94** | 19/24 | **3** |
+
+- **Cause of run 8's regression: the contrast rows.** 9b (confusable names only) keeps track names and is the best run
+  so far (run 4, the shadow model: 84.7% / 84.7%). Solo and mute 5/5; the "bass → Drum Bus" error is gone.
+- Value probe (16 commands, checked as the final fader value): 9a 16/16, 9b 16/16.
+- Adversarial mixer phrasings (29 that sound like a fader change but mean something else; the rule parser, which is
+  what drives Live, gets 29/29): 9a 12/29, 9b 17/29. The planner still reads many as fader changes, so it stays
+  shadow-only; this set is now part of its evaluation.
+- Remaining 9b wrong plans: inspect-parameters read as inspect-devices; a pan+recipe read as one pan; "clarify" read
+  as a mute.
+- **Decision:** 9b is the best candidate for the shadow slot (replacing run 4). Swapping the shadow model is the
+  owner's call; promotion to writes still goes only through `live_llm_promotion.py`. Box copies removed after
+  evaluation (the runs had filled `/mnt/data` overnight); 9b's Q4_K_M kept (2.6 GB).
