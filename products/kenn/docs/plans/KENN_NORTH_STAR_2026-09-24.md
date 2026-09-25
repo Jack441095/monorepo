@@ -116,7 +116,13 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > left" → "30%" or "hard"; "kick -3 dB" → "at -3" (a level) or "3 dB quieter" (a change); "mute" → "the hats".
   > Short replies only, within 5 minutes, joined to the pending request and parsed normally. Found on the way: "pan
   > the synth left 30%" panned right (side before the amount was ignored) — fixed; a pan with no side now asks.
-- [ ] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
+- [x] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
+  > 25 Sept: checked. The brain writes prose only; it has no Live access. Live changes run only in
+  > `handle_command` with a confirmed proposal; a model plan must pass `validate_llm_plan` (typed actions, exact
+  > names from the current set, no hidden nested steps) and cannot override a rule-parser refusal (tests in
+  > `test_live_command.py`: typed plan must match, cannot bypass refusal, shadow keeps rule authority). One gap found
+  > and closed: a brain answer saying "I've turned the bass down" was a false receipt; the grounding gate now
+  > throws it away and uses the template (no false hits on 122 real Qwen answers).
 - [ ] **Gate:** ≥ 95% correct on ≥ 500 natural phrasings (curated holdout grown from 24); human-review packet passes with
       two reviewers; p95 answer latency ≤ 4 s online; zero writes without Apply in shadow logs
 
