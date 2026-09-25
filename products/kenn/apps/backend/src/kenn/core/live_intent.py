@@ -1058,6 +1058,8 @@ def _normalize_kilohertz(text: str) -> str:
 _SINGLE_TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"}
 _TONE_WORDS = re.compile(r"\b(?:high|low|top|bottom)\s+end\b|\b(?:highs|lows|mids|low[- ]mids|treble|brightness|"
                          r"muddiness|mud|boom|harshness|sibilance|air|presence)\b", re.I)
+_EXCEPT = re.compile(r"\b(?:except|apart\s+from|other\s+than|all\s+but|everything\s+but|but\s+not)\b", re.I)
+_PLAY_FROM = re.compile(r"\b(?:play|start|go)\b.*?\bfrom\s+(?:the\s+)?(?P<where>[\w\s-]+?)\s*[.!]?\s*$", re.I)
 _SECTION_SCOPE = re.compile(r"\b(?:in|during|for|through)\s+(?:the\s+)?(?:first\s+|second\s+|last\s+|final\s+)?"
                             r"(?:verse|chorus|hook|drop|intro|outro|bridge|breakdown|build(?:[- ]?up)?|pre[- ]?chorus|"
                             r"section|middle\s+eight)s?\b", re.I)
@@ -1069,13 +1071,26 @@ def _single_track_change_question(parsed: dict[str, Any], snapshot: dict[str, An
     Two named tracks ("the bass 3 dB below the kick"), tone words ("the hats' high end") or a song section
     ("in the verse") mean the fader change KENN would make is not what was asked for.
     """
-    if parsed.get("action") not in _SINGLE_TRACK_ACTIONS or parsed.get("missing_fields") or parsed.get("ambiguity"):
+    if parsed.get("missing_fields") or parsed.get("ambiguity"):
+        return ""
+    if parsed.get("action") == "transport_play":
+        start = _PLAY_FROM.search(str(parsed.get("query") or ""))
+        if start:
+            # "play from the chorus" used to start from wherever the playhead was, silently dropping "from the chorus".
+            return (f"KENN can only start playback from where the playhead is, not from {start.group('where')}. Move the "
+                    "playhead there in Live, then say \"play\".")
+        return ""
+    if parsed.get("action") not in _SINGLE_TRACK_ACTIONS:
         return ""
     query = str(parsed.get("query") or "")
     lowered = query.casefold()
     target = (parsed.get("track") or {}).get("name") if isinstance(parsed.get("track"), dict) else None
     named = [str(t.get("name")) for t in (snapshot or {}).get("tracks") or [] if isinstance(t, dict) and t.get("name")
              and re.search(rf"(?<![\w-]){re.escape(str(t['name']).casefold())}(?![\w-])", lowered)]
+    if _EXCEPT.search(query):
+        # "mute everything except the kick" used to mute the kick: the one track the producer wanted left alone.
+        return (f"KENN changes one track at a time for now, so it can't do \"{_EXCEPT.search(query).group(0)} …\". "
+                "Name the track to change, for example \"mute the snare\".")
     if len(set(named)) >= 2:
         return (f"That mentions {', '.join(sorted(set(named)))}. Which single track should change, and by how much? "
                 "For example \"turn the Bass down 3 dB\".")
