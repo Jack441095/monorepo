@@ -55,3 +55,27 @@ def test_look_alikes_are_not_rewritten_into_a_change(snapshot, request_text) -> 
 def test_a_marker_placed_here_is_not_named_here(snapshot) -> None:
     # Regression: "put a marker called Build here" named the locator "Build here".
     assert parse_request("put a marker called Build here", snapshot)["locator_name"] == "Build"
+
+
+@pytest.mark.parametrize("request_text, track, send_to", [
+    ("put 40% of the bass on reverb", "Bass", "reverb"),
+    ("add 25% of the drums bus to delay", "Drum Bus", "delay"),
+    ("make the vox go to a-reverb at 50%", "Lead Vocal", "reverb"),
+])
+def test_a_portion_on_the_reverb_is_a_send_not_a_new_device(snapshot, request_text, track, send_to) -> None:
+    # Regression (blind check, 25 Sept): these inserted a Reverb device on the track instead of setting its send.
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == "set_send" and parsed["track"]["name"] == track
+    assert send_to in str(parsed.get("return_track_name") or "").lower()
+
+
+def test_a_send_with_no_amount_asks_how_much(snapshot) -> None:
+    parsed = parse_request("can you add a reverb send to the lead vocal?", snapshot)
+    assert parsed["action"] is None and "send_amount" in parsed["missing_fields"]
+
+
+def test_a_rename_finds_the_track_before_the_new_name(snapshot) -> None:
+    # Regression (blind check): "... to main synth" renamed the Synth because "synth" was in the new name.
+    parsed = parse_request("rename the track with no devices to main synth", snapshot)
+    assert parsed["action"] is None or (parsed["track"] or {}).get("name") != "Synth"
+    assert parse_request("rename the synth to Bass Two", snapshot)["track"]["name"] == "Synth"
