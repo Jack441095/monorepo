@@ -1,0 +1,710 @@
+{
+ "schema": "kenn.retrieval_cases.v1",
+ "note": "Producer-worded questions for KENN's technique notes, without the notes' own key terms. Claude-drafted 2026-09-25, pending owner review. Any listed source counts (overlapping notes can both answer).",
+ "cases": [
+  {
+   "id": "technique-purpose-001",
+   "question": "my drums sound limp and don't cut through, how do I get more snap",
+   "source_must_include": [
+    "transient-shaping"
+   ],
+   "source_any_include": [
+    "transient-shaping",
+    "drum-punch",
+    "transient-crest-factor"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-002",
+   "question": "everything sounds boxy and cloudy around the 300 Hz area",
+   "source_must_include": [
+    "muddy-low-mids-fix"
+   ],
+   "source_any_include": [
+    "muddy-low-mids-fix",
+    "frequency-masking"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-003",
+   "question": "the vocal disappears behind the guitars in the chorus",
+   "source_must_include": [
+    "vocal-buried-in-mix"
+   ],
+   "source_any_include": [
+    "vocal-buried-in-mix",
+    "vocal-sit-in-mix",
+    "frequency-masking"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-004",
+   "question": "how do I stop my mixes sounding flat and two dimensional",
+   "source_must_include": [
+    "depth-in-a-mix"
+   ],
+   "source_any_include": [
+    "depth-in-a-mix",
+    "mix-lacks-depth"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-005",
+   "question": "how loud should my master be for Spotify",
+   "source_must_include": [
+    "mastering-streaming-loudness"
+   ],
+   "source_any_include": [
+    "mastering-streaming-loudness",
+    "eliminating-stream-loudness",
+    "aes-streaming-loudness"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-006",
+   "question": "what should my levels peak at when I'm recording a singer",
+   "source_must_include": [
+    "recording-levels-24-bit"
+   ],
+   "source_any_include": [
+    "recording-levels-24-bit",
+    "gain-staging-basics",
+    "home-vocal-recording"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-007",
+   "question": "my singer sounds boomy when they get close to the mic",
+   "source_must_include": [
+    "vocal-microphone-placement"
+   ],
+   "source_any_include": [
+    "vocal-microphone-placement"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-008",
+   "question": "how do I get the pumping effect where the pads duck under the kick",
+   "source_must_include": [
+    "sidechain-compression"
+   ],
+   "source_any_include": [
+    "sidechain-compression"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-009",
+   "question": "the kick and the bass fight each other and the low end is a mess",
+   "source_must_include": [
+    "kick-bass-balance-phase"
+   ],
+   "source_any_include": [
+    "kick-bass-balance-phase",
+    "kick-tuning-with-bass",
+    "low-end-mono-stereo"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-010",
+   "question": "does my kick drum need to be in the same key as my song",
+   "source_must_include": [
+    "kick-tuning-with-bass"
+   ],
+   "source_any_include": [
+    "kick-tuning-with-bass"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-011",
+   "question": "how do I glue my drums together so they feel like one kit",
+   "source_must_include": [
+    "jack-drum-bus-processing"
+   ],
+   "source_any_include": [
+    "jack-drum-bus-processing",
+    "bus-compression-glue",
+    "mix-bus-glue-compression"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-012",
+   "question": "I want my synth to sound huge and wide but still work on a phone speaker",
+   "source_must_include": [
+    "creating-a-wide-stereo-sound"
+   ],
+   "source_any_include": [
+    "creating-a-wide-stereo-sound",
+    "stereo-imaging-width",
+    "low-end-mono-stereo"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-013",
+   "question": "how do I make my hi hats less piercing",
+   "source_must_include": [
+    "harsh-hats-cymbals-control"
+   ],
+   "source_any_include": [
+    "harsh-hats-cymbals-control"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-014",
+   "question": "my laptop keeps crackling and glitching when I play the project",
+   "source_must_include": [
+    "audio-interface-buffer-latency"
+   ],
+   "source_any_include": [
+    "audio-interface-buffer-latency",
+    "cpu-saving"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-015",
+   "question": "there's a delay between hitting a key and hearing the sound",
+   "source_must_include": [
+    "audio-interface-buffer-latency"
+   ],
+   "source_any_include": [
+    "audio-interface-buffer-latency"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-016",
+   "question": "how do I send a mix to a mastering engineer",
+   "source_must_include": [
+    "deliver-final-mix-to-client"
+   ],
+   "source_any_include": [
+    "deliver-final-mix-to-client",
+    "export-stems-for-mixing",
+    "jack-export-specs"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-017",
+   "question": "what files should I give someone who is going to mix my song",
+   "source_must_include": [
+    "export-stems-for-mixing"
+   ],
+   "source_any_include": [
+    "export-stems-for-mixing",
+    "exporting-stems-and-mixdowns",
+    "prepare-session-for-mixing"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-018",
+   "question": "how do I compare my mix against a commercial track fairly",
+   "source_must_include": [
+    "mixing-to-reference-track"
+   ],
+   "source_any_include": [
+    "mixing-to-reference-track",
+    "reference-track-level-match",
+    "reference-track-selection"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-019",
+   "question": "I can only mix on headphones, what should I watch out for",
+   "source_must_include": [
+    "headphone-mixing"
+   ],
+   "source_any_include": [
+    "headphone-mixing"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-020",
+   "question": "my room makes the bass sound different in every corner",
+   "source_must_include": [
+    "room-acoustics"
+   ],
+   "source_any_include": [
+    "room-acoustics",
+    "room-acoustics-treatment",
+    "room-acoustics-monitor-placement"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-021",
+   "question": "how do I make a big build up before the drop",
+   "source_must_include": [
+    "edm-drop-and-buildup"
+   ],
+   "source_any_include": [
+    "edm-drop-and-buildup",
+    "risers-sweeps-transitions"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-022",
+   "question": "my chorus doesn't feel bigger than the verse",
+   "source_must_include": [
+    "house-section-energy-arrangement"
+   ],
+   "source_any_include": [
+    "house-section-energy-arrangement",
+    "arrangement-energy",
+    "arrangement-structure"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-023",
+   "question": "how do I get that lo-fi dusty sound on my beats",
+   "source_must_include": [
+    "lofi-hip-hop-production"
+   ],
+   "source_any_include": [
+    "lofi-hip-hop-production"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-024",
+   "question": "how do I chop up a sample to make a new beat",
+   "source_must_include": [
+    "sample-flipping-hip-hop"
+   ],
+   "source_any_include": [
+    "sample-flipping-hip-hop",
+    "vocal-chops-and-sampling"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-025",
+   "question": "how do I make a wobbling bass line",
+   "source_must_include": [
+    "wobble-bass-dubstep"
+   ],
+   "source_any_include": [
+    "wobble-bass-dubstep"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-026",
+   "question": "the vocal is out of tune in a couple of places",
+   "source_must_include": [
+    "pitch-correction"
+   ],
+   "source_any_include": [
+    "pitch-correction",
+    "vocal-tuning-ableton",
+    "vocal-tuning-comping-workflow"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-027",
+   "question": "how do I make background vocals sit behind the lead",
+   "source_must_include": [
+    "mixing-background-vocals"
+   ],
+   "source_any_include": [
+    "mixing-background-vocals"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-028",
+   "question": "there's a constant hum under my voiceover",
+   "source_must_include": [
+    "mains-hum-removal-for-dialogue"
+   ],
+   "source_any_include": [
+    "mains-hum-removal-for-dialogue",
+    "noise-removal-recording-cleanup"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-029",
+   "question": "how do I cut the noise between drum hits on my tom tracks",
+   "source_must_include": [
+    "noise-gate-usage"
+   ],
+   "source_any_include": [
+    "noise-gate-usage",
+    "expander-gate-noise-control"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-030",
+   "question": "my overheads make the snare sound thin and hollow",
+   "source_must_include": [
+    "drum-overhead-phase-alignment"
+   ],
+   "source_any_include": [
+    "drum-overhead-phase-alignment",
+    "phase-cancellation",
+    "phase-and-polarity"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-031",
+   "question": "is it better to use a delay or a reverb on this vocal",
+   "source_must_include": [
+    "delay-vs-reverb"
+   ],
+   "source_any_include": [
+    "delay-vs-reverb",
+    "vocal-reverb-delay-selection",
+    "vocal-depth-reverb-delay"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-032",
+   "question": "how do I make the last word of a line echo out",
+   "source_must_include": [
+    "vocal-delay-throws-automation"
+   ],
+   "source_any_include": [
+    "vocal-delay-throws-automation",
+    "vocal-doubles-adlibs-throws"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-033",
+   "question": "how do I make my piano sound good in a busy mix",
+   "source_must_include": [
+    "mixing-piano-keys"
+   ],
+   "source_any_include": [
+    "mixing-piano-keys"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-034",
+   "question": "my electric guitars sound fizzy and harsh",
+   "source_must_include": [
+    "mixing-electric-guitar"
+   ],
+   "source_any_include": [
+    "mixing-electric-guitar"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-035",
+   "question": "how do I stack synths without it turning into mush",
+   "source_must_include": [
+    "synth-layering-without-muddiness"
+   ],
+   "source_any_include": [
+    "synth-layering-without-muddiness",
+    "mixing-synths-in-a-full-mix"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-036",
+   "question": "how do I design a kick from a sine wave",
+   "source_must_include": [
+    "making-a-kick-drum"
+   ],
+   "source_any_include": [
+    "making-a-kick-drum",
+    "kick-drum-synthesis"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-037",
+   "question": "how do I make a deep sub that works on big speakers",
+   "source_must_include": [
+    "making-a-sub-bass"
+   ],
+   "source_any_include": [
+    "making-a-sub-bass",
+    "sub-bass-saturation"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-038",
+   "question": "my sub disappears on laptop speakers",
+   "source_must_include": [
+    "sub-bass-saturation"
+   ],
+   "source_any_include": [
+    "sub-bass-saturation",
+    "adding-overtones",
+    "808-translation"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-039",
+   "question": "how do I make a soft evolving background texture",
+   "source_must_include": [
+    "pad-sound-design"
+   ],
+   "source_any_include": [
+    "pad-sound-design",
+    "granular-synthesis",
+    "making-ambient-music"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-040",
+   "question": "what sample rate should I record at",
+   "source_must_include": [
+    "sample-rate-bit-depth-for-music"
+   ],
+   "source_any_include": [
+    "sample-rate-bit-depth-for-music",
+    "sample-rate-bit-depth-dither"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-041",
+   "question": "should I dither when I bounce to 16 bit",
+   "source_must_include": [
+    "sample-rate-bit-depth-dither"
+   ],
+   "source_any_include": [
+    "sample-rate-bit-depth-dither"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-042",
+   "question": "my arrangement has too much going on, how do I strip it back",
+   "source_must_include": [
+    "the-power-of-minimalism"
+   ],
+   "source_any_include": [
+    "the-power-of-minimalism",
+    "frequency-masking-arrangement"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-043",
+   "question": "how do I make the mix louder without it sounding squashed",
+   "source_must_include": [
+    "making-mix-louder"
+   ],
+   "source_any_include": [
+    "making-mix-louder",
+    "mastering-clipper",
+    "jack-mastering-clipper-use"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-044",
+   "question": "how do I keep the energy moving through a long mix with automation",
+   "source_must_include": [
+    "mix-automation-musical-movement"
+   ],
+   "source_any_include": [
+    "mix-automation-musical-movement",
+    "clip-automation-basics"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-045",
+   "question": "the drummer drifted off the click, how do I line it up",
+   "source_must_include": [
+    "warp-markers"
+   ],
+   "source_any_include": [
+    "warp-markers",
+    "warping-audio-to-tempo",
+    "quantize-midi"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-046",
+   "question": "how do I make the track slow down and stop like a turntable",
+   "source_must_include": [
+    "tape-stop-effect"
+   ],
+   "source_any_include": [
+    "tape-stop-effect"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-047",
+   "question": "how do I prepare my project before I start mixing",
+   "source_must_include": [
+    "prepare-session-for-mixing"
+   ],
+   "source_any_include": [
+    "prepare-session-for-mixing",
+    "live-set-organisation",
+    "mixdown-checklist"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-048",
+   "question": "what should I check before I call a mix finished",
+   "source_must_include": [
+    "mixdown-checklist"
+   ],
+   "source_any_include": [
+    "mixdown-checklist"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-049",
+   "question": "how loud should a podcast be when I deliver it",
+   "source_must_include": [
+    "podcast-delivery-loudness-targets"
+   ],
+   "source_any_include": [
+    "podcast-delivery-loudness-targets"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  },
+  {
+   "id": "technique-purpose-050",
+   "question": "how do I set up Live for playing a gig",
+   "source_must_include": [
+    "live-performance-setup"
+   ],
+   "source_any_include": [
+    "live-performance-setup"
+   ],
+   "answer_must_include": [],
+   "category": "technique_purpose",
+   "source_kind": "claude_drafted_owner_review_pending"
+  }
+ ]
+}

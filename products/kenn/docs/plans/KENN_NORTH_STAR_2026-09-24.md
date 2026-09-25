@@ -133,6 +133,9 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > last 13% need better candidates (note wording). "Use it when…" drafts: 0.744 → 0.760, awaiting owner review.
   > Shipping a reranker is a size/latency call (bge-reranker-base adds ~0.3–1 GB and ~1–2 s per answer on a Mac CPU,
   > unmeasured on device yet) — owner decision.
+  > Fixture now **303 questions** (gate size reached): 128 original + 125 device-purpose + 50 technique-purpose
+  > (`evals/technique_purpose_retrieval_cases.json`, producer wording, overlapping notes all count). Today's hybrid on
+  > the technique set: recall@4 **0.84** (BM25 alone 0.64).
 
 ### Stage 3 — Agentic co-producer (beta weeks 6–16)
 
