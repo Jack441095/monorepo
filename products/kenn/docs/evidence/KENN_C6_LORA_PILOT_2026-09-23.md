@@ -410,3 +410,24 @@ added 7–17 wrong plans per set; run 11 added 2–7 and got more right (beginne
 `kenn-c6-run11` from `c6-run11-q4km.gguf` (sha256 51bcf34d…), about 3–4 s per plan once loaded (26 s cold).
 Shadow is observation only; nothing about the promotion stage changed. It takes effect at the companion restart
 after soak #3, which runs on 9b to the end.
+
+## Addendum: run 12, blind-set trap seeds (25 Sept) — not better, run 11 stays
+
+Run 11's recipe plus 12 drafted trap seeds for what the blind phrasing sets caught ("toggle", "hear X without Y",
+sends with no amount, tracks described by their devices, a return "for delay", how-to questions), worded differently
+from those sets. `--clarify-variants 4` kept the ask share at 33% (3,580 records); 403 steps on GPU 0, val loss
+1.85 → 0.0005.
+
+As the fallback where the rules ask (`score_natural_phrasings.py --model`, same scorer and rules as run 11):
+
+| Blind set | Run 11 | Run 12 |
+|---|---|---|
+| Qwen3 14B, 210 | 94.3% right, 2 wrong | 89.5% right, 13 wrong |
+| Qwen3 8B, 171 | 95.3% right, 3 wrong | 92.4% right, 8 wrong |
+| Qwen3 14B beginner, 224 | 89.3% right, 7 wrong | 89.3% right, 5 wrong |
+
+More wrong plans on two of three sets, some of them inverted: "pull back the bass" → unmute, "reduce fx print" →
+mute, "record audio for bass" → play, and "rename the track with the reverb return to Reverb Return" renamed the Kick.
+A validation loss near zero says it fitted its own synthetic phrasings rather than the pattern. **Run 11 stays in
+shadow.** Run 12's Q4_K_M is kept on the box for reference. More seeds of the same kind won't fix this; the next
+planner run needs varied real wording (tester phrasings once the beta starts) and an earlier stop.
