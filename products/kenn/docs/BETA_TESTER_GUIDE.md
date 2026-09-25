@@ -47,6 +47,8 @@ KENN connecting.
 | `Bring the bass down 2 dB` / `Put the kick at -12 dB` | A proposal in dB; nothing changes until Apply |
 | `Pan the synth 20% left` / `Mute the hats` | Proposal, Apply, then "Readback Verified" |
 | `Undo that` or the **Undo** button on a card | Puts the exact previous value back |
+| After a change: `Do that on the snare too` / `Same for the hats` / `Do the opposite on the vocal` | The same change on another track, as a new proposal |
+| When KENN asks "By how much?" or "Which side?", just answer: `3 dB`, `30%`, `left` | Finishes the request you started |
 | `What did you change?` | The recent changes, with before and after values |
 | `What does Note Echo do?` | A cited answer from KENN's notes |
 | A mix WAV in **Inputs** | Review of loudness, true peak, clipping and balance |
@@ -87,6 +89,8 @@ version ships a newer AbletonOSC, the setup page will offer an update the next t
 
 - KENN understands common phrasing, but not everything; when it isn't sure, it asks. Please send us phrasings it
   misunderstood.
+- Follow-ups ("do that on the snare too") repeat track volume, pan, mute, solo and arm changes; device changes and
+  two tracks at once ("the snare and the kick") aren't repeated yet, so KENN asks.
 - Device control in real units covers a starter set (EQ Eight band gain, Compressor, Saturator, Auto Filter and a
   few more); other device parameters can be read but not yet set in real units.
 - KENN inserts only 10 audio effects so far, and no instruments or MIDI effects.
