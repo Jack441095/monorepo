@@ -2197,6 +2197,65 @@ def _resolve_eq_band_tuning_gain(
     return result
 
 
+_FOLLOW_UP = re.compile(
+    r"^(?:(?:and|also|now|plus|then)\s+)?"
+    r"(?:(?P<opposite>(?:do\s+)?the\s+opposite)\s+(?:on|to|for|with)\s+"
+    r"|(?:do\s+(?:that|the\s+same|it|this)|(?:the\s+)?same(?:\s+again)?)\s+(?:on|to|for|with)\s+)?"
+    r"(?P<target>.+?)(?:\s+(?:too|as\s+well|also))?\s*[.!?]*$",
+    re.I,
+)
+_FOLLOW_UP_MARKER = re.compile(r"^(?:and|also|now|plus|then)\b|\b(?:do\s+(?:that|the\s+same|it|this)|same|opposite)\b"
+                               r"|\b(?:too|as\s+well)\s*[.!?]*$", re.I)
+
+
+def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) -> str | None:
+    """ "do that on the snare too" -> the last command, written out for the snare.
+
+    The previous command is re-parsed against the current set, so a relative change ("down 2 dB") is applied
+    from the new track's own level, and the result goes back through the normal parser and its safety checks.
+    "the opposite" flips the direction. Only whole-track mixer changes are repeated; anything else asks.
+    """
+    from kenn.core.session_context import live_conversation_context
+
+    match = _FOLLOW_UP.match(command.strip())
+    if not match or not _FOLLOW_UP_MARKER.search(command):
+        return None
+    prior_text = str(live_conversation_context(session_id).get("last_command") or "")
+    if not prior_text:
+        return None
+    prior = parse_request(prior_text, snapshot)
+    action = prior.get("action")
+    if action not in {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"} or prior.get("missing_fields"):
+        return None
+    if re.search(r"\band\b|,|&|\bboth\b", match.group("target"), re.I):
+        return None  # "the snare and the kick" once changed only the kick; two tracks at once isn't a follow-up yet
+    target = parse_request(f"solo {match.group('target')}", snapshot)
+    track = target.get("track") if isinstance(target.get("track"), dict) else None
+    if not track or target.get("missing_fields") or target.get("ambiguity"):
+        return None
+    prior_track = prior.get("track") if isinstance(prior.get("track"), dict) else {}
+    if track.get("index") == prior_track.get("index"):
+        return None  # the same track again would apply the change twice; let it ask
+    name, flip = str(track.get("name")), bool(match.group("opposite"))
+    value = prior.get("desired_value")
+    if action == "set_volume":
+        relative = prior.get("requested_relative_db")
+        if isinstance(relative, (int, float)):
+            change = -relative if flip else relative
+            return f"turn {name} {'up' if change > 0 else 'down'} {abs(change):g} dB"
+        if flip or not isinstance(value, (int, float)):
+            return None  # the opposite of an absolute level isn't defined
+        return f"set {name} volume to {volume_law.raw_to_db(float(value)):g} dB"
+    if action == "set_pan" and isinstance(value, (int, float)):
+        pan = -float(value) if flip else float(value)
+        return f"center {name}" if abs(pan) < 1e-6 else f"pan {name} {abs(pan) * 100:g}% {'left' if pan < 0 else 'right'}"
+    if isinstance(value, bool):
+        on = (not value) if flip else value
+        verb = {"set_mute": ("mute", "unmute"), "set_solo": ("solo", "unsolo"), "set_arm": ("arm", "disarm")}[action]
+        return f"{verb[0] if on else verb[1]} {name}"
+    return None
+
+
 def _command_needs_mixer_snapshot(command: str, llm_plan: dict[str, Any] | None = None) -> bool:
     """Select one fresh mixer snapshot when the request plainly needs it."""
     if isinstance(llm_plan, dict) and llm_plan.get("action") in TRACK_ACTIONS:
@@ -2605,6 +2664,21 @@ def _handle_command_impl(
     generated_plan: dict[str, Any] | None = None
     parse_started = time.monotonic()
     deterministic_intent = parse_request(clean_command, snapshot)
+    if not deterministic_intent.get("action") and proposal is None:
+        if not mixer_snapshot:  # the previous command may need fader values (a relative dB change)
+            mixer_snapshot = True
+            snapshot = {**_command_snapshot(live, include_mixer=True),
+                        **({"return_tracks": snapshot["return_tracks"]} if "return_tracks" in snapshot else {})}
+        # Match the words the producer typed: the "that" -> last-track rewrite above turned "do that on the snare
+        # too" into "do Bass on the snare too", which once repeated the change on the Bass.
+        typed = str((response.get("context_resolution") or {}).get("original") or clean_command)
+        follow_up = _follow_up_command(typed, response["session_id"], snapshot)
+        if follow_up:
+            response["resolved_command"] = follow_up
+            response["context_resolution"] = {"resolution": "follow_up", "original": typed}
+            clean_command = follow_up
+        # Re-parse either way: the mixer was just read, and an unresolved relative change needs its fader value.
+        deterministic_intent = parse_request(clean_command, snapshot)
     if not mixer_snapshot and "current_volume" in (deterministic_intent.get("missing_fields") or []):
         # The fast topology read has no fader values; a relative change the wording check above missed still works.
         mixer_snapshot = True
@@ -3037,7 +3111,8 @@ def handle_command(
             source_evidence=source_evidence,
             allow_llm=allow_llm,
         )
-        record_live_exchange(session_id=session_id, command=command, result=result)
+        # Remember what was actually planned, so "and the hats too" after a follow-up still has a real command to repeat.
+        record_live_exchange(session_id=session_id, command=str(result.get("resolved_command") or command), result=result)
         record_shadow_result(result)
         total_ms = round((time.monotonic() - command_started) * 1000.0, 2)
         latency = result.setdefault("latency", {})
