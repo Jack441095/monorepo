@@ -91,6 +91,14 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
       (`KENN_LLM_PROVIDER_<TASK>=ollama`, per-task switches `KENN_LLM_ENABLED_<TASK>`).
 - [ ] Choose the conversation model: compare local Qwen sizes on KENN's chat checks (quality on the GPU box, speed on
       the Mac), then fine-tune the winner on KENN's notes and answer style on the box
+  > 25 Sept, first comparison on KENN's real answer path (84 chat questions, box GPU 0, thinking off; tool
+  > `tooling/scripts/evaluate_chat_brain.py`): template 79/84 (0.16 s); Qwen3.5 4B 78/84, its answer used on 37
+  > (36 pass), p50 3.8 s; **Qwen3 8B 78/84, used on 42 (40 pass), p50 2.8 s**; **Qwen3 14B 78/84, used on 43 (42 pass),
+  > p50 3.8 s**. The model answers pass the same content checks as the template, so the choice is about how they read:
+  > side-by-side review for the owner in `docs/reviews/KENN_BRAIN_ANSWERS_REVIEW_2026-09-25.md`. Two fixes came out of
+  > it: the eval now bypasses KENN's semantic answer cache, and KENN adds the sources itself when a model's answer
+  > leaves out "Sources:" (good 8B answers were being thrown away for that). Next: speed of 8B on the owner's M3/16 GB
+  > (after the soak), then a KENN-style fine-tune of the winner on the box.
 - [ ] Chat answers written by the brain from retrieved notes, with citations; templates stay as the offline fallback
 - [ ] One router: rule parser → local planner → brain; every route logged with timing
 - [ ] Multi-turn context: anaphora ("do that on the snare too"), corrections ("no, the other one"), clarifying questions
