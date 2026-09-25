@@ -35,9 +35,20 @@ def _configure(base_url: str, model: str | None) -> None:
                        "KENN_LLM_MODEL": model})
 
 
+def _no_answer_cache() -> None:
+    # KENN serves repeat questions from its semantic answer cache; after the template pass every model run would
+    # just read the template answers back (first attempt measured 0.0 s and no model answers at all).
+    from kenn.core import session_memory
+
+    session_memory.get_semantic_cache_hit = lambda *_a, **_k: None
+    session_memory.save_to_semantic_cache = lambda *_a, **_k: None
+
+
 def run(label: str, cases: list[dict]) -> dict:
     from eval_chat_coverage import _check_dimensions, _expects_public_abstention
     from kenn.core.chat_answer import answer_payload
+
+    _no_answer_cache()
 
     rows = []
     for case in cases:
