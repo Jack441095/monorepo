@@ -73,6 +73,8 @@ class FakeLiveBackend:
         }
         self._selected_device = dict(fixture.get("selected_device") or {"track_index": 0, "device_index": 0})
         self._world_fixture = copy.deepcopy(fixture.get("world") or {})
+        # Live's cue points; the playhead stays at beat 0 here, so one locator can be added before the next asks.
+        self._locators: list[dict[str, Any]] = copy.deepcopy(fixture.get("locators") or [])
         self._clips: dict[tuple[int, int], dict[str, Any]] = {}
         self.writes: list[tuple[Any, ...]] = []
 
@@ -275,6 +277,27 @@ class FakeLiveBackend:
 
     def get_current_song_time(self) -> float:
         return 0.0
+
+    def get_locators_with_status(self) -> tuple[list[dict[str, Any]], bool]:
+        with self._lock:
+            return copy.deepcopy(self._locators), True
+
+    def get_locators(self) -> list[dict[str, Any]]:
+        return self.get_locators_with_status()[0]
+
+    def add_locator(self, name: str) -> bool:
+        with self._lock:
+            self.writes.append(("locator", str(name), 0.0))
+            self._locators.append({"index": len(self._locators), "name": str(name), "time_beats": 0.0})
+            return True
+
+    def remove_locator(self, name: str, time_beats: float) -> bool:
+        with self._lock:
+            before = len(self._locators)
+            self._locators = [item for item in self._locators
+                              if not (item["name"] == name and abs(float(item["time_beats"]) - float(time_beats)) <= 1e-4)]
+            self.writes.append(("remove_locator", str(name), float(time_beats)))
+            return len(self._locators) == before - 1
 
     def get_scene_names(self) -> list[str]:
         with self._lock:
