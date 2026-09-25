@@ -196,7 +196,11 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > redacted file (receipt counts by action and outcome, answer timings p50/p95, versions; no track names, values,
   > questions, audio or paths) to `~/Library/Application Support/KENN/diagnostics`. It saves rather than sends until the
   > feedback channel is chosen. Click-test in the rebuilt app after the soak.
-- [ ] Rollback: previous app version and previous knowledge index one click away
+- [x] Rollback: previous app version and previous knowledge index one click away
+  > 2026-09-25: the app bundles its knowledge index, so the previous DMG is the previous app *and* index. Every build
+  > writes `KENN-beta-<commit>.dmg` next to the older ones in `workspace/builds/kenn-app/`; rolling back is installing
+  > the previous DMG (settings and history in `~/Library/Application Support/KENN` are kept). Steps in the support
+  > runbook. For the dev index, `index_store.rollback_index()` switches to `PREVIOUS`.
 - [ ] Invite the first 3 testers; onboarding call each; widen to 10 after a clean first week
 - [ ] Weekly: triage feedback, re-run the gate, publish a short changelog
 
