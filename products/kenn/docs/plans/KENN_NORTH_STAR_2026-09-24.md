@@ -100,7 +100,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > leaves out "Sources:" (good 8B answers were being thrown away for that). Next: speed of 8B on the owner's M3/16 GB
   > (after the soak), then a KENN-style fine-tune of the winner on the box.
 - [ ] Chat answers written by the brain from retrieved notes, with citations; templates stay as the offline fallback
-- [ ] One router: rule parser → local planner → brain; every route logged with timing
+- [x] One router: rule parser → local planner → brain; every route logged with timing
+  > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
+  > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,
+  > whether the brain wrote the answer and whether a proposal came back to `runtime/logs/routes.jsonl` (no question
+  > text; last 5,000 requests). `tooling/scripts/route_latency_report.py` prints p50/p95 per route against the
+  > 4 s target.
 - [ ] Multi-turn context: anaphora ("do that on the snare too"), corrections ("no, the other one"), clarifying questions
   > 25 Sept: follow-ups for whole-track mixer changes work in the rule path, without a model: "do that on the snare
   > too", "same for the hats", "and the kick too", "now the vocal", "do the opposite on the vocal". The last command is
