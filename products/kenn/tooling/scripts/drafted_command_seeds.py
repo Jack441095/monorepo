@@ -28,6 +28,13 @@ PARAMETER = "To what value? Give the exact parameter value."
 SEND = "How much, and to which return? Give a send level, for example -12 dB to A-Reverb."
 VAGUE = "Which exact change should I make? Name the track, the setting and the amount."
 REFERENT = "Which track do you mean? Name it, and give an amount if you want a change."
+# C6 run 10: requests that sound like a fader change but aren't one. The rule parser asks on all of these; run 9b
+# still turned 12 of the 29 evaluation traps into fader changes. Worded differently from
+# tooling/data/adversarial_mixer_phrasings.jsonl so the model learns the pattern, not the phrases.
+TONE = "That sounds like an EQ change, not the fader. Which frequency and how much, for example cut 3 dB at 8 kHz?"
+SECTION = "I can't change only part of the song yet; that needs automation. Say it without the section to change the whole track."
+RELATION = "Which single track should change, and by how much?"
+FREQUENCY = "That names a frequency, so it sounds like an EQ change, not the fader. Which band, or say it as an EQ cut?"
 
 # (record_id, category, query template, clarification)
 DRAFTED_CLARIFY_SEEDS: tuple[tuple[str, str, str, str], ...] = (
@@ -52,6 +59,20 @@ DRAFTED_CLARIFY_SEEDS: tuple[tuple[str, str, str, str], ...] = (
     ("draft-referent-02", "incomplete", "Mute them", REFERENT),
     ("draft-referent-03", "incomplete", "Same again on the other track", REFERENT),
     ("draft-referent-04", "incomplete", "Softer", REFERENT),
+    ("draft-trap-tone-01", "ambiguity", "Tame the top end on {t1} by 2 dB", TONE),
+    ("draft-trap-tone-02", "ambiguity", "Pull the boominess out of {t3} a few dB", TONE),
+    ("draft-trap-tone-03", "ambiguity", "{t0} has too much low mid, take 3 dB out", TONE),
+    ("draft-trap-tone-04", "ambiguity", "Knock 2 dB of fizz off {t4}", TONE),
+    ("draft-trap-section-01", "ambiguity", "Push {t2} up 2 dB just for the chorus", SECTION),
+    ("draft-trap-section-02", "ambiguity", "Duck {t0} 4 dB under the breakdown", SECTION),
+    ("draft-trap-section-03", "ambiguity", "Mute {t3} for the intro only", SECTION),
+    ("draft-trap-relation-01", "ambiguity", "Sit {t1} 2 dB under {t4}", RELATION),
+    ("draft-trap-relation-02", "ambiguity", "Match {t0} to {t2} level-wise", RELATION),
+    ("draft-trap-relation-03", "ambiguity", "Make {t3} as loud as {t1}", RELATION),
+    ("draft-trap-send-01", "incomplete", "Less reverb on {t2}, say 3 dB", SEND),
+    ("draft-trap-send-02", "incomplete", "Turn the echo on {t4} down a bit", SEND),
+    ("draft-trap-freq-01", "ambiguity", "{t1} down 3 dB around 250", FREQUENCY),
+    ("draft-trap-freq-02", "ambiguity", "Scoop 4 dB out of {t0} near 400 Hz", FREQUENCY),
 )
 
 
