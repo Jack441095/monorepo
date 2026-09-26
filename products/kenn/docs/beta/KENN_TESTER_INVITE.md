@@ -37,6 +37,9 @@ It's ready for its first few outside testers, and I'd love you to be one of them
 - After each session I save a small diagnostics file that records *what KENN did*: how many changes, whether each one
   was confirmed and could be undone. It contains no audio, no project or track names and none of your questions. You
   can look at it before it goes anywhere.
+- When KENN doesn't understand a request, it keeps what you typed (and what you said next) on your Mac, so we can
+  teach it your wording. It only reaches me if you tick "include the requests KENN didn't understand" when saving
+  diagnostics, and you can clear it any time from Setup & Support.
 - Separately, and only if you want to, I'll ask whether you'd share two or three short excerpts (under a minute) of
   finished mixes, so I can check whether KENN's mix feedback is right. That's a separate yes or no, with its own
   consent form. Saying no changes nothing about the rest.

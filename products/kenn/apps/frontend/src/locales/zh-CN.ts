@@ -118,6 +118,8 @@ export default {
     focusTrack: '当前轨道',
     activeEffects: '活跃效果',
     references: '参考素材',
+    upgradePending: '正在根据笔记撰写更完整的回答…',
+    upgraded: "由 KENN 的 AI 根据下方笔记撰写。",
     thinking: 'KENN 思考中…',
     sessionDisconnected: '未检测到 Ableton 会话（需 Live + Mixing Doctor / AbletonOSC）。',
     sessionDispatched:

@@ -18,6 +18,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
+from kenn.core import volume_law
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
 
@@ -45,16 +46,32 @@ _GLUE_PATTERNS = re.compile(
 )
 
 
+def _shift_db(raw: float, change_db: float) -> float | None:
+    """The raw fader value ``change_db`` away from ``raw`` on Live's fader law; None if that goes above 0 dB.
+
+    These recipes used to move faders by fixed raw amounts (-0.07 "about -1.5 dB") and told the producer the wrong
+    number: -0.07 is -2.8 dB, and +0.05 took a vocal already at 0 dB to +2 dB (found 26 Sept).
+    """
+    current = volume_law.raw_to_db(float(raw))
+    if current is None:
+        return None
+    target = current + change_db
+    return None if target > 0.0 else volume_law.db_to_raw(target)
+
+
 class SubjectiveTranslator:
     """Translates producer creative intent into typed, safe Live 12 actions."""
 
     @classmethod
     def can_translate(cls, query: str) -> bool:
         text = str(query or "").strip()
+        from kenn.core import mix_recipes
+
         return bool(
             _VOCAL_PATTERNS.search(text)
             or _MUD_PATTERNS.search(text)
             or _GLUE_PATTERNS.search(text)
+            or mix_recipes.match(text)
         )
 
     @classmethod
@@ -71,6 +88,12 @@ class SubjectiveTranslator:
             return None
 
         live = service or LiveActionService()
+
+        # Named recipes first: their patterns are narrower than the three below.
+        from kenn.core import mix_recipes
+
+        if mix_recipes.match(text):
+            return mix_recipes.translate(text, live, session_id)
 
         # 1. Glue the Drum Bus
         if _GLUE_PATTERNS.search(text):
@@ -188,27 +211,19 @@ class SubjectiveTranslator:
             c_name = str(competing_track.get("name", "Synth"))
             c_vol = float(competing_track.get("volume", 0.75))
 
-            # Step 1: Carve competing track fader by ~ -1.5 dB (0.07 normalized drop)
-            c_new_vol = max(0.0, round(c_vol - 0.07, 3))
-            steps.append({
-                "action": "set_volume",
-                "track_index": c_idx,
-                "track_name": c_name,
-                "value": c_new_vol,
-            })
+            c_new_vol = _shift_db(c_vol, -1.5)
+            v_new_vol = _shift_db(v_vol, 1.0)
+            if c_new_vol is None:
+                return {"status": "clarification_required", "changed": False,
+                        "answer": f"I couldn't read the level of '{c_name}', so nothing changed."}
+            steps.append({"action": "set_volume", "track_index": c_idx, "track_name": c_name, "value": c_new_vol})
+            if v_new_vol is not None:
+                steps.append({"action": "set_volume", "track_index": v_idx, "track_name": v_name, "value": v_new_vol})
 
-            # Step 2: Gently boost vocal presence by ~ +1.0 dB (0.05 normalized rise)
-            v_new_vol = min(0.95, round(v_vol + 0.05, 3))
-            steps.append({
-                "action": "set_volume",
-                "track_index": v_idx,
-                "track_name": v_name,
-                "value": v_new_vol,
-            })
-
+            lift = f" and lifting '{v_name}' by 1.0 dB" if v_new_vol is not None else ""
             recipe_res = LiveRecipeService(service).propose_recipe(
                 steps,
-                reason=f"Unmask '{v_name}' by trimming competing '{c_name}' by -1.5 dB and lifting vocal presence by +1.0 dB.",
+                reason=f"Unmask '{v_name}' by trimming competing '{c_name}' by 1.5 dB{lift}.",
                 session_id=session_id,
             )
             if not recipe_res.get("ok"):
@@ -230,15 +245,19 @@ class SubjectiveTranslator:
                 "confirmation_token": recipe_res.get("confirmation_token", ""),
                 "requires_confirmation": True,
                 "answer": (
-                    f"I've prepared a two-step recipe to help '{v_name}' cut through: "
-                    f"1) Carve headroom by trimming '{c_name}' to {c_new_vol:.2f} (-1.5 dB); "
-                    f"2) Lift '{v_name}' fader to {v_new_vol:.2f} (+1.0 dB). "
-                    f"All changes are within the +/- 3.0 dB safety boundary. Please confirm to apply."
+                    f"To help '{v_name}' cut through: turn '{c_name}' down 1.5 dB"
+                    + (f", then '{v_name}' up 1.0 dB." if v_new_vol is not None else
+                       f". '{v_name}' is already at 0 dB, so I won't lift it further.")
+                    + " Nothing changes until you press Apply."
                 ),
             }
         else:
-            # Only vocal found: lift vocal presence fader within safety bounds
-            v_new_vol = min(0.95, round(v_vol + 0.06, 3))
+            # Only the vocal: lift it 1.2 dB, if that stays at or below 0 dB.
+            v_new_vol = _shift_db(v_vol, 1.2)
+            if v_new_vol is None:
+                return {"status": "clarification_required", "changed": False,
+                        "answer": f"'{v_name}' is already at or near 0 dB and there's no other part to turn down. "
+                                  "Which track is getting in its way?"}
             prop_res = service.propose_track_action(
                 track_index=v_idx,
                 action="set_volume",
@@ -263,8 +282,7 @@ class SubjectiveTranslator:
                 "confirmation_token": prop_res.get("confirmation_token", ""),
                 "requires_confirmation": True,
                 "answer": (
-                    f"I've prepared a proposal to lift '{v_name}' from {v_vol:.2f} to {v_new_vol:.2f} (+1.2 dB) "
-                    f"so it cuts through cleanly. Explicit confirmation required."
+                    f"To help '{v_name}' cut through: turn it up 1.2 dB. Nothing changes until you press Apply."
                 ),
             }
 
@@ -296,15 +314,18 @@ class SubjectiveTranslator:
                 })
 
         # Identify hot non-bass tracks cluttering the low end
+        # "Hot" is above -6 dB (raw 0.70 on Live's fader law, the old threshold).
         mud_track = next(
-            (t for t in tracks if any(kw in str(t.get("name", "")).lower() for kw in {"pad", "pads", "synth", "guitar", "keys", "piano"}) and float(t.get("volume", 0.0)) > 0.70),
+            (t for t in tracks if any(kw in str(t.get("name", "")).lower() for kw in {"pad", "pads", "synth", "guitar", "keys", "piano"})
+             and (volume_law.raw_to_db(float(t.get("volume", 0.0) or 0.0)) or -100.0) > -6.0),
             None,
         )
         if mud_track is not None:
             m_idx = int(mud_track.get("index", mud_track.get("track_index", 0)))
             m_name = str(mud_track.get("name", "Pads"))
             m_vol = float(mud_track.get("volume", 0.75))
-            m_new_vol = max(0.0, round(m_vol - 0.08, 3))
+            m_new_vol = _shift_db(m_vol, -2.0)
+        if mud_track is not None and m_new_vol is not None:
             steps.append({
                 "action": "set_volume",
                 "track_index": m_idx,

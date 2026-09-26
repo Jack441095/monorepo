@@ -69,8 +69,24 @@ def build_support_diagnostics(
     *,
     live_snapshot: object = None,
     repo_root: Path | None = None,
+    include_asked_log: bool = False,
 ) -> dict[str, Any]:
-    """Return an allow-listed diagnostic payload with no sensitive state."""
+    """Return an allow-listed diagnostic payload with no sensitive state.
+
+    ``include_asked_log`` adds what the tester typed when KENN had to ask (asked_log.py). It's their own words, so
+    it's only ever set from the tester's own tick on the support page.
+    """
+    payload = _base_diagnostics(live_snapshot=live_snapshot, repo_root=repo_root)
+    if include_asked_log:
+        from kenn.core import asked_log
+
+        payload["asked_log"] = _optional(asked_log.entries, [])
+        payload["checks"]["asked_log_included"] = True
+        payload["redactions"]["excluded_fields"].remove("request_text")
+    return payload
+
+
+def _base_diagnostics(*, live_snapshot: object, repo_root: Path | None) -> dict[str, Any]:
     root = repo_root.expanduser().resolve() if repo_root else PRODUCT_ROOT
     index_dir = root / "apps" / "backend" / "src" / "kenn" / "data" / "index" / "CURRENT"
     bridge_file = root / "integrations" / "ableton-remote-script" / "KENN_Bridge" / "KENN_Bridge.py"

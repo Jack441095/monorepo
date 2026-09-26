@@ -1,0 +1,2286 @@
+{
+ "schema": "kenn.retrieval_cases.v1",
+ "note": "Two describe-it questions per Ableton note, written by Qwen3 8B on the GPU box from the note alone (26 Sept 2026), sealed until the Use-it-when lines were written. Only the note a question came from counts, so general questions that several notes answer score low. Now development data.",
+ "cases": [
+  {
+   "id": "device-purpose-sealed-000",
+   "question": "How can I navigate Ableton Live using only the keyboard and screen reader?",
+   "source_must_include": [
+    "ableton-accessibility-and-navigation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-001",
+   "question": "I need to control my DAW without using a mouse\u2014what are the keyboard shortcuts for moving between sections?",
+   "source_must_include": [
+    "ableton-accessibility-and-navigation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-002",
+   "question": "How can I make sure my audio syncs perfectly with the video I'm using in my project?",
+   "source_must_include": [
+    "ableton-align-delay-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-003",
+   "question": "My live sound setup has timing issues because the speakers are too far apart, what can I do to fix that?",
+   "source_must_include": [
+    "ableton-align-delay-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-004",
+   "question": "I'm trying to add some grit to my synth lead, but it's sounding too muddy. How can I make it clearer without losing the character?",
+   "source_must_include": [
+    "ableton-amp-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-005",
+   "question": "My guitar track sounds flat and lacks punch. What can I do to make it more present in the mix?",
+   "source_must_include": [
+    "ableton-amp-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-006",
+   "question": "How can I make my synth sound more like an old analog machine with rich, warm tones?",
+   "source_must_include": [
+    "ableton-analog-and-impulse-instruments"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-007",
+   "question": "I want my drum sounds to be more flexible - can I stretch the samples to fit my track's tempo without changing the pitch?",
+   "source_must_include": [
+    "ableton-analog-and-impulse-instruments"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-008",
+   "question": "I'm trying to make a deep, warm bass sound but it's too thin and lacks body. What can I do to add more thickness and richness?",
+   "source_must_include": [
+    "ableton-analog-synth"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-009",
+   "question": "My synth leads sound a bit flat and not punchy enough. How can I make them more dynamic and have that classic analog feel?",
+   "source_must_include": [
+    "ableton-analog-synth"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-010",
+   "question": "How can I make my chords sound like a rhythmic melody that plays each note in a different order?",
+   "source_must_include": [
+    "ableton-arpeggiator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-011",
+   "question": "I want my chord progression to have a more dynamic and varied feel \u2014 what can I do to make the notes play in different patterns and with different timing?",
+   "source_must_include": [
+    "ableton-arpeggiator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-012",
+   "question": "How can I organize multiple effects in a way that lets me switch between different sound setups easily?",
+   "source_must_include": [
+    "ableton-audio-effect-rack-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-013",
+   "question": "I want to control several effects with a single knob or slider\u2014how do I set that up?",
+   "source_must_include": [
+    "ableton-audio-effect-rack-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-014",
+   "question": "I'm hearing some weird clicks and pops in my audio when I warp clips. What could be causing that?",
+   "source_must_include": [
+    "ableton-audio-fact-sheet-neutral-operations"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-015",
+   "question": "My mix sounds a bit muddy, and I'm not sure if it's because of the way I'm mixing or something else. What should I check?",
+   "source_must_include": [
+    "ableton-audio-fact-sheet-neutral-operations"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-016",
+   "question": "How can I make my bass sound more dynamic and have it sweep in and out with the music?",
+   "source_must_include": [
+    "ableton-auto-filter-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-017",
+   "question": "I want my synth to have a sweeping filter effect that follows the volume of the track, but also has some rhythmic movement. What setup should I use?",
+   "source_must_include": [
+    "ableton-auto-filter-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-018",
+   "question": "I want to add a rhythmic stereo effect to my synth pad that makes it feel wider and more dynamic without losing clarity.",
+   "source_must_include": [
+    "ableton-auto-pan-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-019",
+   "question": "My drum loop sounds flat and boring, can I make it more interesting with some movement and intensity?",
+   "source_must_include": [
+    "ableton-auto-pan-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-020",
+   "question": "I'm trying to add some movement to my synth track, but it's sounding too static. How can I make it feel more dynamic and spacey without changing the main melody?",
+   "source_must_include": [
+    "ableton-auto-pan-tremolo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-021",
+   "question": "My drum pattern feels a bit flat in the mix. Is there a way to add some rhythmic variation and width to make it pop more in the stereo field?",
+   "source_must_include": [
+    "ableton-auto-pan-tremolo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-022",
+   "question": "I need to make my vocals sound more in tune with the song's key without it sounding forced. How can I adjust the pitch so it's smooth and natural?",
+   "source_must_include": [
+    "ableton-auto-shift-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-023",
+   "question": "My vocal track has some off-key parts, and I want to fix them while keeping the original feel. Can I shift the pitch without changing the tempo or making it sound robotic?",
+   "source_must_include": [
+    "ableton-auto-shift-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-024",
+   "question": "I want to create a glitchy effect on my drum track that makes it sound like the beat is stuttering and repeating in short bursts. How can I achieve that?",
+   "source_must_include": [
+    "ableton-beat-repeat"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-025",
+   "question": "My vocal track feels a bit boring, and I want to add some rhythmic repetition to it, like a stutter effect that happens at regular intervals. What's a good way to do that?",
+   "source_must_include": [
+    "ableton-beat-repeat"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-026",
+   "question": "How do I turn my track into an audio file so I can use it again later without the original effects?",
+   "source_must_include": [
+    "ableton-bounce-to-audio-workflow"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-027",
+   "question": "I want to create a new track with my processed sound but keep the original track muted. What's the easiest way to do that?",
+   "source_must_include": [
+    "ableton-bounce-to-audio-workflow"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-028",
+   "question": "I'm trying to make my synth bass sound more natural and less digital. It's too harsh and buzzy. What can I do to smooth it out?",
+   "source_must_include": [
+    "ableton-cabinet-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-029",
+   "question": "My guitar sounds a bit thin and lifeless. I want it to have that warm, punchy tone like a real amp and speaker. What should I add to achieve that?",
+   "source_must_include": [
+    "ableton-cabinet-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-030",
+   "question": "I need to control my hardware synth from my DAW using knobs that match the physical controls on the synth. How can I set this up so the knobs work smoothly with the synth's parameters?",
+   "source_must_include": [
+    "ableton-cc-control-midi-effect"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-031",
+   "question": "I want to automate the filter cutoff and resonance on my external synth using my DAW's controls. Can I do this without having to go into complicated menus or use third-party plugins?",
+   "source_must_include": [
+    "ableton-cc-control-midi-effect"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-032",
+   "question": "I'm mixing vocals and they sound a bit muddy. How can I make them clearer without losing their warmth?",
+   "source_must_include": [
+    "ableton-channel-eq-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-033",
+   "question": "My drum tracks have a lot of low-end rumble. What's a quick way to clean them up without affecting the punch?",
+   "source_must_include": [
+    "ableton-channel-eq-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-034",
+   "question": "I'm trying to make my electric guitar sound thicker and more spacious, like it's layered with multiple voices. What can I do to achieve that effect without losing the original clarity?",
+   "source_must_include": [
+    "ableton-chorus-ensemble-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-035",
+   "question": "My synth strings sound a bit flat and lack depth. How can I add more dimension and a rich, swirling texture to make them stand out in the mix?",
+   "source_must_include": [
+    "ableton-chorus-ensemble-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-036",
+   "question": "I want to change the pitch of a sound in my clip based on the notes I play, but I don't want it to affect the whole track. How can I do that?",
+   "source_must_include": [
+    "ableton-clip-envelopes-and-modulation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-037",
+   "question": "I'm trying to make my clip respond to my MIDI controller, but the changes aren't showing up. What should I check?",
+   "source_must_include": [
+    "ableton-clip-envelopes-and-modulation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-038",
+   "question": "I want to make the volume of my clip fade in and out every time it loops, but only for this clip and not affect others. How can I do that?",
+   "source_must_include": [
+    "ableton-clip-envelopes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-039",
+   "question": "My loop has a filter sweep that I want to repeat each time it plays, but I don't want it to mess up the other clips on the track. What's the best way to set that up?",
+   "source_must_include": [
+    "ableton-clip-envelopes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-040",
+   "question": "I'm trying to create realistic mallet sounds that feel natural and dynamic, but the current setup sounds too repetitive and lacks depth. How can I make each hit unique and more organic?",
+   "source_must_include": [
+    "ableton-collision-synth"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-041",
+   "question": "I want to design percussive textures that have a rich, resonant quality like real instruments, but I'm not getting the right timbre. What can I do to make the sounds more complex and varied?",
+   "source_must_include": [
+    "ableton-collision-synth"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-042",
+   "question": "I want to record several takes of a vocal track and then pick the best parts to make a final version. How can I do that without overwriting the original recordings?",
+   "source_must_include": [
+    "ableton-comping-and-take-lanes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-043",
+   "question": "I'm having trouble deciding which parts of my guitar takes to use. Is there a way to listen to different versions side by side and select the best sections easily?",
+   "source_must_include": [
+    "ableton-comping-and-take-lanes"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-044",
+   "question": "I'm trying to make my vocal track sound smoother without losing the punch in the beginning of each word. What can I do to control the loudness variations?",
+   "source_must_include": [
+    "ableton-compressor-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-045",
+   "question": "My bass and kick are clashing in the mix. How can I make the bass quieter when the kick plays so they both stand out better?",
+   "source_must_include": [
+    "ableton-compressor-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-046",
+   "question": "How can I turn my recorded guitar track into playable MIDI notes so I can edit the notes and play them back on a synth?",
+   "source_must_include": [
+    "ableton-converting-audio-to-midi"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-047",
+   "question": "I have a vocal audio clip and I want to convert the melody into MIDI so I can tweak the timing and add effects to the notes",
+   "source_must_include": [
+    "ableton-converting-audio-to-midi"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-048",
+   "question": "I want to make my drum sounds more melodic and add some body to them. How can I achieve that without changing the original sound too much?",
+   "source_must_include": [
+    "ableton-corpus-resonators"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-049",
+   "question": "My percussion tracks sound too thin and lack depth. Is there a way to add some richness and harmonic complexity to them?",
+   "source_must_include": [
+    "ableton-corpus-resonators"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-050",
+   "question": "My computer is getting slow when I play my tracks, and I think it's because of the CPU usage. How can I make it run smoother without changing too much?",
+   "source_must_include": [
+    "ableton-cpu-management-and-freezing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-051",
+   "question": "I noticed some tracks are using a lot of CPU, but I don't need all the effects on them. How can I reduce the load without affecting the sound quality?",
+   "source_must_include": [
+    "ableton-cpu-management-and-freezing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-052",
+   "question": "I'm trying to connect my Eurorack synth to Ableton so I can control it with my DAW. What do I need to do to make sure the pitch and gate signals are synced properly?",
+   "source_must_include": [
+    "ableton-cv-tools-device-routing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-053",
+   "question": "I want to use an LFO from Ableton to modulate my modular filter, but I'm not sure how to set it up. Can you explain how to send the LFO signal to my hardware without any issues?",
+   "source_must_include": [
+    "ableton-cv-tools-device-routing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-054",
+   "question": "I want to add some space to my synth pad so it feels bigger and more atmospheric, but I don't want it to muddy the mix. What can I do?",
+   "source_must_include": [
+    "ableton-delay-and-reverb-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-055",
+   "question": "My guitar sound is a bit dry and lacks depth. How can I make it sound like it's echoing in a room without losing clarity?",
+   "source_must_include": [
+    "ableton-delay-and-reverb-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-056",
+   "question": "My tracks are out of sync when I use some effects. How can I fix the timing issues without changing the effects themselves?",
+   "source_must_include": [
+    "ableton-device-delay-compensation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-057",
+   "question": "When I record live input, the audio is delayed. Is there a way to adjust the timing so it lines up properly with the rest of the track?",
+   "source_must_include": [
+    "ableton-device-delay-compensation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-058",
+   "question": "I want to create a synth sound that has a natural, organic feel with subtle pitch and filter variations. How can I achieve that without making it too unstable?",
+   "source_must_include": [
+    "ableton-drift-and-meld-synths"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-059",
+   "question": "I'm trying to make a thick, layered synth lead that sounds rich and full. What settings or techniques can I use to get that kind of sound?",
+   "source_must_include": [
+    "ableton-drift-and-meld-synths"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-060",
+   "question": "I'm trying to get that warm, chorus-like sound from two oscillators, but they're not detuning enough. How can I make them sound more organic?",
+   "source_must_include": [
+    "ableton-drift-synth"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-061",
+   "question": "My filter isn't responding properly to the envelope, and it's not opening up enough when I play notes. What can I adjust to get more dynamic filtering?",
+   "source_must_include": [
+    "ableton-drift-synth"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-062",
+   "question": "How can I make my drum sounds feel thicker and more powerful without making them too muddy?",
+   "source_must_include": [
+    "ableton-drum-buss-and-beat-repeat"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-063",
+   "question": "I want my beats to have some cool, rhythmic glitches and repeats - how can I create that effect without losing the original sound?",
+   "source_must_include": [
+    "ableton-drum-buss-and-beat-repeat"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-064",
+   "question": "How can I set up different drum sounds to trigger specific effects without using external tracks?",
+   "source_must_include": [
+    "ableton-drum-racks-and-internal-routing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-065",
+   "question": "I want to organize my drum hits so I can easily swap out sounds during a live performance. What's the best way to do that?",
+   "source_must_include": [
+    "ableton-drum-racks-and-internal-routing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-066",
+   "question": "I need to make my kick drum sound punchier and more powerful for the drop in my track. How can I shape the attack and add some low-end without making it too muddy?",
+   "source_must_include": [
+    "ableton-drum-sampler-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-067",
+   "question": "My snare sample isn't cutting through the mix properly. What can I do to make it more defined and give it that sharp, tight hit I'm aiming for?",
+   "source_must_include": [
+    "ableton-drum-sampler-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-068",
+   "question": "How can I add warm, smooth saturation to my vocal tracks without making them sound muddy?",
+   "source_must_include": [
+    "ableton-dynamic-tube-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-069",
+   "question": "I want my synth leads to have that rich, analog-like warmth but keep the high end clear and present. What can I do?",
+   "source_must_include": [
+    "ableton-dynamic-tube-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-070",
+   "question": "I want to add a rich, textured delay to my vocal track that has a warm, analog feel with some subtle pitch wobble and a bit of noise. How can I achieve that?",
+   "source_must_include": [
+    "ableton-echo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-071",
+   "question": "My track sounds a bit flat in the background, and I need a way to create a sense of space and depth without making it too muddy. What can I do to enhance the atmosphere?",
+   "source_must_include": [
+    "ableton-echo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-072",
+   "question": "I'm trying to make my synth sounds more expressive, but the notes aren't responding to pressure or slide like I want. How can I adjust these per note?",
+   "source_must_include": [
+    "ableton-editing-mpe"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-073",
+   "question": "I recorded a MIDI performance, but some notes are too flat or the dynamics aren't right. Can I tweak the expression for each note individually?",
+   "source_must_include": [
+    "ableton-editing-mpe"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-074",
+   "question": "How can I make my piano sound more vintage and realistic without using a real instrument?",
+   "source_must_include": [
+    "ableton-electric-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-075",
+   "question": "I want my piano sound to have more depth and character, what settings should I adjust?",
+   "source_must_include": [
+    "ableton-electric-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-076",
+   "question": "I'm trying to make my synth sound more dynamic, but it's not reacting to the music like I want. How can I make it follow the volume of another track?",
+   "source_must_include": [
+    "ableton-envelope-follower-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-077",
+   "question": "My track feels flat and lacks energy. Is there a way to make the bass kick in stronger when the drums hit, without changing the original sound?",
+   "source_must_include": [
+    "ableton-envelope-follower-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-078",
+   "question": "How can I make a sound get louder when I press a key and then fade out smoothly after I release it?",
+   "source_must_include": [
+    "ableton-envelope-midi-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-079",
+   "question": "I want my synth to change volume based on how hard I press the keys, but also have it repeat a certain pattern when I hold down a note.",
+   "source_must_include": [
+    "ableton-envelope-midi-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-080",
+   "question": "I'm hearing a lot of muddiness in my mix, especially in the mid-range. How can I clean it up without affecting the rest of the sound?",
+   "source_must_include": [
+    "ableton-eq-eight-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-081",
+   "question": "My bass sounds too boomy in the lower frequencies. What's the best way to cut that without losing the punch?",
+   "source_must_include": [
+    "ableton-eq-eight-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-082",
+   "question": "I need a way to quickly mute the bass during a breakdown without affecting the rest of the track. Can you suggest a setup that allows me to switch between different frequency ranges instantly?",
+   "source_must_include": [
+    "ableton-eq-three-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-083",
+   "question": "I'm trying to create dramatic build-ups before a drop by filtering out certain frequencies. How can I set up a tool that lets me toggle between different audio sections with a switch?",
+   "source_must_include": [
+    "ableton-eq-three-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-084",
+   "question": "I'm trying to make my bass sound more punchy and present in the mix, but it's sounding too muddy. What can I do to add some clarity without just boosting the EQ?",
+   "source_must_include": [
+    "ableton-erosion-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-085",
+   "question": "My snare isn't cutting through the mix, especially on smaller speakers. How can I add some high-end texture to make it stand out more?",
+   "source_must_include": [
+    "ableton-erosion-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-086",
+   "question": "I want to make my synth pad sound wider and more dynamic, like it's moving left and right in the mix. How can I achieve that effect without making it too busy?",
+   "source_must_include": [
+    "ableton-essential-audio-utilities"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-087",
+   "question": "My vocal track sounds a bit flat and lacks character. Is there a way to add some texture and harmonic interest without changing the original vocal sound too much?",
+   "source_must_include": [
+    "ableton-essential-audio-utilities"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-088",
+   "question": "How can I quickly hide or show all tracks to make more space on my screen?",
+   "source_must_include": [
+    "ableton-essential-workflow-hacks"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-089",
+   "question": "What's the fastest way to turn off a MIDI clip without deleting it?",
+   "source_must_include": [
+    "ableton-essential-workflow-hacks"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-090",
+   "question": "How can I make a sound change smoothly as I press different keys on my MIDI controller?",
+   "source_must_include": [
+    "ableton-expression-control-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-091",
+   "question": "I want my synth to respond differently to each note I play \u2014 how can I control that with my hardware?",
+   "source_must_include": [
+    "ableton-expression-control-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-092",
+   "question": "How can I use an external analog compressor with my DAW so the processed sound comes back in sync with the original track?",
+   "source_must_include": [
+    "ableton-external-audio-effect"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-093",
+   "question": "I want to add some analog tape delay to my mix but the sound is out of phase with the dry signal\u2014what can I do to fix that?",
+   "source_must_include": [
+    "ableton-external-audio-effect"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-094",
+   "question": "I'm trying to use my hardware synth with Ableton, but the sound is out of sync with the beat. How can I fix the timing issue?",
+   "source_must_include": [
+    "ableton-external-instrument"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-095",
+   "question": "I want to record my live performance on a hardware synth directly into Ableton, but I'm not sure how to set up the inputs and outputs properly. Can you guide me?",
+   "source_must_include": [
+    "ableton-external-instrument"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-096",
+   "question": "I'm trying to add some depth to my vocal track, but the echoes I'm using are making the mix sound muddy. How can I create a clearer, more spacious effect without losing the clarity of the vocal?",
+   "source_must_include": [
+    "ableton-filter-delay-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-097",
+   "question": "My current delay setup is too flat and doesn't give the right sense of space. I want something that makes the sound feel like it's coming from different directions, but I'm not sure how to set it up properly.",
+   "source_must_include": [
+    "ableton-filter-delay-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-098",
+   "question": "How can I make my clips play one after another automatically without manually triggering each one?",
+   "source_must_include": [
+    "ableton-follow-actions"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-099",
+   "question": "I want my music to have some random variations in the drum fills \u2014 how can I set that up easily?",
+   "source_must_include": [
+    "ableton-follow-actions"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-100",
+   "question": "How do I prepare sound effects from Ableton so they're ready to use in a game with Wwise?",
+   "source_must_include": [
+    "ableton-game-audio-asset-prep"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-101",
+   "question": "I need to export some one-shot SFX from Ableton, but I'm not sure how to make sure they work well with the game audio system.",
+   "source_must_include": [
+    "ableton-game-audio-asset-prep"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-102",
+   "question": "I'm mixing a track and the drums sound a bit too harsh and lack punch. How can I make them tighter without losing their natural dynamics?",
+   "source_must_include": [
+    "ableton-glue-compressor-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-103",
+   "question": "My bass and kick are clashing in the low end, and the compression isn't helping. What can I do to smooth out the mix and prevent them from mudding each other?",
+   "source_must_include": [
+    "ableton-glue-compressor-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-104",
+   "question": "How can I make my synth sounds more interesting by adding some random rhythmic variations?",
+   "source_must_include": [
+    "ableton-grain-delay-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-105",
+   "question": "I want to create a glitchy texture in my track, what effect can I use to slice and manipulate my audio in real time?",
+   "source_must_include": [
+    "ableton-grain-delay-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-106",
+   "question": "I'm trying to add a more realistic room sound to my track, but the current reverb feels too artificial. How can I blend a real acoustic space with a more flexible digital reverb?",
+   "source_must_include": [
+    "ableton-hybrid-reverb-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-107",
+   "question": "My vocal reverb is getting muddy, and I can't tell where the sound is coming from. Is there a way to make the reverb sound more natural while still having control over the tail and depth?",
+   "source_must_include": [
+    "ableton-hybrid-reverb-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-108",
+   "question": "I'm trying to make my track sound like it's recorded in a real cathedral, but the reverb I'm using doesn't quite hit the right vibe. How can I blend a real space with some digital reverb for a more natural feel?",
+   "source_must_include": [
+    "ableton-hybrid-reverb"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-109",
+   "question": "My room reverb sounds too dry and doesn't add enough depth. I want to add some richness and texture without making it sound artificial. What's a good way to mix real and algorithmic reverb for a more organic sound?",
+   "source_must_include": [
+    "ableton-hybrid-reverb"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-110",
+   "question": "How can I organize multiple effects and instruments in a single track so it's easier to manage during live performance?",
+   "source_must_include": [
+    "ableton-instrument-rack-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-111",
+   "question": "I want to simplify my setup by grouping related devices together and controlling them with a few knobs. What's the best way to do that?",
+   "source_must_include": [
+    "ableton-instrument-rack-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-112",
+   "question": "How can I make my clips play one after another with some randomness so it sounds more natural?",
+   "source_must_include": [
+    "ableton-launching-clips-and-follow-actions"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-113",
+   "question": "I want my clips to trigger other clips automatically when they finish, but I'm not sure how to set that up.",
+   "source_must_include": [
+    "ableton-launching-clips-and-follow-actions"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-114",
+   "question": "How can I make my synth sound more dynamic by slowly changing its volume over time?",
+   "source_must_include": [
+    "ableton-lfo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-115",
+   "question": "I want my bass to have a pulsing effect that adds movement without overpowering the track. What can I use to achieve that?",
+   "source_must_include": [
+    "ableton-lfo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-116",
+   "question": "I'm trying to stop my master track from clipping during the final mix. How can I set up a limiter to prevent that without losing too much dynamics?",
+   "source_must_include": [
+    "ableton-limiter-and-gate-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-117",
+   "question": "There's a lot of background noise in my vocal track, especially when the singer isn't singing. What can I do to make the silence quieter without affecting the actual vocals?",
+   "source_must_include": [
+    "ableton-limiter-and-gate-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-118",
+   "question": "How can I make multiple devices play in sync without stopping the music when someone joins or leaves?",
+   "source_must_include": [
+    "ableton-link-sync"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-119",
+   "question": "I want my music setup to stay perfectly timed together even if I change the tempo, but I don't want the start and stop to be linked unless I choose.",
+   "source_must_include": [
+    "ableton-link-sync"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-120",
+   "question": "How can I smoothly mix two tracks together in real time using a software tool?",
+   "source_must_include": [
+    "ableton-live-djing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-121",
+   "question": "I want to play two different songs one after the other without any gaps, but I'm not sure how to sync them properly.",
+   "source_must_include": [
+    "ableton-live-djing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-122",
+   "question": "How can I record a loop in real time and add more layers on top of it during a live performance without using a mouse?",
+   "source_must_include": [
+    "ableton-looper-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-123",
+   "question": "I want to create loops that stay in time with my song's tempo, but I'm not sure how to make sure they start and end on the right beats",
+   "source_must_include": [
+    "ableton-looper-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-124",
+   "question": "I want to create a loop that keeps changing as I add more layers on top of it, so it doesn't just repeat the same thing over and over.",
+   "source_must_include": [
+    "ableton-looper"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-125",
+   "question": "How can I record a loop and then keep adding new parts to it while it's playing, so it builds up like a live performance?",
+   "source_must_include": [
+    "ableton-looper"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-126",
+   "question": "I want to add some subtle movement to my synth bass line, like a gentle tremolo effect that makes it feel more alive.",
+   "source_must_include": [
+    "ableton-max-for-live-basics"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-127",
+   "question": "My track feels a bit static, I need a way to make the filters sweep smoothly without it sounding too robotic.",
+   "source_must_include": [
+    "ableton-max-for-live-basics"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-128",
+   "question": "How can I add custom audio effects to my tracks without using the built-in devices?",
+   "source_must_include": [
+    "ableton-max-for-live-overview"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-129",
+   "question": "I want to use some advanced modulation tools, but I'm not sure how to find or install them in Ableton.",
+   "source_must_include": [
+    "ableton-max-for-live-overview"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-130",
+   "question": "I want to add a rhythmic modulation to my filter cutoff that follows the beat, but it should have a smooth, wave-like shape instead of a harsh square wave.",
+   "source_must_include": [
+    "ableton-max-modulation-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-131",
+   "question": "My synth's filter isn't responding smoothly to my MIDI controller; I need a way to shape the modulation curve so it feels more natural and dynamic.",
+   "source_must_include": [
+    "ableton-max-modulation-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-132",
+   "question": "How do I get my MIDI controller to work with Ableton so I can play instruments and control effects live?",
+   "source_must_include": [
+    "ableton-midi-controller-setup"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-133",
+   "question": "I want to map my controller knobs to adjust filter settings and volume, but I'm not sure how to set that up in Ableton.",
+   "source_must_include": [
+    "ableton-midi-controller-setup"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-134",
+   "question": "How can I make different parts of my MIDI track respond to different effects at the same time?",
+   "source_must_include": [
+    "ableton-midi-effect-rack-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-135",
+   "question": "I want to switch between several effect setups on the fly during a live performance\u2014what's the best way to organize that?",
+   "source_must_include": [
+    "ableton-midi-effect-rack-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-136",
+   "question": "I want to create a rhythmic pattern from a chord I'm holding, but it's not sounding varied enough. How can I make it more dynamic and interesting?",
+   "source_must_include": [
+    "ableton-midi-effects-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-137",
+   "question": "My chords sound too static and lack movement. Is there a way to add some harmonic variation without losing the original melody?",
+   "source_must_include": [
+    "ableton-midi-effects-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-138",
+   "question": "My MIDI tracks are timing off during playback, making the beat feel uneven. What can I do to fix the timing issues?",
+   "source_must_include": [
+    "ableton-midi-fact-sheet-timing-jitter"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-139",
+   "question": "Sometimes my MIDI notes are delayed or miss timing, especially when using external hardware. How can I make sure everything stays in sync?",
+   "source_must_include": [
+    "ableton-midi-fact-sheet-timing-jitter"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-140",
+   "question": "How can I see the notes and their strength when I play my keyboard in Ableton?",
+   "source_must_include": [
+    "ableton-midi-monitor-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-141",
+   "question": "I'm having trouble seeing all the MIDI messages when I use my MPE controller, what can I do?",
+   "source_must_include": [
+    "ableton-midi-monitor-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-142",
+   "question": "I want to turn my simple melody into a more complex pattern with different note variations. How can I automatically generate new notes that fit the scale without messing up the timing?",
+   "source_must_include": [
+    "ableton-midi-tools-transformations-generators"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-143",
+   "question": "I'm trying to make my MIDI sequence more dynamic. Is there a way to create rhythmic variations and add new notes that match the key I'm using, so it sounds more interesting?",
+   "source_must_include": [
+    "ableton-midi-tools-transformations-generators"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-144",
+   "question": "I'm mixing a track and the levels are all over the place. How can I get everything to sit better together without clipping?",
+   "source_must_include": [
+    "ableton-mixing-and-gain-staging"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-145",
+   "question": "My track sounds too quiet when I play it back, but the meters don't show anything red. What should I check to make it louder without losing quality?",
+   "source_must_include": [
+    "ableton-mixing-and-gain-staging"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-146",
+   "question": "I want to make my synth pads sound wider and richer, like they're coming from a bigger space. What can I do to add more depth and thickness?",
+   "source_must_include": [
+    "ableton-modulation-effects-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-147",
+   "question": "My guitar tracks sound a bit flat and lack movement. How can I make them feel more dynamic and add some shimmer or space without changing the original tone?",
+   "source_must_include": [
+    "ableton-modulation-effects-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-148",
+   "question": "How can I make the MIDI notes respond more smoothly to my touch on the controller?",
+   "source_must_include": [
+    "ableton-mpe-control-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-149",
+   "question": "I want my instrument to react differently based on how hard I press the keys, but it's not working as expected. What can I do?",
+   "source_must_include": [
+    "ableton-mpe-control-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-150",
+   "question": "I'm mixing a vocal track and the sibilance is really harsh. How can I smooth it out without affecting the rest of the vocal?",
+   "source_must_include": [
+    "ableton-multiband-dynamics-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-151",
+   "question": "My drum bus has some muddy low-end and the high hats are too bright. Can I fix the low end and bring out the high hats without changing the overall sound?",
+   "source_must_include": [
+    "ableton-multiband-dynamics-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-152",
+   "question": "How can I make my MIDI notes repeat in a rhythmic way that gets quieter each time?",
+   "source_must_include": [
+    "ableton-note-echo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-153",
+   "question": "I want my MIDI notes to echo with different pitches and volumes, but I'm not sure how to set it up.",
+   "source_must_include": [
+    "ableton-note-echo-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-154",
+   "question": "I'm trying to create a really deep, evolving sound for a track, but the current synth isn't giving me enough variation. How can I make the sound change over time using modulation?",
+   "source_must_include": [
+    "ableton-operator-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-155",
+   "question": "I want to design a unique tone that has a lot of texture and movement, but I'm not sure how to shape the oscillators and their interactions. What steps should I take to get started?",
+   "source_must_include": [
+    "ableton-operator-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-156",
+   "question": "How can I add a warm, gritty sound to my guitar tracks without making them too muddy?",
+   "source_must_include": [
+    "ableton-overdrive-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-157",
+   "question": "I want my vocal tracks to have more punch and presence\u2014what effect can I use to achieve that?",
+   "source_must_include": [
+    "ableton-overdrive-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-158",
+   "question": "I need a way to add some warmth and grit to my guitar tracks without making them sound too muddy. How can I get that classic overdrive feel?",
+   "source_must_include": [
+    "ableton-pedal-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-159",
+   "question": "My bass sounds a bit thin when I add distortion. Is there a way to enhance the low end while keeping the distortion character clear and punchy?",
+   "source_must_include": [
+    "ableton-pedal-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-160",
+   "question": "I'm trying to make a jet-like swoosh sound for my track, but it's not sweeping smoothly. How can I get that classic jet effect without it sounding too harsh?",
+   "source_must_include": [
+    "ableton-phaser-flanger-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-161",
+   "question": "My pad sounds are getting a bit boring. I want to add some movement and depth without changing the pitch. What's a good way to create that swirling, psychedelic effect?",
+   "source_must_include": [
+    "ableton-phaser-flanger-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-162",
+   "question": "I want to create a more realistic drum sound that has a rich, resonant body without using actual samples. How can I make the sound react more naturally to the hits?",
+   "source_must_include": [
+    "ableton-physical-modeling-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-163",
+   "question": "I'm trying to get a warm, vintage keyboard sound but it's too dull. How can I make it brighter and more dynamic, like a real Rhodes or Wurlitzer?",
+   "source_must_include": [
+    "ableton-physical-modeling-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-164",
+   "question": "How can I make all the notes in my track play for the same length, even if the original MIDI has varying note lengths?",
+   "source_must_include": [
+    "ableton-pitch-and-note-length-midi-effects"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-165",
+   "question": "I want to shift the pitch of my MIDI track up by a whole octave, but only for certain notes. How can I set a range for which notes get transposed?",
+   "source_must_include": [
+    "ableton-pitch-and-note-length-midi-effects"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-166",
+   "question": "How can I set up different sound layers for different parts of the keyboard so each section plays a unique instrument?",
+   "source_must_include": [
+    "ableton-racks-and-chain-selectors"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-167",
+   "question": "I want to make my synth sound different based on how hard I press the keys\u2014can I do that with some kind of zone setup?",
+   "source_must_include": [
+    "ableton-racks-and-chain-selectors"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-168",
+   "question": "I want to create a setup where I can control multiple effects at the same time with a single knob. How can I do that?",
+   "source_must_include": [
+    "ableton-racks-and-macros"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-169",
+   "question": "I need to process my audio with two different effects running at the same time. How can I set that up?",
+   "source_must_include": [
+    "ableton-racks-and-macros"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-170",
+   "question": "How can I make my MIDI notes randomly change pitch in a way that sounds natural and unpredictable?",
+   "source_must_include": [
+    "ableton-random-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-171",
+   "question": "I want my melody to have some random variations each time I play it\u2014what's a simple way to achieve that?",
+   "source_must_include": [
+    "ableton-random-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-172",
+   "question": "How can I make my drum samples sound more gritty and lo-fi without losing their original punch?",
+   "source_must_include": [
+    "ableton-redux-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-173",
+   "question": "I want my synth sounds to have that old-school digital distortion effect, what techniques can I use to achieve that?",
+   "source_must_include": [
+    "ableton-redux-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-174",
+   "question": "I'm trying to add some warmth and character to my synth leads, but it's sounding too muddy. How can I make it clearer without losing the punch?",
+   "source_must_include": [
+    "ableton-roar-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-175",
+   "question": "My drum bus feels a bit flat and lifeless. What's a good way to add some edge and depth without making it too harsh or distorted?",
+   "source_must_include": [
+    "ableton-roar-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-176",
+   "question": "How can I route the output of one track to another so I can process them together?",
+   "source_must_include": [
+    "ableton-routing-and-submixing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-177",
+   "question": "I want to record the main output as a sample while I'm playing, how do I do that?",
+   "source_must_include": [
+    "ableton-routing-and-submixing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-178",
+   "question": "I'm trying to make a drum kit that sounds more realistic, but the hits aren't varying enough. How can I get different sounds for each hit without using a lot of different samples?",
+   "source_must_include": [
+    "ableton-sampler-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-179",
+   "question": "My synth doesn't respond well to different playing dynamics. I want it to play softer notes when I press lightly and louder when I press harder. What can I do to make it more expressive?",
+   "source_must_include": [
+    "ableton-sampler-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-180",
+   "question": "How can I make my kick drum sound warmer and more punchy without it clipping?",
+   "source_must_include": [
+    "ableton-saturator-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-181",
+   "question": "I want my synth to have more presence and harmonic richness, but I don't want it to distort too much. What can I do?",
+   "source_must_include": [
+    "ableton-saturator-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-182",
+   "question": "I want to make sure all the notes I play on my keyboard sound good together. How can I set up my DAW so it only lets me use notes from a specific scale?",
+   "source_must_include": [
+    "ableton-scale-chord-effects"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-183",
+   "question": "I\u2019m trying to create chords by just pressing single notes, but they don\u2019t sound right. Is there a way to automatically add harmonies above each note so they fit the key?",
+   "source_must_include": [
+    "ableton-scale-chord-effects"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-184",
+   "question": "My loop has a click when I play it in the game engine, what can I do to fix it?",
+   "source_must_include": [
+    "ableton-seamless-loop-clicks-wwise"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-185",
+   "question": "I exported a loop from Ableton but it's clicking in the game, how do I make it seamless?",
+   "source_must_include": [
+    "ableton-seamless-loop-clicks-wwise"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-186",
+   "question": "I want to make my synth sound more dynamic by smoothly changing its filter cutoff over time. How can I create a modulation that follows a custom shape?",
+   "source_must_include": [
+    "ableton-shaper-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-187",
+   "question": "My sound isn't evolving as much as I want. Can I use something that lets me shape how a parameter changes over time with clickable points?",
+   "source_must_include": [
+    "ableton-shaper-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-188",
+   "question": "How can I make a sound change smoothly when I press different notes on the keyboard, based on the speed I play them?",
+   "source_must_include": [
+    "ableton-shaper-midi-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-189",
+   "question": "I want my synth to have different effects depending on which key I press, but it's not responding properly to the note velocity. What can I do?",
+   "source_must_include": [
+    "ableton-shaper-midi-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-190",
+   "question": "I'm trying to make my vocal tracks sound more robotic and futuristic, like in old sci-fi movies. How can I achieve that effect without losing the clarity of the voice?",
+   "source_must_include": [
+    "ableton-shifter-and-distortion-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-191",
+   "question": "My synth sounds are a bit flat and lack warmth. I want to add some rich harmonics and a gritty texture. What kind of effect should I use for that?",
+   "source_must_include": [
+    "ableton-shifter-and-distortion-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-192",
+   "question": "How can I make a short, punchy sound from a drum loop that starts quietly and gets louder?",
+   "source_must_include": [
+    "ableton-simpler-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-193",
+   "question": "I want to take a vocal sample and make it loop smoothly without any clicks or pops. What's the best way to do that?",
+   "source_must_include": [
+    "ableton-simpler-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-194",
+   "question": "I want to create a lush, ambient sound from a vocal track by making the delays of different frequencies offset each other. How can I achieve that?",
+   "source_must_include": [
+    "ableton-spectral-effects-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-195",
+   "question": "I have some percussion loops and I want to turn them into melodic instruments by stretching and shifting their frequencies. What can I do to make that happen?",
+   "source_must_include": [
+    "ableton-spectral-effects-devices"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-196",
+   "question": "How can I make my vocal track sound more layered and atmospheric without losing its original clarity?",
+   "source_must_include": [
+    "ableton-spectral-resonator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-197",
+   "question": "I want to add more depth to my synth sounds, but I don't want it to sound muddy or too processed.",
+   "source_must_include": [
+    "ableton-spectral-resonator"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-198",
+   "question": "I'm mixing a track and I think there's a muddy part in the low end. How can I figure out which frequencies are causing it?",
+   "source_must_include": [
+    "ableton-spectrum-analyzer"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-199",
+   "question": "My mix sounds too bright, especially in the high frequencies. Is there a way to check the frequency balance and make it sound smoother?",
+   "source_must_include": [
+    "ableton-spectrum-analyzer"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-200",
+   "question": "I have a track with vocals and drums mixed together, and I want to edit the vocals without affecting the drums. How can I separate them?",
+   "source_must_include": [
+    "ableton-stem-separation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-201",
+   "question": "I need to remix a song but the bass and other instruments are all mixed in one layer. Can I split them out so I can work on each part individually?",
+   "source_must_include": [
+    "ableton-stem-separation"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-202",
+   "question": "I want to set up a project template so I don't have to configure the same tracks and effects every time I start a new session. How can I do that?",
+   "source_must_include": [
+    "ableton-template-project-setup"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-203",
+   "question": "I'm tired of setting up my drum bus and vocal tracks from scratch each time. Can I create a setup that automatically includes these with the right plugins and routing?",
+   "source_must_include": [
+    "ableton-template-project-setup"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-204",
+   "question": "How can I make my DAW sync with other devices in real time so everyone stays in time together?",
+   "source_must_include": [
+    "ableton-tempo-follower-and-sync"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-205",
+   "question": "I want my DAW to adjust its tempo based on a live audio track, how do I set that up?",
+   "source_must_include": [
+    "ableton-tempo-follower-and-sync"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-206",
+   "question": "How can I make my string sound more realistic when I play it on my MIDI controller?",
+   "source_must_include": [
+    "ableton-tension-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-207",
+   "question": "I want my instrument to have a more expressive feel, like it's responding to how hard I press the keys",
+   "source_must_include": [
+    "ableton-tension-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-208",
+   "question": "I'm trying to tune my guitar but the pitch keeps fluctuating. How can I get a stable reading to make sure it's in tune?",
+   "source_must_include": [
+    "ableton-tuner-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-209",
+   "question": "I'm using a microphone to record a vocal track, but the pitch detection isn't accurate. What can I do to get better tuning feedback?",
+   "source_must_include": [
+    "ableton-tuner-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-210",
+   "question": "How can I make my music use a different scale that's not the standard Western one?",
+   "source_must_include": [
+    "ableton-tuning-systems-microtuning"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-211",
+   "question": "I want my tracks to sound more authentic by using a specific tuning system from a different culture. How do I do that?",
+   "source_must_include": [
+    "ableton-tuning-systems-microtuning"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-212",
+   "question": "I want to make my drum loop feel more natural and less robotic. How can I add some randomness and timing variation to it without changing the original clip?",
+   "source_must_include": [
+    "ableton-using-grooves"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-213",
+   "question": "My MIDI bassline sounds too stiff and mechanical. Is there a way to adjust the timing and velocity to make it more human-like and groove-oriented?",
+   "source_must_include": [
+    "ableton-using-grooves"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-214",
+   "question": "I'm mixing a track and the bass sounds muddy when I play it on my phone. How can I make sure the low end stays clear and centered?",
+   "source_must_include": [
+    "ableton-utility-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-215",
+   "question": "My vocal track is sounding phasey when I listen on different speakers. What can I do to fix the phase issues without changing the original recording?",
+   "source_must_include": [
+    "ableton-utility-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-216",
+   "question": "How can I make my drum hits sound more natural and less robotic?",
+   "source_must_include": [
+    "ableton-velocity-midi-effect"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-217",
+   "question": "My MIDI notes are too inconsistent in volume, how do I even them out?",
+   "source_must_include": [
+    "ableton-velocity-midi-effect"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-218",
+   "question": "I want to add some lo-fi crackle and that gritty vinyl sound to my hip-hop track, but it's too harsh in the high frequencies. How can I make it sound more natural and less distorted?",
+   "source_must_include": [
+    "ableton-vinyl-distortion-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-219",
+   "question": "My track sounds too clean and modern. I want to add some random noise and that old-school vinyl effect, but I don't want it to sound like a loop. What can I do to get that authentic crackle without repeating patterns?",
+   "source_must_include": [
+    "ableton-vinyl-distortion-device"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-220",
+   "question": "I want to make my voice sound like a robot singing along with my synth. How can I do that without using any special plugins?",
+   "source_must_include": [
+    "ableton-vocoder"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-221",
+   "question": "My vocal track isn't shaping the synth properly. What can I adjust to get a clearer, more robotic voice effect?",
+   "source_must_include": [
+    "ableton-vocoder"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-222",
+   "question": "My audio clip sounds blurry and the hits aren't sharp anymore. What can I do to fix the transients?",
+   "source_must_include": [
+    "ableton-warp-modes-and-transient-smearing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-223",
+   "question": "I'm trying to warp a drum loop, but the attacks are getting smeared. What setting should I use to keep them clear?",
+   "source_must_include": [
+    "ableton-warp-modes-and-transient-smearing"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-224",
+   "question": "My kick drum sounds clicky after I warped it, what can I do to fix that?",
+   "source_must_include": [
+    "ableton-warped-kick-clicks"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-225",
+   "question": "I warped my kick and now there's a click, how do I make it sound smooth again?",
+   "source_must_include": [
+    "ableton-warped-kick-clicks"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-226",
+   "question": "I'm trying to create a deep, evolving bass sound with a lot of movement. How can I use a wavetable synth to get that warm, analog-like texture with some digital edge?",
+   "source_must_include": [
+    "ableton-wavetable-synth"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  },
+  {
+   "id": "device-purpose-sealed-227",
+   "question": "My current bass sound feels a bit flat and static. Can I use a wavetable synth to add more depth and variation, making it richer and more dynamic?",
+   "source_must_include": [
+    "ableton-wavetable-synth"
+   ],
+   "answer_must_include": [],
+   "category": "device_purpose",
+   "source_kind": "qwen3_8b_from_note_blind"
+  }
+ ]
+}

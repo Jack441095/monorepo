@@ -177,3 +177,22 @@ def test_vocal_cut_through_recipe_undo_formulation(mock_session_snapshot):
     assert undo_steps[0]["after"] == 0.72
     assert undo_steps[1]["track_name"] == "Supersaw Synth"
     assert undo_steps[1]["after"] == 0.78
+
+
+def test_recipe_amounts_are_real_decibels_and_never_push_a_fader_past_zero(monkeypatch, tmp_path):
+    # Regression (26 Sept): the recipe said "-1.5 dB" but moved the fader -2.8 dB, and lifted a vocal already at
+    # 0 dB to +2 dB.
+    from kenn.core import live_receipt_journal, volume_law
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+
+    monkeypatch.setattr(live_receipt_journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    service = LiveActionService(FakeLiveBackend())
+    snapshot = service.snapshot()
+    res = SubjectiveTranslator.translate("Make the vocal cut through", snapshot, "db-check", service)
+
+    steps = res["proposal"]["steps"]
+    synth = next(s for s in steps if s["track_name"] == "Synth")
+    assert volume_law.raw_to_db(synth["after"]) - volume_law.raw_to_db(synth["before"]) == pytest.approx(-1.5, abs=0.05)
+    assert all(volume_law.raw_to_db(s["after"]) <= 0.0 for s in steps if s.get("action") == "set_volume")
+    assert "1.5 dB" in res["answer"] and "already at 0 dB" in res["answer"]

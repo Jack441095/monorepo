@@ -50,6 +50,7 @@ KENN connecting.
 | After a change: `Do that on the snare too` / `Same for the hats` / `Do the opposite on the vocal` | The same change on another track, as a new proposal |
 | Wrong track? `No, I meant the snare` / `Sorry, the kick` | Moves the change to the track you meant; if you'd already applied it, KENN says so and you can say `undo` |
 | When KENN asks "By how much?" or "Which side?", just answer: `3 dB`, `30%`, `left` | Finishes the request you started |
+| Mix recipes: `Make room for the kick`, `Give the vocal some space`, `Push the synth back`, `Tighten the drum bus` | A short plan of up to three changes, in real units; one Apply, one Undo |
 | `What did you change?` | The recent changes, with before and after values |
 | `What does Note Echo do?` | A cited answer from KENN's notes |
 | A mix WAV in **Inputs** | Review of loudness, true peak, clipping and balance |
@@ -82,6 +83,9 @@ version ships a newer AbletonOSC, the setup page will offer an update the next t
   **Setup & Support** in KENN's toolbar and **Save diagnostics for support**, and attach the file it names (in
   `~/Library/Application Support/KENN/diagnostics`). It holds counts and timings only: which kinds of changes KENN
   made and how they ended, how fast it answered, and your versions. No track names, audio, questions or file paths.
+  If you tick **Also include the requests KENN didn't understand**, it adds what you typed at the moments KENN had to
+  ask back, and what you said next. That's the most useful thing you can send us, but it's your words, so it's off
+  unless you tick it; **Clear them** deletes the ones KENN kept.
   If we ask for more, the full logs are `~/Library/Logs/KENN Desktop Companion/server.log` and
   `~/Library/Application Support/KENN/runtime/logs/kenn.log` (fuller; look through them before sending).
   Feedback channel: _(to be confirmed)_

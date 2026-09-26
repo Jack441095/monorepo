@@ -60,6 +60,25 @@ def test_local_service_rejects_invalid_audio_without_creating_review(tmp_path) -
     assert service.list_reviews() == []
 
 
+def test_an_oversized_or_surround_file_says_why_and_leaves_nothing_behind(tmp_path) -> None:
+    service = LocalMixReviewService(tmp_path / "runtime")
+    service.MAX_UPLOAD_BYTES = 1000
+    too_big = service.save_review(_wav_bytes(), "long-master.wav")
+    assert too_big["ok"] is False
+    assert "MB" in too_big["error"] and "shorter section" in too_big["error"]
+
+    output = __import__("io").BytesIO()
+    with wave.open(output, "wb") as handle:
+        handle.setnchannels(4)
+        handle.setsampwidth(2)
+        handle.setframerate(8000)
+        handle.writeframes(b"\x00\x01" * 4 * 8000)
+    quad = LocalMixReviewService(tmp_path / "runtime").save_review(output.getvalue(), "quad.wav")
+    assert quad["ok"] is False
+    assert "only mono or stereo" in quad["error"]
+    assert service.list_reviews() == []
+
+
 def test_local_service_prunes_persisted_reviews_to_newest_bounded_set(tmp_path) -> None:
     runtime = tmp_path / "runtime"
     runtime.mkdir()

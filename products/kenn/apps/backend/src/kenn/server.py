@@ -679,6 +679,17 @@ class Handler(BaseHTTPRequestHandler):
                                  proposal=bool(payload.get("proposal")))
             except Exception:
                 pass  # timing is diagnostic; it must never cost the reply
+            turn = getattr(self, "_ask_turn", None)
+            self._ask_turn = None
+            if turn and status == 200:
+                # What the tester typed when KENN had to ask (kept on this Mac; see core/asked_log.py).
+                try:
+                    from kenn.core import asked_log
+
+                    asked_log.record(turn[0], turn[1], {"status": asked_log.reply_status(payload),
+                                                        "answer": payload.get("answer")})
+                except Exception:
+                    pass
         error_id = self.request_id()
         if status >= 500:
             self.structured_log("server_error", status=status)
@@ -1415,6 +1426,12 @@ class Handler(BaseHTTPRequestHandler):
             # First-run page for the packaged app (kenn/core/live_setup.py does the work).
             self.send_bytes(200, (Path(__file__).with_name("setup_page.html")).read_bytes(), "text/html; charset=utf-8")
             return
+        if parsed.path in {"/api/support/asked-log", "/kenn/api/support/asked-log"}:
+            # A count for the support page's checkbox; the entries themselves only leave inside a diagnostics file.
+            from kenn.core import asked_log
+
+            self.send_json(200, {"ok": True, "count": len(asked_log.entries())})
+            return
         if parsed.path in {"/api/setup/status", "/kenn/api/setup/status"}:
             from kenn.ableton_osc_bridge import live_client
             from kenn.core.live_setup import setup_status
@@ -1581,6 +1598,11 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(200 if result.get("success") else 503, result)
             except Exception as exc:
                 self.send_json(503, {"ok": False, "error": str(exc)})
+            return
+        if parsed.path in {"/kenn/api/ask/upgrade", "/api/ask/upgrade"}:
+            from kenn.core import answer_upgrades
+
+            self.send_json(200, answer_upgrades.get(str(parse_qs(parsed.query).get("id", [""])[0])))
             return
         if parsed.path == "/api/ableton/receipts":
             query = parse_qs(parsed.query)
@@ -1888,7 +1910,14 @@ class Handler(BaseHTTPRequestHandler):
             })
             return
         if parsed.path == "/api/audio/telemetry":
-            length = int(self.headers.get("Content-Length", "0"))
+            # Same 1 MB ceiling as the other JSON routes; these two used to read whatever length was claimed.
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+            except ValueError:
+                length = -1
+            if length < 0 or length > 1024 * 1024:
+                self.send_json(413, {"error": "Request body exceeds 1 MB limit."})
+                return
             raw = self.rfile.read(length) if length > 0 else b"{}"
             try:
                 data = json.loads(raw.decode("utf-8"))
@@ -1904,7 +1933,14 @@ class Handler(BaseHTTPRequestHandler):
             })
             return
         if parsed.path == "/api/mix/plan":
-            length = int(self.headers.get("Content-Length", "0"))
+            # Same ceiling as /api/audio/telemetry above.
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+            except ValueError:
+                length = -1
+            if length < 0 or length > 1024 * 1024:
+                self.send_json(413, {"error": "Request body exceeds 1 MB limit."})
+                return
             raw = self.rfile.read(length) if length > 0 else b"{}"
             try:
                 data = json.loads(raw.decode("utf-8"))
@@ -1957,6 +1993,8 @@ class Handler(BaseHTTPRequestHandler):
             "/kenn/api/setup/install-remote-script",
             "/api/support/diagnostics/save",
             "/kenn/api/support/diagnostics/save",
+            "/api/support/asked-log/clear",
+            "/kenn/api/support/asked-log/clear",
             "/api/ask", "/api/feedback", "/api/session/feedback", "/api/mix-review-step",
             "/api/audiogen/generate", "/api/audiogen/render-song",
             "/api/session/clear", "/api/ableton/apply-repair", "/api/mix-version/save",
@@ -2070,11 +2108,20 @@ class Handler(BaseHTTPRequestHandler):
             directory = Path(os.environ.get("KENN_DIAGNOSTICS_DIR") or (REPO_ROOT / ".runtime" / "diagnostics")).expanduser()
             try:
                 saved = save_support_diagnostics(
-                    build_support_diagnostics(live_snapshot=cached_snapshot, repo_root=REPO_ROOT), directory)
+                    build_support_diagnostics(live_snapshot=cached_snapshot, repo_root=REPO_ROOT,
+                                              include_asked_log=payload.get("include_asked_log") is True), directory)
             except OSError as exc:
                 self.send_json(500, {"ok": False, "error": f"KENN could not write the diagnostics file ({exc.strerror})."})
                 return
             self.send_json(200, {"ok": True, "path": str(saved), "filename": saved.name})
+            return
+        if parsed.path in {"/api/support/asked-log/clear", "/kenn/api/support/asked-log/clear"}:
+            if payload.get("confirm") is not True:
+                self.send_json(400, {"ok": False, "error": "Clearing needs an explicit confirm."})
+                return
+            from kenn.core import asked_log
+
+            self.send_json(200, {"ok": True, "cleared": asked_log.clear()})
             return
         if parsed.path in {"/api/setup/install-remote-script", "/kenn/api/setup/install-remote-script"}:
             # Writes into the user's Ableton User Library: only on an explicit confirm from the setup page.
@@ -2704,6 +2751,7 @@ class Handler(BaseHTTPRequestHandler):
         _ask_t0 = time.perf_counter()
         # send_json logs which route answered and how long it took, whichever of the exits below replies.
         self._ask_started = _ask_t0
+        self._ask_turn = (str(payload.get("session_id", "")), question)
         if not self.enforce_rate_limit("ask"):
             return
         live_inspection_reply = self._maybe_handle_live_inspection(
@@ -2897,10 +2945,24 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 _t_context = time.perf_counter() - _ask_t0
                 _t_answer = time.perf_counter()
-                result = answer_payload(
-                    question, limit=limit, history=history, session_id=session_id,
-                    plugin_session_id=plugin_session_id, correlation_id=correlation_id,
-                )
+                from kenn.core import answer_upgrades
+
+                if answer_upgrades.enabled():
+                    # The template answer now; the model writes in the background and the app picks it up if KENN's
+                    # grounding check accepts it (a 16 GB Mac takes 10-15 s to write one). The background run has no
+                    # session id, so the question isn't recorded twice; the history is passed in instead.
+                    result = answer_payload(
+                        question, limit=limit, history=history, session_id=session_id, allow_llm=False,
+                        plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                    )
+                    upgrade_id = answer_upgrades.start(lambda: answer_payload(question, limit=limit, history=history))
+                    if upgrade_id:
+                        result["answer_upgrade"] = {"id": upgrade_id, "poll_ms": 2000}
+                else:
+                    result = answer_payload(
+                        question, limit=limit, history=history, session_id=session_id,
+                        plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                    )
                 _answer_ms = (time.perf_counter() - _t_answer) * 1000
                 if plugin_turn:
                     result["live_mix_context"] = plugin_context
@@ -3483,8 +3545,10 @@ def main() -> int:
 
             # 2. Apple Silicon MLX local inference pre-warming & KV-cache pinning
             try:
+                from kenn.llm.llm_rewrite import is_enabled as llm_enabled, mlx_selected
                 from kenn.llm.mlx_inference_engine import MLXInferenceEngine
-                use_mlx = os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
+                # Only when MLX will actually answer: pinning a model nobody uses takes memory from Live.
+                use_mlx = mlx_selected() and llm_enabled()
                 if use_mlx and MLXInferenceEngine.is_available():
                     engine = MLXInferenceEngine.get_instance()
                     engine.prewarm(blocking=True)

@@ -150,6 +150,15 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > things *less* safe: 18 wrong plans on one blind set, e.g. "can i hear the vocal without the synth" soloed the
   > Synth. Not met; needs fresh blind wording each round, owner-checked labels, and a planner that asks rather than
   > guesses.
+  > 26 Sept, round 4 (branch `kenn-next-build`): voice-dictation set 77.9% blind → 90.8%; a sealed Logic/FL-wording set
+  > scored **92.7%** on its one blind run (plainer wording) → 97.8%. Found and fixed "synth track 5 dB louder" moving
+  > track 5, "track 2, actually track 3" keeping track 2, and questions that proposed changes. Still not met.
+  > 26 Sept, planner check before training run 13: rules then run 11 on all eight phrasing sets (1,751 phrasings) gets
+  > 9 more right than the rules alone (1,648 vs 1,639) but 22 more wrong plans (23 vs 1): "lift the snare" unmutes it,
+  > "record" presses play, "the track with the delay return" goes to Snare / Clap, pans with no amount go hard left.
+  > The rules have overtaken it, so run 11 stays in shadow and **run 13 isn't trained**: another synthetic corpus would
+  > repeat run 12. The next planner should learn from real tester wording, which the shadow log collects during the
+  > pilot (where the rules ask, what was said, what happened next).
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
@@ -188,6 +197,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > ms-marco-MiniLM-L-6-v2 (Apache-2.0, ~90 MB) 0.966 / 0.800; **bge-reranker-base (MIT, ~1.1 GB fp32) 1.000 / 0.808**.
   > Ceiling: the right note is in the top 20 for 100% / 87.2%, so reranking already captures most of what it can; the
   > last 13% need better candidates (note wording). "Use it when…" drafts: 0.744 → 0.760, awaiting owner review.
+  > 26 Sept: sharper lines written by Claude in producer language, tested on a new sealed set of 228 questions Qwen3 8B
+  > wrote from the notes alone (`evals/device_purpose_sealed_qwen8b.json`). Recall@4 on it: none 0.338, drafted 0.417,
+  > sharper 0.386, **both 0.447**; original fixture 0.983 throughout. Both kinds of line are in the review doc, awaiting
+  > owner ticks; `tooling/scripts/measure_use_it_when_lines.py` re-measures any selection in memory.
   > Shipping a reranker is a size/latency call (bge-reranker-base adds ~0.3–1 GB and ~1–2 s per answer on a Mac CPU,
   > unmeasured on device yet) — owner decision.
   > Fixture now **303 questions** (gate size reached): 128 original + 125 device-purpose + 50 technique-purpose
@@ -202,6 +215,14 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
       confirmed, one receipt per step, undo per step or for the whole task
 - [ ] Advice → fix → re-measure: each audio finding offers a confirmable change and measures again after Apply
 - [ ] ≥ 15 qualified recipes (e.g. "clean up the low end", "make room for the vocal", "set up parallel drums")
+  > 26 Sept (branch `kenn-recipes`): 15 named recipes built, none qualified on real Live yet. The three originals
+  > (glue the drum bus, vocal cut through, low-end mud) moved faders by fixed raw amounts and misreported them ("-1.5
+  > dB" was -2.8 dB; a vocal at 0 dB went to +2 dB); fixed to real dB. Twelve new ones in `core/mix_recipes.py`: room
+  > for the kick, give X some space, bring X forward, push X back, sit X behind Y, dry up X, tighten the drum bus, tame
+  > the vocal peaks, mono low end, solo the rhythm section, make the snare crack, clear the solos. Each writes its steps
+  > as ordinary commands that go through the rule parser and safety checks; a step KENN can't do exactly makes the
+  > recipe ask, and a step that changes nothing is dropped. Plain vague requests ("the hats are too loud") still ask.
+  > Next: each recipe on real Live with exact undo (after soak #4).
 - [ ] Planner promotion only through `live_llm_promotion.py` (≥ 500 comparisons, ≥ 14 days, ≥ 98% schema, ≥ 90% agreement)
 - [ ] **Gate:** recipes pass on real Live with exact undo; per-step latency ≤ 3 s; zero unauthorised writes across
       the pilot

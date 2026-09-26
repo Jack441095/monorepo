@@ -52,8 +52,11 @@ voice, arbitrary plug-in control, silent saves.
 - [ ] **Feedback channel** (BB-3): e.g. a private Discord channel or a form. Recommendation: one channel plus an
       in-app "send diagnostics" button.
 - [ ] **Diagnostics consent.** What testers' KENN may send back (recommend: receipts and timings only, never audio).
-- [ ] **`Audio_Too` dependency** (BB-1): Mix Review still reads a Thursday-owned branch. Vendor the three qualified
+- [x] **`Audio_Too` dependency** (BB-1): Mix Review still reads a Thursday-owned branch. Vendor the three qualified
       detectors into KENN, or drop Mix Review from the beta and keep the new loudness/true-peak path.
+  > 26 Sept: already the case. The app's Mix Review runs KENN's own engine (`mix-review/core/local_engine.py` via
+  > `core/local_mix_review_service.py`); the app bundle has no `Audio_Too` files and its Mix Review smoke check
+  > passes. Only the unshipped legacy `mix-review/adapter.py` still points there.
 
 ## Phase 1: Make it installable (week 1) — biggest gap
 
@@ -110,6 +113,9 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > 2026-09-24: measured results (never audio) persist by content hash in `kenn/data/analysis_cache/` (16 files max; `KENN_ANALYSIS_CACHE_DIR` overrides; tests isolated). After a companion restart with no preflight, demo steps 12–13 answered in 0.2–0.4 s (cold: 3.2 s) and the gate passed.
 - [ ] ~~24-hour~~ 12-hour soak with Live restarts, companion restarts and sleep/wake (`companion_soak` gate)
   > Gate needs 24 h on one companion process and ≥ 1 Live disconnect/reconnect: run overnight when no code is being deployed; owner quits and reopens Live once.
+  > 26 Sept: soak #4 passed on `af1cb64` (721/721, one reconnect, connected at the end); the tester build
+  > `KENN-beta-cb9dad5.dmg` is built from it. Owner then cut future soaks to **8 hours** so one fits overnight and
+  > Live is free for work in the day; three clean 12-hour runs showed no errors or drift in their second half.
   > 2026-09-24: owner cut it to **12 hours** so the Mac stays usable. First run (from ~15:00) invalid: the breaker bug
   > above froze the reported Live status from 15:49. Fixed, branch merged into `main`, companion restarted, real-Live
   > assistant task re-passed; **second run started 20:16, ends ~08:16 Fri 25 Sep**, bound to `c40532b` (no commits on
@@ -160,10 +166,14 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > gets a cited answer ("how do I keep my master under -1 dBTP?"). Commands are offered only if they parse to a clean
   > proposal, so they still go proposal → Apply → readback → Undo; KENN never changes the master. Re-measuring = export
   > again and ask again. In chat audio advice now; Mix Review's own panel (Vue frontend) not yet.
+  > 26 Sept: the panel has it too ("Ask KENN" sends the suggested step to chat, `9bfdb0c`, in the soaked build).
 - [ ] Notes for the last 4 devices (Instrument/MIDI/Audio Effect Rack, Drum Synth) and a small review of the 21 notes
       approved today
   > 2026-09-24: 3 of 4 — Instrument, MIDI and Audio Effect Rack notes approved (77/78 devices). Drum Synth has no
   > entry in the Live 12 manual, so it waits for a measured note. Review of the 21 notes not yet done.
+  > 26 Sept: the review was done the same day and never ticked here: every control name checked against its manual
+  > section, each "Common mistakes" line checked by hand, six unsupported lines removed, all 21 approved
+  > (`docs/evidence/KENN_DEVICE_COVERAGE_2026-09-24.md`). Only Drum Synth is left, waiting for a measured note.
 - [x] Planner: rebuild the C6 corpus with dB volume labels, train run 7, keep in shadow; revisit promotion when the
       gate's 500 comparisons / 14 days are met (likely during the beta itself)
   > 2026-09-24: run 7 trained on the box (GPU 0) with dB labels: volume values fixed, but "bass" solos Drum Bus, so it
