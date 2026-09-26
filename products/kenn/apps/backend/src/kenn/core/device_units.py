@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import isfinite, log
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -217,4 +218,25 @@ def raw_to_display(*, device_name: str, parameter_name: str, raw: float, unit: s
     return float(profile.display_min + (raw_value - profile.raw_min) / (profile.raw_max - profile.raw_min) * span), None
 
 
-__all__ = ["DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "display_to_raw", "find_profile", "normalize_unit", "raw_to_display"]
+_UNIT_LABELS = {"db": "dB", "hz": "Hz", "ms": "ms", "%": "%"}
+
+
+def display_text(device_name: str, parameter_name: str, unit: str, raw: Any) -> str:
+    """A raw device value in the units Live shows. The answer used to say "from 0.85 db to 0.362 db" for -20 dB."""
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        return ""
+    value: float | None = None
+    if find_profile(device_name, parameter_name, unit) is not None:
+        shown, error = raw_to_display(device_name=device_name, parameter_name=parameter_name, raw=float(raw), unit=unit)
+        value = None if error else float(shown)
+    elif str(unit).lower() == "db":
+        value = float(raw)  # unmapped dB parameters (EQ band gains) already read in dB
+    if value is None:
+        return ""
+    if str(unit).lower() == "ratio":
+        return f"{value:.1f}:1"
+    label = _UNIT_LABELS.get(str(unit).lower(), str(unit))
+    return f"{value:.1f} {label}" if label != "%" else f"{value:.0f}%"
+
+
+__all__ = ["DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "display_text", "display_to_raw", "find_profile", "normalize_unit", "raw_to_display"]

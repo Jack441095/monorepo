@@ -41,7 +41,7 @@ def handle_live_command(
         session_id=sess_id,
         proposal=proposal,
         confirm_token=confirm_token,
-        idempotency_key=str(payload.get("idempotency_key", "")),
+        idempotency_key=str(payload.get("idempotency_key") or ""),
         llm_plan=payload.get("llm_plan") if isinstance(payload.get("llm_plan"), dict) else None,
         recipe_steps=payload.get("recipe_steps") if isinstance(payload.get("recipe_steps"), list) else None,
         allow_llm=not deterministic_only,
@@ -100,6 +100,6 @@ def handle_osc_undo(
         undo_proposal,
         confirm_token=str(payload.get("confirm_token", "")),
         session_id=session_id,
-        idempotency_key=str(payload.get("idempotency_key", "")),
+        idempotency_key=str(payload.get("idempotency_key") or ""),
     )
     return (200 if result.get("ok") else 409), result

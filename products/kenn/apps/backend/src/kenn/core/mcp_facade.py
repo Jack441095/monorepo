@@ -1867,7 +1867,7 @@ class KennMCPFacade:
                 raise ValueError("proposal must be a non-empty object")
             confirm_token = str(args.get("confirm_token", "")).strip()
             session_id = str(args.get("session_id", "")).strip()
-            idempotency_key = str(args.get("idempotency_key", "")).strip()
+            idempotency_key = str(args.get("idempotency_key") or "").strip()
             task_id, step_id = self._assistant_binding_ids(args)
             if not confirm_token or not session_id or not idempotency_key:
                 raise ValueError("confirm_token, session_id, and idempotency_key are required")
@@ -2031,7 +2031,7 @@ class KennMCPFacade:
             if not isinstance(proposal, dict) or not proposal:
                 raise ValueError("proposal must be a non-empty object when applying an undo")
             confirm_token = str(args.get("confirm_token", "")).strip()
-            idempotency_key = str(args.get("idempotency_key", "")).strip()
+            idempotency_key = str(args.get("idempotency_key") or "").strip()
             if not confirm_token or not idempotency_key:
                 raise ValueError("confirm_token and idempotency_key are required when applying an undo")
             result = self.client.post(

@@ -103,7 +103,7 @@ def handle_safe_live_action(handler: Any, action: str, payload: dict) -> None:
         proposal,
         confirm_token=confirm_token,
         session_id=session_id,
-        idempotency_key=str(payload.get("idempotency_key", "")),
+        idempotency_key=str(payload.get("idempotency_key") or ""),
         correlation_id=str(payload.get("correlation_id", "")),
     )
     if isinstance(result.get("receipt"), dict):
@@ -162,7 +162,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
             proposal,
             confirm_token=str(payload.get("confirm_token", "")),
             session_id=session_id,
-            idempotency_key=str(payload.get("idempotency_key", "")),
+            idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
         )
         if isinstance(result.get("receipt"), dict):
@@ -187,7 +187,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
             proposal,
             confirm_token=str(payload.get("confirm_token", "")),
             session_id=session_id,
-            idempotency_key=str(payload.get("idempotency_key", "")),
+            idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
         )
         if isinstance(result.get("receipt"), dict):
@@ -199,7 +199,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
             proposal,
             confirm_token=str(payload.get("confirm_token", "")),
             session_id=session_id,
-            idempotency_key=str(payload.get("idempotency_key", "")),
+            idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
         )
         if isinstance(result.get("receipt"), dict):
@@ -213,7 +213,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
                 proposal,
                 confirm_token=str(payload.get("confirm_token", "")),
                 session_id=session_id,
-                idempotency_key=str(payload.get("idempotency_key", "")),
+                idempotency_key=str(payload.get("idempotency_key") or ""),
                 correlation_id=str(payload.get("correlation_id", "")),
             )
         else:
@@ -221,7 +221,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
                 proposal,
                 confirm_token=str(payload.get("confirm_token", "")),
                 session_id=session_id,
-                idempotency_key=str(payload.get("idempotency_key", "")),
+                idempotency_key=str(payload.get("idempotency_key") or ""),
                 correlation_id=str(payload.get("correlation_id", "")),
             )
         if isinstance(result.get("receipt"), dict):
@@ -233,7 +233,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
             proposal,
             confirm_token=str(payload.get("confirm_token", "")),
             session_id=session_id,
-            idempotency_key=str(payload.get("idempotency_key", "")),
+            idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
         )
         if isinstance(result.get("receipt"), dict):
@@ -245,7 +245,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
             proposal,
             confirm_token=str(payload.get("confirm_token", "")),
             session_id=session_id,
-            idempotency_key=str(payload.get("idempotency_key", "")),
+            idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
         )
         if isinstance(result.get("receipt"), dict):
@@ -258,7 +258,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
         session_id=session_id,
         proposal=proposal,
         confirm_token=str(payload.get("confirm_token", "")),
-        idempotency_key=str(payload.get("idempotency_key", "")),
+        idempotency_key=str(payload.get("idempotency_key") or ""),
         llm_plan=payload.get("llm_plan") if isinstance(payload.get("llm_plan"), dict) else None,
         recipe_steps=recipe_steps,
         source_evidence=source_evidence,

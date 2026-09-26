@@ -1039,6 +1039,20 @@ def test_compressor_ratio_attack_and_release_are_set_in_the_units_live_shows() -
     assert "1:1 to 100:1" in too_much["answer"]
 
 
+def test_undoing_a_compressor_setting_is_shown_in_live_units() -> None:
+    # The undo answer read "from 0.75 ratio to 0.5 ratio".
+    from kenn.core.fake_live import FakeLiveBackend
+
+    service = _service(FakeLiveBackend())
+    planned = handle_command("set the compressor ratio on the drum bus to 4:1", session_id="undo-units", service=service,
+                             allow_llm=False)["proposal"]
+    applied = handle_command("", session_id="undo-units", service=service, proposal=planned,
+                             confirm_token=planned["confirmation_token"], idempotency_key=planned["id"], allow_llm=False)
+    undo = service.propose_undo(applied["receipt"], session_id="undo-units")["proposal"]
+    assert (undo["before_display"], undo["after_display"]) == ("4.00 : 1", "2.0:1")
+    assert undo["reason"].startswith("Undo:")
+
+
 def test_an_undo_card_says_it_is_an_undo() -> None:
     # 26 Sept 2026: the undo card read "Explicit user request for set_volume on track 'Bass'".
     from kenn.core.fake_live import FakeLiveBackend

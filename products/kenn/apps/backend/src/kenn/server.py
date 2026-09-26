@@ -2638,28 +2638,28 @@ class Handler(BaseHTTPRequestHandler):
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                 )
             elif undo_proposal.get("schema") == "kenn.ableton_device_insertion_proposal.v1":
                 result = service.execute_device_insertion(
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                 )
             elif undo_proposal.get("schema") == "kenn.ableton_device_removal_proposal.v1":
                 result = service.execute_device_removal(
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                 )
             elif undo_proposal.get("schema") == "kenn.ableton_eq_band_tuning_gain_proposal.v1":
                 result = service.execute_eq_band_tuning_gain(
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                 )
             elif undo_proposal.get("schema") == "kenn.ableton_recipe_proposal.v1":
                 from kenn.core.live_recipe import LiveRecipeService
@@ -2667,14 +2667,14 @@ class Handler(BaseHTTPRequestHandler):
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                 )
             elif undo_proposal.get("schema") == UPDATE_PROPOSAL_SCHEMA:
                 result = MidiClipActionService().execute_update(
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                     correlation_id=str(payload.get("correlation_id", "")),
                 )
             elif undo_proposal.get("schema") == REMOVE_PROPOSAL_SCHEMA:
@@ -2682,7 +2682,7 @@ class Handler(BaseHTTPRequestHandler):
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                     correlation_id=str(payload.get("correlation_id", "")),
                 )
             elif undo_proposal.get("schema") == CLIP_DUPLICATION_UNDO_PROPOSAL_SCHEMA:
@@ -2690,7 +2690,7 @@ class Handler(BaseHTTPRequestHandler):
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                     correlation_id=str(payload.get("correlation_id", "")),
                 )
             elif undo_proposal.get("schema") == CLIP_RENAME_UNDO_PROPOSAL_SCHEMA:
@@ -2698,7 +2698,7 @@ class Handler(BaseHTTPRequestHandler):
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                     correlation_id=str(payload.get("correlation_id", "")),
                 )
             elif undo_proposal.get("schema") == CLIP_AUDITION_PROPOSAL_SCHEMA:
@@ -2706,7 +2706,7 @@ class Handler(BaseHTTPRequestHandler):
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                     correlation_id=str(payload.get("correlation_id", "")),
                 )
             elif undo_proposal.get("schema") == SAMPLE_IMPORT_REMOVE_PROPOSAL_SCHEMA:
@@ -2714,7 +2714,7 @@ class Handler(BaseHTTPRequestHandler):
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                     correlation_id=str(payload.get("correlation_id", "")),
                 )
             else:
@@ -2722,7 +2722,7 @@ class Handler(BaseHTTPRequestHandler):
                     undo_proposal,
                     confirm_token=str(payload.get("confirm_token", "")),
                     session_id=session_id,
-                    idempotency_key=str(payload.get("idempotency_key", "")),
+                    idempotency_key=str(payload.get("idempotency_key") or ""),
                     correlation_id=str(payload.get("correlation_id", "")),
                 )
             if isinstance(result.get("receipt"), dict):

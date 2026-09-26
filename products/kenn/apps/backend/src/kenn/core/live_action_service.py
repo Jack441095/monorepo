@@ -3122,7 +3122,17 @@ class LiveActionService(Tier2Tier3ControlMixin):
         """Create a fresh, confirmed proposal to reverse a verified receipt."""
         result = self._propose_undo(receipt, session_id=session_id)
         proposal = result.get("proposal") if isinstance(result, dict) and result.get("ok") else None
-        if isinstance(proposal, dict) and str(proposal.get("reason") or "").startswith("Explicit user request"):
+        if isinstance(proposal, dict) and proposal.get("device_name") and proposal.get("before_display") \
+                and not proposal.get("after_display"):
+            # "from 0.75 ratio to 0.5 ratio" on the undo card; the change it reverses was shown in Live's units.
+            from kenn.core.device_units import display_text
+
+            shown = display_text(str(proposal["device_name"]), str(proposal.get("parameter") or ""),
+                                 str(proposal.get("unit") or ""), proposal.get("after"))
+            if shown:
+                proposal["after_display"] = shown
+        if isinstance(proposal, dict) and str(proposal.get("reason") or "").startswith(("Explicit user request",
+                                                                                         "Restore verified KENN")):
             # The undo card showed "Explicit user request for set_volume on track 'Bass'", as if asked for afresh.
             where = f" on '{proposal['track_name']}'" if proposal.get("track_name") else ""
             proposal["reason"] = f"Undo: puts back what was there{where} before your last change."
