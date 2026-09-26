@@ -7,7 +7,7 @@ gates pass, while reporting human review as pending. The ``qualified`` profile
 additionally requires complete independent human review, an explicit
 adjudication decision, a clean/reproducible source snapshot, and a verified
 Developer ID signed and notarized macOS plug-in archive, corpus-bound
-intelligence benchmarks, a reconnect-aware 12-hour soak receipt, and a
+intelligence benchmarks, a reconnect-aware 8-hour soak receipt, and a
 consented real-mix evaluation receipt.
 
 This command is read-only unless ``--output`` is used to write its report. It
@@ -52,8 +52,11 @@ DEFAULT_MATRIX = (
 )
 DEFAULT_PLUGIN_ARCHIVE = REPO_ROOT / "dist" / "KENN-Mix-Assistant-0.1.0-macOS.zip"
 DEFAULT_PLUGIN_HOST_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_PLUGIN_HOST_VALIDATION.json"
-# Owner decision 2026-09-24: 12 hours (was 24) so the Mac stays usable for work.
-SOAK_MIN_SECONDS = 12 * 3600
+# Owner decisions: 12 hours (was 24) on 2026-09-24 so the Mac stays usable for work; 8 on 2026-09-26 so a soak fits
+# overnight and Live is free for work in the day. Three 12-hour soaks (21-26 Sept) were clean the whole way: no
+# errors, memory flat at 25-47 MB, no drift in the second half.
+SOAK_MIN_SECONDS = 8 * 3600
+SOAK_HOURS = SOAK_MIN_SECONDS // 3600
 DEFAULT_SOAK_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_COMPANION_24H_SOAK.json"
 DEFAULT_REAL_MIX_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_REAL_MIX_EVALUATION.json"
 DEFAULT_PILOT_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_SUPERVISED_PILOT_EVALUATION.json"
@@ -976,7 +979,7 @@ def _real_live_assistant_gate(path: Path, planner_bakeoff: Path = DEFAULT_PLANNE
 
 def _soak_gate(path: Path) -> Gate:
     if not path.is_file():
-        return _gate("companion_soak", "12-hour companion and Live reconnect soak", "pending", ("qualified",), [path], "A qualifying 12-hour reconnect-aware soak receipt is required.")
+        return _gate("companion_soak", f"{SOAK_HOURS}-hour companion and Live reconnect soak", "pending", ("qualified",), [path], f"A qualifying {SOAK_HOURS}-hour reconnect-aware soak receipt is required.")
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         samples = data.get("samples", [])
@@ -1093,9 +1096,9 @@ def _soak_gate(path: Path) -> Gate:
             and statuses[-1] == "connected"
         )
     except (OSError, json.JSONDecodeError, KeyError, IndexError, TypeError, ValueError, subprocess.CalledProcessError) as exc:
-        return _gate("companion_soak", "12-hour companion and Live reconnect soak", "fail", ("qualified",), [path], f"Soak receipt is invalid: {exc}")
-    details = (f"Observed {elapsed_seconds / 3600:.2f} healthy wall-clock hours with bounded state, a reconnect, and connected final state on the exact source and harness revision." if valid else "Soak receipt does not prove exact-source, healthy 12-hour cadence, bounded memory/state, required reconnect/outage policy, and connected final state.")
-    return _gate("companion_soak", "12-hour companion and Live reconnect soak", "pass" if valid else "fail", ("qualified",), [path], details)
+        return _gate("companion_soak", f"{SOAK_HOURS}-hour companion and Live reconnect soak", "fail", ("qualified",), [path], f"Soak receipt is invalid: {exc}")
+    details = (f"Observed {elapsed_seconds / 3600:.2f} healthy wall-clock hours with bounded state, a reconnect, and connected final state on the exact source and harness revision." if valid else f"Soak receipt does not prove exact-source, healthy {SOAK_HOURS}-hour cadence, bounded memory/state, required reconnect/outage policy, and connected final state.")
+    return _gate("companion_soak", f"{SOAK_HOURS}-hour companion and Live reconnect soak", "pass" if valid else "fail", ("qualified",), [path], details)
 
 
 def _real_mix_gate(path: Path) -> Gate:

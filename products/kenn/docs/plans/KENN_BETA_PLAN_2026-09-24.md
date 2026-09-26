@@ -113,6 +113,9 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > 2026-09-24: measured results (never audio) persist by content hash in `kenn/data/analysis_cache/` (16 files max; `KENN_ANALYSIS_CACHE_DIR` overrides; tests isolated). After a companion restart with no preflight, demo steps 12–13 answered in 0.2–0.4 s (cold: 3.2 s) and the gate passed.
 - [ ] ~~24-hour~~ 12-hour soak with Live restarts, companion restarts and sleep/wake (`companion_soak` gate)
   > Gate needs 24 h on one companion process and ≥ 1 Live disconnect/reconnect: run overnight when no code is being deployed; owner quits and reopens Live once.
+  > 26 Sept: soak #4 passed on `af1cb64` (721/721, one reconnect, connected at the end); the tester build
+  > `KENN-beta-cb9dad5.dmg` is built from it. Owner then cut future soaks to **8 hours** so one fits overnight and
+  > Live is free for work in the day; three clean 12-hour runs showed no errors or drift in their second half.
   > 2026-09-24: owner cut it to **12 hours** so the Mac stays usable. First run (from ~15:00) invalid: the breaker bug
   > above froze the reported Live status from 15:49. Fixed, branch merged into `main`, companion restarted, real-Live
   > assistant task re-passed; **second run started 20:16, ends ~08:16 Fri 25 Sep**, bound to `c40532b` (no commits on
