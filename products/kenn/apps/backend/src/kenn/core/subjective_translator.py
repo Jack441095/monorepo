@@ -65,10 +65,13 @@ class SubjectiveTranslator:
     @classmethod
     def can_translate(cls, query: str) -> bool:
         text = str(query or "").strip()
+        from kenn.core import mix_recipes
+
         return bool(
             _VOCAL_PATTERNS.search(text)
             or _MUD_PATTERNS.search(text)
             or _GLUE_PATTERNS.search(text)
+            or mix_recipes.match(text)
         )
 
     @classmethod
@@ -85,6 +88,12 @@ class SubjectiveTranslator:
             return None
 
         live = service or LiveActionService()
+
+        # Named recipes first: their patterns are narrower than the three below.
+        from kenn.core import mix_recipes
+
+        if mix_recipes.match(text):
+            return mix_recipes.translate(text, live, session_id)
 
         # 1. Glue the Drum Bus
         if _GLUE_PATTERNS.search(text):
