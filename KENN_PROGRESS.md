@@ -9,7 +9,7 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **Soak #3 passed** (00:43 Sat): 721/721 samples, 0 errors, one Live reconnect (3 min out), Live connected at the end,
   median reply 26 ms. It qualifies the code it ran on (`98581b2`).
 - **Merged and pushed:** receipts committed, the north-star branch merged into `main` (1,902 tests pass), main pushed
-  (`10f4f3d`). New app built: `workspace/builds/kenn-app/KENN-beta-8c32b1f.dmg` (220 MB; smoke test passed incl. the
+  (now `3eb5724`). New app built: `workspace/builds/kenn-app/KENN-beta-8c32b1f.dmg` (220 MB; smoke test passed incl. the
   in-app tester guide). Frontend rebuilt, 24/24 frontend tests.
 - **The merge moved the code, so the gate wants fresh evidence:** the soak and the real-Live assistant task passed on
   `98581b2`, not on the merged code, and the gate only accepts evidence from the exact release code. Needs Live open:
@@ -18,12 +18,15 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **Chat model on this Mac: off.** Qwen 8B took 7–16 s an answer through the companion (and far longer under load),
   and KENN used its answer only 1 time in 6; 4B was no better. Chat is back to instant template answers; run 11 stays
   in shadow for commands. Qwen 8B stays the choice for a faster machine or the box GPU (2.8 s there).
+- **Chat prompt trimmed** (01:50): four prompt budgets tested on the box; the new default (1,600 characters of notes
+  plus a 1,200-character draft) passes 80/84 against 75, with no failing model answers kept. It's ~20% shorter, but
+  a local 8B still can't answer in 4 s on a 16 GB Mac (writing the answer alone is ~15 s), so templates stay there.
 - **Live is closed** at the moment; the companion reconnects on its own when it's reopened.
 - **Next (needs Live open):** real-Live assistant task on the current main, then start soak #4.
 - **Needs you:** testers, two reviewers, Apple Developer ID; the drafts to send are in `products/kenn/docs/beta/`
   (tester invite, reviewer brief, supervised-session script).
 
-## Qualified beta gate: 7 / 15 on the current main (`10f4f3d`)
+## Qualified beta gate: 7 / 15 on the current main (`3eb5724`)
 
 - [x] artifacts · real_live · support_matrix · planner_bakeoff · real_live_assistant · automated_suite ·
       intelligence · source_snapshot (the engineering gates; source_snapshot re-passes once the soak change is committed)
