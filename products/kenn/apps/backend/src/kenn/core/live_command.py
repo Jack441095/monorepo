@@ -3000,6 +3000,8 @@ def _handle_command_impl(
                 "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, "
                 "qualified device controls, sends, mix advice, change history, and exact undo.",
             )
+        if "valid_volume" in (intent.get("missing_fields") or []) and intent.get("ambiguity"):
+            return _clarification(response, intent, str(intent["ambiguity"][0]))  # a limit, not a missing detail
         if intent.get("action") in {"insert_device", "insert_device_with_parameter"}:
             device_name = str((intent.get("device") or {}).get("name") or "the device")
             return _clarification(response, intent, f"Which exact Live track should receive {device_name}? I will not change the set until the target is exact.")

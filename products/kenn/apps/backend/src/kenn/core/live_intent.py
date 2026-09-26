@@ -483,7 +483,7 @@ _RELATIVE_VOLUME_UP = re.compile(r"\b(?:up|raise|boost|louder|hotter|push|bump|i
 
 def _volume_range_message(db: float | None) -> str:
     if db is not None and db > 0.0:
-        return "That would take the track above 0 dB, which KENN does not set."
+        return "That would take the track above 0 dB, which KENN doesn't set."
     low = volume_law.law().min_db
     return f"KENN sets track volume between {low:g} dB and 0 dB; mute the track to silence it."
 
@@ -1249,7 +1249,11 @@ def _rewrite_idioms(text: str) -> str:
     if (m := _SIGNED_CHANGE.match(text)):
         if m.group("name") and name(m):
             return f"turn {m.group('name')} {'up' if m.group('sign') == '+' else 'down'} {m.group('amount')} dB"
+        # "vocal +2 dB" is a change; "set the kick to +3 dB" / "put the kick at +3 dB" is a level above 0 dB, and
+        # used to come out as "turn the kick up 3 dB" (26 Sept 2026).
         if m.group("name2") and name(m, "name2"):
+            if re.search(r"\b(?:to|at)\s*$", m.group("name2"), re.I):
+                return f"{m.group('name2')} {m.group('amount2')} dB"
             return f"turn {m.group('name2')} up {m.group('amount2')} dB"
     if (m := _UNITLESS_CHANGE.match(text)):
         if m.group("name") and name(m):
@@ -2539,7 +2543,14 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             if target is None:
                 base.update(action="set_volume")
                 base["missing_fields"].append("valid_volume")
-                base["ambiguity"].append(_volume_range_message(target_db))
+                if current_db is not None and target_db is not None and target_db > 0.0:
+                    # Say where the track is and how much room is left, not just "no".
+                    room = max(0.0, -current_db)
+                    base["ambiguity"].append(
+                        f"'{track.get('name')}' is at {current_db:.1f} dB, so up {relative_db:g} dB would take it above "
+                        f"0 dB, which KENN doesn't set." + (f" Up to {room:.1f} dB is fine." if room >= 0.1 else ""))
+                else:
+                    base["ambiguity"].append(_volume_range_message(target_db))
                 return base
             base.update({"desired_value": target, "unit": "normalized", "requested_unit": "dB",
                          "requested_relative_db": relative_db})

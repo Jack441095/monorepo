@@ -671,6 +671,17 @@ def test_device_questions_read_the_set_but_advice_does_not() -> None:
         assert parse_request(query, snapshot()).get("action") != "inspect_devices"
 
 
+def test_a_plus_level_after_to_or_at_is_a_level_not_a_change() -> None:
+    # 26 Sept 2026: "set the kick to +3 dB" came out as "turn the kick up 3 dB", a different change from the one asked.
+    from kenn.core.fake_live import FakeLiveBackend
+
+    demo = FakeLiveBackend().query_session_state()
+    for query in ("Put the kick at +3 dB", "Set the kick to +3 dB"):
+        result = parse_request(query, demo)
+        assert result.get("requested_relative_db") is None and "valid_volume" in result["missing_fields"], query
+    assert parse_request("kick +3 dB", demo)["requested_relative_db"] == 3.0
+
+
 def test_append_is_a_bounded_device_insertion_synonym() -> None:
     result = parse_request("Append EQ Eight on track 2", snapshot())
     assert result["action"] == "insert_device"
