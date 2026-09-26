@@ -117,3 +117,23 @@ def test_clearing_the_solos_unsolos_only_what_is_soloed(ask) -> None:
     s = mix_recipes.Set([{"name": "Kick", "index": 0, "soloed": True}, {"name": "Bass", "index": 4, "soloed": False}], [])
     commands, _summary = recipe.build(s, None)
     assert commands == ["unsolo Kick"]
+
+
+def test_a_recipe_asks_which_track_when_a_role_matches_several() -> None:
+    # Two basses: "make room for the kick" must not pick one of them for the producer.
+    from kenn.core import mix_recipes
+
+    recipe = mix_recipes.match("make room for the kick")
+    s = mix_recipes.Set([{"name": "Kick", "index": 0, "volume": 0.5}, {"name": "Bass", "index": 1, "volume": 0.5},
+                         {"name": "Sub Bass", "index": 2, "volume": 0.5}], [])
+    built = recipe.build(s, None)
+    assert isinstance(built, str) and "'Bass' or 'Sub Bass'" in built
+
+
+def test_mono_low_end_asks_rather_than_centring_only_some() -> None:
+    from kenn.core import mix_recipes
+
+    recipe = mix_recipes.match("make the low end mono")
+    tracks = [{"name": n, "index": i, "pan": 0.3} for i, n in enumerate(["Kick", "Bass", "Sub", "808", "Kick 2"])]
+    built = recipe.build(mix_recipes.Set(tracks, []), None)
+    assert isinstance(built, str) and "at most three" in built

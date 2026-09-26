@@ -25,12 +25,21 @@ class Set:
     tracks: list[dict]
     returns: list[dict]
 
+    def all(self, *words: str) -> list[dict]:
+        return [track for track in self.tracks
+                if any(re.search(rf"\b{re.escape(word)}\b", str(track.get("name") or "").lower()) for word in words)]
+
     def find(self, *words: str) -> dict | None:
-        for track in self.tracks:
-            name = str(track.get("name") or "").lower()
-            if any(re.search(rf"\b{re.escape(word)}\b", name) for word in words):
-                return track
-        return None
+        """The one track in this role; None when there's none or several (a recipe never guesses between them)."""
+        found = self.all(*words)
+        return found[0] if len(found) == 1 else None
+
+    def which(self, role: str, *words: str) -> str:
+        """The question to ask when a role is missing or matches several tracks."""
+        found = self.all(*words)
+        if len(found) > 1:
+            return f"Which is the {role}: {' or '.join(repr(t['name']) for t in found)}? Name it and I'll go ahead."
+        return f"Which track is the {role}? Name it and I'll go ahead."
 
     def named(self, phrase: str) -> dict | None:
         """The one track a phrase names ("the vox", "hats", "Snare / Clap"), or None."""
@@ -63,8 +72,10 @@ class Recipe:
 
 def _room_for_kick(s: Set, _m: re.Match[str]) -> Built:
     kick, bass = s.find("kick", "bd"), s.find("bass", "sub", "808")
-    if not kick or not bass:
-        return "Which tracks are the kick and the bass? Name them and I'll make room for the kick."
+    if not kick:
+        return s.which("kick", "kick", "bd")
+    if not bass:
+        return s.which("bass", "bass", "sub", "808")
     commands = [f"turn {bass['name']} down 1.5 dB"] + ([f"centre {bass['name']}"] if s.panned(bass) else [])
     return commands, f"To make room for '{kick['name']}': turn '{bass['name']}' down 1.5 dB" + (
         " and centre it." if len(commands) == 2 else ".")
@@ -128,7 +139,7 @@ def _compressor_threshold(words: tuple[str, ...], label: str) -> Callable[[Set, 
     def build(s: Set, _m: re.Match[str]) -> Built:
         track = s.find(*words)
         if not track:
-            return f"Which track is the {label}? Name it and I'll work on its compressor."
+            return s.which(label, *words)
         if not s.has(track, "Compressor"):
             return (f"'{track['name']}' has no Compressor to adjust. Want me to add one first? "
                     f"(Say \"put a compressor on the {track['name']}\".)")
@@ -140,12 +151,15 @@ def _compressor_threshold(words: tuple[str, ...], label: str) -> Callable[[Set, 
 def _mono_low_end(s: Set, _m: re.Match[str]) -> Built:
     low = []
     for words in (("kick", "bd"), ("bass",), ("sub", "808")):
-        track = s.find(*words)
-        if track and track not in low:
-            low.append(track)
+        for track in s.all(*words):  # every low-end track gets centred, so several basses are fine here
+            if track not in low:
+                low.append(track)
     if not low:
         return "Which tracks carry the low end? Name the kick and bass and I'll centre them."
-    panned = [t for t in low if s.panned(t)][:3]
+    panned = [t for t in low if s.panned(t)]
+    if len(panned) > 3:
+        return (f"{len(panned)} low-end tracks are panned ({', '.join(t['name'] for t in panned)}); a recipe changes at "
+                "most three. Which should I centre first?")
     if not panned:
         return f"The low end is already centred ({', '.join(t['name'] for t in low)}). Nothing to change."
     return ([f"centre {t['name']}" for t in panned],
@@ -153,7 +167,11 @@ def _mono_low_end(s: Set, _m: re.Match[str]) -> Built:
 
 
 def _rhythm_section(s: Set, _m: re.Match[str]) -> Built:
-    parts = [t for t in (s.find("kick", "bd"), s.find("snare", "clap"), s.find("bass")) if t]
+    roles = (("kick", ("kick", "bd")), ("snare", ("snare", "clap")), ("bass", ("bass",)))
+    for role, words in roles:
+        if len(s.all(*words)) > 1:
+            return s.which(role, *words)
+    parts = [t for t in (s.find(*words) for _role, words in roles) if t]
     if len(parts) < 2:
         return "Which tracks are the rhythm section? Name them and I'll solo them."
     names = [t["name"] for t in parts]
@@ -163,7 +181,7 @@ def _rhythm_section(s: Set, _m: re.Match[str]) -> Built:
 def _snare_crack(s: Set, _m: re.Match[str]) -> Built:
     snare, reverb = s.find("snare", "clap"), s.ret("reverb")
     if not snare:
-        return "Which track is the snare? Name it and I'll bring it out."
+        return s.which("snare", "snare", "clap")
     commands = [f"turn {snare['name']} up 1.5 dB"] + ([f"send the {snare['name']} to the {reverb} at 10%"] if reverb else [])
     return commands, f"To make '{snare['name']}' crack: turn it up 1.5 dB" + (
         f" and send it to {reverb} at 10%." if reverb else ".")
