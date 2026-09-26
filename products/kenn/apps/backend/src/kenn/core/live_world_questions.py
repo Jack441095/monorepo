@@ -24,7 +24,9 @@ def _question_kind(lower: str) -> str | None:
         return "parameter_value"
     if re.search(r"\b(?:anything|any tracks?|which tracks?)\b.*\b(?:muted|soloed)\b", lower) or re.search(r"\bwhat(?:'s| is)\b.*\b(?:muted|soloed)\b", lower):
         return "mute_solo"
-    if re.search(r"\bwhat\s+key\b|\bwhich\s+key\b|\bkey\s+(?:is|of)\s+(?:the\s+)?(?:song|set|track)\b|\bwhat\s+scale\b", lower):
+    # "depending on which key I press" is about a keyboard, not the song's key.
+    if re.search(r"\b(?:what|which)\s+key\b(?!\s+(?:i|you|we|they)\b)|\bkey\s+(?:is|of)\s+(?:the\s+)?(?:song|set|track)\b"
+                 r"|\bwhat\s+scale\b", lower):
         return "song_key"
     # "What is on track 4?" stays on the existing inventory route; this path
     # adds returns, the master, and tracks named by name (with rack chains).

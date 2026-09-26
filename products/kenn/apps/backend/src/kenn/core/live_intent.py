@@ -1120,6 +1120,10 @@ _SEND_SAID_AMOUNT_FIRST = re.compile(
     r"(?:for|on|from)\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s*[.!?]?\s*$"
     r"|^\s*(?P<ret2>reverb|verb|delay)\s+(?P<value2>\d+(?:\.\d+)?)\s*(?:%|percent)?\s+on\s+(?:the\s+)?"
     r"(?P<name2>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s*[.!?]?\s*$", re.I)
+# "send the synth to A-Reverb 30 percent": the amount without "at".
+_SEND_NO_AT = re.compile(
+    r"^\s*(?:(?:can|could)\s+you\s+)?send\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+to\s+(?:the\s+)?"
+    r"(?P<ret>[\w-]+(?:\s+(?!at\b)[\w-]+)?)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!?]?\s*$", re.I)
 _SEND_SAID_GO_TO = re.compile(
     r"^\s*make\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+go\s+to\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+[\w-]+)?)\s+"
     r"at\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!?]?\s*$", re.I)
@@ -1240,7 +1244,7 @@ def _rewrite_idioms(text: str) -> str:
             value = m.group("value") or m.group("value2")
             if float(value) <= 100:
                 return f"send the {m.group(group)} to the {'reverb' if ret == 'verb' else ret} at {value}%"
-    if (m := _SEND_SAID_PORTION.match(text) or _SEND_SAID_GO_TO.match(text)) and name(m):
+    if (m := _SEND_SAID_PORTION.match(text) or _SEND_SAID_GO_TO.match(text) or _SEND_NO_AT.match(text)) and name(m):
         return f"send the {m.group('name')} to the {m.group('ret')} at {m.group('value')}%"
     if (m := _SEND_SAID_TRACK_FIRST.match(text) or _SEND_SAID_LETTER_FIRST.match(text)) and name(m):
         ret = m.group("ret").lower().replace("return ", "")
@@ -2084,7 +2088,11 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         base["ambiguity"].append(f"Play and stop run the whole set, not one track. Did you mean to solo or mute {what}, "
                                  "or start/stop the whole set? Nothing changed.")
         return base
-    if re.search(r"\b(play|start playback|start\s+(?:the\s+)?(?:song|set|playback|playing)|hit\s+play)\b"
+    # "Play" is Live's transport unless someone is playing notes: "every note I play", "play a sample across the
+    # keyboard" were Play proposals (26 Sept 2026).
+    if re.search(r"(?<!\bi\s)(?<!\bwe\s)(?<!\byou\s)(?<!\bthey\s)\bplay\b(?!\s+(?:a|an|some|each|every|any|one|two|notes?|"
+                 r"chords?|samples?|sounds?|keys?|melod(?:y|ies)|parts?|live|along|over|through|across|around|with)\b)"
+                 r"|\b(?:start playback|start\s+(?:the\s+)?(?:song|set|playback|playing)|hit\s+play)\b"
                  r"|^\s*(?:let'?s\s+(?:hear\s+it|jam)|can\s+we\s+start|let'?s\s+go)\s*[.!?]?\s*$", lower):
         base.update({"mode": "assist", "action": "transport_play", "confirmation_required": True, "confidence": 0.99})
         return base

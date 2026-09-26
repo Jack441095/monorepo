@@ -100,3 +100,12 @@ def test_arrangement_sections_and_harmonics():
     assert harmonics["root_note"] == "F#"
     assert harmonics["scale_name"] == "Minor"
     assert harmonics["key_signature"] == "F# Minor"
+
+
+def test_live_s_numeric_root_becomes_a_note_name() -> None:
+    # Live reports root_note as 0-11; "unsupported root note: '0'" made a chat question a 500 (26 Sept 2026).
+    from kenn.core.session_world_model import SessionWorldModel
+
+    assert SessionWorldModel.harmonic_context({"root_note": 0, "scale_name": "Major"})["root_note"] == "C"
+    assert SessionWorldModel.harmonic_context({"root_note": 9, "scale_name": "Minor"})["root_note"] == "A"
+    assert SessionWorldModel.harmonic_context({"root_note": "F#", "scale_name": "Minor"})["root_note"] == "F#"

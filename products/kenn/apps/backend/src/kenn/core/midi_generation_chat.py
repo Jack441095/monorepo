@@ -21,7 +21,7 @@ from kenn.core.generative_midi import (
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 _GENERATE = re.compile(r"^\s*(?:please\s+)?(?:write|generate|make|create|compose|give\s+me|sketch)\b", re.I)
 _KINDS = (
-    ("drums", re.compile(r"\b(?:drum\s*(?:pattern|loop|groove|beat)?|beat|drums)\b", re.I)),
+    ("drums", re.compile(r"\b(?:drum\s*(?:pattern|loop|groove|beat|part|rhythm)s?|beats?|grooves?|drums)\b", re.I)),
     ("bassline", re.compile(r"\bbass\s*line\b|\bbassline\b", re.I)),
     ("chords", re.compile(r"\bchords?\b|\bchord\s+progression\b|\bprogression\b", re.I)),
 )
@@ -30,11 +30,17 @@ _BARS = re.compile(r"\b(\d{1,2})[\s-]*bars?\b", re.I)
 MAX_BARS = 16
 
 
+# "a tremolo that pulses to the beat", "a fill from a slice of the drums": the beat and the drums are what the effect
+# works on, not the thing to write.
+_NOT_THE_OBJECT = re.compile(r"\b(?:to|of|on|with|from|in|over|behind|under)\s+(?:the|my|a|your)\s+\w+", re.I)
+
+
 def generation_kind(text: str) -> str | None:
     if not _GENERATE.match(str(text or "")):
         return None
+    wanted = _NOT_THE_OBJECT.sub(" ", str(text))
     for kind, pattern in _KINDS:
-        if pattern.search(text):
+        if pattern.search(wanted):
             return kind
     return None
 

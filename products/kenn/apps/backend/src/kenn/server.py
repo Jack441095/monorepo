@@ -196,6 +196,23 @@ def _continues_live_turn(question: str, session_id: str) -> bool:
     return bool(context.get("last_command")) and bool(_FOLLOW_UP_MARKER.search(text) or _CORRECTION.match(text))
 
 
+def _chat_wants_live(question: str) -> bool:
+    """The rule parser, on the last cached look at the set, reads a Live change in a chat message."""
+    from kenn.core.chat_live_router import wants_live_change
+    from kenn.mixing_doctor import get_latest_session_state
+
+    snapshot = get_latest_session_state()
+    if isinstance(snapshot, dict) and re.search(r"\bsends?\b", question, re.I) and not snapshot.get("return_tracks"):
+        # The cached snapshot never lists returns; a send needs them, as the command path does for "send".
+        try:
+            from kenn.ableton_osc_bridge import live_client
+
+            snapshot = {**snapshot, "return_tracks": live_client.get_return_tracks()}
+        except Exception:
+            pass
+    return wants_live_change(question, snapshot)
+
+
 def _cached_ableton_health() -> dict[str, Any]:
     """Return a non-blocking Ableton subsystem summary for ``/api/health``.
 
@@ -708,7 +725,8 @@ class Handler(BaseHTTPRequestHandler):
                     pass
         error_id = self.request_id()
         if status >= 500:
-            self.structured_log("server_error", status=status)
+            # The reply stays generic; the local log keeps what went wrong, or a 500 can't be traced afterwards.
+            self.structured_log("server_error", status=status, error=str(payload.get("error") or "")[:500])
         payload = safe_error_payload(status, payload, error_id)
         body = json.dumps(payload, indent=2).encode("utf-8")
         self.send_response(status)
@@ -749,6 +767,10 @@ class Handler(BaseHTTPRequestHandler):
         devices are routed here, and the command gateway can only inspect or
         clarify on this path; it cannot create or execute a mutation.
         """
+        from kenn.core.chat_live_router import asks_how_to
+
+        if asks_how_to(question):
+            return None  # "can I fit my samples to the track's tempo?" wants the notes, not "the tempo is 120 BPM"
         session_result = answer_live_session_question(question, session_id=session_id)
         if session_result is not None:
             structured_intent = session_result.get("intent")
@@ -824,7 +846,7 @@ class Handler(BaseHTTPRequestHandler):
         reaching the knowledge chat.
         """
         imperative = _is_live_imperative(question)
-        if not imperative and not _continues_live_turn(question, session_id):
+        if not imperative and not _continues_live_turn(question, session_id) and not _chat_wants_live(question):
             return None
         result = handle_command(question, session_id=session_id)
         intents = [result.get(key) for key in ("intent", "live_intent") if isinstance(result.get(key), dict)]

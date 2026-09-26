@@ -38,7 +38,12 @@ def _question_kind(question: str) -> str | None:
         return "track_count"
     if _TRACK_NUMBER.search(lower) and re.search(r"\b(?:what|which)\s+(?:is|are)\s+track\b|\bwhat(?:'s|s)\s+track\b", lower):
         return "track_identity"
-    if "tempo" in lower or "time signature" in lower or re.search(r"\bmeter\b", lower):
+    # Asking what the tempo is, not any sentence with "tempo" in it ("stretch samples to fit my track's tempo" got
+    # "The current tempo is 120 BPM", 26 Sept 2026).
+    if re.search(r"\b(?:set|change|speed\s+up|slow\s+down|raise|lower|double|halve|increase|decrease|bump|drop)\b[^.?!]*"
+                 r"\b(?:tempo|bpm)\b", lower) or re.search(r"\b(?:what|which)(?:'?s|\s+is|\s+are)?\s+(?:the\s+|my\s+|our\s+|this\s+)?(?:current\s+|song'?s?\s+|set'?s?\s+)?"
+                 r"(?:tempo|bpm|time\s+signature|meter)\b|\bhow\s+fast\s+is\b|^\s*(?:the\s+)?(?:tempo|bpm|time\s+signature)\s*\??\s*$"
+                 r"|\b(?:tempo|bpm)\s+(?:and|&)\s+(?:the\s+)?time\s+signature\b", lower):
         return "tempo_signature"
     if (
         "selected track" in lower

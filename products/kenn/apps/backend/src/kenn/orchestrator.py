@@ -181,7 +181,8 @@ _RACK_SYNTHESIZER_PATTERNS = [
 _NEURAL_MIDI_PATTERNS = [
     re.compile(r"\b(generat|creat|make|write|compose)\b.{0,30}\b(bouncy|driving|sustained|drone)?\s*(bassline|bass\s*line|bass\s*pattern)\b", re.I),
     re.compile(r"\b(bouncy|driving|sustained|drone)\s*(bassline|bass\s*line)\b", re.I),
-    re.compile(r"\b(humanize|apply|add|put)\b.{0,30}\b(groove|swing|lofi_swing|boombap|shuffle)\b", re.I),
+    # Only a bassline: this agent writes one, so "add swing to a stiff MIDI drum pattern" came back as a bassline.
+    re.compile(r"(?=.*\bbass)\b(humanize|apply|add|put)\b.{0,30}\b(groove|swing|lofi_swing|boombap|shuffle)\b", re.I),
     re.compile(r"\b(detect|identify|find)\b.{0,30}\b(key|scale)\b.*\b(notes?|chords?|midi)\b", re.I),
 ]
 
@@ -225,7 +226,11 @@ _QUESTION_SHAPE_RE = re.compile(
 
 
 def _is_question_not_request(query: str) -> bool:
-    return bool(_QUESTION_SHAPE_RE.search(query))
+    # Asking how can come after a description too ("My drums rumble. What's a quick way to clean them up?"); that
+    # used to reach the Live agent and come back as a Glue Compressor proposal (26 Sept 2026).
+    from kenn.core.chat_live_router import asks_how_to
+
+    return bool(_QUESTION_SHAPE_RE.search(query)) or asks_how_to(query)
 
 
 # ── Sub-agent dispatch functions ──────────────────────────────────

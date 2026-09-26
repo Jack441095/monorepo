@@ -654,7 +654,12 @@ class SessionWorldModel:
     def harmonic_context(cls, session_state: Dict[str, Any]) -> Dict[str, Any]:
         """Extract global musical key, mode, scale, and tempo context with MIDI note inference."""
         tempo = float(session_state.get("tempo", 120.0))
-        root_note = str(session_state.get("root_note", session_state.get("scale_root", "C"))).strip()
+        raw_root = session_state.get("root_note", session_state.get("scale_root", "C"))
+        # Live reports the set's root as a number (0 = C); the MIDI generators take note names and raised
+        # "unsupported root note: '0'", a 500 in chat (26 Sept 2026).
+        if (isinstance(raw_root, int) and not isinstance(raw_root, bool)) or str(raw_root).strip().isdigit():
+            raw_root = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")[int(raw_root) % 12]
+        root_note = str(raw_root).strip()
         scale_name = str(session_state.get("scale_name", session_state.get("scale", "Minor"))).strip()
         signature_num = int(session_state.get("signature_numerator", 4))
         signature_denom = int(session_state.get("signature_denominator", 4))

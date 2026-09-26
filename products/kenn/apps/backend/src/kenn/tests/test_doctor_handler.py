@@ -25,3 +25,4 @@ def test_an_audit_that_finds_issues_is_not_a_server_error(monkeypatch) -> None:
 
     doctor_handler.handle_post_doctor_audit(handler, {"session_state": hot})
     assert handler.status == 200 and handler.body["issues_found"] >= 1
+
