@@ -12,6 +12,7 @@ from __future__ import annotations
 from email.parser import BytesParser
 from email.policy import default as email_default
 from datetime import datetime, timezone
+import functools
 import hashlib
 import html
 import importlib.util
@@ -29,6 +30,7 @@ from kenn.paths import PACKAGES_ROOT
 _SERVICE_ROOT = PACKAGES_ROOT / "mix-review"
 _ENGINE_PATH = _SERVICE_ROOT / "core" / "local_engine.py"
 _MASKING_PATH = _SERVICE_ROOT / "core" / "masking_analysis.py"
+_MATCHING_PATH = _SERVICE_ROOT / "core" / "reference_matching.py"
 _MAX_TEXT = 512
 MAX_REVIEWS = 500
 
@@ -54,7 +56,17 @@ def _load_engine():
 
 _engine = _load_engine()
 MAX_UPLOAD_BYTES = int(_engine.MAX_UPLOAD_BYTES)
+# "Too large" alone left testers guessing; 150 MB is about 14 minutes of 16-bit, 44.1 kHz stereo.
+TOO_LARGE_ADVICE = (
+    f"Mix Review takes WAV files up to {MAX_UPLOAD_BYTES // (1024 * 1024)} MB (about 14 minutes of 16-bit, "
+    "44.1 kHz stereo, or 9 minutes at 24-bit). Bounce a shorter section or a 16-bit version and try again."
+)
 _masking_engine = _load_module("masking_analysis", _MASKING_PATH)
+
+
+@functools.cache
+def _matching_engine():
+    return _load_module("reference_matching", _MATCHING_PATH)
 
 
 def analyze_stem_masking(stems: list[tuple[str, bytes]]) -> dict[str, Any]:
@@ -197,7 +209,7 @@ def compare_reference_audio(
         if not isinstance(payload, (bytes, bytearray)) or not payload:
             return {"ok": False, "error": f"{label} WAV is empty."}
         if len(payload) > MAX_UPLOAD_BYTES:
-            return {"ok": False, "error": f"{label} WAV is too large."}
+            return {"ok": False, "error": f"{label} WAV is too large. {TOO_LARGE_ADVICE}"}
         clean_name = Path(str(filename or f"{label.lower()}.wav")).name[:256] or f"{label.lower()}.wav"
         if Path(clean_name).suffix.lower() not in _engine.DECODABLE_SUFFIXES:
             return {"ok": False, "error": f"{label} must be a supported WAV file."}
@@ -265,7 +277,10 @@ def compare_reference_audio(
 
     matching_result = None
     try:
-        from reference_matching import compare_mix_to_reference
+        # A bare `from reference_matching import` only worked when some other import had put
+        # mix-review/core on sys.path; the companion never does, so Reference Match quietly lost
+        # its tonal balance, matching gains and EQ Eight preset (found Sept 2026).
+        compare_mix_to_reference = _matching_engine().compare_mix_to_reference
         matching_result = compare_mix_to_reference(
             mix_bytes,
             reference_bytes,
@@ -400,7 +415,7 @@ class LocalMixReviewService:
         if not isinstance(file_bytes, (bytes, bytearray)) or not file_bytes:
             return {"ok": False, "error": "Mix Review audio is empty."}
         if len(file_bytes) > self.MAX_UPLOAD_BYTES:
-            return {"ok": False, "error": "WAV upload is too large."}
+            return {"ok": False, "error": f"This WAV is too large. {TOO_LARGE_ADVICE}"}
         clean_filename = Path(str(filename or "mix.wav")).name[:256] or "mix.wav"
         if Path(clean_filename).suffix.lower() not in _engine.DECODABLE_SUFFIXES:
             return {"ok": False, "error": "Only WAV files are supported by the local Mix Review engine."}
@@ -513,4 +528,4 @@ class LocalMixReviewService:
 local_mix_review = LocalMixReviewService()
 
 
-__all__ = ["LocalMixReviewService", "MAX_REVIEWS", "MAX_UPLOAD_BYTES", "local_mix_review"]
+__all__ = ["LocalMixReviewService", "MAX_REVIEWS", "MAX_UPLOAD_BYTES", "TOO_LARGE_ADVICE", "local_mix_review"]

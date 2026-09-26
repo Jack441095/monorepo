@@ -98,7 +98,6 @@ GLOBAL_LIMITATIONS = (
     "explicitly if the optional pyloudnorm/scipy dependency is not installed). "
     "No masking, tonal-balance, arrangement, dynamics, or genre-context analysis is "
     "performed -- those fault families are explicitly not evaluated. Only mono or "
-    "stereo 16-bit/24-bit PCM WAV is supported."
     "stereo 16-bit/24-bit PCM or 32-bit float WAV is supported."
 )
 
@@ -464,6 +463,13 @@ def analyze_wav(
         channel_data, framerate, channels = _decode_channels(payload)
     except (UnsupportedAudioError, struct.error, wave.Error) as exc:
         return {"ok": False, "error": f"Could not decode audio: {type(exc).__name__}: {exc}"}
+    # The upload routes validate first, but callers of analyze_wav alone got a
+    # 4-channel file measured and then described as "mono" (Sept 2026).
+    if channels not in (1, 2):
+        return {
+            "ok": False,
+            "error": f"Unsupported channel count ({channels}); only mono or stereo WAV is supported in this build.",
+        }
 
     total_frames = len(channel_data[0]) if channel_data else 0
     duration_seconds = total_frames / framerate if framerate else 0.0

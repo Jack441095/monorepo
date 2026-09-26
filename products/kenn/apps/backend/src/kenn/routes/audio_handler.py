@@ -192,7 +192,9 @@ def handle_mix_review(handler: Any, mix_review: Any) -> None:
         handler.send_json(400, {"error": "Upload body is required."})
         return
     if length > mix_review.MAX_UPLOAD_BYTES:
-        handler.send_json(413, {"error": "WAV upload is too large."})
+        from kenn.core.local_mix_review_service import TOO_LARGE_ADVICE
+
+        handler.send_json(413, {"error": f"This WAV is too large. {TOO_LARGE_ADVICE}"})
         return
     try:
         from kenn.server import resolve_session_project

@@ -440,3 +440,48 @@ def test_extensible_wav_format_supported() -> None:
     report = local_engine.analyze_wav(payload, filename="extensible.wav")
     assert report["ok"] is True
     assert report["metrics"]["peak_dbfs"] is not None
+
+
+def test_four_channel_wav_is_refused_by_upload_check_and_engine() -> None:
+    n = int(2.0 * 44100)
+    tone = _sine(n, 110.0, 44100, amplitude=0.2)
+    payload = _wav_bytes([tone, tone, tone, tone], framerate=44100)
+
+    val = local_engine.validate_wav_upload(payload, "quad.wav")
+    assert val["ok"] is False
+    assert "Unsupported channel count (4)" in val["error"]
+
+    # Before this, analyze_wav measured the file and called it mono.
+    report = local_engine.analyze_wav(payload, filename="quad.wav")
+    assert report["ok"] is False
+    assert "Unsupported channel count (4)" in report["error"]
+
+
+def test_a_long_stereo_mix_is_measured_in_bounded_time() -> None:
+    # Three minutes of stereo (about 32 MB). A 12-minute, 127 MB file took about
+    # 12 s on the M-series Mac when BB-5 was checked, so 60 s is generous.
+    import time
+    from array import array
+
+    framerate = 44100
+    frames = 180 * framerate
+    cycle = [int(6000 * math.sin(2 * math.pi * i / 400)) for i in range(400)]
+    mono = array("h", cycle * (frames // 400))
+    stereo = array("h", bytes(len(mono) * 4))
+    stereo[0::2] = mono
+    stereo[1::2] = mono
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as handle:
+        handle.setnchannels(2)
+        handle.setsampwidth(2)
+        handle.setframerate(framerate)
+        handle.writeframes(stereo.tobytes())
+    payload = buffer.getvalue()
+
+    assert local_engine.validate_wav_upload(payload, "long.wav")["ok"] is True
+    started = time.perf_counter()
+    report = local_engine.analyze_wav(payload, filename="long.wav")
+    elapsed = time.perf_counter() - started
+    assert report["ok"] is True
+    assert report["input_context"]["duration_seconds"] == pytest.approx(180.0, abs=0.1)
+    assert elapsed < 60.0
