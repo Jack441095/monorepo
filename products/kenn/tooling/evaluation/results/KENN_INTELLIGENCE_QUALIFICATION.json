@@ -6,9 +6,9 @@
     "python3 tooling/scripts/qualify_assistant_recovery.py",
     "python3 tooling/scripts/evaluate_arrangement_intelligence.py"
   ],
-  "details": "Hard cases 15/15; hybrid recall@4 0.9655; corpus hashes match; session-grounded advice 6/6; assistant recovery 8/8 with 7/7 safety cases; arrangement intelligence 4/4.",
-  "generated_at": "2026-09-24T12:04:36.927441+00:00",
+  "details": "Hard cases 15/15; hybrid recall@4 0.9828; corpus hashes match; session-grounded advice 6/6; assistant recovery 8/8 with 7/7 safety cases; arrangement intelligence 4/4.",
+  "generated_at": "2026-09-26T00:30:00.603762+00:00",
   "passed": true,
   "schema": "kenn.intelligence_qualification.v1",
-  "source_sha256": "f6c3a108d3e94519eee8f8c3bc4f34bfec8539cae41eb827049d76a894578fd8"
+  "source_sha256": "1865434dc2eda27f3b091a88548f26f9bfd633a3d856231364a25a00dbe80605"
 }
