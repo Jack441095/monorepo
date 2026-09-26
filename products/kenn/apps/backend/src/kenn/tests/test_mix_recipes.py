@@ -40,6 +40,18 @@ def test_vocal_space_sends_the_vocal_to_the_reverb_and_the_delay(ask) -> None:
     assert {(s["return_track_name"], s["after"]) for s in steps} == {("A-Reverb", 0.15), ("B-Delay", 0.08)}
 
 
+def test_vocal_space_finds_the_reverb_when_the_snapshot_has_no_returns(ask, monkeypatch, tmp_path) -> None:
+    # The real bridge's session snapshot leaves return_tracks empty; on 26 Sept 2026 that made "give the vocal some
+    # space" say the demo set had no reverb return.
+    class RealShapedLive(FakeLiveBackend):
+        def query_session_state(self, *args, **kwargs):
+            return {**super().query_session_state(*args, **kwargs), "return_tracks": []}
+
+    result = handle_command("give the vocal some space", session_id=f"recipe-{tmp_path.name}",
+                            service=LiveActionService(RealShapedLive()))
+    assert {s["return_track_name"] for s in _steps(result)} == {"A-Reverb", "B-Delay"}
+
+
 def test_drums_forward_lifts_the_drum_bus_and_never_past_zero(ask) -> None:
     (step,) = _steps(ask("bring the drums forward"))
     assert step["track_name"] == "Drum Bus" and _db_change(step) == pytest.approx(1.5, abs=0.05)

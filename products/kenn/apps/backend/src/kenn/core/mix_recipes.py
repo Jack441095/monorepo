@@ -255,6 +255,13 @@ def translate(query: str, service: Any, session_id: str) -> dict[str, Any] | Non
     if recipe is None:
         return None
     state = service.snapshot()
+    if not state.get("return_tracks"):
+        # The session snapshot never lists returns on real Live (only the fake fills them in), so "give the vocal
+        # some space" found no reverb on the demo set's A-Reverb. Read them the way a spoken "send" does.
+        try:
+            state = {**state, "return_tracks": service.client.get_return_tracks()}
+        except Exception:
+            pass
     current = Set([t for t in state.get("tracks", []) if isinstance(t, dict)],
                   [r for r in state.get("return_tracks", []) if isinstance(r, dict)])
     built = recipe.build(current, recipe.pattern.search(query))

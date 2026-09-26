@@ -50,6 +50,15 @@ _RECEIPT_FIELDS = frozenset(
         "undo_steps",
         "undo_payload",
         "undo_available",
+        # Chat "undo that" reads receipts back from here, so everything propose_undo needs has to survive: without
+        # the device order, undoing an insert (Glue on the drum bus, 26 Sept 2026 on real Live) always refused.
+        "after",
+        "parameter_name",
+        "unit",
+        "frequency_requested_value",
+        "gain_requested_value",
+        "requested_devices",
+        "readback_devices",
     }
 )
 

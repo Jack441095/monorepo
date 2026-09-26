@@ -970,6 +970,28 @@ def test_reverb_setup_applies_parameter_after_insertion_and_supports_identity_bo
     assert fake.state["tracks"][1]["devices"] == []
 
 
+def test_an_inserted_device_can_be_undone_from_its_journal_copy() -> None:
+    # "Undo that" reads the receipt back from the journal; on 26 Sept 2026 the journal dropped the device order, so
+    # undoing Glue on the real drum bus refused and left the Glue Compressor in the set.
+    from kenn.core.live_receipt_journal import _safe_projection
+
+    fake = DeviceSetupLive()
+    service = _service(fake)
+    planned = handle_command("add reverb to hi hat at 25% dry wet", session_id="command-device-journal-undo",
+                             service=service, allow_llm=False)
+    applied = handle_command("", session_id="command-device-journal-undo", service=service,
+                             proposal=planned["proposal"], confirm_token=planned["proposal"]["confirmation_token"],
+                             idempotency_key=planned["proposal"]["action_id"], allow_llm=False)
+
+    undo = service.propose_undo(_safe_projection(applied["receipt"]), session_id="command-device-journal-undo")
+    assert undo["ok"] is True, undo.get("error")
+    undone = service.execute_device_removal(undo["proposal"], confirm_token=undo["proposal"]["confirmation_token"],
+                                            session_id="command-device-journal-undo",
+                                            idempotency_key=undo["proposal"]["action_id"])
+    assert undone["ok"] is True
+    assert fake.state["tracks"][1]["devices"] == []
+
+
 def test_reverb_setup_rolls_back_inserted_device_when_parameter_readback_fails() -> None:
     fake = DeviceSetupLive()
     fake.fail_setup_write = True
