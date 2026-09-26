@@ -1,58 +1,35 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-26 14:45 · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-09-26 16:10 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
 north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
 ## Right now
 
-- **Tester build ready (14:25 Sat):** soak #4 **passed** on `af1cb64` (721/721, 0 errors, one Live reconnect of 60 s,
-  connected at the end); receipts committed, gate **9 / 15**, main pushed (`cb9dad5`). App:
-  `workspace/builds/kenn-app/KENN-beta-cb9dad5.dmg` (221 MB, smoke test passed). This is what testers get first.
-- **Next build prepared** on `kenn-next-build`: 90 note corrections applied (backups in
-  `workspace/tmp/kenn-ops/note-backups-20260926/`), its own index `v-07328d9baf04` (main keeps `v-4fd17ceb264f`),
-  retrieval 0.983 / 0.768 / 0.346, intelligence and suite gates pass there. Future soaks are **8 hours** (your call), so
-  one fits overnight. It needs its own soak and real-Live runs before it reaches testers.
-- **Built on branches while it runs (not in the soaked build):**
-  - `kenn-recipes`: 15 named mix recipes (was 3). The original three misreported their own amounts ("-1.5 dB" moved
-    -2.8 dB; a vocal at 0 dB went to +2 dB); fixed. Recipes ask when a role matches several tracks. "Undo that" twice
-    now walks back through changes (it used to undo the undo). `qualify_recipes_live.py` passes 14/15 on fake Live
-    (Glue needs real Live) and runs on real Live after the soak.
-    Also on this branch (03:00 Sat): BB-5 closed. A 12-minute, 127 MB mix is measured in ~12 s. A 4-channel WAV is
-    refused plainly (the engine used to measure it and call it mono). Files over 150 MB now say the limit and what to
-    bounce. Found on the way: Reference Match in the app silently dropped its tonal balance, matching gains and
-    EQ Eight preset because a module never loaded. Fixed. Two small routes now cap request size. 1,924 tests pass.
-  - `kenn-chat-stream`: template answer instantly, model answer swapped in when accepted (off by default).
-  - `kenn-next-build` (07:00 Sat): both branches merged, 1,968 tests, frontend 26/26, recipes 14/15 on fake Live.
-    Ready to soak once testers have the current build. Also on it, phrasing round 4: two new blind sets from the box
-    (voice dictation; Logic/FL wording, kept sealed until the fixes were in). Sealed set **92.7%** first run, best
-    blind number yet but easier wording; voice 77.9% → 90.8%. Wrong plans fixed: "synth track 5 dB louder" changed
-    track 5 (Bass), "mute track 2, actually track 3" muted track 2, a "why is…?" question made a proposal, "maybe add
-    some reverb" inserted one. Still short of 95% on fresh wording.
-    Round 5 (07:00): the beginner fixes did **not** carry to a fresh sealed beginner set (74.3%, 10 wrong: a reason
-    naming another track changed that track; "louder, maybe -13 dB" went 13 dB up). Fixed: 85.6%, 0 wrong. A sealed
-    second-language set scored 93.0% with 0 wrong. Every set is now at 0 wrong but one disputed label.
-- **Decided (03:10 Sat):** testers get the soaked `af1cb64` code. After the soak: commit its receipts, run the gate,
-  push main, then build the tester DMG from that code. `kenn-recipes` and `kenn-chat-stream` (including the Reference
-  Match fix) go into the next build, which will need its own soak.
-- **Chat model on this Mac: off.** Qwen 8B took 7–16 s an answer through the companion (and far longer under load),
-  and KENN used its answer only 1 time in 6; 4B was no better. Chat is back to instant template answers; run 11 stays
-  in shadow for commands. Qwen 8B stays the choice for a faster machine or the box GPU (2.8 s there).
-- **Chat prompt trimmed** (01:50): four prompt budgets tested on the box; the new default (1,600 characters of notes
-  plus a 1,200-character draft) passes 80/84 against 75, with no failing model answers kept. It's ~20% shorter, but
-  a local 8B still can't answer in 4 s on a 16 GB Mac (writing the answer alone is ~15 s), so templates stay there.
-- **Live is closed** at the moment; the companion reconnects on its own when it's reopened.
-- **Armed (02:30 Sat): just open Live with the demo set.** A waiter then restarts the companion on `af1cb64`, checks
-  it's the demo set (stops before any change if not), runs the real-Live assistant task and the tester-guide
-  walkthrough, and starts soak #4 (12 h). During the soak, quit and reopen Live once, and don't commit to `main`.
-  Template-first chat is on branch `kenn-chat-stream` (off by default); it makes answers instant, but this Mac's
-  local model rarely writes one KENN keeps, so templates stay.
-- **Knowledge check (09:00):** every control name in the 325 notes about Live checked against the Live 12 manual: 11 approved notes (mostly the model-drafted `ableton12-…` ones) tell producers to click controls that don't exist ("Quantized Follow", "Use Internal Clock", "Slope 1"…). Approved (26 Sept): after soak #4 and the DMG build, `workspace/tmp/kenn-ops/apply_note_corrections.py` puts five invented notes to Draft, rewrites three from the manual and fixes three steps (originals backed up), then the index is rebuilt and the intelligence gate and review packet re-run.
-- **Full note review (09:30):** a sample of 20 model-drafted `ableton12-…` notes found ~4 in 10 with a wrong step, so all 201 were read against the Live 12 manual: 148 kept, 25 corrected, 28 to Draft (33 Draft and 31 corrected with the earlier 11). Then all 114 hand-written notes too: none invented, 27 corrected (older Live versions, wrong names, the Vocoder set up backwards). **90 notes change after the soak** (33 Draft, 57 corrected); measured in memory, retrieval stays at 0.983 on the original questions and rises slightly on the describe-it sets. No test or fixture relies on a drafted note.
-- **Planner (10:40):** rules then run 11 on all 8 phrasing sets: +9 right but +22 wrong plans, so run 11 stays in shadow and run 13 isn't trained on synthetic data. Instead (your yes): an **asked log** on `kenn-next-build`. When KENN has to ask, it keeps what the tester typed and what they said next, on their Mac only; it goes into a diagnostics file only if they tick the box on Setup & Support, and they can clear it. Tester guide and invite updated. Its first run found a real gap, fixed: "pan the hats" now asks which side, and "30% right" completes it.
-- **After the soak, ready (13:00):** `post_soak_4.sh` (receipts, gate, push main, tester DMG), then `after_soak_notes.sh` (90 note corrections; new index for the next build in the `kenn-next-build` worktree, so main's index is untouched; embeddings on the box in 30 s, identical to a Mac build that took 30+ min; then the retrieval check, the intelligence gate and the review packet). The whole index flow was trialled in scratch.
-- **Needs you:** testers, two reviewers (Apple Developer ID deferred to just before shipping, owner's call 26 Sept); the drafts to send are in `products/kenn/docs/beta/`
-  (tester invite, reviewer brief, supervised-session script).
+- **Testers' build:** `KENN-beta-cb9dad5.dmg`, tag `kenn-beta-2026-09-26` (gate 9 / 15 on `cb9dad5`). Main has moved
+  on since, so the gate reads lower on main's HEAD until the next soak's receipts land.
+- **Next build, ready to soak tonight** (`kenn-after-soak`, `20900c7`; main gets it when the soak starts):
+  - the 90 corrected notes and their index `v-07328d9baf04`, the asked log, phrasing rounds 4–5, the 8-hour soak;
+  - **all 15 mix recipes pass on real Live** (apply, verify, undo, exact restore). Getting there found two bugs:
+    "undo" after adding a device never worked (the change log dropped the device order; Glue was left on the demo
+    Drum Bus, now removed), and "give the vocal some space" couldn't see the set's reverb return;
+  - **the chat now decides Live-or-notes the way the parser reads the message**: requests reaching Live from chat
+    61% -> 94.8%, knowledge questions turned into Live proposals 44 -> 3 of 481
+    (`docs/evidence/KENN_CHAT_ROUTING_2026-09-26.md`). The tester build passes 17 / 26 rows of the tester guide in
+    chat (every follow-up, correction and short reply went to the notes); this build passes 32 / 32 on real Live;
+  - answers and cards in the units Live shows (dB, %, "mute 'Hi-Hats'", "'Synth' is already centred"); a device
+    threshold used to read "from 0.85 db to 0.362 db" for -20 dB. "Set the kick to +3 dB" no longer becomes
+    "turn the kick up 3 dB";
+  - two chat 500s fixed (Live's numeric key crashed the MIDI generator; the session doctor's audit failed whenever it
+    found an issue), and a 500's error text now reaches the local log;
+  - tester guide: unsigned app opens via Privacy & Security > Open Anyway (right-click > Open stopped working in
+    macOS 15; the tester DMG is rejected by Gatekeeper, checked).
+  - 2,024 tests, UI 28 / 28, phrasing scorer 1,642 / 1,751 right with 1 wrong (the disputed "-1 pan" row).
+- **Tonight:** open the demo set, say "ready". `tonight_soak.sh` brings main up to the branch, runs the suite, the
+  real-Live assistant task and the whole guide on real Live, then starts the 8-hour soak. `post_soak_5.sh` in the
+  morning: receipts, gate, tag, push, UI build, tester DMG.
+- **Your Phase 1 list:** `products/kenn/docs/beta/KENN_PHASE1_CLOSEOUT.md` (clean-account test, six answers,
+  Developer ID later). Test kit in `/Users/Shared/KENN-clean-account-test/`.
 
 ## Qualified beta gate: 9 / 15 on the current main (`cb9dad5`)
 
