@@ -1,0 +1,199 @@
+{
+ "schema": "kenn.recipe_qualification.v1",
+ "generated_at": "2026-09-26T13:44:00.199866+00:00",
+ "source_git_commit": "4b42f22413853950db0ea51ac761b26fcf3f402f",
+ "endpoint": "http://127.0.0.1:8090",
+ "seconds": 88.1,
+ "passed": 15,
+ "total": 15,
+ "rows": [
+  {
+   "recipe": "room_for_kick",
+   "request": "Make room for the kick",
+   "passed": true,
+   "steps": [
+    "set_volume Bass"
+   ],
+   "applied_receipt": "receipt-1ea72b01c6ed4cd5a4ad0e14b11878df",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-fea089d949894b848914c13b0cc169f5",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "space",
+   "request": "Give the vocal some space",
+   "passed": true,
+   "steps": [
+    "set_send Lead Vocal A-Reverb",
+    "set_send Lead Vocal B-Delay"
+   ],
+   "applied_receipt": "receipt-14a5445bf02f45aca63cacc122f76eda",
+   "changed_mixer": false,
+   "undo_receipt": "receipt-4620efa55b9248edb4444ea639432753",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "forward",
+   "request": "Bring the drums forward",
+   "passed": true,
+   "steps": [
+    "set_volume Drum Bus"
+   ],
+   "applied_receipt": "receipt-bd948af5e6bf44ca87df412affb4e323",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-b5463f63db754f05b6ab60b468e84aef",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "push_back",
+   "request": "Push the synth back",
+   "passed": true,
+   "steps": [
+    "set_volume Synth",
+    "set_send Synth A-Reverb"
+   ],
+   "applied_receipt": "receipt-c1b2535aa3694d8e984f2811eb4df345",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-b22baba77e214411af3dab43635e4fad",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "behind",
+   "request": "Put the synth behind the vocal",
+   "passed": true,
+   "steps": [
+    "set_volume Synth",
+    "set_send Synth A-Reverb"
+   ],
+   "applied_receipt": "receipt-42ddeb186a1540869d4c4fb7ef2bda1d",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-786a223e19da468ea1ea40f2e3cd1c4e",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "dry_up",
+   "request": "Dry up the vocal",
+   "passed": true,
+   "steps": [
+    "set_send Lead Vocal A-Reverb",
+    "set_send Lead Vocal B-Delay"
+   ],
+   "applied_receipt": "receipt-3ee04da20bb345e483b99ede5aefe3cb",
+   "changed_mixer": false,
+   "undo_receipt": "receipt-3dee8c6d7994495293e2140ba5ca38e4",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "tighten_drum_bus",
+   "request": "Tighten the drum bus",
+   "passed": true,
+   "steps": [
+    "set_device_parameter Drum Bus"
+   ],
+   "applied_receipt": "receipt-bb8e94d044a24f329fe7c0753429a4e5",
+   "changed_mixer": false,
+   "undo_receipt": "receipt-e3313c1288b04217afd3362a43f4518e",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "vocal_peaks",
+   "request": "Tame the vocal peaks",
+   "passed": true,
+   "steps": [
+    "set_device_parameter Lead Vocal"
+   ],
+   "applied_receipt": "receipt-62fb180ac87b41e591075224eda7e7b8",
+   "changed_mixer": false,
+   "undo_receipt": "receipt-5e87c71f38ce4b6abc56e8522feb44b6",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "mono_low_end",
+   "request": "Make the low end mono",
+   "passed": true,
+   "steps": [
+    "set_pan Bass"
+   ],
+   "applied_receipt": "receipt-734984dd4a4649b381b130eed4b29e1c",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-81d9014edc884fceb5e1f49d6ff4b83f",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "rhythm_section",
+   "request": "Solo the rhythm section",
+   "passed": true,
+   "steps": [
+    "set_solo Kick",
+    "set_solo Snare / Clap",
+    "set_solo Bass"
+   ],
+   "applied_receipt": "receipt-361b822a6808472d876e98f08a54eb75",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-a1cd96dde63a44018f1120deca3070b6",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "snare_crack",
+   "request": "Make the snare crack",
+   "passed": true,
+   "steps": [
+    "set_volume Snare / Clap",
+    "set_send Snare / Clap A-Reverb"
+   ],
+   "applied_receipt": "receipt-94076df3c6924c24b72301d3a5271c46",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-0c32e4a2ddfc4a84b7d3fa1ed86b19e8",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "clear_solos",
+   "request": "Clear the solos",
+   "passed": true,
+   "steps": [
+    "set_solo Kick",
+    "set_solo Snare / Clap",
+    "set_solo Bass"
+   ],
+   "applied_receipt": "receipt-0d3675a048b242a7b2990c2be647a5b5",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-10a0d062bbc44eaa8bf0cbb8e71e65da",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "vocal_cut_through",
+   "request": "Make the vocal cut through",
+   "passed": true,
+   "steps": [
+    "set_volume Synth"
+   ],
+   "applied_receipt": "receipt-ae82f69621c64b21b12383305de21a87",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-d32af1b00d1b41ee862b62b2a0db9f7b",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "glue_drum_bus",
+   "request": "Glue the drum bus",
+   "passed": true,
+   "steps": [],
+   "applied_receipt": "receipt-78f85ce3caaa43ec8e9a2cec0995f54f",
+   "changed_mixer": false,
+   "undo_receipt": "receipt-ed9b2eac342e4f4e9b210a7ede77c110",
+   "restored_to_baseline": true
+  },
+  {
+   "recipe": "fix_low_end_mud",
+   "request": "Fix the low-end mud",
+   "passed": true,
+   "steps": [
+    "set_volume Synth"
+   ],
+   "applied_receipt": "receipt-c81dc8b73d914dbe82eb66fd0a9b86e6",
+   "changed_mixer": true,
+   "undo_receipt": "receipt-2aab9ce0f61f467cbf730fac8b5313d0",
+   "restored_to_baseline": true
+  }
+ ],
+ "qualified": true
+}
