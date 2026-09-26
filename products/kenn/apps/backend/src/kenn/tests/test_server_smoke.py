@@ -1619,3 +1619,35 @@ def test_http_undo_dispatches_device_proposal_to_device_executor(running_server:
     assert undone["receipt"]["verified"] is True
     assert fake.value == -3.0
     assert fake.writes == [0.0, -3.0]
+
+
+def _claim_length(base: str, path: str, length: int, content_type: str = "application/json") -> tuple[int, dict]:
+    # Only the header is sent: the server has to refuse on the claimed length, not after reading it.
+    import http.client
+    from urllib.parse import urlparse
+
+    target = urlparse(base)
+    connection = http.client.HTTPConnection(target.hostname, target.port, timeout=5)
+    try:
+        connection.putrequest("POST", path)
+        connection.putheader("Content-Type", content_type)
+        connection.putheader("Content-Length", str(length))
+        connection.endheaders()
+        response = connection.getresponse()
+        return response.status, json.loads(response.read() or b"{}")
+    finally:
+        connection.close()
+
+
+def test_small_json_routes_refuse_a_huge_body_before_reading_it(running_server: str) -> None:
+    # /api/audio/telemetry and /api/mix/plan read any claimed length until Sept 2026.
+    for path in ("/api/audio/telemetry", "/api/mix/plan"):
+        status, body = _claim_length(running_server, path, 50 * 1024 * 1024)
+        assert status == 413, path
+        assert "1 MB" in body["error"]
+
+
+def test_an_oversized_mix_upload_says_the_limit_and_what_to_do(running_server: str) -> None:
+    status, body = _claim_length(running_server, "/api/mix-review", 200 * 1024 * 1024, "multipart/form-data; boundary=x")
+    assert status == 413
+    assert "150 MB" in body["error"] and "shorter section" in body["error"]

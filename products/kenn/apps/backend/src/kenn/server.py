@@ -1888,7 +1888,14 @@ class Handler(BaseHTTPRequestHandler):
             })
             return
         if parsed.path == "/api/audio/telemetry":
-            length = int(self.headers.get("Content-Length", "0"))
+            # Same 1 MB ceiling as the other JSON routes; these two used to read whatever length was claimed.
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+            except ValueError:
+                length = -1
+            if length < 0 or length > 1024 * 1024:
+                self.send_json(413, {"error": "Request body exceeds 1 MB limit."})
+                return
             raw = self.rfile.read(length) if length > 0 else b"{}"
             try:
                 data = json.loads(raw.decode("utf-8"))
@@ -1904,7 +1911,14 @@ class Handler(BaseHTTPRequestHandler):
             })
             return
         if parsed.path == "/api/mix/plan":
-            length = int(self.headers.get("Content-Length", "0"))
+            # Same ceiling as /api/audio/telemetry above.
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+            except ValueError:
+                length = -1
+            if length < 0 or length > 1024 * 1024:
+                self.send_json(413, {"error": "Request body exceeds 1 MB limit."})
+                return
             raw = self.rfile.read(length) if length > 0 else b"{}"
             try:
                 data = json.loads(raw.decode("utf-8"))
