@@ -29,7 +29,9 @@ _SAFETY_BYPASS = re.compile(
     r"\b(?:ignore|bypass|circumvent|disable|skip)\b)",
     re.I,
 )
-_NUMERIC_TRACK = re.compile(r"\b(?:track|trk|channel|chan|ch)\s*#?\s*(\d+)\b", re.I)
+# A number with a unit after it is a value, not a track: "move the synth track 5 dB louder" turned up track 5 (Bass).
+_NUMERIC_TRACK = re.compile(r"\b(?:track|trk|channel|chan|ch)\s*#?\s*(\d+)\b"
+                            r"(?!\.\d|\s*(?:dbs?|decibels?|%|percent|hz|khz|ms|:1)\b|\s*%)", re.I)
 _NUMBERED_SCENE = re.compile(r"\b(?:play|launch|fire|trigger)\b.*?\bscene\s*#?\s*(\d+)\b", re.I)
 _LOCATOR_REQUEST = re.compile(
     r"\b(?:add|create|set|drop|place|put|remove|delete)\b.{0,80}\b(?:locator|cue\s+point|marker)\b"
@@ -284,8 +286,9 @@ def _safety_normalised(text: str) -> str:
     return re.sub(r"[A-Za-z]+", fix, text)
 
 
+# The full stop that ends a typed sentence isn't part of the name ("rename the kick to Big Kick." gave "Big Kick.").
 _RENAME_TRACK = re.compile(
-    r"\b(?:rename|name)\b.*?\b(?:to|as)\s+['\"]?([^'\"]+?)['\"]?\s*$",
+    r"\b(?:rename|name)\b.*?\b(?:to|as)\s+['\"]?([^'\"]+?)['\"]?\s*[.!]?\s*$",
     re.I,
 )
 _INSERT_DEVICE_ALIASES = (
@@ -977,6 +980,7 @@ _POLITE_TAIL = re.compile(r"\s*,?\s+(?:please|pls|plz|thanks|thank\s+you|cheers|
 # Dictated requests stack fillers in front ("um yeah so can you ..."), so the lead repeats.
 _POLITE_LEAD = re.compile(r"^\s*(?:(?:um+|uh+|erm|er|hmm+|yeah|yep|so|well|alright|yo|hey|ok|okay|right|please"
                           r"|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?"
+                          r"|(?:is|would)\s+it\s+(?:be\s+)?possible\s+(?:for\s+you\s+)?to"
                           r"|i\s+(?:want|need|would\s+like|'d\s+like)\s+(?:you\s+)?to)\s*[,!]?\s+)+(?=\w)", re.I)
 # ", can you do that?", "for clarity", "so I can adjust it": asides after the request. Left in, they ended up in new
 # track names ("Synth Lead, can you do that?").
@@ -1046,8 +1050,8 @@ _PAN_ZERO = re.compile(rf"^\s*(?:set\s+)?(?:the\s+)?pan\s+(?:on|of|for)\s+{_NAME
 _WANT_LEVEL = re.compile(rf"^\s*(?:i\s+(?:want|need|would\s+like|'d\s+like)|let'?s\s+(?:have|get))\s+{_NAME}\s+(?:to\s+be|at)\s+"
                          r"(?P<amount>(?:minus\s+|-)?\d+(?:\.\d+)?)\s*dbs?\s*[.!?]?\s*$", re.I)
 # "set the send for a reverb to fifty percent on the drum bus": return first, value, then the track.
-_SEND_TRACK_LAST = re.compile(r"^\s*set\s+(?:the\s+)?(?:send\s+(?:for|to)\s+(?:the\s+|a\s+)?(?P<ret>reverb|verb|delay|[ab])"
-                              r"|(?P<ret2>reverb|verb|delay)\s+send)\s+(?:to|at)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s+"
+_SEND_TRACK_LAST = re.compile(r"^\s*set\s+(?:the\s+)?(?:send\s+(?:for|to)\s+(?:the\s+|a\s+)?(?P<ret>[ab]-(?:reverb|delay)|reverb|verb|delay|[ab])"
+                              r"|(?P<ret2>[ab]-(?:reverb|delay)|reverb|verb|delay)\s+send)\s+(?:to|at)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s+"
                               rf"(?:on|for)\s+{_NAME}\s*[.!?]?\s*$", re.I)
 _COMPRESSOR_TO_THRESHOLD = re.compile(rf"^\s*set\s+(?:the\s+)?compressor\s+on\s+{_NAME}\s+to\s+threshold\s+(?:of\s+)?"
                                       r"(?P<amount>-?\d+(?:\.\d+)?)\s*(?:dbs?)?\s*[.!?]?\s*$", re.I)
@@ -1086,6 +1090,20 @@ _SPOKEN_DB = re.compile(r"\bdee[\s-]*bees?\b|\bd\s+b\b", re.I)
 _SIGNED_SPOKEN_NUMBER = re.compile(
     r"\b(?:minus|negative)\s+(?P<first>" + "|".join(_SPOKEN_NUMBER_VALUES) + r")\b"
     r"(?:\s+(?P<second>" + "|".join(_SPOKEN_NUMBER_VALUES) + r")\b)?", re.I)
+
+
+# Wording carried over from Logic and FL Studio: names in quotes ("the 'Kick' track"), a return called a bus or aux
+# ("the 'A-Reverb' bus"), and a send "with 50%".
+# Quotes after "named"/"called"/"as" mark where a new locator name ends, so those stay.
+_QUOTED_NAME = re.compile(r"(?<!named )(?<!called )(?<!as )(?<![\w'])'(?P<name>[^']+?)'(?![\w'])", re.I)
+_RETURN_AS_BUS = re.compile(r"\b(?P<ret>[ab]-(?:reverb|delay)|reverb|delay)\s+(?:bus|aux)\b", re.I)
+_SEND_WITH_AMOUNT = re.compile(r"^(?P<head>\s*send\b.+?)\s+with\s+(?P<value>\d+(?:\.\d+)?\s*(?:%|percent))", re.I)
+
+
+def _rewrite_other_daw(text: str) -> str:
+    text = _QUOTED_NAME.sub(lambda m: m.group("name"), text)
+    text = _RETURN_AS_BUS.sub(lambda m: m.group("ret"), text)
+    return _SEND_WITH_AMOUNT.sub(lambda m: f"{m.group('head')} at {m.group('value')}", text)
 
 
 def _rewrite_dictation(text: str) -> str:
@@ -1135,7 +1153,7 @@ def _rewrite_idioms(text: str) -> str:
     if (m := _WANT_LEVEL.match(text)) and name(m):
         return f"set {m.group('name')} to {m.group('amount')} dB"
     if (m := _SEND_TRACK_LAST.match(text)) and name(m) and float(m.group("value")) <= 100:
-        ret = (m.group("ret") or m.group("ret2")).lower()
+        ret = (m.group("ret") or m.group("ret2")).lower().split("-")[-1]
         return f"send the {m.group('name')} to the {'reverb' if ret == 'verb' else ret} at {m.group('value')}%"
     if (m := _COMPRESSOR_TO_THRESHOLD.match(text)):
         return f"set the compressor threshold on {m.group('name')} to {m.group('amount')} dB"
@@ -1220,7 +1238,7 @@ def _rewrite_common_phrasings(text: str) -> str:
     elif (m := _MID_CORRECTION_TARGET.match(text)) and (obj := _CORRECTED_OBJECT.match(m.group("before"))):
         before = m.group("before")
         text = before[:obj.start("obj")] + m.group("target") + before[obj.end("obj"):]
-    text = _rewrite_dictation(text)
+    text = _rewrite_dictation(_rewrite_other_daw(text))
     text = _rewrite_idioms(text)
     corrected = _CORRECTION_LEAD.sub("", text)
     if corrected != text:
@@ -1388,6 +1406,10 @@ _NOT_INSERTABLE_DEVICES = (
 _ADD_VERB = re.compile(r"\b(?:add|append|insert|put|load|stick|drop|throw|slap|pop|chuck)\b", re.I)
 _INSERTABLE_NAMES = "EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, Saturator, Roar, Auto Filter, Drum Buss, " \
                     "Hybrid Reverb and Echo"
+# "why is the FX Print track set to 0 dB?" became a proposal to set it to 0 dB. A why/should/is question asks about
+# the set; it never changes it. ("can you ...?" is a request and is handled by the polite-lead rule.)
+_QUESTION_NOT_REQUEST = re.compile(r"^\s*(?:why|how\s+come|should|shouldn't|is|isn't|are|aren't|does|doesn't|do|did|"
+                                   r"was|were|what|which|where|who)\b", re.I)
 _HEDGE = re.compile(r"\b(?:maybe|perhaps|possibly|might)\b", re.I)
 _RETURN_MENTION = re.compile(r"\breturn(?:\s+tracks?)?\b|\b[ab]\s+return\b", re.I)
 _MIXER_WORD = re.compile(r"\b(?:volume|fader|level|gain|louder|quieter|up|down|mute|unmute|solo|unsolo|pan|rename|name|"
@@ -1397,7 +1419,9 @@ _SEND_IN_DB = re.compile(r"\bsend\b.*?-?\d+(?:\.\d+)?\s*db\b|-?\d+(?:\.\d+)?\s*d
 
 def _not_supported_yet(text: str, parsed: dict[str, Any], snapshot: dict[str, Any] | None) -> tuple[str, str] | None:
     """A plain "KENN can't do that yet" for requests the rules would otherwise shrug at (or misread)."""
-    if _ADD_VERB.search(text) and parsed.get("action") in {None, "insert_device", "insert_device_with_parameter"}:
+    # A locator called "chorus" is not the Chorus device.
+    if (_ADD_VERB.search(text) and not _LOCATOR_REQUEST.search(text)
+            and parsed.get("action") in {None, "insert_device", "insert_device_with_parameter"}):
         for device, pattern in _NOT_INSERTABLE_DEVICES:
             if re.search(rf"\b(?:{pattern})\b", text, re.I):
                 return "device", (f"KENN can't add {device} yet. It can add {_INSERTABLE_NAMES}. "
@@ -1428,6 +1452,11 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     if unsupported:
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
                        "missing_fields": [unsupported[0]], "ambiguity": [unsupported[1]]})
+        return parsed
+    if parsed.get("confirmation_required") and _QUESTION_NOT_REQUEST.match(text):
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["how_to"],
+                       "ambiguity": ["That's a question, so nothing changed. Ask it in chat for an answer, or say the "
+                                     "change you want (\"set FX Print to -6 dB\") and KENN prepares it."]})
         return parsed
     if parsed.get("action") in {"insert_device", "insert_device_with_parameter"} and _HEDGE.search(text):
         # "make the clap snappier and maybe add some reverb" is thinking aloud; it used to insert a Reverb.
