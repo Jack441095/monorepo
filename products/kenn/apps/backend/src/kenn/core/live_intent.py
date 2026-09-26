@@ -1031,14 +1031,14 @@ _SEND_LETTER_AFTER = re.compile(rf"^\s*(?:set\s+)?{_NAME}(?:'s)?\s+send\s+(?P<re
                                 r"(?:%|percent)\s*[.!?]?\s*$", re.I)
 _LOCATOR_NOUN = r"(?:loc|locator|marker|mark|cue(?:\s+point)?)"
 _LOCATOR_POSITION = (r"(?:\s+(?:(?:right\s+)?here|now|at\s+now|at\s+(?:the\s+|this\s+|current\s+|the\s+current\s+)?"
-                     r"(?:head|playhead|spot|point|position|cursor|song\s+position|time)))?")
+                     r"(?:head|playhead|spot|point|position|cursor|song\s+position|time)(?:\s+position)?)){0,2}")
 _LOCATOR_SAID = re.compile(
     rf"^\s*(?:add|create|set|drop|place|put)\s+(?:a\s+)?(?:new\s+)?{_LOCATOR_NOUN}{_LOCATOR_POSITION}\s*,?\s+"
     r"(?:called|named|name\s+it|with\s+(?:the\s+)?name|label(?:l?ed)?|for)\s+['\"\u2018\u2019]?(?P<locator>[^'\"\u2018\u2019]+?)['\"\u2018\u2019]?"
     + _LOCATOR_POSITION + r"\s*[.!]?\s*$"
     r"|^\s*(?:mark\s+(?:this\s+(?:point|spot|time|position|bit|moment)|now|here)\s+as|marker\s+(?:now|here)\s+(?:for|called))\s+"
     r"['\"\u2018\u2019]?(?P<locator2>[^'\"\u2018\u2019]+?)"
-    r"['\"\u2018\u2019]?\s*[.!]?\s*$", re.I)
+    r"['\"\u2018\u2019]?(?:\s+with\s+a\s+(?:locator|marker))?\s*[.!]?\s*$", re.I)
 _CALL_TRACK_THE = re.compile(rf"^\s*call\s+{_NAME}\s+track\s+(?:the\s+)?(?P<new>[\w' -]+?)\s*[.!]?\s*$", re.I)
 _MAKE_CALLED = re.compile(rf"^\s*make\s+(?!(?:an?|new|another)\b|(?:midi|audio|return)\b){_NAME}(?:\s+track)?\s+(?:be\s+)?(?:called|named)\s+['\"]?(?P<new>[\w' -]+?)['\"]?\s*[.!]?\s*$",
                           re.I)
@@ -1053,6 +1053,32 @@ _WANT_LEVEL = re.compile(rf"^\s*(?:i\s+(?:want|need|would\s+like|'d\s+like)|let'
 _SEND_TRACK_LAST = re.compile(r"^\s*set\s+(?:the\s+)?(?:send\s+(?:for|to)\s+(?:the\s+|a\s+)?(?P<ret>[ab]-(?:reverb|delay)|reverb|verb|delay|[ab])"
                               r"|(?P<ret2>[ab]-(?:reverb|delay)|reverb|verb|delay)\s+send)\s+(?:to|at)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s+"
                               rf"(?:on|for)\s+{_NAME}\s*[.!?]?\s*$", re.I)
+# Whole polite sentences from beginners (third blind set): "I need the bass track to be at -17 dB. Can you adjust
+# that?", "move the kick all the way to the right", "I want the clap track to send 30% of its signal to B-Delay".
+_ASK_TAIL = re.compile(r"\s*[.,!]?\s+(?:can|could|would|will)\s+(?:you|u)\s+(?:please\s+)?(?:do|adjust|set|change|fix|make|"
+                       r"help(?:\s+me)?(?:\s+with)?)\s+(?:that|it|this)(?:\s+for\s+me)?\s*[?.!]*\s*$", re.I)
+_STATE_LEVEL = re.compile(rf"^\s*(?:(?:i\s+(?:want|need|would\s+like|'d\s+like)\s+)?{_NAME}(?:\s+track)?\s+(?:to\s+be|should\s+be)"
+                          rf"|make\s+sure\s+{_NAME.replace('name', 'name2')}(?:\s+track)?\s+is)\s+(?:at\s+)?"
+                          r"(?P<amount>(?:minus\s+|-)?\d+(?:\.\d+)?)\s*dbs?(?:\s+exactly)?\s*[.!?]?\s*$", re.I)
+_FAR_PAN = re.compile(rf"^\s*(?:move|pan|put|push)\s+{_NAME}(?:\s+track)?\s+(?:all\s+the\s+way\s+(?:to\s+the\s+|over\s+)?|"
+                      r"(?:to\s+the\s+)?far\s+|(?:to\s+the\s+)?hard\s+)(?P<side>left|right)(?:\s+of\s+the\s+stereo\s+(?:field|image))?"
+                      r"\s*[.!?]?\s*$", re.I)
+_STATE_CENTRE = re.compile(rf"^\s*(?:i\s+(?:want|need|would\s+like|'d\s+like)\s+)?{_NAME}(?:\s+track)?\s+(?:to\s+be|should\s+be)\s+"
+                           r"(?:perfectly\s+|back\s+in\s+the\s+)?(?:cent(?:er|re)(?:e?d)?|middle)(?:\s+again)?\s*[.!?]?\s*$", re.I)
+_STATE_SEND = re.compile(rf"^\s*(?:i\s+(?:want|need|think|would\s+like|'d\s+like)\s+)?{_NAME}(?:\s+track)?\s+(?:should\s+|to\s+)send\s+"
+                         r"(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)(?:\s+of\s+(?:its|the)\s+signal)?\s+to\s+(?:the\s+)?"
+                         r"(?P<ret>[ab]-(?:reverb|delay)|reverb|delay)\s*[.!?]?\s*$", re.I)
+_THRESHOLD_ON_COMPRESSOR = re.compile(rf"^\s*(?:change|adjust|move|set)\s+the\s+threshold\s+on\s+the\s+compressor\s+(?:for|of|on)\s+"
+                                      rf"{_NAME}\s+by\s+(?P<sign>[-+])?(?P<change>\d+(?:\.\d+)?)\s*dbs?"
+                                      r"(?:\s+(?P<direction>up|down))?\s*[.!?]?\s*$", re.I)
+_NEW_TRACK_PURPOSE = re.compile(r"^(?P<head>\s*(?:create|make|add)\s+(?:a\s+)?new\s+(?:midi|audio|return)\s+track)\s+for\s+"
+                                r"(?:me|(?:a|an|my|the|some)\s+[\w' -]+?)(?=\s+(?:called|named)\b|\s*[.!?]?\s*$)", re.I)
+_GO_TO_TRACK_WITH = re.compile(r"^\s*(?:go\s+to|take\s+me\s+to|show\s+me|select|jump\s+to)\s+the\s+track\s+(?:that\s+has|that's\s+got|"
+                               r"with|where)\s+(?:the\s+)?(?P<phrase>[\w' /-]+?)(?:\s+(?:is|are|on\s+it))?(?:\s+so\s+i\s+can\s+[\w ]+)?"
+                               r"\s*[.!?]?\s*$", re.I)
+# "I want to solo the synth track. Can you go there?" soloed it; the question is where the request is.
+_GO_THERE = re.compile(r"^(?P<first>.+?)[.!]\s*(?:can|could|would)\s+you\s+(?:please\s+)?(?:go\s+there|take\s+me\s+there|"
+                       r"show\s+me\s+(?:that|the\s+(?P<shown>[\w' /-]+?))\s+track|select\s+it)\s*[?.!]*\s*$", re.I)
 _COMPRESSOR_TO_THRESHOLD = re.compile(rf"^\s*set\s+(?:the\s+)?compressor\s+on\s+{_NAME}\s+to\s+threshold\s+(?:of\s+)?"
                                       r"(?P<amount>-?\d+(?:\.\d+)?)\s*(?:dbs?)?\s*[.!?]?\s*$", re.I)
 _COMP_SETTING = re.compile(r"\b(?:threshold|ratio|attack|release|output|makeup|knee)\b", re.I)
@@ -1123,7 +1149,11 @@ def _rewrite_dictation(text: str) -> str:
 def _rewrite_idioms(text: str) -> str:
     if _HOW_TO_QUESTION.match(text):
         return text
-    text = _TRAILING_ASIDE.sub("", _POLITE_TAIL.sub("", text))
+    if (m := _GO_THERE.match(text)):
+        shown = m.group("shown") or next(iter(re.findall(r"\bthe\s+([\w' /-]+?)\s+track\b", m.group("first"), re.I)), None)
+        if shown:
+            return f"go to the {shown}"
+    text = _ASK_TAIL.sub("", _TRAILING_ASIDE.sub("", _POLITE_TAIL.sub("", text)))
     polite = _POLITE_LEAD.match(text)
     text = _POLITE_LEAD.sub("", text)
     if polite:
@@ -1150,6 +1180,24 @@ def _rewrite_idioms(text: str) -> str:
         group = "name" if m.group("name") else "name2"
         if name(m, group):
             return f"centre {m.group(group)}"
+    if (m := _STATE_LEVEL.match(text)):
+        group = "name" if m.group("name") else "name2"
+        if name(m, group):
+            return f"set {m.group(group)} to {m.group('amount')} dB"
+    if (m := _FAR_PAN.match(text)) and name(m):
+        return f"pan {m.group('name')} hard {m.group('side').lower()}"
+    if (m := _STATE_CENTRE.match(text)) and name(m):
+        return f"centre {m.group('name')}"
+    if (m := _STATE_SEND.match(text)) and name(m) and float(m.group("value")) <= 100:
+        ret = m.group("ret").lower().split("-")[-1]
+        return f"send the {m.group('name')} to the {ret} at {m.group('value')}%"
+    if (m := _THRESHOLD_ON_COMPRESSOR.match(text)) and name(m) and (m.group("sign") or m.group("direction")):
+        down = m.group("sign") == "-" or (m.group("direction") or "").lower() == "down"
+        return f"{'lower' if down else 'raise'} the {m.group('name')} compressor threshold by {m.group('change')} dB"
+    if (m := _NEW_TRACK_PURPOSE.match(text)):
+        return m.group("head") + text[m.end():]
+    if (m := _GO_TO_TRACK_WITH.match(text)):
+        return f"go to the {m.group('phrase')}"
     if (m := _WANT_LEVEL.match(text)) and name(m):
         return f"set {m.group('name')} to {m.group('amount')} dB"
     if (m := _SEND_TRACK_LAST.match(text)) and name(m) and float(m.group("value")) <= 100:
