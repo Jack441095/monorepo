@@ -1,6 +1,6 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-26 16:10 · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-09-26 17:30 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
 north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
@@ -8,7 +8,7 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 
 - **Testers' build:** `KENN-beta-cb9dad5.dmg`, tag `kenn-beta-2026-09-26` (gate 9 / 15 on `cb9dad5`). Main has moved
   on since, so the gate reads lower on main's HEAD until the next soak's receipts land.
-- **Next build, ready to soak tonight** (`kenn-after-soak`, `20900c7`; main gets it when the soak starts):
+- **Next build, ready to soak tonight** (`kenn-after-soak`; main gets it when the soak starts):
   - the 90 corrected notes and their index `v-07328d9baf04`, the asked log, phrasing rounds 4–5, the 8-hour soak;
   - **all 15 mix recipes pass on real Live** (apply, verify, undo, exact restore). Getting there found two bugs:
     "undo" after adding a device never worked (the change log dropped the device order; Glue was left on the demo
@@ -24,7 +24,12 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
     found an issue), and a 500's error text now reaches the local log;
   - tester guide: unsigned app opens via Privacy & Security > Open Anyway (right-click > Open stopped working in
     macOS 15; the tester DMG is rejected by Gatekeeper, checked).
-  - 2,024 tests, UI 28 / 28, phrasing scorer 1,642 / 1,751 right with 1 wrong (the disputed "-1 pan" row).
+  - **fresh wording:** a sealed set of 252 chat messages written by Qwen3 8B on the box, scored before reading:
+    requests reaching Live, tester build 32%, this build 76% first score, 86% after fixing the shapes it found
+    ("lower the bass a bit", "the kick is too loud, can you bring it down", "I need the drum bus muted"); advice
+    questions and unclear requests handled right in both builds;
+  - 2,037 tests, UI 28 / 28, phrasing scorer 1,642 / 1,751 right with 1 wrong (the disputed "-1 pan" row), whole
+    tester guide 32 / 32 on real Live (checked again at `5424f1c`).
 - **Tonight:** open the demo set, say "ready". `tonight_soak.sh` brings main up to the branch, runs the suite, the
   real-Live assistant task and the whole guide on real Live, then starts the 8-hour soak. `post_soak_5.sh` in the
   morning: receipts, gate, tag, push, UI build, tester DMG.
