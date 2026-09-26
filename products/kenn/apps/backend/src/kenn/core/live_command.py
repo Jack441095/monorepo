@@ -2543,12 +2543,17 @@ def _handle_command_impl(
             response["resolved_command"] = resolved_command
             clean_command = resolved_command
         if context_resolution.get("resolution") == "undo_last_receipt":
-            rows = list_receipts(session_id=response["session_id"], limit=1)
-            receipt = rows[0].get("receipt") if rows and isinstance(rows[0], dict) else None
+            from kenn.core.session_context import note_pending_undo, undo_target
+
+            rows = list_receipts(session_id=response["session_id"], limit=50)
+            receipts = [row.get("receipt") for row in rows if isinstance(row, dict) and isinstance(row.get("receipt"), dict)]
+            receipt = undo_target(response["session_id"], receipts)
             if not isinstance(receipt, dict):
                 return _clarification(response, {"action": "undo"}, "I don't have a verified change to undo in this session yet.")
             undo = live.propose_undo(receipt, session_id=response["session_id"])
             if undo.get("ok") and isinstance(undo.get("proposal"), dict):
+                note_pending_undo(response["session_id"], str(undo["proposal"].get("action_id") or ""),
+                                  str(receipt.get("receipt_id") or ""))
                 response["undo_of_receipt_id"] = str(receipt.get("receipt_id") or "")
                 return _proposal_response(response, undo["proposal"], kind="undo")
             return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))

@@ -724,6 +724,10 @@ def _live_conversation(session_id: str) -> dict[str, Any]:
                 "confirmation_status": "none",
                 "current_topic": "",
                 "pending_question": None,
+                # "Undo that" walks back through changes: an undo's action id -> the receipt it reverses, and, once
+                # applied, the undo's own receipt -> that receipt. Kept for the session only.
+                "pending_undos": {},
+                "undo_links": {},
             }
             _LIVE_CONVERSATIONS[key] = state
         _LIVE_CONVERSATIONS.move_to_end(key)
@@ -911,6 +915,11 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
             state["pending_question"] = None
         if receipt.get("receipt_id"):
             state["last_receipt_id"] = _text(receipt.get("receipt_id"), 128)
+            reversed_id = state["pending_undos"].pop(str(receipt.get("action_id") or ""), None)
+            if reversed_id and receipt.get("verified") is True:
+                state["undo_links"][str(receipt["receipt_id"])] = reversed_id
+                while len(state["undo_links"]) > 100:
+                    state["undo_links"].pop(next(iter(state["undo_links"])))
         state["confirmation_status"] = (
             "pending" if status in {"confirmation_required", "requires_confirmation"}
             else "confirmed" if status == "applied"
@@ -928,6 +937,34 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
         })
 
 
+def note_pending_undo(session_id: str, undo_action_id: str, reverses_receipt_id: str) -> None:
+    state = _live_conversation(session_id)
+    with _LIVE_CONVERSATION_LOCK:
+        state["pending_undos"][str(undo_action_id)] = str(reverses_receipt_id)
+        while len(state["pending_undos"]) > 20:
+            state["pending_undos"].pop(next(iter(state["pending_undos"])))
+
+
+def undo_target(session_id: str, receipts: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """The newest change still standing, given receipts newest first: undos, and what they undid, are skipped.
+
+    Found 26 Sept: "undo that" twice undid the undo (a redo) instead of walking back to the change before.
+    """
+    state = _live_conversation(session_id)
+    with _LIVE_CONVERSATION_LOCK:
+        links = dict(state["undo_links"])
+    reversed_ids: set[str] = set()
+    for receipt in receipts:
+        receipt_id = str(receipt.get("receipt_id") or "")
+        if receipt_id in links:
+            reversed_ids.add(links[receipt_id])
+            continue
+        if receipt_id in reversed_ids:
+            continue
+        return receipt
+    return None
+
+
 def live_conversation_context(session_id: str) -> dict[str, Any]:
     """Return a copy suitable for diagnostics and tests."""
     state = _live_conversation(session_id)
@@ -937,6 +974,6 @@ def live_conversation_context(session_id: str) -> dict[str, Any]:
 
 __all__ = [
     "CONTEXT_BINDING_SCHEMA", "SCHEMA", "assistant_context_binding", "build_session_context",
-    "live_conversation_context", "preprocess_live_command", "record_live_exchange",
+    "live_conversation_context", "note_pending_undo", "preprocess_live_command", "record_live_exchange", "undo_target",
     "refresh_session_context_fingerprint", "safe_audio_job", "validate_session_context",
 ]
