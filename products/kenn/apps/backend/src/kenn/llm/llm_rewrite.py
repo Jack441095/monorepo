@@ -1112,10 +1112,11 @@ def _build_synthesis_messages(
     """
     use_mlx = os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
 
-    # Build raw context from chunks. On a 16 GB Mac with Live running the model reads the prompt at ~75 tokens/s, so
-    # the prompt size is most of the wait (26 Sept); these two budgets let a slower machine send less.
-    context_chars = int(os.environ.get("KENN_LLM_CONTEXT_CHARS") or 3500)
-    draft_chars = int(os.environ.get("KENN_LLM_DRAFT_CHARS") or 3500)
+    # Excerpt and draft budgets. The draft is built from the same excerpts, so sending both in full mostly repeats
+    # itself. On the 84 chat questions (Qwen3 8B, 26 Sept) 1,600 + 1,200 characters beat the old 3,500 + 3,500: 80/84
+    # passed against 75, and none of the model answers KENN kept failed (3 did before), with a 19% shorter prompt.
+    context_chars = int(os.environ.get("KENN_LLM_CONTEXT_CHARS") or 1600)
+    draft_chars = int(os.environ.get("KENN_LLM_DRAFT_CHARS") or 1200)
     raw_context = build_raw_context_block(results, source_label, max_chars=context_chars)
     if timeline_context:
         raw_context = f"Track Review History Timeline:\n{timeline_context}\n\n" + raw_context
