@@ -163,6 +163,7 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > gets a cited answer ("how do I keep my master under -1 dBTP?"). Commands are offered only if they parse to a clean
   > proposal, so they still go proposal → Apply → readback → Undo; KENN never changes the master. Re-measuring = export
   > again and ask again. In chat audio advice now; Mix Review's own panel (Vue frontend) not yet.
+  > 26 Sept: the panel has it too ("Ask KENN" sends the suggested step to chat, `9bfdb0c`, in the soaked build).
 - [ ] Notes for the last 4 devices (Instrument/MIDI/Audio Effect Rack, Drum Synth) and a small review of the 21 notes
       approved today
   > 2026-09-24: 3 of 4 — Instrument, MIDI and Audio Effect Rack notes approved (77/78 devices). Drum Synth has no
