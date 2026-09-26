@@ -167,6 +167,9 @@ The beta cannot start while KENN only runs from this Mac's checkout.
       approved today
   > 2026-09-24: 3 of 4 — Instrument, MIDI and Audio Effect Rack notes approved (77/78 devices). Drum Synth has no
   > entry in the Live 12 manual, so it waits for a measured note. Review of the 21 notes not yet done.
+  > 26 Sept: the review was done the same day and never ticked here: every control name checked against its manual
+  > section, each "Common mistakes" line checked by hand, six unsupported lines removed, all 21 approved
+  > (`docs/evidence/KENN_DEVICE_COVERAGE_2026-09-24.md`). Only Drum Synth is left, waiting for a measured note.
 - [x] Planner: rebuild the C6 corpus with dB volume labels, train run 7, keep in shadow; revisit promotion when the
       gate's 500 comparisons / 14 days are met (likely during the beta itself)
   > 2026-09-24: run 7 trained on the box (GPU 0) with dB labels: volume values fixed, but "bass" solos Drum Bus, so it
