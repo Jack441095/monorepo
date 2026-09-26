@@ -148,6 +148,12 @@ SUPPORTED_VIEW_ACTIONS = {"focus_track", "focus_device"}
 LOCATOR_TIME_TOLERANCE = 1e-4
 
 
+def _already_has_device(track_name: str, device: str) -> str:
+    # "Choose the exact existing device instead" read like an error to testers; say what to do next.
+    example = (f" (\"set the compressor threshold on {track_name} to -20 dB\")" if device == "Compressor" else "")
+    return (f"Track '{track_name}' already contains {device}, and KENN adds one of each device for now. To change the "
+            f"one that's there, say which setting to change{example}.")
+
 
 def _scene_text(proposal: dict[str, Any]) -> str:
     return "|".join(
@@ -1558,7 +1564,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             return {"ok": False, "error": error or "Target Live track is unavailable."}
         before_devices = _ordered_device_identities(track)
         if any(item["name"].strip().lower() == canonical_name.lower() for item in before_devices):
-            return {"ok": False, "error": f"Track '{track.get('name', '')}' already contains {canonical_name}; choose the exact existing device instead."}
+            return {"ok": False, "error": _already_has_device(str(track.get("name", "")), canonical_name)}
         expected_index = len(before_devices)
         if insertion_index is not None and int(insertion_index) != expected_index:
             return {"ok": False, "error": "Only append insertion is enabled; the requested insertion position is stale or unsupported."}
@@ -1656,7 +1662,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             return {"ok": False, "error": error or "Target Live track is unavailable."}
         before_devices = _ordered_device_identities(track)
         if any(item["name"].strip().casefold() == canonical_name.casefold() for item in before_devices):
-            return {"ok": False, "error": f"Track '{track.get('name', '')}' already contains {canonical_name}; choose the exact existing device instead."}
+            return {"ok": False, "error": _already_has_device(str(track.get("name", "")), canonical_name)}
         insertion_index = len(before_devices)
         after_devices = before_devices + [{"position": insertion_index, "index": insertion_index, "name": canonical_name}]
         fingerprint = hashlib.sha256(json.dumps(before_devices, sort_keys=True, separators=(",", ":")).encode()).hexdigest()

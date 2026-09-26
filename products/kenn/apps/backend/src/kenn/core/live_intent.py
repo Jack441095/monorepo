@@ -290,6 +290,8 @@ _RENAME_TRACK = re.compile(
 )
 _INSERT_DEVICE_ALIASES = (
     ("Glue Compressor", r"glue\s+compressor"),
+    ("Multiband Dynamics", r"multi-?band(?:\s+(?:dynamics|compressor))?"),
+    ("Roar", r"roar"),
     ("Auto Filter", r"auto\s+filter|filter"),
     ("Drum Buss", r"drum\s+buss"),
     ("Saturator", r"saturator"),
@@ -303,9 +305,9 @@ _INSERT_DEVICE_ALIASES = (
 # shadowed by the generic one; _insert_device_name below relies on
 # _INSERT_DEVICE_ALIASES iteration order for the same reason.
 _ADD_DEVICE = re.compile(
-    r"\b(?:stick|drop|throw|slap|pop|chuck)\s+(?:a|an|another)\s+(?:new\s+)?(?:glue\s+compressor|auto\s+filter|filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
-    r"|\b(?:add|append|insert|put|load)\b.*\b(?:glue\s+compressor|auto\s+filter|filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
-    r"|\b(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b.*\b(?:add|append|insert|put|load)\b",
+    r"\b(?:stick|drop|throw|slap|pop|chuck)\s+(?:a|an|another)\s+(?:new\s+)?(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
+    r"|\b(?:add|append|insert|put|load)\b.*\b(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
+    r"|\b(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b.*\b(?:add|append|insert|put|load)\b",
     re.I,
 )
 _DEVICE_SETUP = re.compile(
@@ -948,6 +950,18 @@ _ORDINAL_CHANNEL = re.compile(
     r"\b(?:the\s+)?(" + "|".join(_ORDINALS) + r")\s+(?:visible\s+)?(?:track|trk|channel|chan|ch)\b", re.I)
 _CORRECTION_LEAD = re.compile(r"^\s*(?:no\s+wait|no|wait|sorry|actually|oops)\s*[,.!:;-]\s*", re.I)
 _CORRECTION_TAIL = re.compile(r",?\s+(?:not|instead\s+of)\s+the\s+[\w\s/'-]+?\s*[.!]?\s*$", re.I)
+# "set Vocal volume to minus six—actually pan it twenty percent right": a new instruction after the correction replaces
+# the first one, and its "it" is the track named before. Only a following verb counts; "solo the vocal, actually the
+# synth" is handled by the correction rules in live_command.
+_MID_CORRECTION = re.compile(
+    r"^(?P<before>.+?)\s*(?:\u2014|\u2013|--|,|;|\.)\s*(?:actually|no\s+wait|scratch\s+that)\s*,?\s+"
+    r"(?P<after>(?:pan|set|mute|unmute|solo|unsolo|turn|make|bring|arm|disarm|put|send|add|rename|cent(?:er|re))\b.+)$", re.I)
+# "mute track 2, actually track 3" used to mute track 2: a bare new target after the correction replaces the old one.
+_MID_CORRECTION_TARGET = re.compile(
+    r"^(?P<before>.+?)\s*(?:\u2014|\u2013|--|,|;)\s*(?:actually|no\s+wait|i\s+mean|sorry)\s*,?\s+"
+    r"(?P<target>(?:the\s+)?(?:track\s+\w+|[a-z][\w/'-]*(?:\s+[a-z][\w/'-]*){0,2}))\s*[.!]?\s*$", re.I)
+_CORRECTED_OBJECT = re.compile(r"^\s*(?:set|turn|bring|make|put|get|pan|mute|solo)\s+(?P<obj>.+?)"
+                               r"(?:\s+(?:volume|level|fader|pan))?(?:\s+(?:to|by|at|up|down)\b.*)?$", re.I)
 _CALL_TRACK = re.compile(r"^\s*call\s+(track\s+\d+)\s+['\"]?(.+?)['\"]?\s*[.!]?\s*$", re.I)
 _TERSE_LEVEL = re.compile(
     r"^\s*(?!(?:set|put|bring|turn|send|pan|make|move|drop|push|pull|get|take|mute|solo|arm|rename|call)\b)"
@@ -960,8 +974,10 @@ _TERSE_LEVEL_EXCLUDE = re.compile(r"\b(?:send|sends|reverb|delay|echo|eq|band|ga
 # resolve, so "synth off" works and "metronome off" still asks.
 _NAME = r"(?P<name>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}?)"
 _POLITE_TAIL = re.compile(r"\s*,?\s+(?:please|pls|plz|thanks|thank\s+you|cheers|mate)\s*[.!?]*\s*$", re.I)
-_POLITE_LEAD = re.compile(r"^\s*(?:yo|hey|ok|okay|right|please|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?"
-                          r"|i\s+(?:want|need|would\s+like|'d\s+like)\s+(?:you\s+)?to)\s*[,!]?\s+(?=\w)", re.I)
+# Dictated requests stack fillers in front ("um yeah so can you ..."), so the lead repeats.
+_POLITE_LEAD = re.compile(r"^\s*(?:(?:um+|uh+|erm|er|hmm+|yeah|yep|so|well|alright|yo|hey|ok|okay|right|please"
+                          r"|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?"
+                          r"|i\s+(?:want|need|would\s+like|'d\s+like)\s+(?:you\s+)?to)\s*[,!]?\s+)+(?=\w)", re.I)
 # ", can you do that?", "for clarity", "so I can adjust it": asides after the request. Left in, they ended up in new
 # track names ("Synth Lead, can you do that?").
 _TRAILING_ASIDE = re.compile(r"\s*,?\s+(?:can\s+you\s+(?:do\s+that|help(?:\s+me)?(?:\s+with\s+that)?)|is\s+that\s+possible|"
@@ -1020,6 +1036,21 @@ _LOCATOR_SAID = re.compile(
     r"['\"\u2018\u2019]?(?P<locator2>[^'\"\u2018\u2019]+?)"
     r"['\"\u2018\u2019]?\s*[.!]?\s*$", re.I)
 _CALL_TRACK_THE = re.compile(rf"^\s*call\s+{_NAME}\s+track\s+(?:the\s+)?(?P<new>[\w' -]+?)\s*[.!]?\s*$", re.I)
+_MAKE_CALLED = re.compile(rf"^\s*make\s+(?!(?:an?|new|another)\b|(?:midi|audio|return)\b){_NAME}(?:\s+track)?\s+(?:be\s+)?(?:called|named)\s+['\"]?(?P<new>[\w' -]+?)['\"]?\s*[.!]?\s*$",
+                          re.I)
+_MAKE_SURE_STATE = re.compile(rf"^\s*make\s+sure\s+{_NAME}(?:\s+tracks?)?\s+(?:is|are|'s)\s*(?P<neg>n't\s+|not\s+|un)?"
+                              r"(?P<state>muted|soloed|(?:record[\s-]?)?armed)\s*[.!?]?\s*$", re.I)
+_PAN_ZERO = re.compile(rf"^\s*(?:set\s+)?(?:the\s+)?pan\s+(?:on|of|for)\s+{_NAME}\s+to\s+(?:zero|0)\s*[.!?]?\s*$"
+                       rf"|^\s*pan\s+{_NAME.replace('name', 'name2')}\s+to\s+(?:zero|0)\s*[.!?]?\s*$", re.I)
+# "i want the drums bus to be -10 dB" names the level it wants; the polite-lead rule only strips "i want (you) to".
+_WANT_LEVEL = re.compile(rf"^\s*(?:i\s+(?:want|need|would\s+like|'d\s+like)|let'?s\s+(?:have|get))\s+{_NAME}\s+(?:to\s+be|at)\s+"
+                         r"(?P<amount>(?:minus\s+|-)?\d+(?:\.\d+)?)\s*dbs?\s*[.!?]?\s*$", re.I)
+# "set the send for a reverb to fifty percent on the drum bus": return first, value, then the track.
+_SEND_TRACK_LAST = re.compile(r"^\s*set\s+(?:the\s+)?(?:send\s+(?:for|to)\s+(?:the\s+|a\s+)?(?P<ret>reverb|verb|delay|[ab])"
+                              r"|(?P<ret2>reverb|verb|delay)\s+send)\s+(?:to|at)\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s+"
+                              rf"(?:on|for)\s+{_NAME}\s*[.!?]?\s*$", re.I)
+_COMPRESSOR_TO_THRESHOLD = re.compile(rf"^\s*set\s+(?:the\s+)?compressor\s+on\s+{_NAME}\s+to\s+threshold\s+(?:of\s+)?"
+                                      r"(?P<amount>-?\d+(?:\.\d+)?)\s*(?:dbs?)?\s*[.!?]?\s*$", re.I)
 _COMP_SETTING = re.compile(r"\b(?:threshold|ratio|attack|release|output|makeup|knee)\b", re.I)
 
 
@@ -1049,6 +1080,28 @@ _SEND_SAID_GO_TO = re.compile(
     r"at\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!?]?\s*$", re.I)
 
 
+# Speech-to-text spells units and signs out: "minus ten dee bee". A signed spoken number is always a number, so it
+# becomes digits even with no unit after it ("turn the snare down to minus fifteen"); unsigned ones still need a unit.
+_SPOKEN_DB = re.compile(r"\bdee[\s-]*bees?\b|\bd\s+b\b", re.I)
+_SIGNED_SPOKEN_NUMBER = re.compile(
+    r"\b(?:minus|negative)\s+(?P<first>" + "|".join(_SPOKEN_NUMBER_VALUES) + r")\b"
+    r"(?:\s+(?P<second>" + "|".join(_SPOKEN_NUMBER_VALUES) + r")\b)?", re.I)
+
+
+def _rewrite_dictation(text: str) -> str:
+    text = _SPOKEN_DB.sub("dB", text)
+
+    def signed(match: re.Match[str]) -> str:
+        first = _SPOKEN_NUMBER_VALUES[match.group("first").lower()]
+        second = _SPOKEN_NUMBER_VALUES[match.group("second").lower()] if match.group("second") else 0
+        if second and not (first >= 20 and second < 10):
+            return f"-{first} {match.group('second')}"  # "minus ten five" isn't one number; leave the second word
+        return f"-{first + second}"
+
+    # Numbers with a unit after them are converted later too; doing it here lets the idiom rules below see digits.
+    return _normalize_spoken_numbers(_SIGNED_SPOKEN_NUMBER.sub(signed, text))
+
+
 def _rewrite_idioms(text: str) -> str:
     if _HOW_TO_QUESTION.match(text):
         return text
@@ -1068,8 +1121,24 @@ def _rewrite_idioms(text: str) -> str:
 
     if (m := _LOCATOR_SAID.match(text)):
         return f"add a locator called {(m.group('locator') or m.group('locator2')).strip()}"
-    if (m := _CALL_TRACK_THE.match(text)) and name(m):
+    if (m := _CALL_TRACK_THE.match(text) or _MAKE_CALLED.match(text)) and name(m):
         return f"rename {m.group('name')} to {m.group('new')}"
+    if (m := _MAKE_SURE_STATE.match(text)) and name(m):
+        verb = {"muted": "mute", "soloed": "solo"}.get(m.group("state").lower(), "arm")
+        if m.group("neg"):
+            verb = "disarm" if verb == "arm" else f"un{verb}"
+        return f"{verb} {m.group('name')}"
+    if (m := _PAN_ZERO.match(text)):
+        group = "name" if m.group("name") else "name2"
+        if name(m, group):
+            return f"centre {m.group(group)}"
+    if (m := _WANT_LEVEL.match(text)) and name(m):
+        return f"set {m.group('name')} to {m.group('amount')} dB"
+    if (m := _SEND_TRACK_LAST.match(text)) and name(m) and float(m.group("value")) <= 100:
+        ret = (m.group("ret") or m.group("ret2")).lower()
+        return f"send the {m.group('name')} to the {'reverb' if ret == 'verb' else ret} at {m.group('value')}%"
+    if (m := _COMPRESSOR_TO_THRESHOLD.match(text)):
+        return f"set the compressor threshold on {m.group('name')} to {m.group('amount')} dB"
     if (m := _VERB_LEVEL.match(text)):
         group = "name" if m.group("name") else "name2"
         if name(m, group):
@@ -1142,6 +1211,16 @@ def _rewrite_common_phrasings(text: str) -> str:
     a bare "kick to -9" still asks). Nothing here changes what a request means.
     """
     text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
+    if (m := _MID_CORRECTION.match(text)):
+        after = m.group("after")
+        obj = _CORRECTED_OBJECT.match(m.group("before"))
+        if obj and re.search(r"\b(?:it|that)\b", after, re.I):
+            after = re.sub(r"\b(?:it|that)\b", obj.group("obj"), after, count=1, flags=re.I)
+        text = after
+    elif (m := _MID_CORRECTION_TARGET.match(text)) and (obj := _CORRECTED_OBJECT.match(m.group("before"))):
+        before = m.group("before")
+        text = before[:obj.start("obj")] + m.group("target") + before[obj.end("obj"):]
+    text = _rewrite_dictation(text)
     text = _rewrite_idioms(text)
     corrected = _CORRECTION_LEAD.sub("", text)
     if corrected != text:
@@ -1292,9 +1371,72 @@ def _single_track_change_question(parsed: dict[str, Any], snapshot: dict[str, An
     return ""
 
 
+# Live devices KENN can't insert yet. Checked before the insert aliases, because several contain one of their words
+# ("EQ Three" has "eq", "Filter Delay" has "filter"): without this, "add a filter delay" became an Auto Filter.
+_NOT_INSERTABLE_DEVICES = (
+    ("Utility", r"utility"), ("Limiter", r"limiter"), ("Gate", r"(?:noise\s+)?gate"), ("Chorus-Ensemble", r"chorus"),
+    ("Phaser-Flanger", r"phaser|flanger"), ("Redux", r"redux|bit\s*crusher"), ("Erosion", r"erosion"),
+    ("Vinyl Distortion", r"vinyl\s+distortion"), ("Overdrive", r"overdrive"), ("Pedal", r"pedal"), ("Amp", r"amp"),
+    ("Cabinet", r"cabinet"), ("Tuner", r"tuner"), ("Spectrum", r"spectrum"), ("Corpus", r"corpus"),
+    ("Resonators", r"resonators?"), ("Vocoder", r"vocoder"), ("Beat Repeat", r"beat\s+repeat"),
+    ("Grain Delay", r"grain\s+delay"), ("Filter Delay", r"filter\s+delay"), ("Align Delay", r"align\s+delay"),
+    ("Auto Pan", r"auto\s*-?\s*pan|tremolo"), ("Frequency Shifter", r"frequency\s+shifter"), ("Channel EQ", r"channel\s+eq"),
+    ("EQ Three", r"eq\s*(?:three|3)"), ("Dynamic Tube", r"dynamic\s+tube"), ("Shifter", r"(?:pitch\s+)?shifter"),
+    ("Spectral Resonator", r"spectral\s+resonator"), ("Spectral Time", r"spectral\s+time"), ("Looper", r"looper"),
+    ("Convolution Reverb", r"convolution\s+reverb"),
+)
+_ADD_VERB = re.compile(r"\b(?:add|append|insert|put|load|stick|drop|throw|slap|pop|chuck)\b", re.I)
+_INSERTABLE_NAMES = "EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, Saturator, Roar, Auto Filter, Drum Buss, " \
+                    "Hybrid Reverb and Echo"
+_HEDGE = re.compile(r"\b(?:maybe|perhaps|possibly|might)\b", re.I)
+_RETURN_MENTION = re.compile(r"\breturn(?:\s+tracks?)?\b|\b[ab]\s+return\b", re.I)
+_MIXER_WORD = re.compile(r"\b(?:volume|fader|level|gain|louder|quieter|up|down|mute|unmute|solo|unsolo|pan|rename|name|"
+                         r"called|set|turn|db)\b", re.I)
+_SEND_IN_DB = re.compile(r"\bsend\b.*?-?\d+(?:\.\d+)?\s*db\b|-?\d+(?:\.\d+)?\s*db\b.*?\bsend\b", re.I)
+
+
+def _not_supported_yet(text: str, parsed: dict[str, Any], snapshot: dict[str, Any] | None) -> tuple[str, str] | None:
+    """A plain "KENN can't do that yet" for requests the rules would otherwise shrug at (or misread)."""
+    if _ADD_VERB.search(text) and parsed.get("action") in {None, "insert_device", "insert_device_with_parameter"}:
+        for device, pattern in _NOT_INSERTABLE_DEVICES:
+            if re.search(rf"\b(?:{pattern})\b", text, re.I):
+                return "device", (f"KENN can't add {device} yet. It can add {_INSERTABLE_NAMES}. "
+                                  f"You can drag {device} in from Live's browser.")
+    if parsed.get("action") is not None:
+        return None
+    earlier = set(parsed.get("missing_fields") or [])  # a more specific question from the rules wins, mostly
+    if not earlier and _SEND_IN_DB.search(text):
+        return "send_amount", ("KENN sets sends in percent for now (\"set the hats delay send to 30%\"); a send level "
+                               "in dB hasn't been measured against Live yet, so nothing changed.")
+    returns = [str(r.get("name") or "") for r in ((snapshot or {}).get("return_tracks") or []) if isinstance(r, dict)]
+    named = next((name for name in returns if name and re.search(rf"\b{re.escape(name)}\b", text, re.I)), None)
+    # "mute a-reverb" used to get "device enable, bypass, mute ... not in the qualified action set", as if A-Reverb
+    # were a device.
+    if (named or _RETURN_MENTION.search(text)) and _MIXER_WORD.search(text) and earlier <= {"device_action",
+                                                                                         "return_track_action"}:
+        which = f"{named} is a return track, and" if named else "That's a return track, and"
+        return "return_track_action", (f"{which} KENN can't change return tracks yet (level, mute, pan or name). Sends "
+                                "into them work: \"set the vocal's reverb send to 20%\".")
+    return None
+
+
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
     parsed = _parse_request_rules(query, session_snapshot)
+    text = str(parsed.get("query") or query or "")
+    unsupported = _not_supported_yet(text, parsed, session_snapshot)
+    if unsupported:
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
+                       "missing_fields": [unsupported[0]], "ambiguity": [unsupported[1]]})
+        return parsed
+    if parsed.get("action") in {"insert_device", "insert_device_with_parameter"} and _HEDGE.search(text):
+        # "make the clap snappier and maybe add some reverb" is thinking aloud; it used to insert a Reverb.
+        device = (parsed.get("device") or {}).get("name") or "that device"
+        track = (parsed.get("track") or {}).get("name") or "the track"
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["device"],
+                       "ambiguity": [f"That sounds like you're still deciding, so nothing changed. Say \"add {device} to "
+                                     f"{track}\" and KENN will prepare it."]})
+        return parsed
     if _HOW_TO_QUESTION.match(str(query or "")):
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["how_to"],
                        "ambiguity": ["That's a how-to question, so nothing changed. Ask it in chat and KENN explains the "
