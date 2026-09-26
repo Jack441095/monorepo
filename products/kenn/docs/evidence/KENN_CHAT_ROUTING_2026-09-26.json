@@ -1,0 +1,341 @@
+{
+ "schema": "kenn.chat_routing.v1",
+ "requests": 1072,
+ "reached_live": 1009,
+ "missed": [
+  {
+   "query": "put an eq8 on the bass plz",
+   "expected": "insert_device",
+   "route": "production"
+  },
+  {
+   "query": "stick a utility on the drums bus",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "insert a utility on the drums bus",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "Let\u2019s jam",
+   "expected": "transport_play",
+   "route": "clarify"
+  },
+  {
+   "query": "Shut it off",
+   "expected": "transport_stop",
+   "route": "clarify"
+  },
+  {
+   "query": "The clap track is at -14 dB, but I want it 1 dB lower. Can you adjust it?",
+   "expected": "set_volume",
+   "route": "ableton"
+  },
+  {
+   "query": "Would it be possible to add a utility to the lead vocal track?",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "Is it possible to add a utility to the drums bus?",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "Would you mind adding a utility to the synth track?",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "I think I need to add a marker here, maybe call it 'hook'?",
+   "expected": "add_locator",
+   "route": "ableton"
+  },
+  {
+   "query": "I think I should add a marker here called 'fill' to remember this part.",
+   "expected": "add_locator",
+   "route": "ableton"
+  },
+  {
+   "query": "I think the track with the EQ on the bass should be called Bass EQ, can you change that?",
+   "expected": "rename_track",
+   "route": "ableton"
+  },
+  {
+   "query": "Could you take me to the track with the reverb return?",
+   "expected": "focus_track",
+   "route": "ableton"
+  },
+  {
+   "query": "Can you go to the track that has the delay effect?",
+   "expected": "focus_track",
+   "route": "ableton"
+  },
+  {
+   "query": "I need to go to the track that has the delay return. Can you take me there?",
+   "expected": "focus_track",
+   "route": "ableton"
+  },
+  {
+   "query": "I need to go to the track that has the FX print. Can you show me that?",
+   "expected": "focus_track",
+   "route": "ableton"
+  },
+  {
+   "query": "I want to create a new track for some MIDI stuff, please.",
+   "expected": "create_midi_track",
+   "route": "audiogen_unavailable"
+  },
+  {
+   "query": "reverb up 1",
+   "expected": "set_volume",
+   "route": "production"
+  },
+  {
+   "query": "delay up 2",
+   "expected": "set_volume",
+   "route": "production"
+  },
+  {
+   "query": "mute the bus",
+   "expected": "set_mute",
+   "route": "ableton"
+  },
+  {
+   "query": "make new synth track",
+   "expected": "create_midi_track",
+   "route": "ableton"
+  },
+  {
+   "query": "rename a-reverb to reverb1",
+   "expected": "rename_track",
+   "route": "production"
+  },
+  {
+   "query": "rename b-delay to delay1",
+   "expected": "rename_track",
+   "route": "production"
+  },
+  {
+   "query": "I want to solo the bass to adjust the EQ Eight. Is that okay?",
+   "expected": "set_solo",
+   "route": "production"
+  },
+  {
+   "query": "I want the drum bus to have a compressor to control the dynamic range. Could you insert that?",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "I want to mute the drum bus for now while I adjust the compressor settings. Is that okay?",
+   "expected": "set_mute",
+   "route": "ableton"
+  },
+  {
+   "query": "I need to focus on the lead vocal track while I work on the vocal processing. Could you focus it?",
+   "expected": "focus_track",
+   "route": "ableton"
+  },
+  {
+   "query": "I'd like to send 30% of the kick to the A-Reverb for some space, is that okay?",
+   "expected": "set_send",
+   "route": "ableton"
+  },
+  {
+   "query": "I need the compressor on the Lead Vocal to have a threshold of -8 dB instead of -10 dB, could you handle that?",
+   "expected": "set_device_parameter",
+   "route": "production"
+  },
+  {
+   "query": "The compressor on the Drum Bus is currently set to -12 dB, could you lower it by 2 dB to give more space for the kick?",
+   "expected": "set_device_parameter",
+   "route": "ableton"
+  },
+  {
+   "query": "I want the hi-hats to be a little more present, could you add some saturation to them?",
+   "expected": "insert_device",
+   "route": "production"
+  },
+  {
+   "query": "The snare is a bit too soft, could you add some compression to it?",
+   "expected": "insert_device",
+   "route": "production"
+  },
+  {
+   "query": "I need to focus on the lead vocal track, can you highlight it?",
+   "expected": "focus_track",
+   "route": "ableton"
+  },
+  {
+   "query": "I'd like the drum bus to have a compressor on it to even out the dynamics, could you handle that?",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "I want the drum bus to have a compressor on it to even out the dynamics, could you handle that?",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "I want the bass to have an EQ Eight on it to cut any unwanted frequencies, could you handle that?",
+   "expected": "insert_device",
+   "route": "production"
+  },
+  {
+   "query": "I'd like the lead vocal to have a compressor on it to control the dynamic range, is that okay?",
+   "expected": "insert_device",
+   "route": "production"
+  },
+  {
+   "query": "I'd like to focus on the kick track to adjust its settings, is that okay?",
+   "expected": "focus_track",
+   "route": "ableton"
+  },
+  {
+   "query": "turn off the Snare / Clap",
+   "expected": "set_mute",
+   "route": "production"
+  },
+  {
+   "query": "Make a locator called end at the current position",
+   "expected": "add_locator",
+   "route": "ableton"
+  },
+  {
+   "query": "add a utility to the drum bus track",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "add a utility to the fx print track",
+   "expected": "insert_device",
+   "route": "ableton"
+  },
+  {
+   "query": "can you create a new track for the vocal adlibs",
+   "expected": "create_audio_track",
+   "route": "audiogen_unavailable"
+  },
+  {
+   "query": "Lower the Vocal Compressor threshold by two dB, then mute the Vocal.",
+   "expected": "recipe",
+   "route": "production"
+  },
+  {
+   "query": "What is living on the Vocal device chain?",
+   "expected": "inspect_devices",
+   "route": "production"
+  },
+  {
+   "query": "Back the Vocal Compressor threshold off by three dB.",
+   "expected": "set_device_parameter",
+   "route": "production"
+  },
+  {
+   "query": "select the drum bus",
+   "expected": "focus_track",
+   "route": "ableton"
+  },
+  {
+   "query": "focus the drum bus compressor",
+   "expected": "focus_device",
+   "route": "ableton"
+  },
+  {
+   "query": "compressor output on the vocal to 2 dB",
+   "expected": "set_device_parameter",
+   "route": "production"
+  },
+  {
+   "query": "boost band 2A on the bass eq by 2 dB",
+   "expected": "set_eq_band_gain",
+   "route": "production"
+  },
+  {
+   "query": "take 2 dB out of the bass at 200 Hz band 2A",
+   "expected": "set_eq_band_gain",
+   "route": "ableton"
+  },
+  {
+   "query": "show me the compressor settings on the drum bus",
+   "expected": "inspect_device_parameters",
+   "route": "ableton"
+  },
+  {
+   "query": "set the compressor output on the vocal to 1 dB",
+   "expected": "set_device_parameter",
+   "route": "production"
+  },
+  {
+   "query": "drum bus compressor output to 2 dB",
+   "expected": "set_device_parameter",
+   "route": "ableton"
+  },
+  {
+   "query": "cut band 2A on the bass eq by 2 dB",
+   "expected": "set_eq_band_gain",
+   "route": "production"
+  },
+  {
+   "query": "bass eq band 1A down 3 dB",
+   "expected": "set_eq_band_gain",
+   "route": "production"
+  },
+  {
+   "query": "pull band 2A on the bass eq down 4 dB",
+   "expected": "set_eq_band_gain",
+   "route": "production"
+  },
+  {
+   "query": "call the kick Kick In",
+   "expected": "rename_track",
+   "route": "production"
+  },
+  {
+   "query": "list the tracks in this set",
+   "expected": "inspect_tracks",
+   "route": "ableton"
+  },
+  {
+   "query": "show me the vocal compressor settings",
+   "expected": "inspect_device_parameters",
+   "route": "production"
+  },
+  {
+   "query": "what are the eq settings on the bass",
+   "expected": "inspect_device_parameters",
+   "route": "production"
+  },
+  {
+   "query": "slo the bass",
+   "expected": "set_solo",
+   "route": "production"
+  },
+  {
+   "query": "mute the kick, wait no, the bass",
+   "expected": "set_mute",
+   "route": "production"
+  }
+ ],
+ "questions": 481,
+ "taken_over": [
+  {
+   "question": "fix muddy low mids in a mix",
+   "route": "autonomous_producer",
+   "answer": "\u2726 **KENN Autonomous ReAct Reasoning Engine**\n\nI have analyzed your session against 40-band ERB psychoacoustics and formulated this 6-step recipe to solve 'fix muddy low mids in a mix':\n\n1. set_volume:"
+  },
+  {
+   "question": "add weight and punch to my drum group with one device",
+   "route": "ableton_controller",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+  },
+  {
+   "question": "I'm tired of setting up my drum bus and vocal tracks from scratch each time. Can I create a setup that automatically includes these with the right plugins and routing?",
+   "route": "ableton_controller",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Drum Bus up 2 dB\" or \"set Drum Bus to -6 dB\"."
+  }
+ ],
+ "errors": []
+}

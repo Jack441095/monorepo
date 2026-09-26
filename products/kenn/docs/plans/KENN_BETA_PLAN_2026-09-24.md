@@ -147,6 +147,11 @@ The beta cannot start while KENN only runs from this Mac's checkout.
   > 2026-09-24: 8/14; every engineering gate passes except the soak (running). Tests also run on the GPU box's CPUs
   > (`tooling/scripts/run_tests_on_box.py`) so results don't depend on this Mac.
 
+> 2026-09-26: the app's chat was the weakest link, not the parser. Measured through the chat itself
+> (`measure_chat_routing.py`, `docs/evidence/KENN_CHAT_ROUTING_2026-09-26.md`): requests reaching Live 61% -> 94%,
+> knowledge questions turned into Live proposals 44 -> 3 of 481, and the whole tester guide 27/27 on real Live
+> (the tester build had 17/26: every follow-up, correction and reply went to the notes). In the next tester build.
+
 ## Phase 3: Fill the capability gaps testers will hit first (weeks 2–3)
 
 - [ ] D1 wave 1 on real Live, same method as the fader law: Compressor (threshold, ratio, attack, release, makeup),
