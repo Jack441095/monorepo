@@ -359,5 +359,52 @@
    "4. For full mixes, use **Complex Pro** with the **Envelope** control set to a moderate value (e.g., 50) to preserve natural dynamics while allowing for rhythmic manipulation. Ensure **Transients** are preserved to maintain punch and clarity.",
    "4. For full mixes, use **Complex** or **Complex Pro**; Complex Pro's default Envelope (128) suits most material."
   ]
+ ],
+ "ableton-hybrid-reverb-device.md": [
+  [
+   "replace",
+   "2. Select a Routing configuration: Convolution Only, Algorithm Only, Serial (convolution feeds algorithm), Parallel (both engines process simultaneously), or Blend (crossfade between the two engines).",
+   "2. Pick one of the four Routing options: Serial (convolution feeds the algorithm), Parallel (both engines at once), Algorithm or Convolution (one engine only). In Serial and Parallel, the Blend knob balances the two."
+  ],
+  [
+   "replace",
+   "4. In the Algorithm section, select an engine type: Dark (warm vintage reverb), Pristine (clean modern spaces), Shimmer (pitch-shifted octave tails), Tides (modulated spectral delay), or Earlate (focused early reflections).",
+   "4. In the Algorithm section, choose Dark Hall (smooth classic halls), Quartz (clear hall with audible echoes), Shimmer (pitch-shifted tails), Tides (modulated) or Prism."
+  ]
+ ],
+ "ableton-tuner-device.md": [
+  [
+   "replace",
+   "2. Select View Mode: Classic for intuitive needle/cents display, or Strobe for ultra-precise intonation calibration.",
+   "2. Choose the view: Classic, like an analog tuner, or Histogram, which shows pitch over time."
+  ],
+  [
+   "delete",
+   "5. In Live 12, toggle Scale/Tuning display mode to calibrate notes against the project's active microtuning tuning system."
+  ]
+ ],
+ "ableton-spectrum-analyzer.md": [
+  [
+   "replace",
+   "7. EQ Eight has a built-in spectrum analyzer \u2014 toggle it on with the headphone icon. This lets you see the spectrum while EQing on the same device, which is faster than using a separate Spectrum.",
+   "7. EQ Eight has a built-in spectrum analyzer: turn on its Analyze switch to see the spectrum while you EQ, which is faster than a separate Spectrum."
+  ]
+ ],
+ "ableton-midi-controller-setup.md": [
+  [
+   "replace",
+   "2. Enable the controller in Preferences > MIDI: find your controller in the Input list, set Track to \"On\" (so it plays instruments), and Sync and Remote to \"On\" as needed for clock sync and remote control.",
+   "2. Enable the controller in Settings > Link, Tempo & MIDI: find it in the Input list, turn on Track (so it plays instruments), and Sync and Remote as needed for clock sync and remote control."
+  ],
+  [
+   "replace",
+   "6. Map a knob to Filter Cutoff on a synth for real-time filter sweeps. Map another to Master Volume for live mixing.",
+   "6. Map a knob to Filter Cutoff on a synth for real-time filter sweeps. Map another to the Main track's volume for live mixing."
+  ],
+  [
+   "replace",
+   "7. Control Surfaces: if you have an Ableton Push, APC40, or Launchpad, set them up in Preferences > MIDI as a Control Surface (not just MIDI). These get deep integration \u2014 Push shows parameter names, Launchpad maps directly to Session View clips.",
+   "7. Control Surfaces: if you have an Ableton Push, APC40, or Launchpad, choose it as a Control Surface in Settings > Link, Tempo & MIDI (not just as MIDI). These get deep integration \u2014 Push shows parameter names, Launchpad maps directly to Session View clips."
+  ]
  ]
 }

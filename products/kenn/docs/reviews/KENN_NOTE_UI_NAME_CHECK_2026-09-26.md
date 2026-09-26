@@ -129,3 +129,10 @@ What the review can't promise: kept notes use real controls in a sensible order,
 - `ableton12-mixing-manual-pt2.md`
 - `ableton12-using-grooves-pt2.md`
 - `ableton12-warp-algorithms-and-transient-preservation.md`
+
+## Hand-written notes, sampled (26 Sept)
+
+15 random `ableton-…` notes (written by hand, not by the notes model): none invented, 4 with one wrong detail each
+(Hybrid Reverb's routing and algorithm names, a Tuner "Strobe" view, EQ Eight's analyzer "headphone icon", the old
+Preferences > MIDI path and "Master Volume"). Corrected from the manual and added to the same decisions file. Better than
+the drafted series, but not clean, so the other 99 get the same full read.
