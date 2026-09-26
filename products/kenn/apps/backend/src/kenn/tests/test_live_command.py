@@ -992,6 +992,19 @@ def test_an_inserted_device_can_be_undone_from_its_journal_copy() -> None:
     assert fake.state["tracks"][1]["devices"] == []
 
 
+def test_an_undo_card_says_it_is_an_undo() -> None:
+    # 26 Sept 2026: the undo card read "Explicit user request for set_volume on track 'Bass'".
+    from kenn.core.fake_live import FakeLiveBackend
+
+    service = _service(FakeLiveBackend())
+    planned = handle_command("Bring the bass down 2 dB", session_id="undo-reason", service=service, allow_llm=False)
+    applied = handle_command("", session_id="undo-reason", service=service, proposal=planned["proposal"],
+                             confirm_token=planned["proposal"]["confirmation_token"],
+                             idempotency_key=planned["proposal"]["action_id"], allow_llm=False)
+    undo = service.propose_undo(applied["receipt"], session_id="undo-reason")
+    assert undo["proposal"]["reason"] == "Undo: puts back what was there on 'Bass' before your last change."
+
+
 def test_reverb_setup_rolls_back_inserted_device_when_parameter_readback_fails() -> None:
     fake = DeviceSetupLive()
     fake.fail_setup_write = True

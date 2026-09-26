@@ -3088,6 +3088,15 @@ class LiveActionService(Tier2Tier3ControlMixin):
 
     def propose_undo(self, receipt: dict[str, Any], *, session_id: str) -> dict[str, Any]:
         """Create a fresh, confirmed proposal to reverse a verified receipt."""
+        result = self._propose_undo(receipt, session_id=session_id)
+        proposal = result.get("proposal") if isinstance(result, dict) and result.get("ok") else None
+        if isinstance(proposal, dict) and str(proposal.get("reason") or "").startswith("Explicit user request"):
+            # The undo card showed "Explicit user request for set_volume on track 'Bass'", as if asked for afresh.
+            where = f" on '{proposal['track_name']}'" if proposal.get("track_name") else ""
+            proposal["reason"] = f"Undo: puts back what was there{where} before your last change."
+        return result
+
+    def _propose_undo(self, receipt: dict[str, Any], *, session_id: str) -> dict[str, Any]:
         if not isinstance(receipt, dict):
             return {"ok": False, "error": "A valid KENN Ableton receipt is required for undo."}
         # Recipe receipts use a distinct schema but still belong to this
