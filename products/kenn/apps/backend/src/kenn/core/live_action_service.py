@@ -218,6 +218,18 @@ def _track_creation_text(proposal: dict[str, Any]) -> str:
     )
 
 
+def _fader_db_fields(before: Any, after: Any) -> dict[str, Any]:
+    def db(raw: Any) -> float | str | None:
+        if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+            return None
+        level = volume_law.raw_to_db(float(raw))
+        if level is None:
+            return None
+        return "-inf" if math.isinf(level) else round(level, 1)
+
+    return {"before_db": db(before), "after_db": db(after)}
+
+
 def _return_track_structure_fingerprint(return_tracks: list[dict[str, Any]]) -> str:
     """Hash the ordered return-track identity used by structural writes."""
     identity = [
@@ -530,6 +542,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "valid_range": list(valid_range) if valid_range else None,
             "reason": f"Explicit user request for {action} on track '{track.get('name', '')}'.",
             "evidence": [f"Current Live snapshot value: {field}={before!r}.", f"Target identity: track {track_index} '{track.get('name', '')}'."],
+            # The card showed raw fader values ("0.50 -> 0.45") beside an answer in dB; people read Live in dB.
+            **(_fader_db_fields(before, value) if action == "set_volume" else {}),
             "confidence": 1.0,
             "risk": "local_mutation",
             "requires_confirmation": True,

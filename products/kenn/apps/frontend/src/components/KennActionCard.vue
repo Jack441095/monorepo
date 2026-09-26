@@ -147,6 +147,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { KennActionProposal, KennActionReceipt } from '../api/kenn'
+import { formatDb } from '../utils/formatLevel'
 
 const props = withDefaults(
   defineProps<{
@@ -206,7 +207,7 @@ const paramLabel = computed(() => {
   const p = props.proposal.parameter || props.proposal.action
   if (p === 'muted') return 'Mute'
   if (p === 'soloed') return 'Solo'
-  if (p === 'volume') return 'Fader Volume'
+  if (p === 'volume') return 'Volume'
   if (p === 'pan') return 'Stereo Pan'
   if (p === 'insert_device' || props.proposal.action === 'insert_device') return 'Device'
   if (p === 'remove_device' || props.proposal.action === 'remove_device') return 'Device'
@@ -232,7 +233,7 @@ const formattedBefore = computed(() => {
   if (props.proposal.action === 'remove_device') {
     return String(props.proposal.device_name || 'Device')
   }
-  return formatVal(props.proposal.before, props.proposal.parameter)
+  return formatDb(props.proposal.before_db) ?? formatVal(props.proposal.before, props.proposal.parameter)
 })
 
 const formattedAfter = computed(() => {
@@ -242,7 +243,7 @@ const formattedAfter = computed(() => {
   if (props.proposal.action === 'remove_device') {
     return '(Removed)'
   }
-  return formatVal(props.proposal.after, props.proposal.parameter)
+  return formatDb(props.proposal.after_db) ?? formatVal(props.proposal.after, props.proposal.parameter)
 })
 
 const statusLabel = computed(() => {

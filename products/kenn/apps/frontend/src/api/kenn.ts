@@ -34,6 +34,8 @@ export type KennActionProposal = {
   device_index?: number
   before?: unknown
   after?: unknown
+  before_db?: number | '-inf' | null
+  after_db?: number | '-inf' | null
   unit?: string
   reason?: string
   confirmation_token?: string

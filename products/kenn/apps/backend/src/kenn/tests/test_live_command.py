@@ -992,6 +992,15 @@ def test_an_inserted_device_can_be_undone_from_its_journal_copy() -> None:
     assert fake.state["tracks"][1]["devices"] == []
 
 
+def test_a_volume_proposal_carries_the_levels_in_db_for_the_card() -> None:
+    # The card showed "0.50 -> 0.45" beside an answer in dB.
+    from kenn.core.fake_live import FakeLiveBackend
+
+    proposal = handle_command("Bring the bass down 2 dB", session_id="card-db", service=_service(FakeLiveBackend()),
+                              allow_llm=False)["proposal"]
+    assert (proposal["before_db"], proposal["after_db"]) == (-14.0, -16.0)
+
+
 def test_an_undo_card_says_it_is_an_undo() -> None:
     # 26 Sept 2026: the undo card read "Explicit user request for set_volume on track 'Bass'".
     from kenn.core.fake_live import FakeLiveBackend
