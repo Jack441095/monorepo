@@ -978,9 +978,26 @@ _TERSE_LEVEL_EXCLUDE = re.compile(r"\b(?:send|sends|reverb|delay|echo|eq|band|ga
 # anchored to the whole request and rewritten into a form the rules already parse; the track name still has to
 # resolve, so "synth off" works and "metronome off" still asks.
 _NAME = r"(?P<name>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}?)"
-_POLITE_TAIL = re.compile(r"\s*,?\s+(?:please|pls|plz|thanks|thank\s+you|cheers|mate)\s*[.!?]*\s*$", re.I)
+_POLITE_TAIL = re.compile(r"\s*,?\s+(?:please|pls|plz|thanks|thank\s+you|cheers|mate|for\s+(?:now|a\s+(?:moment|sec(?:ond)?|minute|while))"
+                          r"|real\s+quick|right\s+now)\s*[.!?]*\s*$", re.I)
+# "bring the kick down to -16, it's too loud": the clause after the comma says why, not what.
+_STATE_REASON_TAIL = re.compile(r"\s*[,;]\s*(?:it'?s|it\s+is|they'?re|they\s+are|it\s+sounds|that'?s)\s+(?:too|a\s+bit|way|really|"
+                                r"kinda|kind\s+of|very|so|quite|pretty)\b[^,;]*$", re.I)
+# "The kick is too loud, can you bring it down to -16?": "it" is the track the first clause named.
+_PROBLEM_THEN_IT = re.compile(rf"^\s*{_NAME}(?:\s+track)?\s+(?:is|sounds|feels|seems|'s)\s+(?:way\s+|a\s+bit\s+|a\s+little\s+|"
+                              r"really\s+|kind\s+of\s+|kinda\s+|pretty\s+|just\s+|still\s+)*too\s+\w+\s*[,.;!]+\s*(?P<rest>.+)$", re.I)
+# "I need the drum bus muted", "make sure the snare is centered", "I want the vocal back to center".
+_WANTED_STATE = re.compile(rf"^\s*(?:make\s+sure|i\s+(?:need|want|would\s+like|'d\s+like)|let'?s\s+(?:have|get))\s+{_NAME}"
+                           r"(?:\s+tracks?)?\s+(?:(?:is|are|'s)\s+|(?:to\s+be|should\s+be)\s+)?(?P<neg>n't\s+|not\s+|un)?"
+                           r"(?P<state>muted|soloed|(?:record[\s-]?)?armed|cent(?:red|ered)|back\s+(?:to|in)\s+(?:the\s+)?"
+                           r"(?:centre|center|middle))\s*[.!?]?\s*$", re.I)
+# "lower the bass a bit": a level change with no amount, so KENN asks how much.
+_VAGUE_LEVEL_VERB = re.compile(rf"^\s*(?P<verb>lower|drop|reduce|decrease|raise|boost|increase|lift)\s+{_NAME}(?:\s+track)?"
+                               r"(?P<vague>\s+(?:a\s+(?:bit|little(?:\s+bit)?|touch|tad|hair)|slightly))?\s*[.!?]?\s*$", re.I)
 # Dictated requests stack fillers in front ("um yeah so can you ..."), so the lead repeats.
 _POLITE_LEAD = re.compile(r"^\s*(?:(?:um+|uh+|erm|er|hmm+|yeah|yep|so|well|alright|yo|hey|ok|okay|right|please"
+                          r"|just(?=\s+(?!the\b|my\b|that\b|this\b)\w)"  # but "just the kick" means solo it
+                          r"|let'?s(?=\s+(?!go\b|jam\b|hear\b|have\b|get\b))|let\s+us(?=\s+(?!go\b|jam\b|hear\b))"
                           r"|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?"
                           r"|(?:is|would)\s+it\s+(?:be\s+)?possible\s+(?:for\s+you\s+)?to"
                           r"|i\s+(?:want|need|would\s+like|'d\s+like)\s+(?:you\s+)?to)\s*[,!]?\s+)+(?=\w)", re.I)
@@ -1173,11 +1190,16 @@ def _rewrite_idioms(text: str) -> str:
         if shown:
             return f"go to the {shown}"
     text = _ASK_TAIL.sub("", _TRAILING_ASIDE.sub("", _POLITE_TAIL.sub("", _OKAY_TAIL.sub("", text))))
+    text = _STATE_REASON_TAIL.sub("", text) or text
     unreasoned = _REASON_TAIL.sub("", text)
     # "I want to reduce the kick by 4 dB": that "to" starts the request, not a reason.
     if len(unreasoned.split()) >= 2 and not _REQUEST_LEAD_END.search(unreasoned):
         text = unreasoned
     text = _HEDGED_TARGET.sub(lambda m: f"at {m.group('amount')} dB", text)
+    if (m := _PROBLEM_THEN_IT.match(text)) and re.search(r"\bit\b", m.group("rest"), re.I) \
+            and not _NOT_A_TRACK_NAME.search(m.group("name")):
+        named = re.sub(r"^the\s+", "the ", m.group("name"), flags=re.I)  # "The clap" mid-sentence didn't resolve
+        text = re.sub(r"\bit\b", named, m.group("rest"), count=1, flags=re.I)
     polite = _POLITE_LEAD.match(text)
     text = _POLITE_LEAD.sub("", text)
     if polite:
@@ -1195,11 +1217,18 @@ def _rewrite_idioms(text: str) -> str:
         return f"add a locator called {(m.group('locator') or m.group('locator2')).strip()}"
     if (m := _CALL_TRACK_THE.match(text) or _MAKE_CALLED.match(text)) and name(m):
         return f"rename {m.group('name')} to {m.group('new')}"
-    if (m := _MAKE_SURE_STATE.match(text)) and name(m):
+    if (m := _WANTED_STATE.match(text)) and name(m) and not m.group("neg") and \
+            m.group("state").lower().startswith(("cent", "back")):
+        return f"centre {m.group('name')}"
+    if (m := _MAKE_SURE_STATE.match(text) or _WANTED_STATE.match(text)) and name(m) \
+            and not m.group("state").lower().startswith(("cent", "back")):
         verb = {"muted": "mute", "soloed": "solo"}.get(m.group("state").lower(), "arm")
         if m.group("neg"):
             verb = "disarm" if verb == "arm" else f"un{verb}"
         return f"{verb} {m.group('name')}"
+    if (m := _VAGUE_LEVEL_VERB.match(text)) and name(m) and not re.search(r"\d", text):  # "lower synth 3" has an amount
+        up = m.group("verb").lower() in {"raise", "boost", "increase", "lift"}
+        return f"turn {m.group('name')} {'up' if up else 'down'}{m.group('vague') or ''}"
     if (m := _PAN_ZERO.match(text)):
         group = "name" if m.group("name") else "name2"
         if name(m, group):
@@ -1726,6 +1755,17 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
                           if _ADD_DEVICE.search(lower) and not _VAGUE_EFFECT.search(lower) else None)
     sounds_like_send = (re.search(r"\bsends?\b|\d\s*(?:%|percent)|\b\d+\s+(?:on|to|into)\s+(?:the\s+)?(?:reverb|delay|verb)\b",
                                   lower) and not device_setup_match and not re.search(r"\b(?:dry|wet|mix)\b", lower))
+    send_to = re.match(r"^\s*send\s+(?:the\s+)?\S.*?\s+to\s+(?:the\s+)?(?P<dest>.+?)\s*[.!?]?\s*$", lower)
+    return_names = [str(r.get("name") or "").lower() for r in ((session_snapshot or {}).get("return_tracks") or [])
+                    if isinstance(r, dict)]
+    if (send_to and not re.search(r"\d", lower) and not re.search(r"\b(?:dry|wet|mix)\b", lower)
+            # Only to a return: "send MIDI to my external gear" isn't a send level.
+            and (re.search(r"\b(?:reverb|verb|delay|echo|return)\b|^[ab]\b|^[ab]-", send_to.group("dest"))
+                 or any(name and name in send_to.group("dest") for name in return_names))):
+        # "send the synth to the A-Reverb": which send is clear, how much isn't.
+        base["missing_fields"].append("send_amount")
+        base["ambiguity"].append("How much? For example \"send the vocal to the reverb at 20%\". Nothing changed.")
+        return base
     if insert_device_name and sounds_like_send:
         # "put 40% of the bass on reverb", "add a reverb send to the vocal" are sends, and used to insert a Reverb on
         # the track. With an amount the send rules below take it; without one, ask. "at 25% dry wet" is still an

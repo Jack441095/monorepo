@@ -28,8 +28,9 @@ _HOW_TO = re.compile(
     r"it\s+(?:sounding|getting|becoming))\b|\bi\s+(?:want|'d\s+like|would\s+like)\b[^.?!]*\bbut\b",
     re.I,
 )
-# Missing fields that still mean the parser found a Live change: the cached snapshot lacks the current fader level.
-_LIVE_WITHOUT_ACTION = frozenset({"current_volume"})
+# Missing fields that still mean the parser found a Live change: the cached snapshot lacks the current fader level, or
+# a send was named without an amount.
+LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount"})
 
 
 def asks_how_to(text: str) -> bool:
@@ -46,7 +47,7 @@ def wants_live_change(text: str, snapshot: dict[str, Any] | None) -> bool:
     missing = set(intent.get("missing_fields") or [])
     if "how_to" in missing:
         return False
-    return bool(intent.get("action")) or bool(missing & _LIVE_WITHOUT_ACTION)
+    return bool(intent.get("action")) or bool(missing & LIVE_WITHOUT_ACTION)
 
 
-__all__ = ["asks_how_to", "wants_live_change"]
+__all__ = ["LIVE_WITHOUT_ACTION", "asks_how_to", "wants_live_change"]

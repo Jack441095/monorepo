@@ -1,0 +1,1697 @@
+[
+ {
+  "query": "Can you lower the bass a bit?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -16,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Hey, could you check the lead vocal volume? It's too loud.",
+  "action": "set_volume",
+  "track": "Lead Vocal",
+  "db": -14,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "I need the synth to be -16 dB, thanks.",
+  "action": "set_volume",
+  "track": "Synth",
+  "db": -16,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Let's bring the kick down by 2 dB.",
+  "action": "set_volume",
+  "track": "Kick",
+  "delta_db": -2,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Please make sure the FX Print is at -14 dB.",
+  "action": "set_volume",
+  "track": "FX Print",
+  "db": -14,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Just lower the snare by 1 dB.",
+  "action": "set_volume",
+  "track": "Snare / Clap",
+  "delta_db": -1,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "The hi-hats are too loud, can you turn them down?",
+  "action": "set_volume",
+  "track": "Hi-Hats",
+  "db": -16,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "What's the current volume of the drum bus?",
+  "action": "question",
+  "track": null,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "The bass has an EQ Eight, can you adjust the low end?",
+  "action": "clarify",
+  "track": "Bass",
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Hey, I think the lead vocal needs more compression.",
+  "action": "clarify",
+  "track": "Lead Vocal",
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Can you move the drum bus to the left a little?",
+  "action": "set_pan",
+  "track": "Drum Bus",
+  "pan": -0.2,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Let's mute the FX Print for now.",
+  "action": "set_mute",
+  "track": "FX Print",
+  "on": true,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Why is the synth at 0 dB? It should be -14.",
+  "action": "question",
+  "track": null,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "The kick is too loud, can you bring it down to -16?",
+  "action": "set_volume",
+  "track": "Kick",
+  "db": -16,
+  "category": "volume_absolute"
+ },
+ {
+  "query": "Can you lower the bass by 2 dB?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -16,
+  "delta_db": -2,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Hey, the lead vocal is too loud, can you turn it down a bit?",
+  "action": "set_volume",
+  "track": "Lead Vocal",
+  "db": -2,
+  "delta_db": -2,
+  "category": "volume_relative"
+ },
+ {
+  "query": "I need the FX Print to be quieter, maybe -2 dB?",
+  "action": "set_volume",
+  "track": "FX Print",
+  "db": -2,
+  "delta_db": -2,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Let's check the pan on the synth, is it centered?",
+  "action": "clarify",
+  "track": null,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Could you mute the drum bus for now?",
+  "action": "set_mute",
+  "track": "Drum Bus",
+  "on": true,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Just make sure the hi-hats are still at -14 dB.",
+  "action": "clarify",
+  "track": null,
+  "category": "volume_relative"
+ },
+ {
+  "query": "What's the current volume of the snare/clap track?",
+  "action": "question",
+  "track": null,
+  "category": "volume_relative"
+ },
+ {
+  "query": "The kick is too loud, can you lower it by 1 dB?",
+  "action": "set_volume",
+  "track": "Kick",
+  "db": -15,
+  "delta_db": -1,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Hey, can you adjust the reverb send on the A return?",
+  "action": "set_send",
+  "track": "A-Reverb",
+  "on": true,
+  "category": "volume_relative"
+ },
+ {
+  "query": "I think the lead vocal is at 0 dB, can you confirm?",
+  "action": "clarify",
+  "track": null,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Please lower the FX Print by 2 dB, it's too bright.",
+  "action": "set_volume",
+  "track": "FX Print",
+  "db": -2,
+  "delta_db": -2,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Is the bass track panned to the center?",
+  "action": "clarify",
+  "track": "Bass",
+  "category": "volume_relative"
+ },
+ {
+  "query": "Can you set the pan of the synth to -1?",
+  "action": "set_pan",
+  "track": "Synth",
+  "pan": -1,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Let's solo the snare to check its level.",
+  "action": "set_solo",
+  "track": "Snare / Clap",
+  "on": true,
+  "category": "volume_relative"
+ },
+ {
+  "query": "Can you lower the bass a bit?",
+  "action": "set_volume",
+  "track": "Bass",
+  "delta_db": -2,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Hey, the lead vocal is too loud, make it quieter",
+  "action": "set_volume",
+  "track": "Lead Vocal",
+  "delta_db": -3,
+  "category": "volume_vague"
+ },
+ {
+  "query": "I need the snare to be more centered",
+  "action": "set_pan",
+  "track": "Snare / Clap",
+  "pan": 0,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Let's pan the synth a little to the right",
+  "action": "set_pan",
+  "track": "Synth",
+  "pan": 0.3,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Could you mute the drum bus?",
+  "action": "set_mute",
+  "track": "Drum Bus",
+  "on": true,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Please solo the hi-hats for a moment",
+  "action": "set_solo",
+  "track": "Hi-Hats",
+  "on": true,
+  "category": "volume_vague"
+ },
+ {
+  "query": "The kick is too loud, bring it down a touch",
+  "action": "set_volume",
+  "track": "Kick",
+  "delta_db": -1.5,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Just turn off the compressor on the lead vocal",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "name": "Compressor",
+  "on": false,
+  "category": "volume_vague"
+ },
+ {
+  "query": "What's the level of the FX Print track?",
+  "action": "question",
+  "track": null,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Why is the bass so muddy? Can you fix it?",
+  "action": "question",
+  "track": null,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Can you add a reverb to the vocal track?",
+  "action": "set_send",
+  "track": "Lead Vocal",
+  "name": "A-Reverb",
+  "on": true,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Make the delay a bit longer on the snare",
+  "action": "set_device_parameter",
+  "track": "Snare / Clap",
+  "name": "B-Delay",
+  "db": 15,
+  "category": "volume_vague"
+ },
+ {
+  "query": "Hey, can you rename the FX Print track to 'Master FX'?",
+  "action": "rename_track",
+  "track": "FX Print",
+  "name": "Master FX",
+  "category": "volume_vague"
+ },
+ {
+  "query": "Could you clarify the pan of the synth track?",
+  "action": "clarify",
+  "track": "Synth",
+  "category": "volume_vague"
+ },
+ {
+  "query": "Can you pan the bass a bit more to the left?",
+  "action": "set_pan",
+  "track": "Bass",
+  "pan": -0.3,
+  "category": "pan"
+ },
+ {
+  "query": "Hey, could you move the synth to hard right?",
+  "action": "set_pan",
+  "track": "Synth",
+  "pan": -1,
+  "category": "pan"
+ },
+ {
+  "query": "I need the lead vocal back to center, please.",
+  "action": "set_pan",
+  "track": "Lead Vocal",
+  "pan": 0,
+  "category": "pan"
+ },
+ {
+  "query": "Let's pan the hi-hats to the left a little.",
+  "action": "set_pan",
+  "track": "Hi-Hats",
+  "pan": -0.2,
+  "category": "pan"
+ },
+ {
+  "query": "The kick is too loud, can you turn it down?",
+  "action": "set_volume",
+  "track": "Kick",
+  "db": -18,
+  "category": "pan"
+ },
+ {
+  "query": "Just make sure the snare is centered.",
+  "action": "set_pan",
+  "track": "Snare / Clap",
+  "pan": 0,
+  "category": "pan"
+ },
+ {
+  "query": "Why is the bass not centered? Fix that.",
+  "action": "set_pan",
+  "track": "Bass",
+  "pan": 0,
+  "category": "pan"
+ },
+ {
+  "query": "Can you pan the reverb to the left?",
+  "action": "set_pan",
+  "track": "A-Reverb",
+  "pan": -0.5,
+  "category": "pan"
+ },
+ {
+  "query": "Please center the FX Print track.",
+  "action": "set_pan",
+  "track": "FX Print",
+  "pan": 0,
+  "category": "pan"
+ },
+ {
+  "query": "What's the current pan on the drum bus?",
+  "action": "question",
+  "track": null,
+  "category": "pan"
+ },
+ {
+  "query": "I think the delay is panned too far right.",
+  "action": "clarify",
+  "track": null,
+  "category": "pan"
+ },
+ {
+  "query": "Set the snare to hard left.",
+  "action": "set_pan",
+  "track": "Snare / Clap",
+  "pan": -1,
+  "category": "pan"
+ },
+ {
+  "query": "Make the lead vocal pan 70% left.",
+  "action": "set_pan",
+  "track": "Lead Vocal",
+  "pan": -0.7,
+  "category": "pan"
+ },
+ {
+  "query": "Can you check the pan on the bass again?",
+  "action": "clarify",
+  "track": "Bass",
+  "category": "pan"
+ },
+ {
+  "query": "Can you mute the Kick track?",
+  "action": "set_mute",
+  "track": "Kick",
+  "category": "mute"
+ },
+ {
+  "query": "Hey, why is the Snare so quiet?",
+  "action": "question",
+  "category": "mute"
+ },
+ {
+  "query": "Let's bring the Bass up by 3 dB",
+  "action": "set_volume",
+  "track": "Bass",
+  "delta_db": 3,
+  "category": "mute"
+ },
+ {
+  "query": "I need to solo the Hi-Hats for a moment",
+  "action": "set_solo",
+  "track": "Hi-Hats",
+  "category": "mute"
+ },
+ {
+  "query": "Please lower the Lead Vocal by 5 dB",
+  "action": "set_volume",
+  "track": "Lead Vocal",
+  "delta_db": -5,
+  "category": "mute"
+ },
+ {
+  "query": "The FX Print is too loud, turn it down",
+  "action": "set_volume",
+  "track": "FX Print",
+  "delta_db": -6,
+  "category": "mute"
+ },
+ {
+  "query": "Can you arm the Synth track for recording?",
+  "action": "set_arm",
+  "track": "Synth",
+  "category": "mute"
+ },
+ {
+  "query": "Hey, could you check the compressor on the Drum Bus?",
+  "action": "clarify",
+  "category": "mute"
+ },
+ {
+  "query": "I think the Reverb send is missing, add it",
+  "action": "set_send",
+  "track": "A-Reverb",
+  "on": true,
+  "category": "mute"
+ },
+ {
+  "query": "What's the name of the track with the compressor?",
+  "action": "question",
+  "category": "mute"
+ },
+ {
+  "query": "Let's rename the Drum Bus to 'Drums'?",
+  "action": "rename_track",
+  "track": "Drum Bus",
+  "name": "Drums",
+  "category": "mute"
+ },
+ {
+  "query": "Focus on the Bass track, please",
+  "action": "focus_track",
+  "track": "Bass",
+  "category": "mute"
+ },
+ {
+  "query": "Can you add an EQ to the Kick track?",
+  "action": "insert_device",
+  "track": "Kick",
+  "name": "EQ Eight",
+  "category": "mute"
+ },
+ {
+  "query": "Why is the transport stopped? Let's start it",
+  "action": "transport_play",
+  "category": "mute"
+ },
+ {
+  "query": "Can you solo the kick?",
+  "action": "set_solo",
+  "track": "Kick",
+  "category": "solo"
+ },
+ {
+  "query": "Hey, could you lower the bass by 3 dB?",
+  "action": "set_volume",
+  "track": "Bass",
+  "delta_db": -3,
+  "category": "solo"
+ },
+ {
+  "query": "I need to hear the snare more clearly, can you pan it slightly left?",
+  "action": "set_pan",
+  "track": "Snare / Clap",
+  "pan": -0.2,
+  "category": "solo"
+ },
+ {
+  "query": "Let's mute the drum bus for now.",
+  "action": "set_mute",
+  "track": "Drum Bus",
+  "category": "solo"
+ },
+ {
+  "query": "Please turn up the lead vocal to 0 dB.",
+  "action": "set_volume",
+  "track": "Lead Vocal",
+  "db": 0,
+  "category": "solo"
+ },
+ {
+  "query": "Just need to solo the FX Print for a quick check.",
+  "action": "set_solo",
+  "track": "FX Print",
+  "category": "solo"
+ },
+ {
+  "query": "What's the best way to set up reverb for the vocal?",
+  "action": "question",
+  "category": "solo"
+ },
+ {
+  "query": "The synth is too loud, can you bring it down 5 dB?",
+  "action": "set_volume",
+  "track": "Synth",
+  "delta_db": -5,
+  "category": "solo"
+ },
+ {
+  "query": "Could you check if the compressor on the lead vocal is armed?",
+  "action": "clarify",
+  "category": "solo"
+ },
+ {
+  "query": "Hey, I think the delay on return B is broken, can you check it?",
+  "action": "clarify",
+  "category": "solo"
+ },
+ {
+  "query": "Let's arm the bass track for recording.",
+  "action": "set_arm",
+  "track": "Bass",
+  "category": "solo"
+ },
+ {
+  "query": "Can you rename the drum bus to 'Drums'?",
+  "action": "rename_track",
+  "track": "Drum Bus",
+  "name": "Drums",
+  "category": "solo"
+ },
+ {
+  "query": "Focus on the hi-hats for a moment.",
+  "action": "focus_track",
+  "track": "Hi-Hats",
+  "category": "solo"
+ },
+ {
+  "query": "Why is the kick not playing? I think it's muted.",
+  "action": "question",
+  "category": "solo"
+ },
+ {
+  "query": "can you lower the bass by 3db?",
+  "action": "set_volume",
+  "track": "Bass",
+  "delta_db": -3,
+  "category": "arm"
+ },
+ {
+  "query": "Hey, why is the lead vocal so loud?",
+  "action": "question",
+  "category": "arm"
+ },
+ {
+  "query": "I need to solo the synth track, please.",
+  "action": "set_solo",
+  "track": "Synth",
+  "category": "arm"
+ },
+ {
+  "query": "Let's arm the FX Print track for recording.",
+  "action": "set_arm",
+  "track": "FX Print",
+  "category": "arm"
+ },
+ {
+  "query": "Could you pan the snare slightly to the left?",
+  "action": "set_pan",
+  "track": "Snare / Clap",
+  "pan": -0.2,
+  "category": "arm"
+ },
+ {
+  "query": "The kick is too quiet, can you turn it up 5db?",
+  "action": "set_volume",
+  "track": "Kick",
+  "delta_db": 5,
+  "category": "arm"
+ },
+ {
+  "query": "Just mute the drum bus for a sec.",
+  "action": "set_mute",
+  "track": "Drum Bus",
+  "category": "arm"
+ },
+ {
+  "query": "What's the purpose of the compressor on the lead vocal?",
+  "action": "question",
+  "category": "arm"
+ },
+ {
+  "query": "Can you add a reverb send to the bass?",
+  "action": "set_send",
+  "track": "Bass",
+  "name": "A-Reverb",
+  "category": "arm"
+ },
+ {
+  "query": "I think the hi-hats are clipping, could you check the compressor?",
+  "action": "clarify",
+  "category": "arm"
+ },
+ {
+  "query": "Rename the lead vocal track to 'Lead Vocal - Clean'.",
+  "action": "rename_track",
+  "track": "Lead Vocal",
+  "name": "Lead Vocal - Clean",
+  "category": "arm"
+ },
+ {
+  "query": "Please focus on the synth track.",
+  "action": "focus_track",
+  "track": "Synth",
+  "category": "arm"
+ },
+ {
+  "query": "The FX Print track is not arm, can you arm it?",
+  "action": "set_arm",
+  "track": "FX Print",
+  "category": "arm"
+ },
+ {
+  "query": "Can you explain how to use the EQ Eight on the bass?",
+  "action": "question",
+  "category": "arm"
+ },
+ {
+  "query": "Can you send the lead vocal to A-Reverb at 40%?",
+  "action": "set_send",
+  "track": "Lead Vocal",
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "Hey, could you set the bass to -12 dB?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -12,
+  "delta_db": 2,
+  "pan": null,
+  "on": null,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "Let's pan the synth to the left a bit.",
+  "action": "set_pan",
+  "track": "Synth",
+  "db": null,
+  "delta_db": null,
+  "pan": -0.5,
+  "on": null,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "I need the drum bus muted for now.",
+  "action": "set_mute",
+  "track": "Drum Bus",
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": true,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "Please solo the snare to check the level.",
+  "action": "set_solo",
+  "track": "Snare / Clap",
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": true,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "Just turn off the compressor on the lead vocal.",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": "Compressor",
+  "category": "send"
+ },
+ {
+  "query": "What's the best way to add reverb to the FX Print?",
+  "action": "question",
+  "track": null,
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "The bass is too loud, can you lower it by 3 dB?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -17,
+  "delta_db": -3,
+  "pan": null,
+  "on": null,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "Hey, I think the hi-hats are clipping, can you add a compressor?",
+  "action": "insert_device",
+  "track": "Hi-Hats",
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": "Compressor",
+  "category": "send"
+ },
+ {
+  "query": "Could you rename the FX Print track to 'Master FX'?",
+  "action": "rename_track",
+  "track": "FX Print",
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": "Master FX",
+  "category": "send"
+ },
+ {
+  "query": "Let's focus on the lead vocal track.",
+  "action": "focus_track",
+  "track": "Lead Vocal",
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "Clarify: Should I use A-Reverb or B-Delay for the synth?",
+  "action": "clarify",
+  "track": null,
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "Can you send the synth to B-Delay at 50%?",
+  "action": "set_send",
+  "track": "Synth",
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": "B-Delay",
+  "category": "send"
+ },
+ {
+  "query": "Please stop the transport.",
+  "action": "transport_stop",
+  "track": null,
+  "db": null,
+  "delta_db": null,
+  "pan": null,
+  "on": null,
+  "name": null,
+  "category": "send"
+ },
+ {
+  "query": "Can you set the compressor on the drum bus to -12 dB?",
+  "action": "set_device_parameter",
+  "track": "Drum Bus",
+  "db": -12,
+  "category": "device"
+ },
+ {
+  "query": "Hey, just lower the lead vocal compressor by 2 dB?",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "delta_db": -2,
+  "category": "device"
+ },
+ {
+  "query": "I need to know how to adjust the compressor on the lead vocal track?",
+  "action": "question",
+  "track": null,
+  "category": "device"
+ },
+ {
+  "query": "Let's set the compressor on the drum bus to -10 dB",
+  "action": "set_device_parameter",
+  "track": "Drum Bus",
+  "db": -10,
+  "category": "device"
+ },
+ {
+  "query": "Could you please increase the compressor threshold on the lead vocal by 1 dB?",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "delta_db": 1,
+  "category": "device"
+ },
+ {
+  "query": "The track name first: Set the compressor on the bass to -16 dB?",
+  "action": "set_device_parameter",
+  "track": "Bass",
+  "db": -16,
+  "category": "device"
+ },
+ {
+  "query": "Why is the compressor on the lead vocal not working?",
+  "action": "clarify",
+  "track": "Lead Vocal",
+  "db": null,
+  "category": "device"
+ },
+ {
+  "query": "Set the compressor on the drum bus to -14 dB, same as the rest?",
+  "action": "set_device_parameter",
+  "track": "Drum Bus",
+  "db": -14,
+  "category": "device"
+ },
+ {
+  "query": "Hey, can you check the compressor settings on the lead vocal track?",
+  "action": "clarify",
+  "track": "Lead Vocal",
+  "db": null,
+  "category": "device"
+ },
+ {
+  "query": "Let me know if you can set the compressor threshold on the lead vocal to -13 dB?",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "db": -13,
+  "category": "device"
+ },
+ {
+  "query": "Set the compressor on the lead vocal track to -15 dB, please?",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "db": -15,
+  "category": "device"
+ },
+ {
+  "query": "Could you turn the compressor on the drum bus off?",
+  "action": "set_device_parameter",
+  "track": "Drum Bus",
+  "db": null,
+  "category": "device"
+ },
+ {
+  "query": "I think the compressor on the lead vocal is set too low, can you raise it by 1 dB?",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "delta_db": 1,
+  "category": "device"
+ },
+ {
+  "query": "Set the compressor on the lead vocal to -12 dB, but only if it's not already there?",
+  "action": "clarify",
+  "track": "Lead Vocal",
+  "db": null,
+  "category": "device"
+ },
+ {
+  "query": "Can you add a compressor to the bass track?",
+  "action": "insert_device",
+  "track": "Bass",
+  "category": "insert"
+ },
+ {
+  "query": "Hey, could you add an EQ Eight to the synth track?",
+  "action": "insert_device",
+  "track": "Synth",
+  "category": "insert"
+ },
+ {
+  "query": "I need to add a saturator to the lead vocal, please.",
+  "action": "insert_device",
+  "track": "Lead Vocal",
+  "category": "insert"
+ },
+ {
+  "query": "Let's add a utility device to the drum bus for some more control.",
+  "action": "insert_device",
+  "track": "Drum Bus",
+  "category": "insert"
+ },
+ {
+  "query": "Just add an auto filter to the hi-hats, thanks.",
+  "action": "insert_device",
+  "track": "Hi-Hats",
+  "category": "insert"
+ },
+ {
+  "query": "The track name first: add a compressor to the snare/clap.",
+  "action": "insert_device",
+  "track": "Snare / Clap",
+  "category": "insert"
+ },
+ {
+  "query": "Why isn't the compressor on the lead vocal working? Clarify.",
+  "action": "clarify",
+  "track": null,
+  "category": "insert"
+ },
+ {
+  "query": "What's the best way to add an EQ to the bass track?",
+  "action": "question",
+  "track": null,
+  "category": "insert"
+ },
+ {
+  "query": "Add a compressor to the FX Print, but make sure it's not too loud.",
+  "action": "insert_device",
+  "track": "FX Print",
+  "category": "insert"
+ },
+ {
+  "query": "Could you add a delay to the return track B?",
+  "action": "set_send",
+  "track": "B-Delay",
+  "category": "insert"
+ },
+ {
+  "query": "Add a saturator to the kick, but keep it subtle.",
+  "action": "insert_device",
+  "track": "Kick",
+  "category": "insert"
+ },
+ {
+  "query": "I need to add an EQ Eight to the bass, can you do that?",
+  "action": "insert_device",
+  "track": "Bass",
+  "category": "insert"
+ },
+ {
+  "query": "Add a utility device to the synth track, please.",
+  "action": "insert_device",
+  "track": "Synth",
+  "category": "insert"
+ },
+ {
+  "query": "Add a compressor to the lead vocal, but don't touch the fader.",
+  "action": "insert_device",
+  "track": "Lead Vocal",
+  "category": "insert"
+ },
+ {
+  "query": "Can you lower the bass by 3 dB?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -17,
+  "category": "create"
+ },
+ {
+  "query": "Hey, could you please pan the synth to the left a bit?",
+  "action": "set_pan",
+  "track": "Synth",
+  "pan": -0.5,
+  "category": "create"
+ },
+ {
+  "query": "I need to solo the lead vocal track, quick!",
+  "action": "set_solo",
+  "track": "Lead Vocal",
+  "on": true,
+  "category": "create"
+ },
+ {
+  "query": "Let's add a reverb to the snare, maybe call it A-Reverb?",
+  "action": "insert_device",
+  "track": "Snare / Clap",
+  "name": "A-Reverb",
+  "category": "create"
+ },
+ {
+  "query": "The kick is too loud, just turn it down 2 dB",
+  "action": "set_volume",
+  "track": "Kick",
+  "delta_db": -2,
+  "category": "create"
+ },
+ {
+  "query": "Please mute the drum bus so I can hear the original tracks",
+  "action": "set_mute",
+  "track": "Drum Bus",
+  "on": true,
+  "category": "create"
+ },
+ {
+  "query": "What's the best way to set up a delay for the vocal?",
+  "action": "question",
+  "category": "create"
+ },
+ {
+  "query": "Hey, can you rename the FX Print track to 'Final FX'?",
+  "action": "rename_track",
+  "track": "FX Print",
+  "name": "Final FX",
+  "category": "create"
+ },
+ {
+  "query": "The lead vocal has a compressor, can you check the threshold?",
+  "action": "clarify",
+  "category": "create"
+ },
+ {
+  "query": "I think the hi-hats are a bit too bright, maybe add an EQ Eight?",
+  "action": "insert_device",
+  "track": "Hi-Hats",
+  "name": "EQ Eight",
+  "category": "create"
+ },
+ {
+  "query": "Let's arm the bass track for recording, quick!",
+  "action": "set_arm",
+  "track": "Bass",
+  "on": true,
+  "category": "create"
+ },
+ {
+  "query": "Can you play the set? It's been stopped for too long",
+  "action": "transport_play",
+  "category": "create"
+ },
+ {
+  "query": "Why is the snare track not sending to the A-Reverb?",
+  "action": "clarify",
+  "category": "create"
+ },
+ {
+  "query": "Just make sure the delay is set to 500ms on track B",
+  "action": "set_device_parameter",
+  "track": "B-Delay",
+  "name": "Delay Time",
+  "db": 500,
+  "category": "create"
+ },
+ {
+  "query": "Can you lower the bass a bit?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -16,
+  "category": "transport"
+ },
+ {
+  "query": "Hey, why is the lead vocal so loud?",
+  "action": "question",
+  "category": "transport"
+ },
+ {
+  "query": "I need to solo the synth track, please.",
+  "action": "set_solo",
+  "track": "Synth",
+  "category": "transport"
+ },
+ {
+  "query": "Let's add a reverb to the snare.",
+  "action": "set_send",
+  "track": "Snare / Clap",
+  "name": "A-Reverb",
+  "category": "transport"
+ },
+ {
+  "query": "The kick is too quiet, can you turn it up?",
+  "action": "set_volume",
+  "track": "Kick",
+  "delta_db": 2,
+  "category": "transport"
+ },
+ {
+  "query": "Could you mute the FX Print track?",
+  "action": "set_mute",
+  "track": "FX Print",
+  "category": "transport"
+ },
+ {
+  "query": "I think the hi-hats need more eq.",
+  "action": "clarify",
+  "category": "transport"
+ },
+ {
+  "query": "Please make the lead vocal louder by 3 dB.",
+  "action": "set_volume",
+  "track": "Lead Vocal",
+  "delta_db": 3,
+  "category": "transport"
+ },
+ {
+  "query": "What's the purpose of the compressor on the vocal?",
+  "action": "question",
+  "category": "transport"
+ },
+ {
+  "query": "Just turn off the compressor on the bass.",
+  "action": "set_device_parameter",
+  "track": "Bass",
+  "name": "EQ Eight",
+  "on": false,
+  "category": "transport"
+ },
+ {
+  "query": "Hey, can you add a delay to the drum bus?",
+  "action": "set_send",
+  "track": "Drum Bus",
+  "name": "B-Delay",
+  "category": "transport"
+ },
+ {
+  "query": "Let's rename the FX Print track to FX Effects.",
+  "action": "rename_track",
+  "track": "FX Print",
+  "name": "FX Effects",
+  "category": "transport"
+ },
+ {
+  "query": "The transport is stopped, can you start it?",
+  "action": "transport_play",
+  "category": "transport"
+ },
+ {
+  "query": "Can you focus on the drum bus track?",
+  "action": "focus_track",
+  "track": "Drum Bus",
+  "category": "transport"
+ },
+ {
+  "query": "Can you add a locator at the 30 sec mark?",
+  "action": "add_locator",
+  "track": null,
+  "category": "locator"
+ },
+ {
+  "query": "Hey, could you set the lead vocal to -14 dB?",
+  "action": "set_volume",
+  "track": "Lead Vocal",
+  "db": -14,
+  "category": "locator"
+ },
+ {
+  "query": "I need the bass to be louder, like -12 dB",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -12,
+  "category": "locator"
+ },
+ {
+  "query": "Let's solo the snare for a moment",
+  "action": "set_solo",
+  "track": "Snare / Clap",
+  "category": "locator"
+ },
+ {
+  "query": "Please mute the FX Print track",
+  "action": "set_mute",
+  "track": "FX Print",
+  "category": "locator"
+ },
+ {
+  "query": "The kick is too quiet, can you turn it up by 2 dB?",
+  "action": "set_volume",
+  "track": "Kick",
+  "delta_db": 2,
+  "category": "locator"
+ },
+ {
+  "query": "What's the current volume of the synth?",
+  "action": "question",
+  "track": null,
+  "category": "locator"
+ },
+ {
+  "query": "Just make sure the hi-hats are centered",
+  "action": "set_pan",
+  "track": "Hi-Hats",
+  "pan": 0,
+  "category": "locator"
+ },
+ {
+  "query": "Can you rename the drum bus to 'Drums'?",
+  "action": "rename_track",
+  "track": "Drum Bus",
+  "name": "Drums",
+  "category": "locator"
+ },
+ {
+  "query": "I think the compressor on the lead vocal is not working",
+  "action": "clarify",
+  "track": "Lead Vocal",
+  "category": "locator"
+ },
+ {
+  "query": "Hey, could you add a reverb send to the synth?",
+  "action": "set_send",
+  "track": "Synth",
+  "name": "A-Reverb",
+  "category": "locator"
+ },
+ {
+  "query": "Why is the transport not playing?",
+  "action": "question",
+  "track": null,
+  "category": "locator"
+ },
+ {
+  "query": "Set the bass EQ to 80 Hz boost",
+  "action": "set_device_parameter",
+  "track": "Bass",
+  "name": "EQ Eight",
+  "parameter": "80 Hz",
+  "value": "boost",
+  "category": "locator"
+ },
+ {
+  "query": "Let's focus on the lead vocal track",
+  "action": "focus_track",
+  "track": "Lead Vocal",
+  "category": "locator"
+ },
+ {
+  "query": "rename the bass track to Bass Line",
+  "action": "rename_track",
+  "track": "Bass",
+  "name": "Bass Line",
+  "category": "rename"
+ },
+ {
+  "query": "Hey, can you rename the lead vocal track to Lead Vocal - Clean?",
+  "action": "rename_track",
+  "track": "Lead Vocal",
+  "name": "Lead Vocal - Clean",
+  "category": "rename"
+ },
+ {
+  "query": "I need to rename the FX Print track to FX Bus",
+  "action": "rename_track",
+  "track": "FX Print",
+  "name": "FX Bus",
+  "category": "rename"
+ },
+ {
+  "query": "Could you rename the drum bus to Drum Mix?",
+  "action": "rename_track",
+  "track": "Drum Bus",
+  "name": "Drum Mix",
+  "category": "rename"
+ },
+ {
+  "query": "Let's rename the synth track to Synth Lead",
+  "action": "rename_track",
+  "track": "Synth",
+  "name": "Synth Lead",
+  "category": "rename"
+ },
+ {
+  "query": "Just rename the hi-hats track to Hi-Hat Pattern",
+  "action": "rename_track",
+  "track": "Hi-Hats",
+  "name": "Hi-Hat Pattern",
+  "category": "rename"
+ },
+ {
+  "query": "Rename the snare/clap track to Snare - 808",
+  "action": "rename_track",
+  "track": "Snare / Clap",
+  "name": "Snare - 808",
+  "category": "rename"
+ },
+ {
+  "query": "The track name is Kick, can you rename it to Kick Drum?",
+  "action": "rename_track",
+  "track": "Kick",
+  "name": "Kick Drum",
+  "category": "rename"
+ },
+ {
+  "query": "Please rename the return track A-Reverb to Reverb Bus",
+  "action": "rename_track",
+  "track": "A-Reverb",
+  "name": "Reverb Bus",
+  "category": "rename"
+ },
+ {
+  "query": "Why is the bass track named Bass? Can you rename it to Bass Line?",
+  "action": "clarify",
+  "category": "rename"
+ },
+ {
+  "query": "I think the FX Print track should be called FX Send, can you rename it?",
+  "action": "rename_track",
+  "track": "FX Print",
+  "name": "FX Send",
+  "category": "rename"
+ },
+ {
+  "query": "Rename the lead vocal to Lead Vocals - Original",
+  "action": "rename_track",
+  "track": "Lead Vocal",
+  "name": "Lead Vocals - Original",
+  "category": "rename"
+ },
+ {
+  "query": "Is there a way to rename the drum bus to just Drum?",
+  "action": "question",
+  "category": "rename"
+ },
+ {
+  "query": "Rename the synth track to Synth - Main",
+  "action": "rename_track",
+  "track": "Synth",
+  "name": "Synth - Main",
+  "category": "rename"
+ },
+ {
+  "query": "Can you lower the bass a bit?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -16,
+  "category": "focus"
+ },
+ {
+  "query": "Hey, why is the lead vocal so loud?",
+  "action": "question",
+  "category": "focus"
+ },
+ {
+  "query": "I need to solo the synth track",
+  "action": "set_solo",
+  "track": "Synth",
+  "category": "focus"
+ },
+ {
+  "query": "Let's pan the hi-hats to the left",
+  "action": "set_pan",
+  "track": "Hi-Hats",
+  "pan": -1,
+  "category": "focus"
+ },
+ {
+  "query": "Please mute the drum bus",
+  "action": "set_mute",
+  "track": "Drum Bus",
+  "category": "focus"
+ },
+ {
+  "query": "Just turn down the kick by 2 dB",
+  "action": "set_volume",
+  "track": "Kick",
+  "delta_db": -2,
+  "category": "focus"
+ },
+ {
+  "query": "The track name first: can you add a reverb to the lead vocal?",
+  "action": "insert_device",
+  "track": "Lead Vocal",
+  "name": "Reverb",
+  "category": "focus"
+ },
+ {
+  "query": "Is there a way to add a delay to the snare?",
+  "action": "question",
+  "category": "focus"
+ },
+ {
+  "query": "Could you send the synth to the A-Reverb?",
+  "action": "set_send",
+  "track": "Synth",
+  "name": "A-Reverb",
+  "category": "focus"
+ },
+ {
+  "query": "I think the bass needs more low end, can you add an EQ?",
+  "action": "clarify",
+  "category": "focus"
+ },
+ {
+  "query": "Let me check the FX Print track",
+  "action": "focus_track",
+  "track": "FX Print",
+  "category": "focus"
+ },
+ {
+  "query": "Why isn't the delay working on the clap?",
+  "action": "question",
+  "category": "focus"
+ },
+ {
+  "query": "Can you rename the drum bus to 'Drum Mix'?",
+  "action": "rename_track",
+  "track": "Drum Bus",
+  "name": "Drum Mix",
+  "category": "focus"
+ },
+ {
+  "query": "Show me the synth track",
+  "action": "focus_track",
+  "track": "Synth",
+  "category": "focus"
+ },
+ {
+  "query": "Can you check the kick track for more punch?",
+  "action": "question",
+  "track": "Kick",
+  "category": "question_track"
+ },
+ {
+  "query": "Hey, the snare sounds too flat, any ideas?",
+  "action": "question",
+  "track": "Snare / Clap",
+  "category": "question_track"
+ },
+ {
+  "query": "Why does the hi-hats sound so muddy? Need advice.",
+  "action": "question",
+  "track": "Hi-Hats",
+  "category": "question_track"
+ },
+ {
+  "query": "The drum bus is too loud, how to fix it?",
+  "action": "question",
+  "track": "Drum Bus",
+  "category": "question_track"
+ },
+ {
+  "query": "I need help making the bass sound tighter.",
+  "action": "question",
+  "track": "Bass",
+  "category": "question_track"
+ },
+ {
+  "query": "How can I make the synth more present in the mix?",
+  "action": "question",
+  "track": "Synth",
+  "category": "question_track"
+ },
+ {
+  "query": "The lead vocal is too loud, what should I do?",
+  "action": "question",
+  "track": "Lead Vocal",
+  "category": "question_track"
+ },
+ {
+  "query": "The FX Print track isn't doing anything, why?",
+  "action": "question",
+  "track": "FX Print",
+  "category": "question_track"
+ },
+ {
+  "query": "Just wondering, should the reverb be on the snare?",
+  "action": "question",
+  "track": "A-Reverb",
+  "category": "question_track"
+ },
+ {
+  "query": "Could you explain why the compressor on the lead vocal isn't working?",
+  "action": "question",
+  "track": "Lead Vocal",
+  "category": "question_track"
+ },
+ {
+  "query": "Let's make the hi-hats more shimmering, any tips?",
+  "action": "question",
+  "track": "Hi-Hats",
+  "category": "question_track"
+ },
+ {
+  "query": "I think the bass has too much low end, how to fix?",
+  "action": "question",
+  "track": "Bass",
+  "category": "question_track"
+ },
+ {
+  "query": "Why is the snare not cutting through the mix?",
+  "action": "question",
+  "track": "Snare / Clap",
+  "category": "question_track"
+ },
+ {
+  "query": "The kick is too soft, how to make it louder without clipping?",
+  "action": "question",
+  "track": "Kick",
+  "category": "question_track"
+ },
+ {
+  "query": "Can you lower the bass by 3 dB?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -15,
+  "category": "question_general"
+ },
+ {
+  "query": "Hey, why is the vocal so loud? It's 0 dB!",
+  "action": "question",
+  "category": "question_general"
+ },
+ {
+  "query": "Let's make the hi-hats a bit more upfront, maybe pan them slightly?",
+  "action": "set_pan",
+  "track": "Hi-Hats",
+  "pan": 0.1,
+  "category": "question_general"
+ },
+ {
+  "query": "I need to solo the snare to check the dynamics, can you do that?",
+  "action": "set_solo",
+  "track": "Snare / Clap",
+  "category": "question_general"
+ },
+ {
+  "query": "Please mute the drum bus so I can focus on the synth.",
+  "action": "set_mute",
+  "track": "Drum Bus",
+  "category": "question_general"
+ },
+ {
+  "query": "The lead vocal has a compressor, can you adjust the ratio?",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "device": "Compressor",
+  "parameter": "ratio",
+  "value": "4:1",
+  "category": "question_general"
+ },
+ {
+  "query": "Could you add a reverb to the FX Print track?",
+  "action": "insert_device",
+  "track": "FX Print",
+  "device": "Reverb",
+  "category": "question_general"
+ },
+ {
+  "query": "Just make the synth a bit louder, maybe +2 dB?",
+  "action": "set_volume",
+  "track": "Synth",
+  "delta_db": 2,
+  "category": "question_general"
+ },
+ {
+  "query": "Why is the kick so muddy? Maybe the EQ needs some tweaking.",
+  "action": "question",
+  "category": "question_general"
+ },
+ {
+  "query": "The drum bus has a compressor, can you check if it's set correctly?",
+  "action": "clarify",
+  "category": "question_general"
+ },
+ {
+  "query": "I think the delay on track B is too long, let's shorten it by 50ms.",
+  "action": "set_device_parameter",
+  "track": "B-Delay",
+  "device": "Delay",
+  "parameter": "time",
+  "value": "50",
+  "category": "question_general"
+ },
+ {
+  "query": "Can you rename the FX Print track to 'Final FX'?",
+  "action": "rename_track",
+  "track": "FX Print",
+  "name": "Final FX",
+  "category": "question_general"
+ },
+ {
+  "query": "Let's focus on the lead vocal track for now.",
+  "action": "focus_track",
+  "track": "Lead Vocal",
+  "category": "question_general"
+ },
+ {
+  "query": "Why is the reverb on the snare so subtle? Maybe we need to increase the send.",
+  "action": "set_send",
+  "track": "Snare / Clap",
+  "return": "A-Reverb",
+  "on": true,
+  "db": -10,
+  "category": "question_general"
+ },
+ {
+  "query": "Can you lower the bass a bit?",
+  "action": "set_volume",
+  "track": "Bass",
+  "db": -16,
+  "category": "unclear"
+ },
+ {
+  "query": "Hey, make the snare louder!",
+  "action": "set_volume",
+  "track": "Snare / Clap",
+  "db": -12,
+  "category": "unclear"
+ },
+ {
+  "query": "I need the lead vocal to be more centered.",
+  "action": "set_pan",
+  "track": "Lead Vocal",
+  "pan": 0,
+  "category": "unclear"
+ },
+ {
+  "query": "Let's add some reverb to the drums.",
+  "action": "set_send",
+  "track": "Drum Bus",
+  "name": "A-Reverb",
+  "category": "unclear"
+ },
+ {
+  "query": "Please mute the synth during the drop.",
+  "action": "set_mute",
+  "track": "Synth",
+  "category": "unclear"
+ },
+ {
+  "query": "Could you solo the hi-hats?",
+  "action": "set_solo",
+  "track": "Hi-Hats",
+  "category": "unclear"
+ },
+ {
+  "query": "Just turn off the compressor on the vocal.",
+  "action": "set_device_parameter",
+  "track": "Lead Vocal",
+  "name": "Compressor",
+  "on": false,
+  "category": "unclear"
+ },
+ {
+  "query": "What's the deal with the FX Print track?",
+  "action": "question",
+  "category": "unclear"
+ },
+ {
+  "query": "The track 'Bass' is too loud, can you fix it?",
+  "action": "clarify",
+  "category": "unclear"
+ },
+ {
+  "query": "Add a delay to the snare.",
+  "action": "set_send",
+  "track": "Snare / Clap",
+  "name": "B-Delay",
+  "category": "unclear"
+ },
+ {
+  "query": "Make the kick a little more punchy.",
+  "action": "clarify",
+  "category": "unclear"
+ },
+ {
+  "query": "Can we rename the FX Print track to 'Master FX'?",
+  "action": "rename_track",
+  "track": "FX Print",
+  "name": "Master FX",
+  "category": "unclear"
+ },
+ {
+  "query": "Focus on the lead vocal track.",
+  "action": "focus_track",
+  "track": "Lead Vocal",
+  "category": "unclear"
+ },
+ {
+  "query": "Why is the compressor on the bass not working?",
+  "action": "question",
+  "category": "unclear"
+ }
+]

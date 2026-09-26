@@ -41,3 +41,22 @@ the command gateway), so they are phrasing coverage, not routing. The 3 question
 the whole tester guide including every follow-up, correction and reply row (main had 17 of 26), plus "can you solo the
 hats?", "bump the synth up 1 dB", "Send the synth to A-Reverb 30 percent", "could you mute the drum bus please", and
 a how-to question about rumbly drums staying with the notes.
+
+## Fresh wording: a sealed chat set (Qwen3 8B on the box)
+
+The table above is on sets the rules were already tuned on, so it flatters. Qwen3 8B wrote 252 new chat messages (every
+request category plus advice questions that name a track, general how-to questions and unclear requests), kept in
+`KENN_CHAT_SEALED_QWEN8B_2026-09-26.json`, scored before anyone read them:
+
+| | Tester build (`cb9dad5`) | This build, first score (frozen) | After fixing what it found |
+|---|---|---|---|
+| Requests that reach Live | 58 / 182 (32%) | 138 / 182 (76%) | 157 / 182 (86%) |
+| Advice questions kept with the notes | 42 / 43 | 42 / 43 | 42 / 43 |
+| Unclear requests with no proposal | 27 / 27 | 27 / 27 | 27 / 27 |
+
+The generator's labels are loose (some rows sit in the wrong category), so read the request row as "at least"; the
+third column isn't blind any more. What it found, all general: a level change with no amount ("lower the bass a bit"
+now asks by how much), "it" pointing back within one message ("the kick is too loud, can you bring it down"), a wanted
+state ("I need the drum bus muted", "back to center"), "just"/"let's" leads and "for a moment" tails, a reason after a
+comma, and a send with no amount (asks how much, only when the destination is a return). The tuned sets stay at
+1,642 / 1,751 right, knowledge questions taken over stay at 3 / 481.

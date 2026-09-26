@@ -859,8 +859,11 @@ class Handler(BaseHTTPRequestHandler):
         is_undo = any(intent.get("action") == "undo" for intent in intents)
         # When the message is about Live (mid-change, or the parser read a Live change in it), KENN's own question is
         # the answer ("that would take the vocal above 0 dB", "'Synth' is already centred"); a notes page isn't.
+        from kenn.core.chat_live_router import LIVE_WITHOUT_ACTION
+
         is_live_question = ((continuing or parsed_live) and result.get("status") == "clarification_required"
-                            and any(intent.get("action") not in {None, "", "action"} for intent in intents))
+                            and any(intent.get("action") not in {None, "", "action"}
+                                    or set(intent.get("missing_fields") or []) & LIVE_WITHOUT_ACTION for intent in intents))
         if not (is_proposal or is_refusal or is_undo or is_live_question):
             return None
         if is_proposal:
