@@ -191,6 +191,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > ms-marco-MiniLM-L-6-v2 (Apache-2.0, ~90 MB) 0.966 / 0.800; **bge-reranker-base (MIT, ~1.1 GB fp32) 1.000 / 0.808**.
   > Ceiling: the right note is in the top 20 for 100% / 87.2%, so reranking already captures most of what it can; the
   > last 13% need better candidates (note wording). "Use it when…" drafts: 0.744 → 0.760, awaiting owner review.
+  > 26 Sept: sharper lines written by Claude in producer language, tested on a new sealed set of 228 questions Qwen3 8B
+  > wrote from the notes alone (`evals/device_purpose_sealed_qwen8b.json`). Recall@4 on it: none 0.338, drafted 0.417,
+  > sharper 0.386, **both 0.447**; original fixture 0.983 throughout. Both kinds of line are in the review doc, awaiting
+  > owner ticks; `tooling/scripts/measure_use_it_when_lines.py` re-measures any selection in memory.
   > Shipping a reranker is a size/latency call (bge-reranker-base adds ~0.3–1 GB and ~1–2 s per answer on a Mac CPU,
   > unmeasured on device yet) — owner decision.
   > Fixture now **303 questions** (gate size reached): 128 original + 125 device-purpose + 50 technique-purpose
