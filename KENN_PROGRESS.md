@@ -1,6 +1,6 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-26 01:40 · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-09-26 07:00 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
 north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
@@ -15,6 +15,30 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
   `98581b2`, not on the merged code, and the gate only accepts evidence from the exact release code. Needs Live open:
   re-run the real-Live assistant task (minutes), then soak #4 on the current main (12 h, one Live quit-and-reopen).
   The review packet was stale too; rebuilt on the merged code, so reviewers score the right answers.
+- **Soak #4 running** since 02:18 on `af1cb64` (ends ~14:18; its one required Live reconnect already happened at ~03:00, so no quit-and-reopen needed); real-Live assistant task **passed** on that code (second
+  try; the first was the box planner not producing one bounded proposal, as last time); tester walkthrough 13/13.
+- **Built on branches while it runs (not in the soaked build):**
+  - `kenn-recipes`: 15 named mix recipes (was 3). The original three misreported their own amounts ("-1.5 dB" moved
+    -2.8 dB; a vocal at 0 dB went to +2 dB); fixed. Recipes ask when a role matches several tracks. "Undo that" twice
+    now walks back through changes (it used to undo the undo). `qualify_recipes_live.py` passes 14/15 on fake Live
+    (Glue needs real Live) and runs on real Live after the soak.
+    Also on this branch (03:00 Sat): BB-5 closed. A 12-minute, 127 MB mix is measured in ~12 s. A 4-channel WAV is
+    refused plainly (the engine used to measure it and call it mono). Files over 150 MB now say the limit and what to
+    bounce. Found on the way: Reference Match in the app silently dropped its tonal balance, matching gains and
+    EQ Eight preset because a module never loaded. Fixed. Two small routes now cap request size. 1,924 tests pass.
+  - `kenn-chat-stream`: template answer instantly, model answer swapped in when accepted (off by default).
+  - `kenn-next-build` (07:00 Sat): both branches merged, 1,968 tests, frontend 26/26, recipes 14/15 on fake Live.
+    Ready to soak once testers have the current build. Also on it, phrasing round 4: two new blind sets from the box
+    (voice dictation; Logic/FL wording, kept sealed until the fixes were in). Sealed set **92.7%** first run, best
+    blind number yet but easier wording; voice 77.9% → 90.8%. Wrong plans fixed: "synth track 5 dB louder" changed
+    track 5 (Bass), "mute track 2, actually track 3" muted track 2, a "why is…?" question made a proposal, "maybe add
+    some reverb" inserted one. Still short of 95% on fresh wording.
+    Round 5 (07:00): the beginner fixes did **not** carry to a fresh sealed beginner set (74.3%, 10 wrong: a reason
+    naming another track changed that track; "louder, maybe -13 dB" went 13 dB up). Fixed: 85.6%, 0 wrong. A sealed
+    second-language set scored 93.0% with 0 wrong. Every set is now at 0 wrong but one disputed label.
+- **Decided (03:10 Sat):** testers get the soaked `af1cb64` code. After the soak: commit its receipts, run the gate,
+  push main, then build the tester DMG from that code. `kenn-recipes` and `kenn-chat-stream` (including the Reference
+  Match fix) go into the next build, which will need its own soak.
 - **Chat model on this Mac: off.** Qwen 8B took 7–16 s an answer through the companion (and far longer under load),
   and KENN used its answer only 1 time in 6; 4B was no better. Chat is back to instant template answers; run 11 stays
   in shadow for commands. Qwen 8B stays the choice for a faster machine or the box GPU (2.8 s there).
@@ -22,8 +46,16 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
   plus a 1,200-character draft) passes 80/84 against 75, with no failing model answers kept. It's ~20% shorter, but
   a local 8B still can't answer in 4 s on a 16 GB Mac (writing the answer alone is ~15 s), so templates stay there.
 - **Live is closed** at the moment; the companion reconnects on its own when it's reopened.
-- **Next (needs Live open):** real-Live assistant task on the current main, then start soak #4.
-- **Needs you:** testers, two reviewers, Apple Developer ID; the drafts to send are in `products/kenn/docs/beta/`
+- **Armed (02:30 Sat): just open Live with the demo set.** A waiter then restarts the companion on `af1cb64`, checks
+  it's the demo set (stops before any change if not), runs the real-Live assistant task and the tester-guide
+  walkthrough, and starts soak #4 (12 h). During the soak, quit and reopen Live once, and don't commit to `main`.
+  Template-first chat is on branch `kenn-chat-stream` (off by default); it makes answers instant, but this Mac's
+  local model rarely writes one KENN keeps, so templates stay.
+- **Knowledge check (09:00):** every control name in the 325 notes about Live checked against the Live 12 manual: 11 approved notes (mostly the model-drafted `ableton12-…` ones) tell producers to click controls that don't exist ("Quantized Follow", "Use Internal Clock", "Slope 1"…). Approved (26 Sept): after soak #4 and the DMG build, `workspace/tmp/kenn-ops/apply_note_corrections.py` puts five invented notes to Draft, rewrites three from the manual and fixes three steps (originals backed up), then the index is rebuilt and the intelligence gate and review packet re-run.
+- **Full note review (09:30):** a sample of 20 model-drafted `ableton12-…` notes found ~4 in 10 with a wrong step, so all 201 were read against the Live 12 manual: 148 kept, 25 corrected, 28 to Draft (33 Draft and 31 corrected with the earlier 11). Then all 114 hand-written notes too: none invented, 27 corrected (older Live versions, wrong names, the Vocoder set up backwards). **90 notes change after the soak** (33 Draft, 57 corrected); measured in memory, retrieval stays at 0.983 on the original questions and rises slightly on the describe-it sets. No test or fixture relies on a drafted note.
+- **Planner (10:40):** rules then run 11 on all 8 phrasing sets: +9 right but +22 wrong plans, so run 11 stays in shadow and run 13 isn't trained on synthetic data. Instead (your yes): an **asked log** on `kenn-next-build`. When KENN has to ask, it keeps what the tester typed and what they said next, on their Mac only; it goes into a diagnostics file only if they tick the box on Setup & Support, and they can clear it. Tester guide and invite updated. Its first run found a real gap, fixed: "pan the hats" now asks which side, and "30% right" completes it.
+- **After the soak, ready (13:00):** `post_soak_4.sh` (receipts, gate, push main, tester DMG), then `after_soak_notes.sh` (90 note corrections; new index for the next build in the `kenn-next-build` worktree, so main's index is untouched; embeddings on the box in 30 s, identical to a Mac build that took 30+ min; then the retrieval check, the intelligence gate and the review packet). The whole index flow was trialled in scratch.
+- **Needs you:** testers, two reviewers (Apple Developer ID deferred to just before shipping, owner's call 26 Sept); the drafts to send are in `products/kenn/docs/beta/`
   (tester invite, reviewer brief, supervised-session script).
 
 ## Qualified beta gate: 7 / 15 on the current main (`3eb5724`)
@@ -34,7 +66,7 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - [ ] human_review — needs two reviewers (parked)
 - [ ] real_mix — needs a consented listening set and reviewers (parked)
 - [ ] supervised_pilot — needs testers (parked)
-- [ ] plugin_distribution — signed, notarized archive; needs Developer ID (parked)
+- [ ] plugin_distribution — signed, notarized archive; deferred with the Developer ID until just before shipping
 - [ ] release_provenance — passes automatically once all the others do
 - Not a gate but tracked: demo rehearsals — 3 of 10 done
 
@@ -47,7 +79,7 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - [x] First-run checks (Live installed, AbletonOSC current, Live connected)
 - [x] Uninstall and update path
 - [x] Tester guide rewritten (`products/kenn/docs/BETA_TESTER_GUIDE.md`)
-- [ ] Sign and notarize — parked (Developer ID)
+- [ ] Sign and notarize — deferred until just before shipping (owner, 26 Sept); testers right-click → Open meanwhile
 - [ ] Exit: clean macOS account, download → "Live connected" in < 15 min — after the soak
 
 ### Phase 2 — reliability
@@ -96,7 +128,9 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - [x] "Use it when…" lines drafted for 114 Ableton notes on the GPU notes model (it saw only each note). Measured in a
       throwaway index: describe-it questions 0.744 → **0.760**, better ranking, nothing worse — a small gain, not the big
       lever hoped for. Sharper lines matter more than more lines
-- [ ] **Needs you:** review them — tick, edit or delete each line in
+- [x] Sharper lines (26 Sept, Claude, producer wording) added under each drafted one. On a new sealed set of 228
+      Qwen-written questions: none 0.338, drafted 0.417, sharper 0.386, **both 0.447**; nothing worse elsewhere
+- [ ] **Needs you:** review them — tick, edit or delete each line (both kinds) in
       `products/kenn/docs/reviews/KENN_USE_IT_WHEN_REVIEW_2026-09-25.md` (on the branch). Only ticked lines go in
 - [x] Rack notes indexed — index `v-4fd17ceb264f` (3,338 chunks, embeddings on the GPU box); retrieval unchanged
       (0.983 / 0.744); review packet rebuilt on it (`98581b2`). 77/78 devices; Drum Synth is not in the manual
