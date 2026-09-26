@@ -692,3 +692,22 @@ for 595 questions written from 300 notes (questions close to the test set remove
 Worse on both counts: the model's answer was used less often, and the slowest answers tripled (it learned to write
 longer). Training on answers the same model already writes teaches it nothing new. **Plain 8B stays.** A fine-tune is
 worth another go only with better targets: answers the owner has reviewed, or ones from a stronger model.
+
+## Prompt budget and the Mac (26 Sept)
+
+On the owner's M3 / 16 GB with Live running, Qwen3 8B reads the prompt at ~75 tokens/s and writes at ~17 tokens/s;
+through the companion it took 7–16 s an answer and KENN kept its answer 1 time in 6. Chat on that Mac is back on
+templates. Four prompt budgets on the box GPU (84 questions, `evaluate_chat_brain.py`, which now records tokens and a
+Mac time estimate):
+
+| Excerpts + draft (characters) | Passed | Model answer used (passed) | Prompt tokens | Mac estimate p50 / p95 |
+|---|---|---|---|---|
+| 3,500 + 3,500 (old default) | 75 | 42 (39) | 1,672 | 37 s / 48 s |
+| 3,500 + none | 76 | 32 (29) | 1,232 | 30 s / 41 s |
+| 1,600 + none | 77 | 33 (30) | 1,082 | 29 s / 35 s |
+| **1,600 + 1,200 (new default)** | **80** | **38 (38)** | 1,353 | 34 s / 40 s |
+
+Trimming saves at most ~20%; writing a ~250-token answer at 17 tokens/s is ~15 s on its own, so no prompt change
+brings a local 8B under the 4 s target on that Mac. What would: streaming the answer as it's written (first words in a
+few seconds), shorter answers, a faster Mac, or serving the brain from the box GPU. The new budget is the default
+anyway because it's better on quality.
