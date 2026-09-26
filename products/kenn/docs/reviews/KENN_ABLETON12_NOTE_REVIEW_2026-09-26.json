@@ -406,5 +406,246 @@
    "7. Control Surfaces: if you have an Ableton Push, APC40, or Launchpad, set them up in Preferences > MIDI as a Control Surface (not just MIDI). These get deep integration \u2014 Push shows parameter names, Launchpad maps directly to Session View clips.",
    "7. Control Surfaces: if you have an Ableton Push, APC40, or Launchpad, choose it as a Control Surface in Settings > Link, Tempo & MIDI (not just as MIDI). These get deep integration \u2014 Push shows parameter names, Launchpad maps directly to Session View clips."
   ]
+ ],
+ "ableton-auto-filter-device.md": [
+  [
+   "replace",
+   "3. Select an analog-modeled circuit to add saturation: OSR (hard clipping), MS2 (screaming resonance), SMP (custom hybrid), or PRD (ladder filter saturation), and turn up the Drive parameter to add warm harmonic distortion.",
+   "3. Pick a circuit in the Filter Circuit chooser (SVF, DFM, MS2 or PRD; circuits apply to the low-pass, high-pass, band-pass, notch and morph filters) and turn up Drive for warm harmonic distortion."
+  ],
+  [
+   "replace",
+   "7. Create rhythmic steps: turn on the Quantize Beat control in the LFO panel to step-quantize the LFO sweep, turning smooth filter movement into stepped patterns.",
+   "7. Create rhythmic steps: switch on Envelope S&H and set the Envelope S&H Rate to quantize the envelope to beat-time values."
+  ]
+ ],
+ "ableton-analog-and-impulse-instruments.md": [
+  [
+   "replace",
+   "1. For Analog: place it on a MIDI track. Select your waveforms on Osc 1 and Osc 2 (Sine, Triangle, Saw, or Noise).",
+   "1. For Analog: place it on a MIDI track. Select your waveforms on Osc 1 and Osc 2 (sine, sawtooth, rectangular or white noise)."
+  ]
+ ],
+ "ableton-analog-synth.md": [
+  [
+   "replace",
+   "2. OSC 1 is your primary oscillator. Set the waveform (Saw, Square, Sine, Triangle) and detune with the Tune control. Saw is the most harmonically rich, useful for basses and leads.",
+   "2. OSC 1 is your primary oscillator. Set the waveform (sine, sawtooth, rectangular or white noise) and detune with the Tune control. Sawtooth is the most harmonically rich, useful for basses and leads."
+  ]
+ ],
+ "ableton-bounce-to-audio-workflow.md": [
+  [
+   "replace",
+   "2. Right-click the track or clip and choose **Bounce Track in Place** from the context menu, or press **Ctrl+B** (Win) / **Cmd+B** (Mac).",
+   "2. Right-click the track or clip and choose **Bounce Track in Place** from the context menu."
+  ]
+ ],
+ "ableton-auto-shift-device.md": [
+  [
+   "delete",
+   "3. Choose your tracking algorithm: Monophonic Pitch for solo vocal takes or Polyphonic for complex polyphonic feeds."
+  ],
+  [
+   "replace",
+   "4. Set the Speed (Glide) control: use fast settings (0-5 ms) for sharp modern hard-tuned effects, or moderate settings (20-45 ms) for transparent vocal stabilization.",
+   "4. For a hard-tuned effect, set Correction Strength high and turn Smooth off; for transparent correction, lower Correction Strength and turn Smooth on (Smoothing Time 0-200 ms)."
+  ]
+ ],
+ "ableton-cabinet-device.md": [
+  [
+   "replace",
+   "2. Select Cabinet Type: 1x12 for vintage combo warmth, 4x12 for heavy rock power, 4x10 for punchy bass, or 8x10 for massive SVT-style low-end weight.",
+   "2. Pick a speaker combination in the Speaker chooser (for example 1x12 or 4x12); more and larger speakers generally sound bigger."
+  ]
+ ],
+ "ableton-clip-envelopes-and-modulation.md": [
+  [
+   "replace",
+   "5. To unlink a clip envelope, right-click in the Envelope Editor and select **Clear Envelope**.",
+   "5. Clip envelopes can be unlinked from the clip to give them their own loop settings; **Clear Envelope** deletes an envelope instead."
+  ]
+ ],
+ "ableton-delay-and-reverb-devices.md": [
+  [
+   "replace",
+   "3. Choose the delay transition mode (Fade, Pitch, or Jump) by right-clicking the device title bar: select Fade to prevent pitch warbling when changing delay times, or Pitch to emulate tape speed pitch bends.",
+   "3. Choose Delay's smoothing mode (Repitch, Fade or Jump) on the device: Fade crossfades between old and new delay times without pitch warble, while Repitch (the default) bends pitch like a tape delay."
+  ]
+ ],
+ "ableton-drift-synth.md": [
+  [
+   "replace",
+   "1. Open Drift from the Instruments browser. The main panel shows two oscillators (VCO 1 and VCO 2), a noise source, a filter, and four envelopes (Env 1\u20134).",
+   "1. Open Drift from the Instruments browser. The main panel shows two oscillators (Osc 1 and Osc 2), a noise source, a filter, and two envelopes (Envelope 2 can switch to a Cycling Envelope)."
+  ],
+  [
+   "replace",
+   "3. Detune VCO 2: set VCO 2 to Sawtooth, detune it \u00b18 cents from VCO 1. This creates natural chorus thickness typical of analog hardware where two oscillators never tune exactly the same.",
+   "3. Detune Osc 2: set Osc 2 to Sawtooth, detune it \u00b18 cents from Osc 1. This creates natural chorus thickness typical of analog hardware where two oscillators never tune exactly the same."
+  ],
+  [
+   "replace",
+   "6. Modulation Routing Panel: click \"Mod\" to open the routing view. Click any source (LFO, Env, Velocity, Note) and drag to any destination (Cutoff, Pitch, VCO Mix, etc.). A cable is drawn connecting them. Adjust the amount by clicking the cable.",
+   "6. Use Drift's modulation matrix to route sources such as the LFO, envelopes, velocity or key to destinations like Cutoff or Pitch, and set each amount."
+  ]
+ ],
+ "ableton-drum-racks-and-internal-routing.md": [
+  [
+   "replace",
+   "5. In **Pad View**, drag samples or effects onto pads to create or modify chains. Use **Hot-Swap** (press D) to quickly replace contents.",
+   "5. In **Pad View**, drag samples or effects onto pads to create or modify chains. Use **Hot-Swap** (press Q) to quickly replace contents."
+  ]
+ ],
+ "ableton-external-audio-effect.md": [
+  [
+   "replace",
+   "6. Click the Hardware Latency measurement button to calculate and offset ADC/DAC conversion delay automatically.",
+   "6. Use the Hardware Latency slider to offset the round-trip delay; the button next to it switches between milliseconds and samples (use samples for digital connections)."
+  ],
+  [
+   "delete",
+   "7. Fine-tune the Latency Delay in milliseconds or samples if manual phase alignment against dry tracks is needed."
+  ]
+ ],
+ "ableton-erosion-device.md": [
+  [
+   "replace",
+   "2. Select Erosion Mode: Noise for white noise modulation, Band Filter for localized sizzle, or Sine for FM-style metallic grit.",
+   "2. Set Noise Blend: at 0% only a sine wave modulates the signal (metallic, FM-style grit), at 100% only filtered noise (sizzle); in between mixes the two."
+  ],
+  [
+   "replace",
+   "4. Adjust Width when in Band Filter mode to narrow the resonance peak or broaden the noisy texture.",
+   "4. Adjust Filter Width to narrow or widen the noise band (it has no effect when Noise Blend is 0%); hold Alt (Win) / Option (Mac) while dragging in the display to change it there."
+  ]
+ ],
+ "ableton-hybrid-reverb.md": [
+  [
+   "replace",
+   "2. The interface has two reverb engines: the left side is Algorithmic (Shimmer-style, with Size/Decay/Diffusion controls) and the right side is Convolution (IR-based, with a file loader for impulse responses).",
+   "2. Hybrid Reverb has two engines: a Convolution engine (impulse responses of real spaces, or any audio file you import) and an Algorithm engine with several reverb modes."
+  ],
+  [
+   "replace",
+   "3. The blend slider between them sets how much algorithmic vs convolution signal you hear. Center = equal blend; left = pure algorithmic; right = pure convolution.",
+   "3. Choose the Routing (Serial, Parallel, Algorithm or Convolution). In Serial and Parallel, the Blend knob balances the two engines: 100/0 is pure convolution."
+  ],
+  [
+   "replace",
+   "5. For natural-sounding room reverb: use a convolution room IR (small room 5ms pre-delay), set algorithmic blend to 0%, and adjust Decay in the convolution section.",
+   "5. For natural-sounding room reverb: choose Convolution routing with a small room IR (around 5 ms pre-delay) and shape the tail with the convolution Decay."
+  ]
+ ],
+ "ableton-live-djing.md": [
+  [
+   "replace",
+   "2. Enable the Crossfader: show it in the Master section (right-click the Master track). Assign Deck A to the A side and Deck B to the B side using the A/B buttons beneath each track header.",
+   "2. Show the crossfader (View > Mixer Controls, or the Mixer Config menu at the bottom right). Assign Deck A to A and Deck B to B with each track's crossfader assign buttons."
+  ],
+  [
+   "replace",
+   "5. Cueing (pre-listen): route headphone pre-listening through a separate audio output. In Preferences > Audio, set Monitor Output to your secondary output. Click the Headphone icon on a clip or track to monitor it before bringing it into the mix.",
+   "5. Cueing (pre-listen): with a second pair of outputs on your interface, choose them in the Cue Out chooser, set the Solo/Cue Mode switch to Cue, and press a track's Cue switch (headphone icon) to hear it in your headphones before bringing it into the mix."
+  ],
+  [
+   "replace",
+   "6. Set the master tempo in the transport bar and link it to all clips via Follow (tap the BPM and type it). All Ableton clips play in time with each other automatically when warped.",
+   "6. Set the tempo in the Control Bar (type it or tap it); warped clips all play in time with it."
+  ]
+ ],
+ "ableton-max-for-live-basics.md": [
+  [
+   "replace",
+   "   - **LFO** (Max MIDI Effects): maps an LFO to any automatable parameter \u2014 tremolo, filter sweep, panning, etc.",
+   "   - **LFO** (Max Audio Effects): maps an LFO to any automatable parameter \u2014 tremolo, filter sweep, panning, etc."
+  ],
+  [
+   "replace",
+   "   - **Envelope Follower** (Max MIDI Effects): uses audio amplitude to control any parameter \u2014 sidechain without a compressor",
+   "   - **Envelope Follower** (Max Audio Effects): uses audio amplitude to control any parameter \u2014 sidechain without a compressor"
+  ],
+  [
+   "delete",
+   "   - **Probability Pack** (Max MIDI Effects): adds probability, random skipping, and variation to MIDI notes"
+  ]
+ ],
+ "ableton-redux-device.md": [
+  [
+   "replace",
+   "3. Select Downsample Mode: choose Linear for musical aliasing or Exponential for extreme frequency disintegration.",
+   "3. Lower Rate to degrade the sample rate (more aliasing and inharmonic tones), and add Jitter for a noisier, wider downsampled sound."
+  ]
+ ],
+ "ableton-random-device.md": [
+  [
+   "replace",
+   "1. Open the Random effect in your MIDI or audio clip.",
+   "1. Place the Random MIDI effect on a MIDI track, before the instrument."
+  ],
+  [
+   "replace",
+   "5. Observe that half the time the note stays at C3, and half the time it changes to a random pitch within the scale.",
+   "5. Half the notes play at C3 and half at C4, an octave up; swap Choices and Interval (Choices 12, Interval 1) and the other half lands anywhere from C#3 to C4."
+  ]
+ ],
+ "ableton-saturator-device.md": [
+  [
+   "replace",
+   "2. Choose a Curve type: Analog Clip or Soft Clip for subtle harmonic enrichment, Medium Curve or Hard Curve for obvious clipping, or Waveshaper for custom graphical distortion.",
+   "2. Choose a Curve type: Analog Clip or Soft Sine for subtle harmonic enrichment, Medium Curve or Hard Curve for obvious clipping, Digital Clip for hard clipping, or Waveshaper for custom graphical distortion."
+  ]
+ ],
+ "ableton-vocoder.md": [
+  [
+   "replace",
+   "1. Create a MIDI track with a synth (Analog or Wavetable with a bright saw or pad sound works well). This is the carrier.",
+   "1. Put the Vocoder on the track with your vocal: the track's own audio is the modulator."
+  ],
+  [
+   "replace",
+   "2. Drop the Vocoder effect after the synth on the same track.",
+   "2. Create a MIDI track with a harmonically rich synth (a bright saw or pad works well); this will be the carrier."
+  ],
+  [
+   "replace",
+   "3. In the Vocoder's Carrier section, it should already be set to use the track's own audio. Keep this.",
+   "3. In the Vocoder's Carrier chooser, choose External."
+  ],
+  [
+   "replace",
+   "4. In the Audio From (sidechain) section of the Vocoder, select the track with your vocal recording as the external modulator source.",
+   "4. In the Audio From chooser below it, select the synth track as the carrier source."
+  ]
+ ],
+ "ableton-velocity-midi-effect.md": [
+  [
+   "replace",
+   "7. Use Operation: choose Add to transpose all velocities upwards, or Scale to scale dynamic curves proportionally.",
+   "7. Use the Operation chooser to remap Note On velocity, Note Off (release) velocity, or both."
+  ]
+ ],
+ "ableton-spectral-effects-devices.md": [
+  [
+   "replace",
+   "2. Trigger the Freeze button: use manual mode to capture a slice of audio and hold it indefinitely as a pad, or set it to Auto mode to freeze whenever the input level exceeds a threshold.",
+   "2. Freeze: in Manual mode, click Freeze to capture a slice of audio and hold it as a pad; in Retrigger mode, the audio re-freezes automatically on each transient (Onsets) or at regular intervals (Sync)."
+  ]
+ ],
+ "ableton-wavetable-synth.md": [
+  [
+   "replace",
+   "1. Open Wavetable from the Instruments browser. Each oscillator can be set to Wavetable (scans through a table of waveforms), Classic (standard analog shapes), or Formant (vowel-like tones).",
+   "1. Open Wavetable from the Instruments browser. Each oscillator plays a wavetable chosen by category, and you can reshape it with an oscillator effect: FM, Classic or Modern."
+  ],
+  [
+   "replace",
+   "4. For a supersaw: use Classic mode on both oscillators, set both to Saw waveform, Detune OSC 2 by +7\u201312 cents, enable Unison (Uni) with 3\u20135 voices and high spread. Add a long filter envelope and reverb.",
+   "4. For a supersaw: choose a basic saw wavetable on both oscillators, detune OSC 2 by +7\u201312 cents, enable Unison with 3\u20135 voices and high spread. Add a long filter envelope and reverb."
+  ],
+  [
+   "replace",
+   "5. Sub oscillator: OSC 2 set to Classic > Sine, pitched 2 octaves below OSC 1. This adds a clean sub foundation under any OSC 1 sound.",
+   "5. Sub: use Wavetable's Sub oscillator, or set OSC 2 to a sine wavetable pitched 2 octaves below OSC 1, for a clean sub foundation."
+  ]
  ]
 }

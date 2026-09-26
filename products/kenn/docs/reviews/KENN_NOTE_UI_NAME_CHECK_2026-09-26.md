@@ -136,3 +136,18 @@ What the review can't promise: kept notes use real controls in a sensible order,
 (Hybrid Reverb's routing and algorithm names, a Tuner "Strobe" view, EQ Eight's analyzer "headphone icon", the old
 Preferences > MIDI path and "Master Volume"). Corrected from the manual and added to the same decisions file. Better than
 the drafted series, but not clean, so the other 99 get the same full read.
+
+## All hand-written notes (26 Sept)
+
+After the sample, the other 98 hand-written `ableton-…` notes were read the same way. None is invented throughout;
+27 of the 114 (with the Clip Envelopes fix above) have one to three wrong details, now corrected from the manual. The
+kinds of mistake: features from older Live versions (Auto Filter's OSR/SMP circuits and Quantize Beat, Erosion's modes,
+now Noise Blend in 12.4), wrong names (Hybrid Reverb's "Pristine"/"Earlate", Analog's "Triangle", Cabinet's "8x10",
+Wavetable's "Formant" oscillator), wrong places (Delay's modes "in the title bar", the crossfader "in the Master
+track"), and two set-ups the wrong way round (the Vocoder's carrier and modulator; Bounce in Place given Bounce to New
+Track's shortcut). Things the manual couldn't confirm were left alone rather than guessed (Multiband Dynamics' upward
+ratios).
+
+**Totals, all notes about Live:** 33 to Draft, 57 corrected, the rest kept. 90 notes change after the soak.
+Measured in memory with every change applied: the 58 original questions stay at 0.983; describe-it questions go 0.744
+to 0.768 and the sealed set 0.338 to 0.346, so nothing KENN could find before is lost.
