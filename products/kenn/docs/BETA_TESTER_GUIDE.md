@@ -50,6 +50,7 @@ KENN connecting.
 | After a change: `Do that on the snare too` / `Same for the hats` / `Do the opposite on the vocal` | The same change on another track, as a new proposal |
 | Wrong track? `No, I meant the snare` / `Sorry, the kick` | Moves the change to the track you meant; if you'd already applied it, KENN says so and you can say `undo` |
 | When KENN asks "By how much?" or "Which side?", just answer: `3 dB`, `30%`, `left` | Finishes the request you started |
+| Mix recipes: `Make room for the kick`, `Give the vocal some space`, `Push the synth back`, `Tighten the drum bus` | A short plan of up to three changes, in real units; one Apply, one Undo |
 | `What did you change?` | The recent changes, with before and after values |
 | `What does Note Echo do?` | A cited answer from KENN's notes |
 | A mix WAV in **Inputs** | Review of loudness, true peak, clipping and balance |
