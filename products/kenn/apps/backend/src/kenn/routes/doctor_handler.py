@@ -5,6 +5,19 @@ from __future__ import annotations
 from typing import Any
 
 
+# Only masking issues carry a conflict track and an EQ suggestion; the session doctor's Issue has none of them, so
+# reading them straight off it made every audit that found something a 500 (seen from the app, 26 Sept 2026).
+_OPTIONAL_ISSUE_FIELDS = ("conflict_track_index", "conflict_track_name", "frequency_hz", "gain_recommendation_db",
+                          "q_recommendation")
+
+
+def _issue_json(issue: Any) -> dict[str, Any]:
+    row = {name: getattr(issue, name) for name in ("code", "severity", "track_index", "track_name", "description",
+                                                   "suggested_action", "proposed_value")}
+    row.update({name: getattr(issue, name) for name in _OPTIONAL_ISSUE_FIELDS if getattr(issue, name, None) is not None})
+    return row
+
+
 def handle_get_doctor_audit(handler: Any) -> None:
     """GET /api/session/doctor/audit - Audit session for masking & clashes."""
     try:
@@ -20,23 +33,7 @@ def handle_get_doctor_audit(handler: Any) -> None:
             "track_count": report.track_count,
             "issues_found": report.issues_found,
             "summary": report.summary,
-            "issues": [
-                {
-                    "code": i.code,
-                    "severity": i.severity,
-                    "track_index": i.track_index,
-                    "track_name": i.track_name,
-                    "description": i.description,
-                    "suggested_action": i.suggested_action,
-                    "proposed_value": i.proposed_value,
-                    "conflict_track_index": i.conflict_track_index,
-                    "conflict_track_name": i.conflict_track_name,
-                    "frequency_hz": i.frequency_hz,
-                    "gain_recommendation_db": i.gain_recommendation_db,
-                    "q_recommendation": i.q_recommendation,
-                }
-                for i in report.issues
-            ],
+            "issues": [_issue_json(i) for i in report.issues],
             "remediation_batch": report.remediation_batch,
         })
     except Exception as e:
@@ -61,23 +58,7 @@ def handle_post_doctor_audit(handler: Any, payload: dict[str, Any]) -> None:
             "track_count": report.track_count,
             "issues_found": report.issues_found,
             "summary": report.summary,
-            "issues": [
-                {
-                    "code": i.code,
-                    "severity": i.severity,
-                    "track_index": i.track_index,
-                    "track_name": i.track_name,
-                    "description": i.description,
-                    "suggested_action": i.suggested_action,
-                    "proposed_value": i.proposed_value,
-                    "conflict_track_index": i.conflict_track_index,
-                    "conflict_track_name": i.conflict_track_name,
-                    "frequency_hz": i.frequency_hz,
-                    "gain_recommendation_db": i.gain_recommendation_db,
-                    "q_recommendation": i.q_recommendation,
-                }
-                for i in report.issues
-            ],
+            "issues": [_issue_json(i) for i in report.issues],
             "remediation_batch": report.remediation_batch,
         })
     except Exception as e:
