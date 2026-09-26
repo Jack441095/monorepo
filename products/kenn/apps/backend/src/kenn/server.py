@@ -752,10 +752,16 @@ class Handler(BaseHTTPRequestHandler):
             "track" in lower
             and any(word in lower for word in ("device", "what is on", "what's on", "whats on"))
         ) or any(cue in lower for cue in ("list my tracks", "what tracks", "show my tracks", "show the tracks"))
-        if not inspection_cue:
+        # "What devices are on the Drum Bus?" never says "track", and went to the manual's Drum Buss note on
+        # 26 Sept 2026. Without "track" it could also be advice ("which plugins are good for vocals?"), so Live
+        # only answers when it found the track the question names.
+        device_cue = bool(re.search(r"\b(?:what|which|list|show)\b.*\b(?:devices|plugins?|plug-ins?|processors)\b", lower))
+        if not inspection_cue and not device_cue:
             return None
         result = handle_command(question, session_id=session_id)
         action = (result.get("intent") or {}).get("action")
+        if not inspection_cue and result.get("status") != "inspected":
+            return None
         if action not in {"inspect_tracks", "inspect_devices"} and result.get("status") not in {"offline"}:
             return None
         structured_intent = result.get("intent")

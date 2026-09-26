@@ -662,6 +662,15 @@ def test_read_only_chain_synonyms_resolve_to_device_inspection() -> None:
         assert result["confirmation_required"] is False
 
 
+def test_device_questions_read_the_set_but_advice_does_not() -> None:
+    # 26 Sept 2026: "What devices are on the Drum Bus?" got the manual's Drum Buss note, and "which plugins" wasn't
+    # read at all; asking for advice must still not turn into a look at one track's chain.
+    for query in ("What devices are on the Drum Bus?", "Which plugins are on the vocal?"):
+        assert parse_request(query, snapshot())["action"] == "inspect_devices"
+    for query in ("What plugins do I need for a punchy kick?", "What's the best plugin for the bass?"):
+        assert parse_request(query, snapshot()).get("action") != "inspect_devices"
+
+
 def test_append_is_a_bounded_device_insertion_synonym() -> None:
     result = parse_request("Append EQ Eight on track 2", snapshot())
     assert result["action"] == "insert_device"

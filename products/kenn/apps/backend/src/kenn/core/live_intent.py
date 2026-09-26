@@ -2399,10 +2399,12 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             )
         return base
 
-    if (
+    # "What plugins do I need for a punchy kick?" is advice, not a look at the Kick track's chain.
+    asks_advice = re.search(r"\b(?:should|need|good|best|recommend|suggest|would you|to get|to make)\b", lower)
+    if not asks_advice and (
         lower.startswith(("what devices", "show devices", "list devices"))
         or "devices on" in lower
-        or re.search(r"\b(?:show|list|inspect|display|what)\b.*\b(?:chain|processors?|devices?|plugins?|plug-ins?)\b", lower)
+        or re.search(r"\b(?:show|list|inspect|display|what|which)\b.*\b(?:chain|processors?|devices?|plugins?|plug-ins?)\b", lower)
         or re.search(r"\bwhat(?:'s| is| are|s)\s+on\s+(?:the\s+)?track\b", lower)
     ):
         base.update({"action": "inspect_devices", "confidence": 0.99})
