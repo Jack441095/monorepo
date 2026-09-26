@@ -150,6 +150,9 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > things *less* safe: 18 wrong plans on one blind set, e.g. "can i hear the vocal without the synth" soloed the
   > Synth. Not met; needs fresh blind wording each round, owner-checked labels, and a planner that asks rather than
   > guesses.
+  > 26 Sept, round 4 (branch `kenn-next-build`): voice-dictation set 77.9% blind → 90.8%; a sealed Logic/FL-wording set
+  > scored **92.7%** on its one blind run (plainer wording) → 97.8%. Found and fixed "synth track 5 dB louder" moving
+  > track 5, "track 2, actually track 3" keeping track 2, and questions that proposed changes. Still not met.
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
