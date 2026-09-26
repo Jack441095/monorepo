@@ -929,6 +929,8 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
                 f"Step {position}: natural recipes currently support track controls, play/stop, send levels, and exact "
                 "existing-device parameter changes; device insertion and EQ band changes must be proposed separately."
             )
+    if not problems and len(steps) == len(step_intents) and len({repr(sorted(step.items())) for step in steps}) == 1:
+        return None  # "mute the snare and clap" is one track here (Snare / Clap), not two steps doing the same thing
     return {
         "schema": "kenn.ableton_recipe_intent.v1",
         "action": "recipe",
@@ -1076,6 +1078,19 @@ _NEW_TRACK_PURPOSE = re.compile(r"^(?P<head>\s*(?:create|make|add)\s+(?:a\s+)?ne
 _GO_TO_TRACK_WITH = re.compile(r"^\s*(?:go\s+to|take\s+me\s+to|show\s+me|select|jump\s+to)\s+the\s+track\s+(?:that\s+has|that's\s+got|"
                                r"with|where)\s+(?:the\s+)?(?P<phrase>[\w' /-]+?)(?:\s+(?:is|are|on\s+it))?(?:\s+so\s+i\s+can\s+[\w ]+)?"
                                r"\s*[.!?]?\s*$", re.I)
+# Beginners add a reason and ask for permission: "lower the snare by 2 dB to make it sit behind the kick, is that
+# okay?". The reason named another track and KENN lowered the Kick; "mute the snare to focus on the hi-hats" muted the
+# hats. The request is what comes before the reason (fifth blind set, 26 Sept).
+_OKAY_TAIL = re.compile(r"\s*[,.;!]?\s*(?:is\s+that\s+(?:okay|ok|alright|all\s+right|possible|acceptable|correct|fine)|"
+                        r"(?:could|can|would)\s+you\s+handle\s+that|would\s+that\s+work|does\s+that\s+make\s+sense)\s*[?.!]*\s*$", re.I)
+_REASON_TAIL = re.compile(r"\s*,?\s+(?:so\s+(?:that\s+)?(?:it|they|its|the|i|we|there)\b|to\s+(?:make|give|help|add|keep|let|focus|"
+                          r"check|ensure|match|balance|create|avoid|stop|bring|reduce|tame|clean|control|even|shape|cut|get)\b|"
+                          r"for\s+(?:better|more|clarity|a\s+(?:more|better|cleaner|clearer|tighter)|some|the\s+sake)\b|because\b|"
+                          r"since\b|in\s+order\s+to\b).*$", re.I)
+_REQUEST_LEAD_END = re.compile(r"\b(?:want|need|like|love|going|trying|have|wish|able|ready|possible|mind|way|how)\s*$", re.I)
+# "a bit louder, maybe -13 dB" names where it should end up. It used to be read as +13 dB.
+_HEDGED_TARGET = re.compile(r"\b(?:(?:a\s+(?:bit|little|touch)|slightly|a\s+little\s+bit)\s+)?(?:louder|quieter|softer|lower|higher|"
+                            r"up|down)\s*,?\s*(?:maybe|like|around|about|say|to)\s+(?P<amount>-\d+(?:\.\d+)?)\s*dbs?\b", re.I)
 # "I want to solo the synth track. Can you go there?" soloed it; the question is where the request is.
 _GO_THERE = re.compile(r"^(?P<first>.+?)[.!]\s*(?:can|could|would)\s+you\s+(?:please\s+)?(?:go\s+there|take\s+me\s+there|"
                        r"show\s+me\s+(?:that|the\s+(?P<shown>[\w' /-]+?))\s+track|select\s+it)\s*[?.!]*\s*$", re.I)
@@ -1153,7 +1168,12 @@ def _rewrite_idioms(text: str) -> str:
         shown = m.group("shown") or next(iter(re.findall(r"\bthe\s+([\w' /-]+?)\s+track\b", m.group("first"), re.I)), None)
         if shown:
             return f"go to the {shown}"
-    text = _ASK_TAIL.sub("", _TRAILING_ASIDE.sub("", _POLITE_TAIL.sub("", text)))
+    text = _ASK_TAIL.sub("", _TRAILING_ASIDE.sub("", _POLITE_TAIL.sub("", _OKAY_TAIL.sub("", text))))
+    unreasoned = _REASON_TAIL.sub("", text)
+    # "I want to reduce the kick by 4 dB": that "to" starts the request, not a reason.
+    if len(unreasoned.split()) >= 2 and not _REQUEST_LEAD_END.search(unreasoned):
+        text = unreasoned
+    text = _HEDGED_TARGET.sub(lambda m: f"at {m.group('amount')} dB", text)
     polite = _POLITE_LEAD.match(text)
     text = _POLITE_LEAD.sub("", text)
     if polite:
@@ -1458,6 +1478,10 @@ _INSERTABLE_NAMES = "EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, 
 # the set; it never changes it. ("can you ...?" is a request and is handled by the polite-lead rule.)
 _QUESTION_NOT_REQUEST = re.compile(r"^\s*(?:why|how\s+come|should|shouldn't|is|isn't|are|aren't|does|doesn't|do|did|"
                                    r"was|were|what|which|where|who)\b", re.I)
+# "The drum bus is set to -14 dB, but I want to make sure the compressor is working" describes the set. It became a
+# proposal to set the Drum Bus to -14 dB.
+_DESCRIBES_SET = re.compile(r"^\s*(?!(?:make|set|put|turn|bring|i|let|please|can|could)\b)(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}\s+"
+                            r"(?:is|are|'s)\s+(?:currently\s+|now\s+|already\s+|still\s+)?(?:set\s+)?(?:at|to|on)\s+", re.I)
 _HEDGE = re.compile(r"\b(?:maybe|perhaps|possibly|might)\b", re.I)
 _RETURN_MENTION = re.compile(r"\breturn(?:\s+tracks?)?\b|\b[ab]\s+return\b", re.I)
 _MIXER_WORD = re.compile(r"\b(?:volume|fader|level|gain|louder|quieter|up|down|mute|unmute|solo|unsolo|pan|rename|name|"
@@ -1500,6 +1524,11 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     if unsupported:
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
                        "missing_fields": [unsupported[0]], "ambiguity": [unsupported[1]]})
+        return parsed
+    if parsed.get("confirmation_required") and (_DESCRIBES_SET.match(text) or _DESCRIBES_SET.match(str(query or ""))):
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["how_to"],
+                       "ambiguity": ["That describes the set, so nothing changed. Say the change you want (\"set the Drum "
+                                     "Bus to -10 dB\") and KENN prepares it."]})
         return parsed
     if parsed.get("confirmation_required") and _QUESTION_NOT_REQUEST.match(text):
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["how_to"],

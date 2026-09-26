@@ -65,3 +65,34 @@ def test_what_a_new_track_is_for_is_not_its_name(snapshot) -> None:
 def test_go_there_goes_to_the_track(snapshot, request_text, track) -> None:
     parsed = parse_request(request_text, snapshot)
     assert parsed["action"] == "focus_track" and parsed["track"]["name"] == track
+
+
+@pytest.mark.parametrize("request_text, action, track", [
+    # The fifth blind set (26 Sept): the reason named another track, and KENN changed that one.
+    ("Could you lower the snare by 2 dB to make it sit behind the kick a bit more?", "set_volume", "Snare / Clap"),
+    ("I want to mute the snare and clap to focus on the hi-hats. Is that okay?", "set_mute", "Snare / Clap"),
+    ("I want to reduce the kick by 4 dB, please.", "set_volume", "Kick"),  # this "to" starts the request
+])
+def test_the_reason_after_a_request_is_not_part_of_it(snapshot, request_text, action, track) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == action and parsed["track"]["name"] == track
+
+
+def test_a_hedged_level_is_where_it_should_end_up(snapshot) -> None:
+    # "a bit louder, maybe -13 dB" was read as 13 dB louder: the Bass went to about -1 dB.
+    parsed = parse_request("I'd like the bass to be slightly louder, maybe -13 dB, so it has more punch, is that okay?", snapshot)
+    assert parsed["action"] == "set_volume" and parsed["desired_value"] == pytest.approx(volume_law.db_to_raw(-13), abs=0.005)
+
+
+def test_a_rename_keeps_only_the_quoted_name(snapshot) -> None:
+    parsed = parse_request("I'd like to rename the FX Print track to 'FX Send' for clarity. Is that okay?", snapshot)
+    assert parsed["action"] == "rename_track" and parsed["desired_value"] == "FX Send"
+
+
+@pytest.mark.parametrize("request_text", [
+    "The drum bus is set to -14 dB, but I want to make sure the compressor is working properly. Could you check that?",
+    "the kick is at -10 dB",
+])
+def test_describing_the_set_changes_nothing(snapshot, request_text) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] is None and not parsed["confirmation_required"]

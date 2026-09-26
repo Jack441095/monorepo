@@ -163,6 +163,31 @@ Reading it straight: the new-register first run (77.9%) beat the earlier blind r
 92.7% is the best blind number yet, but that set was easier wording. 95% on fresh wording with zero wrong is still
 not shown.
 
+## Round 5 (26 Sept): did the beginner fixes carry over?
+
+After fixing the third (beginner) set up to 90%, two fresh sets were written on the box and kept sealed:
+`natural_blind_qwen8b_beginner.jsonl` (whole polite sentences with a reason and "is that okay?") and
+`natural_blind_qwen8b_esl.jsonl` (English as a second language: "put more low the volume of the kick").
+
+| Set | First, blind | After fixes |
+|---|---|---|
+| Beginner, 167 | **74.3%** right, 33 asked, **10 wrong** | 85.6% right, 24 asked, 0 wrong |
+| Second language, 142 | **93.0%** right, 10 asked, 0 wrong | unchanged |
+
+So no: fixes tuned on one beginner set didn't carry to fresh beginner wording, and that set found the worst wrong
+plans of any round. All fixed with tests (`test_beginner_sentences.py`):
+
+- "lower the snare by 2 dB to make it sit behind **the kick**" lowered the **Kick**; "mute the snare and clap to focus
+  on **the hi-hats**" muted the **Hi-Hats**. A reason after a request ("to make…", "so it…", "for clarity") and "is that
+  okay?" are now dropped before parsing, and recipes and the subjective translator read that cleaned text too.
+- "a bit louder, maybe -13 dB" was read as **13 dB louder** (the Bass went to about -1 dB). It's now the target.
+- Renames kept the reason in the name ("FX Send for clarity. Is that okay?").
+- "The drum bus is set to -14 dB, but…" and "the kick is at -10 dB" describe the set; they no longer propose.
+- "…centred for clarity" fired the vocal-clarity recipe.
+
+The second-language set scored well because most of it is vague ("make the kick more down") and KENN asks, which is
+right. After this round every set has 0 wrong plans except the one "-1 pan" row above.
+
 ## Relabelled after the first run (owner to confirm; each row carries a `note`)
 
 These rows first expected an action. KENN asks, by design:

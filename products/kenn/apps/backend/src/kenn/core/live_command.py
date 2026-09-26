@@ -2811,7 +2811,10 @@ def _handle_command_impl(
                     **({"scenes": snapshot["scenes"]} if "scenes" in snapshot and "scene" in clean_command.lower() else {}),
                     **({"return_tracks": snapshot["return_tracks"]} if "return_tracks" in snapshot else {})}
         deterministic_intent = parse_request(clean_command, snapshot)
-    natural_recipe = parse_natural_recipe(clean_command, snapshot)
+    # The rules' cleaned text, not the raw one: "mute the snare and clap to focus on the hi-hats" split into a
+    # two-step recipe on the reason ("... to focus on the hi-hats") before the reason was dropped.
+    cleaned_command = str(deterministic_intent.get("query") or clean_command)
+    natural_recipe = parse_natural_recipe(cleaned_command, snapshot)
     response.setdefault("latency", {})["parse_ms"] = round((time.monotonic() - parse_started) * 1000.0, 2)
     if natural_recipe is not None:
         response["llm"] = {"status": "not_used", "reason": "deterministic_natural_recipe"}
@@ -2842,9 +2845,9 @@ def _handle_command_impl(
         return _recipe_response(response, result["proposal"])
     # A request the rules already understand exactly ("rename the vocal track to 'Vox' for clarity") is never a mix
     # metaphor; "clarity" there once turned a rename into the vocal-unmasking recipe.
-    if SubjectiveTranslator.can_translate(clean_command) and not (
+    if SubjectiveTranslator.can_translate(cleaned_command) and not (
             deterministic_intent.get("action") and not deterministic_intent.get("missing_fields")):
-        subjective_res = SubjectiveTranslator.translate(clean_command, snapshot, response["session_id"], live)
+        subjective_res = SubjectiveTranslator.translate(cleaned_command, snapshot, response["session_id"], live)
         if subjective_res is not None:
             response["llm"] = {"status": "not_used", "reason": "subjective_translation"}
             status = subjective_res.get("status")

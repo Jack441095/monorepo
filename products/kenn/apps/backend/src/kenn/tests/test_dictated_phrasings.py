@@ -93,3 +93,10 @@ def test_roar_and_multiband_dynamics_are_recognised(snapshot) -> None:
 def test_what_kenn_cannot_change_yet_says_so(snapshot, request_text, expected) -> None:
     parsed = parse_request(request_text, snapshot)
     assert parsed["action"] is None and expected in parsed["ambiguity"][0]
+
+
+def test_two_names_for_one_track_are_one_change() -> None:
+    from kenn.core.live_intent import parse_natural_recipe
+
+    # "snare and clap" is the one Snare / Clap track: it used to become a two-step recipe muting it twice.
+    assert parse_natural_recipe("mute the snare and clap", FakeLiveBackend().query_session_state()) is None
