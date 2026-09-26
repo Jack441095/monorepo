@@ -96,3 +96,25 @@ def test_a_rename_keeps_only_the_quoted_name(snapshot) -> None:
 def test_describing_the_set_changes_nothing(snapshot, request_text) -> None:
     parsed = parse_request(request_text, snapshot)
     assert parsed["action"] is None and not parsed["confirmation_required"]
+
+
+@pytest.mark.parametrize("first, reply, track, value", [
+    # Found by the asked log on its first run (26 Sept): "pan the snare a bit" got "I'm not sure what you're asking",
+    # so the tester's "20% left" had nothing to answer.
+    ("pan the snare a bit", "20% left", "Snare / Clap", -0.2),
+    ("pan the hats", "30% right", "Hi-Hats", 0.3),
+])
+def test_a_pan_with_no_side_asks_and_the_reply_completes_it(tmp_path, monkeypatch, first, reply, track, value) -> None:
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.live_command import handle_command
+
+    for name in ("KENN_LIVE_RECEIPT_JOURNAL", "KENN_DB_PATH", "KENN_SESSION_FILE", "KENN_CHATS_DIR", "KENN_ROUTE_LOG"):
+        monkeypatch.setenv(name, str(tmp_path / name.lower()))
+    monkeypatch.setenv("KENN_ALLOW_DAW_CONTROL", "1")
+    service = LiveActionService(FakeLiveBackend())
+    asked = handle_command(first, session_id="pan", service=service, allow_llm=False)
+    assert asked["status"] == "clarification_required" and "Which side" in asked["answer"]
+    done = handle_command(reply, session_id="pan", service=service, allow_llm=False)
+    proposal = done.get("proposal") or {}
+    assert proposal.get("action") == "set_pan" and proposal.get("track_name") == track
+    assert proposal.get("after") == pytest.approx(value)

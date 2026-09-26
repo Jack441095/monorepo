@@ -1482,6 +1482,7 @@ _QUESTION_NOT_REQUEST = re.compile(r"^\s*(?:why|how\s+come|should|shouldn't|is|i
 # proposal to set the Drum Bus to -14 dB.
 _DESCRIBES_SET = re.compile(r"^\s*(?!(?:make|set|put|turn|bring|i|let|please|can|could)\b)(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}\s+"
                             r"(?:is|are|'s)\s+(?:currently\s+|now\s+|already\s+|still\s+)?(?:set\s+)?(?:at|to|on)\s+", re.I)
+_PAN_NO_SIDE = re.compile(r"^\s*pan\s+(?!.*\b(?:left|right|cent(?:er|re)|middle|hard|l\d|r\d)\b)", re.I)
 _HEDGE = re.compile(r"\b(?:maybe|perhaps|possibly|might)\b", re.I)
 _RETURN_MENTION = re.compile(r"\breturn(?:\s+tracks?)?\b|\b[ab]\s+return\b", re.I)
 _MIXER_WORD = re.compile(r"\b(?:volume|fader|level|gain|louder|quieter|up|down|mute|unmute|solo|unsolo|pan|rename|name|"
@@ -1542,6 +1543,15 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["device"],
                        "ambiguity": [f"That sounds like you're still deciding, so nothing changed. Say \"add {device} to "
                                      f"{track}\" and KENN will prepare it."]})
+        return parsed
+    if (parsed.get("action") is None and parsed.get("track") and _PAN_NO_SIDE.match(text)
+            and set(parsed.get("missing_fields") or []) <= {"action"}):
+        # "pan the hats" / "pan the snare a bit" got "I'm not sure what you're asking", so the tester's "30% right"
+        # afterwards had nothing to answer. Ask the real question instead; the reply then completes the request.
+        track = parsed["track"].get("name") or "the track"
+        parsed.update({"action": "set_pan", "mode": "assist", "desired_value": None, "confirmation_required": False,
+                       "missing_fields": ["amount"],
+                       "ambiguity": [f"Which side, and how far? For example \"pan {track} 30% left\" or \"pan {track} hard right\"."]})
         return parsed
     if _HOW_TO_QUESTION.match(str(query or "")):
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["how_to"],

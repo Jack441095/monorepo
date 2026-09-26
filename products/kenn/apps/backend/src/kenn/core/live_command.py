@@ -2342,6 +2342,9 @@ def _reply_to_question(reply: str, session_id: str, snapshot: dict[str, Any]) ->
     if number_only and pending.get("action") == "set_volume":
         answer = f"{number_only.group(1)} dB"  # "By how much?" for a fader is answered in dB
     candidates += [f"{original} {answer}", f"{original} by {answer}"]
+    vague = re.sub(r"\s+(?:a\s+(?:bit|little|touch|tad)|slightly|a\s+little\s+bit)\b", "", original, flags=re.I)
+    if vague != original:
+        candidates.append(f"{vague} {answer}")  # "pan the snare a bit" + "20% left": the reply replaces the "a bit"
     side = re.search(r"\b(left|right)\b", original, re.I)
     if side:
         candidates.append(original[:side.start()] + f"{answer} " + original[side.start():])  # "30%", "hard"
