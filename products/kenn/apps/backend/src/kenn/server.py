@@ -1582,6 +1582,11 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 self.send_json(503, {"ok": False, "error": str(exc)})
             return
+        if parsed.path in {"/kenn/api/ask/upgrade", "/api/ask/upgrade"}:
+            from kenn.core import answer_upgrades
+
+            self.send_json(200, answer_upgrades.get(str(parse_qs(parsed.query).get("id", [""])[0])))
+            return
         if parsed.path == "/api/ableton/receipts":
             query = parse_qs(parsed.query)
             session_id = str(query.get("session_id", [""])[0]).strip()
@@ -2911,10 +2916,24 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 _t_context = time.perf_counter() - _ask_t0
                 _t_answer = time.perf_counter()
-                result = answer_payload(
-                    question, limit=limit, history=history, session_id=session_id,
-                    plugin_session_id=plugin_session_id, correlation_id=correlation_id,
-                )
+                from kenn.core import answer_upgrades
+
+                if answer_upgrades.enabled():
+                    # The template answer now; the model writes in the background and the app picks it up if KENN's
+                    # grounding check accepts it (a 16 GB Mac takes 10-15 s to write one). The background run has no
+                    # session id, so the question isn't recorded twice; the history is passed in instead.
+                    result = answer_payload(
+                        question, limit=limit, history=history, session_id=session_id, allow_llm=False,
+                        plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                    )
+                    upgrade_id = answer_upgrades.start(lambda: answer_payload(question, limit=limit, history=history))
+                    if upgrade_id:
+                        result["answer_upgrade"] = {"id": upgrade_id, "poll_ms": 2000}
+                else:
+                    result = answer_payload(
+                        question, limit=limit, history=history, session_id=session_id,
+                        plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                    )
                 _answer_ms = (time.perf_counter() - _t_answer) * 1000
                 if plugin_turn:
                     result["live_mix_context"] = plugin_context
@@ -3497,8 +3516,10 @@ def main() -> int:
 
             # 2. Apple Silicon MLX local inference pre-warming & KV-cache pinning
             try:
+                from kenn.llm.llm_rewrite import is_enabled as llm_enabled, mlx_selected
                 from kenn.llm.mlx_inference_engine import MLXInferenceEngine
-                use_mlx = os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
+                # Only when MLX will actually answer: pinning a model nobody uses takes memory from Live.
+                use_mlx = mlx_selected() and llm_enabled()
                 if use_mlx and MLXInferenceEngine.is_available():
                     engine = MLXInferenceEngine.get_instance()
                     engine.prewarm(blocking=True)

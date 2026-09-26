@@ -27,6 +27,7 @@ export const API_PATHS = {
   /** KENN（经 Dashboard /kenn 代理）：问答 / Ableton 会话卡片 / DAW 命令控制 */
   kenn: {
     ask: '/kenn/api/ask',
+    askUpgrade: '/kenn/api/ask/upgrade',
     sessionCard: '/kenn/api/ableton/session-card',
     command: '/kenn/api/ableton/command',
     undo: '/kenn/api/ableton/osc/undo',
