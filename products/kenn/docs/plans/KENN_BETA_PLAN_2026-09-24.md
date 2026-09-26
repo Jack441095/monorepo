@@ -52,8 +52,11 @@ voice, arbitrary plug-in control, silent saves.
 - [ ] **Feedback channel** (BB-3): e.g. a private Discord channel or a form. Recommendation: one channel plus an
       in-app "send diagnostics" button.
 - [ ] **Diagnostics consent.** What testers' KENN may send back (recommend: receipts and timings only, never audio).
-- [ ] **`Audio_Too` dependency** (BB-1): Mix Review still reads a Thursday-owned branch. Vendor the three qualified
+- [x] **`Audio_Too` dependency** (BB-1): Mix Review still reads a Thursday-owned branch. Vendor the three qualified
       detectors into KENN, or drop Mix Review from the beta and keep the new loudness/true-peak path.
+  > 26 Sept: already the case. The app's Mix Review runs KENN's own engine (`mix-review/core/local_engine.py` via
+  > `core/local_mix_review_service.py`); the app bundle has no `Audio_Too` files and its Mix Review smoke check
+  > passes. Only the unshipped legacy `mix-review/adapter.py` still points there.
 
 ## Phase 1: Make it installable (week 1) — biggest gap
 
