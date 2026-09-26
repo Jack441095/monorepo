@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('../api/kenn', () => ({
   askKenn: vi.fn(),
+  getAnswerUpgrade: vi.fn(),
   confirmKennAction: vi.fn(),
   undoKennAction: vi.fn(),
   fetchKennSessionCard: vi.fn().mockResolvedValue({
@@ -12,13 +13,14 @@ vi.mock('../api/kenn', () => ({
   }),
 }))
 
-import { askKenn, confirmKennAction, fetchKennSessionCard, undoKennAction } from '../api/kenn'
+import { askKenn, confirmKennAction, fetchKennSessionCard, getAnswerUpgrade, undoKennAction } from '../api/kenn'
 import { useKenn } from './useKenn'
 
 const mockedAsk = vi.mocked(askKenn)
 const mockedConfirm = vi.mocked(confirmKennAction)
 const mockedUndo = vi.mocked(undoKennAction)
 const mockedSessionCard = vi.mocked(fetchKennSessionCard)
+const mockedUpgrade = vi.mocked(getAnswerUpgrade)
 
 describe('useKenn investor-facing failure states', () => {
   const kenn = useKenn()
@@ -140,5 +142,47 @@ describe('useKenn project card with a return selected', () => {
     })
     await kenn.refreshSessionCard()
     expect(kenn.project.value.focusTrack).toBe('A-Reverb')
+  })
+})
+
+
+describe('useKenn answer upgrades', () => {
+  const kenn = useKenn()
+  const base = { suggestions: [], sources: [], findings: [], raw: {} }
+
+  beforeEach(() => {
+    kenn.messages.value = []
+    mockedAsk.mockReset()
+    mockedUpgrade.mockReset()
+  })
+
+  it('shows the template at once, then swaps in the accepted model answer', async () => {
+    vi.useFakeTimers()
+    mockedAsk.mockResolvedValue({ ...base, answer: 'Template answer.', answerUpgrade: { id: 'u1', pollMs: 500 } })
+    mockedUpgrade
+      .mockResolvedValueOnce({ status: 'pending' })
+      .mockResolvedValueOnce({ status: 'accepted', answer: 'Fuller model answer.' })
+
+    await kenn.sendMessage('How do I tame harsh hats?')
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'Template answer.', upgrade: 'pending' })
+
+    await vi.advanceTimersByTimeAsync(1100)
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'Fuller model answer.', upgraded: true })
+    expect(kenn.messages.value.at(-1)).not.toHaveProperty('upgrade', 'pending')
+    vi.useRealTimers()
+  })
+
+  it('keeps the template when the model answer is rejected', async () => {
+    vi.useFakeTimers()
+    mockedAsk.mockResolvedValue({ ...base, answer: 'Template answer.', answerUpgrade: { id: 'u2', pollMs: 500 } })
+    mockedUpgrade.mockResolvedValueOnce({ status: 'rejected' })
+
+    await kenn.sendMessage('What does Drum Buss do?')
+    await vi.advanceTimersByTimeAsync(600)
+    const last = kenn.messages.value.at(-1)
+    expect(last).toMatchObject({ text: 'Template answer.' })
+    expect(last?.role === 'assistant' && last.upgraded).toBeFalsy()
+    expect(last?.role === 'assistant' && last.upgrade).toBeFalsy()
+    vi.useRealTimers()
   })
 })

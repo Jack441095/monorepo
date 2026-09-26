@@ -74,7 +74,15 @@ export type KennAskResult = {
   proposal?: KennActionProposal
   confirmationToken?: string
   requiresConfirmation?: boolean
+  /** The model is writing a fuller answer in the background; poll getAnswerUpgrade with this id. */
+  answerUpgrade?: { id: string; pollMs: number }
   raw: Record<string, unknown>
+}
+
+export type KennAnswerUpgrade = {
+  status: 'pending' | 'accepted' | 'rejected' | 'expired'
+  answer?: string
+  sources?: KennSource[]
 }
 
 function normalizeSeverity(value: unknown): KennAdviceFinding['severity'] {
@@ -284,7 +292,29 @@ export async function askKenn(params: {
     proposal,
     confirmationToken: confirmationToken || undefined,
     requiresConfirmation: Boolean(data.requires_confirmation || proposal),
+    answerUpgrade: parseAnswerUpgrade(data.answer_upgrade),
     raw: data,
+  }
+}
+
+function parseAnswerUpgrade(value: unknown): KennAskResult['answerUpgrade'] {
+  if (!value || typeof value !== 'object') return undefined
+  const upgrade = value as Record<string, unknown>
+  const id = String(upgrade.id || '').trim()
+  return id ? { id, pollMs: Math.max(500, Number(upgrade.poll_ms) || 2000) } : undefined
+}
+
+/** GET /kenn/api/ask/upgrade: the model's answer, once KENN's grounding check has accepted it. */
+export async function getAnswerUpgrade(id: string): Promise<KennAnswerUpgrade> {
+  const base = getApiBase()
+  const res = await fetch(`${base}${API_PATHS.kenn.askUpgrade}?id=${encodeURIComponent(id)}`, { credentials: 'include' })
+  const data = await parseJson(res)
+  if (!res.ok) return { status: 'expired' }
+  const status = String(data.status || 'expired') as KennAnswerUpgrade['status']
+  return {
+    status,
+    answer: status === 'accepted' ? String(data.answer || '').trim() : undefined,
+    sources: status === 'accepted' ? parseSources(data) : undefined,
   }
 }
 

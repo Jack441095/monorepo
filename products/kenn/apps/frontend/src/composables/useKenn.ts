@@ -1,6 +1,7 @@
 import { computed, ref, shallowRef } from 'vue'
 import {
   askKenn,
+  getAnswerUpgrade,
   confirmKennAction,
   undoKennAction,
   fetchKennSessionCard,
@@ -33,6 +34,10 @@ export type KennAssistantMessage = {
   actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
   actionError?: string
   undoOfReceiptId?: string
+  /** The model is still writing a fuller answer; the template text is showing meanwhile. */
+  upgrade?: 'pending'
+  /** The text was replaced by the model's answer after KENN's grounding check accepted it. */
+  upgraded?: boolean
 }
 
 export type KennChatMessage = KennUserMessage | KennAssistantMessage
@@ -209,6 +214,35 @@ export async function refreshSessionCard() {
 
 void refreshSessionCard()
 
+const UPGRADE_WAIT_MS = 90_000
+
+/** Swap in the model's answer once KENN has accepted it; the template stays if it's rejected or never arrives. */
+async function waitForUpgrade(messageId: string, upgradeId: string, pollMs: number) {
+  const settle = (patch: Partial<KennAssistantMessage>) => {
+    const msg = messages.value.find((m) => m.id === messageId) as KennAssistantMessage | undefined
+    if (!msg) return
+    Object.assign(msg, { upgrade: undefined, ...patch })
+    messages.value = [...messages.value]
+  }
+  const deadline = Date.now() + UPGRADE_WAIT_MS
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, pollMs))
+    let result
+    try {
+      result = await getAnswerUpgrade(upgradeId)
+    } catch {
+      break
+    }
+    if (result.status === 'pending') continue
+    if (result.status === 'accepted' && result.answer) {
+      settle({ text: result.answer, upgraded: true, ...(result.sources?.length ? { sources: result.sources } : {}) })
+      return
+    }
+    break
+  }
+  settle({})
+}
+
 async function sendMessage(text: string) {
   const question = text.trim()
   if (!question || sending.value) return
@@ -230,15 +264,17 @@ async function sendMessage(text: string) {
             : m.text || (m.steps || []).join('\n') || '',
       }))
 
-    const { answer, suggestions, sources, findings, proposal, raw } = await askKenn({
+    const { answer, suggestions, sources, findings, proposal, raw, answerUpgrade } = await askKenn({
       question,
       sessionId,
       history: history.slice(0, -1),
     })
+    const assistantId = newId('assistant')
     messages.value = [
       ...messages.value,
       {
-        id: newId('assistant'),
+        id: assistantId,
+        upgrade: answerUpgrade && !proposal ? 'pending' : undefined,
         role: 'assistant',
         text: answer,
         suggestions: suggestions.length ? suggestions : undefined,
@@ -249,6 +285,7 @@ async function sendMessage(text: string) {
         undoOfReceiptId: proposal && raw?.undo_of_receipt_id ? String(raw.undo_of_receipt_id) : undefined,
       },
     ]
+    if (answerUpgrade && !proposal) void waitForUpgrade(assistantId, answerUpgrade.id, answerUpgrade.pollMs)
   } catch (e) {
     const msg = userFacingKennError(
       e,

@@ -42,6 +42,10 @@
             <p v-if="message.text" class="chat-message__text">
               {{ assistantText(message.text, Boolean(message.findings?.length)) }}
             </p>
+            <p v-if="message.upgrade === 'pending'" class="chat-message__upgrade" aria-live="polite">
+              {{ t('kenn.upgradePending') }}
+            </p>
+            <p v-else-if="message.upgraded" class="chat-message__upgrade">{{ t('kenn.upgraded') }}</p>
             <ol v-if="message.steps?.length" class="chat-message__list chat-message__list--ordered">
               <li v-for="(step, index) in message.steps" :key="index">{{ step }}</li>
             </ol>
@@ -394,5 +398,11 @@ const assistantText = summarizeAdviceAnswer
   &__test {
     color: var(--muted-text);
   }
+}
+
+.chat-message__upgrade {
+  margin: 4px 0 0;
+  font-size: 12px;
+  opacity: 0.7;
 }
 </style>

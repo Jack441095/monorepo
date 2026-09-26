@@ -119,6 +119,8 @@ export default {
     focusTrack: 'Focus Track',
     activeEffects: 'Active Effects',
     references: 'References',
+    upgradePending: 'Writing a fuller answer from the notes…',
+    upgraded: "Written by KENN's AI from the notes below.",
     thinking: 'KENN is thinking…',
     sessionDisconnected: 'No Ableton session detected (needs Live + Mixing Doctor / AbletonOSC).',
     sessionDispatched:
