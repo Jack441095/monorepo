@@ -153,6 +153,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > 26 Sept, round 4 (branch `kenn-next-build`): voice-dictation set 77.9% blind → 90.8%; a sealed Logic/FL-wording set
   > scored **92.7%** on its one blind run (plainer wording) → 97.8%. Found and fixed "synth track 5 dB louder" moving
   > track 5, "track 2, actually track 3" keeping track 2, and questions that proposed changes. Still not met.
+  > 26 Sept, planner check before training run 13: rules then run 11 on all eight phrasing sets (1,751 phrasings) gets
+  > 9 more right than the rules alone (1,648 vs 1,639) but 22 more wrong plans (23 vs 1): "lift the snare" unmutes it,
+  > "record" presses play, "the track with the delay return" goes to Snare / Clap, pans with no amount go hard left.
+  > The rules have overtaken it, so run 11 stays in shadow and **run 13 isn't trained**: another synthetic corpus would
+  > repeat run 12. The next planner should learn from real tester wording, which the shadow log collects during the
+  > pilot (where the rules ask, what was said, what happened next).
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
