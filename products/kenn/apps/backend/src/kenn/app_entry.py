@@ -31,6 +31,7 @@ DATA_LOCATIONS = {
     "KENN_SESSION_FILE": "chats/session.json",
     "KENN_LIVE_RECEIPT_JOURNAL": "live/ableton_receipts.jsonl",
     "KENN_LIVE_LLM_SHADOW_LOG": "live/live_llm_shadow.jsonl",
+    "KENN_ASKED_LOG": "live/asked_log.jsonl",
     "KENN_LIVE_LLM_PROMOTION_STATE": "live/live_llm_promotion.json",
     "KENN_ANALYSIS_CACHE_DIR": "analysis_cache",
     "KENN_MIX_OUTPUT_ROOT": "mix_outputs",

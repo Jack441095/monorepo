@@ -83,6 +83,9 @@ version ships a newer AbletonOSC, the setup page will offer an update the next t
   **Setup & Support** in KENN's toolbar and **Save diagnostics for support**, and attach the file it names (in
   `~/Library/Application Support/KENN/diagnostics`). It holds counts and timings only: which kinds of changes KENN
   made and how they ended, how fast it answered, and your versions. No track names, audio, questions or file paths.
+  If you tick **Also include the requests KENN didn't understand**, it adds what you typed at the moments KENN had to
+  ask back, and what you said next. That's the most useful thing you can send us, but it's your words, so it's off
+  unless you tick it; **Clear them** deletes the ones KENN kept.
   If we ask for more, the full logs are `~/Library/Logs/KENN Desktop Companion/server.log` and
   `~/Library/Application Support/KENN/runtime/logs/kenn.log` (fuller; look through them before sending).
   Feedback channel: _(to be confirmed)_

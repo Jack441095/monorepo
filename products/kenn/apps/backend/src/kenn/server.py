@@ -679,6 +679,17 @@ class Handler(BaseHTTPRequestHandler):
                                  proposal=bool(payload.get("proposal")))
             except Exception:
                 pass  # timing is diagnostic; it must never cost the reply
+            turn = getattr(self, "_ask_turn", None)
+            self._ask_turn = None
+            if turn and status == 200:
+                # What the tester typed when KENN had to ask (kept on this Mac; see core/asked_log.py).
+                try:
+                    from kenn.core import asked_log
+
+                    asked_log.record(turn[0], turn[1], {"status": asked_log.reply_status(payload),
+                                                        "answer": payload.get("answer")})
+                except Exception:
+                    pass
         error_id = self.request_id()
         if status >= 500:
             self.structured_log("server_error", status=status)
@@ -1415,6 +1426,12 @@ class Handler(BaseHTTPRequestHandler):
             # First-run page for the packaged app (kenn/core/live_setup.py does the work).
             self.send_bytes(200, (Path(__file__).with_name("setup_page.html")).read_bytes(), "text/html; charset=utf-8")
             return
+        if parsed.path in {"/api/support/asked-log", "/kenn/api/support/asked-log"}:
+            # A count for the support page's checkbox; the entries themselves only leave inside a diagnostics file.
+            from kenn.core import asked_log
+
+            self.send_json(200, {"ok": True, "count": len(asked_log.entries())})
+            return
         if parsed.path in {"/api/setup/status", "/kenn/api/setup/status"}:
             from kenn.ableton_osc_bridge import live_client
             from kenn.core.live_setup import setup_status
@@ -1976,6 +1993,8 @@ class Handler(BaseHTTPRequestHandler):
             "/kenn/api/setup/install-remote-script",
             "/api/support/diagnostics/save",
             "/kenn/api/support/diagnostics/save",
+            "/api/support/asked-log/clear",
+            "/kenn/api/support/asked-log/clear",
             "/api/ask", "/api/feedback", "/api/session/feedback", "/api/mix-review-step",
             "/api/audiogen/generate", "/api/audiogen/render-song",
             "/api/session/clear", "/api/ableton/apply-repair", "/api/mix-version/save",
@@ -2089,11 +2108,20 @@ class Handler(BaseHTTPRequestHandler):
             directory = Path(os.environ.get("KENN_DIAGNOSTICS_DIR") or (REPO_ROOT / ".runtime" / "diagnostics")).expanduser()
             try:
                 saved = save_support_diagnostics(
-                    build_support_diagnostics(live_snapshot=cached_snapshot, repo_root=REPO_ROOT), directory)
+                    build_support_diagnostics(live_snapshot=cached_snapshot, repo_root=REPO_ROOT,
+                                              include_asked_log=payload.get("include_asked_log") is True), directory)
             except OSError as exc:
                 self.send_json(500, {"ok": False, "error": f"KENN could not write the diagnostics file ({exc.strerror})."})
                 return
             self.send_json(200, {"ok": True, "path": str(saved), "filename": saved.name})
+            return
+        if parsed.path in {"/api/support/asked-log/clear", "/kenn/api/support/asked-log/clear"}:
+            if payload.get("confirm") is not True:
+                self.send_json(400, {"ok": False, "error": "Clearing needs an explicit confirm."})
+                return
+            from kenn.core import asked_log
+
+            self.send_json(200, {"ok": True, "cleared": asked_log.clear()})
             return
         if parsed.path in {"/api/setup/install-remote-script", "/kenn/api/setup/install-remote-script"}:
             # Writes into the user's Ableton User Library: only on an explicit confirm from the setup page.
@@ -2723,6 +2751,7 @@ class Handler(BaseHTTPRequestHandler):
         _ask_t0 = time.perf_counter()
         # send_json logs which route answered and how long it took, whichever of the exits below replies.
         self._ask_started = _ask_t0
+        self._ask_turn = (str(payload.get("session_id", "")), question)
         if not self.enforce_rate_limit("ask"):
             return
         live_inspection_reply = self._maybe_handle_live_inspection(

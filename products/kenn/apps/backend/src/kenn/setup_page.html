@@ -51,6 +51,10 @@
     yet, and what to do when something goes wrong.</p>
   <p class="support">Something not working?
     <button id="diagnostics" type="button">Save diagnostics for support</button></p>
+  <p class="support" id="asked-row" hidden>
+    <label><input type="checkbox" id="include-asked"> Also include the <span id="asked-count"></span> KENN
+      didn't understand (what you typed and what KENN asked back). They help us teach KENN your wording.</label>
+    <button id="clear-asked" type="button">Clear them</button></p>
   <div id="diagnostics-message" role="status"></div>
 </main>
 <script>
@@ -118,15 +122,41 @@
     refresh();
   });
 
+  // Requests KENN had to ask about stay on this Mac; they go into a diagnostics file only when the box is ticked.
+  async function refreshAsked() {
+    try {
+      const result = await (await fetch("/api/support/asked-log")).json();
+      $("asked-count").textContent = result.count === 1 ? "1 request" : `${result.count} requests`;
+      $("asked-row").hidden = !result.count;
+      if (!result.count) $("include-asked").checked = false;
+    } catch (error) {
+      $("asked-row").hidden = true;
+    }
+  }
+  refreshAsked();
+
+  $("clear-asked").addEventListener("click", async () => {
+    await fetch("/api/support/asked-log/clear", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: true }),
+    });
+    $("diagnostics-message").textContent = "Cleared the requests KENN kept.";
+    refreshAsked();
+  });
+
   $("diagnostics").addEventListener("click", async () => {
     $("diagnostics").disabled = true;
+    const includeAsked = $("include-asked").checked;
     try {
       const response = await fetch("/api/support/diagnostics/save", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: true }),
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: true, include_asked_log: includeAsked }),
       });
       const result = await response.json();
+      const contents = includeAsked
+        ? "It holds counts and timings, plus the requests KENN didn't understand that you chose to include. No audio or file paths."
+        : "It holds counts and timings only: no track names, audio or file paths.";
       $("diagnostics-message").textContent = result.ok
-        ? `Saved ${result.filename} to ${result.path.replace(/\/[^/]+$/, "")}. Attach it to your report. It holds counts and timings only: no track names, audio or file paths.`
+        ? `Saved ${result.filename} to ${result.path.replace(/\/[^/]+$/, "")}. Attach it to your report. ${contents}`
         : result.error;
     } catch (error) {
       $("diagnostics-message").textContent = "KENN could not save diagnostics. Restart KENN and try again.";
