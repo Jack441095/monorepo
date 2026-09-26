@@ -1,41 +1,29 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-25 late morning · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-09-26 01:40 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
-north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, on branch `kenn-north-star-and-app`
-until the merge after the soak).
+north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
 ## Right now
 
-- **Running: soak #3, started 12:42 Fri, ends ~00:42 Sat**, on the final code (`98581b2`, index `v-4fd17ceb264f`).
-  **Live reconnect recorded 13:24** (3 min offline, then back). Now just leave Live open with the demo set and the
-  Mac on charge until it ends. Nothing is committed on `main` until then.
-- **Before it started, on real Live:** tester-guide walkthrough **13/13** (incl. the "bring the bass down 2 dB" fix),
-  real-Live assistant test **passed** (apply → verify → replay rejected → exact restore; first try blocked on the box
-  planner, retry passed).
-- **Shadow planner is now run 9b** (your OK). Its 4-bit copy on this Mac scores 84.7% (full precision 85.5%) but
-  accepts 6 wrong plans vs 3 — fine for shadow; any promotion test must use the copy that would actually run.
-- **GPU box disk:** our C6 runs filled `/mnt/data` to 100% overnight (three 8.7 GB planner copies in the box's Ollama
-  plus 9b's temp files). Freed 32 GB of our own files straight away (now 96%). From now on each run's copy is removed
-  after its evaluation.
-- **Why restarted:** the first soak would have failed. After one missed reply at 15:49, KENN's Live connection stopped
-  trying (a circuit breaker with no retry) and reported Live "offline" for 4 hours while Live was fine. A tester would
-  have hit the same thing. Fixed (it now retries every 5 s), tested, merged into `main` with the branch; the real-Live
-  test re-passed on the new code (apply → verify → replay rejected → exact restore).
-- **Done since last update:** C6 run 8 evaluated (regressed, not promoted); a new retrieval test exposed a real
-  knowledge gap (below). Box Ollama stopped, GPU 0 back to baseline.
-- **Next:** the after-soak steps below.
-- **Needs you (when convenient):** quit and reopen Live once before ~08:00 Fri (the soak must see one reconnect),
-  leaving the demo set open at the end; rotate the GPU box password.
-- **Question for you:** advice → fix. Each audio finding should offer one change you can Apply, but the obvious
-  fixes need your call: true peak over −1 dBTP → a Limiter on the master (KENN's boundary blocks master changes
-  today); low-end excess → which track gets the cut? And re-measuring needs a fresh export, which KENN can't make yet.
-  My suggestion: offer the change only when a finding names one track, and ask for a re-export to re-measure.
-- **Question for you:** a stronger embedding model for knowledge search (e.g. bge-small-en-v1.5, MIT licence,
-  ~130 MB) — only if you're happy with another pinned download. See the Stage 2 note below.
-- **Parked until the end (your call):** testers, reviewers, Apple Developer ID signing, feedback channel.
+- **Soak #3 passed** (00:43 Sat): 721/721 samples, 0 errors, one Live reconnect (3 min out), Live connected at the end,
+  median reply 26 ms. It qualifies the code it ran on (`98581b2`).
+- **Merged and pushed:** receipts committed, the north-star branch merged into `main` (1,902 tests pass), main pushed
+  (`10f4f3d`). New app built: `workspace/builds/kenn-app/KENN-beta-8c32b1f.dmg` (220 MB; smoke test passed incl. the
+  in-app tester guide). Frontend rebuilt, 24/24 frontend tests.
+- **The merge moved the code, so the gate wants fresh evidence:** the soak and the real-Live assistant task passed on
+  `98581b2`, not on the merged code, and the gate only accepts evidence from the exact release code. Needs Live open:
+  re-run the real-Live assistant task (minutes), then soak #4 on the current main (12 h, one Live quit-and-reopen).
+  The review packet was stale too; rebuilt on the merged code, so reviewers score the right answers.
+- **Chat model on this Mac: off.** Qwen 8B took 7–16 s an answer through the companion (and far longer under load),
+  and KENN used its answer only 1 time in 6; 4B was no better. Chat is back to instant template answers; run 11 stays
+  in shadow for commands. Qwen 8B stays the choice for a faster machine or the box GPU (2.8 s there).
+- **Live is closed** at the moment; the companion reconnects on its own when it's reopened.
+- **Next (needs Live open):** real-Live assistant task on the current main, then start soak #4.
+- **Needs you:** testers, two reviewers, Apple Developer ID; the drafts to send are in `products/kenn/docs/beta/`
+  (tester invite, reviewer brief, supervised-session script).
 
-## Qualified beta gate: 8 / 14
+## Qualified beta gate: 7 / 15 on the current main (`10f4f3d`)
 
 - [x] artifacts · real_live · support_matrix · planner_bakeoff · real_live_assistant · automated_suite ·
       intelligence · source_snapshot (the engineering gates; source_snapshot re-passes once the soak change is committed)
