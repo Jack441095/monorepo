@@ -1,22 +1,18 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-26 07:00 · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-09-26 14:45 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
 north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
 ## Right now
 
-- **Soak #3 passed** (00:43 Sat): 721/721 samples, 0 errors, one Live reconnect (3 min out), Live connected at the end,
-  median reply 26 ms. It qualifies the code it ran on (`98581b2`).
-- **Merged and pushed:** receipts committed, the north-star branch merged into `main` (1,902 tests pass), main pushed
-  (now `3eb5724`). New app built: `workspace/builds/kenn-app/KENN-beta-8c32b1f.dmg` (220 MB; smoke test passed incl. the
-  in-app tester guide). Frontend rebuilt, 24/24 frontend tests.
-- **The merge moved the code, so the gate wants fresh evidence:** the soak and the real-Live assistant task passed on
-  `98581b2`, not on the merged code, and the gate only accepts evidence from the exact release code. Needs Live open:
-  re-run the real-Live assistant task (minutes), then soak #4 on the current main (12 h, one Live quit-and-reopen).
-  The review packet was stale too; rebuilt on the merged code, so reviewers score the right answers.
-- **Soak #4 running** since 02:18 on `af1cb64` (ends ~14:18; its one required Live reconnect already happened at ~03:00, so no quit-and-reopen needed); real-Live assistant task **passed** on that code (second
-  try; the first was the box planner not producing one bounded proposal, as last time); tester walkthrough 13/13.
+- **Tester build ready (14:25 Sat):** soak #4 **passed** on `af1cb64` (721/721, 0 errors, one Live reconnect of 60 s,
+  connected at the end); receipts committed, gate **9 / 15**, main pushed (`cb9dad5`). App:
+  `workspace/builds/kenn-app/KENN-beta-cb9dad5.dmg` (221 MB, smoke test passed). This is what testers get first.
+- **Next build prepared** on `kenn-next-build`: 90 note corrections applied (backups in
+  `workspace/tmp/kenn-ops/note-backups-20260926/`), its own index `v-07328d9baf04` (main keeps `v-4fd17ceb264f`),
+  retrieval 0.983 / 0.768 / 0.346, intelligence and suite gates pass there. Future soaks are **8 hours** (your call), so
+  one fits overnight. It needs its own soak and real-Live runs before it reaches testers.
 - **Built on branches while it runs (not in the soaked build):**
   - `kenn-recipes`: 15 named mix recipes (was 3). The original three misreported their own amounts ("-1.5 dB" moved
     -2.8 dB; a vocal at 0 dB went to +2 dB); fixed. Recipes ask when a role matches several tracks. "Undo that" twice
@@ -58,11 +54,11 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **Needs you:** testers, two reviewers (Apple Developer ID deferred to just before shipping, owner's call 26 Sept); the drafts to send are in `products/kenn/docs/beta/`
   (tester invite, reviewer brief, supervised-session script).
 
-## Qualified beta gate: 7 / 15 on the current main (`3eb5724`)
+## Qualified beta gate: 9 / 15 on the current main (`cb9dad5`)
 
 - [x] artifacts · real_live · support_matrix · planner_bakeoff · real_live_assistant · automated_suite ·
       intelligence · source_snapshot (the engineering gates; source_snapshot re-passes once the soak change is committed)
-- [ ] companion_soak — running (12 h)
+- [x] companion_soak — soak #4 passed on `af1cb64` (26 Sept)
 - [ ] human_review — needs two reviewers (parked)
 - [ ] real_mix — needs a consented listening set and reviewers (parked)
 - [ ] supervised_pilot — needs testers (parked)
@@ -87,9 +83,9 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - [x] Audio-analysis cache survives a companion restart
 - [x] Stale evidence regenerated (gate 3 → 8/14)
 - [x] Human-review packet rebuilt on the hybrid index
-- [ ] Idle-wake: code done; real 2-hour idle test folds into the soak
-- [ ] 12-hour soak — running
-- [ ] Exit: every engineering gate passing — only the soak left
+- [x] Idle-wake: code done; covered by soak #4 (Live dropped at ~03:00 and KENN reconnected by itself)
+- [x] 12-hour soak — soak #4 passed on `af1cb64` (26 Sept); future soaks 8 hours
+- [x] Exit: every engineering gate passing (gate 9 / 15; the rest need people or the Developer ID)
 - [x] Test suite runs on the GPU box too (`tooling/scripts/run_tests_on_box.py`): **1,789 passed**, 12 skipped
       (Apple-only MLX, optional extras), ~2 min. Fixed on the way: the smoke tests' fixed port 8099 now picks a free one
 
