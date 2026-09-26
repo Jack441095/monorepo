@@ -37,7 +37,7 @@ tester should look through them before sending.
 | An answer shows code names (`generate_mix_plan()` and similar) | An internal AutoMix note reached an everyday answer (fixed 24 Sept) | Get the question; add it to the retrieval fixtures |
 | Mix Review rejects a file | Not 16/24-bit PCM WAV, not mono/stereo, too short, or corrupt | Expected. Ask for a 16- or 24-bit WAV export |
 | Mix Review's findings seem wrong on a real mix | Calibration, not a crash | Log against the finding's `fault_family` as real-mix evidence; don't patch it away from one example |
-| App won't open the first time | Unsigned beta build (Gatekeeper) | Right-click KENN in Applications → **Open** → **Open** |
+| App won't open the first time | Unsigned beta build (Gatekeeper) | Double-click once and press **Done**, then System Settings → Privacy & Security → **Open Anyway** (right-click → Open no longer works on macOS 15+) |
 | KENN seems stuck | Companion hung or crashed | Quit and reopen KENN; nothing in Live changes without Apply, so restarting is always safe |
 
 ## Things KENN must never do

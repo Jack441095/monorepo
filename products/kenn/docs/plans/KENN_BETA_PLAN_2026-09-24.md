@@ -95,6 +95,9 @@ The beta cannot start while KENN only runs from this Mac's checkout.
       in under 15 minutes following only the guide
   > Ready to try once the soak ends (the running dev companion holds ports 8090/11001): `build_kenn_app.py --dmg` →
   > `workspace/builds/kenn-app/KENN-beta-<commit>.dmg`. Owner test on a second macOS user account.
+  > 2026-09-26: the tester DMG is ad-hoc signed and Gatekeeper rejects it (`spctl`: rejected). On macOS 15+ the
+  > guide's "right-click → Open" no longer gets past that, so the guide and support runbook now say Done, then
+  > Privacy & Security → Open Anyway. The clean-account test should time that step too.
 
 ## Phase 2: Reliability and the qualification gate (weeks 1–2, overlaps Phase 1)
 

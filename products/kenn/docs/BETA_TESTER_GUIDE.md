@@ -25,8 +25,13 @@ Intel Macs and Live 11 are not supported.
 ## Install (about 5 minutes)
 
 1. Open `KENN-beta-….dmg` and drag **KENN** into **Applications**.
-2. The first time only, **right-click KENN in Applications and choose Open**, then **Open** again. (This beta
-   build isn't notarized by Apple yet, so a normal double-click is blocked the first time.)
+2. The first time only, macOS blocks KENN because this beta build isn't notarized by Apple yet:
+   - Double-click KENN in Applications. macOS says it can't check KENN; press **Done** (not Move to Trash).
+   - Open **System Settings → Privacy & Security**, scroll down to the line about KENN and press **Open Anyway**,
+     then confirm with your password or Touch ID.
+   - KENN opens. From then on a normal double-click works.
+
+   (Right-click → Open worked on older macOS; since macOS 15 it no longer skips this check.)
 3. KENN opens on **Set up KENN** with three checks:
    - **Ableton Live 12 is installed**
    - **KENN's AbletonOSC is in Live's User Library** — press **Install KENN's AbletonOSC**. KENN finds your User
