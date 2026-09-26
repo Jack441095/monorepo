@@ -3502,8 +3502,10 @@ def main() -> int:
 
             # 2. Apple Silicon MLX local inference pre-warming & KV-cache pinning
             try:
+                from kenn.llm.llm_rewrite import is_enabled as llm_enabled, mlx_selected
                 from kenn.llm.mlx_inference_engine import MLXInferenceEngine
-                use_mlx = os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
+                # Only when MLX will actually answer: pinning a model nobody uses takes memory from Live.
+                use_mlx = mlx_selected() and llm_enabled()
                 if use_mlx and MLXInferenceEngine.is_available():
                     engine = MLXInferenceEngine.get_instance()
                     engine.prewarm(blocking=True)

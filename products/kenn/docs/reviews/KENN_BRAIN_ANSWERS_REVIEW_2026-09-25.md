@@ -733,3 +733,13 @@ is too long for this Mac. This also explains the Mac/box gap: the box evaluation
 Conclusion: keep templates on 16 GB Macs. The mechanism is worth keeping for a faster Mac or the box GPU. Worth
 fixing separately: the default prompt layout for an Ollama provider should be the full one (the short layout was
 written for the old MLX runtime).
+
+## Correction: which model answered on the Mac (26 Sept, 03:00)
+
+The Mac has Apple's MLX engine installed, and KENN routed chat completions to it whenever it was present, even with
+Qwen3 8B on Ollama configured; its default model is Qwen2.5 1.5B. So the template-first run above with the default
+(short) prompt was answered by the 1.5B model, not 8B, which explains the unstructured answers and the wrong
+"Range sets the ratio". The Mac speed comparison (4B 46 s, 8B 80 s) and the full-prompt run (58–91 s) forced Ollama
+and stand; so does the conclusion that 8B is too slow on this Mac. Fixed on branch `kenn-chat-stream`: an explicitly
+configured provider always answers, MLX only when chosen or when nothing is configured, and the server no longer pins
+the MLX model in memory when the chat model is off.

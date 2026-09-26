@@ -716,7 +716,7 @@ def _chat_completion(
         return cached, usage
 
     # Prioritize Apple Silicon MLX native on-device inference when enabled and available
-    use_mlx = json_schema is None and os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
+    use_mlx = json_schema is None and mlx_selected(task)
     if use_mlx:
         try:
             from kenn.llm.mlx_inference_engine import MLXInferenceEngine
@@ -875,8 +875,8 @@ def chat_completion_stream(
         yield "", usage
         return
 
-    # Prioritize Apple Silicon MLX native streaming when enabled and available
-    use_mlx = os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
+    # Prioritize Apple Silicon MLX native streaming when it's the chosen runtime and available
+    use_mlx = mlx_selected(task)
     if use_mlx:
         try:
             from kenn.llm.mlx_inference_engine import MLXInferenceEngine
@@ -1089,6 +1089,34 @@ def format_turn_directives(
     return "\n".join(parts)
 
 
+def mlx_selected(task: str = "rewrite") -> bool:
+    """Whether the on-device MLX engine should answer instead of the configured provider.
+
+    An explicit choice wins: KENN_USE_MLX on or off, or a provider named for this task. Only when nothing is configured
+    does MLX take over when installed. It used to take over whenever installed, so a Mac set up for Qwen3 8B on Ollama
+    was silently answered by the 1.5B MLX default (found 26 Sept).
+    """
+    explicit = os.environ.get("KENN_USE_MLX")
+    if explicit is not None:
+        return explicit.strip().lower() in {"1", "true", "yes"}
+    suffix = f"_{task.upper()}" if task != "rewrite" else ""
+    providers = [os.environ.get(name, "").strip().lower() for name in (
+        f"KENN_LLM_PROVIDER{suffix}", f"AUDIO_TOO_LLM_PROVIDER{suffix}", "KENN_LLM_PROVIDER", "AUDIO_TOO_LLM_PROVIDER")]
+    chosen = next((p for p in providers if p), "")
+    return chosen in {"", "mlx"}
+
+
+def _mlx_engine_answers(task: str = "rewrite") -> bool:
+    if not mlx_selected(task):
+        return False
+    try:
+        from kenn.llm.mlx_inference_engine import MLXInferenceEngine
+
+        return bool(MLXInferenceEngine.is_available())
+    except Exception:
+        return False
+
+
 def _build_synthesis_messages(
     query: str,
     template_answer: str,
@@ -1110,7 +1138,10 @@ def _build_synthesis_messages(
     2. Include the template answer as a 'draft' reference (not as the primary source)
     3. Let the LLM synthesise its own answer from the raw sources
     """
-    use_mlx = os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
+    # The short, cache-friendly layout suits the MLX engine; any other model (Ollama) needs the full system prompt to
+    # keep the Short answer / Try this / Sources format. The flag alone used to decide, so with MLX not installed an
+    # Ollama model got the short layout and most answers failed the structure check (26 Sept).
+    use_mlx = _mlx_engine_answers()
 
     # Excerpt and draft budgets. The draft is built from the same excerpts, so sending both in full mostly repeats
     # itself. On the 84 chat questions (Qwen3 8B, 26 Sept) 1,600 + 1,200 characters beat the old 3,500 + 3,500: 80/84
