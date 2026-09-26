@@ -50,3 +50,82 @@ KENN still has correct notes on each topic. Crossfader, tuning systems and Compl
 from the manual; Follow Actions, Multiband Dynamics' sidechain and the EQ Eight parameter name get the one-step fixes
 above (the rest of the Multiband note matches the manual). Then the index is rebuilt and the intelligence gate and review
 packet re-run on the next build.
+
+## Full review of the ableton12-… notes (26 Sept, Jack: "do the full review pass")
+
+A random sample of 20 found roughly 4 in 10 with a wrong step and 1 in 7 wrong throughout, so every one of the 201
+remaining approved `ableton12-…` notes was read against the Live 12 manual (control names, menus, what things do;
+anything uncertain was looked up in the manual text). The manual overruled the reviewer several times ("Enable Send",
+Capture MIDI's 80-160 BPM range, Drift's Freq Mod section and Probability Groups are all real), so those stayed.
+
+| Outcome | Notes |
+|---|---|
+| Kept as they are | 148 |
+| Wrong steps fixed or removed | 25 |
+| Moved to Draft (invented throughout) | 28 |
+
+With the 11 above, 33 notes go to Draft and 31 are corrected. Decisions, with the exact step text changed, are in
+`KENN_ABLETON12_NOTE_REVIEW_2026-09-26.json`; `workspace/tmp/kenn-ops/apply_note_corrections.py` applies them all after
+soak #4 (originals backed up; every step must match exactly or nothing is written).
+
+What the review can't promise: kept notes use real controls in a sensible order, but their example values ("Rate 2 Hz",
+"Drive 50%") are starting points, not checked recommendations.
+
+### Moved to Draft
+
+- `ableton12-arrangement-view-pt4.md`: clip envelopes have no attack/release, sine shape, lock or stretch settings, and there is no MIDI Controller Clip Envelope option
+- `ableton12-audio-clips-warping-pt4.md`: Warp Resolution, Transient Preservation and a Beats setting inside Complex Pro don't exist
+- `ableton12-audio-effect-racks-parallel-chain-splitting.md`: suggests Kontakt 6 as a compressor and Drum Rack pads for frequency splitting
+- `ableton12-audio-effect-racks-pt4.md`: devices don't output to a main or parallel chain, and the Zone Editor doesn't route audio
+- `ableton12-audio-fact-sheet-pt2.md`: there is no global 32-bit float setting in Settings > Audio, and Utility's Width doesn't manage panning loss
+- `ableton12-automation-and-editing-envelopes-pt3.md`: no Thin Automation switch, and envelopes have no attack/release
+- `ableton12-comping-pt2.md`: there are no Take 1/2/3 buttons or Crossfade tool; take lanes come from recording
+- `ableton12-comping-pt3.md`: no Crossfade tool, Auto-Align or Comping device in Live
+- `ableton12-computer-audio-latency-pt2.md`: no Device > Device Delay Compensation menu; the Track Freeze steps repeat
+- `ableton12-computer-audio-latency-pt3.md`: delay compensation isn't in Preferences > Audio > MIDI Timing; returns don't bypass effects
+- `ableton12-converting-audio-to-midi-pt2.md`: invented settings (Sensitivity, Threshold, MIDI Note Stretch) and a wrong location for the conversion commands
+- `ableton12-converting-audio-to-midi-pt3.md`: there is no Convert to MIDI render with rendering settings; mixes up the audio fact sheet
+- `ableton12-editing-mpe-pt2.md`: no Preferences > MIDI > MPE path and no MPE mode inside a clip
+- `ableton12-editing-mpe-pt3.md`: instruments have no MIDI tab with MPE and Per Note settings
+- `ableton12-live-audio-effect-reference-pt16.md`: Shifter's delay isn't set in Hz, and Spectral Resonator's Stretch and Harmonics don't do what it says
+- `ableton12-live-audio-effects-ref-pt13.md`: Redux and Resonators have no LFO2 or envelope follower section
+- `ableton12-live-audio-effects-ref-pt20.md`: invented Push 2 features: a 64-pad step mode setting, 32-note loops, MIDI learn to pads
+- `ableton12-max-for-live-devices-pt5.md`: invented connections: an LFO into Shaper's frequency input at 440 Hz, a Shaper Waveform mode with resonance
+- `ableton12-midi-fact-sheet-pt2.md`: Clip Quantization is launch quantization, and there is no Groove tab or Groove Strength in the MIDI Note Editor
+- `ableton12-midi-tools-pt4.md`: no Arpeggiator mode in the MIDI Tools, and Seed, Time Warp and Strum don't have those settings
+- `ableton12-midi-tools-pt5.md`: there is no MIDI Transform device or Note Mode on a track
+- `ableton12-mixing-manual-pt3.md`: fixed return and main levels as rules, and the crossfader doesn't blend returns with the main track
+- `ableton12-routing-and-io-pt2.md`: return tracks have no input choosers and can't be armed to record
+- `ableton12-routing-and-io-pt4.md`: no Group or Monitor buttons on track headers for routing to a group, and sends aren't set in percent
+- `ableton12-session-view-pt3.md`: no Add Envelope button, envelope attack/sustain/release or Link to Clip option
+- `ableton12-stem-separation-pt2.md`: the command and a Separation Speed setting are invented; the rest is generic effect settings
+- `ableton12-stem-separation-pt3.md`: stems are audio, not MIDI; the steps don't describe stem separation
+- `ableton12-using-tuning-systems-pt3.md`: no Device > MIDI > MIDI Settings menu or Sync to Live option; MIDI sync is set per port in Link, Tempo & MIDI
+
+### Corrected
+
+- `ableton12-audio-effect-racks-pt1.md`
+- `ableton12-clip-view-pt2.md`
+- `ableton12-device-delay-compensation-and-latency.md`
+- `ableton12-editing-midi-pt1.md`
+- `ableton12-internal-audio-routing-and-sidechain-tapping.md`
+- `ableton12-live-audio-effect-reference-pt7.md`
+- `ableton12-live-audio-effect-reference-pt9.md`
+- `ableton12-live-audio-effects-ref-pt16.md`
+- `ableton12-live-audio-effects-ref-pt19.md`
+- `ableton12-live-audio-effects-ref-pt8.md`
+- `ableton12-live-concepts-pt2.md`
+- `ableton12-live-instrument-reference-pt8.md`
+- `ableton12-live-instruments-ref-pt1.md`
+- `ableton12-live-instruments-ref-pt17.md`
+- `ableton12-live-instruments-ref-pt18.md`
+- `ableton12-live-instruments-ref-pt4.md`
+- `ableton12-live-keyboard-shortcuts-pt2.md`
+- `ableton12-live-midi-effect-reference-pt1.md`
+- `ableton12-live-midi-effects-ref-pt4.md`
+- `ableton12-managing-files-and-sets-pt2.md`
+- `ableton12-midi-tools-pt3.md`
+- `ableton12-mixer-gain-staging-and-headroom.md`
+- `ableton12-mixing-manual-pt2.md`
+- `ableton12-using-grooves-pt2.md`
+- `ableton12-warp-algorithms-and-transient-preservation.md`
