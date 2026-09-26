@@ -1651,3 +1651,25 @@ def test_an_oversized_mix_upload_says_the_limit_and_what_to_do(running_server: s
     status, body = _claim_length(running_server, "/api/mix-review", 200 * 1024 * 1024, "multipart/form-data; boundary=x")
     assert status == 413
     assert "150 MB" in body["error"] and "shorter section" in body["error"]
+
+
+def test_chat_hands_follow_ups_to_live_only_mid_change() -> None:
+    # 26 Sept 2026, in the browser: "Do that on the snare too" after "Bring the bass down 2 dB" got a notes answer
+    # about snare drums, because only replies starting with a command verb reached the command gateway.
+    from kenn.core.session_context import record_live_exchange
+    from kenn.server import _continues_live_turn
+
+    record_live_exchange(session_id="chat-follow-up", command="Bring the bass down 2 dB",
+                         result={"status": "confirmation_required", "intent": {"action": "set_volume",
+                                                                               "track": {"name": "Bass"}}})
+    for reply in ("Do that on the snare too", "Same for the hats", "Do the opposite on the vocal",
+                  "No, I meant the snare", "Sorry, the kick"):
+        assert _continues_live_turn(reply, "chat-follow-up"), reply
+    assert not _continues_live_turn("How do I sidechain the bass to the kick?", "chat-follow-up")
+    assert not _continues_live_turn("Do that on the snare too", "chat-nothing-yet")
+
+    record_live_exchange(session_id="chat-question", command="pan the snare",
+                         result={"status": "clarification_required",
+                                 "intent": {"action": "set_pan", "missing_fields": ["pan_side"],
+                                            "track": {"name": "Snare / Clap"}}})
+    assert _continues_live_turn("20% left", "chat-question")

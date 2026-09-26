@@ -180,6 +180,22 @@ def _is_live_imperative(question: str) -> bool:
     return any(_within_one_edit(first, verb) for verb in _LIVE_IMPERATIVE_VERBS if len(verb) >= 3)
 
 
+def _continues_live_turn(question: str, session_id: str) -> bool:
+    """A follow-up, correction or short reply to the Live change this chat is in the middle of.
+
+    "Do that on the snare too", "no, I meant the kick" and "3 dB" don't start with a command verb, so until
+    26 Sept 2026 the chat sent them to the notes even though the command gateway knows what they mean.
+    """
+    from kenn.core.live_command import _CORRECTION, _FOLLOW_UP_MARKER
+    from kenn.core.session_context import live_conversation_context
+
+    context = live_conversation_context(session_id)
+    text = " ".join(str(question or "").split())
+    if context.get("pending_question") and 0 < len(text.split()) <= 6:
+        return True
+    return bool(context.get("last_command")) and bool(_FOLLOW_UP_MARKER.search(text) or _CORRECTION.match(text))
+
+
 def _cached_ableton_health() -> dict[str, Any]:
     """Return a non-blocking Ableton subsystem summary for ``/api/health``.
 
@@ -807,7 +823,7 @@ class Handler(BaseHTTPRequestHandler):
         gateway result falls through so ordinary production questions keep
         reaching the knowledge chat.
         """
-        if not _is_live_imperative(question):
+        if not _is_live_imperative(question) and not _continues_live_turn(question, session_id):
             return None
         result = handle_command(question, session_id=session_id)
         intents = [result.get(key) for key in ("intent", "live_intent") if isinstance(result.get(key), dict)]
