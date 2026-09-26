@@ -52,7 +52,7 @@ KENN connecting.
 | `Bring the bass down 2 dB` / `Put the kick at -12 dB` | A proposal in dB; nothing changes until Apply |
 | `Pan the synth 20% left` / `Mute the hats` | Proposal, Apply, then "Readback Verified" |
 | `Undo that` or the **Undo** button on a card | Puts the exact previous value back |
-| After a change: `Do that on the snare too` / `Same for the hats` / `Do the opposite on the vocal` | The same change on another track, as a new proposal |
+| After a change: `Do that on the snare too` / `Same for the hats` / `Do the opposite on the synth` | The same change on another track, as a new proposal |
 | Wrong track? `No, I meant the snare` / `Sorry, the kick` | Moves the change to the track you meant; if you'd already applied it, KENN says so and you can say `undo` |
 | When KENN asks "By how much?" or "Which side?", just answer: `3 dB`, `30%`, `left` | Finishes the request you started |
 | Mix recipes: `Make room for the kick`, `Give the vocal some space`, `Push the synth back`, `Tighten the drum bus` | A short plan of up to three changes, in real units; one Apply, one Undo |

@@ -1673,3 +1673,28 @@ def test_chat_hands_follow_ups_to_live_only_mid_change() -> None:
                                  "intent": {"action": "set_pan", "missing_fields": ["pan_side"],
                                             "track": {"name": "Snare / Clap"}}})
     assert _continues_live_turn("20% left", "chat-question")
+
+
+def test_chat_shows_kenns_live_question_mid_change(running_server: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    # "Do the opposite on the vocal" would take the vocal above 0 dB, so KENN asks; the chat used to drop that and
+    # answer from the notes about vocals instead.
+    import kenn.server as server_module
+    from kenn.core.session_context import record_live_exchange
+
+    record_live_exchange(session_id="chat-opposite", command="Bring the bass down 2 dB",
+                         result={"status": "confirmation_required", "intent": {"action": "set_volume",
+                                                                               "track": {"name": "Bass"}}})
+    monkeypatch.setattr(server_module, "handle_command", lambda command, *, session_id: {
+        "status": "clarification_required", "intent": {"action": "set_volume", "missing_fields": ["value"]},
+        "answer": "That would take the track above 0 dB, which KENN does not set."})
+    request = urllib.request.Request(
+        f"{running_server}/api/ask",
+        data=json.dumps({"question": "Do the opposite on the vocal", "session_id": "chat-opposite"}).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        body = json.loads(response.read())
+    assert body["route"] == "ableton_controller"
+    assert "above 0 dB" in body["answer"]
+    assert not body.get("requires_confirmation")
