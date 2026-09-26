@@ -72,7 +72,10 @@ def outcome(result: dict[str, Any]) -> dict[str, Any]:
     status = str(result.get("status") or "")
     intent = result.get("intent") if isinstance(result.get("intent"), dict) else {}
     if status in _ASKED or not intent.get("action") or intent.get("missing_fields"):
-        return {"action": "clarify", "track": None, "value": None, "answer": str(result.get("answer") or "")[:400]}
+        return {"action": "clarify", "track": None, "value": None, "answer": str(result.get("answer") or "")[:400],
+                # What was understood, for "'Synth' is already centred": no proposal, and none was needed.
+                "understood": {"action": intent.get("action"), "track": (intent.get("track") or {}).get("name"),
+                               "value": intent.get("desired_value")}}
     # Reads and view changes (inspect, focus) answer directly without a proposal.
     action = _SAME_READ.get(str(intent.get("action")), intent.get("action"))
     return {"action": action, "track": (intent.get("track") or {}).get("name"), "value": None, "read_only": True,
@@ -96,6 +99,12 @@ def verdict(case: dict[str, Any], got: dict[str, Any], want: Any) -> str:
     if got["action"] == "clarify":
         if expected.startswith("focus_") and "already focused" in str(got.get("answer")):
             return "right"  # "That track is already focused": nothing to do, and KENN says so
+        understood = got.get("understood") or {}
+        if "is already" in str(got.get("answer")) and understood.get("action") == expected:
+            # "'Snare / Clap' is already unmuted": understood exactly, and the set is already there. Right only if
+            # what it understood is what was asked, as for a proposal.
+            return verdict(case, {"action": expected, "track": understood.get("track"),
+                                  "value": understood.get("value")}, want)
         return "right" if expected == "clarify" else "asked"
     if expected == "clarify":
         # "Asks" really means "proposes no change": an honest read-only answer ("KENN can't change the tempo yet;

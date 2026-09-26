@@ -36,6 +36,8 @@ export type KennActionProposal = {
   after?: unknown
   before_db?: number | '-inf' | null
   after_db?: number | '-inf' | null
+  before_display?: string
+  after_display?: string
   unit?: string
   reason?: string
   confirmation_token?: string

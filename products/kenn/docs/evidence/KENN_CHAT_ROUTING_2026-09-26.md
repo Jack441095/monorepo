@@ -8,7 +8,7 @@ shouldn't) through `/kenn/api/ask`.
 
 | | Before (main `c648e1a`) | After (`kenn-after-soak`) |
 |---|---|---|
-| Requests that reach Live | 654 / 1,072 (61.0%) | 1,009 / 1,072 (94.1%) |
+| Requests that reach Live | 654 / 1,072 (61.0%) | 1,016 / 1,072 (94.8%) |
 | Knowledge questions taken over by Live | 44 / 481 | 3 / 481 |
 | Server errors | 2 | 0 |
 | Rule path (phrasing scorer) | 1,639 / 1,751 right, 1 wrong | 1,642 / 1,751 right, 1 wrong (the disputed "-1 pan" row) |
@@ -26,10 +26,14 @@ shouldn't) through `/kenn/api/ask`.
 - Narrower matchers: "tempo" anywhere no longer answers "the current tempo is 120 BPM"; "which key I press" isn't the
   song's key; "every note I play" isn't transport Play; "a tremolo that pulses to the beat" isn't a request to write
   drums; swing on a drum pattern doesn't write a bassline.
+- Answers read as a tester reads them: "I can mute 'Hi-Hats'", "rename 'Synth' to 'Pads'", a compressor threshold
+  "from 0.00 dB to -20.0 dB" (it said "from 0.85 db to 0.362 db"), recipes step by step in dB and %, and "'Synth' is
+  already centred" instead of a proposal to change nothing. The phrasing scorer counts "already there" as right only
+  when what KENN understood matches the label (1,642 right, unchanged).
 - The two 500s: Live's numeric root note (0 = C) crashed the MIDI generator; the session doctor's audit read fields
   its issues don't have. Both fixed, and a 500's error text now goes to the local log.
 
-**The 63 requests still missed** are phrasings the rule parser can't do either (0 of them become a proposal through
+**The 56 requests still missed** are phrasings the rule parser can't do either (0 of them become a proposal through
 the command gateway), so they are phrasing coverage, not routing. The 3 questions still taken over are borderline
 ("fix muddy low mids in a mix" reads as a command).
 

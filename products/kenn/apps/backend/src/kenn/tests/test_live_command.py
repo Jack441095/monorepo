@@ -448,9 +448,9 @@ def test_again_and_it_resolve_through_real_command_path() -> None:
     assert repeated["resolved_command"] == "mute track 2"
     assert repeated["proposal"]["track_name"] == "Bass"
 
-    anaphora = handle_command("unmute it", session_id="command-context", service=service, allow_llm=False)
+    anaphora = handle_command("solo it", session_id="command-context", service=service, allow_llm=False)
     assert anaphora["status"] == "confirmation_required"
-    assert anaphora["resolved_command"] == "unmute Bass"
+    assert anaphora["resolved_command"] == "solo Bass"
     assert anaphora["proposal"]["track_name"] == "Bass"
 
 
@@ -999,6 +999,27 @@ def test_a_volume_proposal_carries_the_levels_in_db_for_the_card() -> None:
     proposal = handle_command("Bring the bass down 2 dB", session_id="card-db", service=_service(FakeLiveBackend()),
                               allow_llm=False)["proposal"]
     assert (proposal["before_db"], proposal["after_db"]) == (-14.0, -16.0)
+
+
+def test_answers_say_the_change_in_the_words_and_units_live_uses() -> None:
+    # 26 Sept 2026, reading the answers as a tester would: "set muted on 'Hi-Hats' from off to on", "from Synth
+    # string to Pads string", a compressor threshold "from 0.85 db to 0.362 db" for -20 dB, and "centre the synth" on
+    # a centred synth proposing "from centre to centre".
+    from kenn.core.fake_live import FakeLiveBackend
+
+    service = _service(FakeLiveBackend())
+
+    def say(text: str) -> dict:
+        return handle_command(text, session_id="answer-words", service=service, allow_llm=False)
+
+    assert say("Mute the hats")["answer"].startswith("I can mute 'Hi-Hats'.")
+    assert say("rename the synth to Pads")["answer"].startswith("I can rename 'Synth' to 'Pads'.")
+    threshold = say("set the compressor threshold on the drum bus to -20 dB")
+    assert "from 0.00 dB to -20.0 dB" in threshold["answer"]
+    assert threshold["proposal"]["after_display"] == "-20.0 dB"
+    centred = say("centre the synth")
+    assert centred["status"] == "clarification_required" and "proposal" not in centred
+    assert centred["answer"] == "'Synth' is already centred. Nothing to change."
 
 
 def test_an_undo_card_says_it_is_an_undo() -> None:

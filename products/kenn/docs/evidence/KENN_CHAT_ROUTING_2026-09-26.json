@@ -1,13 +1,8 @@
 {
  "schema": "kenn.chat_routing.v1",
  "requests": 1072,
- "reached_live": 1009,
+ "reached_live": 1016,
  "missed": [
-  {
-   "query": "put an eq8 on the bass plz",
-   "expected": "insert_device",
-   "route": "production"
-  },
   {
    "query": "stick a utility on the drums bus",
    "expected": "insert_device",
@@ -107,16 +102,6 @@
    "query": "make new synth track",
    "expected": "create_midi_track",
    "route": "ableton"
-  },
-  {
-   "query": "rename a-reverb to reverb1",
-   "expected": "rename_track",
-   "route": "production"
-  },
-  {
-   "query": "rename b-delay to delay1",
-   "expected": "rename_track",
-   "route": "production"
   },
   {
    "query": "I want to solo the bass to adjust the EQ Eight. Is that okay?",
@@ -234,16 +219,6 @@
    "route": "production"
   },
   {
-   "query": "select the drum bus",
-   "expected": "focus_track",
-   "route": "ableton"
-  },
-  {
-   "query": "focus the drum bus compressor",
-   "expected": "focus_device",
-   "route": "ableton"
-  },
-  {
    "query": "compressor output on the vocal to 2 dB",
    "expected": "set_device_parameter",
    "route": "production"
@@ -262,11 +237,6 @@
    "query": "show me the compressor settings on the drum bus",
    "expected": "inspect_device_parameters",
    "route": "ableton"
-  },
-  {
-   "query": "set the compressor output on the vocal to 1 dB",
-   "expected": "set_device_parameter",
-   "route": "production"
   },
   {
    "query": "drum bus compressor output to 2 dB",
@@ -311,11 +281,6 @@
   {
    "query": "slo the bass",
    "expected": "set_solo",
-   "route": "production"
-  },
-  {
-   "query": "mute the kick, wait no, the bass",
-   "expected": "set_mute",
    "route": "production"
   }
  ],

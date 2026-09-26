@@ -218,6 +218,24 @@ def _track_creation_text(proposal: dict[str, Any]) -> str:
     )
 
 
+def already_there(action: str, track_name: str, before: Any, value: Any) -> str | None:
+    """"'Synth' is already centred." when a single request would change nothing ("centre" on a centred synth proposed
+    "from centre to centre"). Recipes and undo keep their no-op steps: one step already in place mustn't stop the rest."""
+    if action not in {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"} or not _values_match(before, value):
+        return None
+    return f"'{track_name}' is already {_state_words(action, before)}. Nothing to change."
+
+
+def _state_words(action: str, value: Any) -> str:
+    if action == "set_volume":
+        level = _fader_db_fields(value, value)["before_db"]
+        return f"at {level} dB" if level is not None else "at that level"
+    if action == "set_pan":
+        return "centred" if abs(float(value)) < 0.005 else f"panned {abs(float(value)) * 100:.0f}% {'left' if value < 0 else 'right'}"
+    words = {"set_mute": ("muted", "unmuted"), "set_solo": ("soloed", "not soloed"), "set_arm": ("armed", "not armed")}
+    return words[action][0 if value else 1]
+
+
 def _fader_db_fields(before: Any, after: Any) -> dict[str, Any]:
     def db(raw: Any) -> float | str | None:
         if isinstance(raw, bool) or not isinstance(raw, (int, float)):

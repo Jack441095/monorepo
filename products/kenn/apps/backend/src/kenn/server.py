@@ -846,7 +846,9 @@ class Handler(BaseHTTPRequestHandler):
         reaching the knowledge chat.
         """
         imperative = _is_live_imperative(question)
-        if not imperative and not _continues_live_turn(question, session_id) and not _chat_wants_live(question):
+        continuing = _continues_live_turn(question, session_id)
+        parsed_live = _chat_wants_live(question)
+        if not (imperative or continuing or parsed_live):
             return None
         result = handle_command(question, session_id=session_id)
         intents = [result.get(key) for key in ("intent", "live_intent") if isinstance(result.get(key), dict)]
@@ -855,9 +857,9 @@ class Handler(BaseHTTPRequestHandler):
         is_proposal = result.get("status") == "confirmation_required" and proposal is not None and bool(token)
         is_refusal = result.get("status") == "refused"
         is_undo = any(intent.get("action") == "undo" for intent in intents)
-        # Mid-change, KENN's own question is the answer ("That would take the track above 0 dB"); a notes answer
-        # about vocals isn't. A fresh message still falls through to chat unless it became a proposal.
-        is_live_question = (not imperative and result.get("status") == "clarification_required"
+        # When the message is about Live (mid-change, or the parser read a Live change in it), KENN's own question is
+        # the answer ("that would take the vocal above 0 dB", "'Synth' is already centred"); a notes page isn't.
+        is_live_question = ((continuing or parsed_live) and result.get("status") == "clarification_required"
                             and any(intent.get("action") not in {None, "", "action"} for intent in intents))
         if not (is_proposal or is_refusal or is_undo or is_live_question):
             return None
