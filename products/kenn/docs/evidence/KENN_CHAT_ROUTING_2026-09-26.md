@@ -33,5 +33,7 @@ shouldn't) through `/kenn/api/ask`.
 the command gateway), so they are phrasing coverage, not routing. The 3 questions still taken over are borderline
 ("fix muddy low mids in a mix" reads as a command).
 
-**On real Live** (demo set, branch companion): the whole tester guide, 27 of 27, including every follow-up, correction
-and reply row; main had 17 of 26.
+**On real Live** (demo set, branch companion at `e3afe8b`): 32 of 32 through the chat, with the set restored exactly:
+the whole tester guide including every follow-up, correction and reply row (main had 17 of 26), plus "can you solo the
+hats?", "bump the synth up 1 dB", "Send the synth to A-Reverb 30 percent", "could you mute the drum bus please", and
+a how-to question about rumbly drums staying with the notes.
