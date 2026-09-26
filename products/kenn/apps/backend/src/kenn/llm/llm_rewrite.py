@@ -1112,8 +1112,11 @@ def _build_synthesis_messages(
     """
     use_mlx = os.environ.get("KENN_USE_MLX", "1") in {"1", "true", "yes"}
 
-    # Build raw context from chunks
-    raw_context = build_raw_context_block(results, source_label)
+    # Build raw context from chunks. On a 16 GB Mac with Live running the model reads the prompt at ~75 tokens/s, so
+    # the prompt size is most of the wait (26 Sept); these two budgets let a slower machine send less.
+    context_chars = int(os.environ.get("KENN_LLM_CONTEXT_CHARS") or 3500)
+    draft_chars = int(os.environ.get("KENN_LLM_DRAFT_CHARS") or 3500)
+    raw_context = build_raw_context_block(results, source_label, max_chars=context_chars)
     if timeline_context:
         raw_context = f"Track Review History Timeline:\n{timeline_context}\n\n" + raw_context
 
@@ -1125,11 +1128,12 @@ def _build_synthesis_messages(
         f"{raw_context}"
     )
 
-    user_parts.append(
-        "Draft answer from the local index (use this as a reference for structure and facts, "
-        "but prefer synthesising directly from the source excerpts above):\n"
-        f"{template_answer[:3500]}"
-    )
+    if draft_chars > 0:  # the draft is built from the same excerpts, so a tight budget can leave it out
+        user_parts.append(
+            "Draft answer from the local index (use this as a reference for structure and facts, "
+            "but prefer synthesising directly from the source excerpts above):\n"
+            f"{template_answer[:draft_chars]}"
+        )
 
     if history_context:
         user_parts.append(f"Conversation context: {history_context}")

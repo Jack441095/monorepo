@@ -44,11 +44,28 @@ def _no_answer_cache() -> None:
     session_memory.save_to_semantic_cache = lambda *_a, **_k: None
 
 
+# Measured on the owner's M3 / 16 GB with Live running (26 Sept): Qwen3 8B reads the prompt at ~75 tokens/s and writes
+# at ~17 tokens/s. The box GPU is much faster, so its seconds say little about the Mac; the token counts do.
+MAC_READ_TOKENS_PER_S = 75.0
+MAC_WRITE_TOKENS_PER_S = 17.0
+
+
 def run(label: str, cases: list[dict]) -> dict:
     from eval_chat_coverage import _check_dimensions, _expects_public_abstention
     from kenn.core.chat_answer import answer_payload
+    from kenn.llm import llm_rewrite
 
     _no_answer_cache()
+    tokens: list[tuple[int, int]] = []
+    original = llm_rewrite._chat_completion
+
+    def counting(messages, task, **kwargs):
+        text, usage = original(messages, task, **kwargs)
+        if task == "rewrite" and usage is not None:
+            tokens.append((int(usage.prompt_tokens or 0), int(usage.completion_tokens or 0)))
+        return text, usage
+
+    llm_rewrite._chat_completion = counting
 
     rows = []
     for case in cases:
@@ -59,17 +76,28 @@ def run(label: str, cases: list[dict]) -> dict:
         except Exception as exc:  # a crash is a failed answer, never a skipped one
             payload, error = {}, f"{type(exc).__name__}: {exc}"
         seconds = time.perf_counter() - started
+        prompt_tokens, output_tokens = tokens[-1] if tokens else (0, 0)
+        tokens.clear()
         dims = _check_dimensions(case, payload, expected_abstention=_expects_public_abstention(case)) if payload else {}
         failures = [f for values in dims.values() for f in values] if payload else [error or "no payload"]
         rows.append({"id": case["id"], "passed": not failures, "failures": failures,
                      "llm_used": bool(payload.get("llm_enhanced")), "seconds": round(seconds, 2),
+                     "prompt_tokens": prompt_tokens, "output_tokens": output_tokens,
+                     "mac_seconds_estimate": round(prompt_tokens / MAC_READ_TOKENS_PER_S
+                                                   + output_tokens / MAC_WRITE_TOKENS_PER_S, 1),
                      "answer": str(payload.get("answer") or "")[:3000]})
+    llm_rewrite._chat_completion = original  # leave the module as we found it for the next model
     times = sorted(r["seconds"] for r in rows)
     used = [r for r in rows if r["llm_used"]]
+    called = sorted(r["mac_seconds_estimate"] for r in rows if r["prompt_tokens"])
+    prompts = sorted(r["prompt_tokens"] for r in rows if r["prompt_tokens"])
     return {
         "label": label, "cases": len(rows), "passed": sum(r["passed"] for r in rows),
         "llm_used": len(used), "llm_used_passed": sum(r["passed"] for r in used),
         "p50_s": round(statistics.median(times), 2), "p95_s": round(times[int(0.95 * (len(times) - 1))], 2),
+        "prompt_tokens_p50": statistics.median(prompts) if prompts else None,
+        "mac_p50_s_estimate": statistics.median(called) if called else None,
+        "mac_p95_s_estimate": called[int(0.95 * (len(called) - 1))] if called else None,
         "rows": rows,
     }
 
@@ -79,6 +107,7 @@ def main() -> int:
     parser.add_argument("--base-url", required=True, help="Ollama OpenAI-compatible URL, e.g. http://127.0.0.1:11437/v1")
     parser.add_argument("--model", action="append", default=[], help="Ollama model name (repeat for several)")
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument("--no-template", action="store_true", help="skip the no-LLM baseline pass")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
 
@@ -87,12 +116,14 @@ def main() -> int:
     cases = [c for c in json.loads(CASES.read_text(encoding="utf-8"))["cases"] if not _expects_public_abstention(c)]
     cases = cases[: args.limit] if args.limit else cases
     reports = []
-    for model in [None, *args.model]:
+    for model in ([] if args.no_template else [None]) + args.model:
         _configure(args.base_url, model)
         report = run(model or "template (no LLM)", cases)
         reports.append(report)
+        mac = (f"  prompt {report['prompt_tokens_p50']} tok, Mac est p50 {report['mac_p50_s_estimate']}s "
+               f"p95 {report['mac_p95_s_estimate']}s") if report["prompt_tokens_p50"] else ""
         print(f"{report['label']:28} passed {report['passed']}/{report['cases']}  model answer used "
-              f"{report['llm_used']} (passed {report['llm_used_passed']})  p50 {report['p50_s']}s  p95 {report['p95_s']}s",
+              f"{report['llm_used']} (passed {report['llm_used_passed']})  p50 {report['p50_s']}s  p95 {report['p95_s']}s{mac}",
               flush=True)
     args.out.write_text(json.dumps({"schema": "kenn.chat_brain_comparison.v1", "cases": len(cases), "reports": reports},
                                    indent=1) + "\n", encoding="utf-8")
