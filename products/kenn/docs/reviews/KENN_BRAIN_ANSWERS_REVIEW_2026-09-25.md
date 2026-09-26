@@ -711,3 +711,25 @@ Trimming saves at most ~20%; writing a ~250-token answer at 17 tokens/s is ~15 s
 brings a local 8B under the 4 s target on that Mac. What would: streaming the answer as it's written (first words in a
 few seconds), shorter answers, a faster Mac, or serving the brain from the box GPU. The new budget is the default
 anyway because it's better on quality.
+
+## Template first, model answer when ready (26 Sept, branch `kenn-chat-stream`)
+
+Built behind `KENN_LLM_BACKGROUND=1` (off by default): `/kenn/api/ask` returns the template at once and starts the
+full model pipeline in the background (`core/answer_upgrades.py`, one answer at a time); the app polls
+`/kenn/api/ask/upgrade` and swaps in the model's answer, labelled, only if KENN's checks accepted it.
+
+On the owner's M3 / 16 GB (Live closed, six everyday questions, Qwen3 8B):
+
+| Prompt layout | Answer on screen | Model answer | Accepted |
+|---|---|---|---|
+| Default (`KENN_USE_MLX` on: short system prompt) | 0.1–0.2 s | after 8–22 s | 1 of 6 |
+| Full system prompt (`KENN_USE_MLX=0`, as the box evaluation uses) | 0.1–0.2 s | after 58–91 s (some hit the 90 s timeout) | 1 of 6 |
+
+The answer is now instant, but on this Mac the upgrade rarely arrives. With the short prompt the model skips the
+required "Short answer / Try this / Sources" structure, and one answer was simply wrong (it said Glue Compressor's
+Range sets the ratio), so the structure check was right to drop them; the full prompt fixes the format on the box but
+is too long for this Mac. This also explains the Mac/box gap: the box evaluation used the full prompt (38/84 kept).
+
+Conclusion: keep templates on 16 GB Macs. The mechanism is worth keeping for a faster Mac or the box GPU. Worth
+fixing separately: the default prompt layout for an Ollama provider should be the full one (the short layout was
+written for the old MLX runtime).
