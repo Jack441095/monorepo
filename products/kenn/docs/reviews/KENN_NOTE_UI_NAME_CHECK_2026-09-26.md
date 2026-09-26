@@ -1,6 +1,6 @@
 # KENN notes: controls that don't exist in Live
 
-**Checked:** 2026-09-26 · **Status:** corrections proposed, waiting for Jack's OK · nothing in the notes has changed
+**Checked:** 2026-09-26 · **Status:** approved by Jack (26 Sept); applied after soak #4, because the tester build copies the notes
 
 KENN tells producers where to click, so a made-up control name is a wrong answer they can't follow. Every "Try this"
 step in the 325 approved notes about Live was checked against the Live 12 manual (the owner's PDF, as text): each
@@ -41,5 +41,12 @@ Only names are checked. A step can use real names and still be wrong (the MPE no
 instrument's MIDI tab, which isn't how Live does it). Checking the claims themselves needs a person or a much stronger
 model with the manual section; Qwen3 8B was tried as a judge and flagged too many true steps to be useful.
 
-**To apply:** say yes and the corrections go into the notes, the index is rebuilt, and the intelligence gate and review
-packet are re-run (the note text changes, so the packet's answers would too).
+## What's applied (`workspace/tmp/kenn-ops/apply_note_corrections.py`, originals backed up first)
+
+Reading the whole of each flagged note showed that in five of them most steps were invented, not just one name, so
+those go to **Status: Draft** (the index skips drafts) rather than being patched: `launching-clips-pt3`,
+`clip-envelopes-pt3`, `live-midi-effects-ref-pt3`, `midi-fact-sheet-pt3`, `live-instruments-ref-pt8` (Operator).
+KENN still has correct notes on each topic. Crossfader, tuning systems and Complex Pro get their "Try this" rewritten
+from the manual; Follow Actions, Multiband Dynamics' sidechain and the EQ Eight parameter name get the one-step fixes
+above (the rest of the Multiband note matches the manual). Then the index is rebuilt and the intelligence gate and review
+packet re-run on the next build.
