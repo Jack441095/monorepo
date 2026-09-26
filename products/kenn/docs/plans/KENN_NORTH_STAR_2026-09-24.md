@@ -105,6 +105,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > leaves out "Sources:" (good 8B answers were being thrown away for that). Next: speed of 8B on the owner's M3/16 GB
   > (after the soak), then a KENN-style fine-tune of the winner on the box.
 - [ ] Chat answers written by the brain from retrieved notes, with citations; templates stay as the offline fallback
+  > 26 Sept, measured on the owner's M3 / 16 GB with Live running: Qwen3 8B takes 7–16 s an answer through the
+  > companion, and KENN used its answer 1 time in 6 (the rest failed the grounding check after the wait). The prompt
+  > carries ~1,400 tokens of notes, which the Mac reads at ~75 tokens/s before writing at ~17 tokens/s; Qwen3.5 4B
+  > was no better in practice. Chat on this Mac is back on templates (instant). Ways forward, none built yet: fewer
+  > and shorter notes in the prompt, showing the template at once and the model's answer when it's ready, or serving
+  > the brain from the box GPU (2.8 s) for the owner's own use.
 - [x] One router: rule parser → local planner → brain; every route logged with timing
   > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
   > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,
