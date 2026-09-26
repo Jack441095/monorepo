@@ -42,6 +42,18 @@ EVIDENCE_BACKED_PROFILES = (
                                       -16.0, -14.0, -12.0, -10.0, -8.0, -6.0, -4.0, -2.0,
                                       0.0, 2.0, 4.0, 6.0),
                       mapping="table"),
+    # Compressor Ratio, Attack and Release, measured from Live's display on 26 Sept 2026 and each checked by write,
+    # readback and exact restore on real Live (docs/evidence/KENN_COMPRESSOR_PROFILES_2026-09-26.json): 4:1 shows
+    # "4.00 : 1", 10 ms "10.0 ms", 250 ms "247 ms". Ratio and Release are measured tables; Attack is a log taper.
+    DeviceUnitProfile("Compressor", "Ratio", "ratio", 0, 0.99, 1, 100,
+                      raw_values=(0, 0.2, 0.335, 0.43, 0.5, 0.6, 0.665, 0.715, 0.75, 0.8, 0.835, 0.875, 0.9, 0.935, 0.95, 0.965, 0.98, 0.99),
+                      display_values=(1, 1.25, 1.5, 1.75, 2, 2.5, 2.99, 3.51, 4, 5, 6.06, 8, 10, 15.4, 20, 28.6, 50, 100),
+                      mapping="table"),
+    DeviceUnitProfile("Compressor", "Attack", "ms", 0, 1, 0.01, 1000, mapping="log"),
+    DeviceUnitProfile("Compressor", "Release", "ms", 0, 1, 1, 3000,
+                      raw_values=(0, 0.02, 0.055, 0.085, 0.13, 0.155, 0.2, 0.24, 0.27, 0.32, 0.36, 0.425, 0.515, 0.6, 0.67, 0.78, 0.865, 1),
+                      display_values=(1, 2.04, 5.25, 9.81, 20.7, 29.2, 50, 75.2, 98.9, 148, 198, 301, 495, 742, 998, 1510, 2010, 3000),
+                      mapping="table"),
     DeviceUnitProfile("Saturator", "Drive", "db", 0.0, 1.0, -36.0, 36.0),
     DeviceUnitProfile("Drum Buss", "Drive", "%", 0.0, 1.0, 0.0, 100.0),
     DeviceUnitProfile("Hybrid Reverb", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
@@ -149,10 +161,11 @@ def _table_lookup(profile: DeviceUnitProfile, numeric: float, relative: bool) ->
         display_unit = {"db": "dB", "hz": "Hz", "khz": "kHz"}.get(
             profile.display_unit.lower(), profile.display_unit
         )
+        low, high = (f"{displays[0]:g}:1", f"{displays[-1]:g}:1") if display_unit == "ratio" else \
+            (f"{displays[0]:g}", f"{displays[-1]:g} {display_unit}")
         return None, (
             "That value is outside the safe range. "
-            f"The verified range for {profile.parameter_name} is "
-            f"{displays[0]:g} to {displays[-1]:g} {display_unit}."
+            f"The verified range for {profile.parameter_name} is {low} to {high}."
         )
     for left, right in zip(pairs, pairs[1:]):
         if left[0] <= numeric <= right[0]:

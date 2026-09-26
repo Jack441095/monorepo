@@ -1022,6 +1022,23 @@ def test_answers_say_the_change_in_the_words_and_units_live_uses() -> None:
     assert centred["answer"] == "'Synth' is already centred. Nothing to change."
 
 
+def test_compressor_ratio_attack_and_release_are_set_in_the_units_live_shows() -> None:
+    # Measured and checked on real Live on 26 Sept 2026 (docs/evidence/KENN_COMPRESSOR_PROFILES_2026-09-26.json); until
+    # then "set the ratio to 4:1" was refused as unmeasured.
+    from kenn.core.fake_live import FakeLiveBackend
+
+    service = _service(FakeLiveBackend())
+    for text, shown in [("set the compressor ratio on the lead vocal to 4:1", "to 4.0:1"),
+                        ("set the drum bus compressor ratio to 3 to 1", "to 3.0:1"),
+                        ("set the compressor attack on the drum bus to 10 ms", "to 10.0 ms"),
+                        ("set the compressor release on the drum bus to 250 ms", "to 250.0 ms")]:
+        result = handle_command(text, session_id="compressor-units", service=service, allow_llm=False)
+        assert result["status"] == "confirmation_required" and shown in result["answer"], text
+    too_much = handle_command("set the compressor ratio on the drum bus to 200:1", session_id="compressor-units",
+                              service=service, allow_llm=False)
+    assert "1:1 to 100:1" in too_much["answer"]
+
+
 def test_an_undo_card_says_it_is_an_undo() -> None:
     # 26 Sept 2026: the undo card read "Explicit user request for set_volume on track 'Bass'".
     from kenn.core.fake_live import FakeLiveBackend

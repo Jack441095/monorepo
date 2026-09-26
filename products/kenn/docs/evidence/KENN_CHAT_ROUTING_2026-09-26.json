@@ -1,7 +1,7 @@
 {
  "schema": "kenn.chat_routing.v1",
- "requests": 1072,
- "reached_live": 1016,
+ "requests": 1074,
+ "reached_live": 1018,
  "missed": [
   {
    "query": "stick a utility on the drums bus",

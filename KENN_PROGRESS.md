@@ -28,7 +28,11 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
     requests reaching Live, tester build 32%, this build 76% first score, 86% after fixing the shapes it found
     ("lower the bass a bit", "the kick is too loud, can you bring it down", "I need the drum bus muted"); advice
     questions and unclear requests handled right in both builds;
-  - 2,037 tests, UI 28 / 28, phrasing scorer 1,642 / 1,751 right with 1 wrong (the disputed "-1 pan" row), whole
+  - **Compressor ratio, attack and release now work in real units** ("set the vocal compressor ratio to 4:1",
+    "attack to 10 ms", "release to 250 ms", "3 to 1"). Measured from Live's own display, then every value checked by
+    write, readback and exact restore on real Live: 17 / 17 (`docs/evidence/KENN_COMPRESSOR_PROFILES_2026-09-26.json`).
+    Reverb, Hybrid Reverb and Delay are measured too (candidates in `workspace/tmp/kenn-ops/devices/`), not yet promoted;
+  - 2,038 tests, assistant eval 111 / 111, UI 28 / 28, phrasing scorer 1,643 / 1,751 right with 1 wrong (the disputed "-1 pan" row), whole
     tester guide 32 / 32 on real Live (checked again at `5424f1c`).
 - **Tonight:** open the demo set, say "ready". `tonight_soak.sh` brings main up to the branch, runs the suite, the
   real-Live assistant task and the whole guide on real Live, then starts the 8-hour soak. `post_soak_5.sh` in the

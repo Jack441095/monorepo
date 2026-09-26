@@ -729,7 +729,9 @@ def _generic_device_parameter_match(text: str, device_name: str) -> dict[str, st
     device_match = re.search(re.escape(device_name), text, re.I)
     if device_match is None or _DEVICE_PARAMETER_ACTION.search(text[:device_match.start()]) is None:
         return None
-    tail = text[device_match.end():]
+    # "compressor lookahead on the drum bus to 10 ms": the track is where, not which control; left in, the control
+    # came out as "On The Drum Bus".
+    tail = re.sub(r"\s+on\s+(?:the\s+)?[\w/&' -]+?(?=\s+(?:to|by)\s)", "", text[device_match.end():], count=1, flags=re.I)
     match = re.search(
         r"\s+(?:the\s+)?(?P<parameter>[a-z0-9][a-z0-9]*(?:[ /_-]+[a-z0-9][a-z0-9]*){0,3}?)"
         r"\s+(?P<verb>to|by)\s+" + _NUMBER + r"\s*(?P<unit>db|dbs|decibels?|hz|hertz|khz|kilohertz|%|percent|ms|milliseconds?|:1)?(?=\s|$|on\b)",
@@ -1334,6 +1336,9 @@ def _rewrite_common_phrasings(text: str) -> str:
     a bare "kick to -9" still asks). Nothing here changes what a request means.
     """
     text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
+    if re.search(r"\bratio\b", text, re.I):
+        # "ratio to 3 to 1" became a raw value of 3 and a range error.
+        text = re.sub(r"\b(\d+(?:\.\d+)?)\s+(?:to|in)\s+(?:1|one)\b", r"\1:1", text, flags=re.I)
     if (m := _MID_CORRECTION.match(text)):
         after = m.group("after")
         obj = _CORRECTED_OBJECT.match(m.group("before"))
