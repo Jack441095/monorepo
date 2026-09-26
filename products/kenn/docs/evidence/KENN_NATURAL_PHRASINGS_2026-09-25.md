@@ -124,6 +124,45 @@ The development set found three more, also fixed:
 - "put a marker called Build here" named the locator "Build here".
 - "mute the FX Print" was refused as a device mute because of the "fx".
 
+## Round 4 (26 Sept): dictated wording, and a sealed set from other DAWs
+
+Two new registers from Qwen3 8B on the box (14B had been removed for disk space), labelled before scoring:
+`natural_blind_qwen8b_voice.jsonl` (speech-to-text style: "um can you set the kick to minus ten dee bee") and
+`natural_blind_qwen8b_otherdaw.jsonl` (a Logic/FL Studio user). The second stayed sealed until the fixes from the
+first were committed, then was scored once. Rows asking for a value the demo set already has ("Kick to -14 dB",
+"centre the hats") change nothing and were dropped; 8B mostly ignored the other-DAW wording, so that set is plainer
+than intended. First runs are frozen in `workspace/tmp/kenn-ops/phrasings/blind4_*_FROZEN.json`.
+
+| Set | First, blind | After fixes |
+|---|---|---|
+| Voice, 195 | 77.9% right, 41 asked, 2 wrong | 90.8% right, 17 asked, 1 wrong |
+| Other DAW, 137 (sealed until then) | **92.7%** right, 8 asked, 2 wrong | 97.8% right, 3 asked, 0 wrong |
+
+Nothing else moved down: development 505 at 96.2% (0 wrong), 14B 94.3%, 8B 96.5%, beginner 75.4% (same 2 wrong).
+
+Wrong plans found, all fixed with tests (`test_dictated_phrasings.py`, `test_other_daw_phrasings.py`):
+
+- "move the synth **track 5 dB** louder" turned up **track 5 (Bass)**; "kick track 3 dB louder" moved the Hi-Hats. A
+  number with a unit after it is a value, never a track number. This one predates the round.
+- "mute track 2, actually track 3" muted track 2 (hidden before because that row's label named no track).
+- "why is the FX Print track set to 0 dB?" became a proposal. Why/should/is questions now never change anything.
+- "make the clap a little more snappy and maybe add a little bit of reverb" inserted a Reverb. Thinking aloud
+  ("maybe", "perhaps") asks.
+- "add a filter delay" would have inserted an Auto Filter and "add an eq three" an EQ Eight; devices KENN can't add
+  are now named plainly, with the list it can add.
+
+What got clearer rather than more capable: "dee bee", spoken minus numbers with no unit, stacked fillers, "make sure
+the kick is not muted", "make the snare called clap", quoted names, "the A-Reverb bus", "with 50%". Asks that stay,
+honestly: a second copy of a device already on the track, Utility, return-track level/mute/name, sends in dB (none
+measured or qualified yet).
+
+Still counted wrong: "set the pan on the lead vocal to minus one" gives hard left, by the existing rule that a signed
+number from -1 to 1 is Live's pan value. My label said it should ask; which is right is the owner's call.
+
+Reading it straight: the new-register first run (77.9%) beat the earlier blind runs (66–72%), and the sealed set's
+92.7% is the best blind number yet, but that set was easier wording. 95% on fresh wording with zero wrong is still
+not shown.
+
 ## Relabelled after the first run (owner to confirm; each row carries a `note`)
 
 These rows first expected an action. KENN asks, by design:
