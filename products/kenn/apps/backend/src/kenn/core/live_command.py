@@ -1653,25 +1653,53 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
     return response
 
 
+def _fader_text(raw: Any) -> str:
+    level = volume_law.raw_to_db(float(raw)) if isinstance(raw, (int, float)) and not isinstance(raw, bool) else None
+    if level is None:
+        return str(raw)
+    return "-inf dB" if level == float("-inf") else f"{level:.1f} dB"
+
+
+def _pan_text(raw: Any) -> str:
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        return str(raw)
+    return "centre" if abs(raw) < 0.005 else f"{abs(raw) * 100:.0f}% {'left' if raw < 0 else 'right'}"
+
+
+def _recipe_step_text(step: dict[str, Any]) -> str:
+    """One recipe step in the units Live shows. This used to read "set_volume: Bass / volume 0.49999988 -> 0.462452"."""
+    action = str(step.get("action") or step.get("operation") or "action")
+    track = f"'{step.get('track_name') or 'Live'}'"
+    before, after = step.get("before"), step.get("after")
+    if action == "set_volume":
+        return f"{track} volume {_fader_text(before)} -> {_fader_text(after)}"
+    if action == "set_pan":
+        return f"{track} pan {_pan_text(before)} -> {_pan_text(after)}"
+    if action == "set_send" and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in (before, after)):
+        return f"{track} send to {step.get('return_track_name') or 'the return'} {before * 100:.0f}% -> {after * 100:.0f}%"
+    verbs = {"set_mute": ("mute", "unmute"), "set_solo": ("solo", "unsolo"), "set_arm": ("arm", "disarm")}
+    if action in verbs and isinstance(after, bool):
+        return f"{verbs[action][0 if after else 1].capitalize()} {track}"
+    if action == "set_device_parameter":
+        now = f" (now {step['before_display']})" if step.get("before_display") else ""
+        return f"{step.get('device_name') or 'Device'} {step.get('parameter') or 'setting'} on {track}{now}"
+    return f"{action}: {track} {before} -> {after}"
+
+
 def _recipe_response(response: dict[str, Any], proposal: dict[str, Any]) -> dict[str, Any]:
     """Render a bounded recipe as one exact confirmation card payload."""
     _update_lifecycle(response, "proposal_ready", target={"step_count": proposal.get("step_count", 0)})
-    summaries = []
-    for number, step in enumerate(proposal.get("steps", []), start=1):
-        action = str(step.get("action") or step.get("operation") or "action")
-        target = str(step.get("track_name") or "Live")
-        if step.get("device_name"):
-            target += f" -> {step['device_name']} (device {int(step.get('device_index', 0)) + 1})"
-        if step.get("return_track_name"):
-            target += f" -> {step['return_track_name']}"
-        parameter = str(step.get("parameter") or step.get("action") or "setting")
-        summaries.append(f"{number}. {action}: {target} / {parameter} {step.get('before')} -> {step.get('after')}")
+    summaries = [f"{number}. {_recipe_step_text(step)}" for number, step in enumerate(proposal.get("steps", []), start=1)]
+    count = proposal.get("step_count", len(summaries))
+    reason = str(proposal.get("reason") or "").strip()
+    lead = f"{reason}\n" if reason and not reason.lower().startswith(("llm-proposed", "explicit user request")) else ""
     response.update({
         "status": "confirmation_required",
         "answer": (
-            f"I can apply this {proposal.get('step_count', len(summaries))}-step Live recipe:\n"
+            f"{lead}The plan, {count} change{'s' if count != 1 else ''}:\n"
             + "\n".join(summaries)
-            + "\nNothing has changed. Confirm this exact recipe to apply it."
+            + "\nNothing has changed yet. Apply makes "
+            + ("these changes; one Undo puts them all back." if count != 1 else "this change; Undo puts it back.")
         ),
         "proposal": proposal,
         "confirmation_required": True,

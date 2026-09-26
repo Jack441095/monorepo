@@ -3065,7 +3065,7 @@ def test_command_gateway_uses_recipe_proposal_and_confirmation_boundary() -> Non
     )
     assert planned["status"] == "confirmation_required"
     assert planned["proposal_kind"] == "recipe"
-    assert "1-step Live recipe" in planned["answer"]
+    assert "The plan, 1 change:" in planned["answer"]
     assert fake.writes == []
 
     applied = handle_command(
