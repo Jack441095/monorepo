@@ -232,7 +232,6 @@ def test_two_part_requests_become_recipes(query, steps) -> None:
 
 
 @pytest.mark.parametrize("query", [
-    "pan the synth left and the FX print right",               # how far? each half must be clear
     "set eq frequency to 200 hz and gain to 3 dB on track 5",  # one EQ command, not two
     "mute the kick and make it louder",                         # "louder" by how much?
     "rock and roll",
@@ -241,6 +240,14 @@ def test_plain_and_needs_two_clear_halves(query) -> None:
     from kenn.core.live_intent import parse_natural_recipe
 
     assert parse_natural_recipe(query, FAKE_SET) is None
+
+
+def test_two_pans_without_amounts_ask_how_far_for_each() -> None:
+    # Once read as one pan: it asked about the Synth only, and the FX print was forgotten (27 Sept 2026).
+    from kenn.core.live_intent import parse_natural_recipe
+
+    recipe = parse_natural_recipe("pan the synth left and the FX print right", FAKE_SET)
+    assert recipe["steps"] == [] and recipe["ambiguity"][0].startswith("Step 1: How far left?")
 
 
 @pytest.mark.parametrize("query, action, phrase", [

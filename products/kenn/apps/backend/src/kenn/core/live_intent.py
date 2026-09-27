@@ -505,7 +505,7 @@ def _relative_volume_db(lower: str) -> float | None:
     if down and not up:
         return -abs(value)
     if up and not down:
-        return abs(value)
+        return abs(value)  # "up -3 dB" is caught after parsing and asked about
     if not up and not down and re.search(r"\bby\s+[+-]\d", lower):
         return value
     return None
@@ -842,10 +842,20 @@ def _split_plain_and(text: str, snapshot: dict[str, Any]) -> list[str]:
     first, second = parts[0].strip(), parts[1].strip()
     first_intent = _clean_intent(first, snapshot)
     if first_intent is None:
+        # "pan the kick left and the bass right": neither says how far, but both are clearly pans; keep both so the
+        # recipe asks about each step instead of reading one pan that names both sides.
+        verb = _LEADING_VERB.match(first)
+        if verb and verb.group("verb").lower() == "pan":
+            second_full = second if _LEADING_VERB.match(second) else f"pan {second}"
+            if parse_request(first, snapshot).get("action") == "set_pan" \
+                    and parse_request(second_full, snapshot).get("action") == "set_pan":
+                return [first, second_full]
         return []
     verb = _LEADING_VERB.match(first)
-    if re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?$", second, re.I) and verb:
-        second = f"{verb.group('verb')} {second}"  # "... and the snare"
+    if verb and (re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?$", second, re.I)
+                 or (verb.group("verb").lower() == "pan"
+                     and re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?\s+(?:\d+\s*%?\s*)?(?:hard\s+)?(?:left|right)\b", second, re.I))):
+        second = f"{verb.group('verb')} {second}"  # "... and the snare", "pan the kick left and the bass right"
     track_name = str((first_intent.get("track") or {}).get("name") or "")
     if track_name:
         second = re.sub(r"\b(?:it|that)\b", f"the {track_name}", second, count=1)
@@ -1619,6 +1629,17 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["deferred"],
                        "ambiguity": ["KENN makes a change when you ask for it, not later. Say it when you want it done. "
                                      "Nothing changed."]})
+        return parsed
+    if parsed.get("action") == "set_pan" and re.search(r"\bleft\b", text, re.I) and re.search(r"\bright\b", text, re.I):
+        # "pan the kick 20% left and 20% right" panned left.
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["pan_side"],
+                       "ambiguity": ["Left or right? That names both sides. Nothing changed."]})
+        return parsed
+    if parsed.get("action") == "set_volume" and re.search(r"\b(?:up|louder|raise|boost)\b[^.]*?-\s*\d", text, re.I) \
+            and not parsed.get("absolute_value"):
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["amount"],
+                       "ambiguity": ["Up or down? \"Up\" with a minus amount could mean either. Say \"up 3 dB\" or "
+                                     "\"down 3 dB\". Nothing changed."]})
         return parsed
     if _NEGATED_REQUEST.match(text) or _NEGATED_REQUEST.match(str(query or "")) or _RETRACTED.search(str(query or "")):
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False,

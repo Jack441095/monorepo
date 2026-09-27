@@ -155,3 +155,21 @@ def test_a_half_that_cannot_be_done_stops_the_whole_request(demo) -> None:
     assert recipe["steps"] == []
     assert recipe["ambiguity"] == ["Step 2: 'Lead Vocal' is at 0.0 dB, so up 1 dB would take it above 0 dB, "
                                    "which KENN doesn't set."]
+
+
+@pytest.mark.parametrize("text, missing", [("turn the kick up -3 dB", "amount"),
+                                           ("pan the kick 20% left and 20% right", "pan_side")])
+def test_a_contradiction_asks_instead_of_picking_one(demo, text, missing) -> None:
+    # 27 Sept 2026: "up -3 dB" went up 3 dB, and a pan naming both sides went left.
+    from kenn.core.live_intent import parse_request
+
+    intent = parse_request(text, demo)
+    assert intent.get("action") is None and intent["missing_fields"] == [missing]
+
+
+def test_two_tracks_panned_opposite_ways_are_two_steps(demo) -> None:
+    # Before, "pan the kick left and the bass right" panned only the Kick.
+    from kenn.core.live_intent import parse_natural_recipe
+
+    recipe = parse_natural_recipe("pan the kick hard left and the bass hard right", demo)
+    assert [(step["track_name"], step["value"]) for step in recipe["steps"]] == [("Kick", -1.0), ("Bass", 1.0)]
