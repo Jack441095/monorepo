@@ -83,6 +83,12 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [x] Compact plan output
     > Done 2026-09-23: schema constant no longer decoded (KENN stamps it), ~12 of ~43 tokens saved; qwen3.5:4b 66.1% vs 67.7% before (within noise). Training generator shares `planner_user_prompt()` with production; corpus regenerated.
   - [ ] Grow the rule-based parser for relative dB, focus, sends, slang (volume 1/12 today)
+    > 2026-09-27: 1,643 / 1,751 labelled phrasings right with 1 wrong (disputed "-1 pan"), across seven blind sets
+    > (voice, other-DAW, beginner, second-language). The chat now decides Live-or-notes by what the parser reads:
+    > requests reaching Live from chat 61% -> 95%, knowledge questions taken over 44 -> 3 of 481
+    > (`docs/evidence/KENN_CHAT_ROUTING_2026-09-26.md`, `tooling/scripts/measure_chat_routing.py`). Tricky-wording
+    > tests fixed wrong changes that were in the tester build ("don't mute" muted; "rather than solo the kick, mute the
+    > snare" muted the Kick; multi-track requests changed only some tracks).
     > Relative dB and track nicknames done 2026-09-24, from the owner's first independent test ("tuck the high hats back a couple of dbs", expected −2 dB on Hi-Hats): "up/down/back/off N dB" with one clear direction, "a couple of dB" = 2 dB, "dbs", nicknames (hats/high hats → Hi-Hats, vox → Lead Vocal, drums → Drum Bus) with a guard so "the Lead Vocal" never matches "Backing Vocal", and "some reverb" asks instead of inserting. Plain "X and Y" track controls now ask instead of proposing only X. 124 cases: **62.1%** (was 49.2%), clarify 30/30, 0 wrong plans (was 3: the earlier "0" claim was not measured). Focus, sends and slang still to do.
     > Absolute dB without the word volume ("put the kick at minus 12 dB", "set the snare to -10 dB") done 2026-09-24, same device/send/pan guard: 124 cases **63.7%** (79), 0 wrong plans. Track focus by name without the word "track" ("Select the Drum Bus", "focus the bass.") done the same day, only when every spoken word is in one track's name: 124 cases **64.5%** (80), 0 wrong plans. Punctuation still changes one parse: `_FOCUS_DEVICE` ends in `\s*$`, so "Focus EQ Eight on track 5." (the demo script) falls to the numbered track-focus rule while the same words without the full stop give a device focus. Resolved the same day (owner delegated): the full stop no longer matters, "Focus EQ Eight on track 5." proposes a device focus; demo gate contract, its test and runbook step 8 updated. Gate 2/2; applied and verified in Live.
   - [x] Volume mapping: KENN converts dB with normalized = 10^(dB/20) (1.0 = 0 dB), but Live's fader puts 0 dB at 0.85 and reaches +6 dB. Absolute and relative dB levels are therefore approximate, and "vox up 1.5 dB" at 0 dB is refused. Measure Live's fader law (as the Compressor threshold table was) and use it
@@ -92,6 +98,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
     > Volume in dB done 2026-09-24: `validate_llm_plan` accepts `set_volume` with `unit: "dB"`, absolute or relative, and converts with the rule parser's mapping (now Live's fader law, `core/volume_law.py`; outside −57.2..0 dB on the provisional table, or no current volume, is rejected). Found via C6 run 2, which wrote "+3 dB" plans that the old contract rejected. Pan in % still to do.
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
   - [ ] ≥ 100 phrasings · [ ] ≥ 250 · [ ] ≥ 500 (slang, fragments, corrections, multi-intent). Curated holdout: 24 (Codex). 100 drafted candidates in `tooling/data/natural_holdout_candidates.jsonl` await owner review before promotion.
+    > 2026-09-27: candidates now 481, plus 1,246 in seven sealed blind sets (all excluded from training). The curated
+    > file is still 24: promotion waits for owner review.
 - [ ] **C4 Staged promotion** (owner sign-off per stage)
   - [ ] shadow → propose-with-confirm
   - [ ] propose-with-confirm → active with deterministic fallback
@@ -120,6 +128,11 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [ ] Owner sign-off queue
   - [ ] 20 profiles · [ ] 40 profiles · [ ] 60 profiles
   - [ ] 15 devices · [ ] 25 devices
+  > 2026-09-26/27: Compressor Ratio, Attack and Release measured from Live's display and each value checked by write,
+  > readback and exact restore on real Live, 17/17 (`docs/evidence/KENN_COMPRESSOR_PROFILES_2026-09-26.json`,
+  > `tooling/scripts/qualify_device_profiles.py`): **14 profiles on 8 devices**. Reverb, Hybrid Reverb and Delay are
+  > measured (candidates in `workspace/tmp/kenn-ops/devices/`), waiting for a Live session to qualify. EQ Eight's
+  > parameter list didn't answer the measurement read; retry then.
 - [ ] **D2 Borrowed Live-side handlers** (ableton-mcp, MIT, telemetry excluded; ableton-js as reference); attribution recorded
 - [ ] **D3 New action families** (each with readback and exact undo)
   - [ ] Sends and returns · [ ] Group and ungroup · [ ] Routing
@@ -128,8 +141,11 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [ ] MIDI note edit · [ ] Automation write
   - [ ] Track create with a scoped undo design
 - [ ] **D4 Save automation** (opt-in Accessibility Cmd-S, hash-checked; Project-folder save-as handled)
-- [ ] **D5 Recipes**, single token, per-step readback, rollback
-  - [ ] 5 · [ ] 10 · [ ] 15
+- [x] **D5 Recipes**, single token, per-step readback, rollback
+  - [x] 5 · [x] 10 · [x] 15
+  > 2026-09-26: all 15 named recipes pass on real Live: apply, verify, undo, exact restore
+  > (`tooling/evaluation/results/KENN_RECIPE_QUALIFICATION.json`, `c648e1a`). The first real run found two bugs, both
+  > fixed: undo of an inserted device (the receipt journal dropped the device order) and recipes not seeing returns.
 
 ## Phase E — Listening and analysis
 
