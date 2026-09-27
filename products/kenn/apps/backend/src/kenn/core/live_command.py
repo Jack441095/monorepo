@@ -1747,7 +1747,8 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
     else:
         target_label = f"'{target}'"
     action = str(proposal.get("action") or "")
-    toggles = {"set_mute": ("mute", "unmute"), "set_solo": ("solo", "unsolo"), "set_arm": ("arm", "disarm")}
+    toggles = {"set_mute": ("mute", "unmute"), "set_solo": ("solo", "unsolo"), "set_arm": ("arm", "disarm"),
+               "set_return_mute": ("mute", "unmute")}
     if action in toggles and isinstance(proposal.get("after"), bool):
         change = f"I can {toggles[action][0 if proposal['after'] else 1]} {target_label}."
     elif action == "rename_track":
@@ -3323,6 +3324,17 @@ def _handle_command_impl(
             return _clarification(response, intent, result.get("error", "I could not create a Live proposal."))
         proposal = result["proposal"]
         unchanged = already_there(action, str(proposal.get("track_name") or ""), proposal.get("before"), proposal.get("after"))
+        return _clarification(response, intent, unchanged) if unchanged else _proposal_response(response, proposal, kind="track")
+    if action in {"set_return_volume", "set_return_pan", "set_return_mute"}:
+        result = live.propose_return_mixer_action(
+            action, return_index=int(intent.get("return_track_index", -1)),
+            return_name=str(intent.get("return_track_name") or ""), value=intent.get("desired_value"),
+            relative_db=intent.get("relative_db"), session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a return-track proposal."))
+        proposal = result["proposal"]
+        unchanged = already_there(action.replace("_return", ""), str(proposal.get("track_name") or ""),
+                                  proposal.get("before"), proposal.get("after"))
         return _clarification(response, intent, unchanged) if unchanged else _proposal_response(response, proposal, kind="track")
     if action == "set_time_signature":
         signature = intent.get("desired_value") or {}

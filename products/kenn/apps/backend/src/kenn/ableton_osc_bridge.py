@@ -148,6 +148,7 @@ WRITE_ENDPOINTS = (
     "/live/song/set/tempo",
     "/live/song/set/signature_numerator",
     "/live/song/set/signature_denominator",
+    "/live/kenn/set/return_mixer",
     "/live/scene/fire",
     "/live/device/set/parameter/value",
     "/live/track/insert_device",
@@ -1389,6 +1390,10 @@ class AbletonOSCClient:
     def get_bus_mixer(self, kind: str, index: int = -1) -> dict[str, Any]:
         """Mixer and device names for a return track (``kind='return'``) or the master."""
         return self._kenn_json("/live/kenn/get/bus_mixer", [str(kind), int(index)])
+
+    def set_return_mixer(self, index: int, field: str, value: float | bool) -> bool:
+        """Write a return track's volume, panning or mute; the caller reads it back with get_bus_mixer."""
+        return self._send_only("/live/kenn/set/return_mixer", [int(index), str(field), int(value) if isinstance(value, bool) else float(value)])
 
     def get_device_tree(self, kind: str, index: int = -1) -> dict[str, Any]:
         """Device chain for a track, return, or master, including rack chains (depth 3)."""

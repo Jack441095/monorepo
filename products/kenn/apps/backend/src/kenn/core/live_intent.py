@@ -1814,6 +1814,73 @@ _MIXER_WORD = re.compile(r"\b(?:volume|fader|level|gain|louder|quieter|up|down|m
 _SEND_IN_DB = re.compile(r"\bsend\b.*?-?\d+(?:\.\d+)?\s*db\b|-?\d+(?:\.\d+)?\s*db\b.*?\bsend\b", re.I)
 
 
+def _named_return(text: str, snapshot: dict[str, Any] | None) -> dict[str, Any] | None:
+    """The one return track a message names: "A-Reverb", "return B", "the delay return"."""
+    returns = [r for r in ((snapshot or {}).get("return_tracks") or []) if isinstance(r, dict) and r.get("name")]
+    hits = [r for r in returns if re.search(rf"(?<![\w-]){re.escape(str(r['name']))}(?![\w-])", text, re.I)]
+    if not hits and (m := re.search(r"\breturn(?:\s+track)?\s+([a-h])\b|\b([a-h])\s+return\b", text, re.I)):
+        letter = (m.group(1) or m.group(2)).casefold()
+        hits = [r for r in returns if str(r["name"]).casefold().startswith(letter + "-")]
+    if not hits and (m := re.search(r"\b(reverb|verb|delay|echo)\s+return\b", text, re.I)):
+        kind = "reverb" if m.group(1).lower() in {"reverb", "verb"} else "delay"
+        hits = [r for r in returns if kind in str(r["name"]).casefold()]
+    return hits[0] if len(hits) == 1 else None
+
+
+def _asks_to_change_return(text: str, named: str | None) -> bool:
+    """A sentence that names the return and asks to change it: "the A-Reverb is too wet, maybe cut it… maybe lower the
+    bass" is thinking aloud, and "can you check the A-Reverb settings?" asks for no change (27 Sept 2026)."""
+    for sentence in _SENTENCE_END.split(text):
+        mentions = (named and re.search(rf"\b{re.escape(named)}\b", sentence, re.I)) or _RETURN_MENTION.search(sentence)
+        if mentions and _MIXER_WORD.search(sentence) and not _MUSING.search(sentence) \
+                and not re.search(r"\b(?:check|look|show|settings|what|which|how)\b", sentence, re.I):
+            return True
+    return False
+
+
+def _return_mixer_request(text: str, parsed: dict[str, Any], snapshot: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Level, pan or mute on a return track, read by the track rules as if the returns were tracks."""
+    returned = _named_return(text, snapshot)
+    if returned is None or parsed.get("action") not in {None} or not _asks_to_change_return(text, str(returned["name"])):
+        return None
+    name = str(returned["name"])
+    # The track rules skip volume wording near "reverb" or "delay" (those are sends), and "A-Reverb" is full of it, so
+    # the return is read under a plain stand-in name.
+    stand_in = "Returnbus"
+    spoken = re.sub(rf"\breturn(?:\s+track)?\s+[a-h]\b|\b[a-h]\s+return\b|\b(?:reverb|verb|delay|echo)\s+return\b|(?<![\w-]){re.escape(name)}(?![\w-])",
+                    stand_in, text, count=1, flags=re.I)
+    # A placeholder level lets the rules read "down 1 dB"; only the change is kept, and the service applies it to the
+    # return's real level, read at proposal time.
+    pseudo = {"status": "connected", "tracks": [{"index": int(returned.get("index", 0)), "name": stand_in, "volume": 0.5}]}
+    as_track = _parse_request_rules(spoken, pseudo)
+    action = {"set_volume": "set_return_volume", "set_pan": "set_return_pan", "set_mute": "set_return_mute"}.get(
+        str(as_track.get("action") or ""))
+    if action is None:
+        return None
+    result = dict(as_track)
+    result.update({"action": action, "track": None, "return_track_name": name,
+                   "return_track_index": int(returned.get("index", 0)), "query": text})
+    result["ambiguity"] = [str(a).replace(stand_in, name) for a in as_track.get("ambiguity") or []]
+    relative_said = _relative_volume_db(spoken.lower()) is not None
+    # The placeholder level can't judge headroom for a change; a level above 0 dB is still refused here.
+    missing = [f for f in as_track.get("missing_fields") or []
+               if f != "current_volume" and not (f == "valid_volume" and relative_said)]
+    if action == "set_return_volume" and not missing:
+        if as_track.get("absolute_value") is not None:
+            result["desired_value"] = float(as_track["absolute_value"])
+        else:
+            relative = as_track.get("requested_relative_db")
+            relative = _relative_volume_db(spoken.lower()) if relative is None else relative
+            if relative is None:
+                missing, result["ambiguity"] = ["amount"], [f"By how much? For example \"turn {name} down 2 dB\"."]
+            result.update(desired_value=None, relative_db=relative)
+    result["missing_fields"] = missing
+    result["confirmation_required"] = not missing
+    if not missing:
+        result["ambiguity"] = []
+    return result
+
+
 def _not_supported_yet(text: str, parsed: dict[str, Any], snapshot: dict[str, Any] | None) -> tuple[str, str] | None:
     """A plain "KENN can't do that yet" for requests the rules would otherwise shrug at (or misread)."""
     # A locator called "chorus" is not the Chorus device.
@@ -1829,23 +1896,16 @@ def _not_supported_yet(text: str, parsed: dict[str, Any], snapshot: dict[str, An
     if not earlier and _SEND_IN_DB.search(text):
         return "send_amount", ("KENN sets sends in percent for now (\"set the hats delay send to 30%\"); a send level "
                                "in dB hasn't been measured against Live yet, so nothing changed.")
-    returns = [str(r.get("name") or "") for r in ((snapshot or {}).get("return_tracks") or []) if isinstance(r, dict)]
-    named = next((name for name in returns if name and re.search(rf"\b{re.escape(name)}\b", text, re.I)), None)
+    named_return = _named_return(text, snapshot)
+    named = str(named_return.get("name")) if named_return else None
     # "mute a-reverb" used to get "device enable, bypass, mute ... not in the qualified action set", as if A-Reverb
-    # were a device.
-    # "lower the A-Reverb by 1db" got "no track found" (round 8, 27 Sept 2026): a generic miss is no answer either. But
-    # only a sentence that names the return and asks to change it counts: "the A-Reverb is too wet, maybe cut it… maybe
-    # lower the bass" is thinking aloud, and "can you check the A-Reverb settings?" asks for no change.
-    def asks_to_change_return(sentence: str) -> bool:
-        mentions = (named and re.search(rf"\b{re.escape(named)}\b", sentence, re.I)) or _RETURN_MENTION.search(sentence)
-        return bool(mentions and _MIXER_WORD.search(sentence) and not _MUSING.search(sentence)
-                    and not re.search(r"\b(?:check|look|show|settings|what|which|how)\b", sentence, re.I))
-
-    if (named or _RETURN_MENTION.search(text)) and any(asks_to_change_return(x) for x in _SENTENCE_END.split(text)) \
+    # were a device, and "lower the A-Reverb by 1db" got "no track found". Level, pan and mute are Live changes now
+    # (_return_mixer_request); anything else asked of a return lands here.
+    if (named or _RETURN_MENTION.search(text)) and _asks_to_change_return(text, named) \
             and earlier <= {"device_action", "return_track_action", "track", "action"}:
         which = f"{named} is a return track, and" if named else "That's a return track, and"
-        return "return_track_action", (f"{which} KENN can't change return tracks yet (level, mute, pan or name). Sends "
-                                "into them work: \"set the vocal's reverb send to 20%\".")
+        return "return_track_action", (f"{which} KENN can change a return's level, pan and mute, not its name or solo "
+                                       "yet. Sends into it work too: \"set the vocal's reverb send to 20%\".")
     return None
 
 
@@ -1979,6 +2039,9 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
 def _parse_single_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     parsed = _parse_request_rules(query, session_snapshot)
     text = str(parsed.get("query") or query or "")
+    returned = _return_mixer_request(text, parsed, session_snapshot)
+    if returned is not None:
+        return returned
     unsupported = _not_supported_yet(text, parsed, session_snapshot)
     if unsupported:
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False,

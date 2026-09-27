@@ -162,6 +162,11 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 - [ ] **D2 Borrowed Live-side handlers** (ableton-mcp, MIT, telemetry excluded; ableton-js as reference); attribution recorded
 - [ ] **D3 New action families** (each with readback and exact undo)
   - [ ] Sends and returns · [ ] Group and ungroup · [ ] Routing
+    > Returns built 2026-09-27 (branch): level, pan and mute on a return track ("lower the A-Reverb by 1db", "mute
+    > return B", "pan the delay return 30% left") through a new Remote Script write, `/live/kenn/set/return_mixer`,
+    > stale-checked and read back through `/live/kenn/get/bus_mixer`, with exact undo; name and solo still say "not
+    > yet". Fake Live models return mixers now. Walkthrough dry run 36/36. Soak night deploys the Remote Script
+    > (`deploy_abletonosc.py --apply --reload`, song.py hot-reloads) before the real-Live row runs. Tick after that.
   - [ ] Tempo and signature · [ ] Scenes · [ ] Locators
     > Tempo built 2026-09-27 (branch `kenn-after-soak`): "set the tempo to 124", "tempo up 2 bpm", "slow the tempo
     > down 4 bpm" propose `set_tempo` (120 BPM -> 124 BPM), refuse a tempo Live moved before Apply, verify by readback,

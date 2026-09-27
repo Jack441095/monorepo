@@ -141,6 +141,10 @@ SUPPORTED_TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 SUPPORTED_RETURN_TRACK_CREATION_ACTIONS = {"create_return_track"}
 SUPPORTED_TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
 SUPPORTED_TEMPO_ACTIONS = {"set_tempo", "set_time_signature"}
+# Return-track mixer changes (27 Sept 2026), written through /live/kenn/set/return_mixer and read back through
+# /live/kenn/get/bus_mixer: action -> (Remote Script field, proposal parameter).
+SUPPORTED_RETURN_MIXER_ACTIONS = {"set_return_volume": ("volume", "volume"), "set_return_pan": ("panning", "pan"),
+                                  "set_return_mute": ("mute", "muted")}
 # Live accepts these denominators and numerators from 1 to 99.
 SIGNATURE_DENOMINATORS = (1, 2, 4, 8, 16)
 # Live's own tempo range.
@@ -375,7 +379,7 @@ def _receipt_supports_undo(receipt: dict[str, Any]) -> bool:
     action = str(receipt.get("action", ""))
     undoable = (
         set(SUPPORTED_TRACK_ACTIONS) | set(SUPPORTED_SEND_ACTIONS) | set(SUPPORTED_TRANSPORT_ACTIONS)
-        | set(SUPPORTED_TEMPO_ACTIONS) | set(SUPPORTED_SCENE_ACTIONS) | set(SUPPORTED_CLIP_ACTIONS) | set(SUPPORTED_LOCATOR_ACTIONS)
+        | set(SUPPORTED_TEMPO_ACTIONS) | set(SUPPORTED_RETURN_MIXER_ACTIONS) | set(SUPPORTED_SCENE_ACTIONS) | set(SUPPORTED_CLIP_ACTIONS) | set(SUPPORTED_LOCATOR_ACTIONS)
         | set(SUPPORTED_VIEW_ACTIONS)
         | {"set_device_parameter", "set_eq_band_tuning_gain", "insert_device", "insert_device_with_parameter"}
     )
@@ -1239,6 +1243,75 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "valid_range": list(TEMPO_RANGE_BPM),
             "reason": f"Explicit user request to set the tempo to {after:g} BPM.",
             "evidence": [f"Current Live tempo: {before:g} BPM."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def _return_mixer_value(self, return_index: int, return_name: str, field: str) -> tuple[Any, str | None]:
+        reading = self.client.get_bus_mixer("return", int(return_index))
+        if not isinstance(reading, dict) or not reading.get("success"):
+            return None, "Live didn't answer the return-track mixer read, so nothing changed."
+        if str(reading.get("name", "")) != str(return_name):
+            return None, f"Return track {int(return_index) + 1} isn't '{return_name}' any more; ask again."
+        value = reading.get(field)
+        if field == "mute":
+            return (value if isinstance(value, bool) else None), None
+        return (round(float(value), 6) if isinstance(value, (int, float)) and not isinstance(value, bool) else None), None
+
+    def propose_return_mixer_action(self, action: str, *, return_index: int, return_name: str, value: Any = None,
+                                    relative_db: float | None = None, session_id: str) -> dict[str, Any]:
+        """Volume, pan or mute on a return track, confirmed and read back like a track change."""
+        _cleanup_memory()
+        if action not in SUPPORTED_RETURN_MIXER_ACTIONS:
+            return {"ok": False, "error": f"Unsupported return-track action: {action}"}
+        field, parameter = SUPPORTED_RETURN_MIXER_ACTIONS[action]
+        before, error = self._return_mixer_value(return_index, return_name, field)
+        if error:
+            return {"ok": False, "error": error}
+        if before is None:
+            return {"ok": False, "error": f"Live didn't report the {parameter} of '{return_name}', so nothing changed."}
+        if action == "set_return_volume":
+            if relative_db is not None:
+                current_db = volume_law.raw_to_db(float(before))
+                target_db = None if current_db is None else current_db + float(relative_db)
+            else:
+                target_db = float(value)
+            after = volume_law.db_to_raw(target_db) if target_db is not None and target_db <= 0.0 else None
+            if after is None:
+                return {"ok": False, "error": f"'{return_name}' can't go above 0 dB with KENN; nothing changed."}
+            after = round(float(after), 6)
+        elif action == "set_return_pan":
+            after = round(float(value), 6)
+            if not -1.0 <= after <= 1.0:
+                return {"ok": False, "error": "Pan runs from hard left to hard right; nothing changed."}
+        else:
+            after = bool(value)
+        state = self.snapshot()
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": action,
+            "operation": action,
+            "target": "ableton_return_track",
+            "track_name": str(return_name),
+            "return_track_index": int(return_index),
+            "return_track_name": str(return_name),
+            "parameter": parameter,
+            "before": before,
+            "after": after,
+            "unit": "boolean" if action == "set_return_mute" else "normalized",
+            "valid_range": None if action == "set_return_mute" else ([0.0, 1.0] if action == "set_return_volume" else [-1.0, 1.0]),
+            "reason": f"Explicit user request to change the {parameter} of return track '{return_name}'.",
+            "evidence": [f"Return track {int(return_index) + 1} '{return_name}' {parameter}: {before!r}."],
             "confidence": 1.0,
             "risk": "local_mutation",
             "requires_confirmation": True,
@@ -3305,6 +3378,18 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 return {"ok": False, "error": "Live transport state changed since the receipt; undo is stale."}
             inverse = "transport_play" if bool(receipt.get("before")) else "transport_stop"
             return self.propose_transport_action(inverse, session_id=session_id)
+        if action in SUPPORTED_RETURN_MIXER_ACTIONS:
+            target = receipt.get("target") or {}
+            current, error = self._return_mixer_value(int(target.get("return_track_index", -1)),
+                                                      str(target.get("return_track_name", "")),
+                                                      SUPPORTED_RETURN_MIXER_ACTIONS[action][0])
+            if error or not _values_match(current, receipt.get("readback")):
+                return {"ok": False, "error": error or "The return track changed since the receipt; undo is stale."}
+            before = receipt.get("before")
+            return self.propose_return_mixer_action(
+                action, return_index=int(target["return_track_index"]), return_name=str(target["return_track_name"]),
+                value=(volume_law.raw_to_db(float(before)) if action == "set_return_volume" else before),
+                session_id=session_id)
         if action == "set_time_signature":
             before = receipt.get("before") or {}
             if _signature(self.snapshot()) != receipt.get("readback") or not isinstance(before, dict):
@@ -3758,6 +3843,20 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 write_error = str(exc)
             write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
             timer.mark("write")
+        elif action in SUPPORTED_RETURN_MIXER_ACTIONS:
+            field = SUPPORTED_RETURN_MIXER_ACTIONS[action][0]
+            current, read_error = self._return_mixer_value(int(proposal.get("return_track_index", -1)),
+                                                           str(proposal.get("return_track_name", "")), field)
+            if read_error or not _values_match(current, proposal.get("before")):
+                _finish_idempotency_key(key)
+                return {"ok": False, "error": read_error or "The return track changed since the proposal was created; create a new proposal."}
+            try:
+                write_ok = bool(self.client.set_return_mixer(int(proposal["return_track_index"]), field, proposal["after"]))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
         elif action == "set_time_signature":
             if _signature(state) != proposal.get("before"):
                 _finish_idempotency_key(key)
@@ -3973,6 +4072,10 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 post_name = "" if action == "rename_track" else str(proposal.get("track_name", ""))
                 post_track, _ = _find_track(after_state, int(proposal["track_index"]), post_name)
                 readback = post_track.get(SUPPORTED_TRACK_ACTIONS[action][0]) if post_track else None
+            elif action in SUPPORTED_RETURN_MIXER_ACTIONS:
+                readback, _ = self._return_mixer_value(int(proposal["return_track_index"]),
+                                                       str(proposal.get("return_track_name", "")),
+                                                       SUPPORTED_RETURN_MIXER_ACTIONS[action][0])
             elif action == "set_time_signature":
                 readback = _signature(after_state)
             elif action in SUPPORTED_TEMPO_ACTIONS:
