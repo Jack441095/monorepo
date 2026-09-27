@@ -20,3 +20,15 @@ def test_filler_words_are_not_evidence() -> None:
     plain = {"title": "Kick Tuning", "source": "kick-tuning.md", "tags": ["kick"], "text": "Tune the kick drum"}
     wordy = {**plain, "text": "Tune the kick drum without guessing and with care"}
     assert note_query_affinity("tune the kick without mud", wordy) == note_query_affinity("tune the kick without mud", plain)
+
+
+def test_the_intent_word_can_be_in_another_chunk_of_the_shown_note() -> None:
+    # 27 Sept 2026: "Why might I high-pass a wide clap layer...?" retrieved only snare-clap-layering.md and was still
+    # refused, because "wide" sat in the note's steps chunk, not the one displayed.
+    from kenn.core.chat_retrieval import intent_guard_status
+
+    base = {"kind": "note", "source": "snare-clap-layering.md", "title": "Snare And Clap Layering", "tags": ["clap"]}
+    summary = {**base, "text": "Give each snare or clap layer one job and process the result as one sound."}
+    steps = {**base, "text": "High-pass wide clap layers so their stereo low mids do not weaken mono playback."}
+    question = "Why might I high-pass a wide clap layer before combining it with the main snare?"
+    assert intent_guard_status(question, [(722.0, summary), (637.0, steps)]) == "strong"

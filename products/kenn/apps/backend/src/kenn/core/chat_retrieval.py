@@ -735,10 +735,12 @@ def intent_guard_status(query: str, results: list[tuple[float, dict]]) -> str:
     displayed = display_results(query, results, 3)
     if not displayed:
         return "weak"
-    for _score, chunk in displayed:
-        if chunk.get("kind") != "note":
-            continue
-        if required & chunk_search_terms(chunk):
+    # A note is split into chunks and only one of them is displayed; the word can sit in another retrieved chunk of
+    # the same note. "Why high-pass a wide clap layer?" found only snare-clap-layering.md and was still refused,
+    # because "wide" was in its steps chunk (27 Sept 2026).
+    shown_notes = {chunk.get("source") for _score, chunk in displayed if chunk.get("kind") == "note"}
+    for _score, chunk in results:
+        if chunk.get("kind") == "note" and chunk.get("source") in shown_notes and required & chunk_search_terms(chunk):
             return "strong"
     return "weak"
 
