@@ -114,3 +114,27 @@ def test_a_send_over_100_percent_is_rejected() -> None:
     plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_send", "track_index": 0, "track_name": "Kick",
             "return_track_index": 0, "return_track_name": "A-Reverb", "value": 120.0, "unit": "%"}
     assert not validate_llm_plan(plan, PAN_SNAPSHOT)["ok"]
+
+
+SONG_SNAPSHOT = {"tracks": [{"index": 0, "name": "Kick"}], "tempo": 120.0}
+
+
+@pytest.mark.parametrize("fields, expected", [
+    ({"action": "set_tempo", "value": 124, "unit": "bpm"}, 124.0),
+    ({"action": "set_tempo", "value": -4, "unit": "bpm", "relative": True}, 116.0),
+    ({"action": "set_time_signature", "value": "6/8"}, {"numerator": 6, "denominator": 8}),
+])
+def test_the_planner_can_state_tempo_and_signature_in_musical_units(fields, expected) -> None:
+    checked = validate_llm_plan({"schema": "kenn.ableton_llm_plan.v1", **fields}, SONG_SNAPSHOT)
+    assert checked["ok"], checked
+    assert checked["plan"]["value"] == expected and checked["plan"]["relative"] is False
+
+
+@pytest.mark.parametrize("fields", [
+    {"action": "set_tempo", "value": 1200},
+    {"action": "set_tempo", "value": 124, "track_index": 0, "track_name": "Kick"},
+    {"action": "set_time_signature", "value": "4/3"},
+    {"action": "set_time_signature", "value": 3},
+])
+def test_song_plans_outside_lives_limits_or_with_a_track_are_rejected(fields) -> None:
+    assert not validate_llm_plan({"schema": "kenn.ableton_llm_plan.v1", **fields}, SONG_SNAPSHOT)["ok"]

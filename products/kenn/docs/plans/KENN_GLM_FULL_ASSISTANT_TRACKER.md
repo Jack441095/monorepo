@@ -103,7 +103,9 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
     > Pan and send in % done 2026-09-27 (branch `kenn-after-soak`): `set_pan` with `unit: "%"` (-100..100, absolute or
     > added to the current pan, past hard left/right rejected) and `set_send` with `unit: "%"` (0..100) convert in KENN.
     > The planner prompt still asks for normalized values; switching it (and the C6 corpus labels) goes with the next
-    > fine-tune so the shadow model's prompt doesn't change under it.
+    > fine-tune so the shadow model's prompt doesn't change under it. Same day: plans may also be `set_tempo` (BPM,
+    > absolute or relative) and `set_time_signature` ("3/4"), checked against Live's limits; the prompt's action list
+    > gets them with the next fine-tune too.
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
   - [ ] ≥ 100 phrasings · [ ] ≥ 250 · [ ] ≥ 500 (slang, fragments, corrections, multi-intent). Curated holdout: 24 (Codex). 100 drafted candidates in `tooling/data/natural_holdout_candidates.jsonl` await owner review before promotion.
     > 2026-09-27: candidates now 481, plus 1,246 in seven sealed blind sets (all excluded from training). The curated

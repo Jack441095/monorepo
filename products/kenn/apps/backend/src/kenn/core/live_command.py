@@ -62,6 +62,7 @@ TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "re
 TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 RETURN_TRACK_CREATION_ACTIONS = set(SUPPORTED_RETURN_TRACK_CREATION_ACTIONS)
 TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
+SONG_ACTIONS = {"set_tempo", "set_time_signature"}
 VIEW_ACTIONS = {"focus_track", "focus_device"}
 LLM_PLAN_FIELDS = frozenset({
     "schema", "action", "track_index", "track_name", "device_index", "device_name",
@@ -74,7 +75,7 @@ LLM_PLAN_FIELDS = frozenset({
 
 LLM_PLAN_ACTIONS = frozenset(
     TRACK_ACTIONS | TRACK_CREATION_ACTIONS | RETURN_TRACK_CREATION_ACTIONS | VIEW_ACTIONS | TRANSPORT_ACTIONS
-    | DEVICE_PARAMETER_ACTIONS | {
+    | SONG_ACTIONS | DEVICE_PARAMETER_ACTIONS | {
         "inspect_tracks", "inspect_devices", "inspect_device_parameters", "clarify", "insert_device",
         "insert_device_with_parameter", "duplicate_clip", "rename_clip", "set_send", "add_locator",
         "remove_locator", "set_eq_band_gain", "set_eq_band_tuning_gain", "recipe",
@@ -266,6 +267,33 @@ def _track_by_index(snapshot: dict[str, Any], index: int, name: str = "") -> dic
     return matches[0]
 
 
+def _song_plan(plan: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, Any]:
+    """A planner's tempo in BPM (absolute or relative) or time signature as "3/4", checked against Live's limits."""
+    value = plan.get("value")
+    if plan.get("action") == "set_time_signature":
+        match = re.fullmatch(r"\s*(\d{1,2})\s*/\s*(\d{1,2})\s*", str(value or ""))
+        if match is None or plan.get("relative"):
+            return {"ok": False, "error": "A time-signature plan needs an absolute value like \"3/4\"."}
+        numerator, denominator = int(match.group(1)), int(match.group(2))
+        if not 1 <= numerator <= 99 or denominator not in (1, 2, 4, 8, 16):
+            return {"ok": False, "error": f"Live can't take {numerator}/{denominator} as a time signature."}
+        return {"ok": True, "plan": dict(plan, value={"numerator": numerator, "denominator": denominator},
+                                         unit="time_signature", relative=False)}
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(float(value)):
+        return {"ok": False, "error": "A tempo plan needs a numeric BPM value."}
+    if str(plan.get("unit") or "bpm").strip().lower() not in {"bpm", ""}:
+        return {"ok": False, "error": "A tempo plan must use 'bpm' as its unit."}
+    bpm = float(value)
+    if plan.get("relative"):
+        current = snapshot.get("tempo")
+        if isinstance(current, bool) or not isinstance(current, (int, float)):
+            return {"ok": False, "error": "A relative tempo change needs Live's current tempo in the snapshot."}
+        bpm += float(current)
+    if not 20.0 <= bpm <= 999.0:
+        return {"ok": False, "error": "That tempo is outside Live's 20 to 999 BPM."}
+    return {"ok": True, "plan": dict(plan, value=round(bpm, 3), unit="bpm", relative=False)}
+
+
 def _pan_percent_to_normalized(plan: dict[str, Any], snapshot: dict[str, Any], track_index: int,
                                track_name: str) -> dict[str, Any]:
     """A planner's pan in % (-100 left .. 100 right), absolute or added to the track's current pan."""
@@ -431,6 +459,14 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
         if unit not in {"", "beats"}:
             return {"ok": False, "error": f"A {action} plan must use beats as its unit."}
         return {"ok": True, "plan": dict(plan)}
+    if action in SONG_ACTIONS:
+        rejected = _reject(
+            ("track_index", "track_name", "device_index", "device_name", "insertion_index", "parameter_index", "parameter_name", "frequency_hz", "eq_band", "locator_name"),
+            "A tempo or time-signature plan contains track or device fields",
+        )
+        if rejected:
+            return rejected
+        return _song_plan(plan, snapshot)
     if action in TRACK_CREATION_ACTIONS:
         rejected = _reject(
             ("track_index", "track_name", "device_index", "device_name", "parameter_index", "parameter_name", "value", "relative", "unit", "frequency_hz", "eq_band", "locator_name"),
