@@ -415,18 +415,41 @@ def query_intent_terms(query: str) -> set[str]:
     return {term for term in guarded if len(term) >= 3}
 
 
+# Words that say nothing about which note answers: "without over-compressing" matched every long note's body.
+_AFFINITY_FILLER = frozenset({"without", "with", "also", "just", "really", "very", "still", "into", "onto", "from", "about",
+                              "some", "more", "less", "much", "any", "every", "each", "other", "thing", "things"})
+
+
+@lru_cache(maxsize=4096)
+def _affinity_words(query: str) -> tuple[frozenset[str], ...]:
+    """Each meaningful word of the query with its forms; "punchier" also as "punch"."""
+    words = []
+    for token in dict.fromkeys(tokenize(query)):
+        if token in _AFFINITY_FILLER:
+            continue
+        forms = set(_normalized_terms_cached(token))
+        if len(token) > 5 and token.endswith("ier"):
+            forms.update({token[:-3], token[:-3] + "y"})
+        words.append(frozenset(forms))
+    return tuple(words)
+
+
 def note_query_affinity(query: str, chunk: dict) -> int:
     """Prefer notes whose title/tags match the user's exact words, not just broad topics."""
     query_terms = _normalized_terms_cached(str(query))
     if not query_terms:
         return 0
+    words = _affinity_words(str(query))
     title_terms = _normalized_terms_cached(f"{chunk.get('title', '')} {chunk.get('source', '')}")
     tag_terms: set[str] = set()
     tags = chunk["tags"] if chunk.get("tags") else extract_tags(chunk.get("text", ""))
     for tag in tags:
         tag_terms.update(_normalized_terms_cached(str(tag)))
-    title_hits = query_terms & title_terms
-    tag_hits = query_terms & tag_terms
+    # One hit per word the user typed. Counting normalised variants separately let "drum" and "drums" both score for
+    # "Mixing Drums — Overview", so it led the answer to "how do I make drums punchier" over "Drum Punch And
+    # Transient Control" (27 Sept 2026).
+    title_hits = [variants for variants in words if variants & title_terms]
+    tag_hits = [variants for variants in words if variants & tag_terms]
     score = (3 * len(title_hits)) + (2 * len(tag_hits))
     # Titles and tags are useful intent signals, but narrow troubleshooting
     # questions often name the decisive evidence only in the note body (for
@@ -434,7 +457,7 @@ def note_query_affinity(query: str, chunk: dict) -> int:
     # contribution so a directly answering note can outrank a broadly related
     # workflow without allowing long notes to dominate by repetition.
     body_terms = _normalized_terms_cached(str(chunk.get("text") or ""))
-    body_hits = query_terms & body_terms
+    body_hits = [variants for variants in words if variants & body_terms]
     score += min(8, len(body_hits))
     query_lower = query.lower()
 
