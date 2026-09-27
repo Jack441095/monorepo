@@ -161,3 +161,74 @@ def test_two_tracks_at_the_same_time_are_both_changed(snapshot) -> None:
 
     recipe = parse_natural_recipe("Can you solo the drum bus and the vocal track at the same time?", snapshot)
     assert recipe is not None and len(recipe["segments"]) == 2 and not recipe["ambiguity"]
+
+
+# Typed in a hurry (the phone-shorthand phrasing set, 27 Sept 2026). These used to get "which mix problem?" from chat.
+@pytest.mark.parametrize("request_text, action, track, value", [
+    ("kik 2db down", "set_volume", "Kick", volume_law.db_to_raw(-16)),
+    ("solo kik", "set_solo", "Kick", True),
+    ("mute the bus", "set_mute", "Drum Bus", True),
+    ("hats 20 left", "set_pan", "Hi-Hats", -0.2),
+    ("pan the hats 20 left", "set_pan", "Hi-Hats", -0.2),
+    ("snare 0.5 left", "set_pan", "Snare / Clap", -0.5),
+    ("hats 20L", "set_pan", "Hi-Hats", -0.4),  # Live's panner reads 50L to 50R
+    ("bass eq 200hz cut 3db", "set_eq_band_gain", "Bass", None),
+])
+def test_shorthand_means_the_plain_command(snapshot, request_text, action, track, value) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == action and parsed["track"]["name"] == track and not parsed["missing_fields"]
+    if isinstance(value, bool):
+        assert parsed["desired_value"] is value
+    elif value is not None:
+        assert parsed["desired_value"] == pytest.approx(value, abs=0.005)
+
+
+@pytest.mark.parametrize("request_text", ["bus comp thresh -10", "teh bus comp thresh -10", "comp thresh -10 on bus"])
+def test_compressor_shorthand_reaches_the_drum_bus_compressor(snapshot, request_text) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == "set_device_parameter" and parsed["track"]["name"] == "Drum Bus"
+
+
+def test_a_bare_signed_number_asks_whether_it_is_a_level_or_a_change(snapshot) -> None:
+    parsed = parse_request("kik -3", snapshot)
+    assert parsed["track"]["name"] == "Kick" and parsed["missing_fields"] == ["absolute_or_relative"]
+
+
+@pytest.mark.parametrize("request_text, missing, words", [
+    ("comp thresh -10", "which_track", "Drum Bus and Lead Vocal"),
+    ("delay 30%", "which_track", "Which track's delay send"),
+    ("verb up a hair", "which_track", "Which track's reverb send"),
+    ("turn the delay send on the bass down 5 dB", "amount", "What level should Bass's delay send be"),
+    ("bass eq 100hz cut", "amount", "cut 100 Hz on the bass by 3 dB"),
+])
+def test_shorthand_missing_one_thing_asks_for_exactly_that(snapshot, request_text, missing, words) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["missing_fields"] == [missing] and words in parsed["ambiguity"][0]
+    assert not parsed["confirmation_required"]
+
+
+def test_a_new_name_keeps_the_spelling_the_user_typed(snapshot) -> None:
+    assert parse_request("rename the kick to kik", snapshot)["desired_value"] == "kik"
+
+
+def test_the_article_is_not_read_as_a_track(snapshot) -> None:
+    # "set the compressor threshold to -10 dB" became "set the the compressor..." and lost the question.
+    assert parse_request("set the compressor threshold to -10 dB", snapshot)["missing_fields"] == ["which_track"]
+
+
+@pytest.mark.parametrize("request_text, action, track", [
+    ("auto filter on synth", "insert_device", "Synth"),
+    ("bass eq low cut 40hz", "set_device_parameter", "Bass"),
+])
+def test_device_shorthand_names_the_device_and_the_track(snapshot, request_text, action, track) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == action and parsed["track"]["name"] == track
+
+
+def test_a_vague_shorthand_level_asks_how_much(snapshot) -> None:
+    parsed = parse_request("bass a bit lower", snapshot)
+    assert parsed["action"] == "set_volume" and parsed["missing_fields"] == ["amount"]
+
+
+def test_describing_the_mix_is_not_shorthand_for_a_change(snapshot) -> None:
+    assert parse_request("the kick is lower", snapshot)["action"] is None

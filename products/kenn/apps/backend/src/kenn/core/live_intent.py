@@ -1353,7 +1353,8 @@ def _rewrite_idioms(text: str) -> str:
         return f"set {m.group('name')} to {m.group('amount')} dB"
     if (m := _TERSE_THRESHOLD.match(text)):
         track = m.group("name") or m.group("name2")
-        if track and not _NOT_A_TRACK_NAME.search(track):
+        # "set the compressor threshold to -10 dB" took "the" as the track and came out "set the the compressor...".
+        if track and not _NOT_A_TRACK_NAME.search(track) and track.casefold() not in {"the", "a", "my", "this", "that"}:
             if m.group("direction"):
                 verb = "raise" if m.group("direction").lower() == "up" else "lower"
                 return f"{verb} the {track} compressor threshold by {m.group('change')} dB"
@@ -1417,6 +1418,116 @@ def _rewrite_common_phrasings(text: str) -> str:
     level = _TERSE_LEVEL.match(text)
     if level and not _TERSE_LEVEL_EXCLUDE.search(level.group("name")):
         text = f"set {level.group('name')} to {level.group('amount')} dB"  # "kick to -12 dB": an absolute level
+    return text
+
+
+# Typed in a hurry, from the phone-shorthand phrasing set (27 Sept 2026): "kik -3", "snar up a hair",
+# "teh bus comp thresh -10", "hats 20 left", "verb on the snare". Each rule turns one shape into the full request the
+# rules below already parse, and only when the words left over name a track in the set.
+_SHORTHAND_TYPOS = (
+    (re.compile(r"\bkik\b", re.I), "kick"),
+    (re.compile(r"\bsnar\b", re.I), "snare"),
+    (re.compile(r"\bteh\b", re.I), "the"),
+    (re.compile(r"\bthresh\b", re.I), "threshold"),
+)
+_SHORT_WORD_BEFORE_BUS = {"drum", "drums", "reverb", "delay", "fx", "mix", "master", "group", "vocal", "vocals", "vox",
+                          "synth", "bass", "music", "parallel", "aux"}
+_SHORT_COMP_SETTING = re.compile(
+    r"^\s*(?:(?P<pre>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+)?(?:comp|compressor)\s+"
+    r"(?P<param>threshold|ratio|attack|release|makeup|output|knee)\s+(?P<value>[-+]?\d+(?:\.\d+)?)\s*(?P<unit>dbs?|ms|:1)?"
+    r"(?:\s+on\s+(?:the\s+)?(?P<post>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?))?\s*[.!]?\s*$", re.I)
+_SHORT_DEVICE_SWITCH = re.compile(
+    r"^\s*(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+(?P<device>comp|compressor|eq|eq\s*eight|saturator)\s+(?P<state>on|off)"
+    r"\s*[.!]?\s*$|^\s*turn\s+(?P<state2>on|off)\s+the\s+comp\b", re.I)
+_SHORT_LEVEL = re.compile(r"^\s*(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+(?P<amount>[-+]\d+(?:\.\d+)?)\s*(?:dbs?)?\s*[.!]?\s*$",
+                          re.I)
+_SHORT_EQ = re.compile(
+    r"^\s*(?:set\s+)?(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+eq\s+(?:(?P<verb>boost|cut)\s+(?P<freq>\d+(?:\.\d+)?)\s*(?P<unit>k?hz)"
+    r"|(?P<freq2>\d+(?:\.\d+)?)\s*(?P<unit2>k?hz)\s+(?P<verb2>boost|cut))(?:\s+(?:by\s+)?(?P<amount>\d+(?:\.\d+)?)\s*dbs?)?"
+    r"\s*[.!]?\s*$", re.I)
+_SHORT_FX_ON = re.compile(r"^\s*(?P<fx>reverb|verb|delay)\s+on\s+(?:the\s+)?(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*[.!]?\s*$", re.I)
+_SHORT_PANNED = re.compile(r"^\s*(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+panned\s+(?P<side>left|right)\s*[.!]?\s*$", re.I)
+_SHORT_VAGUE_LEVEL = re.compile(r"^\s*(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+(?P<vague>a\s+(?:bit|little|touch|hair)\s+|slightly\s+)?"
+                                r"(?P<dir>lower|quieter|softer|louder|higher)\s*[.!]?\s*$", re.I)
+_SHORT_INSERT_ON = re.compile(r"^\s*(?:an?\s+)?(?P<device>saturator|auto\s+filter|glue\s+compressor|compressor|eq\s*eight|roar)\s+on\s+"
+                              r"(?:the\s+)?(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*[.!]?\s*$", re.I)
+_SHORT_EQ_SETTING = re.compile(r"^\s*(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+eq\s+(?P<param>low\s+cut|high\s+cut|low|mid|high)\s+"
+                               r"(?P<value>[-+]?\d+(?:\.\d+)?)\s*(?P<unit>k?hz|dbs?)?\s*[.!]?\s*$", re.I)
+_LIVE_PAN = re.compile(r"(?<![\w.])(?P<n>\d{1,2})\s*(?P<side>[lr])\b", re.I)
+
+
+_DEVICE_SETTING_NO_TRACK = re.compile(r"^\s*set\s+the\s+(?P<device>compressor|eq(?:\s*eight)?)\s+"
+                                      r"(?:threshold|ratio|attack|release|makeup|output|knee)\s+to\s+\S+", re.I)
+# "delay 30%", "verb up a hair", "delay send to b": the send said with no track at all.
+_SEND_NO_TRACK = re.compile(r"^\s*(?:the\s+)?(?P<fx>reverb|verb|delay)(?:\s+send)?\s+(?:(?:[-+]?\d|up\b|down\b|to\s+[ab]\b)"
+                            r"(?!.*\b(?:on|for)\b)|on\s*[.!]?\s*$)", re.I)
+# "turn the delay send on the bass down 5 dB", "lead vocal reverb send up": a nudge to a named track's send.
+_SEND_NUDGE = re.compile(r"\b(?P<fx>reverb|verb|delay)\s+send\b(?=.*\b(?:up|down)\b)(?!.*\d\s*%)", re.I)
+_EQ_CUT_NO_AMOUNT = re.compile(r"^\s*(?:boost|cut)\s+\d+(?:\.\d+)?\s*k?hz\s+on\s+(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}\s*$",
+                               re.I)
+
+
+def _rewrite_shorthand(text: str, tracks: list[dict[str, Any]]) -> str:
+    if not re.search(r"\b(?:named|called|rename|name)\b", text, re.I):  # a new name is spelled as the user wants it
+        for pattern, word in _SHORTHAND_TYPOS:
+            text = pattern.sub(word, text)
+    if re.search(r"\bpan\b|\bleft\b|\bright\b|\d\s*[lr]\s*$", text, re.I):
+        # Live's panner reads 50L to 50R, so "20L" as Live shows it is 40% left.
+        text = _LIVE_PAN.sub(lambda m: f"{int(m.group('n')) * 2}% {'left' if m.group('side').lower() == 'l' else 'right'}"
+                             if int(m.group("n")) <= 50 else m.group(0), text)
+
+    def is_track(name: str | None) -> bool:
+        # "the kick is lower" describes the mix; only a bare track name before the shorthand is a request.
+        return (bool(name) and not _TERSE_LEVEL_EXCLUDE.search(name)
+                and not re.search(r"\b(?:is|was|are|were|sounds?|feels?|seems?|looks?|i|we|it|still|too)\b|'s\b", name, re.I)
+                and _find_track(name, tracks)[0] is not None)
+
+    buses = [t for t in tracks if "bus" in re.split(r"[\s/_-]+", str(t.get("name", "")).casefold())]
+    if len(buses) == 1:
+        # "mute the bus", "bus comp on": one track in the set is a bus, so that's the one meant.
+        bus_name = str(buses[0].get("name"))
+
+        def one_bus(match: re.Match[str]) -> str:
+            before = text[:match.start()].split()
+            if before and before[-1].casefold() in _SHORT_WORD_BEFORE_BUS:
+                return match.group(0)
+            return f"the {bus_name}"
+
+        if bus_name.casefold() not in text.casefold():
+            text = re.sub(r"\b(?:the\s+)?bus\b", one_bus, text, flags=re.I)
+    if (m := _SHORT_COMP_SETTING.match(text)) and (not (m.group("pre") or m.group("post"))
+                                                   or is_track(m.group("pre") or m.group("post"))):
+        target = m.group("pre") or m.group("post")
+        unit = (m.group("unit") or {"threshold": "dB", "makeup": "dB", "output": "dB", "knee": "dB", "ratio": ":1",
+                                    "attack": "ms", "release": "ms"}[m.group("param").lower()])
+        unit = unit if unit == ":1" else f" {unit}"
+        where = f" on the {target}" if target else ""
+        return f"set the compressor {m.group('param').lower()}{where} to {m.group('value')}{unit}"
+    if (m := _SHORT_DEVICE_SWITCH.match(text)):
+        if m.group("state2"):
+            return re.sub(r"\bcomp\b", "compressor", text, count=1, flags=re.I)
+        if is_track(m.group("name")):
+            device = "compressor" if m.group("device").lower().startswith("comp") else m.group("device")
+            return f"turn {m.group('state').lower()} the {device} on the {m.group('name')}"
+    if (m := _SHORT_EQ.match(text)) and is_track(m.group("name")):
+        verb = (m.group("verb") or m.group("verb2")).lower()
+        freq, unit = m.group("freq") or m.group("freq2"), (m.group("unit") or m.group("unit2")).lower()
+        amount = f" by {m.group('amount')} dB" if m.group("amount") else ""
+        return f"{verb} {freq} {'kHz' if unit == 'khz' else 'Hz'} on the {m.group('name')}{amount}"
+    if (m := _SHORT_VAGUE_LEVEL.match(text)) and is_track(m.group("name")):
+        up = m.group("dir").lower() in {"louder", "higher"}
+        return f"turn {m.group('name')} {'up' if up else 'down'} {(m.group('vague') or '').strip()}".rstrip()
+    if (m := _SHORT_INSERT_ON.match(text)) and is_track(m.group("name")):
+        return f"add {m.group('device')} to the {m.group('name')}"
+    if (m := _SHORT_EQ_SETTING.match(text)) and is_track(m.group("name")):
+        unit = {"hz": " Hz", "khz": " kHz"}.get((m.group("unit") or "").lower(), " dB" if m.group("unit") else "")
+        return f"set the eq eight {m.group('param').lower()} on the {m.group('name')} to {m.group('value')}{unit}"
+    if (m := _SHORT_FX_ON.match(text)) and is_track(m.group("name")):
+        return f"send the {m.group('name')} to the {'delay' if m.group('fx').lower() == 'delay' else 'reverb'}"
+    if (m := _SHORT_PANNED.match(text)) and is_track(m.group("name")):
+        return f"pan {m.group('name')} {m.group('side').lower()}"
+    if (m := _SHORT_LEVEL.match(text)) and is_track(m.group("name")):
+        return f"{m.group('name')} {m.group('amount')} dB"  # asks whether that's a level or a change
     return text
 
 
@@ -1646,10 +1757,39 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                        "ambiguity": ["KENN makes a change when you ask for it, not later. Say it when you want it done. "
                                      "Nothing changed."]})
         return parsed
+    tracks = [t for t in ((session_snapshot or {}).get("tracks") or []) if isinstance(t, dict)]
+    # The shorthand questions below replace only the generic "no action/no track" miss, never a specific one.
+    generic_miss = parsed.get("action") is None and set(parsed.get("missing_fields") or []) <= {"action", "track"}
+    if generic_miss and not parsed.get("track") and (m := _DEVICE_SETTING_NO_TRACK.match(text)):
+        # "comp thresh -10" names the setting but not the track: say which tracks have one instead of "no track found".
+        device = "EQ Eight" if m.group("device").lower().startswith("eq") else "Compressor"
+        holders = [str(t.get("name")) for t in tracks
+                   if any(str(d.get("name", "")).casefold() == device.casefold() for d in (t.get("devices") or []) if isinstance(d, dict))]
+        where = (f" The {device} is on {' and '.join(holders)}." if len(holders) <= 3 and holders else "")
+        parsed.update({"action": "set_device_parameter", "confirmation_required": False, "missing_fields": ["which_track"],
+                       "ambiguity": [f"Which track's {device}?{where} For example \"{text} on the "
+                                     f"{holders[0] if holders else 'Drum Bus'}\". Nothing changed."]})
+        return parsed
+    if generic_miss and not parsed.get("track") and (m := _SEND_NO_TRACK.match(text)):
+        fx = "delay" if m.group("fx").lower() == "delay" else "reverb"
+        parsed.update({"action": "set_send", "confirmation_required": False, "missing_fields": ["which_track"],
+                       "ambiguity": [f"Which track's {fx} send? For example \"send the Synth to the {fx} at 30%\". "
+                                     "Nothing changed."]})
+        return parsed
+    if generic_miss and parsed.get("track") and (m := _SEND_NUDGE.search(text)):
+        # KENN sets a send to a level; it doesn't nudge one.
+        fx, track = ("delay" if m.group("fx").lower() == "delay" else "reverb"), parsed["track"].get("name")
+        parsed.update({"action": "set_send", "confirmation_required": False, "missing_fields": ["amount"],
+                       "ambiguity": [f"What level should {track}'s {fx} send be? For example \"send the {track} to the "
+                                     f"{fx} at 20%\". Nothing changed."]})
+        return parsed
+    if generic_miss and parsed.get("track") and (m := _EQ_CUT_NO_AMOUNT.match(text)):
+        parsed.update({"action": "set_eq_band_gain", "confirmation_required": False, "missing_fields": ["amount"],
+                       "ambiguity": [f"By how much? For example \"{m.group(0).strip()} by 3 dB\". Nothing changed."]})
+        return parsed
     if parsed.get("action") in {"insert_device", "insert_device_with_parameter"}:
         both = re.search(r"\b(?:to|on)\s+(?P<a>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+and\s+(?P<b>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*[.!?]?\s*$",
                          text, re.I)
-        tracks = [t for t in ((session_snapshot or {}).get("tracks") or []) if isinstance(t, dict)]
         if both and _extract_track_phrase(both.group("b"), tracks):
             # "add reverb to the kick and the snare" inserted it on the Kick only (27 Sept 2026).
             parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
@@ -1726,7 +1866,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
 
 
 def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
-    text = _rewrite_common_phrasings(" ".join(str(query or "").strip().split()))
+    tracks_said = [t for t in ((session_snapshot or {}).get("tracks") or []) if isinstance(t, dict)]
+    text = _rewrite_shorthand(_rewrite_common_phrasings(" ".join(str(query or "").strip().split())), tracks_said)
     numeric_text = _normalize_kilohertz(_normalize_spoken_numbers(text))
     base = {
         "schema": "kenn.ableton_intent.v1",
@@ -2660,6 +2801,10 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             # "hats left 20", "roll track 2 20 percent to the left": a bare number is a percentage.
             pan_side_first_match = re.search(r"\b(left|right)\s+" + _NUMBER + r"\s*(%|percent)?\s*[.!]?\s*$", lower)
             if pan_side_first_match is None:
+                # "hats 20 left", "snare 0.5 left": typed quickly with no verb at all.
+                pan_amount_first_match = re.search(r"^\s*[a-z][\w /'&-]*?\s+" + _NUMBER + r"\s*(%|percent)?\s*(left|right)\s*[.!]?\s*$",
+                                                   lower)
+            if pan_side_first_match is None and pan_amount_first_match is None:
                 pan_amount_first_match = re.search(
                     r"\b(?:roll|shift|nudge|stick|move|put|place|throw|park|sit)\b.*?" + _NUMBER
                     + r"\s*(%|percent)\s*(?:to\s+the\s+)?(left|right)\b", lower)
@@ -2750,8 +2895,8 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
                 amount = -abs(amount)
             elif side == "right":
                 amount = abs(amount)
-            if pan_side_first_match is not None and unit is None and abs(amount) > 1.0:
-                unit = "%"  # "hats left 20" means 20%
+            if unit is None and side and abs(amount) > 1.0:
+                unit = "%"  # "hats left 20" and "pan the hats 20 left" mean 20%; the pan_side hint below says "20 left"
             normalized = amount / 100.0 if unit else amount
             if not -1.0 <= normalized <= 1.0:
                 base["ambiguity"].append("Pan value is outside the supported -1.0 to 1.0 range; no clamping was applied.")

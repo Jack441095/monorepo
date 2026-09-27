@@ -3062,7 +3062,7 @@ def _handle_command_impl(
             return _clarification(response, intent, str(intent["ambiguity"][0]))
         if intent.get("action") is None:
             return _clarification(response, intent, NOT_A_CHANGE)
-        if set(intent.get("missing_fields") or []) & {"valid_volume", "parameter"} and intent.get("ambiguity"):
+        if set(intent.get("missing_fields") or []) & {"valid_volume", "parameter", "which_track", "amount"} and intent.get("ambiguity"):
             # A limit ("above 0 dB") or one plain question ("which Compressor setting?") reads best on its own.
             return _clarification(response, intent, str(intent["ambiguity"][0]))
         if intent.get("action") in {"insert_device", "insert_device_with_parameter"}:
