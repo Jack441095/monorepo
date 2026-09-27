@@ -173,3 +173,19 @@ def test_two_tracks_panned_opposite_ways_are_two_steps(demo) -> None:
 
     recipe = parse_natural_recipe("pan the kick hard left and the bass hard right", demo)
     assert [(step["track_name"], step["value"]) for step in recipe["steps"]] == [("Kick", -1.0), ("Bass", 1.0)]
+
+
+def test_two_renames_in_one_message_are_two_renames(demo) -> None:
+    # 27 Sept 2026: the Synth would have been renamed "Pads and the bass to Sub".
+    from kenn.core.live_intent import parse_natural_recipe, parse_request
+
+    recipe = parse_natural_recipe("rename the synth to Pads and the bass to Sub", demo)
+    assert [(step["track_name"], step["value"]) for step in recipe["steps"]] == [("Synth", "Pads"), ("Bass", "Sub")]
+    assert parse_request("rename the synth to Rock and Roll", demo)["desired_value"] == "Rock and Roll"
+
+
+def test_a_device_for_two_tracks_asks_which_first(demo) -> None:
+    # "add reverb to the kick and the snare" inserted it on the Kick only.
+    from kenn.core.live_intent import parse_request
+
+    assert parse_request("add reverb to the kick and the snare", demo)["missing_fields"] == ["one_track"]

@@ -801,7 +801,7 @@ _AND_SPLIT = re.compile(r"\s*,?\s+and\s+(?!then\b)", re.I)
 _SHARED_TAIL = re.compile(r"^\s*(?P<verb>turn|bring|push|pull|drop|set|put|pan)\s+(?P<a>(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?)"
                           r"\s+and\s+(?P<b>(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?)\s+(?P<tail>(?:up|down|to|by|at|left|right|"
                           r"hard|back)\b.+)$", re.I)
-_LEADING_VERB = re.compile(r"^\s*(?P<verb>(?:un)?mute|(?:un)?solo|pan|arm|disarm|kill|nuke)\b", re.I)
+_LEADING_VERB = re.compile(r"^\s*(?P<verb>(?:un)?mute|(?:un)?solo|pan|arm|disarm|kill|nuke|rename)\b", re.I)
 
 
 def _clean_intent(segment: str, snapshot: dict[str, Any]) -> dict[str, Any] | None:
@@ -852,7 +852,9 @@ def _split_plain_and(text: str, snapshot: dict[str, Any]) -> list[str]:
                 return [first, second_full]
         return []
     verb = _LEADING_VERB.match(first)
-    if verb and (re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?$", second, re.I)
+    if verb and verb.group("verb").lower() == "rename" and re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?\s+to\s+\S", second, re.I):
+        second = f"rename {second}"  # "rename the synth to Pads and the bass to Sub" named the Synth "Pads and the bass to Sub"
+    elif verb and (re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?$", second, re.I)
                  or (verb.group("verb").lower() == "pan"
                      and re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?\s+(?:\d+\s*%?\s*)?(?:hard\s+)?(?:left|right)\b", second, re.I))):
         second = f"{verb.group('verb')} {second}"  # "... and the snare", "pan the kick left and the bass right"
@@ -1630,6 +1632,16 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                        "ambiguity": ["KENN makes a change when you ask for it, not later. Say it when you want it done. "
                                      "Nothing changed."]})
         return parsed
+    if parsed.get("action") in {"insert_device", "insert_device_with_parameter"}:
+        both = re.search(r"\b(?:to|on)\s+(?P<a>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+and\s+(?P<b>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*[.!?]?\s*$",
+                         text, re.I)
+        tracks = [t for t in ((session_snapshot or {}).get("tracks") or []) if isinstance(t, dict)]
+        if both and _extract_track_phrase(both.group("b"), tracks):
+            # "add reverb to the kick and the snare" inserted it on the Kick only (27 Sept 2026).
+            parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
+                           "missing_fields": ["one_track"], "ambiguity": [
+                               "KENN adds a device to one track at a time. Which track first? Nothing changed."]})
+            return parsed
     if parsed.get("action") == "set_pan" and re.search(r"\bleft\b", text, re.I) and re.search(r"\bright\b", text, re.I):
         # "pan the kick 20% left and 20% right" panned left.
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["pan_side"],
