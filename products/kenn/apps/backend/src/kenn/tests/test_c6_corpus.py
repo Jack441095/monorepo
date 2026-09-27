@@ -9,8 +9,8 @@ from scripts.build_kenn_command_training import (
     _plan, assert_no_holdout_overlap, evaluation_queries, normalize_query, plan_target,
 )
 from scripts.drafted_command_seeds import (
-    DRAFTED_ACTION_SEEDS, DRAFTED_CLARIFY_SEEDS, DRAFTED_GLOBAL_SEEDS, DRAFTED_RECIPE_SEEDS, DRAFTED_TRACK_SEEDS,
-    SOURCE_KIND, drafted_records,
+    DRAFTED_ACTION_SEEDS, DRAFTED_CLARIFY_SEEDS, DRAFTED_GLOBAL_SEEDS, DRAFTED_RECIPE_SEEDS, DRAFTED_SONG_CLARIFY_SEEDS,
+    DRAFTED_SONG_SEEDS, DRAFTED_TRACK_SEEDS, SOURCE_KIND, drafted_records,
 )
 from scripts.train_kenn_command_lora_mlx import split_rows
 from kenn.core import volume_law
@@ -40,10 +40,12 @@ def test_drafted_seeds_fill_scenario_names_validate_and_stay_labelled() -> None:
     for snapshot in scenario_snapshots():
         rows = drafted_records(snapshot, _plan)
         assert len(rows) == (len(DRAFTED_CLARIFY_SEEDS) + len(DRAFTED_ACTION_SEEDS) + len(DRAFTED_TRACK_SEEDS)
-                             + len(DRAFTED_GLOBAL_SEEDS) + len(DRAFTED_RECIPE_SEEDS))
+                             + len(DRAFTED_GLOBAL_SEEDS) + len(DRAFTED_RECIPE_SEEDS)
+                             + len(DRAFTED_SONG_SEEDS) + len(DRAFTED_SONG_CLARIFY_SEEDS))
         assert all("{" not in row["query"] for row in rows)
         assert all(row["source_kind"] == SOURCE_KIND for row in rows)
-        assert all(validate_llm_plan(row["label"], snapshot)["ok"] for row in rows)
+        # A relative tempo label validates against Live's current tempo, which the scenario snapshots don't carry.
+        assert all(validate_llm_plan(row["label"], {**snapshot, "tempo": 120.0})["ok"] for row in rows)
 
 
 def test_corpus_with_drafted_seeds_is_leak_free_and_at_least_a_third_clarify() -> None:
