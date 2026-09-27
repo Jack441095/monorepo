@@ -7,7 +7,7 @@ gates pass, while reporting human review as pending. The ``qualified`` profile
 additionally requires complete independent human review, an explicit
 adjudication decision, a clean/reproducible source snapshot, and a verified
 Developer ID signed and notarized macOS plug-in archive, corpus-bound
-intelligence benchmarks, a reconnect-aware 8-hour soak receipt, and a
+intelligence benchmarks, a reconnect-aware 6-hour soak receipt, and a
 consented real-mix evaluation receipt.
 
 This command is read-only unless ``--output`` is used to write its report. It
@@ -53,9 +53,10 @@ DEFAULT_MATRIX = (
 DEFAULT_PLUGIN_ARCHIVE = REPO_ROOT / "dist" / "KENN-Mix-Assistant-0.1.0-macOS.zip"
 DEFAULT_PLUGIN_HOST_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_PLUGIN_HOST_VALIDATION.json"
 # Owner decisions: 12 hours (was 24) on 2026-09-24 so the Mac stays usable for work; 8 on 2026-09-26 so a soak fits
-# overnight and Live is free for work in the day. Three 12-hour soaks (21-26 Sept) were clean the whole way: no
-# errors, memory flat at 25-47 MB, no drift in the second half.
-SOAK_MIN_SECONDS = 8 * 3600
+# overnight and Live is free for work in the day; 6 on 2026-09-27, as Live is needed for work. Three 12-hour soaks
+# (21-26 Sept) and an 8-hour one (27 Sept) were clean the whole way: no errors, memory flat at 25-113 MB, no drift in
+# the later hours, one reconnect handled each time.
+SOAK_MIN_SECONDS = 6 * 3600
 SOAK_HOURS = SOAK_MIN_SECONDS // 3600
 DEFAULT_SOAK_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_COMPANION_24H_SOAK.json"
 DEFAULT_REAL_MIX_REPORT = REPO_ROOT / "tooling" / "evaluation" / "results" / "KENN_REAL_MIX_EVALUATION.json"
