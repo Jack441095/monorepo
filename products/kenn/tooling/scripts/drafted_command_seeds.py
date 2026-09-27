@@ -163,6 +163,29 @@ DRAFTED_TRACK_SEEDS: tuple[tuple[str, str, str, int, dict[str, Any]], ...] = (
     ("draft-eq-02", "EQ Eight band 1A on {t2} to minus 2 dB", "set_eq_band_gain", 2,
      {**_EQ, "value": -2.0, "unit": "dB"}),
 )
+# C6 run 13: song tempo and time signature, which became Live changes on 27 Sept 2026. BPM as the user says it (KENN
+# checks Live's 20-999 range and adds a relative change to the current tempo); a signature as "N/D". Worded
+# differently from the tempo tests in apps/backend/src/kenn/tests/test_tempo_change.py.
+TEMPO = "To what tempo? Give a BPM, for example 124."
+SIGNATURE = "To which time signature? For example 3/4 or 6/8."
+TEMPO_RANGE = "Live's tempo runs from 20 to 999 BPM. What tempo do you want?"
+DRAFTED_SONG_SEEDS: tuple[tuple[str, str, str, dict[str, Any]], ...] = (
+    ("draft-song-tempo-01", "Tempo to 126", "set_tempo", {"value": 126.0, "unit": "bpm"}),
+    ("draft-song-tempo-02", "Make the song 140 BPM", "set_tempo", {"value": 140.0, "unit": "bpm"}),
+    ("draft-song-tempo-03", "Change the BPM to 92", "set_tempo", {"value": 92.0, "unit": "bpm"}),
+    ("draft-song-tempo-04", "Push the tempo up 3 BPM", "set_tempo", {"value": 3.0, "unit": "bpm", "relative": True}),
+    ("draft-song-tempo-05", "Knock 5 BPM off the tempo", "set_tempo", {"value": -5.0, "unit": "bpm", "relative": True}),
+    ("draft-song-tempo-06", "Take the tempo down by 2", "set_tempo", {"value": -2.0, "unit": "bpm", "relative": True}),
+    ("draft-song-sig-01", "Put the project in 6/8", "set_time_signature", {"value": "6/8", "unit": "time_signature"}),
+    ("draft-song-sig-02", "Switch the meter to 3/4", "set_time_signature", {"value": "3/4", "unit": "time_signature"}),
+    ("draft-song-sig-03", "Time signature 7/8 please", "set_time_signature", {"value": "7/8", "unit": "time_signature"}),
+)
+DRAFTED_SONG_CLARIFY_SEEDS: tuple[tuple[str, str, str, str], ...] = (
+    ("draft-song-ask-01", "incomplete", "Make it a bit faster", TEMPO),
+    ("draft-song-ask-02", "incomplete", "Slow the whole song down", TEMPO),
+    ("draft-song-ask-03", "incomplete", "Change the time signature", SIGNATURE),
+    ("draft-song-ask-04", "out_of_range", "Set the tempo to 2000", TEMPO_RANGE),
+)
 # (record_id, query template, [(action, track index or None, fields), ...])
 DRAFTED_RECIPE_SEEDS: tuple[tuple[str, str, tuple[tuple[str, int | None, dict[str, Any]], ...]], ...] = (
     ("draft-recipe-01", "Mute {t1} and solo {t2}",
@@ -213,7 +236,12 @@ def drafted_records(snapshot: dict[str, Any], plan: Any) -> list[dict[str, Any]]
     rows = [
         {"record_id": record_id, "category": category, "query": template.format(**names),
          "label": plan("clarify", clarification=clarification), "source_kind": SOURCE_KIND}
-        for record_id, category, template, clarification in DRAFTED_CLARIFY_SEEDS
+        for record_id, category, template, clarification in DRAFTED_CLARIFY_SEEDS + DRAFTED_SONG_CLARIFY_SEEDS
+    ]
+    rows += [
+        {"record_id": record_id, "category": "supported_control", "query": template, "label": plan(action, **fields),
+         "source_kind": SOURCE_KIND}
+        for record_id, template, action, fields in DRAFTED_SONG_SEEDS
     ]
     rows += [
         {"record_id": record_id, "category": "supported_control", "query": template.format(**names),
@@ -238,4 +266,5 @@ def drafted_records(snapshot: dict[str, Any], plan: Any) -> list[dict[str, Any]]
 
 
 __all__ = ["contrast_records", "DRAFTED_ACTION_SEEDS", "DRAFTED_CLARIFY_SEEDS", "DRAFTED_GLOBAL_SEEDS", "DRAFTED_RECIPE_SEEDS",
+           "DRAFTED_SONG_CLARIFY_SEEDS", "DRAFTED_SONG_SEEDS",
            "DRAFTED_TRACK_SEEDS", "SOURCE_KIND", "drafted_records"]
