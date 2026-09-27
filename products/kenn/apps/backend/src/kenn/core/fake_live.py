@@ -490,6 +490,12 @@ class FakeLiveBackend:
             self._session["is_playing"] = False
             return True
 
+    def set_time_signature(self, numerator: int, denominator: int) -> bool:
+        with self._lock:
+            self._session.update(signature_numerator=int(numerator), signature_denominator=int(denominator))
+            self.writes.append(("set_time_signature", int(numerator), int(denominator)))
+            return True
+
     def set_tempo(self, bpm: float) -> bool:
         with self._lock:
             self._session["tempo"] = max(20.0, min(999.0, float(bpm)))  # the real bridge clamps the same way

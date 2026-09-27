@@ -146,6 +146,8 @@ WRITE_ENDPOINTS = (
     "/live/song/start_playing",
     "/live/song/stop_playing",
     "/live/song/set/tempo",
+    "/live/song/set/signature_numerator",
+    "/live/song/set/signature_denominator",
     "/live/scene/fire",
     "/live/device/set/parameter/value",
     "/live/track/insert_device",
@@ -1903,6 +1905,11 @@ class AbletonOSCClient:
 
     def set_tempo(self, bpm: float) -> bool:
         return self._send_only("/live/song/set/tempo", [max(20.0, min(999.0, float(bpm)))])
+
+    def set_time_signature(self, numerator: int, denominator: int) -> bool:
+        # Two writes; the caller reads both back, so half a change shows up as a failed verification.
+        return (self._send_only("/live/song/set/signature_numerator", [int(numerator)])
+                and self._send_only("/live/song/set/signature_denominator", [int(denominator)]))
 
     def duplicate_clip_to_arrangement(self, track_index: int, clip_slot_index: int, destination_time_beats: float) -> bool:
         """Duplicate a Session View clip into the Arrangement timeline at the specified beat."""

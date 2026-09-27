@@ -92,7 +92,38 @@ def test_the_same_tempo_changes_nothing(fake) -> None:
     assert reply["answer"].startswith("The tempo is already 120 BPM") and not reply.get("proposal")
 
 
-def test_a_time_signature_change_still_says_to_do_it_in_live(fake) -> None:
-    reply = handle_command("set the time signature to 3/4", session_id="tempo", service=LiveActionService(fake),
-                           allow_llm=False)
-    assert "can't change the time signature yet" in reply["answer"] and fake.writes == []
+
+
+@pytest.mark.parametrize("request_text, signature", [
+    ("set the time signature to 3/4", (3, 4)),
+    ("time signature 6/8", (6, 8)),
+    ("switch to 7/8 time", (7, 8)),
+    ("change the meter to 5/4", (5, 4)),
+])
+def test_time_signature_requests_become_a_signature_change(fake, request_text, signature) -> None:
+    parsed = parse_request(request_text, fake.query_session_state())
+    assert parsed["action"] == "set_time_signature" and not parsed["missing_fields"]
+    assert (parsed["desired_value"]["numerator"], parsed["desired_value"]["denominator"]) == signature
+
+
+def test_a_signature_live_cannot_take_is_refused(fake) -> None:
+    parsed = parse_request("set the time signature to 4/3", fake.query_session_state())
+    assert parsed["missing_fields"] == ["amount"] and "1, 2, 4, 8 or 16" in parsed["ambiguity"][0]
+
+
+def test_time_signature_change_is_verified_and_undone_exactly(fake) -> None:
+    service = LiveActionService(fake)
+    planned = handle_command("set the time signature to 3/4", session_id="sig", service=service, allow_llm=False)
+    assert "from 4/4 to 3/4" in planned["answer"] and fake.writes == []
+    proposal = planned["proposal"]
+    applied = service.execute(proposal, confirm_token=proposal["confirmation_token"], session_id="sig")
+    assert applied["receipt"]["verified"] and applied["receipt"]["readback"] == {"numerator": 3, "denominator": 4}
+    undo = service.propose_undo(applied["receipt"], session_id="sig")
+    assert service.execute(undo["proposal"], confirm_token=undo["proposal"]["confirmation_token"], session_id="sig")["ok"]
+    state = fake.query_session_state()
+    assert (state["signature_numerator"], state["signature_denominator"]) == (4, 4)
+
+
+@pytest.mark.parametrize("request_text", ["the hats play 1/16 notes", "the hats play eighth notes", "3/4"])
+def test_note_values_and_bare_fractions_change_nothing(fake, request_text) -> None:
+    assert parse_request(request_text, fake.query_session_state())["action"] not in {"transport_play", "set_time_signature"}

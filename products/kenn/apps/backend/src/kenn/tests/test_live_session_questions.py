@@ -224,10 +224,8 @@ def test_a_tempo_change_request_is_left_for_the_change_path(question) -> None:
     assert answer_live_session_question(question, service=Service(SessionLive())) is None
 
 
-def test_a_time_signature_change_request_says_kenn_cannot_do_it() -> None:
-    # Used to answer only "The current tempo is …", which reads as if KENN had changed it.
-    result = answer_live_session_question("Set the time signature to 3/4", service=Service(SessionLive()))
-    assert result["answer"].startswith("KENN can't change the time signature")
+def test_a_time_signature_change_request_is_left_for_the_change_path() -> None:
+    assert answer_live_session_question("Set the time signature to 3/4", service=Service(SessionLive())) is None
 
 
 def test_a_tempo_question_just_gets_the_tempo() -> None:

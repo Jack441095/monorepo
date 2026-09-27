@@ -140,7 +140,9 @@ SUPPORTED_TRACK_ACTIONS = {
 SUPPORTED_TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 SUPPORTED_RETURN_TRACK_CREATION_ACTIONS = {"create_return_track"}
 SUPPORTED_TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
-SUPPORTED_TEMPO_ACTIONS = {"set_tempo"}
+SUPPORTED_TEMPO_ACTIONS = {"set_tempo", "set_time_signature"}
+# Live accepts these denominators and numerators from 1 to 99.
+SIGNATURE_DENOMINATORS = (1, 2, 4, 8, 16)
 # Live's own tempo range.
 TEMPO_RANGE_BPM = (20.0, 999.0)
 SUPPORTED_SCENE_ACTIONS = {"launch_scene"}
@@ -295,6 +297,13 @@ def _device_setup_text(proposal: dict[str, Any]) -> str:
             "before_device_fingerprint",
         )
     )
+
+
+def _signature(state: dict[str, Any]) -> dict[str, int] | None:
+    numerator, denominator = state.get("signature_numerator"), state.get("signature_denominator")
+    if any(isinstance(v, bool) or not isinstance(v, (int, float)) for v in (numerator, denominator)):
+        return None
+    return {"numerator": int(numerator), "denominator": int(denominator)}
 
 
 def _values_match(expected: Any, actual: Any) -> bool:
@@ -1230,6 +1239,46 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "valid_range": list(TEMPO_RANGE_BPM),
             "reason": f"Explicit user request to set the tempo to {after:g} BPM.",
             "evidence": [f"Current Live tempo: {before:g} BPM."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def propose_time_signature_action(self, numerator: int, denominator: int, *, session_id: str) -> dict[str, Any]:
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        before = _signature(state)
+        if before is None:
+            return {"ok": False, "error": "Live didn't report its time signature, so there's nothing to compare or undo to."}
+        if not 1 <= int(numerator) <= 99 or int(denominator) not in SIGNATURE_DENOMINATORS:
+            return {"ok": False, "error": f"Live takes 1 to 99 beats over 1, 2, 4, 8 or 16; {numerator}/{denominator} isn't one."}
+        after = {"numerator": int(numerator), "denominator": int(denominator)}
+        shown = lambda sig: f"{sig['numerator']}/{sig['denominator']}"
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "set_time_signature",
+            "operation": "set_time_signature",
+            "target": "ableton_song_time_signature",
+            "parameter": "time signature",
+            "before": before,
+            "after": after,
+            "before_display": shown(before),
+            "after_display": shown(after),
+            "unit": "time_signature",
+            "valid_range": None,
+            "reason": f"Explicit user request to set the time signature to {shown(after)}.",
+            "evidence": [f"Current Live time signature: {shown(before)}."],
             "confidence": 1.0,
             "risk": "local_mutation",
             "requires_confirmation": True,
@@ -3256,6 +3305,12 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 return {"ok": False, "error": "Live transport state changed since the receipt; undo is stale."}
             inverse = "transport_play" if bool(receipt.get("before")) else "transport_stop"
             return self.propose_transport_action(inverse, session_id=session_id)
+        if action == "set_time_signature":
+            before = receipt.get("before") or {}
+            if _signature(self.snapshot()) != receipt.get("readback") or not isinstance(before, dict):
+                return {"ok": False, "error": "Live's time signature changed since the receipt; undo is stale."}
+            return self.propose_time_signature_action(int(before["numerator"]), int(before["denominator"]),
+                                                      session_id=session_id)
         if action in SUPPORTED_TEMPO_ACTIONS:
             current = self.snapshot().get("tempo")
             if isinstance(current, bool) or not isinstance(current, (int, float)) \
@@ -3703,6 +3758,18 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 write_error = str(exc)
             write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
             timer.mark("write")
+        elif action == "set_time_signature":
+            if _signature(state) != proposal.get("before"):
+                _finish_idempotency_key(key)
+                return {"ok": False, "error": "Live's time signature changed since the proposal was created; create a new proposal."}
+            try:
+                write_ok = bool(self.client.set_time_signature(int(proposal["after"]["numerator"]),
+                                                               int(proposal["after"]["denominator"])))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
         elif action in SUPPORTED_TEMPO_ACTIONS:
             current = state.get("tempo")
             if isinstance(current, bool) or not isinstance(current, (int, float)) \
@@ -3906,6 +3973,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 post_name = "" if action == "rename_track" else str(proposal.get("track_name", ""))
                 post_track, _ = _find_track(after_state, int(proposal["track_index"]), post_name)
                 readback = post_track.get(SUPPORTED_TRACK_ACTIONS[action][0]) if post_track else None
+            elif action == "set_time_signature":
+                readback = _signature(after_state)
             elif action in SUPPORTED_TEMPO_ACTIONS:
                 tempo = after_state.get("tempo")
                 readback = round(float(tempo), 3) if isinstance(tempo, (int, float)) and not isinstance(tempo, bool) else None

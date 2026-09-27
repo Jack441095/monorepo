@@ -53,11 +53,11 @@ def _question_kind(question: str) -> str | None:
         return "track_identity"
     # Asking what the tempo is, not any sentence with "tempo" in it ("stretch samples to fit my track's tempo" got
     # "The current tempo is 120 BPM", 26 Sept 2026).
-    # Tempo changes are Live changes now (set_tempo, 27 Sept 2026); only a time-signature change still lands here.
+    # Tempo and time-signature changes are Live changes now (27 Sept 2026), so only questions land here.
     # "what bpm is good for house music?" is advice, not this set's tempo.
     advice = re.search(r"\b(?:good|best|right|ideal|should|usually|typical(?:ly)?|normal|common|for\s+(?:a\s+)?[\w-]+\s+(?:music|track|song|beat)s?"
                        r"|genre|house|techno|trance|dnb|drum\s+and\s+bass|dubstep|trap|hip\s*hop|garage|ambient|pop)\b", lower)
-    if not advice and (re.search(r"\b(?:set|change|make|put|switch)\b[^.?!]*\b(?:time\s+signature|meter)\b", lower) or re.search(r"\b(?:what|which)(?:'?s|\s+is|\s+are)?\s+(?:the\s+|my\s+|our\s+|this\s+)?(?:current\s+|song'?s?\s+|set'?s?\s+)?"
+    if not advice and not re.search(r"\b(?:set|change|make|put|switch)\b", lower) and (re.search(r"\b(?:what|which)(?:'?s|\s+is|\s+are)?\s+(?:the\s+|my\s+|our\s+|this\s+)?(?:current\s+|song'?s?\s+|set'?s?\s+)?"
                  r"(?:tempo|bpm|time\s+signature|meter)\b|\bhow\s+fast\s+is\b|^\s*(?:the\s+)?(?:tempo|bpm|time\s+signature)\s*\??\s*$"
                  r"|\b(?:tempo|bpm)\s+(?:and|&)\s+(?:the\s+)?time\s+signature\b", lower)):
         return "tempo_signature"
@@ -219,9 +219,6 @@ def answer_live_session_question(
         tempo_text = f"{float(tempo):g} BPM" if isinstance(tempo, (int, float)) else "an unavailable tempo"
         signature_text = f"{numerator}/{denominator}" if numerator is not None and denominator is not None else "an unavailable time signature"
         answer = f"The current tempo is {tempo_text} and the time signature is {signature_text}."
-        if re.search(r"\b(?:set|change|make|put|switch)\b[^.?!]*\b(?:time\s+signature|meter)\b", question, re.I):
-            # "set the time signature to 3/4" used to get only the current values, which reads as if KENN had done it.
-            answer = f"KENN can't change the time signature yet; set it in Live. {answer}"
         payload.update({
             "answer": answer,
             "tempo": tempo,

@@ -1550,6 +1550,31 @@ _TEMPO_VAGUE = re.compile(r"^\s*(?:(?:speed|slow)\s+(?:it|the\s+(?:tempo|song|tr
                           r"(?:\s+(?:a\s+(?:bit|little|touch|hair)|slightly))?\s*[.!]?\s*$", re.I)
 
 
+_SIGNATURE_REQUEST = re.compile(
+    r"^\s*(?:(?:set|change|put|make|switch|go|move)\s+)?(?:(?:the|my|our|this|it)\s+)?(?:(?:song|project|set|session)\s*'?s?\s+)?"
+    r"(?:(?:time\s+signature|meter|signature)\s+)?(?:to|in(?:to)?|=)?\s*(?P<num>\d{1,3})\s*/\s*(?P<den>\d{1,2})"
+    r"(?:\s+time)?(?:\s+(?:time\s+signature|meter))?\s*[.!]?\s*$", re.I)
+
+
+def _time_signature_request(text: str) -> dict[str, Any] | None:
+    """"set the time signature to 3/4", "switch to 6/8 time": a time-signature change, or None."""
+    if not re.search(r"\b(?:time\s+signature|meter|signature)\b|\d\s*/\s*\d+\s+time\b|^\s*(?:switch|go|change)\s+(?:it\s+)?to\s+\d+\s*/\s*\d+",
+                     text, re.I):
+        return None
+    m = _SIGNATURE_REQUEST.match(text)
+    if m is None:
+        return None
+    numerator, denominator = int(m.group("num")), int(m.group("den"))
+    fields: dict[str, Any] = {"mode": "assist", "action": "set_time_signature", "confidence": 0.97}
+    if not 1 <= numerator <= 99 or denominator not in (1, 2, 4, 8, 16):
+        fields.update(missing_fields=["amount"], confirmation_required=False, ambiguity=[
+            f"Live takes 1 to 99 beats over 1, 2, 4, 8 or 16, so {numerator}/{denominator} can't be set."])
+        return fields
+    fields.update(desired_value={"numerator": numerator, "denominator": denominator}, confirmation_required=True,
+                  unit="time_signature")
+    return fields
+
+
 def _tempo_request(text: str, snapshot: dict[str, Any] | None) -> dict[str, Any] | None:
     """A song-tempo change, as intent fields, or None when the message isn't one."""
     if _TEMPO_NOT_SONG.search(text):
@@ -2198,6 +2223,10 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             "confidence": 0.98,
         })
         return base
+    signature = _time_signature_request(text)
+    if signature is not None:
+        base.update(signature)
+        return base
     tempo = _tempo_request(text, snapshot)
     if tempo is not None:
         base.update(tempo)
@@ -2442,9 +2471,10 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
                                  "or start/stop the whole set? Nothing changed.")
         return base
     # "Play" is Live's transport unless someone is playing notes: "every note I play", "play a sample across the
-    # keyboard" were Play proposals (26 Sept 2026).
+    # keyboard" were Play proposals (26 Sept 2026), and so was "the hats play 1/16 notes" (27 Sept).
     if re.search(r"(?<!\bi\s)(?<!\bwe\s)(?<!\byou\s)(?<!\bthey\s)\bplay\b(?!\s+(?:a|an|some|each|every|any|one|two|notes?|"
-                 r"chords?|samples?|sounds?|keys?|melod(?:y|ies)|parts?|live|along|over|through|across|around|with)\b)"
+                 r"chords?|samples?|sounds?|keys?|melod(?:y|ies)|parts?|live|along|over|through|across|around|with|"
+                 r"\d+\s*/\s*\d+|whole|half|quarter|eighth|sixteenth|8ths?|16ths?|32nds?|triplets?|off-?beats?|straight)\b)"
                  r"|\b(?:start playback|start\s+(?:the\s+)?(?:song|set|playback|playing)|hit\s+play)\b"
                  r"|^\s*(?:let'?s\s+(?:hear\s+it|jam)|can\s+we\s+start|let'?s\s+go)\s*[.!?]?\s*$", lower):
         base.update({"mode": "assist", "action": "transport_play", "confirmation_required": True, "confidence": 0.99})

@@ -1568,7 +1568,8 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
     if kind == "tempo":
         response.update({
             "status": "confirmation_required",
-            "answer": (f"I can change the tempo from {proposal.get('before_display')} to {proposal.get('after_display')}. "
+            "answer": (f"I can change the {proposal.get('parameter') or 'tempo'} from {proposal.get('before_display')} to "
+                       f"{proposal.get('after_display')}. "
                        "Nothing has changed. Confirm this exact proposal to apply it."),
             "proposal": proposal,
             "confirmation_required": True,
@@ -3287,6 +3288,16 @@ def _handle_command_impl(
         proposal = result["proposal"]
         unchanged = already_there(action, str(proposal.get("track_name") or ""), proposal.get("before"), proposal.get("after"))
         return _clarification(response, intent, unchanged) if unchanged else _proposal_response(response, proposal, kind="track")
+    if action == "set_time_signature":
+        signature = intent.get("desired_value") or {}
+        result = live.propose_time_signature_action(int(signature.get("numerator", 0)), int(signature.get("denominator", 0)),
+                                                    session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live time-signature proposal."))
+        proposal = result["proposal"]
+        if proposal.get("before") == proposal.get("after"):
+            return _clarification(response, intent, f"The time signature is already {proposal['after_display']}. Nothing changed.")
+        return _proposal_response(response, proposal, kind="tempo")
     if action == "set_tempo":
         result = live.propose_tempo_action(float(intent.get("desired_value")), session_id=response["session_id"])
         if not result.get("ok"):

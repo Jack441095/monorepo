@@ -150,7 +150,9 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
     > and undo exactly (stale once the tempo moves again). "speed it up a bit" asks "To what tempo?"; outside 20-999
     > BPM is refused. BPM talk about clips, delays or genres stays out ("what bpm is good for house music?" no longer
     > gets the set's tempo). 22 tests on fake Live. Real Live: the soak-night walkthrough now has a tempo +4, apply,
-    > undo, exact-restore row. Time signature still to do.
+    > undo, exact-restore row. Time signature the same day: "set the time signature to 3/4", "switch to 7/8 time"
+    > propose `set_time_signature` (4/4 -> 3/4), stale-checked, both halves read back, exact undo; Live's limits (1-99
+    > over 1/2/4/8/16) refused. Walkthrough dry run on fake Live 35/35. Tick once both rows pass on real Live.
   - [ ] Clips: create, launch, loop, warp, gain, transpose
   - [ ] MIDI note edit · [ ] Automation write
   - [ ] Track create with a scoped undo design
