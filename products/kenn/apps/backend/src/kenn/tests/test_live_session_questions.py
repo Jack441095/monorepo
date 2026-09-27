@@ -252,3 +252,27 @@ def test_a_tracks_level_pan_or_mute_is_read_from_the_set(question, answer) -> No
 def test_tempo_advice_is_not_answered_with_the_sets_tempo(question) -> None:
     # "what bpm is good for house music?" got "The current tempo is 120 BPM" (27 Sept 2026).
     assert answer_live_session_question(question, service=Service(SessionLive())) is None
+
+
+@pytest.mark.parametrize("question, answer", [
+    ("which devices are on the B-Delay", "'B-Delay' has: Delay."),
+    ("what's in return B?", "'B-Delay' has: Delay."),
+])
+def test_return_track_chains_by_name_or_letter(question, answer) -> None:
+    # Both got "no track found" (round 8 phrasing set, 27 Sept 2026).
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.live_command import handle_command
+
+    reply = handle_command(question, session_id="returns", service=LiveActionService(FakeLiveBackend()), allow_llm=False)
+    assert reply["answer"] == answer
+
+
+def test_whats_in_the_mix_is_not_a_chain_question() -> None:
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.live_command import handle_command
+
+    reply = handle_command("what's in the mix that makes it muddy?", session_id="returns",
+                           service=LiveActionService(FakeLiveBackend()), allow_llm=False)
+    assert "has:" not in str(reply.get("answer")) and "Which track, return" not in str(reply.get("answer"))

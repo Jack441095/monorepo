@@ -1810,7 +1810,7 @@ _PAN_NO_SIDE = re.compile(r"^\s*pan\s+(?!.*\b(?:left|right|cent(?:er|re)|middle|
 _HEDGE = re.compile(r"\b(?:maybe|perhaps|possibly|might)\b", re.I)
 _RETURN_MENTION = re.compile(r"\breturn(?:\s+tracks?)?\b|\b[ab]\s+return\b", re.I)
 _MIXER_WORD = re.compile(r"\b(?:volume|fader|level|gain|louder|quieter|up|down|mute|unmute|solo|unsolo|pan|rename|name|"
-                         r"called|set|turn|db)\b", re.I)
+                         r"called|set|turn|db|lower|raise|drop|boost|cut|reduce|bring)\b|\d\s*db\b", re.I)
 _SEND_IN_DB = re.compile(r"\bsend\b.*?-?\d+(?:\.\d+)?\s*db\b|-?\d+(?:\.\d+)?\s*db\b.*?\bsend\b", re.I)
 
 
@@ -1833,8 +1833,16 @@ def _not_supported_yet(text: str, parsed: dict[str, Any], snapshot: dict[str, An
     named = next((name for name in returns if name and re.search(rf"\b{re.escape(name)}\b", text, re.I)), None)
     # "mute a-reverb" used to get "device enable, bypass, mute ... not in the qualified action set", as if A-Reverb
     # were a device.
-    if (named or _RETURN_MENTION.search(text)) and _MIXER_WORD.search(text) and earlier <= {"device_action",
-                                                                                         "return_track_action"}:
+    # "lower the A-Reverb by 1db" got "no track found" (round 8, 27 Sept 2026): a generic miss is no answer either. But
+    # only a sentence that names the return and asks to change it counts: "the A-Reverb is too wet, maybe cut it… maybe
+    # lower the bass" is thinking aloud, and "can you check the A-Reverb settings?" asks for no change.
+    def asks_to_change_return(sentence: str) -> bool:
+        mentions = (named and re.search(rf"\b{re.escape(named)}\b", sentence, re.I)) or _RETURN_MENTION.search(sentence)
+        return bool(mentions and _MIXER_WORD.search(sentence) and not _MUSING.search(sentence)
+                    and not re.search(r"\b(?:check|look|show|settings|what|which|how)\b", sentence, re.I))
+
+    if (named or _RETURN_MENTION.search(text)) and any(asks_to_change_return(x) for x in _SENTENCE_END.split(text)) \
+            and earlier <= {"device_action", "return_track_action", "track", "action"}:
         which = f"{named} is a return track, and" if named else "That's a return track, and"
         return "return_track_action", (f"{which} KENN can't change return tracks yet (level, mute, pan or name). Sends "
                                 "into them work: \"set the vocal's reverb send to 20%\".")

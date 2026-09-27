@@ -308,3 +308,19 @@ def test_a_level_described_earlier_is_not_the_target(snapshot) -> None:
 def test_it_names_the_track_for_a_rename(snapshot) -> None:
     parsed = parse_request("Why is the bass track named Bass? Can you rename it to Bass Line?", snapshot)
     assert parsed["action"] == "rename_track" and parsed["track"]["name"] == "Bass" and parsed["desired_value"] == "Bass Line"
+
+
+@pytest.mark.parametrize("request_text", ["lower the A-Reverb by 1db", "turn down the A-Reverb a little", "mute the B-Delay"])
+def test_a_return_track_change_says_kenn_cannot_yet(snapshot, request_text) -> None:
+    # These got "no track found" (27 Sept 2026); return tracks can't be changed yet, sends into them can.
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["missing_fields"] == ["return_track_action"] and "return track" in parsed["ambiguity"][0]
+
+
+@pytest.mark.parametrize("message", [
+    "The reverb on the A-Reverb is a bit too wet, maybe cut it a little. Also, the bass is clashing with the kick, "
+    "maybe lower the bass by 2db.",
+    "I'm confused. Can you check the A-Reverb settings?",
+])
+def test_musing_about_a_return_or_checking_it_is_not_a_return_change(snapshot, message) -> None:
+    assert "return_track_action" not in parse_request(message, snapshot)["missing_fields"]
