@@ -988,6 +988,7 @@ _ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixt
              "eighth": 8, "ninth": 9, "tenth": 10}
 _ORDINAL_CHANNEL = re.compile(
     r"\b(?:the\s+)?(" + "|".join(_ORDINALS) + r")\s+(?:visible\s+)?(?:track|trk|channel|chan|ch)\b", re.I)
+_ORDINAL_SCENE = re.compile(r"\b(?:the\s+)?(" + "|".join(_ORDINALS) + r")\s+scene\b", re.I)
 _CORRECTION_LEAD = re.compile(r"^\s*(?:no\s+wait|no|wait|sorry|actually|oops)\s*[,.!:;-]\s*", re.I)
 _CORRECTION_TAIL = re.compile(r",?\s+(?:not|instead\s+of)\s+the\s+[\w\s/'-]+?\s*[.!]?\s*$", re.I)
 # "set Vocal volume to minus six—actually pan it twenty percent right": a new instruction after the correction replaces
@@ -1388,6 +1389,7 @@ def _rewrite_common_phrasings(text: str) -> str:
     a bare "kick to -9" still asks). Nothing here changes what a request means.
     """
     text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
+    text = _ORDINAL_SCENE.sub(lambda m: f"scene {_ORDINALS[m.group(1).lower()]}", text)
     if (m := _INSTEAD_OF.match(text)):
         after = m.group("after")
         obj = _INSTEAD_OBJECT.match(m.group("before"))
@@ -1573,6 +1575,14 @@ def _time_signature_request(text: str) -> dict[str, Any] | None:
     fields.update(desired_value={"numerator": numerator, "denominator": denominator}, confirmation_required=True,
                   unit="time_signature")
     return fields
+
+
+def _named_scene(lower: str, snapshot: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not re.search(r"\b(?:play|launch|fire|trigger)\b.*\bscene\b", lower):
+        return None
+    scenes = [sc for sc in ((snapshot or {}).get("scenes") or []) if isinstance(sc, dict) and str(sc.get("name", "")).strip()]
+    hits = [sc for sc in scenes if re.search(rf"(?<![\w-]){re.escape(str(sc['name']).strip().casefold())}(?![\w-])", lower)]
+    return hits[0] if len(hits) == 1 else None
 
 
 def _tempo_request(text: str, snapshot: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -2236,6 +2246,12 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
     # word "play"/"stop" and scene requests are otherwise unrelated to
     # transport state.
     scene_match = _NUMBERED_SCENE.search(lower)
+    if scene_match is None and (named := _named_scene(lower, snapshot)) is not None:
+        # "launch the Chorus scene", "fire scene Drop": the scene's own name from the set, whole words only.
+        base.update({"mode": "assist", "action": "launch_scene",
+                     "scene": {"index": named.get("index"), "name": str(named.get("name", ""))},
+                     "confirmation_required": True, "confidence": 0.95})
+        return base
     if scene_match:
         scene_number = int(scene_match.group(1))
         scenes = [s for s in (snapshot.get("scenes") if isinstance(snapshot, dict) else []) or [] if isinstance(s, dict)]
@@ -2477,6 +2493,17 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
                  r"\d+\s*/\s*\d+|whole|half|quarter|eighth|sixteenth|8ths?|16ths?|32nds?|triplets?|off-?beats?|straight)\b)"
                  r"|\b(?:start playback|start\s+(?:the\s+)?(?:song|set|playback|playing)|hit\s+play)\b"
                  r"|^\s*(?:let'?s\s+(?:hear\s+it|jam)|can\s+we\s+start|let'?s\s+go)\s*[.!?]?\s*$", lower):
+        scene_named = next((sc for sc in ((snapshot or {}).get("scenes") or []) if isinstance(sc, dict)
+                            and str(sc.get("name", "")).strip()
+                            and re.search(rf"\bplay\s+(?:the\s+)?{re.escape(str(sc['name']).strip().casefold())}\s*[.!?]?\s*$", lower)),
+                           None)
+        if scene_named is not None:
+            # "play the chorus" in a set with a Chorus scene: launch it, or press Play? Ask rather than guess.
+            name = str(scene_named["name"]).strip()
+            base["missing_fields"].append("transport_target")
+            base["ambiguity"].append(f"Launch the '{name}' scene, or start playback from the playhead? Say \"launch the "
+                                     f"{name} scene\" or \"press play\". Nothing changed.")
+            return base
         base.update({"mode": "assist", "action": "transport_play", "confirmation_required": True, "confidence": 0.99})
         return base
     if re.search(r"\b(stop playback|stop the session|stop)\b|^\s*pause(?:\s+(?:it|playback|the\s+song))?\s*[.!]?\s*$", lower):

@@ -153,6 +153,9 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
     > undo, exact-restore row. Time signature the same day: "set the time signature to 3/4", "switch to 7/8 time"
     > propose `set_time_signature` (4/4 -> 3/4), stale-checked, both halves read back, exact undo; Live's limits (1-99
     > over 1/2/4/8/16) refused. Walkthrough dry run on fake Live 35/35. Tick once both rows pass on real Live.
+    > Scenes 2026-09-27: launch by ordinal ("fire the second scene") and by the scene's name ("launch the Chorus
+    > scene"), not just "scene 2". "play the chorus" in a set with a Chorus scene asks scene or Play. Scene launch has no
+    > undo (nothing to put back), as before.
   - [ ] Clips: create, launch, loop, warp, gain, transpose
   - [ ] MIDI note edit · [ ] Automation write
   - [ ] Track create with a scoped undo design
