@@ -10,6 +10,11 @@ SOURCE_DIR = Path(__file__).resolve().parents[2]
 if str(SOURCE_DIR) not in sys.path:
     sys.path.insert(0, str(SOURCE_DIR))
 
+# Tests never talk to the real Live on the machine they run on. With the companion stopped (27 Sept 2026), a latency
+# test reached the default OSC client and waited 200 ms on the real set, reading it. A test that wants the real
+# client builds one itself; KENN_LIVE_BACKEND=osc in the environment still overrides this.
+os.environ.setdefault("KENN_LIVE_BACKEND", "fake")
+
 
 # The reviewed knowledge corpus, generated retrieval index, and qualification
 # receipts are intentionally local-only. Keep those integration tests active

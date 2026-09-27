@@ -376,7 +376,18 @@ def test_health_endpoint_does_not_call_blocking_ableton_probe(
     assert body["subsystems"]["abletonosc"]["status"] in {"unknown", "offline", "connected"}
 
 
-def test_ableton_status_endpoint_uses_local_bridge(running_server: str) -> None:
+@pytest.fixture()
+def osc_bridge_client(monkeypatch: pytest.MonkeyPatch):
+    """AbletonOSC's own client for the bridge endpoints, without the network: it never binds or reaches real Live."""
+    import kenn.ableton_osc_bridge as bridge_module
+
+    client = bridge_module.AbletonOSCClient(defer_bind=True)
+    monkeypatch.setattr(client, "probe_connection", lambda *args, **kwargs: {"status": "offline"})
+    monkeypatch.setattr(bridge_module, "live_client", client)
+    return client
+
+
+def test_ableton_status_endpoint_uses_local_bridge(running_server: str, osc_bridge_client) -> None:
     with urllib.request.urlopen(f"{running_server}/api/ableton/status", timeout=5) as response:
         body = json.loads(response.read())
     assert body["ok"] is True
@@ -385,7 +396,7 @@ def test_ableton_status_endpoint_uses_local_bridge(running_server: str) -> None:
     assert body["port"] == 11000
 
 
-def test_ableton_ping_and_watchdog_endpoints(running_server: str, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_ableton_ping_and_watchdog_endpoints(running_server: str, monkeypatch: pytest.MonkeyPatch, osc_bridge_client) -> None:
     import kenn.ableton_osc_bridge as bridge_module
 
     monkeypatch.setattr(bridge_module.live_client, "ping", lambda timeout=0.5: True)
