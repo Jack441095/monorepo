@@ -798,6 +798,9 @@ def split_recipe_request(text: str) -> list[str]:
 
 
 _AND_SPLIT = re.compile(r"\s*,?\s+and\s+(?!then\b)", re.I)
+_SHARED_TAIL = re.compile(r"^\s*(?P<verb>turn|bring|push|pull|drop|set|put|pan)\s+(?P<a>(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?)"
+                          r"\s+and\s+(?P<b>(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?)\s+(?P<tail>(?:up|down|to|by|at|left|right|"
+                          r"hard|back)\b.+)$", re.I)
 _LEADING_VERB = re.compile(r"^\s*(?P<verb>(?:un)?mute|(?:un)?solo|pan|arm|disarm|kill|nuke)\b", re.I)
 
 
@@ -815,7 +818,25 @@ def _split_plain_and(text: str, snapshot: dict[str, Any]) -> list[str]:
     2 dB" resolves "it" to the first track. If either half would not parse on
     its own, return nothing and let the single-command path ask as before.
     """
-    parts = _AND_SPLIT.split(text.strip().rstrip(".!"))
+    text = text.strip().rstrip(".!")
+    # "turn the kick and snare down 2 dB" changed only the Kick (27 Sept 2026): the amount belongs to both.
+    shared = _SHARED_TAIL.match(text)
+    if shared:
+        names = [shared.group("a"), shared.group("b")]
+        distributed = [f"{shared.group('verb')} {name} {shared.group('tail')}" for name in names]
+        # Both halves read as Live changes: keep both, so a half that can't be done is reported as that step
+        # ("Step 2: 'Lead Vocal' is at 0.0 dB...") rather than quietly dropped while the other half goes ahead.
+        if all(parse_request(part, snapshot).get("action") for part in distributed):
+            return distributed
+    parts = _AND_SPLIT.split(text)
+    verb = _LEADING_VERB.match(parts[0]) if parts else None
+    if len(parts) == 2 and "," in parts[0] and verb:
+        # "mute the kick, the snare and the hats" dropped the snare: a list, each name taking the verb.
+        head, *listed = [part.strip() for part in parts[0].split(",") if part.strip()]
+        items = [head] + [f"{verb.group('verb')} {name}" for name in listed + [parts[1].strip()]
+                          if re.match(r"^(?:the\s+)?[\w/'-]+(?:\s+[\w/'-]+)?$", name, re.I)]
+        if len(items) == len(listed) + 2 and all(_clean_intent(item, snapshot) is not None for item in items):
+            return items
     if len(parts) != 2:
         return []
     first, second = parts[0].strip(), parts[1].strip()

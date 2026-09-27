@@ -132,3 +132,26 @@ def test_taken_back_or_for_later_changes_nothing_now(demo, text, missing) -> Non
 
     intent = parse_request(text, demo)
     assert intent.get("action") is None and intent["missing_fields"] == [missing]
+
+
+@pytest.mark.parametrize("text, tracks", [
+    ("turn the kick and snare down 2 dB", ["Kick", "Snare / Clap"]),
+    ("mute the kick, the snare and the hats", ["Kick", "Snare / Clap", "Hi-Hats"]),
+    ("pan the kick and bass left 20%", ["Kick", "Bass"]),
+])
+def test_every_track_named_is_changed_not_just_the_first(demo, text, tracks) -> None:
+    # 27 Sept 2026: the first two changed only the Kick, and only the Kick and Hi-Hats, with no word about the rest.
+    from kenn.core.live_intent import parse_natural_recipe
+
+    recipe = parse_natural_recipe(text, demo)
+    assert [step["track_name"] for step in recipe["steps"]] == tracks
+
+
+def test_a_half_that_cannot_be_done_stops_the_whole_request(demo) -> None:
+    from kenn.core.live_intent import parse_natural_recipe
+
+    # Before, the Synth went up and the vocal was silently left out.
+    recipe = parse_natural_recipe("turn the synth and vocal up 1 dB", demo)
+    assert recipe["steps"] == []
+    assert recipe["ambiguity"] == ["Step 2: 'Lead Vocal' is at 0.0 dB, so up 1 dB would take it above 0 dB, "
+                                   "which KENN doesn't set."]
