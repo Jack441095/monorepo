@@ -35,7 +35,11 @@ LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount", "negated", "de
 
 
 def asks_how_to(text: str) -> bool:
-    return bool(_HOW_TO.search(str(text or "")))
+    from kenn.core.live_intent import LATER_CHANGE_REQUEST
+
+    text = str(text or "")
+    found = _HOW_TO.search(text)
+    return bool(found) and not LATER_CHANGE_REQUEST.search(text[found.end():])
 
 
 def wants_live_change(text: str, snapshot: dict[str, Any] | None) -> bool:

@@ -127,3 +127,13 @@ def test_time_signature_change_is_verified_and_undone_exactly(fake) -> None:
 @pytest.mark.parametrize("request_text", ["the hats play 1/16 notes", "the hats play eighth notes", "3/4"])
 def test_note_values_and_bare_fractions_change_nothing(fake, request_text) -> None:
     assert parse_request(request_text, fake.query_session_state())["action"] not in {"transport_play", "set_time_signature"}
+
+
+@pytest.mark.parametrize("request_text, signature", [
+    ("can we go to 3/4?", (3, 4)),
+    ("the bass is still too loud, maybe we need to lower it more, but the time signature is 4/4. can we try 6/8?", (6, 8)),
+])
+def test_a_signature_said_without_the_word(fake, request_text, signature) -> None:
+    parsed = parse_request(request_text, fake.query_session_state())
+    assert parsed["action"] == "set_time_signature"
+    assert (parsed["desired_value"]["numerator"], parsed["desired_value"]["denominator"]) == signature

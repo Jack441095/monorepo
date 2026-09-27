@@ -283,3 +283,28 @@ def test_it_is_not_guessed_when_two_tracks_or_an_effect_came_before(snapshot, me
     parsed = parse_request(message, snapshot)
     assert parsed["track"] is None and not parsed["confirmation_required"]
     assert parsed["missing_fields"] in (["which_track"], ["action"])
+
+
+def test_can_you_maybe_is_still_a_request(snapshot) -> None:
+    parsed = parse_request("The hats are too loud. I think the drum bus compressor is too aggressive. Can you maybe "
+                           "lower the hi-hats by 1db?", snapshot)
+    assert parsed["action"] == "set_volume" and parsed["track"]["name"] == "Hi-Hats"
+
+
+def test_a_musing_amount_does_not_leak_into_the_request(snapshot) -> None:
+    # "Maybe -5 dB? … Can you just lower the synth a bit?" proposed -5 dB (27 Sept 2026); the request has no amount.
+    parsed = parse_request("I think I need to bring the synth down. Maybe -5 dB? Or should I just lower the fader? "
+                           "Can you just lower the synth a bit?", snapshot)
+    assert parsed["action"] == "set_volume" and parsed["missing_fields"] == ["amount"]
+
+
+def test_a_level_described_earlier_is_not_the_target(snapshot) -> None:
+    # "…the FX Print is at 0 dB … can you bring it down?" answered "already at 0 dB" (27 Sept 2026).
+    parsed = parse_request("Should I lower it? Wait, the FX Print is at 0 dB. Maybe it's meant to be loud? I'm not sure. "
+                           "Anyway, can you bring it down?", snapshot)
+    assert parsed["missing_fields"] == ["which_track"]
+
+
+def test_it_names_the_track_for_a_rename(snapshot) -> None:
+    parsed = parse_request("Why is the bass track named Bass? Can you rename it to Bass Line?", snapshot)
+    assert parsed["action"] == "rename_track" and parsed["track"]["name"] == "Bass" and parsed["desired_value"] == "Bass Line"

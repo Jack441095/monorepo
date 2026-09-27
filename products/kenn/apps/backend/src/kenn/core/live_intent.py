@@ -1557,14 +1557,15 @@ _TEMPO_VAGUE = re.compile(r"^\s*(?:(?:speed|slow)\s+(?:it|the\s+(?:tempo|song|tr
 
 
 _SIGNATURE_REQUEST = re.compile(
-    r"^\s*(?:(?:set|change|put|make|switch|go|move)\s+)?(?:(?:the|my|our|this|it)\s+)?(?:(?:song|project|set|session)\s*'?s?\s+)?"
+    r"^\s*(?:(?:can|could)\s+(?:we|you)\s+|please\s+|let'?s\s+)?(?:(?:set|change|put|make|switch|go|move|try)\s+)?(?:(?:the|my|our|this|it)\s+)?(?:(?:song|project|set|session)\s*'?s?\s+)?"
     r"(?:(?:time\s+signature|meter|signature)\s+)?(?:to|in(?:to)?|=)?\s*(?P<num>\d{1,3})\s*/\s*(?P<den>\d{1,2})"
-    r"(?:\s+time)?(?:\s+(?:time\s+signature|meter))?\s*[.!]?\s*$", re.I)
+    r"(?:\s+time)?(?:\s+(?:time\s+signature|meter))?\s*[.!?]?\s*$", re.I)
 
 
 def _time_signature_request(text: str) -> dict[str, Any] | None:
     """"set the time signature to 3/4", "switch to 6/8 time": a time-signature change, or None."""
-    if not re.search(r"\b(?:time\s+signature|meter|signature)\b|\d\s*/\s*\d+\s+time\b|^\s*(?:switch|go|change)\s+(?:it\s+)?to\s+\d+\s*/\s*\d+",
+    if not re.search(r"\b(?:time\s+signature|meter|signature)\b|\d\s*/\s*\d+\s+time\b"
+                     r"|^\s*(?:(?:can|could)\s+(?:we|you)\s+|please\s+|let'?s\s+)?(?:switch|go|change|move|try)\s+(?:it\s+|the\s+song\s+)?(?:to|in|into)?\s*\d+\s*/\s*\d+\s*[.!?]?\s*$",
                      text, re.I):
         return None
     m = _SIGNATURE_REQUEST.match(text)
@@ -1844,6 +1845,12 @@ def _not_supported_yet(text: str, parsed: dict[str, Any], snapshot: dict[str, An
 # snare is getting lost. Maybe the compressor is too aggressive. Oh, can you lower the kick by 1db?" The clauses
 # addressed to KENN are the request; "maybe I should…", "let me…" and "I think…" are the user thinking aloud.
 _SENTENCE_END = re.compile(r"(?<=[.!?])\s+")
+# "Should I adjust the tempo? I'm not sure. Can you change the tempo to 122?": the question comes first, then a change
+# asked of KENN in a later sentence. "How do I sidechain? Can you explain it?" asks for no change and stays a question.
+LATER_CHANGE_REQUEST = re.compile(
+    r"[.!?]\s+(?:[^.!?]*?[,;]\s*)?(?:(?:oh|so|ok|okay|anyway|well|then)\s*,?\s+)*(?:(?:can|could|would)\s+(?:you|we)|please)\s+"
+    r"(?:just\s+|maybe\s+|please\s+)?(?:lower|raise|set|change|mute|unmute|solo|unsolo|pan|bring|turn|drop|cut|boost|add|"
+    r"switch|go|put|make|arm|disarm|launch|slow|speed|centre|center|rename)\b", re.I)
 _ADDRESSED = re.compile(r"\b(?:can|could|would|will)\s+(?:you|we|u)\b|\bplease\b|\blet'?s\b(?!\s+(?:see|hear|try|check|think))",
                         re.I)
 _IMPERATIVE_START = re.compile(r"^\s*(?:(?:oh|and|also|then|so|ok|okay|anyway|right)\s*,?\s+)*(?:set|turn|bring|push|pull|mute|unmute|"
@@ -1865,6 +1872,9 @@ def _buried_requests(query: str) -> list[str]:
         if found is None:
             continue
         clause = sentence[found.start():]
+        # "Can you maybe lower the bass by 1db?" is politeness, not doubt: only "maybe" after the ask is dropped.
+        clause = re.sub(r"^((?:can|could|would|will)\s+(?:you|we|u)\s+)(?:maybe|perhaps|possibly|just)\s+", r"\1", clause,
+                        flags=re.I)
         if _MUSING.search(clause):
             continue  # "can you maybe…", "could we… or is it the compressor?": still deciding
         asks.append(clause)
@@ -1885,7 +1895,8 @@ def _only_track_named(text: str, tracks: list[dict[str, Any]]) -> dict[str, Any]
     two tracks and "tired of the reverb on the vocal, can you turn it off" names an effect, so neither is guessed: a
     wrong track here was a wrong change (27 Sept 2026).
     """
-    if _IT_COULD_BE_AN_EFFECT.search(text):
+    # "…the bass track to check its EQ settings. Could you solo it?": the track's own EQ isn't what "it" means.
+    if _IT_COULD_BE_AN_EFFECT.search(re.sub(r"\b(?:its|their|the\s+track'?s)\s+\w+", " ", text, flags=re.I)):
         return None
     named = []
     for track in tracks:
@@ -1900,10 +1911,13 @@ def _only_track_named(text: str, tracks: list[dict[str, Any]]) -> dict[str, Any]
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
     parsed = _parse_single_request(query, session_snapshot)
-    if parsed.get("action") is not None and not parsed.get("missing_fields"):
+    # A clean parse of the whole message still gives way to a request addressed to KENN inside it: "Maybe -5 dB? …
+    # Can you just lower the synth a bit?" took the -5 from the musing (27 Sept 2026).
+    if parsed.get("action") is not None and not parsed.get("missing_fields") and not _ADDRESSED.search(str(query)):
         return parsed
-    if set(parsed.get("missing_fields") or []) & {"negated", "deferred", "how_to"}:
-        return parsed  # "mute the drum bus? nah": a "don't", "later" or a question is never overridden
+    missing = set(parsed.get("missing_fields") or [])
+    if missing & {"negated", "deferred"} or ("how_to" in missing and not LATER_CHANGE_REQUEST.search(str(query))):
+        return parsed  # "mute the drum bus? nah": a "don't", "later" or a plain question is never overridden
     asks = _buried_requests(query)
     if not asks:
         return parsed
@@ -1911,7 +1925,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     found, unclear = [], None
     for clause in asks:
         attempt = _parse_single_request(clause, session_snapshot)
-        if attempt.get("action") is None and re.search(r"\b(?:it|them)\b", clause, re.I):
+        no_target = attempt.get("action") is None or "track" in (attempt.get("missing_fields") or [])
+        if no_target and re.search(r"\b(?:it|them)\b", clause, re.I):
             # "…the kick is a bit too loud, can you lower it a bit?": "it" is the track just named, from the same
             # sentence, or the sentence before when the request starts its own.
             before = str(query)[:str(query).find(clause)]
@@ -1927,8 +1942,10 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
                                                      flags=re.I), session_snapshot)
                 if probe.get("action") in TRACK_CHANGE_ACTIONS:
                     unclear = (clause, probe["action"])
-        if attempt.get("action") is not None:
+        if attempt.get("action") is not None and "track" not in (attempt.get("missing_fields") or []):
             found.append((clause, attempt))
+    if not found and unclear is None and parsed.get("action") is not None and not parsed.get("missing_fields"):
+        return parsed  # nothing addressed parsed on its own ("can you do that for me?"): the whole message stands
     if not found and unclear is not None:
         clause, action = unclear
         parsed.update({"action": action, "track": None, "desired_value": None, "confirmation_required": False,
@@ -1938,6 +1955,8 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         return parsed
     if len(found) == 1:
         clause, attempt = found[0]
+        if clause.strip() == str(query).strip():
+            return parsed  # the whole message was the request
         attempt["picked_from_longer_message"] = clause
         return attempt
     if len(found) > 1:
