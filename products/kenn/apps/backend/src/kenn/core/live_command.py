@@ -1364,6 +1364,10 @@ def _format_pan(value: Any) -> str:
     return f"{percent}% {'left' if value < 0 else 'right'}"
 
 
+def _values_match_bpm(before: Any, after: Any) -> bool:
+    return isinstance(before, (int, float)) and isinstance(after, (int, float)) and abs(float(before) - float(after)) < 1e-3
+
+
 def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, kind: str) -> dict[str, Any]:
     _update_lifecycle(
         response,
@@ -1559,6 +1563,17 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
             "confirmation_required": True,
             "proposal_kind": kind,
             "intent": {"action": proposal.get("action"), "track": target, "eq_band": proposal.get("eq_band")},
+        })
+        return response
+    if kind == "tempo":
+        response.update({
+            "status": "confirmation_required",
+            "answer": (f"I can change the tempo from {proposal.get('before_display')} to {proposal.get('after_display')}. "
+                       "Nothing has changed. Confirm this exact proposal to apply it."),
+            "proposal": proposal,
+            "confirmation_required": True,
+            "proposal_kind": kind,
+            "intent": {"action": proposal.get("action"), "value": proposal.get("after"), "unit": "bpm"},
         })
         return response
     if kind == "scene":
@@ -3272,6 +3287,14 @@ def _handle_command_impl(
         proposal = result["proposal"]
         unchanged = already_there(action, str(proposal.get("track_name") or ""), proposal.get("before"), proposal.get("after"))
         return _clarification(response, intent, unchanged) if unchanged else _proposal_response(response, proposal, kind="track")
+    if action == "set_tempo":
+        result = live.propose_tempo_action(float(intent.get("desired_value")), session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live tempo proposal."))
+        proposal = result["proposal"]
+        if _values_match_bpm(proposal.get("before"), proposal.get("after")):
+            return _clarification(response, intent, f"The tempo is already {float(proposal['after']):g} BPM. Nothing changed.")
+        return _proposal_response(response, proposal, kind="tempo")
     if action == "transport_play" or action == "transport_stop":
         result = live.propose_transport_action(action, session_id=response["session_id"])
         return _proposal_response(response, result["proposal"], kind="transport") if result.get("ok") else _clarification(response, intent, result.get("error", "I could not create a Live proposal."))

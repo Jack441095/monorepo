@@ -140,6 +140,9 @@ SUPPORTED_TRACK_ACTIONS = {
 SUPPORTED_TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 SUPPORTED_RETURN_TRACK_CREATION_ACTIONS = {"create_return_track"}
 SUPPORTED_TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
+SUPPORTED_TEMPO_ACTIONS = {"set_tempo"}
+# Live's own tempo range.
+TEMPO_RANGE_BPM = (20.0, 999.0)
 SUPPORTED_SCENE_ACTIONS = {"launch_scene"}
 SUPPORTED_CLIP_ACTIONS = {"stop_clip"}
 SUPPORTED_SEND_ACTIONS = {"set_send"}
@@ -363,7 +366,7 @@ def _receipt_supports_undo(receipt: dict[str, Any]) -> bool:
     action = str(receipt.get("action", ""))
     undoable = (
         set(SUPPORTED_TRACK_ACTIONS) | set(SUPPORTED_SEND_ACTIONS) | set(SUPPORTED_TRANSPORT_ACTIONS)
-        | set(SUPPORTED_SCENE_ACTIONS) | set(SUPPORTED_CLIP_ACTIONS) | set(SUPPORTED_LOCATOR_ACTIONS)
+        | set(SUPPORTED_TEMPO_ACTIONS) | set(SUPPORTED_SCENE_ACTIONS) | set(SUPPORTED_CLIP_ACTIONS) | set(SUPPORTED_LOCATOR_ACTIONS)
         | set(SUPPORTED_VIEW_ACTIONS)
         | {"set_device_parameter", "set_eq_band_tuning_gain", "insert_device", "insert_device_with_parameter"}
     )
@@ -1187,6 +1190,46 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "valid_range": None,
             "reason": f"Explicit user request for {action}.",
             "evidence": [f"Current Live transport state: is_playing={before!r}."],
+            "confidence": 1.0,
+            "risk": "local_mutation",
+            "requires_confirmation": True,
+            "timestamp": time.time(),
+            "session_version": _state_version(state),
+            "snapshot_exchange": dict(getattr(self.client, "last_exchange", {}) or {}),
+        }
+        token, meta = issue_confirmation(session_id=session_id, service_id="ableton_action", text=_text(proposal))
+        proposal["confirmation_token"] = token
+        proposal["confirmation_meta"] = meta
+        _PROPOSALS_BY_TOKEN[token] = proposal
+        return {"ok": True, "proposal": proposal}
+
+    def propose_tempo_action(self, bpm: float, *, session_id: str) -> dict[str, Any]:
+        _cleanup_memory()
+        state = self.snapshot()
+        if state.get("status") in {"offline", "dispatched"}:
+            return {"ok": False, "error": "Ableton Live is offline or returned no usable snapshot."}
+        current = state.get("tempo")
+        if isinstance(current, bool) or not isinstance(current, (int, float)):
+            return {"ok": False, "error": "Live didn't report its tempo, so there's nothing to compare or undo to."}
+        low, high = TEMPO_RANGE_BPM
+        if not math.isfinite(float(bpm)) or not low <= float(bpm) <= high:
+            return {"ok": False, "error": f"Live's tempo runs from {low:g} to {high:g} BPM; {float(bpm):g} is outside that."}
+        before, after = round(float(current), 3), round(float(bpm), 3)
+        proposal = {
+            "schema": PROPOSAL_SCHEMA,
+            "action_id": f"action-{uuid.uuid4().hex}",
+            "action": "set_tempo",
+            "operation": "set_tempo",
+            "target": "ableton_song_tempo",
+            "parameter": "tempo",
+            "before": before,
+            "after": after,
+            "before_display": f"{before:g} BPM",
+            "after_display": f"{after:g} BPM",
+            "unit": "bpm",
+            "valid_range": list(TEMPO_RANGE_BPM),
+            "reason": f"Explicit user request to set the tempo to {after:g} BPM.",
+            "evidence": [f"Current Live tempo: {before:g} BPM."],
             "confidence": 1.0,
             "risk": "local_mutation",
             "requires_confirmation": True,
@@ -3213,6 +3256,12 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 return {"ok": False, "error": "Live transport state changed since the receipt; undo is stale."}
             inverse = "transport_play" if bool(receipt.get("before")) else "transport_stop"
             return self.propose_transport_action(inverse, session_id=session_id)
+        if action in SUPPORTED_TEMPO_ACTIONS:
+            current = self.snapshot().get("tempo")
+            if isinstance(current, bool) or not isinstance(current, (int, float)) \
+                    or not _values_match(round(float(current), 3), receipt.get("readback")):
+                return {"ok": False, "error": "Live's tempo changed since the receipt; undo is stale."}
+            return self.propose_tempo_action(float(receipt.get("before")), session_id=session_id)
         if action in SUPPORTED_SCENE_ACTIONS:
             # Firing a scene has no reversible prior state to restore to -
             # unlike a parameter change, there is no single "before" scene
@@ -3654,6 +3703,19 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 write_error = str(exc)
             write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
             timer.mark("write")
+        elif action in SUPPORTED_TEMPO_ACTIONS:
+            current = state.get("tempo")
+            if isinstance(current, bool) or not isinstance(current, (int, float)) \
+                    or not _values_match(round(float(current), 3), proposal.get("before")):
+                _finish_idempotency_key(key)
+                return {"ok": False, "error": "Live's tempo changed since the proposal was created; create a new proposal."}
+            try:
+                write_ok = bool(self.client.set_tempo(float(proposal["after"])))
+            except Exception as exc:
+                write_ok = False
+                write_error = str(exc)
+            write_exchange = dict(getattr(self.client, "last_exchange", {}) or {})
+            timer.mark("write")
         elif action in SUPPORTED_SCENE_ACTIONS:
             fresh_scene, scene_error = _find_scene(state, int(proposal.get("scene_index", -1)), str(proposal.get("scene_name", "")))
             if scene_error or fresh_scene is None:
@@ -3844,6 +3906,9 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 post_name = "" if action == "rename_track" else str(proposal.get("track_name", ""))
                 post_track, _ = _find_track(after_state, int(proposal["track_index"]), post_name)
                 readback = post_track.get(SUPPORTED_TRACK_ACTIONS[action][0]) if post_track else None
+            elif action in SUPPORTED_TEMPO_ACTIONS:
+                tempo = after_state.get("tempo")
+                readback = round(float(tempo), 3) if isinstance(tempo, (int, float)) and not isinstance(tempo, bool) else None
             elif action in SUPPORTED_SCENE_ACTIONS:
                 # Scenes have no stable "is_playing" property of their own; the
                 # transient is_triggered flag is the primary observable evidence

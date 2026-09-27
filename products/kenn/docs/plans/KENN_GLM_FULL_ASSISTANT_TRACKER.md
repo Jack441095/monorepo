@@ -145,6 +145,12 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 - [ ] **D3 New action families** (each with readback and exact undo)
   - [ ] Sends and returns · [ ] Group and ungroup · [ ] Routing
   - [ ] Tempo and signature · [ ] Scenes · [ ] Locators
+    > Tempo built 2026-09-27 (branch `kenn-after-soak`): "set the tempo to 124", "tempo up 2 bpm", "slow the tempo
+    > down 4 bpm" propose `set_tempo` (120 BPM -> 124 BPM), refuse a tempo Live moved before Apply, verify by readback,
+    > and undo exactly (stale once the tempo moves again). "speed it up a bit" asks "To what tempo?"; outside 20-999
+    > BPM is refused. BPM talk about clips, delays or genres stays out ("what bpm is good for house music?" no longer
+    > gets the set's tempo). 22 tests on fake Live. Real Live: the soak-night walkthrough now has a tempo +4, apply,
+    > undo, exact-restore row. Time signature still to do.
   - [ ] Clips: create, launch, loop, warp, gain, transpose
   - [ ] MIDI note edit · [ ] Automation write
   - [ ] Track create with a scoped undo design

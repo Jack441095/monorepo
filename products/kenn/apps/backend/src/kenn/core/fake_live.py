@@ -490,5 +490,11 @@ class FakeLiveBackend:
             self._session["is_playing"] = False
             return True
 
+    def set_tempo(self, bpm: float) -> bool:
+        with self._lock:
+            self._session["tempo"] = max(20.0, min(999.0, float(bpm)))  # the real bridge clamps the same way
+            self.writes.append(("set_tempo", float(bpm)))
+            return True
+
 
 __all__ = ["DEFAULT_FIXTURE", "FIXTURE_ENV", "FakeLiveBackend"]

@@ -1531,6 +1531,67 @@ def _rewrite_shorthand(text: str, tracks: list[dict[str, Any]]) -> str:
     return text
 
 
+# Song tempo (27 Sept 2026). The word tempo or BPM has to be there: "set the kick to 124" is not a tempo, and a
+# clip's warp or a delay synced "to 120 BPM" belongs to that clip or device, not the song.
+_TEMPO_WORD = re.compile(r"\b(?:tempo|bpm)\b", re.I)
+_TEMPO_NOT_SONG = re.compile(r"\b(?:clip|sample|samples|warp|warped|stretch|loop|delay|echo|lfo|arp|sync|synced|note|notes|"
+                             r"track's|genre|techno|house|dnb|hip\s*hop|song\s+ideas?|generate|make\s+(?:a|me)\s)\b", re.I)
+_TEMPO_ABSOLUTE = re.compile(
+    r"^\s*(?:(?:set|change|put|make|bring|take|move|switch|go|drop|raise|lower|speed\s+up|slow\s+down)\s+)?"
+    r"(?:(?:the|my|our|this)\s+)?(?:(?:song|project|set|session|global)\s+)?(?:tempo|bpm)?\s*(?:of\s+(?:the\s+)?(?:song|project|set)\s+)?"
+    r"(?:(?:up|down)\s+)?(?:to|at|=)?\s*(?P<bpm>\d{1,4}(?:\.\d+)?)\s*(?:bpm)?\s*[.!]?\s*$", re.I)
+_TEMPO_RELATIVE = re.compile(
+    r"^\s*(?:(?P<verb>raise|increase|bump|push|lift|speed(?:\s+up)?|lower|decrease|drop|reduce|slow(?:\s+down)?|nudge|take|bring|"
+    r"turn|move|put)\s+)?(?:(?:the|my|our|this)\s+)?(?:(?:song|project|set)\s+)?(?:tempo|bpm)\s+"
+    r"(?:(?P<dir>up|down)\s+)?(?:by\s+)?(?P<amount>\d{1,3}(?:\.\d+)?)\s*(?:bpm)?(?:\s+(?P<dir2>up|down|faster|slower))?\s*[.!]?\s*$",
+    re.I)
+_TEMPO_VAGUE = re.compile(r"^\s*(?:(?:speed|slow)\s+(?:it|the\s+(?:tempo|song|track|set))\s+(?:up|down)|"
+                          r"(?:raise|increase|lower|decrease|bump|drop)\s+the\s+tempo|(?:make\s+it|go)\s+(?:faster|slower))"
+                          r"(?:\s+(?:a\s+(?:bit|little|touch|hair)|slightly))?\s*[.!]?\s*$", re.I)
+
+
+def _tempo_request(text: str, snapshot: dict[str, Any] | None) -> dict[str, Any] | None:
+    """A song-tempo change, as intent fields, or None when the message isn't one."""
+    if _TEMPO_NOT_SONG.search(text):
+        return None
+    vague = _TEMPO_VAGUE.match(text)
+    if not _TEMPO_WORD.search(text) and not vague:
+        return None
+    current = (snapshot or {}).get("tempo") if isinstance(snapshot, dict) else None
+    current = float(current) if isinstance(current, (int, float)) and not isinstance(current, bool) else None
+    fields: dict[str, Any] = {"mode": "assist", "action": "set_tempo", "confidence": 0.97}
+    ask = None
+    if (m := _TEMPO_RELATIVE.match(text)) and (m.group("verb") or m.group("dir") or m.group("dir2")):
+        words = " ".join(filter(None, (m.group("verb"), m.group("dir"), m.group("dir2")))).lower()
+        down = re.search(r"\b(?:lower|decrease|drop|reduce|slow|down|slower)\b", words)
+        up = re.search(r"\b(?:raise|increase|bump|push|lift|speed|up|faster)\b", words)
+        if bool(down) == bool(up):
+            ask = "Faster or slower? Say \"tempo up 2 BPM\" or \"set the tempo to 124\"."
+        elif current is None:
+            ask = "Live didn't report its tempo, so a change by an amount can't be worked out. Say the tempo you want."
+        else:
+            amount = float(m.group("amount"))
+            fields.update(desired_value=round(current + (-amount if down else amount), 3), relative=True,
+                          requested_relative_bpm=-amount if down else amount)
+    elif (m := _TEMPO_ABSOLUTE.match(text)) and _TEMPO_WORD.search(text):
+        fields["desired_value"] = float(m.group("bpm"))
+    elif vague or _TEMPO_WORD.search(text) and re.match(r"^\s*(?:set|change)\s+(?:the\s+)?tempo\s*[.!]?\s*$", text, re.I):
+        now = f" It's {current:g} BPM now." if current is not None else ""
+        ask = f"To what tempo?{now} For example \"set the tempo to 124\"."
+    else:
+        return None
+    if ask:
+        fields.update(missing_fields=["amount"], ambiguity=[ask], confirmation_required=False)
+        return fields
+    low, high = 20.0, 999.0
+    if not low <= fields["desired_value"] <= high:
+        fields.update(missing_fields=["amount"], confirmation_required=False,
+                      ambiguity=[f"Live's tempo runs from {low:g} to {high:g} BPM, so {fields['desired_value']:g} can't be set."])
+        return fields
+    fields.update(confirmation_required=True, unit="bpm", requested_unit="bpm")
+    return fields
+
+
 _FOCUS_DEVICE_BY_NAME = re.compile(
     r"^\s*(?:show(?:\s+me)?|open|focus|select|go\s+to|jump\s+to|take\s+me\s+to)\s+(?:the\s+)?(?P<phrase>.+?)\s*[.!]?\s*$",
     re.I,
@@ -2136,6 +2197,10 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             "confirmation_required": True,
             "confidence": 0.98,
         })
+        return base
+    tempo = _tempo_request(text, snapshot)
+    if tempo is not None:
+        base.update(tempo)
         return base
     # Scene launch phrasing ("play scene 2") must be checked before the
     # generic transport play/stop match below, since both contain the bare
