@@ -100,6 +100,10 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
     > Found while testing: the C6 corpus labelled absolute volumes as fader values under the old maths ("Bring the FX Return up to 0 dB" → 1.0, which is +6 dB in Live). Run 4 reproduces it ("set Drum Bus level to 0 dB" → 1.0) while writing dB for other levels. The corpus seeds and the unused legacy generator now label volume in dB. The next fine-tune needs this; run 4 must not be promoted for volume before then (shadow only, nothing was written).
   - [ ] Planner emits user units (dB, %) and KENN converts; stop asking the model to normalize
     > Volume in dB done 2026-09-24: `validate_llm_plan` accepts `set_volume` with `unit: "dB"`, absolute or relative, and converts with the rule parser's mapping (now Live's fader law, `core/volume_law.py`; outside −57.2..0 dB on the provisional table, or no current volume, is rejected). Found via C6 run 2, which wrote "+3 dB" plans that the old contract rejected. Pan in % still to do.
+    > Pan and send in % done 2026-09-27 (branch `kenn-after-soak`): `set_pan` with `unit: "%"` (-100..100, absolute or
+    > added to the current pan, past hard left/right rejected) and `set_send` with `unit: "%"` (0..100) convert in KENN.
+    > The planner prompt still asks for normalized values; switching it (and the C6 corpus labels) goes with the next
+    > fine-tune so the shadow model's prompt doesn't change under it.
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
   - [ ] ≥ 100 phrasings · [ ] ≥ 250 · [ ] ≥ 500 (slang, fragments, corrections, multi-intent). Curated holdout: 24 (Codex). 100 drafted candidates in `tooling/data/natural_holdout_candidates.jsonl` await owner review before promotion.
     > 2026-09-27: candidates now 481, plus 1,246 in seven sealed blind sets (all excluded from training). The curated

@@ -266,6 +266,20 @@ def _track_by_index(snapshot: dict[str, Any], index: int, name: str = "") -> dic
     return matches[0]
 
 
+def _pan_percent_to_normalized(plan: dict[str, Any], snapshot: dict[str, Any], track_index: int,
+                               track_name: str) -> dict[str, Any]:
+    """A planner's pan in % (-100 left .. 100 right), absolute or added to the track's current pan."""
+    value = float(plan["value"]) / 100.0
+    if plan.get("relative"):
+        current = (_track_by_index(snapshot, track_index, track_name) or {}).get("pan")
+        if isinstance(current, bool) or not isinstance(current, (int, float)):
+            return {"ok": False, "error": "A relative pan change needs the track's current pan in the snapshot."}
+        value += float(current)
+    if not -1.0 <= value <= 1.0:
+        return {"ok": False, "error": "That pan is past hard left or hard right (-100% to 100%)."}
+    return {"ok": True, "plan": dict(plan, value=round(value, 6), unit="normalized", relative=False)}
+
+
 def _volume_db_to_normalized(plan: dict[str, Any], snapshot: dict[str, Any], track_index: int,
                              track_name: str) -> dict[str, Any]:
     """Convert a planner's dB volume into KENN's normalized value.
@@ -467,12 +481,19 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
         if isinstance(plan.get("value"), bool) or not isinstance(plan.get("value"), (int, float)):
             return {"ok": False, "error": "A send plan must contain a finite numeric normalized value."}
         value = float(plan.get("value"))
-        if not math.isfinite(value) or not 0.0 <= value <= 1.0:
-            return {"ok": False, "error": "A send plan value must be within normalized range 0.0 to 1.0."}
+        in_percent = str(plan.get("unit") or "").strip().lower() in {"%", "percent"}
+        if not math.isfinite(value) or not 0.0 <= value <= (100.0 if in_percent else 1.0):
+            return {"ok": False, "error": "A send plan value must be within normalized range 0.0 to 1.0 (0 to 100 in %)."}
         if bool(plan.get("relative")):
             return {"ok": False, "error": "Send control accepts an absolute normalized value only."}
-        if str(plan.get("unit") or "").strip().lower() not in {"", "normalized"}:
-            return {"ok": False, "error": "A send plan must use 'normalized' as its unit."}
+        unit = str(plan.get("unit") or "").strip().lower()
+        if unit in {"%", "percent"}:
+            # "send the vocal to the reverb at 20%": the user's number, converted here rather than by the model.
+            if not 0.0 <= value <= 100.0:
+                return {"ok": False, "error": "A send plan in % must be within 0 to 100."}
+            return {"ok": True, "plan": dict(plan, value=round(value / 100.0, 6), unit="normalized")}
+        if unit not in {"", "normalized"}:
+            return {"ok": False, "error": "A send plan must use 'normalized' or '%' as its unit."}
         return {"ok": True, "plan": dict(plan)}
     if action == "rename_clip":
         rejected = _reject(
@@ -604,6 +625,11 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
             unit = str(plan.get("unit") or "").strip().lower()
             if action == "set_volume" and unit in {"db", "decibel", "decibels"}:
                 converted = _volume_db_to_normalized(plan, snapshot, track_index, track_name)
+                if not converted.get("ok"):
+                    return converted
+                plan, unit = converted["plan"], "normalized"
+            if action == "set_pan" and unit in {"%", "percent"}:
+                converted = _pan_percent_to_normalized(plan, snapshot, track_index, track_name)
                 if not converted.get("ok"):
                     return converted
                 plan, unit = converted["plan"], "normalized"

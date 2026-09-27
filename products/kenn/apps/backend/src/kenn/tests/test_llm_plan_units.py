@@ -76,3 +76,41 @@ def test_parameter_evidence_only_for_device_requests(query, expected) -> None:
     snapshot = fake.query_session_state()
     enriched = _llm_planner_snapshot(LiveActionService(fake), snapshot, parse_request(query, snapshot))
     assert ("planner_capabilities" in enriched) is expected
+
+
+PAN_SNAPSHOT = {"tracks": [{"index": 0, "name": "Kick", "pan": 0.0}, {"index": 1, "name": "Synth", "pan": 0.9}],
+                "return_tracks": [{"index": 0, "name": "A-Reverb"}]}
+
+
+@pytest.mark.parametrize("fields, expected", [
+    ({"value": -30.0, "unit": "%"}, -0.3),
+    ({"value": 100.0, "unit": "percent"}, 1.0),
+    ({"value": -20.0, "unit": "%", "relative": True, "track_index": 1, "track_name": "Synth"}, 0.7),
+])
+def test_pan_in_percent_converts_like_the_rule_parser(fields, expected) -> None:
+    plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_pan", "track_index": 0, "track_name": "Kick", **fields}
+    checked = validate_llm_plan(plan, PAN_SNAPSHOT)
+    assert checked["ok"], checked
+    assert checked["plan"]["value"] == pytest.approx(expected) and checked["plan"]["unit"] == "normalized"
+    assert checked["plan"]["relative"] is False
+
+
+def test_a_percent_pan_past_hard_right_is_rejected() -> None:
+    plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_pan", "track_index": 1, "track_name": "Synth",
+            "value": 20.0, "unit": "%", "relative": True}
+    checked = validate_llm_plan(plan, PAN_SNAPSHOT)
+    assert not checked["ok"] and "hard right" in checked["error"]
+
+
+def test_a_send_in_percent_is_converted() -> None:
+    plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_send", "track_index": 0, "track_name": "Kick",
+            "return_track_index": 0, "return_track_name": "A-Reverb", "value": 20.0, "unit": "%", "relative": False}
+    checked = validate_llm_plan(plan, PAN_SNAPSHOT)
+    assert checked["ok"], checked
+    assert checked["plan"]["value"] == pytest.approx(0.2) and checked["plan"]["unit"] == "normalized"
+
+
+def test_a_send_over_100_percent_is_rejected() -> None:
+    plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_send", "track_index": 0, "track_name": "Kick",
+            "return_track_index": 0, "return_track_name": "A-Reverb", "value": 120.0, "unit": "%"}
+    assert not validate_llm_plan(plan, PAN_SNAPSHOT)["ok"]
