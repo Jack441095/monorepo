@@ -228,3 +228,18 @@ def test_a_tempo_change_request_says_kenn_cannot_do_it(question) -> None:
 def test_a_tempo_question_just_gets_the_tempo() -> None:
     result = answer_live_session_question("What tempo is this?", service=Service(SessionLive()))
     assert result["answer"].startswith("The current tempo is")
+
+
+@pytest.mark.parametrize("question, answer", [
+    ("What's the current pan on the drum bus?", "'Drum Bus' is centred."),
+    ("is the bass muted?", "No, 'Bass' is not muted."),
+    ("how loud is the lead vocal?", "'Lead Vocal' is at 0.0 dB."),
+    ("what's the kick's volume?", "'Kick' is at -14.0 dB."),
+])
+def test_a_tracks_level_pan_or_mute_is_read_from_the_set(question, answer) -> None:
+    # 27 Sept 2026: the pan question was answered "'Drum Bus' has: Compressor." and "is the bass muted?" got "not sure".
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+
+    result = answer_live_session_question(question, service=LiveActionService(FakeLiveBackend()))
+    assert result["status"] == "inspected" and result["answer"] == answer and result["changed"] is False

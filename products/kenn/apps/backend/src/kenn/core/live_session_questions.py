@@ -16,12 +16,25 @@ from kenn.core.live_session_advice import mix_advice_from_session
 
 
 _TRACK_NUMBER = re.compile(r"\btrack\s*#?\s*(\d+)\b", re.I)
+# "What's the current pan on the drum bus?" was answered "'Drum Bus' has: Compressor." and "is the bass muted?" got
+# "not sure" (27 Sept 2026): a track's level, pan or mute/solo/arm state is read straight from the set.
+_TRACK_STATE_QUESTION = re.compile(
+    r"\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?:current\s+)?(?P<field>pan|panning|volume|level|fader)\s+(?:on|of|for)\s+(?P<name>.+?)\s*\??\s*$"
+    r"|\bwhat(?:'s|s|\s+is)\s+(?:the\s+)?(?P<name2>.+?)(?:'s|s')\s+(?P<field2>pan|panning|volume|level|fader)\s*\??\s*$"
+    r"|\bhow\s+loud\s+is\s+(?P<name3>.+?)\s*\??\s*$"
+    r"|^\s*(?:is|are)\s+(?P<name4>.+?)\s+(?P<state>muted|soloed|armed|(?:record[\s-]?)?armed|panned|cent(?:red|ered))\s*\??\s*$"
+    # "check the lead vocal volume" as the request itself, not "solo the snare to check its level".
+    r"|(?:^|(?:can|could|would)\s+you\s+|\bplease\s+|,\s*)check\s+(?:the\s+)?(?P<name5>(?!its?\b)[^,.?!]+?)\s+(?P<field5>volume|level|pan)\b",
+    re.I,
+)
 
 
 def _question_kind(question: str) -> str | None:
     lower = " ".join(str(question or "").casefold().split())
     if not lower:
         return None
+    if _TRACK_STATE_QUESTION.search(lower):
+        return "track_state"
     if (
         re.search(r"\b(?:what did you change|what have you changed|show(?: me)? (?:the )?history|change history|recent changes)\b", lower)
         or re.search(r"\bundo everything\b", lower)
@@ -60,6 +73,40 @@ def _question_kind(question: str) -> str | None:
     if re.search(r"\b(?:describe|summari[sz]e)\b.*\b(?:live\s+set|ableton\s+session|session)\b", lower):
         return "overview"
     return None
+
+
+def _track_state_answer(question: str, tracks: list[dict[str, Any]]) -> dict[str, Any]:
+    from kenn.core import volume_law
+    from kenn.core.live_intent import _extract_track_phrase, _find_track
+
+    match = _TRACK_STATE_QUESTION.search(" ".join(str(question).split()))
+    groups = match.groupdict() if match else {}
+    phrase = next((groups[key] for key in ("name", "name2", "name3", "name4", "name5") if groups.get(key)), "")
+    field = str(next((groups[key] for key in ("field", "field2", "field5") if groups.get(key)), "")).lower()
+    state = str(groups.get("state") or "").lower()
+    if groups.get("name3"):
+        field = "volume"
+    found = _extract_track_phrase(phrase, tracks)
+    track, ambiguous, error = _find_track(found, tracks) if found else (None, [], "no track")
+    if track is None or ambiguous or error:
+        return {"status": "clarification_required", "answer": "Which track do you mean? Nothing changed."}
+    name = str(track.get("name"))
+    if field in {"volume", "level", "fader"} or (not state and not field):
+        raw = track.get("volume")
+        level = volume_law.raw_to_db(float(raw)) if isinstance(raw, (int, float)) and not isinstance(raw, bool) else None
+        if level is None:
+            return {"status": "clarification_required", "answer": f"I can't read '{name}''s level right now."}
+        shown = "-inf dB" if level == float("-inf") else f"{level:.1f} dB"
+        return {"answer": f"'{name}' is at {shown}.", "track": {"index": track.get("index"), "name": name}, "volume_db": level}
+    if field in {"pan", "panning"} or state in {"panned", "centred", "centered"}:
+        pan = float(track.get("pan") or 0.0)
+        where = "centred" if abs(pan) < 0.005 else f"panned {abs(pan) * 100:.0f}% {'left' if pan < 0 else 'right'}"
+        return {"answer": f"'{name}' is {where}.", "track": {"index": track.get("index"), "name": name}, "pan": pan}
+    key = {"muted": "muted", "soloed": "soloed"}.get(state, "armed")
+    on = bool(track.get(key))
+    word = {"muted": "muted", "soloed": "soloed"}.get(state, "armed")
+    return {"answer": f"{'Yes' if on else 'No'}, '{name}' is {'' if on else 'not '}{word}.",
+            "track": {"index": track.get("index"), "name": name}, key: on}
 
 
 def answer_live_session_question(
@@ -135,6 +182,9 @@ def answer_live_session_question(
         "intent": {"action": f"inspect_{kind}"},
     }
 
+    if kind == "track_state":
+        payload.update(_track_state_answer(question, tracks))
+        return payload
     if kind == "connection":
         backend = str(snapshot.get("backend") or getattr(live.client, "backend_name", "Live backend"))
         payload.update({
