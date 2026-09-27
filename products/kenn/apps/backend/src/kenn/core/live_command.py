@@ -246,6 +246,12 @@ def _one_command_per_line(command: Any) -> str:
     return " ".join(lines)
 
 
+# The most common reply when nothing matched. It listed "qualified device controls" and "exact undo"; examples say it
+# better.
+NOT_A_CHANGE = ("I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% "
+                "left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.")
+
+
 def _clean_text(value: Any, limit: int = 256) -> str:
     return " ".join(str(value or "").split())[:limit]
 
@@ -3055,12 +3061,7 @@ def _handle_command_impl(
             # "not sure what you're asking" hid that from people who'd asked a perfectly clear question.
             return _clarification(response, intent, str(intent["ambiguity"][0]))
         if intent.get("action") is None:
-            return _clarification(
-                response,
-                intent,
-                "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, "
-                "qualified device controls, sends, mix advice, change history, and exact undo.",
-            )
+            return _clarification(response, intent, NOT_A_CHANGE)
         if set(intent.get("missing_fields") or []) & {"valid_volume", "parameter"} and intent.get("ambiguity"):
             # A limit ("above 0 dB") or one plain question ("which Compressor setting?") reads best on its own.
             return _clarification(response, intent, str(intent["ambiguity"][0]))
@@ -3286,12 +3287,7 @@ def _handle_command_impl(
         if result.get("ok"):
             return _proposal_response(response, result["proposal"], kind="device_parameter")
         return _clarification(response, intent, result.get("clarification", result.get("error", "I could not create a Live device proposal.")))
-    return _clarification(
-        response,
-        intent,
-        "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, "
-        "qualified device controls, sends, mix advice, change history, and exact undo.",
-    )
+    return _clarification(response, intent, NOT_A_CHANGE)
 
 
 def handle_command(

@@ -401,9 +401,9 @@ def test_unknown_command_lists_supported_demo_capabilities() -> None:
 
     assert result["status"] == "clarification_required"
     assert result["changed"] is False
-    assert result["answer"].startswith("I'm not sure what you're asking.")
-    assert "track volume/pan/mute/solo" in result["answer"]
-    assert "exact undo" in result["answer"]
+    assert result["answer"].startswith("I didn't catch a change to make there.")
+    # What KENN can do, shown as examples people can copy (27 Sept 2026; it was a list of internal terms).
+    assert "turn the bass down 2 dB" in result["answer"] and "mute the hats" in result["answer"]
 
 
 def test_missing_eq_names_devices_visible_on_the_target_track() -> None:
