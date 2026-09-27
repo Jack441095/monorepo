@@ -189,3 +189,35 @@ def test_a_device_for_two_tracks_asks_which_first(demo) -> None:
     from kenn.core.live_intent import parse_request
 
     assert parse_request("add reverb to the kick and the snare", demo)["missing_fields"] == ["one_track"]
+
+
+@pytest.mark.parametrize("text, action, track", [
+    ("The transport is stopped, can you start it?", "transport_play", None),
+    ("I think the FX Print track should be called FX Send, can you rename it?", "rename_track", "FX Print"),
+])
+def test_everyday_statements_that_are_requests(demo, text, action, track) -> None:
+    # From the sealed chat set (27 Sept 2026): both went to the notes.
+    from kenn.core.live_intent import parse_request
+
+    intent = parse_request(text, demo)
+    assert intent["action"] == action
+    assert track is None or intent["track"]["name"] == track
+
+
+def test_moving_a_track_to_one_side_asks_how_far(demo) -> None:
+    from kenn.core.live_intent import parse_request
+
+    intent = parse_request("Can you move the drum bus to the left a little?", demo)
+    assert intent["action"] == "set_pan" and intent["missing_fields"]
+
+
+def test_switching_a_device_off_is_explained_plainly(demo) -> None:
+    # It was "Device enable, bypass, mute, solo, and arm controls are not in the qualified action set", and the chat
+    # sent the request to the notes.
+    from kenn.core.live_intent import parse_request
+
+    for text in ("Just turn off the compressor on the lead vocal", "Could you turn the compressor on the drum bus off?"):
+        intent = parse_request(text, demo)
+        assert intent["missing_fields"] == ["device_action"]
+        assert intent["ambiguity"][0].startswith("KENN can't switch devices on or off yet.")
+        assert wants_live_change(text, demo)

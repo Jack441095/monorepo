@@ -182,7 +182,7 @@ _UNSUPPORTED_SEND_CONTROL = re.compile(
     re.I,
 )
 _UNSUPPORTED_DEVICE_CONTROL = re.compile(
-    r"\b(?:mute|unmute|enable|disable|bypass|solo|unsolo|arm|disarm|turn\s+(?:on|off))\b",
+    r"\b(?:mute|unmute|enable|disable|bypass|solo|unsolo|arm|disarm|turn\s+(?:on|off))\b|\bturn\b.*\b(?:on|off)\s*[.!?]*\s*$",
     re.I,
 )
 
@@ -1025,6 +1025,14 @@ _STATE_REASON_TAIL = re.compile(r"\s*[,;]\s*(?:it'?s|it\s+is|they'?re|they\s+are
 # "The kick is too loud, can you bring it down to -16?": "it" is the track the first clause named.
 _PROBLEM_THEN_IT = re.compile(rf"^\s*{_NAME}(?:\s+track)?\s+(?:is|sounds|feels|seems|'s)\s+(?:way\s+|a\s+bit\s+|a\s+little\s+|"
                               r"really\s+|kind\s+of\s+|kinda\s+|pretty\s+|just\s+|still\s+)*too\s+\w+\s*[,.;!]+\s*(?P<rest>.+)$", re.I)
+# "The transport is stopped, can you start it?": "it" is the transport, and starting it is Play.
+_TRANSPORT_IT = re.compile(r"\btransport\b.*\b(?P<verb>start|play|run|stop|halt)\s+it\b", re.I)
+# "the FX Print track should be called FX Send, can you rename it?"
+_SHOULD_BE_CALLED = re.compile(rf"^\s*(?:i\s+think\s+)?{_NAME}(?:\s+track)?\s+should\s+be\s+(?:called|named)\s+"
+                               r"['\"]?(?P<new>[^,'\"?!.]+?)['\"]?\s*(?:[,.?!].*)?$", re.I)
+# "move the drum bus to the left a little": a pan without an amount, so KENN asks how far.
+_MOVE_TO_SIDE = re.compile(rf"^\s*(?:move|shift|nudge|push|slide)\s+{_NAME}\s+(?:over\s+)?(?:to\s+)?(?:the\s+)?"
+                           r"(?P<side>left|right)(?:\s+(?:a\s+(?:little|bit|touch)|slightly))?\s*[.!?]?\s*$", re.I)
 # "I need the drum bus muted", "make sure the snare is centered", "I want the vocal back to center".
 _WANTED_STATE = re.compile(rf"^\s*(?:make\s+sure|i\s+(?:need|want|would\s+like|'d\s+like)|let'?s\s+(?:have|get))\s+{_NAME}"
                            r"(?:\s+tracks?)?\s+(?:(?:is|are|'s)\s+|(?:to\s+be|should\s+be)\s+)?(?P<neg>n't\s+|not\s+|un)?"
@@ -1252,6 +1260,12 @@ def _rewrite_idioms(text: str) -> str:
         found = match.group(group)
         return None if not found or _NOT_A_TRACK_NAME.search(found) or _TERSE_LEVEL_EXCLUDE.search(found) else found
 
+    if (m := _TRANSPORT_IT.search(text)):
+        return "stop" if m.group("verb").lower() in {"stop", "halt"} else "play"
+    if (m := _SHOULD_BE_CALLED.match(text)) and name(m):
+        return f"rename {m.group('name')} to {m.group('new').strip()}"
+    if (m := _MOVE_TO_SIDE.match(text)) and name(m):
+        return f"pan {m.group('name')} {m.group('side').lower()}"
     if (m := _LOCATOR_SAID.match(text)):
         return f"add a locator called {(m.group('locator') or m.group('locator2')).strip()}"
     if (m := _CALL_TRACK_THE.match(text) or _MAKE_CALLED.match(text)) and name(m):
@@ -2208,9 +2222,8 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
     ):
         base["missing_fields"].append("device_action")
         base["ambiguity"].append(
-            "Device enable, bypass, mute, solo, and arm controls are not in the qualified action set; "
-            "no track-level action was inferred."
-        )
+            "KENN can't switch devices on or off yet. The device's on/off switch in Live does it (top left of the "
+            "device). Nothing changed.")
         return base
     transport_word = re.search(r"^\s*(?:play|stop|start|pause)\s+(?:the\s+)?(?P<what>.+?)\s*[.!?]?\s*$", lower)
     if transport_word and not re.search(r"\b(?:song|set|session|track|playback|playing|beat|it|music|everything)\b",
