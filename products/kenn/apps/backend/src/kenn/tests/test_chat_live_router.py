@@ -112,3 +112,23 @@ def test_naming_the_device_but_not_the_setting_asks_which(demo) -> None:
     intent = parse_request("Can you set the compressor on the drum bus to -12 dB?", demo)
     assert intent["action"] == "set_device_parameter" and intent["missing_fields"] == ["parameter"]
     assert intent["ambiguity"][0].startswith("Which Compressor setting should change?")
+
+
+@pytest.mark.parametrize("text, track", [("rather than solo the kick, mute the snare", "Snare / Clap"),
+                                         ("instead of soloing the kick, mute the snare", "Snare / Clap"),
+                                         ("instead of muting the drum bus, turn it down 3 dB", "Drum Bus")])
+def test_instead_of_acts_on_the_second_clause(demo, text, track) -> None:
+    # 27 Sept 2026: "rather than solo the kick, mute the snare" proposed muting the Kick.
+    from kenn.core.live_intent import parse_request
+
+    assert parse_request(text, demo)["track"]["name"] == track
+
+
+@pytest.mark.parametrize("text, missing", [("mute the drum bus lol jk", "negated"), ("mute the drum bus? nah", "negated"),
+                                           ("tomorrow mute the drum bus", "deferred"),
+                                           ("remember to mute the drum bus later", "deferred")])
+def test_taken_back_or_for_later_changes_nothing_now(demo, text, missing) -> None:
+    from kenn.core.live_intent import parse_request
+
+    intent = parse_request(text, demo)
+    assert intent.get("action") is None and intent["missing_fields"] == [missing]

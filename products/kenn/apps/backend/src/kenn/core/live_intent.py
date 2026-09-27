@@ -967,6 +967,10 @@ _MID_CORRECTION = re.compile(
 _MID_CORRECTION_TARGET = re.compile(
     r"^(?P<before>.+?)\s*(?:\u2014|\u2013|--|,|;)\s*(?:actually|no\s+wait|i\s+mean|sorry)\s*,?\s+"
     r"(?P<target>(?:the\s+)?(?:track\s+\w+|[a-z][\w/'-]*(?:\s+[a-z][\w/'-]*){0,2}))\s*[.!]?\s*$", re.I)
+# "rather than solo the kick, mute the snare" muted the Kick (27 Sept 2026): only the second clause is the request.
+_INSTEAD_OF = re.compile(r"^\s*(?:instead\s+of|rather\s+than)\s+(?P<before>[^,;]+?)\s*[,;]\s*(?P<after>.+)$", re.I)
+_INSTEAD_OBJECT = re.compile(r"^\s*(?:\w+ing|set|turn|bring|make|put|pan|mute|solo|arm)\s+(?P<obj>.+?)"
+                             r"(?:\s+(?:to|by|at|up|down)\b.*)?$", re.I)
 _CORRECTED_OBJECT = re.compile(r"^\s*(?:set|turn|bring|make|put|get|pan|mute|solo)\s+(?P<obj>.+?)"
                                r"(?:\s+(?:volume|level|fader|pan))?(?:\s+(?:to|by|at|up|down)\b.*)?$", re.I)
 _CALL_TRACK = re.compile(r"^\s*call\s+(track\s+\d+)\s+['\"]?(.+?)['\"]?\s*[.!]?\s*$", re.I)
@@ -1336,6 +1340,12 @@ def _rewrite_common_phrasings(text: str) -> str:
     a bare "kick to -9" still asks). Nothing here changes what a request means.
     """
     text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
+    if (m := _INSTEAD_OF.match(text)):
+        after = m.group("after")
+        obj = _INSTEAD_OBJECT.match(m.group("before"))
+        if obj and re.search(r"\b(?:it|that)\b", after, re.I):
+            after = re.sub(r"\b(?:it|that)\b", obj.group("obj"), after, count=1, flags=re.I)
+        text = after
     if re.search(r"\bratio\b", text, re.I):
         # "ratio to 3 to 1" became a raw value of 3 and a range error.
         text = re.sub(r"\b(\d+(?:\.\d+)?)\s+(?:to|in)\s+(?:1|one)\b", r"\1:1", text, flags=re.I)
@@ -1525,6 +1535,12 @@ _QUESTION_NOT_REQUEST = re.compile(r"^\s*(?:why|how\s+come|should|shouldn't|is|i
 _DESCRIBES_SET = re.compile(r"^\s*(?!(?:make|set|put|turn|bring|i|let|please|can|could)\b)(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}\s+"
                             r"(?:is|are|'s)\s+(?:currently\s+|now\s+|already\s+|still\s+)?(?:(?:set\s+)?(?:at|to|on)|sent|routed|going|"
                             r"feeding|panned)\s+", re.I)
+# "mute the drum bus lol jk", "mute the drum bus? nah": taken back in the same breath.
+_RETRACTED = re.compile(r"\b(?:lol\s+)?(?:jk|j/k|just\s+kidding|kidding|nah|nope|never\s*mind|nvm|forget\s+it|"
+                        r"scratch\s+that|ignore\s+(?:that|me))\W*$", re.I)
+# "tomorrow mute the drum bus", "remember to mute the drum bus later": KENN changes things when asked, not later.
+_DEFERRED = re.compile(r"^\s*(?:(?:later|tomorrow|tonight|next\s+time|at\s+some\s+point)\b|remember\s+to\b|"
+                       r"i'?m\s+going\s+to\b)|\b(?:later|tomorrow|tonight|next\s+time)\s*[.!?]*\s*$", re.I)
 # "don't mute the drum bus" proposed muting it, in every build to 27 Sept 2026: the "don't" was dropped.
 _NEGATED_REQUEST = re.compile(
     r"^\s*(?:(?:please|pls|and|but|so|just|ok(?:ay)?)[,\s]+)*(?:don'?t|dont|do\s+not|never|no\s+need\s+to)\s+"
@@ -1575,7 +1591,15 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
                        "missing_fields": [unsupported[0]], "ambiguity": [unsupported[1]]})
         return parsed
-    if _NEGATED_REQUEST.match(text) or _NEGATED_REQUEST.match(str(query or "")):
+    # "...so I can jump back to it later" is why it's wanted now, not a request for later.
+    if parsed.get("action") and (_DEFERRED.search(str(query or "")) or _DEFERRED.search(text)) \
+            and not re.search(r"\bso\s+(?:that\s+)?(?:i|we|you)\s+can\b|\bto\s+(?:find|jump|come\s+back|return|use)\b",
+                              str(query or ""), re.I):
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["deferred"],
+                       "ambiguity": ["KENN makes a change when you ask for it, not later. Say it when you want it done. "
+                                     "Nothing changed."]})
+        return parsed
+    if _NEGATED_REQUEST.match(text) or _NEGATED_REQUEST.match(str(query or "")) or _RETRACTED.search(str(query or "")):
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
                        "missing_fields": ["negated"], "ambiguity": ["Okay, I'll leave it as it is. Nothing changed."]})
         return parsed
