@@ -1,4 +1,4 @@
-# CI for the standalone KENN repository (Nite-DSP/kenn), where this folder is the repository root. In the NITE DSP
+# CI for the standalone KENN repository (Nite-DSP/kenn-app), where this folder is the repository root. In the NITE DSP
 # monorepo GitHub reads only the root .github/, so this file does nothing there; kenn-core.yml covers the same checks.
 name: KENN CI
 

@@ -98,7 +98,7 @@ repository also corrupts it; use branches and pull requests instead.
 
 ### Working together (from 27 Sept 2026)
 
-KENN has its own private repository, `Nite-DSP/kenn`, split out of the NITE DSP monorepo with its history so a
+KENN has its own private repository, `Nite-DSP/kenn-app`, split out of the NITE DSP monorepo with its history so a
 collaborator sees only KENN. That repository is where KENN work happens now:
 
 - `main` is protected: nobody pushes to it directly. Make a branch per piece of work (`yourname/what-it-does`), push
@@ -106,11 +106,12 @@ collaborator sees only KENN. That repository is where KENN work happens now:
 - Run the checks below before opening a pull request, and keep pull requests small enough to review in one sitting.
   Two people changing `core/live_intent.py` at once is the usual conflict; pull `main` into your branch often.
 - Tests and evaluations use the fake Live backend. Real Live is used only for release soaks, which the owner runs.
+- `Nite-DSP/kenn` is the older, frozen pre-monorepo repository; don't work there.
 - At each release the owner brings `main` back into the monorepo
   (`git subtree pull --prefix=products/kenn <kenn remote> main`). Don't change `products/kenn` in the monorepo in
   between, or the two drift apart.
 
-**Without Ableton Live**, KENN runs against a recorded copy of the demo set. In the `kenn` repository run these from
+**Without Ableton Live**, KENN runs against a recorded copy of the demo set. In the `kenn-app` repository run these from
 its root; in the monorepo, from `products/kenn`:
 
 ```bash
