@@ -23,6 +23,7 @@ _HOW_TO = re.compile(
     r"|\bshould\s+i\b|\bexplain\b|\bteach\s+me\b|\bshow\s+me\s+how\b|\bwalk\s+me\s+through\b"
     r"|\bwhy\s+(?:is|does|do|are|would|can't|won't|doesn't)\b|\bwhat\s+(?:does|do)\s+\w+(?:\s+\w+)?\s+do\b"
     r"|\bdifference\s+between\b|\bwhat\s+causes\b|\bi(?:'m|\s+am)\s+not\s+sure\s+how\b"
+    r"|\bdo\s+you\s+think\b|\bwould\s+(?:it|that)\s+help\b"
     # A wish with a condition is asking for advice: "more depth without it sounding muddy", "I want X, but not Y".
     r"|\bwithout\s+(?:losing|changing|making|affecting|ruining|killing|muddying|sounding|getting|"
     r"it\s+(?:sounding|getting|becoming))\b|\bi\s+(?:want|'d\s+like|would\s+like)\b[^.?!]*\bbut\b",
@@ -30,7 +31,7 @@ _HOW_TO = re.compile(
 )
 # Missing fields that still mean the parser found a Live change: the cached snapshot lacks the current fader level, or
 # a send was named without an amount.
-LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount"})
+LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount", "negated"})
 
 
 def asks_how_to(text: str) -> bool:

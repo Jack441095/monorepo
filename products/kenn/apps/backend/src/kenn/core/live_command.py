@@ -3033,7 +3033,8 @@ def _handle_command_impl(
         return response
     if intent.get("missing_fields") or intent.get("ambiguity"):
         if intent.get("action") is None and intent.get("ambiguity") and set(intent.get("missing_fields") or []) & {
-                "supported_unit_mapping", "device", "send_amount", "transport_target", "how_to", "return_track_action"}:
+                "supported_unit_mapping", "device", "send_amount", "transport_target", "how_to", "return_track_action",
+                "negated"}:
             # The parser knows exactly what's wrong ("Compressor Attack in ms isn't measured yet"); the generic
             # "not sure what you're asking" hid that from people who'd asked a perfectly clear question.
             return _clarification(response, intent, str(intent["ambiguity"][0]))
@@ -3044,8 +3045,9 @@ def _handle_command_impl(
                 "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, "
                 "qualified device controls, sends, mix advice, change history, and exact undo.",
             )
-        if "valid_volume" in (intent.get("missing_fields") or []) and intent.get("ambiguity"):
-            return _clarification(response, intent, str(intent["ambiguity"][0]))  # a limit, not a missing detail
+        if set(intent.get("missing_fields") or []) & {"valid_volume", "parameter"} and intent.get("ambiguity"):
+            # A limit ("above 0 dB") or one plain question ("which Compressor setting?") reads best on its own.
+            return _clarification(response, intent, str(intent["ambiguity"][0]))
         if intent.get("action") in {"insert_device", "insert_device_with_parameter"}:
             device_name = str((intent.get("device") or {}).get("name") or "the device")
             return _clarification(response, intent, f"Which exact Live track should receive {device_name}? I will not change the set until the target is exact.")

@@ -1523,7 +1523,14 @@ _QUESTION_NOT_REQUEST = re.compile(r"^\s*(?:why|how\s+come|should|shouldn't|is|i
 # "The drum bus is set to -14 dB, but I want to make sure the compressor is working" describes the set. It became a
 # proposal to set the Drum Bus to -14 dB.
 _DESCRIBES_SET = re.compile(r"^\s*(?!(?:make|set|put|turn|bring|i|let|please|can|could)\b)(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}\s+"
-                            r"(?:is|are|'s)\s+(?:currently\s+|now\s+|already\s+|still\s+)?(?:set\s+)?(?:at|to|on)\s+", re.I)
+                            r"(?:is|are|'s)\s+(?:currently\s+|now\s+|already\s+|still\s+)?(?:(?:set\s+)?(?:at|to|on)|sent|routed|going|"
+                            r"feeding|panned)\s+", re.I)
+# "don't mute the drum bus" proposed muting it, in every build to 27 Sept 2026: the "don't" was dropped.
+_NEGATED_REQUEST = re.compile(
+    r"^\s*(?:(?:please|pls|and|but|so|just|ok(?:ay)?)[,\s]+)*(?:don'?t|dont|do\s+not|never|no\s+need\s+to)\s+"
+    r"(?:(?:ever|even|actually)\s+)?(?P<verb>mute|unmute|solo|unsolo|arm|disarm|record|pan|cent(?:er|re)|change|touch|move|"
+    r"delete|remove|add|insert|put|send|rename|set|turn|bring|push|pull|lower|raise|boost|cut|drop|play|stop|start|focus|"
+    r"select|apply|undo|make)\b", re.I)
 _PAN_NO_SIDE = re.compile(r"^\s*pan\s+(?!.*\b(?:left|right|cent(?:er|re)|middle|hard|l\d|r\d)\b)", re.I)
 _HEDGE = re.compile(r"\b(?:maybe|perhaps|possibly|might)\b", re.I)
 _RETURN_MENTION = re.compile(r"\breturn(?:\s+tracks?)?\b|\b[ab]\s+return\b", re.I)
@@ -1567,6 +1574,10 @@ def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[s
     if unsupported:
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
                        "missing_fields": [unsupported[0]], "ambiguity": [unsupported[1]]})
+        return parsed
+    if _NEGATED_REQUEST.match(text) or _NEGATED_REQUEST.match(str(query or "")):
+        parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
+                       "missing_fields": ["negated"], "ambiguity": ["Okay, I'll leave it as it is. Nothing changed."]})
         return parsed
     if parsed.get("confirmation_required") and (_DESCRIBES_SET.match(text) or _DESCRIBES_SET.match(str(query or ""))):
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False, "missing_fields": ["how_to"],
@@ -2747,6 +2758,14 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         return base
     if device is not None:
         generic_match = _generic_device_parameter_match(lower, device[1].lower())
+        if not generic_match and _DEVICE_PARAMETER_ACTION.search(lower) and re.search(
+                re.escape(device[1].lower()) + r"(?:\s+(?:on|for)\s+(?:the\s+)?[\w/&' -]+?)?\s+(?:to|by)\s+[-+]?\d", lower):
+            # "set the compressor on the drum bus to -12 dB" names the device, not which of its settings.
+            base.update(action="set_device_parameter")
+            base["missing_fields"].append("parameter")
+            base["ambiguity"].append(f"Which {device[1]} setting should change? For example \"set the "
+                                     f"{device[1].lower()} threshold to -12 dB\". Nothing changed.")
+            return base
         if generic_match:
             relative = generic_match["verb"].lower() == "by"
             amount = float(generic_match["value"])

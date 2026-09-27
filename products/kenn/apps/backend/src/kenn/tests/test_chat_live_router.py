@@ -81,3 +81,34 @@ def test_a_send_without_an_amount_asks_how_much(demo) -> None:
 
     assert "send_amount" in parse_request("Could you send the synth to the A-Reverb?", demo)["missing_fields"]
     assert wants_live_change("Could you send the synth to the A-Reverb?", demo)
+
+
+@pytest.mark.parametrize("negated", ["don't mute the drum bus", "please don't solo the kick", "never arm the synth",
+                                     "do not pan the bass left"])
+def test_a_negated_request_changes_nothing(demo, negated) -> None:
+    # Every build to 27 Sept 2026 dropped the "don't" and proposed exactly what was asked not to be done.
+    from kenn.core.live_intent import parse_request
+
+    intent = parse_request(negated, demo)
+    assert intent.get("action") is None and intent["missing_fields"] == ["negated"]
+    assert intent["ambiguity"] == ["Okay, I'll leave it as it is. Nothing changed."]
+
+
+@pytest.mark.parametrize("description", ["the vocal is sent to the reverb at 20%", "the vocal is panned 20% left"])
+def test_describing_a_send_or_pan_is_not_a_request(demo, description) -> None:
+    from kenn.core.live_intent import parse_request
+
+    assert parse_request(description, demo).get("action") is None
+
+
+def test_asking_for_an_opinion_stays_with_the_notes(demo) -> None:
+    assert not wants_live_change("The kick is too loud, do you think I should bring it down?", demo)
+
+
+def test_naming_the_device_but_not_the_setting_asks_which(demo) -> None:
+    # "set the compressor on the drum bus to -12 dB": before, "on the drum bus" was taken as the setting's name.
+    from kenn.core.live_intent import parse_request
+
+    intent = parse_request("Can you set the compressor on the drum bus to -12 dB?", demo)
+    assert intent["action"] == "set_device_parameter" and intent["missing_fields"] == ["parameter"]
+    assert intent["ambiguity"][0].startswith("Which Compressor setting should change?")
