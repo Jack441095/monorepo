@@ -1709,3 +1709,17 @@ def test_chat_shows_kenns_live_question_mid_change(running_server: str, monkeypa
     assert body["route"] == "ableton_controller"
     assert "above 0 dB" in body["answer"]
     assert not body.get("requires_confirmation")
+
+
+def test_saying_yes_to_a_proposal_points_at_the_apply_button() -> None:
+    # 27 Sept 2026: "yes" after a proposal got "I can help, but I need one bit more direction first".
+    from kenn.core.session_context import record_live_exchange
+    from kenn.server import _SAYS_YES, _proposal_waiting
+
+    record_live_exchange(session_id="chat-yes", command="mute the kick",
+                         result={"status": "confirmation_required", "intent": {"action": "set_mute", "track": {"name": "Kick"}},
+                                 "proposal": {"action": "set_mute", "track_name": "Kick"}})
+    assert _proposal_waiting("chat-yes") and not _proposal_waiting("chat-nothing-pending")
+    for said in ("yes", "Apply it", "go ahead!", "do it please"):
+        assert _SAYS_YES.match(said), said
+    assert not _SAYS_YES.match("yes but turn it down instead")

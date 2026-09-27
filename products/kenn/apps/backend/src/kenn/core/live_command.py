@@ -230,6 +230,22 @@ def planner_system_prompt() -> str:
     return LLM_COMMAND_SYSTEM_PROMPT
 
 
+_LINE_COMMAND = re.compile(r"^\s*(?:please\s+)?(?:set|turn|bring|push|pull|make|mute|unmute|solo|unsolo|pan|cent(?:er|re)|arm|"
+                           r"disarm|send|add|insert|put|create|rename|play|stop|undo|lower|raise|drop|boost|cut)\b", re.I)
+
+
+def _one_command_per_line(command: Any) -> str:
+    """Lines that each start like a command are separate steps; a command wrapped across lines stays one.
+
+    "mute the kick" / "solo the snare" on two lines was flattened to one line and only the Kick was muted (27 Sept
+    2026); "set the kick to" / "-6 dB" is one request that happens to wrap.
+    """
+    lines = [line.strip() for line in str(command or "").splitlines() if line.strip()]
+    if len(lines) > 1 and all(_LINE_COMMAND.match(line) for line in lines):
+        return "; ".join(lines)
+    return " ".join(lines)
+
+
 def _clean_text(value: Any, limit: int = 256) -> str:
     return " ".join(str(value or "").split())[:limit]
 
@@ -2555,7 +2571,7 @@ def _handle_command_impl(
     allow_llm: bool = True,
 ) -> dict[str, Any]:
     """Plan or execute one bounded natural-language Ableton command."""
-    clean_command = _clean_text(command, 4000)
+    clean_command = _clean_text(_one_command_per_line(command), 4000)
     response = _base_response(clean_command, _clean_text(session_id, 128))
     if not response["session_id"]:
         response.update({"status": "invalid", "answer": "A KENN session ID is required."})

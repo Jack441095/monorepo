@@ -3429,3 +3429,11 @@ def test_llm_plan_gets_one_structural_repair_attempt(monkeypatch) -> None:
     assert metadata["usage"]["latency_ms"] == 300
     assert len(calls) == 2
     assert "Validation error:" in calls[1]["messages"][0]["content"]
+
+
+def test_one_command_per_line_is_one_step_each() -> None:
+    # 27 Sept 2026: "mute the kick" / "solo the snare" on two lines muted only the Kick; a wrapped line stays one.
+    from kenn.core.live_command import _one_command_per_line
+
+    assert _one_command_per_line("mute the kick\nsolo the snare") == "mute the kick; solo the snare"
+    assert _one_command_per_line("set the kick to\n-6 dB") == "set the kick to -6 dB"

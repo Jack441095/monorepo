@@ -196,6 +196,16 @@ def _continues_live_turn(question: str, session_id: str) -> bool:
     return bool(context.get("last_command")) and bool(_FOLLOW_UP_MARKER.search(text) or _CORRECTION.match(text))
 
 
+_SAYS_YES = re.compile(r"^\s*(?:yes|yeah|yep|yup|ok(?:ay)?|sure|do\s+it|go\s+ahead|apply(?:\s+(?:it|that|the\s+change))?|"
+                       r"confirm(?:\s+it)?|sounds\s+good|please\s+do|go\s+for\s+it)\s*(?:please)?\s*[.!]*\s*$", re.I)
+
+
+def _proposal_waiting(session_id: str) -> bool:
+    from kenn.core.session_context import live_conversation_context
+
+    return live_conversation_context(session_id).get("confirmation_status") == "pending"
+
+
 def _chat_wants_live(question: str) -> bool:
     """The rule parser, on the last cached look at the set, reads a Live change in a chat message."""
     from kenn.core.chat_live_router import wants_live_change
@@ -845,6 +855,12 @@ class Handler(BaseHTTPRequestHandler):
         gateway result falls through so ordinary production questions keep
         reaching the knowledge chat.
         """
+        if _SAYS_YES.match(question) and _proposal_waiting(session_id):
+            # "yes" / "apply it" after a proposal got "I need more direction": KENN changes Live only from the card.
+            return {"ok": True, "answer": "Press Apply on the card to make that change. KENN only changes Live from the "
+                                          "card, so nothing has changed yet.",
+                    "status": "confirmation_pending", "route": "ableton_controller", "answer_mode": "live_command",
+                    "found": True, "confidence": "high", "source_quality": "high", "sources": []}
         imperative = _is_live_imperative(question)
         continuing = _continues_live_turn(question, session_id)
         parsed_live = _chat_wants_live(question)
