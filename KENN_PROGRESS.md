@@ -1,44 +1,25 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-26 17:30 · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-09-27 06:20 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
 north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
 ## Right now
 
-- **Testers' build:** `KENN-beta-cb9dad5.dmg`, tag `kenn-beta-2026-09-26` (gate 9 / 15 on `cb9dad5`). Main has moved
-  on since, so the gate reads lower on main's HEAD until the next soak's receipts land.
-- **Next build, ready to soak tonight** (`kenn-after-soak`; main gets it when the soak starts):
-  - the 90 corrected notes and their index `v-07328d9baf04`, the asked log, phrasing rounds 4–5, the 8-hour soak;
-  - **all 15 mix recipes pass on real Live** (apply, verify, undo, exact restore). Getting there found two bugs:
-    "undo" after adding a device never worked (the change log dropped the device order; Glue was left on the demo
-    Drum Bus, now removed), and "give the vocal some space" couldn't see the set's reverb return;
-  - **the chat now decides Live-or-notes the way the parser reads the message**: requests reaching Live from chat
-    61% -> 94.8%, knowledge questions turned into Live proposals 44 -> 3 of 481
-    (`docs/evidence/KENN_CHAT_ROUTING_2026-09-26.md`). The tester build passes 17 / 26 rows of the tester guide in
-    chat (every follow-up, correction and short reply went to the notes); this build passes 32 / 32 on real Live;
-  - answers and cards in the units Live shows (dB, %, "mute 'Hi-Hats'", "'Synth' is already centred"); a device
-    threshold used to read "from 0.85 db to 0.362 db" for -20 dB. "Set the kick to +3 dB" no longer becomes
-    "turn the kick up 3 dB";
-  - two chat 500s fixed (Live's numeric key crashed the MIDI generator; the session doctor's audit failed whenever it
-    found an issue), and a 500's error text now reaches the local log;
-  - tester guide: unsigned app opens via Privacy & Security > Open Anyway (right-click > Open stopped working in
-    macOS 15; the tester DMG is rejected by Gatekeeper, checked).
-  - **fresh wording:** a sealed set of 252 chat messages written by Qwen3 8B on the box, scored before reading:
-    requests reaching Live, tester build 32%, this build 76% first score, 86% after fixing the shapes it found
-    ("lower the bass a bit", "the kick is too loud, can you bring it down", "I need the drum bus muted"); advice
-    questions and unclear requests handled right in both builds;
-  - **Compressor ratio, attack and release now work in real units** ("set the vocal compressor ratio to 4:1",
-    "attack to 10 ms", "release to 250 ms", "3 to 1"). Measured from Live's own display, then every value checked by
-    write, readback and exact restore on real Live: 17 / 17 (`docs/evidence/KENN_COMPRESSOR_PROFILES_2026-09-26.json`).
-    Reverb, Hybrid Reverb and Delay are measured too (candidates in `workspace/tmp/kenn-ops/devices/`), not yet promoted;
-  - 2,038 tests, assistant eval 111 / 111, UI 28 / 28, phrasing scorer 1,643 / 1,751 right with 1 wrong (the disputed "-1 pan" row), whole
-    tester guide 32 / 32 on real Live (checked again at `5424f1c`).
-- **Tonight:** open the demo set, say "ready". `tonight_soak.sh` brings main up to the branch, runs the suite, the
-  real-Live assistant task and the whole guide on real Live, then starts the 8-hour soak. `post_soak_5.sh` in the
-  morning: receipts, gate, tag, push, UI build, tester DMG.
-- **Your Phase 1 list:** `products/kenn/docs/beta/KENN_PHASE1_CLOSEOUT.md` (clean-account test, six answers,
-  Developer ID later). Test kit in `/Users/Shared/KENN-clean-account-test/`.
+- **Released 27 Sept 05:52:** soak #5 **qualified** on `f1b961c` (8 hours, 481 samples, 0 errors, one Live pause at
+  01:00 with KENN reconnecting by itself, memory flat, median 28 ms). Receipts committed, tag `kenn-beta-2026-09-27`
+  at `a261eed`, pushed. Tester app: `workspace/builds/kenn-app/KENN-beta-a261eed.dmg` (221 MB, smoke test passed
+  including the tester guide). Gate on `a261eed`: 8 / 15 run in full; `automated_suite` failed only because one
+  latency test read the real Live with the companion stopped (fixed on `kenn-after-soak`, `da4275a`).
+- **What testers get in it:** chat that sends requests to Live and questions to the notes (61% -> 95% of requests on
+  the tuned sets, 32% -> 86% on fresh wording), the whole tester guide working in chat, answers in Live's units,
+  Compressor ratio/attack/release, all 15 recipes, undo after adding a device, the corrected notes.
+- **From now on Live is Jack's** (for his work): engineering on the fake Live backend, suites, measurements and the
+  box. Real Live only for a release soak he schedules. Waiting for the next soak night: Reverb, Hybrid Reverb and
+  Delay profiles (measured, candidates in `workspace/tmp/kenn-ops/devices/`).
+- **Follow-up:** `packages/chat/tests` has 2 failing evaluation tests (hard cases, answer-vs-abstain); they fail the
+  same on the 26 Sept tester build with its own index, so they're older than this work. Not in the gate.
+- **Your Phase 1 list:** `products/kenn/docs/beta/KENN_PHASE1_CLOSEOUT.md`.
 
 ## Qualified beta gate: 9 / 15 on the current main (`cb9dad5`)
 
