@@ -999,8 +999,10 @@ _MID_CORRECTION = re.compile(
     r"(?P<after>(?:pan|set|mute|unmute|solo|unsolo|turn|make|bring|arm|disarm|put|send|add|rename|cent(?:er|re))\b.+)$", re.I)
 # "mute track 2, actually track 3" used to mute track 2: a bare new target after the correction replaces the old one.
 _MID_CORRECTION_TARGET = re.compile(
-    r"^(?P<before>.+?)\s*(?:\u2014|\u2013|--|,|;)\s*(?:actually|no\s+wait|i\s+mean|sorry)\s*,?\s+"
+    r"^(?P<before>.+?)\s*(?:\u2014|\u2013|--|,|;|\.|\s)\s*(?:actually|no\s+wait|i\s+mean|sorry)\s*,?\s+"
     r"(?P<target>(?:the\s+)?(?:track\s+\w+|[a-z][\w/'-]*(?:\s+[a-z][\w/'-]*){0,2}))\s*[.!]?\s*$", re.I)
+# "Mute the kick. No wait, the snare." and "mute the kick no wait the snare" muted the Kick (27 Sept 2026); only a comma
+# after the first request used to count.
 # "rather than solo the kick, mute the snare" muted the Kick (27 Sept 2026): only the second clause is the request.
 _INSTEAD_OF = re.compile(r"^\s*(?:instead\s+of|rather\s+than)\s+(?P<before>[^,;]+?)\s*[,;]\s*(?P<after>.+)$", re.I)
 _INSTEAD_OBJECT = re.compile(r"^\s*(?:\w+ing|set|turn|bring|make|put|pan|mute|solo|arm)\s+(?P<obj>.+?)"
@@ -1547,6 +1549,8 @@ _TEMPO_RELATIVE = re.compile(
     r"turn|move|put)\s+)?(?:(?:the|my|our|this)\s+)?(?:(?:song|project|set)\s+)?(?:tempo|bpm)\s+"
     r"(?:(?P<dir>up|down)\s+)?(?:by\s+)?(?P<amount>\d{1,3}(?:\.\d+)?)\s*(?:bpm)?(?:\s+(?P<dir2>up|down|faster|slower))?\s*[.!]?\s*$",
     re.I)
+_TEMPO_IT_TO = re.compile(r"^\s*(?:can\s+you\s+|could\s+you\s+|please\s+)?(?:slow|speed|bring|take)\s+(?:it|things|everything|the\s+(?:song|track|set|tempo))"
+                          r"\s+(?:down|up|back)\s+to\s+(?P<bpm>\d{2,3}(?:\.\d+)?)\s*bpm\b[\s?.!]*$", re.I)
 _TEMPO_VAGUE = re.compile(r"^\s*(?:(?:speed|slow)\s+(?:it|the\s+(?:tempo|song|track|set))\s+(?:up|down)|"
                           r"(?:raise|increase|lower|decrease|bump|drop)\s+the\s+tempo|(?:make\s+it|go)\s+(?:faster|slower))"
                           r"(?:\s+(?:a\s+(?:bit|little|touch|hair)|slightly))?\s*[.!]?\s*$", re.I)
@@ -1608,7 +1612,7 @@ def _tempo_request(text: str, snapshot: dict[str, Any] | None) -> dict[str, Any]
             amount = float(m.group("amount"))
             fields.update(desired_value=round(current + (-amount if down else amount), 3), relative=True,
                           requested_relative_bpm=-amount if down else amount)
-    elif (m := _TEMPO_ABSOLUTE.match(text)) and _TEMPO_WORD.search(text):
+    elif (m := _TEMPO_ABSOLUTE.match(text) or _TEMPO_IT_TO.match(text)) and _TEMPO_WORD.search(text):
         fields["desired_value"] = float(m.group("bpm"))
     elif vague or _TEMPO_WORD.search(text) and re.match(r"^\s*(?:set|change)\s+(?:the\s+)?tempo\s*[.!]?\s*$", text, re.I):
         now = f" It's {current:g} BPM now." if current is not None else ""
@@ -1836,8 +1840,116 @@ def _not_supported_yet(text: str, parsed: dict[str, Any], snapshot: dict[str, An
     return None
 
 
+# A long chat message with the request buried in it (round 8 phrasing set, 27 Sept 2026): "The kick is too loud and the
+# snare is getting lost. Maybe the compressor is too aggressive. Oh, can you lower the kick by 1db?" The clauses
+# addressed to KENN are the request; "maybe I should…", "let me…" and "I think…" are the user thinking aloud.
+_SENTENCE_END = re.compile(r"(?<=[.!?])\s+")
+_ADDRESSED = re.compile(r"\b(?:can|could|would|will)\s+(?:you|we|u)\b|\bplease\b|\blet'?s\b(?!\s+(?:see|hear|try|check|think))",
+                        re.I)
+_IMPERATIVE_START = re.compile(r"^\s*(?:(?:oh|and|also|then|so|ok|okay|anyway|right)\s*,?\s+)*(?:set|turn|bring|push|pull|mute|unmute|"
+                               r"solo|unsolo|pan|cent(?:er|re)|arm|disarm|send|add|insert|put|create|rename|play|stop|lower|"
+                               r"raise|drop|boost|cut|slow|speed|launch|fire)\b", re.I)
+_CORRECTED = re.compile(r"\b(?:no\s+wait|actually|scratch\s+that|instead|i\s+meant|sorry)\b", re.I)
+_MUSING = re.compile(r"\b(?:maybe|perhaps|or\s+(?:is|maybe)|i\s+(?:think|guess|wonder|dunno|should|could|might)|let\s+me|"
+                     r"not\s+sure|what'?s\s+your\s+take|what\s+do\s+you\s+think)\b", re.I)
+
+
+def _buried_requests(query: str) -> list[str]:
+    """The clauses of a multi-sentence message that ask KENN for something, from their "can you"/"please" on."""
+    sentences = [s.strip() for s in _SENTENCE_END.split(str(query or "").strip()) if s.strip()]
+    if not sentences or _CORRECTED.search(str(query)):
+        return []  # a correction across sentences is handled by the whole-message rules
+    asks = []
+    for sentence in sentences:
+        found = _ADDRESSED.search(sentence) or _IMPERATIVE_START.match(sentence)
+        if found is None:
+            continue
+        clause = sentence[found.start():]
+        if _MUSING.search(clause):
+            continue  # "can you maybe…", "could we… or is it the compressor?": still deciding
+        asks.append(clause)
+    if len(sentences) == 1 and asks and asks[0] == sentences[0]:
+        return []  # one plain request is the whole message; the ordinary rules have already had it
+    return asks
+
+
+TRACK_CHANGE_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm"}
+_IT_COULD_BE_AN_EFFECT = re.compile(r"\b(?:reverb|verb|delay|echo|compressor|comp|eq|saturator|filter|send|plugin|effect|"
+                                    r"tempo|bpm)\b", re.I)
+
+
+def _only_track_named(text: str, tracks: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """The one track the words just before a buried request name, when "it" can only mean that track.
+
+    "The kick is a bit too loud, can you lower it" is the Kick. "The bass is fighting the kick, so let's lower it" names
+    two tracks and "tired of the reverb on the vocal, can you turn it off" names an effect, so neither is guessed: a
+    wrong track here was a wrong change (27 Sept 2026).
+    """
+    if _IT_COULD_BE_AN_EFFECT.search(text):
+        return None
+    named = []
+    for track in tracks:
+        name = str(track.get("name", "")).strip()
+        words = [w for w in re.split(r"[\s/_-]+", name.casefold()) if len(w) >= 3 and w not in _GENERIC_TRACK_WORDS]
+        patterns = [re.escape(name.casefold())] + [re.escape(w) + "s?" for w in words]
+        if any(re.search(rf"(?<![\w-]){p}(?![\w-])", text.casefold()) for p in patterns):
+            named.append(track)
+    return named[0] if len(named) == 1 else None
+
+
 def parse_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     """Parse a request into a safe, non-executable intent result."""
+    parsed = _parse_single_request(query, session_snapshot)
+    if parsed.get("action") is not None and not parsed.get("missing_fields"):
+        return parsed
+    if set(parsed.get("missing_fields") or []) & {"negated", "deferred", "how_to"}:
+        return parsed  # "mute the drum bus? nah": a "don't", "later" or a question is never overridden
+    asks = _buried_requests(query)
+    if not asks:
+        return parsed
+    tracks = [t for t in ((session_snapshot or {}).get("tracks") or []) if isinstance(t, dict)]
+    found, unclear = [], None
+    for clause in asks:
+        attempt = _parse_single_request(clause, session_snapshot)
+        if attempt.get("action") is None and re.search(r"\b(?:it|them)\b", clause, re.I):
+            # "…the kick is a bit too loud, can you lower it a bit?": "it" is the track just named, from the same
+            # sentence, or the sentence before when the request starts its own.
+            before = str(query)[:str(query).find(clause)]
+            sentences = [x for x in _SENTENCE_END.split(before.strip()) if x.strip()]
+            context = "" if not sentences else (sentences[-1] if not re.search(r"[.!?]\s*$", before) else sentences[-1])
+            earlier = _only_track_named(context, tracks)
+            if earlier is not None:
+                clause = re.sub(r"\b(?:it|them)\b", f"the {earlier.get('name')}", clause, count=1, flags=re.I)
+                attempt = _parse_single_request(clause, session_snapshot)
+            elif tracks and unclear is None:
+                # What kind of change it is, with a stand-in track, so the question can be specific.
+                probe = _parse_single_request(re.sub(r"\b(?:it|them)\b", f"the {tracks[0].get('name')}", clause, count=1,
+                                                     flags=re.I), session_snapshot)
+                if probe.get("action") in TRACK_CHANGE_ACTIONS:
+                    unclear = (clause, probe["action"])
+        if attempt.get("action") is not None:
+            found.append((clause, attempt))
+    if not found and unclear is not None:
+        clause, action = unclear
+        parsed.update({"action": action, "track": None, "desired_value": None, "confirmation_required": False,
+                       "missing_fields": ["which_track"], "ambiguity": [
+                           f"Which track do you mean by \"it\" in \"{clause.rstrip('?.! ')}\"? Name it and KENN prepares the "
+                           "change. Nothing changed."]})
+        return parsed
+    if len(found) == 1:
+        clause, attempt = found[0]
+        attempt["picked_from_longer_message"] = clause
+        return attempt
+    if len(found) > 1:
+        first = found[0][1]
+        listed = " and ".join(f"\"{clause.rstrip('?.! ')}\"" for clause, _ in found[:3])
+        first.update({"confirmation_required": False, "missing_fields": ["which_change"], "ambiguity": [
+            f"I heard more than one change: {listed}. Which should I prepare first? Nothing changed."]})
+        return first
+    return parsed
+
+
+def _parse_single_request(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     parsed = _parse_request_rules(query, session_snapshot)
     text = str(parsed.get("query") or query or "")
     unsupported = _not_supported_yet(text, parsed, session_snapshot)
