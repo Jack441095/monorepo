@@ -87,6 +87,39 @@ PYTHONPATH=apps/backend/src python3 tooling/scripts/qualify_ableton_live.py \
   --output /tmp/kenn-control-deck-qualification.json
 ```
 
+## Working on KENN as a collaborator
+
+Clone the repository; don't copy someone's working folder. A working folder carries local-only data that must not
+travel (see `LOCAL_DATA_POLICY.md`): the owner's typed requests (`data/asked_log.jsonl`), Live action receipts, planner
+logs, `.runtime/` logs and demo audio, plus 8 GB of model weights. Two people editing one synced copy of a git
+repository also corrupts it; use branches and pull requests instead.
+
+**What git gives you:** all source, tests, evaluation harnesses and docs. Everything below runs from that alone.
+
+**Without Ableton Live**, KENN runs against a recorded copy of the demo set:
+
+```bash
+export KENN_LIVE_BACKEND=fake        # the tests set this themselves; nothing touches a real Live set
+cd products/kenn
+PYTHONPATH="apps/backend/src:tooling" python3 -m pytest -q apps/backend/src/kenn/tests
+PYTHONPATH="apps/backend/src:tooling" python3 tooling/scripts/score_natural_phrasings.py tooling/data/natural_*.jsonl
+PYTHONPATH="apps/backend/src:tooling" python3 tooling/scripts/measure_chat_routing.py
+```
+
+The first checks every change, the second scores the command parser on 1,751 labelled phrasings, and the third
+starts a private fake-Live KENN and measures where chat messages land (Live or the notes).
+
+**What doesn't come with git, and how to get it:**
+
+| Needed for | Item | How |
+|---|---|---|
+| Hybrid retrieval | MiniLM embedding model | `python3 tooling/scripts/fetch_embedding_model.py` |
+| Knowledge answers | Notes (`Training_Data_Notes/`) and the built index | From the owner after a licensing review: some notes summarise third-party courses and videos |
+| Real Live control | Ableton Live 12 and KENN's AbletonOSC in the User Library | The app's **Set up KENN** page, or `tooling/scripts/deploy_abletonosc.py` |
+
+Without the notes and index, knowledge answers abstain and the tests that need them skip. Model weights, the GPU box
+and its SSH key stay with the owner.
+
 ## Focused verification
 
 ```bash

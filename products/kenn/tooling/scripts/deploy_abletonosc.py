@@ -26,9 +26,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from abletonosc_bundle import HOT_RELOADABLE, SOURCE_DIR, STAMP_RELATIVE, bundle_files, bundle_hash  # noqa: E402
 
 KENN_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_TARGET = Path(os.environ.get(
-    "KENN_ABLETONOSC_TARGET", "/Volumes/Jack_Gandy_1TB_SSD/User Library/Remote Scripts/AbletonOSC"
-))
+sys.path.insert(0, str(KENN_ROOT / "apps" / "backend" / "src"))
+
+from kenn.core.live_setup import user_library_remote_scripts  # noqa: E402
+
+# The User Library the newest Live uses (from its Library.cfg), as the app's setup page finds it; it was one owner's
+# external-drive path, which is wrong on anyone else's Mac.
+DEFAULT_TARGET = Path(os.environ.get("KENN_ABLETONOSC_TARGET") or user_library_remote_scripts() / "AbletonOSC")
 
 
 def _plan(target: Path) -> dict[str, list[str]]:
