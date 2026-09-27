@@ -431,3 +431,31 @@ mute, "record audio for bass" → play, and "rename the track with the reverb re
 A validation loss near zero says it fitted its own synthetic phrasings rather than the pattern. **Run 11 stays in
 shadow.** Run 12's Q4_K_M is kept on the box for reference. More seeds of the same kind won't fix this; the next
 planner run needs varied real wording (tester phrasings once the beta starts) and an earlier stop.
+
+## Addendum: run 13, tempo and time signature (27 Sept) — learns them, but not better; run 11 stays
+
+Tempo and time signature became Live changes on 27 Sept, so the planner didn't know them. Run 13 is run 11's exact
+data (3,575 rows, the same split) plus 118 drafted rows for `set_tempo` (48), `set_time_signature` (30) and asking
+first (40: "Make it a bit faster" → "To what tempo?"), 2 variants per seed per scenario. Same schedule as run 11;
+416 steps on GPU 0. Tempo labels were validated against a 120 BPM snapshot without adding tempo to the prompts, so
+the model can't learn "a tempo field means a tempo change".
+
+| GPU, 124 cases | Correct | Clarify (30) | Act (94) | Curated (24) | Wrong plans accepted |
+|---|---|---|---|---|---|
+| Run 11, plain / evidence | **80.6%** / 83.9% | 30 / 30 | **70** / 74 | 17 / 18 | **0 / 0** |
+| Run 13, plain / evidence | 75.8% / **84.7%** | 30 / 30 | 64 / **75** | **19 / 20** | 1 / 1 |
+
+- Values 16/16. Tempo probe (planner alone, 16 cases): 15/16; the miss ("bpm to 90") asked instead of acting.
+- "Sounds like a fader change" traps: 22/32 (run 11 recorded 29/32).
+- As the fallback where the rules ask, both at Q4_K_M, today's rules (`score_natural_phrasings.py --model`):
+
+| Blind set | Run 11 | Run 13 |
+|---|---|---|
+| Qwen3 14B, 210 | 94.3% right, 2 wrong | 91.4% right, 7 wrong |
+| Qwen3 8B, 171 | 96.5% right, 2 wrong | 97.1% right, 1 wrong |
+| Qwen3 14B beginner, 224 | 92.9% right, 4 wrong | 93.3% right, 2 wrong |
+
+**Run 11 stays in shadow.** Run 13 learned the new actions, but 118 added rows (3%) were enough to lose 7 trap cases
+and add wrong plans on one blind set, the same shift run 12 showed. The rule parser already handles tempo and time
+signature, so the planner doesn't need them yet. Run 13's Q4_K_M is kept on the box
+(`c6-run13-q4km.gguf`). The next run should come from real tester wording, not more drafted seeds.
