@@ -1,6 +1,6 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-27 06:20 · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-09-27 08:30 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
 north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
@@ -14,6 +14,13 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **What testers get in it:** chat that sends requests to Live and questions to the notes (61% -> 95% of requests on
   the tuned sets, 32% -> 86% on fresh wording), the whole tester guide working in chat, answers in Live's units,
   Compressor ratio/attack/release, all 15 recipes, undo after adding a device, the corrected notes.
+- **Next build (`kenn-after-soak`, 27 Sept), waiting for a soak night:** tricky-wording tests on the fake Live found
+  wrong changes that are in the tester build, all fixed: "don't mute the drum bus" proposed muting it; "rather than
+  solo the kick, mute the snare" muted the Kick; "turn the kick and snare down 2 dB", three-track lists and "pan the kick
+  left and the bass right" changed only some tracks; "rename the synth to Pads and the bass to Sub" named the Synth
+  "Pads and the bass to Sub"; a device for two tracks went on one. Also: taken-back ("jk", "nah") and for-later requests
+  change nothing, contradictions ask, the lead note of an answer is chosen by the words asked (4 more eval cases pass),
+  tests never read the real Live. 2,067 tests; fresh-wording requests reaching Live 158 / 182.
 - **From now on Live is Jack's** (for his work): engineering on the fake Live backend, suites, measurements and the
   box. Real Live only for a release soak he schedules. Waiting for the next soak night: Reverb, Hybrid Reverb and
   Delay profiles (measured, candidates in `workspace/tmp/kenn-ops/devices/`).
