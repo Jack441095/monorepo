@@ -19,14 +19,14 @@ from typing import Any
 
 from kenn.ableton_osc_bridge import AbletonOSCClient, live_client
 from kenn.core.confirmation import consume_confirmation, issue_confirmation
-from kenn.core.idempotency_bounds import prune_if_needed
+from kenn.core.idempotency_bounds import IdempotencyTrackingSet, prune_if_needed
 from kenn.core.receipt_contract import StageTimer, classify_retry_safety, resolve_correlation_id
 
 
 PROPOSAL_SCHEMA = "kenn.ableton_clip_duplication_proposal.v1"
 UNDO_PROPOSAL_SCHEMA = "kenn.ableton_clip_duplication_undo_proposal.v1"
 RECEIPT_SCHEMA = "kenn.ableton_clip_duplication_receipt.v1"
-_USED_IDEMPOTENCY_KEYS: set[str] = set()
+_USED_IDEMPOTENCY_KEYS: IdempotencyTrackingSet = IdempotencyTrackingSet()
 _IN_FLIGHT_IDEMPOTENCY_KEYS: set[str] = set()
 _ACTION_LOCK = Lock()
 

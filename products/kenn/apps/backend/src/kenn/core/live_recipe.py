@@ -16,7 +16,7 @@ from threading import Lock
 from typing import Any
 
 from kenn.core.confirmation import consume_confirmation, issue_confirmation
-from kenn.core.idempotency_bounds import prune_if_needed
+from kenn.core.idempotency_bounds import IdempotencyTrackingSet, prune_if_needed
 from kenn.core.live_action_service import (
     LiveActionService,
     SUPPORTED_TRACK_ACTIONS,
@@ -30,7 +30,7 @@ RECIPE_SCHEMA = "kenn.ableton_recipe_proposal.v1"
 RECIPE_RECEIPT_SCHEMA = "kenn.ableton_recipe_receipt.v1"
 MAX_RECIPE_STEPS = 3
 RECIPE_ACTIONS = set(SUPPORTED_TRACK_ACTIONS) | set(SUPPORTED_TRANSPORT_ACTIONS) | {"set_device_parameter", "set_send"}
-_USED_IDEMPOTENCY_KEYS: set[str] = set()
+_USED_IDEMPOTENCY_KEYS: IdempotencyTrackingSet = IdempotencyTrackingSet()
 _IN_FLIGHT_IDEMPOTENCY_KEYS: set[str] = set()
 _LOCK = Lock()
 

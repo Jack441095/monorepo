@@ -14,7 +14,34 @@ issued action ids -- including the just-finished key -- remain protected.
 
 from __future__ import annotations
 
-from kenn.core.idempotency_bounds import MAX_TRACKED_KEYS, prune_if_needed
+from kenn.core.idempotency_bounds import IdempotencyTrackingSet, MAX_TRACKED_KEYS, prune_if_needed
+
+
+def test_prune_if_needed_evicts_oldest_keys_in_fifo_order_preserving_recent_keys() -> None:
+    # Standard Python set.pop() evicts arbitrary keys based on hash bucket distribution,
+    # which dropped recent action ids under load (e.g. 5 of 10 recent keys were evicted in audit).
+    # IdempotencyTrackingSet preserves insertion order so FIFO pruning drops the oldest 5,000 keys
+    # and guarantees all recently completed action ids survive.
+    keys = IdempotencyTrackingSet(f"old-{i}" for i in range(MAX_TRACKED_KEYS))
+    recent_keys = [f"recent-{i}" for i in range(10)]
+    for rk in recent_keys:
+        keys.add(rk)
+
+    assert len(keys) == MAX_TRACKED_KEYS + 10
+    prune_if_needed(keys)
+
+    # Memory is bounded to the target window
+    assert len(keys) == (MAX_TRACKED_KEYS + 10) - (MAX_TRACKED_KEYS // 2)
+
+    # Every single recent action id survives without being dropped
+    for rk in recent_keys:
+        assert rk in keys
+
+    # The oldest 5,000 keys were evicted, while the newer 5,000 old keys remain
+    for i in range(MAX_TRACKED_KEYS // 2):
+        assert f"old-{i}" not in keys
+    for i in range(MAX_TRACKED_KEYS // 2, MAX_TRACKED_KEYS):
+        assert f"old-{i}" in keys
 
 
 def test_prune_if_needed_keeps_set_bounded_without_wiping_replay_protection() -> None:

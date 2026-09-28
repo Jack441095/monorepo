@@ -10,12 +10,12 @@ import uuid
 from threading import Lock
 from typing import Any
 
-from kenn.core.idempotency_bounds import prune_if_needed
+from kenn.core.idempotency_bounds import IdempotencyTrackingSet, prune_if_needed
 from kenn.core.receipt_contract import resolve_correlation_id
 
 RECEIPT_SCHEMA = "kenn.ableton_action_receipt.v1"
 
-_USED_IDEMPOTENCY_KEYS: set[str] = set()
+_USED_IDEMPOTENCY_KEYS: IdempotencyTrackingSet = IdempotencyTrackingSet()
 _IN_FLIGHT_IDEMPOTENCY_KEYS: set[str] = set()
 _RECEIPTS: dict[str, dict[str, Any]] = {}
 _PROPOSALS_BY_TOKEN: dict[str, dict[str, Any]] = {}

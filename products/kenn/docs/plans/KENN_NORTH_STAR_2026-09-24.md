@@ -348,26 +348,39 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
       `before` into whatever parameter now holds that index. No production caller today (tests only), but the
       class docstring's "disabled by default" is untrue of this method, and it drops the undo record when
       AbletonOSC's acknowledgement is lost — the exact bug the production path was already fixed for.
-- [ ] `validate_llm_plan` silently skips the device-parameter range check when the snapshot carries no
+- [x] `validate_llm_plan` silently skips the device-parameter range check when the snapshot carries no
       parameters for the device, and when a profile's bounds are non-numeric (NaN makes the guard false). Both
       fail open.
-- [ ] `set_volume` with `relative: true` is silently dropped for an LLM plan whose unit is `normalized`:
+  > 28 Sept: Fixed in `core/live_command.py`. Enforces fail-closed validation when capability has no parameters
+  > and rejects non-finite bounds (NaN/inf); verified in `test_live_command.py`.
+- [x] `set_volume` with `relative: true` is silently dropped for an LLM plan whose unit is `normalized`:
       `propose_track_action` has no `relative` parameter, so "add 0.15 to the fader" becomes an absolute
       0.15 — a ~30 dB cut on a track at 0.5, which then passes readback and is journalled as verified.
-- [ ] The deterministic-refusal guard in `handle_command` is conditioned on `and clean_command`, so a request
+  > 28 Sept: Fixed in `core/live_command.py`. Normalized relative changes are resolved against current snapshot
+  > track values before proposal, converting to validated absolute normalized values; verified in `test_llm_plan_units.py`.
+- [x] The deterministic-refusal guard in `handle_command` is conditioned on `and clean_command`, so a request
       with an empty `command` and an `llm_plan` skips both the refusal check and the deterministic comparison.
       `validate_llm_plan` still runs, so this is not a direct write bypass, but it defeats the rule parser's
       authority.
+  > 28 Sept: Fixed in `core/live_command.py`. Removed `clean_command and` conditions from deterministic refusal
+  > and action comparison checks, preserving rule parser authority; verified in `test_live_command.py`.
 - [ ] `display_text("Mixer", "Volume", "db", 0.85)` renders unity as `0.8 dB`, and a silent Compressor
       threshold reads `-57.2 dB` instead of `-inf`. Two conversion layers disagree about the same physical
       value, and `volume_law` is the one that is measured.
-- [ ] The semantic answer cache has no `session_id` column, so project A's answer can be served verbatim in
+- [x] The semantic answer cache has no `session_id` column, so project A's answer can be served verbatim in
       project B for any query ≥ 0.95 similar. `chat_answer.py` enables this path precisely when there is *no*
       session context. The Stage 4 cross-project gate exists to prevent exactly this.
-- [ ] `idempotency_bounds.prune_if_needed` evicts arbitrary set members rather than the oldest, so the
+  > 28 Sept: Fixed in `core/session_memory.py` and `core/chat_answer.py`. Added `session_id` column, compound
+  > unique key and index, session-keyed L1 and L2 filtering, and bounded FIFO L2 cache; verified in `test_semantic_cache_versioning.py`.
+- [x] `idempotency_bounds.prune_if_needed` evicts arbitrary set members rather than the oldest, so the
       replay-protection set drops recent action ids (verified: 5 of 10 recent keys evicted).
-- [ ] `ACTION_FLAGS` has a duplicate `daw_control` key, so `action_denied_message` names the wrong environment
+  > 28 Sept: Fixed with `IdempotencyTrackingSet` (dict-backed `MutableSet`) in `core/idempotency_bounds.py`
+  > and deployed across all mutating services. Guarantees strict FIFO eviction of oldest keys under memory pruning;
+  > verified in `test_idempotency_bounds.py` that 10/10 recent keys survive while exactly the oldest 5,000 are evicted.
+- [x] `ACTION_FLAGS` has a duplicate `daw_control` key, so `action_denied_message` names the wrong environment
       variable. Behaviour is right today only because of an explicit legacy fallback.
+  > 28 Sept: Fixed in `core/action_policy.py`. Removed duplicate key to cite canonical `KENN_ALLOW_DAW_CONTROL`;
+  > verified in `test_ported_platform_modules.py`.
 - [ ] `endpoint_policy` fails open: unrecognised `business` POST paths are classified `PUBLIC` while its
       docstring promises fail-closed family defaults, and `/command` is classified `ORCHESTRATED` so the
       confirmation flag is `False` for the endpoint that drives Live.

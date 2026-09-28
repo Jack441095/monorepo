@@ -185,9 +185,10 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - [ ] **Needs you (decision):** ingest the Ableton Live Reference Manual? The code is written and tested for it,
       but all six index versions hold zero `official_ableton_manual` chunks, so every official-manual pathway is
       dead and "what does the manual say about…" now correctly abstains. Details in the North Star plan
-- [ ] **Needs you (decision):** work the Stage 3b open list now or after the beta? Two are reachable and worth
-      closing before a second tester: the semantic answer cache is not project-scoped (one project's answer can
-      be served in another), and `validate_llm_plan` skips the device-parameter range check in two fail-open cases
+- [x] Stage 3b open list remediation (28 Sept): closed 6 high-priority findings with regression tests:
+      semantic answer cache project/session scoping + FIFO eviction; fail-closed device range checks (missing params & NaN);
+      relative normalized volume resolution against snapshot; unconditional deterministic refusal guards; deduplicated
+      `ACTION_FLAGS` `daw_control` mapping; and `IdempotencyTrackingSet` FIFO eviction for replay protection. All 2,231 tests passing.
 - [ ] **Needs you (correction):** the North Star plan says chat coverage 125/128; the tooling measures 124/128 on
       `main`, and the same four cases fail either way. Confirmed by re-running with the audit changes stashed.
       Someone should re-record it so your record matches the tooling

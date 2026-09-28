@@ -19,7 +19,7 @@ from typing import Any
 from kenn.ableton_osc_bridge import AbletonOSCClient, live_client
 from kenn.core.audiogen_artifacts import safe_generation_context
 from kenn.core.confirmation import consume_confirmation, issue_confirmation
-from kenn.core.idempotency_bounds import prune_if_needed
+from kenn.core.idempotency_bounds import IdempotencyTrackingSet, prune_if_needed
 from kenn.core.receipt_contract import StageTimer, classify_retry_safety, resolve_correlation_id
 
 
@@ -33,7 +33,7 @@ RECEIPT_SCHEMA = "kenn.ableton_midi_clip_receipt.v1"
 MAX_NOTES = 4096
 MAX_CLIP_LENGTH = 4096.0
 _SHA256_PREFIX = "sha256:"
-_USED_IDEMPOTENCY_KEYS: set[str] = set()
+_USED_IDEMPOTENCY_KEYS: IdempotencyTrackingSet = IdempotencyTrackingSet()
 _IN_FLIGHT_IDEMPOTENCY_KEYS: set[str] = set()
 _ACTION_LOCK = Lock()
 
