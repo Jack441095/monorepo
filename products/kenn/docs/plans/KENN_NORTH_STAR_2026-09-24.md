@@ -228,6 +228,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 - [ ] Multi-step tasks from the deliberative planner (qualified once on real Live, 24 Sept): plan shown first, each step
       confirmed, one receipt per step, undo per step or for the whole task
 - [ ] Advice → fix → re-measure: each audio finding offers a confirmable change and measures again after Apply
+  > 25 Sept / 28 Sept: Built in `core/advice_next_step.py` (`test_advice_next_step.py` 6/6 pass). Each audio finding offers one small,
+  > reversible confirmable change on the identified track (e.g. "turn the Bass down 1 dB") with a listening test caveat and
+  > re-measure guidance ("export the same way and ask again"); multiple candidate tracks or master problems ask instead of guessing.
+  > Awaits release soak with real Live capture.
 - [x] ≥ 15 qualified recipes (e.g. "clean up the low end", "make room for the vocal", "set up parallel drums")
   > 26 Sept (branch `kenn-recipes`): 15 named recipes built, none qualified on real Live yet. The three originals
   > (glue the drum bus, vocal cut through, low-end mud) moved faders by fixed raw amounts and misreported them ("-1.5
