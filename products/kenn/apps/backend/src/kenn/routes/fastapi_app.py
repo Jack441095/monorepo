@@ -21,7 +21,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel, Field
 
-from kenn.routes.chat_routes import handle_ask, handle_suggest, handle_feedback, handle_session_clear
+from kenn.routes.chat_routes import (
+    handle_ask,
+    handle_suggest,
+    handle_feedback,
+    handle_session_clear,
+    handle_get_memory,
+    handle_record_preference,
+    handle_delete_preference,
+    handle_delete_episode,
+    handle_clear_memory,
+)
 from kenn.routes.daw_routes import handle_live_command, handle_session_card, handle_osc_undo
 from kenn.routes.mix_review_routes import (
     handle_mix_review_status,
@@ -94,6 +104,28 @@ class ReferenceMatchRequest(BaseModel):
     ref_wav_base64: str = Field(..., description="Base64 encoded commercial reference WAV")
 
 
+class PreferenceRecordRequest(BaseModel):
+    session_id: str
+    key: str
+    value: str
+    source_turn_id: Optional[str] = "turn-ui"
+    user_statement: Optional[str] = ""
+
+
+class PreferenceDeleteRequest(BaseModel):
+    session_id: str
+    key: str
+
+
+class EpisodeDeleteRequest(BaseModel):
+    session_id: str
+    episode_id: str
+
+
+class MemoryClearRequest(BaseModel):
+    session_id: str
+
+
 # --- Core Endpoints ----------------------------------------------------------
 
 @app.get("/api/health")
@@ -133,6 +165,38 @@ async def feedback_endpoint(req: dict[str, Any]):
 @app.post("/api/session/clear")
 async def session_clear_endpoint(req: dict[str, Any]):
     status, result = handle_session_clear(req.get("id") or req.get("session_id") or "")
+    return JSONResponse(status_code=status, content=result)
+
+
+# --- Stage 4 Project Memory & Personalisation Endpoints ---------------------
+
+@app.get("/api/memory")
+async def get_memory_endpoint(session_id: str):
+    status, result = handle_get_memory(session_id)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/memory/preference")
+async def record_preference_endpoint(req: PreferenceRecordRequest):
+    status, result = handle_record_preference(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.delete("/api/memory/preference")
+async def delete_preference_endpoint(session_id: str, key: str):
+    status, result = handle_delete_preference(session_id, key)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.delete("/api/memory/episode")
+async def delete_episode_endpoint(session_id: str, episode_id: str):
+    status, result = handle_delete_episode(session_id, episode_id)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/memory/clear")
+async def clear_memory_endpoint(req: MemoryClearRequest):
+    status, result = handle_clear_memory(req.session_id)
     return JSONResponse(status_code=status, content=result)
 
 

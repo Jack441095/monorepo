@@ -247,10 +247,20 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 ### Stage 4 — Memory and personalisation (after Stage 1)
 
-- [ ] Project memory: decisions, references, what was tried, kept per Live set
-- [ ] Opt-in producer preferences ("I like my vocals bright", "I master to -9 LUFS"), always cited when used
-- [ ] Memory view in the UI: see, edit, delete; nothing learned silently
-- [ ] **Gate:** testers can find and delete any memory; memory-using answers cite the memory; no cross-project leaks
+- [x] Project memory: decisions, references, what was tried, kept per Live set
+  > 28 Sept: Persisted per session via `AssistantProfileStore` (`producer_preferences` and `production_episodes` tables).
+  > Includes explicit outcomes, verdicts, and evidence refs bound strictly to session IDs.
+- [x] Opt-in producer preferences ("I like my vocals bright", "I master to -9 LUFS"), always cited when used
+  > 28 Sept: Implemented in `core/project_memory_advisory.py`. Explicit opt-in preferences are parsed from statements or
+  > set via UI. When relevant to a question, KENN cites the preference in the answer prose ("Noting your preference for
+  > this project: ...") and populates `applied_preferences`. Unrelated questions or empty sessions cite nothing.
+- [x] Memory view in the UI: see, edit, delete; nothing learned silently
+  > 28 Sept: Backed by REST endpoints (`GET /api/memory`, `POST /api/memory/preference`, `DELETE /api/memory/preference`,
+  > `DELETE /api/memory/episode`, `POST /api/memory/clear`) and chat intents ("What do you remember about this project?",
+  > "Forget preference ...", "Clear project memory"). Only allowlisted explicit preferences are saved.
+- [x] **Gate:** testers can find and delete any memory; memory-using answers cite the memory; no cross-project leaks
+  > 28 Sept: Verified in `test_project_memory_stage4.py` (5/5 pass) and `test_assistant_profile_memory.py` (7/7 pass).
+  > Proved find/delete lifecycle, citation formatting, zero cross-project leakage between sessions, and rejection of silent/unallowlisted inferences.
 
 ### Stage 5 — Creation (after Stage 3)
 

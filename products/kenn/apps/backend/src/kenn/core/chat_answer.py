@@ -2239,6 +2239,30 @@ def _answer_payload_raw(
         )
         payload["cross_links"] = []
 
+    # Stage 4 Project Memory & Personalisation: apply active preferences and cite them
+    if session_id:
+        try:
+            from kenn.core.assistant_profile_memory import AssistantProfileStore
+            from kenn.core.project_memory_advisory import match_preferences_for_query, format_preference_citation
+            store = AssistantProfileStore()
+            active_prefs = store.current_preferences(session_id)
+            matching_prefs = match_preferences_for_query(query, active_prefs)
+            if matching_prefs:
+                citation = format_preference_citation(matching_prefs)
+                ans = payload.get("answer", "")
+                if citation and citation not in ans:
+                    payload["answer"] = ans + citation
+                payload["applied_preferences"] = matching_prefs
+            else:
+                payload["applied_preferences"] = []
+        except Exception:
+            logging.getLogger("kenn.core.chat_answer").warning(
+                "Project memory preference matching failed", exc_info=True,
+            )
+            payload["applied_preferences"] = []
+    else:
+        payload["applied_preferences"] = []
+
     # Update session memory after generating the payload
     _update_session(
         query,
@@ -2269,10 +2293,19 @@ def _answer_payload_raw(
 
 
 def _short_circuit_evaluator(query: str, history: list | None = None, session_id: str = "") -> dict | None:
-    """Instant sub-millisecond evaluator for status, simple transport, and one-word intents."""
+    """Instant sub-millisecond evaluator for status, simple transport, memory, and one-word intents."""
     cleaned = query.strip().lower()
     if not cleaned:
         return None
+
+    # Project Memory and Personalisation (Stage 4)
+    try:
+        from kenn.core.project_memory_advisory import evaluate_memory_chat_intent
+        mem_eval = evaluate_memory_chat_intent(query, session_id=session_id)
+        if mem_eval is not None:
+            return mem_eval
+    except Exception:
+        pass
 
     # Greetings
     if cleaned in {"hello", "hi", "hey", "good morning", "good afternoon", "good evening"}:

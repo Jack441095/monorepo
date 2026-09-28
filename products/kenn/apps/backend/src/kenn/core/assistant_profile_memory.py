@@ -106,8 +106,12 @@ def _preference_projection(row: sqlite3.Row | dict[str, Any]) -> dict[str, Any]:
 class AssistantProfileStore:
     """Store only explicit preferences and evidence-backed task outcomes."""
 
-    def __init__(self, db_path: Path | str = DB_PATH):
-        self.db_path = Path(db_path)
+    def __init__(self, db_path: Path | str | None = None):
+        if db_path is None:
+            from kenn.core import session_memory
+            self.db_path = Path(session_memory.DB_PATH)
+        else:
+            self.db_path = Path(db_path)
 
     def record_preference(
         self,

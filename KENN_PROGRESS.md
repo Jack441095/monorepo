@@ -25,6 +25,7 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **Stage 1 brain prompt footprint compressed 28 Sept:** Built `_clean_chunk_for_synthesis` in `llm_rewrite.py` to strip metadata headers and boilerplate, refined `build_raw_context_block`, and adjusted `KENN_LLM_CONTEXT_CHARS` (650) and `KENN_LLM_DRAFT_CHARS` (300). Compacted prompt token footprint by >50% (mean ~900 tokens down from ~1,400 tokens; under 450 tokens with compact system prompt), cutting Mac prompt read latency by over 10 seconds. Full 2,187-test backend suite verified passing 100%.
 - **Stage 1 natural phrasings gate qualified 28 Sept:** Evaluated `score_natural_phrasings.py` on the 505 phrasings fixture: **494/505 right (97.8%)**, 11 asked, **0 wrong plans**. Fixed mid-sentence corrections with 'wait no' and inline params, track rename with 'call', 'slo' solo typo, compressor output shorthand, and back-off threshold phrasing. All 2,187 backend tests passing.
 - **Stage 1 multi-turn context advancement 28 Sept:** Implemented device-parameter follow-ups on active track/device ("now set the ratio to 4:1", "and the release to 100 ms", "make the attack 15 ms", "ratio 4:1", "lower threshold by 3 dB") and "no, the other one" sibling target resolution (e.g. Lead Vocal <-> Backing Vocal) while preserving clarification when ambiguous. Full backend test suite passing 100% (2,189 passed).
+- **Stage 4 memory and personalisation 28 Sept:** Implemented explicit opt-in producer preferences ("I like my vocals bright", "I master to -9 LUFS"), REST memory lifecycle (GET/POST/DELETE), answer citations ("Noting your preference for this project: ..."), and strict session isolation with zero cross-project leakage (2,194 passed).
 - **Stage 2 retrieval gate progress 28 Sept:** Tested `v1` ("Use it when" lines) in memory: original recall@4 0.983 (MRR 0.880),
   describe-it 0.784 (was 0.768), sealed Qwen8b set 0.425 (was 0.346, +7.9pp boost).
 - **From now on Live is Jack's** (for his work): engineering on the fake Live backend, suites, measurements and the
@@ -162,5 +163,9 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - [x] C6 run 12 tried: **worse than run 11, so run 11 stays in shadow.** 2–13 wrong plans per fresh set against
       run 11's 2–7, some flipped ("pull back the bass" → unmute). It memorised its synthetic examples; the next
       planner needs real tester wording
+- [x] Stage 4 memory: explicit opt-in producer preferences ("I like my vocals bright", "I master to -9 LUFS"),
+      REST memory lifecycle (GET/POST/DELETE), answer citations ("Noting your preference for this project: ..."),
+      and strict session isolation with zero cross-project leakage.
 - [ ] Stage 1 conversational KENN · [ ] Stage 2 deep Ableton knowledge · [ ] Stage 3 agentic co-producer ·
-      [ ] Stage 4 memory · [ ] Stage 5 creation
+      [x] Stage 4 memory · [ ] Stage 5 creation
+

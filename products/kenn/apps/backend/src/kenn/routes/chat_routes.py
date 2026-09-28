@@ -77,3 +77,77 @@ def handle_session_clear(session_id: str) -> tuple[int, dict[str, Any]]:
         return 400, {"ok": False, "error": "Missing session id."}
     clear_session(clean_id)
     return 200, {"ok": True, "message": f"Session {clean_id} cleared."}
+
+
+def handle_get_memory(session_id: str) -> tuple[int, dict[str, Any]]:
+    """Retrieve active producer preferences and episodic memories for a session."""
+    clean_id = str(session_id or "").strip()
+    if not clean_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    from kenn.core.assistant_profile_memory import AssistantProfileStore
+    store = AssistantProfileStore()
+    return 200, {
+        "ok": True,
+        "session_id": clean_id,
+        "producer_preferences": store.current_preferences(clean_id),
+        "episodic_outcomes": store.recent_episodes(clean_id),
+    }
+
+
+def handle_record_preference(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Record an explicit, opt-in producer preference."""
+    session_id = str(payload.get("session_id", "")).strip()
+    key = str(payload.get("key", "")).strip()
+    value = str(payload.get("value", "")).strip()
+    source_turn_id = str(payload.get("source_turn_id", "")).strip() or "turn-ui"
+    user_statement = str(payload.get("user_statement", "")).strip()
+    if not user_statement:
+        user_statement = f"I prefer {value}" if value else ""
+
+    from kenn.core.assistant_profile_memory import AssistantProfileStore
+    store = AssistantProfileStore()
+    result = store.record_preference(
+        session_id=session_id,
+        key=key,
+        value=value,
+        source_turn_id=source_turn_id,
+        user_statement=user_statement,
+    )
+    status = 200 if result.get("ok") else 400
+    return status, result
+
+
+def handle_delete_preference(session_id: str, key: str) -> tuple[int, dict[str, Any]]:
+    """Forget an explicit producer preference."""
+    clean_id = str(session_id or "").strip()
+    clean_key = str(key or "").strip()
+    if not clean_id or not clean_key:
+        return 400, {"ok": False, "error": "session_id and key are required."}
+    from kenn.core.assistant_profile_memory import AssistantProfileStore
+    store = AssistantProfileStore()
+    forgotten = store.forget_preference(session_id=clean_id, key=clean_key)
+    return 200, {"ok": True, "session_id": clean_id, "key": clean_key, "forgotten": forgotten}
+
+
+def handle_delete_episode(session_id: str, episode_id: str) -> tuple[int, dict[str, Any]]:
+    """Forget an episodic outcome."""
+    clean_id = str(session_id or "").strip()
+    clean_ep = str(episode_id or "").strip()
+    if not clean_id or not clean_ep:
+        return 400, {"ok": False, "error": "session_id and episode_id are required."}
+    from kenn.core.assistant_profile_memory import AssistantProfileStore
+    store = AssistantProfileStore()
+    forgotten = store.forget_episode(session_id=clean_id, episode_id=clean_ep)
+    return 200, {"ok": True, "session_id": clean_id, "episode_id": clean_ep, "forgotten": forgotten}
+
+
+def handle_clear_memory(session_id: str) -> tuple[int, dict[str, Any]]:
+    """Clear all profile preferences and episodic memory for a session."""
+    clean_id = str(session_id or "").strip()
+    if not clean_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    from kenn.core.assistant_profile_memory import AssistantProfileStore
+    store = AssistantProfileStore()
+    cleared = store.clear_profile(clean_id)
+    return 200, {"ok": True, "session_id": clean_id, "cleared": cleared}
+
