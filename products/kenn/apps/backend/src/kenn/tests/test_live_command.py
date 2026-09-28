@@ -3253,6 +3253,32 @@ def test_typed_llm_plan_cannot_bypass_deterministic_refusal() -> None:
     assert fake.writes == []
 
 
+def test_llm_plan_cannot_bypass_deterministic_refusal_even_with_empty_command(monkeypatch) -> None:
+    fake = FakeLive()
+    plan = {
+        "schema": "kenn.ableton_llm_plan.v1",
+        "action": "set_mute",
+        "track_index": 2,
+        "track_name": "Vocal",
+        "value": True,
+        "unit": "boolean",
+    }
+    # When the deterministic rule parser marks the intent mode as refuse,
+    # passing an empty natural-language command with an LLM plan must not bypass refusal.
+    monkeypatch.setattr(live_command_module, "parse_request", lambda cmd, snap: {"mode": "refuse", "missing_fields": []})
+    result = handle_command(
+        "",
+        session_id="command-llm-refusal-bypass-empty",
+        service=_service(fake),
+        llm_plan=plan,
+    )
+    assert result["status"] == "invalid"
+    assert result["llm"]["status"] == "rejected"
+    assert result["llm"]["comparison"]["status"] == "refusal_bypass"
+    assert "proposal" not in result
+    assert fake.writes == []
+
+
 def test_llm_shadow_mode_records_conflict_but_keeps_deterministic_authority(monkeypatch) -> None:
     # Inline shadow, so the comparison is in the response; background shadow
     # is covered in test_live_shadow_background.py.

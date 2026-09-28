@@ -3163,7 +3163,7 @@ def _handle_command_impl(
             return response
         intent = _intent_from_llm_plan(checked["plan"])
         llm_metadata = {"status": "accepted", "source": "request"}
-        if clean_command and deterministic_intent.get("mode") == "refuse":
+        if deterministic_intent.get("mode") == "refuse":
             response.update({
                 "status": "invalid",
                 "answer": "The natural-language request is outside KENN's safety boundary. The typed LLM plan cannot override that refusal, so no Live proposal was created.",
@@ -3173,7 +3173,7 @@ def _handle_command_impl(
             response["llm"] = {**llm_metadata, "status": "rejected", "comparison": {"status": "refusal_bypass"}}
             response["intent"] = deterministic_intent
             return response
-        if clean_command and deterministic_intent.get("action") is not None:
+        if deterministic_intent.get("action") is not None:
             comparison = compare_llm_plan(checked["plan"], deterministic_intent)
             llm_metadata["comparison"] = comparison
             if comparison.get("status") == "mismatch":
