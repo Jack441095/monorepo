@@ -1,6 +1,6 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-27 08:30 · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-09-28 10:55 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
 north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
@@ -14,13 +14,16 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **What testers get in it:** chat that sends requests to Live and questions to the notes (61% -> 95% of requests on
   the tuned sets, 32% -> 86% on fresh wording), the whole tester guide working in chat, answers in Live's units,
   Compressor ratio/attack/release, all 15 recipes, undo after adding a device, the corrected notes.
-- **Next build (`kenn-after-soak`, 27 Sept), waiting for a soak night:** tricky-wording tests on the fake Live found
-  wrong changes that are in the tester build, all fixed: "don't mute the drum bus" proposed muting it; "rather than
-  solo the kick, mute the snare" muted the Kick; "turn the kick and snare down 2 dB", three-track lists and "pan the kick
-  left and the bass right" changed only some tracks; "rename the synth to Pads and the bass to Sub" named the Synth
-  "Pads and the bass to Sub"; a device for two tracks went on one. Also: taken-back ("jk", "nah") and for-later requests
-  change nothing, contradictions ask, the lead note of an answer is chosen by the words asked (4 more eval cases pass),
-  tests never read the real Live. 2,067 tests; fresh-wording requests reaching Live 158 / 182.
+- **Merged to main 28 Sept (`kenn-after-soak`):** All tricky-wording fixes, return track mixer controls
+  (`/live/kenn/set/return_mixer`), song tempo and time-signature changes from chat with readback and exact undo, scene
+  launching, shorthand phrasing parsing ("kik -3", "delay 30%"), and 110 new tests. The full backend test suite on
+  main is now **2,187 passed, 0 failures**.
+- **Repository hygiene consolidated 28 Sept:** Retired redundant top-level `Products/` directory after full cold backup;
+  relocated `CycloneComrades` standalone git checkout to `collaborations/cyclone-comrades` (100% clean); ingested all
+  historical prompt specifications into `products/kenn/docs/plans/historical_prompts/` and studio SOPs into `Business/ops-docs/sops/`.
+  The canonical whole-product root is now unambiguously `monorepo/products/`. Verified 0 secrets, hostnames or credentials tracked in git.
+- **Stage 2 retrieval gate progress 28 Sept:** Tested `v1` ("Use it when" lines) in memory: original recall@4 0.983 (MRR 0.880),
+  describe-it 0.784 (was 0.768), sealed Qwen8b set 0.425 (was 0.346, +7.9pp boost).
 - **From now on Live is Jack's** (for his work): engineering on the fake Live backend, suites, measurements and the
   box. Real Live only for a release soak he schedules. Waiting for the next soak night: Reverb, Hybrid Reverb and
   Delay profiles (measured, candidates in `workspace/tmp/kenn-ops/devices/`).

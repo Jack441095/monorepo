@@ -206,6 +206,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > Fixture now **303 questions** (gate size reached): 128 original + 125 device-purpose + 50 technique-purpose
   > (`evals/technique_purpose_retrieval_cases.json`, producer wording, overlapping notes all count). Today's hybrid on
   > the technique set: recall@4 **0.84** (BM25 alone 0.64).
+  > 28 Sept: measured `v1` ("Use it when" lines) across all fixtures on `main`: original recall@4 **0.983** (MRR 0.880),
+  > describe-it **0.784** (was 0.768, MRR 0.624), sealed Qwen8b set **0.425** (was 0.346, +7.9pp, MRR 0.291).
+  > Merged `kenn-after-soak` to `main`: return track mixer controls, tempo/time-sig chat commands, shorthand phrasing,
+  > full 2,187-test suite passing 100%. Sanitized all remote box references; 0 secrets or GPU credentials tracked.
 
 ### Stage 3 — Agentic co-producer (beta weeks 6–16)
 
