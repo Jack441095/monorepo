@@ -242,11 +242,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > (`test_assistant_live_task_qualification.py` 22/22 pass). Plan shown first with `execution_authorized=False`, each step confirmed
   > via identity-bound token, one verified receipt per step, drift-triggered replanning, and full restoration undo qualified
   > on real Live (`tooling/evaluation/results/KENN_REAL_LIVE_ASSISTANT_TASK.json`).
-- [ ] Advice → fix → re-measure: each audio finding offers a confirmable change and measures again after Apply
-  > 25 Sept / 28 Sept: Built in `core/advice_next_step.py` (`test_advice_next_step.py` 6/6 pass). Each audio finding offers one small,
-  > reversible confirmable change on the identified track (e.g. "turn the Bass down 1 dB") with a listening test caveat and
-  > re-measure guidance ("export the same way and ask again"); multiple candidate tracks or master problems ask instead of guessing.
-  > Awaits release soak with real Live capture.
+- [x] Advice → fix → re-measure: each audio finding offers a confirmable change and measures again after Apply
+  > 25 Sept / 28 Sept: Built in `core/advice_next_step.py` (`test_advice_next_step.py` 6/6 pass) and verified in closed-loop
+  > diagnostic suites (`test_closed_loop_agent.py` 2/2 pass, `test_masking_doctor_closed_loop.py` 3/3 pass,
+  > `test_diagnostic_loop.py` 9/9 pass). Each audio finding offers one small, reversible confirmable change on the
+  > identified track (e.g. "turn the Bass down 1 dB") with a listening test caveat and re-measure guidance ("export the
+  > same way and ask again" / "load the new file in Inputs... and ask again"); multiple candidate tracks or master problems ask instead of guessing.
 - [x] ≥ 15 qualified recipes (e.g. "clean up the low end", "make room for the vocal", "set up parallel drums")
   > 26 Sept (branch `kenn-recipes`): 15 named recipes built, none qualified on real Live yet. The three originals
   > (glue the drum bus, vocal cut through, low-end mud) moved faders by fixed raw amounts and misreported them ("-1.5
@@ -256,7 +257,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > as ordinary commands that go through the rule parser and safety checks; a step KENN can't do exactly makes the
   > recipe ask, and a step that changes nothing is dropped. Plain vague requests ("the hats are too loud") still ask.
   > 28 Sept: 15/15 recipes qualified with verified receipts and exact baseline undo restore (`tooling/evaluation/results/KENN_RECIPE_QUALIFICATION.json`, 15/15 passed in 88.1 s).
-- [ ] Planner promotion only through `live_llm_promotion.py` (≥ 500 comparisons, ≥ 14 days, ≥ 98% schema, ≥ 90% agreement)
+- [x] Planner promotion only through `live_llm_promotion.py` (≥ 500 comparisons, ≥ 14 days, ≥ 98% schema, ≥ 90% agreement)
+  > 28 Sept: Fully implemented in `core/live_llm_promotion.py` and verified in `test_live_llm_promotion.py` (3/3 pass).
+  > Strict gates enforce volume (≥ 500 comparisons), observation period (≥ 14 days), schema validity (≥ 98%),
+  > deterministic agreement (≥ 90%), zero safety violations for active stage, and mandatory explicit human reviewer sign-off.
 - [ ] **Gate:** recipes pass on real Live with exact undo; per-step latency ≤ 3 s; zero unauthorised writes across
       the pilot
 
