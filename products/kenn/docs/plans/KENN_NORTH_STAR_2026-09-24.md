@@ -180,7 +180,11 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
       names what they actually have
   > 28 Sept: Implemented in `core/session_intelligence.py`. Bounded `present_devices` extracted across all active session
   > tracks and return buses from Live snapshots, exposing exact installed device names to advice generators and chat.
-- [ ] Contradiction checks and source tiers (manual and measured data above notes, notes above general advice)
+- [x] Contradiction checks and source tiers (manual and measured data above notes, notes above general advice)
+  > 28 Sept: Verified in `test_source_tiers_and_contradictions.py` (8/8 pass) and `test_retrieval_evidence_classes.py` (14/14 pass).
+  > Enforces strict source hierarchy (official manual/measurements 1.0 > curated notes 0.9 > transcripts 0.7), dynamic trust adaptation
+  > with citations and user corrections, measurement mismatch detection across notes and user corrections, draft demotion on
+  > conflict resolution (primary_a / primary_b), and index rebuild gating via `KENN_MAX_CONTRADICTIONS`.
 - [ ] **Gate:** retrieval recall@4 ≥ 0.95 on a fixture grown to ≥ 300 questions; answer accuracy ≥ 90% on a
       parameter-level quiz scored by reviewers; no uncited factual claims in a 100-answer audit
   > 28 Sept: Parameter quiz test built in `test_device_parameter_quiz.py` (4/4 pass). Verifies evidence-backed device profiles
@@ -225,13 +229,19 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > describe-it **0.784** (was 0.768, MRR 0.624), sealed Qwen8b set **0.425** (was 0.346, +7.9pp, MRR 0.291).
   > Merged `kenn-after-soak` to `main`: return track mixer controls, tempo/time-sig chat commands, shorthand phrasing,
   > full 2,187-test suite passing 100%. Sanitized all remote box references; 0 secrets or GPU credentials tracked.
+  > 28 Sept: Source tiers and contradiction tests consolidated in `test_source_tiers_and_contradictions.py` (8/8 pass).
 
 ### Stage 3 — Agentic co-producer (beta weeks 6–16)
 
 - [ ] Device qualification factory: every insertable device measured and end-to-end tested per parameter
       (D1 in the tracker), growing from 10 devices to ≥ 25 and ≥ 60 parameters
-- [ ] Multi-step tasks from the deliberative planner (qualified once on real Live, 24 Sept): plan shown first, each step
+- [x] Multi-step tasks from the deliberative planner (qualified once on real Live, 24 Sept): plan shown first, each step
       confirmed, one receipt per step, undo per step or for the whole task
+  > 24 Sept / 28 Sept: Fully implemented and tested across `AssistantCoordinator` (`test_assistant_coordinator.py` 10/10 pass),
+  > recovery qualification (`test_assistant_recovery_qualification.py` 1/1 pass, 8/8 cases), and live task qualification
+  > (`test_assistant_live_task_qualification.py` 22/22 pass). Plan shown first with `execution_authorized=False`, each step confirmed
+  > via identity-bound token, one verified receipt per step, drift-triggered replanning, and full restoration undo qualified
+  > on real Live (`tooling/evaluation/results/KENN_REAL_LIVE_ASSISTANT_TASK.json`).
 - [ ] Advice → fix → re-measure: each audio finding offers a confirmable change and measures again after Apply
   > 25 Sept / 28 Sept: Built in `core/advice_next_step.py` (`test_advice_next_step.py` 6/6 pass). Each audio finding offers one small,
   > reversible confirmable change on the identified track (e.g. "turn the Bass down 1 dB") with a listening test caveat and
