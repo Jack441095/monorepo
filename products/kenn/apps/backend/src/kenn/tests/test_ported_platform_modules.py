@@ -129,13 +129,25 @@ def test_validate_json_payload_rejects_too_deep_nesting() -> None:
 
 
 def test_action_allowed_defaults_to_false(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("KENN_ALLOW_DAW_CONTROL", raising=False)
     monkeypatch.delenv("AUDIO_TOO_ALLOW_DAW_CONTROL", raising=False)
     assert action_policy.action_allowed("daw_control") is False
 
 
 def test_action_allowed_respects_explicit_env_flag(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("AUDIO_TOO_ALLOW_DAW_CONTROL", raising=False)
+    monkeypatch.setenv("KENN_ALLOW_DAW_CONTROL", "1")
+    assert action_policy.action_allowed("daw_control") is True
+
+    # Legacy flag is also supported for backward compatibility
+    monkeypatch.delenv("KENN_ALLOW_DAW_CONTROL", raising=False)
     monkeypatch.setenv("AUDIO_TOO_ALLOW_DAW_CONTROL", "1")
     assert action_policy.action_allowed("daw_control") is True
+
+
+def test_action_denied_message_cites_correct_variable() -> None:
+    message = action_policy.action_denied_message("daw_control")
+    assert "KENN_ALLOW_DAW_CONTROL" in message
 
 
 def test_action_allowed_unknown_action_is_false() -> None:

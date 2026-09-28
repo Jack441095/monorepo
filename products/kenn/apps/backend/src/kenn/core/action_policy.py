@@ -11,7 +11,6 @@ import os
 ACTION_FLAGS = {
     "external_email": "AUDIO_TOO_ALLOW_EXTERNAL_EMAIL",
     "desktop_automation": "AUDIO_TOO_ALLOW_DESKTOP_AUTOMATION",
-    "daw_control": "AUDIO_TOO_ALLOW_DAW_CONTROL",
     "daw_control": "KENN_ALLOW_DAW_CONTROL",
     "audio_capture": "AUDIO_TOO_ALLOW_AUDIO_CAPTURE",
     "autonomous_mode": "KENN_AUTONOMOUS_MODE",
