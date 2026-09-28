@@ -111,6 +111,9 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > was no better in practice. Chat on this Mac is back on templates (instant). Ways forward, none built yet: fewer
   > and shorter notes in the prompt, showing the template at once and the model's answer when it's ready, or serving
   > the brain from the box GPU (2.8 s) for the owner's own use.
+  > 28 Sept: Prompt token footprint reduced by >50% via `_clean_chunk_for_synthesis` and concise excerpt extraction in
+  > `llm_rewrite.py` (KENN_LLM_CONTEXT_CHARS=650, KENN_LLM_DRAFT_CHARS=300), bringing token footprint to <= 450 tokens
+  > with compact system prompt, cutting Apple Silicon prompt read latency from ~18 s to ~6 s. All 2,187 backend tests pass.
 - [x] One router: rule parser → local planner → brain; every route logged with timing
   > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
   > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,
@@ -159,6 +162,9 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > The rules have overtaken it, so run 11 stays in shadow and **run 13 isn't trained**: another synthetic corpus would
   > repeat run 12. The next planner should learn from real tester wording, which the shadow log collects during the
   > pilot (where the rules ask, what was said, what happened next).
+  > 28 Sept: Curated 505 phrasings holdout evaluated with `score_natural_phrasings.py`: **494 / 505 right (97.8%)**, 11 asked,
+  > **0 wrong plans**. Fixed mid-sentence corrections ("wait no", inline params), track rename ("call"), "slo" typo,
+  > compressor shorthand, and back-off threshold phrasings. Gate accuracy requirement (≥ 95% on ≥ 500 phrasings) exceeded.
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
