@@ -161,3 +161,159 @@ def test_two_tracks_at_the_same_time_are_both_changed(snapshot) -> None:
 
     recipe = parse_natural_recipe("Can you solo the drum bus and the vocal track at the same time?", snapshot)
     assert recipe is not None and len(recipe["segments"]) == 2 and not recipe["ambiguity"]
+
+
+# Typed in a hurry (the phone-shorthand phrasing set, 27 Sept 2026). These used to get "which mix problem?" from chat.
+@pytest.mark.parametrize("request_text, action, track, value", [
+    ("kik 2db down", "set_volume", "Kick", volume_law.db_to_raw(-16)),
+    ("solo kik", "set_solo", "Kick", True),
+    ("mute the bus", "set_mute", "Drum Bus", True),
+    ("hats 20 left", "set_pan", "Hi-Hats", -0.2),
+    ("pan the hats 20 left", "set_pan", "Hi-Hats", -0.2),
+    ("snare 0.5 left", "set_pan", "Snare / Clap", -0.5),
+    ("hats 20L", "set_pan", "Hi-Hats", -0.4),  # Live's panner reads 50L to 50R
+    ("bass eq 200hz cut 3db", "set_eq_band_gain", "Bass", None),
+])
+def test_shorthand_means_the_plain_command(snapshot, request_text, action, track, value) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == action and parsed["track"]["name"] == track and not parsed["missing_fields"]
+    if isinstance(value, bool):
+        assert parsed["desired_value"] is value
+    elif value is not None:
+        assert parsed["desired_value"] == pytest.approx(value, abs=0.005)
+
+
+@pytest.mark.parametrize("request_text", ["bus comp thresh -10", "teh bus comp thresh -10", "comp thresh -10 on bus"])
+def test_compressor_shorthand_reaches_the_drum_bus_compressor(snapshot, request_text) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == "set_device_parameter" and parsed["track"]["name"] == "Drum Bus"
+
+
+def test_a_bare_signed_number_asks_whether_it_is_a_level_or_a_change(snapshot) -> None:
+    parsed = parse_request("kik -3", snapshot)
+    assert parsed["track"]["name"] == "Kick" and parsed["missing_fields"] == ["absolute_or_relative"]
+
+
+@pytest.mark.parametrize("request_text, missing, words", [
+    ("comp thresh -10", "which_track", "Drum Bus and Lead Vocal"),
+    ("delay 30%", "which_track", "Which track's delay send"),
+    ("verb up a hair", "which_track", "Which track's reverb send"),
+    ("turn the delay send on the bass down 5 dB", "amount", "What level should Bass's delay send be"),
+    ("bass eq 100hz cut", "amount", "cut 100 Hz on the bass by 3 dB"),
+])
+def test_shorthand_missing_one_thing_asks_for_exactly_that(snapshot, request_text, missing, words) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["missing_fields"] == [missing] and words in parsed["ambiguity"][0]
+    assert not parsed["confirmation_required"]
+
+
+def test_a_new_name_keeps_the_spelling_the_user_typed(snapshot) -> None:
+    assert parse_request("rename the kick to kik", snapshot)["desired_value"] == "kik"
+
+
+def test_the_article_is_not_read_as_a_track(snapshot) -> None:
+    # "set the compressor threshold to -10 dB" became "set the the compressor..." and lost the question.
+    assert parse_request("set the compressor threshold to -10 dB", snapshot)["missing_fields"] == ["which_track"]
+
+
+@pytest.mark.parametrize("request_text, action, track", [
+    ("auto filter on synth", "insert_device", "Synth"),
+    ("bass eq low cut 40hz", "set_device_parameter", "Bass"),
+])
+def test_device_shorthand_names_the_device_and_the_track(snapshot, request_text, action, track) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == action and parsed["track"]["name"] == track
+
+
+def test_a_vague_shorthand_level_asks_how_much(snapshot) -> None:
+    parsed = parse_request("bass a bit lower", snapshot)
+    assert parsed["action"] == "set_volume" and parsed["missing_fields"] == ["amount"]
+
+
+def test_describing_the_mix_is_not_shorthand_for_a_change(snapshot) -> None:
+    assert parse_request("the kick is lower", snapshot)["action"] is None
+
+
+# Long chat messages with the request buried in them (round 8 phrasing set, 27 Sept 2026): these got mixing notes.
+@pytest.mark.parametrize("message, action, track", [
+    ("Hey, the kick is kinda loud but the snare is getting lost in the mix. I think the hi-hats are too bright, maybe "
+     "they need some EQ. Oh, and the bass is fighting the kick a bit, can you lower the bass by 2db?", "set_volume", "Bass"),
+    ("The hi-hats are too bright, maybe I should add a low cut. Also, the delay is way too long. Anyway, can you lower "
+     "the hi-hats by 1db?", "set_volume", "Hi-Hats"),
+    ("The bass is fighting the kick. Drop the bass 2 dB.", "set_volume", "Bass"),
+])
+def test_the_request_is_found_inside_a_longer_message(snapshot, message, action, track) -> None:
+    parsed = parse_request(message, snapshot)
+    assert parsed["action"] == action and parsed["track"]["name"] == track and not parsed["missing_fields"]
+
+
+def test_it_in_a_buried_request_is_the_track_just_named(snapshot) -> None:
+    parsed = parse_request("The tempo feels fine. The kick is a bit too loud, can you lower it by 2 dB? Also the reverb "
+                           "on the vocal is too much.", snapshot)
+    assert parsed["action"] == "set_volume" and parsed["track"]["name"] == "Kick"
+
+
+def test_two_buried_requests_ask_which_first(snapshot) -> None:
+    parsed = parse_request("Can you mute the kick? And could you solo the bass please.", snapshot)
+    assert parsed["missing_fields"] == ["which_change"] and not parsed["confirmation_required"]
+
+
+def test_thinking_aloud_is_not_a_buried_request(snapshot) -> None:
+    parsed = parse_request("The synth is way too bright. Maybe we can bring it down a little? Or maybe the EQ is too "
+                           "harsh?", snapshot)
+    assert parsed["action"] is None
+
+
+@pytest.mark.parametrize("message", ["Mute the kick. No wait, the snare.", "mute the kick no wait the snare"])
+def test_a_correction_after_a_full_stop_changes_the_target(snapshot, message) -> None:
+    # Both muted the Kick before 27 Sept 2026; only "mute the kick, no wait, the snare" worked.
+    assert parse_request(message, snapshot)["track"]["name"] == "Snare / Clap"
+
+
+def test_a_taken_back_request_is_not_revived_from_its_first_sentence(snapshot) -> None:
+    assert parse_request("mute the drum bus? nah", snapshot)["missing_fields"] == ["negated"]
+
+
+@pytest.mark.parametrize("message", [
+    "The delay on the synth is just right, but the bass is still fighting the kick, so let's lower it by 1.5db.",
+    "I'm getting a little tired of the reverb on the vocal. Can you turn it off for a moment?",
+])
+def test_it_is_not_guessed_when_two_tracks_or_an_effect_came_before(snapshot, message) -> None:
+    # The first lowered the Kick and the second muted the Lead Vocal while the new rule was being written (27 Sept 2026).
+    parsed = parse_request(message, snapshot)
+    assert parsed["track"] is None and not parsed["confirmation_required"]
+    assert parsed["missing_fields"] in (["which_track"], ["action"])
+
+
+def test_can_you_maybe_is_still_a_request(snapshot) -> None:
+    parsed = parse_request("The hats are too loud. I think the drum bus compressor is too aggressive. Can you maybe "
+                           "lower the hi-hats by 1db?", snapshot)
+    assert parsed["action"] == "set_volume" and parsed["track"]["name"] == "Hi-Hats"
+
+
+def test_a_musing_amount_does_not_leak_into_the_request(snapshot) -> None:
+    # "Maybe -5 dB? … Can you just lower the synth a bit?" proposed -5 dB (27 Sept 2026); the request has no amount.
+    parsed = parse_request("I think I need to bring the synth down. Maybe -5 dB? Or should I just lower the fader? "
+                           "Can you just lower the synth a bit?", snapshot)
+    assert parsed["action"] == "set_volume" and parsed["missing_fields"] == ["amount"]
+
+
+def test_a_level_described_earlier_is_not_the_target(snapshot) -> None:
+    # "…the FX Print is at 0 dB … can you bring it down?" answered "already at 0 dB" (27 Sept 2026).
+    parsed = parse_request("Should I lower it? Wait, the FX Print is at 0 dB. Maybe it's meant to be loud? I'm not sure. "
+                           "Anyway, can you bring it down?", snapshot)
+    assert parsed["missing_fields"] == ["which_track"]
+
+
+def test_it_names_the_track_for_a_rename(snapshot) -> None:
+    parsed = parse_request("Why is the bass track named Bass? Can you rename it to Bass Line?", snapshot)
+    assert parsed["action"] == "rename_track" and parsed["track"]["name"] == "Bass" and parsed["desired_value"] == "Bass Line"
+
+
+@pytest.mark.parametrize("message", [
+    "The reverb on the A-Reverb is a bit too wet, maybe cut it a little. Also, the bass is clashing with the kick, "
+    "maybe lower the bass by 2db.",
+    "I'm confused. Can you check the A-Reverb settings?",
+])
+def test_musing_about_a_return_or_checking_it_is_not_a_return_change(snapshot, message) -> None:
+    assert "return_track_action" not in parse_request(message, snapshot)["missing_fields"]

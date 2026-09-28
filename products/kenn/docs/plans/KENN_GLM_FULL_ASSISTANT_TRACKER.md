@@ -89,6 +89,24 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
     > (`docs/evidence/KENN_CHAT_ROUTING_2026-09-26.md`, `tooling/scripts/measure_chat_routing.py`). Tricky-wording
     > tests fixed wrong changes that were in the tester build ("don't mute" muted; "rather than solo the kick, mute the
     > snare" muted the Kick; multi-track requests changed only some tracks).
+    > 2026-09-27 (branch `kenn-after-soak`): an eighth set, 252 phone-style shorthand messages from Qwen3-8B on the GPU
+    > box ("kik -3", "bus comp thresh -10", "delay 30%"), scored before reading: 85/202 requests reached Live on the
+    > soaking build. After the shorthand rules: 195/202 (no longer blind). Chat routing 95.4%, knowledge taken over
+    > still 3/481, phrasings 1,644 / 1,751 with the same 1 wrong.
+    > Round 8 (27 Sept): 308 long, rambling chat messages with the request buried in them ("…maybe the compressor is
+    > too aggressive. Oh, can you lower the kick by 1db?"), generated on the GPU box and scored sealed: 106/277
+    > requests reached Live on both the release and the branch. Now the clause addressed to KENN is the request; "maybe
+    > I should…", "let me…" are left alone; "it" is only resolved when one track and no effect was just named,
+    > otherwise KENN asks which track. 170/277 (no longer blind); all 35 new proposals read and correct. Knowledge
+    > taken over still 3/481; phrasings 1,646 / 1,751. Also fixed: "Mute the kick. No wait, the snare." muted the Kick.
+    > Then: "can you maybe…" counts as a request, "can we go to 3/4?" as a time signature, and a change asked after a
+    > "should I…?" wins ("…I'm not sure. Can you change the tempo to 122?"; "Can you explain it?" stays a question). An
+    > addressed request beats a whole-message parse, which had taken a musing's "-5 dB" and read "is at 0 dB" as a
+    > target. Round 8: 185/277. One disputed label in round 6: "Why is the bass track named Bass? Can you rename it to
+    > Bass Line?" now proposes the rename (label wanted a question).
+    > Return tracks: "can you lower the A-Reverb by 1db?" now gets the plain "A-Reverb is a return track, and KENN can't
+    > change return tracks yet… sends into them work" (it got "no track found"), only for a sentence that asks to change
+    > the return; "which devices are on the B-Delay" and "what's in return B?" read its chain. Round 8: 187/277.
     > Relative dB and track nicknames done 2026-09-24, from the owner's first independent test ("tuck the high hats back a couple of dbs", expected −2 dB on Hi-Hats): "up/down/back/off N dB" with one clear direction, "a couple of dB" = 2 dB, "dbs", nicknames (hats/high hats → Hi-Hats, vox → Lead Vocal, drums → Drum Bus) with a guard so "the Lead Vocal" never matches "Backing Vocal", and "some reverb" asks instead of inserting. Plain "X and Y" track controls now ask instead of proposing only X. 124 cases: **62.1%** (was 49.2%), clarify 30/30, 0 wrong plans (was 3: the earlier "0" claim was not measured). Focus, sends and slang still to do.
     > Absolute dB without the word volume ("put the kick at minus 12 dB", "set the snare to -10 dB") done 2026-09-24, same device/send/pan guard: 124 cases **63.7%** (79), 0 wrong plans. Track focus by name without the word "track" ("Select the Drum Bus", "focus the bass.") done the same day, only when every spoken word is in one track's name: 124 cases **64.5%** (80), 0 wrong plans. Punctuation still changes one parse: `_FOCUS_DEVICE` ends in `\s*$`, so "Focus EQ Eight on track 5." (the demo script) falls to the numbered track-focus rule while the same words without the full stop give a device focus. Resolved the same day (owner delegated): the full stop no longer matters, "Focus EQ Eight on track 5." proposes a device focus; demo gate contract, its test and runbook step 8 updated. Gate 2/2; applied and verified in Live.
   - [x] Volume mapping: KENN converts dB with normalized = 10^(dB/20) (1.0 = 0 dB), but Live's fader puts 0 dB at 0.85 and reaches +6 dB. Absolute and relative dB levels are therefore approximate, and "vox up 1.5 dB" at 0 dB is refused. Measure Live's fader law (as the Compressor threshold table was) and use it
@@ -96,6 +114,12 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
     > Found while testing: the C6 corpus labelled absolute volumes as fader values under the old maths ("Bring the FX Return up to 0 dB" → 1.0, which is +6 dB in Live). Run 4 reproduces it ("set Drum Bus level to 0 dB" → 1.0) while writing dB for other levels. The corpus seeds and the unused legacy generator now label volume in dB. The next fine-tune needs this; run 4 must not be promoted for volume before then (shadow only, nothing was written).
   - [ ] Planner emits user units (dB, %) and KENN converts; stop asking the model to normalize
     > Volume in dB done 2026-09-24: `validate_llm_plan` accepts `set_volume` with `unit: "dB"`, absolute or relative, and converts with the rule parser's mapping (now Live's fader law, `core/volume_law.py`; outside −57.2..0 dB on the provisional table, or no current volume, is rejected). Found via C6 run 2, which wrote "+3 dB" plans that the old contract rejected. Pan in % still to do.
+    > Pan and send in % done 2026-09-27 (branch `kenn-after-soak`): `set_pan` with `unit: "%"` (-100..100, absolute or
+    > added to the current pan, past hard left/right rejected) and `set_send` with `unit: "%"` (0..100) convert in KENN.
+    > The planner prompt still asks for normalized values; switching it (and the C6 corpus labels) goes with the next
+    > fine-tune so the shadow model's prompt doesn't change under it. Same day: plans may also be `set_tempo` (BPM,
+    > absolute or relative) and `set_time_signature` ("3/4"), checked against Live's limits; the prompt's action list
+    > gets them with the next fine-tune too.
 - [ ] **C3 Natural holdout** `tooling/data/natural_holdout.jsonl`
   - [ ] ≥ 100 phrasings · [ ] ≥ 250 · [ ] ≥ 500 (slang, fragments, corrections, multi-intent). Curated holdout: 24 (Codex). 100 drafted candidates in `tooling/data/natural_holdout_candidates.jsonl` await owner review before promotion.
     > 2026-09-27: candidates now 481, plus 1,246 in seven sealed blind sets (all excluded from training). The curated
@@ -113,6 +137,8 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
   - [x] Run 4: drafted seeds for transport, rename, sends, device parameters, EQ, two-part requests; per-action balancing; gate on wrong plans accepted
     > **84.7%** correct (stock 65.3%), clarify 29/30, curated 19/24, wrong plans accepted 5 (gate met). EQ 0/3, device parameters 2/5, two-part 1/3 remain. Optimistic: the drafted seeds were written after seeing the evaluation's categories.
   - [ ] Fresh evaluation set written by someone other than the author of the training data (owner), for a clean score
+    > Run 13 (27 Sept): run 11 + tempo/time-signature rows. Learns them (tempo probe 15/16) but traps 22/32 (run 11
+    > 29/32) and 7 wrong plans on one blind set (run 11: 2). Not better; run 11 stays in shadow. See the C6 addendum.
   - [x] Run 5: EQ band/frequency and device-parameter coverage; two-part requests
     > Production-shaped evidence (single track, real Live indices). 82.3% correct; EQ 3/3 (was 0/3), same-action two-part 3/3, **2 wrong plans accepted** (safest yet); but device parameters 1/5 and inserts over-asked, curated 15/24. Run 4 stays best overall (84.7%, Mac 83.1%, p50 6.5 s).
   - [x] Latency: the gateway attaches a track's full parameter list to *every* request on that track ("mute the bass" becomes a ~5,000-token prompt because Bass has an EQ Eight). Attach evidence only for device requests, then rebuild the corpus to match.
@@ -136,7 +162,23 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 - [ ] **D2 Borrowed Live-side handlers** (ableton-mcp, MIT, telemetry excluded; ableton-js as reference); attribution recorded
 - [ ] **D3 New action families** (each with readback and exact undo)
   - [ ] Sends and returns · [ ] Group and ungroup · [ ] Routing
+    > Returns built 2026-09-27 (branch): level, pan and mute on a return track ("lower the A-Reverb by 1db", "mute
+    > return B", "pan the delay return 30% left") through a new Remote Script write, `/live/kenn/set/return_mixer`,
+    > stale-checked and read back through `/live/kenn/get/bus_mixer`, with exact undo; name and solo still say "not
+    > yet". Fake Live models return mixers now. Walkthrough dry run 36/36. Soak night deploys the Remote Script
+    > (`deploy_abletonosc.py --apply --reload`, song.py hot-reloads) before the real-Live row runs. Tick after that.
   - [ ] Tempo and signature · [ ] Scenes · [ ] Locators
+    > Tempo built 2026-09-27 (branch `kenn-after-soak`): "set the tempo to 124", "tempo up 2 bpm", "slow the tempo
+    > down 4 bpm" propose `set_tempo` (120 BPM -> 124 BPM), refuse a tempo Live moved before Apply, verify by readback,
+    > and undo exactly (stale once the tempo moves again). "speed it up a bit" asks "To what tempo?"; outside 20-999
+    > BPM is refused. BPM talk about clips, delays or genres stays out ("what bpm is good for house music?" no longer
+    > gets the set's tempo). 22 tests on fake Live. Real Live: the soak-night walkthrough now has a tempo +4, apply,
+    > undo, exact-restore row. Time signature the same day: "set the time signature to 3/4", "switch to 7/8 time"
+    > propose `set_time_signature` (4/4 -> 3/4), stale-checked, both halves read back, exact undo; Live's limits (1-99
+    > over 1/2/4/8/16) refused. Walkthrough dry run on fake Live 35/35. Tick once both rows pass on real Live.
+    > Scenes 2026-09-27: launch by ordinal ("fire the second scene") and by the scene's name ("launch the Chorus
+    > scene"), not just "scene 2". "play the chorus" in a set with a Chorus scene asks scene or Play. Scene launch has no
+    > undo (nothing to put back), as before.
   - [ ] Clips: create, launch, loop, warp, gain, transpose
   - [ ] MIDI note edit · [ ] Automation write
   - [ ] Track create with a scoped undo design

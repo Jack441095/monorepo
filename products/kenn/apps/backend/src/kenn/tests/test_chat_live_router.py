@@ -221,3 +221,19 @@ def test_switching_a_device_off_is_explained_plainly(demo) -> None:
         assert intent["missing_fields"] == ["device_action"]
         assert intent["ambiguity"][0].startswith("KENN can't switch devices on or off yet.")
         assert wants_live_change(text, demo)
+
+
+def test_a_change_asked_after_the_question_is_the_request() -> None:
+    # Round 8 phrasing set (27 Sept 2026): the "should I" made the whole message a question.
+    from kenn.core.fake_live import FakeLiveBackend
+
+    state = FakeLiveBackend().query_session_state()
+    message = ("It feels like it's speeding up. Should I adjust the tempo to 122 BPM? I'm not sure. "
+               "Can you change the tempo to 122?")
+    assert not asks_how_to(message) and wants_live_change(message, state)
+
+
+@pytest.mark.parametrize("message", ["How do I sidechain the bass to the kick? Can you explain it simply.",
+                                     "Should I compress the vocal? Can you tell me why people do that?"])
+def test_asking_for_an_explanation_afterwards_is_still_a_question(message) -> None:
+    assert asks_how_to(message)

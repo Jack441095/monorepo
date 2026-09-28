@@ -176,6 +176,28 @@ class SongHandler(AbletonOSCHandler):
             return (json.dumps(payload),)
         self.osc_server.add_handler("/live/kenn/get/bus_mixer", kenn_get_bus_mixer)
 
+        # Return-track volume, pan and mute (27 Sept 2026). AbletonOSC's track setters address song.tracks only.
+        # KENN confirms, stale-checks and reads back through /live/kenn/get/bus_mixer; this only writes.
+        def kenn_set_return_mixer(params):
+            index, field, value = int(params[0]), str(params[1]), params[2]
+            try:
+                track = self.song.return_tracks[index]
+                if field == "volume":
+                    parameter = track.mixer_device.volume
+                    parameter.value = max(parameter.min, min(parameter.max, float(value)))
+                elif field == "panning":
+                    parameter = track.mixer_device.panning
+                    parameter.value = max(parameter.min, min(parameter.max, float(value)))
+                elif field == "mute":
+                    track.mute = bool(int(value))
+                else:
+                    raise ValueError("field must be volume, panning or mute")
+                payload = {"index": index, "field": field, "ok": True}
+            except Exception as exc:
+                payload = {"index": index, "field": field, "error": str(exc)}
+            return (json.dumps(payload),)
+        self.osc_server.add_handler("/live/kenn/set/return_mixer", kenn_set_return_mixer)
+
         def kenn_get_device_tree(params):
             kind, index = str(params[0]), int(params[1]) if len(params) > 1 else -1
             try:

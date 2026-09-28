@@ -450,7 +450,12 @@ def build_rows(*, variants: int, scenarios: int = 1, include_drafted: bool = Fal
                     label = _real_parameter_indices(label, real)
                     record_text = json.dumps(record_snapshot, ensure_ascii=True, sort_keys=True,
                                              separators=(",", ":"))[:24000]
-                checked = validate_llm_plan(label, record_snapshot)
+                # A relative tempo label needs Live's current tempo to validate. It's checked against one here but not
+                # added to the prompt: only the tempo rows would carry it, and the model could learn "a tempo field
+                # means a tempo change" (C6 run 13).
+                validation_snapshot = ({**record_snapshot, "tempo": 120.0} if label.get("action") == "set_tempo"
+                                       else record_snapshot)
+                checked = validate_llm_plan(label, validation_snapshot)
                 if not checked.get("ok"):
                     raise ValueError(f"Invalid seed label {seed['record_id']} in scenario {scenario_number}: {checked.get('error')}")
                 rows.append({

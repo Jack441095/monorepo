@@ -96,11 +96,26 @@ repository also corrupts it; use branches and pull requests instead.
 
 **What git gives you:** all source, tests, evaluation harnesses and docs. Everything below runs from that alone.
 
-**Without Ableton Live**, KENN runs against a recorded copy of the demo set:
+### Working together (from 27 Sept 2026)
+
+KENN has its own private repository, `Nite-DSP/kenn-app`, split out of the NITE DSP monorepo with its history so a
+collaborator sees only KENN. That repository is where KENN work happens now:
+
+- `main` is protected: nobody pushes to it directly. Make a branch per piece of work (`yourname/what-it-does`), push
+  it, and open a pull request; the other person reviews and merges.
+- Run the checks below before opening a pull request, and keep pull requests small enough to review in one sitting.
+  Two people changing `core/live_intent.py` at once is the usual conflict; pull `main` into your branch often.
+- Tests and evaluations use the fake Live backend. Real Live is used only for release soaks, which the owner runs.
+- `Nite-DSP/kenn` is the older, frozen pre-monorepo repository; don't work there.
+- At each release the owner brings `main` back into the monorepo
+  (`git subtree pull --prefix=products/kenn <kenn remote> main`). Don't change `products/kenn` in the monorepo in
+  between, or the two drift apart.
+
+**Without Ableton Live**, KENN runs against a recorded copy of the demo set. In the `kenn-app` repository run these from
+its root; in the monorepo, from `products/kenn`:
 
 ```bash
 export KENN_LIVE_BACKEND=fake        # the tests set this themselves; nothing touches a real Live set
-cd products/kenn
 PYTHONPATH="apps/backend/src:tooling" python3 -m pytest -q apps/backend/src/kenn/tests
 PYTHONPATH="apps/backend/src:tooling" python3 tooling/scripts/score_natural_phrasings.py tooling/data/natural_*.jsonl
 PYTHONPATH="apps/backend/src:tooling" python3 tooling/scripts/measure_chat_routing.py

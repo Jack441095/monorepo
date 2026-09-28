@@ -1097,3 +1097,29 @@ def test_spelled_out_decibel_unit_parses_on_device_parameters() -> None:
     assert result["action"] == "set_device_parameter"
     assert result["desired_value"] == 18.0
     assert result["unit"] == "db"
+
+
+@pytest.mark.parametrize("request_text, scene_index", [
+    ("fire the second scene", 1),
+    ("play the second scene please", 1),
+    ("launch the Chorus scene", 1),
+    ("play scene drop", 2),
+])
+def test_scenes_by_ordinal_or_by_their_name(request_text, scene_index) -> None:
+    # Only "launch scene 2" worked before 27 Sept 2026; "fire the second scene" got "no track found".
+    from kenn.core.fake_live import FakeLiveBackend
+
+    state = FakeLiveBackend().query_session_state()
+    state["scenes"] = [{"index": 0, "name": "Intro"}, {"index": 1, "name": "Chorus"}, {"index": 2, "name": "Drop"}]
+    parsed = parse_request(request_text, state)
+    assert parsed["action"] == "launch_scene" and parsed["scene"]["index"] == scene_index
+
+
+def test_play_with_a_scene_name_asks_scene_or_transport() -> None:
+    from kenn.core.fake_live import FakeLiveBackend
+
+    state = FakeLiveBackend().query_session_state()
+    state["scenes"] = [{"index": 0, "name": "Chorus"}]
+    parsed = parse_request("play the chorus", state)
+    assert parsed["action"] is None and parsed["missing_fields"] == ["transport_target"]
+    assert parse_request("play the chorus", FakeLiveBackend().query_session_state())["action"] == "transport_play"

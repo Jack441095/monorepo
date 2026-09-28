@@ -86,8 +86,6 @@ def test_roar_and_multiband_dynamics_are_recognised(snapshot) -> None:
 
 
 @pytest.mark.parametrize("request_text, expected", [
-    ("mute a-reverb", "A-Reverb is a return track"),
-    ("set the volume of the return track b to minus fifteen db", "return track"),
     ("set the send on the hats to delay at minus ten dee bee", "Send level must be 0–100%"),
 ])
 def test_what_kenn_cannot_change_yet_says_so(snapshot, request_text, expected) -> None:
@@ -100,3 +98,13 @@ def test_two_names_for_one_track_are_one_change() -> None:
 
     # "snare and clap" is the one Snare / Clap track: it used to become a two-step recipe muting it twice.
     assert parse_natural_recipe("mute the snare and clap", FakeLiveBackend().query_session_state()) is None
+
+
+@pytest.mark.parametrize("request_text, action, value", [
+    ("mute a-reverb", "set_return_mute", True),
+    ("set the volume of the return track b to minus fifteen db", "set_return_volume", -15.0),
+])
+def test_dictated_return_track_changes(snapshot, request_text, action, value) -> None:
+    # Both said KENN couldn't change return tracks before 27 Sept 2026.
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == action and parsed["desired_value"] == value and not parsed["missing_fields"]

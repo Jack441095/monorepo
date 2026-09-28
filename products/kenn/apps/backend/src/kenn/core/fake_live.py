@@ -61,6 +61,9 @@ class FakeLiveBackend:
         self._session = copy.deepcopy(fixture["session"])
         self._session.update({"status": "connected", "backend": "fake", "host": "fake", "port": 0})
         self._returns = copy.deepcopy(fixture.get("return_tracks") or [])
+        # Return-track mixers, for the fixtures that didn't record them: -14 dB (fader 0.5), centre, unmuted.
+        self._return_mixers = {int(r.get("index", i)): {"volume": 0.5, "panning": 0.0, "mute": False}
+                               for i, r in enumerate(self._returns)}
         self._devices: dict[tuple[int, int], dict[str, Any]] = {}
         for key, info in (fixture.get("devices") or {}).items():
             track_index, device_index = (int(part) for part in key.split(":"))
@@ -194,6 +197,11 @@ class FakeLiveBackend:
 
     def get_bus_mixer(self, kind: str, index: int = -1) -> dict[str, Any]:
         recorded = self._world(f"bus_mixer:{kind}:{int(index)}")
+        if recorded is None and kind == "return" and int(index) in self._return_mixers:
+            with self._lock:
+                ret = next(r for r in self._returns if int(r.get("index", -1)) == int(index))
+                return {"success": True, "kind": "return", "index": int(index), "name": ret.get("name", ""),
+                        "devices": list(ret.get("devices") or []), "solo": False, **self._return_mixers[int(index)]}
         if recorded is None:
             return {"success": False, "error": "Not in the fake Live fixture; re-record after deploying AbletonOSC."}
         return {"success": True, **recorded}
@@ -488,6 +496,27 @@ class FakeLiveBackend:
     def stop_playback(self) -> bool:
         with self._lock:
             self._session["is_playing"] = False
+            return True
+
+    def set_return_mixer(self, index: int, field: str, value: float | bool) -> bool:
+        with self._lock:
+            mixer = self._return_mixers.get(int(index))
+            if mixer is None or field not in mixer:
+                return False
+            mixer[field] = bool(value) if field == "mute" else max(-1.0 if field == "panning" else 0.0, min(1.0, float(value)))
+            self.writes.append(("set_return_mixer", int(index), field, mixer[field]))
+            return True
+
+    def set_time_signature(self, numerator: int, denominator: int) -> bool:
+        with self._lock:
+            self._session.update(signature_numerator=int(numerator), signature_denominator=int(denominator))
+            self.writes.append(("set_time_signature", int(numerator), int(denominator)))
+            return True
+
+    def set_tempo(self, bpm: float) -> bool:
+        with self._lock:
+            self._session["tempo"] = max(20.0, min(999.0, float(bpm)))  # the real bridge clamps the same way
+            self.writes.append(("set_tempo", float(bpm)))
             return True
 
 

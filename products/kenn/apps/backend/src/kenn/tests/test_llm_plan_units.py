@@ -76,3 +76,65 @@ def test_parameter_evidence_only_for_device_requests(query, expected) -> None:
     snapshot = fake.query_session_state()
     enriched = _llm_planner_snapshot(LiveActionService(fake), snapshot, parse_request(query, snapshot))
     assert ("planner_capabilities" in enriched) is expected
+
+
+PAN_SNAPSHOT = {"tracks": [{"index": 0, "name": "Kick", "pan": 0.0}, {"index": 1, "name": "Synth", "pan": 0.9}],
+                "return_tracks": [{"index": 0, "name": "A-Reverb"}]}
+
+
+@pytest.mark.parametrize("fields, expected", [
+    ({"value": -30.0, "unit": "%"}, -0.3),
+    ({"value": 100.0, "unit": "percent"}, 1.0),
+    ({"value": -20.0, "unit": "%", "relative": True, "track_index": 1, "track_name": "Synth"}, 0.7),
+])
+def test_pan_in_percent_converts_like_the_rule_parser(fields, expected) -> None:
+    plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_pan", "track_index": 0, "track_name": "Kick", **fields}
+    checked = validate_llm_plan(plan, PAN_SNAPSHOT)
+    assert checked["ok"], checked
+    assert checked["plan"]["value"] == pytest.approx(expected) and checked["plan"]["unit"] == "normalized"
+    assert checked["plan"]["relative"] is False
+
+
+def test_a_percent_pan_past_hard_right_is_rejected() -> None:
+    plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_pan", "track_index": 1, "track_name": "Synth",
+            "value": 20.0, "unit": "%", "relative": True}
+    checked = validate_llm_plan(plan, PAN_SNAPSHOT)
+    assert not checked["ok"] and "hard right" in checked["error"]
+
+
+def test_a_send_in_percent_is_converted() -> None:
+    plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_send", "track_index": 0, "track_name": "Kick",
+            "return_track_index": 0, "return_track_name": "A-Reverb", "value": 20.0, "unit": "%", "relative": False}
+    checked = validate_llm_plan(plan, PAN_SNAPSHOT)
+    assert checked["ok"], checked
+    assert checked["plan"]["value"] == pytest.approx(0.2) and checked["plan"]["unit"] == "normalized"
+
+
+def test_a_send_over_100_percent_is_rejected() -> None:
+    plan = {"schema": "kenn.ableton_llm_plan.v1", "action": "set_send", "track_index": 0, "track_name": "Kick",
+            "return_track_index": 0, "return_track_name": "A-Reverb", "value": 120.0, "unit": "%"}
+    assert not validate_llm_plan(plan, PAN_SNAPSHOT)["ok"]
+
+
+SONG_SNAPSHOT = {"tracks": [{"index": 0, "name": "Kick"}], "tempo": 120.0}
+
+
+@pytest.mark.parametrize("fields, expected", [
+    ({"action": "set_tempo", "value": 124, "unit": "bpm"}, 124.0),
+    ({"action": "set_tempo", "value": -4, "unit": "bpm", "relative": True}, 116.0),
+    ({"action": "set_time_signature", "value": "6/8"}, {"numerator": 6, "denominator": 8}),
+])
+def test_the_planner_can_state_tempo_and_signature_in_musical_units(fields, expected) -> None:
+    checked = validate_llm_plan({"schema": "kenn.ableton_llm_plan.v1", **fields}, SONG_SNAPSHOT)
+    assert checked["ok"], checked
+    assert checked["plan"]["value"] == expected and checked["plan"]["relative"] is False
+
+
+@pytest.mark.parametrize("fields", [
+    {"action": "set_tempo", "value": 1200},
+    {"action": "set_tempo", "value": 124, "track_index": 0, "track_name": "Kick"},
+    {"action": "set_time_signature", "value": "4/3"},
+    {"action": "set_time_signature", "value": 3},
+])
+def test_song_plans_outside_lives_limits_or_with_a_track_are_rejected(fields) -> None:
+    assert not validate_llm_plan({"schema": "kenn.ableton_llm_plan.v1", **fields}, SONG_SNAPSHOT)["ok"]

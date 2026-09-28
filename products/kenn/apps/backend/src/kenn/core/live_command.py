@@ -62,6 +62,7 @@ TRACK_ACTIONS = {"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "re
 TRACK_CREATION_ACTIONS = {"create_midi_track", "create_audio_track"}
 RETURN_TRACK_CREATION_ACTIONS = set(SUPPORTED_RETURN_TRACK_CREATION_ACTIONS)
 TRANSPORT_ACTIONS = {"transport_play", "transport_stop"}
+SONG_ACTIONS = {"set_tempo", "set_time_signature"}
 VIEW_ACTIONS = {"focus_track", "focus_device"}
 LLM_PLAN_FIELDS = frozenset({
     "schema", "action", "track_index", "track_name", "device_index", "device_name",
@@ -74,7 +75,7 @@ LLM_PLAN_FIELDS = frozenset({
 
 LLM_PLAN_ACTIONS = frozenset(
     TRACK_ACTIONS | TRACK_CREATION_ACTIONS | RETURN_TRACK_CREATION_ACTIONS | VIEW_ACTIONS | TRANSPORT_ACTIONS
-    | DEVICE_PARAMETER_ACTIONS | {
+    | SONG_ACTIONS | DEVICE_PARAMETER_ACTIONS | {
         "inspect_tracks", "inspect_devices", "inspect_device_parameters", "clarify", "insert_device",
         "insert_device_with_parameter", "duplicate_clip", "rename_clip", "set_send", "add_locator",
         "remove_locator", "set_eq_band_gain", "set_eq_band_tuning_gain", "recipe",
@@ -266,6 +267,47 @@ def _track_by_index(snapshot: dict[str, Any], index: int, name: str = "") -> dic
     return matches[0]
 
 
+def _song_plan(plan: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, Any]:
+    """A planner's tempo in BPM (absolute or relative) or time signature as "3/4", checked against Live's limits."""
+    value = plan.get("value")
+    if plan.get("action") == "set_time_signature":
+        match = re.fullmatch(r"\s*(\d{1,2})\s*/\s*(\d{1,2})\s*", str(value or ""))
+        if match is None or plan.get("relative"):
+            return {"ok": False, "error": "A time-signature plan needs an absolute value like \"3/4\"."}
+        numerator, denominator = int(match.group(1)), int(match.group(2))
+        if not 1 <= numerator <= 99 or denominator not in (1, 2, 4, 8, 16):
+            return {"ok": False, "error": f"Live can't take {numerator}/{denominator} as a time signature."}
+        return {"ok": True, "plan": dict(plan, value={"numerator": numerator, "denominator": denominator},
+                                         unit="time_signature", relative=False)}
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(float(value)):
+        return {"ok": False, "error": "A tempo plan needs a numeric BPM value."}
+    if str(plan.get("unit") or "bpm").strip().lower() not in {"bpm", ""}:
+        return {"ok": False, "error": "A tempo plan must use 'bpm' as its unit."}
+    bpm = float(value)
+    if plan.get("relative"):
+        current = snapshot.get("tempo")
+        if isinstance(current, bool) or not isinstance(current, (int, float)):
+            return {"ok": False, "error": "A relative tempo change needs Live's current tempo in the snapshot."}
+        bpm += float(current)
+    if not 20.0 <= bpm <= 999.0:
+        return {"ok": False, "error": "That tempo is outside Live's 20 to 999 BPM."}
+    return {"ok": True, "plan": dict(plan, value=round(bpm, 3), unit="bpm", relative=False)}
+
+
+def _pan_percent_to_normalized(plan: dict[str, Any], snapshot: dict[str, Any], track_index: int,
+                               track_name: str) -> dict[str, Any]:
+    """A planner's pan in % (-100 left .. 100 right), absolute or added to the track's current pan."""
+    value = float(plan["value"]) / 100.0
+    if plan.get("relative"):
+        current = (_track_by_index(snapshot, track_index, track_name) or {}).get("pan")
+        if isinstance(current, bool) or not isinstance(current, (int, float)):
+            return {"ok": False, "error": "A relative pan change needs the track's current pan in the snapshot."}
+        value += float(current)
+    if not -1.0 <= value <= 1.0:
+        return {"ok": False, "error": "That pan is past hard left or hard right (-100% to 100%)."}
+    return {"ok": True, "plan": dict(plan, value=round(value, 6), unit="normalized", relative=False)}
+
+
 def _volume_db_to_normalized(plan: dict[str, Any], snapshot: dict[str, Any], track_index: int,
                              track_name: str) -> dict[str, Any]:
     """Convert a planner's dB volume into KENN's normalized value.
@@ -417,6 +459,14 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
         if unit not in {"", "beats"}:
             return {"ok": False, "error": f"A {action} plan must use beats as its unit."}
         return {"ok": True, "plan": dict(plan)}
+    if action in SONG_ACTIONS:
+        rejected = _reject(
+            ("track_index", "track_name", "device_index", "device_name", "insertion_index", "parameter_index", "parameter_name", "frequency_hz", "eq_band", "locator_name"),
+            "A tempo or time-signature plan contains track or device fields",
+        )
+        if rejected:
+            return rejected
+        return _song_plan(plan, snapshot)
     if action in TRACK_CREATION_ACTIONS:
         rejected = _reject(
             ("track_index", "track_name", "device_index", "device_name", "parameter_index", "parameter_name", "value", "relative", "unit", "frequency_hz", "eq_band", "locator_name"),
@@ -467,12 +517,19 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
         if isinstance(plan.get("value"), bool) or not isinstance(plan.get("value"), (int, float)):
             return {"ok": False, "error": "A send plan must contain a finite numeric normalized value."}
         value = float(plan.get("value"))
-        if not math.isfinite(value) or not 0.0 <= value <= 1.0:
-            return {"ok": False, "error": "A send plan value must be within normalized range 0.0 to 1.0."}
+        in_percent = str(plan.get("unit") or "").strip().lower() in {"%", "percent"}
+        if not math.isfinite(value) or not 0.0 <= value <= (100.0 if in_percent else 1.0):
+            return {"ok": False, "error": "A send plan value must be within normalized range 0.0 to 1.0 (0 to 100 in %)."}
         if bool(plan.get("relative")):
             return {"ok": False, "error": "Send control accepts an absolute normalized value only."}
-        if str(plan.get("unit") or "").strip().lower() not in {"", "normalized"}:
-            return {"ok": False, "error": "A send plan must use 'normalized' as its unit."}
+        unit = str(plan.get("unit") or "").strip().lower()
+        if unit in {"%", "percent"}:
+            # "send the vocal to the reverb at 20%": the user's number, converted here rather than by the model.
+            if not 0.0 <= value <= 100.0:
+                return {"ok": False, "error": "A send plan in % must be within 0 to 100."}
+            return {"ok": True, "plan": dict(plan, value=round(value / 100.0, 6), unit="normalized")}
+        if unit not in {"", "normalized"}:
+            return {"ok": False, "error": "A send plan must use 'normalized' or '%' as its unit."}
         return {"ok": True, "plan": dict(plan)}
     if action == "rename_clip":
         rejected = _reject(
@@ -604,6 +661,11 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
             unit = str(plan.get("unit") or "").strip().lower()
             if action == "set_volume" and unit in {"db", "decibel", "decibels"}:
                 converted = _volume_db_to_normalized(plan, snapshot, track_index, track_name)
+                if not converted.get("ok"):
+                    return converted
+                plan, unit = converted["plan"], "normalized"
+            if action == "set_pan" and unit in {"%", "percent"}:
+                converted = _pan_percent_to_normalized(plan, snapshot, track_index, track_name)
                 if not converted.get("ok"):
                     return converted
                 plan, unit = converted["plan"], "normalized"
@@ -1338,6 +1400,10 @@ def _format_pan(value: Any) -> str:
     return f"{percent}% {'left' if value < 0 else 'right'}"
 
 
+def _values_match_bpm(before: Any, after: Any) -> bool:
+    return isinstance(before, (int, float)) and isinstance(after, (int, float)) and abs(float(before) - float(after)) < 1e-3
+
+
 def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, kind: str) -> dict[str, Any]:
     _update_lifecycle(
         response,
@@ -1535,6 +1601,18 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
             "intent": {"action": proposal.get("action"), "track": target, "eq_band": proposal.get("eq_band")},
         })
         return response
+    if kind == "tempo":
+        response.update({
+            "status": "confirmation_required",
+            "answer": (f"I can change the {proposal.get('parameter') or 'tempo'} from {proposal.get('before_display')} to "
+                       f"{proposal.get('after_display')}. "
+                       "Nothing has changed. Confirm this exact proposal to apply it."),
+            "proposal": proposal,
+            "confirmation_required": True,
+            "proposal_kind": kind,
+            "intent": {"action": proposal.get("action"), "value": proposal.get("after"), "unit": "bpm"},
+        })
+        return response
     if kind == "scene":
         scene_number = int(proposal.get("scene_index", -1)) + 1
         scene_name = str(proposal.get("scene_name", "")) or "unnamed"
@@ -1669,7 +1747,8 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
     else:
         target_label = f"'{target}'"
     action = str(proposal.get("action") or "")
-    toggles = {"set_mute": ("mute", "unmute"), "set_solo": ("solo", "unsolo"), "set_arm": ("arm", "disarm")}
+    toggles = {"set_mute": ("mute", "unmute"), "set_solo": ("solo", "unsolo"), "set_arm": ("arm", "disarm"),
+               "set_return_mute": ("mute", "unmute")}
     if action in toggles and isinstance(proposal.get("after"), bool):
         change = f"I can {toggles[action][0 if proposal['after'] else 1]} {target_label}."
     elif action == "rename_track":
@@ -3062,7 +3141,7 @@ def _handle_command_impl(
             return _clarification(response, intent, str(intent["ambiguity"][0]))
         if intent.get("action") is None:
             return _clarification(response, intent, NOT_A_CHANGE)
-        if set(intent.get("missing_fields") or []) & {"valid_volume", "parameter"} and intent.get("ambiguity"):
+        if set(intent.get("missing_fields") or []) & {"valid_volume", "parameter", "which_track", "amount", "which_change"} and intent.get("ambiguity"):
             # A limit ("above 0 dB") or one plain question ("which Compressor setting?") reads best on its own.
             return _clarification(response, intent, str(intent["ambiguity"][0]))
         if intent.get("action") in {"insert_device", "insert_device_with_parameter"}:
@@ -3246,6 +3325,35 @@ def _handle_command_impl(
         proposal = result["proposal"]
         unchanged = already_there(action, str(proposal.get("track_name") or ""), proposal.get("before"), proposal.get("after"))
         return _clarification(response, intent, unchanged) if unchanged else _proposal_response(response, proposal, kind="track")
+    if action in {"set_return_volume", "set_return_pan", "set_return_mute"}:
+        result = live.propose_return_mixer_action(
+            action, return_index=int(intent.get("return_track_index", -1)),
+            return_name=str(intent.get("return_track_name") or ""), value=intent.get("desired_value"),
+            relative_db=intent.get("relative_db"), session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a return-track proposal."))
+        proposal = result["proposal"]
+        unchanged = already_there(action.replace("_return", ""), str(proposal.get("track_name") or ""),
+                                  proposal.get("before"), proposal.get("after"))
+        return _clarification(response, intent, unchanged) if unchanged else _proposal_response(response, proposal, kind="track")
+    if action == "set_time_signature":
+        signature = intent.get("desired_value") or {}
+        result = live.propose_time_signature_action(int(signature.get("numerator", 0)), int(signature.get("denominator", 0)),
+                                                    session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live time-signature proposal."))
+        proposal = result["proposal"]
+        if proposal.get("before") == proposal.get("after"):
+            return _clarification(response, intent, f"The time signature is already {proposal['after_display']}. Nothing changed.")
+        return _proposal_response(response, proposal, kind="tempo")
+    if action == "set_tempo":
+        result = live.propose_tempo_action(float(intent.get("desired_value")), session_id=response["session_id"])
+        if not result.get("ok"):
+            return _clarification(response, intent, result.get("error", "I could not create a Live tempo proposal."))
+        proposal = result["proposal"]
+        if _values_match_bpm(proposal.get("before"), proposal.get("after")):
+            return _clarification(response, intent, f"The tempo is already {float(proposal['after']):g} BPM. Nothing changed.")
+        return _proposal_response(response, proposal, kind="tempo")
     if action == "transport_play" or action == "transport_stop":
         result = live.propose_transport_action(action, session_id=response["session_id"])
         return _proposal_response(response, result["proposal"], kind="transport") if result.get("ok") else _clarification(response, intent, result.get("error", "I could not create a Live proposal."))

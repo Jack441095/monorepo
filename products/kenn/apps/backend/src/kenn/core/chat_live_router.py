@@ -31,11 +31,16 @@ _HOW_TO = re.compile(
 )
 # Missing fields that still mean the parser found a Live change: the cached snapshot lacks the current fader level, or
 # a send was named without an amount.
-LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount", "negated", "deferred", "device_action"})
+LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount", "negated", "deferred", "device_action",
+                                 "return_track_action"})
 
 
 def asks_how_to(text: str) -> bool:
-    return bool(_HOW_TO.search(str(text or "")))
+    from kenn.core.live_intent import LATER_CHANGE_REQUEST
+
+    text = str(text or "")
+    found = _HOW_TO.search(text)
+    return bool(found) and not LATER_CHANGE_REQUEST.search(text[found.end():])
 
 
 def wants_live_change(text: str, snapshot: dict[str, Any] | None) -> bool:

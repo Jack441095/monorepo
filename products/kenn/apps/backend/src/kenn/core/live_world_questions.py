@@ -33,8 +33,9 @@ def _question_kind(lower: str) -> str | None:
     if re.search(r"\btrack\s*#?\s*\d+\b", lower):
         return None
     if re.search(r"\bwhat(?:'s| is| are)\b.*\bon\b.*\b(?:track|bus|return|master|channel)\b", lower) or re.search(
-        r"\bwhat(?:'s| is)\s+on\s+(?:the\s+)?\S", lower
-    ):
+        r"\bwhat(?:'s| is)\s+on\s+(?:the\s+)?\S|\bwhat(?:'s| is)\s+in\s+(?:the\s+)?(?:return\s+[a-h]\b|[a-h]-\w)", lower
+    ) or re.search(r"\b(?:which|what)\s+(?:devices?|plugins?|plug-ins?|effects?)\s+(?:are|is)\s+(?:on|in)\b", lower):
+        # "which devices are on the B-Delay", "what's in return B" (27 Sept 2026) got "no track found".
         return "chain_contents"
     return None
 
@@ -54,6 +55,12 @@ def _resolve_bus(lower: str, model: dict[str, Any]) -> dict[str, Any] | None:
         if model.get("master"):
             return {"kind": "master", "entity": model["master"]}
         return {"unavailable": "master"}
+    letter = re.search(r"\breturn\s+([a-h])\b", lower)
+    if letter:
+        # Live letters its returns: "return B" is the one named "B-…".
+        lettered = [r for r in model.get("returns", []) if str(r.get("name", "")).casefold().startswith(letter.group(1) + "-")]
+        if len(lettered) == 1:
+            return {"kind": "return", "entity": lettered[0]}
     asked = _words(lower)
     candidates = [("return", r) for r in model.get("returns", [])] + [("track", t) for t in model["tracks"]]
     scored = []

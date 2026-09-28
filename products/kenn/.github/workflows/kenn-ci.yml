@@ -1,0 +1,66 @@
+# CI for the standalone KENN repository (Nite-DSP/kenn-app), where this folder is the repository root. In the NITE DSP
+# monorepo GitHub reads only the root .github/, so this file does nothing there; kenn-core.yml covers the same checks.
+name: KENN CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Backend and scoped services
+    runs-on: macos-14
+    timeout-minutes: 20
+    env:
+      KENN_LIVE_BACKEND: fake
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: apps/backend/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r apps/backend/requirements.txt
+
+      - name: Run core verification
+        run: PYTHON=python bash tooling/scripts/ci_verification.sh
+
+  frontend:
+    name: Frontend clean install, audit, test, and build
+    runs-on: macos-14
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/frontend/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Build production client
+        run: npm run build

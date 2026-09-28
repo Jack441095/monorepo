@@ -30,9 +30,10 @@ def test_world_model_from_recorded_fixture_marks_missing_sections_unavailable() 
     assert model["tracks"][3]["device_tree"][0]["name"] == "Compressor"
     assert [r["name"] for r in model["returns"]] == ["A-Reverb", "B-Delay"]
     assert model["master"] is None
-    assert model["availability"]["master"] is False and model["availability"]["return_mixers"] is False
+    assert model["availability"]["master"] is False
     assert model["availability"]["track_sends"] is True
-    assert "volume" not in model["returns"][0]
+    # The fake models return mixers since return changes became Live actions (27 Sept 2026): -14 dB, centre, unmuted.
+    assert model["availability"]["return_mixers"] is True and model["returns"][0]["volume"] == 0.5
 
 
 def test_world_model_includes_returns_master_and_rack_chains_when_recorded(tmp_path) -> None:
