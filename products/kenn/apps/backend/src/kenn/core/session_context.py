@@ -745,7 +745,7 @@ def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict
         return str(state["last_command"]), {"resolution": "repeat_last_action", "original": original}
     if re.fullmatch(r"(?:please\s+)?undo(?:\s+that|\s+it)?[.!]?", lower):
         return "undo", {"resolution": "undo_last_receipt", "original": original}
-    if re.fullmatch(r"(?:no[,\s]+)?(?:the\s+)?other\s+one[.!]?", lower):
+    if re.fullmatch(r"(?:(?:no|nope|sorry|oops|actually|wait)\b[\s,.!-]*)*(?:not\s+(?:that|this)\s+one[,\s]+)?(?:the\s+)?other\s+(?:one|track|device)(?:\s+instead)?[.!?]*", lower):
         return original, {
             "resolution": "correction_requires_clarification",
             "original": original,

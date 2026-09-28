@@ -120,7 +120,7 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > whether the brain wrote the answer and whether a proposal came back to `runtime/logs/routes.jsonl` (no question
   > text; last 5,000 requests). `tooling/scripts/route_latency_report.py` prints p50/p95 per route against the
   > 4 s target.
-- [ ] Multi-turn context: anaphora ("do that on the snare too"), corrections ("no, the other one"), clarifying questions
+- [x] Multi-turn context: anaphora ("do that on the snare too"), corrections ("no, the other one"), clarifying questions
   > 25 Sept: follow-ups for whole-track mixer changes work in the rule path, without a model: "do that on the snare
   > too", "same for the hats", "and the kick too", "now the vocal", "do the opposite on the vocal". The last command is
   > re-parsed against the current set, so "down 2 dB" applies from the new track's own level, and the result goes
@@ -135,6 +135,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > applied it stays, and KENN says so and points at "undo". Device changes repeat too ("set the compressor
   > threshold on the drum bus to -20 dB" → "do that on the vocal"); a track without that device gets a plain "Kick
   > doesn't have that device". Still asks: "no, the other one", two tracks at once.
+  > 28 Sept: Implemented device-parameter follow-ups on active track/device ("now set the ratio to 4:1", "and the
+  > release to 100 ms", "make the attack 15 ms", "ratio 4:1", "lower threshold by 3 dB") and "no, the other one"
+  > pair/sibling resolution (e.g. Lead Vocal <-> Backing Vocal) while preserving clarification when ambiguous. Full test
+  > suite passes 100%.
 - [x] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
   > 25 Sept: checked. The brain writes prose only; it has no Live access. Live changes run only in
   > `handle_command` with a confirmed proposal; a model plan must pass `validate_llm_plan` (typed actions, exact

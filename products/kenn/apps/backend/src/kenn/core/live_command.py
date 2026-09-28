@@ -2458,6 +2458,110 @@ def _correction_command(command: str, session_id: str, snapshot: dict[str, Any])
     return (corrected, str(prior_track.get("name") or "")) if corrected else None
 
 
+def _resolve_other_target(session_id: str, snapshot: dict[str, Any]) -> tuple[str, str] | None:
+    """Resolve "no, the other one" to the alternative track or device when an unambiguous pair exists."""
+    from kenn.core.session_context import live_conversation_context
+
+    ctx = live_conversation_context(session_id)
+    prior_text = str(ctx.get("last_command") or "")
+    if not prior_text:
+        return None
+    prior = parse_request(prior_text, snapshot)
+    if prior.get("action") not in _REPEATABLE_ACTIONS or prior.get("missing_fields"):
+        return None
+
+    tracks = [t for t in (snapshot.get("tracks") or []) if isinstance(t, dict)]
+    prior_track = prior.get("track") if isinstance(prior.get("track"), dict) else {}
+    last_track_name = str(prior_track.get("name") or ctx.get("last_track") or "")
+
+    # Check track alternative first
+    if last_track_name and tracks:
+        other_tracks = [t for t in tracks if str(t.get("name", "")).strip().casefold() != last_track_name.strip().casefold()]
+        candidate_track = None
+        if len(tracks) == 2 and len(other_tracks) == 1:
+            candidate_track = other_tracks[0]
+        else:
+            words = [w.casefold() for w in re.findall(r"[a-zA-Z0-9]+", last_track_name) if len(w) >= 3 and w.casefold() not in {"track", "channel", "the"}]
+            candidates = []
+            for t in other_tracks:
+                t_words = [w.casefold() for w in re.findall(r"[a-zA-Z0-9]+", str(t.get("name", "")))]
+                if set(words) & set(t_words):
+                    candidates.append(t)
+            if len(candidates) == 1:
+                candidate_track = candidates[0]
+        if candidate_track:
+            target_name = str(candidate_track.get("name") or "")
+            corrected = _repeat_on(prior, target_name)
+            if corrected:
+                return (corrected, last_track_name)
+
+    # Check device alternative if track didn't have an other one or action was device parameter
+    last_device_name = str((prior.get("device") or {}).get("name") or ctx.get("last_device") or "")
+    if last_device_name and last_track_name:
+        matching_track = next((t for t in tracks if str(t.get("name", "")).strip().casefold() == last_track_name.strip().casefold()), None)
+        if matching_track and isinstance(matching_track.get("devices"), list):
+            devices = [d for d in matching_track["devices"] if isinstance(d, dict)]
+            other_devs = [d for d in devices if str(d.get("name", "")).strip().casefold() != last_device_name.strip().casefold()]
+            candidate_dev = None
+            if len(devices) == 2 and len(other_devs) == 1:
+                candidate_dev = other_devs[0]
+            else:
+                words = [w.casefold() for w in re.findall(r"[a-zA-Z0-9]+", last_device_name) if len(w) >= 3 and w.casefold() not in {"device", "audio", "effect"}]
+                candidates = []
+                for d in other_devs:
+                    d_words = [w.casefold() for w in re.findall(r"[a-zA-Z0-9]+", str(d.get("name", "")))]
+                    if set(words) & set(d_words):
+                        candidates.append(d)
+                if len(candidates) == 1:
+                    candidate_dev = candidates[0]
+            if candidate_dev:
+                dev_name = str(candidate_dev.get("name") or "")
+                corrected = re.sub(re.escape(last_device_name), dev_name, prior_text, count=1, flags=re.I)
+                if corrected != prior_text:
+                    return (corrected, last_device_name)
+    return None
+
+
+def _device_parameter_follow_up(command: str, session_id: str, snapshot: dict[str, Any]) -> str | None:
+    """Resolve follow-up parameter adjustments on the active track and device ("now set ratio to 4:1")."""
+    from kenn.core.session_context import live_conversation_context
+
+    ctx = live_conversation_context(session_id)
+    last_track = str(ctx.get("last_track") or "")
+    last_device = str(ctx.get("last_device") or "")
+    if not last_track or not last_device:
+        return None
+
+    tracks = [t for t in (snapshot.get("tracks") or []) if isinstance(t, dict)]
+    track = next((t for t in tracks if str(t.get("name", "")).casefold() == last_track.casefold()), None)
+    if not track:
+        return None
+    devices = [str(d.get("name", "")) for d in (track.get("devices") or []) if isinstance(d, dict)]
+    if not any(d.casefold() == last_device.casefold() for d in devices):
+        return None
+
+    clean = re.sub(r"^(?:now|and|also|then|next|plus)\s+", "", command.strip(), flags=re.I)
+    make_m = re.match(r"^make\s+(?:the\s+)?(.+?)\s+to\s+(.+)$", clean, re.I) or re.match(r"^make\s+(?:the\s+)?(.+?)\s+([-+]?\d.*)$", clean, re.I)
+    if make_m:
+        clean = f"set {make_m.group(1)} to {make_m.group(2)}"
+
+    candidates = [
+        f"{clean} on the {last_device} on {last_track}",
+        f"{command} on {last_track}",
+    ]
+    if not re.match(r"^(?:set|lower|raise|turn|boost|reduce|back)\b", clean, re.I):
+        candidates.append(f"set {clean} on the {last_device} on {last_track}")
+        m = re.match(r"^([\w\s]+?)\s+to\s+(.+)$", clean, re.I) or re.match(r"^([\w\s]+?)\s+([-+]?\d+(?:\.\d+)?\s*(?::1|%|ms|db|hz|khz)?)$", clean, re.I)
+        if m:
+            candidates.append(f"set {m.group(1)} to {m.group(2)} on the {last_device} on {last_track}")
+
+    for candidate in candidates:
+        parsed = parse_request(candidate, snapshot)
+        if parsed.get("action") == "set_device_parameter" and parsed.get("confirmation_required") and not parsed.get("missing_fields") and not parsed.get("ambiguity"):
+            return candidate
+    return None
+
+
 PENDING_QUESTION_SECONDS = 300
 
 
@@ -2706,11 +2810,22 @@ def _handle_command_impl(
                 return _proposal_response(response, undo["proposal"], kind="undo")
             return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))
         if context_resolution.get("resolution") == "correction_requires_clarification":
-            return _clarification(
-                response,
-                {"action": "correct_target"},
-                "I can correct the target, but 'the other one' is not an exact identity. Name the track or device you mean.",
-            )
+            other = _resolve_other_target(response["session_id"], _command_snapshot(live, include_mixer=True))
+            if other:
+                from kenn.core.session_context import live_conversation_context
+
+                response["resolved_command"], replaced = other
+                response["context_resolution"] = {
+                    "resolution": "correction", "original": clean_command, "replaces_track": replaced,
+                    "previous_applied": live_conversation_context(response["session_id"]).get("confirmation_status") == "confirmed",
+                }
+                clean_command = other[0]
+            else:
+                return _clarification(
+                    response,
+                    {"action": "correct_target"},
+                    "I can correct the target, but 'the other one' is not an exact identity. Name the track or device you mean.",
+                )
         if context_resolution.get("resolution") == "contextual_direction_requires_value":
             track_name = str(context_resolution.get("track") or "")
             device_name = str(context_resolution.get("device") or "")
@@ -2943,6 +3058,12 @@ def _handle_command_impl(
                 response["resolved_command"] = completed
                 response["context_resolution"] = {"resolution": "answered_question", "original": typed}
                 clean_command = completed
+            else:
+                param_follow_up = _device_parameter_follow_up(typed, response["session_id"], snapshot)
+                if param_follow_up:
+                    response["resolved_command"] = param_follow_up
+                    response["context_resolution"] = {"resolution": "device_parameter_follow_up", "original": typed}
+                    clean_command = param_follow_up
         # Re-parse either way: the mixer was just read, and an unresolved relative change needs its fader value.
         deterministic_intent = parse_request(clean_command, snapshot)
         repeated = (response.get("context_resolution") or {}).get("resolution") in {"follow_up", "correction"}

@@ -103,3 +103,34 @@ def test_a_track_without_the_device_gets_a_straight_answer(say) -> None:
     result = say("and the kick")
     assert result["status"] == "clarification_required"
     assert "Kick doesn't have that device" in result["answer"]
+
+
+def test_device_parameter_follow_up_on_same_track_and_device(say) -> None:
+    say("set the compressor threshold on the drum bus to -20 dB")
+
+    r_ratio = say("now set the ratio to 4:1")
+    assert r_ratio["status"] == "confirmation_required"
+    assert r_ratio["proposal"]["track_name"] == "Drum Bus"
+    assert r_ratio["proposal"]["device_name"] == "Compressor"
+    assert r_ratio["proposal"]["parameter"] == "Ratio"
+    assert r_ratio["proposal"]["after_display"] == "4.0:1"
+
+    r_release = say("and the release to 100 ms")
+    assert r_release["status"] == "confirmation_required"
+    assert r_release["proposal"]["parameter"] == "Release"
+    assert r_release["proposal"]["after_display"] == "100.0 ms"
+
+    r_attack = say("make the attack 15 ms")
+    assert r_attack["status"] == "confirmation_required"
+    assert r_attack["proposal"]["parameter"] == "Attack"
+    assert r_attack["proposal"]["after_display"] == "15.0 ms"
+
+    r_shorthand = say("ratio 4:1")
+    assert r_shorthand["status"] == "confirmation_required"
+    assert r_shorthand["proposal"]["parameter"] == "Ratio"
+
+    r_relative = say("lower threshold by 3 dB")
+    assert r_relative["status"] == "confirmation_required"
+    assert r_relative["proposal"]["parameter"] == "Threshold"
+    assert r_relative["proposal"]["after"] < r_relative["proposal"]["before"]
+

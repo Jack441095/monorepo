@@ -58,3 +58,34 @@ def test_an_applied_change_is_left_alone_and_the_answer_says_so(live) -> None:
 def test_unclear_corrections_still_ask(live, reply) -> None:
     live("Bring the bass down 2 dB")
     assert live(reply)["status"] == "clarification_required"
+
+
+def test_other_one_moves_to_paired_track_when_clear(monkeypatch, tmp_path) -> None:
+    from kenn.core import live_receipt_journal
+
+    monkeypatch.setattr(live_receipt_journal, "JOURNAL_PATH", tmp_path / "receipts.jsonl")
+    monkeypatch.setenv("KENN_ALLOW_DAW_CONTROL", "1")
+    for name in ("KENN_LIVE_LLM_ENABLED", "KENN_LLM_ENABLED", "KENN_LLM_ENABLED_COMMAND"):
+        monkeypatch.delenv(name, raising=False)
+
+    backend = FakeLiveBackend()
+    # Add a paired vocal track
+    backend._session["tracks"].append({
+        "index": 8,
+        "name": "Backing Vocal",
+        "volume": 0.85,
+        "panning": 0.0,
+        "mute": False,
+        "solo": False,
+        "arm": False,
+        "devices": [],
+    })
+    service = LiveActionService(backend)
+    session = f"other-pair-{tmp_path.name}"
+
+    handle_command("Bring the Lead Vocal down 2 dB", session_id=session, service=service)
+    result = handle_command("no, the other one", session_id=session, service=service)
+    assert result["status"] == "confirmation_required"
+    assert result["proposal"]["track_name"] == "Backing Vocal"
+    assert result["context_resolution"]["resolution"] == "correction"
+
