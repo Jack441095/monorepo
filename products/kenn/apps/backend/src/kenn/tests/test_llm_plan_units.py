@@ -49,6 +49,19 @@ def test_normalized_volume_is_unchanged() -> None:
     assert checked["ok"] and checked["plan"]["value"] == 0.7
 
 
+def test_relative_normalized_volume_resolves_against_snapshot_volume() -> None:
+    # Kick in SNAPSHOT has volume 0.5; +0.15 relative normalized should resolve to 0.65
+    checked = validate_llm_plan(_plan(track_index=0, track_name="Kick", unit="normalized", value=0.15, relative=True), SNAPSHOT)
+    assert checked["ok"] is True
+    assert checked["plan"]["value"] == pytest.approx(0.65, abs=1e-6)
+    assert checked["plan"]["relative"] is False
+
+    # Negative relative volume past 0.0 should be rejected
+    rejected = validate_llm_plan(_plan(track_index=0, track_name="Kick", unit="normalized", value=-0.6, relative=True), SNAPSHOT)
+    assert rejected["ok"] is False
+    assert "normalized range" in rejected["error"]
+
+
 def test_recipe_steps_return_in_their_validated_converted_form() -> None:
     recipe = {"schema": "kenn.ableton_llm_plan.v1", "action": "recipe", "steps": [
         {"action": "set_mute", "track_index": 1, "track_name": "Bass", "value": True, "unit": "boolean"},

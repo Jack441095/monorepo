@@ -672,9 +672,21 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
             if unit not in {"", "normalized"}:
                 return {"ok": False, "error": f"The LLM plan unit for {action} must be 'normalized'; user-facing units must be converted before planning."}
             value = float(plan.get("value"))
+            if plan.get("relative"):
+                # propose_track_action takes absolute values only. When the planner
+                # provides a relative normalized fader/pan offset, we must resolve it
+                # against the track's current snapshot value here rather than passing
+                # an unscaled offset as an absolute fader target.
+                prop = "volume" if action == "set_volume" else "pan"
+                current = (_track_by_index(snapshot, track_index, track_name) or {}).get(prop)
+                if isinstance(current, bool) or not isinstance(current, (int, float)):
+                    return {"ok": False, "error": f"A relative {action} change needs the track's current {prop} in the snapshot."}
+                value = float(current) + value
+                plan = dict(plan, value=round(value, 6), relative=False)
             valid_range = (0.0, 1.0) if action == "set_volume" else (-1.0, 1.0)
             if not valid_range[0] <= value <= valid_range[1]:
                 return {"ok": False, "error": f"The LLM plan value for {action} must be within normalized range {valid_range}."}
+            return {"ok": True, "plan": dict(plan)}
     if action == "inspect_device_parameters":
         try:
             device_index = int(plan["device_index"])
