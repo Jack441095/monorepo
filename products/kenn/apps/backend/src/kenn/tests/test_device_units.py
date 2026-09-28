@@ -150,3 +150,33 @@ def test_saturator_drive_db_mapping_is_linear_and_measured() -> None:
     )
     assert error is None
     assert raw == approx(0.5555555555555556, rel=1e-9)
+
+
+def test_display_text_unifies_mixer_volume_with_volume_law() -> None:
+    from kenn.core.device_units import display_text
+
+    # Unity volume (raw 0.85) must render as 0.0 dB rather than 0.8 dB
+    assert display_text("Mixer", "Volume", "db", 0.85) == "0.0 dB"
+    assert display_text("Track", "Volume", "db", 0.85) == "0.0 dB"
+
+    # Silent fader (raw 0.0) renders as -inf dB
+    assert display_text("Mixer", "Volume", "db", 0.0) == "-inf dB"
+    assert display_text("Track", "Volume", "db", 0.0) == "-inf dB"
+
+    # +6 dB boost (raw 1.0)
+    assert display_text("Mixer", "Volume", "db", 1.0) == "6.0 dB"
+
+
+def test_display_text_renders_silent_compressor_threshold_as_neginf() -> None:
+    from kenn.core.device_units import display_text, raw_to_display
+
+    # Silent Compressor threshold (raw 0.0) must render as -inf dB rather than -57.2 dB
+    assert display_text("Compressor", "Threshold", "db", 0.0) == "-inf dB"
+
+    # Inverted mapping also yields -inf
+    val, err = raw_to_display(device_name="Compressor", parameter_name="Threshold", raw=0.0, unit="db")
+    assert err is None
+    assert val == float("-inf")
+
+    # Unity threshold (0.85) renders as 0.0 dB
+    assert display_text("Compressor", "Threshold", "db", 0.85) == "0.0 dB"

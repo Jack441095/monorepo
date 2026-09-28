@@ -367,9 +367,11 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
       authority.
   > 28 Sept: Fixed in `core/live_command.py`. Removed `clean_command and` conditions from deterministic refusal
   > and action comparison checks, preserving rule parser authority; verified in `test_live_command.py`.
-- [ ] `display_text("Mixer", "Volume", "db", 0.85)` renders unity as `0.8 dB`, and a silent Compressor
+- [x] `display_text("Mixer", "Volume", "db", 0.85)` renders unity as `0.8 dB`, and a silent Compressor
       threshold reads `-57.2 dB` instead of `-inf`. Two conversion layers disagree about the same physical
       value, and `volume_law` is the one that is measured.
+  > 28 Sept: Fixed in `core/device_units.py`. Unified `display_text` volume/fader reporting with `volume_law`
+  > (0.85 -> 0.0 dB, 0.0 -> -inf dB) and mapped silent Compressor threshold to -inf dB; verified in `test_device_units.py`.
 - [x] The semantic answer cache has no `session_id` column, so project A's answer can be served verbatim in
       project B for any query ≥ 0.95 similar. `chat_answer.py` enables this path precisely when there is *no*
       session context. The Stage 4 cross-project gate exists to prevent exactly this.

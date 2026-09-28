@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from math import isfinite, log
 from typing import Any
@@ -110,6 +111,8 @@ def display_to_raw(*, device_name: str, parameter_name: str, value: float, unit:
         numeric = float(value)
     except (TypeError, ValueError):
         return None, "The requested display-unit value is not numeric."
+    if math.isinf(numeric) and numeric < 0 and profile.device_name.lower() == "compressor" and profile.parameter_name.lower() == "threshold":
+        return 0.0, None
     if not isfinite(numeric):
         return None, "The requested display-unit value is not finite."
     if profile.raw_values and profile.display_values:
@@ -199,6 +202,9 @@ def raw_to_display(*, device_name: str, parameter_name: str, raw: float, unit: s
         fraction = (raw_value - profile.raw_min) / span
         return float(profile.display_min * (profile.display_max / profile.display_min) ** fraction), None
     if profile.mapping == "table":
+        # Silent Compressor threshold was separately measured in Live as -inf dB at raw 0.0
+        if raw_value <= 0.0 and profile.device_name.lower() == "compressor" and profile.parameter_name.lower() == "threshold":
+            return float("-inf"), None
         pairs = sorted(zip(profile.display_values, profile.raw_values), key=lambda pair: pair[0])
         raws = sorted(zip(profile.raw_values, profile.display_values), key=lambda pair: pair[0])
         if len(pairs) < 2:
@@ -222,20 +228,51 @@ _UNIT_LABELS = {"db": "dB", "hz": "Hz", "ms": "ms", "%": "%"}
 
 
 def display_text(device_name: str, parameter_name: str, unit: str, raw: Any) -> str:
-    """A raw device value in the units Live shows. The answer used to say "from 0.85 db to 0.362 db" for -20 dB."""
+    """A raw device value in the units Live shows.
+
+    Converts raw 0..1 values to Live's exact UI display strings. For example:
+    - Mixer / track volume raw 0.85 renders as "0.0 dB" (unity), and raw 0.0 as "-inf dB".
+    - Silent Compressor threshold raw 0.0 renders as "-inf dB".
+    - Discrete and table-mapped parameters render in their measured physical units.
+    """
     if isinstance(raw, bool) or not isinstance(raw, (int, float)):
         return ""
+
+    device_clean = str(device_name or "").strip()
+    param_clean = str(parameter_name or "").strip()
+    norm_unit = normalize_unit(unit)
+
+    # Track / Mixer volume follows volume_law (raw 0.85 is 0.0 dB unity, raw 0.0 is -inf dB).
+    # Two conversion layers previously disagreed about unity volume: unmapped dB parameters
+    # fell through to float(raw), formatting raw 0.85 as "0.8 dB" instead of unity "0.0 dB".
+    if (
+        (device_clean.lower() in {"mixer", "track", "master", "return", ""} and param_clean.lower() in {"volume", "fader"})
+        or (param_clean.lower() == "volume" and norm_unit == "db")
+    ):
+        from kenn.core import volume_law
+
+        db_val = volume_law.raw_to_db(float(raw))
+        if db_val is not None:
+            if math.isinf(db_val) and db_val < 0:
+                return "-inf dB"
+            return f"{db_val:.1f} dB"
+
     value: float | None = None
     if find_profile(device_name, parameter_name, unit) is not None:
         shown, error = raw_to_display(device_name=device_name, parameter_name=parameter_name, raw=float(raw), unit=unit)
         value = None if error else float(shown)
-    elif str(unit).lower() == "db":
+    elif norm_unit == "db":
         value = float(raw)  # unmapped dB parameters (EQ band gains) already read in dB
+
     if value is None:
         return ""
-    if str(unit).lower() == "ratio":
+    if norm_unit == "ratio":
         return f"{value:.1f}:1"
-    label = _UNIT_LABELS.get(str(unit).lower(), str(unit))
+    if math.isinf(value) and value < 0:
+        return "-inf dB"
+    if math.isinf(value) and value > 0:
+        return "+inf dB"
+    label = _UNIT_LABELS.get(norm_unit, str(unit))
     return f"{value:.1f} {label}" if label != "%" else f"{value:.0f}%"
 
 
