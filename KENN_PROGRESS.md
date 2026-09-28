@@ -23,6 +23,7 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
   historical prompt specifications into `products/kenn/docs/plans/historical_prompts/` and studio SOPs into `Business/ops-docs/sops/`.
   The canonical whole-product root is now unambiguously `monorepo/products/`. Verified 0 secrets, hostnames or credentials tracked in git.
 - **Stage 1 brain prompt footprint compressed 28 Sept:** Built `_clean_chunk_for_synthesis` in `llm_rewrite.py` to strip metadata headers and boilerplate, refined `build_raw_context_block`, and adjusted `KENN_LLM_CONTEXT_CHARS` (650) and `KENN_LLM_DRAFT_CHARS` (300). Compacted prompt token footprint by >50% (mean ~900 tokens down from ~1,400 tokens; under 450 tokens with compact system prompt), cutting Mac prompt read latency by over 10 seconds. Full 2,187-test backend suite verified passing 100%.
+- **Stage 1 natural phrasings gate qualified 28 Sept:** Evaluated `score_natural_phrasings.py` on the 505 phrasings fixture: **494/505 right (97.8%)**, 11 asked, **0 wrong plans**. Fixed mid-sentence corrections with 'wait no' and inline params, track rename with 'call', 'slo' solo typo, compressor output shorthand, and back-off threshold phrasing. All 2,187 backend tests passing.
 - **Stage 2 retrieval gate progress 28 Sept:** Tested `v1` ("Use it when" lines) in memory: original recall@4 0.983 (MRR 0.880),
   describe-it 0.784 (was 0.768), sealed Qwen8b set 0.425 (was 0.346, +7.9pp boost).
 - **From now on Live is Jack's** (for his work): engineering on the fake Live backend, suites, measurements and the

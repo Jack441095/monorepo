@@ -999,7 +999,7 @@ _MID_CORRECTION = re.compile(
     r"(?P<after>(?:pan|set|mute|unmute|solo|unsolo|turn|make|bring|arm|disarm|put|send|add|rename|cent(?:er|re))\b.+)$", re.I)
 # "mute track 2, actually track 3" used to mute track 2: a bare new target after the correction replaces the old one.
 _MID_CORRECTION_TARGET = re.compile(
-    r"^(?P<before>.+?)\s*(?:\u2014|\u2013|--|,|;|\.|\s)\s*(?:actually|no\s+wait|i\s+mean|sorry)\s*,?\s+"
+    r"^(?P<before>.+?)\s*(?:\u2014|\u2013|--|,|;|\.|\s)\s*(?:actually|no\s+wait|wait\s+no|i\s+mean|sorry)\s*,?\s+"
     r"(?P<target>(?:the\s+)?(?:track\s+\w+|[a-z][\w/'-]*(?:\s+[a-z][\w/'-]*){0,2}))\s*[.!]?\s*$", re.I)
 # "Mute the kick. No wait, the snare." and "mute the kick no wait the snare" muted the Kick (27 Sept 2026); only a comma
 # after the first request used to count.
@@ -1009,7 +1009,7 @@ _INSTEAD_OBJECT = re.compile(r"^\s*(?:\w+ing|set|turn|bring|make|put|pan|mute|so
                              r"(?:\s+(?:to|by|at|up|down)\b.*)?$", re.I)
 _CORRECTED_OBJECT = re.compile(r"^\s*(?:set|turn|bring|make|put|get|pan|mute|solo)\s+(?P<obj>.+?)"
                                r"(?:\s+(?:volume|level|fader|pan))?(?:\s+(?:to|by|at|up|down)\b.*)?$", re.I)
-_CALL_TRACK = re.compile(r"^\s*call\s+(track\s+\d+)\s+['\"]?(.+?)['\"]?\s*[.!]?\s*$", re.I)
+_CALL_TRACK = re.compile(r"^\s*call\s+(?:the\s+)?(track\s+\d+|[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s+['\"]?(.+?)['\"]?\s*[.!]?\s*$", re.I)
 _TERSE_LEVEL = re.compile(
     r"^\s*(?!(?:set|put|bring|turn|send|pan|make|move|drop|push|pull|get|take|mute|solo|arm|rename|call)\b)"
     r"(?P<name>[\w/'&-]+(?:\s+[\w/'&-]+){0,3}?)\s+(?:to|at)\s+(?P<amount>(?:minus\s+|[-+])?\d+(?:\.\d+)?)\s*dbs?\s*[.!]?\s*$",
@@ -1263,6 +1263,24 @@ def _rewrite_idioms(text: str) -> str:
         found = match.group(group)
         return None if not found or _NOT_A_TRACK_NAME.search(found) or _TERSE_LEVEL_EXCLUDE.search(found) else found
 
+    # Mid-sentence inline correction: 'pan the snare, sorry the hats, 20% left'
+    if (m := re.match(r"^(?P<action>pan|set|turn|bring|make|put|mute|solo|arm)\s+(?P<before>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*[,;]\s*(?:sorry|actually|no\s+wait|wait\s+no|i\s+mean)\s*,?\s+(?P<target>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*[,;]\s*(?P<rest>.+)$", text, re.I)):
+        text = f"{m.group('action')} {m.group('target')} {m.group('rest')}"
+    # Back off threshold: 'Back the Vocal Compressor threshold off by three dB.'
+    if (m := re.match(r"^\s*back\s+(?:the\s+)?(?P<name>.+?)\s+(?:compressor\s+)?threshold\s+off\s+by\s+(?P<amount>.+?)\s*[.!]?$", text, re.I)):
+        return f"raise the {m.group('name')} compressor threshold by {m.group('amount')}"
+    # Compressor output shorthand: 'compressor output on the vocal to 2 dB'
+    if (m := re.match(r"^\s*(?P<lead>(?:(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?\s+)?compressor\s+output\b.+)$", text, re.I)) and not text.lower().startswith("set "):
+        return f"set {m.group('lead')}"
+    # Pull band down: 'pull band 2A on the bass eq down 4 dB'
+    if (m := re.match(r"^\s*pull\s+band\s+(?P<band>\d+[ab]?)\s+on\s+(?P<rest>.+?)\s+down\s+(?P<amount>\d+(?:\.\d+)?)\s*dbs?\s*[.!]?$", text, re.I)):
+        return f"cut band {m.group('band')} on {m.group('rest')} by {m.group('amount')} dB"
+    # Track eq band down: 'bass eq band 1A down 3 dB'
+    if (m := re.match(r"^\s*(?P<track>[\w/'&-]+)\s+eq\s+band\s+(?P<band>\d+[ab]?)\s+down\s+(?P<amount>\d+(?:\.\d+)?)\s*dbs?\s*[.!]?$", text, re.I)):
+        return f"cut band {m.group('band')} on the {m.group('track')} eq by {m.group('amount')} dB"
+    # Set band X gain on ... to ...: 'set band 4A gain on the bass eq to -2 dB'
+    if (m := re.match(r"^\s*set\s+band\s+(?P<band>\d+[ab]?)\s+gain\s+on\s+(?P<rest>.+?)\s+to\s+(?P<amount>[-+]?\d+(?:\.\d+)?)\s*dbs?\s*[.!]?$", text, re.I)):
+        return f"set eq band {m.group('band')} on {m.group('rest')} to {m.group('amount')} dB"
     if (m := _TRANSPORT_IT.search(text)):
         return "stop" if m.group("verb").lower() in {"stop", "halt"} else "play"
     if (m := _SHOULD_BE_CALLED.match(text)) and name(m):
@@ -3066,7 +3084,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         )
         # "the vocal on its own", "just the vocal please", "gimme only the bass".
         solo_slang = re.search(r"\bon\s+(?:its|their)\s+own\b|\bhear\b.*\b(?:alone|by\s+itself)\s*[.!]?\s*$|^\s*(?:(?:gimme|give\s+me|let\s+me\s+hear)\s+)?(?:just|only)\s+the\b", lower)
-        if solo_off or re.search(r"\b(?:solo|isolate)\b", lower) or solo_slang:
+        if solo_off or re.search(r"\b(?:solo|isolate|slo)\b", lower) or solo_slang:
             action = "set_solo"
             base.update({"desired_value": not bool(solo_off), "unit": "boolean"})
         else:
