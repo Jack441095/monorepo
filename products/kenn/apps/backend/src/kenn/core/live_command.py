@@ -732,19 +732,29 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
             None,
         )
         capability_parameters = capability.get("parameters", []) if isinstance(capability, dict) else []
-        if capability_parameters:
-            exact_parameter = next(
-                (
-                    item for item in capability_parameters
-                    if isinstance(item, dict)
-                    and item.get("index") == plan.get("parameter_index")
-                    and str(item.get("name", "")) == str(plan.get("parameter_name", ""))
-                ),
-                None,
-            )
-            if exact_parameter is None and action in DEVICE_PARAMETER_ACTIONS:
-                return {"ok": False, "error": "The LLM parameter name/index is not an exact match for the current Live capability profile."}
-            if exact_parameter is not None and action in DEVICE_PARAMETER_ACTIONS:
+        if action in DEVICE_PARAMETER_ACTIONS:
+            # When the snapshot provides capability evidence for a device, we fail
+            # closed if the profile carries no parameters or if the parameter is absent.
+            if capability is not None:
+                if not capability_parameters:
+                    return {
+                        "ok": False,
+                        "error": "The targeted device has no capability parameters available to validate the plan.",
+                    }
+                exact_parameter = next(
+                    (
+                        item for item in capability_parameters
+                        if isinstance(item, dict)
+                        and item.get("index") == plan.get("parameter_index")
+                        and str(item.get("name", "")) == str(plan.get("parameter_name", ""))
+                    ),
+                    None,
+                )
+                if exact_parameter is None:
+                    return {"ok": False, "error": "The LLM parameter name/index is not an exact match for the current Live capability profile."}
+            else:
+                exact_parameter = None
+            if exact_parameter is not None:
                 # The capability profile is authoritative for raw ranges.  A
                 # model must not turn a user-facing percentage into an
                 # unchecked raw write, and unsupported units must fail closed
@@ -847,7 +857,14 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
                         maximum = float(exact_parameter.get("max"))
                     except (TypeError, ValueError):
                         minimum = maximum = float("nan")
-                if math.isfinite(minimum) and math.isfinite(maximum) and not minimum <= candidate_value <= maximum:
+                # We fail closed if the parameter's reported range is not finite or numeric.
+                # Previously, NaN bounds made math.isfinite() false, silently skipping range validation.
+                if not (math.isfinite(minimum) and math.isfinite(maximum)):
+                    return {
+                        "ok": False,
+                        "error": "The Live device parameter has non-numeric bounds and cannot be safely verified.",
+                    }
+                if not minimum <= candidate_value <= maximum:
                     return {"ok": False, "error": f"The LLM device value is outside the current Live capability range [{minimum}, {maximum}]."}
         if action in {"set_eq_band_gain", "set_eq_band_tuning_gain"}:
             if observed_name.strip().lower() != "eq eight":

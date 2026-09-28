@@ -106,12 +106,14 @@ def _get_db() -> sqlite3.Connection:
         """
         CREATE TABLE IF NOT EXISTS semantic_cache (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            query TEXT UNIQUE,
+            session_id TEXT NOT NULL DEFAULT '',
+            query TEXT NOT NULL,
             embedding_json TEXT NOT NULL,
             events_json TEXT NOT NULL,
             cache_version TEXT NOT NULL DEFAULT '',
             created_at INTEGER NOT NULL,
-            last_used_at INTEGER NOT NULL
+            last_used_at INTEGER NOT NULL,
+            UNIQUE(session_id, query)
         )
         """
     )
@@ -122,6 +124,37 @@ def _get_db() -> sqlite3.Connection:
         conn.execute(
             "ALTER TABLE semantic_cache ADD COLUMN cache_version TEXT NOT NULL DEFAULT ''"
         )
+    if "session_id" not in semantic_cache_columns:
+        # Recreate table with (session_id, query) uniqueness so cross-session collisions don't violate query UNIQUE
+        conn.execute("DROP TABLE IF EXISTS semantic_cache_old")
+        conn.execute("ALTER TABLE semantic_cache RENAME TO semantic_cache_old")
+        conn.execute(
+            """
+            CREATE TABLE semantic_cache (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL DEFAULT '',
+                query TEXT NOT NULL,
+                embedding_json TEXT NOT NULL,
+                events_json TEXT NOT NULL,
+                cache_version TEXT NOT NULL DEFAULT '',
+                created_at INTEGER NOT NULL,
+                last_used_at INTEGER NOT NULL,
+                UNIQUE(session_id, query)
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO semantic_cache
+                (session_id, query, embedding_json, events_json, cache_version, created_at, last_used_at)
+            SELECT '', query, embedding_json, events_json, cache_version, created_at, last_used_at
+            FROM semantic_cache_old
+            """
+        )
+        conn.execute("DROP TABLE semantic_cache_old")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_semantic_cache_session_query ON semantic_cache(session_id, cache_version, created_at)"
+    )
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -152,17 +185,20 @@ def _semantic_cache_version() -> str:
 # ---------------------------------------------------------------------------
 
 _L1_LOCK = threading.Lock()
-_L1_EXACT_CACHE: dict[str, tuple[float, str, list]] = {}  # clean_query -> (timestamp, version, events)
+# (session_id, clean_query) -> (timestamp, version, events)
+_L1_EXACT_CACHE: dict[tuple[str, str], tuple[float, str, list]] = {}
 _L1_MAX_SIZE = 256
 
 _L2_QUERIES: list[str] = []
+_L2_SESSION_IDS: list[str] = []
 _L2_VERSIONS: list[str] = []
 _L2_MATRIX: np.ndarray | None = None  # shape (N, 384)
 _L2_EVENTS: list[list] = []
 _L2_TIMESTAMPS: list[float] = []
+_L2_MAX_SIZE = 256
 
 
-def get_semantic_cache_hit(query: str, threshold: float = 0.95) -> dict | None:
+def get_semantic_cache_hit(query: str, threshold: float = 0.95, session_id: str = "") -> dict | None:
     """Check the multi-tier semantic cache (L1 in-memory -> L2 NumPy -> SQLite).
 
     Returns the parsed events list if found and not stale, otherwise None.
@@ -171,6 +207,7 @@ def get_semantic_cache_hit(query: str, threshold: float = 0.95) -> dict | None:
     SQLite fallback: ~8-15 ms
     """
     clean_query = query.strip().lower()
+    clean_session = session_id.strip()
     if not clean_query:
         return None
     now = time.time()
@@ -178,9 +215,10 @@ def get_semantic_cache_hit(query: str, threshold: float = 0.95) -> dict | None:
     cache_version = _semantic_cache_version()
 
     # --- Tier 1: In-Memory Exact Match (< 0.05 ms) ---
+    l1_key = (clean_session, clean_query)
     with _L1_LOCK:
-        if clean_query in _L1_EXACT_CACHE:
-            ts, ver, evts = _L1_EXACT_CACHE[clean_query]
+        if l1_key in _L1_EXACT_CACHE:
+            ts, ver, evts = _L1_EXACT_CACHE[l1_key]
             if ts >= min_created_at and ver == cache_version:
                 return evts
 
@@ -192,12 +230,13 @@ def get_semantic_cache_hit(query: str, threshold: float = 0.95) -> dict | None:
             return None
 
         with _L1_LOCK:
-            global _L2_MATRIX, _L2_QUERIES, _L2_VERSIONS, _L2_EVENTS, _L2_TIMESTAMPS
+            global _L2_MATRIX, _L2_QUERIES, _L2_SESSION_IDS, _L2_VERSIONS, _L2_EVENTS, _L2_TIMESTAMPS
             if _L2_MATRIX is not None and len(_L2_QUERIES) > 0:
-                # Valid mask based on TTL and active cache version
+                # We filter by session_id in the valid mask so that Project A's cached advice
+                # never leaks into Project B, preserving cross-project isolation.
                 valid_mask = np.array([
-                    (ts >= min_created_at and ver == cache_version)
-                    for ts, ver in zip(_L2_TIMESTAMPS, _L2_VERSIONS)
+                    (ts >= min_created_at and ver == cache_version and sid == clean_session)
+                    for ts, ver, sid in zip(_L2_TIMESTAMPS, _L2_VERSIONS, _L2_SESSION_IDS)
                 ], dtype=bool)
 
                 if np.any(valid_mask):
@@ -211,39 +250,42 @@ def get_semantic_cache_hit(query: str, threshold: float = 0.95) -> dict | None:
                         valid_indices = np.where(valid_mask)[0]
                         orig_idx = int(valid_indices[best_idx])
                         events = _L2_EVENTS[orig_idx]
-                        # Populate L1 for subsequent requests
-                        _L1_EXACT_CACHE[clean_query] = (now, cache_version, events)
+                        # We only populate L1 if the query matches identically. Writing an
+                        # approximate semantic hit (0.95) into the exact-match cache previously
+                        # made distinct queries return the same answer verbatim on subsequent turns.
+                        if _L2_QUERIES[orig_idx].lower() == clean_query:
+                            _L1_EXACT_CACHE[l1_key] = (now, cache_version, events)
                         return events
-    except Exception as exc:
+    except Exception:
         pass
 
     # --- Tier 3: SQLite Persistent Fallback (Populates L1 and L2) ---
     try:
         conn = _get_db()
-        # 1. First check for exact query match
+        # 1. First check for exact query match within this session
         row = conn.execute(
             """SELECT events_json FROM semantic_cache
-               WHERE LOWER(query) = ? AND created_at >= ? AND cache_version = ?""",
-            (clean_query, min_created_at, cache_version),
+               WHERE session_id = ? AND LOWER(query) = ? AND created_at >= ? AND cache_version = ?""",
+            (clean_session, clean_query, min_created_at, cache_version),
         ).fetchone()
         if row is not None:
             conn.execute(
-                "UPDATE semantic_cache SET last_used_at = ? WHERE LOWER(query) = ?",
-                (int(now), clean_query),
+                "UPDATE semantic_cache SET last_used_at = ? WHERE session_id = ? AND LOWER(query) = ?",
+                (int(now), clean_session, clean_query),
             )
             conn.commit()
             events = json.loads(row["events_json"])
             with _L1_LOCK:
                 if len(_L1_EXACT_CACHE) >= _L1_MAX_SIZE:
                     _L1_EXACT_CACHE.pop(next(iter(_L1_EXACT_CACHE)))
-                _L1_EXACT_CACHE[clean_query] = (now, cache_version, events)
+                _L1_EXACT_CACHE[l1_key] = (now, cache_version, events)
             return events
 
-        # 2. Semantic search across SQLite rows
+        # 2. Semantic search across SQLite rows for this specific session
         rows = conn.execute(
             """SELECT query, embedding_json, events_json FROM semantic_cache
-               WHERE created_at >= ? AND cache_version = ?""",
-            (min_created_at, cache_version),
+               WHERE session_id = ? AND created_at >= ? AND cache_version = ?""",
+            (clean_session, min_created_at, cache_version),
         ).fetchall()
         best_score = -1.0
         best_events_json = None
@@ -264,32 +306,34 @@ def get_semantic_cache_hit(query: str, threshold: float = 0.95) -> dict | None:
 
         if best_score >= threshold and best_events_json is not None:
             conn.execute(
-                "UPDATE semantic_cache SET last_used_at = ? WHERE query = ?",
-                (int(now), best_query),
+                "UPDATE semantic_cache SET last_used_at = ? WHERE session_id = ? AND query = ?",
+                (int(now), clean_session, best_query),
             )
             conn.commit()
             events = json.loads(best_events_json)
-            with _L1_LOCK:
-                _L1_EXACT_CACHE[clean_query] = (now, cache_version, events)
+            # We intentionally leave L1 unpopulated on soft semantic hits to avoid
+            # corrupting exact-match retrieval.
             return events
     except Exception as exc:
         print(f"WARNING: get_semantic_cache_hit failed: {exc}")
     return None
 
 
-def save_to_semantic_cache(query: str, events: list) -> None:
+def save_to_semantic_cache(query: str, events: list, session_id: str = "") -> None:
     """Save a query, its embedding, and generated events to L1, L2, and SQLite."""
     clean_query = query.strip()
+    clean_session = session_id.strip()
     if not clean_query or not events:
         return
     now = time.time()
     cache_version = _semantic_cache_version()
 
-    # Update L1 immediately
+    # Update L1 immediately for this session
+    l1_key = (clean_session, clean_query.lower())
     with _L1_LOCK:
         if len(_L1_EXACT_CACHE) >= _L1_MAX_SIZE:
             _L1_EXACT_CACHE.pop(next(iter(_L1_EXACT_CACHE)))
-        _L1_EXACT_CACHE[clean_query.lower()] = (now, cache_version, events)
+        _L1_EXACT_CACHE[l1_key] = (now, cache_version, events)
 
     try:
         from kenn.retrieval.retrieval import embed_text
@@ -297,10 +341,21 @@ def save_to_semantic_cache(query: str, events: list) -> None:
         if query_emb is None or len(query_emb) == 0:
             return
 
-        # Update L2 Vector Matrix
+        # Update L2 Vector Matrix with bounded FIFO eviction so memory does not grow unbounded
         with _L1_LOCK:
-            global _L2_MATRIX, _L2_QUERIES, _L2_VERSIONS, _L2_EVENTS, _L2_TIMESTAMPS
+            global _L2_MATRIX, _L2_QUERIES, _L2_SESSION_IDS, _L2_VERSIONS, _L2_EVENTS, _L2_TIMESTAMPS
+            if len(_L2_QUERIES) >= _L2_MAX_SIZE:
+                excess = len(_L2_QUERIES) - _L2_MAX_SIZE + 1
+                _L2_QUERIES = _L2_QUERIES[excess:]
+                _L2_SESSION_IDS = _L2_SESSION_IDS[excess:]
+                _L2_VERSIONS = _L2_VERSIONS[excess:]
+                _L2_EVENTS = _L2_EVENTS[excess:]
+                _L2_TIMESTAMPS = _L2_TIMESTAMPS[excess:]
+                if _L2_MATRIX is not None:
+                    _L2_MATRIX = _L2_MATRIX[excess:]
+
             _L2_QUERIES.append(clean_query)
+            _L2_SESSION_IDS.append(clean_session)
             _L2_VERSIONS.append(cache_version)
             _L2_EVENTS.append(events)
             _L2_TIMESTAMPS.append(now)
@@ -310,15 +365,16 @@ def save_to_semantic_cache(query: str, events: list) -> None:
             else:
                 _L2_MATRIX = np.concatenate([_L2_MATRIX, emb_2d], axis=0)
 
-        # Update SQLite persistent storage
+        # Update SQLite persistent storage scoped to this session
         conn = _get_db()
         conn.execute(
             """
             INSERT OR REPLACE INTO semantic_cache
-                (query, embedding_json, events_json, cache_version, created_at, last_used_at)
-            VALUES (?, ?, ?, ?, ?, ?)
+                (session_id, query, embedding_json, events_json, cache_version, created_at, last_used_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (
+                clean_session,
                 clean_query,
                 json.dumps(query_emb.tolist()),
                 json.dumps(events),

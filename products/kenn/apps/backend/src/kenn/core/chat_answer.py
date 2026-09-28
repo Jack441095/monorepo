@@ -1851,14 +1851,13 @@ def _answer_payload_stream(
     plugin_session_id: str = "",
     correlation_id: str = "",
 ):
-    # Cached answers are valid only for stateless turns.  A session can carry
-    # measured evidence and reported troubleshooting outcomes, both of which
-    # materially change the next answer and must never be bypassed by a
-    # generic cached response.
-    if allow_llm and not history and not session_id:
+    # Multi-turn conversations with history skip the cache to allow contextual
+    # follow-ups. For single-turn questions, we scope semantic acceleration to
+    # the active session_id so Project A's advice never leaks into Project B.
+    if allow_llm and not history:
         try:
             from kenn.core.session_memory import get_semantic_cache_hit
-            cached_events = get_semantic_cache_hit(query)
+            cached_events = get_semantic_cache_hit(query, session_id=session_id)
             if cached_events:
                 for event in cached_events:
                     if event.get("event") == "metadata" and isinstance(event.get("data"), dict):
@@ -1884,7 +1883,7 @@ def _answer_payload_stream(
         accumulated_events.append(event)
         yield event
 
-    if allow_llm and not history and not session_id and accumulated_events:
+    if allow_llm and not history and accumulated_events:
         final_metadata = None
         for ev in reversed(accumulated_events):
             if ev.get("event") == "metadata":
@@ -1894,7 +1893,7 @@ def _answer_payload_stream(
         if final_metadata and (final_metadata.get("llm_enhanced") or final_metadata.get("confidence") == "high"):
             try:
                 from kenn.core.session_memory import save_to_semantic_cache
-                save_to_semantic_cache(query, accumulated_events)
+                save_to_semantic_cache(query, accumulated_events, session_id=session_id)
             except Exception:
                 logging.getLogger("kenn.core.chat_answer").warning(
                     "Semantic cache save failed; this answer won't be "
@@ -2523,10 +2522,13 @@ def _answer_payload(
     if short_circuit:
         return short_circuit
 
-    if allow_llm and not history and not session_id:
+    # Multi-turn conversations with history skip the cache to allow contextual
+    # follow-ups. For single-turn questions, we scope semantic acceleration to
+    # the active session_id so Project A's advice never leaks into Project B.
+    if allow_llm and not history:
         try:
             from kenn.core.session_memory import get_semantic_cache_hit
-            cached_events = get_semantic_cache_hit(query)
+            cached_events = get_semantic_cache_hit(query, session_id=session_id)
             if cached_events:
                 final_metadata = None
                 for ev in reversed(cached_events):
@@ -2556,7 +2558,7 @@ def _answer_payload(
         correlation_id=correlation_id,
     )
 
-    if allow_llm and not history and not session_id and isinstance(payload, dict):
+    if allow_llm and not history and isinstance(payload, dict):
         if payload.get("llm_enhanced") or payload.get("confidence") == "high":
             events = [
                 {"event": "metadata", "data": payload},
@@ -2564,7 +2566,7 @@ def _answer_payload(
             ]
             try:
                 from kenn.core.session_memory import save_to_semantic_cache
-                save_to_semantic_cache(query, events)
+                save_to_semantic_cache(query, events, session_id=session_id)
             except Exception:
                 logging.getLogger("kenn.core.chat_answer").warning(
                     "Semantic cache save failed; this answer won't be "

@@ -2559,6 +2559,21 @@ def test_llm_planner_receives_target_device_capabilities_and_exact_profile_is_en
     assert checked["ok"] is False
     assert "evidence-backed" in checked["error"]
 
+    # We fail closed if the snapshot capability carries no parameters for the device.
+    empty_params = deepcopy(enriched)
+    empty_params["planner_capabilities"]["entries"][0]["parameters"] = []
+    checked = validate_llm_plan(valid, empty_params)
+    assert checked["ok"] is False
+    assert "no capability parameters available" in checked["error"]
+
+    # We fail closed if capability bounds are non-numeric or NaN.
+    nan_bounds = deepcopy(enriched)
+    nan_bounds["planner_capabilities"]["entries"][0]["parameters"][0]["min"] = float("nan")
+    valid_normalized = {**valid, "unit": "value", "value": 0.5}
+    checked = validate_llm_plan(valid_normalized, nan_bounds)
+    assert checked["ok"] is False
+    assert "non-numeric bounds" in checked["error"]
+
 
 def test_llm_plan_rejects_hidden_nested_actions_and_unknown_fields() -> None:
     fake = FakeLive()
