@@ -1,0 +1,181 @@
+28.32.6 Output
+Reverb’s Output Section.
+At the reverb output, you can vary the amplitude of reflections and diffusion with the Reflect and
+Diffuse controls and adjust the effect’s overall Dry/Wet mix.
+28.33 Roar
+The Roar Effect.
+Roar is a saturation and coloration device with up to three processing stages and a range of flexible
+routing configurations. Its selection of non-linear shaper curves and filters can be combined to
+produce a wide variety of saturation types, from targeted warmth to sweeping harmonic motion or
+glitchy blasts of noise. Roar’s feedback controls and built-in compressor add a further layer of
+distinctive possibility to the device, which can produce sounds unlike any other instrument or effect
+currently available in Live.
+622
+28.33. 1 Input Section
+Roar’s Input Section.
+The Drive knob sets the level of the signal being input into Roar before the gain stages. It can be used
+to quickly add or remove distortion without having to adjust individual Shaper Amount controls across
+multiple gain stages, for example, or to modify an input signal to ensure a preset behaves as
+expected.
+The Tone Amount knob changes the input signal’s balance of high and low frequencies. When set to
+positive values, high frequencies are boosted and low frequencies are attenuated. When set to
+negative values, low frequencies are boosted and high frequencies are attenuated.
+The Tone Frequency slider sets the frequency of the low shelving filter used by the Tone Amount
+control.
+Adjusting Roar’s Tone parameters has noticeable effects on the timbre of its gain stages, as these
+follow the Input section in Roar’s processing chain. Dialing in positive values with the Tone Amount
+knob can help attenuate low-frequency content in guitars or basses, for example, to avoid muddy
+sounds when using large amounts of distortion.
+The Color Compensation toggle next to the Tone Amount control applies a mirrored version of the
+Tone filter to the output of Roar’s distortion stages. When active, Tone values are attenuated before the
+shaper and boosted after it, giving you more control over the gain stage processing. Activating the
+Color Compensation toggle with negative Tone values is a helpful trick for saturating drums without
+affecting low end frequency impact, for example.
+The Routing Mode panel lets you choose from seven routing types: Single, Serial, Parallel, Multi Band,
+Mid Side, Feedback, and Delay. Apart from Single and Multi Band, each routing mode comes with
+the Blend control that you can use to control the blend between its two gain stages.
+The Serial routing mode processes the input signal using two concatenated shapers. The Blend control
+blends between the sound of Stage 1 and the sound of Stages 1 and 2 combined.
+The Parallel mode processes the input signal using two independent shapers. The Blend control blends
+between the sound of Stage 1 and the sound of Stage 2. To experiment with this mode, try selecting
+two noticeably different Shaper Curves (like Half Wave Rectifier and Fractal) and modulating the
+Blend control so that Roar’s sound shifts continuously from one to the other.
+623
+Multi Band splits the frequency spectrum into three bands (Low, Mid, and High) that can each be
+processed independently. Two Crossover Filters (Low and High) let you define the crossover
+frequency between the three bands. This mode serves a variety of applications, including drum
+processing and adding saturation to entire mixes.
+Mid Side processes the input signal’s mono and stereo signals independently. This mode is useful for
+enhancing a signal’s stereo image without compromising the sound of the signal at the center of the
+stereo field.
+The Feedback routing mode processes the input signal and its feedback independently, which can
+create unusual tones or transform Roar into a distinctive delay. Try modulating Roar’s Shaper Amount
+with an envelope to produce saturation that has a shuffled delay effect, for example, or subtly
+offsetting Shaper Bias to create delays that degrade over time.
+In the Delay mode, the second stage processes the delayed signal from the first stage. The delayed
+signal is sent to the second stage without being scaled by the feedback gain, which produces single
+(distorted) repetitions or slapbacks. The output of the second stage is fed back into itself and scaled
+with the feedback gain, resulting in multiple repetitions and long signal tails.
+28.33.2 Gain Stage Section
+Roar’s Gain Stage Section.
+Each routing mode has its own set of gain stages, which can be turned on or off independently using
+the Stage toggles in the Gain Stage tabs.
+Gain Stage tabs all have the same three controls: Shaper Amount, Shaper Bias, and Filter Frequency.
+Shaper and Filter Types can be selected from their corresponding drop-down menus at the bottom of
+each Gain Stage tab.
+The Shaper Amount control sets the amount of saturation applied to the input signal. You can also click
+and drag the shaper waveform in the Shaper Visualization display to modify this parameter. Distortion
+occurs when the input signal reaches non-linear portions of the visualized curve.
+The Shaper Bias control offsets the signal and creates asymmetrical distortion. At higher settings, it can
+emulate the sound of a broken circuit. At more extreme settings, it will cause the signal to go
+completely quiet.
+624
+The Shaper Type drop-down menu under the Shaper Visualization display has twelve curves to
+choose from:
+Soft Sine uses a sinusoidal curve to add smooth, warm saturation to the input signal. This shaper curve
+tends to produce pleasant, analog-style distortion even when pushed to extreme levels.
+Digital Clip applies a hard clipping curve to the input signal. It produces harsh, higher-order
+harmonics when the input signal reaches the curve’s extremities.
+Bit Crusher produces the characteristic distortion that occurs when quantized amplitudes are applied
+to an input signal, similar to Live’s Redux device. Increasing the Shaper Amount reduces the number of
+bits used for quantization and intensifies the effects of the bit crusher’s built-in compander. This curve
+works well with bias modulation and produces very obvious changes in quieter signals.
+Diode Clipper this type is a virtual analog clipping circuit emulation. It sounds smooth and warm like
+the Soft Sine curve, but with attenuated high-end frequencies.
+Tube Preamp models the soft, analog saturation of a tube preamp. It preserves a signal’s transients
+and dynamics even when the Shaper Amount is set to higher levels.
+Half Wave Rectifier and Full Wave Rectifier produce distinctive, waveshaper-style effects. Half Wave
+Rectifier applies completely asymmetrical distortion to the input signal, which works well for adding
+crunch to drum sounds. Full Wave Rectifier shifts the signal up by an octave, which works well for
+adding harmonic depth to certain synth sounds.
+Polynomial shifts between a sinusoidal curve and more complex waveforms. This shaper curve lends
+itself well to modulation and to producing metallic sounds.
+Fractal introduces a large of amount of high-end harmonics to the input signal.
+Tri Fold this type is a triangular wavefolder. Like Fractal, it adds a large amount of high-end harmonics
+to the input but achieves even harsher, more distorted results.
+Noise Injection applies stereo noise followed by smooth distortion to the input signal. This curve works
+well for producing smooth saturation that also has some dirt and grit.
+Shards continuously changes the slope of its stereo curve segments to rhythmically break apart the
+input signal.
+Shapers can also be turned on or off via the toggle at the bottom of the Shaper Visualization display.
+The Shaper Level control can be used to compensate for changes in output level produced as the
+shaper curve is modified.
+Filter Frequency adjusts the filter’s cutoff frequency. If the Pre toggle has been activated, the filter is
+applied before the Shaper stage. When the Filter Frequency is changed with Pre activated, the filter
+doesn’t affect the harmonics produced by the shaper.
+There are nine filter types to choose from: LP (low-pass), BP (band-pass), HP (high-pass), Notch, Peak,
+Morph, Comb, Resampling, and Dispersion.
+625
+The LP filter attenuates frequencies above the cutoff, BP attenuates lower and higher frequencies
+outside of a specific range, while HP attenuates frequencies below the cutoff.
+Notch attenuates a narrow frequency range while leaving the surrounding frequencies largely
+unaffected.
+The Morph filter allows continuous morphing between low-pass and high-pass filtering, with band-
+pass behavior in between.
+Comb creates a series of notches across the frequency spectrum. When its cutoff is modulated, this
+filter type can produce flanger-like effects.
+The Resampling filter produces sample-rate reduction artifacts, similar to Live’s Redux device.
+Dispersion shifts different frequencies in time by different amounts, without changing their level. This
+slight misalignment of frequencies can create metallic, spring-like tones, especially when modulated.
+Apart from the Resampling filter, each filter has a dedicated Resonance control. The Peak filter has a
+Filter Peak Gain control for boosting or attenuating a specific frequency range. The Morph filter has a
+Morph control for setting its filter shape.
+28.33.3 Modulation Section
+To display Roar’s modulation parameters, click on the toggle in the Modulation panel. This will bring
+up the Mod Sources and Matrix tabs.
+Roar’s Modulation Toggle.
+Roar’s Modulation Section.
+626
+The Mod Sources tab has four modulation sources to choose from: LFO 1, LFO 2, Env (Envelope), and
+Noise. Each of the modulation sources comes with a display that visualizes the signal, as well as a set
+of distinct parameters.
+You can choose one of five waveforms for each LFO: sine, triangle, square, up, or down.
+The LFO rate mode can be set to Free, Synced, Triplet, Dotted, or Sixteenth using the Mode chooser.
+The LFO rate is set via the Rate slider in Hertz (in the Free mode) or tempo-synced beat divisions (in
+the other modes). The Morph control’s value can be set manually or modulated to further sculpt the
+LFO shape. The Smooth control allows you to add smoothing to the LFO signal, which can be helpful
+in preventing harsh changes while using modulation.
+The Env tab’s envelope follower generates a modulation signal based on Roar’s input signal. You can
+use the parameters in this tab to adjust the envelope follower’s response to the input signal.
+The Attack and Release controls shape how quickly the envelope responds to the input signal. You can
+also use the Envelope Hold toggle to control how the envelope moves from the attack to release
+phase: when on, the envelope completes the entire attack phase before starting the release phase.
+The Threshold and Gain controls set the envelope’s sensitivity and strength, while Frequency and
+Width allow you to set a specific frequency range for the signal fed into the envelope follower.
+To play back the input signal only, activate the Envelope Input Listen toggle.
+The envelope follower is particularly useful as a modulation source in Roar’s Modulation Matrix. Try
+setting it to follow a snare sound in a drum loop, for example, and have it modulate Roar’s Dry/Wet
+balance or Shaper Amount each time the snare hits.
+The Noise modulation source includes four different noise types: Simplex, Wander, S & H, and Brown.
+Noise curves can be set in Hertz or tempo-synced and can be smoothed like Roar’s LFO curves.
+Simplex and Wander both generate smoothed random signals, with different random value
+interpolation algorithms used to produce different signal dynamics. Simplex uses interrate modulation,
+which produces a more irregular value interval than Wander. These types of noise are useful for
+introducing small, random, organic-style changes in Roar’s output signal, especially when set to low
+rates.
+S & H (Sample and Hold) generates a random constant value that changes to a new random value at
+an interval determined by the Noise Rate. This is useful for creating stepped random modulation
+patterns in Roar’s output signal.
+Brown produces low-pass filtered white noise, which is useful for producing a constant noise floor or
+for adding crackles and hissing to Roar’s output signal.
+The Matrix tab lets you assign modulation sources to modulation targets within the device. Clicking a
+parameter while the Matrix tab is open will set it as a modulation target. Modulation sources are
+listed horizontally and modulation targets are listed vertically. Click and drag a cell up or down to
+apply modulation between parameters.
+627
+The Global Modulation Amount slider can be dragged up or down to increase or decrease the
+modulation being applied globally. Clicking the X button will erase all modulation applied by the
+Modulation Matrix.
+The Modulation Matrix can also be expanded using the toggle in the device header. When
+expanded, the device’s gain stages are all visible at once, as are all of the modulation sources and
+targets in the Modulation Matrix.
+Roar’s Expanded Matrix.
+Apart from the visualization displays, modulation signals are also indicated via LEDs in the
+Modulation column. Each LED uses a color that corresponds to a modulation source. This allows you
+to quickly determine whether a modulation source is active and gives you an idea of how the source is
+set up without needing to dive into the Modulation Matrix.
+28.33.4 Feedback Section
+Roar’s Feedback Section.
+The Feedback section is one of Roar’s most distinctive features. Feeding Roar’s signal back into itself
+can add a new layer of ringing, otherworldly tones and textures to your sound.
+628

@@ -1,0 +1,80 @@
+================================================================================
+KENN LLM ANSWER PATH BENCHMARK REPORT (CANDIDATE 1: MAX_TOKENS CAP 220)
+Timestamp: 2026-09-18 18:54:00
+Platform: Apple Silicon (Metal MLX) / macOS
+Model Path: /Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn/kenn/artifacts/models/kenn-mlx
+================================================================================
+
+--------------------------------------------------------------------------------
+1. COLD START LATENCY (Server stopped -> cold spawn -> model load -> first answer)
+--------------------------------------------------------------------------------
+OBSERVED: Cold-start total latency: 21.053 s
+OBSERVED: Cold-start answer length: 906 chars
+OBSERVED: Server socket created at: /var/folders/7n/v41hqm4s3rx4vd536fghb0zh0000gn/T/kenn_lm_server.sock (exists: True)
+
+--------------------------------------------------------------------------------
+2. WARM STEADY-STATE LATENCY (N=10 repeated single-turn generations, self_correct=False)
+--------------------------------------------------------------------------------
+   [Iter 01/10] 7.053s | ~184 tokens | ~26.1 tok/s | query: sidechain_kick_bass
+   [Iter 02/10] 7.021s | ~218 tokens | ~31.0 tok/s | query: linear_phase_eq
+   [Iter 03/10] 5.279s | ~136 tokens | ~25.8 tok/s | query: vocal_mud_carving
+   [Iter 04/10] 3.733s | ~89 tokens | ~23.8 tok/s | query: mastering_lufs_target
+   [Iter 05/10] 4.471s | ~126 tokens | ~28.2 tok/s | query: sub_bass_mono
+   [Iter 06/10] 7.476s | ~201 tokens | ~26.9 tok/s | query: parallel_compression_drums
+   [Iter 07/10] 7.367s | ~223 tokens | ~30.3 tok/s | query: sample_rate_nyquist
+   [Iter 08/10] 3.712s | ~107 tokens | ~28.8 tok/s | query: drum_buss_transients
+   [Iter 09/10] 4.266s | ~128 tokens | ~30.0 tok/s | query: reverb_predelay_separation
+   [Iter 10/10] 4.208s | ~133 tokens | ~31.6 tok/s | query: dynamic_eq_vs_multiband
+OBSERVED: Warm Steady-State p50:  5.279 s
+OBSERVED: Warm Steady-State p95:  7.476 s (Down from 14.714 s -> 49.2% improvement)
+OBSERVED: Warm Steady-State Mean: 5.458 s (Down from 7.172 s -> 23.9% improvement)
+OBSERVED: Mean Generation Speed:  28.3 tokens/sec
+OBSERVED: Mean Output Length:     154.5 tokens (118 words)
+
+--------------------------------------------------------------------------------
+3. SELF-CORRECTION OVERHEAD AUDIT (self_correct=True vs self_correct=False)
+--------------------------------------------------------------------------------
+   [Case 1: sidechain_kick_bass] raw=7.319s | with_critique=13.930s | critique_cost=+6.611s
+   [Case 2: linear_phase_eq] raw=7.572s | with_critique=14.287s | critique_cost=+6.714s
+   [Case 3: vocal_mud_carving] raw=4.884s | with_critique=5.694s | critique_cost=+0.810s
+   [Case 4: mastering_lufs_target] raw=3.269s | with_critique=7.170s | critique_cost=+3.901s
+   [Case 5: sub_bass_mono] raw=4.173s | with_critique=9.969s | critique_cost=+5.796s
+OBSERVED: Median latency with self_correct=True: 9.969 s (vs 5.279 s baseline)
+INFERRED: Self-correct critique overhead adds ~4.691 s per turn.
+
+--------------------------------------------------------------------------------
+4. STREAMING PATH & TTFB AUDIT (llm_rewrite.py / Ollama)
+--------------------------------------------------------------------------------
+OBSERVED: Ollama Streaming TTFB: 0.220 s
+OBSERVED: Ollama Streaming Total: 12.129 s (235 chunks received)
+
+--------------------------------------------------------------------------------
+5. ANSWER CACHE AUDIT (Hit vs Miss)
+--------------------------------------------------------------------------------
+OBSERVED: Cache miss lookup: 2.172 ms
+OBSERVED: Cache hit lookup:  0.497 ms
+
+--------------------------------------------------------------------------------
+6. EVAL SET STRUCTURAL QUALITY AUDIT (10 Representative Queries)
+--------------------------------------------------------------------------------
+   [01/10] sidechain_kick_bass: valid=True | len=906 chars | steps=True
+   [02/10] linear_phase_eq: valid=False | len=1157 chars | steps=False
+   [03/10] vocal_mud_carving: valid=False | len=647 chars | steps=False
+   [04/10] mastering_lufs_target: valid=False | len=439 chars | steps=False
+   [05/10] sub_bass_mono: valid=False | len=580 chars | steps=False
+   [06/10] parallel_compression_drums: valid=True | len=886 chars | steps=True
+   [07/10] sample_rate_nyquist: valid=True | len=1110 chars | steps=True
+   [08/10] drum_buss_transients: valid=False | len=494 chars | steps=False
+   [09/10] reverb_predelay_separation: valid=False | len=628 chars | steps=False
+   [10/10] dynamic_eq_vs_multiband: valid=False | len=658 chars | steps=False
+OBSERVED: Structural Validity Rate: 3/10 (30%)
+
+================================================================================
+SUMMARY OF CANDIDATE 1 METRICS
+  - Cold Start Latency:           21.053 s
+  - Warm Steady-State p50:         5.279 s
+  - Warm Steady-State p95:         7.476 s (-49.2% vs baseline 14.714s)
+  - Warm Steady-State Mean:        5.458 s (-23.9% vs baseline 7.172s)
+  - Self-Correct Overhead:         +4.691 s per turn
+  - Generation Throughput:         28.3 tok/s
+================================================================================

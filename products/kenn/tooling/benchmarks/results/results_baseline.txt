@@ -1,0 +1,70 @@
+================================================================================
+KENN LLM ANSWER PATH BENCHMARK REPORT (§2 BASELINE)
+Timestamp: 2026-09-18 18:42:07
+Platform: Apple Silicon (Metal MLX) / macOS
+Model Path: /Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn/kenn/artifacts/models/kenn-mlx
+================================================================================
+
+--------------------------------------------------------------------------------
+1. COLD START LATENCY (Server stopped -> cold spawn -> model load -> first answer)
+--------------------------------------------------------------------------------
+OBSERVED: Cold-start total latency: 20.489 s
+OBSERVED: Cold-start answer length: 906 chars
+OBSERVED: Server socket created at: /var/folders/7n/v41hqm4s3rx4vd536fghb0zh0000gn/T/kenn_lm_server.sock (exists: True)
+
+--------------------------------------------------------------------------------
+2. WARM STEADY-STATE LATENCY (N=10 repeated single-turn generations, self_correct=False)
+--------------------------------------------------------------------------------
+OBSERVED: Warm Steady-State p50:  4.873 s
+OBSERVED: Warm Steady-State p95:  14.714 s
+OBSERVED: Warm Steady-State Mean: 7.172 s
+OBSERVED: Mean Generation Speed:  28.5 tokens/sec
+OBSERVED: Mean Output Length:     206.6 tokens (159 words)
+
+--------------------------------------------------------------------------------
+3. SELF-CORRECTION OVERHEAD AUDIT (self_correct=True vs self_correct=False)
+--------------------------------------------------------------------------------
+   [Case 1: sidechain_kick_bass] raw=6.742s | with_critique=11.776s | critique_cost=+5.034s
+   [Case 2: linear_phase_eq] raw=11.118s | with_critique=17.525s | critique_cost=+6.407s
+   [Case 3: vocal_mud_carving] raw=4.679s | with_critique=5.467s | critique_cost=+0.788s
+   [Case 4: mastering_lufs_target] raw=3.171s | with_critique=6.900s | critique_cost=+3.729s
+   [Case 5: sub_bass_mono] raw=4.214s | with_critique=8.625s | critique_cost=+4.411s
+OBSERVED: Median latency with self_correct=True: 8.625 s (vs 4.873 s baseline)
+INFERRED: Self-correct critique overhead adds ~3.752 s per turn.
+
+--------------------------------------------------------------------------------
+4. STREAMING PATH & TTFB AUDIT (llm_rewrite.py / Ollama)
+--------------------------------------------------------------------------------
+OBSERVED: Ollama Streaming TTFB: 2.078 s
+OBSERVED: Ollama Streaming Total: 7.763 s (108 chunks received)
+
+--------------------------------------------------------------------------------
+5. ANSWER CACHE AUDIT (Hit vs Miss)
+--------------------------------------------------------------------------------
+OBSERVED: Cache miss lookup: 23.670 ms
+OBSERVED: Cache hit lookup:  1.883 ms (Retrieved: '48 kHz is standard professiona...')
+
+--------------------------------------------------------------------------------
+6. EVAL SET STRUCTURAL QUALITY AUDIT (10 Representative Queries)
+--------------------------------------------------------------------------------
+   [01/10] sidechain_kick_bass: valid=True | len=906 chars | steps=True
+   [02/10] linear_phase_eq: valid=False | len=1857 chars | steps=False
+   [03/10] vocal_mud_carving: valid=False | len=647 chars | steps=False
+   [04/10] mastering_lufs_target: valid=False | len=439 chars | steps=False
+   [05/10] sub_bass_mono: valid=False | len=580 chars | steps=False
+   [06/10] parallel_compression_drums: valid=True | len=1844 chars | steps=True
+   [07/10] sample_rate_nyquist: valid=True | len=2000 chars | steps=True
+   [08/10] drum_buss_transients: valid=False | len=494 chars | steps=False
+   [09/10] reverb_predelay_separation: valid=False | len=628 chars | steps=False
+   [10/10] dynamic_eq_vs_multiband: valid=False | len=658 chars | steps=False
+OBSERVED: Structural Validity Rate: 3/10 (30%)
+
+================================================================================
+SUMMARY OF BASELINE METRICS
+  - Cold Start Latency:           20.489 s
+  - Warm Steady-State p50:         4.873 s
+  - Warm Steady-State p95:         14.714 s
+  - Self-Correct Overhead:         +3.752 s per turn
+  - Generation Throughput:         28.5 tok/s
+  - Cache Hit Speedup:             Instant (<0.5ms)
+================================================================================
