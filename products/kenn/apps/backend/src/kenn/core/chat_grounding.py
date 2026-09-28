@@ -163,6 +163,16 @@ _STRUCTURE_TERMS = {
 _CITED_SOURCE_FILENAME_RE = re.compile(r"\(([\w\-]+\.md)\)")
 
 
+def _sources_section(answer: str) -> tuple[int, int]:
+    """Byte range of the answer's own "Sources:" list, or (-1, -1) when there isn't one."""
+    lowered = answer.lower()
+    start = lowered.find("sources:")
+    if start == -1:
+        return -1, -1
+    end = lowered.find("you could also ask", start)
+    return start, (end if end != -1 else len(answer))
+
+
 def _cited_source_filenames(answer: str) -> set[str]:
     """Filenames cited in the answer's own "Sources:" bullet list.
 
@@ -173,13 +183,23 @@ def _cited_source_filenames(answer: str) -> set[str]:
     (not the whole answer) so a legitimate filename mention elsewhere isn't
     misread as a citation.
     """
-    lowered = answer.lower()
-    start = lowered.find("sources:")
+    start, end = _sources_section(answer)
     if start == -1:
         return set()
-    end = lowered.find("you could also ask", start)
-    section = answer[start:end] if end != -1 else answer[start:]
-    return {m.lower() for m in _CITED_SOURCE_FILENAME_RE.findall(section)}
+    return {m.lower() for m in _CITED_SOURCE_FILENAME_RE.findall(answer[start:end])}
+
+
+def _prose_without_sources(answer: str) -> str:
+    """The answer with its own citation list removed.
+
+    The Sources: line is copied from the labels we handed the model, so its words are guaranteed to
+    appear in the evidence. Counting them toward evidence overlap let an answer clear the floor on the
+    strength of the citation alone, with nothing in the prose actually drawn from the note.
+    """
+    start, end = _sources_section(answer)
+    if start == -1:
+        return answer
+    return (answer[:start] + answer[end:]).strip()
 
 
 _SOURCE_PUNT_RE = re.compile(
@@ -242,14 +262,32 @@ def _echoes_prompt_instructions(answer: str) -> bool:
 
 
 # A chat answer is advice; only the Live command path changes the set, and only after Apply. A model that writes
-# "I've turned the bass down 2 dB" is handing the user a receipt for something that never happened, so that answer
-# is thrown away and the template is used. Checked against 122 Qwen answers from the Stage 1 comparison: no false
-# hits ("I'd cut", "you'll want to set" are advice and don't match).
+# "I've turned the bass down 2 dB" is handing the user a receipt for something never happened, so that answer is
+# thrown away and the template is used. Checked against 122 Qwen answers from the Stage 1 comparison: no false hits
+# on the auxiliary forms ("I'd cut", "you'll want to set" are advice and don't match).
+#
+# The auxiliary-only version missed the plainer past tense, which is what a small local model actually writes:
+# "I lowered the bass by 2 dB" claims exactly as much as "I have lowered the bass by 2 dB" and slipped through on
+# 25 of 29 realistic phrasings. Hence the second branch. Bare "I" takes the whole verb list, "set" and "cut"
+# included, because the two errors are not symmetric: a missed claim shows the producer a receipt for a change
+# that never happened, while a false positive only falls back to the template. The advice forms stay clean anyway,
+# because no modal can reach either branch: "I'd set" is stopped by the apostrophe, and "I would set",
+# "I will set" and "I'll set" are stopped by no modal being in the verb list.
+_CHANGE_VERBS = (
+    r"turned|set|muted|unmuted|soloed|unsoloed|panned|lowered|raised|boosted|cut|added|inserted|loaded|"
+    r"applied|changed|adjusted|renamed|created|removed|deleted|moved|made|dropped|bypassed|armed|disarmed|"
+    r"assigned|duplicated|copied|imported|exported|recorded|sent|wrote|replaced|swapped|nudged|faded|chopped|"
+    r"routed|quantized|disabled|enabled|started|stopped|saved|cleared|reset|unlinked|grouped|ungrouped|"
+    r"selected|deselected|automated|opened|closed"
+)
 _LIVE_CHANGE_CLAIM_RE = re.compile(
-    r"\bI(?:'ve|\u2019ve| have| just)\s+(?:just\s+|now\s+|gone ahead and\s+)?"
-    r"(?:turned|set|muted|unmuted|soloed|unsoloed|panned|lowered|raised|boosted|cut|added|inserted|loaded|applied|"
-    r"changed|adjusted|renamed|created|removed|deleted|moved|made)\b"
-    r"|^\s*done[.!,:\u2014-]",
+    # "I've turned", "I have set", "I just muted", "I now lowered", "I've gone ahead and set"
+    rf"\bI(?:'ve|\u2019ve| have| just| now| already)\s+(?:just\s+|now\s+|gone ahead and\s+|already\s+)?"
+    rf"(?:{_CHANGE_VERBS})\b"
+    # Plain past tense with no auxiliary: "I lowered the bass by 2 dB", "I muted the kick", "I set the send to 15%"
+    rf"|\bI\s+(?:then\s+|also\s+|went ahead and\s+)?(?:{_CHANGE_VERBS})\b"
+    # "Done." and "Done - the send is set up." The delimiter used to be mandatory, so "Done - ..." missed.
+    rf"|^\s*done\b",
     re.I | re.M,
 )
 
@@ -275,10 +313,6 @@ def generated_answer_validation(
     remote, sync, streaming, and voice generation cannot select different
     standards. Failed generated text is discarded before it reaches a caller.
     """
-    trusted_inline_context = query.lower().startswith(
-        ("[stems masking analysis context]", "[audio characterization:")
-    )
-    effective_answer_mode = "mix_diagnosis" if trusted_inline_context else answer_mode
     grounding = grounding_report(
         query,
         results,
@@ -287,27 +321,17 @@ def generated_answer_validation(
         confidence=confidence,
         timeline_context=timeline_context,
     )
-    if trusted_inline_context:
-        grounding = {
-            "score": 90,
-            "top_source_trust": 1.0,
-            "approved_note": True,
-            "source_topic_match": True,
-            "answered_intent": True,
-            "route_known": True,
-            "warnings": [],
-        }
     quality = answer_quality_report(
         query,
         results,
         answer,
         route=route,
-        confidence="high" if trusted_inline_context else confidence,
-        answer_mode=effective_answer_mode,
+        confidence=confidence,
+        answer_mode=answer_mode,
         grounding=grounding,
         timeline_context=timeline_context,
     )
-    evidence_text = query + " " + " ".join(
+    evidence_text = " ".join(
         " ".join(
             (
                 str(chunk.get("title") or ""),
@@ -321,8 +345,12 @@ def generated_answer_validation(
         evidence_text = f"{evidence_text} {timeline_context}"
     if additional_evidence_text:
         evidence_text = f"{evidence_text} {additional_evidence_text}"
-    evidence_terms = normalized_terms(f"{query} {evidence_text}")
-    answer_terms = normalized_terms(answer) - _STRUCTURE_TERMS
+    # The query is deliberately not part of the evidence set. This overlap check answers one question:
+    # is the answer built out of the notes we retrieved? Folding the query in would let a model pass by
+    # echoing the words of the question back, which is the one thing a synthesised answer always does.
+    # Whether the answer engages the question is already covered by `answered_intent` in grounding_report.
+    evidence_terms = normalized_terms(evidence_text)
+    answer_terms = normalized_terms(_prose_without_sources(answer)) - _STRUCTURE_TERMS
     overlap = (
         len(answer_terms & evidence_terms) / len(answer_terms)
         if answer_terms
@@ -358,8 +386,7 @@ def generated_answer_validation(
         warnings.append("generated answer punts to the sources instead of synthesizing them")
     if echoes_prompt:
         warnings.append("generated answer echoes its own system prompt instructions")
-    minimum_overlap = 0.10 if trusted_inline_context else 0.16
-    if len(answer_terms) >= 8 and overlap < minimum_overlap:
+    if len(answer_terms) >= 8 and overlap < 0.16:
         warnings.append("generated answer has insufficient evidence overlap")
     if grounding_mode(grounding) == "weak":
         warnings.append("generated answer has weak grounding")
@@ -596,8 +623,10 @@ def should_use_llm_rewrite(
     quality: dict,
     answer_mode: str,
 ) -> bool:
-    if "[stems masking" in query.lower() or "[audio characterization" in query.lower():
-        return True
+    # Deliberately no "trusted context" escape hatch keyed on the query text. A query is producer-supplied,
+    # so a prefix in it is a producer-supplied bypass: typing the marker used to switch this on with a weak
+    # template answer, before the confidence, grounding and quality checks below. Host-supplied context
+    # arrives as `timeline_context`, which is a real argument and cannot be forged from the request body.
     if confidence not in {"high", "medium"}:
         return False
     if route in {"out_of_scope", "clarify", "conversation", "audiogen"}:

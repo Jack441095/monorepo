@@ -173,3 +173,21 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - [ ] Stage 1 conversational KENN · [ ] Stage 2 deep Ableton knowledge · [ ] Stage 3 agentic co-producer ·
       [x] Stage 4 memory · [ ] Stage 5 creation
 
+- [x] Stage 3b correctness pass (28 Sept audit). Eight live defects found and fixed in the safety and answer
+      paths, 2,228 tests passing. The one to know about: the grounding gate had a "trusted context" bypass keyed
+      on a marker in the question text, and nothing in production produced that marker — so a producer could type
+      it and switch off every check. Also: the question was being counted as retrieved evidence; the answer's own
+      Sources: line counted as synthesis; the false-receipt guard missed "I lowered the bass" (25 of 29
+      phrasings); any question containing "docs"/"manual" retrieved 8 notes, cited 0 and did not abstain; a
+      follow-up was answered from the previous question's notes; and a write that landed could be reported as
+      "Nothing was changed" if the session log failed to write. Retrieval recall@4, chat coverage and abstention
+      all unchanged. 18 further findings are listed, unfixed, in Stage 3b of the North Star plan
+- [ ] **Needs you (decision):** ingest the Ableton Live Reference Manual? The code is written and tested for it,
+      but all six index versions hold zero `official_ableton_manual` chunks, so every official-manual pathway is
+      dead and "what does the manual say about…" now correctly abstains. Details in the North Star plan
+- [ ] **Needs you (decision):** work the Stage 3b open list now or after the beta? Two are reachable and worth
+      closing before a second tester: the semantic answer cache is not project-scoped (one project's answer can
+      be served in another), and `validate_llm_plan` skips the device-parameter range check in two fail-open cases
+- [ ] **Needs you (correction):** the North Star plan says chat coverage 125/128; the tooling measures 124/128 on
+      `main`, and the same four cases fail either way. Confirmed by re-running with the audit changes stashed.
+      Someone should re-record it so your record matches the tooling

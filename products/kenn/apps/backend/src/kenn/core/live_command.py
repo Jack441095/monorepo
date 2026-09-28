@@ -3534,6 +3534,7 @@ def handle_command(
 ) -> dict[str, Any]:
     """Fail-safe public boundary for command planning and execution."""
     command_started = time.monotonic()
+    result: dict[str, Any] | None = None
     try:
         result = _handle_command_impl(
             command,
@@ -3569,16 +3570,27 @@ def handle_command(
         return result
     except Exception as exc:
         message = str(exc).casefold()
+        # The write happens inside _handle_command_impl, and the bookkeeping after it (exchange log,
+        # shadow log, latency accounting) is still inside this try. A failure there used to answer
+        # "Nothing was changed" and drop the receipt, telling the producer their set was untouched at
+        # the moment we had just written to it. `result` being set proves the write already happened.
+        applied_change = result if result is not None and result.get("changed") else None
         if isinstance(exc, TimeoutError) or "timed out" in message or "timeout" in message:
             answer = "Ableton Live isn't responding — check the connection and try again."
             error_code = "ableton_timeout"
+        elif applied_change is not None:
+            answer = (
+                "The change went through, but I could not finish writing it to the session log. "
+                "Say \"undo\" if you want it reversed."
+            )
+            error_code = "applied_but_unlogged"
         else:
             answer = "I couldn't complete that Ableton request safely. Nothing was changed; check the connection and try again."
             error_code = "command_failed_safely"
         response = _base_response(_clean_text(command, 4000), _clean_text(session_id, 128))
         response.update({
             "status": "failed",
-            "changed": False,
+            "changed": applied_change is not None,
             "confirmation_required": False,
             "answer": answer,
             "error_code": error_code,
@@ -3587,7 +3599,13 @@ def handle_command(
                 "budget_ms": dict(LATENCY_BUDGET_MS),
             },
         })
+        if applied_change is not None and applied_change.get("receipt"):
+            response["receipt"] = applied_change["receipt"]
         _update_lifecycle(response, "failed", verification="not_verified")
+        logging.getLogger("kenn.core.live_command").warning(
+            "handle_command failed after the Live write completed; reporting the change as applied",
+            exc_info=True,
+        )
         return response
 
 

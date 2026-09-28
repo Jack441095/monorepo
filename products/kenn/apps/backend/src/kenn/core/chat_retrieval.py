@@ -284,11 +284,16 @@ def results_are_weak(query: str, results: list[tuple[float, dict]]) -> bool:
     top_score, top_chunk = results[0]
     if top_score < MIN_RELEVANT_SCORE:
         return True
+    # An empty display set means no chunk will be cited, whatever the raw scores say. `display_results` drops
+    # everything when a producer explicitly asks for the official manual and the index holds no official manual
+    # chunk, so the question "what does the manual say about send effects" retrieved eight strong notes and then
+    # displayed none of them. Scoring the raw list alone let the caller carry on and build an answer with an
+    # empty Sources: line, which is the silent-fabrication shape the whole gate exists to prevent.
+    displayed = display_results(query, results, 1)
+    if not displayed:
+        return True
     topics = query_topics(query)
     if not topics:
-        displayed = display_results(query, results, 1)
-        if not displayed:
-            return True
         _score, primary = displayed[0]
         if primary.get("kind") == "note":
             return note_query_affinity(query, primary) == 0

@@ -3437,3 +3437,83 @@ def test_one_command_per_line_is_one_step_each() -> None:
 
     assert _one_command_per_line("mute the kick\nsolo the snare") == "mute the kick; solo the snare"
     assert _one_command_per_line("set the kick to\n-6 dB") == "set the kick to -6 dB"
+
+
+# handle_command wraps the Live write and the bookkeeping that follows it in one try, so a failure writing
+# the exchange log or the shadow log used to answer "Nothing was changed" and drop the receipt. The producer
+# is told their set is untouched at the moment we have just written to it, and a false receipt is worse than
+# a noisy error because the producer trusts it.
+def test_a_write_that_landed_is_reported_as_changed_when_the_session_log_fails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake = FakeLive()
+    service = _service(fake)
+    planned = handle_command("mute track 2", session_id="log-failure-after-write", service=service)
+    applied = handle_command(
+        "mute track 2",
+        session_id="log-failure-after-write",
+        service=service,
+        proposal=planned["proposal"],
+        confirm_token=planned["proposal"]["confirmation_token"],
+        idempotency_key=planned["proposal"]["action_id"],
+    )
+    assert applied["status"] == "applied"
+    assert fake.writes == [("mute", 1, True)]
+
+    # Plan a second, different change so the failing call has its own proposal to burn through.
+    second = handle_command("mute track 3", session_id="log-failure-after-write", service=service)
+    assert second["status"] == "confirmation_required"
+
+    def no_space_on_disk(*_args, **_kwargs):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(live_command_module, "record_live_exchange", no_space_on_disk)
+    result = handle_command(
+        "mute track 3",
+        session_id="log-failure-after-write",
+        service=service,
+        proposal=second["proposal"],
+        confirm_token=second["proposal"]["confirmation_token"],
+        idempotency_key=second["proposal"]["action_id"],
+    )
+
+    assert fake.writes == [("mute", 1, True), ("mute", 2, True)], "the second write should have landed"
+    assert result["changed"] is True, "the set was changed, so the response has to say so"
+    assert result["error_code"] == "applied_but_unlogged"
+    assert "Nothing was changed" not in result["answer"]
+    assert "undo" in result["answer"].lower(), "the producer needs the reversal path pointed out"
+
+
+def test_a_failure_before_any_write_still_says_nothing_changed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The other half of the contract: never cry "changed" when the request never reached a write, or the
+    # fix above is worse than the bug it replaced.
+    fake = FakeLive()
+    service = _service(fake)
+
+    def no_space_on_disk(*_args, **_kwargs):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(live_command_module, "_handle_command_impl", no_space_on_disk)
+    result = handle_command("mute track 2", session_id="log-failure-before-write", service=service)
+
+    assert fake.writes == []
+    assert result["changed"] is False
+    assert result["error_code"] == "command_failed_safely"
+    assert "Nothing was changed" in result["answer"]
+
+
+def test_a_live_timeout_is_still_reported_as_a_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
+    fake = FakeLive()
+    service = _service(fake)
+
+    def no_reply(*_args, **_kwargs):
+        raise TimeoutError("no reply from Live")
+
+    monkeypatch.setattr(live_command_module, "_handle_command_impl", no_reply)
+    result = handle_command("mute track 2", session_id="log-timeout", service=service)
+
+    assert result["error_code"] == "ableton_timeout"
+    assert result["changed"] is False
+    assert fake.writes == []

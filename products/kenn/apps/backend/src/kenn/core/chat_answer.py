@@ -942,10 +942,9 @@ def make_answer(
     _ma_template_ms = (_time.perf_counter() - _ma_t0) * 1000
     if timeline_context:
         template = timeline_context + "\n\n" + template
-    is_context_query = "[stems masking" in query.lower() or "[audio characterization" in query.lower()
     if (
         results_are_weak(query, results) or intent_guard_failed(query, results)
-    ) and not timeline_context and not is_context_query:
+    ) and not timeline_context:
         print(f"  make_answer: template={_ma_template_ms:.0f}ms (weak, early return)", file=_sys.stderr, flush=True)
         return template, False
     # Exact hardware behaviour is a source boundary, not a creative-writing
@@ -1084,6 +1083,101 @@ def answer_payload_stream(
         yield event
 
 
+def _cached_results_cover_query(query: str, cached: list[tuple[float, dict]]) -> bool:
+    """Can these already-retrieved chunks answer this question, or were they picked for the last one?
+
+    `should_use_history` fires on follow-up wording, which says the new turn belongs to the same conversation.
+    It does not say the subject is the same. "And what release time should I use?" is a follow-up of a reverb
+    send question, and the send notes cannot answer it, so reusing them asks the model to answer question B out
+    of question A's evidence. We only reuse when the new question's own subject words are already present in
+    the cached set, which keeps the saving on true follow-ups ("what about that?") and drops it on a subject
+    change ("do that on the snare too").
+    """
+    wanted = {
+        term
+        for term in normalized_terms(query)
+        if len(term) >= 4 and term not in _DISCOURSE_TERMS
+    }
+    if not wanted:
+        # Nothing to test against ("and then?"), so the follow-up inherits the parent's evidence.
+        return True
+    have = set()
+    for _score, chunk in cached:
+        have.update(normalized_terms(str(chunk.get("text") or "")))
+        have.update(normalized_terms(str(chunk.get("title") or "")))
+    return bool(wanted & have)
+
+
+# Words a producer types while pointing at something already on screen. They carry no retrieval subject, so they
+# must not count as evidence that the new question has strayed from the cached set. Kept as an explicit list
+# because the alternative is a general-purpose stopword list, and the only stopwords that matter here are the ones
+# a follow-up turn is actually made of: "and then?", "is that right?", "what about that?".
+_DISCOURSE_TERMS = {
+    "about",
+    "actually",
+    "also",
+    "again",
+    "another",
+    "anything",
+    "better",
+    "best",
+    "bit",
+    "correct",
+    "else",
+    "enough",
+    "even",
+    "explain",
+    "good",
+    "here",
+    "honestly",
+    "instead",
+    "kind",
+    "like",
+    "maybe",
+    "mean",
+    "means",
+    "more",
+    "much",
+    "nope",
+    "okay",
+    "only",
+    "other",
+    "please",
+    "quite",
+    "rather",
+    "real",
+    "really",
+    "right",
+    "same",
+    "should",
+    "something",
+    "sort",
+    "still",
+    "tell",
+    "than",
+    "that",
+    "their",
+    "then",
+    "there",
+    "these",
+    "they",
+    "thing",
+    "things",
+    "this",
+    "those",
+    "what",
+    "when",
+    "where",
+    "which",
+    "will",
+    "with",
+    "would",
+    "wrong",
+    "yeah",
+    "your",
+}
+
+
 def _resolve_results_with_topic_lock(
     query: str,
     history: list | None,
@@ -1103,11 +1197,13 @@ def _resolve_results_with_topic_lock(
             state = _load_session(session_id=session_id)
             cached_results = state.get("last_retrieved_results")
             if cached_results:
-                results = []
+                cached = []
                 for item in cached_results:
                     if isinstance(item, (list, tuple)) and len(item) == 2:
-                        results.append((float(item[0]), item[1]))
-                reused = True
+                        cached.append((float(item[0]), item[1]))
+                if cached and _cached_results_cover_query(query, cached):
+                    results = cached
+                    reused = True
         except Exception:
             # Non-fatal: results stays None and a fresh search() runs below,
             # so this can't produce a wrong answer -- but a cache-read
