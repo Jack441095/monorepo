@@ -344,10 +344,13 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
 
 **Open from the same audit, not yet fixed** — these need their own work and are listed so nothing is lost:
 
-- [ ] `LiveExecutor.undo_action` checks no confirmation, no mutation gate and no device identity, and writes
+- [x] `LiveExecutor.undo_action` checks no confirmation, no mutation gate and no device identity, and writes
       `before` into whatever parameter now holds that index. No production caller today (tests only), but the
       class docstring's "disabled by default" is untrue of this method, and it drops the undo record when
       AbletonOSC's acknowledgement is lost — the exact bug the production path was already fixed for.
+  > 28 Sept: Fixed in `core/live_executor.py`. Enforces `allow_legacy_mutation` gate on undo, checks pre-write
+  > Live device and parameter identity before restoring, supports confirmation tokens, and reconciles lost OSC
+  > acknowledgements via readback (`unacknowledged_write_reconciled`); verified in `test_live_control_safe_pipeline.py`.
 - [x] `validate_llm_plan` silently skips the device-parameter range check when the snapshot carries no
       parameters for the device, and when a profile's bounds are non-numeric (NaN makes the guard false). Both
       fail open.

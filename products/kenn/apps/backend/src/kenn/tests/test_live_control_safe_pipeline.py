@@ -184,6 +184,8 @@ class TestLiveControlSafePipeline(unittest.TestCase):
             {"success": True, "device_name": "Compressor", "parameters": [{"index": 0, "name": "Threshold", "value": -12.0}]},
             # Post-write readback lookup
             {"success": True, "device_name": "Compressor", "parameters": [{"index": 0, "name": "Threshold", "value": -14.0}]},
+            # Pre-undo device identity lookup
+            {"success": True, "device_name": "Compressor", "parameters": [{"index": 0, "name": "Threshold", "value": -14.0}]},
             # Undo post-write readback lookup
             {"success": True, "device_name": "Compressor", "parameters": [{"index": 0, "name": "Threshold", "value": -12.0}]},
         ]
@@ -204,6 +206,64 @@ class TestLiveControlSafePipeline(unittest.TestCase):
         undo_res = executor.undo_action(undo_payload)
         self.assertTrue(undo_res.get("ok"))
         self.assertEqual(undo_res.get("status"), "undone")
+        self.assertEqual(undo_res.get("write_acknowledgement"), "confirmed")
+
+    def test_undo_action_disabled_by_default_when_allow_legacy_mutation_is_false(self):
+        # Direct mutation through LiveExecutor must fail closed by default
+        executor = LiveExecutor(osc_client=self.mock_osc_client, allow_legacy_mutation=False)
+        undo_payload = {
+            "track_index": 0,
+            "device_index": 0,
+            "parameter_index": 0,
+            "restore_value": -12.0,
+        }
+        res = executor.undo_action(undo_payload)
+        self.assertFalse(res.get("ok"))
+        self.assertIn("Legacy Live mutation is disabled", res.get("error", ""))
+
+    def test_undo_action_refuses_when_device_identity_changed(self):
+        self.mock_osc_client.get_device_parameters.side_effect = None
+        self.mock_osc_client.get_device_parameters.return_value = {
+            "success": True,
+            "device_name": "Auto Filter",  # Swapped from Compressor
+            "parameters": [{"index": 0, "name": "Frequency", "value": 1000.0}],
+        }
+        executor = LiveExecutor(osc_client=self.mock_osc_client, allow_legacy_mutation=True)
+        undo_payload = {
+            "track_index": 0,
+            "device_index": 0,
+            "device_name": "Compressor",
+            "parameter_index": 0,
+            "parameter_name": "Threshold",
+            "restore_value": -12.0,
+        }
+        res = executor.undo_action(undo_payload)
+        self.assertFalse(res.get("ok"))
+        self.assertIn("device identity changed", res.get("error", "").lower())
+
+    def test_undo_action_reconciles_when_osc_ack_is_lost_but_readback_matches(self):
+        self.mock_osc_client.get_device_parameters.side_effect = [
+            # Pre-undo lookup
+            {"success": True, "device_name": "Compressor", "parameters": [{"index": 0, "name": "Threshold", "value": -14.0}]},
+            # Post-write readback confirms restoration succeeded
+            {"success": True, "device_name": "Compressor", "parameters": [{"index": 0, "name": "Threshold", "value": -12.0}]},
+        ]
+        # Simulate dropped UDP acknowledgement packet
+        self.mock_osc_client.set_device_parameter.return_value = False
+
+        executor = LiveExecutor(osc_client=self.mock_osc_client, allow_legacy_mutation=True)
+        undo_payload = {
+            "track_index": 0,
+            "device_index": 0,
+            "device_name": "Compressor",
+            "parameter_index": 0,
+            "parameter_name": "Threshold",
+            "restore_value": -12.0,
+        }
+        res = executor.undo_action(undo_payload)
+        self.assertTrue(res.get("ok"))
+        self.assertEqual(res.get("status"), "undone")
+        self.assertEqual(res.get("write_acknowledgement"), "unacknowledged_write_reconciled")
 
 
     def test_tool_set_ableton_parameter_gating_behavior(self):

@@ -135,6 +135,7 @@ class LiveExecutor:
                 "action_id": child.get("id"),
                 "track_index": track_idx,
                 "device_index": device_idx,
+                "device_name": str(pre_info.get("device_name", "")),
                 "parameter_index": param_idx,
                 "parameter_name": param_name,
                 "before_value": before_val,
@@ -194,7 +195,9 @@ class LiveExecutor:
                     {
                         "track_index": r["track_index"],
                         "device_index": r["device_index"],
+                        "device_name": r.get("device_name", ""),
                         "parameter_index": r["parameter_index"],
+                        "parameter_name": r.get("parameter_name", ""),
                         "restore_value": r["before_value"],
                     }
                     for r in reversed(applied_receipts)
@@ -205,6 +208,8 @@ class LiveExecutor:
 
     def undo_batch_action(self, batch_undo_payload: Dict[str, Any]) -> Dict[str, Any]:
         """Restore all parameters changed in a batch transaction in reverse order."""
+        if not self.allow_legacy_mutation:
+            return {"ok": False, "error": "Legacy batch Live mutation is disabled; use LiveActionService."}
         restore_steps = batch_undo_payload.get("restore_steps", [])
         if not restore_steps:
             return {"ok": False, "error": "Invalid batch undo payload."}
@@ -317,6 +322,7 @@ class LiveExecutor:
                 "target": target,
                 "track_index": track_idx,
                 "device_index": device_idx,
+                "device_name": str(proposal.get("device_name") or pre_info.get("device_name", "")),
                 "parameter_index": param_idx,
                 "parameter_name": param_name,
                 "restore_value": before_val,
@@ -327,8 +333,15 @@ class LiveExecutor:
             return {"ok": False, "error": "Live write was sent but read-back verification failed; no successful execution receipt was issued.", "receipt": receipt}
         return {"ok": True, "receipt": receipt}
 
-    def undo_action(self, undo_payload: Dict[str, Any]) -> Dict[str, Any]:
+    def undo_action(
+        self,
+        undo_payload: Dict[str, Any],
+        confirm_token: Optional[str] = None,
+        session_id: str = "default_session",
+    ) -> Dict[str, Any]:
         """Restore previous parameter value using an execution receipt's undo payload."""
+        if not self.allow_legacy_mutation:
+            return {"ok": False, "error": "Legacy Live mutation is disabled; use LiveActionService."}
         if undo_payload.get("schema") == BATCH_RECEIPT_SCHEMA:
             return self.undo_batch_action(undo_payload)
         try:
@@ -339,20 +352,61 @@ class LiveExecutor:
         except (KeyError, TypeError, ValueError) as exc:
             return {"ok": False, "error": f"Invalid undo payload parameters: {exc}"}
 
-        success = self.osc_client.set_device_parameter(track_idx, device_idx, param_idx, restore_val)
-        if not success:
-            return {"ok": False, "error": "Failed to apply undo parameter restoration to Ableton Live."}
+        # Verify confirmation token if provided or attached to payload
+        token_to_verify = confirm_token or undo_payload.get("confirmation_token")
+        if token_to_verify:
+            req_text = f"undo_device_parameter:{track_idx}:{device_idx}:{param_idx}:{restore_val}"
+            if not consume_confirmation(
+                token_to_verify,
+                session_id=session_id,
+                service_id="ableton_control",
+                text=req_text,
+            ):
+                return {"ok": False, "error": "Invalid, mismatched, or expired confirmation token for undo."}
 
-        # Verification readback
+        # Pre-write Live inspection: enforce exact device and parameter identity so
+        # undo cannot write blindly into shifted parameter indices or swapped devices.
+        pre_info = self.osc_client.get_device_parameters(track_idx, device_idx)
+        if not pre_info.get("success"):
+            return {"ok": False, "error": f"Failed pre-write Live state query for undo: {pre_info.get('error')}"}
+
+        params = pre_info.get("parameters", [])
+        if param_idx < 0 or param_idx >= len(params):
+            return {"ok": False, "error": "Target parameter index out of bounds for undo."}
+
+        expected_device = undo_payload.get("device_name")
+        observed_device = pre_info.get("device_name")
+        if expected_device and observed_device and str(observed_device) != str(expected_device):
+            return {
+                "ok": False,
+                "error": f"Live device identity changed from '{expected_device}' to '{observed_device}'; refusing blind undo write.",
+            }
+
+        expected_param = undo_payload.get("parameter_name")
+        observed_param = params[param_idx].get("name", "")
+        if expected_param and observed_param and str(observed_param) != str(expected_param):
+            return {
+                "ok": False,
+                "error": f"Live parameter identity changed from '{expected_param}' to '{observed_param}'; refusing blind undo write.",
+            }
+
+        # Execute parameter write to Ableton Live
+        write_success = self.osc_client.set_device_parameter(track_idx, device_idx, param_idx, restore_val)
+
+        # Verification readback: reconciles an unacknowledged write if AbletonOSC's
+        # UDP response packet was lost in transit.
+        time.sleep(0.05)
         post_info = self.osc_client.get_device_parameters(track_idx, device_idx)
         verified = False
         if post_info.get("success"):
-            params = post_info.get("parameters", [])
-            if 0 <= param_idx < len(params):
-                current_val = float(params[param_idx].get("value", 0.0))
+            post_params = post_info.get("parameters", [])
+            if 0 <= param_idx < len(post_params):
+                current_val = float(post_params[param_idx].get("value", 0.0))
                 verified = abs(current_val - restore_val) <= 0.01
 
         if not verified:
+            if not write_success:
+                return {"ok": False, "error": "Failed to apply undo parameter restoration to Ableton Live."}
             return {
                 "ok": False,
                 "status": "undo_unverified",
@@ -360,10 +414,13 @@ class LiveExecutor:
                 "verified": False,
                 "restored_value": restore_val,
             }
+
+        acknowledgement = "confirmed" if write_success else "unacknowledged_write_reconciled"
         return {
             "ok": True,
             "status": "undone",
             "verified": verified,
+            "write_acknowledgement": acknowledgement,
             "restored_value": restore_val,
             "track_index": track_idx,
             "device_index": device_idx,
