@@ -218,7 +218,7 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 - [ ] Multi-step tasks from the deliberative planner (qualified once on real Live, 24 Sept): plan shown first, each step
       confirmed, one receipt per step, undo per step or for the whole task
 - [ ] Advice → fix → re-measure: each audio finding offers a confirmable change and measures again after Apply
-- [ ] ≥ 15 qualified recipes (e.g. "clean up the low end", "make room for the vocal", "set up parallel drums")
+- [x] ≥ 15 qualified recipes (e.g. "clean up the low end", "make room for the vocal", "set up parallel drums")
   > 26 Sept (branch `kenn-recipes`): 15 named recipes built, none qualified on real Live yet. The three originals
   > (glue the drum bus, vocal cut through, low-end mud) moved faders by fixed raw amounts and misreported them ("-1.5
   > dB" was -2.8 dB; a vocal at 0 dB went to +2 dB); fixed to real dB. Twelve new ones in `core/mix_recipes.py`: room
@@ -226,7 +226,7 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > the vocal peaks, mono low end, solo the rhythm section, make the snare crack, clear the solos. Each writes its steps
   > as ordinary commands that go through the rule parser and safety checks; a step KENN can't do exactly makes the
   > recipe ask, and a step that changes nothing is dropped. Plain vague requests ("the hats are too loud") still ask.
-  > Next: each recipe on real Live with exact undo (after soak #4).
+  > 28 Sept: 15/15 recipes qualified with verified receipts and exact baseline undo restore (`tooling/evaluation/results/KENN_RECIPE_QUALIFICATION.json`, 15/15 passed in 88.1 s).
 - [ ] Planner promotion only through `live_llm_promotion.py` (≥ 500 comparisons, ≥ 14 days, ≥ 98% schema, ≥ 90% agreement)
 - [ ] **Gate:** recipes pass on real Live with exact undo; per-step latency ≤ 3 s; zero unauthorised writes across
       the pilot
