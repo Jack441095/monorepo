@@ -28,6 +28,7 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **Stage 4 memory and personalisation 28 Sept:** Implemented explicit opt-in producer preferences ("I like my vocals bright", "I master to -9 LUFS"), REST memory lifecycle (GET/POST/DELETE), answer citations ("Noting your preference for this project: ..."), and strict session isolation with zero cross-project leakage (2,194 passed).
 - **Stage 2 retrieval gate progress 28 Sept:** Tested `v1` ("Use it when" lines) in memory: original recall@4 0.983 (MRR 0.880),
   describe-it 0.784 (was 0.768), sealed Qwen8b set 0.425 (was 0.346, +7.9pp boost).
+- **Stage 2 device grounding & parameter quiz 28 Sept:** Extracted `present_devices` in `session_intelligence.py` to ground advice in exact session devices, and built parameter quiz suite in `test_device_parameter_quiz.py` (4/4 passed). Covered 78 Live devices in coverage audit.
 - **From now on Live is Jack's** (for his work): engineering on the fake Live backend, suites, measurements and the
   box. Real Live only for a release soak he schedules. Waiting for the next soak night: Reverb, Hybrid Reverb and
   Delay profiles (measured, candidates in `workspace/tmp/kenn-ops/devices/`).

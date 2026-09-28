@@ -81,6 +81,7 @@ def test_session_intelligence_surfaces_exact_selected_device_context() -> None:
         "device_index": 0,
         "name": "EQ Eight",
     }
+    assert brief["session_observations"]["present_devices"] == ["EQ Eight"]
     assert brief["snapshot"]["transport"]["selected_device_name"] == "EQ Eight"
 
 

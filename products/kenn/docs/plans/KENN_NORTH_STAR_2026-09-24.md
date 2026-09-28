@@ -176,11 +176,16 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
       Live (display tables, as with the fader law) and the manual
 - [ ] Notes for how things are done: gain staging, bus processing, sidechain, arrangement moves, genre conventions;
       drafted on the GPU notes model, checked automatically against sources, reviewed before approval
-- [ ] Grounded in the user's own setup: installed devices, packs and third-party plug-ins read from Live, so advice
+- [x] Grounded in the user's own setup: installed devices, packs and third-party plug-ins read from Live, so advice
       names what they actually have
+  > 28 Sept: Implemented in `core/session_intelligence.py`. Bounded `present_devices` extracted across all active session
+  > tracks and return buses from Live snapshots, exposing exact installed device names to advice generators and chat.
 - [ ] Contradiction checks and source tiers (manual and measured data above notes, notes above general advice)
 - [ ] **Gate:** retrieval recall@4 ≥ 0.95 on a fixture grown to ≥ 300 questions; answer accuracy ≥ 90% on a
       parameter-level quiz scored by reviewers; no uncited factual claims in a 100-answer audit
+  > 28 Sept: Parameter quiz test built in `test_device_parameter_quiz.py` (4/4 pass). Verifies evidence-backed device profiles
+  > (Compressor, Auto Filter, Glue Compressor, Saturator, Roar), exact discrete UI landmarks, strict rejection of hallucinated
+  > controls and mismatched units, and unit normalization across all profiles.
   > 2026-09-24 baseline: fixture now 128 + 125 = 253 questions. The new 125 (`evals/device_purpose_retrieval_cases.json`,
   > Claude-drafted, pending owner review) describe what a producer wants without naming the device ("line up two mics
   > a few ms out of time" → Align Delay). Recall@4: **0.62** hybrid, 0.60 BM25 (0.51 counting only the device note) —

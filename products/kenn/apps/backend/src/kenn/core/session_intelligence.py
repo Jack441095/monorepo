@@ -400,6 +400,12 @@ def _session_observations(context: dict[str, Any]) -> dict[str, Any]:
                 })
         clip_count += sum(1 for slot in (track.get("clip_slots") or []) if isinstance(slot, dict) and slot.get("has_clip") is True)
         arrangement_clip_count += sum(1 for clip in (track.get("arrangement_clips") or []) if isinstance(clip, dict))
+    present_devices = sorted({
+        _text(d.get("name") if isinstance(d, dict) else d, 128)
+        for t in [*tracks, *returns]
+        for d in (t.get("devices") or [])
+        if _text(d.get("name") if isinstance(d, dict) else d, 128)
+    })
     return {
         "selected_track": (
             {"index": selected_track.get("index"), "name": _text(selected_track.get("name"), 128)}
@@ -410,6 +416,7 @@ def _session_observations(context: dict[str, Any]) -> dict[str, Any]:
             if isinstance(selected_scene, dict) else None
         ),
         "selected_device": selected_device,
+        "present_devices": present_devices,
         "return_tracks": [
             {"index": item.get("index"), "name": _text(item.get("name"), 128), "device_count": len(item.get("devices") or [])}
             for item in returns[:64]
