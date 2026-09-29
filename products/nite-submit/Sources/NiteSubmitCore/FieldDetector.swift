@@ -1002,9 +1002,8 @@ extension FieldDetector {
         let ordered = labels.sorted { $0.count > $1.count } // most specific first
         for page in doc.pages.prefix(maxPage) {
             for line in page.lines {
-                let lower = line.lowercased()
                 for label in ordered {
-                    if lower.hasPrefix(label) || lower.contains("\(label):") || lower.contains("\(label) :") {
+                    if anchoredLabelRange(in: line, label: label) != nil {
                         hits.append((label.capitalized, line, page))
                         break
                     }
@@ -1014,9 +1013,25 @@ extension FieldDetector {
         return hits
     }
 
+    /// Word-boundary match for a label followed by its separator, so
+    /// "Filename:" never fires the "name" label and "community:" never fires
+    /// "unit". The separator is a colon, a full-width colon, or a dash —
+    /// "ID number - 24012345" is as common on UWE cover sheets as a colon.
+    /// A full stop is allowed between label and colon for the abbreviated
+    /// "Assignment No.: HEA3183" form.
+    func anchoredLabelRange(in line: String, label: String) -> Range<String.Index>? {
+        let escaped = NSRegularExpression.escapedPattern(for: label)
+        let pattern = "(?:^|(?<=\\s))\\b\(escaped)\\b\\.?\\s*[:\u{FF1A}\\-–—]"
+        guard let re = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else { return nil }
+        let ns = NSRange(line.startIndex..., in: line)
+        guard let m = re.firstMatch(in: line, range: ns),
+              let r = Range(m.range, in: line) else { return nil }
+        return r
+    }
+
     /// Text after a label within the same line, with separator stripped.
     func remainder(of line: String, after label: String) -> String {
-        guard let r = line.lowercased().range(of: label.lowercased()) else { return "" }
+        guard let r = anchoredLabelRange(in: line, label: label) else { return "" }
         var rest = String(line[r.upperBound...])
         rest = regexReplace(rest, pattern: #"^\s*[:：\-–—]?\s*"#) { _ in "" }
         return rest.trimmingCharacters(in: .whitespaces)

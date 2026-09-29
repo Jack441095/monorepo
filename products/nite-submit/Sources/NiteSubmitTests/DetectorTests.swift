@@ -723,5 +723,15 @@ func runDetectorTests() {
            "Illinois title-page title preserves academic wording")
         eq(illinoisTitlePage.university.value!, "University of Illinois Urbana-Champaign",
            "Illinois awarding university outranks Graduate College wrapper")
+
+        // B8: anchored label matching. "Filename:" must not fire the "name"
+        // label (it contains "name:" as a substring) and "Community:" must
+        // not fire the "unit" label. The old contains("name:") check hit both.
+        let filenameLine = detector.detect(in: makeDoc([["Filename: foo"]]))
+        check(filenameLine.studentName.isMissing,
+              "Filename label does not trigger a student name")
+        let communityLine = detector.detect(in: makeDoc([["Community: local group"]]))
+        check(communityLine.moduleCode.isMissing,
+              "Community label does not trigger a unit module code")
     }
 }
