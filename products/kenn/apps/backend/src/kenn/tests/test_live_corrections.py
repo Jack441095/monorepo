@@ -70,3 +70,10 @@ def test_a_correction_naming_two_tracks_points_at_the_follow_up_wording(live) ->
     live("Bring the bass down 2 dB")
     answer = live("no, the snare and the kick")["answer"]
     assert "do that on the snare and the kick" in answer and "Nothing changed" in answer
+
+
+@pytest.mark.parametrize("text", ["wait, what about kick and snare", "actually mute the kick and the snare", "no, the tambourine and the kick"])
+def test_only_a_list_of_real_tracks_gets_the_two_track_help(live, text) -> None:
+    # Regression (review, 29 Sept): any short "no/actually/wait ..." with an "and" got "Nothing changed. Say 'do that on ...'".
+    live("Bring the bass down 2 dB")
+    assert "do that on" not in live(text)["answer"]

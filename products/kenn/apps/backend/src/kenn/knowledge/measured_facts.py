@@ -17,7 +17,7 @@ from typing import Any, Iterable
 
 from kenn.core import device_units
 
-DEFAULT_MEASURED_DIR = Path(__file__).resolve().parents[4] / "tooling" / "data" / "measured_devices"
+DEFAULT_MEASURED_DIR = Path(__file__).resolve().parents[5] / "tooling" / "data" / "measured_devices"
 _CONTINUOUS = {"linear", "log", "table", "table_descending"}
 _UNITS = {"db": "db", "hz": "hz", "khz": "hz", "ms": "ms", "%": "%", "percent": "%"}
 _UNIT_SCALE = {"khz": 1000.0}
@@ -86,17 +86,40 @@ def _name_pattern(name: str) -> re.Pattern[str]:
     return re.compile(r"\b" + r"[\s/_-]*".join(words) + r"\b", re.I)
 
 
+# Another device's name in a sentence means a title-level "this note is about the Compressor" doesn't cover it.
+_OTHER_DEVICE = re.compile(
+    r"\b(?:gate|limiter|expander|eq|equali[sz]er|reverb|delay|echo|saturator|multiband|utility|chorus|phaser|flanger|"
+    r"overdrive|pedal|amp|cabinet|glue|drum buss|auto filter|corpus|resonators?)\b", re.I)
+# "Common mistakes: threshold at -80 dB" and "never go below -70 dB" warn about a value; they don't claim it's settable.
+_WARNING = re.compile(r"\b(?:avoid|mistakes?|don'?t|do not|never|instead of|rather than|too (?:low|high|much|little))\b", re.I)
+
+
+def _names_device(device: str, text: str, all_devices: set[str]) -> bool:
+    """Whether text names this device, not just a longer device that contains its name ("Glue Compressor")."""
+    blocked = [match.span() for other in all_devices if other != device and device.casefold() in other.casefold()
+               for match in _name_pattern(other).finditer(text)]
+    return any(not any(start <= match.start() and match.end() <= end for start, end in blocked)
+               for match in _name_pattern(device).finditer(text))
+
+
 def check_note(text: str, title: str, facts: Iterable[Fact]) -> list[dict[str, Any]]:
     """Numbers a note gives for a measured parameter that Live's own range rules out.
 
-    A device counts as the note's subject when its name is in the title or in the sentence itself. Each figure is
-    tied to the nearest parameter named before it in the sentence, and skipped if another parameter's word sits
-    between them or the unit isn't that parameter's unit ("threshold ... 4:1", "attack 10 ms and threshold -20 dB").
+    A device is the sentence's subject when the sentence names it, or when the title does and the sentence names no
+    other device. Each figure is tied to the nearest parameter named before it in the sentence, and skipped if another
+    parameter's word sits between them, the unit isn't that parameter's unit ("threshold ... 4:1", "attack 10 ms and
+    threshold -20 dB"), or the sentence is a warning about a value rather than a recommendation.
     """
+    facts = list(facts)
+    devices = {fact.device for fact in facts}
     findings: list[dict[str, Any]] = []
     for sentence in _SENTENCE.split(text):
+        if _WARNING.search(sentence):
+            continue
         for fact in facts:
-            if not (_name_pattern(fact.device).search(title) or _name_pattern(fact.device).search(sentence)):
+            in_sentence = _names_device(fact.device, sentence, devices)
+            in_title = _names_device(fact.device, title, devices) and not _OTHER_DEVICE.search(sentence)
+            if not (in_sentence or in_title):
                 continue
             named = _name_pattern(fact.parameter)
             for mention in named.finditer(sentence):
@@ -107,7 +130,7 @@ def check_note(text: str, title: str, facts: Iterable[Fact]) -> list[dict[str, A
                     unit = _UNITS[claim.group("unit").lower()]
                     if unit != fact.unit:
                         continue
-                    value = float(claim.group("value").replace("−", "-")) * _UNIT_SCALE.get(claim.group("unit").lower(), 1.0)
+                    value = float(claim.group("value").replace("\u2212", "-")) * _UNIT_SCALE.get(claim.group("unit").lower(), 1.0)
                     if fact.low - 1e-9 <= value <= fact.high + 1e-9:
                         continue
                     findings.append({"device": fact.device, "parameter": fact.parameter, "claimed": value, "unit": fact.unit,

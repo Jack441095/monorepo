@@ -70,6 +70,28 @@ def submit(step: Callable[[], str | None]) -> str | None:
     return job_id
 
 
+def schedule(result: dict, step: Callable[[], str | None] | None) -> None:
+    """Queue the model step for a reply and mark it `brain_pending`, if the reply is one the model may rewrite.
+
+    Only a grounded knowledge answer waits: not a weak-match reply (its withheld text must stay), not one carrying a
+    proposal (the page won't poll it). The rewrite is calibrated the same way the template was.
+    """
+    if (step is None or result.get("proposal") or result.get("weak_match")
+            or result.get("confidence") not in {"high", "medium"}):
+        return
+    from kenn.core.chat_grounding import calibrate_answer_for_grounding
+
+    grounding = result.get("grounding") or {}
+
+    def rewrite_then_calibrate() -> str | None:
+        text = step()
+        return calibrate_answer_for_grounding(text, grounding) if text else text
+
+    job_id = submit(rewrite_then_calibrate)
+    if job_id:
+        result["brain_pending"] = {"job_id": job_id}
+
+
 def status(job_id: str) -> dict:
     with _LOCK:
         job = _JOBS.get(job_id)

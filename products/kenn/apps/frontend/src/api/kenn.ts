@@ -382,7 +382,6 @@ export async function undoKennAction(params: {
   }
 }
 
-/** GET Ableton 会话卡片（Mixing Doctor 缓存；未连 Live 时可能为空） */
 /** GET /kenn/api/ask/brain: the local model's rewrite of a template answer, once it has finished */
 export async function fetchKennBrainAnswer(
   jobId: string,
@@ -397,6 +396,7 @@ export async function fetchKennBrainAnswer(
   return { status: String(data.status ?? 'unknown'), answer: answer || undefined }
 }
 
+/** GET Ableton 会话卡片（Mixing Doctor 缓存；未连 Live 时可能为空） */
 export async function fetchKennSessionCard(): Promise<KennSessionCard> {
   await ensureAuthSession()
   const base = getApiBase()

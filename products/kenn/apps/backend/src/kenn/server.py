@@ -2910,10 +2910,6 @@ class Handler(BaseHTTPRequestHandler):
                     )
                 finally:
                     brain_step = deferred_brain.end(brain_token) if brain_token is not None else None
-                if brain_step is not None:
-                    brain_job = deferred_brain.submit(brain_step)
-                    if brain_job:
-                        result["brain_pending"] = {"job_id": brain_job}
                 _answer_ms = (time.perf_counter() - _t_answer) * 1000
                 if plugin_turn:
                     result["live_mix_context"] = plugin_context
@@ -2952,6 +2948,7 @@ class Handler(BaseHTTPRequestHandler):
                     result["proposal"] = orch_proposal
                     result["confirmation_token"] = orch_proposal.get("confirmation_token", "")
                     result["requires_confirmation"] = True
+                deferred_brain.schedule(result, brain_step)
                 _total_ms = (time.perf_counter() - _ask_t0) * 1000
                 timing_stats.record("ask", _total_ms)
                 _inner = result.get("timings_ms") or {}

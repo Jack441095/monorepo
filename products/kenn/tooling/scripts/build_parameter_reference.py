@@ -7,8 +7,9 @@ Reads every device JSON in tooling/data/measured_devices/ (or --evidence-dir) an
 twelve parameters to a note so retrieval gets small chunks. Every line is a range, a mapping or a list of options that
 Live itself displayed. What a parameter *does* comes from the manual notes; these say what it can be set to.
 
-Notes are written as ``Status: Draft`` (the index skips drafts) until you run with --approve, so a person looks at
-the first batch before it reaches an answer. The ``measured-`` name and the ``Measured at:`` line are what let the
+New notes are written as ``Status: Draft`` (the index skips drafts) until you run with --approve, so a person looks at
+the first batch before it reaches an answer. A rerun without --approve keeps the status each existing note already has, and
+removes parts a device no longer needs. The ``measured-`` name and the ``Measured at:`` line are what let the
 index label them as measured Live data (see retrieval/build_index.py).
 """
 
@@ -98,7 +99,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--out", type=Path, required=True, help="notes folder to write into")
     parser.add_argument("--evidence-dir", type=Path, default=DEFAULT_EVIDENCE)
-    parser.add_argument("--approve", action="store_true", help="write Status: Approved instead of Draft")
+    parser.add_argument("--approve", action="store_true", help="write Status: Approved for everything written (default: Draft for new notes, existing status kept)")
     args = parser.parse_args()
 
     files = sorted(args.evidence_dir.glob("*.json")) if args.evidence_dir.is_dir() else []
@@ -115,8 +116,19 @@ def main() -> int:
             print(f"skipped {path.name}: {error}", file=sys.stderr)
             continue
         for name, text in notes.items():
-            (args.out / name).write_text(text, encoding="utf-8")
+            target = args.out / name
+            if target.exists() and not args.approve:
+                # Re-running must not undo a review: an approved note stays approved, a draft stays a draft.
+                kept = re.search(r"^Status:\s*(\S+)", target.read_text(encoding="utf-8"), re.M)
+                if kept:
+                    text = re.sub(r"^Status:.*$", f"Status: {kept.group(1)}", text, count=1, flags=re.M)
+            target.write_text(text, encoding="utf-8")
             written += 1
+        # A device that now needs fewer parts must not leave its old last part indexed.
+        stem = next(iter(notes)).rsplit("-", 1)[0]
+        for old in args.out.glob(f"{stem}-*.md"):
+            if old.name not in notes and re.fullmatch(rf"{re.escape(stem)}-\d+\.md", old.name):
+                old.unlink()
     print(f"wrote {written} note(s) from {len(files)} device file(s) into {args.out} "
           f"({'Approved' if args.approve else 'Draft: review, then rerun with --approve'})")
     return 0

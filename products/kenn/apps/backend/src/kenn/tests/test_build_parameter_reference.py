@@ -80,3 +80,23 @@ def test_the_command_writes_drafts_then_approves(tmp_path, monkeypatch) -> None:
     assert main() == 0 and "Status: Draft" in (out / "measured-compressor-1.md").read_text(encoding="utf-8")
     monkeypatch.setattr("sys.argv", ["x", "--out", str(out), "--evidence-dir", str(evidence), "--approve"])
     assert main() == 0 and "Status: Approved" in (out / "measured-compressor-1.md").read_text(encoding="utf-8")
+
+
+def test_a_rerun_keeps_an_approved_note_approved_and_drops_parts_no_longer_needed(tmp_path, monkeypatch) -> None:
+    # Regression (review): a rerun without --approve demoted every note to Draft, and shrunk devices left stale parts.
+    evidence = tmp_path / "evidence"
+    evidence.mkdir()
+    many = {"device": "Operator", "measured_at": "2026-09-30",
+            "parameters": [{"name": f"P{n}", "unit": "%", "mapping": "linear", "display_min": 0, "display_max": 100} for n in range(30)]}
+    (evidence / "operator.json").write_text(json.dumps(many), encoding="utf-8")
+    out = tmp_path / "notes"
+    args = ["x", "--out", str(out), "--evidence-dir", str(evidence)]
+    monkeypatch.setattr("sys.argv", [*args, "--approve"])
+    assert main() == 0 and len(list(out.glob("measured-operator-*.md"))) == 3
+
+    many["parameters"] = many["parameters"][:20]
+    (evidence / "operator.json").write_text(json.dumps(many), encoding="utf-8")
+    monkeypatch.setattr("sys.argv", args)
+    assert main() == 0
+    assert sorted(p.name for p in out.glob("measured-operator-*.md")) == ["measured-operator-1.md", "measured-operator-2.md"]
+    assert all("Status: Approved" in p.read_text(encoding="utf-8") for p in out.glob("measured-operator-*.md"))

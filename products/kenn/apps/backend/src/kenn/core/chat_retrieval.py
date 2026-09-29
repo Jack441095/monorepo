@@ -729,6 +729,7 @@ def intent_guard_failed(query: str, results: list[tuple[float, dict]]) -> bool:
 def result_payload(query: str, results: list[tuple[float, dict]], limit: int = 3) -> list[dict]:
     payload = []
     for score, chunk in display_results(query, results, limit):
+        tier = source_tiers.tier_of(evidence_class(chunk))
         payload.append(
             {
                 "score": round(score, 3),
@@ -737,8 +738,8 @@ def result_payload(query: str, results: list[tuple[float, dict]], limit: int = 3
                 "kind": chunk.get("kind", "manual"),
                 "evidence_class": evidence_class(chunk),
                 "evidence_label": evidence_label(chunk),
-                "tier": source_tiers.tier_of(evidence_class(chunk)),
-                "tier_label": source_tiers.tier_label(source_tiers.tier_of(evidence_class(chunk))),
+                "tier": tier,
+                "tier_label": source_tiers.tier_label(tier),
                 "title": chunk.get("title", ""),
                 "creator": chunk.get("source_creator", ""),
                 "transcript_file": chunk.get("transcript_file", ""),

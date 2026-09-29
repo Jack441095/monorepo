@@ -155,3 +155,41 @@ def test_a_template_waiting_for_its_rewrite_is_not_cached_as_the_final_answer(mo
 
     chat_answer._answer_payload("how do I sidechain the bass to the kick")
     assert saved == ["how do I sidechain the bass to the kick"]
+
+
+def reply(**changes):
+    return {"answer": "template", "confidence": "high", "weak_match": False, "grounding": {}, **changes}
+
+
+def test_a_grounded_answer_waits_for_the_model_and_gets_a_job_id() -> None:
+    result = reply()
+    deferred_brain.schedule(result, lambda: "model answer")
+    assert wait_for(result["brain_pending"]["job_id"])["answer"] == "model answer"
+
+
+@pytest.mark.parametrize("changes", [
+    {"weak_match": True},                       # the withheld "I don't have this" reply must stay
+    {"confidence": "low"},
+    {"proposal": {"action": "set_mute"}},       # the page never polls a reply with an Apply card
+])
+def test_replies_the_model_must_not_rewrite_never_queue_it(changes) -> None:
+    # Regression (review, 29 Sept): the job was queued before this was known, then swapped over a weak-match reply.
+    result = reply(**changes)
+    deferred_brain.schedule(result, lambda: "model answer")
+    assert "brain_pending" not in result
+
+
+def test_a_reply_with_no_deferred_step_is_left_alone() -> None:
+    result = reply()
+    deferred_brain.schedule(result, None)
+    assert "brain_pending" not in result
+
+
+def test_the_rewrite_gets_the_same_medium_grounding_prefix_the_template_got() -> None:
+    result = reply(confidence="medium", grounding={"score": 60, "warnings": []})
+    deferred_brain.schedule(result, lambda: "model answer")
+    text = wait_for(result["brain_pending"]["job_id"])["answer"]
+    assert text.startswith("Based on the closest local notes") and text.endswith("model answer")
+    strong = reply(grounding={"score": 90, "warnings": []})
+    deferred_brain.schedule(strong, lambda: "model answer")
+    assert wait_for(strong["brain_pending"]["job_id"])["answer"] == "model answer"

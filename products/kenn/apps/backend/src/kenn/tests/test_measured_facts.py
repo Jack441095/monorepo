@@ -113,8 +113,15 @@ def test_the_scan_records_a_note_vs_measured_finding_and_then_retires_it_when_th
 
 
 def test_a_generated_measured_note_is_not_checked_against_itself(registry) -> None:
-    (registry / "measured-compressor.md").write_text(NOTE.format(value="-75"), encoding="utf-8")
+    dated = NOTE.replace("Tags: compressor, dynamics", "Tags: compressor, dynamics\nMeasured at: 2026-09-30")
+    (registry / "measured-compressor.md").write_text(dated.format(value="-75"), encoding="utf-8")
     assert [c for c in contradictions.scan_for_contradictions(registry) if c["type"] == "note_vs_measured"] == []
+
+
+def test_a_hand_written_measured_name_without_the_date_is_still_checked(registry) -> None:
+    # Regression (review): the exemption used to be the filename alone.
+    (registry / "measured-compressor.md").write_text(NOTE.format(value="-75"), encoding="utf-8")
+    assert len([c for c in contradictions.scan_for_contradictions(registry) if c["type"] == "note_vs_measured"]) == 1
 
 
 def test_keeping_the_measurement_turns_the_note_back_into_a_draft(registry) -> None:
@@ -124,3 +131,33 @@ def test_keeping_the_measurement_turns_the_note_back_into_a_draft(registry) -> N
     (open_item,) = contradictions.list_contradictions()
     assert contradictions.resolve_contradiction(open_item["contradiction_id"], "primary_b", registry)
     assert "Status: Draft" in note.read_text(encoding="utf-8")
+
+
+GLUE = Fact("Glue Compressor", "Threshold", "db", -40.0, 0.0, "x")
+
+
+def test_the_default_evidence_folder_is_the_one_the_measuring_tool_writes_to() -> None:
+    # Regression (review, 29 Sept): parents[4] pointed at products/kenn/apps/tooling, so measured files were never read.
+    assert measured_facts.DEFAULT_MEASURED_DIR.parent.is_dir() and measured_facts.DEFAULT_MEASURED_DIR.is_dir()
+    assert measured_facts.DEFAULT_MEASURED_DIR.parts[-4:] == ("kenn", "tooling", "data", "measured_devices")
+
+
+def test_a_title_about_one_device_does_not_cover_a_sentence_about_another() -> None:
+    # Regression (review): "Gate threshold -80 dB" in a note titled "Compressor vs Gate" was held to the Compressor's range.
+    assert claimed("Gate threshold -80 dB is fine for noisy drums.", title="Compressor vs Gate") == []
+    assert claimed("Pull the threshold to -80 dB.", title="Compressor basics") == [-80.0]
+
+
+def test_a_longer_device_name_is_not_read_as_the_shorter_one() -> None:
+    both = [THRESHOLD, GLUE]
+    got = check_note("Glue Compressor threshold at -50 dB.", "Glue Compressor tips", both)
+    assert [(i["device"], i["claimed"]) for i in got] == [("Glue Compressor", -50.0)]
+
+
+@pytest.mark.parametrize("sentence", [
+    "Common mistakes: setting the Compressor threshold to -80 dB.",
+    "Never push the Compressor threshold below -70 dB.",
+    "Avoid a Compressor threshold of -90 dB.",
+])
+def test_a_warning_about_a_value_is_not_a_claim_that_it_can_be_set(sentence) -> None:
+    assert claimed(sentence) == []

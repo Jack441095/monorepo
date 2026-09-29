@@ -254,13 +254,15 @@ def scan_for_contradictions(notes_dir: Path) -> list[dict[str, Any]]:
 
 
 def _scan_notes_against_measurements(notes_meta: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    from kenn.core import source_tiers
     from kenn.knowledge.measured_facts import check_note, load_facts
 
     facts = load_facts()
+    winning_class = source_tiers.winner("measured_live_data", "curated_kenn_note")
     found = []
     for note in notes_meta:
         # A note generated from Live's own strings is the measurement, not a claim about it.
-        if str(note["source_name"]).startswith("measured-"):
+        if source_tiers.is_measured_note(str(note["source_name"]), str(note["content"])):
             continue
         for item in check_note(note["content"], str(note["title"]), facts):
             low, high, unit = item["measured_low"], item["measured_high"], item["unit"]
@@ -272,9 +274,9 @@ def _scan_notes_against_measurements(notes_meta: list[dict[str, Any]]) -> list[d
                 "source_a": note["source_name"],
                 "source_b": source_b,
                 "description": desc,
-                "conflicting_data": {**item, "winner": "measured_live_data"},
+                "conflicting_data": {**item, "winner": winning_class},
                 "contradiction_id": save_contradiction("note_vs_measured", note["source_name"], source_b, desc,
-                                                       {**item, "winner": "measured_live_data"}),
+                                                       {**item, "winner": winning_class}),
             })
     return found
 

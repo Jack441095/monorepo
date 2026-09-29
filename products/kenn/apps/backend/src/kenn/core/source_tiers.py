@@ -7,6 +7,8 @@ weight it carries and a contradiction check knows which side to believe.
 
 from __future__ import annotations
 
+import re
+
 TIER_MEASURED = 0
 TIER_MANUAL = 1
 TIER_NOTE = 2
@@ -29,6 +31,15 @@ _LABEL = {
     TIER_THIRD_PARTY: "Third-party material",
     TIER_UNCLASSIFIED: "Unclassified",
 }
+
+
+def is_measured_note(filename: str, text: str) -> bool:
+    """A note written by build_parameter_reference.py: a measured-*.md name and a dated "Measured at:" line.
+
+    This stops an ordinary note being promoted by accident. It doesn't stop someone who writes both by hand; the notes
+    folder is the owner's own, so that's their call.
+    """
+    return str(filename).startswith("measured-") and bool(re.search(r"^Measured at:\s*\S", text, re.M | re.I))
 
 
 def tier_of(evidence_class: str) -> int:

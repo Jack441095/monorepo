@@ -276,7 +276,7 @@ def realtime_knowledge_guidance(query: str, report: dict[str, Any]) -> list[dict
         guidance: list[dict[str, Any]] = []
         source_counts: dict[str, int] = {}
         seen_sources: set[str] = set()
-        allowed_classes = {"official_ableton_manual", "youtube_transcript", "curated_kenn_note"}
+        allowed_classes = {"official_ableton_manual", "youtube_transcript", "curated_kenn_note", "measured_live_data"}
         for _score, chunk in candidates:
             if not isinstance(chunk, dict):
                 continue

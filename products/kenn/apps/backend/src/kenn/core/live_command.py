@@ -41,7 +41,7 @@ from kenn.core.live_action_service import (
 )
 from kenn.core.clip_duplication_service import ClipDuplicationActionService, PROPOSAL_SCHEMA as CLIP_DUPLICATION_PROPOSAL_SCHEMA
 from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHEMA as CLIP_RENAME_PROPOSAL_SCHEMA
-from kenn.core.live_intent import parse_natural_recipe, parse_request
+from kenn.core.live_intent import _NICKNAME_WORDS, parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
 from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS, load_promotion_state
 from kenn.core.live_session_questions import answer_live_session_question
@@ -2234,9 +2234,13 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
         return None
     names: list[str] = []
     for part in parts:
-        target = parse_request(f"solo {part}", snapshot)
-        track = target.get("track") if isinstance(target.get("track"), dict) else None
-        if not track or target.get("missing_fields") or target.get("ambiguity"):
+        track = _bare_track(part, snapshot) if len(parts) > 1 else None
+        if len(parts) == 1:
+            target = parse_request(f"solo {part}", snapshot)
+            track = target.get("track") if isinstance(target.get("track"), dict) else None
+            if not track or target.get("missing_fields") or target.get("ambiguity"):
+                return None
+        elif not track:
             return None
         if track.get("index") == prior_track.get("index"):
             return None  # the same track again would apply the change twice; let it ask
@@ -2247,6 +2251,17 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
     # Two or more tracks go out as one confirmable recipe, each step written out for its own track. (Asking the
     # parser to "solo the snare and the kick" once resolved only the kick, so each name is resolved on its own above.)
     return " and ".join(commands) if all(commands) else None
+
+
+def _bare_track(part: str, snapshot: dict[str, Any]) -> dict[str, Any] | None:
+    """The one track a bare name ("the kick", "hats") points at, or None. "what about kick" is not a bare name."""
+    found = parse_request(f"solo {part}", snapshot)
+    track = found.get("track")
+    if not isinstance(track, dict) or found.get("missing_fields") or found.get("ambiguity"):
+        return None
+    known = set(re.findall(r"[a-z0-9]+", str(track.get("name", "")).casefold())) | _NICKNAME_WORDS
+    words = set(re.findall(r"[a-z0-9]+", re.sub(r"^the\s+", "", part.casefold())))
+    return track if words <= known else None
 
 
 MAX_FOLLOW_UP_TRACKS = 4
@@ -2324,13 +2339,19 @@ def _correction_command(command: str, session_id: str, snapshot: dict[str, Any])
     return (corrected, str(prior_track.get("name") or "")) if corrected else None
 
 
-def _two_track_correction_help(command: str, session_id: str) -> str | None:
-    """ "no, the snare and the kick" after a change: a correction moves it to one track, so say how to get two."""
+def _two_track_correction_help(command: str, session_id: str, snapshot: dict[str, Any]) -> str | None:
+    """ "no, the snare and the kick" after a change: a correction moves it to one track, so say how to get two.
+
+    Only when every name in the list is a track in the set; "wait, what about kick and snare" is a question.
+    """
     from kenn.core.session_context import live_conversation_context
 
     match = _CORRECTION.match(command.strip())
     target = (match.group("target") or match.group("target2") or "") if match else ""
     if not match or len(target.split()) > 6 or not re.search(r"\band\b|,|&", target, re.I) or re.search(r"\d", target):
+        return None
+    parts = [part.strip() for part in re.split(r"\s*(?:,|&|\band\b)\s*", target) if part.strip()]
+    if not all(_bare_track(part, snapshot) for part in parts):
         return None
     last = str(live_conversation_context(session_id).get("last_command") or "")
     if not last:
@@ -2815,7 +2836,7 @@ def _handle_command_impl(
             response["resolved_command"] = follow_up
             response["context_resolution"] = {"resolution": "follow_up", "original": typed}
             clean_command = follow_up
-        elif (two_track_help := _two_track_correction_help(typed, response["session_id"])):
+        elif (two_track_help := _two_track_correction_help(typed, response["session_id"], snapshot)):
             return _clarification(response, deterministic_intent, two_track_help)
         else:
             completed = _reply_to_question(typed, response["session_id"], snapshot)

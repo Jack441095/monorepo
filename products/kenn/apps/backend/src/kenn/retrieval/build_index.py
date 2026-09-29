@@ -317,9 +317,11 @@ def iter_note_chunks(note_path: Path) -> list[Chunk]:
     source_title = metadata_value("Source title")
     transcript_file = metadata_value("Transcript file")
     evidence = "youtube_transcript" if transcript_file else "curated_kenn_note"
-    # Only the parameter-reference generator writes measured-*.md, from Live's own display strings; a note can't
-    # promote itself to the top tier by saying so in its header.
-    if note_path.name.startswith("measured-") and metadata_value("Measured at"):
+    # The parameter-reference generator writes measured-*.md from Live's own display strings. A header alone can't
+    # promote an ordinary note; the name has to match too (see source_tiers.is_measured_note).
+    from kenn.core.source_tiers import is_measured_note
+
+    if is_measured_note(note_path.name, raw):
         evidence = "measured_live_data"
     provenance = ""
     if source_creator or source_title or transcript_file:
