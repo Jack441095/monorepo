@@ -79,3 +79,37 @@ def test_the_measured_facts_check_sees_qualified_profiles_too(profiles, tmp_path
     profiles(entry())
     facts = measured_facts.facts_from_profiles()
     assert any(f.device == "Operator" and f.parameter == "Filter Freq" and (f.low, f.high) == (20.0, 20000.0) for f in facts)
+
+
+@pytest.fixture()
+def say(profiles, tmp_path, monkeypatch):
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.live_command import handle_command
+
+    monkeypatch.setenv("KENN_ALLOW_DAW_CONTROL", "1")
+    monkeypatch.setenv("KENN_LIVE_RECEIPT_JOURNAL", str(tmp_path / "receipts.jsonl"))
+    service = LiveActionService(FakeLiveBackend())
+    return lambda text: handle_command(text, session_id="profiles", service=service, allow_llm=False)
+
+
+def test_a_qualified_profile_is_all_it_takes_to_set_a_control_in_real_units(profiles, say) -> None:
+    """The chain the device factory feeds: measured, qualified, then "set the compressor attack to 10 ms" just works."""
+    unmeasured = say("set the Drum Bus compressor attack to 10 ms")
+    assert unmeasured["status"] == "clarification_required" and "hasn't been measured" in unmeasured["answer"]   # fails closed
+
+    profiles(
+        entry(parameter="Attack", unit="ms", mapping="log", display_min=0.01, display_max=1000.0),
+        entry(parameter="Knee", unit="db", mapping="linear", raw_min=0.0, raw_max=18.0, display_min=0.0, display_max=18.0),
+        device="Compressor", name="compressor-extra.json")
+    attack = say("set the Drum Bus compressor attack to 10 ms")
+    assert attack["status"] == "confirmation_required" and attack["proposal"]["after"] == pytest.approx(0.6, abs=1e-3)
+    knee = say("set the Drum Bus compressor knee to 12 dB")
+    assert knee["status"] == "confirmation_required" and knee["proposal"]["after"] == pytest.approx(12.0)
+
+
+def test_a_qualified_profile_still_refuses_a_value_outside_the_controls_range(profiles, say) -> None:
+    profiles(entry(parameter="Knee", unit="db", mapping="linear", raw_min=0.0, raw_max=18.0, display_min=0.0, display_max=18.0),
+             device="Compressor", name="compressor-extra.json")
+    refused = say("set the Drum Bus compressor knee to 60 dB")
+    assert refused["status"] == "clarification_required" and "outside valid range" in refused["answer"]

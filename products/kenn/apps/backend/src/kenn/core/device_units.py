@@ -236,6 +236,11 @@ def raw_to_display(*, device_name: str, parameter_name: str, raw: float, unit: s
     profile = find_profile(device_name, parameter_name, unit)
     if profile is None:
         return None, "That display unit has no evidence-backed raw-value mapping for this Live parameter yet."
+    return profile_raw_to_display(profile, raw)
+
+
+def profile_raw_to_display(profile: DeviceUnitProfile, raw: float) -> tuple[float | None, str | None]:
+    """What a profile predicts Live will display at a raw value (also used to test a candidate before it is loaded)."""
     try:
         raw_value = float(raw)
     except (TypeError, ValueError):
@@ -269,4 +274,4 @@ def raw_to_display(*, device_name: str, parameter_name: str, raw: float, unit: s
 
 
 __all__ = ["DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "all_profiles", "display_to_raw", "find_profile", "normalize_unit",
-           "qualified_profiles", "raw_to_display", "reload_profiles"]
+           "profile_raw_to_display", "qualified_profiles", "raw_to_display", "reload_profiles"]
