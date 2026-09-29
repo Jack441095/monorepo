@@ -33,13 +33,17 @@ def test_canonical_midi_notes_drops_invalid_notes_instead_of_leaking_them() -> N
 
 
 class _UndoStub:
-    """Succeeds for restore_value != -1, fails otherwise."""
+    """Simulates a Live that rejects restore writes aimed at -1.0: the write
+    returns False and the parameter reads back at 0.0, not the restore value.
+    The read-back matters because undo_action reconciles an unacknowledged
+    write against Live's actual value — a stub that happened to read back the
+    restore value would turn a refused write into a silent success."""
 
     def set_device_parameter(self, *args) -> bool:
         return args[3] != -1.0
 
     def get_device_parameters(self, track_idx: int, device_idx: int) -> dict:
-        value = 1.0 if track_idx == 0 else -1.0
+        value = 1.0 if track_idx == 0 else 0.0
         return {"success": True, "parameters": [{"value": value}]}
 
 
@@ -52,8 +56,12 @@ def _undo_step(track_index: int, restore_value: float) -> dict:
     }
 
 
+# Production mutation goes through LiveActionService; the legacy executor only
+# mutates behind allow_legacy_mutation, which exists exactly for isolated
+# compatibility tests like these two. The default-off gate itself is covered
+# in test_live_control_safe_pipeline.py.
 def test_undo_batch_action_reports_partial_failure_honestly() -> None:
-    executor = LiveExecutor(osc_client=_UndoStub())
+    executor = LiveExecutor(osc_client=_UndoStub(), allow_legacy_mutation=True)
     payload = {
         "batch_id": "batch-1",
         "restore_steps": [_undo_step(0, 1.0), _undo_step(9, -1.0)],
@@ -66,7 +74,7 @@ def test_undo_batch_action_reports_partial_failure_honestly() -> None:
 
 
 def test_undo_batch_action_reports_full_success() -> None:
-    executor = LiveExecutor(osc_client=_UndoStub())
+    executor = LiveExecutor(osc_client=_UndoStub(), allow_legacy_mutation=True)
     payload = {
         "batch_id": "batch-2",
         "restore_steps": [_undo_step(0, 1.0)],
