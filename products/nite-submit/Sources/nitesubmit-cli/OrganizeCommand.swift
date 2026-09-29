@@ -7,7 +7,8 @@ func runOrganize(
     customTemplate: String?,
     destinationPath: String?,
     dryRun: Bool,
-    jsonOutput: Bool
+    jsonOutput: Bool,
+    forceOverwrite: Bool = false
 ) -> Bool {
     let dirURL = URL(fileURLWithPath: directoryPath)
     let fm = FileManager.default
@@ -27,7 +28,10 @@ func runOrganize(
     case "custom", "template":
         ruleType = .customTemplate(template: customTemplate ?? "{category}/{filename}")
     default:
-        ruleType = .groupByCategory
+        // An unknown rule must never silently become group-by-category;
+        // the caller would tidy into folders they never asked for.
+        FileHandle.standardError.write("Unknown --rule \"\(ruleRaw)\". Use category, date, or custom.\n".data(using: .utf8)!)
+        return false
     }
 
     do {
@@ -39,7 +43,7 @@ func runOrganize(
         let plan = engine.generatePlan(manifest: manifest, ruleType: ruleType, destinationDirectory: destURL, copyMode: true)
 
         let op = FileOperator()
-        let receipt = op.executeOrganizationPlan(plan, dryRun: dryRun)
+        let receipt = op.executeOrganizationPlan(plan, dryRun: dryRun, forceOverwrite: forceOverwrite)
 
         if jsonOutput {
             let encoder = JSONEncoder()

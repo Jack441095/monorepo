@@ -190,6 +190,41 @@ public struct FileOperator: Sendable {
             undoPath: dest.path)
     }
 
+    @discardableResult
+    public func moveOriginal(source: URL, directory: URL, newBaseName: String,
+                             ext: String? = nil,
+                             policy: CollisionPolicy) throws -> OperationReceipt {
+        let fileExt = ext ?? source.pathExtension
+        let dest = try resolveDestination(original: source, directory: directory,
+                                          newBaseName: newBaseName, ext: fileExt, policy: policy)
+        let beforeHash = try Self.sha256(of: source)
+        if policy == .replace && FileManager.default.fileExists(atPath: dest.path) {
+            try FileManager.default.removeItem(at: dest)
+        }
+        try FileManager.default.moveItem(at: source, to: dest)
+        do {
+            let afterHash = try Self.sha256(of: dest)
+            guard beforeHash == afterHash else { throw FileOperationError.hashMismatch }
+        } catch {
+            if FileManager.default.fileExists(atPath: dest.path),
+               !FileManager.default.fileExists(atPath: source.path) {
+                try? FileManager.default.moveItem(at: dest, to: source)
+            }
+            throw error
+        }
+
+        var message = "Moved original file."
+        if policy == .replace {
+            message += " Previous file replaced with force; earlier copy was removed only after the hash check."
+        }
+        return OperationReceipt(
+            originalPath: source.path, originalFilename: source.lastPathComponent,
+            newFilename: dest.lastPathComponent, mode: .renameOriginal,
+            timestamp: Date(), success: true,
+            message: message,
+            undoPath: dest.path)
+    }
+
     /// Undo a successful rename-original by moving it back.
     public func undo(_ receipt: OperationReceipt) throws {
         guard receipt.mode == .renameOriginal, receipt.success,
@@ -204,7 +239,11 @@ public struct FileOperator: Sendable {
     }
 
     /// Execute a full folder organization plan with optional dry-run mode.
-    public func executeOrganizationPlan(_ plan: OrganizationPlan, dryRun: Bool = false) -> PlanExecutionReceipt {
+    /// Colliding actions default to refusal: pass forceOverwrite: true to
+    /// explicitly allow replacing existing destinations. We never overwrite
+    /// silently because a library folder can hold a student's only copy.
+    public func executeOrganizationPlan(_ plan: OrganizationPlan, dryRun: Bool = false,
+                                        forceOverwrite: Bool = false) -> PlanExecutionReceipt {
         let fm = FileManager.default
         var receipts: [OperationReceipt] = []
         var successCount = 0
@@ -232,21 +271,57 @@ public struct FileOperator: Sendable {
             }
 
             let newBaseName = action.destinationURL.deletingPathExtension().lastPathComponent
+            let destExt = action.destinationURL.pathExtension
+            // A plan collision means the destination already exists on disk or
+            // twice in this batch. Without explicit force we refuse the action
+            // and leave the existing file untouched.
+            if action.hasCollision && !forceOverwrite {
+                receipts.append(OperationReceipt(
+                    originalPath: action.sourceURL.path,
+                    originalFilename: action.sourceURL.lastPathComponent,
+                    newFilename: action.destinationURL.lastPathComponent,
+                    mode: action.actionType == .copy ? .createCopy : .renameOriginal,
+                    timestamp: Date(),
+                    success: false,
+                    message: "Blocked: “\(action.destinationURL.lastPathComponent)” already exists. Re-run with force to overwrite.",
+                    undoPath: nil
+                ))
+                failCount += 1
+                continue
+            }
+            let policy: CollisionPolicy = forceOverwrite ? .replace : .error
 
             do {
                 if action.actionType == .copy {
-                    let receipt = try createRenamedCopy(
+                    var receipt = try createRenamedCopy(
                         source: action.sourceURL,
                         directory: destDir,
                         newBaseName: newBaseName,
-                        policy: .replace
+                        ext: destExt.isEmpty ? nil : destExt,
+                        policy: policy
                     )
+                    if action.hasCollision {
+                        receipt.message += " Previous file replaced with force; earlier copy was backed up and removed after the hash check."
+                    }
                     receipts.append(receipt)
-                } else {
-                    let receipt = try renameOriginal(
+                } else if destDir.standardizedFileURL.path == action.sourceURL.deletingLastPathComponent().standardizedFileURL.path {
+                    var receipt = try renameOriginal(
                         source: action.sourceURL,
                         newBaseName: newBaseName,
-                        policy: .replace
+                        ext: destExt.isEmpty ? nil : destExt,
+                        policy: policy
+                    )
+                    if action.hasCollision {
+                        receipt.message += " Previous file replaced with force."
+                    }
+                    receipts.append(receipt)
+                } else {
+                    let receipt = try moveOriginal(
+                        source: action.sourceURL,
+                        directory: destDir,
+                        newBaseName: newBaseName,
+                        ext: destExt.isEmpty ? nil : destExt,
+                        policy: policy
                     )
                     receipts.append(receipt)
                 }

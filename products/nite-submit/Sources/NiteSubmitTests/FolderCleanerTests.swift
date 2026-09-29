@@ -67,4 +67,32 @@ func runFolderCleanerTests() {
     check(fm.fileExists(atPath: tempDir.appendingPathComponent("Audio/track.wav").path) == true, "track.wav copied into Audio/")
     check(fm.fileExists(atPath: tempDir.appendingPathComponent("Video/video.mp4").path) == true, "video.mp4 copied into Video/")
     check(fm.fileExists(atPath: tempDir.appendingPathComponent("Code/code.swift").path) == true, "code.swift copied into Code/")
+
+    // 5. A colliding plan must refuse without force and leave the existing
+    // file untouched. This guards the September fix where the executor
+    // hardcoded .replace and silently overwrote library files.
+    let collideDir = fm.temporaryDirectory.appendingPathComponent("nite_collide_test_\(UUID().uuidString)")
+    try? fm.createDirectory(at: collideDir, withIntermediateDirectories: true)
+    defer { try? fm.removeItem(at: collideDir) }
+    let src = collideDir.appendingPathComponent("incoming.pdf")
+    let destDir = collideDir.appendingPathComponent("Sorted")
+    try? fm.createDirectory(at: destDir, withIntermediateDirectories: true)
+    let dest = destDir.appendingPathComponent("incoming.pdf")
+    fm.createFile(atPath: src.path, contents: Data("NEW BYTES".utf8))
+    fm.createFile(atPath: dest.path, contents: Data("KEEP ME".utf8))
+    let collidingPlan = OrganizationPlan(
+        targetDirectory: destDir,
+        ruleType: .groupByCategory,
+        actions: [ProposedFileAction(sourceURL: src, destinationURL: dest,
+                                     actionType: .copy, reason: "test collision",
+                                     hasCollision: true)])
+    let blocked = op.executeOrganizationPlan(collidingPlan)
+    check(blocked.failedCount == 1, "Colliding plan fails the action without force")
+    check(blocked.succeededCount == 0, "Colliding plan succeeds at nothing without force")
+    check((try? Data(contentsOf: dest)) == Data("KEEP ME".utf8), "Colliding plan leaves the existing file untouched")
+    check(blocked.actionReceipts.first?.success == false, "Colliding receipt records the refusal")
+    let forced = op.executeOrganizationPlan(collidingPlan, forceOverwrite: true)
+    check(forced.succeededCount == 1, "Colliding plan succeeds with explicit force")
+    check((try? Data(contentsOf: dest)) == Data("NEW BYTES".utf8), "Forced plan replaces the destination")
+    check(forced.actionReceipts.first?.message.contains("force") == true, "Forced receipt names the overwrite")
 }
