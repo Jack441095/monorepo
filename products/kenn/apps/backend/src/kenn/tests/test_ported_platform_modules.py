@@ -104,6 +104,21 @@ def test_unknown_surface_raises() -> None:
         endpoint_policy("unknown", "GET", "/x")
 
 
+def test_business_defaults_fail_closed_for_writes_and_unknown_verbs() -> None:
+    # The docstring promises fail-closed family defaults. An allowlist miss on a
+    # POST, and any method that isn't a read at all (TRACE, a typo'd verb), must
+    # land authenticated -- _effect classifies both as mutating, and a mutating
+    # handler sitting behind a PUBLIC default is exactly the hole this closes.
+    for method, path in [("POST", "/api/unheard-of"), ("POST", "/weird/path"), ("TRACE", "/cgi-bin/x")]:
+        policy = endpoint_policy("business", method, path)
+        assert policy.access == EndpointAccess.AUTHENTICATED, (method, path)
+        assert policy.mutates is True, (method, path)
+    # The endpoint that drives Live must never lose its confirmation flag.
+    command = endpoint_policy("business", "POST", "/command")
+    assert command.effect == EndpointEffect.ORCHESTRATED
+    assert command.confirmation_required is True
+
+
 # --- request_validation.py -------------------------------------------------
 
 

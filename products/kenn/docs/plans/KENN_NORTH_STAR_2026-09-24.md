@@ -386,9 +386,12 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
       variable. Behaviour is right today only because of an explicit legacy fallback.
   > 28 Sept: Fixed in `core/action_policy.py`. Removed duplicate key to cite canonical `KENN_ALLOW_DAW_CONTROL`;
   > verified in `test_ported_platform_modules.py`.
-- [ ] `endpoint_policy` fails open: unrecognised `business` POST paths are classified `PUBLIC` while its
+- [x] `endpoint_policy` fails open: unrecognised `business` POST paths are classified `PUBLIC` while its
       docstring promises fail-closed family defaults, and `/command` is classified `ORCHESTRATED` so the
       confirmation flag is `False` for the endpoint that drives Live.
+  > 29 Sept: Closed in `core/endpoint_policy.py`. An allowlist miss on any non-read method (POST included, plus
+  > verbs like TRACE that the old mutating-method list never matched) now lands AUTHENTICATED, and `/command`
+  > classifies `ORCHESTRATED` with `confirmation_required` firing on it; verified in `test_ported_platform_modules.py`.
 - [x] The `diagnostic_loop` `inconclusive` branch never advances `active_hypothesis_id`, so three inconclusive
       results wedge the loop permanently and no recommendation is reachable.
   > 29 Sept: Fixed in `core/diagnostic_loop.py`. One inconclusive verdict still asks for clarification; a second

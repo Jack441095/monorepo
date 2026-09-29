@@ -166,6 +166,12 @@ def endpoint_policy(surface: str, method: str, path: str) -> EndpointPolicy:
             access = EndpointAccess.PUBLIC
         elif path.startswith(("/api/", "/kenn/api/")):
             access = EndpointAccess.AUTHENTICATED
+        elif method not in {"GET", "HEAD", "OPTIONS"}:
+            # Fail closed on anything that isn't a read: an unrecognized verb (TRACE, a
+            # typo'd PATCH) still reaches a mutating handler, so it lands authenticated
+            # rather than PUBLIC like a real GET. POST, PUT, PATCH, DELETE take this
+            # branch whenever the allowlists and /api/ prefix above miss them.
+            access = EndpointAccess.AUTHENTICATED
         else:
             access = EndpointAccess.PUBLIC
         csrf_required = method in {"POST", "PUT", "PATCH", "DELETE"} and access == EndpointAccess.AUTHENTICATED
@@ -203,9 +209,11 @@ def endpoint_policy(surface: str, method: str, path: str) -> EndpointPolicy:
         idempotency_required=effect in {
             EndpointEffect.EXTERNAL_COMMUNICATION,
             EndpointEffect.DESTRUCTIVE,
+            EndpointEffect.ORCHESTRATED,
         },
         confirmation_required=effect in {
             EndpointEffect.EXTERNAL_COMMUNICATION,
             EndpointEffect.DESTRUCTIVE,
+            EndpointEffect.ORCHESTRATED,
         },
     )
