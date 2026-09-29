@@ -389,14 +389,23 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
 - [ ] `endpoint_policy` fails open: unrecognised `business` POST paths are classified `PUBLIC` while its
       docstring promises fail-closed family defaults, and `/command` is classified `ORCHESTRATED` so the
       confirmation flag is `False` for the endpoint that drives Live.
-- [ ] The `diagnostic_loop` `inconclusive` branch never advances `active_hypothesis_id`, so three inconclusive
+- [x] The `diagnostic_loop` `inconclusive` branch never advances `active_hypothesis_id`, so three inconclusive
       results wedge the loop permanently and no recommendation is reachable.
-- [ ] `mix_recipes` zips steps against children, so a short proposal response yields "there's nothing to
+  > 29 Sept: Fixed in `core/diagnostic_loop.py`. One inconclusive verdict still asks for clarification; a second
+  > consecutive one on the same hypothesis advances to the next, so the loop can no longer stall on a test the
+  > producer cannot run; verified in `test_diagnostic_loop.py`.
+- [x] `mix_recipes` zips steps against children, so a short proposal response yields "there's nothing to
       change" — a confident false negative. It also reports "I couldn't find a reverb return in this set" when
       the Live read failed, blaming the producer's session for a backend error.
-- [ ] A producer's stated LUFS target is discarded: the rule captures the number but stores the literal
+  > 29 Sept: Fixed in `core/mix_recipes.py`. A step counts as already-done only when its child reports an explicit
+  > `before == after` readback, positional pairing is trusted only when children mirror the steps one-for-one, and a
+  > failed returns read now says the read failed instead of blaming the set (`Set.returns_read_failed`); verified in
+  > `test_mix_recipes.py`.
+- [x] A producer's stated LUFS target is discarded: the rule captures the number but stores the literal
       "master to -9 LUFS", so "I master to -12 LUFS" is rejected and the chat intent falls through with no
       confirmation and no error.
+  > 29 Sept: Fixed in `core/project_memory_advisory.py`. The rule now stores the value the producer actually spoke
+  > (`m.group(0)`) instead of the canned example; verified in `test_project_memory_stage4.py`.
 - [ ] Only one preference per key survives (`record_preference` deactivates the rest) and there is no API to
       list or restore the inactive rows, which contradicts "see, edit, delete; nothing learned silently".
 - [ ] `chat_completion_stream` returns normally on a mid-stream failure, so a truncated answer is validated as
