@@ -317,6 +317,10 @@ def iter_note_chunks(note_path: Path) -> list[Chunk]:
     source_title = metadata_value("Source title")
     transcript_file = metadata_value("Transcript file")
     evidence = "youtube_transcript" if transcript_file else "curated_kenn_note"
+    # Only the parameter-reference generator writes measured-*.md, from Live's own display strings; a note can't
+    # promote itself to the top tier by saying so in its header.
+    if note_path.name.startswith("measured-") and metadata_value("Measured at"):
+        evidence = "measured_live_data"
     provenance = ""
     if source_creator or source_title or transcript_file:
         provenance = (
