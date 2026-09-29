@@ -417,9 +417,15 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
       `</source_excerpt>` after a cut that can land inside the opening tag.
 - [ ] The L2 semantic-cache list grows unbounded and is scanned in full on every query; a *semantic* match is
       also written into the exact-match cache, turning a soft 0.95 match into a hard one.
-- [ ] `mix_recipes`, `device_units.display_to_raw(relative=True)`, `live_recipe.audition_loudness_trim_db` and
+- [x] `mix_recipes`, `device_units.display_to_raw(relative=True)`, `live_recipe.audition_loudness_trim_db` and
       `live_recipe.undo_steps` each treat a raw fader value as dB or fabricate a `readback` field.
       `live_recipe`'s trim constant is dead (never read) but is persisted into receipts.
+  > 29 Sept: Cleared. The `mix_recipes` readback fabrication was the zip bug above (fixed). `execute_recipe` receipts
+  > no longer carry the raw-fader-times-25 "audition trim" estimate or an `undo_steps` preview whose readback was a
+  > copy of the requested value -- nothing ever read either, and undo goes through `propose_undo`, which re-proposes
+  > exact steps for a fresh verified execution; pinned in `test_live_command.py`. `display_to_raw(relative=True)`
+  > verified honest: linear profiles scale a delta with no offset, and table/log profiles refuse or resolve through
+  > a display round-trip against the current raw value in the caller.
 - [ ] The Ableton manual has never been ingested, so **every** official-manual pathway in the product is dead:
       `pdf_evidence_class` would label it, but the index holds 0 `official_ableton_manual` chunks (3,308
       `curated_kenn_note`, 28 transcript, 2 `reference_document`), which makes `session_intelligence.py`'s

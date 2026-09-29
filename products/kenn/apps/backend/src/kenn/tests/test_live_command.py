@@ -2849,6 +2849,11 @@ def test_recipe_executes_each_step_and_returns_verified_receipt() -> None:
     assert result["receipt"]["schema"] == RECIPE_RECEIPT_SCHEMA
     assert result["receipt"]["verified"] is True
     assert result["receipt"]["step_count"] == 2
+    # A journalled receipt carries only numbers Live confirmed: no 25 dB-per-fader
+    # "audition trim" estimate and no undo preview with a copied readback, both of
+    # which used to be written here without Live ever being asked.
+    assert "audition_loudness_trim_db" not in result["receipt"]
+    assert "undo_steps" not in result["receipt"]
     assert fake.state["tracks"][0]["volume"] == 0.4
     assert fake.eq_gain == -3.0
 

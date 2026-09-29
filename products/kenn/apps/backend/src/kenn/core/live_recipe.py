@@ -555,21 +555,6 @@ class LiveRecipeService:
         with _LOCK:
             _mark_used(key)
 
-        # Calculate net energy shift to provide zero-bias A/B audition loudness trim
-        net_vol_delta = 0.0
-        vol_step_count = 0
-        for item in applied:
-            if item.get("action") == "set_volume":
-                try:
-                    b = float(item.get("before", 0.85))
-                    r = float(item.get("requested", b))
-                    net_vol_delta += (r - b)
-                    vol_step_count += 1
-                except Exception:
-                    pass
-        # Approximate dB compensation: 1 fader unit ~ 25 dB in standard working range
-        audition_trim_db = round(-net_vol_delta * 25.0, 2) if vol_step_count > 0 else 0.0
-
         receipt = {
             "schema": RECIPE_RECEIPT_SCHEMA,
             "receipt_id": f"receipt-{uuid.uuid4().hex}",
@@ -581,11 +566,12 @@ class LiveRecipeService:
             "timestamp": time.time(),
             "step_count": len(applied),
             "step_receipts": applied,
-            "audition_loudness_trim_db": audition_trim_db,
-            "undo_steps": [
-                {"action": item["action"], "target": item["target"], "before": item["requested"], "requested": item["before"], "readback": item["requested"], "verified": False}
-                for item in reversed(applied)
-            ],
+            # Earlier versions also journalled an "audition trim" dB estimate (raw fader
+            # delta x a fabricated 25 dB/fader constant) and preview "undo_steps" whose
+            # readback was a copy of the requested value, never a Live read. Nothing ever
+            # read either field; a receipt must only carry numbers Live confirmed, and
+            # undo goes through propose_undo, which re-proposes exact steps for a fresh
+            # verified execution.
         }
         if isinstance(recipe.get("source_evidence"), dict):
             receipt["source_evidence"] = recipe["source_evidence"]
