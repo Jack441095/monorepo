@@ -242,6 +242,7 @@ export async function askKenn(params: {
       history: params.history ?? [],
       session_id: params.sessionId,
       stream: false,
+      ground_in_set: true,
     }),
   })
   const data = await parseJson(res)

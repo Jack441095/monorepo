@@ -188,6 +188,19 @@ describe('useKenn template first, model answer later', () => {
     expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'model answer' })
   })
 
+  it('keeps the in-your-Live line when the model answer replaces the template', async () => {
+    mockedAsk.mockResolvedValue({
+      ...templateReply,
+      raw: { brain_pending: { job_id: 'abc123' }, your_set: { line: 'In your Live, built in: EQ Eight.' } },
+    } as never)
+    mockedBrain.mockResolvedValue({ status: 'ready', answer: 'model answer' })
+
+    await kenn.sendMessage('how do I EQ the bass?')
+    await vi.advanceTimersByTimeAsync(1100)
+
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'model answer\n\nIn your Live, built in: EQ Eight.' })
+  })
+
   it('keeps the template when the rewrite was rejected', async () => {
     mockedAsk.mockResolvedValue(templateReply as never)
     mockedBrain.mockResolvedValue({ status: 'rejected' })

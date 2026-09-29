@@ -570,6 +570,7 @@ from kenn.core.chat_context import (
     stored_mix_review_evidence as _stored_mix_review_evidence,
     attach_explicit_audio_evidence as _attach_explicit_audio_evidence,
     ableton_session_context_turn as _ableton_session_context_turn,
+    attach_your_set,
 )
 
 
@@ -2916,6 +2917,8 @@ class Handler(BaseHTTPRequestHandler):
                 _answer_ms = (time.perf_counter() - _t_answer) * 1000
                 if plugin_turn:
                     result["live_mix_context"] = plugin_context
+                if payload.get("ground_in_set") is True:
+                    result = attach_your_set(result, question)
                 result = _attach_explicit_audio_evidence(
                     result,
                     review_id=mix_review_id,

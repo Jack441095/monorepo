@@ -182,6 +182,14 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
       drafted on the GPU notes model, checked automatically against sources, reviewed before approval
 - [ ] Grounded in the user's own setup: installed devices, packs and third-party plug-ins read from Live, so advice
       names what they actually have
+  > 29 Sept (cloud session, tested on a made-up Mac layout, not yet on a real one): `core/installed_devices.py` reads names
+  > only, from disk — Live's built-in devices from the app bundle, saved racks from the User Library (via `Library.cfg`),
+  > packs from Factory Packs, plug-ins from the VST3/Audio Unit/VST folders. When the page sends `ground_in_set` (the
+  > chat does now) and a knowledge answer found a source, a question about EQ, compression, limiting, reverb, delay or
+  > saturation gets one extra factual line: "In your Live, built into …; plug-ins whose names match: …; your saved racks:
+  > …; already on your tracks: …". A plug-in's family is a guess from its name and the line says so. Nothing is loaded and
+  > nothing leaves the Mac. Not covered: parameters of third-party plug-ins, pack devices inside packs, and Live's own
+  > browser view (AbletonOSC has search but no listing). Check on the Mac: ask "how do I EQ a vocal?" in the app.
 - [ ] Contradiction checks and source tiers (manual and measured data above notes, notes above general advice)
   > 29 Sept (cloud session, no notes or Live here): built and tested on synthetic notes, not yet run on the real 77.
   > Tiers: `core/source_tiers.py` orders measured Live data > Ableton manual > KENN note > third-party; every cited source

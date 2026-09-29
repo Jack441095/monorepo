@@ -126,3 +126,25 @@ def ableton_session_context_turn(include_ableton_context: object) -> dict | None
     except Exception:
         return None
     return evidence_history_turn(packet) if packet else None
+
+
+def attach_your_set(result: dict, question: str) -> dict:
+    """Add a factual "in your Live" line to a knowledge answer when the page asked for it (ground_in_set).
+
+    Only for answers that found a source. It reads names from disk and the last session snapshot; if either fails the
+    answer goes out as it was.
+    """
+    if not isinstance(result, dict) or not result.get("found"):
+        return result
+    try:
+        from kenn.core import installed_devices
+        from kenn.mixing_doctor import get_latest_session_state
+
+        session = get_latest_session_state()
+        note = installed_devices.your_set_note(question, installed_devices.inventory(),
+                                               session if session.get("status") == "connected" else None)
+    except Exception:
+        return result
+    if not note:
+        return result
+    return {**result, "your_set": note, "answer": f"{str(result.get('answer') or '').rstrip()}\n\n{note['line']}"}

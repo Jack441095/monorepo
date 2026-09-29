@@ -214,7 +214,7 @@ void refreshSessionCard()
 const BRAIN_POLL_MS = 1000
 const BRAIN_POLL_LIMIT = 45
 
-async function swapInBrainAnswer(messageId: string, jobId: string) {
+async function swapInBrainAnswer(messageId: string, jobId: string, suffix = '') {
   for (let attempt = 0; attempt < BRAIN_POLL_LIMIT; attempt += 1) {
     await sleep(BRAIN_POLL_MS)
     let result: { status: string; answer?: string }
@@ -225,7 +225,7 @@ async function swapInBrainAnswer(messageId: string, jobId: string) {
     }
     if (result.status === 'ready' && result.answer) {
       messages.value = messages.value.map((m) =>
-        m.id === messageId && m.role === 'assistant' ? { ...m, text: result.answer } : m,
+        m.id === messageId && m.role === 'assistant' ? { ...m, text: `${result.answer}${suffix}` } : m,
       )
       return
     }
@@ -276,7 +276,9 @@ async function sendMessage(text: string) {
     ]
     const brainPending = raw?.brain_pending as { job_id?: unknown } | undefined
     if (!proposal && brainPending?.job_id) {
-      void swapInBrainAnswer(replyId, String(brainPending.job_id))
+      // The "in your Live" line was added to the template; the model's answer doesn't have it, so carry it across.
+      const yourSetLine = (raw?.your_set as { line?: unknown } | undefined)?.line
+      void swapInBrainAnswer(replyId, String(brainPending.job_id), yourSetLine ? `\n\n${String(yourSetLine)}` : '')
     }
   } catch (e) {
     const msg = userFacingKennError(
