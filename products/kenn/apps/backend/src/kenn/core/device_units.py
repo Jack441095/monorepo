@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+import json
+import logging
+import os
 from dataclasses import dataclass
+from functools import lru_cache
 from math import isfinite, log
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -73,9 +78,68 @@ def normalize_unit(unit: str | None) -> str:
     }.get(value, value)
 
 
+PROFILES_DIR = Path(os.environ.get("KENN_DEVICE_PROFILES_DIR", str(Path(__file__).with_name("device_profiles")))).expanduser()
+_MAPPINGS = {"linear", "log", "table"}
+_UNITS = {"db", "hz", "ms", "%", "ratio"}
+MIN_QUALIFICATION_POINTS = 3
+
+
+def _profile_from_entry(device: str, entry: dict) -> DeviceUnitProfile | None:
+    """One profile from a data file, or None unless it carries a passed qualification and is internally consistent."""
+    qualification = entry.get("qualification")
+    if not (isinstance(qualification, dict) and qualification.get("status") == "passed"
+            and int(qualification.get("points") or 0) >= MIN_QUALIFICATION_POINTS and qualification.get("qualified_at")):
+        return None
+    mapping, unit = str(entry.get("mapping") or ""), normalize_unit(entry.get("unit"))
+    if mapping not in _MAPPINGS or unit not in _UNITS or not device or not entry.get("parameter"):
+        return None
+    try:
+        numbers = [float(entry[key]) for key in ("raw_min", "raw_max", "display_min", "display_max")]
+        raw_values = tuple(float(v) for v in entry.get("raw_values") or ())
+        display_values = tuple(float(v) for v in entry.get("display_values") or ())
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not all(isfinite(n) for n in [*numbers, *raw_values, *display_values]) or numbers[1] <= numbers[0]:
+        return None
+    if mapping == "table" and (len(raw_values) < 2 or len(raw_values) != len(display_values)):
+        return None
+    if mapping == "log" and (numbers[2] <= 0 or numbers[3] <= numbers[2]):
+        return None
+    return DeviceUnitProfile(device, str(entry["parameter"]), unit, *numbers, raw_values=raw_values,
+                             display_values=display_values, mapping=mapping)
+
+
+@lru_cache(maxsize=1)
+def qualified_profiles() -> tuple[DeviceUnitProfile, ...]:
+    """Profiles from device_profiles/*.json. A candidate without a passed qualification is never loaded."""
+    profiles: list[DeviceUnitProfile] = []
+    for path in sorted(PROFILES_DIR.glob("*.json")) if PROFILES_DIR.is_dir() else []:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            device = str(data.get("device") or "")
+            entries = data.get("profiles") or []
+        except (OSError, ValueError, AttributeError):
+            logging.getLogger("kenn.device_units").warning("Unreadable device profile file %s", path)
+            continue
+        for entry in entries:
+            profile = _profile_from_entry(device, entry) if isinstance(entry, dict) else None
+            if profile is not None:
+                profiles.append(profile)
+    return tuple(profiles)
+
+
+def all_profiles() -> tuple[DeviceUnitProfile, ...]:
+    """The hand-verified profiles first (they win on a clash), then the qualified data files."""
+    return EVIDENCE_BACKED_PROFILES + qualified_profiles()
+
+
+def reload_profiles() -> None:
+    qualified_profiles.cache_clear()
+
+
 def find_profile(device_name: str, parameter_name: str, unit: str | None) -> DeviceUnitProfile | None:
     normalized_unit = normalize_unit(unit)
-    for profile in EVIDENCE_BACKED_PROFILES:
+    for profile in all_profiles():
         if (
             profile.device_name.casefold() == str(device_name).strip().casefold()
             and profile.parameter_name.casefold() == str(parameter_name).strip().casefold()
@@ -204,4 +268,5 @@ def raw_to_display(*, device_name: str, parameter_name: str, raw: float, unit: s
     return float(profile.display_min + (raw_value - profile.raw_min) / (profile.raw_max - profile.raw_min) * span), None
 
 
-__all__ = ["DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "display_to_raw", "find_profile", "normalize_unit", "raw_to_display"]
+__all__ = ["DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "all_profiles", "display_to_raw", "find_profile", "normalize_unit",
+           "qualified_profiles", "raw_to_display", "reload_profiles"]

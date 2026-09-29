@@ -41,7 +41,7 @@ class Fact:
 
 def facts_from_profiles() -> list[Fact]:
     facts = []
-    for profile in device_units.EVIDENCE_BACKED_PROFILES:
+    for profile in device_units.all_profiles():
         unit = _UNITS.get(device_units.normalize_unit(profile.display_unit).lower())
         if unit is None:
             continue
