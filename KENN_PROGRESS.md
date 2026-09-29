@@ -29,8 +29,11 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **29 Sept, cloud session (no Live, no box):** chat can send the template at once and swap the model's answer in when it
   is ready (`KENN_CHAT_BRAIN_DEFERRED=1`, off by default, not yet measured on this Mac); a fresh 146-phrasing blind set scored
   69.2% first run (76.7% after label review), one wrong plan found and fixed ("kill the send from bass to delay" muted the
-  Bass), 143/146 after fixes; follow-ups can name several tracks. See the north star (Stage 1) and
-  `products/kenn/docs/evidence/KENN_BLIND_PHRASINGS_2026-09-29.md`. Backend suite 1,830 passed here (128 skipped for missing
+  Bass), 143/146 after fixes; follow-ups can name several tracks. Stage 2, what runs without Live: every cited source
+  carries a tier (measured > manual > KENN note > third-party); approved notes are checked against Live's measured ranges;
+  `build_parameter_reference.py` turns measured evidence into parameter notes (0 of 78 devices measured yet, needs Live);
+  knowledge answers can add an "in your Live" line from what's installed and on the tracks. See the north star (Stage 1) and
+  `products/kenn/docs/evidence/KENN_BLIND_PHRASINGS_2026-09-29.md`. Backend suite 1,889 passed here (128 skipped for missing
   git-ignored notes/index data).
 
 ## Qualified beta gate: 7 / 15 on the current main (`3eb5724`)
