@@ -104,6 +104,35 @@ def test_a_recipe_that_would_change_nothing_says_so(ask) -> None:
     assert result.get("proposal") is None and "nothing to change" in result["answer"]
 
 
+def test_a_step_without_readback_is_not_proof_that_nothing_would_change() -> None:
+    # The old zip treated a missing before/after pair as "equal", so any child step
+    # the proposal never reported readback for was silently dropped; a recipe whose
+    # every step lacked readback answered "that's already how the set is" without
+    # ever proposing anything. Only an explicit before == after proves no change.
+    from kenn.core import mix_recipes
+
+    assert mix_recipes._already_at_target({"before": 0.4, "after": 0.4}) is True
+    assert mix_recipes._already_at_target({"before": 0.4, "after": 0.5}) is False
+    assert mix_recipes._already_at_target({"action": "transport_stop"}) is False
+
+
+def test_space_blames_the_failed_read_not_the_producers_set(ask, tmp_path) -> None:
+    # "This set has no reverb return" when the returns query raised blamed the
+    # producer's session for a failure to read it (same class as the 26 Sept
+    # empty-snapshot bug, one layer down).
+    class DeafLive(FakeLiveBackend):
+        def query_session_state(self, *args, **kwargs):
+            return {**super().query_session_state(*args, **kwargs), "return_tracks": []}
+
+        def get_return_tracks(self, *args, **kwargs):
+            raise RuntimeError("OSC timeout")
+
+    result = handle_command("give the vocal some space", session_id=f"recipe-{tmp_path.name}",
+                            service=LiveActionService(DeafLive()))
+    assert result["status"] == "clarification_required"
+    assert "couldn't read your return tracks" in result["answer"]
+
+
 def test_taking_the_reverb_off_leaves_the_delay_alone(ask) -> None:
     from kenn.core import mix_recipes
 

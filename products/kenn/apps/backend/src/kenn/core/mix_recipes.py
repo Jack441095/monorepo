@@ -24,6 +24,10 @@ Built = tuple[list[str], str] | str  # (commands, what the card says) or a quest
 class Set:
     tracks: list[dict]
     returns: list[dict]
+    # Distinguishes "Live says there are no returns" from "we never got an
+    # answer": recipes that need a reverb say the read failed instead of
+    # blaming the producer's session for something we never measured.
+    returns_read_failed: bool = False
 
     def all(self, *words: str) -> list[dict]:
         return [track for track in self.tracks
@@ -87,6 +91,9 @@ def _space(s: Set, m: re.Match[str]) -> Built:
         return "Which track should get the space? Name it and I'll send it to the reverb."
     reverb, delay = s.ret("reverb"), s.ret("delay")
     if not reverb:
+        if s.returns_read_failed:
+            return ("I couldn't read your return tracks from Live, so I can't tell whether this set has a reverb. "
+                    "Check the Live connection and ask again; nothing has changed.")
         return "I couldn't find a reverb return in this set. Add one and I'll send the track to it."
     vocal = re.search(r"\b(?:vocal|vox|voice)\b", str(track["name"]), re.I)
     commands = [f"send the {track['name']} to the {reverb} at {15 if vocal else 12}%"]
@@ -130,6 +137,9 @@ def _dry_up(s: Set, m: re.Match[str]) -> Built:
     only_reverb = bool(re.search(r"\b(?:reverb|verb)\b", said, re.I)) and not re.search(r"\bdelay\b", said, re.I)
     returns = [r for r in (s.ret("reverb"), None if only_reverb else s.ret("delay")) if r]
     if not returns:
+        if s.returns_read_failed:
+            return ("I couldn't read your return tracks from Live, so I can't tell whether this set has a reverb or delay. "
+                    "Check the Live connection and ask again; nothing has changed.")
         return "This set has no reverb or delay returns, so there's nothing to take off."
     return ([f"send the {track['name']} to the {r} at 0%" for r in returns],
             f"To dry up '{track['name']}': turn its {' and '.join(returns)} sends to 0%.")
@@ -245,6 +255,14 @@ def match(query: str) -> Recipe | None:
     return next((recipe for recipe in RECIPES if recipe.pattern.search(str(query or ""))), None)
 
 
+def _already_at_target(child: dict) -> bool:
+    """Only an explicit before == after readback proves a step would change nothing.
+    Transport steps never carry readback keys, and the old zip treated every missing
+    key as equal, so any recipe carrying a transport step collapsed to needed=[] and
+    answered "that's already how the set is" for a change that was never proposed."""
+    return "before" in child and "after" in child and child["before"] == child["after"]
+
+
 def translate(query: str, service: Any, session_id: str) -> dict[str, Any] | None:
     """A recipe proposal, a question, or None when no recipe matches."""
     from kenn.core.live_command import _resolve_natural_recipe_steps
@@ -255,15 +273,17 @@ def translate(query: str, service: Any, session_id: str) -> dict[str, Any] | Non
     if recipe is None:
         return None
     state = service.snapshot()
+    returns_read_failed = False
     if not state.get("return_tracks"):
         # The session snapshot never lists returns on real Live (only the fake fills them in), so "give the vocal
         # some space" found no reverb on the demo set's A-Reverb. Read them the way a spoken "send" does.
         try:
             state = {**state, "return_tracks": service.client.get_return_tracks()}
         except Exception:
-            pass
+            returns_read_failed = True
     current = Set([t for t in state.get("tracks", []) if isinstance(t, dict)],
-                  [r for r in state.get("return_tracks", []) if isinstance(r, dict)])
+                  [r for r in state.get("return_tracks", []) if isinstance(r, dict)],
+                  returns_read_failed)
     built = recipe.build(current, recipe.pattern.search(query))
     if isinstance(built, str):
         return _question(recipe, built)
@@ -284,12 +304,13 @@ def translate(query: str, service: Any, session_id: str) -> dict[str, Any] | Non
         # A step that's already where the recipe would put it ("dry up" on a dry vocal) is left out; if nothing's left,
         # say so rather than show a card that changes nothing.
         children = result["proposal"].get("steps") or []
-        needed = [step for step, child in zip(steps, children) if child.get("before") != child.get("after")]
-        if not needed:
-            return {"status": "answered", "answer": "That's already how the set is, so there's nothing to change.",
-                    "changed": False, "intent": {"action": "recipe", "recipe_name": recipe.name}}
-        if len(needed) < len(steps):
-            result = LiveRecipeService(service).propose_recipe(needed, reason=summary, session_id=session_id)
+        if len(children) == len(steps):
+            needed = [step for step, child in zip(steps, children) if not _already_at_target(child)]
+            if not needed:
+                return {"status": "answered", "answer": "That's already how the set is, so there's nothing to change.",
+                        "changed": False, "intent": {"action": "recipe", "recipe_name": recipe.name}}
+            if len(needed) < len(steps):
+                result = LiveRecipeService(service).propose_recipe(needed, reason=summary, session_id=session_id)
     if not result.get("ok"):
         return {"status": "failed", "answer": result.get("error", "I couldn't prepare that recipe."), "changed": False}
     return {"status": "proposed", "intent": {"action": "recipe", "recipe_name": recipe.name},
