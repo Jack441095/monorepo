@@ -124,4 +124,92 @@ public func runArchiveTests() {
             check(false, "Unexpected error type: \(error)")
         }
     }
+
+    suite("Archive blockers B1/B6/B7") {
+        let fm = FileManager.default
+        let tempDir = fm.temporaryDirectory.appendingPathComponent("nite_submit_blockers_test_\(UUID().uuidString)")
+        try? fm.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? fm.removeItem(at: tempDir) }
+
+        // B1: a queue of 3 with 1 approval archives exactly that 1 file.
+        // We approved the middle item and the two others must not leak in.
+        let queueDir = tempDir.appendingPathComponent("queue", isDirectory: true)
+        try? fm.createDirectory(at: queueDir, withIntermediateDirectories: true)
+        let qa = queueDir.appendingPathComponent("essay_a.pdf")
+        let qb = queueDir.appendingPathComponent("essay_b.pdf")
+        let qc = queueDir.appendingPathComponent("essay_c.pdf")
+        try? "a".data(using: .utf8)?.write(to: qa)
+        try? "b".data(using: .utf8)?.write(to: qb)
+        try? "c".data(using: .utf8)?.write(to: qc)
+        let queueEntries = [ArchiveQueueEntry(url: qa, isApproved: false),
+                            ArchiveQueueEntry(url: qb, isApproved: true),
+                            ArchiveQueueEntry(url: qc, isApproved: false)]
+        let approvedOnly = approvedArchiveSources(from: queueEntries)
+        check(approvedOnly.count == 1, "queue of 3 with 1 approval archives 1 (got \(approvedOnly.count))")
+        check(approvedOnly.first == qb, "the archived file is the approved one")
+        check(approvedArchiveSources(from: []).isEmpty, "empty queue yields no sources")
+
+        // B6: a/report.pdf + b/report.pdf must both land in the archive under
+        // distinct names instead of colliding in the flattened staging dir.
+        let folderA = tempDir.appendingPathComponent("a", isDirectory: true)
+        let folderB = tempDir.appendingPathComponent("b", isDirectory: true)
+        try? fm.createDirectory(at: folderA, withIntermediateDirectories: true)
+        try? fm.createDirectory(at: folderB, withIntermediateDirectories: true)
+        try? "report from folder a".data(using: .utf8)?.write(to: folderA.appendingPathComponent("report.pdf"))
+        try? "report from folder b".data(using: .utf8)?.write(to: folderB.appendingPathComponent("report.pdf"))
+        let dupArchive = tempDir.appendingPathComponent("dupes.tar.gz")
+        do {
+            _ = try ArchiveEngine().compress(
+                sources: [folderA.appendingPathComponent("report.pdf"),
+                          folderB.appendingPathComponent("report.pdf")],
+                destinationArchive: dupArchive, format: .tarGz)
+            let list = Process()
+            list.executableURL = URL(fileURLWithPath: "/usr/bin/tar")
+            list.arguments = ["-tzf", dupArchive.path]
+            let out = Pipe()
+            list.standardOutput = out
+            try list.run()
+            list.waitUntilExit()
+            let text = String(data: out.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+            let reportLines = text.split(separator: "\n").filter { $0.contains("report") }
+            check(reportLines.count == 2, "both report.pdf files land under distinct names (got: \(reportLines))")
+        } catch {
+            check(false, "duplicate-basename compression error: \(error)")
+        }
+
+        // B7: the password must never appear in the spawned process arguments.
+        // Both builders take only a hasPassword flag and emit a bare "-p",
+        // with the secret travelling over stdin instead.
+        let secret = "S3cret-Pw-2026"
+        let sevenZipArgs = ArchiveEngine().sevenZipArchiveArguments(
+            destinationPath: "/tmp/out.7z", level: .normal,
+            volumeSplit: .singleFile, hasPassword: true)
+        check(sevenZipArgs.contains("-p"), "7z args carry a bare -p flag")
+        check(!sevenZipArgs.contains(where: { $0.contains(secret) }),
+              "7z args contain no plaintext password (\(sevenZipArgs))")
+        check(!sevenZipArgs.contains(where: { $0.hasPrefix("-p") && $0 != "-p" }),
+              "7z args never use the inline -p{password} form")
+        check(sevenZipArgs.contains("-mhe=on"),
+              "7z args encrypt the header (7z's own codec is 7zAES-256 by default)")
+        let zipArgs = ArchiveEngine().zipArchiveArgumentsViaSevenZip(
+            destinationPath: "/tmp/out.zip", hasPassword: true)
+        check(!zipArgs.contains("-P"), "zip args never use Info-ZIP -P (argv-visible ZipCrypto)")
+        check(!zipArgs.contains(where: { $0.contains(secret) }),
+              "zip args contain no plaintext password (\(zipArgs))")
+        check(zipArgs.contains("-mem=AES256"), "zip args request AES-256")
+
+        // B7 functional: an encrypted 7z round-trips when the 7z tool exists.
+        if realSevenZipToolAvailable() {
+            let enc7z = tempDir.appendingPathComponent("secret.7z")
+            do {
+                let receipt = try ArchiveEngine().compress(
+                    sources: [qa], destinationArchive: enc7z,
+                    format: .sevenZip, password: secret)
+                check(fm.fileExists(atPath: receipt.archiveURL.path), "encrypted 7z output exists")
+                check(receipt.isEncrypted, "receipt marks AES-256 encrypted 7z archive")
+            } catch {
+                check(false, "encrypted 7z compression error: \(error)")
+            }
+        }
+    }
 }

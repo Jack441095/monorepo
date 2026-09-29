@@ -97,7 +97,7 @@ public enum ArchiveEngineError: LocalizedError {
         case .archiveCreationFailed(let reason): return "Could not create archive: \(reason)"
         case .unsupportedFormat(let fmt): return "Unsupported archive format: \(fmt)"
         case .sevenZipToolRequired:
-            return "Password protection and volume splitting require the 7z command-line tool, which isn't installed on this Mac. Install p7zip (e.g. via Homebrew: brew install p7zip), or create the archive without a password/split."
+            return "Password protection and volume splitting require the 7z command-line tool, which isn't installed on this Mac. Encrypted archives use AES-256 via 7z — we won't substitute the weaker ZipCrypto from the built-in zip tool. Install p7zip (e.g. via Homebrew: brew install p7zip), or create the archive without a password/split."
         }
     }
 }
@@ -138,14 +138,16 @@ public struct ArchiveEngine: Sendable {
         try fm.createDirectory(at: tempDir, withIntermediateDirectories: true)
         defer { try? fm.removeItem(at: tempDir) }
 
-        // Copy/link input files into staging directory
+        // Copy input files into staging directory. Different folders often hold the
+        // same basename (two modules both submitting "report.pdf"), and staging
+        // flattens everything into one directory, so we hand out "report.pdf",
+        // "report 2.pdf", "report 3.pdf" instead of overwriting or aborting on
+        // the second copy with a "file exists" error.
+        var usedStagingNames = Set<String>()
         for src in sources {
-            let target = tempDir.appendingPathComponent(src.lastPathComponent)
-            if src.hasDirectoryPath {
-                try fm.copyItem(at: src, to: target)
-            } else {
-                try fm.copyItem(at: src, to: target)
-            }
+            let target = uniqueStagingTarget(in: tempDir, baseName: src.lastPathComponent,
+                                             used: &usedStagingNames)
+            try fm.copyItem(at: src, to: target)
         }
 
         let cleanPass = password?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -200,6 +202,56 @@ public struct ArchiveEngine: Sendable {
                                isSplitVolume: actualFormat == format && volumeSplit != .singleFile)
     }
 
+    /// Argument list for `7z a` producing a real 7z archive. The password never
+    /// appears here: callers pass bare `-p` and feed the secret over stdin
+    /// (see `passwordInputPipe`), because argv is visible to every other
+    /// process on the Mac via `ps`. `-mhe=on` encrypts the header so filenames
+    /// stay hidden without the password, and 7z's own codec is 7zAES-256 by
+    /// default — do not add `-mem=` here, p7zip 17.05 rejects that switch on
+    /// the 7z format with E_INVALIDARG and the archive is never created.
+    public func sevenZipArchiveArguments(destinationPath: String, level: CompressionLevel,
+                                         volumeSplit: VolumeSplitOption,
+                                         hasPassword: Bool) -> [String] {
+        var args = ["a", "-t7z", "-m0=lzma2", "-mx=\(level.levelValue)"]
+        if hasPassword {
+            args.append("-p")
+            args.append("-mhe=on")
+        }
+        if volumeSplit != .singleFile {
+            let bytes = volumeSplit.rawValue
+            let mb = max(1, bytes / (1024 * 1024))
+            args.append("-v\(mb)m")
+        }
+        args.append(destinationPath)
+        args.append(".")
+        return args
+    }
+
+    /// Argument list for `7z a -tzip` producing an AES-256 encrypted ZIP.
+    /// Same stdin rule as above: bare `-p`, secret never in argv.
+    public func zipArchiveArgumentsViaSevenZip(destinationPath: String, hasPassword: Bool) -> [String] {
+        var args = ["a", "-tzip", "-mem=AES256"]
+        if hasPassword { args.append("-p") }
+        args.append(destinationPath)
+        args.append(".")
+        return args
+    }
+
+    /// 7z reads the password from stdin when `-p` is given bare, prompting
+    /// twice (enter + verify) on archive creation — verified against p7zip
+    /// 17.05, Sep 2026 — so we write it twice up front. The chunk is a few
+    /// dozen bytes, well under the pipe buffer, so writing before `run()`
+    /// cannot deadlock.
+    private func passwordInputPipe(_ password: String) -> Pipe {
+        let pipe = Pipe()
+        let doubled = password + "\n" + password + "\n"
+        if let data = doubled.data(using: .utf8) {
+            pipe.fileHandleForWriting.write(data)
+        }
+        try? pipe.fileHandleForWriting.close()
+        return pipe
+    }
+
     /// Returns true if the real `7z`/`7za` tool was used, false if the `ditto` ZIP fallback ran.
     /// Throws rather than silently dropping password protection or volume splitting — those are
     /// security/delivery guarantees a caller may be relying on, so failing loudly beats a silent,
@@ -209,20 +261,11 @@ public struct ArchiveEngine: Sendable {
         if let p7zPath = bundledSevenZipPath() ?? findExecutable(name: "7z") ?? findExecutable(name: "7za") {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: p7zPath)
-            var args = ["a", "-t7z", "-m0=lzma2", "-mx=\(level.levelValue)"]
-            if let password {
-                args.append("-p\(password)")
-                args.append("-mhe=on") // Encrypt header/filenames
-            }
-            if volumeSplit != .singleFile {
-                let bytes = volumeSplit.rawValue
-                let mb = max(1, bytes / (1024 * 1024))
-                args.append("-v\(mb)m")
-            }
-            args.append(destination.path)
-            args.append(".")
-
-            process.arguments = args
+            process.arguments = sevenZipArchiveArguments(destinationPath: destination.path,
+                                                         level: level,
+                                                         volumeSplit: volumeSplit,
+                                                         hasPassword: password != nil)
+            if let password { process.standardInput = passwordInputPipe(password) }
             process.currentDirectoryURL = stagingDir
             let pipe = Pipe()
             process.standardError = pipe
@@ -256,17 +299,32 @@ public struct ArchiveEngine: Sendable {
     }
 
     private func createZipArchive(stagingDir: URL, destination: URL, level: CompressionLevel, password: String?) throws {
-        if let password, let zipPath = findExecutable(name: "zip") {
+        // Encrypted ZIPs go through 7z with AES-256 (`-mem=AES256`), password
+        // fed over stdin. We never use Info-ZIP `zip -P`: the secret would sit
+        // in argv where `ps` exposes it, and it only buys ZipCrypto, which
+        // attackers recover in minutes. No 7z on the Mac means no encrypted
+        // ZIP — the caller gets sevenZipToolRequired, not a weak lookalike.
+        if let password {
+            guard let p7zPath = bundledSevenZipPath() ?? findExecutable(name: "7z") ?? findExecutable(name: "7za") else {
+                throw ArchiveEngineError.sevenZipToolRequired
+            }
             let process = Process()
-            process.executableURL = URL(fileURLWithPath: zipPath)
-            process.arguments = ["-r", "-P", password, destination.path, "."]
+            process.executableURL = URL(fileURLWithPath: p7zPath)
+            process.arguments = zipArchiveArgumentsViaSevenZip(destinationPath: destination.path,
+                                                               hasPassword: true)
+            process.standardInput = passwordInputPipe(password)
             process.currentDirectoryURL = stagingDir
             let pipe = Pipe()
             process.standardError = pipe
             process.standardOutput = pipe
             try process.run()
             process.waitUntilExit()
-            if process.terminationStatus == 0 { return }
+            guard process.terminationStatus == 0 else {
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                let msg = String(data: data, encoding: .utf8) ?? "7z exited with status \(process.terminationStatus)"
+                throw ArchiveEngineError.archiveCreationFailed(msg)
+            }
+            return
         }
 
         let process = Process()
@@ -298,6 +356,23 @@ public struct ArchiveEngine: Sendable {
             let msg = String(data: data, encoding: .utf8) ?? "tar exited with status \(process.terminationStatus)"
             throw ArchiveEngineError.archiveCreationFailed(msg)
         }
+    }
+
+    /// First free "basename", "basename 2.ext", "basename 3.ext" … inside `dir`.
+    /// Tracks names in `used` as well as checking the filesystem, because two
+    /// sources can collide with each other before either hits the disk.
+    private func uniqueStagingTarget(in dir: URL, baseName: String, used: inout Set<String>) -> URL {
+        var candidate = baseName
+        let stem = (baseName as NSString).deletingPathExtension
+        let ext = (baseName as NSString).pathExtension
+        var counter = 2
+        while used.contains(candidate)
+                || FileManager.default.fileExists(atPath: dir.appendingPathComponent(candidate).path) {
+            candidate = ext.isEmpty ? "\(stem) \(counter)" : "\(stem) \(counter).\(ext)"
+            counter += 1
+        }
+        used.insert(candidate)
+        return dir.appendingPathComponent(candidate)
     }
 
     private func calculateSize(of url: URL) -> Int64 {
