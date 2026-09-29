@@ -177,6 +177,14 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 - [ ] Grounded in the user's own setup: installed devices, packs and third-party plug-ins read from Live, so advice
       names what they actually have
 - [ ] Contradiction checks and source tiers (manual and measured data above notes, notes above general advice)
+  > 29 Sept (cloud session, no notes or Live here): built and tested on synthetic notes, not yet run on the real 77.
+  > Tiers: `core/source_tiers.py` orders measured Live data > Ableton manual > KENN note > third-party; every cited source
+  > in a chat answer now carries `tier` and `tier_label`; only a generated `measured-*.md` note with a `Measured at:` date
+  > can claim the measured tier. Check: `knowledge/measured_facts.py` compares numbers in approved notes with the ranges
+  > Live measured (the 10 device profiles now, plus any `tooling/data/measured_devices/*.json` from
+  > `measure_device_parameters.py`); a note outside the range becomes a `note_vs_measured` contradiction with the
+  > measurement winning, and retires when the note is fixed. Next: run
+  > `tooling/scripts/check_notes_against_measurements.py` on the Mac against the real notes; the item stays open until then.
 - [ ] **Gate:** retrieval recall@4 ≥ 0.95 on a fixture grown to ≥ 300 questions; answer accuracy ≥ 90% on a
       parameter-level quiz scored by reviewers; no uncited factual claims in a 100-answer audit
   > 2026-09-24 baseline: fixture now 128 + 125 = 253 questions. The new 125 (`evals/device_purpose_retrieval_cases.json`,

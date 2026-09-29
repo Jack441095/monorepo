@@ -198,6 +198,11 @@ def scan_for_contradictions(notes_dir: Path) -> list[dict[str, Any]]:
         {(item["source_a"], item["source_b"]) for item in detected}
     )
 
+    # 2b. Compare notes against what Live itself measured; the measurement wins.
+    measured = _scan_notes_against_measurements(notes_meta)
+    _resolve_stale_measured_findings({(item["source_a"], item["source_b"]) for item in measured})
+    detected.extend(measured)
+
     # 3. Compare notes against user corrections (lessons)
     try:
         from kenn.knowledge import list_lessons
@@ -246,6 +251,49 @@ def scan_for_contradictions(notes_dir: Path) -> list[dict[str, Any]]:
         logger.warning(f"Error checking user corrections against notes: {e}")
 
     return detected
+
+
+def _scan_notes_against_measurements(notes_meta: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    from kenn.knowledge.measured_facts import check_note, load_facts
+
+    facts = load_facts()
+    found = []
+    for note in notes_meta:
+        # A note generated from Live's own strings is the measurement, not a claim about it.
+        if str(note["source_name"]).startswith("measured-"):
+            continue
+        for item in check_note(note["content"], str(note["title"]), facts):
+            low, high, unit = item["measured_low"], item["measured_high"], item["unit"]
+            desc = (f"Note '{note['source_name']}' gives {item['parameter']} on {item['device']} as {item['claimed']:g} {unit}, "
+                    f"but Live measured {low:g} to {high:g} {unit}. The measurement wins.")
+            source_b = f"measured:{item['device']}.{item['parameter']}"
+            found.append({
+                "type": "note_vs_measured",
+                "source_a": note["source_name"],
+                "source_b": source_b,
+                "description": desc,
+                "conflicting_data": {**item, "winner": "measured_live_data"},
+                "contradiction_id": save_contradiction("note_vs_measured", note["source_name"], source_b, desc,
+                                                       {**item, "winner": "measured_live_data"}),
+            })
+    return found
+
+
+def _resolve_stale_measured_findings(current_pairs: set[tuple[str, str]]) -> None:
+    """Close note-vs-measured findings for notes that were fixed or are no longer approved."""
+    try:
+        with _get_conn() as conn:
+            rows = conn.execute(
+                "SELECT contradiction_id, source_a, source_b FROM knowledge_contradictions "
+                "WHERE status = 'open' AND type = 'note_vs_measured'"
+            ).fetchall()
+            conn.executemany(
+                "UPDATE knowledge_contradictions SET status = 'resolved', resolution = 'note_no_longer_conflicts' "
+                "WHERE contradiction_id = ?",
+                [(row["contradiction_id"],) for row in rows if (row["source_a"], row["source_b"]) not in current_pairs],
+            )
+    except (sqlite3.Error, OSError) as exc:
+        logger.warning(f"Failed to reconcile note-vs-measured findings: {exc}")
 
 
 def _resolve_stale_measurement_detections(current_pairs: set[tuple[str, str]]) -> None:
@@ -359,11 +407,11 @@ def resolve_contradiction(contradiction_id: str, strategy: str, notes_dir: Path)
             success = True
             if strategy == "primary_a":
                 # Keep Note A, deprecate Note B (turn B to Draft)
-                if not source_b.startswith("lesson:"):
+                if not source_b.startswith(("lesson:", "measured:")):
                     success = _deprecate_note(source_b, notes_dir)
             elif strategy == "primary_b":
                 # Keep Note B, deprecate Note A (turn A to Draft)
-                if not source_a.startswith("lesson:"):
+                if not source_a.startswith(("lesson:", "measured:")):
                     success = _deprecate_note(source_a, notes_dir)
             elif strategy == "merged":
                 # Merged indicates user resolved it manually
