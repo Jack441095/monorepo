@@ -960,12 +960,12 @@ _TERSE_LEVEL_EXCLUDE = re.compile(r"\b(?:send|sends|reverb|delay|echo|eq|band|ga
 # resolve, so "synth off" works and "metronome off" still asks.
 _NAME = r"(?P<name>(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,3}?)"
 _POLITE_TAIL = re.compile(r"\s*,?\s+(?:please|pls|plz|thanks|thank\s+you|cheers|mate)\s*[.!?]*\s*$", re.I)
-_POLITE_LEAD = re.compile(r"^\s*(?:yo|hey|ok|okay|right|please|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?"
-                          r"|i\s+(?:want|need|would\s+like|'d\s+like)\s+(?:you\s+)?to)\s*[,!]?\s+(?=\w)", re.I)
+_POLITE_LEAD = re.compile(r"^\s*(?:yo|hey|ok|okay|right|please|let'?s(?=\s+(?:put|set|make|bring|turn|pan|mute|solo|arm|drop|pull|push|get|take|mute)\b)|quick\s+one|(?:hey\s+)?kenn|(?:can|could|would|will)\s+(?:you|u)(?:\s+please)?"
+                          r"|i\s+(?:want|need|would\s+like|'d\s+like)\s+(?:you\s+)?to)\s*[,:!]?\s+(?=\w)", re.I)
 # ", can you do that?", "for clarity", "so I can adjust it": asides after the request. Left in, they ended up in new
 # track names ("Synth Lead, can you do that?").
 _TRAILING_ASIDE = re.compile(r"\s*,?\s+(?:can\s+you\s+(?:do\s+that|help(?:\s+me)?(?:\s+with\s+that)?)|is\s+that\s+possible|"
-                             r"if\s+(?:you\s+can|possible)|for\s+clarity|for\s+me|at\s+the\s+same\s+time|together|simultaneously|so\s+(?:that\s+)?i\s+can\s+[^,]+|thanks?(?:\s+you)?)"
+                             r"if\s+(?:you\s+can|possible)|for\s+clarity|for\s+me|for\s+(?:now|the\s+moment)|for\s+a\s+sec(?:ond)?|at\s+the\s+same\s+time|together|simultaneously|so\s+(?:that\s+)?i\s+can\s+[^,]+|thanks?(?:\s+you)?)"
                              r"\s*[?.!]*\s*$", re.I)
 # "how do I solo the vocal?" asks how, it doesn't ask KENN to do it; KENN's notes answer it.
 _HOW_TO_QUESTION = re.compile(r"^\s*(?:how\s+(?:do|can|would|should)\s+i|is\s+there\s+a\s+way\s+to|what(?:'s|\s+is)\s+the\s+"
@@ -1002,7 +1002,7 @@ _NOT_A_TRACK_NAME = re.compile(r"\b(?:it|that|this|them|everything|all|solo|arm|
 # A negative bare number as a fader target is dB (Live shows faders in dB): "set hats to -6", "turn the kick down to
 # -16", "make the clap -12". A verb is required, so a bare "kick to -9" still asks, and positive numbers still ask.
 _NEGATIVE = r"(?P<amount>(?:minus\s+|-)\d+(?:\.\d+)?)\s*(?:dbs?)?(?:\s+again)?\s*[.!?]?\s*$"
-_VERB_LEVEL = re.compile(rf"^\s*(?:set|put|bring|turn|drop|pull|push|get|take)\s+{_NAME}(?:\s+(?:down|up|back))?\s+(?:to|at)\s+"
+_VERB_LEVEL = re.compile(rf"^\s*(?:set|put|bring|turn|drop|pull|push|get|take)\s+{_NAME}(?:\s+(?:down|up|back))?\s+(?:to|at|on)\s+"
                          + _NEGATIVE + rf"|^\s*make\s+{_NAME.replace('name', 'name2')}\s+(?:(?:to|at)\s+)?"
                          + _NEGATIVE.replace("amount", "amount2"), re.I)
 _PAN_NEUTRAL = re.compile(rf"^\s*(?:set|put|bring|move)\s+{_NAME}\s+(?:to\s+pan\s+(?:neutral|cent(?:er|re)|middle)|(?:back\s+)?in(?:to)?\s+"
@@ -1047,6 +1047,103 @@ _SEND_SAID_AMOUNT_FIRST = re.compile(
 _SEND_SAID_GO_TO = re.compile(
     r"^\s*make\s+(?:the\s+)?(?P<name>[\w/&-]+(?:\s+[\w/&-]+){0,3}?)\s+go\s+to\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+[\w-]+)?)\s+"
     r"at\s+(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!?]?\s*$", re.I)
+
+
+# Wording from the 29 Sept blind check (tooling/data/natural_blind_claude_2026-09-29.jsonl). Each rewrite is anchored
+# to a shape that only ever means one thing, and turns it into a form the rules above already parse.
+_SPOKEN_MINUS = re.compile(rf"\bminus\s+(?P<word>{_SPOKEN_NUMBER_WORD})\b(?=\s*(?:dbs?)?\s*[.!?]?\s*$)", re.I)
+_AT_SIGN = re.compile(r"\s@\s*")
+_LEVEL_LEAD_IN = re.compile(r"\b(?:sitting|sat|hovering|parked)\s+(?:around|about|at)\b|\bshould\s+(?:live|sit|be|stay)\s+(?=at\b)"
+                            r"|\b(?:around|about|roughly)\s+(?=-\d)", re.I)
+_MISSPELLED_DIRECTION = (
+    (re.compile(r"\bup+\b(?=\s+\d)", re.I), "up"),
+    (re.compile(r"\b(?:dwn|dowm|donw|downn)\b", re.I), "down"),
+)
+_WANT_A_DEVICE = re.compile(r"^\s*i\s+(?:want|need|would\s+like|'d\s+like)\s+(?P<rest>(?:an?|another)\s+(?:new\s+)?"
+                            r"(?:glue\s+compressor|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)"
+                            r"\s+(?:on|to)\s+.+?)\s*[.!]?\s*$", re.I)
+_ZERO_DB = re.compile(r"\bzero\s+(?=dbs?\b)", re.I)
+_FADER_DOWN_TO = re.compile(r"\bfader\s+(?:down|up)\s+(?=(?:to|at)\b)", re.I)
+_TOO_LOUD_THEN_DOWN = re.compile(
+    rf"^\s*{_NAME}\s+(?:is\s+|are\s+)?too\s+(?:loud|hot|quiet|soft|low)\s*,?\s*(?P<direction>up|down)\s+"
+    r"(?P<amount>\d+(?:\.\d+)?)\s*(?:dbs?)?\s*[.!]?\s*$", re.I)
+_MORE_DB_ON = re.compile(rf"^\s*(?:give\s+me|gimme|get\s+me)\s+(?P<amount>\d+(?:\.\d+)?)\s+more\s+(?:dbs?|decibels?)\s+(?:on|for)\s+{_NAME}"
+                         r"\s*[.!]?\s*$", re.I)
+_QUIETEN = re.compile(rf"^\s*(?:quieten|quiet)\s+(?:down\s+)?{_NAME}\s+(?:by\s+)?(?P<amount>\d+(?:\.\d+)?|{_SPOKEN_NUMBER_WORD})\s*(?:dbs?)\s*[.!]?\s*$", re.I)
+_SWING_PAN = re.compile(rf"^\s*(?:swing|shift|send|slide)\s+{_NAME}\s+(?P<amount>\d+(?:\.\d+)?)\s*(?:%|percent)\s+(?:to\s+the\s+)?"
+                        r"(?P<side>left|right)\s*[.!]?\s*$", re.I)
+_OVER_TO_SIDE = re.compile(rf"^\s*{_NAME}\s+(?:over\s+)?to\s+the\s+(?P<side>left|right)\s*,?\s*(?P<amount>\d+(?:\.\d+)?)\s*(?:%|percent)"
+                           r"\s*[.!]?\s*$", re.I)
+_SHUT_UP = re.compile(rf"^\s*shut\s+{_NAME}\s+up\s*[.!]?\s*$", re.I)
+_HEAR_JUST = re.compile(rf"^\s*i\s+(?:need|want)\s+to\s+hear\s+(?:just|only)\s+{_NAME}\s*[.!]?\s*$", re.I)
+_STOP_SOLOING = re.compile(rf"^\s*(?:stop|quit)\s+soloing\s+{_NAME}\s*[.!]?\s*$", re.I)
+_GET_ARMED = re.compile(rf"^\s*get\s+{_NAME}\s+armed\s*[.!]?\s*$", re.I)
+_PAUSE = re.compile(r"^\s*(?:pause|hold\s+(?:it|playback))(?:\s+(?:it|there|here|the\s+(?:song|playback)))*\s*[.!]?\s*$", re.I)
+_KILL_SEND = re.compile(rf"^\s*(?:kill|cut|nuke|zero)\s+the\s+send\s+(?:from\s+)?{_NAME}\s+to\s+(?:the\s+)?(?P<ret>[\w' -]+?)\s*[.!]?\s*$", re.I)
+_SEND_INTO = re.compile(rf"^\s*(?:feed|route|push)\s+{_NAME}\s+(?:in)?to\s+(?:the\s+)?(?P<ret>[\w-]+(?:\s+(?!at\b|by\b)[\w-]+)?)\s+(?:at\s+|by\s+)?"
+                        r"(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!]?\s*$", re.I)
+_SEND_TO_ABOUT = re.compile(rf"^\s*(?:send\s+)?{_NAME}\s+(?:in)?to\s+(?:the\s+)?(?P<ret>[ab]-?(?:reverb|delay)|reverb|delay)\s+(?:about|around|at)?\s*"
+                            r"(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!]?\s*$", re.I)
+_SEND_TURN_DOWN = re.compile(rf"^\s*(?:turn|bring|take)\s+(?:the\s+)?{_NAME}\s+(?P<ret>reverb|verb|delay)\s+send\s+(?:down\s+|up\s+)?(?:to|at)\s+"
+                             r"(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)\s*[.!]?\s*$", re.I)
+_MARKER_COLON = re.compile(r"^\s*(?:set|add|drop|put)\s+(?:a\s+)?(?:new\s+)?(?:marker|locator|cue(?:\s+point)?)\s*:\s*(?P<locator>.+?)\s*[.!]?\s*$", re.I)
+_LOCATOR_NAME_IT = re.compile(r"^\s*(?:new|another)\s+(?:marker|locator|cue(?:\s+point)?)\s*,?\s+(?:name\s+it|call\s+it)\s+(?P<locator>.+?)\s*[.!]?\s*$", re.I)
+_SHOULD_BE_CALLED = re.compile(rf"^\s*{_NAME}\s+(?:track\s+)?should\s+(?:be\s+called|be\s+named|go\s+by)\s+(?P<new>.+?)\s*[.!]?\s*$", re.I)
+_NAME_THE_TRACK = re.compile(rf"^\s*(?:name|relabel|retitle)\s+{_NAME}\s+(?:track\s+)?(?:as|to)\s+(?P<new>[\w'&-]+(?:\s+[\w'&-]+){{0,2}})\s*[.!]?\s*$", re.I)
+
+
+def _rewrite_producer_wording(text: str) -> str:
+    if _HOW_TO_QUESTION.match(text):
+        return text
+    text = _AT_SIGN.sub(" at ", text)
+    text = _SPOKEN_MINUS.sub(lambda m: "-" + str(_SPOKEN_NUMBER_VALUES[m.group("word").lower()]), text)
+    text = _ZERO_DB.sub("0 ", text)
+    text = _LEVEL_LEAD_IN.sub(lambda m: "at " if m.group(0).lower().startswith(("sitting", "sat", "hovering", "parked", "around", "about", "roughly")) else "", text)
+    text = _FADER_DOWN_TO.sub("fader ", text)
+    for pattern, fixed in _MISSPELLED_DIRECTION:
+        text = pattern.sub(fixed, text)
+
+    def clean(match: re.Match[str], group: str = "name") -> str | None:
+        found = match.group(group)
+        return None if not found or _NOT_A_TRACK_NAME.search(found) or _TERSE_LEVEL_EXCLUDE.search(found) else found
+
+    if (m := _WANT_A_DEVICE.match(text)):
+        return f"add {m.group('rest')}"
+    if (m := _TOO_LOUD_THEN_DOWN.match(text)) and clean(m):
+        return f"turn {m.group('name')} {m.group('direction').lower()} {m.group('amount')} dB"
+    if (m := _MORE_DB_ON.match(text)) and clean(m):
+        return f"turn {m.group('name')} up {m.group('amount')} dB"
+    if (m := _QUIETEN.match(text)) and clean(m):
+        return f"turn {m.group('name')} down {m.group('amount')} dB"
+    if (m := _SWING_PAN.match(text) or _OVER_TO_SIDE.match(text)) and clean(m):
+        return f"pan {m.group('name')} {m.group('amount')}% {m.group('side').lower()}"
+    if (m := _SHUT_UP.match(text)) and clean(m):
+        return f"mute {m.group('name')}"
+    if (m := _HEAR_JUST.match(text)) and clean(m):
+        return f"solo {m.group('name')}"
+    if (m := _STOP_SOLOING.match(text)) and clean(m):
+        return f"unsolo {m.group('name')}"
+    if (m := _GET_ARMED.match(text)) and clean(m):
+        return f"arm {m.group('name')}"
+    if _PAUSE.match(text):
+        return "stop playback"
+    if (m := _KILL_SEND.match(text)) and clean(m):
+        return f"send the {m.group('name')} to the {m.group('ret')} at 0%"
+    if (m := _SEND_INTO.match(text)) and clean(m):
+        return f"send the {m.group('name')} to the {m.group('ret')} at {m.group('value')}%"
+    if (m := _SEND_TO_ABOUT.match(text)) and clean(m):
+        return f"send the {m.group('name')} to the {m.group('ret')} at {m.group('value')}%"
+    if (m := _SEND_TURN_DOWN.match(text)) and clean(m):
+        ret = "reverb" if m.group("ret").lower() == "verb" else m.group("ret").lower()
+        return f"send the {m.group('name')} to the {ret} at {m.group('value')}%"
+    if (m := _MARKER_COLON.match(text) or _LOCATOR_NAME_IT.match(text)):
+        return f"add a locator called {m.group('locator').strip()}"
+    if (m := _SHOULD_BE_CALLED.match(text)) and clean(m):
+        return f"rename {m.group('name')} to {m.group('new')}"
+    if (m := _NAME_THE_TRACK.match(text)) and clean(m):
+        return f"rename {m.group('name')} to {m.group('new')}"
+    return text
+
 
 
 def _rewrite_idioms(text: str) -> str:
@@ -1142,7 +1239,7 @@ def _rewrite_common_phrasings(text: str) -> str:
     a bare "kick to -9" still asks). Nothing here changes what a request means.
     """
     text = _ORDINAL_CHANNEL.sub(lambda m: f"track {_ORDINALS[m.group(1).lower()]}", text)
-    text = _rewrite_idioms(text)
+    text = _rewrite_idioms(_rewrite_producer_wording(_TRAILING_ASIDE.sub("", _POLITE_TAIL.sub("", text))))
     corrected = _CORRECTION_LEAD.sub("", text)
     if corrected != text:
         text = _CORRECTION_TAIL.sub("", corrected)
@@ -1157,7 +1254,7 @@ def _rewrite_common_phrasings(text: str) -> str:
 
 
 _FOCUS_DEVICE_BY_NAME = re.compile(
-    r"^\s*(?:show(?:\s+me)?|open|focus|select|go\s+to|jump\s+to|take\s+me\s+to)\s+(?:the\s+)?(?P<phrase>.+?)\s*[.!]?\s*$",
+    r"^\s*(?:show(?:\s+me)?|open(?:\s+up)?|focus|select|go\s+to|jump\s+to|take\s+me\s+to)\s+(?:the\s+)?(?P<phrase>.+?)\s*[.!]?\s*$",
     re.I,
 )
 
@@ -1490,7 +1587,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         # zero-based in the typed intent and proposal.
         eq_device_index = int(eq_device_reference.group(1)) - 1
     eq_band_request = eq_band_match or eq_band_freq_first_match or eq_band_compact_match or eq_band_short_match or eq_band_only_match
-    if any(cue in lower for cue in ("list my tracks", "what tracks", "show my tracks", "show the tracks")) or re.search(
+    if any(cue in lower for cue in ("list my tracks", "what tracks", "which tracks", "show my tracks", "show the tracks")) or re.search(
             r"^\s*(?:list|show(?:\s+me)?)\s+(?:all\s+)?(?:of\s+)?(?:the|my)\s+tracks\b", lower):
         base.update({"action": "inspect_tracks", "confidence": 0.99})
         return base
@@ -2145,6 +2242,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         lower.startswith(("what devices", "show devices", "list devices"))
         or "devices on" in lower
         or re.search(r"\b(?:show|list|inspect|display|what)\b.*\b(?:chain|processors?|devices?|plugins?|plug-ins?)\b", lower)
+        or re.search(r"\b(?:list|show)\b.*\beffects?\s+(?:on|in)\b", lower)
         or re.search(r"\bwhat(?:'s| is| are|s)\s+on\s+(?:the\s+)?track\b", lower)
     ):
         base.update({"action": "inspect_devices", "confidence": 0.99})

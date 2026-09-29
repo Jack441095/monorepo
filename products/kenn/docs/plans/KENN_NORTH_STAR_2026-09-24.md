@@ -153,6 +153,13 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > things *less* safe: 18 wrong plans on one blind set, e.g. "can i hear the vocal without the synth" soloed the
   > Synth. Not met; needs fresh blind wording each round, owner-checked labels, and a planner that asks rather than
   > guesses.
+  > 29 Sept, round 4 (`docs/evidence/KENN_BLIND_PHRASINGS_2026-09-29.md`): 146 new phrasings written before scoring, in a
+  > new register. First run **69.2%** right, 3 wrong (**76.7%, 1 wrong** after I corrected 10 labels that
+  > ignored product rules, e.g. Limiter isn't insertable and the vocal is already at 0 dB). The wrong plan that mattered:
+  > "kill the send from bass to delay" proposed **muting the Bass**. Fixed by group (spoken minus, `@`, "3 more dB",
+  > "swing the snare 15% right", "feed X into the reverb", markers with a colon, and so on), 34 tests; all earlier sets
+  > rescored with no new wrong plan. The new set is now development data (143/146), so the blind number stays ~70–77%.
+  > Two pinned policies conflict with the labelling rules ("lead vocal to -4" and "kill playback" both ask): owner call.
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
