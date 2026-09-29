@@ -111,6 +111,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > was no better in practice. Chat on this Mac is back on templates (instant). Ways forward, none built yet: fewer
   > and shorter notes in the prompt, showing the template at once and the model's answer when it's ready, or serving
   > the brain from the box GPU (2.8 s) for the owner's own use.
+  > 29 Sept: "template now, model's answer when it's ready" is built and off by default
+  > (`KENN_CHAT_BRAIN_DEFERRED=1`). The ask reply carries the template and a `brain_pending` job id; one background
+  > worker runs the same rewrite and validation as before; the page polls `/kenn/api/ask/brain` and swaps the text in
+  > only if the rewrite passed. Never for replies with a Live proposal. Each rewrite is timed in `routes.jsonl` as
+  > `brain_deferred`. Tested with a stubbed model (12 backend, 3 frontend tests). Not measured: wait-to-swap on the
+  > owner's M3 with Live open. Still not ticked until that run shows how often the swap lands and how long it takes.
 - [x] One router: rule parser → local planner → brain; every route logged with timing
   > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
   > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,

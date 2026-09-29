@@ -114,7 +114,7 @@ from kenn.core.sample_import_service import (
 )
 from kenn.core.audition_feedback import build_audition_feedback
 from kenn.core.audition_revision import validate_revision_brief
-from kenn.core import timing_stats
+from kenn.core import deferred_brain, timing_stats
 from kenn.core.support_diagnostics import build_support_diagnostics, save_support_diagnostics
 from kenn.core.companion_instance import CompanionAlreadyRunning, CompanionInstanceLock
 
@@ -1405,6 +1405,10 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(200 if model.get("status") == "connected" else 503, model)
             except Exception as exc:
                 self.send_json(503, {"status": "error", "error": str(exc)})
+            return
+        if parsed.path in {"/api/ask/brain", "/kenn/api/ask/brain"}:
+            job_id = str(parse_qs(parsed.query).get("job_id", [""])[0])[:32]
+            self.send_json(200, deferred_brain.status(job_id))
             return
         if parsed.path == "/guide":
             from kenn.core.tester_guide import guide_html
@@ -2897,10 +2901,18 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 _t_context = time.perf_counter() - _ask_t0
                 _t_answer = time.perf_counter()
-                result = answer_payload(
-                    question, limit=limit, history=history, session_id=session_id,
-                    plugin_session_id=plugin_session_id, correlation_id=correlation_id,
-                )
+                brain_token = deferred_brain.begin() if deferred_brain.enabled() else None
+                try:
+                    result = answer_payload(
+                        question, limit=limit, history=history, session_id=session_id,
+                        plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                    )
+                finally:
+                    brain_step = deferred_brain.end(brain_token) if brain_token is not None else None
+                if brain_step is not None:
+                    brain_job = deferred_brain.submit(brain_step)
+                    if brain_job:
+                        result["brain_pending"] = {"job_id": brain_job}
                 _answer_ms = (time.perf_counter() - _t_answer) * 1000
                 if plugin_turn:
                     result["live_mix_context"] = plugin_context

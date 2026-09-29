@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('../api/kenn', () => ({
   askKenn: vi.fn(),
   confirmKennAction: vi.fn(),
   undoKennAction: vi.fn(),
+  fetchKennBrainAnswer: vi.fn(),
   fetchKennSessionCard: vi.fn().mockResolvedValue({
     ok: true,
     status: 'offline',
@@ -12,10 +13,17 @@ vi.mock('../api/kenn', () => ({
   }),
 }))
 
-import { askKenn, confirmKennAction, fetchKennSessionCard, undoKennAction } from '../api/kenn'
+import {
+  askKenn,
+  confirmKennAction,
+  fetchKennBrainAnswer,
+  fetchKennSessionCard,
+  undoKennAction,
+} from '../api/kenn'
 import { useKenn } from './useKenn'
 
 const mockedAsk = vi.mocked(askKenn)
+const mockedBrain = vi.mocked(fetchKennBrainAnswer)
 const mockedConfirm = vi.mocked(confirmKennAction)
 const mockedUndo = vi.mocked(undoKennAction)
 const mockedSessionCard = vi.mocked(fetchKennSessionCard)
@@ -140,5 +148,66 @@ describe('useKenn project card with a return selected', () => {
     })
     await kenn.refreshSessionCard()
     expect(kenn.project.value.focusTrack).toBe('A-Reverb')
+  })
+})
+
+describe('useKenn template first, model answer later', () => {
+  const kenn = useKenn()
+  const templateReply = {
+    answer: 'template answer',
+    suggestions: [],
+    sources: [],
+    findings: [],
+    proposal: undefined,
+    raw: { brain_pending: { job_id: 'abc123' } },
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.stubGlobal('window', globalThis) // useKenn's sleep() reaches for window.setTimeout; tests run in node
+    kenn.messages.value = []
+    mockedAsk.mockReset()
+    mockedBrain.mockReset()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
+  it('shows the template at once and swaps in the model answer when it is ready', async () => {
+    mockedAsk.mockResolvedValue(templateReply as never)
+    mockedBrain
+      .mockResolvedValueOnce({ status: 'running' })
+      .mockResolvedValueOnce({ status: 'ready', answer: 'model answer' })
+
+    await kenn.sendMessage('how do I sidechain the bass?')
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'template answer' })
+
+    await vi.advanceTimersByTimeAsync(2100)
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'model answer' })
+  })
+
+  it('keeps the template when the rewrite was rejected', async () => {
+    mockedAsk.mockResolvedValue(templateReply as never)
+    mockedBrain.mockResolvedValue({ status: 'rejected' })
+
+    await kenn.sendMessage('how do I sidechain the bass?')
+    await vi.advanceTimersByTimeAsync(3000)
+
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'template answer' })
+    expect(mockedBrain).toHaveBeenCalledTimes(1)
+  })
+
+  it('never polls for a reply that carries a Live proposal', async () => {
+    mockedAsk.mockResolvedValue({
+      ...templateReply,
+      proposal: { action: 'set_mute', confirmation_token: 'token' },
+    } as never)
+
+    await kenn.sendMessage('mute the bass')
+    await vi.advanceTimersByTimeAsync(3000)
+
+    expect(mockedBrain).not.toHaveBeenCalled()
   })
 })

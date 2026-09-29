@@ -3,6 +3,7 @@ import {
   askKenn,
   confirmKennAction,
   undoKennAction,
+  fetchKennBrainAnswer,
   fetchKennSessionCard,
   type KennActionProposal,
   type KennActionReceipt,
@@ -209,6 +210,29 @@ export async function refreshSessionCard() {
 
 void refreshSessionCard()
 
+// The reply shows the template straight away; the local model's rewrite replaces it here if it passes validation.
+const BRAIN_POLL_MS = 1000
+const BRAIN_POLL_LIMIT = 45
+
+async function swapInBrainAnswer(messageId: string, jobId: string) {
+  for (let attempt = 0; attempt < BRAIN_POLL_LIMIT; attempt += 1) {
+    await sleep(BRAIN_POLL_MS)
+    let result: { status: string; answer?: string }
+    try {
+      result = await fetchKennBrainAnswer(jobId)
+    } catch {
+      return
+    }
+    if (result.status === 'ready' && result.answer) {
+      messages.value = messages.value.map((m) =>
+        m.id === messageId && m.role === 'assistant' ? { ...m, text: result.answer } : m,
+      )
+      return
+    }
+    if (result.status !== 'queued' && result.status !== 'running') return
+  }
+}
+
 async function sendMessage(text: string) {
   const question = text.trim()
   if (!question || sending.value) return
@@ -235,10 +259,11 @@ async function sendMessage(text: string) {
       sessionId,
       history: history.slice(0, -1),
     })
+    const replyId = newId('assistant')
     messages.value = [
       ...messages.value,
       {
-        id: newId('assistant'),
+        id: replyId,
         role: 'assistant',
         text: answer,
         suggestions: suggestions.length ? suggestions : undefined,
@@ -249,6 +274,10 @@ async function sendMessage(text: string) {
         undoOfReceiptId: proposal && raw?.undo_of_receipt_id ? String(raw.undo_of_receipt_id) : undefined,
       },
     ]
+    const brainPending = raw?.brain_pending as { job_id?: unknown } | undefined
+    if (!proposal && brainPending?.job_id) {
+      void swapInBrainAnswer(replyId, String(brainPending.job_id))
+    }
   } catch (e) {
     const msg = userFacingKennError(
       e,

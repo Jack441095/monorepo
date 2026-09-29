@@ -8,6 +8,7 @@ from typing import Generator
 
 from kenn.orchestrator import get_orchestrator
 
+from kenn.core import deferred_brain
 from kenn.llm.llm_rewrite import (  # noqa: E402
     get_public_usage_stats as _get_llm_usage_stats,
 )
@@ -1027,21 +1028,24 @@ def make_answer(
     ):
         print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms (no rewrite)", file=_sys.stderr, flush=True)
         return template, False
-    _ma_t2 = _time.perf_counter()
-    enhanced = llm_enhance_answer(
-        query,
-        template,
-        results,
-        history,
-        history_context_line(query, history),
-        source_label,
-        normalize_history,
-        answer_mode=answer_mode,
-        route=route,
-        timeline_context=timeline_context,
-        skill_level=_skill_level_for_session(session_id),
-    )
-    if enhanced:
+    skill_level = _skill_level_for_session(session_id)
+
+    def rewrite() -> str | None:
+        enhanced = llm_enhance_answer(
+            query,
+            template,
+            results,
+            history,
+            history_context_line(query, history),
+            source_label,
+            normalize_history,
+            answer_mode=answer_mode,
+            route=route,
+            timeline_context=timeline_context,
+            skill_level=skill_level,
+        )
+        if not enhanced:
+            return None
         from kenn.llm.linter import lint_response
         mode = answer_mode or classify_answer_mode(query, route, history=history)
         enhanced = lint_response(enhanced, mode)
@@ -1055,10 +1059,18 @@ def make_answer(
             timeline_context=timeline_context,
             additional_evidence_text=_specialist_evidence_context(query, history),
         )
-        if validation["accepted"]:
-            _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
-            print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced)", file=_sys.stderr, flush=True)
-            return enhanced, True
+        return enhanced if validation["accepted"] else None
+
+    # In deferred mode the server sends the template now and runs the rewrite off the request thread.
+    if llm_enabled() and deferred_brain.defer(rewrite):
+        print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms (rewrite deferred)", file=_sys.stderr, flush=True)
+        return template, False
+    _ma_t2 = _time.perf_counter()
+    enhanced = rewrite()
+    if enhanced:
+        _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
+        print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced)", file=_sys.stderr, flush=True)
+        return enhanced, True
     _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
     print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (fallback)", file=_sys.stderr, flush=True)
     return template, False
