@@ -76,8 +76,15 @@ def parse_explicit_preference(text: str) -> tuple[str, str, str] | None:
     for pat, key, val in _KEYWORD_RULES:
         m = pat.search(target_text)
         if m:
-            if "\\1" in val or "{}" in val:
-                val = m.group(0).lower()
+            if pat.groups:
+                # Only the LUFS rules carry capture groups, because there the
+                # producer states the number: "I master to -14 LUFS" must store
+                # -14, not the canned example. record_preference rejects any
+                # value missing verbatim from the statement, so keep the matched
+                # text as spoken. The old placeholder check for a backslash-1
+                # marker never fired (no rule value ever contained it), so every
+                # real target stored "master to -9 LUFS" and then failed that check.
+                val = m.group(0)
             return key, val, clean
 
     return None

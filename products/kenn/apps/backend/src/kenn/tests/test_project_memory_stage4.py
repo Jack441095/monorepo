@@ -219,3 +219,46 @@ def test_answer_payload_cites_memory_and_enforces_cross_project_isolation(tmp_pa
     # Must NOT cite any preference in prose
     assert "Noting your preference" not in ans_other["answer"]
     assert ans_other.get("applied_preferences") == []
+
+
+def test_lufs_preference_stores_the_number_the_producer_spoke(tmp_path):
+    # Regression: the keyword loop checked the rule value for a backslash-1
+    # placeholder that no rule ever contained, so every LUFS target stored the
+    # canned "-9 LUFS" example — and record_preference then rejected it, because
+    # the value must appear verbatim in the statement. "I master to -14 LUFS"
+    # died silently instead of remembering -14.
+    parsed = parse_explicit_preference("I master to -14 LUFS")
+    assert parsed is not None
+    key, value = parsed[0], parsed[1]
+    assert key == "workflow"
+    assert "master to -14 LUFS" in value
+
+    store = AssistantProfileStore(db_path=tmp_path / "profile.db")
+    recorded = store.record_preference(
+        session_id="set-lufs",
+        key=key,
+        value=value,
+        source_turn_id="turn-lufs",
+        user_statement="I master to -14 LUFS",
+    )
+    assert recorded.get("ok") is True, recorded
+    stored = store.current_preferences("set-lufs")
+    assert [p["value"] for p in stored] == ["master to -14 LUFS"]
+
+
+def test_lufs_target_phrase_is_kept_as_spoken(tmp_path):
+    # "target -16 lufs" has no canned example to hide behind: the matched text
+    # itself is what survives the verbatim guard.
+    parsed = parse_explicit_preference("Remember that I target -16 lufs")
+    assert parsed is not None and parsed[0] == "workflow"
+    assert "-16" in parsed[1]
+    store = AssistantProfileStore(db_path=tmp_path / "profile.db")
+    recorded = store.record_preference(
+        session_id="set-lufs-2",
+        key=parsed[0],
+        value=parsed[1],
+        source_turn_id="turn-lufs-2",
+        user_statement="Remember that I target -16 lufs",
+    )
+    assert recorded.get("ok") is True, recorded
+
