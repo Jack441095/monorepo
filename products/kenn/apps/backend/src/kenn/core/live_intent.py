@@ -532,6 +532,58 @@ _SECOND_ACTION = re.compile(
 _VAGUE_EFFECT = re.compile(r"\b(?:some|more|less|a\s+bit\s+of|a\s+little|a\s+touch\s+of|a\s+splash\s+of)\s+(?:reverb|verb|delay|echo)\b", re.I)
 
 
+_CHOICE_VERB = re.compile(r"\b(?:set|change|switch|make|turn|put|select|use|enable|disable|flip|go)\b", re.I)
+_CHOICE_QUESTION = re.compile(r"^\s*(?:what|which|how|is|are|does|do|why|when)\b", re.I)
+_ON_WORDS = re.compile(r"\b(?:on|enable[ds]?|engage[ds]?|activate[ds]?)\b", re.I)
+_OFF_WORDS = re.compile(r"\b(?:off|disable[ds]?|deactivate[ds]?)\b", re.I)
+
+
+def _choice_request(lower: str, device_name: str) -> dict[str, Any] | None:
+    """ "set the compressor model to RMS", "turn auto release on": a qualified chooser named in the words, and one option.
+
+    Reads only the choosers whose options were checked against Live's own labels (core/device_units.py); nothing here
+    guesses at a control it hasn't been taught. Zero or several matching options means it isn't a choice request.
+    """
+    from kenn.core import device_units
+
+    if _CHOICE_QUESTION.match(lower) or not _CHOICE_VERB.search(lower):
+        return None
+    named = []
+    for choice in device_units.qualified_choices():
+        if choice.device_name.casefold() != device_name.casefold():
+            continue
+        spoken = re.sub(r"[\s/_-]*on[\s/_-]*off$", "", choice.parameter_name.casefold())   # "Auto Release On/Off" is said "auto release"
+        found = re.search(r"\b" + r"[\s/_-]*".join(re.escape(w) for w in re.split(r"[^a-z0-9]+", spoken) if w) + r"\b", lower)
+        if found:
+            named.append((len(choice.parameter_name), found, choice))
+    if not named:
+        return None
+    named.sort(key=lambda item: -item[0])
+    if len(named) > 1 and named[0][0] == named[1][0]:
+        return None
+    _length, found, choice = named[0]
+    labels = {label.casefold(): (raw, label) for raw, label in choice.options}
+    if set(labels) == {"on", "off"}:
+        # "turn auto release off on the drum bus": the switch word is the one right next to the parameter, not the "on".
+        before = [w for w in lower[:found.start()].split() if w != "the"][-2:]
+        after = lower[found.end():].split()[:2]
+        following = [after[1]] if len(after) > 1 and after[0] in {"to", "is", "=", "mode"} else after[:1]
+
+        def switch(words: list[str]) -> str | None:
+            on = any(_ON_WORDS.fullmatch(word.strip(".,!?")) for word in words)
+            off = any(_OFF_WORDS.fullmatch(word.strip(".,!?")) for word in words)
+            return ("on" if on else "off") if on != off else None
+
+        chosen = switch(before) or switch(following)
+        hits = [labels[chosen]] if chosen else []
+    else:
+        rest = (lower[:found.start()] + " " + lower[found.end():]).strip()   # the parameter's own words aren't the answer
+        hits = [labels[name] for name in labels if re.search(r"\b" + re.escape(name) + r"\b", rest)]
+    if len(hits) != 1:
+        return None
+    return {"parameter": choice.parameter_name, "raw": hits[0][0], "label": hits[0][1]}
+
+
 def _nickname_track_name(text: str, tracks: list[dict[str, Any]]) -> str:
     """The one track a nickname points at ("hats" -> Hi-Hats, "vox" -> Lead Vocal), or ""."""
     def normalize(value: str) -> str:
@@ -1896,7 +1948,9 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         name = str(track.get("name") or "").strip().lower()
         if name:
             without_track_names = re.sub(rf"(?<!\w){re.escape(name)}(?!\w)", " ", without_track_names)
-    if _UNSUPPORTED_DEVICE_CONTROL.search(lower) and (
+    # "turn auto release on" is a qualified chooser, not the device's own on/off switch the guard below is for.
+    choice_asked = any(_choice_request(lower, name) for name in set(mentioned_devices))
+    if _UNSUPPORTED_DEVICE_CONTROL.search(lower) and not choice_asked and (
         _DEVICE_CONTROL_REFERENCE.search(without_track_names)
         or any(
             re.search(rf"(?<!\w){re.escape(name)}(?!\w)", text, re.I)
@@ -2473,6 +2527,21 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         else:
             base.update({"mode": "inspect", "action": "inspect_device_parameters", "confirmation_required": False, "confidence": 0.99})
         return base
+    if device is not None:
+        choice = _choice_request(lower, device[1])
+        if choice:
+            base.update({
+                "mode": "assist",
+                "action": "set_device_parameter",
+                "parameter": {"name": choice["parameter"]},
+                "desired_value": choice["raw"],
+                "relative": False,
+                "unit": "choice",
+                "choice_label": choice["label"],
+                "confirmation_required": True,
+                "confidence": 0.9,
+            })
+            return base
     delta_match = re.search(r"\b(lower|reduce|decrease|raise|increase|boost)\b.*?\b(threshold|ratio|attack|release|frequency|gain|q)\b.*?by\s+" + _NUMBER + r"\s*(db|dbs|decibels?|hz|hertz|khz|kilohertz|%|percent|ms|milliseconds?|:1)?", lower)
     set_match = re.search(r"\bset\b.*?\b(threshold|ratio|attack|release|frequency|gain|q)\b.*?to\s+" + _NUMBER + r"\s*(db|dbs|decibels?|hz|hertz|khz|kilohertz|%|percent|ms|milliseconds?|:1)?", lower)
     if device is not None and (delta_match or set_match):

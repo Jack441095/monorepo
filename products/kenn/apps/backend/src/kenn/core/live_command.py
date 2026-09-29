@@ -1632,6 +1632,8 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
         before, after = _format_volume(proposal.get("before")), _format_volume(proposal.get("after"))
     elif parameter == "pan" and unit == "normalized":
         before, after = _format_pan(proposal.get("before")), _format_pan(proposal.get("after"))
+    if proposal.get("after_label"):
+        before, after = str(proposal.get("before_label") or _format_value(proposal.get("before"))), str(proposal["after_label"])
     before_display = str(proposal.get("before_display") or "").strip()
     if before_display and unit == "value":
         before = f"raw {_format_value(proposal.get('before'))} (Live displays {before_display})"
@@ -1781,6 +1783,8 @@ def _resolve_device_parameter(
             return {"ok": False, "clarification": f"'{requested}' matches more than one parameter. Choose one of: {', '.join(names[:16])}."}
         return {"ok": False, "clarification": f"I couldn't find parameter '{requested}' on '{device_name}'. Available parameters include: {', '.join(names[:16]) or 'none'}."}
     parameter = matches[0]
+    if normalize_unit(intent.get("unit")) == "choice":
+        return _resolve_device_choice(service, intent, track, parameter, info, device_name, int(device_index), session_id, command, observed_state)
     try:
         current = float(parameter["value"])
         requested_value = float(intent.get("desired_value"))
@@ -1874,6 +1878,47 @@ def _resolve_device_parameter(
         observed_state=observed_state,
         observed_parameter_info=info,
     )
+    return result
+
+
+def _resolve_device_choice(
+    service: LiveActionService,
+    intent: dict[str, Any],
+    track: dict[str, Any],
+    parameter: dict[str, Any],
+    info: dict[str, Any],
+    device_name: str,
+    device_index: int,
+    session_id: str,
+    command: str,
+    observed_state: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """A switch or chooser set by the label Live shows for it ("Model" -> "RMS"), using its qualified option table."""
+    from kenn.core import device_units
+
+    name = str(parameter.get("name", ""))
+    choice = device_units.find_choice(device_name, name)
+    label = str(intent.get("choice_label") or "")
+    raw = next((option for option, text in (choice.options if choice else ()) if text.casefold() == label.casefold()), None)
+    if choice is None or raw is None:
+        return {"ok": False, "clarification": f"I don't have Live's options for {name} on {device_name} checked yet, so I won't guess a value."}
+    try:
+        current = float(parameter["value"])
+        low, high = float(parameter.get("min")), float(parameter.get("max"))
+    except (KeyError, TypeError, ValueError):
+        return {"ok": False, "clarification": "Live returned an unreadable value for that control, so I will not create a proposal."}
+    if not low <= raw <= high:
+        return {"ok": False, "clarification": f"{label} isn't in the range Live reports for {name}; nothing changed."}
+    before_label = device_units.choice_label(choice, current)
+    if before_label and before_label.casefold() == label.casefold():
+        return {"ok": False, "clarification": f"{name} on {device_name} is already {before_label}; nothing to change."}
+    result = service.propose_device_action(
+        track_index=int(track["index"]), device_index=device_index, parameter_index=int(parameter.get("index", 0)),
+        proposed_value=float(raw), reason=f"User command: {command}", session_id=session_id, parameter_name=name,
+        unit="choice", track_name=str(track.get("name", "")), observed_state=observed_state, observed_parameter_info=info,
+    )
+    if result.get("ok") and isinstance(result.get("proposal"), dict):
+        result["proposal"].update({"before_label": before_label, "after_label": label})
     return result
 
 

@@ -124,7 +124,34 @@ def qualify_parameter(candidate_device: str, entry: dict[str, Any], where: tuple
     return {"parameter": entry["parameter"], "passed": ok and apply, "checked": ok, "points": rows}
 
 
-def write_profiles(profiles_dir: Path, transcripts_dir: Path, device: str, passed: list[tuple[dict[str, Any], dict[str, Any]]]) -> Path:
+def _norm(label: str) -> str:
+    return " ".join(str(label).split()).casefold()
+
+
+def qualify_chooser(candidate_device: str, entry: dict[str, Any], where: tuple[int, int], *, qualify: Callable[..., dict[str, Any]],
+                    endpoint: str, apply: bool, pause: float, current: float | None) -> dict[str, Any]:
+    """Set up to three options and require Live's own label for each to match the option table."""
+    options = [(float(o["raw"]), str(o["label"])) for o in entry["options"]]
+    options.sort(key=lambda o: abs(o[0] - current) < 1e-6 if current is not None else False)   # try the ones that change something first
+    rows: list[dict[str, Any]] = []
+    for number, (raw, label) in enumerate(options[:3], start=1):
+        if number > 1 and pause:
+            time.sleep(pause)
+        row = qualify(endpoint=endpoint, track_index=where[0], device_index=where[1], parameter_name=entry["parameter"], value=raw,
+                      session_id=f"qualify-{slug(candidate_device)}-{slug(entry['parameter'])}-{number}", apply=apply)
+        record = {"raw": raw, "label": label, "status": row.get("status"), "error": row.get("error"), "display_after": row.get("display_after")}
+        if apply and row.get("status") == "passed":
+            record["mapping_agrees"] = _norm(row.get("display_after") or "") == _norm(label)
+        rows.append(record)
+        if row.get("status") not in ({"passed"} if apply else {"proposal_ready"}) or (apply and not record.get("mapping_agrees")):
+            break
+    tested = len(rows)
+    ok = tested >= 2 and tested == min(3, len(options)) and all(r["status"] == ("passed" if apply else "proposal_ready") and (not apply or r.get("mapping_agrees")) for r in rows)
+    return {"parameter": entry["parameter"], "passed": ok and apply, "checked": ok, "points": rows}
+
+
+def write_profiles(profiles_dir: Path, transcripts_dir: Path, device: str, passed: list[tuple[dict[str, Any], dict[str, Any]]],
+                   passed_choosers: list[tuple[dict[str, Any], dict[str, Any]]] = ()) -> Path:
     """Merge the passed parameters into core/device_profiles/<device>.json (a re-qualified parameter replaces its old entry)."""
     profiles_dir.mkdir(parents=True, exist_ok=True)
     transcripts_dir.mkdir(parents=True, exist_ok=True)
@@ -140,6 +167,14 @@ def write_profiles(profiles_dir: Path, transcripts_dir: Path, device: str, passe
             "qualification": {"status": "passed", "points": len(result["points"]), "qualified_at": date.today().isoformat(),
                               "transcript": str(transcript.relative_to(KENN_ROOT)) if transcript.is_relative_to(KENN_ROOT) else str(transcript)}}
     existing["profiles"] = sorted(by_name.values(), key=lambda p: p["parameter"].casefold())
+    choosers = {c["parameter"].casefold(): c for c in existing.get("choosers") or []}
+    for entry, result in passed_choosers:
+        log[entry["parameter"]] = {"qualified_at": date.today().isoformat(), "points": result["points"]}
+        choosers[entry["parameter"].casefold()] = {
+            **{k: v for k, v in entry.items() if k != "qualification"},
+            "qualification": {"status": "passed", "points": len(result["points"]), "qualified_at": date.today().isoformat(),
+                              "transcript": str(transcript.relative_to(KENN_ROOT)) if transcript.is_relative_to(KENN_ROOT) else str(transcript)}}
+    existing["choosers"] = sorted(choosers.values(), key=lambda c: c["parameter"].casefold())
     target.write_text(json.dumps(existing, indent=1) + "\n", encoding="utf-8")
     transcript.write_text(json.dumps(log, indent=1) + "\n", encoding="utf-8")
     return target
@@ -183,8 +218,24 @@ def run(candidates_dir: Path, *, qualify: Callable[..., dict[str, Any]], state: 
                 why = last.get("error") or (last.get("mapping") or {}).get("reason") or (
                     f"Live showed {last['mapping']['shown']!r}, mapping predicted {last['mapping']['predicted']:g}" if last.get("mapping") else last.get("status"))
                 summary["failed"].append(f"{device} / {name}: {why}")
-        if passed:
-            write_profiles(profiles_dir, transcripts_dir, device, passed)
+        passed_choosers = []
+        for entry in candidate.get("choosers") or []:
+            name = str(entry["parameter"])
+            if (parameter_filter and name.casefold() != parameter_filter.casefold()) or name.casefold() in SKIP_PARAMETERS:
+                continue
+            result = qualify_chooser(device, entry, where, qualify=qualify, endpoint=endpoint, apply=apply, pause=pause,
+                                     current=current_value(where[0], where[1], name))
+            if result["passed"]:
+                passed_choosers.append((entry, result))
+                summary["passed"].append(f"{device} / {name} (chooser, {len(result['points'])} options)")
+            elif result["checked"]:
+                summary["skipped"].append(f"{device} / {name}: proposals made, nothing written (rerun with --apply)")
+            else:
+                last = result["points"][-1] if result["points"] else {}
+                summary["failed"].append(f"{device} / {name}: " + str(last.get("error") or (
+                    f"Live showed {last.get('display_after')!r} for {last.get('label')!r}" if last.get("mapping_agrees") is False else last.get("status"))))
+        if passed or passed_choosers:
+            write_profiles(profiles_dir, transcripts_dir, device, passed, passed_choosers)
     return summary
 
 

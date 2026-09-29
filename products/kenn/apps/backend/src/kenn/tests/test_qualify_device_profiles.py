@@ -128,3 +128,55 @@ def test_requalifying_replaces_one_parameter_and_keeps_the_others(tmp_path) -> N
 
 def test_locate_finds_the_first_track_carrying_the_device() -> None:
     assert locate(STATE, "operator") == (3, 0) and locate(STATE, "Wavetable") is None
+
+
+MODEL = {"parameter": "Model", "options": [{"raw": 0, "label": "Peak"}, {"raw": 1, "label": "RMS"}, {"raw": 2, "label": "Expand"}]}
+
+
+def choice_setup(tmp_path, chooser=MODEL):
+    candidates = tmp_path / "candidates"
+    candidates.mkdir(exist_ok=True)
+    (candidates / "operator.json").write_text(json.dumps({"device": "Operator", "profiles": [], "choosers": [chooser]}), encoding="utf-8")
+    return dict(candidates_dir=candidates, state=STATE, endpoint="x", pause=0.0, profiles_dir=tmp_path / "profiles", transcripts_dir=tmp_path / "transcripts")
+
+
+def label_truth(names):
+    return lambda parameter, raw: names[int(raw)]
+
+
+def test_a_chooser_whose_labels_all_match_lives_is_qualified_and_then_loads(tmp_path, monkeypatch) -> None:
+    live = FakeLive(label_truth(["Peak", "RMS", "Expand"]))
+    summary = run(**choice_setup(tmp_path), qualify=live.qualify, apply=True)
+    assert summary["passed"] == ["Operator / Model (chooser, 3 options)"] and len(live.calls) == 3
+    saved = json.loads((tmp_path / "profiles" / "operator.json").read_text(encoding="utf-8"))
+    assert saved["choosers"][0]["qualification"]["status"] == "passed"
+    monkeypatch.setattr(device_units, "PROFILES_DIR", tmp_path / "profiles")
+    device_units.reload_profiles()
+    choice = device_units.find_choice("Operator", "Model")
+    monkeypatch.undo()
+    device_units.reload_profiles()
+    assert [label for _raw, label in choice.options] == ["Peak", "RMS", "Expand"]
+
+
+def test_a_chooser_where_live_shows_a_different_label_is_not_written(tmp_path) -> None:
+    live = FakeLive(label_truth(["Peak", "Expand", "RMS"]))   # the measured table has RMS and Expand the wrong way round
+    summary = run(**choice_setup(tmp_path), qualify=live.qualify, apply=True)
+    assert summary["passed"] == [] and "Live showed 'Expand' for 'RMS'" in summary["failed"][0]
+    assert not (tmp_path / "profiles").exists()
+
+
+def test_a_two_option_switch_needs_both_options_to_agree(tmp_path) -> None:
+    switch = {"parameter": "Auto Release On/Off", "options": [{"raw": 0, "label": "Off"}, {"raw": 1, "label": "On"}]}
+    live = FakeLive(label_truth(["Off", "On"]))
+    assert run(**choice_setup(tmp_path, switch), qualify=live.qualify, apply=True)["passed"] == ["Operator / Auto Release On/Off (chooser, 2 options)"]
+
+
+def test_the_label_check_ignores_case_and_spacing(tmp_path) -> None:
+    live = FakeLive(lambda parameter, raw: ["  peak ", "RMS", "expand"][int(raw)])
+    assert len(run(**choice_setup(tmp_path), qualify=live.qualify, apply=True)["passed"]) == 1
+
+
+def test_a_chooser_dry_run_writes_nothing(tmp_path) -> None:
+    live = FakeLive(label_truth(["Peak", "RMS", "Expand"]))
+    summary = run(**choice_setup(tmp_path), qualify=live.qualify, apply=False)
+    assert summary["passed"] == [] and "nothing written" in summary["skipped"][0] and not (tmp_path / "profiles").exists()

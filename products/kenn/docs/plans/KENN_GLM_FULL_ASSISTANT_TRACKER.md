@@ -117,6 +117,12 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 - [ ] **D1 Device qualification factory**
   > Coverage map 2026-09-24 (`KENN_DEVICE_COVERAGE_2026-09-24.md`, page https://claude.ai/artifact/XqhrDvQ8kDmzJwhpuNq2d9, `tooling/scripts/device_coverage.py`): Live 12.4.6 Suite has 78 devices. KENN knows 53 (own note) + 16 (mentioned), sees all 78, inserts 10 audio effects, sets 12 measured parameters on 9 devices. Qualify device by device (capture parameters from Live, measure units, generate per-parameter commands, run `e2e_demo_commands.py`); first wave: EQ Eight, Compressor, Utility, Limiter, Reverb/Hybrid Reverb, Delay/Echo.
   - [ ] Batch sweep → mapping fit → draft `DeviceUnitProfile` + evidence transcript
+    > 29 Sept (cloud session, no Live): the tooling exists and is tested against stand-ins, **0 devices measured or qualified**.
+    > `measure_all_devices.py` (sweep the open set) → `build_device_profiles.py` (candidates, chooser tables, coverage report)
+    > → `qualify_device_profiles.py` (three points per parameter against Live's own display strings, restore, write only
+    > what passes) → `core/device_profiles/*.json`, which `device_units.py` loads only with a passed qualification. Choosers
+    > and switches are set by label ("set the compressor model to RMS", "turn auto release on"). Runbook:
+    > `docs/runbooks/KENN_DEVICE_FACTORY.md`. The two ticks below stay open until a real Live run.
   - [ ] Owner sign-off queue
   - [ ] 20 profiles · [ ] 40 profiles · [ ] 60 profiles
   - [ ] 15 devices · [ ] 25 devices

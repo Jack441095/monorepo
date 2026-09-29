@@ -128,6 +128,62 @@ def qualified_profiles() -> tuple[DeviceUnitProfile, ...]:
     return tuple(profiles)
 
 
+@dataclass(frozen=True)
+class DeviceChoice:
+    """A switch or chooser: the label Live shows for each raw value (e.g. Compressor "Model": 0 Peak, 1 RMS, 2 Expand)."""
+
+    device_name: str
+    parameter_name: str
+    options: tuple[tuple[float, str], ...]
+
+
+def _choice_from_entry(device: str, entry: dict) -> DeviceChoice | None:
+    qualification = entry.get("qualification")
+    if not (isinstance(qualification, dict) and qualification.get("status") == "passed"
+            and int(qualification.get("points") or 0) >= 2 and qualification.get("qualified_at")):
+        return None
+    try:
+        options = tuple((float(item["raw"]), str(item["label"]).strip()) for item in entry.get("options") or [])
+    except (KeyError, TypeError, ValueError):
+        return None
+    labels = [label.casefold() for _raw, label in options]
+    if not device or not entry.get("parameter") or len(options) < 2 or "" in labels or len(set(labels)) != len(labels):
+        return None
+    if not all(isfinite(raw) for raw, _label in options):
+        return None
+    return DeviceChoice(device, str(entry["parameter"]), options)
+
+
+@lru_cache(maxsize=1)
+def qualified_choices() -> tuple[DeviceChoice, ...]:
+    """Choosers from device_profiles/*.json; like profiles, only ones whose options were checked against Live's own labels."""
+    choices: list[DeviceChoice] = []
+    for path in sorted(PROFILES_DIR.glob("*.json")) if PROFILES_DIR.is_dir() else []:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            device, entries = str(data.get("device") or ""), data.get("choosers") or []
+        except (OSError, ValueError, AttributeError):
+            continue
+        choices += [c for entry in entries if isinstance(entry, dict) and (c := _choice_from_entry(device, entry))]
+    return tuple(choices)
+
+
+def find_choice(device_name: str, parameter_name: str) -> DeviceChoice | None:
+    for choice in qualified_choices():
+        if (choice.device_name.casefold() == str(device_name).strip().casefold()
+                and choice.parameter_name.casefold() == str(parameter_name).strip().casefold()):
+            return choice
+    return None
+
+
+def choice_label(choice: DeviceChoice, raw: object) -> str | None:
+    try:
+        value = float(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return next((label for option, label in choice.options if abs(option - value) < 1e-6), None)
+
+
 def all_profiles() -> tuple[DeviceUnitProfile, ...]:
     """The hand-verified profiles first (they win on a clash), then the qualified data files."""
     return EVIDENCE_BACKED_PROFILES + qualified_profiles()
@@ -135,6 +191,7 @@ def all_profiles() -> tuple[DeviceUnitProfile, ...]:
 
 def reload_profiles() -> None:
     qualified_profiles.cache_clear()
+    qualified_choices.cache_clear()
 
 
 def find_profile(device_name: str, parameter_name: str, unit: str | None) -> DeviceUnitProfile | None:
@@ -273,5 +330,5 @@ def profile_raw_to_display(profile: DeviceUnitProfile, raw: float) -> tuple[floa
     return float(profile.display_min + (raw_value - profile.raw_min) / (profile.raw_max - profile.raw_min) * span), None
 
 
-__all__ = ["DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "all_profiles", "display_to_raw", "find_profile", "normalize_unit",
-           "profile_raw_to_display", "qualified_profiles", "raw_to_display", "reload_profiles"]
+__all__ = ["DeviceChoice", "DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "all_profiles", "choice_label", "display_to_raw", "find_choice", "find_profile", "normalize_unit",
+           "profile_raw_to_display", "qualified_choices", "qualified_profiles", "raw_to_display", "reload_profiles"]
