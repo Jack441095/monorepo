@@ -54,7 +54,14 @@ func runBatch(inputPath: String, outputPath: String, template: String,
     let input = URL(fileURLWithPath: inputPath).standardizedFileURL
     let output = URL(fileURLWithPath: outputPath).standardizedFileURL
     let fm = FileManager.default
-    try! fm.createDirectory(at: output, withIntermediateDirectories: true)
+    do {
+        try fm.createDirectory(at: output, withIntermediateDirectories: true)
+    } catch {
+        // A read-only or missing --out must fail the batch loudly instead of
+        // crashing; the caller exits non-zero on a false return.
+        FileHandle.standardError.write(Data("Batch blocked: cannot create output directory \(output.path): \(error.localizedDescription)\n".utf8))
+        return false
+    }
 
     let sourceURLs = (fm.enumerator(at: input, includingPropertiesForKeys: nil,
                                     options: [.skipsHiddenFiles])?.compactMap { $0 as? URL } ?? [])
@@ -254,7 +261,12 @@ func runBatch(inputPath: String, outputPath: String, template: String,
     let reportURL = output.appendingPathComponent("batch_results.json")
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-    try! encoder.encode(results).write(to: reportURL, options: .atomic)
+    do {
+        try encoder.encode(results).write(to: reportURL, options: .atomic)
+    } catch {
+        FileHandle.standardError.write(Data("Batch blocked: cannot write \(reportURL.path): \(error.localizedDescription)\n".utf8))
+        return false
+    }
 
     // Keep a flat report for quick review in Numbers, Excel, or a text editor.
     // Values are escaped as CSV fields so titles and evidence gaps remain intact.
@@ -292,7 +304,12 @@ func runBatch(inputPath: String, outputPath: String, template: String,
         csv += row + "\n"
     }
     let csvURL = output.appendingPathComponent("batch_results.csv")
-    try! csv.write(to: csvURL, atomically: true, encoding: .utf8)
+    do {
+        try csv.write(to: csvURL, atomically: true, encoding: .utf8)
+    } catch {
+        FileHandle.standardError.write(Data("Batch blocked: cannot write \(csvURL.path): \(error.localizedDescription)\n".utf8))
+        return false
+    }
 
     let processed = results.filter { $0.status == "processed" }.count
     let dry = results.filter { $0.status == "dry_run" }.count

@@ -73,8 +73,14 @@ func isAbsent(_ v: String?) -> Bool {
 }
 
 func runValidation(manifestPath: String, outPath: String?) {
-    let data = try! Data(contentsOf: URL(fileURLWithPath: manifestPath))
-    let manifest = try! JSONDecoder().decode(ValidationManifest.self, from: data)
+    let manifest: ValidationManifest
+    do {
+        let data = try Data(contentsOf: URL(fileURLWithPath: manifestPath))
+        manifest = try JSONDecoder().decode(ValidationManifest.self, from: data)
+    } catch {
+        FileHandle.standardError.write(Data("Validation blocked: cannot read manifest \(manifestPath): \(error.localizedDescription)\n".utf8))
+        exit(2)
+    }
     let detector = FieldDetector()
 
     var tp: [String: Int] = [:], fp: [String: Int] = [:], fn: [String: Int] = [:]
@@ -175,9 +181,20 @@ func runValidation(manifestPath: String, outPath: String?) {
         "wrong_high_confidence_total": wrongHighCases.count,
         "fields": summary,
     ]
-    let jsonData = try! JSONSerialization.data(withJSONObject: result, options: [.prettyPrinted])
+    let jsonData: Data
+    do {
+        jsonData = try JSONSerialization.data(withJSONObject: result, options: [.prettyPrinted])
+    } catch {
+        FileHandle.standardError.write(Data("Validation blocked: cannot encode results: \(error.localizedDescription)\n".utf8))
+        exit(2)
+    }
     let target = outPath ?? "validation_results.json"
-    try! jsonData.write(to: URL(fileURLWithPath: target))
+    do {
+        try jsonData.write(to: URL(fileURLWithPath: target))
+    } catch {
+        FileHandle.standardError.write(Data("Validation blocked: cannot write \(target): \(error.localizedDescription)\n".utf8))
+        exit(2)
+    }
     print("Wrote \(target)")
     print("processed=\(processed) encrypted_or_unreadable=\(encryptedCount) missing_files=\(failed)")
     print("WRONG HIGH-CONFIDENCE cases: \(wrongHighCases.count)")
@@ -187,8 +204,14 @@ func runValidation(manifestPath: String, outPath: String?) {
 
 // Terminal review interface: keyboard-driven ground-truth confirmation, resumable.
 func runReview(manifestPath: String, progressPath: String) {
-    let data = try! Data(contentsOf: URL(fileURLWithPath: manifestPath))
-    let manifest = try! JSONDecoder().decode(ValidationManifest.self, from: data)
+    let manifest: ValidationManifest
+    do {
+        let data = try Data(contentsOf: URL(fileURLWithPath: manifestPath))
+        manifest = try JSONDecoder().decode(ValidationManifest.self, from: data)
+    } catch {
+        FileHandle.standardError.write(Data("Review blocked: cannot read manifest \(manifestPath): \(error.localizedDescription)\n".utf8))
+        exit(2)
+    }
     var progress: [String: [String: String]] = [:]
     if FileManager.default.fileExists(atPath: progressPath),
        let obj = try? JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: progressPath)))
@@ -199,8 +222,13 @@ func runReview(manifestPath: String, progressPath: String) {
     let detector = FieldDetector()
 
     func save() {
-        let j = try! JSONSerialization.data(withJSONObject: progress, options: [.prettyPrinted])
-        try! j.write(to: URL(fileURLWithPath: progressPath))
+        do {
+            let j = try JSONSerialization.data(withJSONObject: progress, options: [.prettyPrinted])
+            try j.write(to: URL(fileURLWithPath: progressPath))
+        } catch {
+            FileHandle.standardError.write(Data("Review blocked: cannot write \(progressPath): \(error.localizedDescription)\n".utf8))
+            exit(2)
+        }
     }
     func ask(_ prompt: String) -> String {
         print(prompt, terminator: " ")
