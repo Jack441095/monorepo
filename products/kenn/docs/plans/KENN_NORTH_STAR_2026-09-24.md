@@ -172,6 +172,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 - [ ] Parameter-level knowledge for all 78 devices: every parameter's name, range, unit and what it does, read from
       Live (display tables, as with the fader law) and the manual
+  > 29 Sept (cloud session, no Live): the pipeline after the measurement is built. `measure_device_parameters.py` →
+  > `tooling/data/measured_devices/<device>.json` → `build_parameter_reference.py --out <notes>` writes
+  > `measured-<device>-<n>.md` (12 parameters a note; ranges, mappings and options exactly as Live displayed them; drafts
+  > until `--approve`), which the index labels as the top tier and the note check reads back. 0 of 78 devices are measured
+  > yet: that needs Live open (10 parameters on 9 devices are covered by the existing profiles). "What it does" still
+  > comes from the manual notes; nothing here writes prose about a parameter.
 - [ ] Notes for how things are done: gain staging, bus processing, sidechain, arrangement moves, genre conventions;
       drafted on the GPU notes model, checked automatically against sources, reviewed before approval
 - [ ] Grounded in the user's own setup: installed devices, packs and third-party plug-ins read from Live, so advice
