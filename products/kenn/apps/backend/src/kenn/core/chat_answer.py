@@ -2439,7 +2439,8 @@ def _answer_payload(
         correlation_id=correlation_id,
     )
 
-    if allow_llm and not history and not session_id and isinstance(payload, dict):
+    if allow_llm and not history and not session_id and isinstance(payload, dict) and not deferred_brain.pending():
+        # (A template whose model rewrite is still to come isn't the final answer; caching it would keep the rewrite out.)
         if payload.get("llm_enhanced") or payload.get("confidence") == "high":
             events = [
                 {"event": "metadata", "data": payload},

@@ -137,3 +137,21 @@ def test_the_brain_route_reports_a_job_by_id() -> None:
     finally:
         httpd.shutdown()
         httpd.server_close()
+
+
+def test_a_template_waiting_for_its_rewrite_is_not_cached_as_the_final_answer(monkeypatch) -> None:
+    saved = []
+    monkeypatch.setattr("kenn.core.session_memory.get_semantic_cache_hit", lambda query: None)
+    monkeypatch.setattr("kenn.core.session_memory.save_to_semantic_cache", lambda query, events: saved.append(query))
+    monkeypatch.setattr(chat_answer, "conversational_payload", lambda *a, **k: None)
+    monkeypatch.setattr(chat_answer, "_short_circuit_evaluator", lambda *a, **k: None)
+    monkeypatch.setattr(chat_answer, "_answer_payload_raw", lambda *a, **k: {"answer": "template", "confidence": "high", "llm_enhanced": False})
+
+    token = deferred_brain.begin()
+    deferred_brain.defer(lambda: "later")
+    chat_answer._answer_payload("how do I sidechain the bass to the kick")
+    deferred_brain.end(token)
+    assert saved == []
+
+    chat_answer._answer_payload("how do I sidechain the bass to the kick")
+    assert saved == ["how do I sidechain the bass to the kick"]

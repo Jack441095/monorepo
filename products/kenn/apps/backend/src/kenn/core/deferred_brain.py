@@ -43,6 +43,11 @@ def end(token: contextvars.Token) -> Callable[[], str | None] | None:
     return collected[-1] if collected else None
 
 
+def pending() -> bool:
+    """Whether the request being answered has handed its model step back (so its template must not be cached as final)."""
+    return bool(_sink.get())
+
+
 def defer(step: Callable[[], str | None]) -> bool:
     """Called by make_answer at the point it would have run the model. False means run it inline."""
     collected = _sink.get()
