@@ -1705,13 +1705,20 @@ def _answer_payload_stream_raw(
             skill_level=_skill_level_for_session(session_id),
         )
         generated_parts = []
-        for event in generator:
-            if event["event"] == "token":
-                token = event.get("token") or ""
-                generated_parts.append(token)
-            elif event["event"] == "llm_usage":
-                llm_usage = event.get("data")
-        candidate = "".join(generated_parts).strip()
+        cut_short = ""
+        try:
+            for event in generator:
+                if event["event"] == "token":
+                    token = event.get("token") or ""
+                    generated_parts.append(token)
+                elif event["event"] == "llm_usage":
+                    llm_usage = event.get("data")
+        except Exception as exc:
+            # A stream that dies mid-answer must not hand the truncated candidate to the
+            # validator as if the model had finished writing it (29 Sept audit). Fall back
+            # to the grounded template and record why in generation_validation.
+            cut_short = f"generation stream cut short: {type(exc).__name__}: {str(exc)[:160]}"
+        candidate = "" if cut_short else "".join(generated_parts).strip()
         if candidate:
             validation = generated_answer_validation(
                 relevance_query,
@@ -1754,7 +1761,7 @@ def _answer_payload_stream_raw(
             generation_validation = {
                 **generation_validation,
                 "attempted": True,
-                "warnings": ["generation returned no answer"],
+                "warnings": [cut_short or "generation returned no answer"],
             }
             yield {"event": "token", "token": template}
             final_answer = template

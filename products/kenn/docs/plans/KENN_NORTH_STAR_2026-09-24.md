@@ -411,12 +411,21 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
   > (`m.group(0)`) instead of the canned example; verified in `test_project_memory_stage4.py`.
 - [ ] Only one preference per key survives (`record_preference` deactivates the rest) and there is no API to
       list or restore the inactive rows, which contradicts "see, edit, delete; nothing learned silently".
-- [ ] `chat_completion_stream` returns normally on a mid-stream failure, so a truncated answer is validated as
+- [x] `chat_completion_stream` returns normally on a mid-stream failure, so a truncated answer is validated as
       a complete candidate.
+  > 29 Sept: Fixed. Both swallow sites (`chat_completion_stream` and `enhance_stream`) now propagate instead of
+  > ending the stream quietly -- timeouts and HTTP errors already raised from there, so mid-stream wire failures
+  > now follow the same contract. `chat_answer` catches the propagated error, refuses to validate the truncated
+  > candidate, falls back to the grounded template, and records the reason in `generation_validation.warnings`.
+  > Pinned in `test_llm_stream_honesty.py`.
 - [ ] `llm_rewrite._clean_chunk_for_synthesis` cuts mid-word and mid-code-fence, and appends a closing
       `</source_excerpt>` after a cut that can land inside the opening tag.
-- [ ] The L2 semantic-cache list grows unbounded and is scanned in full on every query; a *semantic* match is
+- [x] The L2 semantic-cache list grows unbounded and is scanned in full on every query; a *semantic* match is
       also written into the exact-match cache, turning a soft 0.95 match into a hard one.
+  > 29 Sept: Cleared without new code -- both halves died in the 28 Sept session-scoping pass. L2 is bounded to
+  > 256 entries with FIFO eviction, and a soft semantic hit is never promoted into the L1/exact cache. Both
+  > behaviors were already pinned in `test_semantic_cache_versioning.py` (`test_l2_cache_fifo_eviction_bounds_memory_to_max_size`,
+  > `test_soft_semantic_hit_does_not_pollute_l1_exact_cache`).
 - [x] `mix_recipes`, `device_units.display_to_raw(relative=True)`, `live_recipe.audition_loudness_trim_db` and
       `live_recipe.undo_steps` each treat a raw fader value as dB or fabricate a `readback` field.
       `live_recipe`'s trim constant is dead (never read) but is persisted into receipts.

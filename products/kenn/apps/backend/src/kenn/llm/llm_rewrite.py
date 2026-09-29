@@ -992,9 +992,12 @@ def chat_completion_stream(
     except httpx.HTTPStatusError as e:
         raise RuntimeError(f"LLM returned {e.response.status_code}: {e.response.text[:200]}")
     except Exception as exc:
-        print(f"WARNING: chat_completion_stream ended early on an unexpected error ({exc!r}) -- "
-              f"caller sees a normally-terminated stream with no indication generation was cut short")
-        return
+        # Raising, not returning: a stream that dies mid-answer used to end quietly, and
+        # the caller validated the truncated text as if the model had finished. Timeouts
+        # and HTTP errors already raise from this function -- an unexpected mid-stream
+        # failure is no less fatal to the candidate answer.
+        print(f"WARNING: chat_completion_stream cut short after {len(_accumulated)} chunks ({exc!r})")
+        raise RuntimeError(f"LLM stream cut short after {len(_accumulated)} chunks: {exc!r}") from exc
 
     elapsed_ms = int((time.perf_counter() - started) * 1000)
     usage = LLMUsage(
@@ -1345,9 +1348,11 @@ def enhance_stream(
                         yield {"event": "token", "token": f"\n\n{block}"}
                 yield {"event": "llm_usage", "data": usage.to_dict()}
     except Exception as exc:
-        print(f"WARNING: enhance_stream ended early on an unexpected error ({exc!r}) -- "
-              f"caller sees a normally-terminated stream with no indication generation was cut short")
-        return
+        # Propagate (after the operator log): swallowing here let a cut-short answer be
+        # validated downstream as a complete candidate. The chat_answer caller turns this
+        # into a template fallback with an honest generation_validation warning.
+        print(f"WARNING: enhance_stream cut short, caller will fall back ({exc!r})")
+        raise
 
 
 def sources_block(results: list[tuple[float, dict]], source_label, limit: int = 3) -> str:
