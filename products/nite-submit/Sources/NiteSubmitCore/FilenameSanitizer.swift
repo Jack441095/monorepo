@@ -96,7 +96,19 @@ public enum FilenameSanitizer {
 
         // Length cap without splitting grapheme clusters.
         if let truncated = truncate(s, to: maxBaseLength) { s = truncated }
+        // Truncation can reintroduce a trailing dot or space, which the
+        // Finder and Windows both reject, so strip them a second time.
+        while s.hasSuffix(".") || s.hasSuffix(" ") { s.removeLast() }
+        s = s.trimmingCharacters(in: .whitespaces)
         if s.isEmpty { s = "Untitled" }
+        // A bare reserved device name (CON, PRN, COM1…) is legal on macOS
+        // but fails on Windows and cloud drives, so disambiguate it.
+        let stem = s.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
+            .first.map(String.init)?.uppercased() ?? s.uppercased()
+        let reserved = Set(["CON", "PRN", "AUX", "NUL",
+                            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+                            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"])
+        if s == "." || s == ".." || reserved.contains(stem) { s += "_" }
         return s
     }
 
@@ -125,7 +137,7 @@ public enum FilenameSanitizer {
             if (out + String(ch)).utf8.count > byteLimit { break }
             out.append(ch)
         }
-        return String(out.drop(while: { $0 == " " || $0 == "_" }))
-            .trimmingCharacters(in: CharacterSet(charactersIn: "_- "))
+        return String(out.drop(while: { $0 == " " || $0 == "_" || $0 == "." }))
+            .trimmingCharacters(in: CharacterSet(charactersIn: "_-. "))
     }
 }

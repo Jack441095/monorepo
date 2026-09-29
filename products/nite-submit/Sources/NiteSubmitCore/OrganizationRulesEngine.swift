@@ -77,12 +77,18 @@ public struct OrganizationRulesEngine: Sendable {
             let srcURL = file.url
             let originalName = srcURL.lastPathComponent
             let ext = file.extensionName
+            // We sanitise here because lastPathComponent can still carry
+            // dots, spaces, or reserved device names, and the custom template
+            // below interpolates it verbatim into a relative path.
+            let safeFilename = FilenameSanitizer.sanitize(originalName)
+            let safeExt = ext.isEmpty ? "no_ext" : FilenameSanitizer.sanitize(ext.lowercased())
+            let safeCategory = FilenameSanitizer.sanitize(file.category.folderName)
             var relativeDestPath = ""
+            var traversalBlocked = false
 
             switch ruleType {
             case .groupByCategory:
-                let categoryFolder = file.category.folderName
-                relativeDestPath = "\(categoryFolder)/\(originalName)"
+                relativeDestPath = "\(safeCategory)/\(safeFilename)"
 
             case .datePrefix:
                 let dateStr: String
@@ -94,36 +100,55 @@ public struct OrganizationRulesEngine: Sendable {
                     dateStr = "unknown-date"
                 }
 
-                if originalName.hasPrefix(dateStr) {
-                    relativeDestPath = originalName
+                if safeFilename.hasPrefix(dateStr) {
+                    relativeDestPath = safeFilename
                 } else {
-                    relativeDestPath = "\(dateStr)_\(originalName)"
+                    relativeDestPath = "\(dateStr)_\(safeFilename)"
                 }
 
             case .customTemplate(let tmpl):
                 var subPath = tmpl
-                subPath = subPath.replacingOccurrences(of: "{category}", with: file.category.folderName)
-                subPath = subPath.replacingOccurrences(of: "{extension}", with: ext.isEmpty ? "no_ext" : ext.lowercased())
-                subPath = subPath.replacingOccurrences(of: "{filename}", with: originalName)
+                subPath = subPath.replacingOccurrences(of: "{category}", with: safeCategory)
+                subPath = subPath.replacingOccurrences(of: "{extension}", with: safeExt)
+                subPath = subPath.replacingOccurrences(of: "{filename}", with: safeFilename)
 
                 let dateStr = (file.modifiedDate != nil) ? dateFormatter.string(from: file.modifiedDate!) : "unknown-date"
                 subPath = subPath.replacingOccurrences(of: "{date}", with: dateStr)
 
-                relativeDestPath = subPath
+                let confined = Self.confinedRelativePath(from: subPath, fallbackName: safeFilename)
+                relativeDestPath = confined.path
+                traversalBlocked = confined.traversalBlocked
             }
 
-            let destURL = baseDir.appendingPathComponent(relativeDestPath)
+            var destURL = baseDir.appendingPathComponent(relativeDestPath)
+            // Belt and braces: a hostile template such as "../../x" must
+            // never resolve outside the chosen base directory. Standardise
+            // and fall back to the flat sanitised name when it does.
+            let baseStandard = baseDir.standardizedFileURL.path
+            let destStandard = destURL.standardized.path
+            if destStandard != baseStandard && !destStandard.hasPrefix(baseStandard + "/") {
+                destURL = baseDir.appendingPathComponent(safeFilename)
+                relativeDestPath = safeFilename
+                traversalBlocked = true
+            }
             let destPathString = destURL.path
 
             let fm = FileManager.default
             let existsOnDisk = fm.fileExists(atPath: destPathString) && destPathString != srcURL.path
             let isDuplicateInBatch = existingDestinations.contains(destPathString)
-            let hasCollision = existsOnDisk || isDuplicateInBatch
+            // A blocked traversal is surfaced as a collision so the executor
+            // refuses it without force, exactly like an existing file.
+            let hasCollision = existsOnDisk || isDuplicateInBatch || traversalBlocked
 
             existingDestinations.insert(destPathString)
 
             let actionType: ProposedFileAction.ActionType = copyMode ? .copy : .move
-            let reason = "Rule: \(ruleType.displayName) -> \(relativeDestPath)"
+            let reason: String
+            if traversalBlocked {
+                reason = "Rule: \(ruleType.displayName) -> \(relativeDestPath) (blocked path traversal, confined to base directory)"
+            } else {
+                reason = "Rule: \(ruleType.displayName) -> \(relativeDestPath)"
+            }
 
             let action = ProposedFileAction(
                 sourceURL: srcURL,
@@ -140,5 +165,35 @@ public struct OrganizationRulesEngine: Sendable {
             ruleType: ruleType,
             actions: proposedActions
         )
+    }
+
+    /// Split a rendered template into path components, sanitise each one,
+    /// and reject ".." or absolute segments so the result cannot escape
+    /// the base directory. Returns a fallback flat name when traversal
+    /// was attempted.
+    static func confinedRelativePath(from subPath: String, fallbackName: String) -> (path: String, traversalBlocked: Bool) {
+        var cleaned = subPath.replacingOccurrences(of: "\\", with: "/")
+        while cleaned.hasPrefix("/") { cleaned.removeFirst() }
+        let rawParts = cleaned.split(separator: "/", omittingEmptySubsequences: true).map(String.init)
+        if rawParts.isEmpty { return (fallbackName, true) }
+        var safeParts: [String] = []
+        var blocked = false
+        for part in rawParts {
+            if part == ".." || part == "." || part.contains("..") {
+                blocked = true
+                continue
+            }
+            let safe = FilenameSanitizer.sanitize(part)
+            if safe == "Untitled" && part.trimmingCharacters(in: .whitespaces) != "Untitled" {
+                // Sanitiser emptied a hostile component such as ".." hidden
+                // behind punctuation; drop it rather than inventing folders.
+                if part.allSatisfy({ ". _-".contains($0) }) { blocked = true; continue }
+            }
+            safeParts.append(safe)
+        }
+        if blocked || safeParts.isEmpty {
+            return (fallbackName, true)
+        }
+        return (safeParts.joined(separator: "/"), false)
     }
 }
