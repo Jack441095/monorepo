@@ -10,14 +10,14 @@ func usage() -> Never {
 
     USAGE:
       nitesubmit-cli suggest <file.pdf> [--template "<tpl>"] [--student-id <id>]
-      nitesubmit-cli copy    <file.pdf> --to <dir> --name <basename> [--policy error|counter|replace]
-      nitesubmit-cli rename  <file.pdf> --name <basename> [--policy ...]
+      nitesubmit-cli copy    <file.pdf> --name <basename> [--to <dir>] [--policy error|counter|replace] [--force]
+      nitesubmit-cli rename  <file.pdf> --name <basename> [--policy error|counter|replace] [--force]
       nitesubmit-cli pack    <files...> --out <archive.7z> [--format 7z|zip|tar.gz] [--level store|fast|normal|maximum]
       nitesubmit-cli optimize <file.pdf> --out <output.pdf>  (lossless; writes a new file, never overwrites the source)
       nitesubmit-cli batch   <input-dir> --out <output-dir> [--template "<tpl>"] [--student-id <id>] [--collision error|counter] [--dry-run] [--approved-manifest approvals.json]
                          [--identity-policy no-rule|name-required|name-prohibited]
                          default template: {student_id}_{project_title}
-      nitesubmit-cli organize <input-dir> [--rule category|date|custom] [--template "<tpl>"] [--to <output-dir>] [--dry-run] [--json]
+      nitesubmit-cli organize <input-dir> [--rule category|date|custom] [--template "<tpl>"] [--to <output-dir>] [--dry-run] [--json] [--force]
       nitesubmit-cli validate --manifest real_manifest.json [--out results.json]
       nitesubmit-cli review   --manifest real_manifest.json [--progress progress.json]
 
@@ -81,20 +81,33 @@ case "suggest":
     }
 
 case "copy", "rename":
-    guard args.count >= 5, let toIdx = args.firstIndex(of: "--name"), toIdx + 1 < args.count else { usage() }
+    guard args.count >= 4,
+          let toIdx = args.firstIndex(of: "--name"), toIdx + 1 < args.count else { usage() }
     let name = args[toIdx + 1]
+    let force = args.contains("--force")
     var policy: CollisionPolicy = .error
-    if let pIdx = args.firstIndex(of: "--policy"), pIdx + 1 < args.count,
-       let p = CollisionPolicy(rawValue: "appendCounter".lowercased().contains(args[pIdx + 1]) ? "appendCounter" : args[pIdx + 1]) {
-        policy = p
-    } else if let pIdx = args.firstIndex(of: "--policy"), pIdx + 1 < args.count {
-        policy = args[pIdx + 1] == "counter" ? .appendCounter : CollisionPolicy(rawValue: args[pIdx + 1]) ?? .error
+    if let pIdx = args.firstIndex(of: "--policy"), pIdx + 1 < args.count {
+        switch args[pIdx + 1].lowercased() {
+        case "error": policy = .error
+        case "counter", "appendcounter", "append_counter", "append-counter": policy = .appendCounter
+        case "replace": policy = .replace
+        default:
+            FileHandle.standardError.write("Unknown --policy \"\(args[pIdx + 1])\". Use error, counter, or replace.\n".data(using: .utf8)!)
+            exit(2)
+        }
+    }
+    if policy == .replace && !force {
+        FileHandle.standardError.write("Refusing to replace without --force. Re-run with --policy replace --force to overwrite.\n".data(using: .utf8)!)
+        exit(2)
     }
     let op = FileOperator()
     do {
         let receipt: OperationReceipt
         if args[1] == "copy" {
-            var dir = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            // Without --to we stay next to the source. Writing into the
+            // current working directory surprised reviewers, so the source
+            // folder is the safe default.
+            var dir = URL(fileURLWithPath: args[2]).deletingLastPathComponent()
             if let dIdx = args.firstIndex(of: "--to"), dIdx + 1 < args.count {
                 dir = URL(fileURLWithPath: args[dIdx + 1])
             }
@@ -223,9 +236,11 @@ case "organize":
     let destPath = args.firstIndex(of: "--to").flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
     let dryRun = args.contains("--dry-run")
     let jsonOutput = args.contains("--json")
+    let force = args.contains("--force")
 
     guard runOrganize(directoryPath: args[2], ruleRaw: rule, customTemplate: template,
-                        destinationPath: destPath, dryRun: dryRun, jsonOutput: jsonOutput) else {
+                        destinationPath: destPath, dryRun: dryRun, jsonOutput: jsonOutput,
+                        forceOverwrite: force) else {
         exit(2)
     }
 
