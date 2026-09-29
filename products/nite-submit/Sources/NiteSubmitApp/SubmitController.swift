@@ -303,6 +303,10 @@ final class SubmitController {
             if receipt.format != format {
                 msg += " — the 7z tool isn't installed on this Mac, so a ZIP was created instead"
             }
+            // Every encrypted receipt is AES-256 via the 7z tool (7z archives use
+            // it by definition, ZIPs get `-mem=AES256`) — ArchiveEngine refuses
+            // an encrypted archive rather than falling back to ZipCrypto, so
+            // this label always means AES-256 and never overstates the crypto.
             if receipt.isEncrypted { msg += " [AES-256 Encrypted]" }
             if receipt.isSplitVolume { msg += " [Multi-Volume]" }
             msg += " [SHA-256: \(receipt.sha256Checksum.prefix(8))...]"

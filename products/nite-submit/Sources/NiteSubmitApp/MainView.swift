@@ -1141,8 +1141,37 @@ final class MainView: NSView, NSTextFieldDelegate {
     }
 
     @objc func doArchive() {
-        let realSources = queueItems.map { $0.url }
-        let sources = realSources.isEmpty ? [controller?.sourceURL].compactMap { $0 } : realSources
+        // Archive only what the user actually approved. Each queue row carries
+        // its own review state, and the shared controller only reflects the
+        // selected row — sending every queued URL after one approval would
+        // ship unreviewed files under the user's name.
+        let sources: [URL]
+        if queueItems.isEmpty {
+            sources = [controller?.sourceURL].compactMap { $0 }
+        } else {
+            if selectedIndex >= 0, selectedIndex < queueItems.count,
+               let controller, controller.hasLoadedDocument {
+                queueItems[selectedIndex].documentState = controller.captureState()
+                syncSelectedQueueItemStatus()
+            }
+            let liveApproval = controller?.reviewApproved ?? false
+            let entries = queueItems.enumerated().map { index, item in
+                ArchiveQueueEntry(url: item.url,
+                                  isApproved: index == selectedIndex
+                                    ? liveApproval
+                                    : (item.documentState?.reviewApproved ?? item.isVerified))
+            }
+            let approved = approvedArchiveSources(from: entries)
+            guard !approved.isEmpty else {
+                statusLabel.stringValue = "Approve at least one file's details before archiving — unreviewed files are never included."
+                return
+            }
+            sources = approved
+        }
+        // Names the partial-queue case in the final message, so a user
+        // archiving 1 of 3 files sees the skip was deliberate, not a bug.
+        let skippedCount = queueItems.isEmpty ? 0 : (queueItems.count - sources.count)
+        let skipNote = skippedCount > 0 ? " (\(skippedCount) unapproved file\(skippedCount == 1 ? "" : "s") skipped)" : ""
         let idx = archiveFormatPopup.indexOfSelectedItem
         let format = (idx >= 0 && idx < ArchiveFormat.allCases.count) ? ArchiveFormat.allCases[idx] : .sevenZip
 
@@ -1153,7 +1182,7 @@ final class MainView: NSView, NSTextFieldDelegate {
         let password = pass.isEmpty ? nil : pass
 
         guard optimizePDFCheckbox.state == .on else {
-            controller?.performArchiveOperation(sources: sources, format: format, level: .normal, password: password, volumeSplit: volumeSplit) { self.statusLabel.stringValue = $0 }
+            controller?.performArchiveOperation(sources: sources, format: format, level: .normal, password: password, volumeSplit: volumeSplit) { self.statusLabel.stringValue = $0 + skipNote }
             return
         }
 
@@ -1181,7 +1210,7 @@ final class MainView: NSView, NSTextFieldDelegate {
 
         controller?.performArchiveOperation(sources: archiveSources, format: format, level: .normal, password: password, volumeSplit: volumeSplit) { [stagingDir] message in
             let suffix = optimizedCount > 0 ? " (\(optimizedCount) PDF\(optimizedCount == 1 ? "" : "s") optimized)" : ""
-            self.statusLabel.stringValue = message + suffix
+            self.statusLabel.stringValue = message + skipNote + suffix
             try? FileManager.default.removeItem(at: stagingDir)
         }
     }
