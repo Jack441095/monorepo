@@ -135,6 +135,13 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > applied it stays, and KENN says so and points at "undo". Device changes repeat too ("set the compressor
   > threshold on the drum bus to -20 dB" → "do that on the vocal"); a track without that device gets a plain "Kick
   > doesn't have that device". Still asks: "no, the other one", two tracks at once.
+  > 29 Sept: two tracks at once works — "do that on the snare and the kick" (also "same for…", "the opposite on…",
+  > "and the kick and the synth too", up to four tracks) is one confirmable recipe with a step per track, each relative
+  > change taken from that track's own level. The same track again, a repeated name, or five tracks still ask.
+  > "no, the other one" still can't be resolved (there is no exact identity to move to), but it now says what the last
+  > change was and how to name the track; "no, the snare and the kick" says to use "do that on the snare and the kick".
+  > What's left for this item: "the other one" after KENN listed exactly two matching tracks, and how well any of this
+  > holds up with a model in the loop.
 - [x] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
   > 25 Sept: checked. The brain writes prose only; it has no Live access. Live changes run only in
   > `handle_command` with a confirmed proposal; a model plan must pass `validate_llm_plan` (typed actions, exact

@@ -2227,18 +2227,29 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
     action = prior.get("action")
     if action not in _REPEATABLE_ACTIONS or prior.get("missing_fields"):
         return None
-    if re.search(r"\band\b|,|&|\bboth\b", match.group("target"), re.I):
-        return None  # "the snare and the kick" once changed only the kick; two tracks at once isn't a follow-up yet
-    target = parse_request(f"solo {match.group('target')}", snapshot)
-    track = target.get("track") if isinstance(target.get("track"), dict) else None
-    if not track or target.get("missing_fields") or target.get("ambiguity"):
-        return None
     prior_track = prior.get("track") if isinstance(prior.get("track"), dict) else {}
-    if track.get("index") == prior_track.get("index"):
-        return None  # the same track again would apply the change twice; let it ask
-    return _repeat_on(prior, str(track.get("name")), flip=bool(match.group("opposite")))
+    flip = bool(match.group("opposite"))
+    parts = [part.strip() for part in re.split(r"\s*(?:,|&|\band\b)\s*", re.sub(r"^both\s+(?:of\s+)?", "", match.group("target"), flags=re.I)) if part.strip()]
+    if not 1 <= len(parts) <= MAX_FOLLOW_UP_TRACKS:
+        return None
+    names: list[str] = []
+    for part in parts:
+        target = parse_request(f"solo {part}", snapshot)
+        track = target.get("track") if isinstance(target.get("track"), dict) else None
+        if not track or target.get("missing_fields") or target.get("ambiguity"):
+            return None
+        if track.get("index") == prior_track.get("index"):
+            return None  # the same track again would apply the change twice; let it ask
+        if track.get("name") in names:
+            return None
+        names.append(str(track.get("name")))
+    commands = [_repeat_on(prior, name, flip=flip) for name in names]
+    # Two or more tracks go out as one confirmable recipe, each step written out for its own track. (Asking the
+    # parser to "solo the snare and the kick" once resolved only the kick, so each name is resolved on its own above.)
+    return " and ".join(commands) if all(commands) else None
 
 
+MAX_FOLLOW_UP_TRACKS = 4
 _REPEATABLE_ACTIONS = frozenset({"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "set_device_parameter"})
 _UNIT_TEXT = {"db": " dB", "hz": " Hz", "%": "%", "ms": " ms", "millisecond": " ms", "milliseconds": " ms", ":1": ":1"}
 
@@ -2311,6 +2322,21 @@ def _correction_command(command: str, session_id: str, snapshot: dict[str, Any])
         return None
     corrected = _repeat_on(prior, str(track.get("name")))
     return (corrected, str(prior_track.get("name") or "")) if corrected else None
+
+
+def _two_track_correction_help(command: str, session_id: str) -> str | None:
+    """ "no, the snare and the kick" after a change: a correction moves it to one track, so say how to get two."""
+    from kenn.core.session_context import live_conversation_context
+
+    match = _CORRECTION.match(command.strip())
+    target = (match.group("target") or match.group("target2") or "") if match else ""
+    if not match or len(target.split()) > 6 or not re.search(r"\band\b|,|&", target, re.I) or re.search(r"\d", target):
+        return None
+    last = str(live_conversation_context(session_id).get("last_command") or "")
+    if not last:
+        return None
+    return (f"A correction moves the last change (\"{last}\") to one track. To make it on both, say "
+            f"\"do that on {target.strip(' .!?')}\". Nothing changed.")
 
 
 PENDING_QUESTION_SECONDS = 300
@@ -2553,10 +2579,15 @@ def _handle_command_impl(
                 return _proposal_response(response, undo["proposal"], kind="undo")
             return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))
         if context_resolution.get("resolution") == "correction_requires_clarification":
+            from kenn.core.session_context import live_conversation_context
+
+            last = live_conversation_context(response["session_id"])
+            said = f" The last change was \"{last['last_command']}\"." if last.get("last_command") else ""
             return _clarification(
                 response,
                 {"action": "correct_target"},
-                "I can correct the target, but 'the other one' is not an exact identity. Name the track or device you mean.",
+                "I can correct the target, but 'the other one' doesn't tell me which track." + said
+                + " Name the track or device you mean, for example \"no, the snare\". Nothing changed.",
             )
         if context_resolution.get("resolution") == "contextual_direction_requires_value":
             track_name = str(context_resolution.get("track") or "")
@@ -2784,6 +2815,8 @@ def _handle_command_impl(
             response["resolved_command"] = follow_up
             response["context_resolution"] = {"resolution": "follow_up", "original": typed}
             clean_command = follow_up
+        elif (two_track_help := _two_track_correction_help(typed, response["session_id"])):
+            return _clarification(response, deterministic_intent, two_track_help)
         else:
             completed = _reply_to_question(typed, response["session_id"], snapshot)
             if completed:

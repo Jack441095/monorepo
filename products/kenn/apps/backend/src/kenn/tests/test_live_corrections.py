@@ -58,3 +58,15 @@ def test_an_applied_change_is_left_alone_and_the_answer_says_so(live) -> None:
 def test_unclear_corrections_still_ask(live, reply) -> None:
     live("Bring the bass down 2 dB")
     assert live(reply)["status"] == "clarification_required"
+
+
+def test_the_other_one_says_what_the_last_change_was_and_how_to_name_the_track(live) -> None:
+    live("Bring the bass down 2 dB")
+    answer = live("no, the other one")["answer"]
+    assert "Bring the bass down 2 dB" in answer and "no, the snare" in answer and "Nothing changed" in answer
+
+
+def test_a_correction_naming_two_tracks_points_at_the_follow_up_wording(live) -> None:
+    live("Bring the bass down 2 dB")
+    answer = live("no, the snare and the kick")["answer"]
+    assert "do that on the snare and the kick" in answer and "Nothing changed" in answer

@@ -51,10 +51,35 @@ def test_the_opposite_flips_the_change(say) -> None:
     assert say("and the kick too")["proposal"]["after"] is True
 
 
-@pytest.mark.parametrize("follow_up", ["do that on the bass too", "do that on the snare and the kick"])
-def test_the_same_track_or_two_tracks_ask_instead(say, follow_up) -> None:
+@pytest.mark.parametrize("follow_up", [
+    "do that on the bass too",             # the same track again would apply it twice
+    "do that on the snare and the snare",  # one track named twice
+    "do that on the bass and the kick",    # includes the track it was already done on
+    "do that on the kick, snare, hats, synth and the vocal",  # more tracks than one confirmation should carry
+])
+def test_the_same_track_or_too_many_tracks_ask_instead(say, follow_up) -> None:
     say("Bring the bass down 2 dB")
     assert say(follow_up)["status"] == "clarification_required"
+
+
+def test_two_tracks_at_once_is_one_recipe_with_a_step_for_each(say) -> None:
+    # Was: "do that on the snare and the kick" asked; resolving both names through one "solo ..." parse once got only the kick.
+    say("Bring the bass down 2 dB")
+    result = say("do that on the snare and the kick")
+    assert result["status"] == "confirmation_required" and result["context_resolution"]["resolution"] == "follow_up"
+    steps = result["proposal"]["steps"]
+    assert [step["track_name"] for step in steps] == ["Snare / Clap", "Kick"]
+    for step in steps:
+        assert volume_law.raw_to_db(step["after"]) == pytest.approx(volume_law.raw_to_db(step["before"]) - 2.0, abs=0.05)
+
+
+def test_two_tracks_can_get_the_opposite_or_a_mute(say) -> None:
+    say("pan the synth 20% left")
+    steps = say("do the opposite on the vocal and the hats")["proposal"]["steps"]
+    assert [(step["track_name"], step["after"]) for step in steps] == [("Lead Vocal", pytest.approx(0.2)), ("Hi-Hats", pytest.approx(0.2))]
+    say("mute the hats")
+    steps = say("and the kick and the synth too")["proposal"]["steps"]
+    assert [(step["track_name"], step["after"]) for step in steps] == [("Kick", True), ("Synth", True)]
 
 
 def test_a_follow_up_with_nothing_before_it_asks(say) -> None:
