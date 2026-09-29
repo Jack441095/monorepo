@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// Structured semantic version (major.minor.patch) conforming to Comparable and Codable.
@@ -8,14 +9,26 @@ public struct SemanticVersion: Comparable, Codable, Equatable, CustomStringConve
     public let rawString: String
 
     public init?(_ versionString: String) {
-        let cleaned = versionString.trimmingCharacters(in: .whitespacesAndNewlines)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
-        let components = cleaned.split(separator: ".").compactMap { Int($0) }
-        guard !components.isEmpty else { return nil }
+        var cleaned = versionString.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleaned.hasPrefix("v") || cleaned.hasPrefix("V") {
+            cleaned = String(cleaned.dropFirst())
+        }
+        // We reject prerelease/build suffixes outright: "1.2-beta" must not
+        // collapse to 1.2.0, or a beta feed entry could masquerade as a
+        // stable release and trigger a bogus update prompt.
+        let parts = cleaned.split(separator: ".", omittingEmptySubsequences: false)
+        guard !parts.isEmpty, parts.count <= 3 else { return nil }
+        var numbers: [Int] = []
+        for part in parts {
+            guard !part.isEmpty,
+                  part.allSatisfy({ $0.isNumber }),
+                  let value = Int(part) else { return nil }
+            numbers.append(value)
+        }
 
-        self.major = components.count > 0 ? components[0] : 0
-        self.minor = components.count > 1 ? components[1] : 0
-        self.patch = components.count > 2 ? components[2] : 0
+        self.major = numbers.count > 0 ? numbers[0] : 0
+        self.minor = numbers.count > 1 ? numbers[1] : 0
+        self.patch = numbers.count > 2 ? numbers[2] : 0
         self.rawString = versionString
     }
 
@@ -68,6 +81,18 @@ public enum UpdateCheckResult: Sendable {
 public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendable {
     public static let defaultAppcastURL = URL(string: "https://www.nitedsp.co.uk/submit/appcast.xml")!
 
+    // The feed itself lives on www; release binaries ship from the releases
+    // subdomain, so both hosts are trusted and every other host is refused.
+    public static let pinnedFeedHost = "www.nitedsp.co.uk"
+    public static let allowedDownloadHosts: Set<String> = ["www.nitedsp.co.uk", "releases.nitedsp.co.uk"]
+
+    // Release Ed25519 public key. The matching private key stays offline with
+    // the release owner and is never committed to git.
+    public static let updatePublicKeyBase64 = "XrMZt5AZ8Am24TGn67teEw/RfzC0i0owOYVmpTM0s2g="
+
+    private let trustedPublicKeyBase64: String
+    private let requireSignature: Bool
+
     // XML Parser State
     private var currentElement = ""
     private var currentTitle = ""
@@ -79,8 +104,43 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
     private var currentPubDate: Date?
     private var parsedItems: [AppcastItem] = []
 
-    public override init() {
+    public init(trustedPublicKeyBase64: String = UpdateEngine.updatePublicKeyBase64, requireSignature: Bool = true) {
+        self.trustedPublicKeyBase64 = trustedPublicKeyBase64
+        self.requireSignature = requireSignature
         super.init()
+    }
+
+    /// Bytes covered by the enclosure Ed25519 signature: version plus download
+    /// URL. Length stays outside the signed payload on purpose, so the release
+    /// owner can refresh it with `stat -f%z` on the built zip without
+    /// invalidating the signature.
+    public static func signaturePayload(versionString: String, downloadURL: URL) -> Data {
+        Data((versionString + "\n" + downloadURL.absoluteString).utf8)
+    }
+
+    /// Only https URLs on our own hosts may be opened or offered as updates.
+    /// Anything else (http, file, custom schemes, foreign hosts) is refused
+    /// so a tampered feed cannot point the download button at malware.
+    public static func isApprovedDownloadURL(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased(), scheme == "https" else { return false }
+        guard let host = url.host?.lowercased() else { return false }
+        return allowedDownloadHosts.contains(host)
+    }
+
+    /// Verifies the enclosure Ed25519 signature against the trusted release
+    /// key. Fails closed: a present-but-invalid signature is refused, and a
+    /// missing signature is refused while requireSignature is true.
+    public func isTrustedEnclosure(_ item: AppcastItem) -> Bool {
+        guard UpdateEngine.isApprovedDownloadURL(item.downloadURL) else { return false }
+        guard let signatureString = item.edSignature, !signatureString.isEmpty else {
+            return !requireSignature
+        }
+        guard let signatureData = Data(base64Encoded: signatureString),
+              let publicKeyData = Data(base64Encoded: trustedPublicKeyBase64),
+              let publicKey = try? Curve25519.Signing.PublicKey(rawRepresentation: publicKeyData)
+        else { return false }
+        let payload = UpdateEngine.signaturePayload(versionString: item.versionString, downloadURL: item.downloadURL)
+        return publicKey.isValidSignature(signatureData, for: payload)
     }
 
     /// Parses an appcast.xml data payload synchronously or asynchronously.
@@ -88,20 +148,35 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
         parsedItems.removeAll()
         let parser = XMLParser(data: data)
         parser.delegate = self
+        // A hostile feed could smuggle file:/// reads or billion-laughs
+        // expansion through external entities; we only read plain text nodes.
+        parser.shouldResolveExternalEntities = false
         parser.parse()
         return parsedItems
     }
 
     /// Checks if a newer version is available compared to currentVersion.
+    /// An update is offered only when the newest feed entry carries a valid
+    /// Ed25519 signature over its exact version and URL; anything unsigned,
+    /// tampered, or off-host returns .failed instead of prompting.
     public func checkStatus(feedData: Data, currentVersionString: String) -> UpdateCheckResult {
         guard let currentVer = SemanticVersion(currentVersionString) else {
             return .failed(reason: "Invalid current version string format: \(currentVersionString)")
         }
 
         let items = parseAppcast(data: feedData)
+        if items.isEmpty {
+            return .upToDate(currentVersion: currentVer)
+        }
         let versionedItems = items.compactMap { item in item.version.map { (item, $0) } }
         guard let (latestItem, latestVer) = versionedItems.max(by: { $0.1 < $1.1 }) else {
-            return .upToDate(currentVersion: currentVer)
+            return .failed(reason: "Feed contained no parseable version numbers")
+        }
+        guard UpdateEngine.isApprovedDownloadURL(latestItem.downloadURL) else {
+            return .failed(reason: "Update URL failed approval: \(latestItem.downloadURL.absoluteString)")
+        }
+        guard isTrustedEnclosure(latestItem) else {
+            return .failed(reason: "Update signature missing or invalid for version \(latestItem.versionString)")
         }
 
         if currentVer < latestVer {
