@@ -255,7 +255,26 @@ def record_diagnostic_result(loop: dict[str, Any], result: dict[str, Any]) -> di
             updated["active_hypothesis_id"] = ""
             updated["status"] = "exhausted"
     else:
-        updated["status"] = "needs_clarification"
+        # One inconclusive result may just mean the test was never really run,
+        # so the first one asks the producer for clarification. The second on
+        # the same hypothesis moves the loop to the next candidate: before, the
+        # loop re-served the same inconclusive test forever and a recommendation
+        # was unreachable. MAX_RESULTS still bounds the whole loop, so a run can
+        # legitimately end at the cap needing clarification.
+        inconclusive_here = sum(
+            1 for item in updated["results"]
+            if item["hypothesis_id"] == updated["active_hypothesis_id"]
+            and item["verdict"] == "inconclusive"
+        )
+        next_index = active_index + 1
+        if inconclusive_here > 1 and next_index < len(updated["hypotheses"]):
+            updated["active_hypothesis_id"] = updated["hypotheses"][next_index]["hypothesis_id"]
+            updated["status"] = "awaiting_test"
+        elif inconclusive_here > 1:
+            updated["active_hypothesis_id"] = ""
+            updated["status"] = "exhausted"
+        else:
+            updated["status"] = "needs_clarification"
     updated["updated_at"] = _now()
     return {"ok": True, "loop": updated}
 

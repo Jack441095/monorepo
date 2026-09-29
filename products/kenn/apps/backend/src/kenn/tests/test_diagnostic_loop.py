@@ -109,6 +109,29 @@ def test_contradicting_one_hypothesis_advances_exactly_one_test() -> None:
     assert loop["results"] == []
 
 
+def test_second_inconclusive_result_on_one_hypothesis_moves_the_loop_on() -> None:
+    # Regression: an inconclusive verdict pinned the loop in needs_clarification
+    # forever, so a test the producer could not run made any recommendation
+    # unreachable. The loop now asks for clarification once, then moves on.
+    loop = start_diagnostic_loop(
+        goal="My distorted master sounds crushed and too loud after the limiter.", context=_context(),
+    )["loop"]
+    first = loop["active_hypothesis_id"]
+
+    once = record_diagnostic_result(loop, _result(loop, "inconclusive"))["loop"]
+    assert once["status"] == "needs_clarification"
+    assert once["active_hypothesis_id"] == first
+
+    twice = record_diagnostic_result(once, _result(once, "inconclusive"))["loop"]
+    assert twice["status"] == "awaiting_test"
+    assert twice["active_hypothesis_id"] != first
+    assert len(twice["results"]) == 2
+
+    final = record_diagnostic_result(twice, _result(twice, "supports"))["loop"]
+    assert final["status"] == "recommendation_ready"
+    assert final["recommendation"]
+
+
 def test_supported_hypothesis_yields_advisory_recommendation_not_execution() -> None:
     context = _context()
     loop = start_diagnostic_loop(
