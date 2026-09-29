@@ -1,6 +1,6 @@
 # KENN north star: an expert production partner inside Ableton Live
 
-**Written:** 2026-09-24 · **Owner:** Jack · **Status:** proposal for owner sign-off
+**Written:** 2026-09-24 · **Owner:** Jack · **Status:** proposal for owner sign-off (brain decided 25 Sept: local only)
 
 The long-term plan for KENN's intelligence. It merges the three GLM plans
 (`KENN_GLM_MEGA_PLAN.md`, `KENN_GLM_ROADMAP_2026-09-21.md`, `KENN_GLM_ABLETON_ASSISTANT_PLAN_2026-09-22.md`) and the
@@ -29,8 +29,8 @@ inside KENN's safety model.
    confirmation, OSC writes, readback, receipts and undo. A model never writes to Live directly.
 2. **Every claim is sourced or measured:** notes and the manual for knowledge, Live reads for session facts, analysis for
    audio. Answers cite; unknowns are said out loud.
-3. **Private by default:** audio never leaves the Mac. Anything sent to a hosted model is text the user can see, and
-   hosted use is opt-in.
+3. **Private by default:** audio never leaves the Mac, and neither does any text. The brain is a local model (owner
+   decision, 25 Sept); there is no hosted provider.
 4. **Promotion by evidence:** a model or a capability moves up (shadow → propose → default) only through a measured gate,
    never because it demos well.
 5. **One product:** browser companion and the AU/VST3 plug-in share one backend and one set of receipts.
@@ -56,10 +56,10 @@ KENN uses three kinds of model, each where it is strongest:
 | Job | Model | Why |
 |---|---|---|
 | Clear commands ("hats down 2 dB") | Rule parser, then the small local planner | Instant, offline, exact |
-| Conversation, explanation, multi-step reasoning | **The brain: decision below** | Needs broad knowledge and real reasoning |
+| Conversation, explanation, multi-step reasoning | **The brain: local Qwen3 8B** (decision below) | Needs broad knowledge and real reasoning |
 | Drafting knowledge notes, labelling training data | Box models (GPU notes model) | Cheap, offline, reviewed before use |
 
-Options for the brain:
+Options that were weighed (25 Sept: the owner chose A, local only):
 
 | Option | Strengths | Costs and risks |
 |---|---|---|
@@ -67,14 +67,11 @@ Options for the brain:
 | **B. Hosted frontier model** (e.g. Claude through the API, with KENN's tools and retrieval) | Best reasoning and conversation now; improves without our training | Per-use cost; needs internet; privacy and terms review; latency depends on the network |
 | **C. Hybrid (recommended)** | B for conversation and planning when online and opted in; A-class local model for private or offline use and commands | Two paths to test; a router decides |
 
-**Recommendation: C, hybrid.** KENN's value is its tools, knowledge and safety model, and those stay the same whichever
-brain drives them. Starting hosted gets real conversational quality in front of testers quickly; the local path keeps
-KENN private-first and gives a fallback. KENN's model layer already supports local Ollama and OpenAI-compatible hosted
-endpoints; a hosted Claude provider would be added the same way.
-
-**Decide before Stage 1 (owner):** hosted provider and budget per tester per month; whether hosted is on by default or
-opt-in (recommend opt-in); what may be sent (recommend: the question, retrieved note excerpts and a session summary;
-never audio, never file paths).
+**Decision (owner, 25 Sept): A, local Qwen only.** KENN's value is its tools, knowledge and safety model, and those stay
+the same whichever brain drives them. Nothing leaves the Mac: no hosted model, no hosted budget, no opt-in to design.
+The model layer's OpenAI-compatible endpoint stays in the code but is not used. Qwen3 8B was picked on 25 Sept (see
+Stage 1). The cost of this choice is speed: on a 16 GB Mac with Live open the 8B is too slow for chat, so chat shows
+the template first and swaps the model's answer in when it is ready.
 
 ## Stages
 
@@ -253,13 +250,13 @@ promotion, and a promotion that regresses is rolled back (the index keeps the pr
 
 Understanding (natural phrasings), answer quality (reviewer scores), retrieval recall, latency by stage (planning,
 OSC round trip, readback, analysis), unauthorised writes (must be zero), undo success (must be 100%), tester
-satisfaction, and hosted cost per tester.
+satisfaction, and how often the local model's answer lands (and how long it takes) on each tester's Mac.
 
 ## Risks
 
 | Risk | Mitigation |
 |---|---|
-| Hosted model cost or terms change | Router with a local fallback; per-tester budget; cost in the monthly report |
+| Local model too slow or too weak on testers' Macs | Templates as the instant path; model answer swapped in when ready; measure the swap rate and wait per Mac |
 | Latency makes KENN feel slow | Route clear commands to the instant path; stream answers; measure by stage |
 | Knowledge errors with confident tone | Source tiers, citations, contradiction checks, reviewer audits |
 | Scope creep before the beta is solid | Stage 0 exit first; later stages start only behind their own gates |
@@ -267,7 +264,7 @@ satisfaction, and hosted cost per tester.
 
 ## Decisions needed from you
 
-- [ ] Sign off this direction (hybrid brain, stages in this order)
+- [ ] Sign off this direction (local Qwen brain, stages in this order)
 - [x] Brain provider: local Qwen only (owner, 25 Sept) — no hosted budget or opt-in needed
 - [x] What may be sent to a hosted model: nothing — no hosted model (owner, 25 Sept)
 - [ ] Whether Stage 2's craft notes should cover specific genres first (which?)

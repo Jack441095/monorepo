@@ -133,7 +133,7 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - [x] Companion restarted on the new code (20:15 Thu)
 
 ## North star (Stages 1–5)
-- [x] Plan written (hybrid brain: local planner + hosted brain for conversation; stages with measured gates)
+- [x] Plan written (stages with measured gates; brain later decided as local Qwen only)
 - [x] Brain decision (you, 25 Sept): **local Qwen only** — nothing leaves the Mac. You can also run a bigger Qwen on
       the box GPU for your own KENN (through the SSH tunnel); testers use a local Qwen on their Mac
 - [x] Stage 1 step 1: Qwen brains compared on KENN's real answer path (84 questions, box GPU). **Qwen3 8B** (2.8 s) and
