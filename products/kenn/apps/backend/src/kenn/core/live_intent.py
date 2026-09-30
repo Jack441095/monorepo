@@ -538,6 +538,14 @@ _SECOND_ACTION = re.compile(
     r"lower|boost|cut|tuck|arm|disarm|rename|add|insert|put|play|stop|start|make|take|nudge|bump|park|center|centre)\b",
     re.I,
 )
+# "mute the Kick, mute the hats" proposed muting only the Kick and the answer never mentioned the hats
+# (round 9, 30 Sept 2026): a comma list repeats the verb instead of joining with "and", so it slips past
+# _SECOND_ACTION and the second request is silently dropped. Same guard, same reason.
+_COMMA_SECOND_ACTION = re.compile(
+    r",\s*(?:the\s+)?(?:turn|mute|unmute|solo|unsolo|pan|bring|set|push|pull|drop|raise|lower|boost|cut|tuck|"
+    r"arm|disarm|rename|add|insert|put|play|stop|start|make|take|nudge|bump|park|center|centre)\b",
+    re.I,
+)
 _VAGUE_EFFECT = re.compile(r"\b(?:some|more|less|a\s+bit\s+of|a\s+little|a\s+touch\s+of|a\s+splash\s+of)\s+(?:reverb|verb|delay|echo)\b", re.I)
 
 
@@ -915,6 +923,19 @@ def _split_plain_and(text: str, snapshot: dict[str, Any]) -> list[str]:
     its own, return nothing and let the single-command path ask as before.
     """
     text = text.strip().rstrip(".!")
+    # "mute the Kick, mute the hats": a comma list repeating the verb. Left alone the single-command parse read
+    # only the first clause, so the hats were never muted and nothing said so. Hand each clause its own verb and
+    # let the recipe path confirm all of them together.
+    comma_clauses = [clause.strip() for clause in text.split(",") if clause.strip()]
+    clause_verbs = [_LEADING_VERB.match(clause) for clause in comma_clauses]
+    if len(comma_clauses) > 1 and all(clause_verbs) and len({m.group("verb").lower() for m in clause_verbs}) == 1:
+        repeated = []
+        for clause, verb_match in zip(comma_clauses, clause_verbs):
+            tail = clause[verb_match.end():].strip()
+            repeated += [f"{verb_match.group('verb')} {part.strip()}"
+                         for part in _AND_SPLIT.split(tail) if part.strip()]
+        if repeated and all(_clean_intent(item, snapshot) is not None for item in repeated):
+            return repeated
     # "turn the kick and snare down 2 dB" changed only the Kick (27 Sept 2026): the amount belongs to both.
     shared = _SHARED_TAIL.match(text)
     if shared:
@@ -1390,6 +1411,11 @@ _OVER_TO_SIDE = re.compile(rf"^\s*{_NAME}\s+(?:over\s+)?to\s+the\s+(?P<side>left
 _SHUT_UP = re.compile(rf"^\s*shut\s+{_NAME}\s+up\s*[.!]?\s*$", re.I)
 _HEAR_JUST = re.compile(rf"^\s*i\s+(?:need|want)\s+to\s+hear\s+(?:just|only)\s+{_NAME}\s*[.!]?\s*$", re.I)
 _STOP_SOLOING = re.compile(rf"^\s*(?:stop|quit)\s+soloing\s+{_NAME}\s*[.!]?\s*$", re.I)
+# "Lead Vocal off solo" soloed it (round 9, 30 Sept 2026): the "off" was dropped, so the proposal did the
+# opposite of what the note said. "unsolo the hats" already worked, so this is the same intent spelled
+# as a state instead of a verb.
+_OFF_SOLO = re.compile(rf"^\s*{_NAME}\s+(?:(?:off|out\s+of)\s+solo(?:ed)?|solo(?:ed)?\s+(?:off|out)|"
+                       rf"(?:is|are)\s+not\s+solo(?:ed)?)\s*[.!]?\s*$", re.I)
 _GET_ARMED = re.compile(rf"^\s*get\s+{_NAME}\s+armed\s*[.!]?\s*$", re.I)
 _PAUSE = re.compile(r"^\s*(?:pause|hold\s+(?:it|playback))(?:\s+(?:it|there|here|the\s+(?:song|playback)))*\s*[.!]?\s*$", re.I)
 _KILL_SEND = re.compile(rf"^\s*(?:kill|cut|nuke|zero)\s+the\s+send\s+(?:from\s+)?{_NAME}\s+to\s+(?:the\s+)?(?P<ret>[\w' -]+?)\s*[.!]?\s*$", re.I)
@@ -1478,6 +1504,8 @@ def _rewrite_producer_wording(text: str) -> str:
     if (m := _HEAR_JUST.match(text)) and clean(m):
         return f"solo {m.group('name')}"
     if (m := _STOP_SOLOING.match(text)) and clean(m):
+        return f"unsolo {m.group('name')}"
+    if (m := _OFF_SOLO.match(text)) and clean(m):
         return f"unsolo {m.group('name')}"
     if (m := _GET_ARMED.match(text)) and clean(m):
         return f"arm {m.group('name')}"
@@ -1821,6 +1849,144 @@ def _rewrite_shorthand(text: str, tracks: list[dict[str, Any]]) -> str:
         return f"pan {m.group('name')} {m.group('side').lower()}"
     if (m := _SHORT_LEVEL.match(text)) and is_track(m.group("name")):
         return f"{m.group('name')} {m.group('amount')} dB"  # asks whether that's a level or a change
+    return text
+
+
+# Mix notes pasted into the chat (round 9, 30 Sept 2026). Every earlier blind register was somebody
+# speaking to KENN; a notes document has no second person, so the line is telegraphic and carries
+# notation instead of a verb: "KICK FADER: -18 dB", "HATS -> A-Reverb 30%", "MARKER: Pre-drop".
+# The rules already know each of these requests, so the job here is only to write the notation into
+# wording they own. Nothing below reads a request that isn't already there, and every branch ends on
+# a form the rules parse; a line that doesn't match any of them is left alone to ask.
+_NOTES_LIST_MARKER = re.compile(r"^\s*(?:[-*+>•]+\s*)+")
+_NOTES_EMPHASIS = re.compile(r"\*\*|__|`")
+_NOTES_TASK_LABEL = re.compile(r"^\s*(?:todo|fixme|note)\s*:\s*", re.I)
+# "KICK - 18 dB": a document pads the sign away from the number. Only a bare sign before digits, so a
+# track list ("Kick - Hats") is untouched.
+_NOTES_SPACED_SIGN = re.compile(r"(?<=\s)-\s+(?=\d)")
+_NOTES_CONTROL_NOUN = re.compile(r"\s+(?:fader|level|volume|pan|pan\s+pot)\s*$", re.I)
+# Section labels a notes document actually uses, mapped to the wording the rules parse. Deliberately a
+# closed list: "MUTE:" and "PAN:" are missing because those words are the verb themselves, and dropping
+# them would turn a working line into a noun.
+_NOTES_SECTION_LABELS = {
+    "show": "show me {rest}",
+    "open": "open {rest}",
+    "list": "list my {rest}",
+    "check": "what plugins are on {rest}",
+    "playback": "start playback",
+    "transport": "start playback",
+    "tempo": "set the tempo to {rest}",
+    "time signature": "set the time signature to {rest}",
+    "new midi track": "add a midi track called {rest}",
+    "new midi channel": "add a midi track called {rest}",
+    "new audio": "add an audio track called {rest}",
+    "new audio track": "add an audio track called {rest}",
+    "marker": "add a locator named {rest}",
+    "locator": "add a locator named {rest}",
+    "cue": "add a locator named {rest}",
+    "cue point": "add a locator named {rest}",
+    "rename": "rename {rest}",
+    "plugins": "what plugins are on {rest}",
+}
+_NOTES_SECTION_LABEL = re.compile(
+    r"^\s*(?P<label>[a-z][a-z /]{0,16}?)\s*:\s*(?P<rest>\S.*?)\s*[.!]?\s*$", re.I)
+# "RENAME: FX Print -> Bounce" and "OPEN: Drum Bus / Compressor" split a track from a device or a name
+# with the document's own arrows, so they need the object order the rules read.
+_NOTES_RENAME_ARROW = re.compile(
+    r"^\s*(?:rename|call)\s*:\s*(?P<track>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*(?:->|→|—|–|\bto\b)\s*(?P<new>\S.+?)\s*[.!]?\s*$",
+    re.I)
+_NOTES_OPEN_ARROW = re.compile(
+    r"^\s*open\s*:\s*(?P<track>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*(?:/|->|→|—|–)\s*(?P<device>\S.+?)\s*[.!]?\s*$", re.I)
+_NOTES_LIST_TRACKS = re.compile(r"^\s*list\s*:\s*(?:all\s+|my\s+|the\s+)?tracks?\s*[.!]?\s*$", re.I)
+# "Lead Vocal send into A-Reverb: 25%", "Lead Vocal -> A-Reverb 30%": the return and the amount, said
+# in the order a notes line puts them.
+_NOTES_SEND = re.compile(
+    r"^\s*(?:(?:send|feed|route)\s+)?(?P<track>[^:—–]+?)\s*(?:'s\s+)?"
+    r"(?:\b(?:send|feed|into|to)\b\s*)?(?:->|→|—|–)?\s*(?P<return>[ab]\s*-?\s*(?:reverb|delay)|reverb|verb|delay)"
+    r"\s*(?::|->|→|—|–|at|to)?\s*(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)?\s*[.!]?\s*$", re.I)
+# "Drum Bus comp threshold: -22 dB", "vocal comp dry/wet 40%": the setting named before the value, which
+# the setting-first device rules don't read.
+_NOTES_DEVICE_SETTING = re.compile(
+    rf"^\s*{_NAME}\s+(?:(?P<device>comp|compressor|glue(?:\s+compressor)?|saturator|auto\s+filter|eq(?:\s+eight)?)"
+    rf"(?:\s+(?P<parameter>threshold|ratio|attack|release|dry\s*[/ ]?\s*wet|drive))?)\s*(?:[:=—–]\s*|\s+)"
+    rf"(?P<value>-?\d+(?:\.\d+)?)\s*(?P<unit>%|percent|dbs?|db|decibels?|ms)\s*[.!]?\s*$", re.I)
+# "Synth muted", "FX Print: record armed": the state written where the verb would be.
+_NOTES_STATE = re.compile(
+    rf"^\s*{_NAME}\s*[:=—–]?\s*(?P<state>muted|unmuted|soloed|unsoloed|record[\s-]?armed|armed|disarmed)\s*[.!]?\s*$", re.I)
+# "Saturator onto the FX Print": the device and the track, the other way round from "put an EQ Eight on the kick".
+_NOTES_DEVICE_ONTO = re.compile(
+    r"^\s*(?P<device>saturator|roar|auto\s+filter|drum\s+buss|glue\s+compressor|multiband\s+dynamics|eq\s*eight|"
+    r"eq(?:ualizer)?|compressor|hybrid\s+reverb|echo)\s+(?:on|onto|to)\s+(?:the\s+)?(?P<track>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*[.!]?\s*$",
+    re.I)
+_NOTES_SEPARATOR = re.compile(r"^\s*(?P<head>[^:=—–]+?)\s*(?::|=|—|–)\s+(?P<tail>\S.*?)\s*[.!]?\s*$")
+# Only a negative number or a percentage after the separator reads as a target. A positive bare dB is the
+# level-or-change ambiguity the rules already ask about ("snare clap -12"), so it is left to ask.
+_NOTES_TARGET = re.compile(r"^(?:minus\s+|-)\d|(?:\d+(?:\.\d+)?)\s*(?:%|percent)\b", re.I)
+_NOTES_CENTRE = re.compile(r"^\s*(?:cent(?:re|er)|middle|dead\s+cent(?:re|er))\s*[.!]?\s*$", re.I)
+_NOTES_PAN_SIDE = re.compile(r"^(?P<amount>\d+(?:\.\d+)?)\s*(?:%|percent)?\s*(?P<side>left|right)\s*[.!]?\s*$", re.I)
+
+
+def _rewrite_notes_line(text: str, tracks: list[dict[str, Any]]) -> str:
+    """Rewrite one pasted mix-notes line into the wording the rules already parse."""
+    text = _NOTES_EMPHASIS.sub("", text)
+    text = _NOTES_TASK_LABEL.sub("", _NOTES_LIST_MARKER.sub("", text))
+    text = _NOTES_SPACED_SIGN.sub("-", text).strip()
+    if not text:
+        return text
+
+    def named(candidate: str) -> str | None:
+        # A control noun ("KICK FADER") is the notes document's way of naming the fader, not part of the
+        # track's name, so it comes off before the name is matched against the set.
+        stripped = _NOTES_CONTROL_NOUN.sub("", candidate).strip()
+        return stripped if _find_track(stripped, tracks)[0] is not None else None
+
+    if not re.match(r"^\s*(?:send|feed|route)\b", text, re.I) and (m := _NOTES_SEND.match(text)):
+        # "send the hats to the A-Reverb at 30%" is already the wording the rules own, so this only takes
+        # the notes shapes: an arrow ("HATS -> A-Reverb 30%") or the track's own word for it.
+        track = named(re.sub(r"\s+(?:send|feed|route)$", "", m.group("track").strip()))
+        if track and m.group("value"):
+            return f"send the {track} to the {m.group('return')} at {m.group('value')}%"
+    if (m := _NOTES_DEVICE_SETTING.match(text)):
+        track = named(m.group("name"))
+        if track and m.group("parameter"):
+            unit = m.group("unit").lower()
+            unit = "%" if unit.startswith("%") or unit.startswith("percent") else (
+                "dB" if unit.startswith("db") or unit.startswith("decibel") else " ms")
+            return (f"set the {m.group('device')} {m.group('parameter').lower()} on the {track} "
+                    f"to {m.group('value')} {unit}")
+    if (m := _NOTES_DEVICE_ONTO.match(text)) and named(m.group("track")):
+        return f"add a {m.group('device')} to the {named(m.group('track'))}"
+    if (m := _NOTES_STATE.match(text)):
+        track = named(m.group("name"))
+        if track:
+            state = m.group("state").lower().replace("record armed", "armed")
+            return {"muted": "mute", "unmuted": "unmute", "soloed": "solo", "unsoloed": "unsolo",
+                    "armed": "arm", "disarmed": "disarm"}[state.replace(" ", "")] + f" the {track}"
+    if _NOTES_LIST_TRACKS.match(text):
+        return "list my tracks"
+    if (m := _NOTES_RENAME_ARROW.match(text)) and named(m.group("track")):
+        return f"rename the {named(m.group('track'))} to {m.group('new')}"
+    if (m := _NOTES_OPEN_ARROW.match(text)) and named(m.group("track")):
+        return f"open the {m.group('device').lower()} on the {named(m.group('track'))}"
+    if (m := _NOTES_SECTION_LABEL.match(text)):
+        template = _NOTES_SECTION_LABELS.get(" ".join(m.group("label").lower().split()))
+        if template:
+            rest = m.group("rest")
+            if template.startswith("what plugins"):
+                # "CHECK: plugins on the Bass" and "CHECK: the Bass" are the same note; take the object
+                # with it rather than reading "plugins on" twice.
+                rest = re.sub(r"^(?:plugins|effects|devices)\s+on\s+(?:the\s+)?", "", rest, flags=re.I)
+            return template.format(rest=rest).strip()
+    if (m := _NOTES_SEPARATOR.match(text)):
+        track = named(m.group("head"))
+        if track:
+            tail = m.group("tail")
+            if _NOTES_CENTRE.match(tail):
+                return f"pan the {track} to centre"
+            if (side := _NOTES_PAN_SIDE.match(tail)):
+                return f"pan the {track} {side.group('amount')}% {side.group('side')}"
+            if _NOTES_TARGET.match(tail):
+                return f"{track} to {tail}"
     return text
 
 
@@ -2495,7 +2661,11 @@ def _parse_single_request(query: str, session_snapshot: dict[str, Any] | None) -
 
 def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     tracks_said = [t for t in ((session_snapshot or {}).get("tracks") or []) if isinstance(t, dict)]
-    text = _rewrite_shorthand(_rewrite_common_phrasings(" ".join(str(query or "").strip().split())), tracks_said)
+    raw_text = " ".join(str(query or "").strip().split())
+    # Pasted mix notes are the one shape that arrives with notation instead of words, so they get their own
+    # pass over the set's real track names. It runs before _rewrite_shorthand because it is only cleanup
+    # ("KICK - 18 dB" loses the space the document padded into the sign), leaving ordinary wording behind.
+    text = _rewrite_shorthand(_rewrite_notes_line(_rewrite_common_phrasings(raw_text), tracks_said), tracks_said)
     numeric_text = _normalize_kilohertz(_normalize_spoken_numbers(text))
     base = {
         "schema": "kenn.ableton_intent.v1",
@@ -3571,7 +3741,7 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             base["missing_fields"].append(question[1])
             base["ambiguity"].append(question[2])
             return base
-    if action and _SECOND_ACTION.search(lower):
+    if action and (_SECOND_ACTION.search(lower) or _COMMA_SECOND_ACTION.search(lower)):
         # "solo the bass and turn it up 2 dB": proposing only the first part
         # would silently drop the rest. Supported two-step requests are
         # handled by parse_natural_recipe before this parser runs.
