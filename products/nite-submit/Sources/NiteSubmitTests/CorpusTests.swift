@@ -19,10 +19,36 @@ func corpusDir() -> URL {
         .appendingPathComponent("Fixtures/corpus")
 }
 
+/// Returns nil when the manifest is absent or malformed. The caller turns
+/// that into a failed check: a missing corpus is zero coverage, and silently
+/// skipping it would let the release gate pass on an empty tree.
+func loadCorpusManifest(_ dir: URL) -> CorpusManifest? {
+    let url = dir.appendingPathComponent("manifest.json")
+    do {
+        return try JSONDecoder().decode(CorpusManifest.self, from: Data(contentsOf: url))
+    } catch {
+        check(false, "corpus manifest unreadable at \(url.path): \(error)")
+        return nil
+    }
+}
+
+/// Cases the manifest marks as deliberately unrenderable. They are never
+/// written to disk, so the extraction loop must skip exactly these and
+/// nothing else.
+func isUnrenderable(_ c: CorpusCase) -> Bool {
+    c.meta["malformed"] == "true" || c.meta["image_only"] == "true"
+}
+
 func runCorpusAndFailureTests() {
     let dir = corpusDir()
-    let manifest = try! JSONDecoder().decode(CorpusManifest.self,
-                                             from: Data(contentsOf: dir.appendingPathComponent("manifest.json")))
+    guard let manifest = loadCorpusManifest(dir) else {
+        // Still run the failure paths: they build their own PDFs and do not
+        // need the corpus, so one broken fixture must not silence them.
+        runFailureCaseTests(dir)
+        return
+    }
+    let renderable = manifest.cases.filter { !isUnrenderable($0) }
+
     suite("PDF Corpus (NITE_SUBMIT_PDF_CORPUS_V1)") {
         check(manifest.cases.count >= 200, "corpus has 200+ cases (\(manifest.cases.count))")
 
@@ -36,13 +62,19 @@ func runCorpusAndFailureTests() {
         let detector = FieldDetector()
         let criticalFields = ["student_name", "student_id", "module_code"]
 
-        for c in manifest.cases {
-            if c.meta["malformed"] == "true" || c.meta["image_only"] == "true" { continue }
+        for c in renderable {
             let url = dir.appendingPathComponent("pdf").appendingPathComponent(c.id + ".pdf")
-            guard FileManager.default.fileExists(atPath: url.path) else { continue }
+            // A fixture the manifest promises but the tree no longer holds is a
+            // failed check, not a skip. Skipping used to let a deleted corpus
+            // directory sail through the extracted >= 150 gate below.
+            guard FileManager.default.fileExists(atPath: url.path) else {
+                check(false, "\(c.id): manifest case has no PDF at \(url.lastPathComponent)")
+                continue
+            }
             let t0 = CFAbsoluteTimeGetCurrent()
-            guard case .success(let doc) = try? PDFExtractor().extract(at: url) else {
-                check(false, "\(c.id): extraction unexpectedly failed")
+            let outcome = try? PDFExtractor().extract(at: url)
+            guard case .success(let doc) = outcome else {
+                check(false, "\(c.id): extraction did not return a text layer")
                 continue
             }
             latencies.append(CFAbsoluteTimeGetCurrent() - t0)
@@ -79,6 +111,10 @@ func runCorpusAndFailureTests() {
                 }
             }
         }
+        // Every promised fixture has to reach the detector, otherwise the
+        // precision numbers below describe a corpus nobody is running.
+        check(extracted == renderable.count,
+              "every renderable manifest case extracted (\(extracted)/\(renderable.count))")
         check(extracted >= 150, "enough extractable PDFs ran (\(extracted))")
 
         func precision(_ f: String) -> Double {
@@ -91,10 +127,10 @@ func runCorpusAndFailureTests() {
         for f in ["student_name", "student_id", "university", "module_code", "project_title"] {
             print("   \(f): hits=\(hits[f] ?? 0) correct=\(correct[f] ?? 0) precision=\(precision(f)) wrongHigh=\(wrongHigh[f] ?? 0)")
         }
-        if !latencies.isEmpty {
+        if let slowest = latencies.max() {
             print(String(format: "   latency: avg=%.4fs max=%.4fs",
                          latencies.reduce(0, +) / Double(latencies.count),
-                         latencies.max()!))
+                         slowest))
         }
         for f in ["student_name", "student_id", "module_code"] {
             check(precision(f) >= 0.98, "\(f) precision >= 98%")

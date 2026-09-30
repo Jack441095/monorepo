@@ -9,8 +9,8 @@ func runPresetTests() {
                                    requiredFields: ["student_id", "project_title"])
 
         // Round-trip: encode/decode preserves all fields.
-        let data = try! JSONEncoder().encode(preset)
-        let decoded = try! JSONDecoder().decode(NamingPreset.self, from: data)
+        let data = try JSONEncoder().encode(preset)
+        let decoded = try JSONDecoder().decode(NamingPreset.self, from: data)
         eq(decoded.id, preset.id, "round-trip preserves id")
         eq(decoded.displayName, preset.displayName, "round-trip preserves displayName")
         eq(decoded.template, preset.template, "round-trip preserves template")

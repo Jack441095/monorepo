@@ -132,5 +132,31 @@ public func runUpdateEngineTests() {
         } else {
             check(false, "requireSignature=false is the only way an unsigned feed is offered")
         }
+
+        // The feed we actually publish lives in web/appcast.xml. It shipped
+        // without a length or an edSignature for a while, which is a silently
+        // dead updater: the parser saw the enclosure, the signature gate
+        // refused it, and nothing ever said why. tools/update_appcast.sh writes
+        // both attributes from the built zip and the offline release key.
+        let shippedFeedURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("web/appcast.xml")
+        guard let shippedFeed = try? Data(contentsOf: shippedFeedURL) else {
+            check(false, "web/appcast.xml is present at \(shippedFeedURL.path)")
+            return
+        }
+        check(true, "web/appcast.xml is present at \(shippedFeedURL.lastPathComponent)")
+        let shippedItems = engine.parseAppcast(data: shippedFeed)
+        check(!shippedItems.isEmpty, "the shipped appcast parses into at least one enclosure")
+        for item in shippedItems {
+            check(item.edSignature != nil,
+                  "shipped \(item.versionString) enclosure carries a sparkle:edSignature attribute")
+            check(item.length != nil,
+                  "shipped \(item.versionString) enclosure carries a length attribute")
+            check(UpdateEngine.isApprovedDownloadURL(item.downloadURL),
+                  "shipped \(item.versionString) download URL is on an approved host")
+        }
     }
 }
