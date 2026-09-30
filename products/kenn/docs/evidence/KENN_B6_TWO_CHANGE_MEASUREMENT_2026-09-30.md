@@ -83,3 +83,35 @@ The two-step plan already renders as text with both steps and "Nothing has chang
 rendering change on top of a payload that exists, **except** for the ambiguous case: where one part is understood and
 the other is not, the two buttons are not "do the first, then the second" but "tell me the amount for the hats" — so the
 frontend cannot be a dumb renderer either way. Worth deciding that shape before building the buttons.
+
+## Addendum, 30 Sept: the buttons are blocked on a broken card, not on missing data
+
+I assumed the frontend had nothing to bind to. It has plenty — the problem is it renders a two-step plan as **"Track "**.
+
+`KennChatHistory.vue:80` renders `KennActionCard` for any message with a `proposal`, and passes the whole proposal
+object. For a recipe that object has no `track_name` and no `track_index`:
+
+```
+proposal has track_name  : False
+proposal has track_index : False
+proposal.steps          : 2
+```
+
+`KennActionCard.vue:10` is then
+
+```vue
+{{ proposal.track_name || `Track ${proposal.track_index != null ? proposal.track_index + 1 : ''}` }}
+```
+
+which with neither present renders the literal string **"Track "**. The plan text is fine — it is in `answer` as "The
+plan, 2 changes: …" — so what a producer sees today is a correct sentence above an action card with no track name on
+it, and a working Apply button. Verified 30 Sept against `FakeLiveBackend`; not verified in a browser, because I cannot
+see one.
+
+Everything the buttons need is already in the payload. Each step carries `action_id`, `action`, `before`, `after`,
+`before_db`, `after_db`, `parameter`, `reason` and `evidence` — so `Hi-Hats -14.0 dB -> -17.0 dB` can be rendered
+per step, which is the thing B6 actually wants ("Do the first, then the second?").
+
+So the frontend work is: a `KennRecipeCard.vue` that iterates `proposal.steps`, and a branch in `KennChatHistory` to
+prefer it when `proposal.action === 'recipe'`. That fixes the empty card as a side effect. **I have not written it** —
+a Vue component I cannot look at is not something to land on a claim that it works.
