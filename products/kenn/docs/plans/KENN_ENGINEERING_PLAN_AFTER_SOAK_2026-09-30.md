@@ -123,7 +123,18 @@ promotion only through the gate).
 
 | B2 | Settle the three pinned policy conflicts (bare "X to -N", "kill playback", "reverb on the vocal": device or send) and encode each with tests | S | Jack decides |
 | B3 | Grow the curated holdout from 24 toward 500: review the 481 drafted candidates; two people check each label; the sealed sets stay out of training | M plus review time | Jack and colleague |
-| B4 | Real-wording loop: verify the opt-in "requests KENN didn't understand" log in the installed app, then a weekly triage script that clusters the misses and proposes rule fixes | M | Testers (E2) |
+| B4 | Real-wording loop: verify the opt-in "requests KENN didn't understand" log in the installed app, then a weekly triage script that clusters the misses and proposes rule fixes | M | **Script done 30 Sept** on branch `kenn-wording-triage`; the real log needs testers (E2) |
+
+> **B4, 30 Sept** (branch `kenn-wording-triage`): the log the plan calls "not yet verified" **does exist** — it is
+> `core/asked_log.py`, writing `kenn/data/asked_log.jsonl` on every ask or refusal, with `setup_page.html:56` carrying
+> the opt-in wording. The catch: the opt-in is on the way **out**, not in — rows are written automatically and the
+> checkbox only decides whether they ride along in a diagnostics file. `triage_unparsed_requests.py` clusters on
+> `(signal, action)` plus a track-substitution probe that makes `needs_track` a real claim, ranks by size, and proposes
+> rule fixes as text for a human — it never edits the parser. It reconciles against the scorer's own counts rather
+> than duplicating scoring. 21 tests. Two things it surfaced that are worth more than the script: the top cluster
+> (`no_action/taste`, 8 rows, "make the drums slap") has **no measurable target**, so the honest proposal is a recipe
+> or a question, not a regex; and `add 2 dB to the reverb return` reports `insert_device` when it should be a send.
+
 | B5 | Multi-turn: "the other one" after KENN listed two matching tracks; corrections on device parameters; wrong-plan tests first | M | |
 | B6 | Two changes in one sentence and "adjust that": answer with buttons ("Do the first, then the second?") instead of a refusal | M | Frontend |
 | B7 | Planner: stays in shadow. Retrain (run 14) only when about 500 owner-labelled tester requests exist, and promote only through `live_llm_promotion.py` | hold | Tester data |
@@ -138,7 +149,24 @@ trust table (manual and Live measurements above notes above general advice).
 | ID | Task | Size | Needs |
 |---|---|---|---|
 | C1 | Ingest the Live manual locally: `download_training_pdfs.py` for Live 11, export Live 12 from Live's Help menu, rebuild with `--include-local-manuals`, qualify with `evaluate_ableton_manual_grounding.py`. PDFs stay in the git-ignored `Training_Data_PDF/`. Moves the index from 0 official-manual chunks and brings the "grounded in the authorized manual" path to life | S | Jack's decision (open in the North Star) |
-| C2 | Retrieval fixture to ≥ 300 questions with a **sealed half** nobody tunes on; baseline with `evaluate_retrieval_modes.py` | M | Review |
+| C2 | Retrieval fixture to ≥ 300 questions with a **sealed half** nobody tunes on; baseline with `evaluate_retrieval_modes.py` | M | **Built 30 Sept** on branch `kenn-sealed-fixture`; fixture awaiting Jack's review |
+
+> **C2, 30 Sept** (branch `kenn-sealed-fixture`): the **228-case sealed Qwen8b set was not split — it is burned.**
+> The North Star records it being scored four times to choose between wordings (0.338 / 0.417 / 0.386 / 0.447), so a
+> half of it would be development data too. Instead a **new 150-case sealed holdout** over 75 notes, marked
+> `"sealed": true` with a policy block. The marker is read from the file's **contents**, not its name, so renaming
+> cannot unseal it; `tooling/scripts/sealed_fixtures.py::tunable_cases()` refuses before reading a case, and two real
+> tuning paths go through it (`measure_use_it_when_lines.py`, `measure_chat_routing.py`). Verified by execution: the
+> guard raises on the holdout, and the holdout is still readable for scoring. Corpus split is now **303 tuned :
+> 150 sealed**. Also fixed: `evaluate_retrieval_modes.py` silently scored 225 of 228 and now prints every dropped case
+> and why, to stderr so stdout JSON stays clean. 19 tests.
+> **Two caveats, both his to close.** The holdout's baseline (**hybrid recall@4 0.42**, bm25 0.2933) was measured
+> against a *worktree* index (`v-db8c6334cf63`, 4,642 chunks), **not the live one** (`v-07328d9baf04`, 3,206 chunks),
+> so it must be re-measured before it is recorded; and 0.42 is higher than the 228's 0.333 for scoring-policy reasons,
+> not retrieval gains. Separately, **3 of the 228 are genuine retrieval questions lost to substring matching** in
+> `_expects_public_abstention` ("What setup **should I use**?" + "**mic**"; "**Wwise**"). Left alone because fixing it
+> changes scoring — it is his call.
+
 | C3 | Reranker decision: measure the cross-encoder on the box and on the Mac with Live open. Adopt only if sealed recall@4 gains ≥ 0.10 at ≤ 150 ms on the Mac | M | Mac, box |
 | C4 | "Use it when…" lines: Jack ticks the drafts, then `measure_use_it_when_lines.py` | S | Jack |
 | C5 | Parameter reference from Live's own displays after A3: `build_parameter_reference.py`, then `check_notes_against_measurements.py`; anything outside a measured range is fixed or drafted back | M | A3 |
@@ -181,7 +209,22 @@ the monthly measures.
 | ID | Task | Size | Needs |
 |---|---|---|---|
 | F1 | `sync_kenn_app.sh`: the monorepo-to-`kenn-app` sync as one command: split `products/kenn`, check the fast-forward, scan the new commits for secrets and attribution lines, run the CI script on a fresh worktree, then push. It does by script what was done by hand on 30 Sept | S–M | Done 30 Sept on branch `kenn-sync-script`; reaches `main` with the next release |
-| F2 | A monthly measures report: one command printing the North Star's list (understanding, answer quality, recall, latency by stage, unauthorised writes, undo success, how often the model's answer lands) and the two added on 28 Sept (answers with no citable source; grounding-gate rejections and why) | M | |
+| F2 | A monthly measures report: one command printing the North Star's list (understanding, answer quality, recall, latency by stage, unauthorised writes, undo success, how often the model's answer lands) and the two added on 28 Sept (answers with no citable source; grounding-gate rejections and why) | M | **Done 30 Sept** on branch `kenn-measures-report` |
+
+> **F2, 30 Sept** (branch `kenn-measures-report`): `tooling/scripts/monthly_measures.py` runs the **existing** evaluation
+> scripts and quotes their output verbatim — it never recomputes a measure, because a measure that quietly changes
+> definition is the "a gate quietly stops gating" failure this task exists to stop. On a fresh worktree it prints 13
+> measures in ~10 s (slowest `e2e_demo_commands.py`, 7.9 s) and **exits 2**, because one required-zero measure cannot
+> be measured with no retrieval index. Two traps it found and refuses to walk into: `evaluate_retrieval_modes.py`
+> with no index prints recall **0.0 and exits 0** (a green look for nothing), and `eval_chat_coverage.py` with no
+> index reports `found: false` on all 128 rows, so counting rows would give a confident **0 = PASS** on a retrieval
+> path that is not running. Both now report "not measured" with the reason. **Undo success reads 292 / 297 = 98.3%,
+> a FAIL against the North Star's "must be 100%"** — all 5 are "Track creation has no safe automatic inverse", so KENN
+> asks to undo rather than lose one. Reported, not gated, and it is a real gap in the number we claim.
+> Two bugs in its own draft were exactly the target failure and are now regression-tested: a fully unmeasured run
+> exited **0**, and both "could not count it" branches dropped the measure from the gate list entirely.
+> 18 tests. `docs/runbooks/MONTHLY_MEASURES_RUNBOOK.md`.
+
 | F3 | A personal-path gate for KENN like SLO's, and scrub the 52 files and 156 places that name a home path, the Live volume or the GPU host | M | **Done 30 Sept** on branch `kenn-path-gate`; reaches `main` with the next release |
 
 > **F3, 30 Sept** (branch `kenn-path-gate`): measured before touching anything, the plan's "52 files and 156 places"
