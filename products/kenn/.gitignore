@@ -152,3 +152,8 @@ apps/frontend/playwright-report/
 
 # Runtime LLM answer cache
 apps/backend/data/
+
+# Knowledge crawl output: per-source JSONL, the dedup manifest and the resume
+# state. Only tooling/scripts/knowledge_ingest/ is tracked; the crawled records
+# stay on this machine (see tooling/scripts/knowledge_ingest/README.md).
+local_data/

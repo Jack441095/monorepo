@@ -6,7 +6,7 @@ NATIVE_PYTHON ?= $(PYTHON)
 AUTOMIX_KERNEL_BUILD_DIR ?= /tmp/kenn-automix-kernels
 CMAKE ?= $(if $(wildcard /opt/homebrew/bin/cmake),/opt/homebrew/bin/cmake,cmake)
 
-.PHONY: demo-cache backend-test backend-dev native-build native-wheel automix-kernel-build frontend-install frontend-test frontend-build frontend-dev
+.PHONY: demo-cache backend-test backend-dev native-build native-wheel automix-kernel-build frontend-install frontend-test frontend-build frontend-dev knowledge-pilot knowledge-crawl-open
 
 demo-cache:
 	$(PYTHON) tooling/scripts/create_demo_slo_cache.py
@@ -43,3 +43,23 @@ frontend-build:
 
 frontend-dev:
 	cd apps/frontend && npm run dev
+
+# Provenance and short summaries from approved open sources. Raw pages and full
+# text stay in the ignored local_data/ tree; only the registry and the crawler
+# are tracked, so a source is added here only after its terms have been read.
+knowledge-pilot:
+	PYTHONPATH=tooling $(PYTHON) -m scripts.knowledge_ingest.crawler \
+		--source mit-ocw-music-technology \
+		--source cycling74-max-docs \
+		--source libretexts-understanding-sound \
+		--limit 5 --dry-run --output-dir /tmp/kenn-knowledge-pilot
+
+knowledge-crawl-open:
+	PYTHONPATH=tooling $(PYTHON) -m scripts.knowledge_ingest.crawler \
+		--source ableton-live-manual-12 \
+		--source ableton-help-tutorials \
+		--source mit-ocw-music-technology \
+		--source cycling74-max-docs \
+		--source libretexts-understanding-sound \
+		--source openlearn-sound-technology \
+		--output-dir local_data/knowledge_ingest

@@ -1,0 +1,131 @@
+{
+  "sources": [
+    {
+      "source_id": "ableton-live-manual-12",
+      "name": "Ableton Live 12 Reference Manual",
+      "publisher": "Ableton",
+      "tier": 1,
+      "seed_urls": [
+        "https://www.ableton.com/en/live-manual/12/",
+        "https://www.ableton.com/en/live-manual/12/mixing/",
+        "https://www.ableton.com/en/live-manual/12/live-audio-effect-reference/",
+        "https://www.ableton.com/en/live-manual/12/live-instrument-reference/",
+        "https://www.ableton.com/en/live-manual/12/max-for-live/"
+      ],
+      "allowed_prefixes": ["https://www.ableton.com/en/live-manual/12/"],
+      "license": "All rights reserved; metadata and short summaries only",
+      "terms_url": "https://www.ableton.com/en/legal/",
+      "raw_storage_allowed": false,
+      "max_pages": 200,
+      "delay_seconds": 2.0,
+      "follow_links": true
+    },
+    {
+      "source_id": "ableton-help-tutorials",
+      "name": "Ableton Help and Tutorials",
+      "publisher": "Ableton",
+      "tier": 1,
+      "seed_urls": [
+        "https://help.ableton.com/hc/en-us/sections/202237829-Tutorials",
+        "https://help.ableton.com/hc/en-us/sections/202549345-Features-and-Functions"
+      ],
+      "allowed_prefixes": ["https://help.ableton.com/hc/en-us/"],
+      "license": "All rights reserved; metadata and short summaries only",
+      "terms_url": "https://www.ableton.com/en/legal/",
+      "raw_storage_allowed": false,
+      "max_pages": 100,
+      "delay_seconds": 2.5,
+      "follow_links": true
+    },
+    {
+      "source_id": "mit-ocw-music-technology",
+      "name": "Music and Technology: Recording Techniques and Audio Production",
+      "publisher": "MIT OpenCourseWare",
+      "tier": 2,
+      "seed_urls": [
+        "https://ocw.mit.edu/courses/21m-380-music-and-technology-recording-techniques-and-audio-production-fall-2016/"
+      ],
+      "allowed_prefixes": ["https://ocw.mit.edu/courses/21m-380-music-and-technology-recording-techniques-and-audio-production-fall-2016/"],
+      "license": "CC BY-NC-SA 4.0; verify individual resource notices",
+      "terms_url": "https://ocw.mit.edu/pages/terms-of-use/",
+      "raw_storage_allowed": false,
+      "max_pages": 80,
+      "delay_seconds": 2.0,
+      "follow_links": true
+    },
+    {
+      "source_id": "openlearn-sound-technology",
+      "name": "Sound for music technology: An introduction",
+      "publisher": "The Open University OpenLearn",
+      "tier": 2,
+      "seed_urls": [
+        "https://www.open.edu/openlearn/science-maths-technology/engineering-technology/sound-music-technology-an-introduction"
+      ],
+      "allowed_prefixes": ["https://www.open.edu/openlearn/science-maths-technology/engineering-technology/sound-music-technology-an-introduction"],
+      "license": "CC BY-NC; third-party materials excluded; verify acknowledgements",
+      "terms_url": "https://www.open.edu/openlearn/about-openlearn/conditions-use",
+      "raw_storage_allowed": false,
+      "max_pages": 80,
+      "delay_seconds": 2.0,
+      "follow_links": true
+    },
+    {
+      "source_id": "openlearn-recording-sound",
+      "name": "Recording music and sound",
+      "publisher": "The Open University OpenLearn",
+      "tier": 2,
+      "seed_urls": [
+        "https://www.open.edu/openlearn/history-the-arts/recording-music-and-sound/content-section-0"
+      ],
+      "allowed_prefixes": ["https://www.open.edu/openlearn/history-the-arts/recording-music-and-sound/"],
+      "license": "CC BY-NC-SA 4.0; third-party materials excluded; verify acknowledgements",
+      "terms_url": "https://www.open.edu/openlearn/about-openlearn/conditions-use",
+      "raw_storage_allowed": false,
+      "max_pages": 80,
+      "delay_seconds": 2.0,
+      "follow_links": true
+    },
+    {
+      "source_id": "cycling74-max-docs",
+      "name": "Max and Max for Live documentation",
+      "publisher": "Cycling '74",
+      "tier": 1,
+      "seed_urls": ["https://cycling74.com/"],
+      "allowed_prefixes": ["https://cycling74.com/"],
+      "license": "Terms vary; metadata and short summaries only",
+      "terms_url": "https://cycling74.com/terms",
+      "raw_storage_allowed": false,
+      "max_pages": 100,
+      "delay_seconds": 2.5,
+      "follow_links": true
+    },
+    {
+      "source_id": "audio-production-course-manual",
+      "name": "Audio Production Course Manual",
+      "publisher": "Minnesota Libraries Publishing",
+      "tier": 2,
+      "seed_urls": ["https://mlpp.pressbooks.pub/audioproduction/"],
+      "allowed_prefixes": ["https://mlpp.pressbooks.pub/audioproduction/"],
+      "license": "CC BY-NC-SA 4.0; verify image and linked-resource notices",
+      "terms_url": "https://mlpp.pressbooks.pub/audioproduction/",
+      "raw_storage_allowed": false,
+      "max_pages": 100,
+      "delay_seconds": 2.0,
+      "follow_links": true
+    },
+    {
+      "source_id": "libretexts-understanding-sound",
+      "name": "Understanding Sound: From Ear to Engineer",
+      "publisher": "Pasadena City College / LibreTexts",
+      "tier": 2,
+      "seed_urls": ["https://human.libretexts.org/Courses/Pasadena_City_College/Understanding_Sound_From_Ear_to_Engineer/"],
+      "allowed_prefixes": ["https://human.libretexts.org/Courses/Pasadena_City_College/Understanding_Sound_From_Ear_to_Engineer/"],
+      "license": "CC BY-SA 4.0; verify page-level attribution and embedded media notices",
+      "terms_url": "https://human.libretexts.org/",
+      "raw_storage_allowed": false,
+      "max_pages": 100,
+      "delay_seconds": 2.0,
+      "follow_links": true
+    }
+  ]
+}
