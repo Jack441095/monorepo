@@ -65,3 +65,22 @@ def test_a_two_change_request_that_both_parse_still_makes_one_plan() -> None:
 ])
 def test_the_dropped_part_is_named_which_side_of_the_and_it_was_on(request_text: str, expected: str) -> None:
     assert expected in _ask(request_text)["answer"]
+
+def test_a_refusal_names_which_change_is_impossible_instead_of_claiming_none_was_caught() -> None:
+    """"lower the bass 2 dB and raise the vocal 1 dB": the Bass is fine, the vocal is at +0.00 dB and cannot rise."""
+    result = _ask("lower the bass 2 dB and raise the vocal 1 dB")
+    assert result["status"] == "clarification_required" and result["changed"] is False
+    answer = result["answer"]
+    assert "Lead Vocal" in answer and "raise the vocal 1 dB" in answer, answer
+    assert "didn't catch a change" not in answer, "the catch-all is wrong here: one change was understood"
+
+
+def test_the_catch_all_is_unchanged_for_a_request_that_is_not_a_change_at_all() -> None:
+    answer = _ask("make it sound like a purple spaceship")["answer"]
+    assert "didn't catch a change to make there" in answer
+    assert "Lead Vocal" not in answer
+
+
+def test_a_two_change_request_that_both_work_is_untouched_by_the_new_refusal() -> None:
+    result = _ask("turn the hats down 3 dB and the kick up 2 dB")
+    assert result["status"] == "confirmation_required" and "2 changes" in result["answer"]
