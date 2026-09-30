@@ -194,6 +194,16 @@
 > *"I can't set volume on Lead Vocal from \"raise the vocal 1 dB\" -- it is already where that would put
 > it."* Both halves are parsed to find that, so the reason is what the parser found rather than a guess.
 > 25 tests across the two B6 files; backend suite green at **2,462 passed, 125 skipped**.
+> **B6 now needs only the frontend, and the blocker is a broken card rather than missing data.** A two-step plan
+> currently renders an action card reading **"Track "**: `KennChatHistory.vue:80` passes any `proposal` to
+> `KennActionCard`, and `KennActionCard.vue:10` prints `track_name || "Track N"` — but a recipe proposal has
+> neither `track_name` nor `track_index`, verified 30 Sept. The plan text above it is correct, so a producer sees
+> a good sentence over an empty card with a working Apply button. Everything the buttons need is already in
+> the payload: each step carries `action_id`, `before`, `after`, `before_db`, `after_db`, `parameter`, `reason`
+> and `evidence`, so `Hi-Hats -14.0 dB -> -17.0 dB` can be shown per step. The work is a `KennRecipeCard.vue`
+> iterating `proposal.steps` plus a branch in `KennChatHistory` to prefer it when `proposal.action === 'recipe'`,
+> which fixes the empty card as a side effect. **Not written** — I cannot look at a browser, and landing a Vue
+> component on a claim that it renders is not something I will do unverified.
 > **B6 now needs only the frontend:** the two buttons. The payload exists — a two-step plan renders as
 > text with both steps and "Nothing has changed yet" — but the ambiguous case is not a dumb render,
 > because there the buttons are not "do the first, then the second" but "tell me the amount for the
