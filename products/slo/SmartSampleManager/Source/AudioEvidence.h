@@ -67,9 +67,14 @@ struct Record {
             return false;
         for (const auto& item : attributes)
             if (item.first.empty() || !item.second.isValid()) return false;
+        // item.second.valid is the field AudioSimilarity's measurementSimilarity
+        // actually gates on, so a record that omits it passes validation here
+        // and is then silently skipped by every consumer, contributing the
+        // count==0 fallback of 0.5 instead of its real measurement.
         for (const auto& item : measurements)
-            if (item.first.empty() || item.second.unit.empty()
-                || item.second.method.empty()) return false;
+            if (item.first.empty() || !item.second.valid
+                || item.second.unit.empty() || item.second.method.empty())
+                return false;
         return true;
     }
 };

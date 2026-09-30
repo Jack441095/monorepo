@@ -54,7 +54,14 @@ inline float cosineSimilarity(const std::vector<float>& a, const std::vector<flo
         bb += static_cast<double>(b[i]) * b[i];
     }
     if (aa <= 1e-12 || bb <= 1e-12) return 0.0f;
-    return clamp01(static_cast<float>((dot / std::sqrt(aa * bb) + 1.0) * 0.5));
+    // Straight cosine, clamped at zero. The old remap, (cos + 1) * 0.5, is the
+    // standard trick for plotting a similarity matrix, but as a similarity
+    // score it squashes the whole useful range into the top decile: unrelated
+    // PANNs embeddings sit around cos 0.0-0.3 and scored 0.50-0.65, while a
+    // genuine near-duplicate at cos 0.95 scored 0.975. Everything read as
+    // "very similar", and overallSimilarity() then averaged that against seven
+    // aspect scores that default to 0.5, so a random pair landed near 50%.
+    return clamp01(static_cast<float>(dot / std::sqrt(aa * bb)));
 }
 
 inline float measurementSimilarity(const SloAudioEvidence::Record& a,
