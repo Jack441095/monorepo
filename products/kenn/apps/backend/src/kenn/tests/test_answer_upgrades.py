@@ -47,3 +47,36 @@ def test_only_one_model_answer_is_written_at_a_time() -> None:
 
 def test_an_unknown_id_has_expired() -> None:
     assert answer_upgrades.get("nope") == {"status": "expired"}
+
+
+def test_every_attempt_leaves_a_timing_row_with_no_text(tmp_path, monkeypatch) -> None:
+    import json
+
+    from kenn.core import route_log
+
+    monkeypatch.setattr(route_log, "LOG", tmp_path / "routes.jsonl")
+    _wait(answer_upgrades.start(lambda: {"llm_enhanced": True, "answer": "secret question answer"}))
+    _wait(answer_upgrades.start(lambda: {"llm_enhanced": False, "answer": "template"}))
+
+    def broken():
+        raise TimeoutError("ollama")
+
+    _wait(answer_upgrades.start(broken))
+    time.sleep(0.05)
+    rows = [json.loads(line) for line in (tmp_path / "routes.jsonl").read_text().splitlines()]
+    assert sorted(row["route"] for row in rows) == ["answer_upgrade:accepted", "answer_upgrade:error", "answer_upgrade:rejected"]
+    assert all(set(row) == {"at", "route", "ms", "brain", "proposal"} for row in rows)
+    assert "secret" not in (tmp_path / "routes.jsonl").read_text()
+
+
+def test_the_landing_rate_and_time_are_read_from_the_log(tmp_path) -> None:
+    from kenn.core import route_log
+
+    log = tmp_path / "routes.jsonl"
+    for outcome, seconds in [("accepted", 9.0), ("accepted", 14.0), ("accepted", 11.0), ("rejected", 12.0), ("busy", 0.0), ("error", 3.0)]:
+        route_log.record(f"answer_upgrade:{outcome}", seconds * 1000, brain=outcome == "accepted", proposal=False, path=log)
+    route_log.record("production", 25.0, brain=False, proposal=False, path=log)
+    report = route_log.upgrade_summary(log)
+    assert report == {"attempts": 6, "accepted": 3, "rejected": 1, "error": 1, "busy": 1, "accepted_rate": 0.5,
+                      "accepted_p50_s": 11.0, "accepted_p95_s": 11.0}
+    assert route_log.upgrade_summary(tmp_path / "none.jsonl")["accepted_rate"] is None

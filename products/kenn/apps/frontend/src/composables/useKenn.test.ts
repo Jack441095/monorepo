@@ -172,6 +172,20 @@ describe('useKenn answer upgrades', () => {
     vi.useRealTimers()
   })
 
+  it('keeps the in-your-Live line when the model answer replaces the template', async () => {
+    vi.useFakeTimers()
+    mockedAsk.mockResolvedValue({
+      ...base, answer: 'Template answer.', answerUpgrade: { id: 'u3', pollMs: 500 },
+      raw: { your_set: { line: 'In your Live, built in: EQ Eight.' } },
+    })
+    mockedUpgrade.mockResolvedValueOnce({ status: 'accepted', answer: 'Fuller model answer.' })
+
+    await kenn.sendMessage('How do I EQ the bass?')
+    await vi.advanceTimersByTimeAsync(600)
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'Fuller model answer.\n\nIn your Live, built in: EQ Eight.' })
+    vi.useRealTimers()
+  })
+
   it('keeps the template when the model answer is rejected', async () => {
     vi.useFakeTimers()
     mockedAsk.mockResolvedValue({ ...base, answer: 'Template answer.', answerUpgrade: { id: 'u2', pollMs: 500 } })

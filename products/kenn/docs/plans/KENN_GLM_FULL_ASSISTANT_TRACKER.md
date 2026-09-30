@@ -151,6 +151,12 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 - [ ] **D1 Device qualification factory**
   > Coverage map 2026-09-24 (`KENN_DEVICE_COVERAGE_2026-09-24.md`, page https://claude.ai/artifact/XqhrDvQ8kDmzJwhpuNq2d9, `tooling/scripts/device_coverage.py`): Live 12.4.6 Suite has 78 devices. KENN knows 53 (own note) + 16 (mentioned), sees all 78, inserts 10 audio effects, sets 12 measured parameters on 9 devices. Qualify device by device (capture parameters from Live, measure units, generate per-parameter commands, run `e2e_demo_commands.py`); first wave: EQ Eight, Compressor, Utility, Limiter, Reverb/Hybrid Reverb, Delay/Echo.
   - [ ] Batch sweep → mapping fit → draft `DeviceUnitProfile` + evidence transcript
+    > 29 Sept (cloud session, no Live): the tooling exists and is tested against stand-ins, **0 devices measured or qualified**.
+    > `measure_all_devices.py` (sweep the open set) → `build_device_profiles.py` (candidates, chooser tables, coverage report)
+    > → `qualify_device_candidates.py` (three points per parameter against Live's own display strings, restore, write only
+    > what passes) → `core/device_profiles/*.json`, which `device_units.py` loads only with a passed qualification. Choosers
+    > and switches are set by label ("set the compressor model to RMS", "turn auto release on"). Runbook:
+    > `docs/runbooks/KENN_DEVICE_FACTORY.md`. The two ticks below stay open until a real Live run.
   - [ ] Owner sign-off queue
   - [ ] 20 profiles · [ ] 40 profiles · [ ] 60 profiles
   - [ ] 15 devices · [ ] 25 devices
@@ -228,6 +234,14 @@ the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 - [ ] **I1 Nightly real-Live regression** (top 50 commands + all recipes via the UI route; SLO report)
 - [ ] **I2 End-to-end benchmark** on the natural holdout, with a per-commit diff
 - [ ] **I3 Chaos suite:** Live killed mid-write, UDP drops, companion restart, stale or replayed tokens
+  > 29 Sept: `tests/test_chaos_live.py` (47 tests) injects faults at the Live boundary — a write Live refuses, times out on,
+  > acknowledges but never applies, or lands on another value; Live offline or changed by hand between proposal and
+  > Apply; a replayed, altered, unsigned, expired or pre-restart confirmation; an undo after the fader moved, or twice;
+  > a recipe that fails on step two. All end "not applied", with Live as it was. Found one real gap and fixed it: a write
+  > that landed on a value nobody asked for (Live clamping a fader, say) was reported as failed but left Live there.
+  > Track changes, sends and device parameters now put the old value back, check it, and say so; if the restore also
+  > fails the receipt says "requires inspection". Against a stand-in Live only; the same faults on real Live (Live
+  > killed mid-write, real UDP loss) still need a session, so the box stays open.
 - [ ] **I4 Per-route rate limits**
 
 ## Scorecard

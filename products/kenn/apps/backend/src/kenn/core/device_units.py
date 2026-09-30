@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import json
+import logging
 import math
+import os
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from math import isfinite, log
+from pathlib import Path
 from typing import Any
 
 
@@ -117,11 +122,129 @@ def normalize_unit(unit: str | None) -> str:
     }.get(value, value)
 
 
+PROFILES_DIR = Path(os.environ.get("KENN_DEVICE_PROFILES_DIR", str(Path(__file__).with_name("device_profiles")))).expanduser()
+_MAPPINGS = {"linear", "log", "table"}
+_UNITS = {"db", "hz", "ms", "%", "ratio"}
+MIN_QUALIFICATION_POINTS = 3
+
+
+def _profile_from_entry(device: str, entry: dict) -> DeviceUnitProfile | None:
+    """One profile from a data file, or None unless it carries a passed qualification and is internally consistent."""
+    qualification = entry.get("qualification")
+    if not (isinstance(qualification, dict) and qualification.get("status") == "passed"
+            and int(qualification.get("points") or 0) >= MIN_QUALIFICATION_POINTS and qualification.get("qualified_at")):
+        return None
+    mapping, unit = str(entry.get("mapping") or ""), normalize_unit(entry.get("unit"))
+    if mapping not in _MAPPINGS or unit not in _UNITS or not device or not entry.get("parameter"):
+        return None
+    try:
+        numbers = [float(entry[key]) for key in ("raw_min", "raw_max", "display_min", "display_max")]
+        raw_values = tuple(float(v) for v in entry.get("raw_values") or ())
+        display_values = tuple(float(v) for v in entry.get("display_values") or ())
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not all(isfinite(n) for n in [*numbers, *raw_values, *display_values]) or numbers[1] <= numbers[0]:
+        return None
+    if mapping == "table" and (len(raw_values) < 2 or len(raw_values) != len(display_values)):
+        return None
+    if mapping == "log" and (numbers[2] <= 0 or numbers[3] <= numbers[2]):
+        return None
+    return DeviceUnitProfile(device, str(entry["parameter"]), unit, *numbers, raw_values=raw_values,
+                             display_values=display_values, mapping=mapping)
+
+
+@lru_cache(maxsize=1)
+def qualified_profiles() -> tuple[DeviceUnitProfile, ...]:
+    """Profiles from device_profiles/*.json. A candidate without a passed qualification is never loaded."""
+    profiles: list[DeviceUnitProfile] = []
+    for path in sorted(PROFILES_DIR.glob("*.json")) if PROFILES_DIR.is_dir() else []:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            device = str(data.get("device") or "")
+            entries = data.get("profiles") or []
+        except (OSError, ValueError, AttributeError):
+            logging.getLogger("kenn.device_units").warning("Unreadable device profile file %s", path)
+            continue
+        for entry in entries:
+            profile = _profile_from_entry(device, entry) if isinstance(entry, dict) else None
+            if profile is not None:
+                profiles.append(profile)
+    return tuple(profiles)
+
+
+@dataclass(frozen=True)
+class DeviceChoice:
+    """A switch or chooser: the label Live shows for each raw value (e.g. Compressor "Model": 0 Peak, 1 RMS, 2 Expand)."""
+
+    device_name: str
+    parameter_name: str
+    options: tuple[tuple[float, str], ...]
+
+
+def _choice_from_entry(device: str, entry: dict) -> DeviceChoice | None:
+    qualification = entry.get("qualification")
+    if not (isinstance(qualification, dict) and qualification.get("status") == "passed"
+            and int(qualification.get("points") or 0) >= 2 and qualification.get("qualified_at")):
+        return None
+    try:
+        options = tuple((float(item["raw"]), str(item["label"]).strip()) for item in entry.get("options") or [])
+    except (KeyError, TypeError, ValueError):
+        return None
+    labels = [label.casefold() for _raw, label in options]
+    if not device or not entry.get("parameter") or len(options) < 2 or "" in labels or len(set(labels)) != len(labels):
+        return None
+    if not all(isfinite(raw) for raw, _label in options):
+        return None
+    return DeviceChoice(device, str(entry["parameter"]), options)
+
+
+@lru_cache(maxsize=1)
+def qualified_choices() -> tuple[DeviceChoice, ...]:
+    """Choosers from device_profiles/*.json; like profiles, only ones whose options were checked against Live's own labels."""
+    choices: list[DeviceChoice] = []
+    for path in sorted(PROFILES_DIR.glob("*.json")) if PROFILES_DIR.is_dir() else []:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            device, entries = str(data.get("device") or ""), data.get("choosers") or []
+        except (OSError, ValueError, AttributeError):
+            continue
+        choices += [c for entry in entries if isinstance(entry, dict) and (c := _choice_from_entry(device, entry))]
+    return tuple(choices)
+
+
+def find_choice(device_name: str, parameter_name: str) -> DeviceChoice | None:
+    for choice in qualified_choices():
+        if (choice.device_name.casefold() == str(device_name).strip().casefold()
+                and choice.parameter_name.casefold() == str(parameter_name).strip().casefold()):
+            return choice
+    return None
+
+
+def choice_label(choice: DeviceChoice, raw: object) -> str | None:
+    try:
+        value = float(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return next((label for option, label in choice.options if abs(option - value) < 1e-6), None)
+
+
+def all_profiles() -> tuple[DeviceUnitProfile, ...]:
+    """The hand-verified profiles first (they win on a clash), then the qualified data files."""
+    return EVIDENCE_BACKED_PROFILES + qualified_profiles()
+
+
+def reload_profiles() -> None:
+    qualified_profiles.cache_clear()
+    qualified_choices.cache_clear()
+
+
 def find_profile(device_name: str, parameter_name: str, unit: str | None) -> DeviceUnitProfile | None:
     normalized_unit = normalize_unit(unit)
     wanted = _canonical_parameter(device_name, parameter_name)
     # Echo shows "Dry Wet" while every other device shows "Dry/Wet"; both read the same control.
-    for profile in EVIDENCE_BACKED_PROFILES:
+    # all_profiles() also carries the qualified data files, so a measured
+    # profile wins over nothing while the hand-verified ones still come first.
+    for profile in all_profiles():
         if (
             profile.device_name.casefold() == str(device_name).strip().casefold()
             and _canonical_parameter(profile.device_name, profile.parameter_name).casefold() == wanted.casefold()
@@ -221,6 +344,11 @@ def raw_to_display(*, device_name: str, parameter_name: str, raw: float, unit: s
     profile = find_profile(device_name, parameter_name, unit)
     if profile is None:
         return None, "That display unit has no evidence-backed raw-value mapping for this Live parameter yet."
+    return profile_raw_to_display(profile, raw)
+
+
+def profile_raw_to_display(profile: DeviceUnitProfile, raw: float) -> tuple[float | None, str | None]:
+    """What a profile predicts Live will display at a raw value (also used to test a candidate before it is loaded)."""
     try:
         raw_value = float(raw)
     except (TypeError, ValueError):
@@ -308,4 +436,6 @@ def display_text(device_name: str, parameter_name: str, unit: str, raw: Any) -> 
     return f"{value:.1f} {label}" if label != "%" else f"{value:.0f}%"
 
 
-__all__ = ["DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "display_text", "display_to_raw", "find_profile", "normalize_unit", "raw_to_display"]
+__all__ = ["DeviceChoice", "DeviceUnitProfile", "EVIDENCE_BACKED_PROFILES", "all_profiles", "choice_label", "display_text", "display_to_raw",
+           "find_choice", "find_profile", "normalize_unit", "profile_raw_to_display", "qualified_choices", "qualified_profiles",
+           "raw_to_display", "reload_profiles"]

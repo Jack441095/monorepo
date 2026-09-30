@@ -32,5 +32,5 @@ checked out in the (dirty, ahead-of-pin) working tree.
 **Not covered by this receipt:** the `automix/` and `chat/` boundaries were
 not re-verified against an isolated clone in this pass (`chat/` already has
 a documented Dockerfile-based build; `automix/` is out of beta scope per
-`BETA_SCOPE.md` and remains untested against a clean checkout — tracked as
+`docs/plans/KENN_BETA_PLAN_2026-09-24.md` and remains untested against a clean checkout — tracked as
 the remaining half of BB-7).

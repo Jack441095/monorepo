@@ -317,6 +317,19 @@ def _signature(state: dict[str, Any]) -> dict[str, int] | None:
     return {"numerator": int(numerator), "denominator": int(denominator)}
 
 
+def _describe_value(action: str, value: Any) -> str:
+    """A track or send value the way a producer reads it, for messages about what Live did."""
+    if isinstance(value, bool):
+        return "on" if value else "off"
+    if isinstance(value, (int, float)):
+        if action == "set_volume":
+            db = volume_law.raw_to_db(float(value))
+            return f"{db:.1f} dB" if db is not None and math.isfinite(db) else "-inf dB"
+        if action == "set_pan":
+            return "centre" if abs(value) < 0.005 else f"{abs(value) * 100:.0f}% {'left' if value < 0 else 'right'}"
+        if action in SUPPORTED_SEND_ACTIONS:
+            return f"{value * 100:.0f}%"
+    return f"'{value}'" if isinstance(value, str) else str(value)
 def _values_match(expected: Any, actual: Any) -> bool:
     if isinstance(expected, bool) or isinstance(actual, bool):
         return expected is actual
@@ -3121,6 +3134,10 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 readback_display = str(display["value_string"])
         readback_matches = _values_match(readback, requested)
         verified = readback_matches
+        # Live landed on a value nobody asked for: put the old one back and check it, as track changes do.
+        restore = None
+        if not verified and readback is not None and not _values_match(readback, before):
+            restore = self._restore_device_parameter(track_index, device_index, parameter_index, before)
         write_acknowledgement = "confirmed" if write_ok else (
             "unacknowledged_write_reconciled" if readback_matches else "not_confirmed"
         )
@@ -3154,6 +3171,8 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "before_value": before,
             "requested_value": requested,
             "readback_value": readback,
+            **({"restore": restore} if restore else {}),
+            **({"retry_safe": "requires_inspection"} if restore and not restore.get("restored") else {}),
             "write_exchange": write_exchange,
             "readback_exchange": readback_exchange,
             "undo_payload": {
@@ -3172,8 +3191,25 @@ class LiveActionService(Tier2Tier3ControlMixin):
             error = "Live device write was sent but read-back verification failed."
             if write_error:
                 error = f"Live device write acknowledgement was lost and read-back did not confirm the requested value: {write_error}"
+            if restore:
+                name = str(proposal.get("parameter", "that control"))
+                error = (
+                    f"Live set {name} to {readback:g} instead of {requested:g}, so I put it back to {before:g} and checked it. Nothing else changed."
+                    if restore.get("restored")
+                    else f"Live set {name} to {readback:g} instead of {requested:g}, and I couldn't put it back to {before:g}. Check that control in Live."
+                )
             return {"ok": False, "error": error, "receipt": receipt}
         return {"ok": True, "receipt": receipt}
+
+    def _restore_device_parameter(self, track_index: int, device_index: int, parameter_index: int, before: Any) -> dict[str, Any]:
+        try:
+            self.client.set_device_parameter(track_index, device_index, parameter_index, float(before))
+            info = self.client.get_device_parameters(track_index, device_index)
+            now = next((item for item in info.get("parameters", []) if isinstance(item, dict) and int(item.get("index", -1)) == parameter_index), None)
+            value = now.get("value") if now else None
+        except Exception as exc:
+            return {"attempted": True, "restored": False, "error": str(exc)}
+        return {"attempted": True, "restored": value is not None and _values_match(value, before), "readback": value}
 
     def execute_eq_band_tuning_gain(
         self,
@@ -4167,6 +4203,12 @@ class LiveActionService(Tier2Tier3ControlMixin):
         readback_matches = _values_match(readback, proposal.get("after"))
         state_change_expected = not _values_match(proposal.get("before"), proposal.get("after"))
         verified = readback_matches and (write_ok or state_change_expected)
+        # Live can land on a value nobody asked for (it clamps, rounds, or trims a name). That is a failed change,
+        # but it must not also leave the set in that state: put the old value back and check that it took.
+        restore = None
+        if (not verified and readback is not None and not _values_match(readback, proposal.get("before"))
+                and (action in SUPPORTED_TRACK_ACTIONS or action in SUPPORTED_SEND_ACTIONS)):
+            restore = self._restore_after_unrequested_value(action, proposal)
         write_acknowledgement = "confirmed" if write_ok else (
             "unacknowledged_write_reconciled" if readback_matches else "not_confirmed"
         )
@@ -4185,6 +4227,7 @@ class LiveActionService(Tier2Tier3ControlMixin):
             "readback": readback,
             "write_acknowledgement": write_acknowledgement,
             **({"write_error": write_error} if write_error else {}),
+            **({"restore": restore} if restore else {}),
             "write_exchange": write_exchange,
             "readback_exchange": readback_exchange,
             "undo": (
@@ -4193,7 +4236,10 @@ class LiveActionService(Tier2Tier3ControlMixin):
                 else {"proposal": {**proposal, "before": proposal.get("after"), "after": proposal.get("before")}}
             ),
             "correlation_id": correlation_id,
-            "retry_safe": classify_retry_safety(verified=verified, status="applied" if verified else "failed_verification"),
+            "retry_safe": (
+                "requires_inspection" if restore and not restore.get("restored")
+                else classify_retry_safety(verified=verified, status="applied" if verified else "failed_verification")
+            ),
             "stage_timings_ms": timer.as_ms(),
         }
         _RECEIPTS[receipt["receipt_id"]] = receipt
@@ -4201,8 +4247,40 @@ class LiveActionService(Tier2Tier3ControlMixin):
             error = "Live write was sent but readback verification failed."
             if write_error:
                 error = f"Live write acknowledgement was lost and readback did not confirm the requested state: {write_error}"
+            if restore:
+                wanted, got, was = (_describe_value(action, value) for value in (proposal.get("after"), readback, proposal.get("before")))
+                error = (
+                    f"Live ended up at {got} instead of {wanted}, so I put it back to {was} and checked it. Nothing else changed."
+                    if restore.get("restored")
+                    else f"Live ended up at {got} instead of {wanted}, and I couldn't put it back to {was}. Check that control in Live."
+                )
             return {"ok": False, "error": error, "receipt": receipt}
         return {"ok": True, "receipt": receipt}
+
+    def _restore_after_unrequested_value(self, action: str, proposal: dict[str, Any]) -> dict[str, Any]:
+        """Write the pre-change value back and read it again; report whether Live is where it started."""
+        before, track_index = proposal.get("before"), int(proposal["track_index"])
+        try:
+            if action in SUPPORTED_SEND_ACTIONS:
+                return_index = int(proposal["return_track_index"])
+                self.client.set_track_send(track_index, return_index, float(before))
+                now = self.client.get_track_send(track_index, return_index)
+                value = round(float(now), 6) if now is not None else None
+            else:
+                writers = {
+                    "set_volume": lambda: self.client.set_track_volume(track_index, float(before)),
+                    "set_pan": lambda: self.client.set_track_pan(track_index, float(before)),
+                    "set_mute": lambda: self.client.set_track_mute(track_index, bool(before)),
+                    "set_solo": lambda: self.client.set_track_solo(track_index, bool(before)),
+                    "set_arm": lambda: self.client.set_track_arm(track_index, bool(before)),
+                    "rename_track": lambda: self.client.set_track_name(track_index, str(before)),
+                }
+                writers[action]()
+                track, _ = _find_track(self.snapshot(), track_index, "")   # by index: a rename changes the name
+                value = track.get(SUPPORTED_TRACK_ACTIONS[action][0]) if track else None
+        except Exception as exc:
+            return {"attempted": True, "restored": False, "error": str(exc)}
+        return {"attempted": True, "restored": value is not None and _values_match(value, before), "readback": value}
 
 
     def propose_gain_staging(

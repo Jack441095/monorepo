@@ -4,7 +4,7 @@
 
 This plan supersedes the beta parts of `KENN_BETA_SPRINT_PLAN_2026-09-06.md`, `KENN_BETA_PLUS_PLAN_2026-09-07.md`,
 `KENN_BETA_ROADMAP.md` and `BETA_SCOPE.md` (whose 1 Sept scope, chat and Mix Review only with no Live control, no longer
-describes KENN). The GLM tracker (`KENN_GLM_FULL_ASSISTANT_TRACKER.md`) stays the log for the wider programme.
+describes KENN). Those files were removed on 29 Sept; git history has them. The GLM tracker (`KENN_GLM_FULL_ASSISTANT_TRACKER.md`) stays the log for the wider programme.
 
 ## What the beta is
 

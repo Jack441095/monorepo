@@ -1,11 +1,10 @@
 # KENN north star: an expert production partner inside Ableton Live
 
-**Written:** 2026-09-24 · **Owner:** Jack · **Status:** proposal for owner sign-off
+**Written:** 2026-09-24 · **Owner:** Jack · **Status:** proposal for owner sign-off (brain decided 25 Sept: local only)
 
-The long-term plan for KENN's intelligence. It merges the three GLM plans
-(`KENN_GLM_MEGA_PLAN.md`, `KENN_GLM_ROADMAP_2026-09-21.md`, `KENN_GLM_ABLETON_ASSISTANT_PLAN_2026-09-22.md`) and the
-frontier plan (`KENN_FRONTIER_PLAN.md`) into one direction. Those stay as reference; this doc decides the order.
-Stage 0 is the private beta (`KENN_BETA_PLAN_2026-09-24.md`). The GLM tracker stays the working log. Tick items here
+The long-term plan for KENN's intelligence. It merged the earlier GLM, frontier and beta plans into one direction, and
+those older plan files were removed on 29 Sept so this is the one place that decides the gates (they are in git
+history). `KENN_MEGA_PLAN_2026-09-29.md` sets the order of the work. Stage 0 is the private beta (`KENN_BETA_PLAN_2026-09-24.md`). The GLM tracker stays the working log. Tick items here
 in the same commit as the work, with the date and the evidence.
 
 ## What KENN becomes
@@ -29,8 +28,8 @@ inside KENN's safety model.
    confirmation, OSC writes, readback, receipts and undo. A model never writes to Live directly.
 2. **Every claim is sourced or measured:** notes and the manual for knowledge, Live reads for session facts, analysis for
    audio. Answers cite; unknowns are said out loud.
-3. **Private by default:** audio never leaves the Mac. Anything sent to a hosted model is text the user can see, and
-   hosted use is opt-in.
+3. **Private by default:** audio never leaves the Mac, and neither does any text. The brain is a local model (owner
+   decision, 25 Sept); there is no hosted provider.
 4. **Promotion by evidence:** a model or a capability moves up (shadow → propose → default) only through a measured gate,
    never because it demos well.
 5. **One product:** browser companion and the AU/VST3 plug-in share one backend and one set of receipts.
@@ -56,10 +55,10 @@ KENN uses three kinds of model, each where it is strongest:
 | Job | Model | Why |
 |---|---|---|
 | Clear commands ("hats down 2 dB") | Rule parser, then the small local planner | Instant, offline, exact |
-| Conversation, explanation, multi-step reasoning | **The brain: decision below** | Needs broad knowledge and real reasoning |
+| Conversation, explanation, multi-step reasoning | **The brain: local Qwen3 8B** (decision below) | Needs broad knowledge and real reasoning |
 | Drafting knowledge notes, labelling training data | Box models (GPU notes model) | Cheap, offline, reviewed before use |
 
-Options for the brain:
+Options that were weighed (25 Sept: the owner chose A, local only):
 
 | Option | Strengths | Costs and risks |
 |---|---|---|
@@ -67,14 +66,11 @@ Options for the brain:
 | **B. Hosted frontier model** (e.g. Claude through the API, with KENN's tools and retrieval) | Best reasoning and conversation now; improves without our training | Per-use cost; needs internet; privacy and terms review; latency depends on the network |
 | **C. Hybrid (recommended)** | B for conversation and planning when online and opted in; A-class local model for private or offline use and commands | Two paths to test; a router decides |
 
-**Recommendation: C, hybrid.** KENN's value is its tools, knowledge and safety model, and those stay the same whichever
-brain drives them. Starting hosted gets real conversational quality in front of testers quickly; the local path keeps
-KENN private-first and gives a fallback. KENN's model layer already supports local Ollama and OpenAI-compatible hosted
-endpoints; a hosted Claude provider would be added the same way.
-
-**Decide before Stage 1 (owner):** hosted provider and budget per tester per month; whether hosted is on by default or
-opt-in (recommend opt-in); what may be sent (recommend: the question, retrieved note excerpts and a session summary;
-never audio, never file paths).
+**Decision (owner, 25 Sept): A, local Qwen only.** KENN's value is its tools, knowledge and safety model, and those stay
+the same whichever brain drives them. Nothing leaves the Mac: no hosted model, no hosted budget, no opt-in to design.
+The model layer's OpenAI-compatible endpoint stays in the code but is not used. Qwen3 8B was picked on 25 Sept (see
+Stage 1). The cost of this choice is speed: on a 16 GB Mac with Live open the 8B is too slow for chat, so chat shows
+the template first and swaps the model's answer in when it is ready.
 
 ## Stages
 
@@ -119,6 +115,10 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > 28 Sept: Prompt token footprint reduced by >50% via `_clean_chunk_for_synthesis` and concise excerpt extraction in
   > `llm_rewrite.py` (KENN_LLM_CONTEXT_CHARS=650, KENN_LLM_DRAFT_CHARS=300), bringing token footprint to <= 450 tokens
   > with compact system prompt, cutting Apple Silicon prompt read latency from ~18 s to ~6 s. All 2,187 backend tests pass.
+  > 29 Sept: "template now, the model's answer when it's ready" exists as `core/answer_upgrades.py`
+  > (`KENN_LLM_BACKGROUND=1`): the reply carries the template and an `answer_upgrade` id, the full answer pipeline runs
+  > once in the background, and the app swaps the text in only if the grounding check accepted it. This note has no
+  > Mac timing for it yet, so the item stays open until there is one (how often the swap lands, and after how long).
 - [x] One router: rule parser → local planner → brain; every route logged with timing
   > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
   > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,
@@ -144,6 +144,13 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > release to 100 ms", "make the attack 15 ms", "ratio 4:1", "lower threshold by 3 dB") and "no, the other one"
   > pair/sibling resolution (e.g. Lead Vocal <-> Backing Vocal) while preserving clarification when ambiguous. Full test
   > suite passes 100%.
+  > 29 Sept: two tracks at once works — "do that on the snare and the kick" (also "same for…", "the opposite on…",
+  > "and the kick and the synth too", up to four tracks) is one confirmable recipe with a step per track, each relative
+  > change taken from that track's own level. The same track again, a repeated name, or five tracks still ask.
+  > "no, the other one" still can't be resolved (there is no exact identity to move to), but it now says what the last
+  > change was and how to name the track; "no, the snare and the kick" says to use "do that on the snare and the kick".
+  > What's left for this item: "the other one" after KENN listed exactly two matching tracks, and how well any of this
+  > holds up with a model in the loop.
 - [x] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
   > 25 Sept: checked. The brain writes prose only; it has no Live access. Live changes run only in
   > `handle_command` with a confirmed proposal; a model plan must pass `validate_llm_plan` (typed actions, exact
@@ -174,6 +181,13 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > 28 Sept: Curated 505 phrasings holdout evaluated with `score_natural_phrasings.py`: **494 / 505 right (97.8%)**, 11 asked,
   > **0 wrong plans**. Fixed mid-sentence corrections ("wait no", inline params), track rename ("call"), "slo" typo,
   > compressor shorthand, and back-off threshold phrasings. Gate accuracy requirement (≥ 95% on ≥ 500 phrasings) exceeded.
+  > 29 Sept, round 5 (`docs/evidence/KENN_BLIND_PHRASINGS_2026-09-29.md`): 146 new phrasings written before scoring, in a
+  > new register. First run **69.2%** right, 3 wrong (**76.7%, 1 wrong** after I corrected 10 labels that
+  > ignored product rules, e.g. Limiter isn't insertable and the vocal is already at 0 dB). The wrong plan that mattered:
+  > "kill the send from bass to delay" proposed **muting the Bass**. Fixed by group (spoken minus, `@`, "3 more dB",
+  > "swing the snare 15% right", "feed X into the reverb", markers with a colon, and so on), 34 tests; all earlier sets
+  > rescored with no new wrong plan. The new set is now development data (143/146), so the blind number stays ~70–77%.
+  > Two pinned policies conflict with the labelling rules ("lead vocal to -4" and "kill playback" both ask): owner call.
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
@@ -190,17 +204,39 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > contradicts the plan's own trust table. Ingest it with a catalog entry of category `ableton` and "manual"
   > in the tags, then re-run the retrieval gate: the describe-it fixtures should improve, and the manual's own
   > paragraph text will satisfy `has_manual_subject_overlap`.
+  > 29 Sept (cloud session, no Live): the pipeline after the measurement is built. `measure_device_parameters.py` →
+  > `tooling/data/measured_devices/<device>.json` → `build_parameter_reference.py --out <notes>` writes
+  > `measured-<device>-<n>.md` (12 parameters a note; ranges, mappings and options exactly as Live displayed them; drafts
+  > until `--approve`), which the index labels as the top tier and the note check reads back. 0 of 78 devices are measured
+  > yet: that needs Live open (10 parameters on 9 devices are covered by the existing profiles). "What it does" still
+  > comes from the manual notes; nothing here writes prose about a parameter.
 - [ ] Notes for how things are done: gain staging, bus processing, sidechain, arrangement moves, genre conventions;
       drafted on the GPU notes model, checked automatically against sources, reviewed before approval
 - [x] Grounded in the user's own setup: installed devices, packs and third-party plug-ins read from Live, so advice
       names what they actually have
   > 28 Sept: Implemented in `core/session_intelligence.py`. Bounded `present_devices` extracted across all active session
   > tracks and return buses from Live snapshots, exposing exact installed device names to advice generators and chat.
-- [x] Contradiction checks and source tiers (manual and measured data above notes, notes above general advice)
+  > 29 Sept (cloud session, tested on a made-up Mac layout, not yet on a real one): `core/installed_devices.py` reads names
+  > only, from disk — Live's built-in devices from the app bundle, saved racks from the User Library (via `Library.cfg`),
+  > packs from Factory Packs, plug-ins from the VST3/Audio Unit/VST folders. When the page sends `ground_in_set` (the
+  > chat does now) and a knowledge answer found a source, a question about EQ, compression, limiting, reverb, delay or
+  > saturation gets one extra factual line: "In your Live, built into …; plug-ins whose names match: …; your saved racks:
+  > …; already on your tracks: …". A plug-in's family is a guess from its name and the line says so. Nothing is loaded and
+  > nothing leaves the Mac. Not covered: parameters of third-party plug-ins, pack devices inside packs, and Live's own
+  > browser view (AbletonOSC has search but no listing). Check on the Mac: ask "how do I EQ a vocal?" in the app.
+- [ ] Contradiction checks and source tiers (manual and measured data above notes, notes above general advice)
   > 28 Sept: Verified in `test_source_tiers_and_contradictions.py` (8/8 pass) and `test_retrieval_evidence_classes.py` (14/14 pass).
   > Enforces strict source hierarchy (official manual/measurements 1.0 > curated notes 0.9 > transcripts 0.7), dynamic trust adaptation
   > with citations and user corrections, measurement mismatch detection across notes and user corrections, draft demotion on
   > conflict resolution (primary_a / primary_b), and index rebuild gating via `KENN_MAX_CONTRADICTIONS`.
+  > 29 Sept (cloud session, no notes or Live here): built and tested on synthetic notes, not yet run on the real 77.
+  > Tiers: `core/source_tiers.py` orders measured Live data > Ableton manual > KENN note > third-party; every cited source
+  > in a chat answer now carries `tier` and `tier_label`; only a generated `measured-*.md` note with a `Measured at:` date
+  > can claim the measured tier. Check: `knowledge/measured_facts.py` compares numbers in approved notes with the ranges
+  > Live measured (the 10 device profiles now, plus any `tooling/data/measured_devices/*.json` from
+  > `measure_device_parameters.py`); a note outside the range becomes a `note_vs_measured` contradiction with the
+  > measurement winning, and retires when the note is fixed. Next: run
+  > `tooling/scripts/check_notes_against_measurements.py` on the Mac against the real notes; the item stays open until then.
 - [ ] **Gate:** retrieval recall@4 ≥ 0.95 on a fixture grown to ≥ 300 questions; answer accuracy ≥ 90% on a
       parameter-level quiz scored by reviewers; no uncited factual claims in a 100-answer audit
   > 28 Sept: Parameter quiz test built in `test_device_parameter_quiz.py` (4/4 pass). Verifies evidence-backed device profiles
@@ -498,7 +534,7 @@ promotion, and a promotion that regresses is rolled back (the index keeps the pr
 
 Understanding (natural phrasings), answer quality (reviewer scores), retrieval recall, latency by stage (planning,
 OSC round trip, readback, analysis), unauthorised writes (must be zero), undo success (must be 100%), tester
-satisfaction, and hosted cost per tester.
+satisfaction, and how often the local model's answer lands (and how long it takes) on each tester's Mac.
 
 Two more, added 28 Sept after the audit, because both failures were invisible until they were counted:
 
@@ -512,7 +548,7 @@ Two more, added 28 Sept after the audit, because both failures were invisible un
 
 | Risk | Mitigation |
 |---|---|
-| Hosted model cost or terms change | Router with a local fallback; per-tester budget; cost in the monthly report |
+| Local model too slow or too weak on testers' Macs | Templates as the instant path; model answer swapped in when ready; measure the swap rate and wait per Mac |
 | Latency makes KENN feel slow | Route clear commands to the instant path; stream answers; measure by stage |
 | Knowledge errors with confident tone | Source tiers, citations, contradiction checks, reviewer audits |
 | Scope creep before the beta is solid | Stage 0 exit first; later stages start only behind their own gates |
@@ -524,7 +560,7 @@ Two more, added 28 Sept after the audit, because both failures were invisible un
 
 ## Decisions needed from you
 
-- [ ] Sign off this direction (hybrid brain, stages in this order)
+- [ ] Sign off this direction (local Qwen brain, stages in this order)
 - [x] Brain provider: local Qwen only (owner, 25 Sept) — no hosted budget or opt-in needed
 - [x] What may be sent to a hosted model: nothing — no hosted model (owner, 25 Sept)
 - [ ] Whether Stage 2's craft notes should cover specific genres first (which?)

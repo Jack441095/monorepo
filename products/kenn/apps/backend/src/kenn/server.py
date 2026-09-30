@@ -613,6 +613,7 @@ from kenn.core.chat_context import (
     stored_mix_review_evidence as _stored_mix_review_evidence,
     attach_explicit_audio_evidence as _attach_explicit_audio_evidence,
     ableton_session_context_turn as _ableton_session_context_turn,
+    attach_your_set,
 )
 
 
@@ -3028,6 +3029,8 @@ class Handler(BaseHTTPRequestHandler):
                     upgrade_id = answer_upgrades.start(lambda: answer_payload(question, limit=limit, history=history))
                     if upgrade_id:
                         result["answer_upgrade"] = {"id": upgrade_id, "poll_ms": 2000}
+                    else:
+                        answer_upgrades.log_outcome("busy", 0.0)   # the model was still writing the last answer
                 else:
                     result = answer_payload(
                         question, limit=limit, history=history, session_id=session_id,
@@ -3036,6 +3039,8 @@ class Handler(BaseHTTPRequestHandler):
                 _answer_ms = (time.perf_counter() - _t_answer) * 1000
                 if plugin_turn:
                     result["live_mix_context"] = plugin_context
+                if payload.get("ground_in_set") is True:
+                    result = attach_your_set(result, question)
                 result = _attach_explicit_audio_evidence(
                     result,
                     review_id=mix_review_id,

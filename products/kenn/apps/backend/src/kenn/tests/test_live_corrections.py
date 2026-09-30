@@ -89,3 +89,22 @@ def test_other_one_moves_to_paired_track_when_clear(monkeypatch, tmp_path) -> No
     assert result["proposal"]["track_name"] == "Backing Vocal"
     assert result["context_resolution"]["resolution"] == "correction"
 
+
+
+def test_the_other_one_says_what_the_last_change_was_and_how_to_name_the_track(live) -> None:
+    live("Bring the bass down 2 dB")
+    answer = live("no, the other one")["answer"]
+    assert "Bring the bass down 2 dB" in answer and "no, the snare" in answer and "Nothing changed" in answer
+
+
+def test_a_correction_naming_two_tracks_points_at_the_follow_up_wording(live) -> None:
+    live("Bring the bass down 2 dB")
+    answer = live("no, the snare and the kick")["answer"]
+    assert "do that on the snare and the kick" in answer and "Nothing changed" in answer
+
+
+@pytest.mark.parametrize("text", ["wait, what about kick and snare", "actually mute the kick and the snare", "no, the tambourine and the kick"])
+def test_only_a_list_of_real_tracks_gets_the_two_track_help(live, text) -> None:
+    # Regression (review, 29 Sept): any short "no/actually/wait ..." with an "and" got "Nothing changed. Say 'do that on ...'".
+    live("Bring the bass down 2 dB")
+    assert "do that on" not in live(text)["answer"]

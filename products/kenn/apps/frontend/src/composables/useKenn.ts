@@ -217,7 +217,7 @@ void refreshSessionCard()
 const UPGRADE_WAIT_MS = 90_000
 
 /** Swap in the model's answer once KENN has accepted it; the template stays if it's rejected or never arrives. */
-async function waitForUpgrade(messageId: string, upgradeId: string, pollMs: number) {
+async function waitForUpgrade(messageId: string, upgradeId: string, pollMs: number, suffix = '') {
   const settle = (patch: Partial<KennAssistantMessage>) => {
     const msg = messages.value.find((m) => m.id === messageId) as KennAssistantMessage | undefined
     if (!msg) return
@@ -235,7 +235,7 @@ async function waitForUpgrade(messageId: string, upgradeId: string, pollMs: numb
     }
     if (result.status === 'pending') continue
     if (result.status === 'accepted' && result.answer) {
-      settle({ text: result.answer, upgraded: true, ...(result.sources?.length ? { sources: result.sources } : {}) })
+      settle({ text: `${result.answer}${suffix}`, upgraded: true, ...(result.sources?.length ? { sources: result.sources } : {}) })
       return
     }
     break
@@ -285,7 +285,11 @@ async function sendMessage(text: string) {
         undoOfReceiptId: proposal && raw?.undo_of_receipt_id ? String(raw.undo_of_receipt_id) : undefined,
       },
     ]
-    if (answerUpgrade && !proposal) void waitForUpgrade(assistantId, answerUpgrade.id, answerUpgrade.pollMs)
+    if (answerUpgrade && !proposal) {
+      // The "in your Live" line was added to the template answer; the model's answer doesn't have it, so carry it across.
+      const yourSetLine = (raw?.your_set as { line?: unknown } | undefined)?.line
+      void waitForUpgrade(assistantId, answerUpgrade.id, answerUpgrade.pollMs, yourSetLine ? `\n\n${String(yourSetLine)}` : '')
+    }
   } catch (e) {
     const msg = userFacingKennError(
       e,

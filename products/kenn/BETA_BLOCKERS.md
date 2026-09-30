@@ -1,6 +1,6 @@
 # KENN Internal Beta — Blocker Register
 
-Updated after each completed work package. See `BETA_SCOPE.md` for the frozen scope these blockers gate.
+Updated after each completed work package. See `docs/plans/KENN_BETA_PLAN_2026-09-24.md` for the frozen scope these blockers gate.
 
 | ID | Blocker | Severity | Owner action needed | Status |
 |---|---|---|---|---|

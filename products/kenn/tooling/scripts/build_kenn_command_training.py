@@ -214,6 +214,8 @@ NATURAL_HOLDOUTS = (
     REPO_ROOT / "tooling" / "data" / "natural_blind_qwen8b_otherdaw.jsonl",
     REPO_ROOT / "tooling" / "data" / "natural_blind_qwen8b_beginner.jsonl",
     REPO_ROOT / "tooling" / "data" / "natural_blind_qwen8b_esl.jsonl",
+    REPO_ROOT / "tooling" / "data" / "natural_blind_drafted_2026-09-29.jsonl",
+    REPO_ROOT / "tooling" / "data" / "natural_blind_drafted_round6_2026-09-29.jsonl",
 )
 
 

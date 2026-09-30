@@ -1,0 +1,2435 @@
+{
+ "schema": "kenn.natural_phrasing_score.v1",
+ "model": null,
+ "counts": {
+  "asked": 42,
+  "right": 101,
+  "wrong": 3
+ },
+ "rows": [
+  {
+   "id": "blind-cl-000",
+   "query": "get the kick sitting around minus 9",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.62495,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-001",
+   "query": "lead vocal to -4 please",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Lead Vocal",
+   "want": 0.75,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-002",
+   "query": "I'd like the synth at -20 dB, thanks",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.36,
+   "got": {
+    "action": "set_volume",
+    "track": "Synth",
+    "device": null,
+    "value": 0.36,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-003",
+   "query": "set bass level -11",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.57495,
+   "got": {
+    "action": "set_volume",
+    "track": "Bass",
+    "device": null,
+    "value": 0.57495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-004",
+   "query": "hats @ -17dB",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.42495,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Hi-Hats at -17 dB, or 17 dB quieter than it is now? Say \"set Hi-Hats to -17 dB\" or \"turn Hi-Hats down 17 dB\"."
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Hi-Hats at -17 dB, or 17 dB quieter than it is now? Say \"set Hi-Hats to -17 "
+  },
+  {
+   "id": "blind-cl-005",
+   "query": "snare clap -12",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Snare / Clap",
+   "want": 0.55,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-006",
+   "query": "drum bus at minus eight",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Drum Bus",
+   "want": 0.65,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-007",
+   "query": "park the fx print at -25 dB",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "FX Print",
+   "want": 0.290455,
+   "got": {
+    "action": "set_volume",
+    "track": "FX Print",
+    "device": null,
+    "value": 0.290455,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-008",
+   "query": "make the kick -7 dB",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.67495,
+   "got": {
+    "action": "set_volume",
+    "track": "Kick",
+    "device": null,
+    "value": 0.67495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-009",
+   "query": "vocal fader down to -3.5",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Lead Vocal",
+   "want": 0.762452,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-010",
+   "query": "bass to zero dB",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.85,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-011",
+   "query": "put synth on -16",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.45,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-012",
+   "query": "let's put the bass at minus 10 for now",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.6,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-013",
+   "query": "kick to -6db pls",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.7,
+   "got": {
+    "action": "set_volume",
+    "track": "Kick",
+    "device": null,
+    "value": 0.7,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-014",
+   "query": "the clap should live at -13",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Snare / Clap",
+   "want": 0.52495,
+   "got": {
+    "action": "set_volume",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.52495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-015",
+   "query": "fx print -30 dB",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "FX Print",
+   "want": 0.238442,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want FX Print at -30 dB, or 30 dB quieter than it is now? Say \"set FX Print to -30 dB\" or \"turn FX Print down 30 dB\"."
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want FX Print at -30 dB, or 30 dB quieter than it is now? Say \"set FX Print to -3"
+  },
+  {
+   "id": "blind-cl-016",
+   "query": "drums bus -5, please",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Drum Bus",
+   "want": 0.72495,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-017",
+   "query": "lead vocal sitting at minus two",
+   "category": "volume_absolute",
+   "expected": "set_volume",
+   "expected_track": "Lead Vocal",
+   "want": 0.8,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-018",
+   "query": "kick up 2 db",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.55,
+   "got": {
+    "action": "set_volume",
+    "track": "Kick",
+    "device": null,
+    "value": 0.55,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-019",
+   "query": "pull the synth back 4 dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.4,
+   "got": {
+    "action": "set_volume",
+    "track": "Synth",
+    "device": null,
+    "value": 0.4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-020",
+   "query": "nudge the vocal up 1.5 dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Lead Vocal",
+   "want": 0.88745,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: That would take the track above 0 dB, which KENN does not set."
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: That would take the track above 0 dB, which KENN does not set."
+  },
+  {
+   "id": "blind-cl-021",
+   "query": "lower bass by 3db",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.42495,
+   "got": {
+    "action": "set_volume",
+    "track": "Bass",
+    "device": null,
+    "value": 0.42495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-022",
+   "query": "raise the hats by six db",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.65,
+   "got": {
+    "action": "set_volume",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 0.65,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-023",
+   "query": "take 2 dB off the drums",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Drum Bus",
+   "want": 0.45,
+   "got": {
+    "action": "set_volume",
+    "track": "Drum Bus",
+    "device": null,
+    "value": 0.45,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-024",
+   "query": "give me 3 more dB on the kick",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.57495,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-025",
+   "query": "bring the fx print down a couple dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "FX Print",
+   "want": 0.8,
+   "got": {
+    "action": "set_volume",
+    "track": "FX Print",
+    "device": null,
+    "value": 0.8,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-026",
+   "query": "kick 3 dB hotter",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.57495,
+   "got": {
+    "action": "set_volume",
+    "track": "Kick",
+    "device": null,
+    "value": 0.57495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-027",
+   "query": "trim the bass 1 dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.47495,
+   "got": {
+    "action": "set_volume",
+    "track": "Bass",
+    "device": null,
+    "value": 0.47495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-028",
+   "query": "boost the synth by 5 dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.62495,
+   "got": {
+    "action": "set_volume",
+    "track": "Synth",
+    "device": null,
+    "value": 0.62495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-029",
+   "query": "drop the vocal 2.5 dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Lead Vocal",
+   "want": 0.78745,
+   "got": {
+    "action": "set_volume",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": 0.78745,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-030",
+   "query": "vocal upp 2 db",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Lead Vocal",
+   "want": 0.9,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Lead Vocal at 2 dB, or 2 dB louder than it is now? Say \"set Lead Vocal to 2 dB\" or \"turn Lead Vocal up 2 dB\"."
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Lead Vocal at 2 dB, or 2 dB louder than it is now? Say \"set Lead Vocal to 2 "
+  },
+  {
+   "id": "blind-cl-031",
+   "query": "okay so the synth is fighting the vocal, can you pull the synth down like 3 dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.42495,
+   "got": {
+    "action": "set_volume",
+    "track": "Synth",
+    "device": null,
+    "value": 0.42495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-032",
+   "query": "honestly the kick needs to come up about 2 db",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.55,
+   "got": {
+    "action": "set_volume",
+    "track": "Kick",
+    "device": null,
+    "value": 0.55,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-033",
+   "query": "hey KENN take the snare down 1 db",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Snare / Clap",
+   "want": 0.47495,
+   "got": {
+    "action": "set_volume",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.47495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-034",
+   "query": "quieten the hats by four dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.4,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-035",
+   "query": "lift the bass 2 dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.55,
+   "got": {
+    "action": "set_volume",
+    "track": "Bass",
+    "device": null,
+    "value": 0.55,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-036",
+   "query": "hi hats too loud, down 3",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.42495,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-037",
+   "query": "snare a hair louder, 1 dB",
+   "category": "volume_relative",
+   "expected": "set_volume",
+   "expected_track": "Snare / Clap",
+   "want": 0.52495,
+   "got": {
+    "action": "set_volume",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.52495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-038",
+   "query": "hats 25% left",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Hi-Hats",
+   "want": -0.25,
+   "got": {
+    "action": "set_pan",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": -0.25,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-039",
+   "query": "pan the synth fully right",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Synth",
+   "want": 1.0,
+   "got": {
+    "action": "set_pan",
+    "track": "Synth",
+    "device": null,
+    "value": 1.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-040",
+   "query": "vocal dead center",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Lead Vocal",
+   "want": 0.0,
+   "got": {
+    "action": "set_pan",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": 0.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-041",
+   "query": "shove the bass 10 percent to the right",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Bass",
+   "want": 0.1,
+   "got": {
+    "action": "set_pan",
+    "track": "Bass",
+    "device": null,
+    "value": 0.1,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-042",
+   "query": "put the fx print hard left",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "FX Print",
+   "want": -1.0,
+   "got": {
+    "action": "set_pan",
+    "track": "FX Print",
+    "device": null,
+    "value": -1.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-043",
+   "query": "centre the kick",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Kick",
+   "want": 0.0,
+   "got": {
+    "action": "set_pan",
+    "track": "Kick",
+    "device": null,
+    "value": 0.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-044",
+   "query": "swing the snare 15% to the right",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Snare / Clap",
+   "want": 0.15,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-045",
+   "query": "clap 40% left please",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Snare / Clap",
+   "want": -0.4,
+   "got": {
+    "action": "set_pan",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": -0.4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-046",
+   "query": "synth over to the left, 30 percent",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Synth",
+   "want": -0.3,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-047",
+   "query": "bring the hats back to the middle",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "Hi-Hats",
+   "want": 0.0,
+   "got": {
+    "action": "set_pan",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 0.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-048",
+   "query": "fx print all the way right",
+   "category": "pan",
+   "expected": "set_pan",
+   "expected_track": "FX Print",
+   "want": 1.0,
+   "got": {
+    "action": "set_pan",
+    "track": "FX Print",
+    "device": null,
+    "value": 1.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-049",
+   "query": "shut the hats up",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Hi-Hats",
+   "want": true,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Hi-Hats up 2 dB\" or \"set Hi-Hats to -6 dB\"."
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Hi-Hats up 2 dB\" or \"set Hi-Hats to -6 dB\"."
+  },
+  {
+   "id": "blind-cl-050",
+   "query": "mute the bass",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Bass",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-051",
+   "query": "unmute the kick",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Kick",
+   "want": false,
+   "got": {
+    "action": "set_mute",
+    "track": "Kick",
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-052",
+   "query": "kill the synth for a sec",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Synth",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Synth",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-053",
+   "query": "hey KENN mute the fx print",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "FX Print",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "FX Print",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-054",
+   "query": "take the clap out of the mix",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Snare / Clap",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-055",
+   "query": "put the kick back in",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Kick",
+   "want": false,
+   "got": {
+    "action": "set_mute",
+    "track": "Kick",
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-056",
+   "query": "un-mute the vocal",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Lead Vocal",
+   "want": false,
+   "got": {
+    "action": "set_mute",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-057",
+   "query": "silence the drum bus",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Drum Bus",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Drum Bus",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-058",
+   "query": "can you mute the synth",
+   "category": "mute",
+   "expected": "set_mute",
+   "expected_track": "Synth",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Synth",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-059",
+   "query": "I need to hear just the vocal",
+   "category": "solo",
+   "expected": "set_solo",
+   "expected_track": "Lead Vocal",
+   "want": true,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-060",
+   "query": "solo the bass for a sec",
+   "category": "solo",
+   "expected": "set_solo",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "set_solo",
+    "track": "Bass",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-061",
+   "query": "take the vocal off solo",
+   "category": "solo",
+   "expected": "set_solo",
+   "expected_track": "Lead Vocal",
+   "want": false,
+   "got": {
+    "action": "set_solo",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-062",
+   "query": "quick one: solo the snare",
+   "category": "solo",
+   "expected": "set_solo",
+   "expected_track": "Snare / Clap",
+   "want": true,
+   "got": {
+    "action": "set_solo",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-063",
+   "query": "let me hear the synth on its own",
+   "category": "solo",
+   "expected": "set_solo",
+   "expected_track": "Synth",
+   "want": true,
+   "got": {
+    "action": "set_solo",
+    "track": "Synth",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-064",
+   "query": "unsolo the kick",
+   "category": "solo",
+   "expected": "set_solo",
+   "expected_track": "Kick",
+   "want": false,
+   "got": {
+    "action": "set_solo",
+    "track": "Kick",
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-065",
+   "query": "solo the drum bus",
+   "category": "solo",
+   "expected": "set_solo",
+   "expected_track": "Drum Bus",
+   "want": true,
+   "got": {
+    "action": "set_solo",
+    "track": "Drum Bus",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-066",
+   "query": "stop soloing the hats",
+   "category": "solo",
+   "expected": "set_solo",
+   "expected_track": "Hi-Hats",
+   "want": false,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "Play and stop run the whole set, not one track. Did you mean to solo or mute soloing the hats, or start/stop the whole set? Nothing changed."
+   },
+   "verdict": "asked",
+   "answer": "Play and stop run the whole set, not one track. Did you mean to solo or mute soloing the hats, or start/stop the whole set? Nothing changed."
+  },
+  {
+   "id": "blind-cl-067",
+   "query": "arm the bass track for recording",
+   "category": "arm",
+   "expected": "set_arm",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "set_arm",
+    "track": "Bass",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-068",
+   "query": "disarm the vocal",
+   "category": "arm",
+   "expected": "set_arm",
+   "expected_track": "Lead Vocal",
+   "want": false,
+   "got": {
+    "action": "set_arm",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-069",
+   "query": "record enable the synth",
+   "category": "arm",
+   "expected": "set_arm",
+   "expected_track": "Synth",
+   "want": true,
+   "got": {
+    "action": "set_arm",
+    "track": "Synth",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-070",
+   "query": "get the lead vocal armed",
+   "category": "arm",
+   "expected": "set_arm",
+   "expected_track": "Lead Vocal",
+   "want": true,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-071",
+   "query": "turn off record arm on the bass",
+   "category": "arm",
+   "expected": "set_arm",
+   "expected_track": "Bass",
+   "want": false,
+   "got": {
+    "action": "set_arm",
+    "track": "Bass",
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-072",
+   "query": "send the snare to the delay at 20%",
+   "category": "send",
+   "expected": "set_send",
+   "expected_track": "Snare / Clap",
+   "want": null,
+   "got": {
+    "action": "set_send",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.2,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-073",
+   "query": "hats to the b-delay about 15 percent",
+   "category": "send",
+   "expected": "set_send",
+   "expected_track": "Hi-Hats",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-074",
+   "query": "feed the synth into the reverb at 50%",
+   "category": "send",
+   "expected": "set_send",
+   "expected_track": "Synth",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-075",
+   "query": "turn the vocal reverb send down to 10%",
+   "category": "send",
+   "expected": "set_send",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-076",
+   "query": "kill the send from bass to delay",
+   "category": "send",
+   "expected": "set_send",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "set_mute",
+    "track": "Bass",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "wrong",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-077",
+   "query": "clap into the a-reverb 35 percent",
+   "category": "send",
+   "expected": "set_send",
+   "expected_track": "Snare / Clap",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-078",
+   "query": "throw a compressor on the bass",
+   "category": "insert",
+   "expected": "insert_device",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Bass",
+    "device": "Compressor",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-079",
+   "query": "add an EQ Eight to the synth",
+   "category": "insert",
+   "expected": "insert_device",
+   "expected_track": "Synth",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Synth",
+    "device": "EQ Eight",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-080",
+   "query": "put a limiter on the drum bus",
+   "category": "insert",
+   "expected": "insert_device",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-081",
+   "query": "stick Utility on the fx print",
+   "category": "insert",
+   "expected": "insert_device",
+   "expected_track": "FX Print",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-082",
+   "query": "drop a delay on the vocal",
+   "category": "insert",
+   "expected": "insert_device",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Lead Vocal",
+    "device": "Echo",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-083",
+   "query": "load a reverb device on the snare",
+   "category": "insert",
+   "expected": "insert_device",
+   "expected_track": "Snare / Clap",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Snare / Clap",
+    "device": "Hybrid Reverb",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-084",
+   "query": "I want an EQ Eight on the kick",
+   "category": "insert",
+   "expected": "insert_device",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-085",
+   "query": "slap a compressor on the lead vocal",
+   "category": "insert",
+   "expected": "insert_device",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "Track 'Lead Vocal' already contains Compressor; choose the exact existing device instead."
+   },
+   "verdict": "asked",
+   "answer": "Track 'Lead Vocal' already contains Compressor; choose the exact existing device instead."
+  },
+  {
+   "id": "blind-cl-086",
+   "query": "mark this spot as Bridge",
+   "category": "locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "add_locator",
+    "track": null,
+    "device": null,
+    "value": {
+     "name": "Bridge",
+     "time_beats": 0.0
+    },
+    "name": "Bridge"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-087",
+   "query": "put a locator here named Verse 2",
+   "category": "locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "add_locator",
+    "track": null,
+    "device": null,
+    "value": {
+     "name": "Verse 2",
+     "time_beats": 0.0
+    },
+    "name": "Verse 2"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-088",
+   "query": "set a marker: Breakdown",
+   "category": "locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-089",
+   "query": "add a cue point called Outro",
+   "category": "locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "add_locator",
+    "track": null,
+    "device": null,
+    "value": {
+     "name": "Outro",
+     "time_beats": 0.0
+    },
+    "name": "Outro"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-090",
+   "query": "drop a marker called Chorus 1",
+   "category": "locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "add_locator",
+    "track": null,
+    "device": null,
+    "value": {
+     "name": "Chorus 1",
+     "time_beats": 0.0
+    },
+    "name": "Chorus 1"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-091",
+   "query": "new locator, name it Pre-drop",
+   "category": "locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-092",
+   "query": "call the synth track Pads",
+   "category": "rename",
+   "expected": "rename_track",
+   "expected_track": "Synth",
+   "want": null,
+   "got": {
+    "action": "rename_track",
+    "track": "Synth",
+    "device": null,
+    "value": "Pads",
+    "name": "Pads"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-093",
+   "query": "change the name of Kick to 808 Kick",
+   "category": "rename",
+   "expected": "rename_track",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "rename_track",
+    "track": "Kick",
+    "device": null,
+    "value": "808 Kick",
+    "name": "808 Kick"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-094",
+   "query": "the fx print should be called Bounce",
+   "category": "rename",
+   "expected": "rename_track",
+   "expected_track": "FX Print",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-095",
+   "query": "rename bass to Sub",
+   "category": "rename",
+   "expected": "rename_track",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "rename_track",
+    "track": "Bass",
+    "device": null,
+    "value": "Sub",
+    "name": "Sub"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-096",
+   "query": "name the lead vocal Main Vox",
+   "category": "rename",
+   "expected": "rename_track",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-097",
+   "query": "relabel the hats as Shaker",
+   "category": "rename",
+   "expected": "rename_track",
+   "expected_track": "Hi-Hats",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-098",
+   "query": "hit play",
+   "category": "transport",
+   "expected": "transport_play",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "transport_play",
+    "track": null,
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-099",
+   "query": "start playback",
+   "category": "transport",
+   "expected": "transport_play",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "transport_play",
+    "track": null,
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-100",
+   "query": "let's hear it",
+   "category": "transport",
+   "expected": "transport_play",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "transport_play",
+    "track": null,
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-101",
+   "query": "stop the song",
+   "category": "transport",
+   "expected": "transport_stop",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "transport_stop",
+    "track": null,
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-102",
+   "query": "kill playback",
+   "category": "transport",
+   "expected": "transport_stop",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-103",
+   "query": "pause it there",
+   "category": "transport",
+   "expected": "transport_stop",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-104",
+   "query": "take me to the bass track",
+   "category": "focus_inspect",
+   "expected": "focus_track",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "focus_track",
+    "track": "Bass",
+    "device": null,
+    "value": 4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-105",
+   "query": "jump to the synth",
+   "category": "focus_inspect",
+   "expected": "focus_track",
+   "expected_track": "Synth",
+   "want": null,
+   "got": {
+    "action": "focus_track",
+    "track": "Synth",
+    "device": null,
+    "value": 5,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-106",
+   "query": "select the drum bus",
+   "category": "focus_inspect",
+   "expected": "focus_track",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That track is already focused in Ableton Live."
+   },
+   "verdict": "right",
+   "answer": "That track is already focused in Ableton Live."
+  },
+  {
+   "id": "blind-cl-107",
+   "query": "open up the vocal compressor",
+   "category": "focus_inspect",
+   "expected": "focus_device",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-108",
+   "query": "what plugins are on the bass?",
+   "category": "focus_inspect",
+   "expected": "inspect_devices",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "inspect_devices",
+    "track": "Bass",
+    "value": null,
+    "read_only": true,
+    "answer": "Track 'Bass' has 1 device(s): EQ Eight."
+   },
+   "verdict": "right",
+   "answer": "Track 'Bass' has 1 device(s): EQ Eight."
+  },
+  {
+   "id": "blind-cl-109",
+   "query": "which tracks do I have",
+   "category": "focus_inspect",
+   "expected": "inspect_tracks",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-110",
+   "query": "list the effects on the drum bus",
+   "category": "focus_inspect",
+   "expected": "inspect_devices",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-111",
+   "query": "what's on the vocal chain",
+   "category": "focus_inspect",
+   "expected": "inspect_devices",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "inspect_devices",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "'Lead Vocal' has: Compressor."
+   },
+   "verdict": "right",
+   "answer": "'Lead Vocal' has: Compressor."
+  },
+  {
+   "id": "blind-cl-112",
+   "query": "show me the drum bus compressor settings",
+   "category": "focus_inspect",
+   "expected": "inspect_device_parameters",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "inspect_device_parameters",
+    "track": "Drum Bus",
+    "value": null,
+    "read_only": true,
+    "answer": "'Compressor' on 'Drum Bus' has 23 readable parameter(s): Device On=1.0, Threshold=0.8500000238418579, Ratio=0.5, Expansion Ratio=1.149999976158142, Attack=0.4000000059604645, Release=0.1569925993680954, Auto Release On/Off=0.0, Output=0.0, Makeup=0.0, Dry/Wet=1.0, Model=0.0, Env Mode=1.0, Knee=6.0, LookAhead=0.0, S/C Listen=0.0, S/C EQ On=0.0."
+   },
+   "verdict": "right",
+   "answer": "'Compressor' on 'Drum Bus' has 23 readable parameter(s): Device On=1.0, Threshold=0.8500000238418579, Ratio=0.5, Expansion Ratio=1.149999976158142, Attack=0.400"
+  },
+  {
+   "id": "blind-cl-113",
+   "query": "vocal compressor threshold to -18 dB",
+   "category": "device",
+   "expected": "set_device_parameter",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "set_device_parameter",
+    "track": "Lead Vocal",
+    "device": "Compressor",
+    "value": 0.4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-114",
+   "query": "drum bus comp threshold down 4 dB",
+   "category": "device",
+   "expected": "set_device_parameter",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "set_device_parameter",
+    "track": "Drum Bus",
+    "device": "Compressor",
+    "value": 0.7500000238418579,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-115",
+   "query": "back the vocal compressor threshold off by 2 dB",
+   "category": "device",
+   "expected": "set_device_parameter",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "asked",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-116",
+   "query": "make it louder",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-117",
+   "query": "turn it down",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-118",
+   "query": "lower the drums a bit",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-119",
+   "query": "kick a touch louder",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Kick up 2 dB\" or \"set Kick to -6 dB\"."
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Kick up 2 dB\" or \"set Kick to -6 dB\"."
+  },
+  {
+   "id": "blind-cl-120",
+   "query": "synth to the left a touch",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-121",
+   "query": "pan the hats",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-122",
+   "query": "comp on the vocal, a bit more",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-123",
+   "query": "put reverb on the vocal",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Lead Vocal",
+    "device": "Hybrid Reverb",
+    "value": null,
+    "name": null
+   },
+   "verdict": "wrong",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-124",
+   "query": "hats a few dB quieter",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Hi-Hats down 2 dB\" or \"set Hi-Hats to -6 dB\"."
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Hi-Hats down 2 dB\" or \"set Hi-Hats to -6 dB\"."
+  },
+  {
+   "id": "blind-cl-125",
+   "query": "bass, maybe a little lower",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-126",
+   "query": "solo the synth and the vocal",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "recipe",
+    "track": null,
+    "device": null,
+    "value": null,
+    "name": null
+   },
+   "verdict": "wrong",
+   "answer": ""
+  },
+  {
+   "id": "blind-cl-127",
+   "query": "mute everything except the kick",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: KENN changes one track at a time for now, so it can't do \"except \u2026\". Name the track to change, for example \"mute the snare\"."
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: KENN changes one track at a time for now, so it can't do \"except \u2026\". Name the track to c"
+  },
+  {
+   "id": "blind-cl-128",
+   "query": "delete the vocal track",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "Deleting, removing, overwriting, and replacing Live content are disabled by the KENN assistant boundary."
+   },
+   "verdict": "right",
+   "answer": "Deleting, removing, overwriting, and replacing Live content are disabled by the KENN assistant boundary."
+  },
+  {
+   "id": "blind-cl-129",
+   "query": "set the master to -3",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-130",
+   "query": "tempo 128",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_tempo_signature",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "The current tempo is 120 BPM and the time signature is 4/4."
+   },
+   "verdict": "right",
+   "answer": "The current tempo is 120 BPM and the time signature is 4/4."
+  },
+  {
+   "id": "blind-cl-131",
+   "query": "pan it left",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-132",
+   "query": "mute the",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-133",
+   "query": "the vocal",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-134",
+   "query": "more vocal in the reverb send",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-135",
+   "query": "bring the third one up 2 dB",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-136",
+   "query": "make the kick and the bass 3 dB louder",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: That mentions Bass, Kick. Which single track should change, and by how much? For example \"turn the Bass down 3 dB\"."
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: That mentions Bass, Kick. Which single track should change, and by how much? For example"
+  },
+  {
+   "id": "blind-cl-137",
+   "query": "turn up the thing at the bottom",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-138",
+   "query": "can you get the levels right",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-139",
+   "query": "mute the tambourine",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-140",
+   "query": "solo the guitar",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-141",
+   "query": "kick to -6 and pan it 20% left",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I could not prepare that multi-step Live request safely: Step 1: No supported Ableton action/value was recognized.; Step 2: No track name or number was found in the current Live snapshot."
+   },
+   "verdict": "right",
+   "answer": "I could not prepare that multi-step Live request safely: Step 1: No supported Ableton action/value was recognized.; Step 2: No track name or number was found in"
+  },
+  {
+   "id": "blind-cl-142",
+   "query": "send some to the delay",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-143",
+   "query": "what should I do next",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-144",
+   "query": "duck the bass",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  },
+  {
+   "id": "blind-cl-145",
+   "query": "bounce the kick to audio",
+   "category": "ambiguous",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, and exact undo."
+   },
+   "verdict": "right",
+   "answer": "I'm not sure what you're asking. I can help with session questions, track volume/pan/mute/solo, qualified device controls, sends, mix advice, change history, an"
+  }
+ ]
+}

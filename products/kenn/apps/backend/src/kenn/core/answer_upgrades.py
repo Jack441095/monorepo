@@ -61,9 +61,23 @@ def start(write: Callable[[], dict[str, Any]]) -> str | None:
         with _LOCK:
             if upgrade_id in _RESULTS:
                 _RESULTS[upgrade_id] = entry
+        log_outcome(entry["status"] if "error" not in entry else "error", entry["seconds"] * 1000.0)
 
     threading.Thread(target=run, name=f"kenn-answer-upgrade-{upgrade_id}", daemon=True).start()
     return upgrade_id
+
+
+def log_outcome(outcome: str, milliseconds: float) -> None:
+    """One timing row per attempt (accepted, rejected, error, or busy), so the landing rate can be measured on a real Mac.
+
+    Only the outcome and how long it took are kept, never the question or either answer.
+    """
+    try:
+        from kenn.core import route_log
+
+        route_log.record(f"answer_upgrade:{outcome}", milliseconds, brain=outcome == "accepted", proposal=False)
+    except Exception:
+        pass  # timing is diagnostic; it must never cost the answer
 
 
 def get(upgrade_id: str) -> dict[str, Any]:
@@ -72,4 +86,4 @@ def get(upgrade_id: str) -> dict[str, Any]:
         return {k: v for k, v in entry.items() if k != "at"} if entry else {"status": "expired"}
 
 
-__all__ = ["KEEP_SECONDS", "enabled", "get", "start"]
+__all__ = ["KEEP_SECONDS", "enabled", "get", "log_outcome", "start"]

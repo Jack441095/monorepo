@@ -42,7 +42,7 @@ from kenn.core.live_action_service import (
 )
 from kenn.core.clip_duplication_service import ClipDuplicationActionService, PROPOSAL_SCHEMA as CLIP_DUPLICATION_PROPOSAL_SCHEMA
 from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHEMA as CLIP_RENAME_PROPOSAL_SCHEMA
-from kenn.core.live_intent import parse_natural_recipe, parse_request
+from kenn.core.live_intent import _NICKNAME_WORDS, parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
 from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS, load_promotion_state
 from kenn.core.live_session_questions import answer_live_session_question
@@ -1764,6 +1764,8 @@ def _proposal_response(response: dict[str, Any], proposal: dict[str, Any], *, ki
         before, after = _format_volume(proposal.get("before")), _format_volume(proposal.get("after"))
     elif parameter == "pan" and unit == "normalized":
         before, after = _format_pan(proposal.get("before")), _format_pan(proposal.get("after"))
+    if proposal.get("after_label"):
+        before, after = str(proposal.get("before_label") or _format_value(proposal.get("before"))), str(proposal["after_label"])
     before_display = str(proposal.get("before_display") or "").strip()
     after_display = str(proposal.get("after_display") or "").strip()
     if before_display and after_display:
@@ -1958,6 +1960,8 @@ def _resolve_device_parameter(
             return {"ok": False, "clarification": "Utility has no Gain knob; its level trim is Output. Say \"set Utility Output to ... dB\" instead; nothing changed."}
         return {"ok": False, "clarification": f"I couldn't find parameter '{requested}' on '{device_name}'. Available parameters include: {', '.join(names[:16]) or 'none'}."}
     parameter = matches[0]
+    if normalize_unit(intent.get("unit")) == "choice":
+        return _resolve_device_choice(service, intent, track, parameter, info, device_name, int(device_index), session_id, command, observed_state)
     try:
         current = float(parameter["value"])
         requested_value = float(intent.get("desired_value"))
@@ -2055,6 +2059,47 @@ def _resolve_device_parameter(
         after_display = display_text(device_name, str(parameter.get("name", "")), unit, result["proposal"].get("after"))
         if after_display:
             result["proposal"]["after_display"] = after_display
+    return result
+
+
+def _resolve_device_choice(
+    service: LiveActionService,
+    intent: dict[str, Any],
+    track: dict[str, Any],
+    parameter: dict[str, Any],
+    info: dict[str, Any],
+    device_name: str,
+    device_index: int,
+    session_id: str,
+    command: str,
+    observed_state: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """A switch or chooser set by the label Live shows for it ("Model" -> "RMS"), using its qualified option table."""
+    from kenn.core import device_units
+
+    name = str(parameter.get("name", ""))
+    choice = device_units.find_choice(device_name, name)
+    label = str(intent.get("choice_label") or "")
+    raw = next((option for option, text in (choice.options if choice else ()) if text.casefold() == label.casefold()), None)
+    if choice is None or raw is None:
+        return {"ok": False, "clarification": f"I don't have Live's options for {name} on {device_name} checked yet, so I won't guess a value."}
+    try:
+        current = float(parameter["value"])
+        low, high = float(parameter.get("min")), float(parameter.get("max"))
+    except (KeyError, TypeError, ValueError):
+        return {"ok": False, "clarification": "Live returned an unreadable value for that control, so I will not create a proposal."}
+    if not low <= raw <= high:
+        return {"ok": False, "clarification": f"{label} isn't in the range Live reports for {name}; nothing changed."}
+    before_label = device_units.choice_label(choice, current)
+    if before_label and before_label.casefold() == label.casefold():
+        return {"ok": False, "clarification": f"{name} on {device_name} is already {before_label}; nothing to change."}
+    result = service.propose_device_action(
+        track_index=int(track["index"]), device_index=device_index, parameter_index=int(parameter.get("index", 0)),
+        proposed_value=float(raw), reason=f"User command: {command}", session_id=session_id, parameter_name=name,
+        unit="choice", track_name=str(track.get("name", "")), observed_state=observed_state, observed_parameter_info=info,
+    )
+    if result.get("ok") and isinstance(result.get("proposal"), dict):
+        result["proposal"].update({"before_label": before_label, "after_label": label})
     return result
 
 
@@ -2408,18 +2453,44 @@ def _follow_up_command(command: str, session_id: str, snapshot: dict[str, Any]) 
     action = prior.get("action")
     if action not in _REPEATABLE_ACTIONS or prior.get("missing_fields"):
         return None
-    if re.search(r"\band\b|,|&|\bboth\b", match.group("target"), re.I):
-        return None  # "the snare and the kick" once changed only the kick; two tracks at once isn't a follow-up yet
-    target = parse_request(f"solo {match.group('target')}", snapshot)
-    track = target.get("track") if isinstance(target.get("track"), dict) else None
-    if not track or target.get("missing_fields") or target.get("ambiguity"):
-        return None
     prior_track = prior.get("track") if isinstance(prior.get("track"), dict) else {}
-    if track.get("index") == prior_track.get("index"):
-        return None  # the same track again would apply the change twice; let it ask
-    return _repeat_on(prior, str(track.get("name")), flip=bool(match.group("opposite")))
+    flip = bool(match.group("opposite"))
+    parts = [part.strip() for part in re.split(r"\s*(?:,|&|\band\b)\s*", re.sub(r"^both\s+(?:of\s+)?", "", match.group("target"), flags=re.I)) if part.strip()]
+    if not 1 <= len(parts) <= MAX_FOLLOW_UP_TRACKS:
+        return None
+    names: list[str] = []
+    for part in parts:
+        track = _bare_track(part, snapshot) if len(parts) > 1 else None
+        if len(parts) == 1:
+            target = parse_request(f"solo {part}", snapshot)
+            track = target.get("track") if isinstance(target.get("track"), dict) else None
+            if not track or target.get("missing_fields") or target.get("ambiguity"):
+                return None
+        elif not track:
+            return None
+        if track.get("index") == prior_track.get("index"):
+            return None  # the same track again would apply the change twice; let it ask
+        if track.get("name") in names:
+            return None
+        names.append(str(track.get("name")))
+    commands = [_repeat_on(prior, name, flip=flip) for name in names]
+    # Two or more tracks go out as one confirmable recipe, each step written out for its own track. (Asking the
+    # parser to "solo the snare and the kick" once resolved only the kick, so each name is resolved on its own above.)
+    return " and ".join(commands) if all(commands) else None
 
 
+def _bare_track(part: str, snapshot: dict[str, Any]) -> dict[str, Any] | None:
+    """The one track a bare name ("the kick", "hats") points at, or None. "what about kick" is not a bare name."""
+    found = parse_request(f"solo {part}", snapshot)
+    track = found.get("track")
+    if not isinstance(track, dict) or found.get("missing_fields") or found.get("ambiguity"):
+        return None
+    known = set(re.findall(r"[a-z0-9]+", str(track.get("name", "")).casefold())) | _NICKNAME_WORDS
+    words = set(re.findall(r"[a-z0-9]+", re.sub(r"^the\s+", "", part.casefold())))
+    return track if words <= known else None
+
+
+MAX_FOLLOW_UP_TRACKS = 4
 _REPEATABLE_ACTIONS = frozenset({"set_volume", "set_pan", "set_mute", "set_solo", "set_arm", "set_device_parameter"})
 _UNIT_TEXT = {"db": " dB", "hz": " Hz", "%": "%", "ms": " ms", "millisecond": " ms", "milliseconds": " ms", ":1": ":1"}
 
@@ -2596,6 +2667,27 @@ def _device_parameter_follow_up(command: str, session_id: str, snapshot: dict[st
         if parsed.get("action") == "set_device_parameter" and parsed.get("confirmation_required") and not parsed.get("missing_fields") and not parsed.get("ambiguity"):
             return candidate
     return None
+
+
+def _two_track_correction_help(command: str, session_id: str, snapshot: dict[str, Any]) -> str | None:
+    """ "no, the snare and the kick" after a change: a correction moves it to one track, so say how to get two.
+
+    Only when every name in the list is a track in the set; "wait, what about kick and snare" is a question.
+    """
+    from kenn.core.session_context import live_conversation_context
+
+    match = _CORRECTION.match(command.strip())
+    target = (match.group("target") or match.group("target2") or "") if match else ""
+    if not match or len(target.split()) > 6 or not re.search(r"\band\b|,|&", target, re.I) or re.search(r"\d", target):
+        return None
+    parts = [part.strip() for part in re.split(r"\s*(?:,|&|\band\b)\s*", target) if part.strip()]
+    if not all(_bare_track(part, snapshot) for part in parts):
+        return None
+    last = str(live_conversation_context(session_id).get("last_command") or "")
+    if not last:
+        return None
+    return (f"A correction moves the last change (\"{last}\") to one track. To make it on both, say "
+            f"\"do that on {target.strip(' .!?')}\". Nothing changed.")
 
 
 PENDING_QUESTION_SECONDS = 300
@@ -2857,10 +2949,17 @@ def _handle_command_impl(
                 }
                 clean_command = other[0]
             else:
+                from kenn.core.session_context import live_conversation_context
+
+                # We could not infer the target, so name the last change and
+                # show the shape of the reply rather than just refusing.
+                last = live_conversation_context(response["session_id"])
+                said = f" The last change was \"{last['last_command']}\"." if last.get("last_command") else ""
                 return _clarification(
                     response,
                     {"action": "correct_target"},
-                    "I can correct the target, but 'the other one' is not an exact identity. Name the track or device you mean.",
+                    "I can correct the target, but 'the other one' doesn't tell me which track." + said
+                    + " Name the track or device you mean, for example \"no, the snare\". Nothing changed.",
                 )
         if context_resolution.get("resolution") == "contextual_direction_requires_value":
             track_name = str(context_resolution.get("track") or "")
@@ -3088,6 +3187,8 @@ def _handle_command_impl(
             response["resolved_command"] = follow_up
             response["context_resolution"] = {"resolution": "follow_up", "original": typed}
             clean_command = follow_up
+        elif (two_track_help := _two_track_correction_help(typed, response["session_id"], snapshot)):
+            return _clarification(response, deterministic_intent, two_track_help)
         else:
             completed = _reply_to_question(typed, response["session_id"], snapshot)
             if completed:

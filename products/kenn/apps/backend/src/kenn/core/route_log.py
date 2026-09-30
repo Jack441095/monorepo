@@ -53,4 +53,29 @@ def summary(path: Path | None = None) -> dict[str, dict[str, Any]]:
     return report
 
 
-__all__ = ["LOG", "MAX_LINES", "record", "summary"]
+def upgrade_summary(path: Path | None = None) -> dict[str, Any]:
+    """How often the model's answer arrived and was accepted, and how long it took (from the answer_upgrade:* rows)."""
+    target = path or LOG
+    rows = [json.loads(line) for line in target.read_text(encoding="utf-8").splitlines() if line.strip()] if target.exists() else []
+    counts: dict[str, int] = {}
+    accepted_ms: list[float] = []
+    for row in rows:
+        route = str(row.get("route", ""))
+        if route.startswith("answer_upgrade:"):
+            outcome = route.split(":", 1)[1]
+            counts[outcome] = counts.get(outcome, 0) + 1
+            if outcome == "accepted":
+                accepted_ms.append(float(row["ms"]))
+    attempts = sum(counts.values())
+    accepted_ms.sort()
+    return {
+        "attempts": attempts,
+        "accepted": counts.get("accepted", 0), "rejected": counts.get("rejected", 0),
+        "error": counts.get("error", 0), "busy": counts.get("busy", 0),
+        "accepted_rate": round(counts.get("accepted", 0) / attempts, 3) if attempts else None,
+        "accepted_p50_s": round(statistics.median(accepted_ms) / 1000, 1) if accepted_ms else None,
+        "accepted_p95_s": round(accepted_ms[int(0.95 * (len(accepted_ms) - 1))] / 1000, 1) if accepted_ms else None,
+    }
+
+
+__all__ = ["LOG", "MAX_LINES", "record", "summary", "upgrade_summary"]

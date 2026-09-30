@@ -1,0 +1,2190 @@
+{
+ "schema": "kenn.natural_phrasing_score.v1",
+ "model": null,
+ "counts": {
+  "right": 93,
+  "asked": 18,
+  "wrong": 1
+ },
+ "rows": [
+  {
+   "id": "blind-r6-000",
+   "query": "mute track 3",
+   "category": "by_number",
+   "expected": "set_mute",
+   "expected_track": "Hi-Hats",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-001",
+   "query": "solo channel 5",
+   "category": "by_number",
+   "expected": "set_solo",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "set_solo",
+    "track": "Bass",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-002",
+   "query": "bring track 6 down 3 dB",
+   "category": "by_number",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.42495,
+   "got": {
+    "action": "set_volume",
+    "track": "Synth",
+    "device": null,
+    "value": 0.42495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-003",
+   "query": "pan track 3 hard right",
+   "category": "by_number",
+   "expected": "set_pan",
+   "expected_track": "Hi-Hats",
+   "want": 1.0,
+   "got": {
+    "action": "set_pan",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 1.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-004",
+   "query": "arm track 7",
+   "category": "by_number",
+   "expected": "set_arm",
+   "expected_track": "Lead Vocal",
+   "want": true,
+   "got": {
+    "action": "set_arm",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-005",
+   "query": "unmute track 1",
+   "category": "by_number",
+   "expected": "set_mute",
+   "expected_track": "Kick",
+   "want": false,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'Kick' is already unmuted. Nothing to change.",
+    "understood": {
+     "action": "set_mute",
+     "track": "Kick",
+     "value": false
+    }
+   },
+   "verdict": "right",
+   "answer": "'Kick' is already unmuted. Nothing to change."
+  },
+  {
+   "id": "blind-r6-006",
+   "query": "take track 2 down 2 dB",
+   "category": "by_number",
+   "expected": "set_volume",
+   "expected_track": "Snare / Clap",
+   "want": 0.45,
+   "got": {
+    "action": "set_volume",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.45,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-007",
+   "query": "track 5 to -10 dB",
+   "category": "by_number",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.6,
+   "got": {
+    "action": "set_volume",
+    "track": "Bass",
+    "device": null,
+    "value": 0.6,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-008",
+   "query": "set track 8 pan to 20% left",
+   "category": "by_number",
+   "expected": "set_pan",
+   "expected_track": "FX Print",
+   "want": -0.2,
+   "got": {
+    "action": "set_pan",
+    "track": "FX Print",
+    "device": null,
+    "value": -0.2,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-009",
+   "query": "switch to track 4",
+   "category": "by_number",
+   "expected": "focus_track",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-010",
+   "query": "mute the second track",
+   "category": "by_number",
+   "expected": "set_mute",
+   "expected_track": "Snare / Clap",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-011",
+   "query": "solo the sixth one",
+   "category": "by_number",
+   "expected": "set_solo",
+   "expected_track": "Synth",
+   "want": true,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-012",
+   "query": "pan the fifth channel 25 percent right",
+   "category": "by_number",
+   "expected": "set_pan",
+   "expected_track": "Bass",
+   "want": 0.25,
+   "got": {
+    "action": "set_pan",
+    "track": "Bass",
+    "device": null,
+    "value": 0.25,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-013",
+   "query": "unsolo track 5",
+   "category": "by_number",
+   "expected": "set_solo",
+   "expected_track": "Bass",
+   "want": false,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'Bass' is already not soloed. Nothing to change.",
+    "understood": {
+     "action": "set_solo",
+     "track": "Bass",
+     "value": false
+    }
+   },
+   "verdict": "right",
+   "answer": "'Bass' is already not soloed. Nothing to change."
+  },
+  {
+   "id": "blind-r6-014",
+   "query": "mute tracks 1 and 2",
+   "category": "by_number",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-015",
+   "query": "mute track 12",
+   "category": "by_number",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-016",
+   "query": "solo track zero",
+   "category": "by_number",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-017",
+   "query": "solo the track with the EQ Eight",
+   "category": "by_description",
+   "expected": "set_solo",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "KENN can't switch devices on or off yet. The device's on/off switch in Live does it (top left of the device). Nothing changed.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "KENN can't switch devices on or off yet. The device's on/off switch in Live does it (top left of the device). Nothing changed."
+  },
+  {
+   "id": "blind-r6-018",
+   "query": "mute the one that has the compressor",
+   "category": "by_description",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "KENN can't switch devices on or off yet. The device's on/off switch in Live does it (top left of the device). Nothing changed.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "KENN can't switch devices on or off yet. The device's on/off switch in Live does it (top left of the device). Nothing changed."
+  },
+  {
+   "id": "blind-r6-019",
+   "query": "focus the track called Bass",
+   "category": "by_description",
+   "expected": "focus_track",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-020",
+   "query": "mute the track named FX Print",
+   "category": "by_description",
+   "expected": "set_mute",
+   "expected_track": "FX Print",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "FX Print",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-021",
+   "query": "the track with no devices, solo it",
+   "category": "by_description",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-022",
+   "query": "would you mind muting the hats",
+   "category": "hedged",
+   "expected": "set_mute",
+   "expected_track": "Hi-Hats",
+   "want": true,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-023",
+   "query": "any chance you could pull the kick down a couple dB",
+   "category": "hedged",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.45,
+   "got": {
+    "action": "set_volume",
+    "track": "Kick",
+    "device": null,
+    "value": 0.45,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-024",
+   "query": "it'd be great if the synth were at -14",
+   "category": "hedged",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.5,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Synth",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-025",
+   "query": "if it's not too much trouble, solo the bass",
+   "category": "hedged",
+   "expected": "set_solo",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "set_solo",
+    "track": "Bass",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-026",
+   "query": "sorry to bother you, could you arm the vocal track",
+   "category": "hedged",
+   "expected": "set_arm",
+   "expected_track": "Lead Vocal",
+   "want": true,
+   "got": {
+    "action": "set_arm",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-027",
+   "query": "I was wondering if you could pan the synth to the left about 30%",
+   "category": "hedged",
+   "expected": "set_pan",
+   "expected_track": "Synth",
+   "want": -0.3,
+   "got": {
+    "action": "set_pan",
+    "track": "Synth",
+    "device": null,
+    "value": -0.3,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-028",
+   "query": "just a thought, maybe mute the clap",
+   "category": "hedged",
+   "expected": "set_mute",
+   "expected_track": "Snare / Clap",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-029",
+   "query": "do you think you could bring the bass up 2 dB",
+   "category": "hedged",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.55,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That's a question, so nothing changed. Ask it in chat for an answer, or say the change you want (\"set FX Print to -6 dB\") and KENN prepares it.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "That's a question, so nothing changed. Ask it in chat for an answer, or say the change you want (\"set FX Print to -6 dB\") and KENN prepares it."
+  },
+  {
+   "id": "blind-r6-030",
+   "query": "I'd love the drum bus a bit quieter",
+   "category": "hedged",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Drum Bus down 2 dB\" or \"set Drum Bus to -6 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Drum Bus down 2 dB\" or \"set Drum Bus to -6 dB\"."
+  },
+  {
+   "id": "blind-r6-031",
+   "query": "perhaps the vocal could be louder",
+   "category": "hedged",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Lead Vocal up 2 dB\" or \"set Lead Vocal to -6 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Lead Vocal",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Lead Vocal up 2 dB\" or \"set Lead Vocal to -6 dB\"."
+  },
+  {
+   "id": "blind-r6-032",
+   "query": "hmm, the hats",
+   "category": "hedged",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-033",
+   "query": "mute the kick then solo the bass",
+   "category": "chained",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "recipe",
+    "track": null,
+    "device": null,
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-034",
+   "query": "solo the vocal and mute the synth",
+   "category": "chained",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "recipe",
+    "track": null,
+    "device": null,
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-035",
+   "query": "pan the hats left 20% and the synth right 20%",
+   "category": "chained",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "recipe",
+    "track": null,
+    "device": null,
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-036",
+   "query": "mute the hats, mute the clap and mute the synth",
+   "category": "chained",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "recipe",
+    "track": null,
+    "device": null,
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-037",
+   "query": "solo the bass, then pan it 10% right",
+   "category": "chained",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I could not prepare that multi-step Live request safely: Step 2: No track name or number was found in the current Live snapshot.",
+    "understood": {
+     "action": "recipe",
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I could not prepare that multi-step Live request safely: Step 2: No track name or number was found in the current Live snapshot."
+  },
+  {
+   "id": "blind-r6-038",
+   "query": "is the bass muted",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_track_state",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "No, 'Bass' is not muted."
+   },
+   "verdict": "right",
+   "answer": "No, 'Bass' is not muted."
+  },
+  {
+   "id": "blind-r6-039",
+   "query": "what's the volume on the kick",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_track_state",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "'Kick' is at -14.0 dB."
+   },
+   "verdict": "right",
+   "answer": "'Kick' is at -14.0 dB."
+  },
+  {
+   "id": "blind-r6-040",
+   "query": "which tracks are soloed right now",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_mute_solo",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "Nothing is muted. Nothing is soloed."
+   },
+   "verdict": "right",
+   "answer": "Nothing is muted. Nothing is soloed."
+  },
+  {
+   "id": "blind-r6-041",
+   "query": "how loud is the vocal",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_track_state",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "'Lead Vocal' is at 0.0 dB."
+   },
+   "verdict": "right",
+   "answer": "'Lead Vocal' is at 0.0 dB."
+  },
+  {
+   "id": "blind-r6-042",
+   "query": "does the snare have any effects",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Snare / Clap",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-043",
+   "query": "what is the tempo",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_tempo_signature",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "The current tempo is 120 BPM and the time signature is 4/4."
+   },
+   "verdict": "right",
+   "answer": "The current tempo is 120 BPM and the time signature is 4/4."
+  },
+  {
+   "id": "blind-r6-044",
+   "query": "is anything armed",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "Which track do you mean? Nothing changed.",
+    "understood": {
+     "action": "inspect_track_state",
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "Which track do you mean? Nothing changed."
+  },
+  {
+   "id": "blind-r6-045",
+   "query": "why is the synth so quiet",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Synth",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-046",
+   "query": "the hats are too harsh",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-047",
+   "query": "my kick has no punch",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-048",
+   "query": "can you tell me what track 3 is",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-049",
+   "query": "are the drums panned",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_track_state",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "'Drum Bus' is centred."
+   },
+   "verdict": "right",
+   "answer": "'Drum Bus' is centred."
+  },
+  {
+   "id": "blind-r6-050",
+   "query": "tell me about the drum bus",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-051",
+   "query": "should I mute the fx print",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That's a question, so nothing changed. Ask it in chat for an answer, or say the change you want (\"set FX Print to -6 dB\") and KENN prepares it.",
+    "understood": {
+     "action": null,
+     "track": "FX Print",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That's a question, so nothing changed. Ask it in chat for an answer, or say the change you want (\"set FX Print to -6 dB\") and KENN prepares it."
+  },
+  {
+   "id": "blind-r6-052",
+   "query": "what would happen if I soloed the bass",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-053",
+   "query": "how do I pan something",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That's a how-to question, so nothing changed. Ask it in chat and KENN explains the steps, or say it as a request (\"solo the lead vocal\") and KENN prepares it.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That's a how-to question, so nothing changed. Ask it in chat and KENN explains the steps, or say it as a request (\"solo the lead vocal\") and KENN prepares it."
+  },
+  {
+   "id": "blind-r6-054",
+   "query": "what does solo do",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-055",
+   "query": "did you mute the kick",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That's a question, so nothing changed. Ask it in chat for an answer, or say the change you want (\"set FX Print to -6 dB\") and KENN prepares it.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That's a question, so nothing changed. Ask it in chat for an answer, or say the change you want (\"set FX Print to -6 dB\") and KENN prepares it."
+  },
+  {
+   "id": "blind-r6-056",
+   "query": "the mix sounds muddy",
+   "category": "question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "Session low end is already well balanced. Sub bass is mono-centered and no hot low-mid rumble was detected. To insert a high-pass filter, tell me which track you'd like to add EQ Eight to.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "Session low end is already well balanced. Sub bass is mono-centered and no hot low-mid rumble was detected. To insert a high-pass filter, tell me which track yo"
+  },
+  {
+   "id": "blind-r6-057",
+   "query": "duck the synth 3 dB",
+   "category": "slang",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.42495,
+   "got": {
+    "action": "set_volume",
+    "track": "Synth",
+    "device": null,
+    "value": 0.42495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-058",
+   "query": "nuke the fx print",
+   "category": "slang",
+   "expected": "set_mute",
+   "expected_track": "FX Print",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "FX Print",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-059",
+   "query": "bring the drum bus back to zero",
+   "category": "slang",
+   "expected": "set_volume",
+   "expected_track": "Drum Bus",
+   "want": 0.85,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Drum Bus down 2 dB\" or \"set Drum Bus to -6 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Drum Bus down 2 dB\" or \"set Drum Bus to -6 dB\"."
+  },
+  {
+   "id": "blind-r6-060",
+   "query": "kick minus six",
+   "category": "slang",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-061",
+   "query": "snare +1.5 dB",
+   "category": "slang",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "set_volume",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.53745,
+    "name": null
+   },
+   "verdict": "wrong",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-062",
+   "query": "bump the bass a smidge",
+   "category": "slang",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-063",
+   "query": "crank the vocal",
+   "category": "slang",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Lead Vocal",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-064",
+   "query": "hats hard left",
+   "category": "slang",
+   "expected": "set_pan",
+   "expected_track": "Hi-Hats",
+   "want": -1.0,
+   "got": {
+    "action": "set_pan",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": -1.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-065",
+   "query": "synth dead centre",
+   "category": "slang",
+   "expected": "set_pan",
+   "expected_track": "Synth",
+   "want": 0.0,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'Synth' is already centred. Nothing to change.",
+    "understood": {
+     "action": "set_pan",
+     "track": "Synth",
+     "value": 0.0
+    }
+   },
+   "verdict": "right",
+   "answer": "'Synth' is already centred. Nothing to change."
+  },
+  {
+   "id": "blind-r6-066",
+   "query": "lose the clap",
+   "category": "slang",
+   "expected": "set_mute",
+   "expected_track": "Snare / Clap",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-067",
+   "query": "give me the bass by itself",
+   "category": "slang",
+   "expected": "set_solo",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-068",
+   "query": "bass down 4",
+   "category": "slang",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.4,
+   "got": {
+    "action": "set_volume",
+    "track": "Bass",
+    "device": null,
+    "value": 0.4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-069",
+   "query": "kick +3",
+   "category": "slang",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-070",
+   "query": "synth 20 left",
+   "category": "slang",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Synth",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-071",
+   "query": "hats off",
+   "category": "slang",
+   "expected": "set_mute",
+   "expected_track": "Hi-Hats",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-072",
+   "query": "clap on",
+   "category": "slang",
+   "expected": "set_mute",
+   "expected_track": "Snare / Clap",
+   "want": false,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Snare / Clap",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-073",
+   "query": "solo kick n bass",
+   "category": "slang",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: That mentions Bass, Kick. Which single track should change, and by how much? For example \"turn the Bass down 3 dB\".",
+    "understood": {
+     "action": "set_solo",
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: That mentions Bass, Kick. Which single track should change, and by how much? For example"
+  },
+  {
+   "id": "blind-r6-074",
+   "query": "vox rec ready",
+   "category": "slang",
+   "expected": "set_arm",
+   "expected_track": "Lead Vocal",
+   "want": true,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Lead Vocal",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-075",
+   "query": "new audio track please",
+   "category": "other",
+   "expected": "create_audio_track",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "create_audio_track",
+    "track": "",
+    "device": null,
+    "value": {
+     "track_count": 9,
+     "track_index": 8,
+     "type": "audio"
+    },
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-076",
+   "query": "add a midi channel called Keys",
+   "category": "other",
+   "expected": "create_midi_track",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-077",
+   "query": "drop a locator called Hook here",
+   "category": "other",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "add_locator",
+    "track": null,
+    "device": null,
+    "value": {
+     "name": "Hook",
+     "time_beats": 0.0
+    },
+    "name": "Hook"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-078",
+   "query": "mark the drop as Drop 2",
+   "category": "other",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-079",
+   "query": "call the bass Sub Bass",
+   "category": "other",
+   "expected": "rename_track",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-080",
+   "query": "rename the vocal track to Lead",
+   "category": "other",
+   "expected": "rename_track",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "rename_track",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": "Lead",
+    "name": "Lead"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-081",
+   "query": "start playing",
+   "category": "other",
+   "expected": "transport_play",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "transport_play",
+    "track": null,
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-082",
+   "query": "stop it",
+   "category": "other",
+   "expected": "transport_stop",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "transport_stop",
+    "track": null,
+    "device": null,
+    "value": false,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-083",
+   "query": "play the song from the top",
+   "category": "other",
+   "expected": "transport_play",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: KENN can only start playback from where the playhead is, not from top. Move the playhead there in Live, then say \"play\".",
+    "understood": {
+     "action": "transport_play",
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: KENN can only start playback from where the playhead is, not from top. Move the playhead"
+  },
+  {
+   "id": "blind-r6-084",
+   "query": "put a compressor on the synth",
+   "category": "other",
+   "expected": "insert_device",
+   "expected_track": "Synth",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Synth",
+    "device": "Compressor",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-085",
+   "query": "add an EQ Eight to the kick",
+   "category": "other",
+   "expected": "insert_device",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Kick",
+    "device": "EQ Eight",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-086",
+   "query": "what's on the drum bus",
+   "category": "other",
+   "expected": "inspect_devices",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "inspect_devices",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "'Drum Bus' has: Compressor."
+   },
+   "verdict": "right",
+   "answer": "'Drum Bus' has: Compressor."
+  },
+  {
+   "id": "blind-r6-087",
+   "query": "show me all my tracks",
+   "category": "other",
+   "expected": "inspect_tracks",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_tracks",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "I found 8 Live track(s)."
+   },
+   "verdict": "right",
+   "answer": "I found 8 Live track(s)."
+  },
+  {
+   "id": "blind-r6-088",
+   "query": "send the synth to the delay at 25%",
+   "category": "other",
+   "expected": "set_send",
+   "expected_track": "Synth",
+   "want": null,
+   "got": {
+    "action": "set_send",
+    "track": "Synth",
+    "device": null,
+    "value": 0.25,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-089",
+   "query": "bass to the reverb 10 percent",
+   "category": "other",
+   "expected": "set_send",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "set_send",
+    "track": "Bass",
+    "device": null,
+    "value": 0.1,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r6-090",
+   "query": "open the drum bus compressor",
+   "category": "other",
+   "expected": "focus_device",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That device is already focused in Ableton Live.",
+    "understood": {
+     "action": "focus_device",
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That device is already focused in Ableton Live."
+  },
+  {
+   "id": "blind-r6-091",
+   "query": "delete the synth",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "Deleting, removing, overwriting, and replacing Live content are disabled by the KENN assistant boundary.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "Deleting, removing, overwriting, and replacing Live content are disabled by the KENN assistant boundary."
+  },
+  {
+   "id": "blind-r6-092",
+   "query": "set the master to -6",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-093",
+   "query": "export the mix",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-094",
+   "query": "undo everything",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_change_history",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "I haven't made any changes to this session yet."
+   },
+   "verdict": "right",
+   "answer": "I haven't made any changes to this session yet."
+  },
+  {
+   "id": "blind-r6-095",
+   "query": "make it sound better",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-096",
+   "query": "fix the low end",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "Session low end is already well balanced. Sub bass is mono-centered and no hot low-mid rumble was detected. To insert a high-pass filter, tell me which track you'd like to add EQ Eight to.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "Session low end is already well balanced. Sub bass is mono-centered and no hot low-mid rumble was detected. To insert a high-pass filter, tell me which track yo"
+  },
+  {
+   "id": "blind-r6-097",
+   "query": "mute everything",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-098",
+   "query": "unmute all tracks",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-099",
+   "query": "solo nothing",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-100",
+   "query": "pan everything center",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-101",
+   "query": "turn it all down 3 dB",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-102",
+   "query": "group the drums",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-103",
+   "query": "mute the piano",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-104",
+   "query": "put the kick at 5 dB",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That would take the track above 0 dB, which KENN doesn't set.",
+    "understood": {
+     "action": "set_volume",
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That would take the track above 0 dB, which KENN doesn't set."
+  },
+  {
+   "id": "blind-r6-105",
+   "query": "set the bass to 200 percent",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-106",
+   "query": "pan the hats 150% left",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-107",
+   "query": "bring the vocal up 3 dB",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'Lead Vocal' is at 0.0 dB, so up 3 dB would take it above 0 dB, which KENN doesn't set.",
+    "understood": {
+     "action": "set_volume",
+     "track": "Lead Vocal",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "'Lead Vocal' is at 0.0 dB, so up 3 dB would take it above 0 dB, which KENN doesn't set."
+  },
+  {
+   "id": "blind-r6-108",
+   "query": "raise the fx print by 2 dB",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'FX Print' is at 0.0 dB, so up 2 dB would take it above 0 dB, which KENN doesn't set.",
+    "understood": {
+     "action": "set_volume",
+     "track": "FX Print",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "'FX Print' is at 0.0 dB, so up 2 dB would take it above 0 dB, which KENN doesn't set."
+  },
+  {
+   "id": "blind-r6-109",
+   "query": "make the synth louder than the vocal",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Synth up 2 dB\" or \"set Synth to -6 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Synth",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: By how much? For example \"turn Synth up 2 dB\" or \"set Synth to -6 dB\"."
+  },
+  {
+   "id": "blind-r6-110",
+   "query": "match the kick to the snare",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r6-111",
+   "query": "copy the bass settings to the synth",
+   "category": "must_ask",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Synth",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  }
+ ]
+}

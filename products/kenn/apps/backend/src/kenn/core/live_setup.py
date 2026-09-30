@@ -37,8 +37,8 @@ def live_apps(applications: Path = Path("/Applications")) -> list[Path]:
     return sorted(applications.glob("Ableton Live 12*.app"))
 
 
-def user_library_remote_scripts(preferences: Path | None = None, home: Path | None = None) -> Path:
-    """Remote Scripts folder of the User Library the newest Live uses."""
+def user_library(preferences: Path | None = None, home: Path | None = None) -> Path:
+    """The User Library folder the newest Live uses."""
     home = home or Path.home()
     preferences = preferences or home / "Library" / "Preferences" / "Ableton"
     for folder in sorted(preferences.glob("Live 1*"), key=_version_key, reverse=True):
@@ -49,8 +49,13 @@ def user_library_remote_scripts(preferences: Path | None = None, home: Path | No
             continue
         for node in root.iter("ProjectPath"):
             if node.get("Value"):
-                return Path(node.get("Value", "")) / "User Library" / "Remote Scripts"
-    return home / "Music" / "Ableton" / "User Library" / "Remote Scripts"
+                return Path(node.get("Value", "")) / "User Library"
+    return home / "Music" / "Ableton" / "User Library"
+
+
+def user_library_remote_scripts(preferences: Path | None = None, home: Path | None = None) -> Path:
+    """Remote Scripts folder of the User Library the newest Live uses."""
+    return user_library(preferences, home) / "Remote Scripts"
 
 
 def installed_stamp(remote_scripts: Path) -> dict[str, Any] | None:

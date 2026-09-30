@@ -16,6 +16,7 @@ from kenn.retrieval.retrieval import (
     warm_metadata_cache,
 )
 from kenn.retrieval.index_store import active_version_dir
+from kenn.core import source_tiers
 
 from kenn.core.chat_constants import (
     CHUNKS_PATH,
@@ -344,6 +345,7 @@ def evidence_label(chunk: dict) -> str:
         "youtube_transcript": "Reviewed producer transcript",
         "reference_document": "Reference document",
         "manual_reference": "Manual reference",
+        "measured_live_data": "Measured in Live",
     }
     return labels.get(evidence_class(chunk), "Retrieved reference")
 
@@ -757,6 +759,7 @@ def intent_guard_failed(query: str, results: list[tuple[float, dict]]) -> bool:
 def result_payload(query: str, results: list[tuple[float, dict]], limit: int = 3) -> list[dict]:
     payload = []
     for score, chunk in display_results(query, results, limit):
+        tier = source_tiers.tier_of(evidence_class(chunk))
         payload.append(
             {
                 "score": round(score, 3),
@@ -765,6 +768,8 @@ def result_payload(query: str, results: list[tuple[float, dict]], limit: int = 3
                 "kind": chunk.get("kind", "manual"),
                 "evidence_class": evidence_class(chunk),
                 "evidence_label": evidence_label(chunk),
+                "tier": tier,
+                "tier_label": source_tiers.tier_label(tier),
                 "title": chunk.get("title", ""),
                 "creator": chunk.get("source_creator", ""),
                 "transcript_file": chunk.get("transcript_file", ""),
