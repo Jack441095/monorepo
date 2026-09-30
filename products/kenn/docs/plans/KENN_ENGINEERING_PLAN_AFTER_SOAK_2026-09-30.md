@@ -274,7 +274,25 @@ Serves: Stage 0 exit (qualified gate, 3 testers) and the beta plan.
 |---|---|---|---|
 | E1 | **Parked to the very end** (owner, 30 Sept: KENN isn't good enough yet). Developer ID, then wire signing and notarisation into `build_kenn_app.py` | S after ID | Jack |
 | E2 | **Parked** (owner, 30 Sept: not worth testing yet). Choose 3 testers with their own projects; the invite, reviewer brief and supervised session script already exist | S | Jack |
-| E3 | Rollback and update path: keep the last two DMGs, a "how to go back" note, the version shown in the app | M | |
+| E3 | Rollback and update path: keep the last two DMGs, a "how to go back" note, the version shown in the app | M | **Done 30 Sept** on branch `kenn-ci-scheduled`; unverified on a real install (needs a signed build) |
+
+> **E3, 30 Sept** (branch `kenn-ci-scheduled`): all three delivered. **`build_dmg` keeps the newest two
+> `KENN-beta-*.dmg`** in the output folder (`--keep-dmgs`, default 2), so the previous build is always still
+> installable — retention is by **modification time rather than the commit in the filename**, because a rebuild of the
+> same commit produces the same name and the pair actually installed still has to survive. **The tray menu shows the
+> build**, read from `Resources/build_manifest.json`: `Build: 65496ca  (2026-09-30, index v-db8c6334cf63)`. It is the
+> commit, the build date and the index the build shipped with, and it reads `Build: unknown` rather than guessing when
+> there is no manifest — a tester filing "it broke" has to be able to name their build before anyone reads the
+> description. **`docs/runbooks/KENN_ROLLBACK_AND_UPDATE.md`** is the "how to go back" note, and it is explicit about
+> what a rollback does **not** undo: data KENN wrote (receipts, asked log, project memory) survives it deliberately,
+> Remote Scripts come back with the older bundle, and no set is affected because KENN never writes to a set without
+> Apply. 6 tests; backend suite green on the branch at **2,443 passed, 125 skipped**.
+> **Not verified on a real install** — that needs a signed build and a second one to roll back to, and signing is
+> E1, parked by the owner. What is verified here is the retention logic and the manifest read, both by test.
+> One defect the tests caught: the version line truncated the index version to 12 characters, which names a version
+> that does not exist (`v-db8c6334cf` is not a real index). That test had also been formatting the line itself rather
+> than calling the function, so it passed regardless; both are fixed.
+
 | E4 | Check on the installed build that diagnostics send receipts and timings only, never audio or typed text | S | |
 | E5 | A weekly review of what KENN did not understand, fed into B4 (starts when testers do) | S weekly | E2 |
 
