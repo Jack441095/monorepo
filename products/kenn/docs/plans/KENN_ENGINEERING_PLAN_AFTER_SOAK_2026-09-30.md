@@ -143,7 +143,7 @@ the monthly measures.
 
 | ID | Task | Size | Needs |
 |---|---|---|---|
-| F1 | `sync_kenn_app.sh`: the monorepo-to-`kenn-app` sync as one command: split `products/kenn`, check the fast-forward, scan the new commits for secrets and attribution lines, run the CI script on a fresh worktree, then push. It does by script what was done by hand on 30 Sept | S–M | |
+| F1 | `sync_kenn_app.sh`: the monorepo-to-`kenn-app` sync as one command: split `products/kenn`, check the fast-forward, scan the new commits for secrets and attribution lines, run the CI script on a fresh worktree, then push. It does by script what was done by hand on 30 Sept | S–M | Done 30 Sept on branch `kenn-sync-script`; reaches `main` with the next release |
 | F2 | A monthly measures report: one command printing the North Star's list (understanding, answer quality, recall, latency by stage, unauthorised writes, undo success, how often the model's answer lands) and the two added on 28 Sept (answers with no citable source; grounding-gate rejections and why) | M | |
 | F3 | A personal-path gate for KENN like SLO's, and scrub the 52 files and 156 places that name a home path, the Live volume or the GPU host | M | |
 | F4 | One `chat` package: `chat/` and `packages/chat/` both exist with their own `app.py`, `eval_runner.py` and `index_runtime.py`, and tooling loads the wrong one under the bare name `app`. Pick the canonical copy, remove the other | M | Jack reviews |
