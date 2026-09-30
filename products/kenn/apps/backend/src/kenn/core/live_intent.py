@@ -1969,6 +1969,27 @@ _VALUE_QUESTION_EXCLUDE = re.compile(
     r"dry|wet|width|filter|cutoff|resonance)\b", re.I)
 
 
+def _unhandled_conjunct(lower: str, track_name: str) -> str | None:
+    """The half of a two-part "and" sentence that names something other than the track we are asking about.
+
+    A producer who said two things must not be asked about one of them. "make the hats quieter and the kick punchier"
+    resolved to the Kick and asked "By how much?", and the Hi-Hats was never mentioned again -- the same shape as
+    round 9's "mute the Kick, mute the hats" quietly proposing one mute. Asking is right; asking about the Kick while
+    forgetting the hats is not.
+    """
+    parts = re.split(r"\s*,?\s+and\s+(?!then\b)", lower)
+    if len(parts) != 2:
+        return None
+    named = track_name.casefold()
+    if named in parts[1]:
+        other = parts[0]
+    elif named in parts[0]:
+        other = parts[1]
+    else:
+        return None
+    return other.strip() or None
+
+
 def _missing_value_question(lower: str, track_name: str) -> tuple[str, str, str] | None:
     """(action, missing field, question) for a clear request that lacks one value."""
     if _VALUE_QUESTION_EXCLUDE.search(lower):
@@ -1986,8 +2007,11 @@ def _missing_value_question(lower: str, track_name: str) -> tuple[str, str, str]
     if not db and (louder or quieter) and not (louder and quieter) and not re.search(r"\d", lower) \
             and re.search(r"\b(?:louder|quieter|softer|turn|bring|make|volume|level|up|down)\b", lower):
         verb = "up" if louder else "down"
-        return ("set_volume", "amount",
-                f"By how much? For example \"turn {track_name} {verb} 2 dB\" or \"set {track_name} to -6 dB\".")
+        question = f"By how much? For example \"turn {track_name} {verb} 2 dB\" or \"set {track_name} to -6 dB\"."
+        other = _unhandled_conjunct(lower, track_name)
+        if other:
+            question += (f" I didn't catch \"{other}\" -- send that on its own, or give me both amounts.")
+        return ("set_volume", "amount", question)
     side = re.search(r"\bpan\b.*?\b(left|right)\b", lower)
     if side and not re.search(r"\d|\b(?:hard|fully|all\s+the\s+way|cent(?:er|re)|middle)\b", lower):
         where = side.group(1)
