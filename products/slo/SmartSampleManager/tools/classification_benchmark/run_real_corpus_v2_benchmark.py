@@ -45,7 +45,12 @@ def calculate_metrics(y_true, y_pred, labels):
         f1 = 2.0 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
         n = sum(1 for t in y_true if t == label)
         metrics[label] = {"n": n, "precision": precision, "recall": recall, "f1": f1}
-    macro_f1 = sum(m["f1"] for m in metrics.values()) / len(labels) if labels else 0.0
+    # Divide by the classes actually present, not the full taxonomy: a class
+    # the slice does not contain contributes a hard 0.0 and silently deflates
+    # the average. See the same fix in run_benchmark.py.
+    present = [label for label in labels if any(t == label for t in y_true)]
+    macro_f1 = (sum(metrics[label]["f1"] for label in present) / len(present)
+                if present else 0.0)
     accuracy = sum(1 for t, p in zip(y_true, y_pred) if t == p) / total if total > 0 else 0.0
     return metrics, macro_f1, accuracy
 

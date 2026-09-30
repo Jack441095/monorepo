@@ -37,8 +37,16 @@ def calculate_metrics(y_true, y_pred, labels):
             "f1": f1
         }
         
-    # Macro F1
-    macro_f1 = sum(m["f1"] for m in metrics.values()) / len(labels) if labels else 0.0
+    # Macro F1. The denominator is the number of classes actually PRESENT in
+    # y_true, not len(labels). Dividing by the full taxonomy means any class the
+    # slice does not contain contributes a hard 0.0 and silently deflates the
+    # average -- a 3-class slice scored against a 16-label list reported a macro
+    # F1 at most 3/16 of its real value. That is how a slice with no Percussion
+    # rows could be reported as if it had failed on Percussion. Weighted F1 and
+    # accuracy were already computed over the rows that exist.
+    present = [label for label in labels if any(t == label for t in y_true)]
+    macro_f1 = (sum(metrics[label]["f1"] for label in present) / len(present)
+                if present else 0.0)
     
     # Weighted F1
     weighted_f1 = sum(m["f1"] * m["n"] for m in metrics.values()) / total_samples if total_samples > 0 else 0.0

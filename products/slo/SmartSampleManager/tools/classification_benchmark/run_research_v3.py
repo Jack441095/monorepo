@@ -307,6 +307,7 @@ def calculate_energy(logits, temperature):
 def calculate_f1_score(y_true, y_pred, labels):
     metrics = {}
     macro_f1 = 0.0
+    present_count = 0
     for label in labels:
         tp = sum(1 for t, p in zip(y_true, y_pred) if t == label and p == label)
         fp = sum(1 for t, p in zip(y_true, y_pred) if t != label and p == label)
@@ -315,8 +316,12 @@ def calculate_f1_score(y_true, y_pred, labels):
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
         f1 = 2.0 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
         metrics[label] = {"precision": precision, "recall": recall, "f1": f1}
-        macro_f1 += f1
-    macro_f1 /= len(labels) if len(labels) > 0 else 1.0
+        if any(t == label for t in y_true):
+            macro_f1 += f1
+            present_count += 1
+    # Classes absent from y_true contribute nothing to the average; counting them
+    # as 0.0 would report a slice as having failed on classes it never saw.
+    macro_f1 /= present_count if present_count > 0 else 1.0
     accuracy = sum(1 for t, p in zip(y_true, y_pred) if t == p) / len(y_true) if len(y_true) > 0 else 0.0
     return accuracy, macro_f1, metrics
 
