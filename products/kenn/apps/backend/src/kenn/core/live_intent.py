@@ -1865,6 +1865,8 @@ _NOTES_TASK_LABEL = re.compile(r"^\s*(?:todo|fixme|note)\s*:\s*", re.I)
 # track list ("Kick - Hats") is untouched.
 _NOTES_SPACED_SIGN = re.compile(r"(?<=\s)-\s+(?=\d)")
 _NOTES_CONTROL_NOUN = re.compile(r"\s+(?:fader|level|volume|pan|pan\s+pot)\s*$", re.I)
+_NOTES_NOT_A_NAME = re.compile(r"\b(?:is|are|'s|not|no|off|out|soloed|unsoloed|muted|unmuted|armed|disarmed|"
+                                r"record|sending|send|into)\b", re.I)
 # Section labels a notes document actually uses, mapped to the wording the rules parse. Deliberately a
 # closed list: "MUTE:" and "PAN:" are missing because those words are the verb themselves, and dropping
 # them would turn a working line into a noun.
@@ -1898,12 +1900,14 @@ _NOTES_RENAME_ARROW = re.compile(
 _NOTES_OPEN_ARROW = re.compile(
     r"^\s*open\s*:\s*(?P<track>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*(?:/|->|→|—|–)\s*(?P<device>\S.+?)\s*[.!]?\s*$", re.I)
 _NOTES_LIST_TRACKS = re.compile(r"^\s*list\s*:\s*(?:all\s+|my\s+|the\s+)?tracks?\s*[.!]?\s*$", re.I)
-# "Lead Vocal send into A-Reverb: 25%", "Lead Vocal -> A-Reverb 30%": the return and the amount, said
-# in the order a notes line puts them.
+# "HATS -> A-Reverb 30%", "Lead Vocal send into A-Reverb: 25%": the return and the amount, said in the order a
+# notes line puts them. A document separator is required, so ordinary wording ("synth to the delay at 20%")
+# is left to the send rules that already read it.
 _NOTES_SEND = re.compile(
-    r"^\s*(?:(?:send|feed|route)\s+)?(?P<track>[^:—–]+?)\s*(?:'s\s+)?"
-    r"(?:\b(?:send|feed|into|to)\b\s*)?(?:->|→|—|–)?\s*(?P<return>[ab]\s*-?\s*(?:reverb|delay)|reverb|verb|delay)"
-    r"\s*(?::|->|→|—|–|at|to)?\s*(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)?\s*[.!]?\s*$", re.I)
+    r"^\s*(?P<track>[\w/'&-]+(?:\s+[\w/'&-]+){0,2}?)\s*(?:'s)?\s*"
+    r"(?:\b(?:send|feed|route)\s+(?:into|to)\s+(?:the\s+)?|(?:->|→|—|–|:)\s*(?:the\s+)?)"
+    r"(?P<return>[ab]\s*-?\s*(?:reverb|delay)|reverb|verb|delay)\s*"
+    r"(?::|-|–|—)?\s*(?P<value>\d+(?:\.\d+)?)\s*(?:%|percent)?\s*[.!]?\s*$", re.I)
 # "Drum Bus comp threshold: -22 dB", "vocal comp dry/wet 40%": the setting named before the value, which
 # the setting-first device rules don't read.
 _NOTES_DEVICE_SETTING = re.compile(
@@ -1938,6 +1942,10 @@ def _rewrite_notes_line(text: str, tracks: list[dict[str, Any]]) -> str:
         # A control noun ("KICK FADER") is the notes document's way of naming the fader, not part of the
         # track's name, so it comes off before the name is matched against the set.
         stripped = _NOTES_CONTROL_NOUN.sub("", candidate).strip()
+        # _find_track is lenient, and a lazy name group will happily swallow "is not" from
+        # "the bass is not soloed". Anything carrying a state or a copula is a sentence, not a name.
+        if _NOTES_NOT_A_NAME.search(stripped):
+            return None
         return stripped if _find_track(stripped, tracks)[0] is not None else None
 
     if not re.match(r"^\s*(?:send|feed|route)\b", text, re.I) and (m := _NOTES_SEND.match(text)):
@@ -2662,10 +2670,10 @@ def _parse_single_request(query: str, session_snapshot: dict[str, Any] | None) -
 def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) -> dict[str, Any]:
     tracks_said = [t for t in ((session_snapshot or {}).get("tracks") or []) if isinstance(t, dict)]
     raw_text = " ".join(str(query or "").strip().split())
-    # Pasted mix notes are the one shape that arrives with notation instead of words, so they get their own
-    # pass over the set's real track names. It runs before _rewrite_shorthand because it is only cleanup
-    # ("KICK - 18 dB" loses the space the document padded into the sign), leaving ordinary wording behind.
-    text = _rewrite_shorthand(_rewrite_notes_line(_rewrite_common_phrasings(raw_text), tracks_said), tracks_said)
+    # Pasted mix notes are the one shape that arrives with notation instead of words. They are cleaned
+    # before the wording rewrites, not after: "KICK FADER: -18 dB" only becomes "KICK to -18 dB" once the
+    # colon is gone, and it is _rewrite_common_phrasings that then reads that as a target.
+    text = _rewrite_shorthand(_rewrite_common_phrasings(_rewrite_notes_line(raw_text, tracks_said)), tracks_said)
     numeric_text = _normalize_kilohertz(_normalize_spoken_numbers(text))
     base = {
         "schema": "kenn.ableton_intent.v1",
