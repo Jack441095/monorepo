@@ -186,7 +186,30 @@ the monthly measures.
 > are unreachable behind an `exec`, so that file is a tombstone pointing at the read-only preflight.
 
 
-| F4 | One `chat` package: `chat/` and `packages/chat/` both exist with their own `app.py`, `eval_runner.py` and `index_runtime.py`, and tooling loads the wrong one under the bare name `app`. Pick the canonical copy, remove the other | M | Jack reviews |
+| F4 | One `chat` package: `chat/` and `packages/chat/` both exist with their own `app.py`, `eval_runner.py` and `index_runtime.py`, and tooling loads the wrong one under the bare name `app`. Pick the canonical copy, remove the other | M | **Analysis done 30 Sept** on branch `kenn-chat-copies`; **the decision is Jack's** (plan decision 8) |
+
+> **F4, 30 Sept** (branch `kenn-chat-copies`, `docs/reviews/KENN_CHAT_PACKAGE_DUPLICATION_2026-09-30.md`): all three
+> claims in the task row are true, and the third is worse than stated. `chat/` is 11 files, `packages/chat/` is 23;
+> `index_runtime.py` is byte-identical, `packages/chat/app.py` is a **strict superset** (310 insertions / 17 deletions —
+> `POST /chat`, `/mix-review`, `/feedback`, request-ID middleware, 29 more `MIX_ADVICE_TERMS`, and the handler that
+> turns the retrieval layer's `SystemExit` into an abstention). Measured independently: with
+> `PYTHONPATH=apps/backend/src:tooling:packages/chat:...`, **all three of `app`, `eval_runner` and `index_runtime`
+> resolve to `packages/chat/`** while `ci_verification.sh:22` runs `chat/tests`. So the copy CI exercises is the one
+> nothing imports, and the copy everything imports has **never been run by CI** — `packages/chat/tests` is 41 test
+> functions against `chat/`'s 16, and it holds the only coverage of `/mix-review`, `/feedback`, the 50 MB upload
+> ceiling, path traversal and prompt injection.
+> **Recommendation in the review: make `packages/chat/` canonical** (it owns all 13 runtime call sites; `chat/` wins
+> only on CI, which is one line). **The flip is not one line, though, and this is the part that would have bitten
+> us:** `packages/chat/tests` has **zero `pytest.skip` calls**, so 8 of its tests hard-fail on a fresh checkout where
+> the git-ignored index is absent — verified here, `8 failed, 57 passed` — and `chat/tests/test_app.py:189` has the
+> guard the other copy lacks (`if not client.get("/health").json()["retrieval"]["available"]: pytest.skip(...)`).
+> So the removal needs those 8 guards (or an index build in CI) **before** line 22 flips, plus three hand-written
+> target lists that move together (`qualify_internal_beta.py:504`, `run_tests_on_box.py:35`,
+> `test_internal_beta_gate.py:357`). The review lists every file and line that breaks, six docs already pointing at
+> `chat/` for files that only exist in `packages/chat/` (`OPERATIONS.md:85` cites a `chat/tests/test_public_api.py`
+> that does not exist), and the same `mix-review/` / `automix/` duplication. Nothing was deleted — that is decision 8.
+
+
 | F5 | CI: a fresh-clone "skips budget" (fail if the skip count grows), a weekly scheduled run of the chaos suite and phrasing scorer, a pull-request template | S | |
 | F6 | Each release, audit every gate with a test that reproduces its bypass (the 28 Sept lesson) | S per release | |
 | F7 | Point the 10 old plan docs that are still linked at the North Star, then delete them | S | |
@@ -287,4 +310,4 @@ Each night starts when Jack says "ready", and a Live pause needs his approval fo
 7. **D1** the Mac timing measurement.
 8. **F2** the monthly measures report.
 9. **B4** the wording triage script.
-10. **F4** the analysis of the two `chat` copies, ready for review.
+10. **F4** the analysis of the two `chat` copies, ready for review. *Done 30 Sept, on `kenn-chat-copies`; the choice is decision 8.*
