@@ -15,7 +15,7 @@ func usage() -> Never {
       nitesubmit-cli pack    <files...> --out <archive.7z> [--format 7z|zip|tar.gz] [--level store|fast|normal|maximum]
       nitesubmit-cli optimize <file.pdf> --out <output.pdf>  (lossless; writes a new file, never overwrites the source)
       nitesubmit-cli batch   <input-dir> --out <output-dir> [--template "<tpl>"] [--student-id <id>] [--collision error|counter] [--dry-run] [--approved-manifest approvals.json]
-                         [--identity-policy no-rule|name-required|name-prohibited]
+                         [--identity-policy no-rule|name-required|name-prohibited] [--ignore-bad-manifest]
                          default template: {student_id}_{project_title}
       nitesubmit-cli organize <input-dir> [--rule category|date|custom] [--template "<tpl>"] [--to <output-dir>] [--dry-run] [--json] [--force]
       nitesubmit-cli validate --manifest real_manifest.json [--out results.json]
@@ -200,7 +200,23 @@ case "batch":
     let approvedManifest = args.firstIndex(of: "--approved-manifest").flatMap {
         $0 + 1 < args.count ? args[$0 + 1] : nil
     }
-    let approvedSources = loadApprovedSources(approvedManifest)
+    let approvedSources: Set<String>
+    switch loadApprovedSources(approvedManifest) {
+    case .approved(let sources):
+        approvedSources = sources
+    case .rejected(let reason):
+        // A manifest we were told to use and could not use is a failed run, not a warning: the
+        // caller asked for those approvals to be honoured, and quietly processing with none of
+        // them would ship inferred filenames the operator believed they had approved.
+        guard args.contains("--ignore-bad-manifest") else {
+            FileHandle.standardError.write(Data("Batch blocked: approval manifest rejected — \(reason). Fix the file, or re-run with --ignore-bad-manifest to process the batch with no approvals.\n".utf8))
+            exit(2)
+        }
+        FileHandle.standardError.write(Data("Warning: approval manifest rejected (\(reason)) — continuing with no approvals because --ignore-bad-manifest was passed.\n".utf8))
+        approvedSources = []
+    case .notRequested:
+        approvedSources = []
+    }
     var identityPolicy: DocumentIdentityPolicy = .noRule
     if let i = args.firstIndex(of: "--identity-policy") {
         guard i + 1 < args.count else {

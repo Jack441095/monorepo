@@ -160,6 +160,35 @@ public struct SubmissionMetadata: Codable, Equatable, Sendable {
     }
 }
 
+public extension SubmissionMetadata {
+    /// Templated variables whose detected value never reached HIGH confidence, sorted so a
+    /// report lists them in a stable order. Every variable the naming rule mentions is checked,
+    /// not just name, id, candidate and code: batch mode used to wave through a rule built on
+    /// {module_code} or {university} values the detector had only guessed at.
+    func lowConfidenceVariables(in variables: Set<String>) -> [String] {
+        // assignment_title is the same detection as project_title (see variableMap), and the
+        // three name variables all come from one name detection, so each group shares a value.
+        let confidenceByVariable: [String: Confidence] = [
+            "first_name": studentName.confidence,
+            "last_name": studentName.confidence,
+            "full_name": studentName.confidence,
+            "student_id": studentId.confidence,
+            "candidate_number": candidateNumber.confidence,
+            "assignment_code": assignmentCode.confidence,
+            "group_id": groupId.confidence,
+            "university": university.confidence,
+            "module_code": moduleCode.confidence,
+            "module_title": moduleTitle.confidence,
+            "project_title": projectTitle.confidence,
+            "assignment_title": projectTitle.confidence,
+        ]
+        return confidenceByVariable
+            .filter { variables.contains($0.key) && $0.value != .high }
+            .map(\.key)
+            .sorted()
+    }
+}
+
 public enum MetadataField: String, CaseIterable, Codable, Sendable {
     case studentName = "student_name"
     case studentId = "student_id"

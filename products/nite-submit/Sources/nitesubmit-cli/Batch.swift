@@ -23,21 +23,29 @@ struct BatchApprovalManifest: Decodable {
     }
 }
 
-func loadApprovedSources(_ path: String?) -> Set<String> {
-    guard let path else { return [] }
+/// What --approved-manifest produced. A manifest the operator pointed at on the command line
+/// is either honoured or the run stops: continuing with an empty approval set after printing a
+/// warning meant a typo'd path silently downgraded every held row back to "nobody approved this"
+/// and the script still exited 0, so nobody noticed until the wrong filenames reached a marker.
+enum ApprovalManifest {
+    case notRequested
+    case approved(Set<String>)
+    case rejected(String)
+}
+
+func loadApprovedSources(_ path: String?) -> ApprovalManifest {
+    guard let path else { return .notRequested }
     do {
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
         let manifest = try JSONDecoder().decode(BatchApprovalManifest.self, from: data)
         guard manifest.version == "BATCH_APPROVAL_V1" else {
-            FileHandle.standardError.write(Data("Approval manifest rejected: unsupported approval_version.\n".utf8))
-            return []
+            return .rejected("\(path) declares unsupported approval_version")
         }
-        return Set(manifest.approvedSources.map {
+        return .approved(Set(manifest.approvedSources.map {
             $0.trimmingCharacters(in: .whitespacesAndNewlines)
-        }.filter { !$0.isEmpty })
+        }.filter { !$0.isEmpty }))
     } catch {
-        FileHandle.standardError.write(Data("Approval manifest rejected: could not read or decode it.\n".utf8))
-        return []
+        return .rejected("\(path) could not be read or decoded")
     }
 }
 
@@ -51,8 +59,16 @@ func runBatch(inputPath: String, outputPath: String, template: String,
         FileHandle.standardError.write(Data("Batch blocked: \(problem)\n".utf8))
         return false
     }
+    // pathIsInside canonicalizes both roots and resolves symlinks, which standardizedFileURL
+    // alone does not, so an --out that reached back into --input through a link (a Dropbox
+    // shortcut, an iCloud-synced assignments folder) is refused here instead of re-scanning the
+    // previous run's own output and doubling the batch from the second run onwards.
     let input = URL(fileURLWithPath: inputPath).standardizedFileURL
     let output = URL(fileURLWithPath: outputPath).standardizedFileURL
+    if pathIsInside(output, input) {
+        FileHandle.standardError.write(Data("Batch blocked: --out \(output.path) is inside --input \(input.path). Choose a separate output directory — writing renamed copies back into the input tree makes the next run treat them as fresh submissions.\n".utf8))
+        return false
+    }
     let fm = FileManager.default
     do {
         try fm.createDirectory(at: output, withIntermediateDirectories: true)
@@ -63,10 +79,12 @@ func runBatch(inputPath: String, outputPath: String, template: String,
         return false
     }
 
+    // The rejection above covers the usual case; this still skips any file that resolves
+    // inside --out, so a symlinked input PDF can never be re-detected from last run's output.
     let sourceURLs = (fm.enumerator(at: input, includingPropertiesForKeys: nil,
                                     options: [.skipsHiddenFiles])?.compactMap { $0 as? URL } ?? [])
         .filter { $0.pathExtension.lowercased() == "pdf" }
-        .filter { !$0.standardizedFileURL.path.hasPrefix(output.path + "/") }
+        .filter { !pathIsInside($0, output) }
         .sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }
 
     let detector = FieldDetector()
@@ -114,6 +132,12 @@ func runBatch(inputPath: String, outputPath: String, template: String,
     for source in sourceURLs {
         let sourceLabel = relative(source)
         seenSourceLabels.insert(sourceLabel)
+        // Held outside the do-block so a collision or a late write failure still reports the
+        // fields and confidences behind the filename we tried to use. The batch report is the
+        // only audit trail a run leaves, and a row reading nothing but "document_type:
+        // unavailable" told nobody which name collided or which detection had fed it.
+        var detectedFields: [String: String] = [:]
+        var detectedConfidence: [String: String] = [:]
         do {
             guard case .success(let doc) = try PDFExtractor().extract(at: source) else {
                 let identityCheck = DocumentIdentityCheck(
@@ -152,6 +176,8 @@ func runBatch(inputPath: String, outputPath: String, template: String,
             fields["document_identity_status"] = identityCheck.status.rawValue
             fields["document_identity_reason"] = identityCheck.evidence
             let confidence = confidenceMap(meta)
+            detectedFields = fields
+            detectedConfidence = confidence
             let values = meta.variableMap()
             let variables = Set(template.variables())
             var gaps: [String] = []
@@ -190,15 +216,13 @@ func runBatch(inputPath: String, outputPath: String, template: String,
                 continue
             }
 
-            let usesName = !variables.isDisjoint(with: ["first_name", "last_name", "full_name"])
             let guidanceReview = classification.kind == .guidanceTemplate
-            let uncertain = guidanceReview ||
-                (usesName && meta.studentName.confidence != .high) ||
-                (variables.contains("student_id") && meta.studentId.confidence != .high) ||
-                (variables.contains("candidate_number") && meta.candidateNumber.confidence != .high) ||
-                (variables.contains("assignment_code") && meta.assignmentCode.confidence != .high) ||
-                (variables.contains("group_id") && meta.groupId.confidence != .high) ||
-                (variables.contains("project_title") && meta.projectTitle.confidence != .high)
+            // Every variable the naming rule reads has to clear the HIGH bar. The old gate
+            // checked name, id, candidate, code, group and project title, which left
+            // {module_code}, {module_title} and {university} free to be written from a value
+            // the detector had only guessed at.
+            let uncertain = guidanceReview
+                || !meta.lowConfidenceVariables(in: variables).isEmpty
             let explicitlyApproved = approvedSources.contains(sourceLabel)
             if dryRun {
                 results.append(BatchResult(source: sourceLabel,
@@ -233,22 +257,22 @@ func runBatch(inputPath: String, outputPath: String, template: String,
                                             gaps: explicitlyApproved && uncertain ? ["explicit_approval"] : []))
             }
         } catch FileOperationError.collision(let name) {
+            // Detection already ran by the time a name can collide, so the report keeps the
+            // real fields and confidences and only the reason is overwritten.
+            var fields = detectedFields
+            fields["document_type"] = fields["document_type"] ?? "unavailable"
+            fields["document_reason"] = "Output collision: \(name)"
             results.append(BatchResult(source: sourceLabel, status: "collision",
-                                        output: nil,
-                                        fields: [
-                                            "document_type": "unavailable",
-                                            "document_reason": "Output collision: \(name)"
-                                        ],
-                                        confidence: [:],
+                                        output: nil, fields: fields,
+                                        confidence: detectedConfidence,
                                         gaps: ["output_collision", name]))
         } catch {
+            var fields = detectedFields
+            fields["document_type"] = fields["document_type"] ?? "unavailable"
+            fields["document_reason"] = "Extraction or file operation failed"
             results.append(BatchResult(source: sourceLabel, status: "failed",
-                                        output: nil,
-                                        fields: [
-                                            "document_type": "unavailable",
-                                            "document_reason": "Extraction or file operation failed"
-                                        ],
-                                        confidence: [:],
+                                        output: nil, fields: fields,
+                                        confidence: detectedConfidence,
                                         gaps: ["extraction_or_copy_failed"]))
         }
     }
