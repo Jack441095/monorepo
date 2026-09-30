@@ -93,7 +93,14 @@ BUS_ORGANIZATION_PROPOSAL_SCHEMA = "kenn.ableton_bus_organization_proposal.v1"
 BUS_ORGANIZATION_RECEIPT_SCHEMA = "kenn.ableton_bus_organization_receipt.v1"
 DEVICE_INSERTION_ALLOWLIST = frozenset({"EQ Eight", "Glue Compressor", "Saturator", "Auto Filter", "Drum Buss", "Compressor", "Hybrid Reverb", "Echo", "Roar", "Multiband Dynamics"})
 DEVICE_SETUP_PARAMETER_ALLOWLIST = {
-    "Compressor": {"threshold": ("Threshold", "dB")},
+    # Dry/Wet reads 0..1 <-> 0..100% on each of these; Glue, Saturator, Auto
+    # Filter and Drum Buss each passed a reversible 2026-09-06 readback run,
+    # and Compressor exposes the same 0..1 control.
+    "Compressor": {"threshold": ("Threshold", "dB"), "drywet": ("Dry/Wet", "%")},
+    "Glue Compressor": {"drywet": ("Dry/Wet", "%")},
+    "Saturator": {"drywet": ("Dry/Wet", "%")},
+    "Auto Filter": {"drywet": ("Dry/Wet", "%")},
+    "Drum Buss": {"drywet": ("Dry/Wet", "%")},
     "Hybrid Reverb": {"drywet": ("Dry/Wet", "%")},
     "Echo": {"drywet": ("Dry Wet", "%")},
     "Roar": {"drive": ("Drive", "dB"), "drywet": ("Dry/Wet", "%"), "tone": ("Tone", "")},
@@ -1751,7 +1758,12 @@ class LiveActionService(Tier2Tier3ControlMixin):
             None,
         )
         if canonical_name is None:
+            from kenn.core.stock_devices import stock_device_name
+
+            stock_name = stock_device_name(requested_name)
             allowed = ", ".join(sorted(DEVICE_INSERTION_ALLOWLIST))
+            if stock_name is not None:
+                return {"ok": False, "error": f"{stock_name} is a genuine Live device, but KENN can't insert it yet. Only these allow-listed devices may be inserted: {allowed}."}
             return {"ok": False, "error": f"Only these allow-listed devices may be inserted: {allowed}."}
         state = observed_state if isinstance(observed_state, dict) else self.snapshot(include_mixer=False)
         if state.get("status") in {"offline", "dispatched"}:
@@ -1825,6 +1837,11 @@ class LiveActionService(Tier2Tier3ControlMixin):
             None,
         )
         if canonical_name is None:
+            from kenn.core.stock_devices import stock_device_name
+
+            stock_name = stock_device_name(requested_name)
+            if stock_name is not None:
+                return {"ok": False, "error": f"{stock_name} is a genuine Live device, but KENN can't insert-and-configure it yet."}
             return {"ok": False, "error": "That device is not in KENN's exact insertion allowlist."}
         parameter_key = _device_setup_parameter_key(parameter_name)
         parameter_spec = DEVICE_SETUP_PARAMETER_ALLOWLIST.get(canonical_name, {}).get(parameter_key)

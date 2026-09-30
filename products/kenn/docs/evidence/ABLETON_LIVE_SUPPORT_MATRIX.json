@@ -29,9 +29,13 @@
         "supervised MIDI clip creation (exact empty slot only)",
         "sample import to an exact empty clip slot",
         "bounded two-step recipe (existing track/transport/device-parameter actions)",
-        "device insertion (append-only, allowlisted): EQ Eight, Glue Compressor, Saturator, Auto Filter, Drum Buss, Compressor, Hybrid Reverb, Echo",
+        "device insertion (append-only, allowlisted): EQ Eight, Glue Compressor, Saturator, Auto Filter, Drum Buss, Compressor, Hybrid Reverb, Echo, Roar, Multiband Dynamics",
         "device removal (identity-bound undo of an insertion)",
-        "existing-device parameter control (name-agnostic; qualified reversible parameters include EQ Eight Output/Gain/Q/Frequency, Compressor Threshold/Ratio/Output, Utility Stereo Width, Glue Compressor Threshold/Dry-Wet, Saturator Drive/Dry-Wet, Auto Filter Resonance/Dry-Wet, Drum Buss Drive/Dry-Wet)",
+        "existing-device parameter control (name-agnostic; qualified reversible parameters include EQ Eight Output/Gain/Q/Frequency (all bands share one 20 Hz..20 kHz log taper; band-qualified requests such as 1 Frequency A resolve exactly, bare keywords ask), Compressor Threshold/Ratio/Attack/Release/Output/Dry-Wet, Utility Stereo Width (Gain requests point to Output), Glue Compressor Threshold/Attack/Ratio/Dry-Wet, Saturator Drive/Dry-Wet, Auto Filter Resonance/Frequency/Dry-Wet, Drum Buss Drive/Dry-Wet, Hybrid Reverb Dry/Wet, Echo Dry Wet, Roar Drive/Dry-Wet)",
+        "insert-and-configure setup (append-only, readback-verified): Compressor Threshold, Dry/Wet setup on Compressor, Glue Compressor, Saturator, Auto Filter, Drum Buss, Hybrid Reverb, Echo, Roar, Multiband Dynamics; EQ Eight band Frequency+Gain",
+        "exact-name browser guard: fuzzy names (Reverb, Delay, Limiter) are refused before any write; a mismatched insertion is auto-removed only while the chain is exactly one unexpected device, otherwise left for inspection",
+        "stock registry: all 78 Live 12.4.6 devices by exact browser name (16 instruments, 47 audio effects, 15 MIDI effects; docs/evidence/KENN_DEVICE_COVERAGE_MAP_2026-09-29.json); unqualified stock devices get an honest can't-add-yet reply naming the device",
+        "recipe pronoun carryover: a then-step speaking in pronouns (it/its/that/this) inherits the previous clean step's track and device; each step still resolves exactly under one confirmation",
         "interruption/recovery: offline read during inspection, Live closing after a proposal but before confirmation, a companion restart with a pending proposal, and stale-undo refusal all verified to fail cleanly with no false success"
       ]
     }

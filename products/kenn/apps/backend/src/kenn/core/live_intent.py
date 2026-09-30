@@ -313,9 +313,13 @@ _ADD_DEVICE = re.compile(
     r"|\b(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b.*\b(?:add|append|insert|put|load)\b",
     re.I,
 )
+# "add glue on drums at 50% dry wet" must reach the same guarded setup path
+# as reverb/echo: each of these exposes Dry/Wet at a 0..1 range, verified by
+# the 2026-09-06 reversible readback runs. Bare "glue" still means the Glue
+# Compressor, matching _INSERT_DEVICE_ALIASES.
 _DEVICE_SETUP = re.compile(
     r"\b(?:add|append|insert|put|load)\s+(?:an?\s+)?"
-    r"(?P<device>hybrid\s+reverb|reverb|echo|delay|compressor)\s+"
+    r"(?P<device>hybrid\s+reverb|reverb|echo|delay|compressor|glue(?:\s+compressor)?|saturator|auto\s+filter|drum\s+buss)\s+"
     r"(?:to|on)\s+(?P<track>.+?)\s+"
     r"(?:at|with|set\s+(?:the\s+)?)\s*"
     r"(?P<value>-?(?:\d+(?:\.\d+)?|\.\d+))\s*(?P<unit>%|percent|db|decibels?)\s+"
@@ -324,7 +328,7 @@ _DEVICE_SETUP = re.compile(
 )
 _DEVICE_SETUP_TRAILING = re.compile(
     r"\b(?:add|append|insert|put|load)\s+(?:an?\s+)?"
-    r"(?P<device>hybrid\s+reverb|reverb|echo|delay|compressor)\s+"
+    r"(?P<device>hybrid\s+reverb|reverb|echo|delay|compressor|glue(?:\s+compressor)?|saturator|auto\s+filter|drum\s+buss)\s+"
     r"(?:to|on)\s+(?P<track>.+?)\s+and\s+set\s+(?:the\s+)?"
     r"(?P<parameter>dry\s*[/ ]?\s*wet|threshold)\s+(?:to|at)\s+"
     r"(?P<value>-?(?:\d+(?:\.\d+)?|\.\d+))\s*(?P<unit>%|percent|db|decibels?)(?:\b|$)",
@@ -636,6 +640,31 @@ def _normalize_spoken_numbers(text: str) -> str:
     return _SPOKEN_NUMBER_CONTEXT.sub(replace, signed_digits)
 
 
+# A bare "frequency"/"gain"/"q" matches 16 EQ Eight controls at once, so the
+# resolver asks. When the request names the band ("1 Frequency A", "gain 2B",
+# "band 3A ... q"), keep the qualifier so the exact Live control resolves.
+# "1 Frequency A" keeps words between the band number and side, while "gain
+# 2B" and "band 3A" keep them adjacent; one pattern covers all three.
+_EQ_BAND_QUALIFIER = re.compile(r"\b([1-8])\s*(?:frequency|gain|q)?\s*([ab])\b", re.I)
+_EQ_BAND_FULL = re.compile(r"^\s*([1-8])\s*(frequency|gain|q)\s*([ab])\s*$", re.I)
+
+
+def _eq_band_qualified_parameter(text: str, device_name: str | None, keyword: str) -> str | None:
+    """Fold "1 Frequency A" to Live's exact control name, else None."""
+    if str(device_name or "").strip().casefold() != "eq eight":
+        return None
+    full = _EQ_BAND_FULL.match(str(keyword or ""))
+    if full:
+        return f"{full.group(1)} {full.group(2).title()} {full.group(3).upper()}"
+    clean = str(keyword or "").strip().casefold()
+    if clean not in {"frequency", "gain", "q"}:
+        return None
+    match = _EQ_BAND_QUALIFIER.search(text or "")
+    if not match:
+        return None
+    return f"{match.group(1)} {clean.title()} {match.group(2).upper()}"
+
+
 def _insert_device_name(text: str) -> str | None:
     for canonical, pattern in _INSERT_DEVICE_ALIASES:
         if re.search(rf"\b(?:{pattern})\b", text, re.I):
@@ -651,6 +680,15 @@ def _device_setup_name(value: str) -> str | None:
         return "Echo"
     if normalized == "compressor":
         return "Compressor"
+    # Bare "glue" means the Glue Compressor, matching _INSERT_DEVICE_ALIASES.
+    if normalized in {"glue", "glue compressor"}:
+        return "Glue Compressor"
+    if normalized == "saturator":
+        return "Saturator"
+    if normalized == "auto filter":
+        return "Auto Filter"
+    if normalized == "drum buss":
+        return "Drum Buss"
     return None
 
 
@@ -784,6 +822,12 @@ def _generic_device_parameter_match(text: str, device_name: str) -> dict[str, st
             "unit": suffix_match.group("unit") or "",
         }
     return None
+
+
+# A later "then" step speaking in pronouns ("set its dry/wet to 50%")
+# inherits the previous clean step's track and device. Only whole-word
+# pronouns trigger it, and only when the step otherwise fails to resolve.
+_RECIPE_PRONOUN = re.compile(r"\b(?:it|its|that|this)\b", re.I)
 
 
 def split_recipe_request(text: str) -> list[str]:
@@ -932,8 +976,23 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     steps: list[dict[str, Any]] = []
     step_intents: list[dict[str, Any]] = []
     problems: list[str] = []
+    last_clean: dict[str, Any] | None = None
     for position, segment in enumerate(segments, start=1):
         intent = parse_request(segment, snapshot)
+        # "set the threshold ... then set its dry/wet ...": a later step
+        # that names no track/device inherits both from the previous clean
+        # step when it speaks in pronouns. The filled wording is kept, so the
+        # confirmation card shows exactly what each step will touch.
+        if position > 1 and last_clean is not None and _RECIPE_PRONOUN.search(segment) \
+                and (intent.get("missing_fields") or intent.get("ambiguity")):
+            prev_track = str((last_clean.get("track") or {}).get("name") or "")
+            prev_device = str((last_clean.get("device") or {}).get("name") or "")
+            if prev_track and prev_device:
+                filled = _RECIPE_PRONOUN.sub(f"the {prev_track} {prev_device}", segment, count=1)
+                retry = parse_request(filled, snapshot)
+                if retry.get("action") and not retry.get("missing_fields") and not retry.get("ambiguity"):
+                    intent = retry
+                    segment = filled
         if intent.get("mode") == "refuse":
             problems.append(f"Step {position}: {intent.get('error', 'the request is outside the safety boundary')}")
             continue
@@ -951,6 +1010,7 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
                 "value": intent.get("desired_value"),
             })
             step_intents.append({"segment": segment, "intent": intent})
+            last_clean = intent
         elif action in _RECIPE_TRANSPORT_ACTIONS:
             steps.append({"action": action})
             step_intents.append({"segment": segment, "intent": intent})
@@ -959,6 +1019,7 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
             # but only the live-side parameter inspection can resolve the
             # sparse parameter index and any evidence-backed unit conversion.
             step_intents.append({"segment": segment, "intent": intent})
+            last_clean = intent
         else:
             problems.append(
                 f"Step {position}: natural recipes currently support track controls, play/stop, send levels, and exact "
@@ -1908,6 +1969,26 @@ def _not_supported_yet(text: str, parsed: dict[str, Any], snapshot: dict[str, An
             if re.search(rf"\b(?:{pattern})\b", text, re.I):
                 return "device", (f"KENN can't add {device} yet. It can add {_INSERTABLE_NAMES}. "
                                   f"You can drag {device} in from Live's browser.")
+        # Any other genuine stock device ("add Wavetable", "add Shifter"): the
+        # hand-written list above only names ~30; the registry holds all 78
+        # exact Live 12 names, longest first so "Filter Delay" wins over "Delay".
+        # Only when the rules resolved nothing: an already-bound insert such
+        # as "add reverb ..." (Hybrid Reverb via alias) must keep its device,
+        # and "add a reverb send" is a send-level request, not a device.
+        if parsed.get("action") is not None:
+            return None
+        if re.search(r"\bsends?\b", text, re.I):
+            return None
+        from kenn.core.live_action_service import DEVICE_INSERTION_ALLOWLIST
+        from kenn.core.stock_devices import STOCK_DEVICES
+
+        insertable = {name.casefold() for name in DEVICE_INSERTION_ALLOWLIST}
+        for stock in sorted(STOCK_DEVICES, key=len, reverse=True):
+            if stock.casefold() in insertable:
+                continue
+            if re.search(rf"\b{re.escape(stock)}\b", text, re.I):
+                return "device", (f"KENN can't add {stock} yet. It can add {_INSERTABLE_NAMES}. "
+                                  f"You can drag {stock} in from Live's browser.")
     if parsed.get("action") is not None:
         return None
     earlier = set(parsed.get("missing_fields") or [])  # a more specific question from the rules wins, mostly
@@ -3295,6 +3376,9 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         relative = delta_match is not None
         direction = delta_match.group(1) if delta_match else "set"
         parameter_name = (delta_match.group(2) if delta_match else set_match.group(1)).title()
+        band_qualified = _eq_band_qualified_parameter(lower, device[1], parameter_name)
+        if band_qualified is not None:
+            parameter_name = band_qualified
         amount = float(delta_match.group(3) if delta_match else set_match.group(2))
         requested_unit = (delta_match.group(4) if delta_match else set_match.group(3)) or "value"
         if str(requested_unit).lower() in {"khz", "kilohertz"}:
@@ -3366,6 +3450,9 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             elif str(unit).lower() == "hertz":
                 unit = "hz"
             parameter_name = generic_match["parameter"].strip().title()
+            band_qualified = _eq_band_qualified_parameter(lower, device[1], parameter_name)
+            if band_qualified is not None:
+                parameter_name = band_qualified
             display_error = _display_unit_error(
                 device_name=device[1], parameter_name=parameter_name, value=amount,
                 unit=unit, relative=relative,

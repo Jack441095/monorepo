@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass
 from math import isfinite, log
 from typing import Any
@@ -34,6 +35,29 @@ class DeviceUnitProfile:
 # as -inf dB). Auto Filter Frequency follows Live's 20 Hz..20 kHz log taper
 # (verified at 20/112/632/1000/3560/20000 Hz). Saturator Drive is linear
 # -36..+36 dB (verified at -36/-18/0/4/18/36 dB).
+# Dry/Wet is linear 0..1 <-> 0..100% on every device that exposes it at a
+# 0..1 range: Glue, Saturator, Auto Filter and Drum Buss each passed a
+# reversible write/readback/restore run on 2026-09-06 (e.g. Glue 100% ->
+# 50% -> 100%), and Compressor exposes the same 0..1 control. EQ Eight band
+# frequency follows Live's 10 Hz * 2200^raw taper (fixture 20.2 Hz at raw
+# 0.0914, 200 Hz at 0.3892, 1 kHz at 0.5984, 5 kHz at 0.8075, matching
+# live_command.py's frequency_raw_value); we bound the profile to the
+# user-safe 20 Hz..20 kHz span.
+_EQ_BAND_PARAMETER = re.compile(r"^\s*([1-8])\s*(frequency|gain|q)\s*([ab])\s*$", re.I)
+
+
+def _canonical_parameter(device_name: str, parameter_name: str) -> str:
+    """Fold Live's per-band / per-spelling names to one profile name."""
+    text = str(parameter_name or "").strip()
+    if str(device_name or "").strip().casefold() == "eq eight":
+        band = _EQ_BAND_PARAMETER.match(text)
+        if band:
+            return {"frequency": "Frequency", "gain": "Gain", "q": "Q"}[band.group(2).lower()]
+    if text.casefold() in {"dry wet", "dry/wet"}:
+        return "Dry/Wet"
+    return text
+
+
 EVIDENCE_BACKED_PROFILES = (
     DeviceUnitProfile("Auto Filter", "Resonance", "%", 0.0, 1.0, 0.0, 100.0),
     DeviceUnitProfile("Auto Filter", "Frequency", "hz", 0.0, 1.0, 20.0, 20000.0, mapping="log"),
@@ -74,6 +98,12 @@ EVIDENCE_BACKED_PROFILES = (
     ),
     DeviceUnitProfile("Roar", "Drive", "dB", 0.0, 1.0, 0.0, 48.0),
     DeviceUnitProfile("Roar", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
+    DeviceUnitProfile("Saturator", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
+    DeviceUnitProfile("Drum Buss", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
+    DeviceUnitProfile("Auto Filter", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
+    DeviceUnitProfile("Glue Compressor", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
+    DeviceUnitProfile("Compressor", "Dry/Wet", "%", 0.0, 1.0, 0.0, 100.0),
+    DeviceUnitProfile("EQ Eight", "Frequency", "hz", 0.09006341340106347, 0.9876159632964067, 20.0, 20000.0, mapping="log"),
 )
 
 
@@ -89,10 +119,12 @@ def normalize_unit(unit: str | None) -> str:
 
 def find_profile(device_name: str, parameter_name: str, unit: str | None) -> DeviceUnitProfile | None:
     normalized_unit = normalize_unit(unit)
+    wanted = _canonical_parameter(device_name, parameter_name)
+    # Echo shows "Dry Wet" while every other device shows "Dry/Wet"; both read the same control.
     for profile in EVIDENCE_BACKED_PROFILES:
         if (
             profile.device_name.casefold() == str(device_name).strip().casefold()
-            and profile.parameter_name.casefold() == str(parameter_name).strip().casefold()
+            and _canonical_parameter(profile.device_name, profile.parameter_name).casefold() == wanted.casefold()
             and profile.display_unit.casefold() == normalized_unit.casefold()
         ):
             return profile

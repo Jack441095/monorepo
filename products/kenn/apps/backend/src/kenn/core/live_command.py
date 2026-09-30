@@ -166,16 +166,18 @@ add an invented device, parameter, or EQ field to a track-only action.
 Never invent an index, device, parameter, or successful result. An
 insert_device plan is allowed only for one of the exact allow-listed native
 devices (EQ Eight, Glue Compressor, Saturator, Auto Filter, Drum Buss,
-Compressor, Hybrid Reverb, Echo), only
+Compressor, Hybrid Reverb, Echo, Roar, Multiband Dynamics), only
 when the target track has no matching device, and only as an append operation;
 otherwise use action=clarify. Compound EQ edits must name one exact band and
 provide both a target frequency and gain change. The host validates this object before it can create a proposal, and confirmation
 is always required for a write.
 
-For `insert_device_with_parameter`, use only Hybrid Reverb/Dry/Wet or Echo/Dry Wet,
-provide an absolute percentage from 0 to 100, and leave device_index and
-parameter_index null because KENN resolves the new device's sparse index after
-insertion. This action is append-only and readback-verified.
+For `insert_device_with_parameter`, use only a qualified Dry/Wet setup
+(Hybrid Reverb, Echo, Compressor, Glue Compressor, Saturator, Auto Filter,
+Drum Buss, Roar, Multiband Dynamics) or Compressor Threshold,
+provide an absolute percentage from 0 to 100 (dB for Threshold), and leave
+device_index and parameter_index null because KENN resolves the new device's
+sparse index after insertion. This action is append-only and readback-verified.
 
 When the snapshot includes `planner_capabilities`, treat its parameter names,
 sparse indices, values, and ranges as the only authoritative device controls.
@@ -592,7 +594,7 @@ def validate_llm_plan(plan: Any, snapshot: dict[str, Any]) -> dict[str, Any]:
             re.sub(r"[^a-z0-9]", "", parameter_name.casefold())
         )
         if parameter_spec is None:
-            return {"ok": False, "error": "Only the qualified Hybrid Reverb/Echo Dry/Wet setup is supported."}
+            return {"ok": False, "error": "Only qualified Dry/Wet setup is supported (Hybrid Reverb, Echo, Compressor, Glue Compressor, Saturator, Auto Filter, Drum Buss, Roar, Multiband Dynamics)."}
         if str(plan.get("unit") or "").strip() != "%":
             return {"ok": False, "error": "A device-setup plan must use '%' as its unit."}
         if bool(plan.get("relative")):
@@ -1949,6 +1951,11 @@ def _resolve_device_parameter(
         names = [str(item.get("name", "")) for item in parameters if item.get("name")]
         if len(matches) > 1:
             return {"ok": False, "clarification": f"'{requested}' matches more than one parameter. Choose one of: {', '.join(names[:16])}."}
+        # Live's Utility exposes no Gain knob; its level trim reads as
+        # Output (unit-probe inventory, 2026-09-21). Point there instead of
+        # letting a guess reach the wrong control.
+        if device_name.strip().casefold() == "utility" and requested == "gain" and "Output" in names:
+            return {"ok": False, "clarification": "Utility has no Gain knob; its level trim is Output. Say \"set Utility Output to ... dB\" instead; nothing changed."}
         return {"ok": False, "clarification": f"I couldn't find parameter '{requested}' on '{device_name}'. Available parameters include: {', '.join(names[:16]) or 'none'}."}
     parameter = matches[0]
     try:

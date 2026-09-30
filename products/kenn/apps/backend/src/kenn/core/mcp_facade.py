@@ -337,7 +337,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "create_live_proposal",
-        "description": "Ask KENN to create a confirmation-only Live proposal, including bounded track and return-track creation, track controls, audio/MIDI-track creation, device work, qualified Hybrid Reverb/Echo Dry/Wet setup, clip/scene actions, and evidence-backed parameter changes. It never applies the proposal.",
+        "description": "Ask KENN to create a confirmation-only Live proposal, including bounded track and return-track creation, track controls, audio/MIDI-track creation, device work, qualified Dry/Wet setup, clip/scene actions, and evidence-backed parameter changes. It never applies the proposal.",
         "inputSchema": {
             "type": "object",
             "properties": {

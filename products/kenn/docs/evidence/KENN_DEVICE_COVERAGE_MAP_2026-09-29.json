@@ -1,0 +1,1228 @@
+{
+ "summary": {
+  "live_version": "12.4.6 (2026-09-10_0de5c8fa9a)",
+  "devices": 78,
+  "by_category": {
+   "Instruments": 16,
+   "Audio Effects": 47,
+   "MIDI Effects": 15
+  },
+  "knows_note": 77,
+  "knows_draft_note": 0,
+  "knows_mentioned": 0,
+  "knows_none": 1,
+  "sees": 78,
+  "inserts": 10,
+  "devices_with_settable_parameters": 9,
+  "settable_parameters": 21,
+  "ableton_notes": 118
+ },
+ "devices": [
+  {
+   "device": "Analog",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-analog-and-impulse-instruments.md",
+     "ableton-analog-synth.md"
+    ],
+    "mentions": 8
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Collision",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-collision-synth.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drift",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-drift-and-meld-synths.md",
+     "ableton-drift-synth.md"
+    ],
+    "mentions": 5
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drum Rack",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-drum-racks-and-internal-routing.md"
+    ],
+    "mentions": 5
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drum Sampler",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-drum-sampler-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drum Synth",
+   "category": "Instruments",
+   "knows": {
+    "level": "none",
+    "notes": [],
+    "mentions": 0
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Electric",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-electric-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "External Instrument",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-external-instrument.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Impulse",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-analog-and-impulse-instruments.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Instrument Rack",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-instrument-rack-device.md"
+    ],
+    "mentions": 5
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Meld",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-drift-and-meld-synths.md",
+     "ableton-meld-synth.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Operator",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-operator-device.md"
+    ],
+    "mentions": 4
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Sampler",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-sampler-device.md"
+    ],
+    "mentions": 5
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Simpler",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-simpler-device.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Tension",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-tension-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Wavetable",
+   "category": "Instruments",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-wavetable-synth.md"
+    ],
+    "mentions": 5
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Align Delay",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-align-delay-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Amp",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-amp-device.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Audio Effect Rack",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-audio-effect-rack-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Auto Filter",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-auto-filter-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Resonance (%)",
+    "Frequency (Hz)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Auto Pan-Tremolo",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-auto-pan-tremolo-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Auto Shift",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-auto-shift-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Beat Repeat",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-beat-repeat.md",
+     "ableton-drum-buss-and-beat-repeat.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Cabinet",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-cabinet-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Channel EQ",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-channel-eq-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Chorus-Ensemble",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-chorus-ensemble-device.md"
+    ],
+    "mentions": 5
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Compressor",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-compressor-device.md"
+    ],
+    "mentions": 10
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Threshold (dB)",
+    "Ratio (ratio)",
+    "Attack (ms)",
+    "Release (ms)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Corpus",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-corpus-resonators.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Delay",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-delay-and-reverb-devices.md"
+    ],
+    "mentions": 16
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Drum Buss",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-drum-buss-and-beat-repeat.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Drive (%)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Dynamic Tube",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-dynamic-tube-device.md"
+    ],
+    "mentions": 4
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "EQ Eight",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-eq-eight-device.md"
+    ],
+    "mentions": 8
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Frequency (Hz)",
+    "band gain (dB, on an existing tuned band)"
+   ]
+  },
+  {
+   "device": "EQ Three",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-eq-three-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Echo",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-echo-device.md"
+    ],
+    "mentions": 5
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Dry Wet (%)"
+   ]
+  },
+  {
+   "device": "Envelope Follower",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-envelope-follower-device.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Erosion",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-erosion-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "External Audio Effect",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-external-audio-effect.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Filter Delay",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-filter-delay-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Gate",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-limiter-and-gate-devices.md"
+    ],
+    "mentions": 9
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Glue Compressor",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-glue-compressor-device.md"
+    ],
+    "mentions": 7
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Attack (ms)",
+    "Ratio (ratio)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Grain Delay",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-grain-delay-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Hybrid Reverb",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-hybrid-reverb-device.md",
+     "ableton-hybrid-reverb.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "LFO",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-lfo-device.md"
+    ],
+    "mentions": 19
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Limiter",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-limiter-and-gate-devices.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Looper",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-looper-device.md",
+     "ableton-looper.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Multiband Dynamics",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-multiband-dynamics-device.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": []
+  },
+  {
+   "device": "Overdrive",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-overdrive-device.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Pedal",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-pedal-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Phaser-Flanger",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-phaser-flanger-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Redux",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-redux-device.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Resonators",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-corpus-resonators.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Reverb",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-delay-and-reverb-devices.md"
+    ],
+    "mentions": 9
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Roar",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-roar-device.md",
+     "ableton-roar-effect.md"
+    ],
+    "mentions": 5
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Drive (dB)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Saturator",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-saturator-device.md"
+    ],
+    "mentions": 7
+   },
+   "sees": true,
+   "inserts": true,
+   "insert_by_name_in_rule_parser": true,
+   "sets": [
+    "Drive (dB)",
+    "Dry/Wet (%)"
+   ]
+  },
+  {
+   "device": "Shaper",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-shaper-device.md",
+     "ableton-shaper-midi-device.md"
+    ],
+    "mentions": 4
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Shifter",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-shifter-and-distortion-devices.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Spectral Resonator",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-spectral-resonator.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Spectral Time",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-spectral-time.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Spectrum",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-spectrum-analyzer.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Tuner",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-tuner-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Utility",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-utility-device.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Vinyl Distortion",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-vinyl-distortion-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Vocoder",
+   "category": "Audio Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-vocoder.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Arpeggiator",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-arpeggiator.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "CC Control",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-cc-control-midi-effect.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Chord",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-scale-chord-effects.md"
+    ],
+    "mentions": 3
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Envelope MIDI",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-envelope-midi-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Expression Control",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-expression-control-device.md"
+    ],
+    "mentions": 4
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "MIDI Effect Rack",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-midi-effect-rack-device.md"
+    ],
+    "mentions": 2
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "MIDI Monitor",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-midi-monitor-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "MPE Control",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-mpe-control-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Note Echo",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-note-echo-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Note Length",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-pitch-and-note-length-midi-effects.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Pitch",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-pitch-and-note-length-midi-effects.md"
+    ],
+    "mentions": 21
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Random",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-random-device.md"
+    ],
+    "mentions": 11
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Scale",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-scale-chord-effects.md"
+    ],
+    "mentions": 9
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Shaper MIDI",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-shaper-midi-device.md"
+    ],
+    "mentions": 1
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  },
+  {
+   "device": "Velocity",
+   "category": "MIDI Effects",
+   "knows": {
+    "level": "note",
+    "notes": [
+     "ableton-velocity-midi-effect.md"
+    ],
+    "mentions": 13
+   },
+   "sees": true,
+   "inserts": false,
+   "insert_by_name_in_rule_parser": false,
+   "sets": []
+  }
+ ]
+}
