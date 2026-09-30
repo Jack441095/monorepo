@@ -110,6 +110,34 @@ private:
     };
     std::atomic<PendingPlayback*> pendingPlayback { nullptr };
 
+    // Retired reader sources, published by the audio thread and drained by the
+    // message thread.
+    //
+    // Why this exists: startPreparedPlayback() used to move-assign readerSource
+    // from inside processBlock(), which destroyed the *previous*
+    // AudioFormatReaderSource -> BufferingAudioReader -> format reader on the
+    // audio thread. That is a large free() plus a file-descriptor close on a
+    // real-time thread, exactly the stall the bufferingThread design exists to
+    // avoid. The audio thread now hands the old source here and never frees it.
+    //
+    // A ring rather than a single slot, because the audio thread may take over
+    // another pending start before the message thread gets a chance to drain, and
+    // a single slot would drop the older reader on the floor. Capacity is a
+    // compile-time constant so the push is a bounds check and one atomic store:
+    // no allocation, no lock, no unbounded growth. It is never realistically
+    // reached -- one slot is consumed per audition start, and a user cannot start
+    // eight auditions faster than the UI thread can drain them -- but if it were,
+    // the overflow is reported rather than leaked.
+    //
+    // publish/consume protocol (lock-free, same shape as pendingPlayback):
+    //   - Audio thread pushes the outgoing source and never frees it.
+    //   - The message thread swaps the whole ring out and deletes every entry.
+    static constexpr int kRetiredReaderSlots = 8;
+    std::atomic<juce::AudioFormatReaderSource*> retiredReaders[kRetiredReaderSlots] {};
+    std::atomic<int> retiredWriteIndex { 0 };
+    void retireReaderOnAudioThread(juce::AudioFormatReaderSource* source) noexcept;
+    void drainRetiredReaders();
+
     // Playback audition classes
     juce::AudioFormatManager formatManager;
     // Background read-ahead thread for audition playback. BufferingAudioReader
@@ -123,8 +151,11 @@ private:
 
     // stopSample() defers the actual transportSource.stop() to the next
     // processBlock() so a one-block gain ramp can run first -- stopping mid-
-    // waveform otherwise produces an audible click at the cut sample.
+    // waveform otherwise produces an audible click at the cut sample. The audio
+    // thread is the only one that touches the transport; stopSample() just sets
+    // this flag.
     std::atomic<bool> fadeOutRequested { false };
+    std::atomic<bool> stopRequested { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SmartSampleManagerAudioProcessor)
 };

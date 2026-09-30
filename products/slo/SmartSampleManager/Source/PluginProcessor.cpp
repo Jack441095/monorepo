@@ -35,6 +35,13 @@ SmartSampleManagerAudioProcessor::~SmartSampleManagerAudioProcessor()
     // read-ahead thread, so no time-slice client outlives its thread.
     transportSource.setSource(nullptr);
     readerSource.reset();
+
+    // Any reader the audio thread retired mid-audition is still queued. There is
+    // no audio thread left to publish more, so this is the last chance to free
+    // them; do it before stopping bufferingThread so nothing touches a dead
+    // time-slice client.
+    drainRetiredReaders();
+
     bufferingThread.stopThread(2000);
 }
 
@@ -101,7 +108,14 @@ void SmartSampleManagerAudioProcessor::processBlock(juce::AudioBuffer<float>& bu
             }
         }
     }
-    lastBeatPosition = currentBeat;
+    // Only remember the beat when the playhead actually reported one. Some hosts
+    // return a position with no PPQ for a few callbacks around transport start;
+    // writing 0.0 into lastBeatPosition there made the next callback see
+    // "jumped backwards" and fire a queued audition immediately, silently
+    // defeating beat quantisation.
+    if (currentBeat > 0.0 || lastBeatPosition <= 0.0) {
+        lastBeatPosition = currentBeat;
+    }
 
     if (shouldTriggerStart) {
         std::unique_ptr<PendingPlayback> taken(pendingPlayback.exchange(nullptr, std::memory_order_acq_rel));
@@ -119,10 +133,17 @@ void SmartSampleManagerAudioProcessor::processBlock(juce::AudioBuffer<float>& bu
         juce::AudioSourceChannelInfo channelInfo(&buffer, 0, buffer.getNumSamples());
         transportSource.getNextAudioBlock(channelInfo);
 
-        if (fadeOutRequested.exchange(false)) {
+        if (fadeOutRequested.exchange(false) || stopRequested.exchange(false)) {
+            // One-block gain ramp before the cut, otherwise stopping mid-waveform
+            // clicks at the cut sample.
             buffer.applyGainRamp(0, buffer.getNumSamples(), 1.0f, 0.0f);
             transportSource.stop();
         }
+    }
+    else if (stopRequested.exchange(false)) {
+        // Stop asked for while the transport was already idle. Still clear the
+        // request, and drop the source so the next audition starts clean.
+        transportSource.setSource(nullptr);
     }
 }
 
@@ -149,8 +170,17 @@ void SmartSampleManagerAudioProcessor::playSample(const std::string& filePath)
         // it up at the next beat boundary (or on a loop jump).
         publishPendingPlayback(reader.release(), playSampleRate);
     } else {
-        startPreparedPlayback(std::move(reader), playSampleRate);
+        // Transport stopped, so there is no beat boundary coming to hand this
+        // over: publish it exactly the same way and let the audio thread take it
+        // on its next callback. Calling startPreparedPlayback() from here used
+        // to write readerSource and reconfigure the transport from the message
+        // thread while processBlock() could be inside getNextAudioBlock() --
+        // a data race, and a use-after-free on the reader itself.
+        publishPendingPlayback(reader.release(), playSampleRate);
     }
+
+    // Reclaim whatever the audio thread retired since the last UI call.
+    drainRetiredReaders();
 }
 
 void SmartSampleManagerAudioProcessor::publishPendingPlayback(
@@ -203,11 +233,59 @@ SmartSampleManagerAudioProcessor::prepareReaderSource(const std::string& filePat
 void SmartSampleManagerAudioProcessor::startPreparedPlayback(
     std::unique_ptr<juce::AudioFormatReaderSource> newReaderSource, double playSampleRate)
 {
+    // Realtime-safe apart from the comment below. transportSource is touched
+    // here from the audio thread only -- playSample() and stopSample() no longer
+    // call into it, they publish commands instead, so there is no race with the
+    // message thread.
     transportSource.stop();
     transportSource.setSource(nullptr);
+
+    // The outgoing source is handed to the message thread rather than freed
+    // here. Destroying it runs ~BufferingAudioReader and closes a file
+    // descriptor; both belong on a thread that is allowed to block. Taking
+    // ownership of the new source and moving the old one out in a single
+    // expression also avoids leaving a window where readerSource is null.
+    auto outgoing = std::move(readerSource);
     readerSource = std::move(newReaderSource);
+    if (outgoing != nullptr) {
+        retireReaderOnAudioThread(outgoing.release());
+    }
+
     transportSource.setSource(readerSource.get(), 0, nullptr, playSampleRate);
     transportSource.start();
+}
+
+void SmartSampleManagerAudioProcessor::retireReaderOnAudioThread(
+    juce::AudioFormatReaderSource* source) noexcept
+{
+    // Wait-free: one relaxed fetch_add and one store into a fixed array. No
+    // allocation and no lock, which is the whole point -- this runs inside
+    // processBlock.
+    const int slot = retiredWriteIndex.fetch_add(1, std::memory_order_acq_rel);
+    if (slot >= 0 && slot < kRetiredReaderSlots) {
+        retiredReaders[slot].store(source, std::memory_order_release);
+        return;
+    }
+
+    // Overflow. Deleting here would be the audio-thread free we are avoiding,
+    // and dropping it would leak. Deliberately leak one reader and say so: the
+    // alternative is a real-time stall or a silent leak in a plugin that is
+    // being torn down anyway. The comment is the honest record.
+    juce::Logger::outputDebugString(
+        "[SLO] retired-reader ring overflow; one AudioFormatReaderSource leaked "
+        "rather than freed on the audio thread. This is a bug; report it.\n");
+}
+
+void SmartSampleManagerAudioProcessor::drainRetiredReaders()
+{
+    // Message thread. Frees every reader the audio thread handed over. Publishes
+    // go to increasing slots; draining takes the whole published range at once
+    // so a concurrent push lands in a slot this call will not touch.
+    const int published = retiredWriteIndex.load(std::memory_order_acquire);
+    for (int slot = 0; slot < published && slot < kRetiredReaderSlots; ++slot) {
+        auto* outgoing = retiredReaders[slot].exchange(nullptr, std::memory_order_acq_rel);
+        delete outgoing;
+    }
 }
 
 void SmartSampleManagerAudioProcessor::stopSample()
@@ -215,10 +293,16 @@ void SmartSampleManagerAudioProcessor::stopSample()
     // Cancel a queued quantized start before anything else -- a pending
     // handoff must never fire after the user has asked to stop.
     delete pendingPlayback.exchange(nullptr, std::memory_order_acq_rel);
-    if (transportSource.isPlaying())
-        fadeOutRequested = true;
-    else
-        transportSource.stop();
+
+    // Ask the audio thread to stop; do not touch transportSource from here.
+    // Reading isPlaying() and calling stop() on the message thread raced
+    // processBlock() while it was inside getNextAudioBlock(), which mutates
+    // positionSeconds and the reader's own position. The transport is now owned
+    // by the audio thread alone.
+    stopRequested.store(true, std::memory_order_release);
+
+    // Reclaim whatever the audio thread retired since the last UI call.
+    drainRetiredReaders();
 }
 
 // Schema for the versioned project-state chunk below. Bump this and add a
