@@ -117,6 +117,29 @@ def handle_record_preference(payload: dict[str, Any]) -> tuple[int, dict[str, An
     return status, result
 
 
+def handle_preference_history(session_id: str, key: str | None = None) -> tuple[int, dict[str, Any]]:
+    """List superseded preferences so a producer can compare and go back."""
+    clean_id = str(session_id or "").strip()
+    if not clean_id:
+        return 400, {"ok": False, "error": "session_id is required."}
+    from kenn.core.assistant_profile_memory import AssistantProfileStore
+    store = AssistantProfileStore()
+    return 200, {"ok": True, "session_id": clean_id,
+                 "superseded_preferences": store.preference_history(clean_id, key=key or None)}
+
+
+def handle_restore_preference(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Reactivate a superseded preference by id, moving the current one back into history."""
+    session_id = str(payload.get("session_id", "")).strip()
+    preference_id = str(payload.get("preference_id", "")).strip()
+    if not session_id or not preference_id:
+        return 400, {"ok": False, "error": "session_id and preference_id are required."}
+    from kenn.core.assistant_profile_memory import AssistantProfileStore
+    store = AssistantProfileStore()
+    result = store.restore_preference(session_id=session_id, preference_id=preference_id)
+    return (200 if result.get("ok") else 404), result
+
+
 def handle_delete_preference(session_id: str, key: str) -> tuple[int, dict[str, Any]]:
     """Forget an explicit producer preference."""
     clean_id = str(session_id or "").strip()
