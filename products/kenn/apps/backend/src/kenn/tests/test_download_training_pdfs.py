@@ -111,6 +111,8 @@ def test_shipped_catalog_is_valid_json_and_pins_manual_policies() -> None:
     # The two Live manuals must be downloadable via the CLI (local_opt_in), while
     # anything nobody vetted stays reference_only -- this edit is the deliberate
     # gate, so a casual flip is a code-reviewed change, not a typo in passing.
+    if not module.CATALOG_PATH.is_file():
+        pytest.skip("The source catalog is in the git-ignored Training_Data_Sources folder, so a fresh clone has none")
     catalog = json.loads(module.CATALOG_PATH.read_text(encoding="utf-8"))
     by_name = {e["filename"]: e for e in catalog}
     assert by_name["live11-manual-en.pdf"]["index_policy"] == "local_opt_in"
