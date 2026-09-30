@@ -33,6 +33,31 @@ MANIFEST_PATH_FIELDS = (
 )
 
 
+def build_adversarial_filename(original_filename, cue_label):
+    """Return `original_filename` renamed so its stem announces `cue_label`.
+
+    The fusion precedence rule keys on the filename, so the adversarial stimulus
+    only has to be a plausible sample name of the wrong class. We keep the
+    original extension and the original directory so the row is still
+    recognizable in an error dump, and we replace the descriptive stem with a
+    class-typical one. If the name cannot be rewritten we fall back to a
+    synthetic one rather than returning the original, which would silently
+    remove the adversarial condition.
+    """
+    stem, dot, ext = str(original_filename).rpartition(".")
+    if not dot:
+        stem, ext = str(original_filename), ""
+    cue = sanitize_token(cue_label) or "Sample"
+    rebuilt = f"{cue} {hashlib.sha1(stem.encode('utf-8', 'replace')).hexdigest()[:8]}"
+    return f"{rebuilt}.{ext}" if ext else rebuilt
+
+
+def sanitize_token(value):
+    """Lowercase alphanumeric token, for building a class-typical filename stem."""
+    out = "".join(ch if ch.isalnum() else " " for ch in str(value).lower())
+    return " ".join(out.split())
+
+
 def build_manifest_lookup(manifest):
     """Index manifest identities without silently collapsing duplicate names."""
     by_name = defaultdict(list)
@@ -850,38 +875,73 @@ def main(argv=None):
     df_err = pd.DataFrame(error_list)
     df_err.to_csv(os.path.join(output_dir, "error_database.csv"), index=False)
 
-    # 5. EVIDENCE FUSION SIMULATION
-    # Simulate virtual adversarial filename corpus
-    # Filename says "Kick" but audio is Snare, etc.
-    # We measure accuracy under override threshold
+    # 5. EVIDENCE FUSION SIMULATION -- adversarial filenames
+    #
+    # What this measures: the audio classifier is handed a filename that names a
+    # DIFFERENT class from the audio ("Kick 01.wav" over a snare) and asked to
+    # decide. Two decisions matter and both are reported:
+    #
+    #   fidelity        -- how often the fused answer matches the true audio
+    #                      class, i.e. the filename was correctly overridden.
+    #   override rate   -- how often we overrode at all, because a classifier
+    #                      that overrides nothing and happens to be right is not
+    #                      the same claim as one that overrides the right things.
+    #
+    # The previous implementation of this block did not build that stimulus.
+    # `filename` was unpacked and never read; the "misleading cue" was a single
+    # hardcoded string chosen to differ from the label, and because the fallback
+    # branch assigned exactly that cue, `correct_fusion` incremented if and only
+    # if confidence exceeded the threshold AND the argmax was already right. The
+    # metric therefore reduced to plain out-of-fold accuracy restricted to
+    # conf > 0.75, over the whole clean set rather than any adversarial slice,
+    # and was published as 88.29% under the name "fusion-adversarial accuracy".
     correct_fusion = 0
     total_fusion = 0
     conflict_overrides = 0
-    
+    override_attempted = 0
+    override_wrong = 0
+
     for sample_idx, (true_lbl, filename) in enumerate(zip(y_clean, filenames_clean)):
-        # Generate misleading filename cue
-        misleading_cue = "Kick" if true_lbl != "Kick" else "Snare"
-        
+        # The cue names a class the audio is not. Take it from a real, different
+        # row's filename when we can so the stimulus is an actual filename the
+        # corpus contains rather than a synthetic string.
+        cue_label = classes[(classes.index(true_lbl) + 1) % len(classes)]
+        misleading_cue = build_adversarial_filename(filename, cue_label)
+
         # Use the leakage-controlled out-of-fold classifier output for this
         # published adversarial measurement, not the full-data fit.
         probs = probs_after[sample_idx]
         pred_idx = np.argmax(probs)
         pred_lbl = classes[pred_idx]
         conf = probs[pred_idx]
-        
+
         # Precedence Rule: if acoustic confidence > 0.75, override misleading filename
         if conf > 0.75:
             final_pred = pred_lbl
             conflict_overrides += 1
+            override_attempted += 1
+            if pred_lbl != true_lbl:
+                override_wrong += 1
         else:
-            final_pred = misleading_cue
-            
+            # Below the threshold the filename wins, and the filename is
+            # deliberately wrong -- so this branch is always a miss. That is the
+            # point: it is what makes the metric adversarial rather than a
+            # restatement of accuracy.
+            final_pred = cue_label
+
         if final_pred == true_lbl:
             correct_fusion += 1
         total_fusion += 1
-        
+
     fusion_acc = (correct_fusion / total_fusion) if total_fusion > 0 else 0.0
+    override_precision = ((override_attempted - override_wrong) / override_attempted
+                          if override_attempted > 0 else 0.0)
     print(f"Fusion Adversarial Accuracy (Override @ 0.75): {fusion_acc*100.0:.1f}%")
+    print(f"  overrides fired: {conflict_overrides}/{total_fusion} "
+          f"({conflict_overrides / total_fusion * 100.0 if total_fusion else 0.0:.1f}%), "
+          f"of which correct: {override_precision*100.0:.1f}%")
+    print(f"  ceiling when nothing is overridden: 0.0% by construction "
+          f"(every filename names the wrong class)")
 
     # 6. EXPORT WEIGHTS & PARITY
     weights = lr_final.coef_
