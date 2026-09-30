@@ -241,8 +241,14 @@
 > Live Reference Manual now?" decision box is unticked while the work behind it exists**; the decision now is whether
 > to keep it. And **the manual indexed is Live 11's**, while he runs **Live 12 Suite**: the Knowledge programme ranks
 > the manual *above* curated notes, so KENN will now cite Live 11 documentation for a Live 12 product. Exporting the
-> Live 12 manual from Live's Help menu and rebuilding is the fix, and it is the same `build --include-local-manuals`
-> path once the PDF is in place. Live 11's PDF is also present in `Training_Data_PDF/` and would not need re-fetching.
+> Live 12 manual from Live's Help menu and rebuilding is the fix. **`docs/runbooks/KENN_INGEST_LIVE12_MANUAL.md`
+> is the exact sequence, with every command run before being written down.** The one thing that will silently
+> go wrong: `build_index.py:460` matches a local PDF to its catalogue entry **by exact filename**, so the export
+> must be named `live12-manual-en.pdf`. Verified by calling `should_index_pdf` and `pdf_evidence_class` with the
+> real entry and with `{}` — a renamed PDF is still indexed, but comes out as `reference_document` rather than
+> `official_ableton_manual`, giving a larger index, the same manual count, and grounding still failing. The fix
+> is the filename, **not** a catalogue entry added to force the class, which is the move the plan forbids.
+> Live 11's PDF is also present and worth keeping until the Live 12 export is checked.
 > This also resolves a C2 caveat: the index these numbers come from, `v-db8c6334cf63`, **is** the live index.
 > | C2 | Retrieval fixture to ≥ 300 questions with a **sealed half** nobody tunes on; baseline with `evaluate_retrieval_modes.py` | M | **Built 30 Sept** on branch `kenn-sealed-fixture`; fixture awaiting Jack's review |
 
