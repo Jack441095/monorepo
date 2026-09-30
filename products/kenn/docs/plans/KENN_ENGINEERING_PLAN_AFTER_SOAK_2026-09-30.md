@@ -159,6 +159,23 @@ promotion only through the gate).
 
 | B5 | Multi-turn: "the other one" after KENN listed two matching tracks; corrections on device parameters; wrong-plan tests first | M | |
 | B6 | Two changes in one sentence and "adjust that": answer with buttons ("Do the first, then the second?") instead of a refusal | M | Frontend |
+
+> **B6, 30 Sept — measured, not built** (`docs/evidence/KENN_B6_TWO_CHANGE_MEASUREMENT_2026-09-30.md`): measured
+> through the gateway, not the parser, because `parse_request` refuses nearly every two-change sentence while
+> `handle_command` upgrades several into plans. **The machinery B6 asks for already exists**: "turn the hats down 3 dB
+> and the kick up 2 dB" produces a two-step confirmable plan with both deltas and "Nothing has changed yet", and
+> "mute the kick and mute the hats" and "solo the bass and turn it up 2 dB" both work, the latter resolving *it* to
+> the Bass. So "instead of a refusal" is not a from-scratch feature.
+> **Three gaps, and the first is the serious one.** "make the hats quieter and the kick punchier" is answered
+> **"By how much? ... 'turn Kick down 2 dB'"** — the Hi-Hats is **silently dropped**, and the reply reads as though one
+> thing was asked. Same shape as round 9's "mute the Kick, mute the hats" proposing one mute, and the fix is narrow:
+> the clarification must name the part it did not understand, the way `_split_plain_and` already refuses rather than
+> half-applying. Second, `lower`/`raise` are not volume verbs in the split path, so "lower the bass 2 dB and raise the
+> vocal 1 dB" refuses although both halves are unambiguous. Third, "adjust that" has no path and needs turn-level
+> anchoring. **The buttons are a rendering change on a payload that exists**, except in the ambiguous case, where they
+> are not "do the first, then the second" but "tell me the amount for the hats" — so the shape should be decided before
+> the frontend is built.
+
 | B7 | Planner: stays in shadow. Retrain (run 14) only when about 500 owner-labelled tester requests exist, and promote only through `live_llm_promotion.py` | hold | Tester data |
 
 **Gate (week 4):** first-run ≥ 85% on a round of real wording (mega plan Phase 2 exit), 0 wrong plans; curated
