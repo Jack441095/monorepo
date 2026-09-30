@@ -1580,7 +1580,12 @@ def _answer_payload_stream_raw(
         }
 
     if weak_match:
-        answer = weak_match_answer(query)
+        # Same rule as build_template_answer and the non-streaming path: a symptom plan is a grounded answer even when
+        # retrieval finds no prose note, so weak retrieval only drops its sources. The stream used to swap in the
+        # generic "share more context" text, and "how does the live bus compare with my uploaded reference?" lost its
+        # measured comparison over the stream while the same question answered properly without it.
+        keeps_plan = diagnostic_plan_for(query) is not None or _is_diagnostic_result_report(query, session_id)
+        answer = template if keeps_plan else weak_match_answer(query)
         followups = starter_questions(limit=2)
         metadata = {
             "question": query,
