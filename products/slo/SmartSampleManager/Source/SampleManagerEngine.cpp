@@ -7004,13 +7004,61 @@ void SampleManagerEngine::reorganizeSamplesAsync(int namingStyle, bool copyInste
 
 void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfMove, juce::File customTargetDir)
 {
-    const juce::ScopedLock sl(dbLock);
-    if (samples.empty()) return;
+    // Three phases with respect to dbLock, matching runFullUMAP() (see its
+    // comment at the top of that function for the original rationale):
+    //   1. snapshot -- under dbLock, copy out the fields the sort reads and
+    //      resolve the destination root;
+    //   2. sort     -- NO lock, because this loop does a filesystem move or
+    //      copy plus a flushed journal row per sample. Holding dbLock across
+    //      it blocked getSamples(), which PluginEditor's 60 Hz timer calls, so
+    //      the window froze and could not even repaint the "Sorting N/M"
+    //      progress text this loop's own counters feed. canUndoSort() and
+    //      getMostRecentSortJournal() blocked on the same lock.
+    //   3. publish  -- under dbLock, write the new paths back by index.
+    //
+    // The snapshot is a small struct rather than a SampleItem copy on purpose:
+    // each SampleItem owns a 512-float embedding, so copying the vector would
+    // drag hundreds of megabytes across a large library just to read a
+    // filename.
+    // A path change plus the path it replaced, so the publish phase can tell
+    // whether the row it snapshotted is still the same sample.
+    struct SortPathUpdate {
+        size_t index = 0;
+        std::string originalPath;
+        std::string newPath;
+    };
+    struct SortCandidate {
+        size_t index = 0;
+        bool isProcessed = false;
+        std::string filePath;
+        std::string instrumentType;
+        std::string category;
+        std::string subcategory;
+        std::string key;
+        float bpm = 0.0f;
+        float tagConfidence = 0.0f;
+        bool tagUserOverridden = false;
+    };
+    std::vector<SortCandidate> plan;
+    juce::File rootDir;
 
-    // Use the resolved common root directory of all scanned files, or customTargetDir if provided
-    juce::File rootDir = (customTargetDir != juce::File() && customTargetDir.isDirectory())
-        ? customTargetDir
-        : getCommonRootDirectory(samples);
+    {
+        const juce::ScopedLock sl(dbLock);
+        if (samples.empty()) return;
+
+        plan.reserve(samples.size());
+        for (size_t i = 0; i < samples.size(); ++i) {
+            const auto& s = samples[i];
+            plan.push_back(SortCandidate { i, s.isProcessed, s.filePath, s.instrumentType,
+                                           s.category, s.subcategory, s.key, s.bpm,
+                                           s.tagConfidence, s.tagUserOverridden });
+        }
+
+        // Use the resolved common root directory of all scanned files, or customTargetDir if provided
+        rootDir = (customTargetDir != juce::File() && customTargetDir.isDirectory())
+            ? customTargetDir
+            : getCommonRootDirectory(samples);
+    }
 
     // Fail closed if the operation cannot establish a durable journal first.
     // A sort is a user-visible filesystem mutation; without an exact mapping
@@ -7020,7 +7068,7 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
     const auto journalFile = rootDir.getChildFile(journalName);
     auto journalStream = std::make_unique<juce::FileOutputStream>(journalFile);
     if (!journalStream->openedOk()) {
-        sortFailed.fetch_add(static_cast<int>(samples.size()), std::memory_order_relaxed);
+        sortFailed.fetch_add(static_cast<int>(plan.size()), std::memory_order_relaxed);
         return;
     }
     journalStream->writeText(
@@ -7070,7 +7118,10 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
         }
     }
 
-    for (size_t i = 0; i < samples.size(); ++i)
+    // New paths, collected off-lock and written back in the publish phase.
+    std::vector<SortPathUpdate> pathUpdates;
+
+    for (const auto& candidate : plan)
     {
         // Checked once per file (not more granularly -- an individual
         // move/copy is already an atomic juce::File operation, so there's no
@@ -7079,7 +7130,7 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
         if (sortCancelRequested.load(std::memory_order_relaxed)) break;
         sortDone.fetch_add(1, std::memory_order_relaxed);
 
-        auto& sample = samples[i];
+        const SortCandidate sample = candidate;
         if (!sample.isProcessed) continue;
 
         juce::File sourceFile(sample.filePath);
@@ -7150,7 +7201,7 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
                                                           sample.key,
                                                           sample.bpm,
                                                           namingStyle,
-                                                          wwiseVariationNumber[i]);
+                                                          wwiseVariationNumber[candidate.index]);
         // sample.key (naming style 5) is the other untrusted-metadata field
         // that reaches this filename, alongside category above -- sanitize
         // the fully-assembled name rather than each contributing field
@@ -7200,12 +7251,31 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
         if (success) {
             appendSortJournalRow(*journalStream, journalOperation, "COMMITTED",
                                  sourceFile, destFile);
-            // Keep database path in sync so auditioning and dragging continue to work
-            sample.filePath = destFile.getFullPathName().toStdString();
+            // Keep database path in sync so auditioning and dragging continue to
+            // work. Queued for the publish phase; writing to samples[] here would
+            // need dbLock, which is the thing this phase is avoiding.
+            pathUpdates.push_back(SortPathUpdate { candidate.index, candidate.filePath,
+                                                    destFile.getFullPathName().toStdString() });
         } else {
             appendSortJournalRow(*journalStream, journalOperation, "FAILED",
                                  sourceFile, destFile);
             sortFailed.fetch_add(1, std::memory_order_relaxed);
+        }
+    }
+
+    // Publish phase: the new paths go back under dbLock. Indices came from the
+    // snapshot, so a concurrent prune or rescan that reordered the vector would
+    // write to the wrong row -- re-check the path we snapshotted before
+    // applying, and skip the update rather than point a sample at another
+    // sample's file.
+    {
+        const juce::ScopedLock sl(dbLock);
+        for (const auto& update : pathUpdates) {
+            if (update.index >= samples.size()) continue;
+            if (samples[update.index].filePath != update.originalPath) {
+                continue;
+            }
+            samples[update.index].filePath = update.newPath;
         }
     }
 

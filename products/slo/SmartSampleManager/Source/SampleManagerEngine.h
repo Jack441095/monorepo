@@ -1112,6 +1112,13 @@ private:
     std::unordered_map<std::string, size_t> pathToIndex;
     std::function<void()> onUpdate;
 
+    // Recursive, and that is load-bearing rather than incidental.
+    //
+    // undoLastSort() holds dbLock and then calls getMostRecentSortJournal(),
+    // which takes it again; replacing this with a std::mutex would deadlock the
+    // message thread on the first Undo. Several "caller must hold dbLock"
+    // helpers rely on the same reentrancy. Stating it here so nobody tidies it
+    // into a plain mutex; if the nesting is ever removed, this can become one.
     mutable juce::CriticalSection dbLock;
     juce::CriticalSection queueLock;
     // A path remains in this set from admission until its scan worker has
