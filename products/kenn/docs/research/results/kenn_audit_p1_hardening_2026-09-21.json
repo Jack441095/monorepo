@@ -21,7 +21,7 @@
     "python_compileall": "passed"
   },
   "frontend_runtime": {
-    "node": "/Users/Ganders4/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "node": "~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
     "node_version": "v24.19.0",
     "node_architecture": "arm64"
   },

@@ -16,7 +16,7 @@ Everything is ready in `/Users/Shared/KENN-clean-account-test/`:
 **Before you switch accounts** (the two Lives would fight over the same ports otherwise):
 - [ ] Save your work and **quit Live** on your account
 - [ ] Tell me "switching", and I'll stop KENN's dev companion. Or run it yourself:
-      `zsh /Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/monorepo/workspace/tmp/kenn-ops/companion.sh stop`
+      `zsh ~/Nite-DSP/monorepo/workspace/tmp/kenn-ops/companion.sh stop`
 
 **The test:**
 - [ ] System Settings → Users & Groups → **Add User**: Standard account, e.g. "KENN Test"

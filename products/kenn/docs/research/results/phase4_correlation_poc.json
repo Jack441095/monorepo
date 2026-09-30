@@ -1,7 +1,7 @@
 {
   "run_date": "2026-09-20",
   "candidate": "temporary-zero-lag-pearson-cpp",
-  "source_fixture_root": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out",
+  "source_fixture_root": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out",
   "cases": [
     {
       "fixture": "dream_of_you/mixdown_v1.wav",

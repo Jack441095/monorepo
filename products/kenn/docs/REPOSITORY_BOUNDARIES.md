@@ -9,7 +9,7 @@ workspace.
 
 ## Standalone repository identity
 
-- Local path: `/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/Shenrendao/KENN`
+- Local path: `~/Nite-DSP/Nite-DSP-Operations/Shenrendao/KENN`
 - GitHub: `Nite-DSP/colloidal-cyclone`
 - Canonical branch: `develop`
 - Remote: `git@github.com:Nite-DSP/colloidal-cyclone.git`
@@ -22,7 +22,7 @@ collaboration documentation.
 
 The whole-product source of truth is the platform monorepo:
 
-- Local path: `/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo`
+- Local path: `~/Nite-DSP/Nite-DSP-Operations/monorepo`
 - GitHub: `Nite-DSP/monorepo`
 - KENN path: `products/kenn`
 - SLO path: `products/slo`

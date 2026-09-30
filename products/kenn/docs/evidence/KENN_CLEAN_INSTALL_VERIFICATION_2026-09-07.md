@@ -28,7 +28,7 @@ release-gate tests did not depend on that stack.
 ## Procedure exercised
 
 ```bash
-git clone --local /Volumes/Jack_Gandy_1TB_SSD/Shenrendao/KENN repo-verified
+git clone --local ~/Shenrendao/KENN repo-verified
 python3 -m venv venv
 venv/bin/python -m pip install -r repo-verified/requirements.txt
 cd repo-verified

@@ -119,7 +119,7 @@ products/kenn/tests/test_kenn_lm_server.py::test_mlx_peft_warm_cache PASSED [ 92
 products/kenn/tests/test_kenn_lm_server.py::test_e2e_subsecond_latency PASSED [100%]
 ============================== 13 passed in 7.34s ==============================
 platform darwin -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
-rootdir: /Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn
+rootdir: ~/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn
 configfile: pyproject.toml
 plugins: anyio-4.14.2
 collected 21 items

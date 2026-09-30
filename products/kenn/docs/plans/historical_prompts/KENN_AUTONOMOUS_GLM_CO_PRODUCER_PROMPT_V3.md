@@ -2,7 +2,7 @@
 
 > **What this file is:** The definitive implementation prompt that drives an AI coding agent (Antigravity / Claude Code / Codex) to transform KENN from a reactive tool bridge into an **autonomous, closed-loop studio co-producer** operating on the **Dual-GLM Architecture** (Frontier Reasoning Brain + Hardware-Grade Deterministic Calibration & Control).
 >
-> **How to use it:** Open the workspace root (`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP`) and instruct the agent: *"Execute `root-docs/KENN_AUTONOMOUS_GLM_CO_PRODUCER_PROMPT_V3.md` in full. Produce every deliverable in §7."* Run in Plan/read-only mode first; do not modify files until the plan is reviewed.
+> **How to use it:** Open the workspace root (`~/Nite-DSP`) and instruct the agent: *"Execute `root-docs/KENN_AUTONOMOUS_GLM_CO_PRODUCER_PROMPT_V3.md` in full. Produce every deliverable in §7."* Run in Plan/read-only mode first; do not modify files until the plan is reviewed.
 >
 > **Owner:** NITE DSP · **Created:** 2026-09-18 · **Predecessors:** `KENN_LLM_SPEEDUP_PROMPT_V1.md` (68–85% latency cut), `KENN_SUBSECOND_LATENCY_AND_AI_EXPANSION_PROMPT_V2.md` (sub-second streaming + telemetry)
 

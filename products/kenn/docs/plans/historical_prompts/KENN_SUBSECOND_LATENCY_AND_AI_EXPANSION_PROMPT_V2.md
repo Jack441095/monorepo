@@ -2,7 +2,7 @@
 
 > **What this file is:** A production-grade, self-contained prompt that drives an AI coding agent (Antigravity / Claude Code / Codex) to push KENN's local intelligence into **sub-second inference (<800ms p50, <200ms TTFB)** and expand KENN with **advanced multimodal audio telemetry, agentic mix planning, and expanded DAW co-pilot capabilities**.
 >
-> **How to use it:** Open the workspace root (`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP`) and instruct the agent: *"Execute `root-docs/KENN_SUBSECOND_LATENCY_AND_AI_EXPANSION_PROMPT_V2.md` in full. Produce every deliverable in §7."* Run in Plan mode first; obtain user approval before modifying files.
+> **How to use it:** Open the workspace root (`~/Nite-DSP`) and instruct the agent: *"Execute `root-docs/KENN_SUBSECOND_LATENCY_AND_AI_EXPANSION_PROMPT_V2.md` in full. Produce every deliverable in §7."* Run in Plan mode first; obtain user approval before modifying files.
 >
 > **Owner:** NITE DSP · **Created:** 2026-09-18 · **Predecessor:** `KENN_LLM_SPEEDUP_PROMPT_V1.md` (achieved 68–85% latency reduction, 1.55s p50)
 

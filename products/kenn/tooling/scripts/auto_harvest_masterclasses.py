@@ -5,12 +5,13 @@ Runs continuously in the background:
 - Monitors pending YouTube masterclass videos.
 - Attempts fetches with randomized delays and respectful pacing.
 - Handles YouTube 429 IP cooldowns with backoff (sleeps 5m on block).
-- On each downloaded transcript, automatically rsyncs to the remote GPU queue:
-  ubuntu@www.haoee.com:/mnt/data/kenn-notes-gpu1/transcripts/
+- On each downloaded transcript, automatically rsyncs to the remote GPU queue. The box's hostname comes from
+  KENN_SERVER_TARGET rather than being committed (AGENTS.md: no remote hostnames in git).
 """
 
 from __future__ import annotations
 
+import os
 import random
 import subprocess
 import time
@@ -46,9 +47,9 @@ def rsync_to_gpu() -> None:
         # Authentication is by SSH key (BatchMode fails fast instead of prompting).
         # Never put a password in this repo.
         cmd = [
-            "rsync", "-avz", "-e", "ssh -p 2022 -o BatchMode=yes -o StrictHostKeyChecking=no",
+            "rsync", "-avz", "-e", f"ssh -p {os.environ.get('KENN_SERVER_PORT', '2022')} -o BatchMode=yes -o StrictHostKeyChecking=no",
             str(OUT_DIR) + "/",
-            "ubuntu@www.haoee.com:/mnt/data/kenn-notes-gpu1/transcripts/"
+            f"{os.environ['KENN_SERVER_TARGET']}:/mnt/data/kenn-notes-gpu1/transcripts/"
         ]
         res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if res.returncode == 0:

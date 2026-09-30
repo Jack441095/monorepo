@@ -3,7 +3,7 @@
   "generated_at": "2026-09-06T21:27:46.131532+00:00",
   "engine": "mix-review/core/local_engine.py (KENN-owned, deterministic, no external runtime)",
   "evidence_kind": "real_mixes",
-  "corpus_source": "/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems (rights confirmed by the corpus owner)",
+  "corpus_source": "~/testing-for-NITE-DSP/testing_track_stems (rights confirmed by the corpus owner)",
   "corpus_note": "8 real song mixdowns (KENN AutoMix-rendered, real stem content), 2 A/B variant renders of the same song, and 1 raw unprocessed drum stem for contrast. No raw audio or filesystem path is included in this packet -- only measured findings and a truncated content hash for identity.",
   "case_count": 11,
   "cases": [

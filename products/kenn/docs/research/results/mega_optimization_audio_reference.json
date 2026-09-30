@@ -27,7 +27,7 @@
     "include_ltas": true,
     "sources": [
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/organized_sample_library/Minimal_Audio_Full/FX/Foley/Atmosphere - Emergent - C - 78 BPM.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/organized_sample_library/Minimal_Audio_Full/FX/Foley/Atmosphere - Emergent - C - 78 BPM.wav",
         "sha256": "97638107a543af2bd423e33dbf0e0ac9968b957edf902f19823c7eaa8adfebfa",
         "bytes": 14178506,
         "wav": {
@@ -39,7 +39,7 @@
         }
       },
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/organized_sample_library/Minimal_Audio_Full/FX/Foley/Atmosphere - Mysteria.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/organized_sample_library/Minimal_Audio_Full/FX/Foley/Atmosphere - Mysteria.wav",
         "sha256": "c01f7a0dc1023ea0efdb44a14e930fcac3454c39571f8f2a650d10284151eab8",
         "bytes": 14700958,
         "wav": {

@@ -26,7 +26,7 @@
     "repeats": 1,
     "sources": [
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav",
         "sha256": "1aff8ca03a9c6aa535ed217db42ea8955bccbf04975306cd3f42c23ae09e8c5c",
         "bytes": 69827174,
         "wav": {
@@ -38,7 +38,7 @@
         }
       },
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/al_james/al_james/mixdown_v1.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/al_james/al_james/mixdown_v1.wav",
         "sha256": "2192e2c25dc588f16fd5f71cdcd5c47fe4781ff762b0893c21b13b1889a2d28f",
         "bytes": 52619180,
         "wav": {
@@ -50,7 +50,7 @@
         }
       },
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/amyhelmandthehandsomestrangers_rescueme/amyhelmandthehandsomestrangers_rescueme/mixdown_v1.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/amyhelmandthehandsomestrangers_rescueme/amyhelmandthehandsomestrangers_rescueme/mixdown_v1.wav",
         "sha256": "95942f6f332ddc78781c77e9599c18314d1cd2d3f9d9031c597c427a54794c16",
         "bytes": 68066174,
         "wav": {
@@ -62,7 +62,7 @@
         }
       },
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/angeloboltini_fragments/angeloboltini_fragments/mixdown_v1.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/angeloboltini_fragments/angeloboltini_fragments/mixdown_v1.wav",
         "sha256": "a355db5fc344b3f3798703d295c791a9b50914e2b121d6d699be1f9a9709c169",
         "bytes": 46893014,
         "wav": {
@@ -74,7 +74,7 @@
         }
       },
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/atlantisbound_itwasmyfaultforwaiting/atlantisbound_itwasmyfaultforwaiting/mixdown_v1.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/atlantisbound_itwasmyfaultforwaiting/atlantisbound_itwasmyfaultforwaiting/mixdown_v1.wav",
         "sha256": "b18edf1f849d4c1642805fe8cd1a4b45059d3d60c9cbf446d2b17193c87748b3",
         "bytes": 63390290,
         "wav": {
@@ -86,7 +86,7 @@
         }
       },
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/dream_of_you/dream_of_you/mixdown_v1.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/dream_of_you/dream_of_you/mixdown_v1.wav",
         "sha256": "caf45abc11440f01c40a8f200b850de486650247ee466df7d351087c7ea56c75",
         "bytes": 21390872,
         "wav": {
@@ -98,7 +98,7 @@
         }
       },
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/reggueton_pop/reggueton_pop/mixdown_v1.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/reggueton_pop/reggueton_pop/mixdown_v1.wav",
         "sha256": "5d5ad17f5ab3c43d12261cf83f58507ea695366243ecd1a904b7a4798457daaa",
         "bytes": 37836872,
         "wav": {
@@ -110,7 +110,7 @@
         }
       },
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/stranger/stranger-validate/mixdown_v1.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/stranger/stranger-validate/mixdown_v1.wav",
         "sha256": "4cffabb62958a3576291b6ed89264198cd41214a8f2db4f4ccaa0936077989f8",
         "bytes": 54300536,
         "wav": {
