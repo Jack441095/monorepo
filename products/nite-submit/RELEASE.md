@@ -20,8 +20,11 @@ runs `tools/test_deterministic_archive.sh` to verify repeatable checksums.
 The release gate also runs `tools/run_pdf_matrix_check.sh` across dissertation,
 capstone, guidance, anonymous-candidate, and image-only PDFs.
 It also runs `tools/run_full_corpus_write_check.sh`, which writes and verifies
-both the safe ID+Project and explicit name-bearing rules across all 203
-synthetic fixture PDFs without modifying the source corpus.
+both the safe ID+Project and explicit name-bearing rules across all 233
+synthetic fixture PDFs without modifying the source corpus. The expected
+processed/review split comes from the corpus manifest, and
+`tools/check_corpus_parity.sh` fails if the two checked-in copies of the
+corpus drift apart.
 
 Packaging automatically runs `tools/verify_app_bundle.sh`, which checks the
 bundle identifier, executable/CLI presence, PDF association, and code-signature
@@ -84,8 +87,12 @@ PDFs before a broader real-document claim.
 
 Ed25519 offline licence key system (`LicenseEngine.swift`). The app gates
 behind activation on first launch. Keys are generated with the developer-only
-`nitesubmit-keygen` CLI (reads `tools/license-private-key.base64`). The
-private key is gitignored and never shipped.
+`nitesubmit-keygen` CLI, which reads
+`$XDG_CONFIG_HOME/nite-submit/license-private-key.base64` (falling back to
+`~/.config/nite-submit/`) and warns if it has to fall back to the old
+in-tree `tools/` copy. The private key lives outside the source tree, and
+`tools/package_app.sh` and `tools/verify_app_bundle.sh` both refuse a bundle
+that contains any `*private-key*` file.
 
 Price: £3 one-time (lifetime student licence). Payment/checkout lives in the
 website + payment processor, not in the product code.

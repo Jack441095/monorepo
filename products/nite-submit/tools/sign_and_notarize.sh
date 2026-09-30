@@ -56,12 +56,29 @@ echo "\n[1/6] Packaging fresh application..."
 ./tools/package_app.sh
 
 # 2. Code sign with Hardened Runtime (inside-out: embedded binaries first)
+# Apple's rule is strictly innermost first: a dylib has to be signed before the
+# executable that loads it, and the executable before the bundle that holds it.
+# `--deep` on the bundle alone does not cover Resources/lib/*.dylib
+# (libqpdf, libjpeg, libcrypto), so a notarised build can be rejected for an
+# unsigned nested library even though the outer signature verifies.
 echo "\n[2/6] Code signing app bundle with Developer ID..."
+for dylib in "$APP_PATH"/Contents/Resources/lib/*.dylib; do
+  [[ -f "$dylib" ]] || continue
+  echo "  Signing dylib: $(basename "$dylib")"
+  codesign --force --options runtime --timestamp \
+    --sign "$SIGNING_IDENTITY" "$dylib"
+done
 for embedded in "$APP_PATH"/Contents/Resources/bin/*; do
   [[ -x "$embedded" && ! -d "$embedded" ]] || continue
   echo "  Signing embedded binary: $(basename "$embedded")"
   codesign --force --options runtime --timestamp \
     --sign "$SIGNING_IDENTITY" "$embedded"
+done
+for executable in "$APP_PATH"/Contents/MacOS/*; do
+  [[ -f "$executable" ]] || continue
+  echo "  Signing executable: $(basename "$executable")"
+  codesign --force --options runtime --timestamp \
+    --sign "$SIGNING_IDENTITY" "$executable"
 done
 codesign --force --options runtime --timestamp \
   --sign "$SIGNING_IDENTITY" \
@@ -69,7 +86,13 @@ codesign --force --options runtime --timestamp \
 
 echo "Verifying code signature..."
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
-spctl --assess --type execute --verbose "$APP_PATH" || true
+# Fail closed. A bundle that signs but is rejected by Gatekeeper is a ship
+# blocker, and swallowing the exit here was how that got shipped once already.
+if ! spctl --assess --type execute --verbose=4 "$APP_PATH"; then
+  echo "ERROR: Gatekeeper rejected the signed app: $APP_PATH" >&2
+  echo "       Do not publish this build. Check the signature above first." >&2
+  exit 1
+fi
 
 # 3. Create ZIP and DMG artifacts
 echo "\n[3/6] Packaging signed ZIP and DMG installer..."

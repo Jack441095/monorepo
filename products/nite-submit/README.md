@@ -71,7 +71,7 @@ Requires macOS 13+ and Swift command line tools.
 swift build                 # debug build
 swift run nitesubmit-tests  # full test suite + corpus evaluation
 ./tools/package_app.sh      # produce artifacts/Submit-1.0.0-macOS.app
-./tools/run_full_corpus_write_check.sh  # verify both full 203-PDF write loads
+./tools/run_full_corpus_write_check.sh  # verify both full 233-PDF write loads
 ```
 
 ## Command line
@@ -115,7 +115,9 @@ items to be written; missing required fields still block. See
 - `tools/run_beta_intake_smoke_check.sh` — aggregate-only beta-validator privacy gate
 - `tools/test_release_corpus_scope.sh` — fail-closed public/private corpus boundary check
 - `tools/run_acceptance_sweep.sh` — categorized multi-PDF acceptance runner
-- `tools/run_full_corpus_write_check.sh` — guarded 203-PDF ID/name write load
+- `tools/run_full_corpus_write_check.sh` — guarded 233-PDF ID/name write load
+- `tools/check_corpus_parity.sh` — fail-closed check that both corpus copies match
+- `tools/update_appcast.sh` — sign and stamp `web/appcast.xml` for a release
 - `real_validation_corpus/beta_intake/` — ignored private beta intake workspace
 - `docs/` — architecture, testing, release notes
 

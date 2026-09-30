@@ -33,6 +33,22 @@ this explicit approval even when their fields look complete, collisions still
 follow the selected collision policy, and unlisted files remain
 `review_required`.
 
+The confidence gate covers every field the naming rule prints, not only the
+name, number and code. A rule that uses `{module_code}`, `{module_title}` or
+`{university}` is held whenever those detections are anything below `high`, and
+the approval manifest is what releases it.
+
+If the manifest cannot be read, decoded, or declares an `approval_version`
+other than `BATCH_APPROVAL_V1`, the batch stops and exits 2 without writing
+anything: a manifest that was asked for and could not be used must not
+silently become "no approvals at all". Add `--ignore-bad-manifest` to run the
+batch anyway with zero approvals, which holds every uncertain file for review.
+
+`--out` must not sit inside the input directory. Writing renamed copies back
+into the input tree makes the next run read its own output as fresh
+submissions, so the batch refuses that combination (again exit 2) and resolves
+symlinks on both paths before comparing them.
+
 The JSON and CSV reports also include `document_type` and `document_reason`.
 Normal extracted documents are `likely_submission`; guidance/template files
 are `guidance_template`; image-only files are `image_only`; and extraction or

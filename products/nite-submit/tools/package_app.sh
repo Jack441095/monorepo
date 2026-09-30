@@ -1,7 +1,8 @@
 #!/bin/zsh
 # Build Submit.app (unsigned development build) into artifacts/.
-set -e
-cd "$(dirname "$0")/.."
+set -euo pipefail
+product_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$product_dir"
 APP_NAME="Submit"
 # Single source of truth for the version (RELEASE FACTORY V1): the VERSION
 # file at repo root. Scripts must read it, never hardcode it.
@@ -20,6 +21,18 @@ mkdir -p "$OUT.app/Contents/MacOS" "$OUT.app/Contents/Resources/bin" "$OUT.app/C
 
 cp "$BUILD_DIR/NiteSubmitApp" "$OUT.app/Contents/MacOS/NiteSubmit"
 cp "$BUILD_DIR/nitesubmit-cli" "$OUT.app/Contents/MacOS/nitesubmit-cli"
+
+# Every third-party binary and dylib we ship is pinned by digest. These are
+# prebuilt arm64 blobs dropped into the tree by hand, so an unnoticed swap would
+# otherwise ride straight into a notarised build and into customers' Applications
+# folder. Verify before a single byte is copied.
+echo "== third-party integrity =="
+(cd tools && shasum -a 256 --check SHA256SUMS) || {
+    echo "ERROR: tools/bin or tools/lib no longer matches tools/SHA256SUMS." >&2
+    echo "       Treat this as a supply-chain incident until the provenance of the" >&2
+    echo "       replacement is confirmed, then update the pinned digests." >&2
+    exit 1
+}
 
 # Bundled 7za (arm64, LGPL 2.1, from the p7zip project) gives every user real LZMA2 7z
 # compression out of the box, without depending on them having separately installed
@@ -40,6 +53,17 @@ cp "$PWD/tools/lib/libjpeg.8.dylib" "$OUT.app/Contents/Resources/lib/libjpeg.8.d
 cp "$PWD/tools/lib/libcrypto.3.dylib" "$OUT.app/Contents/Resources/lib/libcrypto.3.dylib"
 cp "$PWD/tools/lib/qpdf-LICENSE-Apache-2.0.txt" "$OUT.app/Contents/Resources/bin/qpdf-LICENSE-Apache-2.0.txt"
 cp "$PWD/THIRD_PARTY_NOTICES.md" "$OUT.app/Contents/Resources/THIRD_PARTY_NOTICES.md"
+
+# The Ed25519 licence signing key must never leave the owner's machine. It used
+# to live in tools/ next to these scripts, so any future sweep of that directory
+# into the bundle would have shipped it. The key now resolves from
+# $XDG_CONFIG_HOME/nite-submit/license-private-key.base64, and this check is the
+# backstop for a build run from an old checkout.
+leaked_key="$(find "$OUT.app" -type f -name '*private-key*' -print -quit)"
+[[ -z "$leaked_key" ]] || {
+    echo "ERROR: refusing to ship a private key: $leaked_key" >&2
+    exit 1
+}
 
 cat > "$OUT.app/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>

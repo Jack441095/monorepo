@@ -71,5 +71,17 @@ for executable in "$binary_path" "$cli_path" "$resources_path/bin/7za" "$resourc
   }
 done
 
+# Nothing that can mint a customer licence key may be inside the product. The
+# Ed25519 private key used to live in tools/ next to the packaging scripts, so a
+# broad copy of that directory into Resources would have shipped it to every
+# customer. Keygen now reads it from $XDG_CONFIG_HOME/nite-submit; this is the
+# backstop that says so out loud.
+leaked_key=$(find "$app_path" -type f -name '*private-key*' -print -quit)
+if [[ -n "$leaked_key" ]]; then
+  echo "Private key found inside the bundle: $leaked_key" >&2
+  echo "Remove it from the staging tree and re-run tools/package_app.sh." >&2
+  exit 1
+fi
+
 codesign --verify --deep --strict "$app_path"
 echo "Bundle verification passed: $app_path"
