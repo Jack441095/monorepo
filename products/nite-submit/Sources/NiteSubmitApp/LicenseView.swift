@@ -86,15 +86,20 @@ final class LicenseView: NSView {
             statusLabel.textColor = .systemOrange
             return
         }
-        if LicenseEngine.storeLicense(key) {
-            statusLabel.stringValue = "Licence activated."
-            statusLabel.textColor = .systemGreen
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-                self?.onActivated?()
-            }
-        } else {
-            statusLabel.stringValue = "Invalid licence key. Check and try again."
+        // storeLicense throws rather than returning a bool, because a valid key
+        // that never reached the disk used to be reported as "activated" and the
+        // student was asked for it again on the next launch with no explanation.
+        do {
+            try LicenseEngine.storeLicense(key)
+        } catch {
+            statusLabel.stringValue = error.localizedDescription
             statusLabel.textColor = .systemRed
+            return
+        }
+        statusLabel.stringValue = "Licence activated."
+        statusLabel.textColor = .systemGreen
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+            self?.onActivated?()
         }
     }
 }
