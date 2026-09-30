@@ -1,5 +1,31 @@
 # SLO Private Beta Readiness V2
 
+> **RETRACTED 2026-09-30 — the scan path is format-aware, not WAV-only.**
+> The claim below that `addPathToQueue()` globs `*.wav`, and the code comment said to
+> confirm it, do not exist in this tree. What is actually there:
+> `Source/SampleManagerEngine.cpp:2188` enumerates `"*"` and admits each file through
+> `formatManager.findFormatForFileExtension()` (`:2192, :2199`); dr_wav was demoted to a
+> WAV-only *validation* guard at `:5924-5943` ahead of the tolerant JUCE reader; and
+> `Source/test_format_aware_scan_main.cpp:91-92` exercises `AiffAudioFormat` and
+> `FlacAudioFormat` under CMake target `TestFormatAwareScan`. The repo's own
+> `SmartSampleManager/validation/class-opt-v1/FORMAT_SUPPORT_CORRECTION.md:4-6` reached
+> the same conclusion earlier and called it "a disclosure + verification task, not an
+> engineering gap".
+> **AIFF and FLAC ship. The real remaining gap is MP3 and OGG**, which the
+> drag-and-drop filter accepts (`Source/PluginEditor.cpp:16-18`) but which have no
+> runtime decode fixture. Any owner decision framed as "WAV-only vs multi-format" is
+> asking a settled question.
+
+
+
+> **Accuracy figure unverified, 2026-09-30.** The 39.0% audio-only number quoted
+> below comes from `OOD_RECALIBRATION_V1_REPORT.md`, which re-ran the full
+> production pipeline. The V2 artifact for the same 5,157 files records 17.5% and
+> macro-F1 0.073. The corpus is no longer on this machine, so neither figure could be
+> re-measured. Treat both as open until the benchmark is re-run; see
+> `docs/SLO_REVIEW_V1.md` A2-b2.
+
+
 **Supersedes:** `SLO_BETA_BLOCKER_REGISTER_V2.md` as the current synthesis (that register stays as the detailed per-blocker evidence trail; this doc is the readiness verdict this program was asked to produce, cross-referencing it rather than restating it).
 
 ## What this program did

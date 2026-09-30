@@ -1,4 +1,40 @@
 # SLO Evaluation Scorecard — 2026-09-18
+
+> **RETRACTED 2026-09-30 — the scan path is format-aware, not WAV-only.**
+> The claim below that `addPathToQueue()` globs `*.wav`, and the code comment said to
+> confirm it, do not exist in this tree. What is actually there:
+> `Source/SampleManagerEngine.cpp:2188` enumerates `"*"` and admits each file through
+> `formatManager.findFormatForFileExtension()` (`:2192, :2199`); dr_wav was demoted to a
+> WAV-only *validation* guard at `:5924-5943` ahead of the tolerant JUCE reader; and
+> `Source/test_format_aware_scan_main.cpp:91-92` exercises `AiffAudioFormat` and
+> `FlacAudioFormat` under CMake target `TestFormatAwareScan`. The repo's own
+> `SmartSampleManager/validation/class-opt-v1/FORMAT_SUPPORT_CORRECTION.md:4-6` reached
+> the same conclusion earlier and called it "a disclosure + verification task, not an
+> engineering gap".
+> **AIFF and FLAC ship. The real remaining gap is MP3 and OGG**, which the
+> drag-and-drop filter accepts (`Source/PluginEditor.cpp:16-18`) but which have no
+> runtime decode fixture. Any owner decision framed as "WAV-only vs multi-format" is
+> asking a settled question.
+
+
+
+> **UNVERIFIED — conflicting benchmark figures, 2026-09-30.**
+> This report quotes V2 as **71.5%**. The artifact it cites,
+> `SmartSampleManager/docs/classification/REAL_CORPUS_CROSS_VENDOR_V2_REPORT.md:23-24`,
+> records **77.9%** for the same 5,157 files. Both landed in commit `f4a90d2c`.
+> The second figure is traceable to `OOD_RECALIBRATION_V1_REPORT.md:36,72`, which
+> re-ran the full production pipeline and reported 39.0% / 71.5% as the
+> *pre-recalibration baseline*, and claims it "re-confirmed at exactly" those
+> numbers. So the two reports describe the same corpus and disagree.
+>
+> The corpus itself is no longer on this machine, so the benchmark could not be
+> re-run to settle it. **Do not quote either figure as current until it is
+> re-measured.** Which of the two measures the full production path
+> (`MlOverrideGate` + `AbletonTaxonomy::classify()`) and which measures a
+> narrower evaluation is the open question — a 5.4x gap on audio-only macro-F1
+> is a difference in what was measured, not a rounding difference.
+> Owner decision; see `docs/SLO_REVIEW_V1.md` A2-b2.
+
 **Method:** read-mostly evaluation per `SLO_EVALUATION_FEATURES_AI_PERF_PROMPT_V1.md` §2. No builds/tests run; no edits on main. Grades: A=ran it, B=read code, C=partial, D=claimed-only, E=contradicted, F=unknown. All accuracy/perf numbers are repository-held historical evidence unless marked fresh.
 
 ## Verdict
@@ -9,7 +45,10 @@
 |---|---|---|---|
 | Discovery & scan | 6/10 | B | WAV-only discovery+decode; AIFF/FLAC/MP3 invisible (SLO_SCAN_INDEX_PIPELINE_REPORT_V1: `addPathToQueue()` globs `*.wav`; decode path is dr_wav-specific) |
 | Classification quality | 5/10 | B/D | Synthetic 96.5% headline self-declared stale (`slo_classification_metrics_v1.json`: "REPOSITORY_HELD_HISTORICAL_NOT_FRESH"); honest cross-vendor 62.9% full / 30.2% audio-only (B-006 CLOSED reporting); golden-set audio-only 5.9% |
-| Fusion & decision gates | 7/10 | B | Fusion lift real (71.5% vs 39.0%, V2 5,157-file benchmark, SLO_ACCURACY_ROADMAP_V1); but lift is filename-dominated (81.2%/77.9% when filename/folder wins) — DSP-only is the bottleneck; Stage-2 recalibration null result fully reverted, byte-identical |
+| Fusion & decision gates | 7/10 | B | Fusion lift real (71.5% vs 39.0%, V2 5,157-file benchmark, SLO_ACCURACY_ROADMAP_V1); but lift is filename-dominated — in the V2 evidence-source table the FILENAME rows win
+2897 times at 81.2% and the FOLDER rows win 1684 times at 98.5%; the 77.9% this line
+previously paired with 81.2% is the overall full-evidence accuracy, not a per-source figure
+(REAL_CORPUS_CROSS_VENDOR_V2_REPORT.md:23,54,55) — DSP-only is the bottleneck; Stage-2 recalibration null result fully reverted, byte-identical |
 | Similarity search | 8/10 | B | Best-evidenced area: TestFindSimilar/Weighted/NearDuplicates/EmbeddingQuality/TimeoutTimbre/ReferenceSearch 6/6 PASS on real decode→inference chain (SLO_SIMILARITY_SEARCH_REPORT_V1); combined similarity+filter query UX unexercised |
 | UX & presentation | 6/10 | B | CorrectionLog.h exists (append-only JSONL, no-audio, captures original before overwrite); graduated-confidence bundle (category+subtype+attributes) missing — flagged in SLO_PRODUCER_TAXONOMY_REQUIREMENTS_V1; never-scanned vs Unknown text fix landed (B-007) |
 | Robustness & safety | 9/10 | B | Read-only scan SHA-256-qualified (B-013, TestReadOnlySafetyQualification); sort move/copy/undo journal + cancellation (B-011); cache corrupt→quarantine; 3-way version gates (feature/taxonomy/embeddingModel); TestMalformedAudio PASS |

@@ -1,5 +1,41 @@
 # SLO Current Working State Audit V1
 
+> **RETRACTED 2026-09-30 — the scan path is format-aware, not WAV-only.**
+> The claim below that `addPathToQueue()` globs `*.wav`, and the code comment said to
+> confirm it, do not exist in this tree. What is actually there:
+> `Source/SampleManagerEngine.cpp:2188` enumerates `"*"` and admits each file through
+> `formatManager.findFormatForFileExtension()` (`:2192, :2199`); dr_wav was demoted to a
+> WAV-only *validation* guard at `:5924-5943` ahead of the tolerant JUCE reader; and
+> `Source/test_format_aware_scan_main.cpp:91-92` exercises `AiffAudioFormat` and
+> `FlacAudioFormat` under CMake target `TestFormatAwareScan`. The repo's own
+> `SmartSampleManager/validation/class-opt-v1/FORMAT_SUPPORT_CORRECTION.md:4-6` reached
+> the same conclusion earlier and called it "a disclosure + verification task, not an
+> engineering gap".
+> **AIFF and FLAC ship. The real remaining gap is MP3 and OGG**, which the
+> drag-and-drop filter accepts (`Source/PluginEditor.cpp:16-18`) but which have no
+> runtime decode fixture. Any owner decision framed as "WAV-only vs multi-format" is
+> asking a settled question.
+
+
+
+> **UNVERIFIED — conflicting benchmark figures, 2026-09-30.**
+> This report quotes V2 as **71.5%**. The artifact it cites,
+> `SmartSampleManager/docs/classification/REAL_CORPUS_CROSS_VENDOR_V2_REPORT.md:23-24`,
+> records **77.9%** for the same 5,157 files. Both landed in commit `f4a90d2c`.
+> The second figure is traceable to `OOD_RECALIBRATION_V1_REPORT.md:36,72`, which
+> re-ran the full production pipeline and reported 39.0% / 71.5% as the
+> *pre-recalibration baseline*, and claims it "re-confirmed at exactly" those
+> numbers. So the two reports describe the same corpus and disagree.
+>
+> The corpus itself is no longer on this machine, so the benchmark could not be
+> re-run to settle it. **Do not quote either figure as current until it is
+> re-measured.** Which of the two measures the full production path
+> (`MlOverrideGate` + `AbletonTaxonomy::classify()`) and which measures a
+> narrower evaluation is the open question — a 5.4x gap on audio-only macro-F1
+> is a difference in what was measured, not a rounding difference.
+> Owner decision; see `docs/SLO_REVIEW_V1.md` A2-b2.
+
+
 **Purpose:** ground truth on what actually exists in this repo today, before any of the readiness-program work (Tasks 2-13) begins. Every claim below is backed by a command or file reference run against the real repo, not assumed.
 
 ## Repo identity

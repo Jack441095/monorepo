@@ -1,5 +1,23 @@
 # SLO Classification Accuracy Roadmap V1
 
+> **UNVERIFIED — conflicting benchmark figures, 2026-09-30.**
+> This report quotes V2 as **71.5%**. The artifact it cites,
+> `SmartSampleManager/docs/classification/REAL_CORPUS_CROSS_VENDOR_V2_REPORT.md:23-24`,
+> records **77.9%** for the same 5,157 files. Both landed in commit `f4a90d2c`.
+> The second figure is traceable to `OOD_RECALIBRATION_V1_REPORT.md:36,72`, which
+> re-ran the full production pipeline and reported 39.0% / 71.5% as the
+> *pre-recalibration baseline*, and claims it "re-confirmed at exactly" those
+> numbers. So the two reports describe the same corpus and disagree.
+>
+> The corpus itself is no longer on this machine, so the benchmark could not be
+> re-run to settle it. **Do not quote either figure as current until it is
+> re-measured.** Which of the two measures the full production path
+> (`MlOverrideGate` + `AbletonTaxonomy::classify()`) and which measures a
+> narrower evaluation is the open question — a 5.4x gap on audio-only macro-F1
+> is a difference in what was measured, not a rounding difference.
+> Owner decision; see `docs/SLO_REVIEW_V1.md` A2-b2.
+
+
 **Purpose:** answer "how do we get to classifying all sounds correctly?" honestly, as a real long-term plan, not just the near-term stages. Short version on the ceiling: literal 100% isn't achievable or even the right target — this doc explains why — but the plan below is the real, sequenced path to get as close as the data, the model, and the product's own design philosophy allow, and it doesn't stop at "recalibrate the classifier."
 
 ## Why 100% is the wrong target, not just a hard one

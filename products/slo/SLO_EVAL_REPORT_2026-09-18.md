@@ -1,4 +1,22 @@
 # SLO Evaluation Report — 2026-09-18
+
+> **RETRACTED 2026-09-30 — the scan path is format-aware, not WAV-only.**
+> The claim below that `addPathToQueue()` globs `*.wav`, and the code comment said to
+> confirm it, do not exist in this tree. What is actually there:
+> `Source/SampleManagerEngine.cpp:2188` enumerates `"*"` and admits each file through
+> `formatManager.findFormatForFileExtension()` (`:2192, :2199`); dr_wav was demoted to a
+> WAV-only *validation* guard at `:5924-5943` ahead of the tolerant JUCE reader; and
+> `Source/test_format_aware_scan_main.cpp:91-92` exercises `AiffAudioFormat` and
+> `FlacAudioFormat` under CMake target `TestFormatAwareScan`. The repo's own
+> `SmartSampleManager/validation/class-opt-v1/FORMAT_SUPPORT_CORRECTION.md:4-6` reached
+> the same conclusion earlier and called it "a disclosure + verification task, not an
+> engineering gap".
+> **AIFF and FLAC ship. The real remaining gap is MP3 and OGG**, which the
+> drag-and-drop filter accepts (`Source/PluginEditor.cpp:16-18`) but which have no
+> runtime decode fixture. Any owner decision framed as "WAV-only vs multi-format" is
+> asking a settled question.
+
+
 **Prompt executed:** `SLO_EVALUATION_FEATURES_AI_PERF_PROMPT_V1.md` · **Mode:** read-mostly (Phase 1 + proposals; no code edits anywhere, incl. no branch — Phase 4 EXECUTE declined, see §Perf) · **Commit:** `1102468` (ops/mirror-and-notes; SLO subtree clean; unrelated `kenn/` modifications pre-existing)
 
 ## Summary
