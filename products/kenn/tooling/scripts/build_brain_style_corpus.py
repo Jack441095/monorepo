@@ -35,7 +35,11 @@ def _words(text: str) -> set[str]:
 
 
 def evaluation_questions() -> list[set[str]]:
-    """Every question KENN is scored on, as word sets (a near-copy leaks as surely as an exact one)."""
+    """Every question KENN is scored on, as word sets (a near-copy leaks as surely as an exact one).
+
+    Sealed fixtures are read here on purpose: this is the leak guard, and a question the
+    retrieval gate scores on must not reach a fine-tune set whether or not it is tuned on.
+    """
     found = []
     for path in EVALS.glob("*.json"):
         try:
