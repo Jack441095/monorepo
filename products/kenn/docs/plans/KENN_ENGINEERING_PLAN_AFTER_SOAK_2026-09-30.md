@@ -175,6 +175,25 @@ promotion only through the gate).
 > anchoring. **The buttons are a rendering change on a payload that exists**, except in the ambiguous case, where they
 > are not "do the first, then the second" but "tell me the amount for the hats" — so the shape should be decided before
 > the frontend is built.
+> **The silent drop is now fixed** (same branch): the question quotes the part KENN did not catch, so
+"
+"> "make the hats quieter and the kick punchier" answers *"By how much? ... turn Kick down 2 dB ... I didn't catch
+"
+'> "make the hats quieter" -- send that on its own, or give me both amounts."* 6 tests; backend suite green at
+'
+"> **2,449 passed, 125 skipped**. **B6 stays open** for the two parts that remain: `lower`/`raise` as volume verbs, and
+"
+'> "adjust that".
+'
+"> One thing worth knowing before anyone extends this: **session context is load-bearing.** Asking the same
+"
+"> two-change sentence twice in one session gives different answers — the second comes from
+"
+"> `clarify_contextual_direction` — because the first exchange established what was being discussed. That is intended,
+"
+"> and it is why tests of these scenarios must not share a session id. My first draft did, and it looked like a cache
+"
+"> leak rather than what it was.
 
 | B7 | Planner: stays in shadow. Retrain (run 14) only when about 500 owner-labelled tester requests exist, and promote only through `live_llm_promotion.py` | hold | Tester data |
 
