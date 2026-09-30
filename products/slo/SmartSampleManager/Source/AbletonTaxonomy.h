@@ -189,6 +189,12 @@ LoopDetectionResult detectLoopVsOneShot(float durationSeconds, float decayTimeSe
 // vaguer buckets like "Other") and the loop-detection confidence where that
 // signal was used to pick between two subcategory variants. This is an
 // honest, if approximate, signal -- not a calibrated probability.
+// Resolves the functional category/subcategory and its Loop/One-Shot tags.
+// classify() wraps this and appends the Foley provenance tag, so the tag lands
+// on every path that resolved a subcategory rather than only the DSP
+// loop-detection branch.
+Classification classifySubcategoryAndTags(const ClassificationInput& input);
+
 Classification classify(const ClassificationInput& input);
 
 bool mapAcousticClassToTaxonomy(const std::string& acousticClass, std::string& outCategory, std::string& outSubcategory);

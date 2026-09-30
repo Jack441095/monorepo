@@ -331,6 +331,24 @@ FilenameSubcategoryEvidence detectFilenameSubcategoryEvidence(
 
 Classification classify(const ClassificationInput& input)
 {
+    // Foley is a provenance attribute, orthogonal to the functional
+    // subcategory: AbletonTaxonomy.h promises it on every path that resolves a
+    // base mapping, at 62% recall / 69% precision. It used to be appended only
+    // on the loop-vs-one-shot DSP path, so Footstep, every filename-evidence
+    // Vocal, the "Loop" catch-all, and every bucket with no loop variant all
+    // silently lost the tag -- a producer searching by Foley got an arbitrary
+    // subset of foley-sourced files. Applying it once here, after the
+    // subcategory is decided, makes the promise true on every path without
+    // touching five separate return sites.
+    Classification result = classifySubcategoryAndTags(input);
+    if (!result.subcategory.empty() && isFoleySourced(input.fileName)) {
+        result.secondaryTags.push_back("Foley");
+    }
+    return result;
+}
+
+Classification classifySubcategoryAndTags(const ClassificationInput& input)
+{
     Classification result;
     result.winningEvidence = input.winningEvidence;
 
@@ -435,8 +453,6 @@ Classification classify(const ClassificationInput& input)
     result.category = mapping.category;
     result.subcategory = loopDetection.isLoop ? mapping.subcategoryLoop : mapping.subcategoryOneShot;
     result.secondaryTags.push_back(loopDetection.isLoop ? "Loop" : "One-Shot");
-    // Provenance attribute, orthogonal to the functional subcategory.
-    if (isFoleySourced(input.fileName)) result.secondaryTags.push_back("Foley");
     result.confidence = effectiveBaseConfidence * (0.5f + 0.5f * loopDetection.confidence);
     return result;
 }
