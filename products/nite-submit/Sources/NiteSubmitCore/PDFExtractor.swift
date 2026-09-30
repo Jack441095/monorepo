@@ -58,13 +58,31 @@ public struct PDFExtractor: Sendable {
 
         var pages: [PDFTextDocument.Page] = []
         var totalChars = 0
+        // Page numbers that carried no usable text layer, i.e. scans. This has to
+        // be tracked as we go rather than worked out from `pages` afterwards: a
+        // page with no text layer never makes it into that array at all, so the
+        // old allSatisfy({ $0.lines.isEmpty }) test could not see a scan sitting
+        // behind a typed cover sheet and never looked for one.
+        var scannedPageNumbers: [Int] = []
         for i in 0..<pageCount {
             guard let page = doc.page(at: i) else { continue }
-            guard let raw = page.string else { continue }
+            guard let fullText = page.string,
+                  !fullText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                scannedPageNumbers.append(i + 1)
+                continue
+            }
+            // Cut the raw page text down to the per-page budget *before* splitting
+            // it into lines. PDFKit hands back the whole text layer in one string,
+            // so a file with a hostile multi-megabyte page paid the full cost of
+            // splitting it into a line array before anything threw most of it away.
+            let raw = String(fullText.prefix(maxCharactersPerPage))
             let lines = Self.normaliseLines(raw)
                 .prefix(maxCharactersPerPage / 40)
             for line in lines { totalChars += line.count }
             pages.append(PDFTextDocument.Page(pageNumber: i + 1, lines: Array(lines)))
+            // Stop once we have read enough to fill the whole document's budget.
+            // The per-page cap above is what actually bounds memory; this only
+            // avoids grinding through thousands of pages once it is reached.
             if totalChars > maxCharactersPerPage * maxPages / 4 { break }
         }
 
@@ -78,21 +96,44 @@ public struct PDFExtractor: Sendable {
             if k.contains("author") { metaAuthor = s }
         }
 
-        if pages.allSatisfy({ $0.lines.isEmpty }) {
-            if let ocrPages = Self.extractOCRPages(from: doc,
-                                                   pageCount: pageCount,
-                                                   maxPages: ocrMaxPages,
-                                                   maxDimension: ocrMaxDimension),
-               !ocrPages.isEmpty {
+        // A real submission is often a typed cover sheet followed by a scan of the
+        // signed form, and the identity fields can be on the scan. Those pages were
+        // never read, because the document had text somewhere and the old check
+        // only asked whether everything it had kept was empty. Read the pages the
+        // text layer did not cover and merge them into the same document, which
+        // also covers the all-scans case on its own: with no embedded pages there
+        // is nothing to merge into and `merged` is just the recognised pages.
+        if !scannedPageNumbers.isEmpty {
+            let recognised = Self.extractOCRPages(from: doc, pageNumbers: scannedPageNumbers,
+                                                  maxPages: ocrMaxPages,
+                                                  maxDimension: ocrMaxDimension)
+            if !recognised.isEmpty {
+                var merged = pages
+                for page in recognised {
+                    if let index = merged.firstIndex(where: { $0.pageNumber == page.pageNumber }) {
+                        merged[index] = page
+                    } else {
+                        merged.append(page)
+                    }
+                }
+                merged.sort { $0.pageNumber < $1.pageNumber }
+                // Marked .ocr even when page 1 had a real text layer: the document
+                // now contains recognised text, and the detector drops a notch of
+                // confidence for anything it reads out of an OCR origin. Calling it
+                // embedded text would let a guess off a scan reach the student as a
+                // HIGH-confidence field.
                 return .success(PDFTextDocument(
                     pageCount: doc.pageCount,
-                    pages: ocrPages,
+                    pages: merged,
                     metadataTitle: Self.cleanMetadata(metaTitle),
                     metadataAuthor: Self.cleanMetadata(metaAuthor),
                     textOrigin: .ocr
                 ))
             }
-            return .imageOnly(pageCount: doc.pageCount)
+            if pages.isEmpty {
+                // Nothing on the pages, not even anything Vision could read.
+                return .imageOnly(pageCount: doc.pageCount)
+            }
         }
         return .success(PDFTextDocument(
             pageCount: doc.pageCount,
@@ -105,15 +146,16 @@ public struct PDFExtractor: Sendable {
 
     /// Bounded local OCR fallback for scanned PDFs. OCR is intentionally
     /// limited to the first few pages because filename-critical fields are
-    /// normally on a cover/title page. It returns nil when Vision cannot
-    /// produce usable text so callers can retain the manual-entry path.
-    static func extractOCRPages(from doc: PDFDocument, pageCount: Int,
-                                maxPages: Int, maxDimension: CGFloat) -> [PDFTextDocument.Page]? {
-        guard maxPages > 0, maxDimension > 0 else { return nil }
+    /// normally on a cover/title page, and each page costs a second or more. It
+    /// returns an empty array when Vision cannot produce usable text so callers
+    /// can retain the manual-entry path. `pageNumbers` is 1-based, matching
+    /// PDFTextDocument.Page.
+    static func extractOCRPages(from doc: PDFDocument, pageNumbers: [Int],
+                                maxPages: Int, maxDimension: CGFloat) -> [PDFTextDocument.Page] {
+        guard maxPages > 0, maxDimension > 0 else { return [] }
         var pages: [PDFTextDocument.Page] = []
-        let limit = min(pageCount, maxPages)
-        for index in 0..<limit {
-            guard let page = doc.page(at: index),
+        for pageNumber in pageNumbers.prefix(maxPages) {
+            guard let page = doc.page(at: pageNumber - 1),
                   let image = renderImage(for: page, maxDimension: maxDimension),
                   let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
                 continue
@@ -131,10 +173,10 @@ public struct PDFExtractor: Sendable {
             guard let observations = request.results, !observations.isEmpty else { continue }
             let lines = ocrLines(from: observations)
             if !lines.isEmpty {
-                pages.append(PDFTextDocument.Page(pageNumber: index + 1, lines: lines))
+                pages.append(PDFTextDocument.Page(pageNumber: pageNumber, lines: lines))
             }
         }
-        return pages.isEmpty ? nil : pages
+        return pages
     }
 
     static func renderImage(for page: PDFPage, maxDimension: CGFloat) -> NSImage? {

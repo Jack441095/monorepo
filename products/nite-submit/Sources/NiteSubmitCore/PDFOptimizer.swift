@@ -25,6 +25,7 @@ public enum PDFOptimizerError: LocalizedError {
     case toolUnavailable
     case sourceNotFound(URL)
     case notAPDF(URL)
+    case sourceUnreadable(URL)
     case optimizationFailed(String)
 
     public var errorDescription: String? {
@@ -35,6 +36,8 @@ public enum PDFOptimizerError: LocalizedError {
             return "Source file not found at \(url.path)."
         case .notAPDF(let url):
             return "\(url.lastPathComponent) is not a PDF."
+        case .sourceUnreadable(let url):
+            return "Could not read \(url.lastPathComponent) to measure its size — check the folder's permissions."
         case .optimizationFailed(let reason):
             return "Could not optimize this PDF: \(reason)"
         }
@@ -78,16 +81,25 @@ public struct PDFOptimizer: Sendable {
         let fm = FileManager.default
         guard fm.fileExists(atPath: source.path) else { throw PDFOptimizerError.sourceNotFound(source) }
         guard source.pathExtension.lowercased() == "pdf" else { throw PDFOptimizerError.notAPDF(source) }
+        // Measured before anything else is done, and a failed stat is an error
+        // rather than a zero. It used to be coerced to 0, so the receipt claimed
+        // a 0-byte original and percentSaved divided by zero into a flat "0% saved"
+        // for what was really a 40 MB submission.
+        guard let originalSize = ((try? fm.attributesOfItem(atPath: source.path))?[.size] as? Int64) else {
+            throw PDFOptimizerError.sourceUnreadable(source)
+        }
         guard let qpdfPath = bundledQPDFPath() ?? findSystemQPDF() else {
             throw PDFOptimizerError.toolUnavailable
         }
 
-        let originalSize = (try? fm.attributesOfItem(atPath: source.path)[.size] as? Int64) ?? nil ?? 0
-
         try? fm.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
-        if fm.fileExists(atPath: destination.path) {
-            try fm.removeItem(at: destination)
-        }
+        // qpdf writes into a hidden sibling and the result is swapped in at the
+        // end. It used to delete the destination first and then write straight to
+        // it, so a qpdf failure, a full disk or a crash between the two steps left
+        // the student with no file where their previous one had been.
+        let staged = destination.deletingLastPathComponent()
+            .appendingPathComponent(".nitesubmit-optimize-\(UUID().uuidString).pdf")
+        defer { try? fm.removeItem(at: staged) }
 
         let process = Process()
         process.executableURL = URL(fileURLWithPath: qpdfPath)
@@ -96,7 +108,7 @@ public struct PDFOptimizer: Sendable {
             "--compress-streams=y",
             "--recompress-flate",
             "--compression-level=9",
-            source.path, destination.path,
+            source.path, staged.path,
         ]
         let pipe = Pipe()
         process.standardError = pipe
@@ -113,13 +125,16 @@ public struct PDFOptimizer: Sendable {
             throw PDFOptimizerError.optimizationFailed(msg)
         }
 
-        guard fm.fileExists(atPath: destination.path),
-              let attrs = try? fm.attributesOfItem(atPath: destination.path),
+        guard let attrs = try? fm.attributesOfItem(atPath: staged.path),
               let optimizedSize = attrs[.size] as? Int64 else {
             throw PDFOptimizerError.optimizationFailed("Optimized output file was not produced.")
         }
 
-        let checksum = try FileOperator.sha256(of: destination)
+        let checksum = try FileOperator.sha256(of: staged)
+        // One atomic rename: the destination is the old file or the complete new
+        // one, never a half-written qpdf output.
+        _ = try fm.replaceItemAt(destination, withItemAt: staged, backupItemName: nil,
+                                 options: .usingNewMetadataOnly)
         return PDFOptimizationReceipt(outputURL: destination, originalSizeBytes: originalSize,
                                        optimizedSizeBytes: optimizedSize, sha256Checksum: checksum)
     }
