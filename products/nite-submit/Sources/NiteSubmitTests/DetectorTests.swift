@@ -269,6 +269,35 @@ func runDetectorTests() {
         let tbdPlaceholder = detector.detect(in: makeDoc([["Student Name: TBD", "Student Number: 12345678"]]))
         check(tbdPlaceholder.studentName.isMissing, "all-caps single-word placeholder is not treated as a name")
 
+        // The name shape used to be a hand-rolled [A-Za-zÀ-ɏ] class, which threw away every
+        // name written in the Cyrillic, CJK, Arabic, Devanagari and Greek alphabets even
+        // though Localization.swift advertises ar/zh/ja/ko/hi/uk/ru. \p{L} fixes that.
+        let cyrillicName = detector.detect(in: makeDoc([[
+            "Student Name: Иван Петров", "Student Number: 12345678",
+        ]]))
+        eq(cyrillicName.studentName.value ?? "?", "Иван Петров",
+           "Cyrillic student name accepted as a plausible person name")
+        let cjkName = detector.detect(in: makeDoc([[
+            "Student Name: 田中花子", "Student Number: 12345678",
+        ]]))
+        eq(cjkName.studentName.value ?? "?", "田中花子",
+           "CJK student name accepted as a plausible person name")
+        let arabicName = detector.detect(in: makeDoc([[
+            "Student Name: محمد علي", "Student Number: 12345678",
+        ]]))
+        eq(arabicName.studentName.value ?? "?", "محمد علي",
+           "Arabic student name accepted as a plausible person name")
+        // Widening to \p{L} must not turn a numeric identifier into a person's name.
+        check(detector.detect(in: makeDoc([[
+            "Student Name: 12345678", "Student Number: 12345678",
+        ]])).studentName.isMissing, "a bare number is not a person name")
+        check(detector.detect(in: makeDoc([[
+            "Student Name: <student@uni.ac.uk>", "Student Number: 12345678",
+        ]])).studentName.isMissing, "an email address is not a person name")
+        check(detector.detect(in: makeDoc([[
+            "Student Name: ###", "Student Number: 12345678",
+        ]])).studentName.isMissing, "symbol soup is not a person name")
+
         let distinctIdentifiers = detector.detect(in: makeDoc([[
             "Student Number: 00361288",
             "Candidate Number: 004812",

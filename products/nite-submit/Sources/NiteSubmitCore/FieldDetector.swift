@@ -80,6 +80,16 @@ public struct FieldDetector: Sendable {
     ]
     static let universityLabels = ["university", "institution", "school", "faculty"]
 
+    /// `\p{L}` is any Unicode letter, so Cyrillic, CJK, Arabic, Greek and
+    /// Devanagari names pass the shape check. The hand-rolled A-Za-zÀ-ɏ class
+    /// this replaced rejected every one of them, even though Localization.swift
+    /// advertises ar/zh/ja/ko/hi/uk/ru as supported interface languages. Digits
+    /// stay rejected: a name is not an identifier. Cached because
+    /// isPlausiblePerson runs once per candidate line on every extraction.
+    static let personNameShape: NSRegularExpression? = {
+        try? NSRegularExpression(pattern: #"^[\p{L}'’\-\., ]+$"#)
+    }()
+
     // MARK: - Public API
 
     public func detect(in doc: PDFTextDocument) -> SubmissionMetadata {
@@ -275,11 +285,17 @@ public struct FieldDetector: Sendable {
     /// inferred title-page path, where a single stray capitalized word is a much weaker signal.
     /// Still gated to title-case only (first letter upper, rest lower) so an all-caps placeholder
     /// like "TBD" can't slip through just because it satisfies the character-class check below.
+    /// Chinese, Japanese and Korean have no letter case, so a name written in them
+    /// (e.g. "田中花子") is a single token that can never look title-cased. We skip the
+    /// casing test when the text carries no case at all rather than rejecting those
+    /// scripts outright.
     func isPlausiblePerson(_ s: String, allowSingleWord: Bool = false) -> Bool {
         let wordCount = s.split(separator: " ").count
         if wordCount < 2 {
-            guard allowSingleWord, wordCount == 1, s.count <= 60,
-                  s.first?.isUppercase == true, s.dropFirst().allSatisfy({ !$0.isLetter || $0.isLowercase })
+            guard allowSingleWord, wordCount == 1, s.count <= 60 else { return false }
+            let hasCase = s.first?.isUppercase == true || s.first?.isLowercase == true
+            guard !hasCase || (s.first?.isUppercase == true
+                               && s.dropFirst().allSatisfy({ !$0.isLetter || $0.isLowercase }))
             else { return false }
         }
         guard s.count <= 60 else { return false }
@@ -304,7 +320,12 @@ public struct FieldDetector: Sendable {
         }
         if Self.staffKeywords.contains(where: { lower.contains($0) }) { return false }
         if s.contains("@") || s.contains("/") { return false }
-        return s.range(of: #"^[A-Za-zÀ-ɏ'’\-\., ]+$"#, options: .regularExpression) != nil
+        guard let shape = Self.personNameShape else { return false }
+        let full = NSRange(s.startIndex..., in: s)
+        guard let m = shape.firstMatch(in: s, range: full) else { return false }
+        // ICU lets `$` match before a trailing newline, so confirm the match
+        // really covered the whole string rather than trusting the anchors.
+        return m.range == full
     }
 
     /// Conservative fallback for cover sheets that show an author/name but
