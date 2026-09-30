@@ -170,30 +170,36 @@ promotion only through the gate).
 > **"By how much? ... 'turn Kick down 2 dB'"** — the Hi-Hats is **silently dropped**, and the reply reads as though one
 > thing was asked. Same shape as round 9's "mute the Kick, mute the hats" proposing one mute, and the fix is narrow:
 > the clarification must name the part it did not understand, the way `_split_plain_and` already refuses rather than
-> half-applying. Second, `lower`/`raise` are not volume verbs in the split path, so "lower the bass 2 dB and raise the
-> vocal 1 dB" refuses although both halves are unambiguous. Third, "adjust that" has no path and needs turn-level
-> anchoring. **The buttons are a rendering change on a payload that exists**, except in the ambiguous case, where they
+> half-applying.
+> **Correction, same day:** I first wrote up a second gap -- `lower`/`raise` not being volume verbs in the split
+> path. That is **wrong**. `raise the bass 1 dB` works (0.52495); the fixture's Lead Vocal is at **+0.00 dB**, so
+> "raise the vocal 1 dB" has nowhere to go, and the sentence is correctly refused because one of its two changes
+> is impossible. Round 9 hit the same thing and I recorded it then as a label error. What it does show is a weak
+> reply: KENN says "I didn't catch a change to make there" when one change was fine and the other was impossible,
+> which is nearer the silent-drop problem above than a missing rule.
+> Third, "adjust that" has no path and needs turn-level anchoring. **The buttons are a rendering change on a
+> payload that exists**, except in the ambiguous case, where they
 > are not "do the first, then the second" but "tell me the amount for the hats" — so the shape should be decided before
 > the frontend is built.
 > **The silent drop is now fixed** (same branch): the question quotes the part KENN did not catch, so
 "
-"> "make the hats quieter and the kick punchier" answers *"By how much? ... turn Kick down 2 dB ... I didn't catch
+>> "make the hats quieter and the kick punchier" answers *"By how much? ... turn Kick down 2 dB ... I didn't catch
 "
-'> "make the hats quieter" -- send that on its own, or give me both amounts."* 6 tests; backend suite green at
+>> "make the hats quieter" -- send that on its own, or give me both amounts."* 6 tests; backend suite green at
 '
-"> **2,449 passed, 125 skipped**. **B6 stays open** for the two parts that remain: `lower`/`raise` as volume verbs, and
+>> **2,449 passed, 125 skipped**. **B6 stays open** for the two parts that remain: `lower`/`raise` as volume verbs, and
 "
-'> "adjust that".
+>> "adjust that".
 '
-"> One thing worth knowing before anyone extends this: **session context is load-bearing.** Asking the same
+>> One thing worth knowing before anyone extends this: **session context is load-bearing.** Asking the same
 "
-"> two-change sentence twice in one session gives different answers — the second comes from
+>> two-change sentence twice in one session gives different answers — the second comes from
 "
-"> `clarify_contextual_direction` — because the first exchange established what was being discussed. That is intended,
+>> `clarify_contextual_direction` — because the first exchange established what was being discussed. That is intended,
 "
-"> and it is why tests of these scenarios must not share a session id. My first draft did, and it looked like a cache
+>> and it is why tests of these scenarios must not share a session id. My first draft did, and it looked like a cache
 "
-"> leak rather than what it was.
+>> leak rather than what it was.
 
 | B7 | Planner: stays in shadow. Retrain (run 14) only when about 500 owner-labelled tester requests exist, and promote only through `live_llm_promotion.py` | hold | Tester data |
 
