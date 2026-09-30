@@ -66,13 +66,27 @@ Serves: Stage 3 "device qualification factory" and its gate (recipes pass on rea
 | ID | Task | Size | Needs |
 |---|---|---|---|
 | A1 | Tonight: soak and real-Live rows; commit receipts, tag `kenn-beta-2026-09-30`, build the DMG, sync `kenn-app` | S | Live night 0 |
-| A2 | Device-zoo set: a checklist (one track per wave-1 device, named as the scripts expect) and a preparation script, dry-run on the fake backend | S | Claude; Jack builds the set in Live |
+| A2 | Device-zoo set: a checklist (one track per wave-1 device, named as the scripts expect) and a preparation script, dry-run on the fake backend | S | **Done 30 Sept** on branch `kenn-device-zoo-wave1`; reaches `main` with the next release |
 | A3 | Wave 1: `measure_all_devices.py`, then `build_device_profiles.py`, then `qualify_device_candidates.py` for EQ Eight, Compressor, Utility, Limiter, Reverb, Hybrid Reverb, Delay, Echo, Saturator, Auto Filter, Glue Compressor, Multiband Dynamics. Follow `docs/runbooks/KENN_DEVICE_FACTORY.md`; the qualifier writes each value, reads it back and restores it | M | Live night 1 |
 | A4 | Sign-off queue: Jack reviews each batch's candidate profiles (units, ranges, display strings) before they load | S per batch | Jack |
 | A5 | The 15 recipes on real Live, each with exact undo and per-step latency recorded | M | Live night 2 |
 | A6 | Return-track rename (the bridge already has the endpoint) and solo (needs a small Remote Script addition), scenes by name; add walkthrough rows | S | Live night 3 |
 | A7 | Wave 2: the next 13 devices | M | Live night 3 |
 | A8 | Clean-account test: install the DMG on a fresh macOS user, first successful command in under 15 minutes | M | Jack creates the test user |
+
+> **A2, 30 Sept** (branch `kenn-device-zoo-wave1`): `docs/runbooks/KENN_DEVICE_ZOO_WAVE1.md` is the checklist and
+> `tooling/scripts/prep_device_zoo.py` the preparation script. It checks all twelve names against the exact browser
+> names in `core/stock_devices.py`, prints which ones have to be dragged in by hand, and rehearses the measure, the
+> candidate build and the unapplied qualifier against `FakeLiveBackend` on a new `device_zoo_wave1.json` fixture:
+> **12 of 12 devices measured, 35 candidate profiles, 17 choosers, 1 unmapped** (EQ Eight's Q, which Live shows as a
+> bare `1.00` with no unit). 14 tests in `test_device_zoo_wave1_prep.py`; `ci_verification.sh` green on the branch
+> (backend 2,451 passed / 125 skipped, chat 38, Mix Review 66, AutoMix 4 + 4). Two things came out of it:
+> **four of the twelve cannot be inserted by KENN** (Utility, Limiter, Reverb, Delay — two because AbletonOSC's browser
+> search resolved "Reverb" to Convolution Reverb and "Delay" to Align Delay), so that part of the set is a hand drag;
+> and `pick_raw_values` walked an all-positive dB control down to 0 dB and collapsed its three test points onto one
+> value, so **Saturator's Base and Multiband Dynamics' Range could never have qualified at all** — fixed, with the
+> clamp still holding for controls that do go below 0 dB. Unrelated and pre-existing: `test_mlx_inference.py::
+> test_mlx_inference_latency_and_output` fails on `main` too, so MLX inference is not currently covered by the suite.
 
 **Gate (week 4):** ≥ 12 devices and ≥ 40 parameters qualified (North Star end state: ≥ 25 and ≥ 60); 15/15 recipes with
 exact undo; 0 unauthorised writes.
@@ -238,9 +252,9 @@ Each night starts when Jack says "ready", and a Live pause needs his approval fo
 
 ## 10. First ten tasks, none needing Live
 
-1. **F1** the sync script.
+1. **F1** the sync script. *Done 30 Sept, on `kenn-sync-script`.*
 2. **C1** the manual ingest (after decision 3).
-3. **A2** the device-zoo checklist and preparation script.
+3. **A2** the device-zoo checklist and preparation script. *Done 30 Sept, on `kenn-device-zoo-wave1`.*
 4. **B1** blind round 9 in a new register, written by a second author.
 5. **C2** the retrieval fixture with a sealed half.
 6. **F3** the personal-path gate and scrub.

@@ -293,6 +293,14 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 - [ ] Device qualification factory: every insertable device measured and end-to-end tested per parameter
       (D1 in the tracker), growing from 10 devices to ≥ 25 and ≥ 60 parameters
+  > 30 Sept: the wave-1 set is built and rehearsed, so night 1 costs two hours of measurement rather than two hours
+  > of preparation. `docs/runbooks/KENN_DEVICE_ZOO_WAVE1.md` lists the twelve regular tracks and
+  > `tooling/scripts/prep_device_zoo.py` checks the names and dry-runs the whole pipeline on `FakeLiveBackend`
+  > (12 of 12 measured, 35 candidate profiles, 17 choosers, 1 unmapped). It found that `pick_raw_values` collapsed
+  > an all-positive dB control to a single test value, so Saturator's Base and Multiband Dynamics' Range could never
+  > have qualified; fixed, and the 0 dB clamp still holds for controls that go below it. **Still 0 of 78 measured:**
+  > nothing here has touched real Live, and four of the twelve wave-1 devices are not in
+  > `DEVICE_INSERTION_ALLOWLIST`, so that part of the set is a hand drag.
 - [x] Multi-step tasks from the deliberative planner (qualified once on real Live, 24 Sept): plan shown first, each step
       confirmed, one receipt per step, undo per step or for the whole task
   > 24 Sept / 28 Sept: Fully implemented and tested across `AssistantCoordinator` (`test_assistant_coordinator.py` 10/10 pass),
