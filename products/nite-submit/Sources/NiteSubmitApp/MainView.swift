@@ -32,6 +32,9 @@ final class MainView: NSView, NSTextFieldDelegate {
     private var queueItems: [DocumentItem] = []
     private var selectedIndex: Int = 0
     private var queueButtons: [NSButton] = []
+    /// Held so a reset can empty the rack: without the stack view there was no way to take the
+    /// arranged subviews back out, and item 0's captured state came straight back to life.
+    private let queueStack = NSStackView()
 
     // Findings & Inspection Rack
     private let inspectionTitle = NSTextField(labelWithString: "Detected details")
@@ -170,7 +173,6 @@ final class MainView: NSView, NSTextFieldDelegate {
         }
         dropZone.translatesAutoresizingMaskIntoConstraints = false
 
-        let queueStack = NSStackView()
         queueStack.orientation = .vertical
         queueStack.alignment = .width
         queueStack.spacing = 6
@@ -631,12 +633,13 @@ final class MainView: NSView, NSTextFieldDelegate {
     private func updateSelectionUI(index: Int) {
         guard index >= 0 && index < queueItems.count else { return }
 
-        // Preserve the outgoing item's real review state (metadata edits, approval, etc.) so
-        // switching back to it later doesn't lose work or re-run detection from scratch. Guarded
-        // on index != selectedIndex and hasLoadedDocument so this never fires for the first item
-        // ever added to an empty queue — selectedIndex's initial value (0) otherwise coincides
-        // with that very first item's own index, wrongly "capturing" the controller's blank
-        // pre-load state and restoring that blank state instead of ever calling loadPDF.
+        // Preserve the outgoing item's real review state (metadata edits, approval, its rename
+        // receipt) so switching back to it later doesn't lose work or re-run detection from
+        // scratch. Guarded on index != selectedIndex and hasLoadedDocument so this never fires
+        // for the first item ever added to an empty queue — selectedIndex's initial value (0)
+        // otherwise coincides with that very first item's own index, wrongly "capturing" the
+        // controller's blank pre-load state and restoring that blank state instead of ever
+        // reading the file.
         if index != selectedIndex, selectedIndex >= 0, selectedIndex < queueItems.count,
            let controller, controller.hasLoadedDocument {
             queueItems[selectedIndex].documentState = controller.captureState()
@@ -655,7 +658,9 @@ final class MainView: NSView, NSTextFieldDelegate {
         if let state = item.documentState {
             controller?.restore(state)
         } else {
-            controller?.loadPDF(at: item.url)
+            // loadFile, not loadPDF: a dropped .mp4 or .zip has to go through MediaExtractor,
+            // and the read happens on the controller's work queue, not on this thread.
+            controller?.loadFile(at: item.url)
         }
 
         stepperView.activeStep = .recommendation
@@ -706,22 +711,33 @@ final class MainView: NSView, NSTextFieldDelegate {
             let btn = createQueueButton(for: newItem, index: index)
             queueButtons.append(btn)
 
-            if let documentSection = dropZone.superview as? NSStackView,
-               let queueStack = documentSection.arrangedSubviews.compactMap({ $0 as? NSStackView }).last {
-                queueStack.addArrangedSubview(btn)
-                btn.widthAnchor.constraint(equalTo: queueStack.widthAnchor).isActive = true
-            }
+            queueStack.addArrangedSubview(btn)
+            btn.widthAnchor.constraint(equalTo: queueStack.widthAnchor).isActive = true
+
             lastIndex = index
         }
         updateSelectionUI(index: lastIndex)
     }
 
+    /// Empties the queue rack. Reset used to leave the rows in place, so the next
+    /// updateSelectionUI restored item 0's captured metadata, approval and rename receipt —
+    /// a session the user had explicitly ended came straight back to life.
+    private func clearQueue() {
+        queueButtons.forEach { $0.removeFromSuperview() }
+        queueButtons.removeAll()
+        queueItems.removeAll()
+        selectedIndex = 0
+    }
+
     @objc func resetSession() {
         controller?.reset()
+        clearQueue()
         stepperView.activeStep = .input
         statusLabel.stringValue = "Session reset — Submit helps you prepare safely. Submit does not submit automatically."
-        updateSelectionUI(index: 0)
         refreshFields()
+        // refreshPreview() bails out while no document is loaded, so nothing else brings the
+        // empty state back: the details rack and the action bar have to be hidden explicitly.
+        refreshReviewState()
     }
 
     @objc private func toggleAllDetails() {
@@ -1091,7 +1107,14 @@ final class MainView: NSView, NSTextFieldDelegate {
         emptyStateLabel.isHidden = hasDocument
 
         let blockingReason = c.reviewBlockingReason()
-        if c.sourceURL == nil {
+        if c.isBusy {
+            // A read, an optimization pass or an archive is running. Say so, and keep every
+            // action that writes a file switched off: approving now would judge a document
+            // whose details have not finished arriving.
+            reviewLed.state = .amber
+            reviewLabel.stringValue = "Working — one moment"
+            reviewLabel.textColor = NiteSubmitUI.warning
+        } else if c.sourceURL == nil {
             reviewLed.state = .off
             reviewLabel.stringValue = "Load a PDF to begin"
             reviewLabel.textColor = NiteSubmitUI.mutedDim
@@ -1111,10 +1134,11 @@ final class MainView: NSView, NSTextFieldDelegate {
         }
         approveButton.title = "Approve details"
         let safeToApprove = c.sourceURL != nil && blockingReason == nil
-        approveButton.isEnabled = safeToApprove && !c.reviewApproved
-        copyButton.isEnabled = c.reviewApproved && safeToApprove
-        archiveButton.isEnabled = c.reviewApproved && safeToApprove
-        renameButton.isEnabled = c.reviewApproved && safeToApprove
+        let ready = safeToApprove && !c.isBusy
+        approveButton.isEnabled = ready && !c.reviewApproved
+        copyButton.isEnabled = c.reviewApproved && ready
+        archiveButton.isEnabled = c.reviewApproved && ready
+        renameButton.isEnabled = c.reviewApproved && ready
         reviewRow?.isHidden = c.reviewApproved || !hasDocument
         reviewSectionLabel.isHidden = c.reviewApproved || !hasDocument
         primaryActionRow?.isHidden = !c.reviewApproved || !hasDocument
@@ -1185,6 +1209,7 @@ final class MainView: NSView, NSTextFieldDelegate {
             controller?.performArchiveOperation(sources: sources, format: format, level: .normal, password: password, volumeSplit: volumeSplit) { self.statusLabel.stringValue = $0 + skipNote }
             return
         }
+        guard let c = controller else { return }
 
         // Optimize PDFs into a scratch staging area first — the originals in `sources` are never
         // touched, only what goes into the archive changes. Non-PDF sources, and any PDF that
@@ -1192,8 +1217,25 @@ final class MainView: NSView, NSTextFieldDelegate {
         // rather than blocking the whole archive over one file.
         let stagingDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try? FileManager.default.createDirectory(at: stagingDir, withIntermediateDirectories: true)
-        var optimizedCount = 0
+        statusLabel.stringValue = "Optimizing PDFs, then creating the archive…"
+        c.performInBackground({ Self.optimizedCopies(of: sources, into: stagingDir) }) { result in
+            let prepared = (try? result.get()) ?? (sources, 0)
+            c.performArchiveOperation(sources: prepared.0, format: format, level: .normal,
+                                      password: password, volumeSplit: volumeSplit) { [stagingDir] message in
+                let suffix = prepared.1 > 0 ? " (\(prepared.1) PDF\(prepared.1 == 1 ? "" : "s") optimized)" : ""
+                self.statusLabel.stringValue = message + skipNote + suffix
+                try? FileManager.default.removeItem(at: stagingDir)
+            }
+        }
+    }
+
+    /// Losslessly re-encodes each PDF into `stagingDir` so the archive carries smaller files
+    /// while every original is left alone. Runs on the controller's work queue: qpdf at
+    /// --compression-level=9 is CPU-bound and a thesis-sized batch is not a main-thread job.
+    private static func optimizedCopies(of sources: [URL],
+                                        into stagingDir: URL) -> (sources: [URL], optimized: Int) {
         var archiveSources: [URL] = []
+        var optimizedCount = 0
         for source in sources {
             guard source.pathExtension.lowercased() == "pdf" else {
                 archiveSources.append(source)
@@ -1207,12 +1249,7 @@ final class MainView: NSView, NSTextFieldDelegate {
                 archiveSources.append(source)
             }
         }
-
-        controller?.performArchiveOperation(sources: archiveSources, format: format, level: .normal, password: password, volumeSplit: volumeSplit) { [stagingDir] message in
-            let suffix = optimizedCount > 0 ? " (\(optimizedCount) PDF\(optimizedCount == 1 ? "" : "s") optimized)" : ""
-            self.statusLabel.stringValue = message + skipNote + suffix
-            try? FileManager.default.removeItem(at: stagingDir)
-        }
+        return (archiveSources, optimizedCount)
     }
 
     @objc func doRename() {
