@@ -211,16 +211,26 @@ def _chat_wants_live(question: str) -> bool:
     from kenn.core.chat_live_router import wants_live_change
     from kenn.mixing_doctor import get_latest_session_state
 
-    snapshot = get_latest_session_state()
-    if isinstance(snapshot, dict) and re.search(r"\bsends?\b", question, re.I) and not snapshot.get("return_tracks"):
-        # The cached snapshot never lists returns; a send needs them, as the command path does for "send".
-        try:
-            from kenn.ableton_osc_bridge import live_client
+    from kenn.core.chat_live_router import needs_return_tracks
 
-            snapshot = {**snapshot, "return_tracks": live_client.get_return_tracks()}
-        except Exception:
-            pass
+    snapshot = get_latest_session_state()
+    if isinstance(snapshot, dict) and needs_return_tracks(question, snapshot):
+        # The cached snapshot never lists returns, and a message about one (a send, or its level) needs them. Kept for
+        # a few seconds: this runs for every chat message.
+        global _RETURNS_CACHE
+        if _RETURNS_CACHE is None or time.monotonic() - _RETURNS_CACHE[0] > 20:
+            try:
+                from kenn.ableton_osc_bridge import live_client
+
+                _RETURNS_CACHE = (time.monotonic(), live_client.get_return_tracks())
+            except Exception:
+                _RETURNS_CACHE = None
+        if _RETURNS_CACHE is not None:
+            snapshot = {**snapshot, "return_tracks": _RETURNS_CACHE[1]}
     return wants_live_change(question, snapshot)
+
+
+_RETURNS_CACHE: tuple[float, list] | None = None
 
 
 def _cached_ableton_health() -> dict[str, Any]:

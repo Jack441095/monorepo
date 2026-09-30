@@ -35,6 +35,24 @@ LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount", "negated", "de
                                  "return_track_action", "single_action"})
 
 
+_RETURN_HINT = re.compile(r"\b(?:sends?|returns?|reverb|verb|delay|echo|aux)\b|\b[a-h]-[a-z]+\b", re.I)
+_MIXER_VERB = re.compile(r"\b(?:mute|unmute|solo|pan|louder|quieter|volume|level|lower|raise|turn|bring|drop|boost|cut|set|up|down|db)\b",
+                         re.I)
+
+
+def needs_return_tracks(text: str, snapshot: dict[str, Any] | None) -> bool:
+    """Whether to read the return tracks before parsing this message.
+
+    Real Live's session snapshot never lists them (they're a separate read), so "lower the A-Reverb by 1 dB" parsed
+    against an empty list and went to the mix notes; only "send" messages fetched them. The fake backend's snapshot
+    carries them, which is why the fake walkthrough passed and the first real one didn't (30 Sept 2026). A return can
+    have any name, so any message with a mixer verb in it counts.
+    """
+    if isinstance(snapshot, dict) and snapshot.get("return_tracks"):
+        return False
+    return bool(_RETURN_HINT.search(str(text or "")) or _MIXER_VERB.search(str(text or "")))
+
+
 def asks_how_to(text: str) -> bool:
     from kenn.core.live_intent import LATER_CHANGE_REQUEST
 
@@ -56,4 +74,4 @@ def wants_live_change(text: str, snapshot: dict[str, Any] | None) -> bool:
     return bool(intent.get("action")) or bool(missing & LIVE_WITHOUT_ACTION)
 
 
-__all__ = ["LIVE_WITHOUT_ACTION", "asks_how_to", "wants_live_change"]
+__all__ = ["LIVE_WITHOUT_ACTION", "asks_how_to", "needs_return_tracks", "wants_live_change"]

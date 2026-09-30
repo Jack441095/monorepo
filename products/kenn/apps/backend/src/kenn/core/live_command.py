@@ -45,6 +45,7 @@ from kenn.core.clip_rename_service import ClipRenameActionService, PROPOSAL_SCHE
 from kenn.core.live_intent import _NICKNAME_WORDS, parse_natural_recipe, parse_request
 from kenn.core.live_recipe import LiveRecipeService, RECIPE_SCHEMA
 from kenn.core.live_llm_promotion import PROMOTION_THRESHOLDS, load_promotion_state
+from kenn.core.chat_live_router import needs_return_tracks
 from kenn.core.live_session_questions import answer_live_session_question
 from kenn.core.live_receipt_journal import list_receipts
 from kenn.core.session_context import preprocess_live_command, record_live_exchange
@@ -3182,7 +3183,7 @@ def _handle_command_impl(
             and any(isinstance(step, dict) and step.get("action") == "set_send" for step in (llm_plan.get("steps") or []))
         )
     )
-    if "send" in clean_command.lower() or llm_plan_has_send:
+    if "send" in clean_command.lower() or llm_plan_has_send or needs_return_tracks(clean_command, snapshot):
         try:
             return_tracks = live.client.get_return_tracks()
         except Exception:

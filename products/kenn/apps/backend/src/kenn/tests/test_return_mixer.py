@@ -80,3 +80,49 @@ def test_turning_down_the_reverb_on_a_track_asks_for_its_send_level(fake) -> Non
     parsed = parse_request("turn down the reverb on the snare", fake.query_session_state())
     assert parsed["action"] == "set_send" and parsed["missing_fields"] == ["amount"]
     assert "Snare / Clap's reverb send" in parsed["ambiguity"][0]
+
+
+class _RealShapedLive(FakeLiveBackend):
+    """The session snapshot real Live gives: no return_tracks (the bridge reads those separately)."""
+
+    def query_session_state(self, **kwargs):
+        state = super().query_session_state(**kwargs)
+        state.pop("return_tracks", None)
+        return state
+
+
+@pytest.mark.parametrize("request_text, action", [
+    ("lower the A-Reverb by 1 dB", "set_return_volume"),
+    ("mute the B-Delay", "set_return_mute"),
+])
+def test_return_changes_work_when_the_snapshot_has_no_return_tracks(request_text, action) -> None:
+    # The first real-Live walkthrough (30 Sept 2026) got mix notes for "lower the A-Reverb by 1 dB": only messages saying
+    # "send" fetched the returns, and the fake snapshot hid it because it carries them.
+    live = _RealShapedLive()
+    assert "return_tracks" not in live.query_session_state()
+    reply = handle_command(request_text, session_id="real-shape", service=LiveActionService(live), allow_llm=False)
+    assert reply["status"] == "confirmation_required" and reply["proposal"]["action"] == action
+
+
+def test_the_chat_gate_reads_the_returns_for_a_message_about_one(monkeypatch) -> None:
+    import kenn.server as server
+    import kenn.ableton_osc_bridge as bridge
+    import kenn.mixing_doctor as mixing_doctor
+
+    live = _RealShapedLive()
+    monkeypatch.setattr(server, "_RETURNS_CACHE", None)
+    monkeypatch.setattr(mixing_doctor, "get_latest_session_state", lambda: live.query_session_state())
+    monkeypatch.setattr(bridge, "live_client", live, raising=False)
+    assert server._chat_wants_live("lower the A-Reverb by 1 dB") is True
+    assert server._chat_wants_live("how do I sidechain the bass to the kick?") is False
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("lower the A-Reverb by 1 dB", True), ("mute return B", True), ("send the vocal to the reverb", True),
+    ("what's the tempo?", False), ("how do I sidechain the bass?", False),
+])
+def test_which_messages_read_the_returns(text, expected) -> None:
+    from kenn.core.chat_live_router import needs_return_tracks
+
+    assert needs_return_tracks(text, {"tracks": []}) is expected
+    assert needs_return_tracks(text, {"return_tracks": [{"name": "A-Reverb"}]}) is False
