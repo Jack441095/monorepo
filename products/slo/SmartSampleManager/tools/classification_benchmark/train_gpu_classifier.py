@@ -159,7 +159,13 @@ def evaluate(model, dataloader, device):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="/mnt/data/slo_training/slo_embeddings_v2.npz")
+    parser.add_argument(
+        "--data",
+        default=os.environ.get("SLO_TRAIN_DATA", ""),
+        help="Path to the embedding matrix. Required: the training corpus lives on the "
+             "GPU box, not in this repository, so there is no safe default. Set "
+             "SLO_TRAIN_DATA or pass --data."
+    )
     parser.add_argument("--epochs", type=int, default=150)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-3)
@@ -262,7 +268,7 @@ def main():
     print(f"Final Model Train Fit: Accuracy={final_acc*100:.2f}%, Macro F1={final_f1:.4f}")
 
     # Save model weights
-    save_path = "/mnt/data/slo_training/slo_classifier_model.pt"
+    save_path = getattr(args, "out", None) or os.environ.get("SLO_MODEL_OUT", "slo_classifier_model.pt")
     torch.save({
         "model_type": args.model_type,
         "classes": CLASSES,

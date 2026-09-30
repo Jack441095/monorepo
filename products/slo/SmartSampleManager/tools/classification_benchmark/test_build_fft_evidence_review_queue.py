@@ -35,7 +35,7 @@ def _fixture(tmp_path: Path) -> tuple[Path, Path]:
                    "rename_actions": False},
     }
     row = {
-        "path": "/mnt/data/slo_training/sample_pack_testing/loop.wav",
+        "path": "/remote/training-root/sample_pack_testing/loop.wav",
         "content_sha256": digest, "status": "review", "semantic_label": None,
         "model_agreement": False, "model_a_status": "review", "model_b_status": "suggest",
         "model_a_margin": 0.01, "model_b_margin": 0.02,

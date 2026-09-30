@@ -31,7 +31,8 @@ The owner's shipping requirement is **≥ 90% minimum classification accuracy**.
 ## 2. Evaluation Method
 
 ### 2.1 Dataset
-- **Source:** `/mnt/data/slo_training/clap_oof.npz`
+- **Source:** `clap_oof.npz`, from the training root on the GPU box
+  (absolute path deliberately not recorded; the file is in the owner archive)
 - **Size:** 21,793 samples
 - **Features:** 520-D vectors (512-D CLAP-music embeddings + 8 DSP features)
 - **Labels:** 16 classes derived from filename/folder keywords
@@ -286,10 +287,10 @@ DSP attributes     →  always available (BPM, key, energy, etc.)
 | Artifact | Location |
 |---|---|
 | Evaluation script | `/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/workspace/eval_90_precision_gpu.py` |
-| Remote evaluation script | `/mnt/data/slo_training/eval_90_precision_gpu.py` |
-| OOF predictions | `/mnt/data/slo_training/clap_oof.npz` (21,793 samples) |
-| Precision receipt | `/mnt/data/slo_training/clap_90_precision_receipt.json` |
-| CLAP ceiling analysis | `/mnt/data/slo_training/clap_ceiling.json` |
+| Remote evaluation script | `eval_90_precision_gpu.py` |
+| OOF predictions | `clap_oof.npz` (21,793 samples) |
+| Precision receipt | `clap_90_precision_receipt.json` |
+| CLAP ceiling analysis | `clap_ceiling.json` |
 | Encoder research decision | `SLO_ENCODER_RESEARCH_DECISION_2026-09-15.md` |
 | Beta candidate receipt | `docs/BETA_CANDIDATE_MAIN_RECEIPT_2026-09-17.md` |
 | Roadmap to Beta | `docs/ROADMAP_TO_BETA.md` |

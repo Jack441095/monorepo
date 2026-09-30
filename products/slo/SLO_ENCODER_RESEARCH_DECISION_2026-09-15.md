@@ -62,6 +62,8 @@ Percussion (309 cases), followed by Percussion/Hi-Hat and Hi-Hat/Percussion.
 - Local copy: `_artifacts/slo_encoder_quality_detailed_20260915.json`
 - Size: 9,308 bytes
 - SHA-256: `83c8ab41254b781a6a3f68bdc632cf68d985d126ab9b457023f0f25b8c62682f`
-- Remote source: `/mnt/data/slo_training/beta_research/encoder_quality_detailed_20260915.json`
+- Remote source: the training root on the GPU box,
+  `beta_research/encoder_quality_detailed_20260915.json` (absolute path deliberately not
+  recorded here; the receipt is in the owner archive)
 - GPU 0 was idle again after completion.
 - The run did not reset or restart the server, GPU, services, or other jobs.

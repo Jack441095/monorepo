@@ -10,8 +10,8 @@ created.
 """
 
 from __future__ import annotations
-
 import argparse
+import os
 import importlib.util
 import json
 import math
@@ -108,7 +108,7 @@ def _resolve(row: dict[str, Any], by_hash: dict[str, list[dict[str, Any]]],
         candidate = Path(str(item["path"]))
         if candidate.exists() and bool(item.get("readable", True)):
             return candidate
-    # GPU receipts use /mnt/data/slo_training/... while the inventory keeps the
+    # GPU receipts use the remote training root while the inventory keeps the
     # same path relative to the local sample_pack_testing root.  Resolve by
     # suffix only after the content hash, never by a basename guess.
     marker = "/sample_pack_testing/"

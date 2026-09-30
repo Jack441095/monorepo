@@ -11,8 +11,8 @@
     "decision_gate_pp": 2.0
   },
   "inputs": {
-    "corpus": "/mnt/data/slo_training/corpus_v4b_escape_recovered.npz",
-    "manifest": "/mnt/data/slo_training/factorised_training_manifest_v1.json",
+    "corpus": "corpus_v4b_escape_recovered.npz",
+    "manifest": "factorised_training_manifest_v1.json",
     "n_rows": 1495,
     "n_classes": 27,
     "n_collections": 80

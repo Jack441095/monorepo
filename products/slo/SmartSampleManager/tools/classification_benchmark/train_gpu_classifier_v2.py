@@ -214,7 +214,13 @@ def train_and_eval(model_fn, X, y, vendors, classes, epochs=120, lr=1e-3, device
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="/mnt/data/slo_training/slo_embeddings_v2.npz")
+    parser.add_argument(
+        "--data",
+        default=os.environ.get("SLO_TRAIN_DATA", ""),
+        help="Path to the embedding matrix. Required: the training corpus lives on the "
+             "GPU box, not in this repository, so there is no safe default. Set "
+             "SLO_TRAIN_DATA or pass --data."
+    )
     parser.add_argument("--gpu", type=int, default=0)
     args = parser.parse_args()
 
@@ -293,7 +299,7 @@ def main():
         else:
             per_class_thresholds[c] = 0.70
 
-    save_path = "/mnt/data/slo_training/slo_classifier_v2.pt"
+    save_path = getattr(args, "out", None) or os.environ.get("SLO_MODEL_OUT", "slo_classifier_v2.pt")
     torch.save({
         "model_type": "deep_residual_mlp",
         "classes": CLASSES_16,

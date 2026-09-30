@@ -71,3 +71,19 @@ SmartSampleManager/tools/classification_benchmark/mw_cache/
 # owner data home (Products/SLO) before removal. Regenerable or archived.
 SmartSampleManager/tools/classification_benchmark/*.jsonl
 __pycache__/
+
+# Benchmark result dumps carry the owner's absolute library paths, vendor names
+# and folder structure. The *.jsonl rule above excludes this data class by
+# extension; these arrived as .json and sailed past it, so match the content
+# class instead. ~168k path occurrences across 216 files before this rule.
+# Regenerate with the benchmark scripts; nothing here is a source artifact.
+SmartSampleManager/tools/classification_benchmark/results_*.json
+SmartSampleManager/tools/classification_benchmark/review_collections_*.json
+SmartSampleManager/tools/classification_benchmark/definition_cards_*.json
+SmartSampleManager/tools/classification_benchmark/*_evidence.json
+
+# Corrections store: holds file_path and user_note for licensed samples.
+# *.sqlite3 is covered above; this file is created with a .db extension.
+**/slo_corrections.db
+**/slo_corrections.db-wal
+**/slo_corrections.db-shm
