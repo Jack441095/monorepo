@@ -98,6 +98,29 @@ promotion only through the gate).
 | ID | Task | Size | Needs |
 |---|---|---|---|
 | B1 | One blind round a week, a different register each time (voice, beginner, second-language, other-DAW, long message, phone), plus one written by a person who did not write the parser fixes. Score once, report the first-run number, then fix | S weekly | Colleague or Jack writes |
+
+> **B1, round 9** (branch `kenn-blind-round-9`; register **mix notes**, uppercase targets and labels instead of verbs):
+> **74 / 118 right (62.7%), 40 asked, 4 wrong** on the first run, scored once before any rule change. After
+> correcting three labels: **77 / 118, 38 asked, 3 wrong**. First-run accuracy across registers now reads 42% → 38% →
+> 32% → 69.2% → **62.7%**. Write-up in
+> `docs/evidence/KENN_BLIND_PHRASINGS_ROUND9_MIXNOTES_2026-09-30.md`.
+> **One of the four wrong plans was a real silent wrong write, and it is fixed.** "Lead Vocal off solo" soloed the
+> vocal: every negation pattern in `live_intent.py` required a verb, so a bare mix-note negation fell through to the
+> positive branch. It read back clean and was journalled as verified, which is the worst class of bug in that file.
+> "no solo", "solo off" and "off mute" failed the same way. Fixed on `kenn-solo-negation` with 14 tests; the
+> curated holdout re-scores **492/505 both with and without the change**, so it costs no phrasings.
+> Two of the other three were bad labels, not bad answers: bare "Delay" is a pinned policy conflict (Deliberately
+> not insertable because the browser search resolved it to Align Delay), and the three-change list is documented
+> working behaviour that the round measured one layer too high. The fourth, "set the vocal compressor knee to 3 dB",
+> is **unresolved and is the owner's call**: there is no qualified Knee profile on any of the 9 measured devices, and
+> the question is whether that refusal belongs at parse time or at write time.
+> **The second author was this session, not a person who had not written the parser fixes**, which is weaker evidence
+> for register-independence than the plan intends; the evidence doc says so rather than burying it. Seven cases are
+> held unscored in `natural_blind_round9_mixnotes_pending_owner_2026-09-30.jsonl` because they are the pinned policy
+> conflicts that are the owner's to rule on. **B1 stays open**: the plan asks for one round a week, so round 10 wants
+> a human author picking the register.
+
+
 | B2 | Settle the three pinned policy conflicts (bare "X to -N", "kill playback", "reverb on the vocal": device or send) and encode each with tests | S | Jack decides |
 | B3 | Grow the curated holdout from 24 toward 500: review the 481 drafted candidates; two people check each label; the sealed sets stay out of training | M plus review time | Jack and colleague |
 | B4 | Real-wording loop: verify the opt-in "requests KENN didn't understand" log in the installed app, then a weekly triage script that clusters the misses and proposes rule fixes | M | Testers (E2) |

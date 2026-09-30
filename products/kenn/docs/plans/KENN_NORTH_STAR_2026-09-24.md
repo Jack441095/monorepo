@@ -181,6 +181,19 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > 28 Sept: Curated 505 phrasings holdout evaluated with `score_natural_phrasings.py`: **494 / 505 right (97.8%)**, 11 asked,
   > **0 wrong plans**. Fixed mid-sentence corrections ("wait no", inline params), track rename ("call"), "slo" typo,
   > compressor shorthand, and back-off threshold phrasings. Gate accuracy requirement (≥ 95% on ≥ 500 phrasings) exceeded.
+  > **30 Sept correction: re-scored on unmodified `main`, the same command now gives 492 / 505 right (97.4%), 13 asked,
+  > 0 wrong plans** — not the 494 / 11 recorded above. The 494 was the 28 Sept number and drifted as later work
+  > landed; the accuracy requirement is met either way, and **0 wrong plans still holds**, which is the part this gate
+  > actually turns on. Corrected here so the record matches what the tooling prints.
+  > 30 Sept, round 9 (`docs/evidence/KENN_BLIND_PHRASINGS_ROUND9_MIXNOTES_2026-09-30.md`), mix-notes register: 118
+  > phrasings written before scoring, **74 / 118 (62.7%), 40 asked, 4 wrong** on the one blind run. The real find was a
+  > **silent wrong write**: "Lead Vocal off solo" **soloed** the vocal, because every negation pattern in
+  > `live_intent.py` required a verb, so a bare mix-note negation fell through to the positive branch — it read back
+  > clean and was journalled as verified. "no solo", "solo off" and "off mute" were wrong the same way. Fixed on
+  > `kenn-solo-negation` (14 tests); the holdout re-scores 492/505 with and without the change, so it cost no
+  > phrasings. Two of the other three wrong rows were mislabels, not defects. **The round's second author was an
+  > automated session rather than a person who had not written the parser fixes**, which weakens the
+  > independence claim and is stated in the evidence doc; the plan wants a human second author each round.
   > 29 Sept, round 5 (`docs/evidence/KENN_BLIND_PHRASINGS_2026-09-29.md`): 146 new phrasings written before scoring, in a
   > new register. First run **69.2%** right, 3 wrong (**76.7%, 1 wrong** after I corrected 10 labels that
   > ignored product rules, e.g. Limiter isn't insertable and the vocal is already at 0 dB). The wrong plan that mattered:
