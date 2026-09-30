@@ -6768,7 +6768,7 @@ juce::File getCommonRootDirectory(const std::vector<SampleItem>& items)
         commonPath = commonPath.substring(0, commonLen);
     }
     
-    // Make sure we end on a folder boundary (e.g. if common prefix is "/Volumes/Jack/Samples/Ki", it should be "/Volumes/Jack/Samples")
+    // Make sure we end on a folder boundary (e.g. if the common prefix is "/media/samples/Ki", it should be "/media/samples")
     juce::File resultDir(commonPath);
     while (commonPath.isNotEmpty() && !resultDir.isDirectory())
     {

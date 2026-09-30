@@ -342,8 +342,8 @@ def main():
         print("=== Launching Remote GPU Job on ubuntu@www.haoee.com:2022 (GPU 0) ===")
         import subprocess
         remote_cmd = (
-            "cd /home/ubuntu/slo_v4_training && "
-            "CUDA_VISIBLE_DEVICES=0 /home/ubuntu/.conda/envs/qwen-edit/bin/python train_physics_inversion_gpu.py --data slo_all_packs_hybrid_v4.npz"
+            "cd \"$SLO_TRAIN_ROOT\" && "
+            f"CUDA_VISIBLE_DEVICES={gpu} \"{python_exe}\" train_physics_inversion_gpu.py --data slo_all_packs_hybrid_v4.npz"
         )
         cmd = ["ssh", "-p", "2022", "ubuntu@www.haoee.com", remote_cmd]
         res = subprocess.run(cmd, capture_output=True, text=True)
