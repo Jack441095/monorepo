@@ -898,6 +898,7 @@ ssm_add_engine_test(TestInferenceBatchFlush Source/test_inference_batch_flush_ma
 # (Phase 3): map-miss lookups, prune + rescan without duplicates, and
 # post-prune similarity-query consistency.
 ssm_add_engine_test(TestPathIndexIntegrity Source/test_path_index_integrity_main.cpp)
+ssm_add_engine_test(TestQuadTreeCoincidentPoints Source/test_quadtree_coincident_main.cpp)
 
 # Find-Similar Regression Test -- proves findSimilarSamples() ranks
 # acoustically similar samples correctly through the real production
@@ -1199,6 +1200,7 @@ set(SSM_TEST_TARGETS
     TestSortPreviewAndUndo
     TestEmbeddingQuality TestFindSimilar BenchmarkScan TestFavorites
     TestInferenceBatchFlush TestPathIndexIntegrity
+    TestQuadTreeCoincidentPoints
     TestHistory TestSmartCollections TestAudioFeatures TestCacheIntegrity
     TestFindSimilarWeighted TestTimbreRefinement TestReferenceSearch
     TestNearDuplicates TestAutoTagging TestMapClusters TestCacheVersionEnforcement

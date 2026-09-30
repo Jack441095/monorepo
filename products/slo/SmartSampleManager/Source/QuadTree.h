@@ -14,6 +14,10 @@ class QuadTree {
 public:
     static constexpr int CAPACITY = 32;
 
+    // Below this side length a split cannot separate float coordinates any
+    // further, so splitting again is pure recursion.
+    static constexpr float kMinSide = 0.0001f;
+
     struct Node {
         juce::Rectangle<float> bounds;
         std::vector<int> indices;
@@ -65,14 +69,40 @@ public:
             }
 
             if (isLeaf) {
+                // Samples without a usable embedding are parked at (0,0) by
+                // SampleManagerEngine (rebuildSpatialIndexFull places them at
+                // the origin when HNSW returns no neighbours), so a library
+                // with 33+ pending or permanently-failed inferences puts every
+                // point on the same pixel. Subdividing on that never separates
+                // them: insertIntoChildren keeps routing the non-contained
+                // remainder into nw, which re-subdivides forever. So only split
+                // when the node is still bigger than a pixel and this leaf
+                // actually holds a point somewhere else; otherwise it stays a
+                // dense leaf that a query can still scan.
+                const bool canSplit = bounds.getWidth() > kMinSide
+                                   && bounds.getHeight() > kMinSide
+                                   && hasDistinctPoint(px, py);
+
                 indices.push_back(idx);
-                if (indices.size() > static_cast<size_t>(CAPACITY)) {
+                if (indices.size() > static_cast<size_t>(CAPACITY) && canSplit) {
                     subdivide();
                 }
                 return true;
             }
 
             return insertIntoChildren(idx);
+        }
+
+        // True when this leaf already holds a point that is not on top of the
+        // incoming one. With every point at (0,0) this is false, which is what
+        // stops the subdivision.
+        bool hasDistinctPoint(float px, float py) const {
+            for (int other : indices) {
+                if ((*items)[other].x != px || (*items)[other].y != py) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         void query(const juce::Rectangle<float>& range, std::vector<int>& results) const {
