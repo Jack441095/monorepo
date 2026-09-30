@@ -51,7 +51,7 @@ seen. The process has to change, not just the rules (Track B).
 |---|---|---|---|
 | **0** (30 Sept–1 Oct) | Tonight: 1-hour soak, tempo/time-signature/return rows | Release, tag, DMG, `kenn-app` sync; F1 sync script; C1 manual ingest; blind round 9 | Qualified gate; release tagged |
 | **1** (1–7 Oct) | Night 1 (~2 h): device factory wave 1 | A2 device-zoo set checklist; B2 policy calls; B3 holdout review starts; C2 fixture; C4 lines; D1 Mac timing; F2 measures report; F3 path gate | ≥ 12 devices swept, ≥ 40 parameters qualified |
-| **2** (8–14 Oct) | Night 2 (~1 h): the 15 recipes | C3 reranker measure; C5 parameter reference; B4 wording triage; B5 multi-turn; D2 prompt cut; A8 clean-account test; E2 testers chosen | 15/15 recipes with exact undo; 3 testers invited |
+| **2** (8–14 Oct) | Night 2 (~1 h): the 15 recipes | C3 reranker measure; C5 parameter reference; B4 wording triage; B5 multi-turn; D2 prompt cut; A8 clean-account test | 15/15 recipes with exact undo |
 | **3** (15–21 Oct) | Night 3 (~1.5 h): wave 2 devices and first new family | G1–G2 new families; D3 model options; C6 craft notes start; B6 two-changes chips; E3 rollback | Next 13 devices; first new family qualified |
 | **4** (22–28 Oct) | Night 4 (1 h): release soak for the four-week build | Gate report against every number in section 7; blind round; decide the next phase | Phase-1 exit reported, good and bad |
 
@@ -92,7 +92,7 @@ promotion only through the gate).
 | B7 | Planner: stays in shadow. Retrain (run 14) only when about 500 owner-labelled tester requests exist, and promote only through `live_llm_promotion.py` | hold | Tester data |
 
 **Gate (week 4):** first-run ≥ 85% on a round of real wording (mega plan Phase 2 exit), 0 wrong plans; curated
-holdout ≥ 200 reviewed.
+holdout ≥ 200 reviewed. With no testers yet, B4's log has only our own use; the second author in B1 stands in.
 
 ### Track C: knowledge and retrieval
 Serves: Stage 2 (parameter-level knowledge, craft notes, source tiers, the recall gate) and the Knowledge programme's
@@ -131,11 +131,11 @@ Serves: Stage 0 exit (qualified gate, 3 testers) and the beta plan.
 
 | ID | Task | Size | Needs |
 |---|---|---|---|
-| E1 | Developer ID, then wire signing and notarisation into `build_kenn_app.py` | S after ID | Jack |
-| E2 | Choose 3 testers who have their own projects; use the existing invite, reviewer brief and supervised session script | S | Jack |
+| E1 | **Parked to the very end** (owner, 30 Sept: KENN isn't good enough yet). Developer ID, then wire signing and notarisation into `build_kenn_app.py` | S after ID | Jack |
+| E2 | **Parked** (owner, 30 Sept: not worth testing yet). Choose 3 testers with their own projects; the invite, reviewer brief and supervised session script already exist | S | Jack |
 | E3 | Rollback and update path: keep the last two DMGs, a "how to go back" note, the version shown in the app | M | |
 | E4 | Check on the installed build that diagnostics send receipts and timings only, never audio or typed text | S | |
-| E5 | A weekly review of what KENN did not understand, fed into B4 | S weekly | E2 |
+| E5 | A weekly review of what KENN did not understand, fed into B4 (starts when testers do) | S weekly | E2 |
 
 ### Track F: engineering health and working together
 Serves: Stage 3b, the North Star risk "a gate quietly stops gating" (an audit is a recurring cost, not a one-off), and
@@ -204,8 +204,8 @@ Each night starts when Jack says "ready", and a Live pause needs his approval fo
 | Official-manual chunks in the index | 0 | > 0, grounding-qualified | Manual above notes in trust order |
 | Model answer lands within 15 s (16 GB M3, Live open) | about 1 in 6 (26 Sept) | Measured, plan set | ≥ 70% |
 | Answers with no citable source | not counted | 0 in a 100-answer audit | 0 |
-| Testers onboarded | 0 | 3 | 5–10 |
-| Sign and notarise | waiting on Developer ID | Done | Done |
+| Testers onboarded | 0 | Parked | 5–10 |
+| Sign and notarise | waiting on Developer ID | Parked to the end | Done |
 | Unauthorised writes | 0 | 0 | 0 |
 | Undo success | 100% on what is qualified | 100% | 100% |
 
@@ -231,7 +231,7 @@ Each night starts when Jack says "ready", and a Live pause needs his approval fo
 5. The reranker rule: adopt only for ≥ 0.10 sealed recall@4 at ≤ 150 ms on the Mac (C3).
 6. Stage 3b: work the three open items now (C8); the cross-project cache leak and the `validate_llm_plan` range gaps
    are already fixed, and these three do not block the beta.
-7. The Developer ID (E1) and three tester names (E2).
+7. ~~The Developer ID (E1) and three tester names (E2).~~ Parked by the owner on 30 Sept: revisit when KENN is good enough, Developer ID last.
 8. Which copy of `chat` is canonical (F4).
 9. GitHub Team for branch protection, or keep pull requests as a convention (F8).
 10. The Live-night schedule in section 6.
