@@ -352,7 +352,25 @@ the monthly measures.
 > that does not exist), and the same `mix-review/` / `automix/` duplication. Nothing was deleted — that is decision 8.
 
 
-| F5 | CI: a fresh-clone "skips budget" (fail if the skip count grows), a weekly scheduled run of the chaos suite and phrasing scorer, a pull-request template | S | |
+| F5 | CI: a fresh-clone "skips budget" (fail if the skip count grows), a weekly scheduled run of the chaos suite and phrasing scorer, a pull-request template | S | **Skips budget done 30 Sept** on `kenn-answer-audit`; scheduled run and PR template still open |
+
+> **F5, 30 Sept — the skips budget, and what it found.** `tooling/scripts/check_skip_budget.py` runs the backend
+> suite with `-rs` and **allows listed reasons rather than a count**. Measured on a fresh worktree: **125 skips
+> across 5 reasons**, all environmental — no built knowledge index, no git-ignored `Training_Data_Sources` catalog,
+> no PANNS embedding model. A count-based budget would have to allow 125 on CI and 5 on a checkout that has the
+> index, without noticing the difference is the index and not the code. So `tooling/known_skip_reasons.json` lists the
+> five reasons with their justification, and **any other skip fails the build**.
+> **The number that matters: 48 of those skips are `test_server_smoke.py`, so the HTTP server smoke path does not run
+> in CI at all** — a fresh clone has no index to serve. That is a real coverage hole in the primary integration
+> surface, and it is invisible in every green run.
+> **Building the checker found two bugs in the checker itself, both of the class it exists to catch.** Its parser
+> split on the first colon, so `77: ` landed in front of every reason and the allowlist could never match; then it
+> *required* a line number, which silently dropped every module-level skip — **70 of the 125**. It reported 55 skips
+> while the suite reported 125. Both are pinned by tests, and the allowlist is now generated from the checker's own
+> parser so the two cannot drift apart again.
+> Still open in this row: the **weekly scheduled run** of the chaos suite and the phrasing scorer, and the
+> **pull-request template**.
+
 | F6 | Each release, audit every gate with a test that reproduces its bypass (the 28 Sept lesson) | S per release | |
 | F7 | Point the 10 old plan docs that are still linked at the North Star, then delete them | S | **Done 30 Sept** — 1 broken link, not 10 |
 
