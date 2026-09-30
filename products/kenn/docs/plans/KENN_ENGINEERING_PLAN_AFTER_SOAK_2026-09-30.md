@@ -333,7 +333,16 @@ the monthly measures.
 
 | F5 | CI: a fresh-clone "skips budget" (fail if the skip count grows), a weekly scheduled run of the chaos suite and phrasing scorer, a pull-request template | S | |
 | F6 | Each release, audit every gate with a test that reproduces its bypass (the 28 Sept lesson) | S per release | |
-| F7 | Point the 10 old plan docs that are still linked at the North Star, then delete them | S | |
+| F7 | Point the 10 old plan docs that are still linked at the North Star, then delete them | S | **Done 30 Sept** — 1 broken link, not 10 |
+
+> **F7, 30 Sept:** every `.md` the North Star, the beta plan and this plan cite by bare filename was checked against
+> disk. **Exactly one was genuinely missing** — `BETA_SCOPE.md`, the 1 Sept scope removed on 29 Sept, whose dangling
+> reference was in the beta plan's preamble and in its "confirm the promise above" line. Both now describe it as
+> removed with the date, and point at git history. The other nine all exist, in `docs/evidence/`,
+> `docs/reviews/` or `docs/runbooks/`; the plan's "10 still linked" was a count of *references*, not of broken links.
+> Nothing was deleted: a file that exists and is cited is not clutter. The preamble now warns to cite these by path
+> rather than bare filename, since that is exactly how a `BETA_SCOPE.md` reference outlived the file.
+
 | F8 | GitHub Team so `main` on `kenn-app` can be protected (rulesets are not enforced on a private repo today) | — | Jack decides |
 
 ### Track G: new control and capability families

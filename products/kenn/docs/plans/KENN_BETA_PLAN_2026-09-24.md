@@ -3,8 +3,12 @@
 **Written:** 2026-09-24 · **Owner:** Jack · Tick items in the same commit as the work, with the date and the evidence.
 
 This plan supersedes the beta parts of `KENN_BETA_SPRINT_PLAN_2026-09-06.md`, `KENN_BETA_PLUS_PLAN_2026-09-07.md`,
-`KENN_BETA_ROADMAP.md` and `BETA_SCOPE.md` (whose 1 Sept scope, chat and Mix Review only with no Live control, no longer
-describes KENN). Those files were removed on 29 Sept; git history has them. The GLM tracker (`KENN_GLM_FULL_ASSISTANT_TRACKER.md`) stays the log for the wider programme.
+`KENN_BETA_ROADMAP.md` and the 1 Sept scope that was then in `BETA_SCOPE.md` (chat and Mix Review only with no Live
+control, which no longer describes KENN). Of the four, `KENN_BETA_ROADMAP.md` and `KENN_GLM_FULL_ASSISTANT_TRACKER.md`
+still exist; `BETA_SCOPE.md` and the 21 other unreferenced plans were removed on 29 Sept, and git history has them.
+**30 Sept (F7):** the bare filename was left dangling here, which is the last broken link in the plan set — every other
+plan and evidence file the North Star cites was checked and lives, in `docs/evidence/`, `docs/reviews/` or
+`docs/runbooks/`. Reference them by that path, not by bare filename, so a move cannot silently break the link again. The GLM tracker (`KENN_GLM_FULL_ASSISTANT_TRACKER.md`) stays the log for the wider programme.
 
 ## What the beta is
 
@@ -44,7 +48,7 @@ voice, arbitrary plug-in control, silent saves.
 
 ## Decisions needed from you (before Phase 1 ends)
 
-- [ ] **Confirm the promise above** as the beta scope (it replaces `BETA_SCOPE.md`).
+- [ ] **Confirm the promise above** as the beta scope (it replaces the 1 Sept scope removed on 29 Sept).
 - [ ] **Distribution.** Signed and notarized app/installer needs an Apple Developer ID (£79/year, your account). Without it,
       testers must bypass Gatekeeper by hand. Recommendation: buy it.
 - [ ] **Testers.** Names or a shortlist of 5–10; at least 3 bring their own real projects (needed for the pilot gate).
