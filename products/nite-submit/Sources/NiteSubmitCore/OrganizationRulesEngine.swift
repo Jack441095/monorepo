@@ -133,14 +133,26 @@ public struct OrganizationRulesEngine: Sendable {
             }
             let destPathString = destURL.path
 
+            // A default APFS volume is case-insensitive, so "Report.pdf" and
+            // "report.pdf" name one file, not two. Comparing the path as written
+            // reported no collision, the executor then wrote on top of the other
+            // submission, and one of the two was destroyed with no warning. The
+            // key we compare on is lowercased; the path we hand the executor is
+            // still spelled exactly as the rule rendered it. (A case-sensitive
+            // volume — a case-sensitive APFS container, a Linux-formatted drive —
+            // gets the same treatment here, which errs towards a false
+            // collision rather than a lost file.)
+            let collisionKey = destPathString.lowercased()
+            let sourceKey = srcURL.path.lowercased()
+
             let fm = FileManager.default
-            let existsOnDisk = fm.fileExists(atPath: destPathString) && destPathString != srcURL.path
-            let isDuplicateInBatch = existingDestinations.contains(destPathString)
+            let existsOnDisk = fm.fileExists(atPath: destPathString) && collisionKey != sourceKey
+            let isDuplicateInBatch = existingDestinations.contains(collisionKey)
             // A blocked traversal is surfaced as a collision so the executor
             // refuses it without force, exactly like an existing file.
             let hasCollision = existsOnDisk || isDuplicateInBatch || traversalBlocked
 
-            existingDestinations.insert(destPathString)
+            existingDestinations.insert(collisionKey)
 
             let actionType: ProposedFileAction.ActionType = copyMode ? .copy : .move
             let reason: String
