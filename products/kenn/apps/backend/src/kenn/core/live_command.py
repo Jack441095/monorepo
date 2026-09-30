@@ -2966,6 +2966,16 @@ def _handle_command_impl(
                 response["undo_of_receipt_id"] = str(receipt.get("receipt_id") or "")
                 return _proposal_response(response, undo["proposal"], kind="undo")
             return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))
+        if context_resolution.get("resolution") == "adjust_requires_amount":
+            previous = str(context_resolution.get("last_command") or "").strip()
+            if not previous:
+                return _clarification(response, {"action": "clarify_adjust"},
+                                      "There's nothing to adjust yet in this session.")
+            return _clarification(
+                response,
+                {"action": "clarify_adjust", "previous_command": previous},
+                f"You last asked for \"{previous}\". By how much should I change it?",
+            )
         if context_resolution.get("resolution") == "correction_requires_clarification":
             other = _resolve_other_target(response["session_id"], _command_snapshot(live, include_mixer=True))
             if other:

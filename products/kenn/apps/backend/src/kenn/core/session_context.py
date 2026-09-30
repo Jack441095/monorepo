@@ -743,6 +743,18 @@ def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict
     lower = original.casefold()
     if lower in {"again", "do it again", "same again"} and state["last_command"]:
         return str(state["last_command"]), {"resolution": "repeat_last_action", "original": original}
+    # "adjust that" means "change the amount of what we just proposed", and it cannot become a command on its own --
+    # there is no amount in it. So it is handed on as a resolution rather than resolved into text, and the caller asks
+    # by how much, quoting the previous command so the producer can see what is being adjusted. Without it this
+    # phrasing fell through to the generic anaphora branch and produced "I didn't catch a change to make there".
+    if re.fullmatch(r"(?:please\s+)?adjust\s+(?:that|it|this)(?:\s+one)?(?:\s+a\s+bit)?[.!?]*", lower) and state["last_command"]:
+        return original, {
+            "resolution": "adjust_requires_amount",
+            "original": original,
+            "last_command": str(state["last_command"]),
+            "last_action": str(state["last_action"]),
+            "last_track": str(state["last_track"]),
+        }
     if re.fullmatch(r"(?:please\s+)?undo(?:\s+that|\s+it)?[.!]?", lower):
         return "undo", {"resolution": "undo_last_receipt", "original": original}
     if re.fullmatch(r"(?:(?:no|nope|sorry|oops|actually|wait)\b[\s,.!-]*)*(?:not\s+(?:that|this)\s+one[,\s]+)?(?:the\s+)?other\s+(?:one|track|device)(?:\s+instead)?[.!?]*", lower):
