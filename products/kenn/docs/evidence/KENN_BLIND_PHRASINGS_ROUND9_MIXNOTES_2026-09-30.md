@@ -64,6 +64,15 @@ fraction** on the seven send rows, because the fixture schema has no send-specif
 unpinned would let a wrong send level pass; and the `notes_document_format` rows keep their document punctuation in the
 query text rather than normalising it away, which is the point of the register.
 
+Three labels were corrected after the first run and the set was re-scored with **no rule change at all**, so the two
+numbers bracket the label errors and nothing else.
+
+**One note on the history, for anyone auditing this.** A concurrent session working in this worktree committed the
+parser fixes and a write-up together in a single commit whose text claimed "rule changes in this round: none". That
+commit was split so the fixes (`b2961010`) and the write-up are separate, and two claims in the earlier draft that were
+wrong — that the multi-track recipe was a label error rather than a dropped request, and the 505-holdout count — are
+corrected above. **No first-run number moved**: `41658821` and `38fd60dd` predate any parser change and are untouched.
+
 ## The wrong plans
 
 Four on the first run. Three after three labels were corrected. Listed individually, because 0 wrong plans is the gate
