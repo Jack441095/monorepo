@@ -76,5 +76,8 @@ Operation receipts are kept for the session.
   `PDFExtractor` now falls back to Vision (`VNRecognizeTextRequest`) for
   image-only PDFs, feeding `FieldDetector` the same way as native text, at
   reduced confidence. See `PDFExtractor.swift` and `DetectorTests.swift`.
-- **Entitlement hook:** `EntitlementProvider` protocol exists; V1 ships an
-  always-open implementation. No DRM.
+- **Entitlement hook:** `EntitlementProvider` protocol exists; V1 gates the app
+  on a locally verified Ed25519 licence key (`LicenseEngine`, `NTSUB1-` format)
+  rather than a server call. No trial clock and no revocation — a key is valid
+  for as long as its signature checks out. `EntitlementProvider` is still
+  unused.

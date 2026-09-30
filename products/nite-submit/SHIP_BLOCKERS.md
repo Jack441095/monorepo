@@ -1,123 +1,90 @@
 # SHIP BLOCKERS — NITE Submit 1.0.0
 
-**Date:** 2026-09-18
-**Verdict:** `NOT READY` — 3 P0 blockers, 8 P1 issues
-
-> The sale does not go live until every P0 shows `VERIFIED FIXED` with evidence.
+**Date:** 2026-09-30
+**Status:** 3 open, 0 code blocks. Two are owner accounts, one is a key the owner holds offline.
 
 ---
 
-## P0 — Blocks the sale outright
+## Open — owner action required
 
-### P0-1: Artifact is ad-hoc signed, not Developer ID signed or notarized
+### P0-1: Not signed with a Developer ID certificate, not notarized
 
-**Evidence:**
-- `codesign -dv`: `Signature=adhoc`, `TeamIdentifier=not set`, `flags=0x2(adhoc)`
-- `spctl -a -vv`: `rejected`
-- `xcrun stapler validate`: `does not have a ticket stapled to it`
-- `distribution-readiness.json`: `developer_id_identity_available: false`, `ready_for_public_distribution: false`
-- `RELEASE.md` acknowledges ad-hoc status
-
-**Impact:** Every customer who downloads the app via a browser will hit Gatekeeper blocking. Right-click-Open is not acceptable for a paid product — it signals "unsigned/untrusted" to the user.
+**Evidence:** `tools/check_distribution_readiness.sh` → `developer_id_identity_count: 0`, `current_app_developer_id_signed: false`, `current_app_notarised: false`, `ready_for_public_distribution: false`. The current build is ad-hoc signed, which Gatekeeper rejects on any Mac but this one.
 
 **Fix steps:**
-1. Obtain or configure a Developer ID Application certificate from the Apple Developer Program
-2. Sign the app and all embedded binaries (`7za`, `qpdf`) with Developer ID and hardened runtime (`codesign --options runtime -s "Developer ID Application: ..."`)
-3. Submit for notarization via `xcrun notarytool submit`
-4. Staple the ticket: `xcrun stapler staple Submit-1.0.0-macOS.app`
-5. Rebuild the DMG/ZIP from the signed+notarized app
-6. Verify: `spctl -a -vv` must show `accepted` and `source=Notarized Developer ID`
-7. Run `tools/check_distribution_readiness.sh --require-ready` — must pass
+1. Install a Developer ID Application certificate in the login keychain (`security find-identity -v -p codesigning` must list one).
+2. Configure the `NITE_SUBMIT` notarytool profile (`xcrun notarytool store-credentials NITE_SUBMIT`).
+3. `tools/package_app.sh` then `tools/sign_and_notarize.sh`.
+4. `xcrun stapler validate` and `spctl -a -vv` must report `accepted` with `source=Notarized Developer ID`. `spctl` in that script now fails closed, so a rejected build stops the run instead of warning.
+5. `tools/check_distribution_readiness.sh --require-ready` must pass.
 
-### P0-2: No licensing or activation system
+**Owner:** Jack. Nothing in the codebase blocks this.
 
-**Evidence:**
-- Zero results for licensing/activation/serial/trial code in `Sources/` (grep returned only PDF field-detection vocabulary and `NSApplication.setActivationPolicy`)
-- No DRM, license key validation, trial period, or usage restriction of any kind
+### P0-3: No payment processor or key fulfilment
 
-**Impact:** The app is fully functional without payment. Anyone with a copy of the binary can use it forever. The "£3 Mac licence" claim on the sales page has no enforcement mechanism.
-
-**Fix steps (choose one approach):**
-- **A) Honour-system / unlockable:** Accept that the free binary is the product, and the payment is voluntary. Remove "licence" language from the sales page; call it a "download" or "purchase." This is the simplest path but weakest commercially.
-- **B) License-key gate:** Integrate a lightweight license system (Paddle, LemonSqueezy, or a self-hosted key server). On first launch, prompt for a license key. Validate locally or via a one-time server check. Store validation state in Keychain or a signed local file.
-- **C) App Store distribution:** Submit to the Mac App Store (handles payment, DRM, signing, and notarization). Requires adapting to App Store sandbox rules.
-
-Whichever path: the activation/purchase flow must work end-to-end before sale.
-
-### P0-3: No payment processor or fulfillment pipeline
-
-**Evidence:**
-- No Paddle, Stripe, Gumroad, or any payment SDK in source or `Package.swift`
-- Buy buttons link to `https://www.nitedsp.co.uk/pricing` — an external URL with no verified checkout
-- No license delivery mechanism from payment → app
-
-**Impact:** Even if a customer pays, there is no automated path to deliver the product or a license key. Manual fulfillment does not scale and has no audit trail.
+**Evidence:** no checkout integration in `web/index.html`; `LicenseEngine` validates keys but nothing mints one for a customer. The "£3 lifetime licence" claim on the sales page has no fulfilment path.
 
 **Fix steps:**
-1. Choose and integrate a payment processor (Paddle recommended for macOS indie apps — handles tax, receipts, license keys)
-2. Configure product, pricing (£3), and webhook for license delivery
-3. Test the full flow: purchase → receipt → license key → app activation
-4. Publish download link with integrity checksum
-5. If using honour-system (P0-2 option A): at minimum, set up a payment page that delivers a download link after payment
+1. Choose a processor (LemonSqueezy or Paddle both handle EU VAT and key delivery).
+2. Mint keys with `nitesubmit-keygen` (now reading the signing key from `$XDG_CONFIG_HOME/nite-submit/license-private-key.base64`).
+3. Wire the webhook so a paid order receives a key by email.
+4. Test: purchase → key arrives → activates → refund.
+
+**Owner:** Jack. The key tooling is ready and tested.
+
+### P1-6: Update feed ships an empty signature
+
+**Evidence:** `web/appcast.xml` carries `length="0"` and `sparkle:edSignature=""`. `UpdateEngine.checkStatus` refuses an enclosure with no signature while `requireSignature` is true, so the live feed shows "no update available" rather than offering a download.
+
+**Fix steps:** `tools/update_appcast.sh <version> <built-zip> <release-private-key>`. It writes both attributes and refuses a key that does not verify against `UpdateEngine.updatePublicKeyBase64`. The release key is offline and is a different key from the licence key in `tools/`.
+
+**Owner:** Jack.
 
 ---
 
-## P1 — Must fix before or immediately at launch
+## Closed — 2026-09-30
 
-### P1-1: CHANGELOG says `[Unreleased]`, not `[1.0.0]`
+All fixed with regression tests; 475/475 checks pass. Full detail in `docs/NITE_SUBMIT_REVIEW_V1.md`.
 
-**File:** `CHANGELOG.md:7`
-**Fix:** Rename `[Unreleased] - 2026-09-08` to `[1.0.0] - <release date>`.
-
-### P1-2: Artifact built from stale commit
-
-**Evidence:** Release manifest `git_sha: 2d63db2`, HEAD is `1e086a6` (2 commits ahead: `refactor: simplify Submit around three-step workflow`, `feat: harden Submit public release path`).
-**Fix:** Rebuild the artifact from the final release commit after all fixes land. Re-run `tools/run_release_checks.sh`.
-
-### P1-3: Git state not release-ready
-
-**Evidence:** Branch `engineering/nite-submit-v1.1-beta`, dirty tree (deleted old artifacts, modified test results), no `v1.0.0` tag.
-**Fix:** Clean the tree, commit or discard changes, create a `v1.0.0` release tag on the final release commit.
-
-### P1-4: CI is manual-only with no recent evidence
-
-**Evidence:** `ci.yml` triggers only on `workflow_dispatch`. No evidence of recent runs.
-**Fix:** Run CI manually at minimum. Consider adding `push`/`pull_request` triggers for ongoing assurance.
-
-### P1-5: Test suite not verified against current HEAD
-
-**Evidence:** Release manifest tests recorded at `2d63db2`, HEAD is `1e086a6`.
-**Fix:** Run `swift build -c release --product nitesubmit-tests && swift run nitesubmit-tests` on the final commit. Record results.
-
-### P1-6: Sales page mockup shows old console-style UI
-
-**Evidence:** `web/index.html:83` — "NITE Submit Console — Hardware Layout" with LED-style indicators. `CHANGELOG.md` documents UI was simplified from console jargon to plain English with system sans-serif.
-**Fix:** Update the mockup in `web/index.html` to match the current app appearance.
-
-### P1-7: arm64 only — Intel Macs excluded without disclosure
-
-**Evidence:** `file` on binary: `Mach-O 64-bit executable arm64`. Sales page says "macOS 13+" without architecture caveat.
-**Fix:** Either build Universal (arm64 + x86_64) or add "Apple Silicon" / "arm64 only" to the sales page system requirements.
-
-### P1-8: No rollback plan documented
-
-**Evidence:** No "pull the sale page offline" procedure. No formal rollback steps.
-**Fix:** Document: (1) how to pull the download page, (2) how to revert to previous artifact, (3) how to notify customers of a recall.
+| ID | Was | Fix |
+|----|-----|-----|
+| P0-2 | No licensing or activation system | `LicenseEngine.swift` Ed25519 `NTSUB1-` gate on first launch; little-endian timestamp, 24 h skew refused, failed writes surfaced. Was implemented before this pass but the docs still called it absent — corrected in `SHIP_READINESS_REPORT.md` and `ARCHITECTURE.md`. |
+| B1 | Archive shipped every queued file after one approval | Approved rows only; skip count named in the message |
+| B2 | Update signature parsed and never verified; download URL unvalidated | Ed25519 verification, `https` + host allowlist, XML entities off, fail closed |
+| B3 | Organize executor hardcoded `.replace` | Refused unless `--force` |
+| B4 | CLI `--policy replace` silent; `copy` defaulted to CWD | `--force` required, `--to` defaults to source folder |
+| B5 | `try!` traps in batch and validation | `do`/`catch`, stderr, exit 2 |
+| B6 | Duplicate basenames aborted an archive | `report.pdf`, `report 2.pdf`, … |
+| B7 | Password in argv; ZipCrypto ZIPs | stdin, 7zAES-256, refusal rather than a weak substitute |
+| B8 | `Filename:` matched the `name` label | Word-boundary anchored match; corpus `student_id` 215→219 at precision 1.0 |
+| B9 | Template traversal out of the target folder | Confined path, reported as a collision |
+| B10 | `1.2-beta` compared equal to `1.2.0` | Prerelease refused |
+| M1 | Latin-1-only person names | `\p{L}` with conditional casing |
+| M2 | Cross-volume staging, TOCTOU, symlink following | Sibling temp, `replaceItemAt`, `O_EXCL` claim, symlinks refused |
+| M3 | Case-sensitive collision check | Lowercased comparison key for APFS |
+| M4 | Unreadable folder read as empty; nondeterministic order | `FolderScanError`, sorted `relativePath`, `realpath` fix |
+| M5 | Native-endian licence timestamp; swallowed store failure | Explicit little-endian, throwing store, future-dated refused |
+| M6 | PDF text unbounded; scans behind a typed page never OCR'd | Truncate first, per-page OCR, OCR fields drop a confidence notch |
+| M7 | Optimizer deleted the destination before running | Temp sibling, atomic replace, stat failures throw |
+| M8 | Media kind by extension; camera dates read as student IDs | 16-byte header sniff, filename-only matches `.low` |
+| M9 | Media drops could never load; main-thread blocking; reset resurrected state | `loadFile`, work queue with staleness token, queue cleared, receipts per item |
+| M10 | Batch manifest fail-open; partial confidence gate; `--out` inside `--input` | Exit 2, every templated field gated, containment enforced |
+| M11 | Runner crashed on regression; missing fixtures skipped; corpora drifted 239 vs 209 | Soft-failure runner, missing fixture fails, one generator + parity gate |
+| M12 | Unpinned third-party blobs; `--deep` signing; key in `tools/` | `SHA256SUMS`, inside-out signing, key outside the tree with a bundle guard |
+| P1-1 | `CHANGELOG` said `[Unreleased]` | `[1.0.0] - 2026-09-18` |
+| P1-2 | Artifact built from a stale commit | Rebuilt from HEAD, `verify_app_bundle.sh` passes |
+| P1-3 | Sales page mockup showed the old console UI | Updated to the current drop → review → preview flow |
+| P1-4 | Apple Silicon not disclosed | Added to the system requirements line |
+| P1-5 | No rollback plan | Documented in `RELEASE.md` |
 
 ---
 
-## P2 — Nice-to-have before first marketing push
+## Still open, not blocking v1.0.0
 
-### P2-1: `.DS_Store` in artifacts directory
-
-**File:** `artifacts/.DS_Store`
-**Fix:** Add to `.gitignore`, remove from tree.
-
-### P2-2: Refund handling plan undocumented
-
-**Fix:** Document refund policy and procedure, align with payment processor terms.
-
-### P2-3: LGPL source availability notice
-
-**Evidence:** `THIRD_PARTY_NOTICES.md` mentions 7za LGPL-2.1 but could more explicitly state that source code is available from the upstream project and that customers may request it.
-**Fix:** Add a sentence: "The source code for 7za is available at [upstream URL] and may be requested from NITE DSP."
+- `ARCHITECTURE.md` notes a CJK name with no `Student Name:` label is still missed, because the title-page path requires letter casing. Needs a script-aware heuristic.
+- Archive checksums are not reproducible across machines: mtimes, uids, and traversal order land in the bytes.
+- Undo covers one interactive rename. Batch, organize, archive, and copy have no undo.
+- `TemplateEngine` drops a user's `caseStyle` preference unless the caller re-applies it.
+- `Settings.load()` rewrites the file to repair permissions on every launch; `save()` swallows write errors.
+- `Presets.swift` reuses `id: "custom"` in both lists and its Harvard/Chicago labels read as institutional endorsement.
+- Entitlements have no expiry or revocation. Deliberate for a one-shot student purchase.

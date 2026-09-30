@@ -21,11 +21,17 @@
 ## The one network request the app makes
 
 If you choose **Check for Updates…** from the app menu, NITE Submit fetches a
-small release feed from `releases.nitedsp.com` to see whether a newer version
-exists. This request contains no document content, extracted data, or
-identifying information — just a plain HTTP GET for the feed. It only happens
-when you click that menu item; the app never checks for updates automatically
-or in the background.
+small release feed from `www.nitedsp.co.uk/submit/appcast.xml` to see whether a
+newer version exists. This request contains no document content, extracted
+data, or identifying information — just a plain HTTPS GET for the feed. It only
+happens when you click that menu item; the app never checks for updates
+automatically or in the background.
+
+The feed is also the app's only trust anchor for downloads. Every enclosure in
+it must carry an Ed25519 signature over its version and download URL, and the
+app refuses anything unsigned, mis-signed, plain `http:`, or served from a host
+other than `www.nitedsp.co.uk` and `releases.nitedsp.co.uk`. A tampered feed
+therefore shows "no update available" rather than offering you a file.
 
 ## What is stored locally
 
