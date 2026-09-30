@@ -11,9 +11,10 @@ SLO is a coherent local macOS product and a credible candidate for a tightly con
 - Mode: read-mostly qualification audit.
 - Canonical repo: `/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo`.
 - Branch: `engineering/build-system-optimisation`.
-- HEAD at precheck: `dd60ddb31c66d8ee43f318764c0ac1f9eb972eef`.
-- RC1 qualified worktree: `533849894660c2a42b08217f5d044367c3db68a5`.
-- Audio-foundation probe: `301ad0a070b6d522b526d3809fcfd0f3a77035c4`.
+- HEAD at precheck, RC1 qualified worktree, and the audio-foundation probe: _all three SHAs this
+  report originally cited do not resolve in the `monorepo` object database; they predate the
+  monorepo consolidation. The qualification conclusions below still describe the run, but the
+  provenance cannot be re-derived. See `docs/SLO_REVIEW_V1.md`._
 - Owner/customer audio accessed: **No**.
 - Protected holdouts rerun: **0**.
 - Production plugin overwritten: **No**.

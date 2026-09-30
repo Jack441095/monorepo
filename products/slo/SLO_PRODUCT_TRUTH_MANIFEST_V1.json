@@ -1,7 +1,7 @@
 {
   "manifest_schema": "slo.product-truth.v1",
-  "manifest_version": 1,
-  "generated_at": "2026-08-30",
+  "manifest_version": 2,
+  "generated_at": "2026-09-30",
   "product_id": "slo",
   "display_name": "SLO",
   "historical_name": "Smart Sample Manager",
@@ -12,16 +12,12 @@
   "release_status": "blocked",
   "source": {
     "repository_path": "products/slo",
-    "product_code_checkpoint_sha": "4645425535a35da06fb734c0a9a08e821b116ade",
-    "estate_registry_commit": "8cc73e0653eb8402b955ac8d8c587fb8eb978db8",
-    "branch": "engineering/slo-format-aware-scan-v1",
-    "worktree_state": "clean at qualification checkpoint; generated build/cache state is outside the source commit",
-    "shared_canonical_candidate": {
-      "sha": "c6d0746ac876a0a3af9244907486ffc001b3e718",
-      "branch": "main",
-      "dirty_entries": 49,
-      "release_truth": "not_clean"
-    }
+    "product_code_checkpoint_sha": null,
+    "branch": "main",
+    "worktree_state": "clean; see docs/SLO_REVIEW_V1.md for the 2026-09-30 review",
+    "product_code_checkpoint_sha_status": "unresolvable. The checkpoint originally cited here, and the branch named beside it, both predate the monorepo consolidation and exist in no reachable object database. Recorded as a retraction so the rollback path is not mistaken for a real target.",
+    "current_repository_head": "bec0161495aa73382edaef024684e40be9af8c35",
+    "verified_at": "2026-09-30"
   },
   "product_boundary": {
     "source_product": "SmartSampleManager",
@@ -29,12 +25,19 @@
     "research_separation": [
       "audio foundation-model probe remains research evidence",
       "classification experiments and protected evaluation material are not release claims",
-      "nitedsp/backend and nitedsp/website remain duplicate platform authorities pending semantic migration"
+      "products/slo/nitedsp is an empty leftover holding only a tracked .DS_Store; the duplicate platform authorities it once named are gone"
     ]
   },
   "supported_scope": {
-    "enabled_input_formats": ["WAV"],
-    "not_enabled_input_formats": ["AIFF", "FLAC", "MP3"],
+    "enabled_input_formats": [
+      "WAV",
+      "AIFF",
+      "FLAC"
+    ],
+    "not_enabled_input_formats": [
+      "MP3",
+      "OGG"
+    ],
     "workflow": [
       "Choose a local sample folder",
       "Scan and build a local durable versioned index",
@@ -45,7 +48,7 @@
     ],
     "read_only_default": true,
     "network_upload_in_scan_classify_path": false,
-    "unsupported_format_behavior": "not_claimed as supported; requires explicit product-scope decision before implementation"
+    "unsupported_format_behavior": "admitted by the scan path and covered by Source/test_format_aware_scan_main.cpp for AIFF/FLAC; MP3 and OGG are accepted by the drag-and-drop filter (Source/PluginEditor.cpp:16-18) but have no runtime decode fixture yet, so they are unverified rather than absent"
   },
   "identity": {
     "user_visible_name": "SLO",
@@ -54,7 +57,14 @@
     "product_version": null,
     "version_status": "not_defined",
     "bundle_id": "com.nitedsp.smartsamplemanager",
-    "formats": ["VST3", "AU", "Standalone"]
+    "formats": [
+      "VST3",
+      "AU",
+      "Standalone"
+    ],
+    "taxonomy_version": 5,
+    "feature_analysis_version": 8,
+    "identity_status": "user_visible_name is SLO (CMakeLists.txt:491); bundle_id and plugin_code are still the pre-rename SmartSampleManager identity and remain an owner decision"
   },
   "quality_evidence": {
     "full_build": {
@@ -105,14 +115,14 @@
   "support_and_rollback": {
     "support_stage": "internal_read_only_pilot_candidate",
     "support_model_status": "not complete for external beta",
-    "rollback_reference": "validation/audits/stage-2-slo-estate-refresh-v1/SLO_ESTATE_REFRESH_PACKAGE_REPORT_V1.md#rollback",
-    "source_recovery": "Return to product code checkpoint 4645425535a35da06fb734c0a9a08e821b116ade and preserve the shared main checkout and all worktrees.",
+    "rollback_reference": "git: revert to any tagged commit on main; the pre-consolidation checkpoint this manifest used to cite does not exist in this repository",
+    "source_recovery": "Revert to a known-good commit on main (reviewed HEAD at time of writing: bec0161495aa73382edaef024684e40be9af8c35). Do not attempt to return to the pre-consolidation checkpoint: it is not present in this object database.",
     "retention": "Keep private audio, models, holdouts, and evaluation results outside release claims and do not move them in this package."
   },
   "owner_decisions_required": [
-    "Is WAV-only acceptable for V1 private beta, or is AIFF/FLAC/MP3 support a launch blocker?",
-    "Choose a product version scheme and decide whether the Smart Sample Manager internal identity is retained.",
-    "Choose a clean release checkpoint and authorize signing/clean-machine qualification.",
+    "Is MP3/OGG decode a launch blocker, or is WAV/AIFF/FLAC sufficient for the private beta? AIFF/FLAC already ship; the older WAV-only framing of this question is retired.",
+    "Choose a product version scheme and decide whether the SmartSampleManager bundle id and plugin code are retained or migrated to the SLO identity.",
+    "Authorize signing/clean-machine qualification against a named release checkpoint.",
     "Authorize protected evaluation/OOD threshold changes and name the beta tester cohort."
   ],
   "truth_controls": {

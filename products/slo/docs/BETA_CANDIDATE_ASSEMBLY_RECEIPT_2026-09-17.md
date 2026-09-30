@@ -44,8 +44,8 @@ Current live status of the `products/slo` checkout (smaller than the 2026-09-15 
 
 | Item | Value |
 |---|---|
-| Git HEAD (candidate) | `f9b502e0c511f040b6d70087e03f4d02c94f3557` |
-| Local main | `dc855bee2e7f0cb8e66973df28c229f9542ec480` (8 ahead, unpushed) |
+| Git HEAD (candidate) | _unresolvable; pre-consolidation SHA, see `docs/SLO_REVIEW_V1.md`_ |
+| Local main | _unresolvable; pre-consolidation SHA_ |
 | Model | `panns_cnn10_embedding.onnx` — SHA-256 `cbc3653cf2ef3cc35f6be48c4863b6d735b0ff85af3b3e9607706a0f467ffad2` (84,379 B) — **byte-identical in both worktrees** |
 | Model data | `panns_cnn10_embedding.onnx.data` — SHA-256 `8e2b47834248ba6ba0e0993bedcac8babd01666e82a5faf77aaeaca69fa086a8` (24,248,320 B) |
 | Classifier head | **branch `f9b502e`: `AcousticWeights::modelVersion = 4` / main `dc855be`: `modelVersion = 6`** — different weights files |

@@ -3,7 +3,7 @@
 **Date:** 2026-09-17  
 **Executed by:** Antigravity (Lead Audio DSP & ML Systems Engineer)  
 **Target Candidate Worktree:** `/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/workspace/worktrees/slo/beta-1-main`  
-**Candidate Commit:** `dc855bee2e7f0cb8e66973df28c229f9542ec480` (`main`)  
+**Candidate Commit:** _unresolvable; the SHA cited here predates the monorepo consolidation and does not exist in this repository. See `docs/SLO_REVIEW_V1.md`._  
 **Status:** Clean worktree, 0 dirty files.
 
 ---
@@ -12,7 +12,7 @@
 
 | Item | Value | Verification Source |
 |---|---|---|
-| Git HEAD (candidate) | `dc855bee2e7f0cb8e66973df28c229f9542ec480` | `git rev-parse HEAD` in `beta-1-main` |
+| Git HEAD (candidate) | _unresolvable; pre-consolidation SHA, see `docs/SLO_REVIEW_V1.md`_ | was `git rev-parse HEAD` in `beta-1-main` |
 | Embedding Model ONNX | `panns_cnn10_embedding.onnx` (84,379 B) | SHA-256: `cbc3653cf2ef3cc35f6be48c4863b6d735b0ff85af3b3e9607706a0f467ffad2` |
 | Embedding Model Data | `panns_cnn10_embedding.onnx.data` (24,248,320 B) | SHA-256: `8e2b47834248ba6ba0e0993bedcac8babd01666e82a5faf77aaeaca69fa086a8` |
 | Classifier Head | `AcousticClassifierWeights.h` | `modelVersion = 6` |

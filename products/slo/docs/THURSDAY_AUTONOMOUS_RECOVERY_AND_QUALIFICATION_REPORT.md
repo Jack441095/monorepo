@@ -56,7 +56,7 @@ between writing the integration tests and implementing the routing.
 
 ## Starting SHA / Ending SHA
 
-- Starting SHA: `6810283b67d24c1e8bbcc65ac3a4969330d1e8af`
+- Starting SHA: _unresolvable; pre-consolidation SHA, see `docs/SLO_REVIEW_V1.md`_
 - Ending SHA: see Commits section (branch advanced by 6 commits).
 
 ## Recovered Work

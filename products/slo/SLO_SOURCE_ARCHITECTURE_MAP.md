@@ -7,7 +7,11 @@ The shared engine-core object-library build optimization is source-visible and p
 Audit: SLO Full Product, Classification & Beta-Readiness Audit V1  
 Canonical product path: `/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo`  
 Current source checkout: `products/slo/SmartSampleManager`  
-Current HEAD: `dd60ddb31c66d8ee43f318764c0ac1f9eb972eef`
+Current HEAD: recorded in `docs/SLO_REVIEW_V1.md` and `docs/SLO_BETA_READINESS_V1.md` at review time
+
+> _Unresolvable 2026-09-30: the commit this document originally cited does not exist in
+> the `monorepo` object database; it predates the monorepo consolidation. The figure is
+> retained for the record and must not be used as a rollback target._
 
 ## Product identity
 

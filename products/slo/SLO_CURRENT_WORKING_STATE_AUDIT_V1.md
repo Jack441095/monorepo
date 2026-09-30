@@ -6,7 +6,8 @@
 
 - **Path:** `/Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo`
 - **Branch:** `main`
-- **HEAD:** `be3e6310a6aae86c0e6b138c0c75aadc9546fdd2`
+- **HEAD:** _not recorded — the SHA this document originally cited (`be3e6310…`) does not resolve in
+  the `monorepo` object database. See `docs/SLO_REVIEW_V1.md` for the verified state._
 - **Dirty state:** 1 tracked file modified (`SmartSampleManager/docs/classification/REAL_CORPUS_CROSS_VENDOR_V2_REPORT.md` — an auto-regenerated benchmark report, harmless), plus ~30 untracked report/doc files at repo root from earlier sessions' work (audit/readiness docs, benchmark result JSON dumps). None of this is code — no uncommitted source changes exist. Not cleaned up as part of this audit since it wasn't asked for and isn't blocking anything.
 - **Recent history:** last 10 commits are all this session's classification-accuracy work (corpus expansion, ground-truth fixes, an OOD recalibration attempt that was tried, found not to be a clean win, and fully reverted — see `docs/classification/OOD_RECALIBRATION_V1_REPORT.md`).
 
