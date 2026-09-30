@@ -159,7 +159,33 @@ the monthly measures.
 |---|---|---|---|
 | F1 | `sync_kenn_app.sh`: the monorepo-to-`kenn-app` sync as one command: split `products/kenn`, check the fast-forward, scan the new commits for secrets and attribution lines, run the CI script on a fresh worktree, then push. It does by script what was done by hand on 30 Sept | S–M | Done 30 Sept on branch `kenn-sync-script`; reaches `main` with the next release |
 | F2 | A monthly measures report: one command printing the North Star's list (understanding, answer quality, recall, latency by stage, unauthorised writes, undo success, how often the model's answer lands) and the two added on 28 Sept (answers with no citable source; grounding-gate rejections and why) | M | |
-| F3 | A personal-path gate for KENN like SLO's, and scrub the 52 files and 156 places that name a home path, the Live volume or the GPU host | M | |
+| F3 | A personal-path gate for KENN like SLO's, and scrub the 52 files and 156 places that name a home path, the Live volume or the GPU host | M | **Done 30 Sept** on branch `kenn-path-gate`; reaches `main` with the next release |
+
+> **F3, 30 Sept** (branch `kenn-path-gate`): measured before touching anything, the plan's "52 files and 156 places"
+> was close but not exact — **47 tracked files, 164 occurrences** of a home, volume or `/home/` path, of which **40
+> files and 140 occurrences were real** (`/Volumes/Jack_Gandy_1TB_SSD/` ×134, `/Users/Ganders4/` ×6). The other 24
+> were already placeholders (`/Volumes/X`, `/Users/example`, `/Users/Shared`, `/Volumes/...`). The 140 were rewritten
+> to `~/`, which is how a person writes a path anyway, so the gate below needed no debt list — unlike SLO's, which
+> ships a 124-file / 34,722-occurrence ratchet precisely because that debt was never scrubbed.
+> **The GPU host was still committed, which the plan's own wording ("or the GPU host") had not been matched
+> against:** `ubuntu@www.haoee.com` appeared in 6 tracked box scripts and 1 evidence doc, against AGENTS.md's "never
+> commit remote hostnames". `run_tests_on_box.py`, `sync_gpu_notes.sh`, `sync_gpu1_notes.sh`,
+> `notes_server_preflight.sh`, `deploy-and-run-notes.sh` and `run_kenn_command_pilot_remote.sh` now read
+> `KENN_SERVER_TARGET` / `KENN_SERVER_PORT` and fail loudly when unset, so **they will not run until that is
+> exported** — that is the cost of not having the hostname in git. Also found: `phase4_testing_assets_stem_matrix.json`
+> listed the contents of a private stem library (`al_james/01_Kick.wav` and 57 siblings), which AGENTS.md's "zero
+> private audio, user stems" also forbids; the paths are now `~/`-relative.
+> The gate is `tooling/scripts/check_personal_paths.py`, run as step **[9/9]** of `ci_verification.sh`, which both
+> `kenn-core.yml` and `kenn-ci.yml` already invoke — so unlike SLO's, which no workflow calls despite two SLO docs
+> claiming it "fails the build", this one actually stops the build. Current state: `personal-path-gate=pass
+> tracked_files=1218 findings=0`. `test_personal_path_gate.py` (24 tests) checks both directions against the nine
+> lines that actually leaked, and fails if a placeholder is added to the allowlist that nothing uses.
+> `ci_verification.sh` green on the branch: backend **2,461 passed / 125 skipped**, chat 38, Mix Review 66, AutoMix
+> 4 + 4. **History still contains the original paths and hostname**; rewriting history is an owner decision and the
+> gate says so rather than implying otherwise. Also noted, not acted on: 290 of `deploy-and-run-notes.sh`'s 319 lines
+> are unreachable behind an `exec`, so that file is a tombstone pointing at the read-only preflight.
+
+
 | F4 | One `chat` package: `chat/` and `packages/chat/` both exist with their own `app.py`, `eval_runner.py` and `index_runtime.py`, and tooling loads the wrong one under the bare name `app`. Pick the canonical copy, remove the other | M | Jack reviews |
 | F5 | CI: a fresh-clone "skips budget" (fail if the skip count grows), a weekly scheduled run of the chaos suite and phrasing scorer, a pull-request template | S | |
 | F6 | Each release, audit every gate with a test that reproduces its bypass (the 28 Sept lesson) | S per release | |
@@ -257,7 +283,7 @@ Each night starts when Jack says "ready", and a Live pause needs his approval fo
 3. **A2** the device-zoo checklist and preparation script. *Done 30 Sept, on `kenn-device-zoo-wave1`.*
 4. **B1** blind round 9 in a new register, written by a second author.
 5. **C2** the retrieval fixture with a sealed half.
-6. **F3** the personal-path gate and scrub.
+6. **F3** the personal-path gate and scrub. *Done 30 Sept, on `kenn-path-gate`.*
 7. **D1** the Mac timing measurement.
 8. **F2** the monthly measures report.
 9. **B4** the wording triage script.
