@@ -145,6 +145,44 @@ def sync_remote_gpu_notes() -> bool:
     return False
 
 
+def installed_build_info() -> str:
+    """One line naming the build actually running, or why we cannot say.
+
+    E3 asks for the version in the app. A beta tester filing "it broke" needs the commit they were on before anyone
+    reads a word of the description, and the commit is only written into Resources/build_manifest.json at build time.
+    """
+    info = build_info()
+    if not info:
+        return "Build: unknown -- no build_manifest.json"
+    commit = (info.get("source_git_commit") or "unknown")[:7]
+    built = (info.get("built_at") or "")[:10]
+    index = info.get("index_version") or "?"
+    return f"Build: {commit}  ({built}, index {index})"
+
+
+def build_info(app_bundle: Path | None = None) -> dict[str, str]:
+    """The build manifest as a dict, or {} when there is none to read. Split out so it can be tested without rumps."""
+    here = Path(__file__).resolve()
+    candidates = []
+    if app_bundle is not None:
+        candidates.append(app_bundle / "Contents" / "Resources" / "build_manifest.json")
+    else:
+        candidates += [
+            here.parent.parent / "Contents" / "Resources" / "build_manifest.json",   # inside KENN.app
+            here.parent.parent.parent / "Resources" / "build_manifest.json",
+            here.parent.parent / "build_manifest.json",
+        ]
+    for path in candidates:
+        if path.is_file():
+            try:
+                manifest = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                return {}
+            return {key: str(manifest.get(key) or "") for key in
+                    ("source_git_commit", "built_at", "index_version", "signing")}
+    return {}
+
+
 def run_mac_menu_app():
     """Launch macOS menu bar tray app using rumps."""
     try:
@@ -171,6 +209,9 @@ def run_mac_menu_app():
                 None,
                 "Open Live 12 Demo Project",
                 "Install Live Remote Scripts",
+                None,
+                # Disabled so it is readable but not clickable: rumps renders a plain string as a disabled item.
+                installed_build_info(),
             ]
             self.timer = rumps.Timer(self.refresh_status, 3)
             self.timer.start()
