@@ -471,6 +471,15 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
   > (`m.group(0)`) instead of the canned example; verified in `test_project_memory_stage4.py`.
 - [ ] Only one preference per key survives (`record_preference` deactivates the rest) and there is no API to
       list or restore the inactive rows, which contradicts "see, edit, delete; nothing learned silently".
+  > 30 Sept: fixed on `kenn-stage3b-items`. `record_preference` deactivating the previous value is right for
+  > answering and wrong for "see, edit, delete; nothing learned silently" — a producer who said "actually, I master
+  > to -9, not -12" lost the old value with no way to see, compare or restore it. The rows were **already retained**
+  > by the `MAX_PREFERENCES` prune; they were simply never readable. Added `preference_history` (superseded rows,
+  > newest first, optionally narrowed to one key) and `restore_preference`, where restore is a **move** — it
+  > deactivates the current value and reactivates the chosen row in one transaction, so `current_preferences` still
+  > returns one row per key. Exposed as `GET /api/memory/preference/history` and
+  > `POST /api/memory/preference/restore`. 8 tests, including that another session's `preference_id` cannot be
+  > restored and that the restore window is bounded by `MAX_PREFERENCES` (32), not wider.
 - [x] `chat_completion_stream` returns normally on a mid-stream failure, so a truncated answer is validated as
       a complete candidate.
   > 29 Sept: Fixed. Both swallow sites (`chat_completion_stream` and `enhance_stream`) now propagate instead of
@@ -480,6 +489,17 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
   > Pinned in `test_llm_stream_honesty.py`.
 - [ ] `llm_rewrite._clean_chunk_for_synthesis` cuts mid-word and mid-code-fence, and appends a closing
       `</source_excerpt>` after a cut that can land inside the opening tag.
+  > 30 Sept: fixed on `kenn-stage3b-items`. All three defects land in the same place — the markup that tells the
+  > model where untrusted evidence stops. A 240-char cut severed a word and glued the fragment to the ellipsis; a
+  > fenced block was flattened into one broken statement (`` ```python
+KENN_LLM_CONTEXT_CHARS=650
+``` `` became a
+  > single line); and `build_raw_context_block` sliced the assembled block, emitting
+  > `<source_excerpt label="… section Dry/Wet para</source_excerpt>` — an unterminated attribute with the label cut
+  > mid-word. Now: `_truncate_on_word_boundary` cuts on a word boundary with the ellipsis **inside** the budget,
+  > fenced regions are dropped whole rather than joined into the prose, and the opening tag is budgeted before any
+  > slicing — including the `\n\n` joiner, which was the reason it overshot `max_chars`. An excerpt whose label
+  > leaves no room is dropped rather than squeezed. 8 tests.
 - [x] The L2 semantic-cache list grows unbounded and is scanned in full on every query; a *semantic* match is
       also written into the exact-match cache, turning a soft 0.95 match into a hard one.
   > 29 Sept: Cleared without new code -- both halves died in the 28 Sept session-scoping pass. L2 is bounded to

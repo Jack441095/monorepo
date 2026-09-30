@@ -215,7 +215,19 @@ trust table (manual and Live measurements above notes above general advice).
 | C5 | Parameter reference from Live's own displays after A3: `build_parameter_reference.py`, then `check_notes_against_measurements.py`; anything outside a measured range is fixed or drafted back | M | A3 |
 | C6 | Craft notes for the first three genres: draft on the notes model on the box, check against cited sources, review before approval; third-party material only with rights | L | Jack picks genres; review |
 | C7 | Answer audit: 100 answers, count those with no citable source (must be 0) and the grounding-gate rejections and their top warning | S monthly | |
-| C8 | Stage 3b leftovers: `_clean_chunk_for_synthesis` cutting mid-word or mid-fence; only one preference per key surviving, with no way to list or restore the rest | S each | |
+| C8 | Stage 3b leftovers: `_clean_chunk_for_synthesis` cutting mid-word or mid-fence; only one preference per key surviving, with no way to list or restore the rest | S each | **Both done 30 Sept** on branch `kenn-stage3b-items` |
+
+> **C8, 30 Sept** (branch `kenn-stage3b-items`): both items closed, 16 tests. **Source excerpts no longer break at
+> their boundaries** — word-boundary cuts with the ellipsis inside the budget, fenced code dropped whole instead of
+> flattened into one broken statement, and the opening tag budgeted before slicing so
+> `<source_excerpt label="… para</source_excerpt>` cannot be emitted. The `\n\n` joiner was why it overshot
+> `max_chars`; an excerpt whose label leaves no room is now dropped rather than squeezed.
+> **Superseded preferences can be listed and put back** — `preference_history` and `restore_preference`, the latter a
+> move rather than a second live row, over `GET /api/memory/preference/history` and
+> `POST /api/memory/preference/restore`. The rows were already retained by the `MAX_PREFERENCES` prune, so the
+> restore window is bounded at 32 rather than unbounded. Backend suite green on the branch: **2,453 passed,
+> 125 skipped**.
+
 
 **Gate (week 4):** sealed-set recall@4 ≥ 0.60 (the end-state gate is ≥ 0.95 on the full fixture and ≥ 0.80 on the
 sealed set); manual chunks in the index and grounding-qualified; 0 uncited claims in the audit.
