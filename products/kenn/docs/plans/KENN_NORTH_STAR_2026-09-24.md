@@ -206,6 +206,9 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 - [ ] Parameter-level knowledge for all 78 devices: every parameter's name, range, unit and what it does, read from
       Live (display tables, as with the fader law) and the manual
+  > **30 Sept correction to the 28 Sept note below: the manual IS in the index.** 1,436
+  > `official_ableton_manual` chunks from `live11-manual-en.pdf`, 16 / 16 grounding cases passing, `--require-manual`
+  > exit 0. Every "0 chunks" figure in the note below was true on 28 Sept and is not true now.
   > 28 Sept: **the manual is not in the index at all.** `pdf_evidence_class` (`retrieval/build_index.py:241`)
   > labels a PDF `official_ableton_manual` when its catalog entry is category `ableton` with "manual" in the
   > title or tags, but all six index versions hold 0 such chunks — 3,308 `curated_kenn_note`, 28
@@ -492,10 +495,20 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
   > exact steps for a fresh verified execution; pinned in `test_live_command.py`. `display_to_raw(relative=True)`
   > verified honest: linear profiles scale a delta with no offset, and table/log profiles refuse or resolve through
   > a display round-trip against the current raw value in the caller.
-- [ ] The Ableton manual has never been ingested, so **every** official-manual pathway in the product is dead:
+- [x] The Ableton manual has never been ingested, so **every** official-manual pathway in the product is dead:
       `pdf_evidence_class` would label it, but the index holds 0 `official_ableton_manual` chunks (3,308
       `curated_kenn_note`, 28 transcript, 2 `reference_document`), which makes `session_intelligence.py`'s
       "Grounded in the authorized Ableton manual" unreachable. This is a Stage 2 content gap, not a code gap.
+  > **30 Sept: no longer true — the premise was stale by about a day.** Re-measured on the live index with
+  > `evaluate_ableton_manual_grounding.py`: **`official_manual_chunk_count: 1436`**, `all_cases_passed: true`,
+  > 16 / 16 reference cases, every one selecting `official_ableton_manual`, `--require-manual` exit **0**. Counted
+  > from the index: 4,642 chunks = 3,176 curated + **1,436 official-manual** + 28 transcript + 2 reference, all from
+  > `Training_Data_PDF/live11-manual-en.pdf`, which is git-ignored. The pathway is live, not dead.
+  > **Two things remain open, and both are the owner's.** The manual indexed is **Live 11's** while he runs **Live 12
+  > Suite**, and the Knowledge programme ranks the manual *above* curated notes, so KENN now cites Live 11
+  > documentation for a Live 12 product — export the Live 12 manual from Live's Help menu and rebuild to fix that.
+  > And the ingest ran at 01:09 on 30 Sept while the decision box below was still unticked, so the decision now is
+  > whether to keep it rather than whether to start it.
   > 29 Sept: Partly a code gap after all -- verified counts are 3,176 curated / 28 transcript / 2 reference /
   > 0 official (index `v-07328d9baf04`), and the documented fetch path (`download-pdfs`) pointed at a script
   > that never existed. That script is now real (`tooling/scripts/setup/download_training_pdfs.py`), the Live 11
@@ -585,9 +598,12 @@ Two more, added 28 Sept after the audit, because both failures were invisible un
 - [x] Brain provider: local Qwen only (owner, 25 Sept) — no hosted budget or opt-in needed
 - [x] What may be sent to a hosted model: nothing — no hosted model (owner, 25 Sept)
 - [ ] Whether Stage 2's craft notes should cover specific genres first (which?)
-- [ ] Ingest the Ableton Live Reference Manual now, or keep the knowledge base KENN-written only until Stage 2's
+- [x] Ingest the Ableton Live Reference Manual now, or keep the knowledge base KENN-written only until Stage 2's
       parameter work lands? It is the one source the Knowledge programme ranks above curated notes, and the code
       is already written and tested for it; the gap is the catalogue entry and the extraction run.
+  > **Answered by action before it was recorded:** the Live 11 manual is ingested (1,436 chunks, grounding 16/16)
+  > as of 30 Sept 01:09. The decision left is narrower — whether to keep it given it is the **Live 11** manual for a
+  > **Live 12** install, and whether to export the Live 12 manual to replace it.
 - [ ] Does Stage 3b's open list get worked now or after the beta? Twelve of the eighteen have no production
       caller or no reachable path, so the beta is not blocked by any of them — but the semantic-cache
       cross-project leak and the `validate_llm_plan` range-check gaps are worth closing before a second tester
