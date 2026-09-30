@@ -52,6 +52,18 @@ _FORGET_PREF_PATTERNS = re.compile(
 )
 
 
+# A question, or somebody else's opinion, is not the producer declaring their own preference: "One person says master to
+# -14 LUFS and another says go louder. What should I do?" was stored as a -14 LUFS preference and answered "Got it"
+# instead of with the notes (30 Sept 2026). "remember that ..." and "preference key: value" stay explicit either way.
+_NOT_A_DECLARATION = re.compile(
+    r"\?|^(?:what|how|why|which|when|where|should|can|could|would|is|are|do|does|did)\b|\bshould\s+(?:i|we)\b"
+    r"|\b(?:one|another|some|other)\s+(?:person|people|guy|guys|producer|producers|engineer|engineers)\b"
+    r"|\b(?:someone|somebody|people|friends?|forums?|tutorials?|videos?)\s+(?:says?|said|told|recommends?|suggests?)\b"
+    r"|\b(?:says?|said|told\s+me|tells\s+me|recommends?|suggests?)\b",
+    re.I,
+)
+
+
 def parse_explicit_preference(text: str) -> tuple[str, str, str] | None:
     """Extract an explicit, opt-in producer preference from user text.
 
@@ -70,6 +82,9 @@ def parse_explicit_preference(text: str) -> tuple[str, str, str] | None:
         v = direct.group(2).strip()
         if k in PREFERENCE_KEYS and v:
             return k, v, clean
+
+    if stripped == clean and _NOT_A_DECLARATION.search(clean):
+        return None  # no "remember that" in front, and it reads as a question or hearsay
 
     # Keyword rules
     target_text = stripped or clean
