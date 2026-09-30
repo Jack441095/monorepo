@@ -20,7 +20,8 @@ from threading import Lock
 from typing import Any
 
 
-ALLOWED_GPU_SELECTION = "1,2,3,4"
+ALLOWED_GPU_SELECTIONS = {"0", "1", "0,1", "1,0"}
+DEFAULT_GPU_SELECTION = "0,1"
 MAX_INPUT_TOKENS = 8_192
 CACHE_ENVIRONMENT = {
     "HF_HOME": Path("huggingface"),
@@ -34,8 +35,8 @@ def validate_configuration(*, host: str, model_path: Path, data_root: Path, cuda
         raise ValueError("The qualification endpoint must bind to loopback only.")
     if cuda_devices is None:
         cuda_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
-    if cuda_devices != ALLOWED_GPU_SELECTION:
-        raise ValueError(f"CUDA_VISIBLE_DEVICES must be exactly {ALLOWED_GPU_SELECTION}.")
+    if cuda_devices not in ALLOWED_GPU_SELECTIONS:
+        raise ValueError(f"Only GPU 0 and 1 can be used for KENN processes. Received CUDA_VISIBLE_DEVICES={cuda_devices!r}.")
     root = data_root.expanduser().resolve()
     model = model_path.expanduser().resolve()
     if not root.is_dir():
@@ -190,13 +191,11 @@ def main() -> int:
     parser.add_argument("--port", type=int, default=11435)
     parser.add_argument(
         "--cuda-devices",
-        default=ALLOWED_GPU_SELECTION,
+        default=DEFAULT_GPU_SELECTION,
         help=(
             "Comma-separated NVIDIA device IDs to expose to this process via "
-            "CUDA_VISIBLE_DEVICES. Defaults to the qualification pool "
-            f"({ALLOWED_GPU_SELECTION}). Set explicitly to repin a test run, "
-            "e.g. --cuda-devices 1,2. NOTE: the inference server that KENN's "
-            "plugin talks to is pinned to GPU 0 and is NOT touched by this flag."
+            "CUDA_VISIBLE_DEVICES. Only GPU 0 and 1 are permitted for KENN "
+            f"({sorted(ALLOWED_GPU_SELECTIONS)})."
         ),
     )
     args = parser.parse_args()

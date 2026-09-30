@@ -13,19 +13,21 @@ server = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(server)
 
 
-def test_configuration_requires_exact_gpu_selection(tmp_path: Path, monkeypatch) -> None:
+@pytest.mark.parametrize("selection", ["2", "1,2", "1,2,3,4", "0,2"])
+def test_configuration_allows_only_gpu_0_and_1(tmp_path: Path, monkeypatch, selection) -> None:
+    # The box rule since 30 Sept 2026: KENN processes use GPU 0 and 1 only. The old rule demanded exactly 1,2,3,4.
     model = tmp_path / "model"
     model.mkdir()
-    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "1,2")
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", selection)
 
-    with pytest.raises(ValueError, match="exactly 1,2,3,4"):
+    with pytest.raises(ValueError, match="Only GPU 0 and 1"):
         server.validate_configuration(host="127.0.0.1", model_path=model, data_root=tmp_path)
 
 
 def test_configuration_rejects_non_loopback_bind(tmp_path: Path, monkeypatch) -> None:
     model = tmp_path / "model"
     model.mkdir()
-    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "1,2,3,4")
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
 
     with pytest.raises(ValueError, match="loopback"):
         server.validate_configuration(host="0.0.0.0", model_path=model, data_root=tmp_path)
@@ -36,14 +38,14 @@ def test_configuration_requires_model_below_data_root(tmp_path: Path, monkeypatc
     root.mkdir()
     model = tmp_path / "elsewhere"
     model.mkdir()
-    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "1,2,3,4")
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
 
     with pytest.raises(ValueError, match="below"):
         server.validate_configuration(host="localhost", model_path=model, data_root=root)
 
 
 def test_configuration_rejects_data_root_as_model_directory(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "1,2,3,4")
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
 
     with pytest.raises(ValueError, match="dedicated directory below"):
         server.validate_configuration(
@@ -54,7 +56,7 @@ def test_configuration_rejects_data_root_as_model_directory(tmp_path: Path, monk
 def test_configuration_accepts_qualified_boundary(tmp_path: Path, monkeypatch) -> None:
     model = tmp_path / "models" / "qwen"
     model.mkdir(parents=True)
-    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "1,2,3,4")
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
 
     assert server.validate_configuration(
         host="127.0.0.1", model_path=model, data_root=tmp_path,
