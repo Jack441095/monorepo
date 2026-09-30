@@ -8,6 +8,9 @@ import pytest
 
 SERVICE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVICE_ROOT))
+# Same as test_app.py: another suite's copy of this module may already be loaded under the bare name.
+if "eval_runner" in sys.modules and Path(sys.modules["eval_runner"].__file__).resolve().parent != SERVICE_ROOT:
+    del sys.modules["eval_runner"]
 
 import eval_runner  # noqa: E402
 

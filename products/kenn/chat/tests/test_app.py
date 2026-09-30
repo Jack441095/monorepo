@@ -10,6 +10,11 @@ from fastapi.testclient import TestClient
 
 SERVICE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVICE_ROOT))
+# In one process with the backend suite, tooling scripts have already loaded packages/chat's app.py as "app", and this
+# import then returned the public API: the health test read "kenn-public-api" instead of "kenn-chat". CI runs each
+# suite in its own process, so it only showed when they were run together.
+if "app" in sys.modules and Path(sys.modules["app"].__file__).resolve().parent != SERVICE_ROOT:
+    del sys.modules["app"]
 
 import app  # noqa: E402
 
