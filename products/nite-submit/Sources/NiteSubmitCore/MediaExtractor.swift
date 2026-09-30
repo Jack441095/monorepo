@@ -25,7 +25,28 @@ public enum FileKind: String, Codable, Sendable {
     }
 
     public static func detect(url: URL) -> FileKind {
-        switch url.pathExtension.lowercased() {
+        let byExtension = kind(forExtension: url.pathExtension.lowercased())
+        switch sniffHeader(at: url) {
+        case .kind(let sniffed):
+            // A .docx is a ZIP as far as its header is concerned, so the extension
+            // is the only thing that can tell a Word file from an archive.
+            if sniffed == .archiveZip, byExtension == .docx { return .docx }
+            return sniffed
+        case .notTheClaimedType:
+            // The header is recognisable and it is not what the name says — an MP3
+            // wearing a .wav name. We have no MP3 kind to give it, and the app has
+            // no MP3 handling behind the label, so it becomes a plain asset rather
+            // than something it is not.
+            return .unknown
+        case .noHeader:
+            // Empty file, a format we do not sniff, or unreadable: the extension is
+            // all we have, which is exactly what this did before.
+            return byExtension
+        }
+    }
+
+    private static func kind(forExtension ext: String) -> FileKind {
+        switch ext {
         case "pdf": return .pdf
         case "docx", "doc": return .docx
         case "wav", "aiff", "flac": return .audioWav
@@ -35,6 +56,40 @@ public enum FileKind: String, Codable, Sendable {
         case "7z": return .archive7z
         default: return .unknown
         }
+    }
+
+    private enum HeaderVerdict {
+        case kind(FileKind)
+        case notTheClaimedType
+        case noHeader
+    }
+
+    /// Decide from the container's own first 16 bytes. The extension is the one
+    /// piece of evidence a file browser got wrong when someone renamed a file, so
+    /// a recognised signature wins over the name.
+    private static func sniffHeader(at url: URL) -> HeaderVerdict {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return .noHeader }
+        defer { try? handle.close() }
+        guard let head = try? handle.read(upToCount: 16), head.count >= 4 else { return .noHeader }
+        let bytes = [UInt8](head)
+        func starts(_ magic: [UInt8]) -> Bool { Array(bytes.prefix(magic.count)) == magic }
+        func box(_ offset: Int, _ magic: [UInt8]) -> Bool {
+            offset + magic.count <= bytes.count && Array(bytes[offset..<offset + magic.count]) == magic
+        }
+
+        if starts([0x25, 0x50, 0x44, 0x46]) { return .kind(.pdf) }            // %PDF
+        if starts([0x37, 0x7A, 0xBC, 0xAF]) { return .kind(.archive7z) }       // 7z signature
+        if starts([0x50, 0x4B, 0x03, 0x04]) { return .kind(.archiveZip) }      // PK.. local header
+        if starts(Array("RIFF".utf8)), box(8, Array("WAVE".utf8)) { return .kind(.audioWav) }
+        if starts(Array("FORM".utf8)), box(8, Array("AIFF".utf8)) { return .kind(.audioWav) }
+        if box(4, Array("ftyp".utf8)) {
+            // QuickTime and MP4 share the ftyp box; the brand right after it is
+            // what separates them.
+            return .kind(box(8, Array("qt  ".utf8)) ? .videoMov : .videoMp4)
+        }
+        if starts(Array("ID3".utf8)) { return .notTheClaimedType }            // MP3 with an ID3 tag
+        if bytes[0] == 0xFF, bytes[1] & 0xE0 == 0xE0 { return .notTheClaimedType }  // MPEG frame sync
+        return .noHeader
     }
 }
 
@@ -48,15 +103,22 @@ public struct MediaExtractor: Sendable {
         let filename = url.deletingPathExtension().lastPathComponent
         let kind = FileKind.detect(url: url)
 
-        // Attempt filename pattern matching for student ID / module code / title
+        // Attempt filename pattern matching for student ID / module code / title.
+        // A number- or code-shaped token in a filename is the weakest evidence we
+        // have: "IMG_20240115" and "TAKE1234" both match, and at MEDIUM confidence
+        // either could be pasted straight into a submission filename and then into
+        // a university upload form. These stay LOW and name their origin, so a
+        // student is asked rather than told.
         if let idMatch = extractStudentId(from: filename) {
-            metadata.studentId = Detection(value: idMatch, confidence: .medium,
-                                           source: "Extracted from filename pattern", rule: "filename_id_regex")
+            metadata.studentId = Detection(value: idMatch, confidence: .low,
+                                           source: "Student-number shape in the filename — please check",
+                                           rule: "filename_id_regex")
         }
 
         if let moduleMatch = extractModuleCode(from: filename) {
-            metadata.moduleCode = Detection(value: moduleMatch, confidence: .medium,
-                                            source: "Extracted from filename pattern", rule: "filename_module_regex")
+            metadata.moduleCode = Detection(value: moduleMatch, confidence: .low,
+                                            source: "Module-code shape in the filename — please check",
+                                            rule: "filename_module_regex")
         }
 
         let cleanTitle = sanitizeTitleFromFilename(filename)
