@@ -148,7 +148,28 @@ trust table (manual and Live measurements above notes above general advice).
 
 | ID | Task | Size | Needs |
 |---|---|---|---|
-| C1 | Ingest the Live manual locally: `download_training_pdfs.py` for Live 11, export Live 12 from Live's Help menu, rebuild with `--include-local-manuals`, qualify with `evaluate_ableton_manual_grounding.py`. PDFs stay in the git-ignored `Training_Data_PDF/`. Moves the index from 0 official-manual chunks and brings the "grounded in the authorized manual" path to life | S | Jack's decision (open in the North Star) |
+| C1 | Ingest the Live manual locally: `download_training_pdfs.py` for Live 11, export Live 12 from Live's Help menu, rebuild with `--include-local-manuals`, qualify with `evaluate_ableton_manual_grounding.py`. PDFs stay in the git-ignored `Training_Data_PDF/`. Moves the index from 0 official-manual chunks and brings the "grounded in the authorized manual" path to life | S | **Already done before this row was written** — re-measured 30 Sept, see below |
+
+> **C1, re-measured 30 Sept: this is already done, and four plan records saying otherwise are stale.** Measured on
+> the live index with `evaluate_ableton_manual_grounding.py`: **`official_manual_chunk_count: 1436`**, not 0.
+> `all_cases_passed: true`, **16 / 16** reference cases, every one selecting evidence class
+> `official_ableton_manual`, `status: evaluated`. `--require-manual` exits **0**, not the 2 this plan and the North
+> Star both record. Counted straight from the index: 4,642 chunks = 3,176 `curated_kenn_note` + **1,436
+> `official_ableton_manual`** + 28 `youtube_transcript` + 2 `reference_document`, all 1,436 from
+> `Training_Data_PDF/live11-manual-en.pdf` (96,881,315 bytes, file dated 30 Sept 01:09). That PDF is git-ignored
+> (`.gitignore:101`), so no licensed manual is tracked — the hygiene half of C1 holds.
+> **So the claims "the manual is not in the index at all", "0 `official_ableton_manual` chunks", "the whole
+> official-manual pathway is dead", "`session_intelligence.py:554`'s 'Grounded in the authorized Ableton manual' is
+> unreachable" and "`manual_grounding_evaluation` can never pass" are all wrong as of 30 Sept.** Those appear in the
+> North Star's Stage 2 note, the Stage 3b open list, the NEXT_PROMPT's Task 5, and this row.
+> **Two things the owner needs to know, neither a blocker.** The ingest ran at 01:09 on 30 Sept — during the night-0
+> soak work — while this row still said the work was blocked on his sign-off, so **the North Star's "Ingest the Ableton
+> Live Reference Manual now?" decision box is unticked while the work behind it exists**; the decision now is whether
+> to keep it. And **the manual indexed is Live 11's**, while he runs **Live 12 Suite**: the Knowledge programme ranks
+> the manual *above* curated notes, so KENN will now cite Live 11 documentation for a Live 12 product. Exporting the
+> Live 12 manual from Live's Help menu and rebuilding is the fix, and it is the same `build --include-local-manuals`
+> path once the PDF is in place. Live 11's PDF is also present in `Training_Data_PDF/` and would not need re-fetching.
+> This also resolves a C2 caveat: the index these numbers come from, `v-db8c6334cf63`, **is** the live index.
 | C2 | Retrieval fixture to ≥ 300 questions with a **sealed half** nobody tunes on; baseline with `evaluate_retrieval_modes.py` | M | **Built 30 Sept** on branch `kenn-sealed-fixture`; fixture awaiting Jack's review |
 
 > **C2, 30 Sept** (branch `kenn-sealed-fixture`): the **228-case sealed Qwen8b set was not split — it is burned.**
