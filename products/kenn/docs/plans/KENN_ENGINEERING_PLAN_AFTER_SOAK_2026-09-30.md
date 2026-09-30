@@ -260,7 +260,7 @@
 > is the filename, **not** a catalogue entry added to force the class, which is the move the plan forbids.
 > Live 11's PDF is also present and worth keeping until the Live 12 export is checked.
 > This also resolves a C2 caveat: the index these numbers come from, `v-db8c6334cf63`, **is** the live index.
-> | C2 | Retrieval fixture to ≥ 300 questions with a **sealed half** nobody tunes on; baseline with `evaluate_retrieval_modes.py` | M | **Built 30 Sept** on branch `kenn-sealed-fixture`; fixture awaiting Jack's review |
+> | C2 | Retrieval fixture to ≥ 300 questions with a **sealed half** nobody tunes on; baseline with `evaluate_retrieval_modes.py` | M | **Built 30 Sept** on branch `kenn-sealed-fixture`; the fixture carries an explicit `review: {status: awaiting_owner_review}` block |
 
 > **C2, 30 Sept** (branch `kenn-sealed-fixture`): the **228-case sealed Qwen8b set was not split — it is burned.**
 > The North Star records it being scored four times to choose between wordings (0.338 / 0.417 / 0.386 / 0.447), so a
