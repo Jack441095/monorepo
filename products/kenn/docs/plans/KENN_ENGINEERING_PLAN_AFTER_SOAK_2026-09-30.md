@@ -368,8 +368,18 @@ the monthly measures.
 > *required* a line number, which silently dropped every module-level skip — **70 of the 125**. It reported 55 skips
 > while the suite reported 125. Both are pinned by tests, and the allowlist is now generated from the checker's own
 > parser so the two cannot drift apart again.
-> Still open in this row: the **weekly scheduled run** of the chaos suite and the phrasing scorer, and the
-> **pull-request template**.
+> **F5's remaining half, same day** (branch `kenn-ci-scheduled`): `.github/workflows/kenn-weekly.yml` runs the
+> chaos suite and the phrasing scorer on a cron (Monday 06:11 UTC — deliberately not :00, when every scheduled workflow
+> fires), plus a **pull-request template** at `.github/PULL_REQUEST_TEMPLATE.md`. Neither weekly job needs the
+> knowledge index, so both genuinely run on a fresh clone, which was measured rather than assumed on a worktree with
+> no index: **chaos 47 passed, phrasings 492/505 with 0 wrong plans**. The chaos suite matters because it is the only
+> place faults are injected — a fault-handling bug can pass every other suite — and the phrasing score is the Stage 1
+> gate number, which a rule change can cost while the suite stays green.
+> **Two follow-ups for the sync script (F1), not done here:** the weekly workflow lives only in the monorepo's
+> `.github/workflows/`, so it does not reach `Nite-DSP/kenn-app` until F1 carries it across, and the skips-budget step
+> is deliberately absent from the weekly workflow because `check_skip_budget.py` is on `kenn-answer-audit` and would
+> fail on `main` until that branch lands.
+
 
 | F6 | Each release, audit every gate with a test that reproduces its bypass (the 28 Sept lesson) | S per release | |
 | F7 | Point the 10 old plan docs that are still linked at the North Star, then delete them | S | **Done 30 Sept** — 1 broken link, not 10 |
