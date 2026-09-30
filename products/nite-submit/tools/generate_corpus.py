@@ -1,20 +1,53 @@
 #!/usr/bin/env python3
 """NITE_SUBMIT_PDF_CORPUS_V1 — deterministic synthetic PDF corpus generator.
 
-Generates 220+ labelled cases as JSON manifests (page text lines + ground truth)
-plus real PDFs for all text cases. Deterministic (fixed seed).
-Output: Tests/NiteSubmitCoreTests/Fixtures/corpus/manifest.json
-        Tests/NiteSubmitCoreTests/Fixtures/corpus/pdf/<case_id>.pdf
+Builds the labelled case set as one manifest (page text lines + ground truth)
+plus real PDFs for every renderable case. Deterministic (fixed seed).
+
+This script owns the corpus. Both checked-in copies come from here:
+
+    tools/generate_corpus.py                      # Sources/NiteSubmitTests/Fixtures/corpus
+    tools/generate_corpus.py --out tools/Fixtures/corpus
+    tools/check_corpus_parity.sh                  # fails if the copies drift
+
+Ground truth lives in the case definitions below, so the manifest a test reads
+is always the manifest the generator produces. Anything the release gate needs
+to assert about a batch run is recorded in the manifest too (see
+EXPECTED_BATCH_SUMMARY) rather than hardcoded in a shell script.
 """
+import argparse
 import json
 import os
 import random
 
 from fpdf import FPDF
 
-OUT_JSON = os.path.join(os.path.dirname(__file__),
-                        "..", "Sources", "NiteSubmitTests", "Fixtures", "corpus")
-OUT_PDF = os.path.join(OUT_JSON, "pdf")
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DEFAULT_OUT_JSON = os.path.join(REPO_ROOT, "Sources", "NiteSubmitTests",
+                                "Fixtures", "corpus")
+
+# What a correct batch run must produce, per filename template. These are
+# measured, not guessed: run tools/run_full_corpus_write_check.sh and paste
+# what it prints, or refresh them with tools/record_corpus_batch_expectations.sh
+# after a detector change that is supposed to move the processed/review split.
+# The gate reads these numbers, so a silent behaviour change fails the check
+# instead of quietly rewriting the target it is measured against.
+EXPECTED_BATCH_SUMMARY = {
+    "id_project": {
+        "template": "{student_id}_{project_title}",
+        "processed": 172,
+        "review_required": 61,
+        "collisions": 0,
+        "failures": 0,
+    },
+    "name_project": {
+        "template": "{student_id}_{full_name}_{project_title}",
+        "processed": 162,
+        "review_required": 71,
+        "collisions": 0,
+        "failures": 0,
+    },
+}
 
 rng = random.Random(20260823)
 
@@ -214,7 +247,11 @@ add("long_title_00", [[
     "Module Code: MUSC4001",
     "Project Title: An Extended Investigation into Spatial Audio Perception and Binaural Rendering Techniques for Interactive Virtual Environments with Particular Reference to Game Audio Middleware Integration Practices",
 ]], {"student_name": "Amara Okonkwo", "student_id": "22334455",
-     "university": "Cardiff University", "module_code": "MUSC4001"})
+     "university": "Cardiff University", "module_code": "MUSC4001",
+     # The cover title wraps, so the detector only ever sees the first line of
+     # it. Recording the recovered line is the honest ground truth here — the
+     # full 200-character string is not what any filename can carry.
+     "project_title": "An Extended Investigation into Spatial Audio Perception and Binaural Rendering Techniques"})
 
 add("multi_institution_00", [[
     "University of the West of England",
@@ -225,7 +262,7 @@ add("multi_institution_00", [[
     "Project Title: Dual Institution Study",
 ]], {"student_name": "Liam Murphy", "student_id": "33445566",
      "university": "University of the West of England",
-     "module_code": "UFMXXX-30-3"})
+     "module_code": "UFMXXX-30-3", "project_title": "Dual Institution Study"})
 
 add("whitespace_00", [[
     "Bath Spa University",
@@ -234,7 +271,8 @@ add("whitespace_00", [[
     "Module Code: BSP222",
     "Project Title: Messy Whitespace Study",
 ]], {"student_name": "Sofia Rossi", "student_id": "55667788",
-     "university": "Bath Spa University", "module_code": "BSP222"})
+     "university": "Bath Spa University", "module_code": "BSP222",
+     "project_title": "Messy Whitespace Study"})
 
 add("metadata_only_title_00", [[
     "University of Southampton",
@@ -327,17 +365,26 @@ for i in range(10):
 print(f"Built {len(cases)} case definitions")
 
 
-def write_json():
-    os.makedirs(OUT_JSON, exist_ok=True)
-    with open(os.path.join(OUT_JSON, "manifest.json"), "w") as f:
-        json.dump({"corpus_id": "NITE_SUBMIT_PDF_CORPUS_V1",
-                   "generator_seed": 20260823,
-                   "cases": [{"id": c["id"], "truth": c["truth"],
-                              "meta": c["meta"]} for c in cases]}, f, indent=1)
+def manifest_document():
+    return {"corpus_id": "NITE_SUBMIT_PDF_CORPUS_V1",
+            "generator_seed": 20260823,
+            # Cases the render loop deliberately skips, so a consumer can tell
+            # "no PDF expected" from "PDF missing" without guessing from meta.
+            "unrenderable_case_count": sum(1 for c in cases
+                                           if not c.get("generate_pdf", True)),
+            "expected_batch_summary": EXPECTED_BATCH_SUMMARY,
+            "cases": [{"id": c["id"], "truth": c["truth"],
+                       "meta": c["meta"]} for c in cases]}
 
 
-def write_pdfs():
-    os.makedirs(OUT_PDF, exist_ok=True)
+def write_json(out_json):
+    os.makedirs(out_json, exist_ok=True)
+    with open(os.path.join(out_json, "manifest.json"), "w") as f:
+        json.dump(manifest_document(), f, indent=1)
+
+
+def write_pdfs(out_pdf):
+    os.makedirs(out_pdf, exist_ok=True)
     made = 0
     for c in cases:
         if not c.get("generate_pdf", True):
@@ -354,7 +401,7 @@ def write_pdfs():
                 except Exception:
                     pass
             pdf.add_page()
-        path = os.path.join(OUT_PDF, c["id"] + ".pdf")
+        path = os.path.join(out_pdf, c["id"] + ".pdf")
         with open(path, "wb") as fh:
             fh.write(bytes(pdf.output()))
         if c["meta"].get("title"):
@@ -369,9 +416,25 @@ def write_pdfs():
             except Exception:
                 pass
         made += 1
-    print(f"Wrote {made} PDFs")
+    print(f"Wrote {made} PDFs to {out_pdf}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--out", default=DEFAULT_OUT_JSON,
+                        help="corpus root to write (default: the test fixture corpus)")
+    parser.add_argument("--manifest-only", action="store_true",
+                        help="rewrite manifest.json only, leaving the PDFs on disk "
+                             "untouched so a re-sync does not churn 233 binaries")
+    args = parser.parse_args()
+
+    out_json = os.path.abspath(args.out)
+    print(f"Built {len(cases)} case definitions")
+    write_json(out_json)
+    print(f"Wrote manifest to {out_json}/manifest.json")
+    if not args.manifest_only:
+        write_pdfs(os.path.join(out_json, "pdf"))
 
 
 if __name__ == "__main__":
-    write_json()
-    write_pdfs()
+    main()

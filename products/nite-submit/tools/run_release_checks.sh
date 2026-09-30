@@ -31,6 +31,8 @@ fi
   exit 1
 }
 
+echo "== corpus parity gate =="
+./tools/check_corpus_parity.sh
 echo "== regression suite =="
 test_log="$reports_dir/test-suite.log"
 swift run nitesubmit-tests | tee "$test_log"

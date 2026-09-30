@@ -1,6 +1,23 @@
 {
  "corpus_id": "NITE_SUBMIT_PDF_CORPUS_V1",
  "generator_seed": 20260823,
+ "unrenderable_case_count": 6,
+ "expected_batch_summary": {
+  "id_project": {
+   "template": "{student_id}_{project_title}",
+   "processed": 172,
+   "review_required": 61,
+   "collisions": 0,
+   "failures": 0
+  },
+  "name_project": {
+   "template": "{student_id}_{full_name}_{project_title}",
+   "processed": 162,
+   "review_required": 71,
+   "collisions": 0,
+   "failures": 0
+  }
+ },
  "cases": [
   {
    "id": "clear_000",
@@ -996,9 +1013,10 @@
    "id": "id_variant_00",
    "truth": {
     "student_name": "Jack Gandy",
-    "student_id": "12345678",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 0",
+    "student_id": "12345678"
    },
    "meta": {}
   },
@@ -1006,9 +1024,9 @@
    "id": "id_variant_01",
    "truth": {
     "student_name": "Amara Okonkwo",
-    "student_id": "A12345678",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 1"
    },
    "meta": {}
   },
@@ -1016,9 +1034,10 @@
    "id": "id_variant_02",
    "truth": {
     "student_name": "Sofia Rossi",
-    "student_id": "87654321",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 2",
+    "student_id": "87654321"
    },
    "meta": {}
   },
@@ -1026,9 +1045,10 @@
    "id": "id_variant_03",
    "truth": {
     "student_name": "Liam Murphy",
-    "student_id": "24012345",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 3",
+    "student_id": "24012345"
    },
    "meta": {}
   },
@@ -1036,9 +1056,10 @@
    "id": "id_variant_04",
    "truth": {
     "student_name": "Noor Haddad",
-    "student_id": "B09876543",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 4",
+    "student_id": "B09876543"
    },
    "meta": {}
   },
@@ -1046,9 +1067,10 @@
    "id": "id_variant_05",
    "truth": {
     "student_name": "Chen Wei",
-    "student_id": "12345678",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 5",
+    "student_id": "12345678"
    },
    "meta": {}
   },
@@ -1056,9 +1078,9 @@
    "id": "id_variant_06",
    "truth": {
     "student_name": "Priya Sharma",
-    "student_id": "A12345678",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 6"
    },
    "meta": {}
   },
@@ -1066,9 +1088,10 @@
    "id": "id_variant_07",
    "truth": {
     "student_name": "Tomas Silva",
-    "student_id": "87654321",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 7",
+    "student_id": "87654321"
    },
    "meta": {}
   },
@@ -1076,9 +1099,10 @@
    "id": "id_variant_08",
    "truth": {
     "student_name": "Zoe Muller",
-    "student_id": "24012345",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 8",
+    "student_id": "24012345"
    },
    "meta": {}
   },
@@ -1086,9 +1110,10 @@
    "id": "id_variant_09",
    "truth": {
     "student_name": "Ethan Kowalski",
-    "student_id": "B09876543",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 9",
+    "student_id": "B09876543"
    },
    "meta": {}
   },
@@ -1096,9 +1121,10 @@
    "id": "id_variant_10",
    "truth": {
     "student_name": "Fatima Bennett",
-    "student_id": "12345678",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 10",
+    "student_id": "12345678"
    },
    "meta": {}
   },
@@ -1106,9 +1132,9 @@
    "id": "id_variant_11",
    "truth": {
     "student_name": "Oskar Novak",
-    "student_id": "A12345678",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 11"
    },
    "meta": {}
   },
@@ -1116,9 +1142,10 @@
    "id": "id_variant_12",
    "truth": {
     "student_name": "Jack Gandy",
-    "student_id": "87654321",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 12",
+    "student_id": "87654321"
    },
    "meta": {}
   },
@@ -1126,9 +1153,10 @@
    "id": "id_variant_13",
    "truth": {
     "student_name": "Amara Okonkwo",
-    "student_id": "24012345",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 13",
+    "student_id": "24012345"
    },
    "meta": {}
   },
@@ -1136,9 +1164,10 @@
    "id": "id_variant_14",
    "truth": {
     "student_name": "Sofia Rossi",
-    "student_id": "B09876543",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 14",
+    "student_id": "B09876543"
    },
    "meta": {}
   },
@@ -1146,9 +1175,10 @@
    "id": "id_variant_15",
    "truth": {
     "student_name": "Liam Murphy",
-    "student_id": "12345678",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 15",
+    "student_id": "12345678"
    },
    "meta": {}
   },
@@ -1156,9 +1186,9 @@
    "id": "id_variant_16",
    "truth": {
     "student_name": "Noor Haddad",
-    "student_id": "A12345678",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 16"
    },
    "meta": {}
   },
@@ -1166,9 +1196,10 @@
    "id": "id_variant_17",
    "truth": {
     "student_name": "Chen Wei",
-    "student_id": "87654321",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 17",
+    "student_id": "87654321"
    },
    "meta": {}
   },
@@ -1176,9 +1207,10 @@
    "id": "id_variant_18",
    "truth": {
     "student_name": "Priya Sharma",
-    "student_id": "24012345",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 18",
+    "student_id": "24012345"
    },
    "meta": {}
   },
@@ -1186,9 +1218,10 @@
    "id": "id_variant_19",
    "truth": {
     "student_name": "Tomas Silva",
-    "student_id": "B09876543",
     "university": "University of the West of England",
-    "module_code": "UFMGGT-15-2"
+    "module_code": "UFMGGT-15-2",
+    "project_title": "Soundscape Study 19",
+    "student_id": "B09876543"
    },
    "meta": {}
   },
@@ -1198,7 +1231,8 @@
     "student_name": "Jack Murphy",
     "student_id": "20000000",
     "university": "Cardiff University",
-    "module_code": "CS101"
+    "module_code": "CS101",
+    "project_title": "Adaptive Game Audio 0"
    },
    "meta": {}
   },
@@ -1208,7 +1242,8 @@
     "student_name": "Amara Haddad",
     "student_id": "20000001",
     "university": "Cardiff University",
-    "module_code": "MUSC4001"
+    "module_code": "MUSC4001",
+    "project_title": "Adaptive Game Audio 1"
    },
    "meta": {}
   },
@@ -1218,7 +1253,8 @@
     "student_name": "Sofia Wei",
     "student_id": "20000002",
     "university": "Cardiff University",
-    "module_code": "UFMXYZ-30-3"
+    "module_code": "UFMXYZ-30-3",
+    "project_title": "Adaptive Game Audio 2"
    },
    "meta": {}
   },
@@ -1228,7 +1264,8 @@
     "student_name": "Liam Sharma",
     "student_id": "20000003",
     "university": "Cardiff University",
-    "module_code": "ENG2087A"
+    "module_code": "ENG2087A",
+    "project_title": "Adaptive Game Audio 3"
    },
    "meta": {}
   },
@@ -1238,7 +1275,8 @@
     "student_name": "Noor Silva",
     "student_id": "20000004",
     "university": "Cardiff University",
-    "module_code": "DA101"
+    "module_code": "DA101",
+    "project_title": "Adaptive Game Audio 4"
    },
    "meta": {}
   },
@@ -1248,7 +1286,8 @@
     "student_name": "Chen Muller",
     "student_id": "20000005",
     "university": "Cardiff University",
-    "module_code": "CS101"
+    "module_code": "CS101",
+    "project_title": "Adaptive Game Audio 5"
    },
    "meta": {}
   },
@@ -1258,7 +1297,8 @@
     "student_name": "Priya Kowalski",
     "student_id": "20000006",
     "university": "Cardiff University",
-    "module_code": "MUSC4001"
+    "module_code": "MUSC4001",
+    "project_title": "Adaptive Game Audio 6"
    },
    "meta": {}
   },
@@ -1268,7 +1308,8 @@
     "student_name": "Tomas Bennett",
     "student_id": "20000007",
     "university": "Cardiff University",
-    "module_code": "UFMXYZ-30-3"
+    "module_code": "UFMXYZ-30-3",
+    "project_title": "Adaptive Game Audio 7"
    },
    "meta": {}
   },
@@ -1278,7 +1319,8 @@
     "student_name": "Zoe Novak",
     "student_id": "20000008",
     "university": "Cardiff University",
-    "module_code": "ENG2087A"
+    "module_code": "ENG2087A",
+    "project_title": "Adaptive Game Audio 8"
    },
    "meta": {}
   },
@@ -1288,7 +1330,8 @@
     "student_name": "Ethan Gandy",
     "student_id": "20000009",
     "university": "Cardiff University",
-    "module_code": "DA101"
+    "module_code": "DA101",
+    "project_title": "Adaptive Game Audio 9"
    },
    "meta": {}
   },
@@ -1298,7 +1341,8 @@
     "student_name": "Fatima Okonkwo",
     "student_id": "20000010",
     "university": "Cardiff University",
-    "module_code": "CS101"
+    "module_code": "CS101",
+    "project_title": "Adaptive Game Audio 10"
    },
    "meta": {}
   },
@@ -1308,7 +1352,8 @@
     "student_name": "Oskar Rossi",
     "student_id": "20000011",
     "university": "Cardiff University",
-    "module_code": "MUSC4001"
+    "module_code": "MUSC4001",
+    "project_title": "Adaptive Game Audio 11"
    },
    "meta": {}
   },
@@ -1318,7 +1363,8 @@
     "student_name": "Jack Murphy",
     "student_id": "20000012",
     "university": "Cardiff University",
-    "module_code": "UFMXYZ-30-3"
+    "module_code": "UFMXYZ-30-3",
+    "project_title": "Adaptive Game Audio 12"
    },
    "meta": {}
   },
@@ -1328,7 +1374,8 @@
     "student_name": "Amara Haddad",
     "student_id": "20000013",
     "university": "Cardiff University",
-    "module_code": "ENG2087A"
+    "module_code": "ENG2087A",
+    "project_title": "Adaptive Game Audio 13"
    },
    "meta": {}
   },
@@ -1338,7 +1385,8 @@
     "student_name": "Sofia Wei",
     "student_id": "20000014",
     "university": "Cardiff University",
-    "module_code": "DA101"
+    "module_code": "DA101",
+    "project_title": "Adaptive Game Audio 14"
    },
    "meta": {}
   },
@@ -1348,7 +1396,8 @@
     "student_name": "Liam Sharma",
     "student_id": "20000015",
     "university": "Cardiff University",
-    "module_code": "CS101"
+    "module_code": "CS101",
+    "project_title": "Adaptive Game Audio 15"
    },
    "meta": {}
   },
@@ -1358,7 +1407,8 @@
     "student_name": "Noor Silva",
     "student_id": "20000016",
     "university": "Cardiff University",
-    "module_code": "MUSC4001"
+    "module_code": "MUSC4001",
+    "project_title": "Adaptive Game Audio 16"
    },
    "meta": {}
   },
@@ -1368,7 +1418,8 @@
     "student_name": "Chen Muller",
     "student_id": "20000017",
     "university": "Cardiff University",
-    "module_code": "UFMXYZ-30-3"
+    "module_code": "UFMXYZ-30-3",
+    "project_title": "Adaptive Game Audio 17"
    },
    "meta": {}
   },
@@ -1378,7 +1429,8 @@
     "student_name": "Priya Kowalski",
     "student_id": "20000018",
     "university": "Cardiff University",
-    "module_code": "ENG2087A"
+    "module_code": "ENG2087A",
+    "project_title": "Adaptive Game Audio 18"
    },
    "meta": {}
   },
@@ -1388,7 +1440,8 @@
     "student_name": "Tomas Bennett",
     "student_id": "20000019",
     "university": "Cardiff University",
-    "module_code": "DA101"
+    "module_code": "DA101",
+    "project_title": "Adaptive Game Audio 19"
    },
    "meta": {}
   },
@@ -1398,7 +1451,8 @@
     "student_name": "Jack Gandy",
     "student_id": "30000000",
     "university": "University of Southampton",
-    "project_title": "Interactive Audio Systems"
+    "project_title": "Interactive Audio Systems",
+    "module_code": "UFMABC-30-1"
    },
    "meta": {}
   },
@@ -1408,7 +1462,8 @@
     "student_name": "Amara Okonkwo",
     "student_id": "30000001",
     "university": "University of Southampton",
-    "project_title": "Adaptive Game Audio"
+    "project_title": "Adaptive Game Audio",
+    "module_code": "UFMABC-30-2"
    },
    "meta": {}
   },
@@ -1418,7 +1473,8 @@
     "student_name": "Sofia Rossi",
     "student_id": "30000002",
     "university": "University of Southampton",
-    "project_title": "Machine Listening Report"
+    "project_title": "Machine Listening Report",
+    "module_code": "UFMABC-30-3"
    },
    "meta": {}
   },
@@ -1428,7 +1484,8 @@
     "student_name": "Liam Murphy",
     "student_id": "30000003",
     "university": "University of Southampton",
-    "project_title": "Final Major Project"
+    "project_title": "Final Major Project",
+    "module_code": "UFMABC-30-4"
    },
    "meta": {}
   },
@@ -1438,7 +1495,8 @@
     "student_name": "Noor Haddad",
     "student_id": "30000004",
     "university": "University of Southampton",
-    "project_title": "Soundscape Composition Study"
+    "project_title": "Soundscape Composition Study",
+    "module_code": "UFMABC-30-5"
    },
    "meta": {}
   },
@@ -1448,7 +1506,8 @@
     "student_name": "Chen Wei",
     "student_id": "30000005",
     "university": "University of Southampton",
-    "project_title": "Reverb Network Analysis"
+    "project_title": "Reverb Network Analysis",
+    "module_code": "UFMABC-30-6"
    },
    "meta": {}
   },
@@ -1458,7 +1517,8 @@
     "student_name": "Priya Sharma",
     "student_id": "30000006",
     "university": "University of Southampton",
-    "project_title": "Interactive Audio Systems"
+    "project_title": "Interactive Audio Systems",
+    "module_code": "UFMABC-30-7"
    },
    "meta": {}
   },
@@ -1468,7 +1528,8 @@
     "student_name": "Tomas Silva",
     "student_id": "30000007",
     "university": "University of Southampton",
-    "project_title": "Adaptive Game Audio"
+    "project_title": "Adaptive Game Audio",
+    "module_code": "UFMABC-30-8"
    },
    "meta": {}
   },
@@ -1478,7 +1539,8 @@
     "student_name": "Zoe Muller",
     "student_id": "30000008",
     "university": "University of Southampton",
-    "project_title": "Machine Listening Report"
+    "project_title": "Machine Listening Report",
+    "module_code": "UFMABC-30-9"
    },
    "meta": {}
   },
@@ -1488,7 +1550,8 @@
     "student_name": "Ethan Kowalski",
     "student_id": "30000009",
     "university": "University of Southampton",
-    "project_title": "Final Major Project"
+    "project_title": "Final Major Project",
+    "module_code": "UFMABC-30-1"
    },
    "meta": {}
   },
@@ -1497,7 +1560,8 @@
    "truth": {
     "student_name": "Jack Gandy",
     "student_id": "40000000",
-    "university": "Bath Spa University"
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 0"
    },
    "meta": {}
   },
@@ -1506,7 +1570,8 @@
    "truth": {
     "student_name": "Amara Okonkwo",
     "student_id": "40000001",
-    "university": "Bath Spa University"
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 1"
    },
    "meta": {}
   },
@@ -1515,7 +1580,8 @@
    "truth": {
     "student_name": "Sofia Rossi",
     "student_id": "40000002",
-    "university": "Bath Spa University"
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 2"
    },
    "meta": {}
   },
@@ -1524,7 +1590,8 @@
    "truth": {
     "student_name": "Liam Murphy",
     "student_id": "40000003",
-    "university": "Bath Spa University"
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 3"
    },
    "meta": {}
   },
@@ -1533,7 +1600,8 @@
    "truth": {
     "student_name": "Noor Haddad",
     "student_id": "40000004",
-    "university": "Bath Spa University"
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 4"
    },
    "meta": {}
   },
@@ -1542,7 +1610,8 @@
    "truth": {
     "student_name": "Chen Wei",
     "student_id": "40000005",
-    "university": "Bath Spa University"
+    "university": "Bath Spa University",
+    "project_title": "Reverb Network Analysis 5"
    },
    "meta": {}
   },
@@ -1551,7 +1620,9 @@
    "truth": {
     "student_name": "Jack Gandy",
     "student_id": "50000000",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 0: Sonic Environments"
    },
    "meta": {}
   },
@@ -1560,7 +1631,9 @@
    "truth": {
     "student_name": "Amara Okonkwo",
     "student_id": "50000001",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 1: Sonic Environments"
    },
    "meta": {}
   },
@@ -1569,7 +1642,9 @@
    "truth": {
     "student_name": "Sofia Rossi",
     "student_id": "50000002",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 2: Sonic Environments"
    },
    "meta": {}
   },
@@ -1578,7 +1653,9 @@
    "truth": {
     "student_name": "Liam Murphy",
     "student_id": "50000003",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 3: Sonic Environments"
    },
    "meta": {}
   },
@@ -1587,7 +1664,9 @@
    "truth": {
     "student_name": "Noor Haddad",
     "student_id": "50000004",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 4: Sonic Environments"
    },
    "meta": {}
   },
@@ -1596,7 +1675,9 @@
    "truth": {
     "student_name": "Chen Wei",
     "student_id": "50000005",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 5: Sonic Environments"
    },
    "meta": {}
   },
@@ -1605,7 +1686,9 @@
    "truth": {
     "student_name": "Priya Sharma",
     "student_id": "50000006",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 6: Sonic Environments"
    },
    "meta": {}
   },
@@ -1614,7 +1697,9 @@
    "truth": {
     "student_name": "Tomas Silva",
     "student_id": "50000007",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 7: Sonic Environments"
    },
    "meta": {}
   },
@@ -1623,7 +1708,9 @@
    "truth": {
     "student_name": "Zoe Muller",
     "student_id": "50000008",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 8: Sonic Environments"
    },
    "meta": {}
   },
@@ -1632,7 +1719,9 @@
    "truth": {
     "student_name": "Ethan Kowalski",
     "student_id": "50000009",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 9: Sonic Environments"
    },
    "meta": {}
   },
@@ -1641,7 +1730,9 @@
    "truth": {
     "student_name": "Fatima Bennett",
     "student_id": "50000010",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 10: Sonic Environments"
    },
    "meta": {}
   },
@@ -1650,7 +1741,9 @@
    "truth": {
     "student_name": "Oskar Novak",
     "student_id": "50000011",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 11: Sonic Environments"
    },
    "meta": {}
   },
@@ -1659,7 +1752,9 @@
    "truth": {
     "student_name": "Jack Gandy",
     "student_id": "50000012",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 12: Sonic Environments"
    },
    "meta": {}
   },
@@ -1668,7 +1763,9 @@
    "truth": {
     "student_name": "Amara Okonkwo",
     "student_id": "50000013",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 13: Sonic Environments"
    },
    "meta": {}
   },
@@ -1677,7 +1774,9 @@
    "truth": {
     "student_name": "Sofia Rossi",
     "student_id": "50000014",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 14: Sonic Environments"
    },
    "meta": {}
   },
@@ -1686,7 +1785,9 @@
    "truth": {
     "student_name": "Liam Murphy",
     "student_id": "50000015",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 15: Sonic Environments"
    },
    "meta": {}
   },
@@ -1695,7 +1796,9 @@
    "truth": {
     "student_name": "Noor Haddad",
     "student_id": "50000016",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 16: Sonic Environments"
    },
    "meta": {}
   },
@@ -1704,7 +1807,9 @@
    "truth": {
     "student_name": "Chen Wei",
     "student_id": "50000017",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 17: Sonic Environments"
    },
    "meta": {}
   },
@@ -1713,7 +1818,9 @@
    "truth": {
     "student_name": "Priya Sharma",
     "student_id": "50000018",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 18: Sonic Environments"
    },
    "meta": {}
   },
@@ -1722,7 +1829,9 @@
    "truth": {
     "student_name": "Tomas Silva",
     "student_id": "50000019",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 19: Sonic Environments"
    },
    "meta": {}
   },
@@ -1731,7 +1840,9 @@
    "truth": {
     "student_name": "Zoe Muller",
     "student_id": "50000020",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 20: Sonic Environments"
    },
    "meta": {}
   },
@@ -1740,7 +1851,9 @@
    "truth": {
     "student_name": "Ethan Kowalski",
     "student_id": "50000021",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 21: Sonic Environments"
    },
    "meta": {}
   },
@@ -1749,7 +1862,9 @@
    "truth": {
     "student_name": "Fatima Bennett",
     "student_id": "50000022",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 22: Sonic Environments"
    },
    "meta": {}
   },
@@ -1758,7 +1873,9 @@
    "truth": {
     "student_name": "Oskar Novak",
     "student_id": "50000023",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 23: Sonic Environments"
    },
    "meta": {}
   },
@@ -1767,7 +1884,9 @@
    "truth": {
     "student_name": "Jack Gandy",
     "student_id": "50000024",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 24: Sonic Environments"
    },
    "meta": {}
   },
@@ -1776,7 +1895,9 @@
    "truth": {
     "student_name": "Amara Okonkwo",
     "student_id": "50000025",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 25: Sonic Environments"
    },
    "meta": {}
   },
@@ -1785,7 +1906,9 @@
    "truth": {
     "student_name": "Sofia Rossi",
     "student_id": "50000026",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 26: Sonic Environments"
    },
    "meta": {}
   },
@@ -1794,7 +1917,9 @@
    "truth": {
     "student_name": "Liam Murphy",
     "student_id": "50000027",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 27: Sonic Environments"
    },
    "meta": {}
   },
@@ -1803,7 +1928,9 @@
    "truth": {
     "student_name": "Noor Haddad",
     "student_id": "50000028",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 28: Sonic Environments"
    },
    "meta": {}
   },
@@ -1812,7 +1939,9 @@
    "truth": {
     "student_name": "Chen Wei",
     "student_id": "50000029",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 29: Sonic Environments"
    },
    "meta": {}
   },
@@ -1821,7 +1950,9 @@
    "truth": {
     "student_name": "Priya Sharma",
     "student_id": "50000030",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 30: Sonic Environments"
    },
    "meta": {}
   },
@@ -1830,7 +1961,9 @@
    "truth": {
     "student_name": "Tomas Silva",
     "student_id": "50000031",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 31: Sonic Environments"
    },
    "meta": {}
   },
@@ -1839,7 +1972,9 @@
    "truth": {
     "student_name": "Zoe Muller",
     "student_id": "50000032",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 32: Sonic Environments"
    },
    "meta": {}
   },
@@ -1848,7 +1983,9 @@
    "truth": {
     "student_name": "Ethan Kowalski",
     "student_id": "50000033",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 33: Sonic Environments"
    },
    "meta": {}
   },
@@ -1857,7 +1994,9 @@
    "truth": {
     "student_name": "Fatima Bennett",
     "student_id": "50000034",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 34: Sonic Environments"
    },
    "meta": {}
   },
@@ -1866,7 +2005,9 @@
    "truth": {
     "student_name": "Oskar Novak",
     "student_id": "50000035",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 35: Sonic Environments"
    },
    "meta": {}
   },
@@ -1875,7 +2016,9 @@
    "truth": {
     "student_name": "Jack Gandy",
     "student_id": "50000036",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 36: Sonic Environments"
    },
    "meta": {}
   },
@@ -1884,7 +2027,9 @@
    "truth": {
     "student_name": "Amara Okonkwo",
     "student_id": "50000037",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 37: Sonic Environments"
    },
    "meta": {}
   },
@@ -1893,7 +2038,9 @@
    "truth": {
     "student_name": "Sofia Rossi",
     "student_id": "50000038",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 38: Sonic Environments"
    },
    "meta": {}
   },
@@ -1902,77 +2049,89 @@
    "truth": {
     "student_name": "Liam Murphy",
     "student_id": "50000039",
-    "university": "University of the West of England"
+    "university": "University of the West of England",
+    "module_code": "UFMSND-15-1",
+    "project_title": "Implicit Study 39: Sonic Environments"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_00",
    "truth": {
-    "student_name": "Jack Gandy"
+    "student_name": "Jack Gandy",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_01",
    "truth": {
-    "student_name": "Amara Okonkwo"
+    "student_name": "Amara Okonkwo",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_02",
    "truth": {
-    "student_name": "Sofia Rossi"
+    "student_name": "Sofia Rossi",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_03",
    "truth": {
-    "student_name": "Liam Murphy"
+    "student_name": "Liam Murphy",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_04",
    "truth": {
-    "student_name": "Noor Haddad"
+    "student_name": "Noor Haddad",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_05",
    "truth": {
-    "student_name": "Chen Wei"
+    "student_name": "Chen Wei",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_06",
    "truth": {
-    "student_name": "Priya Sharma"
+    "student_name": "Priya Sharma",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_07",
    "truth": {
-    "student_name": "Tomas Silva"
+    "student_name": "Tomas Silva",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_08",
    "truth": {
-    "student_name": "Zoe Muller"
+    "student_name": "Zoe Muller",
+    "university": "Some University"
    },
    "meta": {}
   },
   {
    "id": "missing_fields_09",
    "truth": {
-    "student_name": "Ethan Kowalski"
+    "student_name": "Ethan Kowalski",
+    "university": "Some University"
    },
    "meta": {}
   },
@@ -2039,7 +2198,8 @@
     "student_name": "Amara Okonkwo",
     "student_id": "22334455",
     "university": "Cardiff University",
-    "module_code": "MUSC4001"
+    "module_code": "MUSC4001",
+    "project_title": "An Extended Investigation into Spatial Audio Perception and Binaural Rendering Techniques"
    },
    "meta": {}
   },
@@ -2049,7 +2209,8 @@
     "student_name": "Liam Murphy",
     "student_id": "33445566",
     "university": "University of the West of England",
-    "module_code": "UFMXXX-30-3"
+    "module_code": "UFMXXX-30-3",
+    "project_title": "Dual Institution Study"
    },
    "meta": {}
   },
@@ -2059,7 +2220,8 @@
     "student_name": "Sofia Rossi",
     "student_id": "55667788",
     "university": "Bath Spa University",
-    "module_code": "BSP222"
+    "module_code": "BSP222",
+    "project_title": "Messy Whitespace Study"
    },
    "meta": {}
   },
@@ -2068,7 +2230,8 @@
    "truth": {
     "student_name": "Noor Haddad",
     "student_id": "77889900",
-    "university": "University of Southampton"
+    "university": "University of Southampton",
+    "project_title": "Metadata Sourced Project Title"
    },
    "meta": {
     "title": "Metadata Sourced Project Title"
@@ -2087,7 +2250,338 @@
     "student_name": "Ethan Bennett",
     "student_id": "88990011",
     "university": "University of the West of England",
-    "module_code": "UFMLNG-40-3"
+    "module_code": "UFMLNG-40-3",
+    "project_title": "Long Form Dissertation on Acoustics"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_00",
+   "truth": {
+    "student_name": "Jack Wei",
+    "student_id": "90000000",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 0"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_01",
+   "truth": {
+    "student_name": "Amara Sharma",
+    "student_id": "90000001",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_02",
+   "truth": {
+    "student_name": "Sofia Silva",
+    "student_id": "90000002",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_03",
+   "truth": {
+    "student_name": "Liam Muller",
+    "student_id": "90000003",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 3"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_04",
+   "truth": {
+    "student_name": "Noor Kowalski",
+    "student_id": "90000004",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 4"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_05",
+   "truth": {
+    "student_name": "Chen Bennett",
+    "student_id": "90000005",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 5"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_06",
+   "truth": {
+    "student_name": "Priya Novak",
+    "student_id": "90000006",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 6"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_07",
+   "truth": {
+    "student_name": "Tomas Gandy",
+    "student_id": "90000007",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 7"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_08",
+   "truth": {
+    "student_name": "Zoe Okonkwo",
+    "student_id": "90000008",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 8"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_generic_heading_09",
+   "truth": {
+    "student_name": "Ethan Rossi",
+    "student_id": "90000009",
+    "university": "University of the West of England",
+    "module_code": "UFMGEN-30-3",
+    "project_title": "Spatial Audio Research 9"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "A7000000",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 0"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "A7000001",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 1"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "A7000002",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 2"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "A7000003",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 3"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "A7000004",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 4"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "A7000005",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 5"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_06",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "A7000006",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 6"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_07",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "A7000007",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 7"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_08",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "A7000008",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 8"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_group_names_09",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "A7000009",
+    "university": "Cardiff University",
+    "module_code": "MANGTBL-20-2",
+    "project_title": "Group Portfolio 9"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_00",
+   "truth": {
+    "student_name": "Jack Gandy",
+    "student_id": "C8000000",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 0: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_01",
+   "truth": {
+    "student_name": "Amara Okonkwo",
+    "student_id": "C8000001",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 1: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_02",
+   "truth": {
+    "student_name": "Sofia Rossi",
+    "student_id": "C8000002",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 2: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_03",
+   "truth": {
+    "student_name": "Liam Murphy",
+    "student_id": "C8000003",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 3: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_04",
+   "truth": {
+    "student_name": "Noor Haddad",
+    "student_id": "C8000004",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 4: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_05",
+   "truth": {
+    "student_name": "Chen Wei",
+    "student_id": "C8000005",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 5: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_06",
+   "truth": {
+    "student_name": "Priya Sharma",
+    "student_id": "C8000006",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 6: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_07",
+   "truth": {
+    "student_name": "Tomas Silva",
+    "student_id": "C8000007",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 7: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_08",
+   "truth": {
+    "student_name": "Zoe Muller",
+    "student_id": "C8000008",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 8: Perception and Practice"
+   },
+   "meta": {}
+  },
+  {
+   "id": "v2_colon_title_09",
+   "truth": {
+    "student_name": "Ethan Kowalski",
+    "student_id": "C8000009",
+    "university": "Bath Spa University",
+    "module_code": "BSPSND-15-1",
+    "project_title": "Binaural Rendering 9: Perception and Practice"
    },
    "meta": {}
   }

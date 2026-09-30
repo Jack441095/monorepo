@@ -27,17 +27,22 @@ gate because System Events control is machine-specific.
 | TemplateEngine | rendering, required-field gating, optional collapse, unknown-variable validation, date/original-name variables |
 | FieldDetector | cover sheets, staff-name exclusion, reference-ID resistance, ID/module format variants, missing-field correctness, candidates, metadata distrust, Unicode |
 | FileOperations | copy byte-preservation (hard regression), rename hash identity, undo, collision policies, failure cases, settings round-trip |
-| PDF Corpus | NITE_SUBMIT_PDF_CORPUS_V1: 203 real generated PDFs, field-level precision gates, wrong-HIGH rate gate, latency |
+| PDF Corpus | NITE_SUBMIT_PDF_CORPUS_V1: 233 real generated PDFs, field-level precision gates, wrong-HIGH rate gate, latency |
 | Failure handling | image-only simulation, malformed PDF, zero-byte file, missing file |
 
 ## Corpus
 
-`tools/generate_corpus.py` deterministically generates **209 labelled cases**
-(203 real PDFs) covering clear cover sheets, ID/label variants, module-code
+`tools/generate_corpus.py` deterministically generates **239 labelled cases**
+(233 real PDFs) covering clear cover sheets, ID/label variants, module-code
 formats, adversarial staff/reference content, implicit titles, missing fields,
 image-only and malformed simulations, Unicode, path-like titles, very long
 titles, multi-institution text, messy whitespace, metadata-only titles and a
 50-page report. Ground truth lives in `manifest.json`.
+
+The corpus used to exist twice with 239 and 209 cases, so the unit tests
+measured the detector against documents the release gate never ran. One
+generator now builds both copies and `tools/check_corpus_parity.sh` fails if
+they stop matching.
 
 ## Quality gates enforced by tests
 

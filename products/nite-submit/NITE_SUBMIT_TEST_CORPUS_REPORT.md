@@ -4,9 +4,11 @@
 
 - Generator: `tools/generate_corpus.py` (Python + fpdf2 + pypdf, dev-only;
   deterministic seed 20260823)
-- Cases defined: **209**
-- Real PDFs written: **203** (image-only/malformed cases simulated separately)
-- Ground truth: `Sources/NiteSubmitTests/Fixtures/corpus/manifest.json`
+- Cases defined: **239**
+- Real PDFs written: **233** (image-only/malformed cases simulated separately)
+- Ground truth: `Sources/NiteSubmitTests/Fixtures/corpus/manifest.json`,
+  copied byte-for-byte to `tools/Fixtures/corpus/manifest.json` and enforced
+  by `tools/check_corpus_parity.sh`
 
 ## Families
 
@@ -20,6 +22,9 @@
 | implicit_title_00–39 | 40 | title as heading without label |
 | missing_fields_00–09 | 10 | only partial data present |
 | image_only_00–04 | 5 | image-only simulation (no PDF) |
+| v2_generic_heading_00–09 | 10 | big generic banner above the real project title |
+| v2_group_names_00–09 | 10 | two student names on one sheet; confidence must cap at MEDIUM |
+| v2_colon_title_00–09 | 10 | colon-separated titles survive sanitisation intact |
 | specials | ~9 | Unicode, path-like title, very long title, multi-institution, whitespace chaos, metadata-only title, malformed, 50-page report |
 
 ## Cross-generator robustness
@@ -36,5 +41,20 @@ NITE_SUBMIT_PDF_EXTRACTION_REPORT.md.
 ## Regenerating
 
 ```sh
+# Manifest only, which is what you want after editing ground truth: it leaves
+# the 233 PDFs on disk alone instead of churning every binary.
+python3 tools/generate_corpus.py --manifest-only
+
+# Full rebuild, and re-sync the copy the release scripts batch through.
 python3 tools/generate_corpus.py
+python3 tools/generate_corpus.py --out tools/Fixtures/corpus
+python3 tools/check_corpus_parity.sh
+```
+
+`expected_batch_summary` in the manifest is the measured processed/review split
+that `tools/run_full_corpus_write_check.sh` asserts against. After a detector
+change that is meant to move it, refresh it with:
+
+```sh
+tools/record_corpus_batch_expectations.sh
 ```
