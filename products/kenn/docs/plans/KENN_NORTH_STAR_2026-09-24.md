@@ -594,6 +594,11 @@ Two more, added 28 Sept after the audit, because both failures were invisible un
 
 - **Answers with no citable source** (must be zero). The display layer can legitimately return nothing — that is
   how KENN says "I don't know" — but the answer must never be built anyway with an empty `Sources:` line.
+- **Answers with no citable source** (must be zero). First counted 30 Sept by `tooling/scripts/answer_audit.py`:
+  100 answers on the live index, **88 answered, 12 abstained, 0 uncited** — the requirement holds. Two traps had to
+  be closed first, both the "a gate quietly stops gating" failure this list exists to catch: with no retrieval index
+  every answer abstains and the measure reads 0 (now `NOT_MEASURED`, exit 2), and a mixer recipe has `grounding: null`
+  and nothing to cite, so counting it as an uncited answer was a false positive (recipes are now counted separately).
 - **Answers rejected by the grounding gate, and why** (rate plus top warning). A jump here means the retrieval or
   the notes changed, not that the gate is misbehaving. The gate failing *open* is the thing to alarm on, and the
   `test_the_marker_prefix_is_not_a_grounding_input_anywhere` test is the standing guard for that.

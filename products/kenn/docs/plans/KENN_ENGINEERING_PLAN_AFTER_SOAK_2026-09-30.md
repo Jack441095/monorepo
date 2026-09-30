@@ -214,7 +214,28 @@ trust table (manual and Live measurements above notes above general advice).
 | C4 | "Use it when…" lines: Jack ticks the drafts, then `measure_use_it_when_lines.py` | S | Jack |
 | C5 | Parameter reference from Live's own displays after A3: `build_parameter_reference.py`, then `check_notes_against_measurements.py`; anything outside a measured range is fixed or drafted back | M | A3 |
 | C6 | Craft notes for the first three genres: draft on the notes model on the box, check against cited sources, review before approval; third-party material only with rights | L | Jack picks genres; review |
-| C7 | Answer audit: 100 answers, count those with no citable source (must be 0) and the grounding-gate rejections and their top warning | S monthly | |
+| C7 | Answer audit: 100 answers, count those with no citable source (must be 0) and the grounding-gate rejections and their top warning | S monthly | **Done 30 Sept** on branch `kenn-answer-audit`; first audit run 30 Sept |
+
+> **C7, 30 Sept** (branch `kenn-answer-audit`): `tooling/scripts/answer_audit.py` asks 100 questions through
+> `kenn.core.chat_answer.answer_payload` and counts the two measures the North Star added on 28 Sept because both
+> were invisible until counted. F2 had already established that the top grounding warning is **not persisted
+> anywhere** — `generation_validation.warnings` is payload-only — so the audit reads `grounding.warnings` live
+> instead of trying to reconstruct it from a log.
+> **First real run, on the live index `v-db8c6334cf63`: 100 answers, 88 answered, 12 abstained,
+> no citable source 0 (PASS, required 0), grounding gate spoke on 12 (12.0%), top warning
+> `retrieval skipped by route` on 9 answers, 0 errors.** So the North Star's "answers with no citable source must
+> be zero" **is currently met** — which is only knowable because the thing that counts it now exists.
+> **Two ways this audit could have been a gate that always passes, both hit while building it.** Run with no
+> retrieval index and every answer abstains, so the required-zero measure reads 0 — the same trap F2 found in
+> `evaluate_retrieval_modes.py` (recall 0.0, exit 0) and `eval_chat_coverage.py` (`found: false` everywhere, so
+> counting rows gives 0). It now reports `answer-audit=NOT_MEASURED` and exits 2. And the first run flagged
+> `muddy-low-mids` as uncited, which is a **false positive**: it routes to `autonomous_producer` and returns a
+> six-step mixer recipe with `grounding: null`, asserting nothing factual and so having nothing to cite. Recipes are
+> now counted separately as `uncited_recipes` and reported, not gated — a gate that cries wolf is as useless as one
+> that never fires. Every other answered question had 1–3 sources (85 of 88 had 3).
+> 8 tests. Note: the top-level `apps/backend/src/kenn/data/index/embeddings-gpu.npy` is a stale 9 Sept leftover
+> beside the real per-version artifacts; the audit resolves `CURRENT` → `versions/<id>/` and ignores it.
+
 | C8 | Stage 3b leftovers: `_clean_chunk_for_synthesis` cutting mid-word or mid-fence; only one preference per key surviving, with no way to list or restore the rest | S each | **Both done 30 Sept** on branch `kenn-stage3b-items` |
 
 > **C8, 30 Sept** (branch `kenn-stage3b-items`): both items closed, 16 tests. **Source excerpts no longer break at
