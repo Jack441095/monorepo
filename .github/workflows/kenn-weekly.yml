@@ -1,0 +1,49 @@
+name: KENN weekly
+
+# The weekly half of F5. kenn-core.yml runs the whole suite on every push and pull request; this runs the two things
+# that only matter on a cadence, because both are about drift rather than about a change.
+#
+#   test_chaos_live.py          what a change does when Live misbehaves -- refused writes, lost acknowledgements,
+#                               a replayed confirmation, an undo after the fader moved. A fault-injection bug can pass
+#                               every other suite, because nothing else injects one.
+#   score_natural_phrasings.py  the Stage 1 gate number. It moves when a rule changes, and a rule change can look
+#                               green on the suite while costing phrasings.
+#
+# Neither needs the knowledge index, so both run on a fresh clone. Measured 30 Sept on a worktree with no index:
+# chaos 47 passed, phrasings 492/505 right with 0 wrong plans.
+on:
+  schedule:
+    # Monday 06:11 UTC. Deliberately not :00 -- every scheduled workflow on the planet fires then and the runners
+    # queue.
+    - cron: "11 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  weekly:
+    name: Chaos suite and phrasing score
+    runs-on: macos-14
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r products/kenn/apps/backend/requirements.txt
+
+      - name: Chaos suite
+        working-directory: products/kenn
+        env:
+          KENN_LIVE_BACKEND: fake
+        run: python -m pytest -q apps/backend/src/kenn/tests/test_chaos_live.py
+
+      - name: Natural phrasing score
+        working-directory: products/kenn
+        run: python tooling/scripts/score_natural_phrasings.py --show wrong
