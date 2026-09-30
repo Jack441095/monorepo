@@ -62,3 +62,21 @@ def test_a_return_above_0_db_is_refused(fake) -> None:
 def test_what_returns_cannot_do_yet_is_said_plainly(fake) -> None:
     parsed = parse_request("solo the B-Delay", fake.query_session_state())
     assert parsed["missing_fields"] == ["return_track_action"] and "not its name or solo" in parsed["ambiguity"][0]
+
+
+@pytest.mark.parametrize("request_text, name", [
+    ("can you lower the reverb by 1db?", "A-Reverb"),
+    ("turn the delay down", "B-Delay"),
+    ("The snare is fine. Maybe the delay time is too short. Oh, can you lower the reverb by 1db?", "A-Reverb"),
+])
+def test_a_bare_effect_level_asks_return_or_send(fake, request_text, name) -> None:
+    # These got mix notes (round 8, 27 Sept 2026): it's the return's level or one track's send, so KENN asks which.
+    parsed = parse_request(request_text, fake.query_session_state())
+    assert parsed["missing_fields"] == ["which_change"] and f"The {name} return's level" in parsed["ambiguity"][0]
+    assert not parsed["confirmation_required"]
+
+
+def test_turning_down_the_reverb_on_a_track_asks_for_its_send_level(fake) -> None:
+    parsed = parse_request("turn down the reverb on the snare", fake.query_session_state())
+    assert parsed["action"] == "set_send" and parsed["missing_fields"] == ["amount"]
+    assert "Snare / Clap's reverb send" in parsed["ambiguity"][0]

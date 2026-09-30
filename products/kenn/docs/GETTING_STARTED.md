@@ -132,7 +132,9 @@ starts a private fake-Live KENN and measures where chat messages land (Live or t
 | Knowledge answers | Notes (`Training_Data_Notes/`) and the built index | From the owner after a licensing review: some notes summarise third-party courses and videos |
 | Real Live control | Ableton Live 12 and KENN's AbletonOSC in the User Library | The app's **Set up KENN** page, or `tooling/scripts/deploy_abletonosc.py` |
 
-Without the notes and index, knowledge answers abstain and the tests that need them skip. Model weights, the GPU box
+Without the notes and index, knowledge answers abstain and the tests that need them skip: about 120 of the backend
+suite's ~2,200 in a fresh clone ("Knowledge index not built", "requires the local KENN corpus/index"). That's expected,
+not a failure. Model weights, the GPU box
 and its SSH key stay with the owner.
 
 ## Focused verification

@@ -1832,6 +1832,34 @@ def _recipe_step_text(step: dict[str, Any]) -> str:
     return f"{action}: {track} {before} -> {after}"
 
 
+def _recipe_parts_text(recipe: dict[str, Any]) -> str:
+    """Which parts of a two-part request KENN can do and which need their own request, in plain words (27 Sept 2026).
+
+    It used to say "Step 2: natural recipes currently support track controls, play/stop, send levels…".
+    """
+    reads = [r for r in recipe.get("part_reads") or [] if isinstance(r, dict)]
+    if not reads:
+        return "I could not prepare that multi-step Live request safely: " + "; ".join(recipe.get("ambiguity") or [])
+    doable, alone, unclear = [], [], []
+    for read in reads:
+        text, action = str(read.get("segment") or "").strip(), read.get("action")
+        if action in {"insert_device", "insert_device_with_parameter", "set_eq_band_gain", "set_eq_band_tuning_gain"}:
+            alone.append(text)
+        elif action and not read.get("missing_fields"):
+            doable.append(text)
+        else:
+            unclear.append(text)
+    parts = []
+    if alone:
+        parts.append("KENN adds a device or changes an EQ band in a request of its own, not alongside other changes.")
+    if unclear:
+        parts.append("I didn't catch a change in " + " or ".join(f'"{t}"' for t in unclear) + ".")
+    order = doable + alone
+    if order:
+        parts.append("Say " + ", then ".join(f'"{t}"' for t in order) + ".")
+    return " ".join(parts) + " Nothing changed."
+
+
 def _recipe_response(response: dict[str, Any], proposal: dict[str, Any]) -> dict[str, Any]:
     """Render a bounded recipe as one exact confirmation card payload."""
     _update_lifecycle(response, "proposal_ready", target={"step_count": proposal.get("step_count", 0)})
@@ -3226,11 +3254,7 @@ def _handle_command_impl(
         response["llm"] = {"status": "not_used", "reason": "deterministic_natural_recipe"}
         response["intent"] = natural_recipe
         if natural_recipe.get("ambiguity"):
-            return _clarification(
-                response,
-                natural_recipe,
-                "I could not prepare that multi-step Live request safely: " + "; ".join(natural_recipe["ambiguity"]),
-            )
+            return _clarification(response, natural_recipe, _recipe_parts_text(natural_recipe))
         recipe_steps, recipe_error = _resolve_natural_recipe_steps(
             live,
             natural_recipe,
@@ -3242,7 +3266,8 @@ def _handle_command_impl(
             return _clarification(response, natural_recipe, "I could not prepare that multi-step Live request safely: " + recipe_error)
         result = LiveRecipeService(live).propose_recipe(
             recipe_steps,
-            reason=clean_command or "Explicit natural-language Live recipe",
+            # "Explicit user request" keeps the typed words out of the plan's heading; they were echoed back in front of it.
+            reason=f"Explicit user request: {clean_command}" if clean_command else "Explicit natural-language Live recipe",
             session_id=response["session_id"],
             source_evidence=source_evidence,
         )
@@ -3393,7 +3418,7 @@ def _handle_command_impl(
     if intent.get("missing_fields") or intent.get("ambiguity"):
         if intent.get("action") is None and intent.get("ambiguity") and set(intent.get("missing_fields") or []) & {
                 "supported_unit_mapping", "device", "send_amount", "transport_target", "how_to", "return_track_action",
-                "negated", "deferred", "pan_side", "amount", "one_track", "device_action"}:
+                "negated", "deferred", "pan_side", "amount", "one_track", "device_action", "single_action"}:
             # The parser knows exactly what's wrong ("Compressor Attack in ms isn't measured yet"); the generic
             # "not sure what you're asking" hid that from people who'd asked a perfectly clear question.
             return _clarification(response, intent, str(intent["ambiguity"][0]))

@@ -3175,7 +3175,7 @@ def test_natural_language_recipe_rejects_device_insertion_inside_recipe() -> Non
         service=_service(fake),
     )
     assert result["status"] == "clarification_required"
-    assert "device insertion" in result["answer"]
+    assert "KENN adds a device" in result["answer"] and '"mute track 1", then "add EQ on track 2"' in result["answer"]
     assert fake.writes == []
 
 

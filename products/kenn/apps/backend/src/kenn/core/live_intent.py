@@ -297,20 +297,20 @@ _INSERT_DEVICE_ALIASES = (
     ("Roar", r"roar"),
     ("Auto Filter", r"auto\s+filter|filter"),
     ("Drum Buss", r"drum\s+buss"),
-    ("Saturator", r"saturator"),
+    ("Saturator", r"saturator|saturation"),
     ("EQ Eight", r"eq(?:ualizer)?(?:\s+eight)?|eq\s*8"),
     ("Hybrid Reverb", r"hybrid\s+reverb|reverb"),
     ("Echo", r"echo|delay"),
-    ("Compressor", r"compressor"),
+    ("Compressor", r"compressor|compression"),
 )
 # NOTE: order matters here -- "glue compressor" must be checked before the
 # bare "compressor" alternative so a request naming the specific device isn't
 # shadowed by the generic one; _insert_device_name below relies on
 # _INSERT_DEVICE_ALIASES iteration order for the same reason.
 _ADD_DEVICE = re.compile(
-    r"\b(?:stick|drop|throw|slap|pop|chuck)\s+(?:a|an|another)\s+(?:new\s+)?(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
-    r"|\b(?:add|append|insert|put|load)\b.*\b(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b"
-    r"|\b(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|drum\s+buss|saturator|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor)\b.*\b(?:add|append|insert|put|load)\b",
+    r"\b(?:stick|drop|throw|slap|pop|chuck)\s+(?:a|an|another)\s+(?:new\s+)?(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|filter|drum\s+buss|saturator|saturation|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor|compression)\b"
+    r"|\b(?:add|append|insert|put|load)\b.*\b(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|filter|drum\s+buss|saturator|saturation|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor|compression)\b"
+    r"|\b(?:glue\s+compressor|multi-?band(?:\s+(?:dynamics|compressor))?|roar|auto\s+filter|drum\s+buss|saturator|saturation|eq(?:ualizer)?(?:\s+eight)?|eq\s*8|hybrid\s+reverb|reverb|echo|delay|compressor|compression)\b.*\b(?:add|append|insert|put|load)\b",
     re.I,
 )
 # "add glue on drums at 50% dry wet" must reach the same guarded setup path
@@ -1029,6 +1029,7 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     step_intents: list[dict[str, Any]] = []
     problems: list[str] = []
     last_clean: dict[str, Any] | None = None
+    part_reads = []  # what each part asked for, kept even when the recipe is refused, so the answer can say which part
     for position, segment in enumerate(segments, start=1):
         intent = parse_request(segment, snapshot)
         # "set the threshold ... then set its dry/wet ...": a later step
@@ -1045,6 +1046,10 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
                 if retry.get("action") and not retry.get("missing_fields") and not retry.get("ambiguity"):
                     intent = retry
                     segment = filled
+        # Read after the carryover, so a part that only resolved on the previous
+        # step's track and device is recorded as the action it will really run.
+        part_reads.append({"segment": segment, "action": intent.get("action"),
+                           "missing_fields": list(intent.get("missing_fields") or [])})
         if intent.get("mode") == "refuse":
             problems.append(f"Step {position}: {intent.get('error', 'the request is outside the safety boundary')}")
             continue
@@ -1086,6 +1091,7 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
         "segments": segments,
         "steps": steps if not problems else [],
         "step_intents": step_intents if not problems else [],
+        "part_reads": part_reads,
         "missing_fields": [],
         "ambiguity": problems,
         "confirmation_required": bool(steps) and not problems,
@@ -1747,7 +1753,9 @@ _DEVICE_SETTING_NO_TRACK = re.compile(r"^\s*set\s+the\s+(?P<device>compressor|eq
 _SEND_NO_TRACK = re.compile(r"^\s*(?:the\s+)?(?P<fx>reverb|verb|delay)(?:\s+send)?\s+(?:(?:[-+]?\d|up\b|down\b|to\s+[ab]\b)"
                             r"(?!.*\b(?:on|for)\b)|on\s*[.!]?\s*$)", re.I)
 # "turn the delay send on the bass down 5 dB", "lead vocal reverb send up": a nudge to a named track's send.
-_SEND_NUDGE = re.compile(r"\b(?P<fx>reverb|verb|delay)\s+send\b(?=.*\b(?:up|down)\b)(?!.*\d\s*%)", re.I)
+_SEND_NUDGE = re.compile(r"\b(?P<fx>reverb|verb|delay)\s+(?:send\b|on\s+)(?!.*\d\s*%)", re.I)
+# "turn down the reverb on the snare" nudges the send too: the direction can come first.
+_NUDGE_DIRECTION = re.compile(r"\b(?:up|down|lower|raise|reduce|less|more|boost|cut)\b", re.I)
 _EQ_CUT_NO_AMOUNT = re.compile(r"^\s*(?:boost|cut)\s+\d+(?:\.\d+)?\s*k?hz\s+on\s+(?:the\s+)?[\w/'&-]+(?:\s+[\w/'&-]+){0,2}\s*$",
                                re.I)
 
@@ -2095,6 +2103,13 @@ _MIXER_WORD = re.compile(r"\b(?:volume|fader|level|gain|louder|quieter|up|down|m
 _SEND_IN_DB = re.compile(r"\bsend\b.*?-?\d+(?:\.\d+)?\s*db\b|-?\d+(?:\.\d+)?\s*db\b.*?\bsend\b", re.I)
 
 
+_BARE_EFFECT_LEVEL = re.compile(
+    r"^\s*(?:(?:can|could|would)\s+(?:you|we)\s+|please\s+)?(?:maybe\s+|just\s+)?(?:turn|lower|raise|bring|drop|cut|boost|reduce|pull|push)"
+    r"\s+(?:down\s+|up\s+)?(?:the\s+)?(?P<fx>reverb|verb|delay|echo)\b(?!\s+(?:send|time|decay|feedback|mix|on|in|for))"
+    r"(?:\s+(?:up|down|back))?(?:\s+(?:a\s+(?:bit|little|touch|hair)|slightly|by\s+\d+(?:\.\d+)?\s*dbs?|\d+(?:\.\d+)?\s*dbs?))?"
+    r"(?:\s+(?:for\s+now|please))?\s*[.!?]?\s*$", re.I)
+
+
 def _named_return(text: str, snapshot: dict[str, Any] | None) -> dict[str, Any] | None:
     """The one return track a message names: "A-Reverb", "return B", "the delay return"."""
     returns = [r for r in ((snapshot or {}).get("return_tracks") or []) if isinstance(r, dict) and r.get("name")]
@@ -2343,6 +2358,20 @@ def _parse_single_request(query: str, session_snapshot: dict[str, Any] | None) -
     returned = _return_mixer_request(text, parsed, session_snapshot)
     if returned is not None:
         return returned
+    if parsed.get("action") is None and (m := _BARE_EFFECT_LEVEL.match(text)):
+        # "can you lower the reverb by 1db?" (round 8 phrasing set, 27 Sept 2026): the A-Reverb return's level, or a
+        # track's send into it? Both are Live changes, so ask which instead of answering with mix notes.
+        fx = "reverb" if m.group("fx").lower() in {"reverb", "verb"} else "delay"
+        ret = next((r for r in ((session_snapshot or {}).get("return_tracks") or [])
+                    if isinstance(r, dict) and (fx in str(r.get("name", "")).casefold()
+                                                or (fx == "delay" and "echo" in str(r.get("name", "")).casefold()))), None)
+        if ret is not None:
+            name = str(ret.get("name"))
+            parsed.update({"action": "set_return_volume", "track": None, "confirmation_required": False,
+                           "missing_fields": ["which_change"], "ambiguity": [
+                               f"The {name} return's level, or one track's send into it? Say \"lower the {name} by 1 dB\" "
+                               f"or \"set the vocal's {fx} send to 20%\". Nothing changed."]})
+            return parsed
     unsupported = _not_supported_yet(text, parsed, session_snapshot)
     if unsupported:
         parsed.update({"action": None, "desired_value": None, "confirmation_required": False,
@@ -2375,7 +2404,7 @@ def _parse_single_request(query: str, session_snapshot: dict[str, Any] | None) -
                        "ambiguity": [f"Which track's {fx} send? For example \"send the Synth to the {fx} at 30%\". "
                                      "Nothing changed."]})
         return parsed
-    if generic_miss and parsed.get("track") and (m := _SEND_NUDGE.search(text)):
+    if generic_miss and parsed.get("track") and (m := _SEND_NUDGE.search(text)) and _NUDGE_DIRECTION.search(text):
         # KENN sets a send to a level; it doesn't nudge one.
         fx, track = ("delay" if m.group("fx").lower() == "delay" else "reverb"), parsed["track"].get("name")
         parsed.update({"action": "set_send", "confirmation_required": False, "missing_fields": ["amount"],

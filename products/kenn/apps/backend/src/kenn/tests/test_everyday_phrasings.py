@@ -317,3 +317,31 @@ def test_it_names_the_track_for_a_rename(snapshot) -> None:
 ])
 def test_musing_about_a_return_or_checking_it_is_not_a_return_change(snapshot, message) -> None:
     assert "return_track_action" not in parse_request(message, snapshot)["missing_fields"]
+
+
+def test_a_change_plus_a_device_says_to_add_the_device_on_its_own(snapshot) -> None:
+    # It said "Step 2: natural recipes currently support track controls, play/stop, send levels…" (27 Sept 2026).
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.live_command import handle_command
+
+    reply = handle_command("bring the bass down 2db and add a compressor to the bass", session_id="parts",
+                           service=LiveActionService(FakeLiveBackend()), allow_llm=False)
+    assert reply["answer"].startswith("KENN adds a device") and '"bring the bass down 2db", then' in reply["answer"]
+
+
+def test_a_two_part_plan_does_not_repeat_the_request_as_its_heading() -> None:
+    from kenn.core.fake_live import FakeLiveBackend
+    from kenn.core.live_action_service import LiveActionService
+    from kenn.core.live_command import handle_command
+
+    reply = handle_command("mute the kick and solo the bass", session_id="parts",
+                           service=LiveActionService(FakeLiveBackend()), allow_llm=False)
+    assert reply["answer"].startswith("The plan, 2 changes")
+
+
+@pytest.mark.parametrize("request_text, device", [("add a bit of compression to the bass", "Compressor"),
+                                                  ("add some saturation to the synth", "Saturator")])
+def test_an_effect_named_by_what_it_does_is_that_device(snapshot, request_text, device) -> None:
+    parsed = parse_request(request_text, snapshot)
+    assert parsed["action"] == "insert_device" and parsed["device"]["name"] == device

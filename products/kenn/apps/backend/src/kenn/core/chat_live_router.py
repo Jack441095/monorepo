@@ -32,7 +32,7 @@ _HOW_TO = re.compile(
 # Missing fields that still mean the parser found a Live change: the cached snapshot lacks the current fader level, or
 # a send was named without an amount.
 LIVE_WITHOUT_ACTION = frozenset({"current_volume", "send_amount", "negated", "deferred", "device_action",
-                                 "return_track_action"})
+                                 "return_track_action", "single_action"})
 
 
 def asks_how_to(text: str) -> bool:
