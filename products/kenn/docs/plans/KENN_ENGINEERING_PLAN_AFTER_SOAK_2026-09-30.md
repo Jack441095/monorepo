@@ -17,7 +17,29 @@ Jack's Mac with Live open on a set he has prepared; nothing else touches real Li
 |---|---|---|---|
 | Understands open phrasing | Rules 80/124; planner in shadow | Rules 1,647 of 1,751 labelled phrasings (94%), but **fresh wording starts near 40%** (below); planner still in shadow, holds until real tester data | ≥ 95% on ≥ 500 natural phrasings (Stage 1) |
 | Converses | Template answers; model off for chat | Instant template first; the 8B model's answer takes 7–16 s on the M3 and was used 1 time in 6 | Model-written, cited answers land in ≤ 15 s on ≥ 70% (Stage 1 open item) |
-| Knows Live | 74/78 devices, recall@4 0.966 | 77/78 device notes; recall@4 0.98 when the topic is named, **0.74** for "what I want" wording, sealed set **0.34–0.45**; the index has **0 official-manual chunks** (fetch script exists, run not done) | recall@4 ≥ 0.95 on ≥ 300 questions (Stage 2) |
+| Knows Live | 74/78 devices, recall@4 0.966 | 77/78 device notes; recall@4 0.98 when the topic is named, **0.752** for "what I want" wording, technique **0.840**, sealed set **0.3333**; **the index has 1,436 `official_ableton_manual` chunks** (see C1) | recall@4 ≥ 0.95 on ≥ 300 questions (Stage 2) |
+
+> **Retrieval numbers re-measured 30 Sept on the live index, because the manual landed and moved it.** Index is now
+> **`v-db8c6334cf63`, 4,642 chunks** (3,176 curated + 1,436 official-manual + 28 transcript + 2 reference), not the
+> `v-07328d9baf04` / 3,206 chunks these figures were taken on. `evaluate_retrieval_modes.py`, cutoff 4, verified here
+> and independently by the C2 branch:
+>
+> | Fixture | cases | BM25 r@4 | hybrid r@4 | plan said |
+> |---|---|---|---|---|
+> | describe-it | 125 | 0.600 | **0.752** | 0.74 / 0.768 |
+> | technique-purpose | 50 | 0.640 | **0.840** | 0.86 |
+> | sealed Qwen8b | **225 scored of 228** | 0.200 | **0.3333** | 0.34–0.45 |
+>
+> **The prediction that failed.** The NEXT_PROMPT argued the manual "is the one source that speaks the producer's
+> language rather than the engineer's, and 0.768 on describe-it against 0.983 on device-named questions is exactly the
+> gap a manual would close." The manual is now indexed and **describe-it went 0.768 → 0.752, slightly down**. 1,436
+> manual chunks did not move producer-worded recall. So the lever is still note wording — the "Use it when…" lines and
+> C4, which are waiting on Jack's ticks — and not more source material. Anyone tempted to add a source to fix recall
+> should read this line first.
+>
+> The sealed denominator is **225 of 228**, not 228: `_expects_public_abstention` drops cases 017, 100 and 209 on
+> substring matches ("**mic**" in "What setup should I use?", "**Wwise**"), and all three are genuine retrieval
+> questions. `evaluate_retrieval_modes.py` now prints each dropped case and why (C2).
 | Controls Live | Mixer, focus, sends, 12 parameters on 9 devices | 14 measured profiles on 8 devices; **built but never run on real Live:** tempo, time signature, return level/pan/mute, scenes by name, the device factory, choosers and switches | ≥ 60 parameters on ≥ 25 devices, all undoable (Stage 3) |
 | Thinks in steps | Deliberative planner qualified once | 15 recipes built, **0 run on real Live** | Recipes pass on real Live with exact undo, ≤ 3 s a step (Stage 3) |
 | Listens | Rendered captures only | Unchanged | Live capture, masking (Stages 2/3 later) |
