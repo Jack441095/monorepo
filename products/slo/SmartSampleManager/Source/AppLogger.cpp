@@ -10,9 +10,18 @@ AppLogger::AppLogger() {
         "SmartSampleManager", "SmartSampleManager_", ".log",
         "Smart Sample Manager log started"));
 
-    if (fileLogger != nullptr) {
-        juce::Logger::setCurrentLogger(fileLogger.get());
-    }
+    // Deliberately NOT installed as juce::Logger::setCurrentLogger. A global
+    // FileLogger takes a CriticalSection and does a write() plus flush() per
+    // message, and JUCE routes some of its own internal diagnostics through
+    // whichever thread hits them first -- including processBlock(). In a
+    // standalone app that is merely a slow log line; inside a host plugin it is
+    // locked file I/O on a real-time thread, which is exactly the stall the
+    // audition BufferingAudioReader/TimeSliceThread design exists to avoid.
+    //
+    // Our own logInfo/logWarning/logError/logDebug calls go straight to
+    // fileLogger, so the file still gets everything SLO itself reports. What is
+    // given up is JUCE's internal chatter, which is duplicated by our own error
+    // reporting at every site that mattered.
 }
 
 AppLogger::~AppLogger() {
