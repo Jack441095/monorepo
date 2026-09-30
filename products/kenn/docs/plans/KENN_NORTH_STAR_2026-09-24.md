@@ -439,6 +439,14 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
       `pdf_evidence_class` would label it, but the index holds 0 `official_ableton_manual` chunks (3,308
       `curated_kenn_note`, 28 transcript, 2 `reference_document`), which makes `session_intelligence.py`'s
       "Grounded in the authorized Ableton manual" unreachable. This is a Stage 2 content gap, not a code gap.
+  > 29 Sept: Partly a code gap after all -- verified counts are 3,176 curated / 28 transcript / 2 reference /
+  > 0 official (index `v-07328d9baf04`), and the documented fetch path (`download-pdfs`) pointed at a script
+  > that never existed. That script is now real (`tooling/scripts/setup/download_training_pdfs.py`), the Live 11
+  > catalog entry flipped to `local_opt_in` with its CDN URL verified live, and the dead `./ableton` pointers in
+  > the catalog now name the actual `python main.py` entry point. What remains is genuinely content: download
+  > the PDFs (Live 11 via `download-pdfs`, Live 12 exported from Live's Help menu) into the gitignored
+  > `Training_Data_PDF/`, rebuild with `--include-local-manuals`, and qualify with
+  > `evaluate_ableton_manual_grounding.py`.
 
 ### Stage 4 — Memory and personalisation (after Stage 1)
 - [x] Project memory: decisions, references, what was tried, kept per Live set

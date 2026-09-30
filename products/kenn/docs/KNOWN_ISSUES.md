@@ -177,11 +177,16 @@ remain unimplemented (stem separation needs an isolated Demucs ML venv,
 complex subsystems appropriately out of scope for this sprint, and already
 safe to leave unresolved because they fail cleanly.
 
-`apps/backend/src/kenn/main.py`'s deeper subcommands (`build-checklist`,
-`download-pdfs`) still reference scripts (`scripts/build_audio_too_checklist.py`,
-`scripts/setup/download_training_pdfs.py`) that don't exist in this repo;
-the default `build`/`ask`/`chat` commands work (see ISSUE-09/GAP-03). Not
-fixed this sprint -- low priority, non-core commands.
+`apps/backend/src/kenn/main.py`'s `build-checklist` subcommand still
+references `scripts/build_audio_too_checklist.py`, which doesn't exist in
+this repo (see ISSUE-09/GAP-03). `download-pdfs` was restored 29 Sept 2026:
+`tooling/scripts/setup/download_training_pdfs.py` now exists, honors the
+catalog's `index_policy` gate (reference-only manuals are never fetched),
+refuses non-PDF response bodies, and is pinned in
+`tests/test_download_training_pdfs.py`. The Ableton manual PDFs themselves
+still have to land in `Training_Data_PDF/` (gitignored) and the index rebuilt
+with `--include-local-manuals` before any `official_ableton_manual` pathway
+in the product can light up.
 
 Added `apps/backend/src/kenn/tests/` -- this package's first-ever test coverage: 22
 tests covering every ported module plus a live smoke test that starts the
