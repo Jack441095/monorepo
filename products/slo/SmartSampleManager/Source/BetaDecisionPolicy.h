@@ -100,11 +100,31 @@ inline bool isSuggestClass(const std::string& subcategory) {
 // support. Where one is present the action is capped at Suggest EVEN IF the
 // audio agrees -- agreement is not independent evidence when both the filename
 // detector and the audio model are reading the same misleading token.
+inline bool hasWordToken(const std::string& haystackLower, const char* word) {
+    // Token-boundary match, not substring. Ableton ships a folder literally
+    // called "Snapshots", and every file under it matched "snap" -- so an entire
+    // user folder was permanently capped at Suggest no matter how confident the
+    // classifier was. "stops" and "accord" have the same problem ("accord" is
+    // the stem of "accordion"; "stops" is inside "stopsolo"). Same shape as the
+    // hasWord helper in AbletonTaxonomy.cpp.
+    const std::string needle(word);
+    size_t pos = haystackLower.find(needle);
+    while (pos != std::string::npos) {
+        const bool leftOk  = (pos == 0) || !std::isalnum(static_cast<unsigned char>(haystackLower[pos - 1]));
+        const size_t end   = pos + needle.size();
+        const bool rightOk = (end >= haystackLower.size())
+                          || !std::isalnum(static_cast<unsigned char>(haystackLower[end]));
+        if (leftOk && rightOk) return true;
+        pos = haystackLower.find(needle, pos + 1);
+    }
+    return false;
+}
+
 inline bool hasMisleadingToken(const std::string& fileName) {
     const std::string n = toLowerCopy(fileName);
     static const char* kTokens[] = { "snap", "tops", "chord" };
     for (const char* t : kTokens)
-        if (n.find(t) != std::string::npos) return true;
+        if (hasWordToken(n, t)) return true;
     return false;
 }
 
