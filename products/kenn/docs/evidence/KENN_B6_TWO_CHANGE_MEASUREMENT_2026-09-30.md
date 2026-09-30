@@ -28,7 +28,7 @@ feature** — the machinery and the wording for a two-step confirmable plan alre
 
 | Request | Told | Which kind of gap |
 |---|---|---|
-| `"lower the bass 2 dB and raise the vocal 1 dB"` | "I didn't catch a change to make there" | **parser.** `lower`/`raise` are not volume verbs the split path knows; `_AND_SPLIT` handles `turn X down N dB`, and `raise the vocal 1 dB` alone fails `valid_volume` |
+| `"lower the bass 2 dB and raise the vocal 1 dB"` | "I didn't catch a change to make there" | **not a gap — the request is impossible.** The fixture's Lead Vocal sits at **+0.00 dB**, so raising it has nowhere to go. `raise` is a volume verb and works on every other track (`raise the bass 1 dB` → 0.52495). See the correction below. |
 | `"make the hats quieter and the kick punchier"` | **"By how much? ... 'turn Kick down 2 dB'"** | **the serious one: a silent drop** |
 | `"adjust that"` | "I didn't catch a change to make there" | missing entirely |
 
@@ -44,10 +44,31 @@ The fix is narrow and belongs in the clarification: when a plain-`and` sentence 
 the reply must name the part it did not understand, the same way `_split_plain_and` already refuses rather than
 half-applying. Asking "by how much?" is correct here; asking it about the Kick **and forgetting the hats** is not.
 
-### The parser gap is ordinary work
+### The `lower`/`raise` "gap" was my mistake, and the behaviour is right
 
-`lower`/`raise` need to be volume verbs in the direction-plus-amount forms the split already understands. This is the
-same shape as the existing `turn X down N dB` handling, so it belongs beside it rather than in a new rule family.
+I first wrote this up as a parser gap: `lower` and `raise` not being volume verbs the split path knows. That is
+**wrong**, and the reason it looked wrong is worth recording. Splitting the sentence gives two halves, the second of
+which fails:
+
+```
+'raise the vocal 1 dB'  -> action=set_volume  missing=['valid_volume']  value=None
+```
+
+`valid_volume` reads like a missing rule. It is not: the fixture's Lead Vocal is at **+0.00 dB** (raw 0.8500, unity),
+so a 1 dB raise has nowhere to go. Every other track is at -14.00 dB and raises fine:
+
+```
+'raise the bass 1 dB'   -> missing=[]  value=0.52495
+'raise the kick 1 dB'   -> missing=[]  value=0.52495
+```
+
+So the whole sentence is correctly refused: one of the two changes cannot be made. Round 9 hit exactly this and I
+recorded it then as a *label* error ("the vocal is already at 0 dB"). I should have recognised it here instead of
+reaching for a missing rule. **The refusal is right; the sentence is impossible.**
+
+What it does show is a reply worth having: KENN says "I didn't catch a change to make there" when one change was fine
+and the other was impossible. That is closer to the silent-drop problem above than to a parser gap — the producer is
+told nothing about either half.
 
 ### "adjust that" needs the previous exchange
 
