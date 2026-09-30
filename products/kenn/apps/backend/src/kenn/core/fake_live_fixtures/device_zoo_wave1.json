@@ -1,0 +1,1053 @@
+{
+ "schema": "kenn.fake_live_fixture.v1",
+ "recorded_at": "2026-09-30T00:00:00+0100",
+ "normalised_to_reset": true,
+ "note": "Device zoo for A2 / Live night 1: one wave-1 device per regular track, nothing on a return or the master, because qualify_device_candidates.locate() only searches state['tracks']. Each parameter records the display Live shows at both ends of its travel rather than a captured table, so the rehearsal can classify a real unit without claiming to know the curve. Night 1 measures the real thing and writes it to tooling/data/measured_devices/.",
+ "session": {
+  "status": "connected",
+  "host": "fake",
+  "port": 0,
+  "is_playing": false,
+  "tempo": 120.0,
+  "signature_numerator": 4,
+  "signature_denominator": 4,
+  "root_note": 0,
+  "scale_name": "Major",
+  "selected_track_index": 0,
+  "tracks": [
+   {
+    "index": 0,
+    "name": "EQ Eight",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "EQ Eight"
+     }
+    ]
+   },
+   {
+    "index": 1,
+    "name": "Compressor",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Compressor"
+     }
+    ]
+   },
+   {
+    "index": 2,
+    "name": "Utility",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Utility"
+     }
+    ]
+   },
+   {
+    "index": 3,
+    "name": "Limiter",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Limiter"
+     }
+    ]
+   },
+   {
+    "index": 4,
+    "name": "Reverb",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Reverb"
+     }
+    ]
+   },
+   {
+    "index": 5,
+    "name": "Hybrid Reverb",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Hybrid Reverb"
+     }
+    ]
+   },
+   {
+    "index": 6,
+    "name": "Delay",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Delay"
+     }
+    ]
+   },
+   {
+    "index": 7,
+    "name": "Echo",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Echo"
+     }
+    ]
+   },
+   {
+    "index": 8,
+    "name": "Saturator",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Saturator"
+     }
+    ]
+   },
+   {
+    "index": 9,
+    "name": "Auto Filter",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Auto Filter"
+     }
+    ]
+   },
+   {
+    "index": 10,
+    "name": "Glue Compressor",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Glue Compressor"
+     }
+    ]
+   },
+   {
+    "index": 11,
+    "name": "Multiband Dynamics",
+    "volume": 0.49999988079071045,
+    "pan": 0.0,
+    "muted": false,
+    "soloed": false,
+    "armed": false,
+    "devices": [
+     {
+      "index": 0,
+      "name": "Multiband Dynamics"
+     }
+    ]
+   }
+  ],
+  "return_tracks": [],
+  "master_track": {
+   "index": -1,
+   "name": "Master",
+   "devices": []
+  },
+  "scenes": []
+ },
+ "return_tracks": [],
+ "devices": {
+  "0:0": {
+   "device_name": "EQ Eight",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Frequency",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "20.00 Hz",
+     "end_display": "20000.00 Hz",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Gain",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "-15.00 dB",
+     "end_display": "15.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Q",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.10",
+     "end_display": "18.00",
+     "quantized": false,
+     "readable": true
+    }
+   ]
+  },
+  "1:0": {
+   "device_name": "Compressor",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Threshold",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "-60.00 dB",
+     "end_display": "0.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Ratio",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "1.00 : 1",
+     "end_display": "20.00 : 1",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Attack",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 ms",
+     "end_display": "2000.00 ms",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 4,
+     "name": "Model",
+     "min": 0.0,
+     "max": 2.0,
+     "value": 0.0,
+     "value_display": "Peak",
+     "end_display": "Expand",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Peak"
+      ],
+      [
+       1.0,
+       "RMS"
+      ],
+      [
+       2.0,
+       "Expand"
+      ]
+     ]
+    }
+   ]
+  },
+  "2:0": {
+   "device_name": "Utility",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Gain",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "-60.00 dB",
+     "end_display": "60.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Output",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "-60.00 dB",
+     "end_display": "60.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Width",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "200 %",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 4,
+     "name": "Quality",
+     "min": 0.0,
+     "max": 2.0,
+     "value": 0.0,
+     "value_display": "High",
+     "end_display": "Low",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "High"
+      ],
+      [
+       1.0,
+       "Medium"
+      ],
+      [
+       2.0,
+       "Low"
+      ]
+     ]
+    }
+   ]
+  },
+  "3:0": {
+   "device_name": "Limiter",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Threshold",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "-60.00 dB",
+     "end_display": "0.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Ceiling",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "-20.00 dB",
+     "end_display": "0.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Release",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 ms",
+     "end_display": "500.00 ms",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 4,
+     "name": "Mode",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "True",
+     "end_display": "False",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "True"
+      ],
+      [
+       1.0,
+       "False"
+      ]
+     ]
+    }
+   ]
+  },
+  "4:0": {
+   "device_name": "Reverb",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Predelay",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 ms",
+     "end_display": "200.00 ms",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Size",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.50 s",
+     "end_display": "22.00 s",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Dry/Wet",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    }
+   ]
+  },
+  "5:0": {
+   "device_name": "Hybrid Reverb",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Decay",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.10 s",
+     "end_display": "60.00 s",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Dry/Wet",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Color",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    }
+   ]
+  },
+  "6:0": {
+   "device_name": "Delay",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Time",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 s",
+     "end_display": "2.00 s",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Feedback",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Dry/Wet",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    }
+   ]
+  },
+  "7:0": {
+   "device_name": "Echo",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "L Time",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 s",
+     "end_display": "4.00 s",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Dry Wet",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Feedback",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    }
+   ]
+  },
+  "8:0": {
+   "device_name": "Saturator",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Drive",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 dB",
+     "end_display": "48.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Base",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 dB",
+     "end_display": "24.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Dry/Wet",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 4,
+     "name": "Mode",
+     "min": 0.0,
+     "max": 3.0,
+     "value": 0.0,
+     "value_display": "Digital",
+     "end_display": "Warm",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Digital"
+      ],
+      [
+       1.0,
+       "Analog"
+      ],
+      [
+       2.0,
+       "Digital 2"
+      ],
+      [
+       3.0,
+       "Warm"
+      ]
+     ]
+    }
+   ]
+  },
+  "9:0": {
+   "device_name": "Auto Filter",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Frequency",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "20.00 Hz",
+     "end_display": "18000.00 Hz",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Resonance",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 %",
+     "end_display": "100.00 %",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Dry/Wet",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 4,
+     "name": "Type",
+     "min": 0.0,
+     "max": 3.0,
+     "value": 0.0,
+     "value_display": "Notch",
+     "end_display": "36 dB",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Notch"
+      ],
+      [
+       1.0,
+       "12 dB"
+      ],
+      [
+       2.0,
+       "24 dB"
+      ],
+      [
+       3.0,
+       "36 dB"
+      ]
+     ]
+    }
+   ]
+  },
+  "10:0": {
+   "device_name": "Glue Compressor",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Threshold",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "-60.00 dB",
+     "end_display": "0.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Ratio",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "1.00 : 1",
+     "end_display": "20.00 : 1",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Dry/Wet",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    }
+   ]
+  },
+  "11:0": {
+   "device_name": "Multiband Dynamics",
+   "parameters": [
+    {
+     "index": 0,
+     "name": "Device On",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 1.0,
+     "value_display": "On",
+     "end_display": "On",
+     "quantized": true,
+     "readable": true,
+     "options": [
+      [
+       0.0,
+       "Off"
+      ],
+      [
+       1.0,
+       "On"
+      ]
+     ]
+    },
+    {
+     "index": 1,
+     "name": "Dry/Wet",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0 %",
+     "end_display": "100 %",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 2,
+     "name": "Threshold",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "-60.00 dB",
+     "end_display": "0.00 dB",
+     "quantized": false,
+     "readable": true
+    },
+    {
+     "index": 3,
+     "name": "Range",
+     "min": 0.0,
+     "max": 1.0,
+     "value": 0.0,
+     "value_display": "0.00 dB",
+     "end_display": "24.00 dB",
+     "quantized": false,
+     "readable": true
+    }
+   ]
+  }
+ },
+ "sends": {},
+ "selected_device": {
+  "track_index": 0,
+  "device_index": 0
+ },
+ "world": {}
+}
