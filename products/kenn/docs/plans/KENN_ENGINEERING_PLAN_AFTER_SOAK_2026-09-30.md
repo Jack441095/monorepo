@@ -395,6 +395,31 @@
 > dominant rejection is the model stating numbers that are not in the retrieved notes — a prompt and evidence
 > problem, not a speed problem, and now visible without instrumentation.
 >
+> **1 Oct, later still: that gate had three defects, and one of them was a hole.** Checking the validator against the
+> 128 evaluation questions rather than reading it found its one measurement pattern could not tell a range from a
+> sign, and could not match a percentage at all. `"200-400 Hz"` read as `"-400 Hz"`, so an answer quoting a range's
+> own lower bound was rejected for inventing a measurement; `"-18 dBFS"` lost its sign and could be restated
+> `"+18 dBFS"`; and a trailing `\b` cannot match after `%`, so **every percentage escaped the gate entirely** —
+> including send levels, the most common measurement in this domain. All three fixed and pinned by tests
+> (`test_llm_grounding_pair.py`); the percentage one was a hole rather than a false alarm.
+>
+> **A rejection now records which measurement, so the reason above is actionable.** `make_answer` computed
+> `validation["unsupported_measurements"]` and dropped it, the same way it had earlier dropped `warnings`. That value
+> is now logged in a `detail` field, deliberately *not* folded into the route name: routes are truncated at 64 chars
+> and `route_latency_report.py` groups by them, so a measurement in the name would split one reason across as many
+> routes as there are measurements. The values are regex-extracted and so cannot carry the producer's prose, which
+> keeps `route_log`'s rule that it never holds the question or the answer.
+>
+> **Measured effect, honestly bounded** (`KENN_GROUNDING_VALIDATOR_AB_2026-10-01.json`): both validators scored
+> against the *same* 12 generated answers, since a cross-run comparison proves nothing when the model is
+> non-deterministic. 11 verdicts identical, 1 newly rejected — and that one is a true positive, not a regression: on
+> "export stems for mixing" the model claimed `128bpm` where the retrieved notes carry `44.1 kHz` and no tempo at
+> all. Twelve answers is a small sample, one flip either way would change the sign, and whether a newly caught answer
+> was genuinely wrong is a human judgement about the answer. It explains **none** of the 19 rejections logged above:
+> that harness recorded the route and its metadata but never the answer text, so those cannot be re-scored after the
+> fact. A 30-question run after the fix landed 8 of 29 (28%), against 38% recorded on different code and a
+> differently loaded machine — one sample in a 28–43% range, not a trend.
+>
 > **1 Oct, later, and this closes D1/D2 with the gate met.** After the thinking fix, the same 30 questions on the
 > 4090 through the real `KENN_LLM_BACKGROUND=1` path: template on screen **p50 0.23 s / p95 0.76 s**, the brain's
 > answer **lands 13 of 30 (43%) at p50 2.5 s / p95 3.5 s**, answer on screen **p50 0.76 s / p95 3.75 s** — inside
