@@ -3582,7 +3582,11 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:mute|silence)\b|"
         r"\b(?:turn|switch)\s+(?:mute|silence)\s+off\b|"
         # "take the mute off the kick": the noun-first order means off, not on.
-        r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?(?:mute|silence)\s+off\b",
+        r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?(?:mute|silence)\s+off\b|"
+        # A mix note writes the bare negation with no verb -- "Lead Vocal off mute", "Kick mute off" -- and the
+        # patterns above all require one. Round 9 (2026-09-30) caught "Lead Vocal off solo" being read as solo on:
+        # a silent wrong write that still passes readback and is journalled as verified.
+        r"\b(?:off|no)\s+(?:the\s+)?(?:mute|silence)\b|\b(?:mute|silence)\s+off\b",
         lower,
     )
     # "kill the FX print", "nuke the hats", "take the kick out of the mix"; not "kill playback".
@@ -3596,7 +3600,10 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
             r"\b(?:un-?solo|un[- ]?isolate)\b|\b(?:turn|switch|take)\s+off\s+(?:the\s+)?solo\b|"
             r"\b(?:take|turn|switch)\b.*?\b(?:out\s+of|off)\s+(?:solo|isolation)\b|"
             r"\b(?:turn|switch)\s+solo\s+off\b|"
-            r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?solo\s+off\b",
+            r"\b(?:take|turn|switch|pull|get)\s+(?:the\s+)?solo\s+off\b|"
+            # Same bare-negation gap as mute: every pattern above wants a verb, so "Lead Vocal off solo" fell
+            # through to the positive branch and soloed the track. Reads back fine, so nothing downstream caught it.
+            r"\b(?:off|no)\s+(?:the\s+)?(?:solo|isolation)\b|\b(?:solo|isolation)\s+off\b",
             lower,
         )
         # "the vocal on its own", "just the vocal please", "gimme only the bass".
