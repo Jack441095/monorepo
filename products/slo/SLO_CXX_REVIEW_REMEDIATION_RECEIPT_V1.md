@@ -113,7 +113,12 @@ Every entry below has a test that failed before the fix and passes after, except
 | Phase 3 — `fadeOutRequested` (write-never atomic) | deleted | RT stress still green | `492f1f0f` |
 | Phase 3 — `ClassificationPresentation::isNeutral` (no caller) | deleted | its test removed with it | `492f1f0f` |
 | Phase 3 — two comment blocks damaged by a bad edit | repaired | — | `492f1f0f` |
-| P1-10, P1-11, P1-15, P1-18…P1-27, P1-32, Phase 3 large deletions, Phase 4 | **open** | — | — |
+| **P1-18** symlinked sort destination passes the prefix check | fixed | full suite green; `createDirectory()` result now checked too | `db8facee` |
+| **P1-19** `lastSortJournalPath` written without the lock readers hold | fixed | full suite green; lock scoped to the one assignment | `5eeb3fbb` |
+| **P1-20** undo cannot find its own journal after a restart | fixed | full suite green; search made recursive, tie-break deterministic | `5eeb3fbb` |
+| **P1-25** unmeasurable decay read as an instantaneous metal strike | fixed | `TestPhysicalAcoustics` — 0.0 decay no longer yields HardMetal | `9f36eaf2` |
+| **P1-27** the OOD gate, the production decision boundary, was unasserted | fixed | mutation-verified: the new gate assertion fails when inverted | `8f631270` |
+| P1-10 (R8), P1-11, P1-15, P1-21, P1-22 (R8), P1-23, P1-24, P1-26, P1-32, Phase 3 large deletions (R8), Phase 4 | **open** | — | — |
 
 ---
 
@@ -180,6 +185,20 @@ exclusive would fail the second write and abort the whole operation with *"Could
 create a backup — aborting without writing"*. That site needs P1-21's timestamped
 backup instead, which is a different change.
 
+**P1-25 is narrower than the brief implies.** The brief's fix reads as though every
+comparison against `decayTimeSeconds` needs guarding. Only the `<` comparisons do: 0.0
+*passes* `x < 0.8`, so those read a missing measurement as a real one. A `>=` test already
+rejects 0.0, and guarding those changed the classification for no safety gain — my first
+attempt did, and a test caught it. An unmeasurable decay still classifies as
+one-shot rather than sustained; that is a separate, pre-existing conservatism, not
+something this change addressed.
+
+**P1-27's fix is narrower than "assert the gate".** Pinning 50 per-case expected OOD
+verdicts would have meant inventing golden values from the code under test — the trap
+P1-32 is about. The assertion instead pins the property that makes the class checks
+meaningful: across the fixture set the gate must return *both* verdicts. Mutation-tested
+by inverting the condition and confirming the test fails.
+
 Also: `jlimit(-1, 1, NaN)` returns `NaN` in JUCE 8.0.2, not the `1.0f` one subagent
 reported — the ternary form at `juce_MathsFunctions.h:520` returns the value unchanged.
 `AudioSimilarity.h:42`'s `clamp01(NaN) == 1.0f` I did confirm by compiling.
@@ -230,6 +249,23 @@ reported — the ternary form at `juce_MathsFunctions.h:520` returns the value u
 | `Source/` line count | 35,601 | see §7.6 note |
 
 ---
+
+## 7.6a Dead-code ledger
+
+| Item | Grep evidence | Lines | Decision |
+|---|---|---|---|
+| `detectLoopVsOneShot` 2-arg overload | 3 call sites, all in `test_taxonomy_main.cpp`; zero production | 26 | **deleted** |
+| `ClassificationPresentation::isNeutral` | one call site, in its own test | 5 | **deleted** with the test |
+| `fadeOutRequested` | declared, read once, never written | 1 | **deleted** |
+| `PhaseCorrelationMeter.h` | **zero** references anywhere in `Source/` | 171 | kept — over R8's 100-line ceiling, needs sign-off |
+| `PhysicalSynthesizer.h` | only `test_physical_acoustics_main.cpp` | 268 | kept — over R8's ceiling |
+| `AudioEvidence.h` | only its test and `AudioSimilarity.h` | 160 | kept — over R8's ceiling |
+| `AudioSimilarity.h` | only its test and `AudioEvidence.h` | 165 | kept — over R8's ceiling |
+| fusion-v2 / loop-v2 feature flags | setters called only by their own test binaries | ~35 gated | kept — see §7.7 |
+| `"physics"` evidence branch | no producer, but a passing test pins it | 1 | kept — see §7.5 |
+| `customTargetDir` parameter | no caller supplies it | — | kept — removing it changes a public signature |
+
+Deleted: 32 lines. Kept despite being unreachable: 764 lines, all gated on sign-off.
 
 ## 7.7 What I deliberately did not touch, and why
 
