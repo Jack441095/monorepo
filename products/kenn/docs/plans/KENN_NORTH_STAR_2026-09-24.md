@@ -278,6 +278,15 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > "swing the snare 15% right", "feed X into the reverb", markers with a colon, and so on), 34 tests; all earlier sets
   > rescored with no new wrong plan. The new set is now development data (143/146), so the blind number stays ~70–77%.
   > Two pinned policies conflict with the labelling rules ("lead vocal to -4" and "kill playback" both ask): owner call.
+  > **1 Oct, the four gate conditions against current evidence, so the box is not left unexplained.** (1) *Not honestly
+  > met*: `score_natural_phrasings.py` reads **491 right, 14 asked, 0 wrong of 505** — 97.2% on the rule path — but the
+  > labels are machine-drafted and need the owner, and the rules were tuned on this set, so the blind figure of ~70–93%
+  > is the one that counts. (2) *Owner-only*: review packets exist, two human reviewers do not. (3) **Met on one RTX 4090,
+  > not on the M3** — p95 3.75 s with 13 of 30 landing, against 47.5 s with 10 of 30 on the M3, same 30 questions
+  > (`docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`). (4) *No evidence either way*: there is no shadow-mode
+  > receipt in `tooling/evaluation/results/`; the real-Live receipt carries write and undo receipts but is not a shadow
+  > run, so "zero writes without Apply" is currently unmeasured rather than passed. Two of the four need the owner and
+  > one needs a shadow run, so the gate stays unticked.
 
 ### Stage 2 — Deep Ableton knowledge (beta weeks 2–10, runs alongside)
 
