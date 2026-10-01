@@ -572,9 +572,13 @@
 > on `origin/main` is already present here; it only rewrites SHAs for the 606 commits origin has not seen. The
 > destructive direction is the opposite one: `git reset --hard origin/main` would drop those 606 local-only commits,
 > 447 of them KENN. The 142-file / 24,962-insertion tree difference is local `main` carrying 606 commits *more* work,
-> not origin holding anything absent here. One limit worth stating: patch-ids compare added lines, so a file origin
-> has and local `main` deliberately deleted would not surface as absent — that would be a decision to confirm, not
-> lost work.
+> not origin holding anything absent here.
+>
+> Patch-ids on their own would not have settled that, because they compare added lines and so miss a file that origin
+> has and local `main` deleted. I checked file state directly as well: `git diff --name-status origin/main main` over the
+> whole repo reports **69 added, 92 modified, 0 deleted**. Nothing origin holds is missing here, which is the only
+> direction that can lose work. The superset claim therefore rests on both checks — every origin patch present under a
+> new SHA, and no file absent — so a force-push would drop neither a patch nor a file.
 >
 > Publishing local `main` is still the owner's call, deliberately not done here, because it rewrites SHAs that other
 > clones may have cached. Note that my own commits are on local `main` only up to `2b4831a5`; the last four (`6ddbe471`,
