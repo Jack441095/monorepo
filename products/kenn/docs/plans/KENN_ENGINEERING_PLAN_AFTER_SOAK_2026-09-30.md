@@ -517,7 +517,7 @@
 > that does not exist), and the same `mix-review/` / `automix/` duplication. Nothing was deleted — that is decision 8.
 
 
-> | F5 | CI: a fresh-clone "skips budget" (fail if the skip count grows), a weekly scheduled run of the chaos suite and phrasing scorer, a pull-request template | S | **Skips budget done 30 Sept** on `kenn-answer-audit`; scheduled run and PR template still open |
+> | F5 | CI: a fresh-clone "skips budget" (fail if the skip count grows), a weekly scheduled run of the chaos suite and phrasing scorer, a pull-request template | S | **All three built.** Weekly cron + PR template 30 Sept on `kenn-ci-scheduled`; **skips budget now a step in that weekly workflow, 1 Oct**, after fixing the one skip whose message had drifted from the allowlist. Only reaching `Nite-DSP/kenn-app` is outstanding, and that is F1's |
 
 > **F5, 30 Sept — the skips budget, and what it found.** `tooling/scripts/check_skip_budget.py` runs the backend
 > suite with `-rs` and **allows listed reasons rather than a count**. Measured on a fresh worktree: **125 skips
@@ -544,6 +544,20 @@
 > `.github/workflows/`, so it does not reach `Nite-DSP/kenn-app` until F1 carries it across, and the skips-budget step
 > is deliberately absent from the weekly workflow because `check_skip_budget.py` is on `kenn-answer-audit` and would
 > fail on `main` until that branch lands.
+>
+> **1 Oct, the second follow-up is done and the first still stands.** `kenn-answer-audit` is merged and
+> `check_skip_budget.py` is on `main`, so the step is no longer waiting on anything — it is now the third step of
+> `kenn-weekly.yml`. It failed on the first run, which is what the deferral predicted: **124 skips, 123 accounted
+> for, 1 unaccounted**. The one was not a real skip. `test_sealed_retrieval_holdout.py` skipped with its own wording,
+> `requires the local KENN index`, where `conftest.py` and the allowlist both say
+> `requires the local KENN corpus/index` — a one-word drift in a skip *message*, invisible to a bare skip count and
+> exactly what the by-reason allowlist exists to catch. Aligned with the canonical wording, and re-measured with the
+> index hidden to reproduce a fresh clone: **124 skips, 124 environmental, 0 unaccounted, pass**. With the index
+> present it is 5 and also passes.
+>
+> That is the whole argument for checking by reason rather than by number, in one line: a bare count could not tell
+> this apart from 48 index-dependent skips, and the count went *up* on the fix rather than down. The weekly workflow
+> still does not reach `Nite-DSP/kenn-app`; that is F1's, and the sync script for it is written and dry-run tested.
 
 
 > | F6 | Each release, audit every gate with a test that reproduces its bypass (the 28 Sept lesson) | S per release | |

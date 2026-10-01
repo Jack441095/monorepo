@@ -47,3 +47,7 @@ jobs:
       - name: Natural phrasing score
         working-directory: products/kenn
         run: python tooling/scripts/score_natural_phrasings.py --show wrong
+
+      - name: Skips budget
+        working-directory: products/kenn
+        run: python tooling/scripts/check_skip_budget.py

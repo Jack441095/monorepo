@@ -123,7 +123,7 @@ def test_no_holdout_question_names_the_note_it_was_written_from() -> None:
 
 def test_every_holdout_case_names_a_note_that_is_actually_indexed() -> None:
     if not INDEX_POINTER.exists():
-        pytest.skip("requires the local KENN index, excluded from public CI")
+        pytest.skip("requires the local KENN corpus/index, excluded from public CI")
     chunks = Path(__file__).resolve().parents[2] / "kenn" / "data" / "index" / "versions"
     indexed = {
         json.loads(line)["source"].removesuffix(".md")
