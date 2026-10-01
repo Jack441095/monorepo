@@ -705,12 +705,16 @@ get_target_property(SSM_UMAPPP_INTERFACE_INCLUDE_DIRECTORIES
 function(ssm_add_engine_core name)
     add_library(${name} OBJECT ${SSM_ENGINE_CORE_SOURCES})
     # PUBLIC include dirs + definitions replace the identical per-target lists
-    # every engine-consuming target used to restate by hand. NOTE: this set is
-    # intentionally WITHOUT ${SODIUM_INCLUDE_DIR} -- the historical per-test
-    # include sets never listed it and nothing in these TUs or test mains
-    # includes <sodium.h> directly.
+    # every engine-consuming target used to restate by hand. ${SODIUM_INCLUDE_DIR}
+    # joined this set when SampleManagerEngine.cpp started including
+    # SortFileSafety.h for its exclusive move/copy helpers -- that header pulls
+    # in <sodium.h> unconditionally for the fingerprint helpers, so the include
+    # path is needed even though the sort path itself calls no sodium symbol.
+    # We add the path but not ${SODIUM_LIBRARY}: the engine core is an OBJECT
+    # library and nothing in the sort path has a sodium symbol to resolve.
     target_include_directories(${name} PUBLIC
         Source
+        ${SODIUM_INCLUDE_DIR}
         ${TAGLIB_INCLUDE_DIR}
         ${ONNXRUNTIME_INCLUDE_DIR}
         ${dr_libs_SOURCE_DIR}

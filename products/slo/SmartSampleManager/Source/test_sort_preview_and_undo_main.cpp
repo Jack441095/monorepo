@@ -1,6 +1,7 @@
 #include <iostream>
 #include "SampleManagerEngine.h"
 #include "TestCacheDbIsolation.h"
+#include "SortFileSafety.h"
 
 // Unit test suite for Phase 2: Interactive Rename Preview & One-Click Undo.
 // Verifies:
@@ -329,6 +330,81 @@ int main()
 
             std::cout << "SUCCESS: Test 4 (occupied-destination undo) passed." << std::endl;
         }
+    }
+
+    // =========================================================================
+    // Test 5: the exclusive move/copy helpers the sort path relies on.
+    //
+    // The sort used to call JUCE's moveFileTo/copyFileTo, which delete the
+    // destination before writing over it (juce_File.cpp:300 and :317).
+    // chooseNonDestructiveDestination() checked the destination did not exist
+    // and then acted on it, so a file that appeared in between was destroyed
+    // with no journal row and no sortFailed increment. The fix is to stop
+    // checking and start asking the kernel: moveExclusive uses
+    // renamex_np(..., RENAME_EXCL) and copyExclusive uses
+    // copy_file(copy_options::none), each a single atomic operation that fails
+    // if the destination exists.
+    //
+    // Note on what this test can and cannot prove: the defect being fixed is a
+    // time-of-check/time-of-use window, so there is no deterministic
+    // failing-before test for it -- you cannot make a file appear inside
+    // someone else's syscall gap on demand. What this test does pin is the
+    // property the whole sort now rests on: given an occupied destination,
+    // both helpers refuse and leave the existing file's bytes untouched. That
+    // assertion holds no matter who wins the race.
+    // =========================================================================
+    {
+        auto helperRoot = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                              .getChildFile("SmartSampleManagerSortSafetyTest_" + juce::Uuid().toString());
+        helperRoot.createDirectory();
+
+        const juce::String originalBytes = "ORIGINAL AUDIO -- must survive";
+        const juce::String incomingBytes = "INCOMING AUDIO -- must not land here";
+
+        auto existing = helperRoot.getChildFile("occupied.wav");
+        auto absent = helperRoot.getChildFile("free.wav");
+        auto incoming = helperRoot.getChildFile("incoming.wav");
+
+        CHECK(existing.replaceWithText(originalBytes), "wrote the file that must survive");
+        CHECK(incoming.replaceWithText(incomingBytes), "wrote the file that wants to move");
+
+        // Move onto an occupied destination must fail and change nothing.
+        CHECK(!slo::sortSafety::moveExclusive(incoming, existing),
+              "moveExclusive must refuse an occupied destination");
+        CHECK(existing.loadFileAsString() == originalBytes,
+              "moveExclusive overwrote the occupied destination");
+        CHECK(incoming.existsAsFile(),
+              "moveExclusive consumed the source even though the move failed");
+        CHECK(!absent.existsAsFile(), "moveExclusive created the destination despite failing");
+
+        // Copy onto an occupied destination must fail and change nothing.
+        CHECK(!slo::sortSafety::copyExclusive(incoming, existing),
+              "copyExclusive must refuse an occupied destination");
+        CHECK(existing.loadFileAsString() == originalBytes,
+              "copyExclusive overwrote the occupied destination");
+
+        // With the destination free, both must actually do their job -- a
+        // helper that always returned false would pass everything above.
+        CHECK(slo::sortSafety::moveExclusive(incoming, absent),
+              "moveExclusive must succeed onto a free destination");
+        CHECK(!incoming.existsAsFile(), "moveExclusive left the source behind");
+        CHECK(absent.loadFileAsString() == incomingBytes,
+              "moveExclusive did not deliver the source bytes");
+        CHECK(existing.loadFileAsString() == originalBytes,
+              "the unrelated occupied file was disturbed by a successful move");
+
+        auto copySource = helperRoot.getChildFile("copy-source.wav");
+        auto copyTarget = helperRoot.getChildFile("copy-target.wav");
+        CHECK(copySource.replaceWithText(originalBytes), "wrote a copy source");
+        CHECK(slo::sortSafety::copyExclusive(copySource, copyTarget),
+              "copyExclusive must succeed onto a free destination");
+        CHECK(copySource.existsAsFile(), "copyExclusive consumed the source");
+        CHECK(copyTarget.loadFileAsString() == originalBytes,
+              "copyExclusive did not deliver the source bytes");
+
+        helperRoot.deleteRecursively();
+
+        std::cout << "SUCCESS: Test 5 (exclusive move/copy helpers) passed." << std::endl;
     }
 
     tempRoot.deleteRecursively();

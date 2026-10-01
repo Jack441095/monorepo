@@ -27,6 +27,7 @@
 #include "VectorMath.h"
 #include "AppLogger.h"
 #include "AbletonTaxonomy.h"
+#include "SortFileSafety.h"
 #include "AcousticClassifier.h"
 #include "MlOverrideGate.h"
 #include "BassTimbreClassifier.h"
@@ -7239,12 +7240,12 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
                              sourceFile, destFile);
         bool success = false;
         if (copyInsteadOfMove) {
-            success = sourceFile.copyFileTo(destFile);
+            success = slo::sortSafety::copyExclusive(sourceFile, destFile);
         } else {
             if (sourceFile.getFullPathName() == destFile.getFullPathName()) {
                 success = true;
             } else {
-                success = sourceFile.moveFileTo(destFile);
+                success = slo::sortSafety::moveExclusive(sourceFile, destFile);
             }
         }
 
@@ -7397,7 +7398,7 @@ SampleManagerEngine::UndoSortResult SampleManagerEngine::undoLastSort()
                 }
                 affectedDirs.insert(destFile.getParentDirectory().getFullPathName());
                 sourceFile.getParentDirectory().createDirectory();
-                if (destFile.moveFileTo(sourceFile)) {
+                if (slo::sortSafety::moveExclusive(destFile, sourceFile)) {
                     result.revertedCount++;
                     for (auto& s : samples) {
                         if (s.filePath == destFile.getFullPathName().toStdString()) {
