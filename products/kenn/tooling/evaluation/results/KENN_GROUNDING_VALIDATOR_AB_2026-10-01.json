@@ -50,7 +50,8 @@
   },
   "limits": [
     "12 answers is a small sample. One flip in either direction would change the sign of the result.",
-    "The A/B says the fix is net stricter, not that stricter is better. Whether the newly caught answers were genuinely wrong is the question, and that is a human judgement about the answers.",
-    "Nothing here explains the 12 rejections recorded on 1 Oct: that harness logged the route and its metadata but not the answer text, so those rejections cannot be re-scored after the fact."
+    "The A/B says the fix is net stricter, not that stricter is better. Whether the newly caught answers were genuinely wrong is a question about the answers themselves.",
+    "SUPERSEDED IN PART: the version measured here was stricter than the current code for a wrong reason. Its normalisation collapsed whitespace but never inserted a space, so '120Hz' and '120 Hz' were different keys and an answer quoting a note faithfully was rejected for inventing a measurement. Found later by capturing a real candidate answer, and fixed in 20135625. Any acceptance rate measured before that commit is depressed by that false rejection, so the net-stricter result above mixes one real improvement with one defect.",
+    "Nothing here explains the 12 rejections recorded on 1 Oct: that harness logged the route and its metadata but not the answer text, so those rejections cannot be re-scored after the fact. The --capture-answers flag added in 20135625 exists so the next run does not have that problem."
   ]
 }

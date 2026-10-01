@@ -420,6 +420,16 @@
 > fact. A 30-question run after the fix landed 8 of 29 (28%), against 38% recorded on different code and a
 > differently loaded machine — one sample in a 28–43% range, not a trend.
 >
+> **Corrected: that 28% is too low, and the reason is a defect in the fix above.** The normalisation collapsed
+> whitespace but never inserted a space, so `120Hz` and `120 Hz` keyed differently and an answer quoting a note
+> faithfully was rejected for inventing a measurement. `44.1kHz`, `48kHz` and `-18dBFS` are ordinary audio
+> notation, so this fired on common phrasing. It surfaced only after `measure_chat_latency.py` gained
+> `--capture-answers`: the payload cannot show a rejected answer, because the streaming path substitutes the
+> template before metadata is built, so the first two captured candidates were the first place the rejected text
+> could be read. Fixed in `20135625`. The one flip above is still a true positive, but "net stricter" mixed that
+> real improvement with this false rejection, and **any acceptance rate measured before `20135625` is depressed by
+> it.** Re-measure before quoting a rate.
+>
 > **1 Oct, later, and this closes D1/D2 with the gate met.** After the thinking fix, the same 30 questions on the
 > 4090 through the real `KENN_LLM_BACKGROUND=1` path: template on screen **p50 0.23 s / p95 0.76 s**, the brain's
 > answer **lands 13 of 30 (43%) at p50 2.5 s / p95 3.5 s**, answer on screen **p50 0.76 s / p95 3.75 s** — inside
