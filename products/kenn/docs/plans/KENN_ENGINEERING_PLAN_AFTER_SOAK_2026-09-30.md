@@ -586,19 +586,23 @@
 > and it drops no content — every patch and every file they carry is already on `main` here.
 >
 > What I got wrong in the first version of this note was calling it "two commands". The branch tip is not just ahead of
-> `main` by my work: of the 48 commits in `main..HEAD`, **16 are mine and 32 belong to another session working in this
-> same checkout, touching 27 `products/slo` files and 14 under `products/kenn`.** None of those 32 are on `origin/main`
-> today — all 32 are genuinely new to origin. So a force-push here would not merely relabel SHAs, it would publish
-> another session's unmerged work to the shared remote for the first time, under someone else's force-push, in a scope
-> I have deliberately stayed out of. That is a coordination question before it is a git question, and it is why this is
-> the owner's call rather than mine. The number to check first is `git log --oneline main..HEAD` — if that other
-> session's work is not meant to be published yet, the fix is to land only my commits on a fresh branch off `main` and
-> push that, which the subtree split then reads, rather than fast-forwarding all 48.
+> `main` by my work: of the 48 commits in `main..HEAD`, **32 belong to another session working in this same checkout**,
+> touching 27 `products/slo` files and 14 under `products/kenn`. **None of those 32 are on `origin/main` today** — all 32
+> are genuinely new to origin. So a force-push here would not merely relabel SHAs, it would publish another session's
+> unmerged work to the shared remote for the first time, under someone else's force-push, in a scope I have deliberately
+> stayed out of. That is a coordination question before it is a git question, and it is why this is the owner's call
+> rather than mine.
 >
-> My own work reaches `main` only up to `2b4831a5`; everything after that is on this branch and arrives with the
-> fast-forward, not before. I have deliberately not listed the commit hashes here, because each correction to this note
-> is itself a commit on the branch and would make the list stale again. `git log 2b4831a5..HEAD --oneline` is the
-> authority, and the count that matters for the decision is the 46 above.
+> **The narrower alternative is verified, not assumed.** If that other session's work is not meant to be published yet,
+> the fix is to land only my commits on a fresh branch off `main` and push that, which is what the subtree split reads.
+> I rehearsed exactly that in a throwaway worktree and it applies with **zero conflicts** — 18 commits, no rejects — so
+> the alternative is mechanical, not risky. The trap is in how you select them: filter by path (`products/kenn`) and you
+> also pick up `670af758`, another session's commit that touches KENN. Filter by explicit SHA list, not by path.
+>
+> I have deliberately not written my own commit hashes or my own share of the 48 here. Two measurements of that split
+> disagreed (16 against 17) because `main` moved between them, and each correction to this note is itself a commit that
+> moves it again. `git log --oneline main..HEAD` is the authority; the stable fact is the 32 that are not mine and the
+> zero-conflict rehearsal, not a count that drifts.
 >
 > **1 Oct, the copy itself is verified end to end, so only the branch move is outstanding.** Splitting this branch
 > rather than `main` carries **both** `.github/workflows/kenn-ci.yml` and `kenn-weekly.yml`, and running the sync's own
