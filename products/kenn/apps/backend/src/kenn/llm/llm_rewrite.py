@@ -18,6 +18,8 @@ import sqlite3
 import ssl
 import threading
 import time
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Generator
@@ -175,6 +177,30 @@ def truthy(name: str, default: str = "0") -> bool:
     return os.environ.get(name, default).strip().lower() in {"1", "true", "yes", "on"}
 
 
+# How long the current thread's calls may take, when it has a reason to wait longer than the ask path does.
+# A ContextVar rather than a global because the answer upgrade runs on its own thread while the producer's next
+# question is being answered on the request thread: a global would hand the 120 s budget to the ask path too and
+# put a two-minute spinner back in front of someone who already has a template on screen.
+_BACKGROUND_TIMEOUT: ContextVar[int | None] = ContextVar("kenn_llm_background_timeout", default=None)
+
+
+@contextmanager
+def background_budget(seconds: int | None = None):
+    """Give the calls made inside this block a longer timeout than the interactive one.
+
+    The ask path must fail fast into the template answer, because someone is watching a spinner. The background
+    answer upgrade has already shown that template and nobody is waiting on the result, so the interactive ceiling
+    only guarantees the swap never lands: measured 1 Oct on the owner's M3, the upgrade accepted 0 of 30 because a
+    60 s answer always hit the 20 s interactive timeout and fell back to the template it was meant to replace.
+    """
+    budget = seconds if seconds is not None else int(os.environ.get("KENN_LLM_BACKGROUND_TIMEOUT", "120") or "120")
+    token = _BACKGROUND_TIMEOUT.set(budget)
+    try:
+        yield
+    finally:
+        _BACKGROUND_TIMEOUT.reset(token)
+
+
 def config(task: str = "rewrite") -> dict:
     """Return config for a specific task, allowing per-task model routing.
 
@@ -245,7 +271,21 @@ def config(task: str = "rewrite") -> dict:
         # comment explaining why -- 20s is still generous for a local
         # model but caps the worst case at something a user will actually
         # wait through.
-        "timeout": int(os.environ.get("AUDIO_TOO_LLM_TIMEOUT", "20") or "20"),
+        #
+        # Per-task override, same suffix rule as model and provider above, and `background_budget()`
+        # above both: the 20 s budget is right for the ask path, where a producer is staring at a
+        # spinner, and wrong for the background answer upgrade, where the template is already on
+        # screen and nobody is waiting -- measured 1 Oct on the owner's M3, that path accepted 0 of
+        # 30 because a 60 s answer always hit the interactive ceiling and fell back to the template
+        # it was meant to replace. `AUDIO_TOO_LLM_TIMEOUT` stays the global default so nothing
+        # else changes.
+        "timeout": _BACKGROUND_TIMEOUT.get() or int(
+            os.environ.get(f"KENN_LLM_TIMEOUT{suffix}", "")
+            or os.environ.get(f"AUDIO_TOO_LLM_TIMEOUT{suffix}", "")
+            or os.environ.get("KENN_LLM_TIMEOUT", "")
+            or os.environ.get("AUDIO_TOO_LLM_TIMEOUT", "")
+            or "20"
+        ),
     }
 
 
