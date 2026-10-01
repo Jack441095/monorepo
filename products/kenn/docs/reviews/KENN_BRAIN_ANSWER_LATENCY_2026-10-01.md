@@ -325,6 +325,24 @@ Remaining rejections on the 4090, from the route log: 12 unsupported measurement
 citations, 1 claiming it changed the Live set. The last one is the safety property working — the model
 asserted it had modified the session and the grounding check refused it.
 
+**Those 12 were counted by a validator with three defects, so read them as a floor, not a diagnosis.**
+Checking the gate against the 128 evaluation questions rather than reading it found that its one
+measurement pattern could not tell a range from a sign: `200-400 Hz` was read as `-400 Hz`, so an answer
+quoting a range's own lower bound was rejected for inventing a measurement, and `-18 dBFS` lost its sign
+and could be restated `+18 dBFS`. The same trailing `\b` also cannot match after `%`, so **every
+percentage escaped the gate entirely** — including send levels, the most common measurement here. All
+three are fixed and pinned by tests; percentages were the serious one, being a hole rather than a
+false alarm.
+
+What this does **not** do is explain the 12. The harness logs the route and its metadata but never the
+answer text, so there is nothing to re-check a past rejection against. A second, independent mismatch is
+real — the prompt shows `results[:4]` while the validator checks `display_results(..., 3)`, which
+re-ranks — but it is **latent, not the cause**: at the `context_chars=300` these runs used, the gap is
+**0 of 124** questions, because a 300-char budget fits fewer excerpts than the validator's three. At the
+code default of 650 it opens on 9 of 124. So the honest position is that the dominant rejection reason
+remains unexplained, and the next step is to log the answer text so a rejection can finally be
+attributed rather than counted.
+
 ## D3's answer: a smaller model is not the lever
 
 The obvious way to close the last 3 s on a GPU is a smaller model, so `qwen3:4b` was measured too, with
