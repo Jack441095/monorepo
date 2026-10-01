@@ -181,6 +181,19 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > 28 Sept: Curated 505 phrasings holdout evaluated with `score_natural_phrasings.py`: **494 / 505 right (97.8%)**, 11 asked,
   > **0 wrong plans**. Fixed mid-sentence corrections ("wait no", inline params), track rename ("call"), "slo" typo,
   > compressor shorthand, and back-off threshold phrasings. Gate accuracy requirement (≥ 95% on ≥ 500 phrasings) exceeded.
+  > **30 Sept correction: re-scored on unmodified `main`, the same command now gives 492 / 505 right (97.4%), 13 asked,
+  > 0 wrong plans** — not the 494 / 11 recorded above. The 494 was the 28 Sept number and drifted as later work
+  > landed; the accuracy requirement is met either way, and **0 wrong plans still holds**, which is the part this gate
+  > actually turns on. Corrected here so the record matches what the tooling prints.
+  > 30 Sept, round 9 (`docs/evidence/KENN_BLIND_PHRASINGS_ROUND9_MIXNOTES_2026-09-30.md`), mix-notes register: 118
+  > phrasings written before scoring, **74 / 118 (62.7%), 40 asked, 4 wrong** on the one blind run. The real find was a
+  > **silent wrong write**: "Lead Vocal off solo" **soloed** the vocal, because every negation pattern in
+  > `live_intent.py` required a verb, so a bare mix-note negation fell through to the positive branch — it read back
+  > clean and was journalled as verified. "no solo", "solo off" and "off mute" were wrong the same way. Fixed on
+  > `kenn-solo-negation` (14 tests); the holdout re-scores 492/505 with and without the change, so it cost no
+  > phrasings. Two of the other three wrong rows were mislabels, not defects. **The round's second author was an
+  > automated session rather than a person who had not written the parser fixes**, which weakens the
+  > independence claim and is stated in the evidence doc; the plan wants a human second author each round.
   > 29 Sept, round 5 (`docs/evidence/KENN_BLIND_PHRASINGS_2026-09-29.md`): 146 new phrasings written before scoring, in a
   > new register. First run **69.2%** right, 3 wrong (**76.7%, 1 wrong** after I corrected 10 labels that
   > ignored product rules, e.g. Limiter isn't insertable and the vocal is already at 0 dB). The wrong plan that mattered:
@@ -193,6 +206,9 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 - [ ] Parameter-level knowledge for all 78 devices: every parameter's name, range, unit and what it does, read from
       Live (display tables, as with the fader law) and the manual
+  > **30 Sept correction to the 28 Sept note below: the manual IS in the index.** 1,436
+  > `official_ableton_manual` chunks from `live11-manual-en.pdf`, 16 / 16 grounding cases passing, `--require-manual`
+  > exit 0. Every "0 chunks" figure in the note below was true on 28 Sept and is not true now.
   > 28 Sept: **the manual is not in the index at all.** `pdf_evidence_class` (`retrieval/build_index.py:241`)
   > labels a PDF `official_ableton_manual` when its catalog entry is category `ableton` with "manual" in the
   > title or tags, but all six index versions hold 0 such chunks — 3,308 `curated_kenn_note`, 28
@@ -293,6 +309,14 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 - [ ] Device qualification factory: every insertable device measured and end-to-end tested per parameter
       (D1 in the tracker), growing from 10 devices to ≥ 25 and ≥ 60 parameters
+  > 30 Sept: the wave-1 set is built and rehearsed, so night 1 costs two hours of measurement rather than two hours
+  > of preparation. `docs/runbooks/KENN_DEVICE_ZOO_WAVE1.md` lists the twelve regular tracks and
+  > `tooling/scripts/prep_device_zoo.py` checks the names and dry-runs the whole pipeline on `FakeLiveBackend`
+  > (12 of 12 measured, 35 candidate profiles, 17 choosers, 1 unmapped). It found that `pick_raw_values` collapsed
+  > an all-positive dB control to a single test value, so Saturator's Base and Multiband Dynamics' Range could never
+  > have qualified; fixed, and the 0 dB clamp still holds for controls that go below it. **Still 0 of 78 measured:**
+  > nothing here has touched real Live, and four of the twelve wave-1 devices are not in
+  > `DEVICE_INSERTION_ALLOWLIST`, so that part of the set is a hand drag.
 - [x] Multi-step tasks from the deliberative planner (qualified once on real Live, 24 Sept): plan shown first, each step
       confirmed, one receipt per step, undo per step or for the whole task
   > 24 Sept / 28 Sept: Fully implemented and tested across `AssistantCoordinator` (`test_assistant_coordinator.py` 10/10 pass),
@@ -447,6 +471,15 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
   > (`m.group(0)`) instead of the canned example; verified in `test_project_memory_stage4.py`.
 - [ ] Only one preference per key survives (`record_preference` deactivates the rest) and there is no API to
       list or restore the inactive rows, which contradicts "see, edit, delete; nothing learned silently".
+  > 30 Sept: fixed on `kenn-stage3b-items`. `record_preference` deactivating the previous value is right for
+  > answering and wrong for "see, edit, delete; nothing learned silently" — a producer who said "actually, I master
+  > to -9, not -12" lost the old value with no way to see, compare or restore it. The rows were **already retained**
+  > by the `MAX_PREFERENCES` prune; they were simply never readable. Added `preference_history` (superseded rows,
+  > newest first, optionally narrowed to one key) and `restore_preference`, where restore is a **move** — it
+  > deactivates the current value and reactivates the chosen row in one transaction, so `current_preferences` still
+  > returns one row per key. Exposed as `GET /api/memory/preference/history` and
+  > `POST /api/memory/preference/restore`. 8 tests, including that another session's `preference_id` cannot be
+  > restored and that the restore window is bounded by `MAX_PREFERENCES` (32), not wider.
 - [x] `chat_completion_stream` returns normally on a mid-stream failure, so a truncated answer is validated as
       a complete candidate.
   > 29 Sept: Fixed. Both swallow sites (`chat_completion_stream` and `enhance_stream`) now propagate instead of
@@ -456,6 +489,17 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
   > Pinned in `test_llm_stream_honesty.py`.
 - [ ] `llm_rewrite._clean_chunk_for_synthesis` cuts mid-word and mid-code-fence, and appends a closing
       `</source_excerpt>` after a cut that can land inside the opening tag.
+  > 30 Sept: fixed on `kenn-stage3b-items`. All three defects land in the same place — the markup that tells the
+  > model where untrusted evidence stops. A 240-char cut severed a word and glued the fragment to the ellipsis; a
+  > fenced block was flattened into one broken statement (`` ```python
+KENN_LLM_CONTEXT_CHARS=650
+``` `` became a
+  > single line); and `build_raw_context_block` sliced the assembled block, emitting
+  > `<source_excerpt label="… section Dry/Wet para</source_excerpt>` — an unterminated attribute with the label cut
+  > mid-word. Now: `_truncate_on_word_boundary` cuts on a word boundary with the ellipsis **inside** the budget,
+  > fenced regions are dropped whole rather than joined into the prose, and the opening tag is budgeted before any
+  > slicing — including the `\n\n` joiner, which was the reason it overshot `max_chars`. An excerpt whose label
+  > leaves no room is dropped rather than squeezed. 8 tests.
 - [x] The L2 semantic-cache list grows unbounded and is scanned in full on every query; a *semantic* match is
       also written into the exact-match cache, turning a soft 0.95 match into a hard one.
   > 29 Sept: Cleared without new code -- both halves died in the 28 Sept session-scoping pass. L2 is bounded to
@@ -471,10 +515,20 @@ Live state, a parameter or a source". This stage is the cleanup list; it does no
   > exact steps for a fresh verified execution; pinned in `test_live_command.py`. `display_to_raw(relative=True)`
   > verified honest: linear profiles scale a delta with no offset, and table/log profiles refuse or resolve through
   > a display round-trip against the current raw value in the caller.
-- [ ] The Ableton manual has never been ingested, so **every** official-manual pathway in the product is dead:
+- [x] The Ableton manual has never been ingested, so **every** official-manual pathway in the product is dead:
       `pdf_evidence_class` would label it, but the index holds 0 `official_ableton_manual` chunks (3,308
       `curated_kenn_note`, 28 transcript, 2 `reference_document`), which makes `session_intelligence.py`'s
       "Grounded in the authorized Ableton manual" unreachable. This is a Stage 2 content gap, not a code gap.
+  > **30 Sept: no longer true — the premise was stale by about a day.** Re-measured on the live index with
+  > `evaluate_ableton_manual_grounding.py`: **`official_manual_chunk_count: 1436`**, `all_cases_passed: true`,
+  > 16 / 16 reference cases, every one selecting `official_ableton_manual`, `--require-manual` exit **0**. Counted
+  > from the index: 4,642 chunks = 3,176 curated + **1,436 official-manual** + 28 transcript + 2 reference, all from
+  > `Training_Data_PDF/live11-manual-en.pdf`, which is git-ignored. The pathway is live, not dead.
+  > **Two things remain open, and both are the owner's.** The manual indexed is **Live 11's** while he runs **Live 12
+  > Suite**, and the Knowledge programme ranks the manual *above* curated notes, so KENN now cites Live 11
+  > documentation for a Live 12 product — export the Live 12 manual from Live's Help menu and rebuild to fix that.
+  > And the ingest ran at 01:09 on 30 Sept while the decision box below was still unticked, so the decision now is
+  > whether to keep it rather than whether to start it.
   > 29 Sept: Partly a code gap after all -- verified counts are 3,176 curated / 28 transcript / 2 reference /
   > 0 official (index `v-07328d9baf04`), and the documented fetch path (`download-pdfs`) pointed at a script
   > that never existed. That script is now real (`tooling/scripts/setup/download_training_pdfs.py`), the Live 11
@@ -540,6 +594,11 @@ Two more, added 28 Sept after the audit, because both failures were invisible un
 
 - **Answers with no citable source** (must be zero). The display layer can legitimately return nothing — that is
   how KENN says "I don't know" — but the answer must never be built anyway with an empty `Sources:` line.
+- **Answers with no citable source** (must be zero). First counted 30 Sept by `tooling/scripts/answer_audit.py`:
+  100 answers on the live index, **88 answered, 12 abstained, 0 uncited** — the requirement holds. Two traps had to
+  be closed first, both the "a gate quietly stops gating" failure this list exists to catch: with no retrieval index
+  every answer abstains and the measure reads 0 (now `NOT_MEASURED`, exit 2), and a mixer recipe has `grounding: null`
+  and nothing to cite, so counting it as an uncited answer was a false positive (recipes are now counted separately).
 - **Answers rejected by the grounding gate, and why** (rate plus top warning). A jump here means the retrieval or
   the notes changed, not that the gate is misbehaving. The gate failing *open* is the thing to alarm on, and the
   `test_the_marker_prefix_is_not_a_grounding_input_anywhere` test is the standing guard for that.
@@ -564,9 +623,12 @@ Two more, added 28 Sept after the audit, because both failures were invisible un
 - [x] Brain provider: local Qwen only (owner, 25 Sept) — no hosted budget or opt-in needed
 - [x] What may be sent to a hosted model: nothing — no hosted model (owner, 25 Sept)
 - [ ] Whether Stage 2's craft notes should cover specific genres first (which?)
-- [ ] Ingest the Ableton Live Reference Manual now, or keep the knowledge base KENN-written only until Stage 2's
+- [x] Ingest the Ableton Live Reference Manual now, or keep the knowledge base KENN-written only until Stage 2's
       parameter work lands? It is the one source the Knowledge programme ranks above curated notes, and the code
       is already written and tested for it; the gap is the catalogue entry and the extraction run.
+  > **Answered by action before it was recorded:** the Live 11 manual is ingested (1,436 chunks, grounding 16/16)
+  > as of 30 Sept 01:09. The decision left is narrower — whether to keep it given it is the **Live 11** manual for a
+  > **Live 12** install, and whether to export the Live 12 manual to replace it.
 - [ ] Does Stage 3b's open list get worked now or after the beta? Twelve of the eighteen have no production
       caller or no reachable path, so the beta is not blocked by any of them — but the semantic-cache
       cross-project leak and the `validate_llm_plan` range-check gaps are worth closing before a second tester
