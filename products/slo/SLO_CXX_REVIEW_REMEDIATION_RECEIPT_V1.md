@@ -412,3 +412,54 @@ anyone reading the history:
   because forcibly rewinding a branch another session is actively working on is far
   more dangerous than the constraint breach. Flagging it for the owner.
 - Nothing was pushed. No remote branch contains this work.
+
+---
+
+## 7.9 Test-validity audit: which of my own tests can actually fail
+
+The brief's R3 asks for a test per fix. It does not ask whether those tests can fail. I
+went back and checked, by mutating the product and confirming the test notices. Six of my
+own assertions had never been verified, and **two were broken**.
+
+### The two that were broken
+
+**P1-21 XMP backups — the test passed against the defect it was written for.** It did two
+writes and asserted "a backup exists whose contents differ from the current sidecar". With
+a destructive fixed `.xmp.bak` name, that assertion still passed: after two writes the
+backup holds generation 1 and the sidecar holds generation 2, so they differ. The original
+is only actually lost on the *third* write, when the generation-1 backup is overwritten.
+Three writes, not two, is the whole difference between a test that catches the bug and one
+that documents the bug. Verified by restoring the fixed-name backup: the strengthened test
+fails with `found 1 backup(s)`.
+
+**P1-13/P1-14 cache versioning — a tautology.** The row was planted with
+`tag_source = 'ml_v3'` and the test asserted `tagSource == "ml_v3"`. An entirely untouched
+row passes that. Re-planting it as `__unrefreshed__` exposed a second problem: the
+surrounding checks sat inside `if (expectedSource == "ml_v3")`, where `expectedSource` was
+the hardcoded constant `"ml_v3"` — so the `ml_ood` arm was unreachable dead code. Removing
+the branch and asserting the recompute directly now catches a skipped refresh (5 failures
+under mutation). Probing the real behaviour also corrected the surrounding comment: the ML
+override gate does *not* re-run on a cache-hydrated embedding, the row is genuinely
+recomputed (`Drums`/`Kick`, taxonomy 5), and the gate correctly declines a one-file fixture
+to `heuristic`. I did not assert `winning_evidence` was refreshed — the engine carries it
+through, that is existing behaviour, and pinning it would only lock in an accident.
+
+### The four that were sound
+
+`TestMapClusters` (5 failures when clusters are made to return nothing),
+`TestCachedReclassification` (`reclassified 0 rows; the benchmark proved nothing`),
+`clamp01` in `TestAudioSimilarity`, and the OOD gate in
+`TestAcousticClassifierParity` all fail under mutation as intended.
+
+### Still unverified, and left alone
+
+`test_smart_collections_main.cpp` derives its expected physical-class count from the same
+`physicalClass` predicate the collection filters on, so it is semi-circular. It is the
+collector's own test, not part of this remediation, and it does catch a filter that
+inverts. Noted rather than rewritten.
+
+### Why this section exists
+
+"56/56 passing" measures nothing about test strength. Two of the tests backing shipped
+fixes would have passed with those fixes reverted, and the only reason I know is that I
+went looking. Any future change to these tests should be mutation-checked the same way.
