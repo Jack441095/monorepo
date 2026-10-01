@@ -124,7 +124,10 @@ Every entry below has a test that failed before the fix and passes after, except
 | **P1-23** `MlOverrideGate::Decision` cannot carry `isOod` | documented, not changed | the parity test pins the behaviour as intended; the omission now says so | `5bbe4934` |
 | **P1-24** `harmonicToNoiseRatio` is not a ratio; the 10.0 sentinel is magic | fixed | `TestPhysicalAcoustics` green; sentinel named, comment corrected | `a67d1b43` |
 | **P1-32** two tests derived expectations from the code under test | fixed | full suite green; both expectations now exact and independent | `061bb97b` |
-| P1-10 (R8), P1-15, P1-22 (R8), Phase 3 large deletions (R8), Phase 4 | **open** | — | — |
+| P1-15 editor FIFO fast path | investigated, **not fixed** — the brief's fix would break classification; see §7.7 | — | — |
+| P1-22 bass/hi-hat confidence | **rejected as specified** — measured and rejected in-repo; see §7.4 and Phase 4 proposal 3 | — | — |
+| Phase 3 — `playSample`'s two byte-identical branches | deleted | RT stress still green | `954f13f7` |
+| P1-10, P1-22, Phase 3 large deletions, Phase 4 items 1–6 | **awaiting owner sign-off** — written up in `SLO_CXX_REMEDIATION_PHASE4_PROPOSALS_V1.md` | — | — |
 
 ---
 
