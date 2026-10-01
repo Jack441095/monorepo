@@ -225,6 +225,50 @@ One configuration note, because it cost a wasted run: `KENN_LLM_BASE_URL` must i
 failure was mine too: an SSH tunnel on local port 11434 silently did not bind, because that port is the
 Mac's own ollama -- so it was measuring the Mac and calling it the box. The box tunnel is on 21434.
 
+## The biggest finding of the day: KENN was asking a thinking model to answer immediately
+
+Chasing why the 4B was *slower* than the 8B on the 4090 (7.4 s against 5.2 s, and 24 of 29 returning
+nothing at all) turned up a defect that had been live the whole time, on both machines.
+
+Qwen3 is a reasoning model. With thinking on, it writes a `thinking` block first, and with a 200- or
+1200-token cap it will spend the entire budget there and return **zero characters of answer**:
+
+```
+think=true   content=0ch  thinking=1054ch  eval_tok=200   # 4B
+think=true   content=0ch  thinking= 954ch  eval_tok=200   # 8B
+think=false  content=989ch thinking=0ch     eval_tok=200   # 4B
+```
+
+KENN does not send `think: false` on the chat path. `_ollama_think_off()` was gated on
+`json_schema is not None`, so prose answers went to Ollama's OpenAI-compatible route, which **ignores**
+`think` entirely. Every chat answer was therefore paying for a block of reasoning that was then thrown away.
+`enhance()` got an empty string, returned `None`, and KENN fell back to the template — logged as
+`generation returned no answer`, which reads like a grounding failure and is not one at all.
+
+Worse, the guard that was supposed to catch this never fired on the model KENN actually ships. The pattern
+was `(?:^|/)qwen3`, which requires `qwen3` at the start of the name or after a slash, so it matched stock
+`qwen3:8b` and **never matched `kenn-brain-qwen3-8b`**, the curated build on the owner's Mac. The fix was live
+on the GPU box and dead in production.
+
+Fixed both: the schema gate is gone, and the pattern matches `qwen3` anywhere in the name. `KENN_LLM_THINK=on`
+still opts back into reasoning, and a schema still routes the planner's structured calls. Same 30 questions:
+
+| | Accepted (of 29 attempts) | Median | p95 |
+|---|---|---|---|
+| M3, default | 7 (24%) | 60.2 s | 89.5 s |
+| **M3, thinking off** | **11 (38%)** | 91.1 s | 117.1 s |
+| 4090, default | 5 (17%) | 5.2 s | 7.5 s |
+| **4090, thinking off** | **10 (34%)** | **5.5 s** | **6.9 s** |
+
+**Acceptance roughly doubles on both machines.** On the 4090 it costs nothing at all: 5.5 s median, 6.9 s p95.
+On the M3 it is genuinely slower — 60 s to 91 s — and that is the correct trade, because the answers that used
+to be discarded empty now run to the cap and are real. A grounded answer at 91 s beats a template at 60 s every
+time; it just makes the M3 less usable, not more.
+
+This is the part of Stage 1 that was never a speed problem at all. A meaningful slice of what the North Star
+recorded as "the rest failed the grounding check after the wait" was a thinking model being asked not to think,
+and never getting to the grounding check at all.
+
 ## Two caches make this measurement reproducible
 
 Anyone re-running this will otherwise get numbers that mean nothing:

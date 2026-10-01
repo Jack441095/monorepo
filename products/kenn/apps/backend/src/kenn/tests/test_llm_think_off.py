@@ -22,10 +22,28 @@ def test_other_models_keep_the_openai_route(monkeypatch, model) -> None:
     assert not llm_rewrite._ollama_think_off(_cfg(model), SCHEMA)
 
 
-def test_only_schema_calls_to_ollama_are_rerouted(monkeypatch) -> None:
+def test_prose_qwen3_calls_are_rerouted_too(monkeypatch) -> None:
+    """A qwen3 chat answer must not think first, schema or no schema.
+
+    This used to assert the opposite, and that was the defect: 1 Oct 2026 measured 24 of 30 questions coming
+    back with an empty answer and ``finish_reason: length``, because the prose path took Ollama's
+    OpenAI-compatible route, which ignores ``think``, and Qwen3 spent the whole cap inside a ``thinking`` block.
+    KENN logged it as "generation returned no answer" and it read as a grounding failure.
+    """
     monkeypatch.delenv("KENN_LLM_THINK", raising=False)
-    assert not llm_rewrite._ollama_think_off(_cfg("qwen3.5:4b"), None)
+    assert llm_rewrite._ollama_think_off(_cfg("qwen3.5:4b"), None)
     assert not llm_rewrite._ollama_think_off(_cfg("qwen3.5:4b", provider="openai"), SCHEMA)
+
+
+def test_kenns_own_curated_build_is_recognised_as_a_thinking_model(monkeypatch) -> None:
+    """The name pattern has to match kenn-brain-qwen3-8b, which is the model the Mac actually runs.
+
+    `(?:^|/)qwen3` looked equivalent and matched only stock names, so the fix was live on the GPU box and
+    dead on the owner's machine.
+    """
+    monkeypatch.delenv("KENN_LLM_THINK", raising=False)
+    for name in ("kenn-brain-qwen3-8b", "kenn-brain-qwen3-8b:latest", "kenn-brain-qwen3-4b"):
+        assert llm_rewrite._ollama_think_off(_cfg(name), None), name
 
 
 def test_env_override_forces_or_disables(monkeypatch) -> None:

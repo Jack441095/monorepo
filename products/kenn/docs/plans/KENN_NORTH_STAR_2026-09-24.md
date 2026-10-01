@@ -160,6 +160,17 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > like-for-like. Receipts `KENN_CHAT_LATENCY_BOX_GPU0_STREAM_2026-10-01.json` and
   > `KENN_BACKGROUND_SWAP_BOX_GPU0_2026-10-01.json`. **Box GPU is a good, fast machine but it is not the producer's
   > laptop, so a KENN that depends on it is not a KENN that works on its own.**
+  > **1 Oct, later, and this one was never a speed problem: KENN was asking a thinking model not to think.**
+  > Qwen3 writes a `thinking` block before answering; with the token cap spent there it returns **zero characters**
+  > (`think=true` -> 1054 chars of thinking, 0 of answer). KENN's `_ollama_think_off()` was gated on a JSON schema
+  > being present, so chat answers took Ollama's OpenAI-compatible route, which ignores `think` — measured **24 of
+  > 30 questions on the 4B returning an empty answer**, logged as "generation returned no answer" and mistaken for a
+  > grounding failure. And the guard never fired on the shipped model anyway: the pattern `(?:^|/)qwen3` does not
+  > match `kenn-brain-qwen3-8b`, so the fix was live on the 4090 and dead on the M3. Both fixed (schema gate
+  > removed, pattern matches `qwen3` anywhere). **Acceptance 24% -> 38% on the M3 and 17% -> 34% on the 4090**, and
+  > on the 4090 it is free: 5.5 s median, 6.9 s p95. On the M3 it costs real time (60 s -> 91 s) because the
+  > previously-discarded answers now run to the cap and are real, which is the right trade. Part of what this item
+  > recorded as "failed the grounding check after the wait" was never reaching the grounding check.
 - [x] One router: rule parser → local planner → brain; every route logged with timing
   > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
   > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,

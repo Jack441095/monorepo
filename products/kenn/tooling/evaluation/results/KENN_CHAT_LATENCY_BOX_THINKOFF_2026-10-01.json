@@ -1,0 +1,519 @@
+{
+ "schema": "kenn.chat_latency.v1",
+ "generated_at": "2026-10-01T13:35:44.817428+00:00",
+ "model": "qwen3:8b",
+ "index_version": "v-db8c6334cf63",
+ "counts": {
+  "asked": 30,
+  "llm_attempted": 29,
+  "llm_accepted": 10,
+  "llm_rejected": 19,
+  "errors": 0
+ },
+ "seconds": {
+  "all_median": 5.4615,
+  "all_p95": 6.877,
+  "attempted_median": 5.707,
+  "accepted_median": 5.906499999999999,
+  "accepted_p95": 6.519
+ },
+ "top_rejection_reason": {
+  "reason": "generated answer introduced unsupported measurements",
+  "answers": 14
+ },
+ "rows": [
+  {
+   "id": "bass-processing",
+   "category": "uncategorized",
+   "seconds": 9.692,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "sidechain-bass-kick",
+   "category": "uncategorized",
+   "seconds": 4.247,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements",
+    "generated answer is below the quality threshold"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "sidechain-bass-disappears",
+   "category": "production",
+   "seconds": 5.707,
+   "stream_events": 2,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements",
+    "generated answer has insufficient evidence overlap"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "sidechain-release-time",
+   "category": "production",
+   "seconds": 5.12,
+   "stream_events": 6,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements",
+    "generated answer is below the quality threshold"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "sidechain-pumping-attack-release",
+   "category": "production",
+   "seconds": 6.877,
+   "stream_events": 6,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "reverb-send",
+   "category": "uncategorized",
+   "seconds": 5.843,
+   "stream_events": 2,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "export-stems",
+   "category": "uncategorized",
+   "seconds": 4.643,
+   "stream_events": 3,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "gain-staging",
+   "category": "uncategorized",
+   "seconds": 4.125,
+   "stream_events": 6,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements",
+    "generated answer is below the quality threshold"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "mix-revisions",
+   "category": "uncategorized",
+   "seconds": 4.93,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements",
+    "generated answer is below the quality threshold"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "streaming-loudness",
+   "category": "uncategorized",
+   "seconds": 4.716,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "client-stem-handoff",
+   "category": "uncategorized",
+   "seconds": 6.153,
+   "stream_events": 4,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "session-prep-mix",
+   "category": "uncategorized",
+   "seconds": 5.772,
+   "stream_events": 3,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "home-vocal-recording",
+   "category": "uncategorized",
+   "seconds": 5.216,
+   "stream_events": 6,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer has insufficient evidence overlap"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "muddy-low-mids",
+   "category": "uncategorized",
+   "seconds": 0.868,
+   "stream_events": 1,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": false,
+   "accepted": false,
+   "warnings": [],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 0,
+   "error": null
+  },
+  {
+   "id": "mix-bus-glue",
+   "category": "uncategorized",
+   "seconds": 6.323,
+   "stream_events": 2,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "deliver-final-mix",
+   "category": "uncategorized",
+   "seconds": 4.931,
+   "stream_events": 4,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "wwise-events",
+   "category": "uncategorized",
+   "seconds": 4.136,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer is below the quality threshold"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "vocal-compressor",
+   "category": "uncategorized",
+   "seconds": 4.826,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "sub-bass-saturation",
+   "category": "uncategorized",
+   "seconds": 6.191,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer is below the quality threshold"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "clip-automation",
+   "category": "uncategorized",
+   "seconds": 6.092,
+   "stream_events": 3,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "cpu-overload",
+   "category": "uncategorized",
+   "seconds": 5.97,
+   "stream_events": 3,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "reference-track-level-match",
+   "category": "uncategorized",
+   "seconds": 5.103,
+   "stream_events": 3,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer is below the quality threshold"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "group-bus-workflow",
+   "category": "uncategorized",
+   "seconds": 5.992,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "eq-eight-cleanup",
+   "category": "uncategorized",
+   "seconds": 5.815,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "podcast-dialogue-edit",
+   "category": "uncategorized",
+   "seconds": 6.466,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "freeze-flatten-bounce",
+   "category": "uncategorized",
+   "seconds": 4.362,
+   "stream_events": 6,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer is below the quality threshold"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "filter-cutoff-automation",
+   "category": "uncategorized",
+   "seconds": 4.785,
+   "stream_events": 3,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "warp-markers",
+   "category": "uncategorized",
+   "seconds": 6.519,
+   "stream_events": 3,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "drum-rack-samples",
+   "category": "uncategorized",
+   "seconds": 4.661,
+   "stream_events": 2,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": true,
+   "warnings": [],
+   "llm_enhanced": true,
+   "found": true,
+   "sources": 3,
+   "error": null
+  },
+  {
+   "id": "delay-fade-glitch",
+   "category": "uncategorized",
+   "seconds": 6.47,
+   "stream_events": 5,
+   "cache_dropped": true,
+   "surface": "stream",
+   "attempted": true,
+   "accepted": false,
+   "warnings": [
+    "generated answer introduced unsupported measurements"
+   ],
+   "llm_enhanced": false,
+   "found": true,
+   "sources": 3,
+   "error": null
+  }
+ ]
+}

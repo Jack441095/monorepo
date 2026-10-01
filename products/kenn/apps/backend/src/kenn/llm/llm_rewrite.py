@@ -424,15 +424,23 @@ def _build_payload(
 # Ollama's native /api/chat honours ``think: false`` with a schema for the
 # qwen3 family, so schema-constrained calls to those models go there.
 # DeepSeek-R1 is deliberately absent: it kept thinking even natively.
-_THINK_OFF_MODEL = re.compile(r"(?:^|/)qwen3", re.IGNORECASE)
+# Not `(?:^|/)qwen3`: that never matched KENN's own build, kenn-brain-qwen3-8b, so the thinking fix was live
+# for stock qwen3:8b on the GPU box and dead on the owner's machine. Found 1 Oct 2026 measuring Track D.
+_THINK_OFF_MODEL = re.compile(r"qwen3", re.IGNORECASE)
 
 
 def _ollama_think_off(cfg: dict, json_schema: dict | None) -> bool:
     """Whether this call must go to Ollama's native route with thinking off.
 
-    ``KENN_LLM_THINK=off`` forces it for any model and for prose answers too (a local Qwen brain writing chat
-    answers should not spend seconds thinking first); ``KENN_LLM_THINK=on`` disables it. Unset, only
-    schema-constrained qwen3 calls use it.
+    ``KENN_LLM_THINK=off`` forces it for any model; ``KENN_LLM_THINK=on`` disables it. Unset, any qwen3 model
+    uses it for every call, prose included.
+
+    Found 1 Oct 2026 measuring Track D: the prose case was not covered, so chat answers went to the
+    OpenAI-compatible route, which ignores ``think``. Qwen3 is a reasoning model, so each of those calls spent
+    the whole token cap inside a ``thinking`` block and returned empty ``content`` -- 24 of 30 questions on the
+    4B, ``finish_reason: length`` with 0 content characters -- which KENN logged as "generation returned no
+    answer" and read as a grounding failure. Enabling it for prose took the same 30 questions from 7/29 to
+    11/29 accepted on the M3 and 5/29 to 10/29 on a 4090.
     """
     if cfg.get("provider") != "ollama":
         return False
@@ -441,7 +449,7 @@ def _ollama_think_off(cfg: dict, json_schema: dict | None) -> bool:
         return False
     if setting in {"off", "0", "false", "no"}:
         return True
-    return json_schema is not None and bool(_THINK_OFF_MODEL.search(str(cfg.get("model") or "")))
+    return bool(_THINK_OFF_MODEL.search(str(cfg.get("model") or "")))
 
 
 def _build_native_ollama_payload(cfg: dict, messages: list[dict], *, answer_mode: str, json_schema: dict | None) -> dict:
