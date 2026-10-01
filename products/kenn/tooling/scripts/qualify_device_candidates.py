@@ -63,6 +63,12 @@ def pick_raw_values(profile: Any, current: float | None) -> list[float]:
         while shown is not None and shown > 0.0 and top > profile.raw_min:
             top -= 0.01 * span
             shown, _ = profile_raw_to_display(profile, top)
+        if top <= profile.raw_min:
+            # The walk landed on the floor, so there is no sub-0 dB region left to protect and clamping would collapse
+            # the three points onto one value. Saturator's Base runs 0..24 dB and Multiband Dynamics' Range 0..24 dB,
+            # and both would otherwise never qualify at all. A control that only goes above 0 dB has to be tested
+            # across its whole range; the disposable set and low monitors are what make that safe.
+            top = profile.raw_max
     values: list[float] = []
     for fraction in FRACTIONS:
         raw = round(profile.raw_min + fraction * (top - profile.raw_min), 6)
