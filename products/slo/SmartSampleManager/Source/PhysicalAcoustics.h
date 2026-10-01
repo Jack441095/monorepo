@@ -384,6 +384,34 @@ inline float estimateContactDurationMs(const float* mono, int numFrames, double 
     return (riseSamples / static_cast<float>(sampleRate)) * 1000.0f;
 }
 
+// PROVENANCE OF THE THRESHOLDS BELOW -- read this before trusting one.
+//
+// The resonator and physical-class tree further down is HAND-TUNED, not measured.
+// Roughly sixteen constants decide it (0.22, 0.45, 0.65, 0.55, 0.50, 0.18, 0.35,
+// 0.25, 120.0, 350.0, 0.08, 0.40, 0.15, 0.6, 0.10, 0.0005, 1500.0, 3.0, 0.8, 0.6),
+// and no corpus, cross-validation figure, or held-out measurement exists for any of
+// them. They were chosen by ear against a small fixture set and have not been
+// re-validated since. Treat `physicalClass` and `material` as a useful first guess
+// that is occasionally and confidently wrong, not as a measurement.
+//
+// This is stated plainly because the alternative -- leaving the numbers bare -- is
+// what makes them look calibrated. Compare AbletonTaxonomy.h:141-179, which documents
+// its own thresholds honestly: 649 by-ear labels, 5-fold cross-validation, 96.4%
+// held-out, and the measurement that selected 1.5 s in all five folds. That is what a
+// calibrated threshold looks like in this codebase, and this tree is not that.
+//
+// The blast radius is limited but not nil: physicalClass and material are persisted
+// and are user-filterable (SampleManagerEngine.cpp's collection rules match on them),
+// so a wrong value is a wrong filter, not a wrong file move. Nothing in the sort path
+// reads them.
+//
+// If you tune these: change one at a time, and record what you measured and on what.
+// If you want them calibrated rather than tuned, the corpus work is the missing piece,
+// and it is worth more than any further hand adjustment.
+//
+// One related known gap, for the same reason: AbletonTaxonomy.cpp:70's `durationSeconds
+// >= 4.0f` is load-bearing -- it is the only thing that rescues a long, decayed crash
+// from the one-shot branch -- and is likewise undocumented.
 inline Analysis analyze(const std::vector<SpectralPeak>& peaks,
                         float f0Hz,
                         float pitchSlopeSemitonesPerSec,
