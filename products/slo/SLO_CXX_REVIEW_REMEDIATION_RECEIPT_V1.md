@@ -270,7 +270,14 @@ reported — the ternary form at `juce_MathsFunctions.h:520` returns the value u
    test kept failing against correct source, and I very nearly committed a "fix" that
    did not build. `touch`ing the header relinked and it passed. Worth knowing before
    trusting a red test after any edit/restore cycle.
-7. **A single-file library cannot produce a map cluster** — `computeMapClusters()` defaults
+7. **`SLO_SOURCE_ARCHITECTURE_MAP.md:8` names a product path that does not exist** —
+   `Canonical product path: /Volumes/Jack_Gandy_1TB_SSD/NITE_DSP/products/slo`, but the
+   real root is `Nite-DSP` and there is no `NITE_DSP` directory. The same document also
+   describes the working checkout as `products/slo/SmartSampleManager`, so the two lines
+   contradict each other. Pre-existing, not introduced here, and logged under R4 rather
+   than fixed. It matters because that file is the one a new engineer reads first to learn
+   where the source lives.
+8. **A single-file library cannot produce a map cluster** — `computeMapClusters()` defaults
    to `minGroupSize 2`. `test_map_clusters_main` copied exactly one fixture, so it could
    never have formed a group. This is why it had no meaningful assertions to make.
 
