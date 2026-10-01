@@ -552,6 +552,16 @@
 > is deliberately absent from the weekly workflow because `check_skip_budget.py` is on `kenn-answer-audit` and would
 > fail on `main` until that branch lands.
 >
+> **1 Oct, second follow-up done, first one now has a copy and is still not through.** `products/kenn/.github/workflows/kenn-weekly.yml`
+> exists on this branch, which is the only location `sync_kenn_app.sh` reads — it ships `products/kenn` as the
+> kenn-app root, so the monorepo's root `.github/` can never cross. All three steps were run in that layout with the
+> index hidden: chaos 47 passed, phrasings 491/505, skips budget 124 environmental and 0 unaccounted.
+> **It does not cross yet, and it is worth being exact about why:** `git subtree split --prefix=products/kenn main`
+> still carries only `kenn-ci.yml`, because the copy is on this branch and not on `main`. It reaches `Nite-DSP/kenn-app`
+> when this branch lands on `main`, not before. Separately the sync's own dry run is blocked earlier still: it requires
+> `main` to equal `origin/main`, and after a real fetch local `main` is `bd6ae627` against `origin/main` `9131dcb6`,
+> **515 ahead and 606 behind**. Reconciling that is the owner's call.
+>
 > **1 Oct, the second follow-up is done and the first still stands.** `kenn-answer-audit` is merged and
 > `check_skip_budget.py` is on `main`, so the step is no longer waiting on anything — it is now the third step of
 > `kenn-weekly.yml`. It failed on the first run, which is what the deferral predicted: **124 skips, 123 accounted
