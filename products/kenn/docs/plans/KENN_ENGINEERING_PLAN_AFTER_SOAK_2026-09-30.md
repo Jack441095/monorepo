@@ -580,12 +580,20 @@
 > direction that can lose work. The superset claim therefore rests on both checks — every origin patch present under a
 > new SHA, and no file absent — so a force-push would drop neither a patch nor a file.
 >
-> **Landing this branch on `main` is a plain fast-forward, and I checked that separately.** `main` is an ancestor of
-> this branch's tip, 46 commits back, so moving `main` up to here needs no merge commit and cannot conflict. Combined with
-> the superset check above, the whole blocked step is: fast-forward `main` to this branch, then push with force. Force is
-> required only because origin's 515 commits are rewritten SHAs rather than ancestors, and it drops no content — every
-> patch and every file they carry is already on `main` here. Clones that fetched `origin/main` before the rewrite keep
-> their old SHAs until they re-fetch, which is the one real cost and the reason this stays the owner's call.
+> **Landing this branch on `main` is mechanically a plain fast-forward, but it is not bounded to my work, which is
+> the part that matters here.** `main` is an ancestor of this branch's tip, so moving `main` up to here needs no merge
+> commit and cannot conflict. Force is required because origin's 515 commits are rewritten SHAs rather than ancestors,
+> and it drops no content — every patch and every file they carry is already on `main` here.
+>
+> What I got wrong in the first version of this note was calling it "two commands". The branch tip is not just ahead of
+> `main` by my work: of the 48 commits in `main..HEAD`, **16 are mine and 32 belong to another session working in this
+> same checkout, touching 27 `products/slo` files and 14 under `products/kenn`.** None of those 32 are on `origin/main`
+> today — all 32 are genuinely new to origin. So a force-push here would not merely relabel SHAs, it would publish
+> another session's unmerged work to the shared remote for the first time, under someone else's force-push, in a scope
+> I have deliberately stayed out of. That is a coordination question before it is a git question, and it is why this is
+> the owner's call rather than mine. The number to check first is `git log --oneline main..HEAD` — if that other
+> session's work is not meant to be published yet, the fix is to land only my commits on a fresh branch off `main` and
+> push that, which the subtree split then reads, rather than fast-forwarding all 48.
 >
 > My own work reaches `main` only up to `2b4831a5`; everything after that is on this branch and arrives with the
 > fast-forward, not before. I have deliberately not listed the commit hashes here, because each correction to this note
