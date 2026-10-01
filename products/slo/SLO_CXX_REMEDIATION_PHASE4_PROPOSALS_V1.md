@@ -32,8 +32,28 @@ audio.
 of keeping ~40 lines of the old parser, which can then be deleted once the fallback has
 shipped for a release.
 
-**Effort.** ~2 h including the round-trip test. Needs a test that a journal written by
-the new writer parses back through the new reader and that a legacy `.csv` still undoes.
+**Design, still unexecuted.** New journals are named
+`.slo_sort_journal_<uuid>.jsonl`; one JSON object per line; append-only; flush every row;
+a crash-partial final line costs one record. Each record carries the same vocabulary as
+today: numeric `version`, `operation` of `move`/`copy`, `status` of
+`PLANNED`/`COMMITTED`/`FAILED`, exact `source`/`destination` paths, and ISO-8601
+`timestamp`. Strings use `CorrectionLog`-style JSON escaping so paths round-trip exactly
+instead of being flattened. The reader accepts one object per line, requires all fields
+with the right types and vocabulary, ignores unknown fields, skips malformed lines, and
+otherwise preserves today’s undo rules: accept the provable `PLANNED`-only landed state,
+refuse an occupied restore destination, fail closed on an empty/degraded journal, and
+retire a used journal by appending `.undone`. Discovery keeps today’s order:
+`lastSortJournalPath` first, then newest non-`.undone` journal by mtime plus filename
+tie-break, across `.jsonl` with `.csv` fallback. Keep one shared `JournalRow` validator
+for both line parsers; never write CSV again. Retire the CSV fallback in a later release
+once open CSV journals are gone.
+
+**Validation before execution.** Round-trip new writer to new reader with hostile names
+containing newline, quote, backslash, control characters, Unicode, and long paths; prove
+legacy `.csv` still undoes; prove malformed/truncated JSONL fails closed; run full
+`ctest`.
+
+**Effort.** ~3 h including fallback discovery and the round-trip tests.
 
 ---
 
