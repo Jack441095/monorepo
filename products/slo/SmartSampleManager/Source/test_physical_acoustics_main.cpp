@@ -27,6 +27,18 @@ int main()
             { 500.0f, 0.3f }
         };
 
+        // decayTimeSeconds 0.0 means "could not be measured", not "measured as
+        // instantaneous". These same peaks with a real reading come out as a
+        // HarmonicStringPipe; with the unmeasurable 0.0 they were treated as
+        // impulsive, landed on HardMetal and took the "Sharp Metal Impact" badge.
+        // mallet is derived from a persisted, user-filterable physicalClass, so
+        // the distinction matters.
+        auto unmeasured = PhysicalAcoustics::analyze(harmonicPeaks, 100.0f, 0.0f, 0.02f,
+                                                      2.0f, 0.0f, 0.60f);
+        expectTrue(unmeasured.mallet != PhysicalAcoustics::MalletHardness::HardMetal,
+                   "An unmeasurable decay must not be read as an instantaneous metal strike, got: "
+                     + std::to_string(static_cast<int>(unmeasured.mallet)));
+
         auto analysis = PhysicalAcoustics::analyze(harmonicPeaks, 100.0f, 0.0f, 0.02f, 2.0f, 2.0f, 0.60f);
         expectTrue(analysis.harmonicFit > 0.90f, "Harmonic fit should be > 0.90 for integer partials");
         expectTrue(analysis.resonator == PhysicalAcoustics::ResonatorType::HarmonicStringPipe,

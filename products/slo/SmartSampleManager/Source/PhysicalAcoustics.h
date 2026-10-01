@@ -452,7 +452,18 @@ inline Analysis analyze(const std::vector<SpectralPeak>& peaks,
     }
 
     // Physical Classification Mapping (Deterministic Acoustic Rules)
-    const bool isImpulsive = crestFactor >= 3.0f || decayTimeSeconds < 0.8f;
+    // A decayTimeSeconds of exactly 0.0 means "could not be measured", not
+    // "measured as instantaneous" -- computeEnvelopeDecayTimeSeconds() returns
+    // 0.0 for audio too short to analyse. Treating that as a real reading made
+    // every unmeasurable file isImpulsive, which routed it to HardMetal and the
+    // "Sharp Metal Impact" badge, and physicalClass is persisted and filterable.
+    // So require a positive measurement before believing the number.
+    const bool decayWasMeasured = decayTimeSeconds > 0.0f;
+    const bool isImpulsive = crestFactor >= 3.0f
+                             || (decayWasMeasured && decayTimeSeconds < 0.8f);
+    // No decayWasMeasured guard here, and deliberately so: a ">=" test already
+    // rejects the 0.0 sentinel, so adding the guard would change behaviour for no
+    // safety gain. Only the "<" comparisons need it, because 0.0 passes those.
     const bool isSustained = energyDecayRatio >= 0.25f && decayTimeSeconds >= 1.5f;
 
     if (result.resonator == ResonatorType::CircularMembrane)
@@ -487,7 +498,7 @@ inline Analysis analyze(const std::vector<SpectralPeak>& peaks,
     }
     else if (result.resonator == ResonatorType::NoiseAtonal)
     {
-        if (zeroCrossingRate >= 0.25f && decayTimeSeconds < 0.6f)
+        if (zeroCrossingRate >= 0.25f && decayWasMeasured && decayTimeSeconds < 0.6f)
         {
             result.physicalClass = "Hi-Hat";
         }
