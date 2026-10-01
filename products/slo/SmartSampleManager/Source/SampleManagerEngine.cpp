@@ -7145,7 +7145,17 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
         "version,operation,status,source,destination,timestamp\n",
         false, false, nullptr);
     journalStream->flush();
-    lastSortJournalPath = journalFile.getFullPathName().toStdString();
+    {
+        // Under dbLock, unlike the sort loop below. lastSortJournalPath is a plain
+        // std::string read under dbLock by getMostRecentSortJournal() and
+        // getLastSortJournalPath(), both reachable from the message thread via
+        // canUndoSort() and SortPreviewPanel while this worker is running, so the
+        // assignment was a data race and a torn read was possible. Scoped to this
+        // one assignment on purpose: holding it across the move loop is exactly
+        // what the phase comment above this function warns against.
+        const juce::ScopedLock sl(dbLock);
+        lastSortJournalPath = journalFile.getFullPathName().toStdString();
+    }
     const auto journalOperation = copyInsteadOfMove ? "copy" : "move";
 
     // For the Wwise and ThinkSpace naming styles, group samples that share the
@@ -7386,15 +7396,25 @@ juce::File SampleManagerEngine::getMostRecentSortJournal() const
     if (!rootDir.isDirectory())
         return {};
 
+    // Recursive, because a single-category sort leaves the library root one level
+    // shallower than the files it wrote, and a non-recursive search from the
+    // recomputed root then cannot see its own journal -- Undo simply becomes
+    // unavailable after closing the DAW, with no error. The filename pattern is
+    // specific enough that picking up a nested journal is the intent.
     juce::Array<juce::File> journals;
-    rootDir.findChildFiles(journals, juce::File::findFiles, false, ".slo_sort_journal_*.csv");
+    rootDir.findChildFiles(journals, juce::File::findFiles, true, ".slo_sort_journal_*.csv");
     juce::File bestJournal;
     juce::Time bestTime(0);
     for (const auto& j : journals) {
         if (j.getFileName().endsWith(".undone"))
             continue;
-        auto modTime = j.getLastModificationTime();
-        if (modTime > bestTime) {
+        const auto modTime = j.getLastModificationTime();
+        // >= rather than >, with the name as a tie-break: two sorts inside the same
+        // filesystem timestamp used to resolve by directory order, which is
+        // filesystem-dependent, so Undo could reverse the wrong one.
+        if (modTime > bestTime
+            || (modTime == bestTime && j.getFileName() > bestJournal.getFileName()))
+        {
             bestTime = modTime;
             bestJournal = j;
         }
