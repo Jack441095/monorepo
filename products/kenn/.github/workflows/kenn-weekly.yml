@@ -1,0 +1,50 @@
+# Weekly CI for the standalone KENN repository (Nite-DSP/kenn-app), where this folder is the repository root. In the
+# NITE DSP monorepo GitHub reads only the root .github/, so this file does nothing there and
+# .github/workflows/kenn-weekly.yml is the monorepo's copy of the same three steps. Keep the two in step: the paths
+# differ, the steps must not.
+#
+# The chaos suite and the phrasing score are drift checks, not change checks, which is why they run on a cadence
+# rather than on every push. The skips budget is here because the skip count is also drift: a test that quietly stops
+# running reports green everywhere else, and the count is the only place it shows up. None of the three needs the
+# knowledge index, so all three genuinely run on a fresh clone.
+name: KENN weekly
+
+on:
+  schedule:
+    # Monday 06:11 UTC. Deliberately not :00 -- every scheduled workflow on the planet fires then and the runners
+    # queue.
+    - cron: "11 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  weekly:
+    name: Chaos suite, phrasing score and skips budget
+    runs-on: macos-14
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: apps/backend/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r apps/backend/requirements.txt
+
+      - name: Chaos suite
+        env:
+          KENN_LIVE_BACKEND: fake
+        run: python -m pytest -q apps/backend/src/kenn/tests/test_chaos_live.py
+
+      - name: Natural phrasing score
+        run: python tooling/scripts/score_natural_phrasings.py --show wrong
+
+      - name: Skips budget
+        run: python tooling/scripts/check_skip_budget.py

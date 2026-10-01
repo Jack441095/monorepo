@@ -330,4 +330,14 @@ anyone reading the history:
   commits are ancestors of the current `HEAD`, confirmed with `git merge-base
   --is-ancestor`. `slo/review-fix-v1` still points at `62b202ca` (my 8th commit); the
   remaining 4 are on `consolidate-20261001`, which descends from it.
-- Nothing was pushed. `main` is untouched.
+- **`main` was moved by the other session, not by me.** The brief requires `main`
+  untouched, and I never wrote to it — no commit, no merge, no checkout. But
+  `git reflog show main` records `main@{0}: branch: Reset to HEAD`, i.e. someone ran a
+  deliberate `git branch -f main HEAD` while my work was in the tree. `main` therefore
+  points at `bd6ae627`, one of the SLO commits below my tip, and now contains most of
+  this remediation. `main` is an *ancestor* of `HEAD`, so nothing is lost and no SLO
+  change is unaccounted for; but the "main untouched" constraint was not met by the
+  repository as a whole, only by my own actions. Left as found rather than moved back,
+  because forcibly rewinding a branch another session is actively working on is far
+  more dangerous than the constraint breach. Flagging it for the owner.
+- Nothing was pushed. No remote branch contains this work.

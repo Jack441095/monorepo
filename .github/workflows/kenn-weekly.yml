@@ -1,16 +1,23 @@
 name: KENN weekly
 
-# The weekly half of F5. kenn-core.yml runs the whole suite on every push and pull request; this runs the two things
-# that only matter on a cadence, because both are about drift rather than about a change.
+# The weekly half of F5. kenn-core.yml runs the whole suite on every push and pull request; this runs the three things
+# that only matter on a cadence, because all three are about drift rather than about a change.
 #
 #   test_chaos_live.py          what a change does when Live misbehaves -- refused writes, lost acknowledgements,
 #                               a replayed confirmation, an undo after the fader moved. A fault-injection bug can pass
 #                               every other suite, because nothing else injects one.
 #   score_natural_phrasings.py  the Stage 1 gate number. It moves when a rule changes, and a rule change can look
 #                               green on the suite while costing phrasings.
+#   check_skip_budget.py        the skip count is drift too: a test that quietly stops running reports green
+#                               everywhere else, and the count is the only place it shows up.
 #
-# Neither needs the knowledge index, so both run on a fresh clone. Measured 30 Sept on a worktree with no index:
-# chaos 47 passed, phrasings 492/505 right with 0 wrong plans.
+# None of the three needs the knowledge index, so all three run on a fresh clone. Measured 30 Sept on a worktree
+# with no index: chaos 47 passed, phrasings 492/505 right with 0 wrong plans.
+#
+# products/kenn/.github/workflows/kenn-weekly.yml is the same three steps for the standalone repository, where that
+# folder is the root. This file cannot be mirrored there: sync_kenn_app.sh ships products/kenn as the kenn-app root,
+# so anything in the monorepo's root .github/ stays behind. That is why the copy exists and why the two have to be
+# edited together.
 on:
   schedule:
     # Monday 06:11 UTC. Deliberately not :00 -- every scheduled workflow on the planet fires then and the runners
