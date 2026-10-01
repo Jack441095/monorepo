@@ -1,0 +1,2219 @@
+{
+ "schema": "kenn.natural_phrasing_score.v1",
+ "model": null,
+ "counts": {
+  "right": 109,
+  "asked": 8,
+  "wrong": 1
+ },
+ "rows": [
+  {
+   "id": "blind-r9-000",
+   "query": "KICK FADER: -18 dB",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.4,
+   "got": {
+    "action": "set_volume",
+    "track": "Kick",
+    "device": null,
+    "value": 0.4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-001",
+   "query": "hi-hats to -20 dB",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.36,
+   "got": {
+    "action": "set_volume",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 0.36,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-002",
+   "query": "Lead Vocal fader: -1.5 dB",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Lead Vocal",
+   "want": 0.812452,
+   "got": {
+    "action": "set_volume",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": 0.812452,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-003",
+   "query": "**Bass**: -12 dB",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.55,
+   "got": {
+    "action": "set_volume",
+    "track": "Bass",
+    "device": null,
+    "value": 0.55,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-004",
+   "query": "- Synth: -20 dB",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.36,
+   "got": {
+    "action": "set_volume",
+    "track": "Synth",
+    "device": null,
+    "value": 0.36,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-005",
+   "query": "SNARE / CLAP \u2014 16 dB",
+   "category": "notes_level_target",
+   "expected": "clarify",
+   "expected_track": "Snare / Clap",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Snare / Clap at 16 dB, or 16 dB louder than it is now? Say \"set Snare / Clap to 16 dB\" or \"turn Snare / Clap up 16 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Snare / Clap",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Snare / Clap at 16 dB, or 16 dB louder than it is now? Say \"set Snare / Clap"
+  },
+  {
+   "id": "blind-r9-006",
+   "query": "FX Print: -6 dB",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "FX Print",
+   "want": 0.7,
+   "got": {
+    "action": "set_volume",
+    "track": "FX Print",
+    "device": null,
+    "value": 0.7,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-007",
+   "query": "Drum Bus fader to -16 dB.",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Drum Bus",
+   "want": 0.45,
+   "got": {
+    "action": "set_volume",
+    "track": "Drum Bus",
+    "device": null,
+    "value": 0.45,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-008",
+   "query": "kick dB: -18",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.4,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-009",
+   "query": "Drum Bus = -17 dB",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Drum Bus",
+   "want": 0.42495,
+   "got": {
+    "action": "set_volume",
+    "track": "Drum Bus",
+    "device": null,
+    "value": 0.42495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-010",
+   "query": "hats level -19 dB",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.378423,
+   "got": {
+    "action": "set_volume",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 0.378423,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-011",
+   "query": "synth at -22",
+   "category": "notes_level_target",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.328843,
+   "got": {
+    "action": "set_volume",
+    "track": "Synth",
+    "device": null,
+    "value": 0.328843,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-012",
+   "query": "hats 4 dB quieter",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.4,
+   "got": {
+    "action": "set_volume",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 0.4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-013",
+   "query": "the drums bus needs 3 dB less",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "Drum Bus",
+   "want": 0.42495,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Drum Bus at 3 dB, or 3 dB louder than it is now? Say \"set Drum Bus to 3 dB\" or \"turn Drum Bus up 3 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Drum Bus at 3 dB, or 3 dB louder than it is now? Say \"set Drum Bus to 3 dB\" "
+  },
+  {
+   "id": "blind-r9-014",
+   "query": "give the Synth 2 dB more",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "Synth",
+   "want": 0.55,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Synth at 2 dB, or 2 dB louder than it is now? Say \"set Synth to 2 dB\" or \"turn Synth up 2 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Synth",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Synth at 2 dB, or 2 dB louder than it is now? Say \"set Synth to 2 dB\" or \"tu"
+  },
+  {
+   "id": "blind-r9-015",
+   "query": "KICK +3 dB",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "Kick",
+   "want": 0.57495,
+   "got": {
+    "action": "set_volume",
+    "track": "Kick",
+    "device": null,
+    "value": 0.57495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-016",
+   "query": "Snare / Clap: 2.5 dB up",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "Snare / Clap",
+   "want": 0.562452,
+   "got": {
+    "action": "set_volume",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.562452,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-017",
+   "query": "Bass -2 dB off its current level",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "Bass",
+   "want": 0.45,
+   "got": {
+    "action": "set_volume",
+    "track": "Bass",
+    "device": null,
+    "value": 0.45,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-018",
+   "query": "take 1 dB off the hats",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.47495,
+   "got": {
+    "action": "set_volume",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 0.47495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-019",
+   "query": "the vocal down 2 dB",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "Lead Vocal",
+   "want": 0.8,
+   "got": {
+    "action": "set_volume",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": 0.8,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-020",
+   "query": "FX Print 3 dB quieter",
+   "category": "notes_level_relative",
+   "expected": "set_volume",
+   "expected_track": "FX Print",
+   "want": 0.77495,
+   "got": {
+    "action": "set_volume",
+    "track": "FX Print",
+    "device": null,
+    "value": 0.77495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-021",
+   "query": "hats 25% left",
+   "category": "notes_pan",
+   "expected": "set_pan",
+   "expected_track": "Hi-Hats",
+   "want": -0.25,
+   "got": {
+    "action": "set_pan",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": -0.25,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-022",
+   "query": "Drum Bus: centre",
+   "category": "notes_pan",
+   "expected": "set_pan",
+   "expected_track": "Drum Bus",
+   "want": 0.0,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'Drum Bus' is already centred. Nothing to change.",
+    "understood": {
+     "action": "set_pan",
+     "track": "Drum Bus",
+     "value": 0.0
+    }
+   },
+   "verdict": "right",
+   "answer": "'Drum Bus' is already centred. Nothing to change."
+  },
+  {
+   "id": "blind-r9-023",
+   "query": "KICK \u2014 30% RIGHT",
+   "category": "notes_pan",
+   "expected": "set_pan",
+   "expected_track": "Kick",
+   "want": 0.3,
+   "got": {
+    "action": "set_pan",
+    "track": "Kick",
+    "device": null,
+    "value": 0.3,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-024",
+   "query": "snare clap hard right",
+   "category": "notes_pan",
+   "expected": "set_pan",
+   "expected_track": "Snare / Clap",
+   "want": 1.0,
+   "got": {
+    "action": "set_pan",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 1.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-025",
+   "query": "Bass: pan left 40%",
+   "category": "notes_pan",
+   "expected": "set_pan",
+   "expected_track": "Bass",
+   "want": -0.4,
+   "got": {
+    "action": "set_pan",
+    "track": "Bass",
+    "device": null,
+    "value": -0.4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-026",
+   "query": "synth 50% right",
+   "category": "notes_pan",
+   "expected": "set_pan",
+   "expected_track": "Synth",
+   "want": 0.5,
+   "got": {
+    "action": "set_pan",
+    "track": "Synth",
+    "device": null,
+    "value": 0.5,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-027",
+   "query": "hats to the left",
+   "category": "notes_pan",
+   "expected": "clarify",
+   "expected_track": "Hi-Hats",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-028",
+   "query": "MUTE: FX Print",
+   "category": "notes_mute",
+   "expected": "set_mute",
+   "expected_track": "FX Print",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "FX Print",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-029",
+   "query": "unmute the Drum Bus",
+   "category": "notes_mute",
+   "expected": "set_mute",
+   "expected_track": "Drum Bus",
+   "want": false,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'Drum Bus' is already unmuted. Nothing to change.",
+    "understood": {
+     "action": "set_mute",
+     "track": "Drum Bus",
+     "value": false
+    }
+   },
+   "verdict": "right",
+   "answer": "'Drum Bus' is already unmuted. Nothing to change."
+  },
+  {
+   "id": "blind-r9-030",
+   "query": "MUTE SNARE / CLAP",
+   "category": "notes_mute",
+   "expected": "set_mute",
+   "expected_track": "Snare / Clap",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-031",
+   "query": "Synth muted",
+   "category": "notes_mute",
+   "expected": "set_mute",
+   "expected_track": "Synth",
+   "want": true,
+   "got": {
+    "action": "set_mute",
+    "track": "Synth",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-032",
+   "query": "SOLO: Bass",
+   "category": "notes_solo",
+   "expected": "set_solo",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "set_solo",
+    "track": "Bass",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-033",
+   "query": "Lead Vocal off solo",
+   "category": "notes_solo",
+   "expected": "set_solo",
+   "expected_track": "Lead Vocal",
+   "want": false,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'Lead Vocal' is already not soloed. Nothing to change.",
+    "understood": {
+     "action": "set_solo",
+     "track": "Lead Vocal",
+     "value": false
+    }
+   },
+   "verdict": "right",
+   "answer": "'Lead Vocal' is already not soloed. Nothing to change."
+  },
+  {
+   "id": "blind-r9-034",
+   "query": "solo the Kick",
+   "category": "notes_solo",
+   "expected": "set_solo",
+   "expected_track": "Kick",
+   "want": true,
+   "got": {
+    "action": "set_solo",
+    "track": "Kick",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-035",
+   "query": "ARM: Bass (recording)",
+   "category": "notes_arm",
+   "expected": "set_arm",
+   "expected_track": "Bass",
+   "want": true,
+   "got": {
+    "action": "set_arm",
+    "track": "Bass",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-036",
+   "query": "disarm the Kick",
+   "category": "notes_arm",
+   "expected": "set_arm",
+   "expected_track": "Kick",
+   "want": false,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "'Kick' is already not armed. Nothing to change.",
+    "understood": {
+     "action": "set_arm",
+     "track": "Kick",
+     "value": false
+    }
+   },
+   "verdict": "right",
+   "answer": "'Kick' is already not armed. Nothing to change."
+  },
+  {
+   "id": "blind-r9-037",
+   "query": "FX Print: record armed",
+   "category": "notes_arm",
+   "expected": "set_arm",
+   "expected_track": "FX Print",
+   "want": true,
+   "got": {
+    "action": "set_arm",
+    "track": "FX Print",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-038",
+   "query": "MUTE: Kick and Hi-Hats",
+   "category": "notes_mute",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "recipe",
+    "track": null,
+    "device": null,
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-039",
+   "query": "HATS \u2192 A-Reverb 30%",
+   "category": "notes_send",
+   "expected": "set_send",
+   "expected_track": "Hi-Hats",
+   "want": 0.3,
+   "got": {
+    "action": "set_send",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 0.3,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-040",
+   "query": "Kick to B-Delay at 12%",
+   "category": "notes_send",
+   "expected": "set_send",
+   "expected_track": "Kick",
+   "want": 0.12,
+   "got": {
+    "action": "set_send",
+    "track": "Kick",
+    "device": null,
+    "value": 0.12,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-041",
+   "query": "Lead Vocal send into A-Reverb: 25%",
+   "category": "notes_send",
+   "expected": "set_send",
+   "expected_track": "Lead Vocal",
+   "want": 0.25,
+   "got": {
+    "action": "set_send",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": 0.25,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-042",
+   "query": "Synth -> B-Delay 40%",
+   "category": "notes_send",
+   "expected": "set_send",
+   "expected_track": "Synth",
+   "want": 0.4,
+   "got": {
+    "action": "set_send",
+    "track": "Synth",
+    "device": null,
+    "value": 0.4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-043",
+   "query": "Snare / Clap reverb send 15%",
+   "category": "notes_send",
+   "expected": "set_send",
+   "expected_track": "Snare / Clap",
+   "want": 0.15,
+   "got": {
+    "action": "set_send",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.15,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-044",
+   "query": "Bass to the A-Reverb at 20 percent",
+   "category": "notes_send",
+   "expected": "set_send",
+   "expected_track": "Bass",
+   "want": 0.2,
+   "got": {
+    "action": "set_send",
+    "track": "Bass",
+    "device": null,
+    "value": 0.2,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-046",
+   "query": "hats send to B-Delay at -6 dB",
+   "category": "notes_send",
+   "expected": "clarify",
+   "expected_track": "Hi-Hats",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "B-Delay is a return track, and KENN can change a return's level, pan and mute, not its name or solo yet. Sends into it work too: \"set the vocal's reverb send to 20%\".",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "B-Delay is a return track, and KENN can change a return's level, pan and mute, not its name or solo yet. Sends into it work too: \"set the vocal's reverb send to"
+  },
+  {
+   "id": "blind-r9-047",
+   "query": "Feed the hats into the reverb",
+   "category": "notes_send",
+   "expected": "clarify",
+   "expected_track": "Hi-Hats",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-048",
+   "query": "A-Reverb: mute",
+   "category": "notes_return_mixer",
+   "expected": "set_return_mute",
+   "expected_track": "A-Reverb",
+   "want": true,
+   "got": {
+    "action": "set_return_mute",
+    "track": "A-Reverb",
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-049",
+   "query": "B-Delay pan hard right",
+   "category": "notes_return_mixer",
+   "expected": "set_return_pan",
+   "expected_track": "B-Delay",
+   "want": null,
+   "got": {
+    "action": "set_return_pan",
+    "track": "B-Delay",
+    "device": null,
+    "value": 1.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-050",
+   "query": "A-Reverb fader to -12 dB",
+   "category": "notes_return_mixer",
+   "expected": "set_return_volume",
+   "expected_track": "A-Reverb",
+   "want": 0.55,
+   "got": {
+    "action": "set_return_volume",
+    "track": "A-Reverb",
+    "device": null,
+    "value": 0.55,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-051",
+   "query": "B-Delay level -15 dB",
+   "category": "notes_return_mixer",
+   "expected": "set_return_volume",
+   "expected_track": "B-Delay",
+   "want": 0.47495,
+   "got": {
+    "action": "set_return_volume",
+    "track": "B-Delay",
+    "device": null,
+    "value": 0.47495,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-053",
+   "query": "solo the B-Delay",
+   "category": "notes_return_mixer",
+   "expected": "clarify",
+   "expected_track": "B-Delay",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "B-Delay is a return track, and KENN can change a return's level, pan and mute, not its name or solo yet. Sends into it work too: \"set the vocal's reverb send to 20%\".",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "B-Delay is a return track, and KENN can change a return's level, pan and mute, not its name or solo yet. Sends into it work too: \"set the vocal's reverb send to"
+  },
+  {
+   "id": "blind-r9-054",
+   "query": "Drum Bus comp threshold: -22 dB",
+   "category": "notes_device_parameter",
+   "expected": "set_device_parameter",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "set_device_parameter",
+    "track": "Drum Bus",
+    "device": "Compressor",
+    "value": 0.33055555555555555,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-055",
+   "query": "vocal compressor ratio 4:1",
+   "category": "notes_device_parameter",
+   "expected": "set_device_parameter",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "set_device_parameter",
+    "track": "Lead Vocal",
+    "device": "Compressor",
+    "value": 0.75,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-056",
+   "query": "Lead Vocal comp attack 5 ms",
+   "category": "notes_device_parameter",
+   "expected": "set_device_parameter",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "set_device_parameter",
+    "track": "Lead Vocal",
+    "device": "Compressor",
+    "value": 0.5397940008672037,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-057",
+   "query": "drum bus compressor release 250 ms",
+   "category": "notes_device_parameter",
+   "expected": "set_device_parameter",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "set_device_parameter",
+    "track": "Drum Bus",
+    "device": "Compressor",
+    "value": 0.3928155339805825,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-058",
+   "query": "Bass EQ: band 2A -3 dB",
+   "category": "notes_device_parameter",
+   "expected": "set_eq_band_gain",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-059",
+   "query": "vocal comp dry/wet 40%",
+   "category": "notes_device_parameter",
+   "expected": "set_device_parameter",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Lead Vocal",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-060",
+   "query": "Drum Bus comp threshold: -60 dB",
+   "category": "notes_device_parameter",
+   "expected": "clarify",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That value is outside the safe range. The verified range for Threshold is -57.2 to 6 dB.",
+    "understood": {
+     "action": "set_device_parameter",
+     "track": "Drum Bus",
+     "value": -60.0
+    }
+   },
+   "verdict": "right",
+   "answer": "That value is outside the safe range. The verified range for Threshold is -57.2 to 6 dB."
+  },
+  {
+   "id": "blind-r9-061",
+   "query": "set the vocal compressor knee to 3 dB",
+   "category": "notes_device_parameter",
+   "expected": "clarify",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "set_device_parameter",
+    "track": "Lead Vocal",
+    "device": "Compressor",
+    "value": 3.0,
+    "name": null
+   },
+   "verdict": "wrong",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-062",
+   "query": "Kick reverb at 20%",
+   "category": "notes_device_parameter",
+   "expected": "clarify",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-063",
+   "query": "Bass Auto Filter cutoff 800 Hz",
+   "category": "notes_device_parameter",
+   "expected": "clarify",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-064",
+   "query": "INSERT: Glue Compressor on the Drum Bus",
+   "category": "notes_insert",
+   "expected": "insert_device",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Drum Bus",
+    "device": "Glue Compressor",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-065",
+   "query": "insert an EQ Eight on the Kick",
+   "category": "notes_insert",
+   "expected": "insert_device",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Kick",
+    "device": "EQ Eight",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-066",
+   "query": "ADD: Hybrid Reverb on the Lead Vocal",
+   "category": "notes_insert",
+   "expected": "insert_device",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Lead Vocal",
+    "device": "Hybrid Reverb",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-067",
+   "query": "Saturator onto the FX Print",
+   "category": "notes_insert",
+   "expected": "insert_device",
+   "expected_track": "FX Print",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "FX Print",
+    "device": "Saturator",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-068",
+   "query": "INSERT: Roar on the Synth",
+   "category": "notes_insert",
+   "expected": "insert_device",
+   "expected_track": "Synth",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Synth",
+    "device": "Roar",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-069",
+   "query": "ADD: Limiter on the Drum Bus",
+   "category": "notes_insert",
+   "expected": "clarify",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "KENN can't add Limiter yet. It can add EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, Saturator, Roar, Auto Filter, Drum Buss, Hybrid Reverb and Echo. You can drag Limiter in from Live's browser.",
+    "understood": {
+     "action": null,
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "KENN can't add Limiter yet. It can add EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, Saturator, Roar, Auto Filter, Drum Buss, Hybrid Reverb and Ech"
+  },
+  {
+   "id": "blind-r9-070",
+   "query": "insert Utility on the FX Print",
+   "category": "notes_insert",
+   "expected": "clarify",
+   "expected_track": "FX Print",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "KENN can't add Utility yet. It can add EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, Saturator, Roar, Auto Filter, Drum Buss, Hybrid Reverb and Echo. You can drag Utility in from Live's browser.",
+    "understood": {
+     "action": null,
+     "track": "FX Print",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "KENN can't add Utility yet. It can add EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, Saturator, Roar, Auto Filter, Drum Buss, Hybrid Reverb and Ech"
+  },
+  {
+   "id": "blind-r9-071",
+   "query": "put another Compressor on the Drum Bus",
+   "category": "notes_insert",
+   "expected": "clarify",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "Track 'Drum Bus' already contains Compressor, and KENN adds one of each device for now. To change the one that's there, say which setting to change (\"set the compressor threshold on Drum Bus to -20 dB\").",
+    "understood": {
+     "action": "insert_device",
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "Track 'Drum Bus' already contains Compressor, and KENN adds one of each device for now. To change the one that's there, say which setting to change (\"set the co"
+  },
+  {
+   "id": "blind-r9-072",
+   "query": "ADD: Delay on the Lead Vocal",
+   "category": "notes_insert",
+   "expected": "insert_device",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "insert_device",
+    "track": "Lead Vocal",
+    "device": "Echo",
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-073",
+   "query": "RENAME: FX Print \u2192 Bounce",
+   "category": "notes_rename",
+   "expected": "rename_track",
+   "expected_track": "FX Print",
+   "want": null,
+   "got": {
+    "action": "rename_track",
+    "track": "FX Print",
+    "device": null,
+    "value": "Bounce",
+    "name": "Bounce"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-074",
+   "query": "CALL THE BASS: Sub",
+   "category": "notes_rename",
+   "expected": "rename_track",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-075",
+   "query": "SYNTH: rename to Pads",
+   "category": "notes_rename",
+   "expected": "rename_track",
+   "expected_track": "Synth",
+   "want": null,
+   "got": {
+    "action": "rename_track",
+    "track": "Synth",
+    "device": null,
+    "value": "Pads",
+    "name": "Pads"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-076",
+   "query": "name the Drum Bus 'Drums'",
+   "category": "notes_rename",
+   "expected": "rename_track",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-077",
+   "query": "Lead Vocal should be called Main Vox",
+   "category": "notes_rename",
+   "expected": "rename_track",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "rename_track",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": "Main Vox",
+    "name": "Main Vox"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-078",
+   "query": "MARKER: Pre-drop",
+   "category": "notes_locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "add_locator",
+    "track": null,
+    "device": null,
+    "value": {
+     "name": "Pre-drop",
+     "time_beats": 0.0
+    },
+    "name": "Pre-drop"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-080",
+   "query": "marker called Bridge",
+   "category": "notes_locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "asked",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-081",
+   "query": "Cue point: Chorus 3",
+   "category": "notes_locator",
+   "expected": "add_locator",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "add_locator",
+    "track": null,
+    "device": null,
+    "value": {
+     "name": "Chorus 3",
+     "time_beats": 0.0
+    },
+    "name": "Chorus 3"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-082",
+   "query": "SHOW: the Bass",
+   "category": "notes_focus",
+   "expected": "focus_track",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "focus_track",
+    "track": "Bass",
+    "device": null,
+    "value": 4,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-083",
+   "query": "jump to the Lead Vocal",
+   "category": "notes_focus",
+   "expected": "focus_track",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "focus_track",
+    "track": "Lead Vocal",
+    "device": null,
+    "value": 6,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-084",
+   "query": "OPEN: Drum Bus / Compressor",
+   "category": "notes_focus",
+   "expected": "focus_device",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That device is already focused in Ableton Live.",
+    "understood": {
+     "action": "focus_device",
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That device is already focused in Ableton Live."
+  },
+  {
+   "id": "blind-r9-085",
+   "query": "show me the Bass EQ",
+   "category": "notes_focus",
+   "expected": "focus_device",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "focus_device",
+    "track": "Bass",
+    "device": "EQ Eight",
+    "value": {
+     "track_index": 4,
+     "device_index": 0
+    },
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-087",
+   "query": "LIST: all tracks",
+   "category": "notes_inspect",
+   "expected": "inspect_tracks",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_tracks",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "I found 8 Live track(s)."
+   },
+   "verdict": "right",
+   "answer": "I found 8 Live track(s)."
+  },
+  {
+   "id": "blind-r9-088",
+   "query": "CHECK: plugins on the Bass",
+   "category": "notes_inspect",
+   "expected": "inspect_devices",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "inspect_devices",
+    "track": "Bass",
+    "value": null,
+    "read_only": true,
+    "answer": "Track 'Bass' has 1 device(s): EQ Eight."
+   },
+   "verdict": "right",
+   "answer": "Track 'Bass' has 1 device(s): EQ Eight."
+  },
+  {
+   "id": "blind-r9-090",
+   "query": "PLAYBACK: start",
+   "category": "notes_transport",
+   "expected": "transport_play",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "transport_play",
+    "track": null,
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-092",
+   "query": "TRANSPORT: play",
+   "category": "notes_transport",
+   "expected": "transport_play",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "transport_play",
+    "track": null,
+    "device": null,
+    "value": true,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-093",
+   "query": "NEW MIDI TRACK: Keys",
+   "category": "notes_create",
+   "expected": "create_midi_track",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "create_midi_track",
+    "track": "Keys",
+    "device": null,
+    "value": {
+     "track_count": 9,
+     "track_index": 8,
+     "type": "midi",
+     "name": "Keys"
+    },
+    "name": "Keys"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-095",
+   "query": "NEW AUDIO: Vocals",
+   "category": "notes_create",
+   "expected": "create_audio_track",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "create_audio_track",
+    "track": "Vocals",
+    "device": null,
+    "value": {
+     "track_count": 9,
+     "track_index": 8,
+     "type": "audio",
+     "name": "Vocals"
+    },
+    "name": "Vocals"
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-096",
+   "query": "TEMPO: 128",
+   "category": "notes_tempo",
+   "expected": "set_tempo",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "set_tempo",
+    "track": null,
+    "device": null,
+    "value": 128.0,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-098",
+   "query": "TIME SIGNATURE: 3/4",
+   "category": "notes_tempo",
+   "expected": "set_time_signature",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "set_time_signature",
+    "track": null,
+    "device": null,
+    "value": {
+     "numerator": 3,
+     "denominator": 4
+    },
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-099",
+   "query": "1) kick -18 dB, 2) hats -20 dB, 3) bass -12 dB",
+   "category": "notes_revision_list",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Kick at -18 dB, or 18 dB quieter than it is now? Say \"set Kick to -18 dB\" or \"turn Kick down 18 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Kick at -18 dB, or 18 dB quieter than it is now? Say \"set Kick to -18 dB\" or"
+  },
+  {
+   "id": "blind-r9-100",
+   "query": "hats -18 / kick -20 / bass -16",
+   "category": "notes_revision_list",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-101",
+   "query": "Kick -18 dB. Hats -20 dB.",
+   "category": "notes_revision_list",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Kick at -18 dB, or 18 dB quieter than it is now? Say \"set Kick to -18 dB\" or \"turn Kick down 18 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Kick at -18 dB, or 18 dB quieter than it is now? Say \"set Kick to -18 dB\" or"
+  },
+  {
+   "id": "blind-r9-102",
+   "query": "- Kick: -18 dB\n- Hats: -20 dB\n- Bass: -12 dB",
+   "category": "notes_revision_list",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-103",
+   "query": "mute the Kick, mute the hats and solo the Bass",
+   "category": "notes_revision_list",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change in \"mute the Kick, mute the hats\". Say \"solo the Bass\". Nothing changed.",
+    "understood": {
+     "action": "recipe",
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change in \"mute the Kick, mute the hats\". Say \"solo the Bass\". Nothing changed."
+  },
+  {
+   "id": "blind-r9-104",
+   "query": "LEVELS: kick -18, hats -20",
+   "category": "notes_revision_list",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-105",
+   "query": "mute the hats then pan it 30% right",
+   "category": "notes_revision_list",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "recipe",
+    "track": null,
+    "device": null,
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-106",
+   "query": "kick and bass both to -16 dB",
+   "category": "notes_revision_list",
+   "expected": "recipe",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "recipe",
+    "track": null,
+    "device": null,
+    "value": null,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-107",
+   "query": "should the hats be lower?",
+   "category": "notes_question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-108",
+   "query": "why does the FX Print sit at 0 dB?",
+   "category": "notes_question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That's a question, so nothing changed. Ask it in chat for an answer, or say the change you want (\"set FX Print to -6 dB\") and KENN prepares it.",
+    "understood": {
+     "action": null,
+     "track": "FX Print",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That's a question, so nothing changed. Ask it in chat for an answer, or say the change you want (\"set FX Print to -6 dB\") and KENN prepares it."
+  },
+  {
+   "id": "blind-r9-109",
+   "query": "how do I EQ the vocal?",
+   "category": "notes_question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That's a how-to question, so nothing changed. Ask it in chat and KENN explains the steps, or say it as a request (\"solo the lead vocal\") and KENN prepares it.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That's a how-to question, so nothing changed. Ask it in chat and KENN explains the steps, or say it as a request (\"solo the lead vocal\") and KENN prepares it."
+  },
+  {
+   "id": "blind-r9-110",
+   "query": "is the drum bus muted?",
+   "category": "notes_question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "inspect_track_state",
+    "track": null,
+    "value": null,
+    "read_only": true,
+    "answer": "No, 'Drum Bus' is not muted."
+   },
+   "verdict": "right",
+   "answer": "No, 'Drum Bus' is not muted."
+  },
+  {
+   "id": "blind-r9-111",
+   "query": "can the kick go to -18 dB?",
+   "category": "notes_question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-112",
+   "query": "would you put a limiter on the kick?",
+   "category": "notes_question",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "KENN can't add Limiter yet. It can add EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, Saturator, Roar, Auto Filter, Drum Buss, Hybrid Reverb and Echo. You can drag Limiter in from Live's browser.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "KENN can't add Limiter yet. It can add EQ Eight, Compressor, Glue Compressor, Multiband Dynamics, Saturator, Roar, Auto Filter, Drum Buss, Hybrid Reverb and Ech"
+  },
+  {
+   "id": "blind-r9-113",
+   "query": "the Kick is at -14 dB",
+   "category": "notes_description",
+   "expected": "clarify",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That describes the set, so nothing changed. Say the change you want (\"set the Drum Bus to -10 dB\") and KENN prepares it.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That describes the set, so nothing changed. Say the change you want (\"set the Drum Bus to -10 dB\") and KENN prepares it."
+  },
+  {
+   "id": "blind-r9-116",
+   "query": "the demo set is at 120 BPM",
+   "category": "notes_description",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": null,
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-117",
+   "query": "hats quieter",
+   "category": "notes_vague",
+   "expected": "clarify",
+   "expected_track": "Hi-Hats",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "By how much? For example \"turn Hi-Hats down 2 dB\" or \"set Hi-Hats to -6 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Hi-Hats",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "By how much? For example \"turn Hi-Hats down 2 dB\" or \"set Hi-Hats to -6 dB\"."
+  },
+  {
+   "id": "blind-r9-119",
+   "query": "the vocal needs to come up",
+   "category": "notes_vague",
+   "expected": "clarify",
+   "expected_track": "Lead Vocal",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "By how much? For example \"turn Lead Vocal up 2 dB\" or \"set Lead Vocal to -6 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Lead Vocal",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "By how much? For example \"turn Lead Vocal up 2 dB\" or \"set Lead Vocal to -6 dB\"."
+  },
+  {
+   "id": "blind-r9-120",
+   "query": "drums feel heavy",
+   "category": "notes_vague",
+   "expected": "clarify",
+   "expected_track": null,
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-122",
+   "query": "**HATS**: -20 dB",
+   "category": "notes_document_format",
+   "expected": "set_volume",
+   "expected_track": "Hi-Hats",
+   "want": 0.36,
+   "got": {
+    "action": "set_volume",
+    "track": "Hi-Hats",
+    "device": null,
+    "value": 0.36,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-123",
+   "query": "KICK - 18 dB",
+   "category": "notes_document_format",
+   "expected": "clarify",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Kick at -18 dB, or 18 dB quieter than it is now? Say \"set Kick to -18 dB\" or \"turn Kick down 18 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Kick at -18 dB, or 18 dB quieter than it is now? Say \"set Kick to -18 dB\" or"
+  },
+  {
+   "id": "blind-r9-124",
+   "query": "`Snare / Clap`: -16 dB",
+   "category": "notes_document_format",
+   "expected": "set_volume",
+   "expected_track": "Snare / Clap",
+   "want": 0.45,
+   "got": {
+    "action": "set_volume",
+    "track": "Snare / Clap",
+    "device": null,
+    "value": 0.45,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-125",
+   "query": "TODO: FX Print to -6 dB",
+   "category": "notes_document_format",
+   "expected": "set_volume",
+   "expected_track": "FX Print",
+   "want": 0.7,
+   "got": {
+    "action": "set_volume",
+    "track": "FX Print",
+    "device": null,
+    "value": 0.7,
+    "name": null
+   },
+   "verdict": "right",
+   "answer": ""
+  },
+  {
+   "id": "blind-r9-126",
+   "query": "KICK: +20 dB",
+   "category": "notes_out_of_range",
+   "expected": "clarify",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Kick at 20 dB, or 20 dB louder than it is now? Say \"set Kick to 20 dB\" or \"turn Kick up 20 dB\".",
+    "understood": {
+     "action": "set_volume",
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I need one more exact detail before I can prepare a safe Live proposal: Do you want Kick at 20 dB, or 20 dB louder than it is now? Say \"set Kick to 20 dB\" or \"t"
+  },
+  {
+   "id": "blind-r9-127",
+   "query": "pan the Bass at 150% right",
+   "category": "notes_out_of_range",
+   "expected": "clarify",
+   "expected_track": "Bass",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Bass",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  },
+  {
+   "id": "blind-r9-128",
+   "query": "Drum Bus compressor ratio 200:1",
+   "category": "notes_out_of_range",
+   "expected": "clarify",
+   "expected_track": "Drum Bus",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "That value is outside the safe range. The verified range for Ratio is 1:1 to 100:1.",
+    "understood": {
+     "action": null,
+     "track": "Drum Bus",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "That value is outside the safe range. The verified range for Ratio is 1:1 to 100:1."
+  },
+  {
+   "id": "blind-r9-129",
+   "query": "EQ Eight band 2A on the Kick at +4 dB",
+   "category": "notes_out_of_range",
+   "expected": "clarify",
+   "expected_track": "Kick",
+   "want": null,
+   "got": {
+    "action": "clarify",
+    "track": null,
+    "value": null,
+    "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.",
+    "understood": {
+     "action": null,
+     "track": "Kick",
+     "value": null
+    }
+   },
+   "verdict": "right",
+   "answer": "I didn't catch a change to make there. Try something like \"turn the bass down 2 dB\", \"pan the synth 20% left\" or \"mute the hats\", ask about your set (\"what's on"
+  }
+ ]
+}
