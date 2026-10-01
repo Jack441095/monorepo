@@ -304,10 +304,26 @@ Deleted: 32 lines. Kept despite being unreachable: 764 lines, all gated on sign-
 - **`customTargetDir`** — a defaulted parameter on a public method that no caller supplies.
   Removing it changes a public signature, which is a larger call than this brief makes
   silently.
-- **P1-15** (`samplesVersion` defeats the editor FIFO fast path) — the only remaining
-  non-R8 finding. It needs the FIFO protocol understood well enough to know which
-  increments the append path cannot express, and getting that wrong silently starves
-  the editor's 60 Hz refresh. Left rather than guessed at.
+- **P1-15** (`samplesVersion` defeats the editor FIFO fast path) — investigated, and the
+  brief's fix would have broken classification. It says "bump the version only for
+  changes the FIFO cannot express", implying the inference-batch bump at
+  `SampleManagerEngine.cpp:4964` is one the FIFO can express. It is not: the FIFO is
+  written **only** in the `isNewSample` branch (`:4917-4933`). An already-known sample is
+  updated in place at `:4936` (`samples[existingIndex] = std::move(p.item)`) and that
+  update reaches the UI *only* through the version bump, because
+  `drainNewSampleEvents` returns whatever the FIFO holds and the editor's only other
+  route is a full `getSamples()`. Drop the bump and every sample stays UNCLASSIFIED on
+  screen forever.
+
+  So the real cost is structural, not a stray increment: during a scan the editor must
+  deep-copy the whole sample vector — each `SampleItem` carrying a 512-float embedding —
+  under `dbLock` at the batch commit rate, because appends travel cheaply and updates
+  cannot. Making that cheap means letting the FIFO carry *updates* as well as appends,
+  plus an `updateSamples` counterpart to `canvas.appendNewSamples`. That is a change to
+  a lock-free protocol and the editor's update path, not a patch, and getting it wrong
+  fails silently as stale rows. Not attempted blind. The measurement to confirm the win
+  is in place: `TestRtDeadlineStress` is unrelated, so this needs a large-library
+  profile of a scan.
 - **P1-22** and every other threshold — R8.
 - **P1-10** (audio-thread ownership of `transportSource`) — R8, and Phase 4 item 2.
 
