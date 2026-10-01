@@ -77,15 +77,34 @@ apart on a 10-question sample is not a 10% swing worth acting on. The cut neithe
 hurts the answer quality.
 
 It also does not help latency, which is the only reason to have considered it: median moved
-3.4 s and p95 moved 0.9 s in opposite directions, i.e. within run-to-run variation, against
-an expected gain of about 0.01 s from the 179 tokens saved.
+3.4 s one way and p95 0.9 s the other, i.e. within run-to-run variation, against a computed
+gain of 0.009 s for the 179 tokens removed.
 
-**Where the remaining budget actually goes.** The 28 Sept note claimed the pass took the
-footprint to <= 450 tokens. That figure is only true on the MLX path. `_mlx_engine_answers()`
-is False here (MLX is not installed), so KENN sends `build_system_prompt()` - **534 tokens,
-63% of the request** - rather than `STATIC_CORE_SYSTEM_PROMPT`. The short prompt cannot be
-used on the Ollama path because it made most answers fail the structure check (26 Sept). So
-816 is the real footprint, and the floor is 534 no matter how short the excerpts get.
+**The prompt-cache half of D2 was measured too, and it cannot help for the same reason.** A shared
+prefix is only worth prefill, and prefill is 0.05 ms per 1000 tokens; reusing KENN's 536-token system
+prompt between turns saves about 0.03 s against a decode of seconds. There is no arrangement of prompt
+tokens that reaches a 4 s answer while the model writes hundreds of them.
+
+**Where the remaining budget actually goes**, from exact `prompt_eval_count` on a real KENN prompt
+(714 tokens for that question, counted by Ollama, not estimated from characters):
+
+| | Tokens | Share |
+|---|---|---|
+| `build_system_prompt()` — the Ollama path | 536 | the floor |
+| `STATIC_CORE_SYSTEM_PROMPT` — the MLX/short path | 338 | 198 fewer, unusable here |
+| Excerpts + draft + question (the part D2 can cut) | ~180-390 | the remainder |
+
+The 28 Sept note claimed the footprint reached <= 450 tokens. That is only true on the MLX path.
+`_mlx_engine_answers()` is False here (MLX is not installed), so KENN sends `build_system_prompt()`.
+The short prompt cannot be substituted on the Ollama path because it made most answers fail the
+structure check (26 Sept). So ~816 is the real footprint and **536 tokens is the floor no matter
+how short the excerpts get** — D2 is trimming the smaller half of a number that does not matter.
+
+**And prefill is nearly free**, measured cleanly on the idle 4090 because the Mac was too contended
+to trust (Live at 58.8% of a core plus the harness itself): 137 tokens 0.22 s cold, then 262 tokens
+0.023 s, 512 tokens 0.034 s, 2012 tokens 0.103 s — about **0.05 ms per 1000 tokens** once warm. So
+KENN's whole ~816-token prompt costs **~0.04 s**, and the 179 tokens D2 removes are worth **0.009 s**.
+Decode is 300-1200 tokens at ~141 tok/s, i.e. 2.1-8.5 s. The prompt is under 2% of an answer.
 
 Cutting excerpts and dropping the draft removed 22% of the tokens and the user part fell
 318 -> 106 tokens. That is real, and it is the only part of D2 that works — but it buys
