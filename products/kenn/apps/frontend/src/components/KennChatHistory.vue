@@ -76,9 +76,22 @@
               </article>
             </div>
 
+            <!-- A recipe proposal is several changes, and carries no track of its own. It has to be rendered as a
+                 list or every step shows as "Track " (2026-09-30). -->
+            <KennRecipeCard
+              v-if="message.proposal?.action === 'recipe' && message.proposal.steps?.length"
+              :proposal="message.proposal"
+              :card-status="message.actionStatus || 'pending'"
+              :receipt="message.receipt"
+              :error-message="message.actionError"
+              @apply="applyMessageProposal(message.id)"
+              @reject="rejectMessageProposal(message.id)"
+              @undo="undoMessageProposal(message.id)"
+            />
+
             <!-- DAW Action Proposal Card -->
             <KennActionCard
-              v-if="'proposal' in message && message.proposal"
+              v-else-if="'proposal' in message && message.proposal"
               :proposal="message.proposal"
               :card-status="message.actionStatus || 'pending'"
               :receipt="message.receipt"
@@ -127,6 +140,7 @@ import { useI18n } from 'vue-i18n'
 import { useKenn } from '../composables/useKenn'
 import { summarizeAdviceAnswer } from '../api/kenn'
 import KennActionCard from './KennActionCard.vue'
+import KennRecipeCard from './KennRecipeCard.vue'
 
 const { t } = useI18n()
 const { messages, sending, sendMessage, applyMessageProposal, undoMessageProposal, rejectMessageProposal } = useKenn()

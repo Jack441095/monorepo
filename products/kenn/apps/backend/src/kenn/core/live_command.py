@@ -256,6 +256,45 @@ NOT_A_CHANGE = ("I didn't catch a change to make there. Try something like \"tur
                 "left\" or \"mute the hats\", ask about your set (\"what's on the drum bus?\") or ask a mixing question.")
 
 
+def _impossible_conjunct(command: str, snapshot: dict[str, Any]) -> str | None:
+    """Which half of a two-part "and" request cannot be made, quoted back.
+
+    "lower the bass 2 dB and raise the vocal 1 dB" is refused outright, and the catch-all says it caught no change --
+    which is wrong twice over: the Bass can come down, and the reason the other half fails is that the Lead Vocal is
+    already at 0 dB. Saying which part and why is the difference between a producer retyping the sentence and a
+    producer understanding KENN. Both halves are parsed here rather than pattern-matched, so the reason is whatever
+    the parser actually found.
+    """
+    from kenn.core.live_intent import parse_request
+
+    parts = re.split(r"\s*,?\s+and\s+(?!then\b)", command)
+    if len(parts) != 2:
+        return None
+    blocked = []
+    for part in parts:
+        part = part.strip()
+        if not part:
+            continue
+        intent = parse_request(part, snapshot)
+        if intent.get("missing_fields"):
+            blocked.append((part, list(intent.get("missing_fields") or [])))
+    if len(blocked) != 1 or not any(field.startswith("valid_") for _part, fields in blocked for field in fields):
+        return None
+    part, fields = blocked[0]
+    track = (parse_request(part, snapshot).get("track") or {}).get("name") or "that track"
+    reason = fields[0].removeprefix("valid_")
+    return f"I can't set {reason.replace('_', ' ')} on {track} from \"{part}\" -- it is already where that would put it."
+
+
+def _not_a_change(command: str, snapshot: dict[str, Any] | None) -> str:
+    """NOT_A_CHANGE, unless one half of a two-part request is specifically impossible -- then say so."""
+    if snapshot:
+        detail = _impossible_conjunct(command, snapshot)
+        if detail:
+            return detail
+    return NOT_A_CHANGE
+
+
 def _clean_text(value: Any, limit: int = 256) -> str:
     return " ".join(str(value or "").split())[:limit]
 
@@ -2966,6 +3005,16 @@ def _handle_command_impl(
                 response["undo_of_receipt_id"] = str(receipt.get("receipt_id") or "")
                 return _proposal_response(response, undo["proposal"], kind="undo")
             return _clarification(response, {"action": "undo"}, undo.get("error", "The latest change cannot be undone safely."))
+        if context_resolution.get("resolution") == "adjust_requires_amount":
+            previous = str(context_resolution.get("last_command") or "").strip()
+            if not previous:
+                return _clarification(response, {"action": "clarify_adjust"},
+                                      "There's nothing to adjust yet in this session.")
+            return _clarification(
+                response,
+                {"action": "clarify_adjust", "previous_command": previous},
+                f"You last asked for \"{previous}\". By how much should I change it?",
+            )
         if context_resolution.get("resolution") == "correction_requires_clarification":
             other = _resolve_other_target(response["session_id"], _command_snapshot(live, include_mixer=True))
             if other:
@@ -3424,7 +3473,7 @@ def _handle_command_impl(
             # "not sure what you're asking" hid that from people who'd asked a perfectly clear question.
             return _clarification(response, intent, str(intent["ambiguity"][0]))
         if intent.get("action") is None:
-            return _clarification(response, intent, NOT_A_CHANGE)
+            return _clarification(response, intent, _not_a_change(command, snapshot))
         if set(intent.get("missing_fields") or []) & {"valid_volume", "parameter", "which_track", "amount", "which_change"} and intent.get("ambiguity"):
             # A limit ("above 0 dB") or one plain question ("which Compressor setting?") reads best on its own.
             return _clarification(response, intent, str(intent["ambiguity"][0]))
@@ -3679,7 +3728,7 @@ def _handle_command_impl(
         if result.get("ok"):
             return _proposal_response(response, result["proposal"], kind="device_parameter")
         return _clarification(response, intent, result.get("clarification", result.get("error", "I could not create a Live device proposal.")))
-    return _clarification(response, intent, NOT_A_CHANGE)
+    return _clarification(response, intent, _not_a_change(command, snapshot))
 
 
 def handle_command(

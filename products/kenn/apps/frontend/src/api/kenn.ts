@@ -22,7 +22,28 @@ export type KennAdviceFinding = {
   listeningTest?: string
 }
 
+// One step of a recipe proposal. A recipe's own fields carry no track, so a card that reads track_name off the
+// proposal renders "Track " for every step -- which is what the chat did before KennRecipeCard existed.
+export type KennActionStep = {
+  action_id?: string
+  action: string
+  operation?: string
+  track_index?: number
+  track_name?: string
+  parameter?: string
+  device_name?: string
+  before?: unknown
+  after?: unknown
+  before_db?: number | '-inf' | null
+  after_db?: number | '-inf' | null
+  unit?: string
+  reason?: string
+  evidence?: string[]
+  requires_confirmation?: boolean
+}
+
 export type KennActionProposal = {
+  steps?: KennActionStep[]
   schema?: string
   action: string
   operation?: string

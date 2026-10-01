@@ -224,7 +224,22 @@ def copy_data(kenn: Path, data_root: Path) -> dict[str, str]:
     return {"index_version": version}
 
 
-def build_dmg(app: Path, output: Path, manifest: dict) -> dict[str, str]:
+def retain_recent_dmgs(output: Path, keep: int = 2) -> list[str]:
+    """Keep the newest `keep` KENN-beta DMGs in output and remove the rest.
+
+    "Go back to the last build" only works if the last build is still on disk. Retention is by modification time
+    rather than by the commit in the filename, because a rebuilt commit produces a DMG with the same name and we
+    want the pair the owner actually installed to survive.
+    """
+    dmgs = sorted(output.glob("KENN-beta-*.dmg"), key=lambda path: path.stat().st_mtime, reverse=True)
+    removed = []
+    for stale in dmgs[keep:]:
+        stale.unlink()
+        removed.append(stale.name)
+    return removed
+
+
+def build_dmg(app: Path, output: Path, manifest: dict, *, keep_dmgs: int = 2) -> dict[str, str]:
     """KENN.app plus an Applications link, as a compressed read-only disk image."""
     version = manifest.get("source_git_commit", "")[:7] or "dev"
     staging = output / "dmg-staging"
@@ -249,6 +264,8 @@ def main() -> int:
     parser.add_argument("--code-root", type=Path, default=KENN_ROOT)
     parser.add_argument("--output", type=Path, required=True, help="folder to write KENN.app into")
     parser.add_argument("--dmg", action="store_true", help="also write a compressed drag-to-Applications disk image")
+    parser.add_argument("--keep-dmgs", type=int, default=2,
+                        help="how many KENN-beta DMGs to keep in --output so the previous build stays installable")
     args = parser.parse_args()
 
     app = args.output / "KENN.app"
@@ -275,6 +292,10 @@ def main() -> int:
     result = {"app": str(app), "python": str(python), "size_mb": round(size / 1e6, 1), **data}
     if args.dmg:
         result.update(build_dmg(app, args.output, manifest))
+        pruned = retain_recent_dmgs(args.output, args.keep_dmgs)
+        if pruned:
+            result["dmgs_removed"] = pruned
+            print(f"removed {len(pruned)} older DMG(s), keeping the newest {args.keep_dmgs}", file=sys.stderr)
     print(json.dumps(result, indent=2))
     return 0
 
