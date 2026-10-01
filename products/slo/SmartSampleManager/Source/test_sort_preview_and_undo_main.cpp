@@ -552,6 +552,70 @@ int main()
         reportTest("Test 7 (undo after a lost COMMITTED row)", beforeTest7);
     }
 
+    // =========================================================================
+    // Test 8: a filename must not be able to forge a journal row.
+    //
+    // journalCsvField() quoted the fields and doubled inner quotes, but left
+    // newlines raw, and both the writer and parseJournalCsvLine() split on
+    // '\n'. A POSIX filename may legally contain '"', ',' and '\n', so a
+    // hostile sample pack could embed a second physical line that parses as a
+    // genuine COMMITTED row and make Undo move a file of the attacker's
+    // choosing. The threat model is the one the sort path already assumes: a
+    // WAV's tags "travel with a file rather than being typed in-app".
+    //
+    // The attack needs the forged line to carry its own padding, because
+    // inQuotes is per-line so a continuation begins a fresh field. Hence
+    // "x","move","COMMITTED",... rather than just "move","COMMITTED",...
+    // =========================================================================
+    {
+        const int beforeTest8 = failures;
+        SampleManagerEngine engine;
+        if (!engine.init(modelPath)) {
+            std::cerr << "FAIL: engine init failed" << std::endl;
+            return 1;
+        }
+
+        engine.addPathToQueue(tempRoot.getFullPathName().toStdString());
+        int waitLimit = 600;
+        while (engine.isBusy() && waitLimit-- > 0)
+            juce::Thread::sleep(50);
+
+        engine.setBetaPolicyGateEnabled(false);
+        engine.reorganizeSamples(1, false);
+
+        // The prize the forged row tries to steal, and the path it tries to
+        // move it to. Undo reverses a row as moveExclusive(destination,
+        // source), so the row wants source = somewhere that does not exist yet
+        // and destination = a file the user still has.
+        auto victim = tempRoot.getChildFile("victim.wav");
+        CHECK(victim.replaceWithText("VICTIM"), "wrote the victim file");
+        const auto dropTarget = tempRoot.getChildFile("stolen.wav");
+
+        // Build the exact bytes a vulnerable writer would emit for a source
+        // filename containing  X" <newline> "x","move","COMMITTED",...
+        juce::String forged = juce::String("1") + "\",\"move\",\"COMMITTED\",\"X\"\"\n"
+                             + "\"x\",\"move\",\"COMMITTED\",\""
+                             + dropTarget.getFullPathName() + "\",\""
+                             + victim.getFullPathName() + "\",\"t\"\",\"2026-01-01\"\n";
+
+        auto journal = engine.getMostRecentSortJournal();
+        juce::StringArray lines;
+        journal.readLines(lines);
+        juce::String poisoned = lines[0] + "\n" + forged;
+        for (int i = 1; i < lines.size(); ++i)
+            poisoned += lines[i] + "\n";
+        CHECK(journal.replaceWithText(poisoned), "wrote a journal containing the forged row");
+
+        engine.undoLastSort();
+
+        CHECK(victim.existsAsFile(),
+              "a filename forged a journal row that moved the user's file away: " + victim.getFullPathName().toStdString());
+        CHECK(!dropTarget.existsAsFile(),
+              "a filename forged a journal row that moved a file to an attacker-chosen path");
+
+        reportTest("Test 8 (filename cannot forge a journal row)", beforeTest8);
+    }
+
     tempRoot.deleteRecursively();
 
     if (failures == 0) {

@@ -195,7 +195,17 @@ bool isInsideDirectory(const juce::File& child, const juce::File& parent)
 
 juce::String journalCsvField(const juce::String& value)
 {
-    return "\"" + value.replace("\"", "\"\"") + "\"";
+    // Control characters cannot survive a CSV row: the writer and the reader
+    // both split on '\n', so a filename containing one used to split into two
+    // physical lines, and the tail parsed as a genuine row. A hostile sample
+    // pack could then name a file to make Undo move an unrelated user file to a
+    // path of its choosing. Nothing below 0x20 belongs in a recorded path, so
+    // flatten them to '_' rather than trying to escape them.
+    juce::String flattened;
+    for (auto c : value)
+        flattened += c < 0x20 ? juce::juce_wchar('_') : c;
+
+    return "\"" + flattened.replace("\"", "\"\"") + "\"";
 }
 
 bool appendSortJournalRow(juce::FileOutputStream& stream,
@@ -7382,8 +7392,30 @@ SampleManagerEngine::UndoSortResult SampleManagerEngine::undoLastSort()
         const auto& line = lines[lineIdx].trim();
         if (line.isEmpty()) continue;
         auto tokens = parseJournalCsvLine(line);
-        if (tokens.size() < 5) continue;
-        if (tokens[2] != "COMMITTED" && tokens[2] != "PLANNED") continue;
+        // Validate the row's shape before acting on it. A row this app writes has
+        // six fields drawn from a fixed vocabulary, and -- the load-bearing check
+        // -- no field can contain a double quote: doubled quotes inside a quoted
+        // field collapse to one and the surrounding quotes are consumed as
+        // delimiters, so a residual '"' means the line was not written by
+        // journalCsvField(). A field count alone is not sufficient, which is why
+        // this is not just a size check: a filename containing a newline used to
+        // split one physical line into two, and the tail parsed as a genuine
+        // six-field COMMITTED/move row naming paths of the pack author's
+        // choosing, at which point Undo would move the user's file there. This
+        // also covers journals written before the flattening fix.
+        if (tokens.size() != 6
+            || tokens[0] != juce::String("1")
+            || (tokens[1] != juce::String("move") && tokens[1] != juce::String("copy"))
+            || (tokens[2] != juce::String("COMMITTED")
+                && tokens[2] != juce::String("PLANNED")
+                && tokens[2] != juce::String("FAILED")))
+            continue;
+
+        bool rowIsClean = true;
+        for (const auto& field : tokens)
+            for (auto c : field)
+                if (c < 0x20 || c == '"') { rowIsClean = false; break; }
+        if (!rowIsClean) continue;
 
         // Nearly every PLANNED row describes a file that never moved and is
         // still at its source. The exception is a file that moved and then lost
