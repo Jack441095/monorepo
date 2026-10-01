@@ -1088,7 +1088,9 @@ def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) ->
         warnings = [str(w) for w in (validation.get("warnings") or [])]
         reason = warnings[0] if warnings else ("accepted" if accepted else "rejected")
         route = f"generation:{'accepted' if accepted else reason}"
-        route_log.record(route, seconds * 1000.0, brain=accepted, proposal=False)
+        detail = [f"unsupported measurement: {m}" for m in (validation.get("unsupported_measurements") or [])]
+        detail += [f"fabricated source: {s}" for s in (validation.get("fabricated_sources") or [])]
+        route_log.record(route, seconds * 1000.0, brain=accepted, proposal=False, detail=detail)
     except Exception:
         logging.getLogger("kenn.core.chat_answer").debug("generation outcome logging failed", exc_info=True)
 

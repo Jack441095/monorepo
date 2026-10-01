@@ -86,6 +86,64 @@ def test_logging_failure_does_not_cost_the_producer_an_answer(tmp_path, monkeypa
     chat_answer._log_generation_outcome(False, {"warnings": ["anything"]}, 1.0)
 
 
+def test_a_rejection_records_which_measurement_the_notes_never_gave(tmp_path, monkeypatch):
+    """A reason alone cannot be acted on: "unsupported measurements" does not say which one.
+
+    The 1 Oct rejections were counted but never attributable, because the harness logs the route and its
+    metadata but not what tripped the gate. Recording the extracted value is what lets a landing rate be
+    diagnosed, and the values come from the grounding regexes, so they cannot carry the answer's prose.
+    """
+    log = tmp_path / "routes.jsonl"
+    monkeypatch.setattr(route_log, "LOG", log)
+
+    chat_answer._log_generation_outcome(
+        False,
+        {
+            "warnings": ["generated answer introduced unsupported measurements"],
+            "unsupported_measurements": ["500 hz"],
+            "fabricated_sources": ["invented-reverb-guide.md"],
+        },
+        61.2,
+    )
+
+    (row,) = _read(log)
+    assert row["detail"] == ["unsupported measurement: 500 hz", "fabricated source: invented-reverb-guide.md"]
+
+
+def test_the_measurement_does_not_go_in_the_route_name(tmp_path, monkeypatch):
+    """Routes are truncated at 64 chars and the report groups by them, so a measurement there would
+    split one rejection reason across as many routes as there are measurements."""
+    log = tmp_path / "routes.jsonl"
+    monkeypatch.setattr(route_log, "LOG", log)
+
+    for measurement in ("500 hz", "-18 dbfs", "12%"):
+        chat_answer._log_generation_outcome(
+            False,
+            {
+                "warnings": ["generated answer introduced unsupported measurements"],
+                "unsupported_measurements": [measurement],
+            },
+            1.0,
+        )
+
+    rows = _read(log)
+    assert {row["route"] for row in rows} == {"generation:generated answer introduced unsupported measurements"}
+    report = route_log.summary(log)
+    rejected = {r: v["requests"] for r, v in report.items() if not r.endswith(":accepted")}
+    assert rejected == {"generation:generated answer introduced unsupported measurements": 3}
+
+
+def test_an_accepted_answer_records_no_detail(tmp_path, monkeypatch):
+    """Nothing to attribute when the answer landed, so the field is absent rather than an empty list."""
+    log = tmp_path / "routes.jsonl"
+    monkeypatch.setattr(route_log, "LOG", log)
+
+    chat_answer._log_generation_outcome(True, {"warnings": [], "unsupported_measurements": []}, 74.0)
+
+    (row,) = _read(log)
+    assert "detail" not in row
+
+
 def test_the_route_report_groups_rejections_without_re_deriving_them(tmp_path):
     """route_latency_report.py must count the rows chat_answer already wrote, not recompute anything."""
     log = tmp_path / "routes.jsonl"

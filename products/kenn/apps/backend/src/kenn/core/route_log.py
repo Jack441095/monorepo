@@ -1,7 +1,8 @@
 """Which path answered each chat request and how long it took (Stage 1: one router, every route timed).
 
-Only the route name, the time, whether the local brain wrote the answer and whether a Live proposal came back are
-kept, never the question or the answer. The log is trimmed to the last MAX_LINES requests.
+Kept per request: the route name, the time, whether the local brain wrote the answer, whether a Live proposal
+came back, and optionally a `detail` list of values the caller already extracted. Never the question or the
+answer. The log is trimmed to the last MAX_LINES requests.
 """
 
 from __future__ import annotations
@@ -21,13 +22,32 @@ MAX_LINES = 5000
 _LOCK = Lock()
 
 
-def record(route: str, milliseconds: float, *, brain: bool, proposal: bool, path: Path | None = None) -> None:
+def record(
+    route: str,
+    milliseconds: float,
+    *,
+    brain: bool,
+    proposal: bool,
+    detail: list[str] | None = None,
+    path: Path | None = None,
+) -> None:
     from kenn.core import timing_stats
 
     timing_stats.record(f"route:{route}", milliseconds)
     target = path or LOG
-    line = json.dumps({"at": round(time.time(), 1), "route": route[:64], "ms": round(milliseconds, 1),
-                       "brain": brain, "proposal": proposal}) + "\n"
+    row: dict[str, Any] = {
+        "at": round(time.time(), 1),
+        "route": route[:64],
+        "ms": round(milliseconds, 1),
+        "brain": brain,
+        "proposal": proposal,
+    }
+    # Detail is a separate field, never folded into the route: routes are truncated at 64 chars and the report
+    # groups by them, so a measurement in the name would split one reason into thousands of routes. Callers pass
+    # regex-extracted values like "500 hz", which cannot carry prose, so this keeps to the rule in the docstring.
+    if detail:
+        row["detail"] = [str(d)[:80] for d in detail[:8]]
+    line = json.dumps(row) + "\n"
     with _LOCK:
         target.parent.mkdir(parents=True, exist_ok=True)
         with target.open("a", encoding="utf-8") as handle:
