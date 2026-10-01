@@ -560,16 +560,26 @@
 > still carries only `kenn-ci.yml`, because the copy is on this branch and not on `main`. It reaches `Nite-DSP/kenn-app`
 > when this branch lands on `main`, not before.
 >
-> **And the sync's own dry run is blocked by something that needs care, not just a push.** It requires `main` to equal
-> `origin/main`, and a fetch shows local `main` at `bd6ae627` against `origin/main` `9131dcb6`, **515 behind and 606
-> ahead**. That phrasing invites the wrong response, so to be exact: the two are **completely disjoint** since
-> `184fa868` — not "unpushed commits". 606 commits exist only locally and 515 only on origin, with none shared since
-> the fork, and **they ship different KENN**: 447 KENN commits are local-only against 371 origin-only, and the two
-> `products/kenn` trees differ by 142 files / 24,962 insertions. So a `git push --force` here would discard 371 KENN
-> commits that exist only on origin, and a `git reset --hard origin/main` would discard 447 that exist only locally.
-> This reads like a force-push that was never reconciled, and reconciling it is the owner's call — deliberately not
-> attempted here, since either resolution discards real work. Note also that my own commits are on local `main` only
-> up to `2b4831a5`; the last three (`6ddbe471`, `615299d9`, `d6947fc8`) are on this branch and not on `main` at all.
+> **And the sync's own dry run is blocked by a history rewrite, which is much cheaper to resolve than the commit
+> counts suggest.** It requires `main` to equal `origin/main`, and a fetch shows local `main` at `bd6ae627` against
+> `origin/main` `9131dcb6`, **515 behind and 606 ahead** with no shared commit since `184fa868`. Those counts read like
+> two bodies of work, so I compared content instead of guessing: `git cherry main origin/main` marks all **498**
+> origin-only non-merge commits `-`, meaning every one is already in local `main` under a different SHA, and **0** as
+> `+`. The 17 origin-only merges were checked separately because cherry skips merges, and none carries a patch local
+> `main` lacks. So this is one history with rewritten SHAs — a rebase or filter-branch, not lost work.
+>
+> **That reverses the risk I first wrote here.** `git push --force origin main` discards no content, because everything
+> on `origin/main` is already present here; it only rewrites SHAs for the 606 commits origin has not seen. The
+> destructive direction is the opposite one: `git reset --hard origin/main` would drop those 606 local-only commits,
+> 447 of them KENN. The 142-file / 24,962-insertion tree difference is local `main` carrying 606 commits *more* work,
+> not origin holding anything absent here. One limit worth stating: patch-ids compare added lines, so a file origin
+> has and local `main` deliberately deleted would not surface as absent — that would be a decision to confirm, not
+> lost work.
+>
+> Publishing local `main` is still the owner's call, deliberately not done here, because it rewrites SHAs that other
+> clones may have cached. Note that my own commits are on local `main` only up to `2b4831a5`; the last four (`6ddbe471`,
+> `615299d9`, `d6947fc8`, `65a8af74`) are on this branch and not on `main` at all, so they are not in what a push would
+> publish yet.
 >
 > **1 Oct, the copy itself is verified end to end, so only the branch move is outstanding.** Splitting this branch
 > rather than `main` carries **both** `.github/workflows/kenn-ci.yml` and `kenn-weekly.yml`, and running the sync's own
