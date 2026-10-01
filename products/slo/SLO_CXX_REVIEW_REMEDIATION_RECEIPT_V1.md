@@ -118,7 +118,9 @@ Every entry below has a test that failed before the fix and passes after, except
 | **P1-20** undo cannot find its own journal after a restart | fixed | full suite green; search made recursive, tie-break deterministic | `5eeb3fbb` |
 | **P1-25** unmeasurable decay read as an instantaneous metal strike | fixed | `TestPhysicalAcoustics` — 0.0 decay no longer yields HardMetal | `9f36eaf2` |
 | **P1-27** the OOD gate, the production decision boundary, was unasserted | fixed | mutation-verified: the new gate assertion fails when inverted | `8f631270` |
-| P1-10 (R8), P1-11, P1-15, P1-21, P1-22 (R8), P1-23, P1-24, P1-26, P1-32, Phase 3 large deletions (R8), Phase 4 | **open** | — | — |
+| **P1-11** a host reporting `isPlaying` with no PPQ stranded the audition forever | fixed | full suite green; `isDawPlaying` now cleared when no position is reported | `364e6bb1` |
+| **P1-26** `clamp01(NaN) == 1.0f`, so a broken measurement scored as a perfect match | fixed | `TestAudioSimilarity` — mutation-verified in both directions | `63366af2` |
+| P1-10 (R8), P1-15, P1-21, P1-22 (R8), P1-23, P1-24, P1-32, Phase 3 large deletions (R8), Phase 4 | **open** | — | — |
 
 ---
 
@@ -228,7 +230,14 @@ reported — the ternary form at `juce_MathsFunctions.h:520` returns the value u
    contract for a producer that does not exist yet. I deleted it, the test failed, and I
    put it back. A subagent grep finding "no producer" was true and still not sufficient
    evidence of dead code.
-6. **A single-file library cannot produce a map cluster** — `computeMapClusters()` defaults
+6. **Build hygiene: restoring a file in the same second as a build leaves a stale
+   binary.** While mutation-testing P1-26 I reverted a header with `cp` in the same
+   second the mutated version had been compiled. Make compared equal timestamps,
+   decided the target was up to date, and left the mutated object in place — so the
+   test kept failing against correct source, and I very nearly committed a "fix" that
+   did not build. `touch`ing the header relinked and it passed. Worth knowing before
+   trusting a red test after any edit/restore cycle.
+7. **A single-file library cannot produce a map cluster** — `computeMapClusters()` defaults
    to `minGroupSize 2`. `test_map_clusters_main` copied exactly one fixture, so it could
    never have formed a group. This is why it had no meaningful assertions to make.
 
