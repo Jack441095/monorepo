@@ -41,6 +41,11 @@ struct AspectScores {
 
 inline float clamp01(float value)
 {
+    // NaN has to be rejected explicitly. std::min(1.0f, NaN) returns 1.0f -- the
+    // comparison is false, so it yields the first argument -- which made a NaN
+    // measurement score as a *perfect* match and pull the overall score up rather
+    // than down. Compiled and confirmed: the previous expression returned 1.0f.
+    if (!std::isfinite(value)) return 0.0f;
     return std::max(0.0f, std::min(1.0f, value));
 }
 

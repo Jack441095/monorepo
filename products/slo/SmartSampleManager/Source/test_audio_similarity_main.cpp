@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <limits>
 
 namespace {
 void check(bool condition, const char* message)
@@ -80,6 +81,24 @@ int main()
     matWeights.material = 1.0f;
     const auto matOnly = SloAudioSimilarity::score(woodSound, woodCopy, {}, {}, matWeights);
     check(std::abs(matOnly.overall - matOnly.material) < 1e-5f, "material-only weight should define overall score");
+
+    // A NaN measurement must not read as a perfect match. clamp01() was
+    // std::max(0, std::min(1, v)), and std::min(1, NaN) returns 1, so a broken
+    // measurement scored as the strongest possible match and pulled the overall
+    // score up. Compiled and confirmed before the isfinite guard went in.
+    {
+        SloAudioEvidence::Record nanA;
+        nanA.contentId = "a"; nanA.sourcePath = "/a.wav";
+        nanA.measurements["crest_factor"] = {std::numeric_limits<float>::quiet_NaN(),
+                                             "ratio", "test", true};
+        check(!nanA.isValid(), "a NaN measurement must fail Record::isValid");
+
+        SloAudioEvidence::Record nanB = nanA;
+        nanB.contentId = "b"; nanB.sourcePath = "/b.wav";
+        const std::vector<float> ea{1.0f, 0.0f};
+        const auto s = SloAudioSimilarity::score(nanA, nanB, ea, ea);
+        check(s.overall < 0.5f, "a NaN measurement must not score as a match");
+    }
 
     std::cout << "AudioSimilarity tests passed\n";
     return 0;

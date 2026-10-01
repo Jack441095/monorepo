@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "AbletonTaxonomy.h"
 
 #include <algorithm>
@@ -72,7 +74,12 @@ struct Record {
         // and is then silently skipped by every consumer, contributing the
         // count==0 fallback of 0.5 instead of its real measurement.
         for (const auto& item : measurements)
+            // The value needs a finiteness check too. Claim::confidence is range
+            // checked, but a PhysicalMeasurement with valid=true and a NaN value
+            // passed, and clamp01() upstream used to turn that NaN into a perfect
+            // score -- so a broken measurement read as the strongest possible match.
             if (item.first.empty() || !item.second.valid
+                || !std::isfinite(item.second.value)
                 || item.second.unit.empty() || item.second.method.empty())
                 return false;
         return true;
