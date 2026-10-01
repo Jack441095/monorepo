@@ -75,18 +75,33 @@ void SmartSampleManagerAudioProcessor::processBlock(juce::AudioBuffer<float>& bu
 
     // 1. Fetch DAW Sync information from the playhead
     double currentBeat = 0.0;
+    bool transportReportedAPosition = false;
+    bool ppqWasReported = false;
     if (auto* playHead = getPlayHead()) {
         auto posInfo = playHead->getPosition();
         if (posInfo.hasValue()) {
+            transportReportedAPosition = true;
             if (posInfo->getBpm().hasValue()) {
                 dawBpm.store(*(posInfo->getBpm()), std::memory_order_relaxed);
             }
             isDawPlaying.store(posInfo->getIsPlaying(), std::memory_order_relaxed);
             if (posInfo->getPpqPosition().hasValue()) {
                 currentBeat = *(posInfo->getPpqPosition());
+                ppqWasReported = true;
             }
         }
     }
+
+    // A host can report a transport with no PPQ at all. That used to strand a
+    // queued audition permanently: currentBeat stayed 0.0, lastBeatPosition was
+    // pinned at 0.0, so nextBoundary was always 1.0 and neither "reached the
+    // boundary" (0 >= 1) nor "jumped backwards" (0 < 0) could ever be true. The
+    // pending handoff then held an open file descriptor and the user heard
+    // nothing. With no PPQ there is no beat to quantise to, so start at once.
+    const bool canQuantise = ppqWasReported;
+
+    if (!transportReportedAPosition)
+        isDawPlaying.store(false, std::memory_order_relaxed);
 
     // Check beat boundary crossing for quantized audition starts. Peek the
     // handoff pointer only to decide WHETHER to start; the exchange below is
@@ -96,7 +111,7 @@ void SmartSampleManagerAudioProcessor::processBlock(juce::AudioBuffer<float>& bu
     PendingPlayback* peeked = pendingPlayback.load(std::memory_order_acquire);
     bool shouldTriggerStart = false;
     if (peeked != nullptr) {
-        if (!isDawPlaying.load(std::memory_order_relaxed)) {
+        if (!isDawPlaying.load(std::memory_order_relaxed) || !canQuantise) {
             shouldTriggerStart = true;
         } else {
             double nextBoundary = std::floor(lastBeatPosition) + 1.0;
