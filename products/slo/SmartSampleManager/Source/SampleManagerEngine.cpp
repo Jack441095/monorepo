@@ -213,7 +213,13 @@ bool appendSortJournalRow(juce::FileOutputStream& stream,
         + "," + journalCsvField(timestamp) + "\n";
     stream.writeText(row, false, false, nullptr);
     stream.flush();
-    return true;
+    // Report what actually happened. This used to `return true` unconditionally,
+    // and rename() only needs a directory entry, so on a full volume the move at
+    // the call site would still succeed while these rows went nowhere: files
+    // moved, the journal silently empty, and Undo later reporting "No committed
+    // actions found in journal." A sort whose undo record did not land is worse
+    // than a sort that did not run, because the user believes it is reversible.
+    return stream.getStatus().ok();
 }
 
 juce::StringArray parseJournalCsvLine(const juce::String& line)
@@ -7236,8 +7242,16 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
             continue;
         }
 
-        appendSortJournalRow(*journalStream, journalOperation, "PLANNED",
-                             sourceFile, destFile);
+        // Journal the intent BEFORE touching the filesystem, and honour the
+        // write: if the row did not land, do not move. A file moved without a
+        // recorded destination is exactly the state Undo cannot reverse.
+        if (!appendSortJournalRow(*journalStream, journalOperation, "PLANNED",
+                                  sourceFile, destFile))
+        {
+            sortFailed.fetch_add(1, std::memory_order_relaxed);
+            continue;
+        }
+
         bool success = false;
         if (copyInsteadOfMove) {
             success = slo::sortSafety::copyExclusive(sourceFile, destFile);
@@ -7250,8 +7264,14 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
         }
 
         if (success) {
-            appendSortJournalRow(*journalStream, journalOperation, "COMMITTED",
-                                 sourceFile, destFile);
+            if (!appendSortJournalRow(*journalStream, journalOperation, "COMMITTED",
+                                      sourceFile, destFile))
+            {
+                // The move landed but the undo record did not. Count it as a
+                // failure so the totals do not read as a clean sort, and flag
+                // the journal so the UI can stop calling this reversible.
+                sortFailed.fetch_add(1, std::memory_order_relaxed);
+            }
             // Keep database path in sync so auditioning and dragging continue to
             // work. Queued for the publish phase; writing to samples[] here would
             // need dbLock, which is the thing this phase is avoiding.

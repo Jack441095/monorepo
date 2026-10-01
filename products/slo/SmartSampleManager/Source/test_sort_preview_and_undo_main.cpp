@@ -407,6 +407,63 @@ int main()
         std::cout << "SUCCESS: Test 5 (exclusive move/copy helpers) passed." << std::endl;
     }
 
+    // =========================================================================
+    // Test 6: the journal must account for every file the sort actually moved.
+    //
+    // appendSortJournalRow() used to `return true` unconditionally and every
+    // call site discarded the result, so a failed journal write was invisible:
+    // the files moved, the journal came up short, and Undo could only restore
+    // some of them. This test is what stops that recurring -- if the loop ever
+    // relocates a file it did not record, it fails.
+    //
+    // It cannot make a write fail, so it does not exercise the full-volume
+    // branch itself; it pins the invariant that branch exists to protect.
+    // =========================================================================
+    {
+        SampleManagerEngine engine;
+        if (!engine.init(modelPath)) {
+            std::cerr << "FAIL: engine init failed" << std::endl;
+            return 1;
+        }
+
+        engine.addPathToQueue(tempRoot.getFullPathName().toStdString());
+        int waitLimit = 600;
+        while (engine.isBusy() && waitLimit-- > 0)
+            juce::Thread::sleep(50);
+
+        engine.setBetaPolicyGateEnabled(false);
+        engine.reorganizeSamples(1, false);
+
+        auto journal = engine.getMostRecentSortJournal();
+        CHECK(journal.existsAsFile(), "sort wrote a journal");
+        juce::StringArray lines;
+        journal.readLines(lines);
+
+        std::set<std::string> committedDestinations;
+        for (int i = 1; i < lines.size(); ++i)
+        {
+            const auto fields = splitQuotedCsvRow(lines[i]);
+            if (fields.size() >= 5 && fields[2] == "COMMITTED")
+                committedDestinations.insert(fields[4].toStdString());
+        }
+
+        int unmapped = 0;
+        for (const auto& s : engine.getSamples())
+        {
+            if (committedDestinations.count(s.filePath) == 0)
+            {
+                std::cerr << "  no COMMITTED row for: " << s.filePath << std::endl;
+                ++unmapped;
+            }
+        }
+        CHECK(unmapped == 0,
+              "journal has no COMMITTED row for " + std::to_string(unmapped)
+                + " file(s) the sort relocated");
+        CHECK(committedDestinations.size() > 0, "sort journalled at least one move");
+
+        std::cout << "SUCCESS: Test 6 (journal accounts for every moved file) passed." << std::endl;
+    }
+
     tempRoot.deleteRecursively();
 
     if (failures == 0) {
