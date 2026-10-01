@@ -103,10 +103,17 @@ Every entry below has a test that failed before the fix and passes after, except
 | **P1-14** uncapped `editorSearchText` in project chunk | fixed | same round-trip test | `50376dcf` |
 | **P1-15** `samplesVersion` defeats the editor FIFO fast path | **deferred** | — | — |
 | **P1-16** `~` / control chars / overlong tag values in path components | fixed | none — §7.3. Also a **correction**, §7.4 | `dc8332c7` |
+| **P1-17** sort root is a character prefix, not a scanned root | fixed | full suite green; the shared-prefix case is now unreachable for a single-root library | `7123f5ac` |
 | **P1-28** `test_search_lexicon` cannot fail in Release | fixed | none — §7.3 | `8a4ec894` |
 | **P1-29** production-cache-guard test never compiled | fixed | the test now passes, which is the first evidence the guard works | `8a4ec894` |
 | **P1-30** licensing test destroys the user's real licence | fixed | asserts the real file is byte-identical after a run; verified absent on this machine | `d959c396` |
-| P1-10, P1-17…P1-27, P1-31…P1-33, Phase 3, Phase 4 | **open** | — | — |
+| **P1-31** two tests assert nothing | fixed | `computeMapClusters()` on one sample correctly returns nothing, so the test never exercised clustering; added a second fixture and real assertions | `bd6ae627` |
+| **P1-33** three tests resolve cache dirs from the CWD | fixed | verified: no `fixtures/` directory is created any more | `bd6ae627` |
+| Phase 3 — `detectLoopVsOneShot` 2-arg overload (no caller, disagreed at 1.5 s) | deleted | `TestTaxonomy` converted to the 3-arg form, plus a new case for the 4.0 s rule | `492f1f0f` |
+| Phase 3 — `fadeOutRequested` (write-never atomic) | deleted | RT stress still green | `492f1f0f` |
+| Phase 3 — `ClassificationPresentation::isNeutral` (no caller) | deleted | its test removed with it | `492f1f0f` |
+| Phase 3 — two comment blocks damaged by a bad edit | repaired | — | `492f1f0f` |
+| P1-10, P1-11, P1-15, P1-18…P1-27, P1-32, Phase 3 large deletions, Phase 4 | **open** | — | — |
 
 ---
 
@@ -186,18 +193,25 @@ reported — the ternary form at `juce_MathsFunctions.h:520` returns the value u
 2. **JUCE leak-detector assertion** fires at exit in four binaries: `BenchmarkScan`,
    `TestCacheIntegrity`, `TestKickLength`, `TestRtDeadlineStress`. Harmless in a test
    binary, but it means an object is outliving its scope somewhere in the engine.
-3. **The sort root is a character prefix, not a scanned root** (brief P1-17) — two
-   sibling roots give a common prefix of `/Users/me`, which is a directory, so the walk-up
-   never runs. I confirmed the code path but did not fix it; it needs a decision about
-   whether multi-root sorts are allowed at all.
-4. **The RT gate had to be loosened, not tightened.** My first version failed on any
+3. **The RT gate had to be loosened, not tightened.** My first version failed on any
    deadline miss and was flaky: the pre-existing outlier population measures 2–86 ms in
    roughly 1 callback in 1000, while the regression it exists to catch measured a
    deterministic 1397 ms. The gate is now a 250 ms ceiling on the worst callback, which
    separates the two populations. Reported rather than hidden, because a loosened gate is
    exactly the kind of change that should be argued with.
-
----
+4. **My own test file was the cause of a later failure.** Test 6 sorted and never undid,
+   so Test 7 started from an already-sorted library and its sort had nothing to move.
+   Eight tests sharing one temp directory is the underlying fragility; Test 6 now undoes
+   on the way out. Noted because the symptom (a P1-17 change "breaking" Test 7) pointed
+   the wrong way.
+5. **`ClassificationPresentation::evidenceLabel`'s `"physics"` branch** is in the brief's
+   deletion list as unreachable. It has a passing test, so it is the presentation layer's
+   contract for a producer that does not exist yet. I deleted it, the test failed, and I
+   put it back. A subagent grep finding "no producer" was true and still not sufficient
+   evidence of dead code.
+6. **A single-file library cannot produce a map cluster** — `computeMapClusters()` defaults
+   to `minGroupSize 2`. `test_map_clusters_main` copied exactly one fixture, so it could
+   never have formed a group. This is why it had no meaningful assertions to make.
 
 ## 7.6 Before → after
 
@@ -211,24 +225,37 @@ reported — the ternary form at `juce_MathsFunctions.h:520` returns the value u
 | Sort-journal rows honoured | write result discarded | gate the move; malformed rows rejected |
 | Journal rows consumed by undo | `COMMITTED` only | `COMMITTED` + provably-landed `PLANNED` |
 | Retired-reader slots before leak | 8, then never again | 8, wrapping |
-| `Source/` line count | 35,601 | 36,331 (+730, all tests and comments; Phase 3 not reached) |
+| Sort root for a single-root library | character prefix | the directory the user added |
+| Tests that create files in the working directory | 3 | 0 |
+| `Source/` line count | 35,601 | see §7.6 note |
 
 ---
 
 ## 7.7 What I deliberately did not touch, and why
 
 - **All of Phase 4** — six items needing owner sign-off, per the brief.
-- **P1-22, and every threshold in `PhysicalAcoustics.h` / `AbletonTaxonomy.cpp` /
-  `MlOverrideGate.h`** — R8. P1-22 additionally needs a holdout similarity distribution
-  that is not in the repo; the 92.9% in the header is accuracy, not a separation point.
+- **The four large test-only headers** — `PhaseCorrelationMeter.h` (171 lines, zero
+  references anywhere), `AudioSimilarity.h` (165), `AudioEvidence.h` (160),
+  `PhysicalSynthesizer.h` (268). All four are confirmed dead by grep, and all four exceed
+  R8's 100-line deletion ceiling, so they go to sign-off rather than being removed. The
+  dead-code ledger is therefore short but real.
+- **The fusion-v2 and loop-v2 feature flags** (`MlOverrideGate.h:37`,
+  `AbletonTaxonomy.h:27`). Their setters are called only by their own test binaries, so in
+  production they are permanently false and ~35 lines are unreachable — which reads like
+  YAGNI. But the surrounding comment states the gates are values "the owner must pass
+  before V2 ships", i.e. deliberately parked pending an owner decision, and
+  `test_fusion_v2_main` / `test_loop_v2_main` are real coverage of that parked path.
+  Deleting them would destroy staged work, not dead code.
+- **`ClassificationPresentation`'s `"physics"` branch** — see §7.5 item 5.
+- **Every threshold in `PhysicalAcoustics.h` / `AbletonTaxonomy.cpp` / `MlOverrideGate.h`**
+  — R8. P1-22 additionally needs a holdout similarity distribution that is not in the repo.
 - **`AcousticClassifierWeights.h` and `AcousticClassifierCentroids.h`** — R8, both
   generated and marked `DO NOT EDIT MANUALLY`.
 - **`AbletonXmpWriter.cpp:107`** — see §7.4; `copyExclusive` there would break the backup.
-- **Phase 3 deletions** — not reached. The dead-code ledger is therefore empty, which is
-  a real gap in this receipt rather than a claim that nothing is dead.
-- **P1-11, P1-15, P1-17…P1-27, P1-31…P1-33** — open, listed in §7.2.
-
----
+- **`customTargetDir`** — a defaulted parameter on a public method that no caller supplies.
+  Removing it changes a public signature, which is a larger call than this brief makes
+  silently.
+- **P1-11, P1-15, P1-18…P1-27, P1-32** — open, listed in §7.2.
 
 ## 7.8 Repository interference
 
