@@ -262,3 +262,17 @@ def test_lufs_target_phrase_is_kept_as_spoken(tmp_path):
     )
     assert recorded.get("ok") is True, recorded
 
+
+
+def test_a_question_about_what_others_say_is_not_stored_as_a_preference():
+    # Stored as a -14 LUFS preference and answered "Got it" instead of from the mastering notes (30 Sept 2026).
+    assert parse_explicit_preference(
+        "One person says master to -14 LUFS and another says go louder. What should I actually do?") is None
+    assert parse_explicit_preference("What LUFS should I master to for Spotify?") is None
+    assert parse_explicit_preference("My engineer says master to -14 LUFS") is None
+
+
+def test_your_own_statements_and_explicit_remember_still_count():
+    assert parse_explicit_preference("I master to -14 LUFS")[0] == "workflow"
+    assert parse_explicit_preference("Remember that I master to -14 LUFS")[0] == "workflow"
+    assert parse_explicit_preference("I mix on headphones")[0] == "monitoring"
