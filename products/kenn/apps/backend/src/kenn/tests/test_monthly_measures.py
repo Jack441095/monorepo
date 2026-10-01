@@ -76,11 +76,23 @@ def no_index(monkeypatch, tmp_path):
     return tmp_path
 
 
+@pytest.fixture
+def no_route_log(monkeypatch, tmp_path):
+    """Point the report at a route log that was never written.
+
+    KENN writes .runtime/logs/routes.jsonl during real use, so on any machine that has run the
+    assistant the log is real and these tests read somebody's actual latencies instead of the
+    empty state they are about. Both are gitignored, so a fresh clone has neither.
+    """
+    monkeypatch.setattr(monthly_measures.route_log, "LOG", tmp_path / "logs" / "routes.jsonl")
+    return tmp_path
+
+
 def find(report: list[Measure], needle: str) -> Measure:
     return next(measure for measure in report if needle in measure.title)
 
 
-def test_missing_route_log_reports_not_measured_rather_than_a_latency_number(no_index):
+def test_missing_route_log_reports_not_measured_rather_than_a_latency_number(no_index, no_route_log):
     report, _ = build_report(runner_for({"e2e_demo_commands.py": e2e_output()}), pilot_logs=[])
     for title in ("Latency by stage", "How often the local model's answer lands",
                   "Answers rejected by the grounding gate"):
@@ -235,7 +247,7 @@ def test_a_default_run_writes_nothing_tracked_and_leaves_no_receipt(monkeypatch,
     assert sorted((KENN_ROOT / "tooling/evaluation/results").glob("KENN_MONTHLY_MEASURES_*.json")) == receipts
 
 
-def test_receipt_is_written_only_on_request_with_a_dated_schema_consistent_name(monkeypatch, tmp_path, capsys):
+def test_receipt_is_written_only_on_request_with_a_dated_schema_consistent_name(monkeypatch, no_index, tmp_path, capsys):
     monkeypatch.setattr(monthly_measures, "default_runner", runner_for({"e2e_demo_commands.py": e2e_output()}))
     monkeypatch.setattr(monthly_measures, "RESULTS_DIR", tmp_path / "results")
     main(["--receipt"])
