@@ -1242,12 +1242,78 @@ foreach(_ssmJuceDepTarget IN LISTS SSM_JUCE_HEADER_DEPENDENT_TARGETS)
     endif()
 endforeach()
 
+# --- R1 (2026-10-01): ctest registration ---
+#
+# This project never called enable_testing(), so `ctest` had zero tests to run
+# and the ssm_qual_* groups below only ever BUILT their binaries: a DEPENDS list
+# says nothing about pass/fail, so every "suite passed" claim in the audit docs
+# came from someone running 55 executables by hand. One `ctest` invocation is
+# the regression gate from here on.
+enable_testing()
+
+# WORKING_DIRECTORY is load-bearing for three tests. TestKickLength,
+# TestReadOnlySafetyQualification and TestRtDeadlineStress build their cache
+# path from getCurrentWorkingDirectory(), so what they test depends on where
+# they were launched from. Pin every test to the product root -- the parent of
+# SmartSampleManager/ -- so ctest reproduces the hand-run behaviour and the
+# fixtures/ tree they create is the one already checked in. Move those three
+# onto ScopedIsolatedCacheDb and this can go.
+set(SSM_TEST_WORKING_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
+
+# TestLicensing is deliberately NOT registered. It tampers with and then deletes
+# the real ~/Library/Application Support/SmartSampleManager/license.json
+# (Source/test_licensing_main.cpp:125-155) because LicenseManager::appDataDir()
+# has no test override hook, and it needs a live uvicorn server plus a real key
+# to mean anything. It gets registered in the commit that adds the override.
+#
+# ClassificationBenchmark is the research harness, not a regression test: it
+# wants a mode, a scan dir and an output JSON path, and it writes into
+# tools/classification_benchmark/. BenchmarkScan takes only a fixture dir, so it
+# is registered below with one.
+set(SSM_CTEST_TARGETS
+    TestAcousticClassifierInputSafety TestAcousticClassifierParity
+    TestAudioEvidence TestAudioFeatures TestAudioSimilarity TestAuditionTempo
+    TestAutoTagging TestBassTimbre TestBetaDecisionPolicy TestBetaSortGate
+    TestCachedReclassification TestCacheIntegrity TestCacheVersionEnforcement
+    TestClassificationPresentation TestCorrectionLog TestDiagnosticsBundle
+    TestDuplicateDetection TestEmbeddingQuality TestFavorites TestFindSimilar
+    TestFindSimilarWeighted TestFormatAwareScan TestFusionV2 TestHiHatType
+    TestHistory TestInferenceBatchFlush TestKickLength
+    TestLabelFreeEvidencePacket TestLoopV2 TestMalformedAudio TestMapClusters
+    TestMultiInstance TestNearDuplicates TestPathIndexIntegrity
+    TestPathTraversal TestPersistedCacheHydration TestPhysicalAcoustics
+    TestPrecisionBrowserSorting TestPruneMissing TestQuadTreeCoincidentPoints
+    TestReadOnlySafetyQualification TestReferenceSearch TestResilience
+    TestRtDeadlineStress TestSafetyRegression TestSampleEngine
+    TestSearchLexicon TestSmartCollections TestSortLibraryAsync
+    TestSortPreviewAndUndo TestTaxonomy TestTimbreRefinement
+    TestUmapEligibility TestXmpWriter
+)
+foreach(_ssmCtestTarget IN LISTS SSM_CTEST_TARGETS)
+    if(TARGET ${_ssmCtestTarget})
+        add_test(NAME ${_ssmCtestTarget}
+                 COMMAND ${_ssmCtestTarget}
+                 WORKING_DIRECTORY ${SSM_TEST_WORKING_DIR})
+    endif()
+endforeach()
+
+# BenchmarkScan prints usage and exits 1 without a fixture directory.
+if(TARGET BenchmarkScan)
+    add_test(NAME BenchmarkScan
+             COMMAND BenchmarkScan "${CMAKE_CURRENT_SOURCE_DIR}/../fixtures"
+             WORKING_DIRECTORY ${SSM_TEST_WORKING_DIR})
+endif()
+
 # --- BUILD-SYSTEM OPTIMISATION (2026-08-22): selective qualification groups --
 #
 # Map tests to risk surfaces so a small classification change does not force a
-# rebuild/run of every unrelated target. Groups are plain custom targets:
+# rebuild of every unrelated target. Groups are plain custom targets:
 #     cmake --build <tree> --target ssm_qual_classification
 # Full-suite qualification remains available via ssm_qual_full.
+#
+# These remain BUILD-only by design: they are a fast incremental-rebuild
+# convenience, and they say nothing about whether anything passed. Use
+# `ctest --output-on-failure` for that.
 add_custom_target(ssm_qual_fast_regression
     DEPENDS TestTaxonomy TestAcousticClassifierInputSafety TestClassificationPresentation TestXmpWriter TestPathTraversal TestDuplicateDetection
             TestPruneMissing TestSafetyRegression TestCachedReclassification
