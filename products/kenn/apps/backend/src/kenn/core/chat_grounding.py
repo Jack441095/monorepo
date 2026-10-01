@@ -152,10 +152,31 @@ def grounding_mode(report: dict) -> str:
     return "weak"
 
 
-_MEASUREMENT_RE = re.compile(
-    r"\b-?\d+(?:\.\d+)?\s*(?:hz|khz|db(?:fs|tp)?|ms|%|lufs?|bpm|bits?)\b",
+# Three defects this pattern carried, found by running real answers against real evidence. A hyphen
+# between two numbers is a range, not a sign: "200-400 Hz" read as "-400 Hz", so quoting the range's
+# own lower bound was rejected as invented, and "-18 dBFS" lost its sign and could be restated
+# "+18 dBFS" and pass. Ranges are rewritten to their endpoints first, leaving the hyphen unambiguous.
+# The trailing \b was the third: it cannot match after "%", so percentages escaped the gate entirely.
+_RANGE_RE = re.compile(
+    r"\b(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)"
+    r"(\s*(?:hz|khz|db(?:fs|tp)?|ms|%|lufs?|bpm|bits?))(?![a-z0-9])",
     re.IGNORECASE,
 )
+_MEASUREMENT_RE = re.compile(
+    r"(?<![\d.])-?\d+(?:\.\d+)?\s*(?:hz|khz|db(?:fs|tp)?|ms|%|lufs?|bpm|bits?)"
+    r"(?![a-z0-9])",
+    re.IGNORECASE,
+)
+
+
+def _measurements(text: str) -> set[str]:
+    """Each measurement in `text`, whitespace-normalised so formatting never decides a match."""
+    return {
+        " ".join(m.lower().split())
+        for m in _MEASUREMENT_RE.findall(_RANGE_RE.sub(r"\1\3 \2\3", text))
+    }
+
+
 _STRUCTURE_TERMS = {
     "short", "answer", "try", "this", "check", "sources", "source", "step",
     "steps", "first", "then", "use", "using", "based", "notes", "note",
@@ -356,15 +377,7 @@ def generated_answer_validation(
         if answer_terms
         else 0.0
     )
-    evidence_measurements = {
-        " ".join(match.lower().split())
-        for match in _MEASUREMENT_RE.findall(evidence_text)
-    }
-    answer_measurements = {
-        " ".join(match.lower().split())
-        for match in _MEASUREMENT_RE.findall(answer)
-    }
-    unsupported_measurements = sorted(answer_measurements - evidence_measurements)
+    unsupported_measurements = sorted(_measurements(answer) - _measurements(evidence_text))
     displayed_filenames = {
         str(chunk.get("source") or "").lower()
         for _score, chunk in display_results(query, results, 3)

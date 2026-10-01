@@ -117,3 +117,32 @@ def test_advice_in_the_first_person_is_not_mistaken_for_a_change() -> None:
     result = validate(advice)
     assert result["claims_live_change"] is False
     assert result["accepted"] is True
+
+
+def test_restating_one_end_of_a_retrieved_range_is_not_charged_with_inventing_it() -> None:
+    # The hyphen in "200-400 Hz" used to read as a minus, so the note held only "-400 Hz" and rejected the lower bound.
+    result = validate(PARAPHRASE.replace("200-400 Hz", "200 Hz"))
+    assert result["unsupported_measurements"] == []
+    assert result["accepted"] is True
+
+
+def test_a_send_level_the_notes_never_gave_is_caught() -> None:
+    # A trailing \b cannot match after "%", so an invented send level used to pass as grounded.
+    result = validate(PARAPHRASE.replace("10-20% send", "45% send"))
+    assert "45%" in result["unsupported_measurements"]
+    assert result["accepted"] is False
+
+
+def test_flipping_the_sign_on_a_measured_level_is_caught() -> None:
+    # The sign used to be dropped, so "-18 dBFS" in the evidence matched "+18 dBFS" in the answer.
+    result = generated_answer_validation(
+        QUERY,
+        RESULTS,
+        PARAPHRASE + "\n\nSet the send to +18 dBFS.",
+        route="production",
+        confidence="high",
+        answer_mode="quick_fix",
+        additional_evidence_text="Set the send to -18 dBFS.",
+    )
+    assert "18 dbfs" in result["unsupported_measurements"]
+    assert result["accepted"] is False
