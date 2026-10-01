@@ -33,7 +33,17 @@ static void runV4HTests()
         int clapIdx = -1;
         for (int c = 0; c < AcousticOodCentroids::numClasses; ++c)
             if (std::strcmp(AcousticOodCentroids::classNames[c], "Clap") == 0) { clapIdx = c; break; }
-        V4H_CHECK(clapIdx >= 0, "'Clap' found in AcousticOodCentroids::classNames");
+        if (clapIdx < 0)
+        {
+            // Hard stop, not V4H_CHECK: that macro records the failure and keeps
+            // going, so the next line would index centroids[-1] and classify() would
+            // then read 512 floats from a wild pointer. Reachable whenever a model
+            // regeneration renames or drops a class in a DO-NOT-EDIT-MANUALLY file.
+            std::cerr << "FAIL (V4-H): 'Clap' is not in AcousticOodCentroids::classNames"
+                      << std::endl;
+            v4hFailures++;
+            return;
+        }
 
         auto res = AcousticClassifier::classify(AcousticOodCentroids::centroids[clapIdx]);
         V4H_CHECK(!res.isOod, "an embedding identical to the Clap centroid is NOT flagged OOD");
@@ -55,7 +65,13 @@ static void runV4HTests()
             if (std::strcmp(AcousticOodCentroids::classNames[c], "Foley") == 0) foleyIdx = c;
             if (std::strcmp(AcousticOodCentroids::classNames[c], "Riser") == 0) riserIdx = c;
         }
-        V4H_CHECK(foleyIdx >= 0 && riserIdx >= 0, "'Foley' and 'Riser' found in AcousticOodCentroids::classNames");
+        if (foleyIdx < 0 || riserIdx < 0)
+        {
+            std::cerr << "FAIL (V4-H): 'Foley'/'Riser' missing from AcousticOodCentroids::classNames"
+                      << std::endl;
+            v4hFailures++;
+            return;
+        }
         V4H_CHECK(AcousticOodCentroids::perClassOodThreshold[foleyIdx] < AcousticOodCentroids::perClassOodThreshold[riserIdx],
                    "Foley's per-class threshold is lower (more permissive) than Riser's, as derived from calibration data");
 
@@ -312,6 +328,8 @@ int main()
     std::cout << "Running Python/C++ Numerical Parity Tests (" << parityArray->size() << " cases)..." << std::endl;
 
     double maxLogitError = 0.0;
+    int oodVerdicts = 0;
+    int inDistributionVerdicts = 0;
     double maxProbError = 0.0;
 
     for (int i = 0; i < parityArray->size(); ++i)
@@ -360,6 +378,12 @@ int main()
 
         // 2. Verify Classifier Output (if not OOD)
         auto res = AcousticClassifier::classify520(embed);
+
+        // Count the gate's verdicts rather than only checking the class when the
+        // gate says "in distribution". Skipping the OOD cases meant a gate that
+        // regressed to always-OOD would silently switch off every class assertion
+        // in this file and the suite would still be green.
+        if (res.isOod) ++oodVerdicts; else ++inDistributionVerdicts;
 
         if (!res.isOod && res.subcategory != expectedSub)
         {
@@ -410,6 +434,22 @@ int main()
         std::cerr << "FAIL: Probability error exceeded 1e-4 tolerance!" << std::endl;
         return 1;
     }
+
+    // The gate has to be capable of both verdicts for the class assertions above to
+    // mean anything. Asserting the counts rather than golden per-case values keeps
+    // this honest: the numbers come from the shipped centroids, and the property
+    // under test is that the gate discriminates, not that it matches a table.
+    if (inDistributionVerdicts == 0 || oodVerdicts == 0)
+    {
+        std::cerr << "FAIL: the OOD gate returned a single verdict across the fixture set ("
+                  << inDistributionVerdicts << " in-distribution, " << oodVerdicts
+                  << " OOD). A gate that always abstains would pass every class check by "
+                     "skipping it." << std::endl;
+        return 1;
+    }
+    std::cout << "OOD gate verdicts across the fixture set: "
+              << inDistributionVerdicts << " in-distribution, " << oodVerdicts << " OOD"
+              << std::endl;
 
     std::cout << "SUCCESS: All numerical parity checks passed!" << std::endl;
 
