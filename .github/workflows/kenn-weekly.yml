@@ -11,8 +11,10 @@ name: KENN weekly
 #   check_skip_budget.py        the skip count is drift too: a test that quietly stops running reports green
 #                               everywhere else, and the count is the only place it shows up.
 #
-# None of the three needs the knowledge index, so all three run on a fresh clone. Measured 30 Sept on a worktree
-# with no index: chaos 47 passed, phrasings 492/505 right with 0 wrong plans.
+# None of the three needs the knowledge index, so all three run on a fresh clone. Re-measured 1 Oct on this tree with
+# the index hidden to reproduce a fresh clone: chaos 47 passed, phrasings 491/505 right with 14 asked and 0 wrong,
+# skips budget 124 environmental and 0 unaccounted. The 30 Sept note said 492/505; it is 491 now, identically with and
+# without the index, so the score moved by a phrasing rather than by environment.
 #
 # products/kenn/.github/workflows/kenn-weekly.yml is the same three steps for the standalone repository, where that
 # folder is the root. This file cannot be mirrored there: sync_kenn_app.sh ships products/kenn as the kenn-app root,

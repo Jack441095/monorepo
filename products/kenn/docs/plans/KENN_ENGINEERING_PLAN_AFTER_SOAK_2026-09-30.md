@@ -540,6 +540,13 @@
 > no index: **chaos 47 passed, phrasings 492/505 with 0 wrong plans**. The chaos suite matters because it is the only
 > place faults are injected — a fault-handling bug can pass every other suite — and the phrasing score is the Stage 1
 > gate number, which a rule change can cost while the suite stays green.
+>
+> **1 Oct, re-measured and the 492 is stale: it is 491/505, with 14 asked and still 0 wrong.** Measured with the index
+> hidden to reproduce a fresh clone, and again with it present: identical, so the difference is a phrasing moving
+> right → asked rather than an environment effect. The weekly workflow now runs the skips budget as a third step and
+> this note's figures are the ones it will print, so they are recorded as measured. The two A/B claims elsewhere in
+> this file that quote 492/505 are left alone deliberately: they are about a specific past comparison on
+> `kenn-solo-negation`, and only the current-tree side is re-measurable without checking that branch out.
 > **Two follow-ups for the sync script (F1), not done here:** the weekly workflow lives only in the monorepo's
 > `.github/workflows/`, so it does not reach `Nite-DSP/kenn-app` until F1 carries it across, and the skips-budget step
 > is deliberately absent from the weekly workflow because `check_skip_budget.py` is on `kenn-answer-audit` and would
