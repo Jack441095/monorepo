@@ -101,9 +101,21 @@ WriteResult writeTagsForFile(const std::string& audioFilePath, const std::vector
             return result;
         }
 
-        // Back up before modifying anything pre-existing, using LiveTagger's
-        // own ".xmp.bak" convention (restore by renaming it back to ".xmp").
-        juce::File backupFile = xmpFile.getSiblingFile(xmpFile.getFileName() + ".bak");
+        // Back up before modifying anything pre-existing. The name is timestamped
+        // rather than a fixed ".xmp.bak": copyFileTo is delete-then-copy, so a
+        // fixed name means the second run's backup holds SLO's own previous output
+        // and the user's original sidecar is gone for good. Timestamped names keep
+        // every generation, and still sort chronologically.
+        // "2026-10-01 17:33:44" with separators stripped: sorts chronologically as a
+        // filename component, which a fixed ".xmp.bak" name does not.
+        const auto stamp = juce::Time::getCurrentTime()
+                               .toString(true, true, true, true)
+                               .replaceCharacters(" :", "");
+        juce::File backupFile = xmpFile.getSiblingFile(
+            xmpFile.getFileName() + "." + stamp + ".xmp.bak");
+        if (backupFile.existsAsFile())
+            backupFile = xmpFile.getSiblingFile(
+                xmpFile.getFileName() + "." + stamp + "-2.xmp.bak");
         if (!xmpFile.copyFileTo(backupFile)) {
             result.errorMessage = "Could not create a backup of the existing XMP file -- aborting without "
                                    "writing, to avoid risking data loss.";
@@ -154,9 +166,26 @@ WriteResult writeTagsForFile(const std::string& audioFilePath, const std::vector
         }
     }
 
-    if (!doc->writeTo(xmpFile)) {
-        result.errorMessage = "Failed to write the XMP file to disk.";
-        return result;
+    // Write to a temporary and rename into place, rather than truncating the
+    // sidecar in place: a crash mid-write otherwise leaves a corrupt file, and the
+    // .bak only covers the case where the previous generation was readable.
+    {
+        juce::File tempFile = xmpFile.getSiblingFile(xmpFile.getFileName() + ".slo-tmp");
+        tempFile.deleteFile();
+        if (!doc->writeTo(tempFile))
+        {
+            tempFile.deleteFile();
+            result.errorMessage = "Failed to write the XMP file to disk.";
+            return result;
+        }
+        // Deliberately overwrites our own sidecar -- that is the point. The
+        // timestamped backup above is what protects the user's generation.
+        if (!tempFile.moveFileTo(xmpFile))
+        {
+            tempFile.deleteFile();
+            result.errorMessage = "Could not replace the XMP file with the newly written one.";
+            return result;
+        }
     }
 
     result.success = true;

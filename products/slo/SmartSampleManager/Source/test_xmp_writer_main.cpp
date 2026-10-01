@@ -111,9 +111,23 @@ int main()
         auto secondFileTags = AbletonXmpWriter::readTagsForFile(sampleFile2.getFullPathName().toStdString());
         expectTrue(secondFileTags.size() == 1 && secondFileTags[0] == "Drums|Snare", "second file should have its own tag");
 
-        juce::File backupFile = scratchDir.getChildFile("Ableton Folder Info")
-                                     .getChildFile("dc66a3fa-0fe1-5352-91cf-3ec237e9ee90.xmp.bak");
-        expectTrue(backupFile.existsAsFile(), "a .xmp.bak backup should exist after the second write");
+        // Backups are timestamped, and the assertion is on what a backup *contains*
+        // rather than on a fixed name. A fixed ".xmp.bak" was the defect: copyFileTo
+        // is delete-then-copy, so the second write's backup held SLO's own previous
+        // output and the user's original sidecar became unrecoverable.
+        const juce::File infoDir = scratchDir.getChildFile("Ableton Folder Info");
+        const juce::File currentXmp = infoDir.getChildFile("dc66a3fa-0fe1-5352-91cf-3ec237e9ee90.xmp");
+
+        juce::Array<juce::File> backups;
+        infoDir.findChildFiles(backups, juce::File::findFiles, false, "*.xmp.bak");
+        expectTrue(!backups.isEmpty(), "a .xmp.bak backup should exist after the second write");
+
+        bool foundDistinctBackup = false;
+        for (const auto& b : backups)
+            if (b.loadFileAsString() != currentXmp.loadFileAsString())
+                foundDistinctBackup = true;
+        expectTrue(foundDistinctBackup,
+                   "every backup holds the file SLO just wrote, so the user's original is gone");
     }
 
     // --- Test 3: parse a REAL Ableton/LiveTagger-produced sidecar (not one
