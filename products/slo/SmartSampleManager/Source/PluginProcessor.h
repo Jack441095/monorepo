@@ -165,7 +165,6 @@ private:
     // waveform otherwise produces an audible click at the cut sample. The audio
     // thread is the only one that touches the transport; stopSample() just sets
     // this flag.
-    std::atomic<bool> fadeOutRequested { false };
     std::atomic<bool> stopRequested { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SmartSampleManagerAudioProcessor)

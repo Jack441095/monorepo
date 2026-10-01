@@ -34,8 +34,6 @@ int main()
     expectEqual(ClassificationPresentation::filterText("", "", "Kick", "ml_ood"),
                 "Unknown Other",
                 "ML OOD must remain visible through the default Other filter");
-    expectTrue(!ClassificationPresentation::isNeutral("Needs review"),
-               "Needs review is an intentional visible state");
 
     expectEqual(ClassificationPresentation::primaryLabel("Drums", "Kick", "Kick", "heuristic"),
                 "Kick",

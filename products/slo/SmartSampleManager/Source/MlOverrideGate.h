@@ -28,10 +28,12 @@ namespace MlOverrideGate
     //   * fused cross-vendor accuracy >= 0.65
     // QC-01 (2026-09-18): named here so the gate is auditable and the
     // benchmark receipt can assert against kPromotion* constants instead of
-    // magic numbers scattered across scripts._FILENAME evidence weight cap:
-    // symbolic evidence alone must never outrank a confident non-OOD acoustic
-    // verdict on loop-length audio — enforced by the duration rule below, not
-    // by a numeric weight, so there is no hidden linear-weight to drift.
+    // magic numbers scattered across scripts.
+    //
+    // FILENAME evidence weight cap: symbolic evidence alone must never outrank a
+    // confident non-OOD acoustic verdict on loop-length audio — enforced by the
+    // duration rule below, not by a numeric weight, so there is no hidden
+    // linear-weight to drift.
     static constexpr float kFusionV2AdversarialPromotionFloor = 0.40f;
     static constexpr float kFusionV2FusedPromotionFloor = 0.65f;
     inline std::atomic<bool> g_fusionV2Enabled{false};

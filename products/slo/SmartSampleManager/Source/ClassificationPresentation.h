@@ -83,16 +83,14 @@ inline bool matchesCategoryFilter(const std::string& filterTextValue,
     return haystack.find(needle) != std::string::npos;
 }
 
-inline bool isNeutral(const std::string& label) noexcept
-{
-    return label.empty() || label == "Unknown";
-}
-
 inline std::string evidenceLabel(const std::string& tagSource,
                                  const std::string& winningEvidence)
 {
     if (tagSource == "user" || winningEvidence == "USER_OVERRIDE") return "user override";
     if (tagSource == "ml_ood") return "OOD abstention";
+    // Nothing in the codebase produces "physics"/"PHYSICS" yet, but the branch
+    // stays: test_classification_presentation_main pins it, so it is the
+    // presentation layer's contract for when a producer does appear, not dead code.
     if (tagSource == "physics" || winningEvidence == "PHYSICS") return "physical acoustics";
     if (tagSource == "ml_v3") return "audio model";
     if (winningEvidence == "EMBEDDED_METADATA") return "metadata-assisted";

@@ -180,7 +180,6 @@ bool isFoleySourced(const std::string& fileName);
 
 LoopDetectionResult detectLoopVsOneShot(float durationSeconds, float decayTimeSeconds,
                                         float energyDecayRatio);
-LoopDetectionResult detectLoopVsOneShot(float durationSeconds, float decayTimeSeconds);
 
 // Produces a Category/Subcategory/secondary-tags classification.
 //

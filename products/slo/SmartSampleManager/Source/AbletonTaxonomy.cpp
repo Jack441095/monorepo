@@ -81,34 +81,8 @@ LoopDetectionResult detectLoopVsOneShot(float durationSeconds, float decayTimeSe
         // Long but decayed to silence: a one-shot with a natural tail --
         // a crash, a reverb-tailed hit, a sustained vocal note. This is the
         // case the previous heuristic got wrong.
-        // a crash, a reverb-tailed hit, a sustained vocal note.
         result.isLoop = false;
         result.confidence = 0.70f;
-    }
-    return result;
-}
-
-LoopDetectionResult detectLoopVsOneShot(float durationSeconds, float decayTimeSeconds)
-{
-    // Back-compat path for callers that cannot supply energyDecayRatio.
-    //
-    // This deliberately preserves the ORIGINAL duration/decay-ratio heuristic
-    // rather than forwarding a neutral ratio. Forwarding 1.0 ("sustained")
-    // would classify every file >= 1.5s as a loop, silently breaking the
-    // long-but-fast-decaying one-shot case (a crash, a reverb tail) for any
-    // caller that has not been updated. Behaviour here is unchanged; only
-    // callers passing a real ratio get the measured rule.
-    const bool longEnough = durationSeconds > 1.5f;
-    const bool sustained = decayTimeSeconds > 0.0f && durationSeconds > 0.0f
-        && (decayTimeSeconds / durationSeconds) > 0.9f;
-
-    LoopDetectionResult result;
-    if (longEnough && sustained) {
-        result.isLoop = true;  result.confidence = 0.65f;
-    } else if (!longEnough && decayTimeSeconds < 0.35f) {
-        result.isLoop = false; result.confidence = 0.6f;
-    } else {
-        result.isLoop = false; result.confidence = 0.25f;
     }
     return result;
 }

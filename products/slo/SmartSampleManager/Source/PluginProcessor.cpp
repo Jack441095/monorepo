@@ -133,7 +133,7 @@ void SmartSampleManagerAudioProcessor::processBlock(juce::AudioBuffer<float>& bu
         juce::AudioSourceChannelInfo channelInfo(&buffer, 0, buffer.getNumSamples());
         transportSource.getNextAudioBlock(channelInfo);
 
-        if (fadeOutRequested.exchange(false) || stopRequested.exchange(false)) {
+        if (stopRequested.exchange(false)) {
             // One-block gain ramp before the cut, otherwise stopping mid-waveform
             // clicks at the cut sample.
             buffer.applyGainRamp(0, buffer.getNumSamples(), 1.0f, 0.0f);

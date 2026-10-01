@@ -125,25 +125,31 @@ int main()
         expectEqual(result.winningEvidence, "FILENAME", "Hi-Hat winningEvidence");
     }
 
-    // detectLoopVsOneShot directly: a long, sustained-decay signal should read as a loop.
-    // Threshold raised 0.6->0.9 (see docs/classification/DECAY_TIME_ENVELOPE_FIX_V1_REPORT.md);
-    // 2.9/3.0 = 0.967, clearly above it.
+    // detectLoopVsOneShot directly. The three-argument form takes an explicit
+    // energyDecayRatio; the two-argument overload these used to call was
+    // back-compat only, had no production caller, and disagreed with this one
+    // at exactly 1.5s -- so it is gone and these now say which ratio they mean.
+    // Thresholds: kMinLoopSeconds 1.5, kMinSustainedRatio 0.10, veryLong 4.0.
     {
-        LoopDetectionResult r = detectLoopVsOneShot(3.0f, 2.9f);
+        LoopDetectionResult r = detectLoopVsOneShot(3.0f, 2.9f, 0.967f);
         expectTrue(r.isLoop, "Long sustained signal should be detected as a loop");
     }
-    // A short, fast-decaying signal should read as a one-shot with reasonable confidence.
+    // Too short to tile, whatever the decay ratio says.
     {
-        LoopDetectionResult r = detectLoopVsOneShot(0.4f, 0.1f);
+        LoopDetectionResult r = detectLoopVsOneShot(0.4f, 0.1f, 0.25f);
         expectTrue(!r.isLoop, "Short fast-decay signal should be detected as a one-shot");
         expectTrue(r.confidence >= 0.5f, "Clear one-shot case should have reasonably high confidence");
     }
-    // An ambiguous case (long duration, but fast decay -- e.g. a cymbal
-    // tail) should still default to one-shot, but honestly at low confidence.
+    // Long and sustained in energy but short of the 4.0s override.
     {
-        LoopDetectionResult r = detectLoopVsOneShot(3.0f, 0.2f);
-        expectTrue(!r.isLoop, "Ambiguous long/fast-decay case should default to one-shot");
-        expectTrue(r.confidence < 0.4f, "Ambiguous case must not claim high confidence");
+        LoopDetectionResult r = detectLoopVsOneShot(3.0f, 2.9f, 0.05f);
+        expectTrue(!r.isLoop, "Long but decayed-to-silence should default to one-shot");
+    }
+    // 4.0s and above is a loop even with a natural tail -- the case the old
+    // heuristic got wrong.
+    {
+        LoopDetectionResult r = detectLoopVsOneShot(4.5f, 0.3f, 0.01f);
+        expectTrue(r.isLoop, "A 4.5s hit with a reverb tail is still a loop");
     }
 
     // Vocal instrumentType mapping to Vocals category and Vocal Phrase / Vocal Loop subcategories
