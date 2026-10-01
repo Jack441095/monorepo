@@ -1281,6 +1281,46 @@ set(SSM_TEST_WORKING_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 # has no test override hook, and it needs a live uvicorn server plus a real key
 # to mean anything. It gets registered in the commit that adds the override.
 #
+# --- QUALIFICATION GROUPS: one table, two consumers -------------------------
+#
+# Before this, group membership was written down exactly once, in the DEPENDS
+# list of a custom target that only ever built things. That is why six targets
+# named ssm_qual_* read like pass/fail gates while proving nothing about
+# pass/fail -- the confusion the 2026-10 C++ review had to correct in its own
+# baseline. It also meant a test could be built but never run, or run but never
+# built by the group a reader expected to cover it.
+#
+# So the membership lives here, once, and both consumers read it:
+#   * ssm_build_<group>  builds the members. Named "build" because that is all
+#     it does; a green build is not a green suite.
+#   * ctest -L <group>   runs the registered members, because the same group name
+#     is applied as a ctest label. This is the real gate. Build-only members
+#     stay out of ctest: ClassificationBenchmark needs research-harness arguments,
+#     and TestLicensing needs a live server plus a provisioned key.
+set(SSM_GROUP_fast_regression
+    TestTaxonomy TestAcousticClassifierInputSafety TestClassificationPresentation
+    TestXmpWriter TestPathTraversal TestDuplicateDetection TestPruneMissing
+    TestSafetyRegression TestCachedReclassification TestReadOnlySafetyQualification
+    TestAudioEvidence TestLabelFreeEvidencePacket TestAudioSimilarity
+    TestSearchLexicon TestCorrectionLog TestDiagnosticsBundle)
+set(SSM_GROUP_cache
+    TestResilience TestCacheIntegrity TestCacheVersionEnforcement
+    TestPersistedCacheHydration TestMalformedAudio TestFormatAwareScan
+    TestMultiInstance TestSortLibraryAsync TestSortPreviewAndUndo)
+set(SSM_GROUP_classification
+    TestTaxonomy TestAcousticClassifierInputSafety TestClassificationPresentation
+    TestAudioFeatures TestAutoTagging TestSmartCollections TestMapClusters
+    TestAcousticClassifierParity ClassificationBenchmark TestBassTimbre
+    TestKickLength TestHiHatType TestFusionV2 TestLoopV2)
+set(SSM_GROUP_intelligence
+    TestEmbeddingQuality TestFindSimilar TestFindSimilarWeighted
+    TestTimbreRefinement TestReferenceSearch TestNearDuplicates)
+set(SSM_GROUP_ui
+    TestPrecisionBrowserSorting TestFavorites TestHistory TestLicensing
+    TestSampleEngine TestRtDeadlineStress TestAuditionTempo)
+set(SSM_QUAL_GROUP_NAMES
+    fast_regression cache classification intelligence ui)
+
 # ClassificationBenchmark is the research harness, not a regression test: it
 # wants a mode, a scan dir and an output JSON path, and it writes into
 # tools/classification_benchmark/. BenchmarkScan takes only a fixture dir, so it
@@ -1307,9 +1347,18 @@ set(SSM_CTEST_TARGETS
 )
 foreach(_ssmCtestTarget IN LISTS SSM_CTEST_TARGETS)
     if(TARGET ${_ssmCtestTarget})
+        # "qual" on everything, plus one label per group this test belongs to, so
+        # `ctest -L qual` is the whole suite and `ctest -L cache` is one surface.
+        set(_ssmLabels qual)
+        foreach(_ssmGroup IN LISTS SSM_QUAL_GROUP_NAMES)
+            if("${_ssmCtestTarget}" IN_LIST SSM_GROUP_${_ssmGroup})
+                list(APPEND _ssmLabels ${_ssmGroup})
+            endif()
+        endforeach()
         add_test(NAME ${_ssmCtestTarget}
                  COMMAND ${_ssmCtestTarget}
                  WORKING_DIRECTORY ${SSM_TEST_WORKING_DIR})
+        set_tests_properties(${_ssmCtestTarget} PROPERTIES LABELS "${_ssmLabels}")
     endif()
 endforeach()
 
@@ -1318,47 +1367,32 @@ if(TARGET BenchmarkScan)
     add_test(NAME BenchmarkScan
              COMMAND BenchmarkScan "${CMAKE_CURRENT_SOURCE_DIR}/../fixtures"
              WORKING_DIRECTORY ${SSM_TEST_WORKING_DIR})
+    set_tests_properties(BenchmarkScan PROPERTIES LABELS "qual")
 endif()
 
 # --- BUILD-SYSTEM OPTIMISATION (2026-08-22): selective qualification groups --
 #
 # Map tests to risk surfaces so a small classification change does not force a
-# rebuild of every unrelated target. Groups are plain custom targets:
-#     cmake --build <tree> --target ssm_qual_classification
-# Full-suite qualification remains available via ssm_qual_full.
+# rebuild of every unrelated target. Membership is not repeated here; it comes
+# from the SSM_GROUP_* tables above, so a target and its ctest label can never
+# disagree about who belongs to which surface.
 #
-# These remain BUILD-only by design: they are a fast incremental-rebuild
-# convenience, and they say nothing about whether anything passed. Use
-# `ctest --output-on-failure` for that.
-add_custom_target(ssm_qual_fast_regression
-    DEPENDS TestTaxonomy TestAcousticClassifierInputSafety TestClassificationPresentation TestXmpWriter TestPathTraversal TestDuplicateDetection
-            TestPruneMissing TestSafetyRegression TestCachedReclassification
-            TestReadOnlySafetyQualification TestAudioEvidence TestLabelFreeEvidencePacket TestAudioSimilarity
-            TestSearchLexicon TestCorrectionLog TestDiagnosticsBundle
-    COMMENT "Fast pure-logic / low-cost regression suite")
-add_custom_target(ssm_qual_cache
-    DEPENDS TestResilience TestCacheIntegrity TestCacheVersionEnforcement
-            TestPersistedCacheHydration TestMalformedAudio TestFormatAwareScan TestMultiInstance
-            TestSortLibraryAsync TestSortPreviewAndUndo
-    COMMENT "Cache integrity / resilience / concurrency risk surface")
-add_custom_target(ssm_qual_classification
-    DEPENDS TestTaxonomy TestAcousticClassifierInputSafety TestClassificationPresentation TestAudioFeatures TestAutoTagging TestSmartCollections
-            TestMapClusters TestAcousticClassifierParity ClassificationBenchmark
-            TestBassTimbre TestKickLength TestHiHatType TestFusionV2 TestLoopV2
-    COMMENT "Classification & tagging risk surface")
-add_custom_target(ssm_qual_intelligence
-    DEPENDS TestEmbeddingQuality TestFindSimilar TestFindSimilarWeighted
-            TestTimbreRefinement TestReferenceSearch TestNearDuplicates
-    COMMENT "Embedding/similarity intelligence stack")
-add_custom_target(ssm_qual_ui
-    DEPENDS TestPrecisionBrowserSorting TestFavorites TestHistory TestLicensing
-            TestSampleEngine TestRtDeadlineStress TestAuditionTempo
-    COMMENT "User state, browser behaviour, licensing, RT deadline/allocation stress")
+# These are BUILD targets and are named ssm_build_* to say so. They were
+# ssm_qual_*, which read like pass/fail gates and were the reason a green build
+# got reported as a green suite:
+#     cmake --build <tree> --target ssm_build_classification   # build one surface
+#     ctest -L classification                                  # run one surface
+#     ctest                                                    # run everything
+foreach(_ssmGroup IN LISTS SSM_QUAL_GROUP_NAMES)
+    add_custom_target(ssm_build_${_ssmGroup}
+        DEPENDS ${SSM_GROUP_${_ssmGroup}}
+        COMMENT "Build the ${_ssmGroup} risk surface (run it with: ctest -L ${_ssmGroup})")
+endforeach()
 add_custom_target(ssm_plugins
     DEPENDS SmartSampleManager_VST3 SmartSampleManager_AU SmartSampleManager_Standalone
     COMMENT "Build all JUCE plugin formats")
-add_custom_target(ssm_qual_full
-    DEPENDS ssm_qual_fast_regression ssm_qual_cache ssm_qual_classification
-            ssm_qual_intelligence ssm_qual_ui BenchmarkScan
+add_custom_target(ssm_build_full
+    DEPENDS ssm_build_fast_regression ssm_build_cache ssm_build_classification
+            ssm_build_intelligence ssm_build_ui BenchmarkScan
             SmartSampleManager_VST3 SmartSampleManager_AU SmartSampleManager_Standalone
-    COMMENT "Full qualification: all tests/benchmarks + all plugin formats")
+    COMMENT "Build all tests/benchmarks + all plugin formats (run the suite with: ctest)")

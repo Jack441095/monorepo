@@ -3,7 +3,7 @@
 
 Examples:
     python3 scripts/measure_build.py --preset ssm-dev-ninja \
-        --target ssm_qual_fast_regression --clean-first \
+        --target ssm_build_fast_regression --clean-first \
         --json ../reports/ssm-dev-ninja-clean.json
 
     python3 scripts/measure_build.py --preset ssm-dev-ninja \
@@ -75,7 +75,7 @@ def parse_args() -> argparse.Namespace:
     project_dir = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preset", required=True, help="CMake build/configure preset")
-    parser.add_argument("--target", default="ssm_qual_fast_regression")
+    parser.add_argument("--target", default="ssm_build_fast_regression")
     parser.add_argument("--jobs", type=int, default=8)
     parser.add_argument("--source-dir", type=Path, default=project_dir)
     parser.add_argument("--configure", action="store_true")

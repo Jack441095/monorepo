@@ -149,7 +149,7 @@ int main()
     sqlite3_close(db);
     tempDbFile.deleteFile();
 
-    // This is a DEPENDS of ssm_qual_fast_regression, so it reads like a gate.
+    // This is a DEPENDS of ssm_build_fast_regression, and it runs in ctest with the fast_regression label.
     // It measured nothing: processedCount was printed and never checked, so a
     // reclassify that matched zero rows still reported success.
     if (processedCount <= 0) {

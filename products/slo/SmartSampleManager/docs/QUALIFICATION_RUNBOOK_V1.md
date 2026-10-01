@@ -1,10 +1,11 @@
 # SLO Qualification Runbook V1
 
 This is the supported local entry point for SLO qualification. It documents
-the current CMake target groups and the separate step that executes the
-resulting binaries. The custom `ssm_qual_*` targets build dependencies only;
-they do not run tests, and the project currently has no CTest registration for
-these binaries.
+the current CMake build groups and the separate step that executes the
+registered tests. The custom `ssm_build_*` targets build dependencies only;
+they do not run tests. Registered tests run under CTest, with one label per
+risk-surface group; authoritative membership lives in `CMakeLists.txt`
+(`SSM_GROUP_*`), not in the lists below.
 
 ## Configure and build
 
@@ -12,23 +13,24 @@ Run from `SmartSampleManager/`:
 
 ```bash
 cmake --preset ssm-qualification
-cmake --build --preset ssm-qualification --target ssm_qual_classification
+cmake --build --preset ssm-qualification --target ssm_build_classification
+ctest --test-dir ../_build/ssm-qualification -L classification --output-on-failure
 ```
 
 The out-of-tree build directory is `../_build/ssm-qualification/`. The
 qualification preset is Release with plugin LTO enabled and test LTO disabled.
 It is distinct from `ssm-dev` and `ssm-release-candidate`.
 
-Replace `ssm_qual_classification` above with one of these risk-surface groups:
+Replace `ssm_build_classification` above with one of these risk-surface groups:
 
 | Build target | Executable targets |
 | --- | --- |
-| `ssm_qual_fast_regression` | `TestTaxonomy`, `TestAcousticClassifierInputSafety`, `TestClassificationPresentation`, `TestXmpWriter`, `TestPathTraversal`, `TestDuplicateDetection`, `TestPruneMissing`, `TestSafetyRegression`, `TestCachedReclassification`, `TestReadOnlySafetyQualification` |
-| `ssm_qual_cache` | `TestResilience`, `TestCacheIntegrity`, `TestCacheVersionEnforcement`, `TestPersistedCacheHydration`, `TestMalformedAudio`, `TestFormatAwareScan`, `TestMultiInstance`, `TestSortLibraryAsync` |
-| `ssm_qual_classification` | `TestTaxonomy`, `TestAcousticClassifierInputSafety`, `TestClassificationPresentation`, `TestAudioFeatures`, `TestAutoTagging`, `TestSmartCollections`, `TestMapClusters`, `TestAcousticClassifierParity`, `ClassificationBenchmark`, `TestBassTimbre`, `TestKickLength`, `TestHiHatType` |
-| `ssm_qual_intelligence` | `TestEmbeddingQuality`, `TestFindSimilar`, `TestFindSimilarWeighted`, `TestTimbreRefinement`, `TestReferenceSearch`, `TestNearDuplicates` |
-| `ssm_qual_ui` | `TestPrecisionBrowserSorting`, `TestFavorites`, `TestHistory`, `TestLicensing`, `TestSampleEngine`, `TestRtDeadlineStress` |
-| `ssm_qual_full` | All groups above, `BenchmarkScan`, and the VST3/AU/Standalone plugin builds |
+| `ssm_build_fast_regression` | `TestTaxonomy`, `TestAcousticClassifierInputSafety`, `TestClassificationPresentation`, `TestXmpWriter`, `TestPathTraversal`, `TestDuplicateDetection`, `TestPruneMissing`, `TestSafetyRegression`, `TestCachedReclassification`, `TestReadOnlySafetyQualification` |
+| `ssm_build_cache` | `TestResilience`, `TestCacheIntegrity`, `TestCacheVersionEnforcement`, `TestPersistedCacheHydration`, `TestMalformedAudio`, `TestFormatAwareScan`, `TestMultiInstance`, `TestSortLibraryAsync` |
+| `ssm_build_classification` | `TestTaxonomy`, `TestAcousticClassifierInputSafety`, `TestClassificationPresentation`, `TestAudioFeatures`, `TestAutoTagging`, `TestSmartCollections`, `TestMapClusters`, `TestAcousticClassifierParity`, `ClassificationBenchmark`, `TestBassTimbre`, `TestKickLength`, `TestHiHatType` |
+| `ssm_build_intelligence` | `TestEmbeddingQuality`, `TestFindSimilar`, `TestFindSimilarWeighted`, `TestTimbreRefinement`, `TestReferenceSearch`, `TestNearDuplicates` |
+| `ssm_build_ui` | `TestPrecisionBrowserSorting`, `TestFavorites`, `TestHistory`, `TestLicensing`, `TestSampleEngine`, `TestRtDeadlineStress` |
+| `ssm_build_full` | All groups above, `BenchmarkScan`, and the VST3/AU/Standalone plugin builds |
 
 ## Execute the binaries
 
@@ -56,7 +58,7 @@ done
 ```
 
 Use the same pattern for the other rows in the matrix. Run each duplicate
-target only once when executing `ssm_qual_full`; plugin targets are build
+target only once when executing `ssm_build_full`; plugin targets are build
 artifacts and are validated separately through the host/release procedures.
 
 The licensing target has two distinct execution paths. The no-network URL

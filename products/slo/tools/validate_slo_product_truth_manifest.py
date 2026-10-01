@@ -35,7 +35,7 @@ def main() -> int:
     assert data["truth_controls"]["owner_approved"] is False
     assert data["truth_controls"]["protected_data_accessed"] is False
     assert (ROOT / "SLO_V1_WORKING_PRODUCT_DEFINITION.md").is_file()
-    assert "ssm_qual_full" in (ROOT / "SmartSampleManager/CMakeLists.txt").read_text()
+    assert "ssm_build_full" in (ROOT / "SmartSampleManager/CMakeLists.txt").read_text()
     print("slo_product_truth_manifest=valid")
     print("product=slo")
     print("version_status=not_defined")

@@ -39,8 +39,8 @@ int main() {
 
     // Assert something about the clusters. Printing SUCCESS for any result at
     // all meant an empty vector, non-finite coordinates or a bogus blob all
-    // passed -- and this binary is a DEPENDS of ssm_qual_classification, so a
-    // reader reasonably assumed it gated the map.
+    // passed -- and this binary is a DEPENDS of ssm_build_classification and runs
+    // in ctest with the classification label, so it actually gates the map.
     auto clusters = engine.computeMapClusters();
     auto samples = engine.getSamples();
     if (clusters.empty()) {

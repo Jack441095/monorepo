@@ -15,7 +15,7 @@ From `SmartSampleManager`:
 
 ```sh
 cmake --preset ssm-qualification
-cmake --build --preset ssm-qualification --target ssm_qual_full --parallel 8
+cmake --build --preset ssm-qualification --target ssm_build_full --parallel 8
 ```
 
 Build trees and FetchContent sources live under the ignored sibling
