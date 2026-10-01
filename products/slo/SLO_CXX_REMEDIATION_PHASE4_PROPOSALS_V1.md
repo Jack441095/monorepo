@@ -71,35 +71,52 @@ this is a latency-quality improvement, not a correctness one.
 
 ---
 
-## 3. Bass timbre and hi-hat confidence floors
+## 3. Bass timbre and hi-hat: present the confidence, do not gate on it
 
-**Why.** `SampleManagerEngine.cpp:409` and `:415` call
-`addUniqueSecondaryTag(bassTimbre.label)` with no floor. `BassTimbreClassifier::classify`
-returns a label whenever a centroid is merely *nearest*, so an embedding at cosine 0.05
-to both the 808 and Reese centroids is tagged `"808"` and persisted. The class's own
-comment defers the decision to the caller; the caller does not make one.
+**This proposal replaces a threshold gate, because the threshold was already measured
+and rejected.**
 
-**This needs a measurement, not a guess.** The 92.9% in `BassTimbreClassifier.h` is
-accuracy, not a separation point — it says the classifier is right about its own
-centroids, which is the self-comparison P1-32 removed from the test. The number that
-matters is the distribution of `classify().confidence` over embeddings that are *not*
-near a centroid, and that distribution is not in the repo.
+The review asks for a confidence floor on the bass/hi-hat secondary tag — something like
+`if (bassTimbre.label != "" && bassTimbre.confidence >= 0.55f)`. The separation that
+gate would need does not exist, and the project's own calibration says so.
+`BASS_TIMBRE_TAG_V1_REPORT.md:15`:
 
-**What I can do without a threshold change.** The centroids *are* separable:
-`test_bass_timbre_main` now asserts each centroid beats the other by a positive margin of
-comparable size, so the between-class case is healthy. The unmeasured case is everything
-else.
+> per-sample confidence margin (top1 vs top2 centroid similarity) does **not** cleanly
+> separate correct from wrong predictions at this sample size — the lowest-margin wrong
+> prediction (0.0019) and a correct prediction with similarly low margin (0.0024) overlap
 
-**Recommendation.** Before any threshold lands, dump `BassTimbreClassifier::classify()`
-confidence and margin over the 42-sample holdout and over the corpus, and put the
-histogram in `docs/classification/`. Pick the floor at the point that maximises held-out
-F1, and write that number into the header next to the accuracy figure so the next person
-can see which is which. Until that exists, a threshold is a guess with a persisted
-user-visible label attached.
+`HIHAT_TYPE_TAG_V1_REPORT.md:11` gives the hi-hat version as a number: mean intra-class
+similarity **0.939** against inter-class **0.930**, a gap of 0.009. Any floor placed near
+that band throws away correct predictions at the same rate as wrong ones. A 0.55 floor
+would be worse than useless — it would sit far below the whole distribution and tag
+everything, which is the current behaviour, while looking like a gate.
 
-**Effort.** ~3 h for the measurement; the change itself is one line per call site.
+**What is actually wrong.** `SampleManagerEngine.cpp:409` and `:415` commit the label
+silently. The classifiers were designed to "expose a score and let downstream callers/UI
+decide how to present it" — the same posture as `tagConfidence` — and the downstream
+decided nothing. So a `"808"` tag the model is nearly indifferent about reaches the user's
+library indistinguishable from a confident one.
 
----
+**Options, in the order I would try them.**
+
+1. **Present it, change nothing about tagging.** Show the margin in the inspector or as
+   part of the badge, so a user who cares can see it is a weak call. This is what the
+   classifier contract asks for, costs no accuracy, and is reversible.
+2. **Tag, but record the score on the sample** so a later pass can revisit low-confidence
+   tags without re-running inference. A schema addition, so it needs R8.
+3. **Widen the corpus.** The Reese class is 24 samples and the report already flags it as
+   thin; the hi-hat gap of 0.009 is the same problem. More examples from more vendors
+   would sharpen the centroids and might make a gate viable — but that is a data task, and
+   until it is done no threshold is defensible.
+4. **Drop the tag entirely.** Honest, and costs a feature that is right 92% of the time.
+
+**Recommendation.** Option 1 now, option 3 as ongoing work, and explicitly *not* a
+threshold. Whichever is chosen, the number belongs in the header next to the accuracy
+figure so the next reader can see which is which — that confusion is what produced this
+proposal in the first place.
+
+**Effort.** Option 1 is a UI change, ~3 h. Option 3 is unbounded and is a data-collection
+project.
 
 ## 4. `ctest` versus the six `ssm_qual_*` groups
 
@@ -204,7 +221,7 @@ the flags `constexpr` and delete the toggles.
 |---|---|---|---|---|
 | 1 | CSV → JSONL journal | R8 (format) | 2 h | Do, with a read-both fallback |
 | 2 | `transportSource` off the audio thread | R8 (RT ownership) | 4 h + soak | Attempt only with a soak scheduled |
-| 3 | Bass/hi-hat confidence floors | R8 (threshold) | 3 h to measure | Measure first; no threshold without a histogram |
+| 3 | Bass/hi-hat confidence | R8 (threshold) | 3 h for option 1 | Present the score; the gate was measured and rejected |
 | 4 | `ctest` vs `ssm_qual_*` | none | 1 h | Convert and rename |
 | 5 | `TestLicensing` registration | none | 10 min | Mark manual now |
 | 6 | `getTailLengthSeconds()` | needs a host | 30 min | Soak, then fix or document |

@@ -177,6 +177,32 @@ because `sample.category` is non-empty for classified files, so `instrumentType`
 reaches the sanitiser. The hardening is still in, on the grounds that a tag value is
 attacker-controlled and relying on a second line of defence in a filename is wrong.
 
+**P1-22's recommended fix is not merely un-measured — it was measured and rejected, in
+this repo, in writing.** The brief proposes gating the bass/hi-hat secondary tag on a
+confidence floor such as `confidence >= 0.55f`, and says the 92.9% header figure is
+"accuracy, not a separation point". Both halves are right, and together they mean the gate
+cannot work. `docs/classification/BASS_TIMBRE_TAG_V1_REPORT.md:15` records:
+
+> per-sample confidence margin (top1 vs top2 centroid similarity) does **not** cleanly
+> separate correct from wrong predictions at this sample size — the lowest-margin wrong
+> prediction (0.0019) and a correct prediction with similarly low margin (0.0024) overlap.
+> A margin-based "only tag if confident" gate would not meaningfully improve precision
+> here, so this ships as: always compute and return the label plus a confidence score, and
+> let downstream callers/UI decide how to present it — not a hard binary gate.
+
+`HIHAT_TYPE_TAG_V1_REPORT.md:11` makes the same point quantitatively for hi-hats: mean
+intra-class similarity 0.939 against inter-class 0.930, a gap of **0.009**. A floor set
+anywhere near that band discards correct predictions alongside wrong ones, and the header
+itself (`:21`) says the margin "was not separately re-verified as a clean correct/wrong
+separator".
+
+So the review's P1-22 is right that the caller applies a label unconditionally, and wrong
+that a confidence floor is the remedy. The contract these classifiers were built to is
+"expose a score, let the presentation layer decide" — the same posture as `tagConfidence`
+— and the review read the missing caller-side gate as an oversight rather than as the
+documented design. The real remediation is presentation, not filtering, and it is in Phase 4
+proposal 3.
+
 **P0-4(3) is worse than the brief says, and my first fix was wrong.** The brief proposed
 rejecting `\r`/`\n`/`"` in `journalCsvField`. I did that, and the exploit still worked —
 because the forged continuation line yields exactly **six** fields, so a field-count
