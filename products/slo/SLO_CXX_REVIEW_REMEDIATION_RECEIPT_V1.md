@@ -463,3 +463,31 @@ inverts. Noted rather than rewritten.
 "56/56 passing" measures nothing about test strength. Two of the tests backing shipped
 fixes would have passed with those fixes reverted, and the only reason I know is that I
 went looking. Any future change to these tests should be mutation-checked the same way.
+
+---
+
+## 7.10 Phase 4 items 4–5 executed on owner sign-off
+
+The owner approved executing the two cheapest Phase 4 items. Items 1–3 and 6 remain
+proposals; `main` was left alone.
+
+**Item 4 — `ctest` versus the six `ssm_qual_*` groups.** Group membership now lives once
+in `CMakeLists.txt` (`SSM_GROUP_*`). The build targets are `ssm_build_*`; the same group
+names are CTest labels, so `ctest -L qual` runs all 56, `ctest -L fast_regression` runs
+16, `ctest -L cache` runs 9, `ctest -L classification` runs 13, `ctest -L intelligence`
+runs 6, and `ctest -L ui` runs 6. `ClassificationBenchmark` and `TestLicensing` stay
+build-only because they need harness arguments or a live server/key. The live validator,
+build-measurement script, build policy, runbook, and two source comments were updated to
+the new target names; historical receipts were not rewritten. During this change, configure
+caught one real CMake error: `add_test()` has no `LABELS` keyword, so labels are applied
+with `set_tests_properties()`.
+
+**Item 5 — `TestLicensing` is an explicit manual soak.** The full activation path stays out
+of CTest because it needs `uvicorn` on port 8420 plus a provisioned key. The source header
+and CMake comment now say so directly. `TestLicensing --url-policy` remains the only mode
+that runs without that environment.
+
+**Evidence.** Configure completed; build exit 0 with 0 errors; `ctest` passed 56/56 in
+455.45 s. The validator and build script were syntax-checked after the rename; the full
+truth-manifest validator was not run as a release gate here because it also pins unrelated
+manifest and clean-tree state.
