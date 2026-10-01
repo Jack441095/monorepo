@@ -1,0 +1,56 @@
+{
+  "schema": "kenn.grounding_validator_ab.v1",
+  "generated_at": "2026-10-01T20:38:00+00:00",
+  "what_this_measures": "Whether the 1 Oct measurement-validator fix rejects more or fewer answers. A cross-run comparison cannot answer that, because the model is non-deterministic, so both validators were scored against the SAME generated answers in one run.",
+  "method": "measure_chat_latency.py with kenn.core.chat_grounding.generated_answer_validation wrapped to capture (query, results, answer). Each captured answer was then scored twice: once with the pattern shipped before 1b217854, once with the current one. Evidence text is rebuilt identically for both sides, so only the pattern differs.",
+  "environment": {
+    "model": "kenn-brain-qwen3-8b",
+    "provider": "ollama",
+    "machine": "M3 (owner's laptop), not the 4090",
+    "index_version": "v-db8c6334cf63",
+    "context_chars": 300,
+    "draft_chars": 0,
+    "llm_cache": "off"
+  },
+  "same_answer_ab": {
+    "answers_compared": 12,
+    "same_verdict_either_way": 11,
+    "old_rejected_new_accepted": [],
+    "old_accepted_new_rejected": [
+      {
+        "question": "export stems for mixing",
+        "newly_flagged": [
+          "128bpm"
+        ]
+      }
+    ]
+  },
+  "the_one_flip_is_a_true_positive": {
+    "question": "export stems for mixing",
+    "model_claimed": "128bpm",
+    "evidence_measurements": [
+      "44.1 khz"
+    ],
+    "evidence_contains_128": false,
+    "evidence_contains_any_tempo": false,
+    "conclusion": "The retrieved notes for this question carry no tempo at all, so 128bpm was invented. The old pattern accepted it. This is the percentage/bpm class of defect the fix closes, not a regression introduced by it."
+  },
+  "landing_rate_after_the_fix": {
+    "asked": 30,
+    "attempted": 29,
+    "accepted": 8,
+    "rejected": 21,
+    "median_seconds": 67.004,
+    "rejection_reasons": {
+      "generated answer is below the quality threshold": 15,
+      "generated answer introduced unsupported measurements": 14,
+      "generated answer has insufficient evidence overlap": 1
+    },
+    "do_not_compare_to_the_38_percent_figure": "38% was recorded on different code with a different question mix and a differently loaded machine; a median of 66 s here against 91 s there says the load differed. Treat 28-43% as the range and this receipt as one sample inside it, not as a trend."
+  },
+  "limits": [
+    "12 answers is a small sample. One flip in either direction would change the sign of the result.",
+    "The A/B says the fix is net stricter, not that stricter is better. Whether the newly caught answers were genuinely wrong is the question, and that is a human judgement about the answers.",
+    "Nothing here explains the 12 rejections recorded on 1 Oct: that harness logged the route and its metadata but not the answer text, so those rejections cannot be re-scored after the fact."
+  ]
+}
