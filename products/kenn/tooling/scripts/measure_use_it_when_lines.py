@@ -14,6 +14,7 @@ from kenn.retrieval import retrieval
 from kenn.retrieval.build_index import Chunk, build_terms
 from evaluate_retrieval_modes import _rank
 from eval_chat_coverage import _expects_public_abstention
+from sealed_fixtures import tunable_cases
 
 EVALS = Path("apps/backend/src/kenn/evals")
 retrieval.load_source_feedback_scores = lambda: {}
@@ -22,11 +23,12 @@ base_emb = retrieval.load_embedding_index()
 
 
 def question_sets():
+    # tunable_cases refuses a sealed fixture, so adding a holdout to this tuner fails
+    # here instead of producing a wording comparison nobody is allowed to act on.
     sets = {}
     for name, path in (("original", EVALS / "questions.json"), ("describe_it", EVALS / "device_purpose_retrieval_cases.json")):
-        cases = [c for c in json.loads(path.read_text())["cases"] if c.get("source_must_include") and not _expects_public_abstention(c)]
-        sets[name] = cases
-    sets["sealed_qwen"] = json.loads((EVALS / "device_purpose_sealed_qwen8b.json").read_text())["cases"]
+        sets[name] = [c for c in tunable_cases(path) if c.get("source_must_include") and not _expects_public_abstention(c)]
+    sets["sealed_qwen"] = tunable_cases(EVALS / "device_purpose_sealed_qwen8b.json")
     return sets
 
 

@@ -32,8 +32,10 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tooling" / "scripts"))
 DATA = ROOT / "tooling" / "data"
 EVALS = ROOT / "apps" / "backend" / "src" / "kenn" / "evals"
+from sealed_fixtures import tunable_cases  # noqa: E402
 KNOWLEDGE_SETS = ("questions.json", "device_purpose_retrieval_cases.json", "device_purpose_sealed_qwen8b.json")
 LIVE_ROUTES = {"ableton_controller", "ableton_live_inspection"}
 NOT_A_LIVE_ACTION = {None, "", "clarify", "refuse", "chat", "none"}
@@ -92,7 +94,9 @@ def main() -> int:
 
     requests = [row for path in sorted(DATA.glob("natural_*.jsonl")) for row in map(json.loads, path.open())
                 if row.get("expected_action") not in NOT_A_LIVE_ACTION]
-    questions = [case["question"] for name in KNOWLEDGE_SETS for case in json.loads((EVALS / name).read_text())["cases"]]
+    # tunable_cases refuses a sealed fixture: routing thresholds get tuned against these
+    # questions, so a holdout does not belong in the list even as a negative.
+    questions = [case["question"] for name in KNOWLEDGE_SETS for case in tunable_cases(EVALS / name)]
     with tempfile.TemporaryDirectory() as scratch:
         server, base = _start_server(Path(scratch))
         try:

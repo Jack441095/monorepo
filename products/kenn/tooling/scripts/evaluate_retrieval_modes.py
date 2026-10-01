@@ -9,6 +9,7 @@ import json
 import statistics
 import sys
 import time
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -26,6 +27,39 @@ from kenn.retrieval.index_store import active_version_id  # noqa: E402
 
 SCHEMA = "kenn.retrieval_mode_comparison.v1"
 DEFAULT_CASES = REPO_ROOT / "apps" / "backend" / "src" / "kenn" / "evals" / "questions.json"
+
+SKIP_NOT_A_CASE = "not_a_case_object"
+SKIP_NO_EXPECTED_SOURCE = "no_source_must_include"
+SKIP_PUBLIC_ABSTENTION = "public_abstention"
+
+
+def _select_cases(raw: bytes) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Split a fixture into the cases we score and the cases we drop, with the reason for each drop.
+
+    Every score here divides by the scored list, so a fixture that loads 228 cases and
+    scores 225 used to report 225 with no hint that three had gone. On 30 Sept 2026 that
+    was exactly the sealed Qwen8b file: cases 017 and 209 read as product-ranking
+    requests because they mention a mic and the words "should I use"/"better", and case
+    100 mentions Wwise. All three are ordinary retrieval questions, but the drop is
+    correct for this scorer, so it gets reported rather than argued about here.
+    """
+    scored: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    for position, case in enumerate(json.loads(raw).get("cases", []), start=1):
+        entry = {
+            "position": position,
+            "id": str(case.get("id") or "unknown") if isinstance(case, dict) else None,
+            "category": case.get("category") if isinstance(case, dict) else None,
+        }
+        if not isinstance(case, dict):
+            skipped.append({**entry, "reason": SKIP_NOT_A_CASE})
+        elif not case.get("source_must_include"):
+            skipped.append({**entry, "reason": SKIP_NO_EXPECTED_SOURCE})
+        elif _expects_public_abstention(case):
+            skipped.append({**entry, "reason": SKIP_PUBLIC_ABSTENTION})
+        else:
+            scored.append(case)
+    return scored, skipped
 
 
 def _source_matches(chunk: dict[str, Any], expected: list[str]) -> bool:
@@ -70,10 +104,7 @@ def evaluate(
     searchers: dict[str, Callable[[str, int], list[tuple[float, dict[str, Any]]]]] | None = None,
 ) -> dict[str, Any]:
     raw = cases_path.read_bytes()
-    fixtures = [
-        case for case in json.loads(raw).get("cases", [])
-        if isinstance(case, dict) and case.get("source_must_include") and not _expects_public_abstention(case)
-    ]
+    fixtures, skipped = _select_cases(raw)
     if searchers is None:
         chunks, terms = load_chunks(), load_terms()
         embedding_index = retrieval.load_embedding_index()
@@ -130,7 +161,13 @@ def evaluate(
         "corpus_sha256": hashlib.sha256(raw).hexdigest(),
         "index_version": active_version_id() or "unknown",
         "cutoff": cutoff,
+        # fixture_count stays for readers already keyed on it; the three below say the same
+        # thing without making anyone subtract to find out what was dropped.
         "fixture_count": len(fixtures),
+        "cases_loaded": len(fixtures) + len(skipped),
+        "cases_scored": len(fixtures),
+        "cases_skipped": len(skipped),
+        "skipped": skipped,
         "modes": modes,
         "decision": {
             "candidate": "hybrid",
@@ -153,6 +190,14 @@ def main() -> int:
         parser.error("cutoff must be between 1 and 20")
     receipt = evaluate(cases_path=args.cases.expanduser().resolve(), cutoff=args.cutoff)
     rendered = json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+    if receipt["cases_skipped"]:
+        # stderr, so piping stdout to a file or jq still gets clean JSON.
+        reasons = Counter(entry["reason"] for entry in receipt["skipped"])
+        print(f"scored {receipt['cases_scored']} of {receipt['cases_loaded']} cases in {args.cases.name}; "
+              f"{receipt['cases_skipped']} skipped "
+              f"({', '.join(f'{count} {reason}' for reason, count in sorted(reasons.items()))})", file=sys.stderr)
+        for entry in receipt["skipped"]:
+            print(f"  skipped {entry['id']}: {entry['reason']}", file=sys.stderr)
     if args.output:
         target = args.output.expanduser().resolve()
         target.parent.mkdir(parents=True, exist_ok=True)

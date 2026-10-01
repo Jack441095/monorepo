@@ -13,6 +13,8 @@ evaluation = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(evaluation)
 
+EVALS = Path(__file__).resolve().parents[2] / "kenn" / "evals"
+
 
 def test_retrieval_comparison_scores_rank_and_rejects_regression(tmp_path: Path) -> None:
     cases = tmp_path / "cases.json"
@@ -46,6 +48,55 @@ def test_expected_source_rank_deduplicates_chunks_and_requires_each_source() -> 
     assert evaluation._rank(["first", "second"], results) == 2
     assert evaluation._rank(["missing"], results) is None
 
+
+def test_abstention_cases_are_named_in_the_receipt_instead_of_vanishing_from_the_denominator(tmp_path: Path) -> None:
+    # A dropped case must not reach the scores and must not disappear from the count either:
+    # "2 scored of 3, here is the one that went" is answerable, a bare recall of 1.0 is not.
+    cases = tmp_path / "cases.json"
+    cases.write_text(json.dumps({"cases": [
+        {"id": "kept-1", "question": "line up two mics", "source_must_include": ["align-delay"]},
+        {"id": "kept-2", "question": "sidechain the bass", "source_must_include": ["sidechain-bass"]},
+        {"id": "dropped-1", "question": "which is better, Ableton or Logic",
+         "source_must_include": ["routing"], "category": "refusal"},
+    ]}), encoding="utf-8")
+    hit = [(9.0, {"source": "align-delay.md", "title": "Align Delay"}),
+           (8.0, {"source": "sidechain-bass.md", "title": "Sidechain Bass"})]
+
+    receipt = evaluation.evaluate(cases_path=cases, cutoff=4,
+                                  searchers={"bm25": lambda _q, _l: hit, "hybrid": lambda _q, _l: hit})
+
+    assert (receipt["cases_loaded"], receipt["cases_scored"], receipt["cases_skipped"]) == (3, 2, 1)
+    assert receipt["fixture_count"] == 2
+    assert receipt["skipped"] == [{"position": 3, "id": "dropped-1", "category": "refusal",
+                                   "reason": "public_abstention"}]
+    assert receipt["modes"]["bm25"]["summary"]["cases"] == 2
+    # 2 of 2 kept cases found, not 2 of 3: the drop neither dilutes the score nor hides in it.
+    assert receipt["modes"]["bm25"]["summary"]["recall_at_4"] == 1.0
+
+
+def test_a_case_with_no_expected_source_is_reported_as_dropped_for_its_own_reason(tmp_path: Path) -> None:
+    cases = tmp_path / "cases.json"
+    cases.write_text(json.dumps({"cases": [
+        {"id": "kept-1", "question": "line up two mics", "source_must_include": ["align-delay"]},
+        {"id": "no-target-1", "question": "tell me a joke"},
+    ]}), encoding="utf-8")
+
+    _scored, skipped = evaluation._select_cases(cases.read_bytes())
+
+    assert [entry["reason"] for entry in skipped] == ["no_source_must_include"]
+
+
+def test_the_sealed_qwen_fixture_reports_two_hundred_and_twenty_five_of_two_hundred_and_twenty_eight() -> None:
+    # 30 Sept 2026: this file reported 225 with no sign that three cases had been dropped, so a
+    # reader comparing it against the plan's "228 questions" had no way to see the difference.
+    raw = (EVALS / "device_purpose_sealed_qwen8b.json").read_bytes()
+    scored, skipped = evaluation._select_cases(raw)
+
+    assert (len(scored) + len(skipped), len(scored)) == (228, 225)
+    assert [entry["id"] for entry in skipped] == [
+        "device-purpose-sealed-017", "device-purpose-sealed-100", "device-purpose-sealed-209",
+    ]
+    assert {entry["reason"] for entry in skipped} == {"public_abstention"}
 
 
 def test_any_of_sources_counts_the_best_ranked_acceptable_source(tmp_path: Path) -> None:

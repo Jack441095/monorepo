@@ -1,0 +1,1994 @@
+{
+ "schema": "kenn.retrieval_cases.v1",
+ "sealed": true,
+ "note": "Held out. Two producer-worded questions per note, 75 notes, 150 cases, written 2026-09-30 by reading only the indexed text of each note. Each case names the note it was written from; where a manual chapter was split into -pt1/-pt2/-pt3 parts that say the same thing, every part in that family counts (source_any_include), because the part boundary is ours and not the producer's. 59 of the 75 notes are ones no tuned fixture asks about; the other 16 are shared, and the closest question here to any tuned question is 0.40 word-overlap. This file replaces device_purpose_sealed_qwen8b.json as the holdout: that set was already scored four times to choose between wordings (none 0.338 / drafted 0.417 / sharper 0.386 / both 0.447, North Star 26-28 Sept) and its own note now reads 'Now development data', so no half of it is still sealed. AWAITING OWNER REVIEW: authored by an automated session on 2026-09-30, not by Jack. The C2 row in the four-week plan lists Review as its dependency, and this file has not been through it. Treat the questions as unreviewed until he has looked at them: the agent read only the indexed text of each note, but nobody has checked that its idea of what a producer would ask matches his.",
+ "policy": [
+  "Tuned on: never. No change to note wording, index, embedding model or ranking is chosen by looking at these questions.",
+  "Scored with tooling/scripts/evaluate_retrieval_modes.py at gate time only, and the receipt is filed with the result.",
+  "tooling/scripts/sealed_fixtures.py refuses this file for any tuning path, so pointing one at it raises rather than printing a number.",
+  "A tuning run that leaks here retires the holdout: fix the leak, then author a fresh set of the same size.",
+  "build_brain_style_corpus.py still reads this file, on purpose: it drops near-copies of every eval question out of training material."
+ ],
+ "cases": [
+  {
+   "id": "sealed-purpose-000",
+   "question": "I need the same eight bars to repeat over and over while I work on a transition, how do I set the repeat range without dragging handles?",
+   "source_must_include": [
+    "ableton12-arrangement-view-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-arrangement-view-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-001",
+   "question": "I want to jump straight to the chorus instead of scrubbing from bar one every time, can I drop a marker and start playback from it?",
+   "source_must_include": [
+    "ableton12-arrangement-view-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-arrangement-view-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-002",
+   "question": "when I hit the row of buttons on the right it fires every clip in that row at once, what is that button and how do I stop everything again?",
+   "source_must_include": [
+    "ableton12-session-view-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-session-view-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-003",
+   "question": "clips are playing and I need to silence one of them without clicking round the grid, is there a keyboard shortcut for the highlighted one?",
+   "source_must_include": [
+    "ableton12-session-view-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-session-view-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-004",
+   "question": "some of my clips shouldn't fire when a scene launches but the sound still needs to be there, is there a switch inside the clip?",
+   "source_must_include": [
+    "ableton12-clip-view-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-clip-view-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-005",
+   "question": "every time I drag a chopped vocal in I retype the same loop length, can Live remember the loop I set last time?",
+   "source_must_include": [
+    "ableton12-clip-view-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-clip-view-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-006",
+   "question": "on my Push the pads light up in different colours depending on what they do, what are those colours telling me?",
+   "source_must_include": [
+    "ableton12-using-push-1-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-using-push-1-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-007",
+   "question": "I want to play a kit from Push and step-sequence it at the same time, which mode do I switch to and how do I set the step size?",
+   "source_must_include": [
+    "ableton12-using-push-1-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-using-push-1-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-008",
+   "question": "on Push 2 the pads do three different jobs depending on which button I press, what is that button called?",
+   "source_must_include": [
+    "ableton12-using-push-2-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-using-push-2-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-009",
+   "question": "I want to record a drum pattern at full velocity so the ghost notes still come through, what do I switch on before I hit record?",
+   "source_must_include": [
+    "ableton12-using-push-2-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-using-push-2-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-010",
+   "question": "my set stutters on the drum bus once the project gets big, where do I look to see whether it's the processor or the drive?",
+   "source_must_include": [
+    "ableton12-computer-audio-resources-and-strategies-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-computer-audio-resources-and-strategies-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-011",
+   "question": "I've read that long samples can be kept in memory instead of being read off the disk every pass, which setting is that?",
+   "source_must_include": [
+    "ableton12-computer-audio-resources-and-strategies-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-computer-audio-resources-and-strategies-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-012",
+   "question": "I want the reverb on a track, and I also want that track's signal from before the compressor so I can feed something else \u2014 how do I get at that point?",
+   "source_must_include": [
+    "ableton12-internal-audio-routing-and-sidechain-tapping"
+   ],
+   "source_any_include": [
+    "ableton12-internal-audio-routing-and-sidechain-tapping"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-013",
+   "question": "how do I send one track into another track inside the same set without running a cable between them?",
+   "source_must_include": [
+    "ableton12-internal-audio-routing-and-sidechain-tapping"
+   ],
+   "source_any_include": [
+    "ableton12-internal-audio-routing-and-sidechain-tapping"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-014",
+   "question": "when I'm playing a live input I want to hear it in the speakers without it being recorded, which monitoring mode do I pick?",
+   "source_must_include": [
+    "ableton12-routing-and-io-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-routing-and-io-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-015",
+   "question": "my own keyboard doesn't show up as a source anywhere in the session, there's a switch that turns the computer's keyboard into a MIDI source, what is it called?",
+   "source_must_include": [
+    "ableton12-routing-and-io-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-routing-and-io-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-016",
+   "question": "I want to fix one bad line in the middle of a take without losing the rest of it, how do I put the record button into that mode?",
+   "source_must_include": [
+    "ableton12-recording-new-clips-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-recording-new-clips-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-017",
+   "question": "my MIDI parts land a few milliseconds late even though I played them on the beat, where do I tell it to tidy them up on the way in?",
+   "source_must_include": [
+    "ableton12-recording-new-clips-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-recording-new-clips-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-018",
+   "question": "I want to play a sample at a different pitch from Push without it sliding, which two settings do I need?",
+   "source_must_include": [
+    "ableton12-using-push-2-pt4"
+   ],
+   "source_any_include": [
+    "ableton12-using-push-2-pt4"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-019",
+   "question": "can Push chop a loop into playable pieces for me, and can it find the cuts on its own?",
+   "source_must_include": [
+    "ableton12-using-push-2-pt4"
+   ],
+   "source_any_include": [
+    "ableton12-using-push-2-pt4"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-020",
+   "question": "my sample folder has thousands of files in it and I can never find the same bass twice, can I save a search I've set up as its own shelf?",
+   "source_must_include": [
+    "ableton12-working-with-the-browser-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-working-with-the-browser-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-021",
+   "question": "is there a way to type one word and have Live only show me the kicks and the snares?",
+   "source_must_include": [
+    "ableton12-working-with-the-browser-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-working-with-the-browser-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-022",
+   "question": "the timing on my programmed hats is too perfect and sounds like a machine, is there a way to loosen them without losing the beat?",
+   "source_must_include": [
+    "ableton12-using-grooves-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-using-grooves-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-023",
+   "question": "I found a feel in an audio loop I like, can I put that exact feel onto my MIDI parts?",
+   "source_must_include": [
+    "ableton12-using-grooves-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-using-grooves-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-024",
+   "question": "I want my parts to play in a scale that isn't twelve notes to the octave, can I load a different tuning into the set?",
+   "source_must_include": [
+    "ableton12-using-tuning-systems-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-using-tuning-systems-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-025",
+   "question": "after I load a tuning all my existing parts have jumped to different notes, how do I stop that happening?",
+   "source_must_include": [
+    "ableton12-using-tuning-systems-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-using-tuning-systems-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-026",
+   "question": "I want some notes in a part to only play half the time, is there a per-note probability I can set?",
+   "source_must_include": [
+    "ableton12-editing-midi-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-editing-midi-pt1",
+    "ableton12-editing-midi-pt2",
+    "ableton12-editing-midi-pt3"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-027",
+   "question": "every time I move a note in the editor it lands somewhere I didn't want, how do I turn the snapping off for that edit?",
+   "source_must_include": [
+    "ableton12-editing-midi-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-editing-midi-pt1",
+    "ableton12-editing-midi-pt2",
+    "ableton12-editing-midi-pt3"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-028",
+   "question": "there are a couple of hundred notes in this part and I only want the quiet ones, can I pick them out by how hard they were played?",
+   "source_must_include": [
+    "ableton12-editing-midi-pt2"
+   ],
+   "source_any_include": [
+    "ableton12-editing-midi-pt2",
+    "ableton12-editing-midi-pt1",
+    "ableton12-editing-midi-pt3"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-029",
+   "question": "I want to work on every note except the ones I've already fixed, is there a way to flip the selection over?",
+   "source_must_include": [
+    "ableton12-editing-midi-pt2"
+   ],
+   "source_any_include": [
+    "ableton12-editing-midi-pt2",
+    "ableton12-editing-midi-pt1",
+    "ableton12-editing-midi-pt3"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-030",
+   "question": "I've got one long held chord and I want it to stab in eighths instead, how do I split it into equal pieces?",
+   "source_must_include": [
+    "ableton12-editing-midi-pt3"
+   ],
+   "source_any_include": [
+    "ableton12-editing-midi-pt3",
+    "ableton12-editing-midi-pt1",
+    "ableton12-editing-midi-pt2"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-031",
+   "question": "my MIDI part is far too rigid, is there a way to add human variation to where the notes start?",
+   "source_must_include": [
+    "ableton12-editing-midi-pt3"
+   ],
+   "source_any_include": [
+    "ableton12-editing-midi-pt3",
+    "ableton12-editing-midi-pt1",
+    "ableton12-editing-midi-pt2"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-032",
+   "question": "every time I load a big compressed sample Live spends a moment unpacking it, where do I control how much room it uses for that?",
+   "source_must_include": [
+    "ableton12-managing-files-and-sets-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-managing-files-and-sets-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-033",
+   "question": "there's a small sidecar file that travels with my samples, what is it for and when does Live write it?",
+   "source_must_include": [
+    "ableton12-managing-files-and-sets-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-managing-files-and-sets-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-034",
+   "question": "I've got a template set with all my usual tracks in it, is there a way to pull the whole thing into a new project in one go?",
+   "source_must_include": [
+    "ableton12-managing-files-and-sets-pt2"
+   ],
+   "source_any_include": [
+    "ableton12-managing-files-and-sets-pt2"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-035",
+   "question": "my renders keep glitching halfway through, there's a setting that retries the render when that happens, what is it called?",
+   "source_must_include": [
+    "ableton12-managing-files-and-sets-pt2"
+   ],
+   "source_any_include": [
+    "ableton12-managing-files-and-sets-pt2"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-036",
+   "question": "there's a percussion instrument in the Max folder I can drop into Live, what is that thing actually for?",
+   "source_must_include": [
+    "ableton12-max-for-live-devices-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-max-for-live-devices-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-037",
+   "question": "I want a metallic hit that follows the loudness of another sound, how do I wire the two together?",
+   "source_must_include": [
+    "ableton12-max-for-live-devices-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-max-for-live-devices-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-038",
+   "question": "my controller's knobs end up at a different value than the one I turned, there's a setting about how it takes over \u2014 what should it be for a knob that sends absolute values?",
+   "source_must_include": [
+    "ableton12-midi-and-key-remote-control-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-midi-and-key-remote-control-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-039",
+   "question": "I keep nudging a fader with the mouse while the controller is plugged in and it fights me, how do I take that fader away from the surface for a minute?",
+   "source_must_include": [
+    "ableton12-midi-and-key-remote-control-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-midi-and-key-remote-control-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-040",
+   "question": "I have four notes I played and I want them to play one after another instead of together, can I turn the part into an ordered figure without retyping it?",
+   "source_must_include": [
+    "ableton12-midi-tools-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-midi-tools-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-041",
+   "question": "the figure I made out of my chord is fine but the notes are too short, which control stretches them?",
+   "source_must_include": [
+    "ableton12-midi-tools-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-midi-tools-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-042",
+   "question": "my drum loop loses its punch when I change the project tempo, which mode do I pick so the hits stay where they were?",
+   "source_must_include": [
+    "ableton12-warp-algorithms-and-transient-preservation"
+   ],
+   "source_any_include": [
+    "ableton12-warp-algorithms-and-transient-preservation"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-043",
+   "question": "a vocal I'm time-stretching starts sounding like a chipmunk and loses its character, which mode do I use and what do I watch while I set it?",
+   "source_must_include": [
+    "ableton12-warp-algorithms-and-transient-preservation"
+   ],
+   "source_any_include": [
+    "ableton12-warp-algorithms-and-transient-preservation"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-044",
+   "question": "when I play through my interface there's a delay between my fingers and the sound, what do I change first?",
+   "source_must_include": [
+    "ableton12-device-delay-compensation-and-latency"
+   ],
+   "source_any_include": [
+    "ableton12-device-delay-compensation-and-latency"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-045",
+   "question": "a compressor on the master bus is adding so much delay that the whole set feels behind, what do I do about it?",
+   "source_must_include": [
+    "ableton12-device-delay-compensation-and-latency"
+   ],
+   "source_any_include": [
+    "ableton12-device-delay-compensation-and-latency"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-046",
+   "question": "I want to flip between the grid of clips and the timeline without touching the mouse, what's the key?",
+   "source_must_include": [
+    "ableton12-live-keyboard-shortcuts-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-live-keyboard-shortcuts-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-047",
+   "question": "there's a shortcut that grows the loop I'm working in \u2014 what is it, and what do I press to shrink it again?",
+   "source_must_include": [
+    "ableton12-live-keyboard-shortcuts-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-live-keyboard-shortcuts-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-048",
+   "question": "I've got a finished track and I want the vocal out of it on its own, can the set do that by itself?",
+   "source_must_include": [
+    "ableton12-stem-separation-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-stem-separation-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-049",
+   "question": "when it splits a track up for me, does the fast setting sound worse than the slow one?",
+   "source_must_include": [
+    "ableton12-stem-separation-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-stem-separation-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-050",
+   "question": "I want my set to follow the tempo of another app on the same laptop, how do I turn that on?",
+   "source_must_include": [
+    "ableton12-synchronizing-with-link-tempo-follower-and-midi-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-synchronizing-with-link-tempo-follower-and-midi-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-051",
+   "question": "my drummer's box is the master clock and the rest of us follow it \u2014 do I send clock out or take it in?",
+   "source_must_include": [
+    "ableton12-synchronizing-with-link-tempo-follower-and-midi-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-synchronizing-with-link-tempo-follower-and-midi-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-052",
+   "question": "I want a filter to open up by itself over eight bars, do I have to draw the line or can I just turn the knob while it records?",
+   "source_must_include": [
+    "ableton12-automation-and-editing-envelopes-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-automation-and-editing-envelopes-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-053",
+   "question": "I need to move one point of an existing line without disturbing the rest of it, what do I hold while I drag?",
+   "source_must_include": [
+    "ableton12-automation-and-editing-envelopes-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-automation-and-editing-envelopes-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-054",
+   "question": "I want my melody to move between its own variations in no fixed order, so it never plays the same way twice \u2014 is that possible?",
+   "source_must_include": [
+    "ableton12-launching-clips-pt2"
+   ],
+   "source_any_include": [
+    "ableton12-launching-clips-pt2",
+    "ableton12-launching-clips-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-055",
+   "question": "my clips overlap slightly when they hand over to each other, can I make the change happen without the phrase being chopped?",
+   "source_must_include": [
+    "ableton12-launching-clips-pt2"
+   ],
+   "source_any_include": [
+    "ableton12-launching-clips-pt2",
+    "ableton12-launching-clips-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-056",
+   "question": "I want one knob on a track that turns a filter on a device buried five plugins deep, is there a way to get at it?",
+   "source_must_include": [
+    "ableton12-instrument-drum-and-effect-racks-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-instrument-drum-and-effect-racks-pt1",
+    "ableton12-audio-effect-racks-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-057",
+   "question": "a kit is triggering three different chains depending on where the note lands \u2014 what decides that?",
+   "source_must_include": [
+    "ableton12-instrument-drum-and-effect-racks-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-instrument-drum-and-effect-racks-pt1",
+    "ableton12-audio-effect-racks-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-058",
+   "question": "my channel meters sit in the red all the time and I want to know whether that's actually a problem in this program",
+   "source_must_include": [
+    "ableton12-mixer-gain-staging-and-headroom"
+   ],
+   "source_any_include": [
+    "ableton12-mixer-gain-staging-and-headroom"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-059",
+   "question": "where should the big fader on the right sit while I'm mixing, and why there?",
+   "source_must_include": [
+    "ableton12-mixer-gain-staging-and-headroom"
+   ],
+   "source_any_include": [
+    "ableton12-mixer-gain-staging-and-headroom"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-060",
+   "question": "I want a feedback delay that swells when I raise the volume on a track \u2014 how do I get that send to ignore the fader?",
+   "source_must_include": [
+    "ableton12-return-tracks-and-parallel-send-routing"
+   ],
+   "source_any_include": [
+    "ableton12-return-tracks-and-parallel-send-routing"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-061",
+   "question": "the send knob on my return track does nothing at all, what has to be switched on first?",
+   "source_must_include": [
+    "ableton12-return-tracks-and-parallel-send-routing"
+   ],
+   "source_any_include": [
+    "ableton12-return-tracks-and-parallel-send-routing"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-062",
+   "question": "I've got a music video and I only want it to start when the guitar comes in, how do I cut the dead space off the front?",
+   "source_must_include": [
+    "ableton12-working-with-video-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-working-with-video-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-063",
+   "question": "the video in my set has drifted out of sync with the music by the second chorus, how do I put the sync points back?",
+   "source_must_include": [
+    "ableton12-working-with-video-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-working-with-video-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-064",
+   "question": "someone gave me a patch for a custom device and it doesn't show up in the browser, where do those files have to live?",
+   "source_must_include": [
+    "ableton12-max-for-live-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-max-for-live-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-065",
+   "question": "I want to change what one of those custom devices does and have it apply everywhere it's used, how do I open it up?",
+   "source_must_include": [
+    "ableton12-max-for-live-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-max-for-live-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-066",
+   "question": "I can't use a mouse at all \u2014 how do I get the program to step between controls with the keyboard?",
+   "source_must_include": [
+    "ableton12-accessibility-and-keyboard-navigation-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-accessibility-and-keyboard-navigation-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-067",
+   "question": "the screen reader says nothing when I move around the window, where do I turn the spoken help on?",
+   "source_must_include": [
+    "ableton12-accessibility-and-keyboard-navigation-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-accessibility-and-keyboard-navigation-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-068",
+   "question": "there's a strip along the top with the tempo and the view buttons in it, is that a movable window or part of the program?",
+   "source_must_include": [
+    "ableton12-live-concepts-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-live-concepts-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-069",
+   "question": "I want the file browser to take up less room while I'm working, how do I get it out of the way?",
+   "source_must_include": [
+    "ableton12-live-concepts-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-live-concepts-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-070",
+   "question": "my controller sends a different amount of pressure for every note and I want to see it, where does that show up inside the clip?",
+   "source_must_include": [
+    "ableton12-editing-mpe-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-editing-mpe-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-071",
+   "question": "how do I keep an expression line horizontal when I drag one of its points?",
+   "source_must_include": [
+    "ableton12-editing-mpe-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-editing-mpe-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-072",
+   "question": "the notes I record come back in slightly different order every time I play the same part, what should I change?",
+   "source_must_include": [
+    "ableton12-midi-fact-sheet-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-midi-fact-sheet-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-073",
+   "question": "I want to hear the synth while I record notes from my keyboard and still get clean timing, what's the setting for that?",
+   "source_must_include": [
+    "ableton12-midi-fact-sheet-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-midi-fact-sheet-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-074",
+   "question": "I want the pitch of each note in a clip to jump up a few semitones in the last bar without touching the device, can the clip do that?",
+   "source_must_include": [
+    "ableton12-clip-envelopes-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-clip-envelopes-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-075",
+   "question": "there's a line inside the clip that changes where in the sample playback starts, what is it called and what is it good for?",
+   "source_must_include": [
+    "ableton12-clip-envelopes-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-clip-envelopes-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-076",
+   "question": "I want the same signal to go through three different treatments at once and blend between them, what's the container for that?",
+   "source_must_include": [
+    "ableton12-audio-effect-racks-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-audio-effect-racks-pt1",
+    "ableton12-instrument-drum-and-effect-racks-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-077",
+   "question": "only one of the three chains on my track is doing anything and I can't work out which, is there a way to see?",
+   "source_must_include": [
+    "ableton12-audio-effect-racks-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-audio-effect-racks-pt1",
+    "ableton12-instrument-drum-and-effect-racks-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-078",
+   "question": "I want to try a hundred random settings of my rack quickly, is there a button for that, and can I keep one knob out of it?",
+   "source_must_include": [
+    "ableton12-instrument-drum-and-effect-racks-pt3"
+   ],
+   "source_any_include": [
+    "ableton12-instrument-drum-and-effect-racks-pt3",
+    "ableton12-audio-effect-racks-pt1",
+    "ableton12-instrument-drum-and-effect-racks-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-079",
+   "question": "I've found three good positions of my macro knobs \u2014 is there a way to save them and flip between them?",
+   "source_must_include": [
+    "ableton12-instrument-drum-and-effect-racks-pt3"
+   ],
+   "source_any_include": [
+    "ableton12-instrument-drum-and-effect-racks-pt3",
+    "ableton12-audio-effect-racks-pt1",
+    "ableton12-instrument-drum-and-effect-racks-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-080",
+   "question": "my synth plays four different parts on four different channels and I want each one on its own fader, how many tracks does that take?",
+   "source_must_include": [
+    "ableton12-routing-and-io-pt3"
+   ],
+   "source_any_include": [
+    "ableton12-routing-and-io-pt3"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-081",
+   "question": "the synth has a second output on the back of it, how do I get that one onto its own channel?",
+   "source_must_include": [
+    "ableton12-routing-and-io-pt3"
+   ],
+   "source_any_include": [
+    "ableton12-routing-and-io-pt3"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-082",
+   "question": "on Push, half the pads play my kit and the other half change something else entirely \u2014 which half does what?",
+   "source_must_include": [
+    "ableton12-using-push-1-pt5"
+   ],
+   "source_any_include": [
+    "ableton12-using-push-1-pt5"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-083",
+   "question": "I want the footswitch to hold a chord without moving the playhead, can I set it to that?",
+   "source_must_include": [
+    "ableton12-using-push-1-pt5"
+   ],
+   "source_any_include": [
+    "ableton12-using-push-1-pt5"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-084",
+   "question": "I've sung the chorus five times and I want the best line out of each one, how do I get them side by side?",
+   "source_must_include": [
+    "ableton12-comping-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-comping-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-085",
+   "question": "once I've picked the best bits, how do I move them into the actual track?",
+   "source_must_include": [
+    "ableton12-comping-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-comping-pt1"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-086",
+   "question": "I want a clip that runs for exactly one pass and then waits for me, rather than looping \u2014 which launch mode is that?",
+   "source_must_include": [
+    "ableton12-launching-clips-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-launching-clips-pt1",
+    "ableton12-launching-clips-pt2"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-087",
+   "question": "the clips in my set don't all start on the beat when I trigger them, is there a per-clip setting that lines them up?",
+   "source_must_include": [
+    "ableton12-launching-clips-pt1"
+   ],
+   "source_any_include": [
+    "ableton12-launching-clips-pt1",
+    "ableton12-launching-clips-pt2"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-088",
+   "question": "I want eight clips on a track to play through in order and then start again from the first one without me touching anything",
+   "source_must_include": [
+    "follow-actions-and-clip-launching"
+   ],
+   "source_any_include": [
+    "follow-actions-and-clip-launching"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-089",
+   "question": "I want every clip on the track to pick a random other clip to follow it, so the set never plays the same way twice",
+   "source_must_include": [
+    "follow-actions-and-clip-launching"
+   ],
+   "source_any_include": [
+    "follow-actions-and-clip-launching"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-090",
+   "question": "the client wants something they can review on their phone \u2014 what do I actually send them as the finished track?",
+   "source_must_include": [
+    "client-preview-mp3-export"
+   ],
+   "source_any_include": [
+    "client-preview-mp3-export"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-091",
+   "question": "I'm sending a compressed copy for review and the real one for delivery, how do I name them so nobody mixes them up?",
+   "source_must_include": [
+    "client-preview-mp3-export"
+   ],
+   "source_any_include": [
+    "client-preview-mp3-export"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-092",
+   "question": "the mix engineer is asking for the parts \u2014 what do I need to agree with them in writing before I export anything?",
+   "source_must_include": [
+    "client-stem-handoff-checklist"
+   ],
+   "source_any_include": [
+    "client-stem-handoff-checklist"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-093",
+   "question": "my stems don't line up when the other engineer imports them, what's the fix on my side?",
+   "source_must_include": [
+    "client-stem-handoff-checklist"
+   ],
+   "source_any_include": [
+    "client-stem-handoff-checklist"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-094",
+   "question": "I want to take the load off the processor but still be able to change the settings later, which of the two options do I want?",
+   "source_must_include": [
+    "freeze-flatten-bounce"
+   ],
+   "source_any_include": [
+    "freeze-flatten-bounce"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-095",
+   "question": "I turned a track into audio by mistake and I've already saved \u2014 can I get the devices back?",
+   "source_must_include": [
+    "freeze-flatten-bounce"
+   ],
+   "source_any_include": [
+    "freeze-flatten-bounce"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-096",
+   "question": "I want to glue the whole drum section together with one compressor instead of putting it on every channel \u2014 how do I set that up?",
+   "source_must_include": [
+    "group-bus-workflow"
+   ],
+   "source_any_include": [
+    "group-bus-workflow"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-097",
+   "question": "when the chorus comes in I want the whole drum section to come up with it, where do I automate that?",
+   "source_must_include": [
+    "group-bus-workflow"
+   ],
+   "source_any_include": [
+    "group-bus-workflow"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-098",
+   "question": "my session is over fifty tracks and I can't find anything in it, is there a colour scheme that actually helps?",
+   "source_must_include": [
+    "live-set-organisation"
+   ],
+   "source_any_include": [
+    "live-set-organisation"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-099",
+   "question": "I've rebuilt this same session layout three times this month, can I save it as a starting point?",
+   "source_must_include": [
+    "live-set-organisation"
+   ],
+   "source_any_include": [
+    "live-set-organisation"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-100",
+   "question": "I've got an idea as a loop in the grid view and now I need it as a song \u2014 is there a way to capture what I played straight into the timeline?",
+   "source_must_include": [
+    "session-vs-arrangement-view"
+   ],
+   "source_any_include": [
+    "session-vs-arrangement-view"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-101",
+   "question": "my grid is still responding to clip triggers even though the timeline is playing, what do I press to go back?",
+   "source_must_include": [
+    "session-vs-arrangement-view"
+   ],
+   "source_any_include": [
+    "session-vs-arrangement-view"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-102",
+   "question": "my hardware synth is showing up in the list but the notes come out of the computer keyboard's output instead \u2014 how do I choose the right port?",
+   "source_must_include": [
+    "midi-routing-and-external-sync"
+   ],
+   "source_any_include": [
+    "midi-routing-and-external-sync"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-103",
+   "question": "I want the notes from one track to feed a device on a different track, is that allowed?",
+   "source_must_include": [
+    "midi-routing-and-external-sync"
+   ],
+   "source_any_include": [
+    "midi-routing-and-external-sync"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-104",
+   "question": "my hardware synth's notes come out fine but there's about 20 ms of delay coming back, what do I set to fix that?",
+   "source_must_include": [
+    "external-midi-hardware-setup"
+   ],
+   "source_any_include": [
+    "external-midi-hardware-setup"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-105",
+   "question": "I bought a controller and the program doesn't see it at all, which two switches do I need on in the settings?",
+   "source_must_include": [
+    "external-midi-hardware-setup"
+   ],
+   "source_any_include": [
+    "external-midi-hardware-setup"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-106",
+   "question": "I can only mix on headphones, is there something I can put on the master that makes the stereo picture less fake?",
+   "source_must_include": [
+    "headphone-mixing"
+   ],
+   "source_any_include": [
+    "headphone-mixing"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-107",
+   "question": "everything sounds great on my cans and falls apart on my phone \u2014 what am I over-doing?",
+   "source_must_include": [
+    "headphone-mixing"
+   ],
+   "source_any_include": [
+    "headphone-mixing"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-108",
+   "question": "my speakers and my chair are in completely different spots and the bass changes when I lean forward \u2014 where should things actually go?",
+   "source_must_include": [
+    "room-acoustics-monitor-placement"
+   ],
+   "source_any_include": [
+    "room-acoustics-monitor-placement"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-109",
+   "question": "there's a dip in the low end right where I sit, is putting a cut on it with an EQ the right fix?",
+   "source_must_include": [
+    "room-acoustics-monitor-placement"
+   ],
+   "source_any_include": [
+    "room-acoustics-monitor-placement"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-110",
+   "question": "I bought a pack of thin foam panels \u2014 is that going to fix the boom in my corners?",
+   "source_must_include": [
+    "room-acoustics-treatment"
+   ],
+   "source_any_include": [
+    "room-acoustics-treatment"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-111",
+   "question": "how do I find out where the sound is bouncing off the wall behind my monitors?",
+   "source_must_include": [
+    "room-acoustics-treatment"
+   ],
+   "source_any_include": [
+    "room-acoustics-treatment"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-112",
+   "question": "I'm recording a singer in an untreated bedroom and it sounds like they're in a bathroom \u2014 what do I put behind them?",
+   "source_must_include": [
+    "home-vocal-recording"
+   ],
+   "source_any_include": [
+    "home-vocal-recording"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-113",
+   "question": "how loud should I be getting the singer into the track before I hit record?",
+   "source_must_include": [
+    "home-vocal-recording"
+   ],
+   "source_any_include": [
+    "home-vocal-recording"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-114",
+   "question": "the singer can't play to a straight click, is there anything better I can give them to follow?",
+   "source_must_include": [
+    "recording-with-click-track"
+   ],
+   "source_any_include": [
+    "recording-with-click-track"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-115",
+   "question": "I want two bars of the beat before the recording actually starts, where do I set that?",
+   "source_must_include": [
+    "recording-with-click-track"
+   ],
+   "source_any_include": [
+    "recording-with-click-track"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-116",
+   "question": "I want two bars in 3/4 in the middle of a 4/4 song to make the phrase stumble \u2014 how do I set that up?",
+   "source_must_include": [
+    "time-signature-changes"
+   ],
+   "source_any_include": [
+    "time-signature-changes"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-117",
+   "question": "does changing the meter change how my existing MIDI parts play, or only what the grid looks like?",
+   "source_must_include": [
+    "time-signature-changes"
+   ],
+   "source_any_include": [
+    "time-signature-changes"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-118",
+   "question": "I played this in but it's all over the place, and I want to tighten it without it going robotic \u2014 is there a halfway setting?",
+   "source_must_include": [
+    "quantize-midi-ableton"
+   ],
+   "source_any_include": [
+    "quantize-midi-ableton"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-119",
+   "question": "which grid do I pick so the hats don't get pushed around but the kick and snare land properly?",
+   "source_must_include": [
+    "quantize-midi-ableton"
+   ],
+   "source_any_include": [
+    "quantize-midi-ableton"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-120",
+   "question": "a loop I imported is playing at half speed because the tempo it found is obviously wrong, how do I correct it?",
+   "source_must_include": [
+    "warping-audio-to-tempo"
+   ],
+   "source_any_include": [
+    "warping-audio-to-tempo"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-121",
+   "question": "I recorded a live take and the drums drift later and later, how do I pull it back onto the grid?",
+   "source_must_include": [
+    "warping-audio-to-tempo"
+   ],
+   "source_any_include": [
+    "warping-audio-to-tempo"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-122",
+   "question": "I want the attack of the snare in a loop to sit exactly on beat 3 \u2014 how do I pin it there?",
+   "source_must_include": [
+    "warp-markers"
+   ],
+   "source_any_include": [
+    "warp-markers"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-123",
+   "question": "the timing is right at the start of a long recording and wrong by the end \u2014 where do I put the fix?",
+   "source_must_include": [
+    "warp-markers"
+   ],
+   "source_any_include": [
+    "warp-markers"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-124",
+   "question": "how many bits and what sample rate do I export at for a streaming release?",
+   "source_must_include": [
+    "exporting-stems-and-mixdowns"
+   ],
+   "source_any_include": [
+    "exporting-stems-and-mixdowns"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-125",
+   "question": "I want one file per track for the mix engineer \u2014 which option in the render dialog does that?",
+   "source_must_include": [
+    "exporting-stems-and-mixdowns"
+   ],
+   "source_any_include": [
+    "exporting-stems-and-mixdowns"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-126",
+   "question": "what level should the master be peaking at when I hand a mix over for mastering?",
+   "source_must_include": [
+    "mixdown-checklist"
+   ],
+   "source_any_include": [
+    "mixdown-checklist"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-127",
+   "question": "some parts disappear when I fold the whole thing to mono \u2014 how do I find out which ones?",
+   "source_must_include": [
+    "mixdown-checklist"
+   ],
+   "source_any_include": [
+    "mixdown-checklist"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-128",
+   "question": "what integrated loudness should I be aiming for if this is going on Spotify?",
+   "source_must_include": [
+    "mastering-workflow-ableton"
+   ],
+   "source_any_include": [
+    "mastering-workflow-ableton"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-129",
+   "question": "I've only got the master bus to work with \u2014 in what order do I put the EQ, the compressor and the limiter?",
+   "source_must_include": [
+    "mastering-workflow-ableton"
+   ],
+   "source_any_include": [
+    "mastering-workflow-ableton"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-130",
+   "question": "I've got a limiter on the master purely to make it louder \u2014 does that need to come off before I send it out?",
+   "source_must_include": [
+    "mastering-prep-and-headroom"
+   ],
+   "source_any_include": [
+    "mastering-prep-and-headroom"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-131",
+   "question": "how much room should I leave under the top of the file when I export for mastering?",
+   "source_must_include": [
+    "mastering-prep-and-headroom"
+   ],
+   "source_any_include": [
+    "mastering-prep-and-headroom"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-132",
+   "question": "I'm getting clicks and dropouts every time the drop fills up \u2014 what do I change first, and what do I change only when I'm actually recording?",
+   "source_must_include": [
+    "cpu-saving"
+   ],
+   "source_any_include": [
+    "cpu-saving"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-133",
+   "question": "my CPU meter spikes on two tracks that use heavy synths, which two things can I turn off while I'm writing the music?",
+   "source_must_include": [
+    "cpu-saving"
+   ],
+   "source_any_include": [
+    "cpu-saving"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-134",
+   "question": "I lose track of which file and which track is which after about an hour \u2014 what habit fixes that?",
+   "source_must_include": [
+    "workflow-optimization"
+   ],
+   "source_any_include": [
+    "workflow-optimization"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-135",
+   "question": "my levels and settings drift between one session and the next on the same song, what should I be writing down instead of setting by hand?",
+   "source_must_include": [
+    "workflow-optimization"
+   ],
+   "source_any_include": [
+    "workflow-optimization"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-136",
+   "question": "what buffer size do I set the night before a gig so nothing glitches when I hit a pad?",
+   "source_must_include": [
+    "live-performance-setup"
+   ],
+   "source_any_include": [
+    "live-performance-setup"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-137",
+   "question": "I want a safety control I can hit mid-set if something goes wrong \u2014 what do I set up?",
+   "source_must_include": [
+    "live-performance-setup"
+   ],
+   "source_any_include": [
+    "live-performance-setup"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-138",
+   "question": "the bottom end falls apart on a phone but is fine on my monitors, what's the first thing to look at?",
+   "source_must_include": [
+    "low-end-mono-stereo-management"
+   ],
+   "source_any_include": [
+    "low-end-mono-stereo-management"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-139",
+   "question": "how wide is too wide for the sub?",
+   "source_must_include": [
+    "low-end-mono-stereo-management"
+   ],
+   "source_any_include": [
+    "low-end-mono-stereo-management"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-140",
+   "question": "I want the bass to get out of the way every time the kick lands, how do I set that up and what does the ducking key off?",
+   "source_must_include": [
+    "sidechain-compression"
+   ],
+   "source_any_include": [
+    "sidechain-compression"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-141",
+   "question": "my ducking is clicking on the way back up, what have I got wrong?",
+   "source_must_include": [
+    "sidechain-compression"
+   ],
+   "source_any_include": [
+    "sidechain-compression"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-142",
+   "question": "I want the aggression of heavy compression without losing the punch \u2014 what's that technique called and how much of it do I blend?",
+   "source_must_include": [
+    "parallel-processing-techniques"
+   ],
+   "source_any_include": [
+    "parallel-processing-techniques"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-143",
+   "question": "my bass needs more harmonic content on small speakers but the low end has to stay clean, how do I add it?",
+   "source_must_include": [
+    "parallel-processing-techniques"
+   ],
+   "source_any_include": [
+    "parallel-processing-techniques"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-144",
+   "question": "my reverb is making the whole mix muddy in the low mids \u2014 what do I do on the return?",
+   "source_must_include": [
+    "reverb-send-workflow"
+   ],
+   "source_any_include": [
+    "reverb-send-workflow"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-145",
+   "question": "how much should I be sending from an individual track to start with?",
+   "source_must_include": [
+    "reverb-send-workflow"
+   ],
+   "source_any_include": [
+    "reverb-send-workflow"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-146",
+   "question": "I don't want to load a separate copy of the reverb on every track, is there a way to share one?",
+   "source_must_include": [
+    "sends-and-returns-in-ableton"
+   ],
+   "source_any_include": [
+    "sends-and-returns-in-ableton"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-147",
+   "question": "I want the reverb level to stay the same whether I turn the track up or down, which send type do I need?",
+   "source_must_include": [
+    "sends-and-returns-in-ableton"
+   ],
+   "source_any_include": [
+    "sends-and-returns-in-ableton"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-148",
+   "question": "I want to try the chorus twice in a row to hear whether the structure works \u2014 how do I copy a section without breaking anything?",
+   "source_must_include": [
+    "arrangement-view-shortcuts"
+   ],
+   "source_any_include": [
+    "arrangement-view-shortcuts"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  },
+  {
+   "id": "sealed-purpose-149",
+   "question": "there's a way to make the view jump to exactly the part I've selected, what is it?",
+   "source_must_include": [
+    "arrangement-view-shortcuts"
+   ],
+   "source_any_include": [
+    "arrangement-view-shortcuts"
+   ],
+   "answer_must_include": [],
+   "category": "sealed_purpose",
+   "source_kind": "note_blind_agent_drafted_2026_09_30"
+  }
+ ],
+ "review": {
+  "status": "awaiting_owner_review",
+  "authored_by": "automated_session_2026-09-30",
+  "reviewed_by": null,
+  "reviewed_at": null
+ }
+}
