@@ -1,0 +1,59 @@
+{"at": 1790868818.2, "route": "generation:generated answer introduced unsupported measurements", "ms": 48230.9, "brain": false, "proposal": false}
+{"at": 1790868819.1, "route": "answer_upgrade:rejected", "ms": 49300.0, "brain": false, "proposal": false}
+{"at": 1790868858.1, "route": "generation:generated answer introduced unsupported measurements", "ms": 38343.5, "brain": false, "proposal": false}
+{"at": 1790868858.7, "route": "answer_upgrade:rejected", "ms": 39000.0, "brain": false, "proposal": false}
+{"at": 1790868891.4, "route": "generation:generated answer has insufficient evidence overlap", "ms": 31982.7, "brain": false, "proposal": false}
+{"at": 1790868892.1, "route": "answer_upgrade:rejected", "ms": 32800.0, "brain": false, "proposal": false}
+{"at": 1790868921.0, "route": "generation:generated answer introduced unsupported measurements", "ms": 28441.4, "brain": false, "proposal": false}
+{"at": 1790868921.5, "route": "answer_upgrade:rejected", "ms": 29100.0, "brain": false, "proposal": false}
+{"at": 1790868947.4, "route": "generation:generated answer introduced unsupported measurements", "ms": 25211.5, "brain": false, "proposal": false}
+{"at": 1790868948.0, "route": "answer_upgrade:rejected", "ms": 26000.0, "brain": false, "proposal": false}
+{"at": 1790868984.7, "route": "generation:accepted", "ms": 35791583.9, "brain": true, "proposal": false}
+{"at": 1790868985.5, "route": "answer_upgrade:accepted", "ms": 36800.0, "brain": true, "proposal": false}
+{"at": 1790869023.7, "route": "generation:generated answer introduced unsupported measurements", "ms": 37639.6, "brain": false, "proposal": false}
+{"at": 1790869024.2, "route": "answer_upgrade:rejected", "ms": 38300.0, "brain": false, "proposal": false}
+{"at": 1790869057.1, "route": "generation:generated answer introduced unsupported measurements", "ms": 32395.2, "brain": false, "proposal": false}
+{"at": 1790869057.6, "route": "answer_upgrade:rejected", "ms": 33000.0, "brain": false, "proposal": false}
+{"at": 1790869096.1, "route": "generation:generated answer introduced unsupported measurements", "ms": 37990.8, "brain": false, "proposal": false}
+{"at": 1790869096.5, "route": "answer_upgrade:rejected", "ms": 38400.0, "brain": false, "proposal": false}
+{"at": 1790869119.8, "route": "generation:generated answer cites sources not in the retrieved e", "ms": 22990.9, "brain": false, "proposal": false}
+{"at": 1790869120.2, "route": "answer_upgrade:rejected", "ms": 23500.0, "brain": false, "proposal": false}
+{"at": 1790869162.2, "route": "generation:accepted", "ms": 41475990.1, "brain": true, "proposal": false}
+{"at": 1790869162.7, "route": "answer_upgrade:accepted", "ms": 42100.0, "brain": true, "proposal": false}
+{"at": 1790869204.0, "route": "generation:accepted", "ms": 40735610.9, "brain": true, "proposal": false}
+{"at": 1790869204.6, "route": "answer_upgrade:accepted", "ms": 41500.0, "brain": true, "proposal": false}
+{"at": 1790869243.6, "route": "generation:generated answer claims it changed the Live set", "ms": 38551.4, "brain": false, "proposal": false}
+{"at": 1790869244.1, "route": "answer_upgrade:rejected", "ms": 39200.0, "brain": false, "proposal": false}
+{"at": 1790869245.0, "route": "answer_upgrade:rejected", "ms": 200.0, "brain": false, "proposal": false}
+{"at": 1790869278.1, "route": "generation:generated answer is below the quality threshold", "ms": 32429.8, "brain": false, "proposal": false}
+{"at": 1790869278.6, "route": "answer_upgrade:rejected", "ms": 33100.0, "brain": false, "proposal": false}
+{"at": 1790869320.2, "route": "generation:generated answer introduced unsupported measurements", "ms": 40606.1, "brain": false, "proposal": false}
+{"at": 1790869320.4, "route": "answer_upgrade:rejected", "ms": 41100.0, "brain": false, "proposal": false}
+{"at": 1790869359.3, "route": "generation:accepted", "ms": 38118360.2, "brain": true, "proposal": false}
+{"at": 1790869359.7, "route": "answer_upgrade:accepted", "ms": 38600.0, "brain": true, "proposal": false}
+{"at": 1790869406.3, "route": "generation:accepted", "ms": 45914489.9, "brain": true, "proposal": false}
+{"at": 1790869407.4, "route": "answer_upgrade:accepted", "ms": 47100.0, "brain": true, "proposal": false}
+{"at": 1790869444.3, "route": "generation:generated answer introduced unsupported measurements", "ms": 35563.8, "brain": false, "proposal": false}
+{"at": 1790869444.8, "route": "answer_upgrade:rejected", "ms": 36600.0, "brain": false, "proposal": false}
+{"at": 1790869471.1, "route": "generation:generated answer cites sources not in the retrieved e", "ms": 25650.5, "brain": false, "proposal": false}
+{"at": 1790869471.5, "route": "answer_upgrade:rejected", "ms": 26300.0, "brain": false, "proposal": false}
+{"at": 1790869502.8, "route": "generation:accepted", "ms": 30486719.7, "brain": true, "proposal": false}
+{"at": 1790869503.7, "route": "answer_upgrade:accepted", "ms": 31500.0, "brain": true, "proposal": false}
+{"at": 1790869539.1, "route": "generation:generated answer is below the quality threshold", "ms": 34308.2, "brain": false, "proposal": false}
+{"at": 1790869540.4, "route": "answer_upgrade:rejected", "ms": 35800.0, "brain": false, "proposal": false}
+{"at": 1790869587.7, "route": "generation:accepted", "ms": 44091058.7, "brain": true, "proposal": false}
+{"at": 1790869588.2, "route": "answer_upgrade:accepted", "ms": 45900.0, "brain": true, "proposal": false}
+{"at": 1790869623.3, "route": "generation:accepted", "ms": 34151490.2, "brain": true, "proposal": false}
+{"at": 1790869623.9, "route": "answer_upgrade:accepted", "ms": 35200.0, "brain": true, "proposal": false}
+{"at": 1790869664.1, "route": "generation:generated answer introduced unsupported measurements", "ms": 39487.2, "brain": false, "proposal": false}
+{"at": 1790869664.5, "route": "answer_upgrade:rejected", "ms": 40100.0, "brain": false, "proposal": false}
+{"at": 1790869697.8, "route": "generation:generated answer cites sources not in the retrieved e", "ms": 32828.4, "brain": false, "proposal": false}
+{"at": 1790869698.9, "route": "answer_upgrade:rejected", "ms": 34000.0, "brain": false, "proposal": false}
+{"at": 1790869731.9, "route": "generation:generated answer cites sources not in the retrieved e", "ms": 31989.8, "brain": false, "proposal": false}
+{"at": 1790869732.7, "route": "answer_upgrade:rejected", "ms": 33100.0, "brain": false, "proposal": false}
+{"at": 1790869778.2, "route": "generation:accepted", "ms": 43828803.0, "brain": true, "proposal": false}
+{"at": 1790869778.7, "route": "answer_upgrade:accepted", "ms": 45000.0, "brain": true, "proposal": false}
+{"at": 1790869814.6, "route": "generation:accepted", "ms": 35146455.4, "brain": true, "proposal": false}
+{"at": 1790869815.6, "route": "answer_upgrade:accepted", "ms": 36400.0, "brain": true, "proposal": false}
+{"at": 1790869853.0, "route": "generation:generated answer introduced unsupported measurements", "ms": 36735.2, "brain": false, "proposal": false}
+{"at": 1790869853.9, "route": "answer_upgrade:rejected", "ms": 37800.0, "brain": false, "proposal": false}

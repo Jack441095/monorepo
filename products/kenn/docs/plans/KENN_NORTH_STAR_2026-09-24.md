@@ -130,6 +130,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > 0.15 s p95. Of 22 rejections, 17 were `generated answer introduced unsupported measurements` — the model invents
   > numbers. Full numbers, the prompt cut, and the Live-contention split:
   > `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`.
+  > **1 Oct, and the Live half of the split is measured.** With the owner closing and reopening Live and the same
+  > code on both sides, 30 questions each: **Live open 40.3 s swap p50, Live closed 41.4 s and 39.8 s** across two
+  > closed runs. Live's cost sits inside the 1.6 s run-to-run spread, so **the model is the slow part, not Live** —
+  > Ollama decodes on the GPU while Live's tax is CPU, measured at 57.5% of a core. An earlier reading in this file
+  > put Live's cost at about 2x; that was a confound, because its 81 s figure came from the pre-fix run and so
+  > differed in Live state *and* in the thinking fix simultaneously.
   > 28 Sept: Prompt token footprint reduced by >50% via `_clean_chunk_for_synthesis` and concise excerpt extraction in
   > `llm_rewrite.py` (KENN_LLM_CONTEXT_CHARS=650, KENN_LLM_DRAFT_CHARS=300), bringing token footprint to <= 450 tokens
   > with compact system prompt, cutting Apple Silicon prompt read latency from ~18 s to ~6 s. All 2,187 backend tests pass.

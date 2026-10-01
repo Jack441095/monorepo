@@ -347,8 +347,15 @@
 > that size changed a 300-token generation by 0.95x (noise), because Ollama decodes on the GPU. Gate target is
 > >= 70% upgrading within 15 s; measured 24% at 60.2 s. Receipts in
 > `tooling/evaluation/results/KENN_CHAT_LATENCY_M3_*_2026-10-01.json`; evidence
-> `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`. **Live-closed half still owed** — it needs the owner to
-> close Live at a break, which is not ours to do.
+> `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`.
+>
+> **1 Oct, later, and the Live split is now measured rather than owed.** The owner closed and reopened Live, and
+> the same 30 questions ran on each side with the same code: **Live open 40.3 s swap p50, Live closed 41.4 s and
+> 39.8 s** across two closed runs. Live's cost is smaller than the 1.6 s spread between those two identical runs,
+> so **the model is slow, not Live** — Ollama decodes on the GPU and Live's tax is CPU, measured at 57.5% of a core
+> when reopened. The earlier "Live costs about 2x" reading in this file was a confound: its 81 s figure came from
+> the pre-fix run, so it differed in Live state *and* in the thinking fix at the same time. The 4090 remains the
+> only configuration that meets p95 <= 4 s, at 3.75 s and 43%.
 >
 > **1 Oct, `KENN_LLM_BACKGROUND=1` measured through the real path, and it was dead.** New
 > `tooling/scripts/measure_background_swap.py` drives the same `answer_upgrades.start()` the ask route uses

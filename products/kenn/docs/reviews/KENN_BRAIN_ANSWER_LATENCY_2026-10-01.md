@@ -98,21 +98,33 @@ The prompt is 1% of the cost. The 534-token system prompt that cannot be shorten
 breaking the structure check is 1% of the cost. The other 99% is the GPU writing hundreds of
 tokens at 10-16 tok/s.
 
-## Live open vs Live closed
+## Live open vs Live closed, measured properly (1 Oct)
 
-The separation the North Star wants, as far as it can be had without quitting the owner's DAW.
+This is the separation the North Star says nobody has, so it was measured last, with the owner closing and
+opening Live and the same code on both sides. Four runs, 30 questions each, `KENN_LLM_BACKGROUND=1`:
 
-- **Live open, idle, is not free**: `ps` CPU-time delta over a 5 s window puts Live at
-  **39.8% of one core**, continuously, with nothing playing.
-- **A Live-sized load costs the model nothing.** Re-running a 300-token generation with a
-  synthetic load of the same size: 31.0 s idle -> 29.3 s loaded, **0.95x, i.e. inside noise**.
-  Ollama decodes on the GPU via Metal; Live's 39.8% is CPU. The two do not contend for the
-  resource the answer is waiting on.
+| Run | Accepted | Swap p50 | Swap p95 | Template p50 |
+|---|---|---|---|---|
+| Live **open**, post-fix | 10/30 | 40.3 s | 47.4 s | 0.27 s |
+| Live **closed**, run 1 | 12/30 | 41.4 s | 47.0 s | 0.43 s |
+| Live **closed**, run 2 | 14/30 | 39.8 s | 46.7 s | 0.43 s |
+| Live open, pre-fix (for reference) | 5/30 | 81.4 s | 105.3 s | 0.12 s |
 
-So the hypothesis "Live is competing for the machine" is refuted as the driver. What is left
-is the model itself. The true Live-closed half still needs someone to close Live at a natural
-break; that is a 10-second owner action and it is the one thing here we did not do, because it
-is not ours to do.
+**Live costs 40.3 s open against 41.4 s and 39.8 s closed. That difference is smaller than the 1.6 s
+run-to-run spread between two identical closed runs.** Live is not competing for the resource the answer waits
+on: Ollama decodes on the GPU via Metal, and Live's cost is CPU. Measured as such, Live sat at 39.8% of a core
+when first checked and **57.5%** when it was reopened for this test — a large and variable tax on the CPU that
+does not reach the GPU decode loop.
+
+An earlier reading of this section claimed Live *did* cost about 2x (81 s open against 41 s closed). That was
+wrong, and the reason is worth recording because it is the same trap twice: the 81 s figure came from the run
+**before** the thinking fix, so it differed from the 41 s in two ways at once — Live state *and* the fix. The
+controlled-load experiment had already contradicted it at 0.95x, and I read that as "Live is not the reason"
+while still quoting the confounded 2x elsewhere. One change at a time, and when a number is surprising, distrust
+it before believing it.
+
+So the answer to "the model is slow, or Live is competing" is: **the model is slow.** 40 s with or without Live,
+against a 4 s gate.
 
 ## Why 4 s is out of reach on this box
 
