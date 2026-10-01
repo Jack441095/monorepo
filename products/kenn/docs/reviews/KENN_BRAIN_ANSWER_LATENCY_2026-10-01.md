@@ -85,26 +85,23 @@ prefix is only worth prefill, and prefill is 0.05 ms per 1000 tokens; reusing KE
 prompt between turns saves about 0.03 s against a decode of seconds. There is no arrangement of prompt
 tokens that reaches a 4 s answer while the model writes hundreds of them.
 
-**Where the remaining budget actually goes**, from exact `prompt_eval_count` on a real KENN prompt
-(714 tokens for that question, counted by Ollama, not estimated from characters):
-
-| | Tokens | Share |
-|---|---|---|
-| `build_system_prompt()` — the Ollama path | 536 | the floor |
-| `STATIC_CORE_SYSTEM_PROMPT` — the MLX/short path | 338 | 198 fewer, unusable here |
-| Excerpts + draft + question (the part D2 can cut) | ~180-390 | the remainder |
+**Where the remaining budget actually goes**, from exact `prompt_eval_count` measured by
+`measure_answer_cost.py` on the 4090 (receipt `KENN_ANSWER_COST_BOX_GPU0_2026-10-01.json`): across 5 real
+questions KENN's prompt averages **597 tokens**, split **464 system + 187 user** on average, and ranging
+538-641 depending on which `answer_mode` the question classifies into. Counted directly, `build_system_prompt()`
+is **536 tokens** for `mix_diagnosis` and `STATIC_CORE_SYSTEM_PROMPT` is **338** — so the Ollama path carries
+roughly **200 tokens** the MLX path would not, and that difference is the floor D2 cannot reach no matter how
+short the excerpts get.
 
 The 28 Sept note claimed the footprint reached <= 450 tokens. That is only true on the MLX path.
-`_mlx_engine_answers()` is False here (MLX is not installed), so KENN sends `build_system_prompt()`.
-The short prompt cannot be substituted on the Ollama path because it made most answers fail the
-structure check (26 Sept). So ~816 is the real footprint and **536 tokens is the floor no matter
-how short the excerpts get** — D2 is trimming the smaller half of a number that does not matter.
+`_mlx_engine_answers()` is False here (MLX is not installed), so KENN sends `build_system_prompt()`. The short
+prompt cannot be substituted on the Ollama path because it made most answers fail the structure check
+(26 Sept). D2 is trimming the smaller half of a number that does not matter.
 
-**And prefill is nearly free**, measured cleanly on the idle 4090 because the Mac was too contended
-to trust (Live at 58.8% of a core plus the harness itself): 137 tokens 0.22 s cold, then 262 tokens
-0.023 s, 512 tokens 0.034 s, 2012 tokens 0.103 s — about **0.05 ms per 1000 tokens** once warm. So
-KENN's whole ~816-token prompt costs **~0.04 s**, and the 179 tokens D2 removes are worth **0.009 s**.
-Decode is 300-1200 tokens at ~141 tok/s, i.e. 2.1-8.5 s. The prompt is under 2% of an answer.
+**And prefill is nearly free**, from the same receipt: 462 tokens in **0.055 s**, 1326 tokens in **0.096 s** —
+about **0.05 ms per 1000 tokens**. So KENN's whole ~600-token prompt costs ~0.03 s, and the 179 tokens D2
+removes are worth about **0.009 s**. Decode is 300-1200 tokens at ~140 tok/s, i.e. 2.1-8.5 s. The prompt is
+**under 2% of an answer**.
 
 Cutting excerpts and dropping the draft removed 22% of the tokens and the user part fell
 318 -> 106 tokens. That is real, and it is the only part of D2 that works — but it buys
@@ -129,11 +126,10 @@ opening Live and the same code on both sides. Four runs, 30 questions each, `KEN
 | Live **closed**, run 2 | 14/30 | 39.8 s | 46.7 s | 0.43 s |
 | Live open, pre-fix (for reference) | 5/30 | 81.4 s | 105.3 s | 0.12 s |
 
-**Live costs 40.3 s open against 41.4 s and 39.8 s closed. That difference is smaller than the 1.6 s
-run-to-run spread between two identical closed runs.** Live is not competing for the resource the answer waits
-on: Ollama decodes on the GPU via Metal, and Live's cost is CPU. Measured as such, Live sat at 39.8% of a core
-when first checked and **57.5%** when it was reopened for this test — a large and variable tax on the CPU that
-does not reach the GPU decode loop.
+**Ollama decodes on the GPU via Metal, and Live's cost is CPU.** Measured again today with
+`measure_answer_cost.py`, which times the same 300-token generation idle and then under a synthetic load the size
+of Live's: **139.8 tok/s idle against 133.1 tok/s loaded, 1.05x** — with Live itself sitting at **75.2% of a
+core** over the same window. A large and variable tax on the CPU that barely reaches the GPU decode loop.
 
 An earlier reading of this section claimed Live *did* cost about 2x (81 s open against 41 s closed). That was
 wrong, and the reason is worth recording because it is the same trap twice: the 81 s figure came from the run
@@ -143,7 +139,8 @@ while still quoting the confounded 2x elsewhere. One change at a time, and when 
 it before believing it.
 
 So the answer to "the model is slow, or Live is competing" is: **the model is slow.** 40 s with or without Live,
-against a 4 s gate.
+against a 4 s gate. Live open 40.3 s against closed 41.4 s and 39.8 s — a difference smaller than the 1.6 s
+spread between those two identical closed runs.
 
 ## Why 4 s is out of reach on this box
 

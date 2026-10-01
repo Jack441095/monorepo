@@ -1,0 +1,92 @@
+{
+ "schema": "kenn.answer_cost.v1",
+ "generated_at": "2026-10-01T16:31:46.769417+00:00",
+ "model": "qwen3:8b",
+ "index_version": "v-db8c6334cf63",
+ "context_chars": "(default 650)",
+ "draft_chars": "(default 300)",
+ "interactive_timeout_seconds": 20,
+ "prompts": [
+  {
+   "id": "bass-processing",
+   "question": "how do I process bass",
+   "prompt_tokens": 641,
+   "system_tokens": 464,
+   "user_tokens": 187
+  },
+  {
+   "id": "sidechain-bass-kick",
+   "question": "how do I sidechain bass to the kick",
+   "prompt_tokens": 627,
+   "system_tokens": 464,
+   "user_tokens": 173
+  },
+  {
+   "id": "sidechain-bass-disappears",
+   "question": "Why does my bass disappear when the kick plays?",
+   "prompt_tokens": 538,
+   "system_tokens": 464,
+   "user_tokens": 84
+  },
+  {
+   "id": "sidechain-release-time",
+   "question": "What release time should I use for sidechain compression on bass?",
+   "prompt_tokens": 541,
+   "system_tokens": 464,
+   "user_tokens": 87
+  },
+  {
+   "id": "sidechain-pumping-attack-release",
+   "question": "My sidechain is pumping too obviously, how should I set attack and release?",
+   "prompt_tokens": 636,
+   "system_tokens": 464,
+   "user_tokens": 182
+  }
+ ],
+ "prompt_tokens": {
+  "mean": 596.6,
+  "min": 538,
+  "max": 641,
+  "system_tokens": 464,
+  "user_tokens": 187
+ },
+ "tokens_only": false,
+ "prefill": [
+  {
+   "prompt_tokens": 462,
+   "prefill_seconds": 0.0551,
+   "requested_tokens": 356
+  },
+  {
+   "prompt_tokens": 1326,
+   "prefill_seconds": 0.0959,
+   "requested_tokens": 1028
+  }
+ ],
+ "decode_idle": {
+  "decode_tokens": 300,
+  "decode_seconds": 2.146,
+  "wall_seconds": 2.869,
+  "prefill_tokens": 468,
+  "tokens_per_second": 139.8
+ },
+ "decode_loaded": {
+  "decode_tokens": 300,
+  "decode_seconds": 2.254,
+  "wall_seconds": 2.979,
+  "prefill_tokens": 468,
+  "tokens_per_second": 133.12
+ },
+ "load_cores": 1,
+ "slowdown_ratio": 1.05,
+ "live_cpu": {
+  "live_running": true,
+  "window_seconds": 5.0,
+  "live_cpu_seconds": 3.76,
+  "live_percent_of_one_core": 75.2,
+  "per_process_percent": {
+   "67707": 75.2,
+   "67772": 0.0
+  }
+ }
+}
