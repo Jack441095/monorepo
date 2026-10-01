@@ -196,20 +196,18 @@ void SmartSampleManagerAudioProcessor::playSample(const std::string& filePath)
     auto reader = prepareReaderSource(filePath, 0.0f, playSampleRate);
     if (reader == nullptr) return;
 
-    if (isDawPlaying.load(std::memory_order_relaxed)) {
-        // Quantized start: hand the already-opened, already-buffered reader
-        // to the audio thread via the lock-free handoff; processBlock() picks
-        // it up at the next beat boundary (or on a loop jump).
-        publishPendingPlayback(reader.release(), playSampleRate);
-    } else {
-        // Transport stopped, so there is no beat boundary coming to hand this
-        // over: publish it exactly the same way and let the audio thread take it
-        // on its next callback. Calling startPreparedPlayback() from here used
-        // to write readerSource and reconfigure the transport from the message
-        // thread while processBlock() could be inside getNextAudioBlock() --
-        // a data race, and a use-after-free on the reader itself.
-        publishPendingPlayback(reader.release(), playSampleRate);
-    }
+    // One handoff either way. When the transport is running, processBlock() takes
+    // this at the next beat boundary (or on a loop jump); when it is stopped there
+    // is no boundary coming, so the audio thread takes it on its next callback.
+    //
+    // The distinction used to be expressed as two branches with byte-identical
+    // bodies, which read as though the transport state changed something here. It
+    // does not, and it must not: calling startPreparedPlayback() from the message
+    // thread instead used to write readerSource and reconfigure the transport
+    // while processBlock() could be inside getNextAudioBlock(), which is a data
+    // race and a use-after-free on the reader. processBlock() is the only place
+    // that touches the transport.
+    publishPendingPlayback(reader.release(), playSampleRate);
 
     // Reclaim whatever the audio thread retired since the last UI call.
     drainRetiredReaders();
