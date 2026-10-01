@@ -134,12 +134,21 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > (`KENN_LLM_BACKGROUND=1`): the reply carries the template and an `answer_upgrade` id, the full answer pipeline runs
   > once in the background, and the app swaps the text in only if the grounding check accepted it. This note has no
   > Mac timing for it yet, so the item stays open until there is one (how often the swap lands, and after how long).
-  > **1 Oct, the Mac timing this note was waiting on now exists**: the swap lands **7 times in 29 attempts (24%)** after
-  > a **60.2 s median / 89.5 s p95**, against a gate of >= 70% within 15 s. The box stays **unticked on purpose** — the
-  > mechanism is built and now measured, but it does not meet the gate, and ticking it would record a capability the
-  > M3 cannot actually deliver. The binding constraint is decode, not the prompt (see the 1 Oct notes above and
-  > `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`), so the next moves are D3 (model choice; Qwen3 1.7B does a
-  > 120-token answer in 3.17 s) and serving from the box GPU. Chat on the M3 stays on templates.
+  > **1 Oct, the Mac timing this note was waiting on now exists, and the path was broken.** Driving it through the
+  > real `answer_upgrades.start()` calls the ask route makes: **0 of 30 swaps landed**, because the background thread
+  > inherited the ask path's 20 s HTTP timeout (`AUDIO_TOO_LLM_TIMEOUT`) against a ~60 s answer, so every one timed out
+  > and offered back the template it was meant to replace. Fixed with `llm_rewrite.background_budget()` — a
+  > `ContextVar`, so the longer budget goes to the upgrade thread and not to the producer's next question — and
+  > **re-measured: 4 of 30 land (13%)**, template on screen at **p50 0.22 s / p95 0.54 s**, the swap itself at
+  > p50 74 s when it lands. `route_latency_report.py` reports the same events from the route log independently
+  > (30 started, 4 accepted, median 73.8 s), so the harness and the existing tool agree. The streaming path over the
+  > same 30 questions is 7/29 (24%) at a 60.2 s median. The box stays **unticked on purpose**: the template path meets
+  > the 4 s gate comfortably, but "answers written by the brain" is 13% here and takes 74 s when it works, against a
+  > gate of >= 70% within 15 s. The binding constraint is decode, not the prompt (see the 1 Oct notes above and
+  > `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`), so the next moves are D3 (model choice; Qwen3 1.7B does
+  > a 120-token answer in 3.17 s) and serving from the box GPU. A second defect is recorded and deliberately not
+  > changed: `valid_response()` gates only the non-streaming path, so a well-formed bulleted answer can be discarded
+  > for format on the swap path while the streaming path accepts it.
 - [x] One router: rule parser → local planner → brain; every route logged with timing
   > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
   > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,

@@ -349,6 +349,21 @@
 > `tooling/evaluation/results/KENN_CHAT_LATENCY_M3_*_2026-10-01.json`; evidence
 > `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`. **Live-closed half still owed** — it needs the owner to
 > close Live at a break, which is not ours to do.
+>
+> **1 Oct, `KENN_LLM_BACKGROUND=1` measured through the real path, and it was dead.** New
+> `tooling/scripts/measure_background_swap.py` drives the same `answer_upgrades.start()` the ask route uses
+> (`server.py:3019`), template first then the model in the background, each question asked only after the previous
+> swap settled. It landed **0 of 30**, because `answer_upgrades` inherited the ask path's 20 s `AUDIO_TOO_LLM_TIMEOUT`
+> against a ~60 s answer, so every upgrade timed out and returned the template it was meant to replace. Fixed with
+> `llm_rewrite.background_budget()` (a `ContextVar`, so the long budget applies to the upgrade thread and not to the
+> producer's next question) and re-measured: **4 of 30 land (13%)**, **template on screen p50 0.22 s / p95 0.54 s**,
+> swap p50 74 s when it lands, 0 busy. `route_latency_report.py` independently reports 30 started / 4 accepted /
+> median 73.8 s from the route log this wrote, so both tools agree. Two things found and deliberately **not** changed:
+> `valid_response()` gates only the non-streaming path, so a well-formed bulleted answer can be rejected for format on
+> the swap path while streaming accepts it; and `make_answer()` discards its `validation["warnings"]`, so rejection
+> reasons are invisible in the logs. Gate target >= 70% within 15 s against 13% at 74 s — the template path meets the
+> 4 s gate, the brain-written path does not. Receipts
+> `KENN_BACKGROUND_SWAP_M3_2026-10-01.json` and `KENN_BACKGROUND_SWAP_ROUTES_M3_2026-10-01.jsonl`.
 
 > **Gate (week 4):** timing measured and written down for the M3; the target stays ≥ 70% of knowledge answers upgrading
 > within 15 s with the grounding check passing.

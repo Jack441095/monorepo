@@ -6,6 +6,11 @@ check as always (``answer_payload`` with the model on); only an answer KENN woul
 upgrade. One answer is written at a time: two at once would compete for the same memory and both would be slower.
 
 Switched on with ``KENN_LLM_BACKGROUND=1`` (and the chat model enabled); otherwise nothing here runs.
+
+The model call here runs under ``llm_rewrite.background_budget()`` rather than the interactive ask-path timeout.
+On the owner's M3 an answer takes about 60 s, so the 20 s interactive ceiling made every upgrade time out and fall
+back to the template it was supposed to improve: 0 of 30 accepted when measured 1 Oct. Nothing is waiting on this
+thread -- the template is already on screen -- so the interactive budget has nothing to protect here.
 """
 
 from __future__ import annotations
@@ -48,7 +53,16 @@ def start(write: Callable[[], dict[str, Any]]) -> str | None:
     def run() -> None:
         started = time.perf_counter()
         try:
-            payload = write()
+            # The interactive LLM timeout is tuned for the ask path, where someone is watching a
+            # spinner and needs a fast fallback. Inheriting it here meant this path could never win:
+            # measured 1 Oct on the owner's M3, 0 of 30 upgrades were accepted, because a ~60 s
+            # answer always hit the 20 s ceiling and `enhance()` returned None, so the swap offered
+            # back the same template the producer was already looking at. The template is already on
+            # screen by the time this thread runs, so there is nobody to fail fast for.
+            from kenn.llm.llm_rewrite import background_budget
+
+            with background_budget():
+                payload = write()
             accepted = bool(payload.get("llm_enhanced"))
             entry = {"status": "accepted" if accepted else "rejected",
                      "answer": str(payload.get("answer") or "") if accepted else "",
