@@ -1150,6 +1150,17 @@ ssm_add_engine_test(TestSmartCollections Source/test_smart_collections_main.cpp)
 # order to prove the guard logic classifies it correctly.
 ssm_add_engine_core_prod_consumer(TestSafetyRegression Source/test_safety_regression_main.cpp)
 
+# The only test of openCacheDb()'s fail-closed production-path guard, and it was
+# previously absent from this file entirely, so it had never been compiled.
+#
+# It links the ordinary test core, which is the opposite of what you would guess:
+# the guard itself lives inside `#if defined(SSM_TEST_BINARY)`, so a prod-core
+# build compiles the guard out and the forked child exits 0 -- which this test
+# correctly reports as the guard failing open. SSM_TEST_BINARY is what makes the
+# guard exist; the thing the child must lack is the runtime cache override, and
+# that is a separate mechanism (setCacheDbDirectoryOverrideForTesting).
+ssm_add_engine_test(TestProductionCacheGuard Source/test_production_cache_guard_main.cpp)
+
 add_executable(TestAcousticClassifierParity
     Source/TestAcousticClassifierParity.cpp
     Source/AbletonTaxonomy.cpp
@@ -1288,7 +1299,8 @@ set(SSM_CTEST_TARGETS
     TestPathTraversal TestPersistedCacheHydration TestPhysicalAcoustics
     TestPrecisionBrowserSorting TestPruneMissing TestQuadTreeCoincidentPoints
     TestReadOnlySafetyQualification TestReferenceSearch TestResilience
-    TestRtDeadlineStress TestSafetyRegression TestSampleEngine
+    TestRtDeadlineStress TestSafetyRegression TestProductionCacheGuard
+    TestSampleEngine
     TestSearchLexicon TestSmartCollections TestSortLibraryAsync
     TestSortPreviewAndUndo TestTaxonomy TestTimbreRefinement
     TestUmapEligibility TestXmpWriter
