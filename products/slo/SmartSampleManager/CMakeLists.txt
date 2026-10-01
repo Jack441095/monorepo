@@ -1275,11 +1275,11 @@ enable_testing()
 # onto ScopedIsolatedCacheDb and this can go.
 set(SSM_TEST_WORKING_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-# TestLicensing is deliberately NOT registered. It tampers with and then deletes
-# the real ~/Library/Application Support/SmartSampleManager/license.json
-# (Source/test_licensing_main.cpp:125-155) because LicenseManager::appDataDir()
-# has no test override hook, and it needs a live uvicorn server plus a real key
-# to mean anything. It gets registered in the commit that adds the override.
+# TestLicensing is deliberately NOT registered. The full activation path is a
+# manual soak: it needs a live uvicorn server plus a provisioned key. The binary
+# redirects its licence file to a scratch directory and asserts the real
+# license.json is untouched, but only TestLicensing --url-policy runs without
+# that server/key environment.
 #
 # --- QUALIFICATION GROUPS: one table, two consumers -------------------------
 #

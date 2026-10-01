@@ -2,8 +2,9 @@
 #include <cstdlib>
 #include "Licensing/LicenseManager.h"
 
-// Exercises LicenseManager end to end against a running instance of
-// licensing_server/ (start it first: ./.venv/bin/uvicorn server:app --port 8420).
+// MANUAL SOAK, not part of ctest. Exercises LicenseManager end to end against
+// a running instance of licensing_server/ (start it first:
+// ./.venv/bin/uvicorn server:app --port 8420).
 // Requires a license key to be passed as argv[1] -- create one via:
 //   curl -X POST localhost:8420/v1/admin/licenses -H "Content-Type: application/json" \
 //        -d '{"customer_email":"test@example.com","max_activations":2}'
