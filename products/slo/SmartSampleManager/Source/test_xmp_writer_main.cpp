@@ -111,23 +111,42 @@ int main()
         auto secondFileTags = AbletonXmpWriter::readTagsForFile(sampleFile2.getFullPathName().toStdString());
         expectTrue(secondFileTags.size() == 1 && secondFileTags[0] == "Drums|Snare", "second file should have its own tag");
 
-        // Backups are timestamped, and the assertion is on what a backup *contains*
-        // rather than on a fixed name. A fixed ".xmp.bak" was the defect: copyFileTo
-        // is delete-then-copy, so the second write's backup held SLO's own previous
-        // output and the user's original sidecar became unrecoverable.
+        // Backups are timestamped, and the assertion is on how many generations
+        // survive rather than on a fixed name. A fixed ".xmp.bak" was the defect:
+        // copyFileTo is delete-then-copy, so each write destroys the previous backup.
+        //
+        // Three writes, not two, and that is the whole point. After two writes a
+        // fixed-name backup still holds generation 1 and differs from the current
+        // file, so a two-write test passes against the destructive behaviour --
+        // verified by mutation. The original is only actually lost on the THIRD
+        // write, when the generation-1 backup is overwritten by generation 2.
         const juce::File infoDir = scratchDir.getChildFile("Ableton Folder Info");
-        const juce::File currentXmp = infoDir.getChildFile("dc66a3fa-0fe1-5352-91cf-3ec237e9ee90.xmp");
+
+        juce::File sampleFile3 = scratchDir.getChildFile("third_hat.wav");
+        sampleFile3.replaceWithText("not real audio, just needs to exist");
+        const auto third = AbletonXmpWriter::writeTagsForFile(
+            sampleFile3.getFullPathName().toStdString(), { "Drums|Hat" });
+        expectTrue(third.success, "third file's write should succeed");
+        expectTrue(third.backupCreated, "third write should also back up");
 
         juce::Array<juce::File> backups;
         infoDir.findChildFiles(backups, juce::File::findFiles, false, "*.xmp.bak");
-        expectTrue(!backups.isEmpty(), "a .xmp.bak backup should exist after the second write");
+        expectTrue(backups.size() >= 2,
+                   "after three writes every prior generation must still be on disk, found "
+                     + std::to_string(backups.size()) + " backup(s)");
 
-        bool foundDistinctBackup = false;
-        for (const auto& b : backups)
-            if (b.loadFileAsString() != currentXmp.loadFileAsString())
-                foundDistinctBackup = true;
-        expectTrue(foundDistinctBackup,
-                   "every backup holds the file SLO just wrote, so the user's original is gone");
+        // And the two retained generations must actually differ from each other,
+        // or "two backups" could just be the same content written twice.
+        if (backups.size() >= 2)
+        {
+            std::vector<juce::String> contents;
+            for (const auto& b : backups) contents.push_back(b.loadFileAsString());
+            bool anyDistinct = false;
+            for (size_t i = 0; i < contents.size() && !anyDistinct; ++i)
+                for (size_t j = i + 1; j < contents.size(); ++j)
+                    if (contents[i] != contents[j]) { anyDistinct = true; break; }
+            expectTrue(anyDistinct, "the retained backups are byte-identical, so no generation was kept");
+        }
     }
 
     // --- Test 3: parse a REAL Ableton/LiveTagger-produced sidecar (not one
