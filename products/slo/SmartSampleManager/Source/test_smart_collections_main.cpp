@@ -56,7 +56,13 @@ int main() {
         return 1;
     }
 
-    // Test physical_class smart collection
+    // Test physical_class smart collection.
+    //
+    // The rule is built from the engine's own inferred class, so this is a test of
+    // the *filtering*, not of the classification -- which is fine, as long as the
+    // expectation is exact. "Not empty" passed even if the filter returned the
+    // whole library. So: the result must be precisely the set of samples whose
+    // physicalClass matches, no more and no fewer.
     auto samples = engine.getSamples();
     std::string actualClass = samples.empty() ? "Percussive Hit" : samples[0].audioFeatures.physics.physicalClass;
     std::string physRules = "{\"physical_class\": \"" + actualClass + "\"}";
@@ -65,6 +71,25 @@ int main() {
     if (physCollected.empty()) {
         std::cerr << "FAIL: expected sample in Physical Match collection" << std::endl;
         return 1;
+    }
+    {
+        int expectedMatches = 0;
+        for (const auto& s : samples)
+            if (s.audioFeatures.physics.physicalClass == actualClass) ++expectedMatches;
+        if (static_cast<int>(physCollected.size()) != expectedMatches)
+        {
+            std::cerr << "FAIL: physical_class filter returned " << physCollected.size()
+                      << " sample(s) but " << expectedMatches << " carry class '" << actualClass
+                      << "'" << std::endl;
+            return 1;
+        }
+        for (const auto& s : physCollected)
+            if (s.audioFeatures.physics.physicalClass != actualClass)
+            {
+                std::cerr << "FAIL: physical_class filter returned '" << s.audioFeatures.physics.physicalClass
+                          << "', which does not match the rule '" << actualClass << "'" << std::endl;
+                return 1;
+            }
     }
 
     // Test material query using the material actually inferred for the
