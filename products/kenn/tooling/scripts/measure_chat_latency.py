@@ -85,6 +85,44 @@ def _drop_semantic_cache() -> None:
         pass
 
 
+def _install_capture(path: Path) -> None:
+    """Record every candidate answer so a rejection can be re-scored offline.
+
+    The payload cannot supply this: when the grounding gate rejects the brain's answer, the streaming
+    path swaps in the template and reports that as the answer, so the rejected text is gone before
+    metadata is built. generated_answer_validation is the last place it exists, and reading it out of a
+    wrapper is how the dominant rejection was originally identified. Point --capture-answers at a
+    git-ignored path: this holds the model's prose, which the receipt itself must never carry.
+    """
+    from kenn.core import chat_answer
+    from kenn.core.chat_retrieval import display_results
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    real = chat_answer.generated_answer_validation
+
+    def capture(query, results, answer, **kwargs):
+        validation = real(query, results, answer, **kwargs)
+        evidence = " ".join(
+            " ".join((str(c.get("title") or ""), str(c.get("source") or ""), str(c.get("text") or "")))
+            for _score, c in display_results(query, results, 3)
+        )
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps({
+                "question": query,
+                "answer": answer,
+                "accepted": bool(validation["accepted"]),
+                "warnings": [str(w) for w in validation.get("warnings") or []],
+                "unsupported_measurements": list(validation.get("unsupported_measurements") or []),
+                "fabricated_sources": list(validation.get("fabricated_sources") or []),
+                "evidence_text": evidence,
+                "additional_evidence_text": kwargs.get("additional_evidence_text") or "",
+                "timeline_context": kwargs.get("timeline_context") or "",
+            }) + "\n")
+        return validation
+
+    chat_answer.generated_answer_validation = capture
+
+
 def _ask(chat_answer, question: str, *, allow_llm: bool, surface: str) -> tuple[dict, int]:
     """Return the final metadata dict and how many token events the answer took to arrive."""
     if surface == "stream":
@@ -222,6 +260,9 @@ def main() -> int:
     parser.add_argument("--surface", choices=("stream", "payload"), default="stream",
                         help="stream = kenn.core.chat / chat_cli; payload = the browser companion's non-streaming call")
     parser.add_argument("--receipt", type=Path)
+    parser.add_argument("--capture-answers", type=Path, metavar="PATH",
+                        help="append every candidate answer to PATH as JSONL, including rejected ones, so a "
+                             "gate can be re-scored offline. Must be git-ignored: it holds model prose.")
     args = parser.parse_args()
 
     if not args.cases.is_file():
@@ -235,6 +276,8 @@ def main() -> int:
         return 2
 
     cases = json.loads(args.cases.read_text(encoding="utf-8")).get("cases", [])[: args.limit]
+    if args.capture_answers:
+        _install_capture(args.capture_answers)
     report = measure(cases, allow_llm=not args.templates_only, surface=args.surface)
     print(render(report))
     if args.receipt:

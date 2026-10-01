@@ -78,7 +78,7 @@ def test_structured_but_unsupported_llm_candidate_is_rejected() -> None:
     result = validate(unsafe)
 
     assert result["accepted"] is False
-    assert "500 hz" in result["unsupported_measurements"]
+    assert "500hz" in result["unsupported_measurements"]
     assert "invented-reverb-guide.md" in result["fabricated_sources"]
 
 
@@ -99,7 +99,28 @@ def test_typed_specialist_measurement_can_ground_generated_answer() -> None:
     assert result["unsupported_measurements"] == []
 
 
-def test_a_below_threshold_answer_says_which_sections_were_missing() -> None:
+def test_spacing_between_number_and_unit_does_not_decide_a_match() -> None:
+    # A captured answer wrote "120Hz" where the note wrote "120 Hz"; the space was part of the key, so a
+    # faithful quotation was rejected as invented. Audio writing puts it both ways, so it cannot be in the key.
+    for note, quoted in (
+        ("Set the crossover to 120 Hz.", "Use 120Hz for the crossover."),
+        ("Sample rate 44.1 kHz.", "Print at 44.1kHz."),
+        ("Set the send to -18 dBFS.", "Set the send to -18dBFS."),
+        ("Begin with a send around 10-20%.", "Start with a 10–20% send."),
+    ):
+        result = generated_answer_validation(
+            QUERY,
+            RESULTS,
+            f"Short answer: {quoted}\n\nTry this:\n1. Do it.\n2. Check it.\n\nSources:\n- Reverb send workflow (reverb-send-workflow.md)\n",
+            route="production",
+            confidence="high",
+            answer_mode="quick_fix",
+            additional_evidence_text=note,
+        )
+        assert result["unsupported_measurements"] == [], (note, result["unsupported_measurements"])
+
+
+def test_a_rejection_records_which_sections_were_missing() -> None:
     # This was the dominant rejection and named nothing. The aggregate stays first because the route report
     # groups on it; the specifics behind it are what make the count actionable.
     result = validate("Send the reverb from a return at around 10-20%.")
@@ -155,5 +176,5 @@ def test_flipping_the_sign_on_a_measured_level_is_caught() -> None:
         answer_mode="quick_fix",
         additional_evidence_text="Set the send to -18 dBFS.",
     )
-    assert "18 dbfs" in result["unsupported_measurements"]
+    assert "18dbfs" in result["unsupported_measurements"]
     assert result["accepted"] is False

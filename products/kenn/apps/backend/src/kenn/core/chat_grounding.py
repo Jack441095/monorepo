@@ -170,9 +170,14 @@ _MEASUREMENT_RE = re.compile(
 
 
 def _measurements(text: str) -> set[str]:
-    """Each measurement in `text`, whitespace-normalised so formatting never decides a match."""
+    """Each measurement in `text`, keyed so spacing never decides a match.
+
+    The space between number and unit is dropped rather than collapsed: audio writing puts it both ways
+    in the same breath ("120 Hz" in a note, "120Hz" from the model), and treating those as two different
+    values rejected answers that quoted the note correctly.
+    """
     return {
-        " ".join(m.lower().split())
+        "".join(m.lower().split())
         for m in _MEASUREMENT_RE.findall(_RANGE_RE.sub(r"\1\3 \2\3", text))
     }
 
