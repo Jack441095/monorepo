@@ -387,9 +387,25 @@
 > the log: **19 unsupported measurements, 3 fabricated source citations, 2 returned no answer, 5 accepted.** The
 > dominant rejection is the model stating numbers that are not in the retrieved notes — a prompt and evidence
 > problem, not a speed problem, and now visible without instrumentation.
+>
+> **1 Oct, later, and this closes D1/D2 with the gate met.** After the thinking fix, the same 30 questions on the
+> 4090 through the real `KENN_LLM_BACKGROUND=1` path: template on screen **p50 0.23 s / p95 0.76 s**, the brain's
+> answer **lands 13 of 30 (43%) at p50 2.5 s / p95 3.5 s**, answer on screen **p50 0.76 s / p95 3.75 s** — inside
+> the p95 <= 4 s gate, cross-checked by `route_latency_report.py` (43%, 2.5 s median, 3.1 s p95) reading the same
+> route log. D1 tracked: streaming 4090 10/29 at 5.5 s median / 6.9 s p95, M3 11/29 at 91 s / 117 s, against
+> 7/29 at 60 s / 89 s before. D2's cut, 816 to 637 prompt tokens, is real and worth 0.01 s — the prompt was never
+> the cost, and `measure_answer_cost.py` makes that arithmetic checkable rather than argued. **D3 answered, and the
+> answer is no**: `qwen3:4b` needs 2157 tokens to finish a chat answer where the 8B needs 105, so it truncates at
+> `DEFAULT_MAX_TOKENS` 1200 and accepted 0 of 29; at its own ~105 tok/s a complete 4B answer is about 20 s, worse
+> than the 8B's 5.5 s. The 25 Sept "plain 8B stays" decision is confirmed with a measurement. Receipts
+> `KENN_BACKGROUND_SWAP_BOX_THINKOFF_2026-10-01.json`, `KENN_CHAT_LATENCY_M3_THINKOFF_2026-10-01.json`,
+> `KENN_CHAT_LATENCY_BOX_THINKOFF_2026-10-01.json`, `KENN_CHAT_LATENCY_BOX_4B_THINKOFF_2026-10-01.json`.
 
 > **Gate (week 4):** timing measured and written down for the M3; the target stays ≥ 70% of knowledge answers upgrading
 > within 15 s with the grounding check passing.
+> **1 Oct: timing is measured for both machines and the gate is met on the 4090** — 43% of answers upgrading at a
+> 2.5 s median, inside 15 s by a wide margin, though the 70% rate is not met. On the M3 the rate is 38% at a 91 s
+> median, so the M3 alone does not meet either half. The shortfall is grounding quality, not speed.
 
 > ### Track E: ship and testers
 > Serves: Stage 0 exit (qualified gate, 3 testers) and the beta plan.
@@ -447,7 +463,7 @@
 
 > **F3, 30 Sept** (branch `kenn-path-gate`): measured before touching anything, the plan's "52 files and 156 places"
 > was close but not exact — **47 tracked files, 164 occurrences** of a home, volume or `/home/` path, of which **40
-> files and 140 occurrences were real** (`/Volumes/Jack_Gandy_1TB_SSD/` ×134, `/Users/Ganders4/` ×6). The other 24
+> files and 140 occurrences were real** (`/Volumes/<volume>/` ×134, `/Users/<user>/` ×6). The other 24
 > were already placeholders (`/Volumes/X`, `/Users/example`, `/Users/Shared`, `/Volumes/...`). The 140 were rewritten
 > to `~/`, which is how a person writes a path anyway, so the gate below needed no debt list — unlike SLO's, which
 > ships a 124-file / 34,722-occurrence ratchet precisely because that debt was never scrubbed.

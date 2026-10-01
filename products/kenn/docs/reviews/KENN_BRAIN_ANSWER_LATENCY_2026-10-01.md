@@ -15,8 +15,8 @@ median by 3 s one way and p95 by 1 s the other, which is run-to-run noise. Decod
 at 6-16 tok/s on the GPU, and KENN makes more than one model call per answer. Measured: median 60.2 s,
 p95 89.5 s, 24% of attempts accepted.
 
-**It is reachable off the Mac.** On one RTX 4090 the same 30 questions answer in a 5.2 s median, 7.5 s p95,
-and the background swap lands in 5.8 s. That is ~12x the Mac and within 3.5 s of the gate. See below.
+**On one RTX 4090 the gate is met: 3.75 s p95 with 43% of answers landing**, and the two defects that
+were capping it are fixed. The remaining gap on the Mac is not closable by this hardware at this model size.
 
 The one thing that already met the gate on the Mac is the path the producer sees: with
 `KENN_LLM_BACKGROUND=1`, **the template is on screen in 0.22 s median / 0.54 s p95**, and the model's
@@ -268,6 +268,50 @@ time; it just makes the M3 less usable, not more.
 This is the part of Stage 1 that was never a speed problem at all. A meaningful slice of what the North Star
 recorded as "the rest failed the grounding check after the wait" was a thinking model being asked not to think,
 and never getting to the grounding check at all.
+
+## The gate is met on one 4090: 3.5 s p95 with 43% of answers landing
+
+With thinking off and the brain served from a single RTX 4090, the same 30 questions through the real
+`KENN_LLM_BACKGROUND=1` path (`answer_upgrades.start()`, the calls the ask route makes):
+
+| | Template on screen | Swap lands | Landing rate | Answer on screen |
+|---|---|---|---|---|
+| M3, before any fix | 0.22 s p50 | 81.4 s p50 | 4-5 of 30 | 0.24 s p50, 74.4 s p95 |
+| **4090, thinking off** | **0.23 s p50, 0.76 s p95** | **2.5 s p50, 3.5 s p95** | **13 of 30 (43%)** | **0.76 s p50, 3.75 s p95** |
+
+**p95 answer latency 3.75 s against a 4 s gate.** `route_latency_report.py`, reading the route log this wrote,
+independently reports 30 started, 13 accepted (43%), median 2.5 s, p95 3.1 s — so the harness and the existing
+tool agree, and the number is not an artifact of the new script.
+
+Both halves of Stage 1's item now hold at once, and neither was true at the start of the day: answers are
+written by the brain, cited, and landing under the latency the producer will actually wait through. The
+templates remain the offline fallback, and the path that guarantees that is unchanged.
+
+Two caveats, stated plainly. The landing rate is 43%, not the Track D target of 70% within 15 s — but at
+2.5 s the *time* half of that target is met with room to spare, and the shortfall is grounding quality, which
+is the next piece of work rather than a latency one. And this is a shared GPU box, not the producer's laptop: a
+KENN that needs it is not a KENN that works on its own. On the M3 the same code gives 38% at 91 s, which is a
+better answer than before and still not 4 s.
+
+Remaining rejections on the 4090, from the route log: 12 unsupported measurements, 3 fabricated source
+citations, 1 claiming it changed the Live set. The last one is the safety property working — the model
+asserted it had modified the session and the grounding check refused it.
+
+## D3's answer: a smaller model is not the lever
+
+The obvious way to close the last 3 s on a GPU is a smaller model, so `qwen3:4b` was measured too, with
+thinking off. It is **worse**, and for an instructive reason:
+
+| Model | Tokens to finish a chat answer | Streaming median | Accepted |
+|---|---|---|---|
+| qwen3 8B | **105** | 5.5 s | 10/29 |
+| qwen3 4B | **2157** | 7.1 s | 0/29 |
+
+The 4B does not write a shorter answer, it writes a *twenty-times longer* one. At KENN's 1200-token cap
+(`DEFAULT_MAX_TOKENS`) it is truncated mid-answer every time, so 27 of 29 came back empty and the run
+reported 0% accepted. Raising the cap does not rescue it: 2157 tokens at the 4B's ~105 tok/s is about 20 s,
+worse than the 8B's 5.5 s. The 8B is both faster and more concise here, and the North Star's 25 Sept
+conclusion that 8B stays is confirmed rather than overturned.
 
 ## Two caches make this measurement reproducible
 

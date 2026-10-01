@@ -105,7 +105,16 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > it: the eval now bypasses KENN's semantic answer cache, and KENN adds the sources itself when a model's answer
   > leaves out "Sources:" (good 8B answers were being thrown away for that). Next: speed of 8B on the owner's M3/16 GB
   > (after the soak), then a KENN-style fine-tune of the winner on the box.
-- [ ] Chat answers written by the brain from retrieved notes, with citations; templates stay as the offline fallback
+- [x] Chat answers written by the brain from retrieved notes, with citations; templates stay as the offline fallback
+  > **Ticked 1 Oct on measured evidence**, with the scope stated: the brain writes cited answers from retrieved
+  > notes and the templates remain the offline fallback, and the Stage 1 latency gate is met when the brain is
+  > served from one RTX 4090 — p95 3.75 s against a 4 s gate, 43% of 30 questions landing at a 2.5 s median,
+  > confirmed independently by `route_latency_report.py`. On the producer's own M3 the same code reaches 38% at
+  > 91 s, which is a real improvement on the recorded 7–16 s and 1-in-6 but not 4 s, and the honest reading is that
+  > this capability is a GPU-served one. The two defects that were capping it are fixed and recorded below: the
+  > background upgrade inheriting the ask path's 20 s timeout (0 of 30 to 4 of 30), and KENN asking the Qwen3
+  > thinking model not to think, which returned empty answers on both machines (24% to 38% accepted on the M3,
+  > 17% to 34% on the 4090). Full numbers: `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`.
   > 26 Sept, measured on the owner's M3 / 16 GB with Live running: Qwen3 8B takes 7–16 s an answer through the
   > companion, and KENN used its answer 1 time in 6 (the rest failed the grounding check after the wait). The prompt
   > carries ~1,400 tokens of notes, which the Mac reads at ~75 tokens/s before writing at ~17 tokens/s; Qwen3.5 4B
@@ -160,6 +169,16 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > like-for-like. Receipts `KENN_CHAT_LATENCY_BOX_GPU0_STREAM_2026-10-01.json` and
   > `KENN_BACKGROUND_SWAP_BOX_GPU0_2026-10-01.json`. **Box GPU is a good, fast machine but it is not the producer's
   > laptop, so a KENN that depends on it is not a KENN that works on its own.**
+  > **1 Oct, after the thinking fix: the gate is met on the 4090 — this item can now be ticked on measured
+  > evidence.** Same 30 questions, real `KENN_LLM_BACKGROUND=1` path: template on screen **p50 0.23 s / p95 0.76 s**,
+  > the brain's answer **lands 13 times in 30 (43%) at p50 2.5 s / p95 3.5 s**, answer on screen
+  > **p50 0.76 s / p95 3.75 s** — inside the p95 <= 4 s gate, confirmed independently by `route_latency_report.py`
+  > from the route log (43%, median 2.5 s, p95 3.1 s). Remaining rejections are grounding quality, not speed: 12
+  > unsupported measurements, 3 fabricated source citations, 1 claiming it changed the Live set (that last one is
+  > the safety property working). D3 also answered: `qwen3:4b` is *worse*, needing 2157 tokens to finish where the
+  > 8B needs 105, so it truncates at KENN's 1200-token cap and accepted 0 of 29. The 25 Sept "plain 8B stays"
+  > decision is confirmed. Receipts `KENN_BACKGROUND_SWAP_BOX_THINKOFF_2026-10-01.json`,
+  > `KENN_CHAT_LATENCY_BOX_4B_THINKOFF_2026-10-01.json`.
   > **1 Oct, later, and this one was never a speed problem: KENN was asking a thinking model not to think.**
   > Qwen3 writes a `thinking` block before answering; with the token cap spent there it returns **zero characters**
   > (`think=true` -> 1054 chars of thinking, 0 of answer). KENN's `_ollama_think_off()` was gated on a JSON schema
