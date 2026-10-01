@@ -405,6 +405,8 @@ def generated_answer_validation(
         warnings.append("generated answer has weak grounding")
     if int(quality.get("score", 0) or 0) < ANSWER_QUALITY_MIN_SCORE:
         warnings.append("generated answer is below the quality threshold")
+        # Aggregate first: route_latency_report.py groups on the first warning, so specifics ahead would split it.
+        warnings.extend(str(w) for w in (quality.get("warnings") or []))
     return {
         "accepted": not warnings,
         "warnings": warnings,

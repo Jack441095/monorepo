@@ -99,6 +99,17 @@ def test_typed_specialist_measurement_can_ground_generated_answer() -> None:
     assert result["unsupported_measurements"] == []
 
 
+def test_a_below_threshold_answer_says_which_sections_were_missing() -> None:
+    # This was the dominant rejection and named nothing. The aggregate stays first because the route report
+    # groups on it; the specifics behind it are what make the count actionable.
+    result = validate("Send the reverb from a return at around 10-20%.")
+
+    assert result["accepted"] is False
+    assert result["warnings"][0] == "generated answer is below the quality threshold"
+    assert "missing short answer section" in result["warnings"]
+    assert "fewer than two actionable steps" in result["warnings"]
+
+
 def test_a_chat_answer_that_claims_it_changed_the_set_is_thrown_away() -> None:
     # Only the Live command path changes the set, after Apply. A brain answer saying it did is a false receipt.
     for claim in (
