@@ -6553,8 +6553,34 @@ juce::String sanitizePathComponent(const juce::String& raw, const juce::String& 
     juce::String s = raw.replaceCharacters("/\\:", "___");
     while (s.startsWith("."))
         s = s.substring(1);
+
+    // Strip a leading '~'. JUCE's File::isAbsolutePath counts it as absolute
+    // (juce_File.cpp:428), so File::getChildFile("~x") discards the parent
+    // entirely and hands back File("~x") (juce_File.cpp:436) -- a path with no
+    // relationship to the library root. Nothing crashes: the getpwnam inside
+    // parseAbsolutePath is null-checked, so the string survives as a literal and
+    // the isInsideDirectory guard downstream rejects it. That guard is the reason
+    // this has never escaped, but a filename is not the place to rely on a second
+    // line of defence, and a tag value is attacker-controlled.
+    while (s.startsWith("~"))
+        s = s.substring(1);
+
     s = s.trim();
-    return s.isEmpty() ? fallback : s;
+
+    // Drop control characters, which have no business in a filename and would
+    // break the journal's line-oriented format if they ever reached it.
+    juce::String cleaned;
+    for (auto c : s)
+        if (c >= 0x20)
+            cleaned += c;
+
+    // Bound the length. A 300-byte ID3 tag otherwise fails the move with
+    // ENAMETOOLONG for every file carrying it, silently making a whole library
+    // unsortable. 128 is what juce::File::createLegalFileName uses.
+    if (cleaned.length() > 128)
+        cleaned = cleaned.substring(0, 128);
+
+    return cleaned.isEmpty() ? fallback : cleaned;
 }
 
 juce::String formatKeyForSampleName(const juce::String& key, bool oneShot)
