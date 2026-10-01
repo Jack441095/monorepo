@@ -7273,7 +7273,21 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
                 categoryDir = rootDir.getChildFile("Other");
             }
         }
-        categoryDir.createDirectory();
+
+        // isInsideDirectory() is a string-prefix test, so a symlink sitting at the
+        // category path passes it while pointing anywhere on disk -- <root>/Kick ->
+        // ~/Desktop would move the user's audio out of the library. The scan
+        // already rejects symlinked files and roots; this is the same check for the
+        // one path the sort creates. Anything that is not a real directory we own
+        // falls back to "Other", which is inside the root by construction.
+        if (categoryDir.isSymbolicLink())
+            categoryDir = rootDir.getChildFile("Other");
+
+        if (!categoryDir.createDirectory() && !categoryDir.isDirectory())
+        {
+            sortFailed.fetch_add(1, std::memory_order_relaxed);
+            continue;
+        }
 
         juce::String formattedBase = getFormattedFilename(sourceFile.getFileNameWithoutExtension(),
                                                           category,
