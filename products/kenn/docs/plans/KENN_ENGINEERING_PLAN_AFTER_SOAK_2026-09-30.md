@@ -364,6 +364,29 @@
 > reasons are invisible in the logs. Gate target >= 70% within 15 s against 13% at 74 s — the template path meets the
 > 4 s gate, the brain-written path does not. Receipts
 > `KENN_BACKGROUND_SWAP_M3_2026-10-01.json` and `KENN_BACKGROUND_SWAP_ROUTES_M3_2026-10-01.jsonl`.
+>
+> **1 Oct, later: the same 30 questions on a box RTX 4090, and D3's premise is now measured.** GPU 0 only (one of
+> the two AGENTS.md authorises for KENN; 2–7 untouched), same index `v-db8c6334cf63`, same `qwen3` at the same
+> Q4_K_M quantisation, reached over an SSH tunnel: **streaming 5.2 s median / 7.5 s p95** vs the Mac's
+> 60.2 / 89.5 (**~12x**), **background swap 5.8 s p50** when it lands vs the Mac's 81.4 s, raw decode of 300
+> tokens 2.12 s at 141.3 tok/s vs the Mac's 6.3–7.4 tok/s (**~20x**). So the Stage 1 gate of p95 <= 4 s is
+> **not reachable on the M3 and is within 3.5 s on one 4090** — the last of it is a model-size question, which is
+> what D3 schedules, not a hardware one. Acceptance rates are **not** comparable across the two: the Mac's
+> `kenn-brain-qwen3-8b` is a KENN-curated build, the box ran stock `qwen3:8b`, same Q4_K_M but a different
+> digest; only the timing columns are like-for-like. Receipts `KENN_CHAT_LATENCY_BOX_GPU0_STREAM_2026-10-01.json`,
+> `KENN_BACKGROUND_SWAP_BOX_GPU0_2026-10-01.json`, `KENN_BACKGROUND_SWAP_BOX_ROUTES_2026-10-01.jsonl`. Two
+> configuration traps cost a run each and are worth writing down: `KENN_LLM_BASE_URL` **must** keep the `/v1`
+> suffix (without it every call 404s and the harness reports 0 attempts in 0.46 s, which looks like a triumph and
+> is a total failure), and an SSH tunnel on local port 11434 will not bind because that is the Mac's own ollama —
+> it then measures the Mac while claiming the box. Box tunnel used 21434.
+>
+> **1 Oct: rejection reasons are now in the log.** `make_answer` used to discard `validation["warnings"]` on its
+> fallback branch, so 26 of 30 swap rejections came with no reason attached and finding the dominant one meant
+> monkeypatching the validation call. It now records one `generation:<reason>` row per attempt, and
+> `route_latency_report.py` groups those rows into a by-reason count without recomputing anything. Measured from
+> the log: **19 unsupported measurements, 3 fabricated source citations, 2 returned no answer, 5 accepted.** The
+> dominant rejection is the model stating numbers that are not in the retrieved notes — a prompt and evidence
+> problem, not a speed problem, and now visible without instrumentation.
 
 > **Gate (week 4):** timing measured and written down for the M3; the target stays ≥ 70% of knowledge answers upgrading
 > within 15 s with the grounding check passing.

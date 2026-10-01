@@ -12,10 +12,13 @@ model `kenn-brain-qwen3-8b` (Qwen3 8B, 5.0 GB).
 **D2 cannot reach p95 <= 4 s on this Mac for a brain-written answer, and Live is not the reason.** The
 prompt was never the cost: prefill is ~60 ms of a ~60 s answer, and cutting the prompt by 22% moved the
 median by 3 s one way and p95 by 1 s the other, which is run-to-run noise. Decoding is 300 output tokens
-at 10-16 tok/s on the GPU, and KENN makes more than one model call per answer. Measured: median 60.2 s,
+at 6-16 tok/s on the GPU, and KENN makes more than one model call per answer. Measured: median 60.2 s,
 p95 89.5 s, 24% of attempts accepted.
 
-The one thing that does meet the gate is the path the producer actually sees: with
+**It is reachable off the Mac.** On one RTX 4090 the same 30 questions answer in a 5.2 s median, 7.5 s p95,
+and the background swap lands in 5.8 s. That is ~12x the Mac and within 3.5 s of the gate. See below.
+
+The one thing that already met the gate on the Mac is the path the producer sees: with
 `KENN_LLM_BACKGROUND=1`, **the template is on screen in 0.22 s median / 0.54 s p95**, and the model's
 answer, when it is accepted at all (13%), arrives at 74 s. That path was dead until today — it accepted
 0 of 30 because the background thread inherited the ask path's 20 s HTTP timeout against a 60 s answer.
@@ -188,6 +191,39 @@ The honest summary of Stage 1's item on this machine: the **template** path meet
 the **brain-written answer** path is 0.22 s to first paint and then a 13% chance of a 74 s improvement. That
 is a usable product, and it is not the item as written -- "chat answers written by the brain" is 13% here,
 not the default.
+
+## The box GPU: the gate is reachable off the Mac (1 Oct, later the same day)
+
+The North Star has carried "or serving the brain from the box GPU (2.8 s) for the owner's own use" since 25
+Sept, with no receipt behind the 2.8 s. Measured properly, on an RTX 4090 (GPU 0, one of the two GPUs
+AGENTS.md authorises for KENN work; 2-7 untouched), same index, same 30 questions, same `qwen3` model at the
+same Q4_K_M quantisation, reached over an SSH tunnel:
+
+| | Mac M3 (local ollama) | Box, 1x RTX 4090 | Ratio |
+|---|---|---|---|
+| Raw decode, 300 tokens | 40.6-47.9 s eval, 6.3-7.4 tok/s | **2.12 s eval, 141.3 tok/s** | **~20x** |
+| Streaming path, 30 questions | 60.2 s median, 89.5 s p95 | **5.2 s median, 7.5 s p95** | **~12x** |
+| Background swap, template on screen | 0.12 s p50, 0.96 s p95 | **0.12 s p50, 0.76 s p95** | - |
+| Background swap, when it lands | 81.4 s p50, 105.3 s p95 | **5.8 s p50, 6.0 s p95** | **~15x** |
+
+So the answer to the question Stage 1 was blocked on is: **p95 <= 4 s is not reachable on this Mac, and is
+nearly reachable on one 4090.** 5.2 s median and 7.5 s p95 against a 4 s gate -- the same prompt the Mac
+takes 60 s to answer. Getting the last 1.5 s is now a model-size question rather than a hardware one, which
+is a very different place to be: Qwen3 4B or a 1.7B on the same 4090 lands inside the gate, and D3 already
+schedules that comparison.
+
+**The acceptance rates are not comparable and must not be read as a regression.** Box 5/30 accepted on
+streaming, Mac 7/30; box 2/30 on the swap, Mac 5/30. The two models have different digests at the same Q4_K_M
+quantisation: the Mac's `kenn-brain-qwen3-8b` is a KENN-curated build, the box ran stock `qwen3:8b`. A stock
+model grounding itself against KENN's notes will cite things the curated one does not. Only the timing columns
+are a like-for-like comparison; the acceptance columns are "how often this particular model lands", and
+running the curated model on the 4090 is the obvious next measurement.
+
+One configuration note, because it cost a wasted run: `KENN_LLM_BASE_URL` must include the `/v1` suffix
+(KENN's own default is `http://127.0.0.1:11434/v1`). Without it every request 404s and the harness reports
+0 attempts in 0.46 s, which reads like a spectacular result and is in fact a total failure. The second
+failure was mine too: an SSH tunnel on local port 11434 silently did not bind, because that port is the
+Mac's own ollama -- so it was measuring the Mac and calling it the box. The box tunnel is on 21434.
 
 ## Two caches make this measurement reproducible
 

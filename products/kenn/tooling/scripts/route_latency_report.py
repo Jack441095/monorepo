@@ -21,6 +21,18 @@ def main() -> int:
     print(json.dumps(report, indent=1))
     slow = [route for route, row in report.items() if row["p95_ms"] > 4000]
     print(f"{sum(r['requests'] for r in report.values())} requests; routes over the 4 s p95 target: {slow or 'none'}")
+
+    # Why a generated answer was dropped, counted the same way as above rather than re-derived: chat_answer writes
+    # one `generation:<reason>` row per attempt, so this is a group-by over rows already in the log.
+    reasons: dict[str, int] = {}
+    for route, row in report.items():
+        if route.startswith("generation:") and not route.endswith(":accepted"):
+            reasons[route.split(":", 1)[1]] = row["requests"]
+    if reasons:
+        total = sum(reasons.values())
+        print(f"generated answers dropped, by reason (of {total} dropped): "
+              + ", ".join(f"{count} {reason}" for reason, count in
+                          sorted(reasons.items(), key=lambda kv: -kv[1])))
     upgrades = route_log.upgrade_summary(args.log)
     if upgrades["attempts"]:
         rate = f"{upgrades['accepted_rate']:.0%}"

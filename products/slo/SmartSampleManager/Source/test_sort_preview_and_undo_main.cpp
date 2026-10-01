@@ -1,6 +1,7 @@
 #include <iostream>
 #include "SampleManagerEngine.h"
 #include "TestCacheDbIsolation.h"
+#include "SortFileSafety.h"
 
 // Unit test suite for Phase 2: Interactive Rename Preview & One-Click Undo.
 // Verifies:
@@ -21,6 +22,57 @@ static int failures = 0;
             failures++; \
         } \
     } while (0)
+
+// Minimal reader for the sort journal's row format, which is RFC-4180 quoted
+// with doubled inner quotes. We parse it here rather than calling into the
+// engine so the test checks the bytes on disk, not the writer's own idea of
+// them -- a writer/reader pair that agree on the wrong format is exactly the
+// failure mode Test 4 exists to catch.
+static juce::StringArray splitQuotedCsvRow(const juce::String& line)
+{
+    juce::StringArray out;
+    juce::String field;
+    bool inQuotes = false;
+    for (int i = 0; i < line.length(); ++i)
+    {
+        const juce::juce_wchar c = line[i];
+        if (c == '"')
+        {
+            if (inQuotes && i + 1 < line.length() && line[i + 1] == '"')
+            {
+                field += '"';
+                ++i;
+            }
+            else
+            {
+                inQuotes = !inQuotes;
+            }
+        }
+        else if (c == ',' && !inQuotes)
+        {
+            out.add(field);
+            field.clear();
+        }
+        else
+        {
+            field += c;
+        }
+    }
+    out.add(field);
+    return out;
+}
+
+// A test that prints SUCCESS while its own CHECKs fail is worse than silence:
+// it is the "always passes" pattern this suite has too much of. Report from the
+// failure counter, not from the narrative.
+static void reportTest(const char* name, int failuresBefore)
+{
+    if (failures == failuresBefore)
+        std::cout << "SUCCESS: " << name << " passed." << std::endl;
+    else
+        std::cerr << "FAILED: " << name << " -- " << (failures - failuresBefore)
+                  << " check(s) failed." << std::endl;
+}
 
 int main()
 {
@@ -59,6 +111,7 @@ int main()
     // Test 1: previewSortLibrary (zero filesystem side-effects)
     // =========================================================================
     {
+        const int beforeTest1 = failures;
         SampleManagerEngine engine;
         if (!engine.init(modelPath)) {
             std::cerr << "FAIL: engine init failed" << std::endl;
@@ -107,13 +160,14 @@ int main()
         CHECK(foundIR, "impulse_response_room.wav not found in preview items");
         CHECK(foundKick, "kick_heavy.wav not found in preview items");
 
-        std::cout << "SUCCESS: Test 1 (previewSortLibrary) passed without disk mutations." << std::endl;
+        reportTest("Test 1 (previewSortLibrary)", beforeTest1);
     }
 
     // =========================================================================
     // Test 2: Sort (Move mode) and Undo
     // =========================================================================
     {
+        const int beforeTest2 = failures;
         SampleManagerEngine engine;
         if (!engine.init(modelPath)) {
             std::cerr << "FAIL: engine init failed" << std::endl;
@@ -168,13 +222,14 @@ int main()
         // canUndoSort should now be false (journal is marked .undone)
         CHECK(!engine.canUndoSort(), "canUndoSort() should be false after sort is undone");
 
-        std::cout << "SUCCESS: Test 2 (Move mode sort + undo) passed." << std::endl;
+        reportTest("Test 2 (Move mode sort + undo)", beforeTest2);
     }
 
     // =========================================================================
     // Test 3: Sort (Copy mode) and Undo
     // =========================================================================
     {
+        const int beforeTest3 = failures;
         SampleManagerEngine engine;
         if (!engine.init(modelPath)) {
             std::cerr << "FAIL: engine init failed" << std::endl;
@@ -214,7 +269,351 @@ int main()
 
         CHECK(!engine.canUndoSort(), "canUndoSort() should be false after copy undo");
 
-        std::cout << "SUCCESS: Test 3 (Copy mode sort + undo) passed." << std::endl;
+        reportTest("Test 3 (Copy mode sort + undo)", beforeTest3);
+    }
+
+    // =========================================================================
+    // Test 4: Undo must refuse to clobber a file the user put back at the
+    // original path.
+    //
+    // The regression this pins: undoLastSort() called JUCE's moveFileTo()
+    // without checking whether the original path was occupied again, and
+    // JUCE's moveFileTo deletes the destination before renaming over it
+    // (juce_File.cpp:300). So after a move sort, if anything put a live file
+    // back where the sample used to live -- a backup agent restoring it, the
+    // user copying a take back, a second SLO instance touching the same
+    // library, or simply sorting again -- Undo silently destroyed that file
+    // and reported success.
+    // =========================================================================
+    {
+        const int beforeTest4 = failures;
+        SampleManagerEngine engine;
+        if (!engine.init(modelPath)) {
+            std::cerr << "FAIL: engine init failed" << std::endl;
+            return 1;
+        }
+
+        engine.addPathToQueue(tempRoot.getFullPathName().toStdString());
+        int waitLimit = 600;
+        while (engine.isBusy() && waitLimit-- > 0)
+            juce::Thread::sleep(50);
+
+        engine.setBetaPolicyGateEnabled(false);
+        engine.reorganizeSamples(1, false);   // move mode
+
+        // Read the journal from the outside rather than reusing the engine's
+        // parser: the point is to confirm the on-disk format records where the
+        // file came from, independently of the code that wrote it.
+        auto journal = engine.getMostRecentSortJournal();
+        CHECK(journal.existsAsFile(), "sort wrote a journal we can read back");
+        juce::StringArray lines;
+        journal.readLines(lines);
+
+        juce::File occupiedPath;
+        for (int i = 1; i < lines.size() && occupiedPath == juce::File(); ++i)
+        {
+            const auto fields = splitQuotedCsvRow(lines[i]);
+            if (fields.size() >= 4 && fields[2] == "COMMITTED")
+            {
+                juce::File src(fields[3]);
+                if (src.getParentDirectory() == tempRoot) { occupiedPath = src; break; }
+            }
+        }
+        CHECK(occupiedPath != juce::File(), "journal has a COMMITTED row sourced from tempRoot");
+
+        if (occupiedPath == juce::File())
+        {
+            std::cerr << "FAILED: Test 4 -- nothing moved out of tempRoot, so there was no "
+                         "occupied destination to test" << std::endl;
+            failures++;
+        }
+        else
+        {
+            // A recognisable body, so an overwrite is detectable by content and
+            // not just by "the file is still there".
+            const juce::String planted = "USER PUT THIS BACK -- DO NOT DESTROY";
+            CHECK(occupiedPath.replaceWithText(planted), "planted a file at the occupied original path");
+
+            const auto undoResult = engine.undoLastSort();
+
+            CHECK(occupiedPath.existsAsFile(),
+                  "Undo destroyed a file the user had put back at the original path: "
+                    + occupiedPath.getFullPathName().toStdString());
+            if (occupiedPath.existsAsFile())
+                CHECK(occupiedPath.loadFileAsString() == planted,
+                      "Undo overwrote the user's file at the original path");
+            CHECK(undoResult.failedCount > 0,
+                  "Undo should count the occupied destination as a failure, got failedCount="
+                    + std::to_string(undoResult.failedCount));
+
+            reportTest("Test 4 (occupied-destination undo)", beforeTest4);
+        }
+    }
+
+    // =========================================================================
+    // Test 5: the exclusive move/copy helpers the sort path relies on.
+    //
+    // The sort used to call JUCE's moveFileTo/copyFileTo, which delete the
+    // destination before writing over it (juce_File.cpp:300 and :317).
+    // chooseNonDestructiveDestination() checked the destination did not exist
+    // and then acted on it, so a file that appeared in between was destroyed
+    // with no journal row and no sortFailed increment. The fix is to stop
+    // checking and start asking the kernel: moveExclusive uses
+    // renamex_np(..., RENAME_EXCL) and copyExclusive uses
+    // copy_file(copy_options::none), each a single atomic operation that fails
+    // if the destination exists.
+    //
+    // Note on what this test can and cannot prove: the defect being fixed is a
+    // time-of-check/time-of-use window, so there is no deterministic
+    // failing-before test for it -- you cannot make a file appear inside
+    // someone else's syscall gap on demand. What this test does pin is the
+    // property the whole sort now rests on: given an occupied destination,
+    // both helpers refuse and leave the existing file's bytes untouched. That
+    // assertion holds no matter who wins the race.
+    // =========================================================================
+    {
+        const int beforeTest5 = failures;
+        auto helperRoot = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                              .getChildFile("SmartSampleManagerSortSafetyTest_" + juce::Uuid().toString());
+        helperRoot.createDirectory();
+
+        const juce::String originalBytes = "ORIGINAL AUDIO -- must survive";
+        const juce::String incomingBytes = "INCOMING AUDIO -- must not land here";
+
+        auto existing = helperRoot.getChildFile("occupied.wav");
+        auto absent = helperRoot.getChildFile("free.wav");
+        auto incoming = helperRoot.getChildFile("incoming.wav");
+
+        CHECK(existing.replaceWithText(originalBytes), "wrote the file that must survive");
+        CHECK(incoming.replaceWithText(incomingBytes), "wrote the file that wants to move");
+
+        // Move onto an occupied destination must fail and change nothing.
+        CHECK(!slo::sortSafety::moveExclusive(incoming, existing),
+              "moveExclusive must refuse an occupied destination");
+        CHECK(existing.loadFileAsString() == originalBytes,
+              "moveExclusive overwrote the occupied destination");
+        CHECK(incoming.existsAsFile(),
+              "moveExclusive consumed the source even though the move failed");
+        CHECK(!absent.existsAsFile(), "moveExclusive created the destination despite failing");
+
+        // Copy onto an occupied destination must fail and change nothing.
+        CHECK(!slo::sortSafety::copyExclusive(incoming, existing),
+              "copyExclusive must refuse an occupied destination");
+        CHECK(existing.loadFileAsString() == originalBytes,
+              "copyExclusive overwrote the occupied destination");
+
+        // With the destination free, both must actually do their job -- a
+        // helper that always returned false would pass everything above.
+        CHECK(slo::sortSafety::moveExclusive(incoming, absent),
+              "moveExclusive must succeed onto a free destination");
+        CHECK(!incoming.existsAsFile(), "moveExclusive left the source behind");
+        CHECK(absent.loadFileAsString() == incomingBytes,
+              "moveExclusive did not deliver the source bytes");
+        CHECK(existing.loadFileAsString() == originalBytes,
+              "the unrelated occupied file was disturbed by a successful move");
+
+        auto copySource = helperRoot.getChildFile("copy-source.wav");
+        auto copyTarget = helperRoot.getChildFile("copy-target.wav");
+        CHECK(copySource.replaceWithText(originalBytes), "wrote a copy source");
+        CHECK(slo::sortSafety::copyExclusive(copySource, copyTarget),
+              "copyExclusive must succeed onto a free destination");
+        CHECK(copySource.existsAsFile(), "copyExclusive consumed the source");
+        CHECK(copyTarget.loadFileAsString() == originalBytes,
+              "copyExclusive did not deliver the source bytes");
+
+        helperRoot.deleteRecursively();
+
+        reportTest("Test 5 (exclusive move/copy helpers)", beforeTest5);
+    }
+
+    // =========================================================================
+    // Test 6: the journal must account for every file the sort actually moved.
+    //
+    // appendSortJournalRow() used to `return true` unconditionally and every
+    // call site discarded the result, so a failed journal write was invisible:
+    // the files moved, the journal came up short, and Undo could only restore
+    // some of them. This test is what stops that recurring -- if the loop ever
+    // relocates a file it did not record, it fails.
+    //
+    // It cannot make a write fail, so it does not exercise the full-volume
+    // branch itself; it pins the invariant that branch exists to protect.
+    // =========================================================================
+    {
+        const int beforeTest6 = failures;
+        SampleManagerEngine engine;
+        if (!engine.init(modelPath)) {
+            std::cerr << "FAIL: engine init failed" << std::endl;
+            return 1;
+        }
+
+        engine.addPathToQueue(tempRoot.getFullPathName().toStdString());
+        int waitLimit = 600;
+        while (engine.isBusy() && waitLimit-- > 0)
+            juce::Thread::sleep(50);
+
+        engine.setBetaPolicyGateEnabled(false);
+        engine.reorganizeSamples(1, false);
+
+        auto journal = engine.getMostRecentSortJournal();
+        CHECK(journal.existsAsFile(), "sort wrote a journal");
+        juce::StringArray lines;
+        journal.readLines(lines);
+
+        std::set<std::string> committedDestinations;
+        for (int i = 1; i < lines.size(); ++i)
+        {
+            const auto fields = splitQuotedCsvRow(lines[i]);
+            if (fields.size() >= 5 && fields[2] == "COMMITTED")
+                committedDestinations.insert(fields[4].toStdString());
+        }
+
+        int unmapped = 0;
+        for (const auto& s : engine.getSamples())
+        {
+            if (committedDestinations.count(s.filePath) == 0)
+            {
+                std::cerr << "  no COMMITTED row for: " << s.filePath << std::endl;
+                ++unmapped;
+            }
+        }
+        CHECK(unmapped == 0,
+              "journal has no COMMITTED row for " + std::to_string(unmapped)
+                + " file(s) the sort relocated");
+        CHECK(committedDestinations.size() > 0, "sort journalled at least one move");
+
+        reportTest("Test 6 (journal accounts for every moved file)", beforeTest6);
+    }
+
+    // =========================================================================
+    // Test 7: a move that landed without its COMMITTED row is still undoable.
+    //
+    // The sort writes PLANNED, moves, then writes COMMITTED. If the host dies
+    // between the move and the COMMITTED write, that file sits in its category
+    // folder with only a PLANNED row describing it -- and the undo parser read
+    // COMMITTED rows exclusively, so it reported "No committed actions found in
+    // journal" and left the file stranded. The PLANNED row carries the full
+    // source -> destination mapping; it simply was not being read.
+    //
+    // Simulated by truncating a real journal down to its PLANNED rows, which is
+    // exactly the state a crash leaves on disk.
+    // =========================================================================
+    {
+        const int beforeTest7 = failures;
+        SampleManagerEngine engine;
+        if (!engine.init(modelPath)) {
+            std::cerr << "FAIL: engine init failed" << std::endl;
+            return 1;
+        }
+
+        engine.addPathToQueue(tempRoot.getFullPathName().toStdString());
+        int waitLimit = 600;
+        while (engine.isBusy() && waitLimit-- > 0)
+            juce::Thread::sleep(50);
+
+        engine.setBetaPolicyGateEnabled(false);
+        engine.reorganizeSamples(1, false);
+
+        auto journal = engine.getMostRecentSortJournal();
+        CHECK(journal.existsAsFile(), "sort wrote a journal");
+
+        int moved = 0;
+        for (const auto& s : engine.getSamples())
+            if (juce::File(s.filePath).getParentDirectory() != tempRoot)
+                ++moved;
+        CHECK(moved > 0, "at least one file moved out of tempRoot");
+
+        juce::StringArray plannedSources;
+        juce::StringArray lines;
+        journal.readLines(lines);
+        juce::String truncated = lines[0] + "\n";
+        for (int i = 1; i < lines.size(); ++i) {
+            const auto fields = splitQuotedCsvRow(lines[i]);
+            if (fields.size() >= 3 && fields[2] == "PLANNED") {
+                truncated += lines[i] + "\n";
+                if (fields.size() >= 5) plannedSources.add(fields[3]);
+            }
+        }
+        CHECK(journal.replaceWithText(truncated), "truncated the journal to PLANNED rows only");
+        CHECK(!plannedSources.isEmpty(), "journal recorded PLANNED rows to test against");
+
+        const auto undoResult = engine.undoLastSort();
+        CHECK(undoResult.success, "undo of a PLANNED-only journal failed: " + undoResult.errorMessage);
+        CHECK(undoResult.revertedCount > 0,
+              "undo reverted nothing from a PLANNED-only journal, got revertedCount="
+                + std::to_string(undoResult.revertedCount));
+
+        // Assert against the source path each PLANNED row recorded, not against
+        // the destination: once the file is moved back the destination path is
+        // a stale string that says nothing about where the file is now.
+        for (const auto& source : plannedSources)
+            CHECK(juce::File(source).existsAsFile(),
+                  "PLANNED-only undo did not restore " + source.toStdString());
+
+        reportTest("Test 7 (undo after a lost COMMITTED row)", beforeTest7);
+    }
+
+    // =========================================================================
+    // Test 8: a filename must not be able to forge a journal row.
+    //
+    // journalCsvField() quoted the fields and doubled inner quotes, but left
+    // newlines raw, and both the writer and parseJournalCsvLine() split on
+    // '\n'. A POSIX filename may legally contain '"', ',' and '\n', so a
+    // hostile sample pack could embed a second physical line that parses as a
+    // genuine COMMITTED row and make Undo move a file of the attacker's
+    // choosing. The threat model is the one the sort path already assumes: a
+    // WAV's tags "travel with a file rather than being typed in-app".
+    //
+    // The attack needs the forged line to carry its own padding, because
+    // inQuotes is per-line so a continuation begins a fresh field. Hence
+    // "x","move","COMMITTED",... rather than just "move","COMMITTED",...
+    // =========================================================================
+    {
+        const int beforeTest8 = failures;
+        SampleManagerEngine engine;
+        if (!engine.init(modelPath)) {
+            std::cerr << "FAIL: engine init failed" << std::endl;
+            return 1;
+        }
+
+        engine.addPathToQueue(tempRoot.getFullPathName().toStdString());
+        int waitLimit = 600;
+        while (engine.isBusy() && waitLimit-- > 0)
+            juce::Thread::sleep(50);
+
+        engine.setBetaPolicyGateEnabled(false);
+        engine.reorganizeSamples(1, false);
+
+        // The prize the forged row tries to steal, and the path it tries to
+        // move it to. Undo reverses a row as moveExclusive(destination,
+        // source), so the row wants source = somewhere that does not exist yet
+        // and destination = a file the user still has.
+        auto victim = tempRoot.getChildFile("victim.wav");
+        CHECK(victim.replaceWithText("VICTIM"), "wrote the victim file");
+        const auto dropTarget = tempRoot.getChildFile("stolen.wav");
+
+        // Build the exact bytes a vulnerable writer would emit for a source
+        // filename containing  X" <newline> "x","move","COMMITTED",...
+        juce::String forged = juce::String("1") + "\",\"move\",\"COMMITTED\",\"X\"\"\n"
+                             + "\"x\",\"move\",\"COMMITTED\",\""
+                             + dropTarget.getFullPathName() + "\",\""
+                             + victim.getFullPathName() + "\",\"t\"\",\"2026-01-01\"\n";
+
+        auto journal = engine.getMostRecentSortJournal();
+        juce::StringArray lines;
+        journal.readLines(lines);
+        juce::String poisoned = lines[0] + "\n" + forged;
+        for (int i = 1; i < lines.size(); ++i)
+            poisoned += lines[i] + "\n";
+        CHECK(journal.replaceWithText(poisoned), "wrote a journal containing the forged row");
+
+        engine.undoLastSort();
+
+        CHECK(victim.existsAsFile(),
+              "a filename forged a journal row that moved the user's file away: " + victim.getFullPathName().toStdString());
+        CHECK(!dropTarget.existsAsFile(),
+              "a filename forged a journal row that moved a file to an attacker-chosen path");
+
+        reportTest("Test 8 (filename cannot forge a journal row)", beforeTest8);
     }
 
     tempRoot.deleteRecursively();

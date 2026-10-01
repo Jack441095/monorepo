@@ -149,6 +149,17 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > a 120-token answer in 3.17 s) and serving from the box GPU. A second defect is recorded and deliberately not
   > changed: `valid_response()` gates only the non-streaming path, so a well-formed bulleted answer can be discarded
   > for format on the swap path while the streaming path accepts it.
+  > **1 Oct, later: measured on a box GPU, and the gate is nearly in reach.** One RTX 4090 (GPU 0, one of the two
+  > AGENTS.md authorises for KENN work), same index, same 30 questions, same Q4_K_M quantisation over an SSH tunnel:
+  > streaming **5.2 s median / 7.5 s p95** against the Mac's 60.2 / 89.5 — **~12x** — and the background swap lands
+  > at **5.8 s p50** against the Mac's 81.4 s. Raw decode of 300 tokens is 2.12 s at 141 tok/s against the Mac's
+  > 6-7 tok/s, ~20x. So the honest answer to "can this reach p95 <= 4 s" is **not on the M3, and nearly on one 4090**:
+  > the remaining 3.5 s is a model-size question now, not a hardware one, which is what D3 schedules. The acceptance
+  > rates are *not* comparable and must not be read as a regression — the Mac's `kenn-brain-qwen3-8b` is a
+  > KENN-curated build and the box ran stock `qwen3:8b`, same Q4_K_M but a different digest; only the timings are
+  > like-for-like. Receipts `KENN_CHAT_LATENCY_BOX_GPU0_STREAM_2026-10-01.json` and
+  > `KENN_BACKGROUND_SWAP_BOX_GPU0_2026-10-01.json`. **Box GPU is a good, fast machine but it is not the producer's
+  > laptop, so a KENN that depends on it is not a KENN that works on its own.**
 - [x] One router: rule parser → local planner → brain; every route logged with timing
   > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
   > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,

@@ -105,7 +105,12 @@ private:
     //   - stopSample()/destructor exchange(nullptr) to cancel a pending start.
     struct PendingPlayback
     {
-        juce::AudioFormatReaderSource* reader; // owned; prepared, not yet started
+        // Owns the reader. A raw pointer here leaked: three sites `delete` the
+        // PendingPlayback struct, which frees the 16-byte wrapper and nothing
+        // else, so ~BufferingAudioReader never ran and the reader stayed
+        // registered with the time-slice thread with its file descriptor open.
+        // Holding it in a unique_ptr makes every one of those sites correct.
+        std::unique_ptr<juce::AudioFormatReaderSource> reader; // prepared, not yet started
         double sampleRate;
     };
     std::atomic<PendingPlayback*> pendingPlayback { nullptr };
@@ -124,17 +129,23 @@ private:
     // another pending start before the message thread gets a chance to drain, and
     // a single slot would drop the older reader on the floor. Capacity is a
     // compile-time constant so the push is a bounds check and one atomic store:
-    // no allocation, no lock, no unbounded growth. It is never realistically
-    // reached -- one slot is consumed per audition start, and a user cannot start
-    // eight auditions faster than the UI thread can drain them -- but if it were,
-    // the overflow is reported rather than leaked.
+    // no allocation, no lock, no unbounded growth.
+    //
+    // The index wraps with a modulo, deliberately. An earlier version only ever
+    // fetch_add'ed it, so slot 8 and every slot after it fell into the overflow
+    // branch for the remaining life of the plugin instance -- not a burst limit
+    // as the comment here used to claim, but a lifetime one. Each overflow leaked
+    // a reader and, worse, performed a String allocation and a blocking write(2)
+    // to stderr from inside processBlock. Wrapping means a slow drain can cost
+    // at most the eight entries the ring holds, and the drain always takes every
+    // slot, so the push never has to be careful about what the drain is doing.
     //
     // publish/consume protocol (lock-free, same shape as pendingPlayback):
     //   - Audio thread pushes the outgoing source and never frees it.
-    //   - The message thread swaps the whole ring out and deletes every entry.
+    //   - The message thread swaps every slot out and deletes what it finds.
     static constexpr int kRetiredReaderSlots = 8;
     std::atomic<juce::AudioFormatReaderSource*> retiredReaders[kRetiredReaderSlots] {};
-    std::atomic<int> retiredWriteIndex { 0 };
+    std::atomic<unsigned> retiredWriteIndex { 0 };
     void retireReaderOnAudioThread(juce::AudioFormatReaderSource* source) noexcept;
     void drainRetiredReaders();
 

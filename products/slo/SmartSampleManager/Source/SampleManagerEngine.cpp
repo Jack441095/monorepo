@@ -27,6 +27,7 @@
 #include "VectorMath.h"
 #include "AppLogger.h"
 #include "AbletonTaxonomy.h"
+#include "SortFileSafety.h"
 #include "AcousticClassifier.h"
 #include "MlOverrideGate.h"
 #include "BassTimbreClassifier.h"
@@ -194,7 +195,17 @@ bool isInsideDirectory(const juce::File& child, const juce::File& parent)
 
 juce::String journalCsvField(const juce::String& value)
 {
-    return "\"" + value.replace("\"", "\"\"") + "\"";
+    // Control characters cannot survive a CSV row: the writer and the reader
+    // both split on '\n', so a filename containing one used to split into two
+    // physical lines, and the tail parsed as a genuine row. A hostile sample
+    // pack could then name a file to make Undo move an unrelated user file to a
+    // path of its choosing. Nothing below 0x20 belongs in a recorded path, so
+    // flatten them to '_' rather than trying to escape them.
+    juce::String flattened;
+    for (auto c : value)
+        flattened += c < 0x20 ? juce::juce_wchar('_') : c;
+
+    return "\"" + flattened.replace("\"", "\"\"") + "\"";
 }
 
 bool appendSortJournalRow(juce::FileOutputStream& stream,
@@ -212,7 +223,13 @@ bool appendSortJournalRow(juce::FileOutputStream& stream,
         + "," + journalCsvField(timestamp) + "\n";
     stream.writeText(row, false, false, nullptr);
     stream.flush();
-    return true;
+    // Report what actually happened. This used to `return true` unconditionally,
+    // and rename() only needs a directory entry, so on a full volume the move at
+    // the call site would still succeed while these rows went nowhere: files
+    // moved, the journal silently empty, and Undo later reporting "No committed
+    // actions found in journal." A sort whose undo record did not land is worse
+    // than a sort that did not run, because the user believes it is reversible.
+    return stream.getStatus().ok();
 }
 
 juce::StringArray parseJournalCsvLine(const juce::String& line)
@@ -7235,22 +7252,36 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
             continue;
         }
 
-        appendSortJournalRow(*journalStream, journalOperation, "PLANNED",
-                             sourceFile, destFile);
+        // Journal the intent BEFORE touching the filesystem, and honour the
+        // write: if the row did not land, do not move. A file moved without a
+        // recorded destination is exactly the state Undo cannot reverse.
+        if (!appendSortJournalRow(*journalStream, journalOperation, "PLANNED",
+                                  sourceFile, destFile))
+        {
+            sortFailed.fetch_add(1, std::memory_order_relaxed);
+            continue;
+        }
+
         bool success = false;
         if (copyInsteadOfMove) {
-            success = sourceFile.copyFileTo(destFile);
+            success = slo::sortSafety::copyExclusive(sourceFile, destFile);
         } else {
             if (sourceFile.getFullPathName() == destFile.getFullPathName()) {
                 success = true;
             } else {
-                success = sourceFile.moveFileTo(destFile);
+                success = slo::sortSafety::moveExclusive(sourceFile, destFile);
             }
         }
 
         if (success) {
-            appendSortJournalRow(*journalStream, journalOperation, "COMMITTED",
-                                 sourceFile, destFile);
+            if (!appendSortJournalRow(*journalStream, journalOperation, "COMMITTED",
+                                      sourceFile, destFile))
+            {
+                // The move landed but the undo record did not. Count it as a
+                // failure so the totals do not read as a clean sort, and flag
+                // the journal so the UI can stop calling this reversible.
+                sortFailed.fetch_add(1, std::memory_order_relaxed);
+            }
             // Keep database path in sync so auditioning and dragging continue to
             // work. Queued for the publish phase; writing to samples[] here would
             // need dbLock, which is the thing this phase is avoiding.
@@ -7355,20 +7386,53 @@ SampleManagerEngine::UndoSortResult SampleManagerEngine::undoLastSort()
         juce::String destination;
         juce::String timestamp;
     };
-    std::vector<JournalRow> committedRows;
+    std::vector<JournalRow> reversibleRows;
 
     for (int lineIdx = 1; lineIdx < lines.size(); ++lineIdx) {
         const auto& line = lines[lineIdx].trim();
         if (line.isEmpty()) continue;
         auto tokens = parseJournalCsvLine(line);
-        if (tokens.size() >= 5) {
-            if (tokens[2] == "COMMITTED") {
-                committedRows.push_back({ tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens.size() > 5 ? tokens[5] : "" });
-            }
-        }
+        // Validate the row's shape before acting on it. A row this app writes has
+        // six fields drawn from a fixed vocabulary, and -- the load-bearing check
+        // -- no field can contain a double quote: doubled quotes inside a quoted
+        // field collapse to one and the surrounding quotes are consumed as
+        // delimiters, so a residual '"' means the line was not written by
+        // journalCsvField(). A field count alone is not sufficient, which is why
+        // this is not just a size check: a filename containing a newline used to
+        // split one physical line into two, and the tail parsed as a genuine
+        // six-field COMMITTED/move row naming paths of the pack author's
+        // choosing, at which point Undo would move the user's file there. This
+        // also covers journals written before the flattening fix.
+        if (tokens.size() != 6
+            || tokens[0] != juce::String("1")
+            || (tokens[1] != juce::String("move") && tokens[1] != juce::String("copy"))
+            || (tokens[2] != juce::String("COMMITTED")
+                && tokens[2] != juce::String("PLANNED")
+                && tokens[2] != juce::String("FAILED")))
+            continue;
+
+        bool rowIsClean = true;
+        for (const auto& field : tokens)
+            for (auto c : field)
+                if (c < 0x20 || c == '"') { rowIsClean = false; break; }
+        if (!rowIsClean) continue;
+
+        // Nearly every PLANNED row describes a file that never moved and is
+        // still at its source. The exception is a file that moved and then lost
+        // its COMMITTED row -- host killed between the writes, or the COMMITTED
+        // write hit a full volume. Source gone plus destination present is that
+        // case exactly, and is safe to reverse: both halves are proven, not
+        // assumed. Refusing these rows left such files moved with no way back
+        // except by hand.
+        if (tokens[2] == "PLANNED"
+            && (juce::File(tokens[3]).existsAsFile() || ! juce::File(tokens[4]).existsAsFile()))
+            continue;
+
+        reversibleRows.push_back({ tokens[0], tokens[1], tokens[2], tokens[3], tokens[4],
+                                   tokens.size() > 5 ? tokens[5] : "" });
     }
 
-    if (committedRows.empty()) {
+    if (reversibleRows.empty()) {
         result.success = false;
         result.errorMessage = "No committed actions found in journal.";
         return result;
@@ -7376,16 +7440,28 @@ SampleManagerEngine::UndoSortResult SampleManagerEngine::undoLastSort()
 
     std::set<juce::String> affectedDirs;
 
-    for (auto it = committedRows.rbegin(); it != committedRows.rend(); ++it) {
+    for (auto it = reversibleRows.rbegin(); it != reversibleRows.rend(); ++it) {
         const auto& row = *it;
         juce::File sourceFile(row.source);
         juce::File destFile(row.destination);
 
         if (row.operation == "move") {
             if (destFile.existsAsFile()) {
+                // Refuse to restore over a path that is occupied again. Between
+                // the sort and the Undo the user may have put a file back where
+                // the sample used to live -- a restored backup, a take copied
+                // back, or the result of sorting the same library twice. JUCE's
+                // moveFileTo deletes the destination before renaming over it
+                // (juce_File.cpp:300), so an unguarded call here destroys that
+                // file outright. Count it and leave both files alone rather than
+                // guessing which one the user wants.
+                if (sourceFile.existsAsFile()) {
+                    result.failedCount++;
+                    continue;
+                }
                 affectedDirs.insert(destFile.getParentDirectory().getFullPathName());
                 sourceFile.getParentDirectory().createDirectory();
-                if (destFile.moveFileTo(sourceFile)) {
+                if (slo::sortSafety::moveExclusive(destFile, sourceFile)) {
                     result.revertedCount++;
                     for (auto& s : samples) {
                         if (s.filePath == destFile.getFullPathName().toStdString()) {

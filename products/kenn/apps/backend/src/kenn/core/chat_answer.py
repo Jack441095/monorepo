@@ -1057,10 +1057,40 @@ def make_answer(
         if validation["accepted"]:
             _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
             print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced)", file=_sys.stderr, flush=True)
+            _log_generation_outcome(True, validation, _ma_llm_ms)
             return enhanced, True
+        # Measured 1 Oct on the owner's M3: 26 of 30 background swaps were rejected, and nothing recorded why.
+        # Track D's standing question is "how often does the model's answer land", and a rejection rate with no
+        # reason attached cannot answer "why not" -- establishing that these are `unsupported measurements`
+        # rejections meant reading this dict out of a monkeypatched harness. Same reason and no question text,
+        # matching route_log's rule that the log holds timings and outcomes, never the producer's words.
+        _log_generation_outcome(False, validation, _time.perf_counter() - _ma_t2)
+    else:
+        # The model wrote nothing usable: timed out, unavailable, or failed the structure check in enhance().
+        # Distinct from a rejected answer, so the two do not average into one meaningless "the swap failed" number.
+        _log_generation_outcome(False, {"warnings": ["generation returned no answer"]}, _time.perf_counter() - _ma_t2)
     _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
     print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (fallback)", file=_sys.stderr, flush=True)
     return template, False
+
+
+def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) -> None:
+    """Record one line per generated answer with the reason it was kept or dropped.
+
+    The top warning goes in the route name rather than the body because route_latency_report.py groups by route,
+    so this is what turns Track D's landing rate into an answerable question: which rejection dominates, and does it
+    change after a prompt or model change. Never raises -- a logging failure must not cost the producer an answer,
+    which is the same rule log_outcome() in answer_upgrades follows.
+    """
+    try:
+        from kenn.core import route_log
+
+        warnings = [str(w) for w in (validation.get("warnings") or [])]
+        reason = warnings[0] if warnings else ("accepted" if accepted else "rejected")
+        route = f"generation:{'accepted' if accepted else reason}"
+        route_log.record(route, seconds * 1000.0, brain=accepted, proposal=False)
+    except Exception:
+        logging.getLogger("kenn.core.chat_answer").debug("generation outcome logging failed", exc_info=True)
 
 
 def answer_payload_stream(
