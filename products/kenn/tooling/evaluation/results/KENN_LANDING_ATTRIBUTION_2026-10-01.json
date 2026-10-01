@@ -1,0 +1,213 @@
+{
+  "schema": "kenn.landing_rate_attribution.v1",
+  "generated_at": "2026-10-01T22:05:00+00:00",
+  "what_this_measures": "Why the brain's answers are rejected, counted per candidate rather than inferred from an aggregate. Run with --capture-answers, so every candidate including rejected ones was available to inspect offline. That was previously impossible: the streaming path substitutes the template before metadata is built, so the rejected text existed nowhere on disk.",
+  "method": "measure_chat_latency.py --limit 30 with KENN_LLM_CONTEXT_CHARS=300, cache off, on the M3. Each captured candidate was then re-scored offline against its own recorded evidence text, which makes the check deterministic and independent of the model's non-determinism.",
+  "environment": {
+    "model": "kenn-brain-qwen3-8b",
+    "machine": "M3 (owner's laptop)",
+    "index_version": "v-db8c6334cf63",
+    "context_chars": 300,
+    "llm_cache": "off"
+  },
+  "counts": {
+    "candidates_captured": 29,
+    "accepted": 4,
+    "rejected": 25
+  },
+  "landing_rate": {
+    "this_run": 4,
+    "of": 29,
+    "do_not_trend_this": "The previous run gave 8 of 29 and this one 4 of 29. At n=29 that difference is well inside sampling noise for a non-deterministic model, so neither figure is a rate. Any acceptance rate quoted from a single 30-question run of this model should be treated as a sample, not a measurement."
+  },
+  "rejection_reasons": {
+    "generated answer is below the quality threshold": 17,
+    "fewer than two actionable steps": 17,
+    "missing verification check": 17,
+    "generated answer introduced unsupported measurements": 11,
+    "ableton mode lacks Live safety boundary": 8,
+    "client-delivery mode lacks scope boundary": 4,
+    "mix-diagnosis mode lacks symptom-first structure": 3,
+    "generated answer has insufficient evidence overlap": 2,
+    "ableton mode lacks Ableton/Live grounding": 1,
+    "mastering mode lacks loudness boundary": 1,
+    "game-audio mode lacks runtime tradeoff": 1
+  },
+  "what_the_rejections_are": "Structural, not evidential. 17 of 25 rejections are the answer missing required sections: no numbered steps, no verification check, and for ableton mode no Live safety boundary. Only 11 candidates cite a measurement absent from their evidence.",
+  "measurement_check": {
+    "candidates_with_unsupported_measurement": 11,
+    "measurements_grounded_against_own_evidence": 12,
+    "spot_check": "'how do i process bass': its evidence carries 200hz and 350hz only; the answer cited 120hz, 20ms, 40ms, 60hz and 80hz, none of which appear in the notes. The gate is right and the model is inventing plausible EQ frequencies and delay times.",
+    "verdict": "The measurement gate is not the bottleneck and the spacing defect fixed in 20135625 was not what drove the low rate. These are genuine fabrications."
+  },
+  "per_candidate": [
+    {
+      "question": "how do I process bass",
+      "flagged": [
+        "120hz",
+        "20ms",
+        "40ms",
+        "60hz",
+        "80hz"
+      ],
+      "present_in_its_own_evidence": [
+        "200hz",
+        "350hz"
+      ]
+    },
+    {
+      "question": "how do I sidechain bass to the kick",
+      "flagged": [
+        "60hz"
+      ],
+      "present_in_its_own_evidence": [
+        "0ms",
+        "150ms",
+        "2db",
+        "5ms",
+        "6db",
+        "80ms"
+      ]
+    },
+    {
+      "question": "Why does my bass disappear when the kick plays?",
+      "flagged": [
+        "120hz",
+        "60hz"
+      ],
+      "present_in_its_own_evidence": []
+    },
+    {
+      "question": "My sidechain is pumping too obviously, how should I set attack and release?",
+      "flagged": [
+        "200ms",
+        "20ms",
+        "50ms"
+      ],
+      "present_in_its_own_evidence": [
+        "0.01ms",
+        "100ms",
+        "120bpm",
+        "1ms",
+        "300ms",
+        "30ms",
+        "3db",
+        "6db",
+        "80ms"
+      ]
+    },
+    {
+      "question": "gain staging before mixing",
+      "flagged": [
+        "-1dbfs",
+        "0dbfs",
+        "192khz"
+      ],
+      "present_in_its_own_evidence": [
+        "60db"
+      ]
+    },
+    {
+      "question": "glue compression on the mix bus",
+      "flagged": [
+        "-6db",
+        "200ms",
+        "50ms"
+      ],
+      "present_in_its_own_evidence": [
+        "-12db",
+        "-18db",
+        "0.1ms",
+        "0dbfs",
+        "1.5ms",
+        "100ms",
+        "1db",
+        "1ms",
+        "20db",
+        "2db",
+        "30ms",
+        "3db",
+        "4db",
+        "5db",
+        "6db"
+      ]
+    },
+    {
+      "question": "how do I deliver the final mix to a client",
+      "flagged": [
+        "24bit",
+        "48khz"
+      ],
+      "present_in_its_own_evidence": []
+    },
+    {
+      "question": "how do I use compressor on vocals",
+      "flagged": [
+        "-3db",
+        "-6db",
+        "200ms",
+        "20ms"
+      ],
+      "present_in_its_own_evidence": [
+        "0ms",
+        "100hz",
+        "10ms",
+        "150ms",
+        "1ms",
+        "2db",
+        "30ms",
+        "3db",
+        "4db",
+        "50ms",
+        "6db",
+        "80hz"
+      ]
+    },
+    {
+      "question": "how do I saturate sub bass without distortion",
+      "flagged": [
+        "120hz",
+        "1db",
+        "3db",
+        "60hz"
+      ],
+      "present_in_its_own_evidence": [
+        "4.5khz"
+      ]
+    },
+    {
+      "question": "how do I level match a reference track against my mix",
+      "flagged": [
+        "-1db",
+        "-6db"
+      ],
+      "present_in_its_own_evidence": []
+    },
+    {
+      "question": "how do I use eq eight to clean up a mix",
+      "flagged": [
+        "100hz",
+        "12khz",
+        "200hz",
+        "60hz",
+        "8khz"
+      ],
+      "present_in_its_own_evidence": [
+        "0.5db",
+        "0db",
+        "10khz",
+        "120hz",
+        "1db",
+        "20hz",
+        "2db",
+        "2khz",
+        "30ms",
+        "48db",
+        "5khz",
+        "80hz"
+      ]
+    }
+  ],
+  "contains_answer_text": false,
+  "note": "Answer prose is deliberately absent. The candidates live in a git-ignored capture file; this receipt carries only extracted values and the reason strings, which are KENN's own vocabulary."
+}
