@@ -7376,20 +7376,31 @@ SampleManagerEngine::UndoSortResult SampleManagerEngine::undoLastSort()
         juce::String destination;
         juce::String timestamp;
     };
-    std::vector<JournalRow> committedRows;
+    std::vector<JournalRow> reversibleRows;
 
     for (int lineIdx = 1; lineIdx < lines.size(); ++lineIdx) {
         const auto& line = lines[lineIdx].trim();
         if (line.isEmpty()) continue;
         auto tokens = parseJournalCsvLine(line);
-        if (tokens.size() >= 5) {
-            if (tokens[2] == "COMMITTED") {
-                committedRows.push_back({ tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens.size() > 5 ? tokens[5] : "" });
-            }
-        }
+        if (tokens.size() < 5) continue;
+        if (tokens[2] != "COMMITTED" && tokens[2] != "PLANNED") continue;
+
+        // Nearly every PLANNED row describes a file that never moved and is
+        // still at its source. The exception is a file that moved and then lost
+        // its COMMITTED row -- host killed between the writes, or the COMMITTED
+        // write hit a full volume. Source gone plus destination present is that
+        // case exactly, and is safe to reverse: both halves are proven, not
+        // assumed. Refusing these rows left such files moved with no way back
+        // except by hand.
+        if (tokens[2] == "PLANNED"
+            && (juce::File(tokens[3]).existsAsFile() || ! juce::File(tokens[4]).existsAsFile()))
+            continue;
+
+        reversibleRows.push_back({ tokens[0], tokens[1], tokens[2], tokens[3], tokens[4],
+                                   tokens.size() > 5 ? tokens[5] : "" });
     }
 
-    if (committedRows.empty()) {
+    if (reversibleRows.empty()) {
         result.success = false;
         result.errorMessage = "No committed actions found in journal.";
         return result;
@@ -7397,7 +7408,7 @@ SampleManagerEngine::UndoSortResult SampleManagerEngine::undoLastSort()
 
     std::set<juce::String> affectedDirs;
 
-    for (auto it = committedRows.rbegin(); it != committedRows.rend(); ++it) {
+    for (auto it = reversibleRows.rbegin(); it != reversibleRows.rend(); ++it) {
         const auto& row = *it;
         juce::File sourceFile(row.source);
         juce::File destFile(row.destination);

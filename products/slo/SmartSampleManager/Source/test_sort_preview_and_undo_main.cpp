@@ -62,6 +62,18 @@ static juce::StringArray splitQuotedCsvRow(const juce::String& line)
     return out;
 }
 
+// A test that prints SUCCESS while its own CHECKs fail is worse than silence:
+// it is the "always passes" pattern this suite has too much of. Report from the
+// failure counter, not from the narrative.
+static void reportTest(const char* name, int failuresBefore)
+{
+    if (failures == failuresBefore)
+        std::cout << "SUCCESS: " << name << " passed." << std::endl;
+    else
+        std::cerr << "FAILED: " << name << " -- " << (failures - failuresBefore)
+                  << " check(s) failed." << std::endl;
+}
+
 int main()
 {
     ScopedIsolatedCacheDb _isolatedCacheDb;
@@ -99,6 +111,7 @@ int main()
     // Test 1: previewSortLibrary (zero filesystem side-effects)
     // =========================================================================
     {
+        const int beforeTest1 = failures;
         SampleManagerEngine engine;
         if (!engine.init(modelPath)) {
             std::cerr << "FAIL: engine init failed" << std::endl;
@@ -147,13 +160,14 @@ int main()
         CHECK(foundIR, "impulse_response_room.wav not found in preview items");
         CHECK(foundKick, "kick_heavy.wav not found in preview items");
 
-        std::cout << "SUCCESS: Test 1 (previewSortLibrary) passed without disk mutations." << std::endl;
+        reportTest("Test 1 (previewSortLibrary)", beforeTest1);
     }
 
     // =========================================================================
     // Test 2: Sort (Move mode) and Undo
     // =========================================================================
     {
+        const int beforeTest2 = failures;
         SampleManagerEngine engine;
         if (!engine.init(modelPath)) {
             std::cerr << "FAIL: engine init failed" << std::endl;
@@ -208,13 +222,14 @@ int main()
         // canUndoSort should now be false (journal is marked .undone)
         CHECK(!engine.canUndoSort(), "canUndoSort() should be false after sort is undone");
 
-        std::cout << "SUCCESS: Test 2 (Move mode sort + undo) passed." << std::endl;
+        reportTest("Test 2 (Move mode sort + undo)", beforeTest2);
     }
 
     // =========================================================================
     // Test 3: Sort (Copy mode) and Undo
     // =========================================================================
     {
+        const int beforeTest3 = failures;
         SampleManagerEngine engine;
         if (!engine.init(modelPath)) {
             std::cerr << "FAIL: engine init failed" << std::endl;
@@ -254,7 +269,7 @@ int main()
 
         CHECK(!engine.canUndoSort(), "canUndoSort() should be false after copy undo");
 
-        std::cout << "SUCCESS: Test 3 (Copy mode sort + undo) passed." << std::endl;
+        reportTest("Test 3 (Copy mode sort + undo)", beforeTest3);
     }
 
     // =========================================================================
@@ -271,6 +286,7 @@ int main()
     // and reported success.
     // =========================================================================
     {
+        const int beforeTest4 = failures;
         SampleManagerEngine engine;
         if (!engine.init(modelPath)) {
             std::cerr << "FAIL: engine init failed" << std::endl;
@@ -307,7 +323,9 @@ int main()
 
         if (occupiedPath == juce::File())
         {
-            std::cout << "SKIP: Test 4 -- the sort moved nothing out of tempRoot" << std::endl;
+            std::cerr << "FAILED: Test 4 -- nothing moved out of tempRoot, so there was no "
+                         "occupied destination to test" << std::endl;
+            failures++;
         }
         else
         {
@@ -328,7 +346,7 @@ int main()
                   "Undo should count the occupied destination as a failure, got failedCount="
                     + std::to_string(undoResult.failedCount));
 
-            std::cout << "SUCCESS: Test 4 (occupied-destination undo) passed." << std::endl;
+            reportTest("Test 4 (occupied-destination undo)", beforeTest4);
         }
     }
 
@@ -354,6 +372,7 @@ int main()
     // assertion holds no matter who wins the race.
     // =========================================================================
     {
+        const int beforeTest5 = failures;
         auto helperRoot = juce::File::getSpecialLocation(juce::File::tempDirectory)
                               .getChildFile("SmartSampleManagerSortSafetyTest_" + juce::Uuid().toString());
         helperRoot.createDirectory();
@@ -404,7 +423,7 @@ int main()
 
         helperRoot.deleteRecursively();
 
-        std::cout << "SUCCESS: Test 5 (exclusive move/copy helpers) passed." << std::endl;
+        reportTest("Test 5 (exclusive move/copy helpers)", beforeTest5);
     }
 
     // =========================================================================
@@ -420,6 +439,7 @@ int main()
     // branch itself; it pins the invariant that branch exists to protect.
     // =========================================================================
     {
+        const int beforeTest6 = failures;
         SampleManagerEngine engine;
         if (!engine.init(modelPath)) {
             std::cerr << "FAIL: engine init failed" << std::endl;
@@ -461,7 +481,75 @@ int main()
                 + " file(s) the sort relocated");
         CHECK(committedDestinations.size() > 0, "sort journalled at least one move");
 
-        std::cout << "SUCCESS: Test 6 (journal accounts for every moved file) passed." << std::endl;
+        reportTest("Test 6 (journal accounts for every moved file)", beforeTest6);
+    }
+
+    // =========================================================================
+    // Test 7: a move that landed without its COMMITTED row is still undoable.
+    //
+    // The sort writes PLANNED, moves, then writes COMMITTED. If the host dies
+    // between the move and the COMMITTED write, that file sits in its category
+    // folder with only a PLANNED row describing it -- and the undo parser read
+    // COMMITTED rows exclusively, so it reported "No committed actions found in
+    // journal" and left the file stranded. The PLANNED row carries the full
+    // source -> destination mapping; it simply was not being read.
+    //
+    // Simulated by truncating a real journal down to its PLANNED rows, which is
+    // exactly the state a crash leaves on disk.
+    // =========================================================================
+    {
+        const int beforeTest7 = failures;
+        SampleManagerEngine engine;
+        if (!engine.init(modelPath)) {
+            std::cerr << "FAIL: engine init failed" << std::endl;
+            return 1;
+        }
+
+        engine.addPathToQueue(tempRoot.getFullPathName().toStdString());
+        int waitLimit = 600;
+        while (engine.isBusy() && waitLimit-- > 0)
+            juce::Thread::sleep(50);
+
+        engine.setBetaPolicyGateEnabled(false);
+        engine.reorganizeSamples(1, false);
+
+        auto journal = engine.getMostRecentSortJournal();
+        CHECK(journal.existsAsFile(), "sort wrote a journal");
+
+        int moved = 0;
+        for (const auto& s : engine.getSamples())
+            if (juce::File(s.filePath).getParentDirectory() != tempRoot)
+                ++moved;
+        CHECK(moved > 0, "at least one file moved out of tempRoot");
+
+        juce::StringArray plannedSources;
+        juce::StringArray lines;
+        journal.readLines(lines);
+        juce::String truncated = lines[0] + "\n";
+        for (int i = 1; i < lines.size(); ++i) {
+            const auto fields = splitQuotedCsvRow(lines[i]);
+            if (fields.size() >= 3 && fields[2] == "PLANNED") {
+                truncated += lines[i] + "\n";
+                if (fields.size() >= 5) plannedSources.add(fields[3]);
+            }
+        }
+        CHECK(journal.replaceWithText(truncated), "truncated the journal to PLANNED rows only");
+        CHECK(!plannedSources.isEmpty(), "journal recorded PLANNED rows to test against");
+
+        const auto undoResult = engine.undoLastSort();
+        CHECK(undoResult.success, "undo of a PLANNED-only journal failed: " + undoResult.errorMessage);
+        CHECK(undoResult.revertedCount > 0,
+              "undo reverted nothing from a PLANNED-only journal, got revertedCount="
+                + std::to_string(undoResult.revertedCount));
+
+        // Assert against the source path each PLANNED row recorded, not against
+        // the destination: once the file is moved back the destination path is
+        // a stale string that says nothing about where the file is now.
+        for (const auto& source : plannedSources)
+            CHECK(juce::File(source).existsAsFile(),
+                  "PLANNED-only undo did not restore " + source.toStdString());
+
+        reportTest("Test 7 (undo after a lost COMMITTED row)", beforeTest7);
     }
 
     tempRoot.deleteRecursively();
