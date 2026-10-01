@@ -1090,6 +1090,21 @@ private:
     std::atomic<bool> betaPolicyGateEnabled{true};
     std::atomic<float> betaPolicyGate{0.93f};
     std::atomic<int> sortFailed{0};
+    // Directories the user actually added, as opposed to the character prefix
+    // their contents share. The sort needs a root, and the prefix cannot always
+    // supply a safe one: two sibling libraries give a common prefix of
+    // "/Users/me/", which is itself a directory, so the walk-up stops there and
+    // every file would be relocated to /Users/me/<Category>/ -- outside both
+    // libraries the user pointed at. Guarded by dbLock.
+    std::vector<juce::File> scanRoots;
+
+    // The root a sort should write into. A single root the user added is
+    // authoritative and returned verbatim; anything else falls back to the
+    // character-prefix walk in getCommonRootDirectory(), which cannot tell "the
+    // folder I added" from "the folder that happens to contain everything I
+    // added" -- two sibling libraries share a prefix like "/Users/me/" that is
+    // itself a directory, and guessing wrong relocates files outside the library.
+    juce::File resolveSortRoot() const;
     std::string lastSortJournalPath;
     // Files the beta decision policy declined to touch. Reported to the user so
     // "SLO sorted fewer files than I have" is explained rather than mysterious.

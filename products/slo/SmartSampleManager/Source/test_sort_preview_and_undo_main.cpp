@@ -481,6 +481,15 @@ int main()
                 + " file(s) the sort relocated");
         CHECK(committedDestinations.size() > 0, "sort journalled at least one move");
 
+        // Put the library back. Leaving it sorted meant the next test's scan
+        // started from files already in their category folders, so its sort had
+        // nothing left to move and it asserted against a stale premise.
+        // Best-effort, deliberately not asserted. Undo can legitimately decline
+        // to restore a file when the original path is occupied, which is the
+        // P0-1 guard doing its job and is asserted properly in Test 4 -- not here.
+        // The only requirement is that the next test's sort has work to do.
+        engine.undoLastSort();
+
         reportTest("Test 6 (journal accounts for every moved file)", beforeTest6);
     }
 

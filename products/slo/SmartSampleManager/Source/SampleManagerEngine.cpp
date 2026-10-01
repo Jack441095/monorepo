@@ -2190,6 +2190,14 @@ void SampleManagerEngine::addPathToQueue(const std::string& path)
     juce::File file(path);
     if (!file.exists() || file.isSymbolicLink()) return;
 
+    if (file.isDirectory())
+    {
+        const juce::ScopedLock sl(dbLock);
+        if (std::none_of(scanRoots.begin(), scanRoots.end(),
+                         [&file](const juce::File& r) { return r == file; }))
+            scanRoots.push_back(file);
+    }
+
     std::vector<std::string> newFiles;
     int skippedHere = 0;
 
@@ -6788,6 +6796,25 @@ juce::String getFormattedFilename(const juce::String& originalName,
     return originalName;
 }
 
+juce::File SampleManagerEngine::resolveSortRoot() const
+{
+    const juce::ScopedLock sl(dbLock);
+    if (scanRoots.size() == 1)
+    {
+        const auto& root = scanRoots.front();
+        const bool holdsEverything =
+            std::all_of(samples.begin(), samples.end(),
+                        [&root](const SampleItem& i)
+                        {
+                            const juce::File f(i.filePath);
+                            return f == root || isInsideDirectory(f, root);
+                        });
+        if (holdsEverything)
+            return root;
+    }
+    return resolveSortRoot();
+}
+
 juce::File getCommonRootDirectory(const std::vector<SampleItem>& items)
 {
     if (items.empty()) return {};
@@ -6868,7 +6895,7 @@ SampleManagerEngine::SortPreviewResult SampleManagerEngine::previewSortLibrary(i
 
     juce::File rootDir = (customTargetDir != juce::File() && customTargetDir.isDirectory())
         ? customTargetDir
-        : getCommonRootDirectory(samples);
+        : resolveSortRoot();
     result.rootDirectory = rootDir.getFullPathName().toStdString();
 
     std::map<std::string, int> wwiseGroupTotals;
@@ -7100,7 +7127,7 @@ void SampleManagerEngine::reorganizeSamples(int namingStyle, bool copyInsteadOfM
         // Use the resolved common root directory of all scanned files, or customTargetDir if provided
         rootDir = (customTargetDir != juce::File() && customTargetDir.isDirectory())
             ? customTargetDir
-            : getCommonRootDirectory(samples);
+            : resolveSortRoot();
     }
 
     // Fail closed if the operation cannot establish a durable journal first.
@@ -7355,7 +7382,7 @@ juce::File SampleManagerEngine::getMostRecentSortJournal() const
     if (samples.empty())
         return {};
 
-    juce::File rootDir = getCommonRootDirectory(samples);
+    juce::File rootDir = resolveSortRoot();
     if (!rootDir.isDirectory())
         return {};
 
@@ -7529,7 +7556,7 @@ SampleManagerEngine::UndoSortResult SampleManagerEngine::undoLastSort()
         }
     }
 
-    juce::File rootDir = getCommonRootDirectory(samples);
+    juce::File rootDir = resolveSortRoot();
     for (const auto& dirPath : affectedDirs) {
         juce::File dir(dirPath);
         if (dir.isDirectory() && dir != rootDir && isInsideDirectory(dir, rootDir)) {
