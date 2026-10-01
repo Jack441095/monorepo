@@ -562,6 +562,14 @@
 > `main` to equal `origin/main`, and after a real fetch local `main` is `bd6ae627` against `origin/main` `9131dcb6`,
 > **515 ahead and 606 behind**. Reconciling that is the owner's call.
 >
+> **1 Oct, the copy itself is verified end to end, so only the branch move is outstanding.** Splitting this branch
+> rather than `main` carries **both** `.github/workflows/kenn-ci.yml` and `kenn-weekly.yml`, and running the sync's own
+> step 5 — `ci_verification.sh` on a fresh worktree of that split, with no index, exactly as a colleague's clone would
+> be — passes at **2,656 passed, 126 skipped**. Doing that found a bug of mine: a test pointed at the real index path
+> and so failed on any fresh clone while passing indefinitely on this machine (`6ddbe471`). It is the second of my own
+> bugs that only a fresh-clone run exposed, after the split of `main` coming back without the copy. Both are the kind
+> that never surface from the checkout you are sitting at.
+>
 > **1 Oct, the second follow-up is done and the first still stands.** `kenn-answer-audit` is merged and
 > `check_skip_budget.py` is on `main`, so the step is no longer waiting on anything — it is now the third step of
 > `kenn-weekly.yml`. It failed on the first run, which is what the deferral predicted: **124 skips, 123 accounted
