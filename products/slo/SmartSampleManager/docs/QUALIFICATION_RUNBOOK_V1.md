@@ -32,34 +32,19 @@ Replace `ssm_build_classification` above with one of these risk-surface groups:
 | `ssm_build_ui` | `TestPrecisionBrowserSorting`, `TestFavorites`, `TestHistory`, `TestLicensing`, `TestSampleEngine`, `TestRtDeadlineStress` |
 | `ssm_build_full` | All groups above, `BenchmarkScan`, and the VST3/AU/Standalone plugin builds |
 
-## Execute the binaries
+## Execute the registered tests
 
-After building a group, execute its binaries directly from the build tree.
-For example, the classification group is:
+After building, run CTest from the configured build tree:
 
 ```bash
-build_dir="../_build/ssm-qualification"
-for test in \
-  TestTaxonomy \
-  TestAcousticClassifierInputSafety \
-  TestClassificationPresentation \
-  TestAudioFeatures \
-  TestAutoTagging \
-  TestSmartCollections \
-  TestMapClusters \
-  TestAcousticClassifierParity \
-  ClassificationBenchmark \
-  TestBassTimbre \
-  TestKickLength \
-  TestHiHatType
-do
-  "$build_dir/$test"
-done
+ctest --test-dir ../_build/ssm-qualification -L classification --output-on-failure
+ctest --test-dir ../_build/ssm-qualification --output-on-failure
 ```
 
-Use the same pattern for the other rows in the matrix. Run each duplicate
-target only once when executing `ssm_build_full`; plugin targets are build
-artifacts and are validated separately through the host/release procedures.
+Direct binary execution remains useful for debugging, but it is not the gate.
+CTest labels already handle tests that belong to more than one group; plugin
+targets are build artifacts and are validated separately through the host/release
+procedures.
 
 The licensing target has two distinct execution paths. The no-network URL
 policy regression can always run directly:
