@@ -1,0 +1,11 @@
+{
+ "schema": "kenn.known_skip_reasons.v1",
+ "note": "Skip reasons that are legitimate in every environment, so check_skip_budget.py can allow them by reason rather than by a bare count: a fresh CI clone has no built knowledge index, no Training_Data_Sources catalog and no PANNS embedding model, so the tests needing them cannot run there. Measured 30 Sept on a worktree with none of the three. Anything not listed here fails the build.",
+ "environmental": [
+  "Knowledge index not built -- run `python3 apps/backend/src/kenn/main.py build` first.",
+  "Local knowledge corpus is intentionally excluded from public CI",
+  "PANNs embedding model/onnxruntime is not available in this environment",
+  "The source catalog is in the git-ignored Training_Data_Sources folder, so a fresh clone has none",
+  "requires the local KENN corpus/index, excluded from public CI"
+ ]
+}
