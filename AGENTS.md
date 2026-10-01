@@ -34,6 +34,7 @@ The goal of this repository is production-grade audio engineering software that 
 - **Tests read like clear examples**: Name test functions for the exact human behavior or boundary they protect (e.g., `test_other_one_moves_to_paired_track_when_clear`, `test_parameter_quiz_rejects_hallucinated_parameters_and_units`).
 - A regression test should explain in one line what broke and why the regression cannot recur.
 - When creating new features, always include unit and integration tests verifying happy paths, boundary failures, and isolation.
+- Mutation-check new regression tests once before merge: change the guarded code and confirm the test fails.
 
 ---
 
