@@ -331,6 +331,24 @@
 > | D2 | Cut the prompt (fewer, shorter excerpts) and reuse the prompt cache between turns; tokens a second before and after | M | Box, then Mac |
 > | D3 | Model options on the sealed chat set (grow it from 84 to 200): Qwen3 4B vs 8B, quantisation levels, MLX vs Ollama; one change at a time with `evaluate_chat_brain.py` | M | Box |
 > | D4 | Style fine-tune of the 8B: hold until there are ≥ 500 owner-approved answers (the first attempt was worse) | hold | |
+>
+> **1 Oct — D1 and D2 measured on the M3; the gate is not met.** Tool
+> `tooling/scripts/measure_chat_latency.py` (added), index `v-db8c6334cf63`, `kenn-brain-qwen3-8b`, both answer
+> caches off, 30 questions. Streaming path: **29 attempted, 7 accepted (24%), median 60.2 s, p95 89.5 s**; accepted
+> answers alone median 64.5 s, p95 96.0 s. Companion (`answer_payload`): **0 of 30 written by the model**,
+> `llm_enhanced` false on all 30, 20.2 s median — the 20 s is `post_answer_critique()` grading the template.
+> Templates: 0.08 s median, 0.15 s p95. **D2 measured and rejected**: exact Ollama `prompt_eval_count` is
+> **816 before** (`CONTEXT_CHARS=650`/`DRAFT_CHARS=300`, 534 system + 318 user), **637 after** (`300`/`0`, 534 + 106)
+> — at the same 30 questions the cut is level on quality (7/29 to 9/29 accepted) and level on latency
+> (median 60.2 -> 56.8 s, p95 89.5 -> 90.4 s, i.e. noise), because prefill is 0.06 s. An earlier 10-question
+> pass read the cut as halving the accepted rate; that was sample noise, corrected here rather than acted on.
+> The North Star's `<= 450 tokens` was MLX-path only; on the Ollama path `build_system_prompt()` alone is 534 tokens
+> and is the floor. Live contention **refuted as the driver**: Live idles at 39.8% of a core, and a synthetic load of
+> that size changed a 300-token generation by 0.95x (noise), because Ollama decodes on the GPU. Gate target is
+> >= 70% upgrading within 15 s; measured 24% at 60.2 s. Receipts in
+> `tooling/evaluation/results/KENN_CHAT_LATENCY_M3_*_2026-10-01.json`; evidence
+> `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`. **Live-closed half still owed** — it needs the owner to
+> close Live at a break, which is not ours to do.
 
 > **Gate (week 4):** timing measured and written down for the M3; the target stays ≥ 70% of knowledge answers upgrading
 > within 15 s with the grounding check passing.

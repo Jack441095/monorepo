@@ -112,13 +112,34 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > was no better in practice. Chat on this Mac is back on templates (instant). Ways forward, none built yet: fewer
   > and shorter notes in the prompt, showing the template at once and the model's answer when it's ready, or serving
   > the brain from the box GPU (2.8 s) for the owner's own use.
+  > **1 Oct, re-measured and the 26 Sept figures do not hold.** `tooling/scripts/measure_chat_latency.py`, index
+  > `v-db8c6334cf63`, `kenn-brain-qwen3-8b`, both answer caches off, 30 questions: on the streaming path
+  > (`kenn.core.chat`, `chat_cli`) 29 attempted, **7 accepted (24%), median 60.2 s, p95 89.5 s** — not 7–16 s. On the
+  > **companion surface (`answer_payload`) the model never wrote an answer at all**: 0 of 30, `llm_enhanced` false on
+  > all 30, 20.2 s median, and that 20 s is `post_answer_critique()` grading KENN's own template — so the companion
+  > pays a fifth of a minute for self-criticism and ships the template every time. Templates alone: 0.08 s median,
+  > 0.15 s p95. Of 22 rejections, 17 were `generated answer introduced unsupported measurements` — the model invents
+  > numbers. Full numbers, the prompt cut, and the Live-contention split:
+  > `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`.
   > 28 Sept: Prompt token footprint reduced by >50% via `_clean_chunk_for_synthesis` and concise excerpt extraction in
   > `llm_rewrite.py` (KENN_LLM_CONTEXT_CHARS=650, KENN_LLM_DRAFT_CHARS=300), bringing token footprint to <= 450 tokens
   > with compact system prompt, cutting Apple Silicon prompt read latency from ~18 s to ~6 s. All 2,187 backend tests pass.
+  > **1 Oct, the <= 450 token figure is wrong on this Mac and is corrected here.** It holds only on the MLX path.
+  > `_mlx_engine_answers()` is False here (MLX is not installed), so KENN sends `build_system_prompt()` — measured
+  > **534 tokens, 63% of the request** — instead of `STATIC_CORE_SYSTEM_PROMPT`. Exact `prompt_eval_count` from Ollama
+  > on 3 questions: **816 mean** (849/840/759), not <= 450. The short prompt cannot simply be substituted: on the
+  > Ollama path it made most answers fail the structure check (26 Sept), so 534 is the floor and the 28 Sept claim of
+  > "prompt read latency ~6 s" is not supported — prefill measured here is 0.06 s at 356 tokens and 0.07 s at 1,028.
   > 29 Sept: "template now, the model's answer when it's ready" exists as `core/answer_upgrades.py`
   > (`KENN_LLM_BACKGROUND=1`): the reply carries the template and an `answer_upgrade` id, the full answer pipeline runs
   > once in the background, and the app swaps the text in only if the grounding check accepted it. This note has no
   > Mac timing for it yet, so the item stays open until there is one (how often the swap lands, and after how long).
+  > **1 Oct, the Mac timing this note was waiting on now exists**: the swap lands **7 times in 29 attempts (24%)** after
+  > a **60.2 s median / 89.5 s p95**, against a gate of >= 70% within 15 s. The box stays **unticked on purpose** — the
+  > mechanism is built and now measured, but it does not meet the gate, and ticking it would record a capability the
+  > M3 cannot actually deliver. The binding constraint is decode, not the prompt (see the 1 Oct notes above and
+  > `docs/reviews/KENN_BRAIN_ANSWER_LATENCY_2026-10-01.md`), so the next moves are D3 (model choice; Qwen3 1.7B does a
+  > 120-token answer in 3.17 s) and serving from the box GPU. Chat on the M3 stays on templates.
 - [x] One router: rule parser → local planner → brain; every route logged with timing
   > 25 Sept: `/kenn/api/ask` already sends a request down one path (Live question → Live command via the rule
   > parser, then the shadow/live planner → knowledge answer via the brain). Every exit now logs the route, time,
