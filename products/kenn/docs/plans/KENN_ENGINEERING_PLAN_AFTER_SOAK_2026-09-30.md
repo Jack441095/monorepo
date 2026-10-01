@@ -558,9 +558,18 @@
 > index hidden: chaos 47 passed, phrasings 491/505, skips budget 124 environmental and 0 unaccounted.
 > **It does not cross yet, and it is worth being exact about why:** `git subtree split --prefix=products/kenn main`
 > still carries only `kenn-ci.yml`, because the copy is on this branch and not on `main`. It reaches `Nite-DSP/kenn-app`
-> when this branch lands on `main`, not before. Separately the sync's own dry run is blocked earlier still: it requires
-> `main` to equal `origin/main`, and after a real fetch local `main` is `bd6ae627` against `origin/main` `9131dcb6`,
-> **515 ahead and 606 behind**. Reconciling that is the owner's call.
+> when this branch lands on `main`, not before.
+>
+> **And the sync's own dry run is blocked by something that needs care, not just a push.** It requires `main` to equal
+> `origin/main`, and a fetch shows local `main` at `bd6ae627` against `origin/main` `9131dcb6`, **515 behind and 606
+> ahead**. That phrasing invites the wrong response, so to be exact: the two are **completely disjoint** since
+> `184fa868` — not "unpushed commits". 606 commits exist only locally and 515 only on origin, with none shared since
+> the fork, and **they ship different KENN**: 447 KENN commits are local-only against 371 origin-only, and the two
+> `products/kenn` trees differ by 142 files / 24,962 insertions. So a `git push --force` here would discard 371 KENN
+> commits that exist only on origin, and a `git reset --hard origin/main` would discard 447 that exist only locally.
+> This reads like a force-push that was never reconciled, and reconciling it is the owner's call — deliberately not
+> attempted here, since either resolution discards real work. Note also that my own commits are on local `main` only
+> up to `2b4831a5`; the last three (`6ddbe471`, `615299d9`, `d6947fc8`) are on this branch and not on `main` at all.
 >
 > **1 Oct, the copy itself is verified end to end, so only the branch move is outstanding.** Splitting this branch
 > rather than `main` carries **both** `.github/workflows/kenn-ci.yml` and `kenn-weekly.yml`, and running the sync's own
