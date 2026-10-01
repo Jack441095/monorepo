@@ -1774,6 +1774,7 @@ def _answer_payload_stream_raw(
                 "unsupported_measurements": list(
                     validation["unsupported_measurements"]
                 ),
+                "fabricated_sources": list(validation["fabricated_sources"]),
                 "evidence_overlap": validation["evidence_overlap"],
             }
             if validation["accepted"]:

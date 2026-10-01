@@ -133,6 +133,10 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "attempted": bool(validation.get("attempted")),
             "accepted": bool(validation.get("accepted")),
             "warnings": [str(w) for w in (validation.get("warnings") or [])],
+            # The warning names the class of fault but not the value, so a measure built on these receipts could
+            # count rejections without saying which measurement or citation was at fault. Both are regex-extracted.
+            "unsupported_measurements": [str(m) for m in (validation.get("unsupported_measurements") or [])],
+            "fabricated_sources": [str(s) for s in (validation.get("fabricated_sources") or [])],
             "llm_enhanced": bool(payload.get("llm_enhanced")),
             "found": bool(payload.get("found")),
             "sources": len(payload.get("sources") or []),

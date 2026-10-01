@@ -139,6 +139,57 @@ def test_a_receipt_that_mixed_surfaces_would_say_so(tool):
     assert tool.surface_of(report) == "mixed"
 
 
+def test_a_rejection_records_which_measurement_and_which_citation(tool, monkeypatch):
+    """A warning names the class of fault but not the value.
+
+    Measured 1 Oct: 19 of 30 rejections were "unsupported measurements", and nothing said which
+    measurement, so a measure built on these receipts could count the problem without ever naming it.
+    """
+    payload = {
+        "generation_validation": {
+            "attempted": True,
+            "accepted": False,
+            "warnings": [
+                "generated answer introduced unsupported measurements",
+                "generated answer cites sources not in the retrieved evidence",
+            ],
+            "unsupported_measurements": ["128bpm"],
+            "fabricated_sources": ["invented-guide.md"],
+        },
+        "llm_enhanced": False,
+        "found": True,
+        "sources": [{"title": "Reverb send workflow"}],
+    }
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 3))
+
+    report = tool.measure([{"id": "q1", "question": "how do I set a send?"}], allow_llm=True)
+
+    (row,) = report["rows"]
+    assert row["unsupported_measurements"] == ["128bpm"]
+    assert row["fabricated_sources"] == ["invented-guide.md"]
+
+
+def test_a_receipt_records_no_answer_text(tool, monkeypatch):
+    """These receipts are committed, and route_log's rule is that timings and outcomes are kept, never the answer."""
+    payload = {
+        "generation_validation": {
+            "attempted": True,
+            "accepted": False,
+            "warnings": ["generated answer introduced unsupported measurements"],
+            "unsupported_measurements": ["-18 dbfs"],
+        },
+        "llm_enhanced": False, "found": True, "sources": [],
+    }
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 3))
+
+    report = tool.measure([{"id": "q1", "question": "how do I set a send?"}], allow_llm=True)
+
+    blob = json.dumps(report)
+    assert "short answer" not in blob.lower() and "try this" not in blob.lower()
+
+
 def test_the_committed_receipts_have_the_shape_the_plan_quotes(tool):
     """Track D's gate is quoted straight out of these files, so their schema must not drift."""
     results = KENN_ROOT / "tooling" / "evaluation" / "results"
