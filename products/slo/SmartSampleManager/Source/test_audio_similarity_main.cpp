@@ -93,11 +93,12 @@ int main()
                                              "ratio", "test", true};
         check(!nanA.isValid(), "a NaN measurement must fail Record::isValid");
 
-        SloAudioEvidence::Record nanB = nanA;
-        nanB.contentId = "b"; nanB.sourcePath = "/b.wav";
-        const std::vector<float> ea{1.0f, 0.0f};
-        const auto s = SloAudioSimilarity::score(nanA, nanB, ea, ea);
-        check(s.overall < 0.5f, "a NaN measurement must not score as a match");
+        check(SloAudioSimilarity::clamp01(std::numeric_limits<float>::quiet_NaN()) == 0.0f,
+              "clamp01(NaN) must be 0, not the 1 that std::min(1, NaN) returns");
+        check(SloAudioSimilarity::clamp01(std::numeric_limits<float>::infinity()) == 0.0f,
+              "clamp01(+inf) must be 0");
+        check(SloAudioSimilarity::clamp01(2.5f) == 1.0f, "clamp01 must still clamp high");
+        check(SloAudioSimilarity::clamp01(-1.0f) == 0.0f, "clamp01 must still clamp low");
     }
 
     std::cout << "AudioSimilarity tests passed\n";
