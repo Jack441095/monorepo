@@ -89,16 +89,43 @@ def test_run_is_refused_when_the_gitignored_index_is_missing(tool, tmp_path, cap
 
 
 def test_the_script_sets_the_background_flag_itself(tool, tmp_path, monkeypatch):
-    """A run with KENN_LLM_BACKGROUND unset measures only templates and reports it as a landing rate of zero.
+    """A run with KENN_LLM_BACKGROUND unset measures only templates and reports a landing rate of zero.
 
     The flag is what the ask route reads, so the harness setting it is the difference between measuring the
-    background swap and measuring nothing while printing numbers.
+    background swap and measuring nothing while printing numbers. `measure` is stubbed out and CURRENT pointed at a
+    file that exists, so this checks the flag rather than needing an index or a model -- the first version of this
+    test read the real index path, which made it fail on any fresh clone, and its assertion passed vacuously
+    because it was satisfied by the variable simply being absent.
     """
-    monkeypatch.setattr(tool, "CURRENT", RESULTS.parent.parent.parent / "apps/backend/src/kenn/data/index/CURRENT")
+    index = tmp_path / "CURRENT"
+    index.write_text("v-test", encoding="utf-8")
+    monkeypatch.setattr(tool, "CURRENT", index)
+    monkeypatch.setattr(tool, "measure", lambda *a, **k: _report())
+    monkeypatch.delenv("KENN_LLM_BACKGROUND", raising=False)
+    monkeypatch.setattr(sys, "argv", ["measure_background_swap.py", "--limit", "1"])
+
+    assert tool.main() == 0
+    assert tool.os.environ.get("KENN_LLM_BACKGROUND") == "1", "the harness must set the flag the ask route reads"
+
+
+def test_templates_only_leaves_the_background_flag_alone(tool, tmp_path, monkeypatch):
+    """--templates-only is the floor measurement, and it must not turn the model on to get it."""
+    index = tmp_path / "CURRENT"
+    index.write_text("v-test", encoding="utf-8")
+    monkeypatch.setattr(tool, "CURRENT", index)
+    seen: dict = {}
+
+    def spy(*args, **kwargs):
+        seen["allow_llm"] = kwargs.get("allow_llm")
+        return _report()
+
+    monkeypatch.setattr(tool, "measure", spy)
     monkeypatch.delenv("KENN_LLM_BACKGROUND", raising=False)
     monkeypatch.setattr(sys, "argv", ["measure_background_swap.py", "--templates-only", "--limit", "1"])
+
     assert tool.main() == 0
-    assert "KENN_LLM_BACKGROUND" not in tool.os.environ or tool.os.environ["KENN_LLM_BACKGROUND"] != ""
+    assert seen["allow_llm"] is False
+    assert tool.os.environ.get("KENN_LLM_BACKGROUND") != "1"
 
 
 def test_the_committed_swap_receipt_records_the_run_the_docs_quote(tool):
