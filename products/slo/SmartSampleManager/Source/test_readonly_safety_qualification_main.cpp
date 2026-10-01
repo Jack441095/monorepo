@@ -56,8 +56,11 @@ int main()
     // Isolated cache -- never the production DB (see
     // test_safety_regression_main.cpp's documented incident this pattern
     // exists to prevent).
-    juce::File customCacheDir = juce::File::getCurrentWorkingDirectory()
-        .getChildFile("fixtures").getChildFile("cache_readonly_safety");
+    // A UUID temp dir, not a path under getCurrentWorkingDirectory(): these tests used
+    // fixtures/cache_*, so what they exercised depended on the directory they were
+    // launched from, and each run left a cache database behind in whatever that was.
+    juce::File customCacheDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+        .getChildFile("SloReadOnlySafetyTest_" + juce::Uuid().toString());
     customCacheDir.createDirectory();
     SampleManagerEngine::setCacheDbDirectoryOverrideForTesting(customCacheDir);
 
@@ -65,8 +68,8 @@ int main()
     // real (non-owner-library) test fixture audio, copied into an isolated
     // scratch directory so this test can safely assert on file count and
     // checksums without any risk of touching a real source-controlled file.
-    juce::File fixtureLibraryDir = juce::File::getCurrentWorkingDirectory()
-        .getChildFile("fixtures").getChildFile("readonly_safety_library");
+    juce::File fixtureLibraryDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+        .getChildFile("SloReadOnlySafetyLibrary_" + juce::Uuid().toString());
     fixtureLibraryDir.deleteRecursively();
     fixtureLibraryDir.createDirectory();
 

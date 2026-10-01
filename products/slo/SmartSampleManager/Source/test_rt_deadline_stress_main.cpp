@@ -157,8 +157,11 @@ int main()
     // via engine.initAsync(). Without this override, the engine's fail-closed
     // production-cache guard aborts rather than risk touching a real user's
     // sample library database. Same pattern as classification_benchmark_main.cpp.
-    juce::File customCacheDir = juce::File::getCurrentWorkingDirectory()
-        .getChildFile("fixtures").getChildFile("cache_rt_stress");
+    // A UUID temp dir, not a path under getCurrentWorkingDirectory(): these tests used
+    // fixtures/cache_*, so what they exercised depended on the directory they were
+    // launched from, and each run left a cache database behind in whatever that was.
+    juce::File customCacheDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+        .getChildFile("SloRtStressTest_" + juce::Uuid().toString());
     customCacheDir.createDirectory();
     SampleManagerEngine::setCacheDbDirectoryOverrideForTesting(customCacheDir);
 

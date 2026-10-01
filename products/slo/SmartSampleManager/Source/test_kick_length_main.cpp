@@ -28,8 +28,11 @@ int main()
 {
     std::cout << "Running kick-length regression tests..." << std::endl;
 
-    juce::File customCacheDir = juce::File::getCurrentWorkingDirectory()
-        .getChildFile("fixtures").getChildFile("cache_kick_length");
+    // A UUID temp dir, not a path under getCurrentWorkingDirectory(): these tests used
+    // fixtures/cache_*, so what they exercised depended on the directory they were
+    // launched from, and each run left a cache database behind in whatever that was.
+    juce::File customCacheDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+        .getChildFile("SloKickLengthTest_" + juce::Uuid().toString());
     customCacheDir.createDirectory();
     SampleManagerEngine::setCacheDbDirectoryOverrideForTesting(customCacheDir);
 

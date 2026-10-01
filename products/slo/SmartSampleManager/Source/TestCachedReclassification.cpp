@@ -149,6 +149,17 @@ int main()
     sqlite3_close(db);
     tempDbFile.deleteFile();
 
+    // This is a DEPENDS of ssm_qual_fast_regression, so it reads like a gate.
+    // It measured nothing: processedCount was printed and never checked, so a
+    // reclassify that matched zero rows still reported success.
+    if (processedCount <= 0) {
+        std::cerr << "FAIL: reclassified 0 rows; the benchmark proved nothing" << std::endl;
+        sqlite3_close(db);
+        tempDbFile.deleteFile();
+        juce::MessageManager::deleteInstance();
+        return 1;
+    }
+
     std::cout << "SUCCESS: Cache reclassification benchmark completed successfully!" << std::endl;
     juce::MessageManager::deleteInstance();
     return 0;
