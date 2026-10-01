@@ -580,10 +580,15 @@
 > direction that can lose work. The superset claim therefore rests on both checks — every origin patch present under a
 > new SHA, and no file absent — so a force-push would drop neither a patch nor a file.
 >
-> Publishing local `main` is still the owner's call, deliberately not done here, because it rewrites SHAs that other
-> clones may have cached. Note that my own commits are on local `main` only up to `2b4831a5`; the last four (`6ddbe471`,
-> `615299d9`, `d6947fc8`, `65a8af74`) are on this branch and not on `main` at all, so they are not in what a push would
-> publish yet.
+> **Landing this branch on `main` is a plain fast-forward, and I checked that separately.** `main` is an ancestor of
+> this branch's tip, 46 commits back, so moving `main` up to here needs no merge commit and cannot conflict. Combined with
+> the superset check above, the whole blocked step is: fast-forward `main` to this branch, then push with force. Force is
+> required only because origin's 515 commits are rewritten SHAs rather than ancestors, and it drops no content — every
+> patch and every file they carry is already on `main` here. Clones that fetched `origin/main` before the rewrite keep
+> their old SHAs until they re-fetch, which is the one real cost and the reason this stays the owner's call.
+>
+> My own commits reach `main` only up to `2b4831a5`; the last six (`6ddbe471`, `615299d9`, `d6947fc8`, `65a8af74`,
+> `9da372b8`, `f68fa32b`) are on this branch and would arrive with that fast-forward, not before.
 >
 > **1 Oct, the copy itself is verified end to end, so only the branch move is outstanding.** Splitting this branch
 > rather than `main` carries **both** `.github/workflows/kenn-ci.yml` and `kenn-weekly.yml`, and running the sync's own
