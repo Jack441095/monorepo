@@ -137,7 +137,24 @@ void SmartSampleManagerAudioProcessor::processBlock(juce::AudioBuffer<float>& bu
             // One-block gain ramp before the cut, otherwise stopping mid-waveform
             // clicks at the cut sample.
             buffer.applyGainRamp(0, buffer.getNumSamples(), 1.0f, 0.0f);
-            transportSource.stop();
+            // Never AudioTransportSource::stop() from here. In JUCE 8.0.2 it is
+            // a bounded spin of 500 x Thread::sleep(2) -- a full second --
+            // whose exit condition (`stopped`) is cleared only inside
+            // getNextAudioBlock() (juce_AudioTransportSource.cpp:133). On the
+            // audio thread nothing else runs that function, so the loop could
+            // never exit early and every STOP cost ~1 s of blocked audio plus
+            // a second of digital silence, since the buffer is already ramped
+            // to zero by the time we get here. Measured at 1396 ms against an
+            // 11.61 ms deadline before this changed; see
+            // test_rt_deadline_stress_main.cpp.
+            //
+            // setSource(nullptr) clears `playing` under JUCE's own callbackLock,
+            // which getNextAudioBlock above already takes on every single
+            // block, so this adds no new lock the callback was not already
+            // paying for. It also frees only the ResamplingAudioSource; the
+            // AudioFormatReaderSource stays owned by readerSource and is
+            // retired through the lock-free ring.
+            transportSource.setSource(nullptr);
         }
     }
     else if (stopRequested.exchange(false)) {
@@ -233,11 +250,15 @@ SmartSampleManagerAudioProcessor::prepareReaderSource(const std::string& filePat
 void SmartSampleManagerAudioProcessor::startPreparedPlayback(
     std::unique_ptr<juce::AudioFormatReaderSource> newReaderSource, double playSampleRate)
 {
-    // Realtime-safe apart from the comment below. transportSource is touched
-    // here from the audio thread only -- playSample() and stopSample() no longer
-    // call into it, they publish commands instead, so there is no race with the
-    // message thread.
-    transportSource.stop();
+    // transportSource is touched here from the audio thread only -- playSample()
+    // and stopSample() no longer call into it, they publish commands instead, so
+    // there is no race with the message thread.
+    //
+    // No stop() call on purpose. The setSource(nullptr) below is what actually
+    // detaches the outgoing source, and it clears `playing` in the same place,
+    // so the stop() in front of it was pure overhead -- and on the audio thread
+    // that overhead was the full 500 x 2 ms spin JUCE's stop() performs. See the
+    // note in processBlock.
     transportSource.setSource(nullptr);
 
     // The outgoing source is handed to the message thread rather than freed

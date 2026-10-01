@@ -1,14 +1,24 @@
 // SLO Master Plan V2, Phase 8 (B-010): RT deadline-stress + allocation
 // instrumentation for SmartSampleManagerAudioProcessor::processBlock().
 //
-// Diagnostic tool, not a pass/fail correctness test -- same posture as
-// ClassificationBenchmark's perf/soak modes. Drives processBlock() at a real
-// block size/sample rate under simulated audio-callback timing pressure,
-// interleaved with playSample() start/stop/source-change calls the way a
-// live DAW session actually behaves, and reports deadline misses plus heap
-// allocation activity during the tracked callback window. Writes a JSON
-// receipt; does not fail the build on a bad result -- this exists to
-// produce honest evidence, not to gate on a threshold nobody has set yet.
+// Drives processBlock() at a real block size/sample rate under simulated
+// audio-callback timing pressure, interleaved with playSample() and
+// stopSample() calls the way a live DAW session actually behaves, and reports
+// deadline misses plus heap allocation activity during the tracked callback
+// window. Writes a JSON receipt.
+//
+// The stopSample() interleave is load-bearing, not decoration. processBlock
+// used to call juce::AudioTransportSource::stop() to service a stop request,
+// and that call is a bounded 500 x 2 ms spin-sleep (juce_AudioTransportSource
+// .cpp:133) whose exit condition is cleared only inside getNextAudioBlock().
+// Called from the audio thread, nothing can clear it, so the loop always ran
+// to completion: a ~1 s stall plus a second of digital silence. This test
+// could not see it because test_kick.wav is 86 blocks long while playSample
+// only re-fired every 100 iterations, so the transport had always finished
+// before anything could stop it. Hence stopSample at +10, mid-playback.
+//
+// Unlike the original revision of this tool it now gates: a deadline miss
+// fails the run. A diagnostic nobody can fail is a diagnostic nobody reads.
 //
 // See docs/SLO_RT_THREADING_AUDIT_V1.md for the source-review-only
 // assessment this instruments for real, and the master plan's Phase 8 for
@@ -84,6 +94,7 @@ int main()
     constexpr double deadlineMs = (static_cast<double>(blockSize) / sampleRate) * 1000.0; // ~11.61ms
     constexpr int numIterations = 2000; // ~23s of simulated audio at this block size
     constexpr int playSampleEveryN = 100; // stress start/stop/source-change periodically
+    constexpr int stopSampleAfterN = 10;  // stop while the transport is still sounding
 
     std::cout << "RT deadline-stress: " << numIterations << " iterations, block=" << blockSize
               << " @ " << sampleRate << "Hz, deadline=" << deadlineMs << "ms" << std::endl;
@@ -111,6 +122,11 @@ int main()
         // session -- never inside the tracked/timed window below.
         if (i > 0 && i % playSampleEveryN == 0) {
             processor.playSample(fixturePath);
+        }
+        if (i > 0 && i % playSampleEveryN == stopSampleAfterN) {
+            // Stop mid-playback. test_kick.wav is 86 blocks and we stop at +10,
+            // so the transport is definitely still playing here.
+            processor.stopSample();
         }
 
         juce::AudioBuffer<float> buffer(2, blockSize);
@@ -179,5 +195,15 @@ int main()
     }
 
     juce::MessageManager::deleteInstance();
+
+    if (deadlineMisses > 0) {
+        std::cerr << "FAIL: " << deadlineMisses << " of " << numIterations
+                  << " audio callbacks exceeded the " << deadlineMs
+                  << "ms deadline (worst " << maxMs << "ms). An audio callback that overruns "
+                     "its deadline is an audible dropout in the host." << std::endl;
+        return 1;
+    }
+
+    std::cout << "PASS: no audio callback exceeded its " << deadlineMs << "ms deadline." << std::endl;
     return 0;
 }
