@@ -75,7 +75,21 @@ namespace MlOverrideGate
         std::string category;
         std::string subcategory;
         float tagConfidence = 0.0f;
-        std::string tagSource;            // "heuristic" (unchanged) / "ml_v3" (override applied) / "ml_ood" (cleared)
+        // "heuristic" (unchanged) / "ml_v3" (override applied) / "ml_ood" (cleared).
+        //
+        // Note there is deliberately NO isOod field, and tagSource is the only place
+        // the abstention survives. That means an OOD verdict paired with FILENAME or
+        // EMBEDDED_METADATA evidence leaves tagSource at "heuristic" and keeps the
+        // stale label -- the else-if above is entered but its guard is false, so
+        // nothing happens. ClassificationPresentation::isMlOod() then reads
+        // tagSource and cannot see the abstention.
+        //
+        // This is intentional, not an oversight: trusted symbolic evidence is
+        // allowed to outrank a model abstention, and
+        // TestAcousticClassifierParity.cpp:126-131 pins it. Recorded here because
+        // the omission reads exactly like a bug, and the next person to "fix" it
+        // would change classification behaviour rather than repair a defect.
+        std::string tagSource;
         std::string winningEvidence;
         bool overrideApplied = false;
         bool fusionV2Applied = false;     // true iff the V2 duration rule (not V1) decided
