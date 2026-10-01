@@ -540,14 +540,45 @@ def build_system_prompt(
 # Raw context block builder (feeds full source excerpts for LLM synthesis)
 # ---------------------------------------------------------------------------
 
+def _truncate_on_word_boundary(text: str, limit: int) -> str:
+    """Cut to limit without severing a word or gluing an ellipsis onto a fragment.
+
+    The excerpt boundary is what tells the model where untrusted evidence stops, so a cut that lands inside a word
+    makes the source text harder to trust, not easier. Reported on the 28 Sept audit and fixed 30 Sept.
+    """
+    if limit <= 0:
+        return ""
+    if len(text) <= limit:
+        return text
+    # The ellipsis is inside the budget, not added on top of it: appending it after the cut returned up to three
+    # characters more than the caller asked for, which is how the excerpt overshot max_chars.
+    budget = limit - 3
+    head = text[:budget]
+    space = head.rfind(" ")
+    if space > budget // 2:
+        head = head[:space]
+    return head.rstrip() + "..."
+
+
 def _clean_chunk_for_synthesis(chunk: dict, max_len: int = 240) -> str:
-    """Extract substantive, concise knowledge lines from a note chunk, skipping metadata boilerplate."""
+    """Extract substantive, concise knowledge lines from a note chunk, skipping metadata boilerplate.
+
+    Fenced code is skipped whole rather than joined into the prose. Joining turned
+    "```python\nKENN_LLM_CONTEXT_CHARS=650\n```" into one line, which reads as a single broken statement rather
+    than a code block, and the model is about to reason over exactly this text.
+    """
     if chunk.get("section") == "Related questions":
         return ""
     raw = str(chunk.get("text", ""))
     lines: list[str] = []
+    in_fence = False
     for line in raw.splitlines():
         line = line.strip()
+        if line.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
         if not line or line.startswith("#"):
             continue
         if re.match(r"^(Type|Status|Tags|Section):\s*", line, re.IGNORECASE):
@@ -571,7 +602,7 @@ def _clean_chunk_for_synthesis(chunk: dict, max_len: int = 240) -> str:
         if last_dot > max_len // 2:
             joined = cut[: last_dot + 1]
         else:
-            joined = cut.rstrip() + "..."
+            joined = _truncate_on_word_boundary(joined, max_len)
     return joined
 
 
@@ -594,14 +625,21 @@ def build_raw_context_block(
         if not content:
             continue
         label = source_label(chunk)
-        block = f'<source_excerpt label="{label}" relevance="{score:.1f}">\n{content}\n</source_excerpt>'
-        if char_count + len(block) > max_chars:
-            remaining = max_chars - char_count
-            if remaining > 100:
-                parts.append(block[:remaining] + "\n</source_excerpt>")
+        opening = f'<source_excerpt label="{label}" relevance="{score:.1f}">'
+        closing = "\n</source_excerpt>"
+        # Budget the tag before slicing. Slicing the assembled block is what produced an unterminated
+        # <source_excerpt label="... chapter (curated note, section Dry/Wet para</source_excerpt>, so the model was
+        # handed malformed markup and a label cut mid-word.
+        # The "\n\n" joiner counts against the budget too, including the one before the first block, since the
+        # preamble is always parts[0]. Leaving it out overshot max_chars by two.
+        separator = 2
+        overhead = len(opening) + len(closing) + 1 + separator
+        if char_count + overhead >= max_chars:
             break
-        parts.append(block)
-        char_count += len(block)
+        body = content if char_count + overhead + len(content) <= max_chars \
+            else _truncate_on_word_boundary(content, max_chars - char_count - overhead)
+        parts.append(f"{opening}\n{body}{closing}")
+        char_count += overhead + len(body)
     return "\n\n".join(parts) if len(parts) > 1 else "(no source excerpts provided)"
 
 

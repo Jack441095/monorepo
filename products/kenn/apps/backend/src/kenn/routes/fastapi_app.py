@@ -29,6 +29,8 @@ from kenn.routes.chat_routes import (
     handle_get_memory,
     handle_record_preference,
     handle_delete_preference,
+    handle_preference_history,
+    handle_restore_preference,
     handle_delete_episode,
     handle_clear_memory,
 )
@@ -112,6 +114,11 @@ class PreferenceRecordRequest(BaseModel):
     user_statement: Optional[str] = ""
 
 
+class PreferenceRestoreRequest(BaseModel):
+    session_id: str
+    preference_id: str
+
+
 class PreferenceDeleteRequest(BaseModel):
     session_id: str
     key: str
@@ -179,6 +186,18 @@ async def get_memory_endpoint(session_id: str):
 @app.post("/api/memory/preference")
 async def record_preference_endpoint(req: PreferenceRecordRequest):
     status, result = handle_record_preference(req.model_dump())
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.get("/api/memory/preference/history")
+async def preference_history_endpoint(session_id: str, key: str | None = None):
+    status, result = handle_preference_history(session_id, key)
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/memory/preference/restore")
+async def restore_preference_endpoint(req: PreferenceRestoreRequest):
+    status, result = handle_restore_preference(req.model_dump())
     return JSONResponse(status_code=status, content=result)
 
 

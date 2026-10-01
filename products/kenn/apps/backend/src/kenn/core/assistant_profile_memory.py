@@ -193,6 +193,56 @@ class AssistantProfileStore:
             conn.close()
         return [_preference_projection(row) for row in rows]
 
+    def preference_history(self, session_id: str, *, key: str | None = None) -> list[dict[str, Any]]:
+        """Superseded preferences, newest first.
+
+        record_preference deactivates the previous value for a key, which is right for answering and wrong for
+        "testers can find and delete any memory": a producer who said "actually, I master to -9, not -12" had no way
+        to see the old value, compare it, or put it back. These rows are already kept -- the retention DELETE in
+        record_preference holds the newest MAX_PREFERENCES inactive rows -- they were simply never readable.
+        """
+        clause = " AND preference_key = ?" if key else ""
+        params: tuple[Any, ...] = (_text(session_id, 128),)
+        if key:
+            params += (_text(key, 128),)
+        conn = _connect(self.db_path)
+        try:
+            rows = conn.execute(
+                f"SELECT * FROM producer_preferences WHERE session_id = ? AND active = 0{clause} "
+                f"ORDER BY created_at DESC LIMIT ?",
+                params + (MAX_PREFERENCES,),
+            ).fetchall()
+        finally:
+            conn.close()
+        return [_preference_projection(row) for row in rows]
+
+    def restore_preference(self, *, session_id: str, preference_id: str) -> dict[str, Any]:
+        """Make a superseded preference active again, as a move rather than a second live row.
+
+        Deactivating the current value and activating the chosen one in the same transaction is what keeps
+        current_preferences returning one row per key.
+        """
+        conn = _connect(self.db_path)
+        try:
+            row = conn.execute(
+                "SELECT * FROM producer_preferences WHERE preference_id = ? AND session_id = ?",
+                (_text(preference_id, 128), _text(session_id, 128)),
+            ).fetchone()
+            if row is None:
+                return {"ok": False, "error": "No such preference in this session."}
+            if row["active"]:
+                return {"ok": True, "restored": False, "preference": _preference_projection(row),
+                        "reason": "already active"}
+            conn.execute(
+                "UPDATE producer_preferences SET active = 0 WHERE session_id = ? AND preference_key = ? AND active = 1",
+                (_text(session_id, 128), row["preference_key"]),
+            )
+            conn.execute("UPDATE producer_preferences SET active = 1 WHERE preference_id = ?", (row["preference_id"],))
+            conn.commit()
+        finally:
+            conn.close()
+        return {"ok": True, "restored": True, "preference": _preference_projection(row)}
+
     def forget_preference(self, *, session_id: str, key: str) -> bool:
         conn = _connect(self.db_path)
         try:
