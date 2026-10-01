@@ -4,7 +4,7 @@
 **Status:** internal qualification pass; native release-default gate not met
 
 The supplied directory
-`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets`
+`~/Nite-DSP/Nite-DSP-Operations/testing-assets`
 contains a 9-track manifest with 341 audio files. Eight canonical generated
 stereo mixdowns were benchmarked without copying them into the repository:
 

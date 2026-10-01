@@ -2,7 +2,7 @@
 
 > **What this file is:** The definitive autonomous execution prompt that drives an AI coding assistant (Antigravity / Claude Code / Codex) to implement KENN Version 4.0: transforming KENN from a single-track deliberative assistant into an **autonomous multi-track auto-mixer, in-DAW VST3 sensory copilot, and full-session acoustic doctor**.
 >
-> **How to execute autonomously:** Open the workspace root (`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP`) and prompt the agent:
+> **How to execute autonomously:** Open the workspace root (`~/Nite-DSP`) and prompt the agent:
 > ```bash
 > Execute root-docs/KENN_AUTONOMOUS_AUTO_MIXER_AND_IN_DAW_COPILOT_PROMPT_V4.md in full. Produce every deliverable in §7 with 100% test passing and tri-repo synchronization.
 > ```

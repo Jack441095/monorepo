@@ -7,8 +7,10 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 NOTES_DIR="${REPO_ROOT}/apps/backend/src/kenn/Training_Data_Notes"
 PROGRESS_FILE="${REPO_ROOT}/apps/backend/src/kenn/Training_Data_Sources/.batch_distillation_progress.json"
-REMOTE_HOST="ubuntu@www.haoee.com"
-REMOTE_PORT="2022"
+# The box's hostname is not committed (AGENTS.md: no remote hostnames in git), so it comes from the
+# environment. Sync scripts are run by hand, so failing here is better than an ssh error 90 seconds in.
+REMOTE_HOST="${KENN_SERVER_TARGET:?set KENN_SERVER_TARGET to user@host for the notes box}"
+REMOTE_PORT="${KENN_SERVER_PORT:-2022}"
 REMOTE_DIR="/mnt/data/kenn-notes-gpu1/generated_notes/"
 REMOTE_PROGRESS="/mnt/data/kenn-notes-gpu1/.batch_distillation_progress.json"
 

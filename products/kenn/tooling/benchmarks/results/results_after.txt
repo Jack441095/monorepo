@@ -2,7 +2,7 @@
 KENN LLM ANSWER PATH BENCHMARK REPORT (§3 FINAL RESULTS & COMPARISON)
 Timestamp: 2026-09-18 19:56:00
 Platform: Apple Silicon (Metal MLX) / macOS
-Model Path: /Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn/kenn/artifacts/models/kenn-mlx
+Model Path: ~/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn/kenn/artifacts/models/kenn-mlx
 ================================================================================
 
 --------------------------------------------------------------------------------

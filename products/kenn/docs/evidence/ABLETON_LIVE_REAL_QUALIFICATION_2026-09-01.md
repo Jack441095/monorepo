@@ -124,7 +124,7 @@ native crash-recovery dialog. This proves failure classification and no
 overclaim after Live loss, but not retained-state restoration after recovery.
 
 A second, saved-state retention probe used the disposable set saved as
-`/Volumes/Jack_Gandy_1TB_SSD/Ableton Projects/2026/KENN-live-retention-20260901/KENN_retention_test Project/KENN_retention_test.als`
+`~/Ableton Projects/2026/KENN-live-retention-20260901/KENN_retention_test Project/KENN_retention_test.als`
 with Compressor, EQ Eight, and Utility present and their qualified values
 restored. The exact Live process was then terminated, and Live reopened with
 the recovery prompt for that set. A subsequent application poll showed the

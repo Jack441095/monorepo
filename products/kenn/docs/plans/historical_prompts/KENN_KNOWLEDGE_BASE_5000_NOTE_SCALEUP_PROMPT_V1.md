@@ -2,7 +2,7 @@
 
 > **What this file is:** a reusable, self-contained prompt that drives an AI coding agent (Claude Code / Cline / Codex / any repo-aware agent) to grow KENN's approved knowledge-note corpus from its current size to 5,000 high-quality, correctly-classified notes — without diluting trust, causing contradictions, or padding the count with junk.
 >
-> **How to use it:** open the workspace root (`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/handoff/kenn-full-product-slo`) and instruct the agent: *"Execute `KENN_KNOWLEDGE_BASE_5000_NOTE_SCALEUP_PROMPT_V1.md` in full. Produce every deliverable in §8."* Run Phase 1 (inventory) in read-only mode first; only start bulk ingestion after the owner approves the plan in §6.
+> **How to use it:** open the workspace root (`~/Nite-DSP/handoff/kenn-full-product-slo`) and instruct the agent: *"Execute `KENN_KNOWLEDGE_BASE_5000_NOTE_SCALEUP_PROMPT_V1.md` in full. Produce every deliverable in §8."* Run Phase 1 (inventory) in read-only mode first; only start bulk ingestion after the owner approves the plan in §6.
 >
 > **Owner:** NITE DSP (Jack) · **Created:** 2026-09-21 · **Supersedes:** none
 

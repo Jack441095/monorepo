@@ -4,7 +4,7 @@
   "kenn_boundary": {
     "tests": 163,
     "bridge_loaded": true,
-    "producer_root": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo-collab/Audio_Too/studio/audiogen/audiogen",
+    "producer_root": "~/Nite-DSP/Nite-DSP-Operations/monorepo-collab/Audio_Too/studio/audiogen/audiogen",
     "producer_seeds": [20260921, 20260922, 20260923, 20260924, 20260925],
     "producer_p50_ms": 870.52,
     "producer_p95_ms": 922.287,

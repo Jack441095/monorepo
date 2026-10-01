@@ -7,7 +7,10 @@ if [[ "${1:-}" == "--help" ]]; then
   exit 0
 fi
 SSH_ARGS=(-o StrictHostKeyChecking=yes -o ConnectTimeout=15
-  -o ServerAliveInterval=15 -o ServerAliveCountMax=2 -p 2022)
+  -o ServerAliveInterval=15 -o ServerAliveCountMax=2 -p "${KENN_SERVER_PORT:-2022}")
+# The box's hostname is not committed (AGENTS.md: no remote hostnames in git); this is a read-only check, so it
+# says so plainly rather than falling through to an ssh error.
+: "${KENN_SERVER_TARGET:?set KENN_SERVER_TARGET to user@host for the shared notes box}"
 if [[ -n "${KENN_SERVER_PASSWORD:-}" ]]; then
   command -v sshpass >/dev/null
   export SSHPASS="$KENN_SERVER_PASSWORD"
@@ -17,7 +20,7 @@ else
   AUTH=()
   SSH_ARGS+=(-o BatchMode=yes)
 fi
-"${AUTH[@]}" ssh "${SSH_ARGS[@]}" ubuntu@www.haoee.com 'bash -s' <<'REMOTE'
+"${AUTH[@]}" ssh "${SSH_ARGS[@]}" "${KENN_SERVER_TARGET}" 'bash -s' <<'REMOTE'
 set -euo pipefail
 export PYTHONDONTWRITEBYTECODE=1
 ROOT=/mnt/data/kenn-GPU

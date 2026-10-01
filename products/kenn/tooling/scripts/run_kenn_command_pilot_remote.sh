@@ -11,9 +11,9 @@ usage() {
 Usage: tooling/scripts/run_kenn_command_pilot_remote.sh [options]
 
 Options:
-  --host HOST             Remote host (default: www.haoee.com)
+  --host HOST             Remote host (default: $KENN_SERVER_TARGET, which must be set)
   --user USER             Remote user (default: ubuntu)
-  --port PORT             SSH port (default: 2022)
+  --port PORT             SSH port (default: $KENN_SERVER_PORT, or 2022)
   --identity-file PATH    SSH private key to use (optional)
   --remote-workdir PATH   Empty remote pilot directory (default: generated /tmp path)
   --run                   Train and evaluate after preflight (default: preflight only)
@@ -28,9 +28,11 @@ artifacts.
 EOF
 }
 
-host="www.haoee.com"
+# The box's hostname is not committed (AGENTS.md: no remote hostnames in git); pass --host or set
+# KENN_SERVER_TARGET. An unset target has to fail here, before the repository-cleanliness checks run.
+host="${KENN_SERVER_TARGET:-}"
 user="ubuntu"
-port="2022"
+port="${KENN_SERVER_PORT:-2022}"
 identity_file=""
 remote_workdir="/tmp/kenn-command-pilot-$(date -u +%Y%m%d-%H%M%S)"
 run_training=0
@@ -82,6 +84,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$host" ]]; then
+  echo "No remote host: pass --host, or set KENN_SERVER_TARGET (the hostname is not committed)." >&2
+  exit 2
+fi
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"

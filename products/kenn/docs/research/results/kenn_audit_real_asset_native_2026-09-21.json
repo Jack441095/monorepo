@@ -27,7 +27,7 @@
     "include_ltas": true,
     "sources": [
       {
-        "path": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/42_BackingVox01.wav",
+        "path": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/42_BackingVox01.wav",
         "sha256": "09cc99f54986265e9448b374e7b959d3d6c979d4e84ece8dbfa54d8ce2c6b272",
         "bytes": 1167567,
         "wav": {

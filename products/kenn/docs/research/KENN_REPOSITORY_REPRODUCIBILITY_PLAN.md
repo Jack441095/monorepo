@@ -100,11 +100,11 @@ python3 -m venv /tmp/kenn-clean-venv
 PYTHONPATH=apps/backend/src /tmp/kenn-clean-venv/bin/python -m pytest -q \
   apps/backend/src/kenn/tests
 
-PATH=/Users/Ganders4/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
+PATH=~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
   npm --prefix apps/frontend ci
-PATH=/Users/Ganders4/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
+PATH=~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
   npm --prefix apps/frontend test
-PATH=/Users/Ganders4/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
+PATH=~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
   npm --prefix apps/frontend run build
 
 cmake -S tooling/native/fft_poc -B /tmp/kenn-fft-clean \

@@ -1,10 +1,10 @@
 {
   "schema": "kenn.dsp_real_mix_comparison.v1",
   "candidate": "cpp-scalar-nanobind",
-  "fixture_root": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets",
+  "fixture_root": "~/Nite-DSP/Nite-DSP-Operations/testing-assets",
   "cases": [
     {
-      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav",
+      "fixture": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav",
       "reference_ms": 13870.92491700605,
       "native_ms": 13962.141832998896,
       "speedup": 0.9934668393227994,
@@ -20,7 +20,7 @@
       ]
     },
     {
-      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/al_james/al_james/mixdown_v1.wav",
+      "fixture": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/al_james/al_james/mixdown_v1.wav",
       "reference_ms": 10120.488333996036,
       "native_ms": 10165.523999996367,
       "speedup": 0.9955697644311944,
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/amyhelmandthehandsomestrangers_rescueme/amyhelmandthehandsomestrangers_rescueme/mixdown_v1.wav",
+      "fixture": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/amyhelmandthehandsomestrangers_rescueme/amyhelmandthehandsomestrangers_rescueme/mixdown_v1.wav",
       "reference_ms": 13281.638624997868,
       "native_ms": 13078.987792003318,
       "speedup": 1.0154943819978526,
@@ -52,7 +52,7 @@
       ]
     },
     {
-      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/angeloboltini_fragments/angeloboltini_fragments/mixdown_v1.wav",
+      "fixture": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/angeloboltini_fragments/angeloboltini_fragments/mixdown_v1.wav",
       "reference_ms": 9011.540291998244,
       "native_ms": 9050.265624995518,
       "speedup": 0.9957210832696093,
@@ -68,7 +68,7 @@
       ]
     },
     {
-      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/atlantisbound_itwasmyfaultforwaiting/atlantisbound_itwasmyfaultforwaiting/mixdown_v1.wav",
+      "fixture": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/atlantisbound_itwasmyfaultforwaiting/atlantisbound_itwasmyfaultforwaiting/mixdown_v1.wav",
       "reference_ms": 12185.24674999935,
       "native_ms": 12248.455834000197,
       "speedup": 0.9948394242623315,
@@ -84,7 +84,7 @@
       ]
     },
     {
-      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/dream_of_you/dream_of_you/mixdown_v1.wav",
+      "fixture": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/dream_of_you/dream_of_you/mixdown_v1.wav",
       "reference_ms": 4191.5239580048365,
       "native_ms": 4173.291375002009,
       "speedup": 1.0043688737172871,
@@ -100,7 +100,7 @@
       ]
     },
     {
-      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/reggueton_pop/reggueton_pop/mixdown_v1.wav",
+      "fixture": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/reggueton_pop/reggueton_pop/mixdown_v1.wav",
       "reference_ms": 7285.608833997685,
       "native_ms": 7339.916083998105,
       "speedup": 0.9926011075087334,
@@ -116,7 +116,7 @@
       ]
     },
     {
-      "fixture": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/stranger/stranger-validate/mixdown_v1.wav",
+      "fixture": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/stranger/stranger-validate/mixdown_v1.wav",
       "reference_ms": 10439.899416000117,
       "native_ms": 10453.206999998656,
       "speedup": 0.9987269376758213,

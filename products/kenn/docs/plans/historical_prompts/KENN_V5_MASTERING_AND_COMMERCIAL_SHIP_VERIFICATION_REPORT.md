@@ -1,7 +1,7 @@
 # KENN V5.0 Verification Report: Intelligent Autonomous Mastering, Reference Track Matcher & Commercial Ship Readiness
 
 **Execution Date:** September 19, 2026  
-**Target Specification:** [`root-docs/KENN_INTELLIGENT_MASTERING_REFERENCE_MATCHER_AND_COMMERCIAL_SHIP_PROMPT_V5.md`](file:///Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/root-docs/KENN_INTELLIGENT_MASTERING_REFERENCE_MATCHER_AND_COMMERCIAL_SHIP_PROMPT_V5.md)  
+**Target Specification:** [`root-docs/KENN_INTELLIGENT_MASTERING_REFERENCE_MATCHER_AND_COMMERCIAL_SHIP_PROMPT_V5.md`](file://~/Nite-DSP/root-docs/KENN_INTELLIGENT_MASTERING_REFERENCE_MATCHER_AND_COMMERCIAL_SHIP_PROMPT_V5.md)  
 **Status:** **100% COMPLETE & PRODUCTION SHIP READY** (30/30 Automated Tests Passing, Tri-Repo Parity Verified with 0 Diffs)
 
 ---
@@ -71,7 +71,7 @@ KENN Version 5.0 delivers the final commercial production and mastering tier of 
 ```text
 ============================= test session starts ==============================
 platform darwin -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
-rootdir: /Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn
+rootdir: ~/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn
 configfile: pyproject.toml
 plugins: anyio-4.14.2
 collected 30 items

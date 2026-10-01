@@ -92,9 +92,9 @@ ctest --test-dir build/plugins/kenn-vst3-au -C Release --output-on-failure
 apps/backend/.venv/bin/python tooling/scripts/qualify_ableton_live.py \
   --output docs/research/results/kenn_audit_ableton_real_qualification_2026-09-21.json
 
-PATH=/Users/Ganders4/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
+PATH=~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
   npm --prefix apps/frontend test
-PATH=/Users/Ganders4/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
+PATH=~/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
   npm --prefix apps/frontend run build
 ```
 
@@ -116,13 +116,13 @@ KENN_DSP_NATIVE=1 KENN_DSP_MASKING_NATIVE=1 KENN_DSP_BUILD_TYPE=release \
 KENN_DSP_NATIVE=0 KENN_DSP_MASKING_NATIVE=0 \
   apps/backend/.venv/bin/python tooling/scripts/benchmark_audio_analysis.py \
   --workers 4 --repeats 10 --include-ltas \
-  --fixture '/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/42_BackingVox01.wav' \
+  --fixture '~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/42_BackingVox01.wav' \
   --json-out docs/research/results/kenn_audit_real_asset_reference_2026-09-21.json
 
 KENN_DSP_NATIVE=1 KENN_DSP_MASKING_NATIVE=1 KENN_DSP_BUILD_TYPE=release \
   apps/backend/.venv/bin/python tooling/scripts/benchmark_audio_analysis.py \
   --workers 4 --repeats 10 --include-ltas \
-  --fixture '/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/42_BackingVox01.wav' \
+  --fixture '~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/al_james/42_BackingVox01.wav' \
   --json-out docs/research/results/kenn_audit_real_asset_native_2026-09-21.json
 
 apps/backend/.venv/bin/python tooling/scripts/benchmark_mix_review_native.py \

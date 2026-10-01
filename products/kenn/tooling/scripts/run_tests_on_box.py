@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import tarfile
 import time
@@ -28,9 +29,12 @@ from pathlib import Path
 
 MONOREPO = Path(__file__).resolve().parents[4]
 KENN = MONOREPO / "products" / "kenn"
-HOST = "ubuntu@www.haoee.com"
-SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ControlMaster=no", "-p", "2022", HOST]
-SCP = ["scp", "-o", "BatchMode=yes", "-o", "ControlMaster=no", "-P", "2022", "-q"]
+# The box's hostname is not committed (AGENTS.md: no remote hostnames in git), so it comes from the environment and
+# these scripts fail loudly without it rather than carrying a literal that outlives the machine.
+HOST = os.environ.get("KENN_SERVER_TARGET", "").strip()
+PORT = os.environ.get("KENN_SERVER_PORT", "22")
+SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ControlMaster=no", "-p", PORT, HOST]
+SCP = ["scp", "-o", "BatchMode=yes", "-o", "ControlMaster=no", "-P", PORT, "-q"]
 REMOTE = "/mnt/data/kenn-bakeoff/ci"
 TARGETS = ("apps/backend/src/kenn/tests", "chat/tests", "mix-review/tests", "automix/tests")
 DATA_PATHS = ("Training_Data_Notes", "artifacts/models/minilm")  # plus the active index version
@@ -83,6 +87,8 @@ def main() -> int:
                         help="KENN folder holding the git-ignored index, notes and model (default: main checkout)")
     parser.add_argument("--out", type=Path, default=Path("box-test-results.json"))
     args = parser.parse_args()
+    if not HOST:
+        parser.error("set KENN_SERVER_TARGET to user@host for the GPU box; the hostname is not committed")
     args.data_root = args.data_root or main_checkout() / "products" / "kenn"
 
     scratch = Path("/tmp") / f"kenn-box-test-{int(time.time())}"

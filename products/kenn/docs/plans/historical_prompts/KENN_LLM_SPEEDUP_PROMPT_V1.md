@@ -2,7 +2,7 @@
 
 > **What this file is:** a reusable, self-contained prompt that drives an AI coding agent (Cline / Claude Code / Codex / any repo-aware agent) to profile and make KENN's local LLM answer path measurably faster — without regressing answer quality or breaking the self-correction guarantee.
 >
-> **How to use it:** open the workspace root (`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP`) and instruct the agent: *"Execute `KENN_LLM_SPEEDUP_PROMPT_V1.md` in full. Produce every deliverable in §7."* Run in Plan/read-only mode first; only implement after the owner approves the plan in §5.
+> **How to use it:** open the workspace root (`~/Nite-DSP`) and instruct the agent: *"Execute `KENN_LLM_SPEEDUP_PROMPT_V1.md` in full. Produce every deliverable in §7."* Run in Plan/read-only mode first; only implement after the owner approves the plan in §5.
 >
 > **Owner:** NITE DSP (Jack) · **Created:** 2026-09-18 · **Supersedes:** none
 

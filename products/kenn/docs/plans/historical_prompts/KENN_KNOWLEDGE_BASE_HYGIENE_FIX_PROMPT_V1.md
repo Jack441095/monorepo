@@ -2,7 +2,7 @@
 
 > **What this file is:** a reusable, self-contained prompt that drives an AI coding agent to fix the five concrete corpus-hygiene issues surfaced by the 2026-09-21 Phase 1 inventory (see `KENN_KNOWLEDGE_BASE_5000_NOTE_SCALEUP_PROMPT_V1.md` §2 gate) — **before** any bulk ingestion toward the 5,000-note target proceeds. This is fix-first groundwork, not the scale-up itself.
 >
-> **How to use it:** open the workspace root (`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/handoff/kenn-full-product-slo`) and instruct the agent: *"Execute `KENN_KNOWLEDGE_BASE_HYGIENE_FIX_PROMPT_V1.md` in full. Produce every deliverable in §7."*
+> **How to use it:** open the workspace root (`~/Nite-DSP/handoff/kenn-full-product-slo`) and instruct the agent: *"Execute `KENN_KNOWLEDGE_BASE_HYGIENE_FIX_PROMPT_V1.md` in full. Produce every deliverable in §7."*
 >
 > **Owner:** NITE DSP (Jack) · **Created:** 2026-09-21 · **Supersedes:** none · **Depends on:** Phase 1 inventory findings, 2026-09-21
 

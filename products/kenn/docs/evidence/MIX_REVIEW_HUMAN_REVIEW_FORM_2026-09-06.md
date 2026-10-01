@@ -13,7 +13,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 1: al_james
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/al_james/al_james/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/al_james/al_james/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -39,7 +39,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 2: ae_mere_humsafar
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -65,7 +65,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 3: amyhelmandthehandsomestrangers_rescueme
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/amyhelmandthehandsomestrangers_rescueme/amyhelmandthehandsomestrangers_rescueme/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/amyhelmandthehandsomestrangers_rescueme/amyhelmandthehandsomestrangers_rescueme/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -91,7 +91,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 4: angeloboltini_fragments
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/angeloboltini_fragments/angeloboltini_fragments/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/angeloboltini_fragments/angeloboltini_fragments/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -118,7 +118,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 5: atlantisbound_itwasmyfaultforwaiting
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/atlantisbound_itwasmyfaultforwaiting/atlantisbound_itwasmyfaultforwaiting/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/atlantisbound_itwasmyfaultforwaiting/atlantisbound_itwasmyfaultforwaiting/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -144,7 +144,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 6: dream_of_you
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/dream_of_you/dream_of_you/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/dream_of_you/dream_of_you/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -170,7 +170,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 7: reggueton_pop
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/reggueton_pop/reggueton_pop/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/reggueton_pop/reggueton_pop/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -196,7 +196,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 8: stranger
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/stranger/stranger-validate/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/stranger/stranger-validate/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -222,7 +222,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 9: REAL_stranger_electronic_baseline
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/REAL_stranger_electronic/baseline/baseline/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/REAL_stranger_electronic/baseline/baseline/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -248,7 +248,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 10: REAL_stranger_electronic_matched
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/REAL_stranger_electronic/matched/matched/mixdown_v1.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/REAL_stranger_electronic/matched/matched/mixdown_v1.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**
@@ -276,7 +276,7 @@ real issue in one of those categories that a listener should know KENN can't cur
 
 ## Case 11: al_james_raw_kick_stem
 
-**File**: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/al_james/01_Kick.wav`
+**File**: `~/testing-for-NITE-DSP/testing_track_stems/al_james/01_Kick.wav`
 **Technical rating (KENN's own summary)**: Minor issues found
 
 **KENN's flagged findings:**

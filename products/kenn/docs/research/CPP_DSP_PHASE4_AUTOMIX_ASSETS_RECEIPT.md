@@ -6,7 +6,7 @@
 The supplied corpus includes the existing full-duration AutoMix validation
 summary at:
 
-`/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/VALIDATION_SUMMARY.json`
+`~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/VALIDATION_SUMMARY.json`
 
 That summary reports seven completed AutoMix renders with `status: ok`. The
 source stem sets cover 15, 18, 19, 22, 44, and 62 WAV stems (the 15/18/19

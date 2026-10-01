@@ -1,7 +1,7 @@
 # KENN V6.0 Verification Report: Autonomous Generative Arranger, Stem Delivery & Commercial Distribution
 
 **Execution Date:** September 19, 2026  
-**Target Specification:** [`root-docs/KENN_AUTONOMOUS_GENERATIVE_ARRANGER_STEM_DELIVERY_AND_DISTRIBUTION_PROMPT_V6.md`](file:///Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/root-docs/KENN_AUTONOMOUS_GENERATIVE_ARRANGER_STEM_DELIVERY_AND_DISTRIBUTION_PROMPT_V6.md)  
+**Target Specification:** [`root-docs/KENN_AUTONOMOUS_GENERATIVE_ARRANGER_STEM_DELIVERY_AND_DISTRIBUTION_PROMPT_V6.md`](file://~/Nite-DSP/root-docs/KENN_AUTONOMOUS_GENERATIVE_ARRANGER_STEM_DELIVERY_AND_DISTRIBUTION_PROMPT_V6.md)  
 **Status:** **100% COMPLETE & PRODUCTION SHIP READY** (42/42 Automated Tests Passing, Tri-Repo Parity Verified with 0 Diffs)
 
 ---
@@ -69,7 +69,7 @@ KENN Version 6.0 completes the full-cycle production suite, connecting the acous
 ```text
 ============================= test session starts ==============================
 platform darwin -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
-rootdir: /Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn
+rootdir: ~/Nite-DSP/Nite-DSP-Operations/monorepo/products/kenn
 configfile: pyproject.toml
 plugins: anyio-4.14.2
 collected 42 items

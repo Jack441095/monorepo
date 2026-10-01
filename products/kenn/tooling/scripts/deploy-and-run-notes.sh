@@ -31,8 +31,10 @@ exit 1
 
 # ── Configuration ──────────────────────────────────────────────────────────
 SERVER_USER="ubuntu"
-SERVER_HOST="www.haoee.com"
-SERVER_PORT="2022"
+# Unreachable: the exec above hands off to the read-only preflight. Kept only so re-enabling the legacy path has no
+# committed hostname in it; the real value comes from the environment like every other box script.
+SERVER_HOST="${KENN_SERVER_TARGET:?set KENN_SERVER_TARGET to user@host for the notes box}"
+SERVER_PORT="${KENN_SERVER_PORT:-2022}"
 # Password — passed via env var to avoid leaking in ps output. Override with:
 #   export KENN_SERVER_PASSWORD="yourpassword"
 SERVER_PASSWORD="${KENN_SERVER_PASSWORD:-}"

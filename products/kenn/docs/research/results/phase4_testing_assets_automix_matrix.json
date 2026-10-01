@@ -1,7 +1,7 @@
 {
   "run_date": "2026-09-20",
-  "source_manifest": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/manifest.json",
-  "validation_summary": "/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/VALIDATION_SUMMARY.json",
+  "source_manifest": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/manifest.json",
+  "validation_summary": "~/Nite-DSP/Nite-DSP-Operations/testing-assets/testing_track_stems/_automix_out/VALIDATION_SUMMARY.json",
   "source_license_status": "TODO-vendor-pack",
   "existing_validation_tracks": 7,
   "existing_validation_statuses": {

@@ -2,7 +2,7 @@
 
 ## Input
 
-- Source: `/Volumes/Jack_Gandy_1TB_SSD/testing-for-NITE-DSP/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav`
+- Source: `~/testing-for-NITE-DSP/testing_track_stems/_automix_out/ae_mere_humsafar/ae_mere_humsafar/mixdown_v1.wav`
 - Filename presented to the analyzer: `ae_mere_humsafar_mixdown_v1.wav`
 - Format: stereo 24-bit PCM WAV, 44.1 kHz, 263.897 seconds
 - Source SHA-256: `1aff8ca03a9c6aa535ed217db42ea8955bccbf04975306cd3f42c23ae09e8c5c`

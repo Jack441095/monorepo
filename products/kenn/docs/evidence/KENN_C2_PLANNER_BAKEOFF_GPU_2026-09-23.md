@@ -124,8 +124,9 @@ between different requests.
 ```bash
 # Box (GPU 0, loopback only):
 /mnt/data/kenn-bakeoff/ollama/serve.sh
-# Mac: tunnel, thinking proxy, bake-off
-ssh -f -N -L 11438:127.0.0.1:11437 -p 2022 ubuntu@www.haoee.com
+# Mac: tunnel, thinking proxy, bake-off. The box's hostname is not committed (AGENTS.md), so set
+# KENN_SERVER_TARGET=user@host first; 2022 was its SSH port on 2026-09-23.
+ssh -f -N -L 11438:127.0.0.1:11437 -p "${KENN_SERVER_PORT:-2022}" "$KENN_SERVER_TARGET"
 python3 tooling/scripts/thinking_budget_proxy.py --upstream http://127.0.0.1:11438 --port 11439 &
 KENN_BAKEOFF_BASE_URL=http://127.0.0.1:11439/v1 python3 tooling/scripts/planner_bakeoff.py \
   --model qwen3.5:4b@nothink --holdout <124-case jsonl> --timeout 60 --out <file>
