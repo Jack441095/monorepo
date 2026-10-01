@@ -22,6 +22,45 @@ static int failures = 0;
         } \
     } while (0)
 
+// Minimal reader for the sort journal's row format, which is RFC-4180 quoted
+// with doubled inner quotes. We parse it here rather than calling into the
+// engine so the test checks the bytes on disk, not the writer's own idea of
+// them -- a writer/reader pair that agree on the wrong format is exactly the
+// failure mode Test 4 exists to catch.
+static juce::StringArray splitQuotedCsvRow(const juce::String& line)
+{
+    juce::StringArray out;
+    juce::String field;
+    bool inQuotes = false;
+    for (int i = 0; i < line.length(); ++i)
+    {
+        const juce::juce_wchar c = line[i];
+        if (c == '"')
+        {
+            if (inQuotes && i + 1 < line.length() && line[i + 1] == '"')
+            {
+                field += '"';
+                ++i;
+            }
+            else
+            {
+                inQuotes = !inQuotes;
+            }
+        }
+        else if (c == ',' && !inQuotes)
+        {
+            out.add(field);
+            field.clear();
+        }
+        else
+        {
+            field += c;
+        }
+    }
+    out.add(field);
+    return out;
+}
+
 int main()
 {
     ScopedIsolatedCacheDb _isolatedCacheDb;
@@ -215,6 +254,81 @@ int main()
         CHECK(!engine.canUndoSort(), "canUndoSort() should be false after copy undo");
 
         std::cout << "SUCCESS: Test 3 (Copy mode sort + undo) passed." << std::endl;
+    }
+
+    // =========================================================================
+    // Test 4: Undo must refuse to clobber a file the user put back at the
+    // original path.
+    //
+    // The regression this pins: undoLastSort() called JUCE's moveFileTo()
+    // without checking whether the original path was occupied again, and
+    // JUCE's moveFileTo deletes the destination before renaming over it
+    // (juce_File.cpp:300). So after a move sort, if anything put a live file
+    // back where the sample used to live -- a backup agent restoring it, the
+    // user copying a take back, a second SLO instance touching the same
+    // library, or simply sorting again -- Undo silently destroyed that file
+    // and reported success.
+    // =========================================================================
+    {
+        SampleManagerEngine engine;
+        if (!engine.init(modelPath)) {
+            std::cerr << "FAIL: engine init failed" << std::endl;
+            return 1;
+        }
+
+        engine.addPathToQueue(tempRoot.getFullPathName().toStdString());
+        int waitLimit = 600;
+        while (engine.isBusy() && waitLimit-- > 0)
+            juce::Thread::sleep(50);
+
+        engine.setBetaPolicyGateEnabled(false);
+        engine.reorganizeSamples(1, false);   // move mode
+
+        // Read the journal from the outside rather than reusing the engine's
+        // parser: the point is to confirm the on-disk format records where the
+        // file came from, independently of the code that wrote it.
+        auto journal = engine.getMostRecentSortJournal();
+        CHECK(journal.existsAsFile(), "sort wrote a journal we can read back");
+        juce::StringArray lines;
+        journal.readLines(lines);
+
+        juce::File occupiedPath;
+        for (int i = 1; i < lines.size() && occupiedPath == juce::File(); ++i)
+        {
+            const auto fields = splitQuotedCsvRow(lines[i]);
+            if (fields.size() >= 4 && fields[2] == "COMMITTED")
+            {
+                juce::File src(fields[3]);
+                if (src.getParentDirectory() == tempRoot) { occupiedPath = src; break; }
+            }
+        }
+        CHECK(occupiedPath != juce::File(), "journal has a COMMITTED row sourced from tempRoot");
+
+        if (occupiedPath == juce::File())
+        {
+            std::cout << "SKIP: Test 4 -- the sort moved nothing out of tempRoot" << std::endl;
+        }
+        else
+        {
+            // A recognisable body, so an overwrite is detectable by content and
+            // not just by "the file is still there".
+            const juce::String planted = "USER PUT THIS BACK -- DO NOT DESTROY";
+            CHECK(occupiedPath.replaceWithText(planted), "planted a file at the occupied original path");
+
+            const auto undoResult = engine.undoLastSort();
+
+            CHECK(occupiedPath.existsAsFile(),
+                  "Undo destroyed a file the user had put back at the original path: "
+                    + occupiedPath.getFullPathName().toStdString());
+            if (occupiedPath.existsAsFile())
+                CHECK(occupiedPath.loadFileAsString() == planted,
+                      "Undo overwrote the user's file at the original path");
+            CHECK(undoResult.failedCount > 0,
+                  "Undo should count the occupied destination as a failure, got failedCount="
+                    + std::to_string(undoResult.failedCount));
+
+            std::cout << "SUCCESS: Test 4 (occupied-destination undo) passed." << std::endl;
+        }
     }
 
     tempRoot.deleteRecursively();

@@ -7383,6 +7383,18 @@ SampleManagerEngine::UndoSortResult SampleManagerEngine::undoLastSort()
 
         if (row.operation == "move") {
             if (destFile.existsAsFile()) {
+                // Refuse to restore over a path that is occupied again. Between
+                // the sort and the Undo the user may have put a file back where
+                // the sample used to live -- a restored backup, a take copied
+                // back, or the result of sorting the same library twice. JUCE's
+                // moveFileTo deletes the destination before renaming over it
+                // (juce_File.cpp:300), so an unguarded call here destroys that
+                // file outright. Count it and leave both files alone rather than
+                // guessing which one the user wants.
+                if (sourceFile.existsAsFile()) {
+                    result.failedCount++;
+                    continue;
+                }
                 affectedDirs.insert(destFile.getParentDirectory().getFullPathName());
                 sourceFile.getParentDirectory().createDirectory();
                 if (destFile.moveFileTo(sourceFile)) {
