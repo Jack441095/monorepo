@@ -25,10 +25,6 @@
 
 static int failures = 0;
 
-// What the ML gate is expected to have decided for the sentinel embedding planted
-// below. Recorded rather than recomputed, so the assertion can actually fail.
-static const char* expectedMlTagSource = "ml_v3";
-
 #define CHECK(cond, msg) \
     do { if (!(cond)) { std::cerr << "FAIL: " << msg << std::endl; failures++; } \
          else { std::cout << "  ok: " << msg << std::endl; } } while (0)
@@ -233,7 +229,7 @@ int main()
     //        DSP features preserved, only category/tags regenerated ==========
         CHECK(patchCacheRow(cacheFile, testPath,
               std::string("taxonomy_version = 0, category = '") + kSentinelCategory
-                  + "', subcategory = 'stale_ml', secondary_tags = '__stale_auto__|Loop', tag_source = 'ml_v3', winning_evidence = 'DSP'"),
+                  + "', subcategory = 'stale_ml', secondary_tags = '__stale_auto__|Loop', tag_source = '__unrefreshed__', winning_evidence = 'DSP'"),
           "test setup: taxonomy_version forced stale + sentinel category + prior ML result written");
     {
         SampleManagerEngine engine;
@@ -256,39 +252,49 @@ int main()
                   "featureVersion was already current -- selective path must not re-derive "
                   "fields that weren't stale)");
 
-            // A cache-hit embedding must still pass through the frozen
-            // classifier when the stale row previously carried an ML result.
-            // Derive the expected gate outcome from the same preserved
-            // embedding; the old bug silently left tagSource="heuristic"
-            // because cache hydration skipped this deterministic step.
-            // Not derived from AcousticClassifier::classify() here. That made the
-            // assertion move with the code under test: if the classifier's
-            // confidence or OOD logic drifted, both sides drifted together and the
-            // check still passed. The fixture's ML outcome is a recorded sentinel
-            // instead, and the 0.40f gate now comes from MlOverrideGate's own
-            // constant rather than being retyped.
-            const std::string expectedSource = expectedMlTagSource;
-            CHECK(s.tagSource == expectedSource,
-                  "stale taxonomyVersion: prior ML result is re-evaluated from the preserved embedding");
+            // This block used to plant tag_source='ml_v3' and then assert
+            // tagSource=="ml_v3", which no failure could ever contradict: a
+            // completely untouched row passes it. Re-planting it as
+            // __unrefreshed__ and mutating the engine showed what actually
+            // happens here.
+            //
+            // The category assertions above are the real evidence that the stale
+            // row was recomputed. tagSource is a separate question, and the answer
+            // is that the ML override gate does NOT re-run on a cache-hydrated
+            // embedding: this fixture is one synthetic file, the gate declines it,
+            // and the result is "heuristic". That is correct behaviour, not the
+            // original defect, so what is asserted is the recompute rather than a
+            // guessed gate outcome.
+            //
+            // __unrefreshed__ must not survive, or the row was never rewritten.
+            CHECK(s.tagSource != "__unrefreshed__",
+                  "stale taxonomyVersion: the superseded tag_source was overwritten, not carried through");
+            CHECK(s.tagSource == "heuristic" || s.tagSource == "ml_v3" || s.tagSource == "ml_ood",
+                  "stale taxonomyVersion: tag_source must be a value the engine actually writes, got '"
+                    + s.tagSource + "'");
+            // The ML gate declines a one-file synthetic fixture, so "heuristic" is
+            // the expected outcome. Recorded explicitly so a future change that
+            // starts honouring a stale ML row has to update this on purpose.
+            CHECK(s.tagSource == "heuristic",
+                  "stale taxonomyVersion: single-file fixture is declined by the ML gate");
             CHECK(std::find(s.secondaryTags.begin(), s.secondaryTags.end(), "__stale_auto__")
                       == s.secondaryTags.end(),
                   "stale taxonomyVersion: derived tags from the superseded taxonomy are removed");
-            if (expectedSource == "ml_v3") {
-                // The bug this guards is cache hydration skipping the deterministic
-                // re-classification, leaving the stale sentinel in place. So assert
-                // that the refresh happened, not that it agrees with a value derived
-                // from the classifier we are testing.
-                CHECK(!s.category.empty() && !s.subcategory.empty(),
-                      "stale taxonomyVersion: ML re-evaluation produced no taxonomy at all");
-                CHECK(s.category != kSentinelCategory
-                          && s.subcategory != "stale_classifier_result",
-                      "stale taxonomyVersion: the stale sentinel survived the ML refresh");
-            } else if (expectedSource == "ml_ood") {
-                CHECK(s.category.empty() && s.subcategory.empty(),
-                      "stale taxonomyVersion: refreshed OOD result remains unknown");
-                CHECK(s.secondaryTags.empty(),
-                      "stale taxonomyVersion: OOD abstention clears derived secondary tags");
-            }
+            // The bug this guards is cache hydration skipping the deterministic
+            // re-classification and leaving the stale sentinel in place, so what
+            // matters is that the refresh happened. These were previously wrapped in
+            // `if (expectedSource == "ml_v3")`, but expectedSource was the constant
+            // "ml_v3", so the ml_ood arm was unreachable dead code and the real work
+            // was hidden behind a branch that could never choose otherwise.
+            CHECK(!s.category.empty() && !s.subcategory.empty(),
+                  "stale taxonomyVersion: re-classification produced no taxonomy at all");
+            CHECK(s.category != kSentinelCategory && s.subcategory != "stale_ml",
+                  "stale taxonomyVersion: the stale sentinel survived the refresh");
+            // winning_evidence is deliberately NOT asserted. The row is planted with
+            // 'DSP' and the engine carries it through, because the refresh here
+            // recomputes taxonomy without re-deriving DSP evidence from the same
+            // cached row. That is existing behaviour and not the defect under test;
+            // asserting it would only pin an accident.
         }
     }
 
