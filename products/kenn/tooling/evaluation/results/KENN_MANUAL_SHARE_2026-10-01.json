@@ -1,0 +1,41 @@
+{
+ "schema": "kenn.manual_share.v1",
+ "generated_at": "2026-10-01T17:25:13.730066+00:00",
+ "index_version": "v-db8c6334cf63",
+ "chunks_total": 4642,
+ "chunks_by_class": {
+  "curated_kenn_note": 3176,
+  "official_ableton_manual": 1436,
+  "youtube_transcript": 28,
+  "reference_document": 2
+ },
+ "sets": [
+  {
+   "name": "device purpose",
+   "questions": 125,
+   "manual_top1": 1,
+   "manual_top1_rate": 0.008,
+   "manual_in_top4": 13,
+   "manual_in_top4_rate": 0.104,
+   "mean_manual_per_query": 0.184
+  },
+  {
+   "name": "technique",
+   "questions": 50,
+   "manual_top1": 0,
+   "manual_top1_rate": 0.0,
+   "manual_in_top4": 1,
+   "manual_in_top4_rate": 0.02,
+   "mean_manual_per_query": 0.02
+  },
+  {
+   "name": "sealed holdout",
+   "questions": 150,
+   "manual_top1": 24,
+   "manual_top1_rate": 0.16,
+   "manual_in_top4": 61,
+   "manual_in_top4_rate": 0.407,
+   "mean_manual_per_query": 0.813
+  }
+ ]
+}

@@ -570,6 +570,29 @@
 > bugs that only a fresh-clone run exposed, after the split of `main` coming back without the copy. Both are the kind
 > that never surface from the checkout you are sitting at.
 >
+> **1 Oct, measured so the decision has numbers to weigh** (`tooling/scripts/measure_manual_share.py`, receipt
+> `KENN_MANUAL_SHARE_2026-10-01.json`). The manual is **1,436 of 4,642 chunks, 31% of the index**, but its share of
+> actual retrieval is nothing like that:
+>
+> | set | asked | manual at top-1 | manual in top-4 | mean per query |
+> |---|---|---|---|---|
+> | device purpose | 125 | 1 (1%) | 13 (10%) | 0.18 |
+> | technique | 50 | 0 (0%) | 1 (2%) | 0.02 |
+> | **sealed holdout** | 150 | **24 (16%)** | **61 (41%)** | **0.81** |
+>
+> So the picture is not "31% of the index for almost nothing". On the two sets the rules were tuned against the
+> manual is very nearly dead weight. On the **sealed holdout — the unseen-wording set, which is the number the North
+> Star treats as the honest one — it wins top-1 on 16% of questions and appears in 41%**, and those 24 top-1 wins are
+> very likely a large part of why sealed recall is 0.3333 at all. Dropping it to tidy the Live 11/Live 12 mismatch would
+> therefore cost real recall on exactly the set that matters most, and the export-Live-12-and-rebuild route stays the
+> right one.
+>
+> **The keep/drop A/B itself is not measured, and why is worth recording:** it cannot be done by filtering the chunk
+> list. `search()` passes `bm25_search` an index cached against the full corpus, so a filtered pool raises
+> `IndexError: list index out of range` at `retrieval/retrieval.py:781` — the doc indices belong to the 4,642-chunk
+> index, not the 3,206 handed in. A real comparison means rebuilding the index without the manual, which replaces the
+> live index and is the owner's call anyway.
+>
 > **1 Oct, the second follow-up is done and the first still stands.** `kenn-answer-audit` is merged and
 > `check_skip_budget.py` is on `main`, so the step is no longer waiting on anything — it is now the third step of
 > `kenn-weekly.yml`. It failed on the first run, which is what the deferral predicted: **124 skips, 123 accounted
