@@ -475,7 +475,7 @@
 > to `~/`, which is how a person writes a path anyway, so the gate below needed no debt list — unlike SLO's, which
 > ships a 124-file / 34,722-occurrence ratchet precisely because that debt was never scrubbed.
 > **The GPU host was still committed, which the plan's own wording ("or the GPU host") had not been matched
-> against:** `ubuntu@www.haoee.com` appeared in 6 tracked box scripts and 1 evidence doc, against AGENTS.md's "never
+> against:** the box login appeared in 6 tracked box scripts and 1 evidence doc, against AGENTS.md's "never
 > commit remote hostnames". `run_tests_on_box.py`, `sync_gpu_notes.sh`, `sync_gpu1_notes.sh`,
 > `notes_server_preflight.sh`, `deploy-and-run-notes.sh` and `run_kenn_command_pilot_remote.sh` now read
 > `KENN_SERVER_TARGET` / `KENN_SERVER_PORT` and fail loudly when unset, so **they will not run until that is
