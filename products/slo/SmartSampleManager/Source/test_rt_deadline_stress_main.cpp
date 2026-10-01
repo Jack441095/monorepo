@@ -75,6 +75,81 @@ void operator delete[](void* p) noexcept
     std::free(p);
 }
 
+// This binary is the only target that links PluginProcessor.cpp (it needs the
+// real processBlock), so the processor's state round-trip is asserted here too.
+// The naming style is the part that matters: it selects the filename format the
+// sort uses, and style 0 is not a style -- it falls through every branch of
+// getFormattedFilename to "return originalName" while still relocating files,
+// so an unvalidated project chunk would drive a filesystem move with no naming
+// scheme at all.
+static int checkProcessorStateRoundTrip()
+{
+    int failures = 0;
+    SmartSampleManagerAudioProcessor processor;
+
+    int restoredStyle = 0;
+    juce::String restoredSearch;
+
+    auto roundTrip = [&processor, &restoredStyle, &restoredSearch](int namingStyleId,
+                                                                 const juce::String& searchText)
+    {
+        juce::MemoryBlock blob;
+        processor.setEditorNamingStyleId(namingStyleId);
+        processor.setEditorSearchText(searchText);
+        processor.getStateInformation(blob);
+        SmartSampleManagerAudioProcessor restored;
+        restored.setStateInformation(blob.getData(), (int) blob.getSize());
+        restoredStyle = restored.getEditorNamingStyleId();
+        restoredSearch = restored.getEditorSearchText();
+    };
+
+    for (const int badStyle : { 0, -1, 99 })
+    {
+        roundTrip(badStyle, "kick");
+        if (restoredStyle < 1 || restoredStyle > 9)
+        {
+            std::cerr << "FAIL: namingStyleId " << badStyle << " restored as " << restoredStyle
+                      << ", outside the 1-9 range the sort understands" << std::endl;
+            ++failures;
+        }
+    }
+
+    {   // A valid style must survive untouched, or the clamp is over-eager.
+        roundTrip(4, "kick");
+        if (restoredStyle != 4)
+        {
+            std::cerr << "FAIL: valid namingStyleId 4 restored as " << restoredStyle << std::endl;
+            ++failures;
+        }
+        if (restoredSearch != "kick")
+        {
+            std::cerr << "FAIL: search text did not survive the round trip" << std::endl;
+            ++failures;
+        }
+    }
+
+    {   // A paste larger than the cap must not ride along in the project chunk.
+        juce::String huge;
+        for (int i = 0; i < 4096; ++i) huge += 'x';
+        roundTrip(9, huge);
+        if (restoredSearch.length() > 512)
+        {
+            std::cerr << "FAIL: a 4096-character paste round-tripped as " << restoredSearch.length()
+                      << " characters; the project chunk is uncapped" << std::endl;
+            ++failures;
+        }
+    }
+
+    if (failures == 0)
+        std::cout << "SUCCESS: processor state round-trip clamps namingStyleId and caps search text."
+                  << std::endl;
+    else
+        std::cerr << "FAILED: processor state round-trip -- " << failures << " check(s) failed."
+                  << std::endl;
+
+    return failures;
+}
+
 int main()
 {
     // Must happen before any SampleManagerEngine is constructed --
@@ -88,6 +163,11 @@ int main()
     SampleManagerEngine::setCacheDbDirectoryOverrideForTesting(customCacheDir);
 
     juce::MessageManager::getInstance();
+
+    // After the cache override, not before: constructing the processor builds a
+    // SampleManagerEngine internally, and the override is what stops that from
+    // tripping the fail-closed production-cache guard.
+    int stateFailures = checkProcessorStateRoundTrip();
 
     constexpr double sampleRate = 44100.0;
     constexpr int blockSize = 512;
@@ -215,5 +295,5 @@ int main()
               << "ms ceiling. Deadline misses (" << deadlineMisses << "/" << numIterations
               << ") are reported above but not gated on; see the comment before this check."
               << std::endl;
-    return 0;
+    return stateFailures;
 }

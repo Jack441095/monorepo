@@ -357,8 +357,15 @@ void SmartSampleManagerAudioProcessor::setStateInformation(const void* data, int
     if (schemaVersion <= 0 || schemaVersion > kStateSchemaVersion)
         return; // Unknown/future schema -- ignore rather than misinterpret.
 
-    editorSearchText = state.getProperty("searchText", juce::String()).toString();
-    editorNamingStyleId = static_cast<int>(state.getProperty("namingStyleId", 9));
+    // Bounded on read as well as on the way in: this string is written on every
+    // keystroke, so an unbounded copy would let one paste inflate the DAW's
+    // project chunk on every save from then on.
+    editorSearchText = state.getProperty("searchText", juce::String()).toString().substring(0, 512);
+    // A corrupt or hand-edited chunk yields 0, and 0 falls through every branch of
+    // getFormattedFilename to "return originalName" while still relocating files into
+    // category folders -- so an unvalidated project chunk would drive a filesystem move
+    // with no naming scheme. Clamp to the styles that exist.
+    editorNamingStyleId = juce::jlimit(1, 9, static_cast<int>(state.getProperty("namingStyleId", 9)));
 }
 
 // This handles plugin instantiation

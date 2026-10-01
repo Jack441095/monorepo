@@ -24,6 +24,13 @@ public:
     
     void loadFile(const juce::File& file)
     {
+        // The 60 Hz editor timer calls this whenever any displayed field changes,
+        // and a scan churns embeddingStatus and tagConfidence continuously, so
+        // without this guard the same selection is re-decoded from disk several
+        // times a second. detectTransients is a full synchronous read.
+        if (file == currentFile)
+            return;
+
         currentFile = file;
         thumbnail.setSource(new juce::FileInputSource(file));
         transients.clear();
