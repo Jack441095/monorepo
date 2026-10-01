@@ -92,7 +92,14 @@ struct Analysis
     float inharmonicityB = 0.0f;    // Stiff string parameter B in fn = n*f0*sqrt(1 + B*n^2)
     float pitchSlopeSemitonesPerSec = 0.0f; // df0/dt
     float oddEvenHarmonicRatio = 1.0f;      // Ratio of odd to even partial energy
-    float harmonicToNoiseRatio = 0.0f;     // Ratio of modal energy to background noise
+    // NOT a ratio, despite the name: analyze() fills this with the summed
+    // magnitudes of the detected spectral peaks, each already normalised by the
+    // largest peak, and saturates at 1.0. So it reads as a saturating peak-mass
+    // proxy, and it only looks like a ratio because it is scaled 0..1. Renaming it
+    // would ripple through every consumer; the honest options are to divide by a
+    // real noise-floor estimate or to rename it to peakMassNormalised, and neither
+    // is a change to make without measuring the corpus.
+    float harmonicToNoiseRatio = 0.0f;
     float qualityFactorQ = 0.0f;           // Resonator Q factor (pi * f0 * tau)
     float contactDurationMs = 0.0f;        // Hertzian mallet contact duration (tau_c)
 
@@ -185,6 +192,11 @@ inline float estimateInharmonicityB(const std::vector<SpectralPeak>& peaks)
     return count > 0 ? static_cast<float>(bSum / count) : 0.0f;
 }
 
+// Stands in for an odd/even ratio that is mathematically infinite. 10 is arbitrary
+// except that it sits above the 2.2 bore threshold, so "no even harmonics" reads as
+// a closed pipe. Nothing downstream treats it as a quantity.
+inline constexpr float kNoEvenHarmonicsSentinel = 10.0f;
+
 inline float computeOddEvenRatio(const std::vector<SpectralPeak>& peaks)
 {
     if (peaks.size() < 2) return 1.0f;
@@ -203,7 +215,14 @@ inline float computeOddEvenRatio(const std::vector<SpectralPeak>& peaks)
             else evenMag += p.magnitude;
         }
     }
-    return (evenMag > 1.0e-9f) ? (oddMag / evenMag) : (oddMag > 0.0f ? 10.0f : 1.0f);
+    // With no even-harmonic energy at all there is no ratio to report -- odd/zero is
+    // infinite, not 10. Spell that out rather than returning a magic number that
+    // happens to clear the 2.2 bore threshold below, so a reader can see the
+    // decision is "undefined, and it leans closed" rather than a measurement.
+    if (evenMag <= 1.0e-9f)
+        return oddMag > 0.0f ? kNoEvenHarmonicsSentinel : 1.0f;
+
+    return oddMag / evenMag;
 }
 
 inline std::vector<SpectralPeak> extractSpectralPeaksFromBuffer(const float* data, int numSamples, double sampleRate, int maxPeaks = 12)
