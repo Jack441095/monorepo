@@ -120,7 +120,11 @@ Every entry below has a test that failed before the fix and passes after, except
 | **P1-27** the OOD gate, the production decision boundary, was unasserted | fixed | mutation-verified: the new gate assertion fails when inverted | `8f631270` |
 | **P1-11** a host reporting `isPlaying` with no PPQ stranded the audition forever | fixed | full suite green; `isDawPlaying` now cleared when no position is reported | `364e6bb1` |
 | **P1-26** `clamp01(NaN) == 1.0f`, so a broken measurement scored as a perfect match | fixed | `TestAudioSimilarity` — mutation-verified in both directions | `63366af2` |
-| P1-10 (R8), P1-15, P1-21, P1-22 (R8), P1-23, P1-24, P1-32, Phase 3 large deletions (R8), Phase 4 | **open** | — | — |
+| **P1-21** the XMP `.xmp.bak` kept one generation, then held SLO's own output | fixed | `TestXmpWriter` — asserts a backup exists whose content differs from what SLO just wrote | `52da0b94` |
+| **P1-23** `MlOverrideGate::Decision` cannot carry `isOod` | documented, not changed | the parity test pins the behaviour as intended; the omission now says so | `5bbe4934` |
+| **P1-24** `harmonicToNoiseRatio` is not a ratio; the 10.0 sentinel is magic | fixed | `TestPhysicalAcoustics` green; sentinel named, comment corrected | `a67d1b43` |
+| **P1-32** two tests derived expectations from the code under test | fixed | full suite green; both expectations now exact and independent | `061bb97b` |
+| P1-10 (R8), P1-15, P1-22 (R8), Phase 3 large deletions (R8), Phase 4 | **open** | — | — |
 
 ---
 
@@ -300,7 +304,12 @@ Deleted: 32 lines. Kept despite being unreachable: 764 lines, all gated on sign-
 - **`customTargetDir`** — a defaulted parameter on a public method that no caller supplies.
   Removing it changes a public signature, which is a larger call than this brief makes
   silently.
-- **P1-11, P1-15, P1-18…P1-27, P1-32** — open, listed in §7.2.
+- **P1-15** (`samplesVersion` defeats the editor FIFO fast path) — the only remaining
+  non-R8 finding. It needs the FIFO protocol understood well enough to know which
+  increments the append path cannot express, and getting that wrong silently starves
+  the editor's 60 Hz refresh. Left rather than guessed at.
+- **P1-22** and every other threshold — R8.
+- **P1-10** (audio-thread ownership of `transportSource`) — R8, and Phase 4 item 2.
 
 ## 7.8 Repository interference
 
