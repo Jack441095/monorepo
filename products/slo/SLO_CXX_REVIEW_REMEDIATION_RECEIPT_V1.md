@@ -363,6 +363,25 @@ Deleted: 32 lines. Kept despite being unreachable: 764 lines, all gated on sign-
 - **P1-22** and every other threshold — R8.
 - **P1-10** (audio-thread ownership of `transportSource`) — R8, and Phase 4 item 2.
 
+## 7.7a Reproducibility check
+
+The whole thing was rebuilt from nothing into a second, empty build tree to confirm none
+of the green results depend on incremental state:
+
+```
+rm -rf /tmp/slo-verify
+cmake --preset ssm-dev -B /tmp/slo-verify -DSSM_USE_CCACHE=ON   # configure rc=0
+cmake --build /tmp/slo-verify -j8                                # 164.8 s, 0 errors
+ctest                                                          # 56/56 in 112.7 s
+```
+
+RT stress on that fresh tree: **0/2000 deadline misses, worst callback 0.891 ms**, against
+the 1396.82 ms the same binary measured before P0-3. 38 of 2000 callbacks still carry
+allocations (max 2 in one) — that is P1-10, which is in Phase 4 because moving the
+transport off the audio thread is an R8 item.
+
+Totals: **42 commits, 39 files, +2,331 / −225 lines.**
+
 ## 7.8 Repository interference
 
 This monorepo is shared with another session working KENN, and it moved the branch
