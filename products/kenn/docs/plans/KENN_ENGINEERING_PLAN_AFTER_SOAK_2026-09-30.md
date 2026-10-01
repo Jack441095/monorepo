@@ -587,8 +587,10 @@
 > patch and every file they carry is already on `main` here. Clones that fetched `origin/main` before the rewrite keep
 > their old SHAs until they re-fetch, which is the one real cost and the reason this stays the owner's call.
 >
-> My own commits reach `main` only up to `2b4831a5`; the last six (`6ddbe471`, `615299d9`, `d6947fc8`, `65a8af74`,
-> `9da372b8`, `f68fa32b`) are on this branch and would arrive with that fast-forward, not before.
+> My own work reaches `main` only up to `2b4831a5`; everything after that is on this branch and arrives with the
+> fast-forward, not before. I have deliberately not listed the commit hashes here, because each correction to this note
+> is itself a commit on the branch and would make the list stale again. `git log 2b4831a5..HEAD --oneline` is the
+> authority, and the count that matters for the decision is the 46 above.
 >
 > **1 Oct, the copy itself is verified end to end, so only the branch move is outstanding.** Splitting this branch
 > rather than `main` carries **both** `.github/workflows/kenn-ci.yml` and `kenn-weekly.yml`, and running the sync's own
