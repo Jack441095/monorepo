@@ -76,6 +76,23 @@ int main(int argc, char* argv[]) {
     juce::String licenseKey(argv[1]);
 
     juce::MessageManager::getInstance();
+
+    // Point the licence file at a scratch directory for the whole run. The
+    // tamper case below rewrites license.json and deactivate() then deletes it,
+    // and without this the file it destroys is the user's real one in
+    // ~/Library/Application Support/SmartSampleManager. The real path is
+    // recorded and asserted untouched at the end.
+    const auto realLicenseDir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
+                                    .getChildFile("SmartSampleManager");
+    const auto realLicenseFile = realLicenseDir.getChildFile("license.json");
+    const bool realLicenseExisted = realLicenseFile.existsAsFile();
+    const auto realLicenseSize = realLicenseExisted ? realLicenseFile.getSize() : -1;
+
+    auto scratchDir = juce::File::getSpecialLocation(juce::File::tempDirectory)
+                          .getChildFile("SloLicenseTest_" + juce::Uuid().toString());
+    scratchDir.createDirectory();
+    LicenseManager::setAppDataDirOverrideForTesting(scratchDir);
+
     LicenseManager mgr;
 
     std::cout << "Device ID: " << mgr.getDeviceId() << std::endl;
@@ -122,9 +139,8 @@ int main(int argc, char* argv[]) {
     std::cout << "SUCCESS: revalidate() round-tripped a fresh signed token." << std::endl;
 
     std::cout << "\n--- tamper test: corrupt the persisted signature, confirm it's rejected ---" << std::endl;
-    auto licenseFile = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
-                            .getChildFile("SmartSampleManager")
-                            .getChildFile("license.json");
+    // The scratch copy LicenseManager actually wrote, not the user's real one.
+    auto licenseFile = scratchDir.getChildFile("license.json");
     auto original = licenseFile.loadFileAsString();
     // Mutate via parse, not string search-and-replace -- JUCE's JSON writer
     // formats with a space after ':' ("signature": "...") which a naive
@@ -161,6 +177,22 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     std::cout << "SUCCESS: deactivate() cleared local state." << std::endl;
+
+    // The whole point of the scratch directory: this run must not have touched
+    // the user's real licence. Assert it rather than assuming it.
+    if (realLicenseExisted != realLicenseFile.existsAsFile()
+        || (realLicenseExisted && realLicenseSize != realLicenseFile.getSize()))
+    {
+        std::cerr << "FAIL: this test run modified the real licence at "
+                  << realLicenseFile.getFullPathName() << std::endl;
+        LicenseManager::setAppDataDirOverrideForTesting(juce::File());
+        scratchDir.deleteRecursively();
+        juce::MessageManager::deleteInstance();
+        return 1;
+    }
+
+    LicenseManager::setAppDataDirOverrideForTesting(juce::File());
+    scratchDir.deleteRecursively();
 
     std::cout << "\nALL LICENSING TESTS PASSED SUCCESSFULLY!" << std::endl;
     juce::MessageManager::deleteInstance();

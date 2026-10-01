@@ -46,7 +46,20 @@ juce::int64 nowUnixSeconds() {
     return static_cast<juce::int64>(juce::Time::getCurrentTime().toMilliseconds() / 1000);
 }
 
+// Tests point this at a scratch directory. Without an override the tamper test
+// in test_licensing_main.cpp rewrites -- and then deactivates, which deletes --
+// the real ~/Library/Application Support/SmartSampleManager/license.json, so
+// running that binary with a real key installed destroys the user's licence.
+// Same shape as SampleManagerEngine::setCacheDbDirectoryOverrideForTesting.
+juce::File& appDataDirOverride() {
+    static juce::File override;
+    return override;
+}
+
 juce::File appDataDir() {
+    if (appDataDirOverride() != juce::File())
+        return appDataDirOverride();
+
     auto dir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
                    .getChildFile("SmartSampleManager");
     dir.createDirectory();
@@ -54,6 +67,10 @@ juce::File appDataDir() {
 }
 
 } // namespace
+
+void LicenseManager::setAppDataDirOverrideForTesting(const juce::File& dir) {
+    appDataDirOverride() = dir;
+}
 
 LicenseManager::LicenseManager() {
     // sodium_init() is safe to call more than once (subsequent calls are a

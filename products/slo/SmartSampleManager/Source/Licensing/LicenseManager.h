@@ -27,6 +27,12 @@ public:
     LicenseManager();
     ~LicenseManager();
 
+    // Test-only: redirect the licence file away from the user's real
+    // application-data directory. Pass an empty File to restore. Without this,
+    // test_licensing_main.cpp's tamper case rewrites and then deletes the real
+    // license.json.
+    static void setAppDataDirOverrideForTesting(const juce::File& dir);
+
     // Loads and signature-verifies any license persisted from a previous
     // activate()/revalidate() call. Pure local check, no network I/O.
     Licensing::LicenseState loadPersisted() const;
