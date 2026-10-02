@@ -310,6 +310,13 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   Include admission/queue, context/retrieval, prefill, generation, verification,
   polling and displayed-result timing. Declare model-cold/warm conditions and record
   combined memory pressure, swap and audio dropouts at a fixed Live buffer/session.
+  - [x] Captured five existing public knowledge questions through the real stream
+    runner on M3/16 GB at `b1d97ad`: two generated answers accepted, two stopped
+    for unsupported measurements and one provider timeout with template fallback.
+    All-row median completion is 15.603 s; provider streaming takes 98.6–99.4%
+    of each row. Caches, cold start, model/index/embedding hashes and isolated
+    FakeLive runtime are declared; native phase telemetry and full C1 remain open.
+    [Evidence and numeric receipt](docs/evidence/KENN_QWEN_SMALL_CURRENT_PATH_2026-10-02.md).
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already

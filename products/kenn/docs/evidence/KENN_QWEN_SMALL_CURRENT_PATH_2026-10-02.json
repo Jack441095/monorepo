@@ -1,0 +1,1836 @@
+{
+  "capture_report_sha256": "c0cae169a3e3caf18a2feeffa636f27d7d0546410f8b103472c0097b3bbee673",
+  "capture_summary": {
+    "accepted_median": 18.7195,
+    "all_median": 15.603,
+    "attempted_median": 15.603,
+    "ttft_median": 6.775
+  },
+  "controls": {
+    "fake_live_backend": true,
+    "llm_response_cache_disabled": true,
+    "model_downloads_allowed": false,
+    "semantic_cache_cleared_before_every_question_by_real_runner": true,
+    "skip_embeddings_enabled": false,
+    "timeout_override_by_harness": false
+  },
+  "counts": {
+    "asked": 5,
+    "errors": 0,
+    "llm_accepted": 2,
+    "llm_attempted": 5,
+    "llm_rejected": 3
+  },
+  "embedding_identity_end": {
+    "backend": "onnxruntime",
+    "dimensions": 384,
+    "id": "Xenova/all-MiniLM-L6-v2",
+    "max_tokens": 256,
+    "model_sha256": "759c3cd2b7fe7e93933ad23c4c9181b7396442a2ed746ec7c1d46192c469c46e",
+    "tokenizer_sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0"
+  },
+  "embedding_identity_start": {
+    "backend": "onnxruntime",
+    "dimensions": 384,
+    "id": "Xenova/all-MiniLM-L6-v2",
+    "max_tokens": 256,
+    "model_sha256": "759c3cd2b7fe7e93933ad23c4c9181b7396442a2ed746ec7c1d46192c469c46e",
+    "tokenizer_sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0"
+  },
+  "end_fingerprint": {
+    "code_revision": "b1d97ad105832105ff43701cd95d66388bdcbbbb",
+    "index_artifacts": {
+      "chunks.jsonl": {
+        "sha256": "3a92778dbfa93645e53677659a5cad3eea7f1b285aed2da3e8b9c80743a7fd51",
+        "size_bytes": 5545880
+      },
+      "embeddings.npy": {
+        "sha256": "4a21a1476c16a957b316879ccd975c4e4fa034a0a362af4c3ab009c05f9170ec",
+        "size_bytes": 7130240
+      },
+      "terms.json": {
+        "sha256": "27441df63bb50e2cbb449ed260d6236c17f5d95a99627f99c9f172fb1753354b",
+        "size_bytes": 3780120
+      }
+    },
+    "index_manifest_sha256": "4f561f8da75725fd685b0b207becca83dc5f34ab3ebb8d5e00b91691d2630565",
+    "index_version": "v-db8c6334cf63",
+    "model_tags": [
+      {
+        "digest": "90a5eaf166fdda7e95441577e6ae96ebacf3248772a4366d1199b7b6ac0b0405",
+        "name": "kenn-brain-qwen3-8b:latest",
+        "size": 5027783603
+      },
+      {
+        "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+        "name": "qwen3:4b",
+        "size": 2497293931
+      }
+    ],
+    "ollama_version": "0.34.4",
+    "resident_selected_models": [
+      {
+        "context_length": 4096,
+        "digest": "90a5eaf166fdda7e95441577e6ae96ebacf3248772a4366d1199b7b6ac0b0405",
+        "name": "kenn-brain-qwen3-8b:latest",
+        "size": 5722288946,
+        "size_vram": 5722288946
+      }
+    ]
+  },
+  "frozen_provenance": {
+    "cases_sha256": "8f219e2215bdd9376483237105931307a48dd3631dd55fe270eef6414d449a5f",
+    "code_revision": "b1d97ad105832105ff43701cd95d66388bdcbbbb",
+    "embedding_model": {
+      "backend": "onnxruntime",
+      "dimensions": 384,
+      "id": "Xenova/all-MiniLM-L6-v2",
+      "max_tokens": 256,
+      "model_sha256": "759c3cd2b7fe7e93933ad23c4c9181b7396442a2ed746ec7c1d46192c469c46e",
+      "tokenizer_sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0"
+    },
+    "hardware": {
+      "chip": "Apple M3",
+      "memory_bytes": 17179869184
+    },
+    "index_artifacts": {
+      "chunks.jsonl": {
+        "sha256": "3a92778dbfa93645e53677659a5cad3eea7f1b285aed2da3e8b9c80743a7fd51",
+        "size_bytes": 5545880
+      },
+      "embeddings.npy": {
+        "sha256": "4a21a1476c16a957b316879ccd975c4e4fa034a0a362af4c3ab009c05f9170ec",
+        "size_bytes": 7130240
+      },
+      "terms.json": {
+        "sha256": "27441df63bb50e2cbb449ed260d6236c17f5d95a99627f99c9f172fb1753354b",
+        "size_bytes": 3780120
+      }
+    },
+    "index_chunks": 4642,
+    "index_dimensions": 384,
+    "index_manifest_sha256": "4f561f8da75725fd685b0b207becca83dc5f34ab3ebb8d5e00b91691d2630565",
+    "index_version": "v-db8c6334cf63",
+    "live_process_running": false,
+    "model_tags": [
+      {
+        "details": {
+          "context_length": 40960,
+          "embedding_length": 4096,
+          "families": [
+            "qwen3"
+          ],
+          "family": "qwen3",
+          "format": "gguf",
+          "parameter_size": "8.2B",
+          "parent_model": "Qwen3-8B-Q4_K_M.gguf",
+          "quantization_level": "Q4_K_M"
+        },
+        "digest": "90a5eaf166fdda7e95441577e6ae96ebacf3248772a4366d1199b7b6ac0b0405",
+        "name": "kenn-brain-qwen3-8b:latest",
+        "size": 5027783603
+      },
+      {
+        "details": {
+          "context_length": 262144,
+          "embedding_length": 2560,
+          "families": [
+            "qwen3"
+          ],
+          "family": "qwen3",
+          "format": "gguf",
+          "parameter_size": "4.0B",
+          "parent_model": "",
+          "quantization_level": "Q4_K_M"
+        },
+        "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+        "name": "qwen3:4b",
+        "size": 2497293931
+      }
+    ],
+    "ollama_version": "0.34.4",
+    "resident_selected_models": []
+  },
+  "generated_at": "2026-10-02T15:47:44.622715+00:00",
+  "generation_enablement": "Harness explicitly enabled global LLM generation and rewrite; inherited provider/model configuration was disabled and empty. Effective model_configuration is the declared experiment configuration, not a claim about a running product service.",
+  "harness_sha256": "09b609a6a6203228017e1465aec531a7cb44a3fdccdddd3901416de9abc96762",
+  "instrumented_owners": [
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.orchestrator.KennOrchestrator.dispatch",
+      "stage": "orchestration"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer.route_query"
+      ],
+      "generator": false,
+      "owner": "kenn.core.chat_routing.route_query",
+      "stage": "routing"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer.load_chunks"
+      ],
+      "generator": false,
+      "owner": "kenn.core.chat_retrieval.load_chunks",
+      "stage": "retrieval"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer.load_terms"
+      ],
+      "generator": false,
+      "owner": "kenn.core.chat_retrieval.load_terms",
+      "stage": "retrieval"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer.search"
+      ],
+      "generator": false,
+      "owner": "kenn.core.chat_retrieval.search",
+      "stage": "retrieval"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.retrieval.retrieval.load_embedding_index",
+      "stage": "retrieval_index_load"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.retrieval.retrieval._get_embedding_model",
+      "stage": "embedding_model_load_or_lookup"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.retrieval.retrieval.embed_text",
+      "stage": "query_embedding"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.retrieval.onnx_embedder.OnnxEmbedder.encode",
+      "stage": "embedding_encode"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.retrieval.retrieval.hybrid_search",
+      "stage": "hybrid_retrieval"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.retrieval.retrieval.bm25_search",
+      "stage": "lexical_retrieval"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.retrieval.retrieval.rerank_results",
+      "stage": "retrieval_rerank"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.llm.llm_rewrite._build_synthesis_messages",
+      "stage": "prompt_assembly"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer.llm_enhance_answer_stream"
+      ],
+      "generator": true,
+      "owner": "kenn.llm.llm_rewrite.enhance_stream",
+      "stage": "answer_generation_pipeline"
+    },
+    {
+      "aliases": [],
+      "generator": true,
+      "owner": "kenn.llm.llm_rewrite.chat_completion_stream",
+      "stage": "provider_stream"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.llm.llm_rewrite._chat_completion",
+      "stage": "provider_nonstream"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.core.chat_grounding.StreamedAnswerGuard.check",
+      "stage": "stream_prefix_validation"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer.generated_answer_validation"
+      ],
+      "generator": false,
+      "owner": "kenn.core.chat_grounding.generated_answer_validation",
+      "stage": "generated_answer_validation"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer.grounding_report"
+      ],
+      "generator": false,
+      "owner": "kenn.core.chat_grounding.grounding_report",
+      "stage": "grounding_validation"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer.answer_quality_report"
+      ],
+      "generator": false,
+      "owner": "kenn.core.chat_grounding.answer_quality_report",
+      "stage": "answer_quality_validation"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.core.chat_answer._critique_and_save_trace",
+      "stage": "critique_and_reasoning_pipeline"
+    },
+    {
+      "aliases": [
+        "kenn.knowledge.post_answer_critique"
+      ],
+      "generator": false,
+      "owner": "kenn.knowledge.reflection.post_answer_critique",
+      "stage": "post_answer_critique"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.llm.llm_rewrite.critique_answer",
+      "stage": "optional_model_critique"
+    },
+    {
+      "aliases": [
+        "kenn.knowledge.query_reasoning_traces"
+      ],
+      "generator": false,
+      "owner": "kenn.knowledge.reasoning.query_reasoning_traces",
+      "stage": "reasoning_lookup"
+    },
+    {
+      "aliases": [
+        "kenn.knowledge.save_reasoning_trace"
+      ],
+      "generator": false,
+      "owner": "kenn.knowledge.reasoning.save_reasoning_trace",
+      "stage": "reasoning_persistence"
+    },
+    {
+      "aliases": [
+        "kenn.knowledge.record_citations"
+      ],
+      "generator": false,
+      "owner": "kenn.knowledge.trust_scores.record_citations",
+      "stage": "trust_persistence"
+    },
+    {
+      "aliases": [
+        "kenn.core.chat_answer._update_session"
+      ],
+      "generator": false,
+      "owner": "kenn.core.session_memory.update_session",
+      "stage": "session_persistence"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.core.session_memory.save_session",
+      "stage": "session_persistence"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.core.session_memory.save_session_to_db",
+      "stage": "session_database_write"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.core.session_memory.save_to_semantic_cache",
+      "stage": "semantic_cache_persistence"
+    },
+    {
+      "aliases": [],
+      "generator": false,
+      "owner": "kenn.core.route_log.record",
+      "stage": "route_log_persistence"
+    }
+  ],
+  "memory_end": {
+    "memory_pressure_level": 2,
+    "physical_memory_bytes": 17179869184,
+    "process_max_rss_bytes": 313081856,
+    "swap_free_bytes": 1110903357,
+    "swap_total_bytes": 2147483648,
+    "swap_used_bytes": 1036580291,
+    "system_memory_free_percent": 25.0
+  },
+  "memory_start": {
+    "memory_pressure_level": 1,
+    "physical_memory_bytes": 17179869184,
+    "process_max_rss_bytes": 55492608,
+    "swap_free_bytes": 1102514749,
+    "swap_total_bytes": 2147483648,
+    "swap_used_bytes": 1044968899,
+    "system_memory_free_percent": 67.0
+  },
+  "model_configuration": {
+    "chat": {
+      "enabled": true,
+      "model": "kenn-brain-qwen3-8b",
+      "provider": "ollama",
+      "timeout": 20
+    },
+    "command": {
+      "enabled": true,
+      "model": "qwen3:4b",
+      "provider": "ollama",
+      "timeout": 20
+    },
+    "followups": {
+      "enabled": true,
+      "model": "kenn-brain-qwen3-8b",
+      "provider": "ollama",
+      "timeout": 20
+    },
+    "paraphrase": {
+      "enabled": true,
+      "model": "kenn-brain-qwen3-8b",
+      "provider": "ollama",
+      "timeout": 20
+    },
+    "rewrite": {
+      "enabled": true,
+      "model": "kenn-brain-qwen3-8b",
+      "provider": "ollama",
+      "timeout": 20
+    },
+    "route": {
+      "enabled": true,
+      "model": "kenn-brain-qwen3-8b",
+      "provider": "ollama",
+      "timeout": 20
+    }
+  },
+  "preserved_generation_settings": {
+    "context_chars": 1200,
+    "critique_llm_enabled": false,
+    "default_max_tokens": 384,
+    "max_tokens_by_mode": {
+      "ableton_steps": 384,
+      "client_delivery": 384,
+      "command": 256,
+      "deep_explanation": 384,
+      "dialogue_cleanup": 384,
+      "game_audio_implementation": 384,
+      "mastering_safety": 384,
+      "mix_diagnosis": 384,
+      "mix_review_followup": 384,
+      "quick_fix": 256,
+      "studio_dialogue": 384,
+      "voice": 220
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_keep_alive_interval_seconds": 240,
+    "stream_deadline_seconds": 60
+  },
+  "provenance_unchanged": true,
+  "qualification": "Five public questions on stream only, one process/run. Not the 30-question C1 baseline, UI/HTTP/network latency, planner qualification, independent human answer review, Live coexistence or a speedup comparison.",
+  "question_corpus_sha256": "caf9ad86ba0fc6dba3ae191f82d1729c0e85d5ba05e2591e8fa2887056bbc01f",
+  "requested_limit": 5,
+  "rows": [
+    {
+      "accepted": true,
+      "attempted": true,
+      "cache_dropped": true,
+      "category": "uncategorized",
+      "embedding_load_failed": false,
+      "embedding_model_loaded": true,
+      "error_type": null,
+      "fabricated_source_count": 0,
+      "fake_live_write_count": 0,
+      "found": true,
+      "id": "bass-processing",
+      "llm_enhanced": true,
+      "memory_after": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 28.0
+      },
+      "memory_before": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 55574528,
+        "swap_free_bytes": 1102514749,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1044968899,
+        "system_memory_free_percent": 67.0
+      },
+      "owner_summary": [
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000291,
+          "inclusive_active_seconds": 0.004507,
+          "owner": "kenn.core.chat_answer._critique_and_save_trace"
+        },
+        {
+          "calls": 232,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.006482,
+          "inclusive_active_seconds": 0.006482,
+          "owner": "kenn.core.chat_grounding.StreamedAnswerGuard.check"
+        },
+        {
+          "calls": 2,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000378,
+          "inclusive_active_seconds": 0.000378,
+          "owner": "kenn.core.chat_grounding.answer_quality_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000488,
+          "inclusive_active_seconds": 0.000835,
+          "owner": "kenn.core.chat_grounding.generated_answer_validation"
+        },
+        {
+          "calls": 2,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000506,
+          "inclusive_active_seconds": 0.000506,
+          "owner": "kenn.core.chat_grounding.grounding_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.088387,
+          "inclusive_active_seconds": 0.088387,
+          "owner": "kenn.core.chat_retrieval.load_chunks"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 8.9e-05,
+          "inclusive_active_seconds": 8.9e-05,
+          "owner": "kenn.core.chat_retrieval.load_terms"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 7.4e-05,
+          "inclusive_active_seconds": 0.01133,
+          "owner": "kenn.core.chat_retrieval.search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000207,
+          "inclusive_active_seconds": 0.000207,
+          "owner": "kenn.core.chat_routing.route_query"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 2.3e-05,
+          "inclusive_active_seconds": 0.000387,
+          "owner": "kenn.core.session_memory.save_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000365,
+          "inclusive_active_seconds": 0.000365,
+          "owner": "kenn.core.session_memory.save_session_to_db"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.00134,
+          "inclusive_active_seconds": 0.003667,
+          "owner": "kenn.core.session_memory.save_to_semantic_cache"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001443,
+          "inclusive_active_seconds": 0.00183,
+          "owner": "kenn.core.session_memory.update_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.00165,
+          "inclusive_active_seconds": 0.00165,
+          "owner": "kenn.knowledge.reasoning.query_reasoning_traces"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000597,
+          "inclusive_active_seconds": 0.000597,
+          "owner": "kenn.knowledge.reasoning.save_reasoning_trace"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001268,
+          "inclusive_active_seconds": 0.001268,
+          "owner": "kenn.knowledge.reflection.post_answer_critique"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000701,
+          "inclusive_active_seconds": 0.000701,
+          "owner": "kenn.knowledge.trust_scores.record_citations"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000506,
+          "inclusive_active_seconds": 0.000506,
+          "owner": "kenn.llm.llm_rewrite._build_synthesis_messages"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 21.536767,
+          "inclusive_active_seconds": 21.536767,
+          "owner": "kenn.llm.llm_rewrite.chat_completion_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002093,
+          "inclusive_active_seconds": 21.539366,
+          "owner": "kenn.llm.llm_rewrite.enhance_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001521,
+          "inclusive_active_seconds": 0.001521,
+          "owner": "kenn.orchestrator.KennOrchestrator.dispatch"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.007568,
+          "inclusive_active_seconds": 0.007568,
+          "owner": "kenn.retrieval.onnx_embedder.OnnxEmbedder.encode"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.078666,
+          "inclusive_active_seconds": 0.078666,
+          "owner": "kenn.retrieval.retrieval._get_embedding_model"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002568,
+          "inclusive_active_seconds": 0.002568,
+          "owner": "kenn.retrieval.retrieval.bm25_search"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 2.6e-05,
+          "inclusive_active_seconds": 0.08626,
+          "owner": "kenn.retrieval.retrieval.embed_text"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002761,
+          "inclusive_active_seconds": 0.010007,
+          "owner": "kenn.retrieval.retrieval.hybrid_search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001249,
+          "inclusive_active_seconds": 0.001249,
+          "owner": "kenn.retrieval.retrieval.load_embedding_index"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.003083,
+          "inclusive_active_seconds": 0.003083,
+          "owner": "kenn.retrieval.retrieval.rerank_results"
+        }
+      ],
+      "provider_active_share_of_runner_wall_time": 0.986296,
+      "provider_usage": [
+        {
+          "completion_tokens": 232,
+          "latency_ms": 21528,
+          "model": "kenn-brain-qwen3-8b",
+          "prompt_tokens": 1144,
+          "provider": "ollama",
+          "task": "rewrite",
+          "total_tokens": 1376
+        }
+      ],
+      "question_number": 1,
+      "rejection_observation": "accepted_by_current_gate",
+      "seconds": 21.836,
+      "sources": 3,
+      "stage_exclusive_seconds": {
+        "answer_generation_pipeline": 0.002093,
+        "answer_quality_validation": 0.000378,
+        "critique_and_reasoning_pipeline": 0.000291,
+        "embedding_encode": 0.007569,
+        "embedding_model_load_or_lookup": 0.078666,
+        "generated_answer_validation": 0.000488,
+        "grounding_validation": 0.000507,
+        "hybrid_retrieval": 0.002761,
+        "lexical_retrieval": 0.002568,
+        "orchestration": 0.001521,
+        "post_answer_critique": 0.001268,
+        "prompt_assembly": 0.000506,
+        "provider_stream": 21.536767,
+        "query_embedding": 2.5e-05,
+        "reasoning_lookup": 0.00165,
+        "reasoning_persistence": 0.000597,
+        "retrieval": 0.088551,
+        "retrieval_index_load": 0.001249,
+        "retrieval_rerank": 0.003083,
+        "routing": 0.000207,
+        "semantic_cache_persistence": 0.00134,
+        "session_database_write": 0.000365,
+        "session_persistence": 0.001466,
+        "stream_prefix_validation": 0.006489,
+        "trust_persistence": 0.000701
+      },
+      "stream_events": 232,
+      "surface": "stream",
+      "ttft_seconds": 8.123,
+      "unsupported_measurement_count": 0,
+      "warning_count": 0
+    },
+    {
+      "accepted": true,
+      "attempted": true,
+      "cache_dropped": true,
+      "category": "production",
+      "embedding_load_failed": false,
+      "embedding_model_loaded": true,
+      "error_type": null,
+      "fabricated_source_count": 0,
+      "fake_live_write_count": 0,
+      "found": true,
+      "id": "sidechain-release-time",
+      "llm_enhanced": true,
+      "memory_after": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 28.0
+      },
+      "memory_before": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 28.0
+      },
+      "owner_summary": [
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000263,
+          "inclusive_active_seconds": 0.006396,
+          "owner": "kenn.core.chat_answer._critique_and_save_trace"
+        },
+        {
+          "calls": 160,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.004432,
+          "inclusive_active_seconds": 0.004432,
+          "owner": "kenn.core.chat_grounding.StreamedAnswerGuard.check"
+        },
+        {
+          "calls": 2,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000363,
+          "inclusive_active_seconds": 0.000363,
+          "owner": "kenn.core.chat_grounding.answer_quality_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001061,
+          "inclusive_active_seconds": 0.001785,
+          "owner": "kenn.core.chat_grounding.generated_answer_validation"
+        },
+        {
+          "calls": 2,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000734,
+          "inclusive_active_seconds": 0.000734,
+          "owner": "kenn.core.chat_grounding.grounding_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 6.7e-05,
+          "inclusive_active_seconds": 6.7e-05,
+          "owner": "kenn.core.chat_retrieval.load_chunks"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 4.2e-05,
+          "inclusive_active_seconds": 4.2e-05,
+          "owner": "kenn.core.chat_retrieval.load_terms"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 7.4e-05,
+          "inclusive_active_seconds": 0.038425,
+          "owner": "kenn.core.chat_retrieval.search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 7.3e-05,
+          "inclusive_active_seconds": 7.3e-05,
+          "owner": "kenn.core.chat_routing.route_query"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 8.2e-05,
+          "inclusive_active_seconds": 0.001129,
+          "owner": "kenn.core.session_memory.save_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001047,
+          "inclusive_active_seconds": 0.001047,
+          "owner": "kenn.core.session_memory.save_session_to_db"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002101,
+          "inclusive_active_seconds": 0.007674,
+          "owner": "kenn.core.session_memory.save_to_semantic_cache"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002255,
+          "inclusive_active_seconds": 0.003384,
+          "owner": "kenn.core.session_memory.update_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.00237,
+          "inclusive_active_seconds": 0.00237,
+          "owner": "kenn.knowledge.reasoning.query_reasoning_traces"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001882,
+          "inclusive_active_seconds": 0.001882,
+          "owner": "kenn.knowledge.reasoning.save_reasoning_trace"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000217,
+          "inclusive_active_seconds": 0.000217,
+          "owner": "kenn.knowledge.reflection.post_answer_critique"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001663,
+          "inclusive_active_seconds": 0.001663,
+          "owner": "kenn.knowledge.trust_scores.record_citations"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000146,
+          "inclusive_active_seconds": 0.000146,
+          "owner": "kenn.llm.llm_rewrite._build_synthesis_messages"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 15.515758,
+          "inclusive_active_seconds": 15.515758,
+          "owner": "kenn.llm.llm_rewrite.chat_completion_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001417,
+          "inclusive_active_seconds": 15.51732,
+          "owner": "kenn.llm.llm_rewrite.enhance_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 1.5e-05,
+          "inclusive_active_seconds": 1.5e-05,
+          "owner": "kenn.orchestrator.KennOrchestrator.dispatch"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.011414,
+          "inclusive_active_seconds": 0.011414,
+          "owner": "kenn.retrieval.onnx_embedder.OnnxEmbedder.encode"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 7e-06,
+          "inclusive_active_seconds": 7e-06,
+          "owner": "kenn.retrieval.retrieval._get_embedding_model"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.028577,
+          "inclusive_active_seconds": 0.028577,
+          "owner": "kenn.retrieval.retrieval.bm25_search"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 4.1e-05,
+          "inclusive_active_seconds": 0.011462,
+          "owner": "kenn.retrieval.retrieval.embed_text"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.004745,
+          "inclusive_active_seconds": 0.038296,
+          "owner": "kenn.retrieval.retrieval.hybrid_search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 5.5e-05,
+          "inclusive_active_seconds": 5.5e-05,
+          "owner": "kenn.retrieval.retrieval.load_embedding_index"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.00217,
+          "inclusive_active_seconds": 0.00217,
+          "owner": "kenn.retrieval.retrieval.rerank_results"
+        }
+      ],
+      "provider_active_share_of_runner_wall_time": 0.994409,
+      "provider_usage": [
+        {
+          "completion_tokens": 160,
+          "latency_ms": 15524,
+          "model": "kenn-brain-qwen3-8b",
+          "prompt_tokens": 1087,
+          "provider": "ollama",
+          "task": "rewrite",
+          "total_tokens": 1247
+        }
+      ],
+      "question_number": 2,
+      "rejection_observation": "accepted_by_current_gate",
+      "seconds": 15.603,
+      "sources": 3,
+      "stage_exclusive_seconds": {
+        "answer_generation_pipeline": 0.001417,
+        "answer_quality_validation": 0.000363,
+        "critique_and_reasoning_pipeline": 0.000263,
+        "embedding_encode": 0.011415,
+        "embedding_model_load_or_lookup": 7e-06,
+        "generated_answer_validation": 0.001061,
+        "grounding_validation": 0.000734,
+        "hybrid_retrieval": 0.004745,
+        "lexical_retrieval": 0.028577,
+        "orchestration": 1.5e-05,
+        "post_answer_critique": 0.000217,
+        "prompt_assembly": 0.000146,
+        "provider_stream": 15.515758,
+        "query_embedding": 4e-05,
+        "reasoning_lookup": 0.00237,
+        "reasoning_persistence": 0.001882,
+        "retrieval": 0.000183,
+        "retrieval_index_load": 5.5e-05,
+        "retrieval_rerank": 0.00217,
+        "routing": 7.3e-05,
+        "semantic_cache_persistence": 0.002101,
+        "session_database_write": 0.001047,
+        "session_persistence": 0.002337,
+        "stream_prefix_validation": 0.004428,
+        "trust_persistence": 0.001663
+      },
+      "stream_events": 160,
+      "surface": "stream",
+      "ttft_seconds": 6.758,
+      "unsupported_measurement_count": 0,
+      "warning_count": 0
+    },
+    {
+      "accepted": false,
+      "attempted": true,
+      "cache_dropped": true,
+      "category": "uncategorized",
+      "embedding_load_failed": false,
+      "embedding_model_loaded": true,
+      "error_type": null,
+      "fabricated_source_count": 0,
+      "fake_live_write_count": 0,
+      "found": true,
+      "id": "reverb-send",
+      "llm_enhanced": false,
+      "memory_after": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 25.0
+      },
+      "memory_before": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 28.0
+      },
+      "owner_summary": [
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000534,
+          "inclusive_active_seconds": 0.004035,
+          "owner": "kenn.core.chat_answer._critique_and_save_trace"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000267,
+          "inclusive_active_seconds": 0.000267,
+          "owner": "kenn.core.chat_grounding.answer_quality_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000314,
+          "inclusive_active_seconds": 0.000314,
+          "owner": "kenn.core.chat_grounding.grounding_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 5.9e-05,
+          "inclusive_active_seconds": 5.9e-05,
+          "owner": "kenn.core.chat_retrieval.load_chunks"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 3.9e-05,
+          "inclusive_active_seconds": 3.9e-05,
+          "owner": "kenn.core.chat_retrieval.load_terms"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 6.1e-05,
+          "inclusive_active_seconds": 0.024349,
+          "owner": "kenn.core.chat_retrieval.search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000159,
+          "inclusive_active_seconds": 0.000159,
+          "owner": "kenn.core.chat_routing.route_query"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 4.4e-05,
+          "inclusive_active_seconds": 0.000635,
+          "owner": "kenn.core.session_memory.save_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000591,
+          "inclusive_active_seconds": 0.000591,
+          "owner": "kenn.core.session_memory.save_session_to_db"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.00167,
+          "inclusive_active_seconds": 0.002305,
+          "owner": "kenn.core.session_memory.update_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001342,
+          "inclusive_active_seconds": 0.001342,
+          "owner": "kenn.knowledge.reasoning.query_reasoning_traces"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000954,
+          "inclusive_active_seconds": 0.000954,
+          "owner": "kenn.knowledge.reasoning.save_reasoning_trace"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000304,
+          "inclusive_active_seconds": 0.000304,
+          "owner": "kenn.knowledge.reflection.post_answer_critique"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000902,
+          "inclusive_active_seconds": 0.000902,
+          "owner": "kenn.knowledge.trust_scores.record_citations"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000592,
+          "inclusive_active_seconds": 0.000592,
+          "owner": "kenn.llm.llm_rewrite._build_synthesis_messages"
+        },
+        {
+          "calls": 1,
+          "exception_types": [
+            "TimeoutError"
+          ],
+          "exclusive_active_seconds": 20.002117,
+          "inclusive_active_seconds": 20.002117,
+          "owner": "kenn.llm.llm_rewrite.chat_completion_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [
+            "TimeoutError"
+          ],
+          "exclusive_active_seconds": 8.4e-05,
+          "inclusive_active_seconds": 20.002793,
+          "owner": "kenn.llm.llm_rewrite.enhance_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.054471,
+          "inclusive_active_seconds": 0.054471,
+          "owner": "kenn.orchestrator.KennOrchestrator.dispatch"
+        },
+        {
+          "calls": 2,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.004229,
+          "inclusive_active_seconds": 0.004229,
+          "owner": "kenn.retrieval.onnx_embedder.OnnxEmbedder.encode"
+        },
+        {
+          "calls": 2,
+          "exception_types": [],
+          "exclusive_active_seconds": 4e-06,
+          "inclusive_active_seconds": 4e-06,
+          "owner": "kenn.retrieval.retrieval._get_embedding_model"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.017553,
+          "inclusive_active_seconds": 0.017553,
+          "owner": "kenn.retrieval.retrieval.bm25_search"
+        },
+        {
+          "calls": 2,
+          "exception_types": [],
+          "exclusive_active_seconds": 1.8e-05,
+          "inclusive_active_seconds": 0.004253,
+          "owner": "kenn.retrieval.retrieval.embed_text"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.003085,
+          "inclusive_active_seconds": 0.024243,
+          "owner": "kenn.retrieval.retrieval.hybrid_search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 4.5e-05,
+          "inclusive_active_seconds": 4.5e-05,
+          "owner": "kenn.retrieval.retrieval.load_embedding_index"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.00185,
+          "inclusive_active_seconds": 0.00185,
+          "owner": "kenn.retrieval.retrieval.rerank_results"
+        }
+      ],
+      "provider_active_share_of_runner_wall_time": 0.994586,
+      "provider_usage": [],
+      "question_number": 3,
+      "rejection_observation": "provider_timeout_handled_by_template_fallback",
+      "seconds": 20.111,
+      "sources": 3,
+      "stage_exclusive_seconds": {
+        "answer_generation_pipeline": 8.4e-05,
+        "answer_quality_validation": 0.000267,
+        "critique_and_reasoning_pipeline": 0.000534,
+        "embedding_encode": 0.004229,
+        "embedding_model_load_or_lookup": 4e-06,
+        "grounding_validation": 0.000314,
+        "hybrid_retrieval": 0.003085,
+        "lexical_retrieval": 0.017553,
+        "orchestration": 0.054471,
+        "post_answer_critique": 0.000304,
+        "prompt_assembly": 0.000592,
+        "provider_stream": 20.002117,
+        "query_embedding": 1.8e-05,
+        "reasoning_lookup": 0.001342,
+        "reasoning_persistence": 0.000954,
+        "retrieval": 0.000158,
+        "retrieval_index_load": 4.5e-05,
+        "retrieval_rerank": 0.00185,
+        "routing": 0.000159,
+        "session_database_write": 0.000591,
+        "session_persistence": 0.001714,
+        "trust_persistence": 0.000902
+      },
+      "stream_events": 1,
+      "surface": "stream",
+      "ttft_seconds": 20.104,
+      "unsupported_measurement_count": 0,
+      "warning_count": 1
+    },
+    {
+      "accepted": false,
+      "attempted": true,
+      "cache_dropped": true,
+      "category": "uncategorized",
+      "embedding_load_failed": false,
+      "embedding_model_loaded": true,
+      "error_type": null,
+      "fabricated_source_count": 0,
+      "fake_live_write_count": 0,
+      "found": true,
+      "id": "gain-staging",
+      "llm_enhanced": false,
+      "memory_after": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 27.0
+      },
+      "memory_before": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 25.0
+      },
+      "owner_summary": [
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000397,
+          "inclusive_active_seconds": 0.005183,
+          "owner": "kenn.core.chat_answer._critique_and_save_trace"
+        },
+        {
+          "calls": 58,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002027,
+          "inclusive_active_seconds": 0.002027,
+          "owner": "kenn.core.chat_grounding.StreamedAnswerGuard.check"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000424,
+          "inclusive_active_seconds": 0.000424,
+          "owner": "kenn.core.chat_grounding.answer_quality_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000734,
+          "inclusive_active_seconds": 0.000734,
+          "owner": "kenn.core.chat_grounding.grounding_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000118,
+          "inclusive_active_seconds": 0.000118,
+          "owner": "kenn.core.chat_retrieval.load_chunks"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 7.8e-05,
+          "inclusive_active_seconds": 7.8e-05,
+          "owner": "kenn.core.chat_retrieval.load_terms"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000183,
+          "inclusive_active_seconds": 0.044047,
+          "owner": "kenn.core.chat_retrieval.search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 9.2e-05,
+          "inclusive_active_seconds": 9.2e-05,
+          "owner": "kenn.core.chat_routing.route_query"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 4.6e-05,
+          "inclusive_active_seconds": 0.000768,
+          "owner": "kenn.core.session_memory.save_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000722,
+          "inclusive_active_seconds": 0.000722,
+          "owner": "kenn.core.session_memory.save_session_to_db"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002266,
+          "inclusive_active_seconds": 0.019936,
+          "owner": "kenn.core.session_memory.save_to_semantic_cache"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.005044,
+          "inclusive_active_seconds": 0.005811,
+          "owner": "kenn.core.session_memory.update_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002254,
+          "inclusive_active_seconds": 0.002254,
+          "owner": "kenn.knowledge.reasoning.query_reasoning_traces"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001236,
+          "inclusive_active_seconds": 0.001236,
+          "owner": "kenn.knowledge.reasoning.save_reasoning_trace"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000308,
+          "inclusive_active_seconds": 0.000308,
+          "owner": "kenn.knowledge.reflection.post_answer_critique"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000988,
+          "inclusive_active_seconds": 0.000988,
+          "owner": "kenn.knowledge.trust_scores.record_citations"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000284,
+          "inclusive_active_seconds": 0.000284,
+          "owner": "kenn.llm.llm_rewrite._build_synthesis_messages"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 10.015322,
+          "inclusive_active_seconds": 10.015322,
+          "owner": "kenn.llm.llm_rewrite.chat_completion_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000697,
+          "inclusive_active_seconds": 10.016303,
+          "owner": "kenn.llm.llm_rewrite.enhance_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000236,
+          "inclusive_active_seconds": 0.000236,
+          "owner": "kenn.orchestrator.KennOrchestrator.dispatch"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.024975,
+          "inclusive_active_seconds": 0.024975,
+          "owner": "kenn.retrieval.onnx_embedder.OnnxEmbedder.encode"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 1.1e-05,
+          "inclusive_active_seconds": 1.1e-05,
+          "owner": "kenn.retrieval.retrieval._get_embedding_model"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.027474,
+          "inclusive_active_seconds": 0.027474,
+          "owner": "kenn.retrieval.retrieval.bm25_search"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 6.3e-05,
+          "inclusive_active_seconds": 0.025049,
+          "owner": "kenn.retrieval.retrieval.embed_text"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.007552,
+          "inclusive_active_seconds": 0.043782,
+          "owner": "kenn.retrieval.retrieval.hybrid_search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 8.2e-05,
+          "inclusive_active_seconds": 8.2e-05,
+          "owner": "kenn.retrieval.retrieval.load_embedding_index"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.005703,
+          "inclusive_active_seconds": 0.005703,
+          "owner": "kenn.retrieval.retrieval.rerank_results"
+        }
+      ],
+      "provider_active_share_of_runner_wall_time": 0.989363,
+      "provider_usage": [],
+      "question_number": 4,
+      "rejection_observation": "unsupported_measurement_prefix_guard",
+      "seconds": 10.123,
+      "sources": 3,
+      "stage_exclusive_seconds": {
+        "answer_generation_pipeline": 0.000697,
+        "answer_quality_validation": 0.000424,
+        "critique_and_reasoning_pipeline": 0.000397,
+        "embedding_encode": 0.024975,
+        "embedding_model_load_or_lookup": 1.1e-05,
+        "grounding_validation": 0.000734,
+        "hybrid_retrieval": 0.007552,
+        "lexical_retrieval": 0.027474,
+        "orchestration": 0.000236,
+        "post_answer_critique": 0.000308,
+        "prompt_assembly": 0.000284,
+        "provider_stream": 10.015322,
+        "query_embedding": 6.3e-05,
+        "reasoning_lookup": 0.002254,
+        "reasoning_persistence": 0.001236,
+        "retrieval": 0.000379,
+        "retrieval_index_load": 8.2e-05,
+        "retrieval_rerank": 0.005703,
+        "routing": 9.2e-05,
+        "semantic_cache_persistence": 0.002266,
+        "session_database_write": 0.000722,
+        "session_persistence": 0.005089,
+        "stream_prefix_validation": 0.002029,
+        "trust_persistence": 0.000988
+      },
+      "stream_events": 56,
+      "surface": "stream",
+      "ttft_seconds": 6.775,
+      "unsupported_measurement_count": 1,
+      "warning_count": 1
+    },
+    {
+      "accepted": false,
+      "attempted": true,
+      "cache_dropped": true,
+      "category": "uncategorized",
+      "embedding_load_failed": false,
+      "embedding_model_loaded": true,
+      "error_type": null,
+      "fabricated_source_count": 0,
+      "fake_live_write_count": 0,
+      "found": true,
+      "id": "streaming-loudness",
+      "llm_enhanced": false,
+      "memory_after": {
+        "memory_pressure_level": 2,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 25.0
+      },
+      "memory_before": {
+        "memory_pressure_level": 1,
+        "physical_memory_bytes": 17179869184,
+        "process_max_rss_bytes": 313081856,
+        "swap_free_bytes": 1110903357,
+        "swap_total_bytes": 2147483648,
+        "swap_used_bytes": 1036580291,
+        "system_memory_free_percent": 27.0
+      },
+      "owner_summary": [
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000476,
+          "inclusive_active_seconds": 0.00464,
+          "owner": "kenn.core.chat_answer._critique_and_save_trace"
+        },
+        {
+          "calls": 90,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.003415,
+          "inclusive_active_seconds": 0.003415,
+          "owner": "kenn.core.chat_grounding.StreamedAnswerGuard.check"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000216,
+          "inclusive_active_seconds": 0.000216,
+          "owner": "kenn.core.chat_grounding.answer_quality_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000238,
+          "inclusive_active_seconds": 0.000238,
+          "owner": "kenn.core.chat_grounding.grounding_report"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000147,
+          "inclusive_active_seconds": 0.000147,
+          "owner": "kenn.core.chat_retrieval.load_chunks"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000105,
+          "inclusive_active_seconds": 0.000105,
+          "owner": "kenn.core.chat_retrieval.load_terms"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000143,
+          "inclusive_active_seconds": 0.034794,
+          "owner": "kenn.core.chat_retrieval.search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000152,
+          "inclusive_active_seconds": 0.000152,
+          "owner": "kenn.core.chat_routing.route_query"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 5.3e-05,
+          "inclusive_active_seconds": 0.000963,
+          "owner": "kenn.core.session_memory.save_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.00091,
+          "inclusive_active_seconds": 0.00091,
+          "owner": "kenn.core.session_memory.save_session_to_db"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.003618,
+          "inclusive_active_seconds": 0.015113,
+          "owner": "kenn.core.session_memory.save_to_semantic_cache"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.002969,
+          "inclusive_active_seconds": 0.003932,
+          "owner": "kenn.core.session_memory.update_session"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001693,
+          "inclusive_active_seconds": 0.001693,
+          "owner": "kenn.knowledge.reasoning.query_reasoning_traces"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001165,
+          "inclusive_active_seconds": 0.001165,
+          "owner": "kenn.knowledge.reasoning.save_reasoning_trace"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000259,
+          "inclusive_active_seconds": 0.000259,
+          "owner": "kenn.knowledge.reflection.post_answer_critique"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001046,
+          "inclusive_active_seconds": 0.001046,
+          "owner": "kenn.knowledge.trust_scores.record_citations"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000195,
+          "inclusive_active_seconds": 0.000195,
+          "owner": "kenn.llm.llm_rewrite._build_synthesis_messages"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 10.604738,
+          "inclusive_active_seconds": 10.604738,
+          "owner": "kenn.llm.llm_rewrite.chat_completion_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.001114,
+          "inclusive_active_seconds": 10.606048,
+          "owner": "kenn.llm.llm_rewrite.enhance_stream"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 5.1e-05,
+          "inclusive_active_seconds": 5.1e-05,
+          "owner": "kenn.orchestrator.KennOrchestrator.dispatch"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.020517,
+          "inclusive_active_seconds": 0.020517,
+          "owner": "kenn.retrieval.onnx_embedder.OnnxEmbedder.encode"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 1.4e-05,
+          "inclusive_active_seconds": 1.4e-05,
+          "owner": "kenn.retrieval.retrieval._get_embedding_model"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.01808,
+          "inclusive_active_seconds": 0.01808,
+          "owner": "kenn.retrieval.retrieval.bm25_search"
+        },
+        {
+          "calls": 3,
+          "exception_types": [],
+          "exclusive_active_seconds": 8.8e-05,
+          "inclusive_active_seconds": 0.020621,
+          "owner": "kenn.retrieval.retrieval.embed_text"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.008216,
+          "inclusive_active_seconds": 0.034522,
+          "owner": "kenn.retrieval.retrieval.hybrid_search"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.000128,
+          "inclusive_active_seconds": 0.000128,
+          "owner": "kenn.retrieval.retrieval.load_embedding_index"
+        },
+        {
+          "calls": 1,
+          "exception_types": [],
+          "exclusive_active_seconds": 0.004428,
+          "inclusive_active_seconds": 0.004428,
+          "owner": "kenn.retrieval.retrieval.rerank_results"
+        }
+      ],
+      "provider_active_share_of_runner_wall_time": 0.991653,
+      "provider_usage": [],
+      "question_number": 5,
+      "rejection_observation": "unsupported_measurement_prefix_guard",
+      "seconds": 10.694,
+      "sources": 3,
+      "stage_exclusive_seconds": {
+        "answer_generation_pipeline": 0.001114,
+        "answer_quality_validation": 0.000216,
+        "critique_and_reasoning_pipeline": 0.000476,
+        "embedding_encode": 0.020517,
+        "embedding_model_load_or_lookup": 1.4e-05,
+        "grounding_validation": 0.000238,
+        "hybrid_retrieval": 0.008216,
+        "lexical_retrieval": 0.01808,
+        "orchestration": 5.1e-05,
+        "post_answer_critique": 0.000259,
+        "prompt_assembly": 0.000195,
+        "provider_stream": 10.604738,
+        "query_embedding": 8.9e-05,
+        "reasoning_lookup": 0.001693,
+        "reasoning_persistence": 0.001165,
+        "retrieval": 0.000396,
+        "retrieval_index_load": 0.000128,
+        "retrieval_rerank": 0.004428,
+        "routing": 0.000152,
+        "semantic_cache_persistence": 0.003618,
+        "session_database_write": 0.00091,
+        "session_persistence": 0.003022,
+        "stream_prefix_validation": 0.003414,
+        "trust_persistence": 0.001046
+      },
+      "stream_events": 88,
+      "surface": "stream",
+      "ttft_seconds": 5.32,
+      "unsupported_measurement_count": 1,
+      "warning_count": 1
+    }
+  ],
+  "schema": "kenn.small_current_path_receipt.v1",
+  "source_runner_sha256": "39aa92974727d02120f52e827f30a60088791ab2b234d2d84f9fcaaa9e9644b1",
+  "standard_question_corpus_sha256": "8f219e2215bdd9376483237105931307a48dd3631dd55fe270eef6414d449a5f",
+  "start_condition": {
+    "benchmark_process_new": true,
+    "embedding_process_cold": true,
+    "models_unloaded_by_harness": false,
+    "selected_models_resident": []
+  },
+  "start_fingerprint": {
+    "code_revision": "b1d97ad105832105ff43701cd95d66388bdcbbbb",
+    "index_artifacts": {
+      "chunks.jsonl": {
+        "sha256": "3a92778dbfa93645e53677659a5cad3eea7f1b285aed2da3e8b9c80743a7fd51",
+        "size_bytes": 5545880
+      },
+      "embeddings.npy": {
+        "sha256": "4a21a1476c16a957b316879ccd975c4e4fa034a0a362af4c3ab009c05f9170ec",
+        "size_bytes": 7130240
+      },
+      "terms.json": {
+        "sha256": "27441df63bb50e2cbb449ed260d6236c17f5d95a99627f99c9f172fb1753354b",
+        "size_bytes": 3780120
+      }
+    },
+    "index_manifest_sha256": "4f561f8da75725fd685b0b207becca83dc5f34ab3ebb8d5e00b91691d2630565",
+    "index_version": "v-db8c6334cf63",
+    "model_tags": [
+      {
+        "digest": "90a5eaf166fdda7e95441577e6ae96ebacf3248772a4366d1199b7b6ac0b0405",
+        "name": "kenn-brain-qwen3-8b:latest",
+        "size": 5027783603
+      },
+      {
+        "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+        "name": "qwen3:4b",
+        "size": 2497293931
+      }
+    ],
+    "ollama_version": "0.34.4",
+    "resident_selected_models": []
+  },
+  "status": "complete",
+  "surface": "stream",
+  "timing_semantics": {
+    "elapsed_span_seconds": "First entry to final resume/close. Generator spans can overlap downstream validation and token consumption; do not add to other stages.",
+    "exclusive_active_seconds": "Owner active time minus direct instrumented child active time; does not invent uninstrumented stage boundaries.",
+    "inclusive_active_seconds": "Actual owner execution, including instrumented child owners. For generators sum time inside next/send/throw/close; excludes time suspended in the consumer.",
+    "seconds": "Existing runner measurement: _ask wall time including answer stream delivery and final session/cache persistence; excludes pre-question semantic-cache clearing.",
+    "stage_totals": "Exclusive owner time summed by declared stage; inclusive values retained per owner and per call for nested inspection.",
+    "ttft_seconds": "Existing runner time to its first delivered token; that token can belong to a fallback template. It is not necessarily model prefill time.",
+    "unavailable": [
+      "Provider prefill/decode/load splits are not exposed by this production stream owner. No guessed split.",
+      "Kernel model work may continue concurrently while client validates a yielded token.",
+      "Existing Ollama keep-alive pinger remains enabled, runs in another thread, and is not attributed to a question."
+    ]
+  }
+}
