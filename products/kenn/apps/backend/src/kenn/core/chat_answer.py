@@ -204,6 +204,9 @@ def is_mix_help_request(query: str) -> bool:
     return bool(_MIX_HELP_RE.search(query.lower()))
 
 
+_ELLIPTICAL_TURN_RE = re.compile(r"\b(still|no (?:change|difference|luck)|didn'?t work|doesn'?t work)\b", re.I)
+
+
 def _is_diagnostic_result_report(query: str, session_id: str) -> bool:
     """Whether this turn explicitly reports the active plan's test result."""
     if not session_id:
@@ -595,7 +598,7 @@ def build_template_answer(
     # this session, but only after the normal query itself produced no plan.
     reported_findings = diagnostic_reported_findings(diagnostic_state, query)
     diagnosis_continuation = is_followup_query(query) or bool(reported_findings) or bool(
-        re.search(r"\b(still|no (?:change|difference|luck)|didn'?t work|doesn'?t work)\b", query, re.I)
+        _ELLIPTICAL_TURN_RE.search(query)
     )
     if not diagnostic_plan and (not timeline_context or history_evidence) and diagnosis_continuation:
         canonical = diagnostic_followup_query(diagnostic_state)
@@ -1958,7 +1961,10 @@ def _answer_payload_stream(
     # the active session_id so Project A's advice never leaks into Project B.
     # Plug-in context is not part of the cache key and may change between
     # requests, so a plug-in-bound answer always reads current evidence.
-    cache_allowed = allow_llm and not history and not plugin_session_id
+    cache_allowed = (
+        allow_llm and not history and not plugin_session_id
+        and not _answer_reads_session_state(query, session_id)
+    )
     if cache_allowed:
         try:
             from kenn.core.session_memory import get_semantic_cache_hit
@@ -2029,16 +2035,37 @@ def _answer_payload_stream(
                 )
 
 
+def _answer_reads_session_state(query: str, session_id: str) -> bool:
+    """Whether this question's answer can depend on more than its own text.
+
+    These are the same conditions the engine uses to pull in the session
+    summary, an active diagnostic plan or a saved mix review. None of that is
+    in the cache key, so "is that too loud?" would replay whatever it first
+    meant, and a newly saved review would never reach a cached answer.
+    """
+    if session_id and (
+        is_followup_query(query)
+        or _ELLIPTICAL_TURN_RE.search(query)
+        or _is_diagnostic_result_report(query, session_id)
+    ):
+        return True
+    return bool(mix_review_timeline_lookup(query) or latest_track_memory_lookup(query))
+
+
 def _may_store_in_semantic_cache(metadata: dict | None) -> bool:
     """Only plain knowledge answers are replayable from the cache.
 
     A proposal, its confirmation token or an orchestrator result describes the
     session as it was when the question was asked. Replaying one skips the
-    fresh Live read and hands back a token that has already been spent.
+    fresh Live read and hands back a token that has already been spent. An
+    audiogen payload carries a queued job, so a replay would claim a job that
+    was never queued for the second request.
     """
     if not metadata:
         return False
-    if any(metadata.get(key) for key in ("proposal", "requires_confirmation", "confirmation_token", "orchestration")):
+    if any(metadata.get(key) for key in (
+        "proposal", "requires_confirmation", "confirmation_token", "orchestration", "audiogen",
+    )):
         return False
     return bool(metadata.get("llm_enhanced") or metadata.get("confidence") == "high")
 
@@ -2763,7 +2790,10 @@ def _answer_payload(
     # Multi-turn conversations with history skip the cache to allow contextual
     # follow-ups. For single-turn questions, we scope semantic acceleration to
     # the active session_id so Project A's advice never leaks into Project B.
-    cache_allowed = allow_llm and record_session and not history and not plugin_session_id
+    cache_allowed = (
+        allow_llm and record_session and not history and not plugin_session_id
+        and not _answer_reads_session_state(query, session_id)
+    )
     if cache_allowed:
         try:
             from kenn.core.session_memory import get_semantic_cache_hit

@@ -3,6 +3,9 @@
 The non-stream path cached any high-confidence payload, so asking the same single-turn question twice replayed
 the first proposal and its already-spent confirmation token without a fresh Live read. It also ignored the
 plug-in session that the stream path already refuses to cache across.
+
+Answers that lean on the session summary, an active diagnostic plan or a saved mix review are state-bound too:
+none of that is in the cache key, so "is that too loud?" kept meaning whatever it meant the first time.
 """
 
 from __future__ import annotations
@@ -29,6 +32,8 @@ def isolated_cache(monkeypatch, tmp_path):
     for name in ("_L2_QUERIES", "_L2_SESSION_IDS", "_L2_VERSIONS", "_L2_EVENTS", "_L2_TIMESTAMPS"):
         monkeypatch.setattr(session_memory, name, [])
     monkeypatch.setattr(retrieval, "embed_text", lambda *args: None)
+    monkeypatch.setattr(chat_answer, "mix_review_timeline_lookup", lambda query: None)
+    monkeypatch.setattr(chat_answer, "latest_track_memory_lookup", lambda query: None)
 
 
 def _engine(monkeypatch, **extra):
@@ -55,6 +60,7 @@ def test_a_plain_knowledge_answer_is_still_served_from_the_cache(monkeypatch):
     {"confirmation_token": "tok-1"},
     {"requires_confirmation": True},
     {"orchestration": {"agent_name": "live_reader"}},
+    {"audiogen": {"job_id": "job-1", "status": "queued"}},
 ])
 def test_non_stream_state_bound_answers_are_not_cached(monkeypatch, extra):
     calls = _engine(monkeypatch, **extra)
@@ -88,3 +94,73 @@ def test_stream_orchestrator_answer_is_not_cached(monkeypatch):
     monkeypatch.setattr(chat_answer, "_answer_payload_stream_raw", engine)
     list(chat_answer.answer_payload_stream(QUESTION, session_id="song-a"))
     assert session_memory.get_semantic_cache_hit(QUESTION, session_id="song-a") is None
+
+
+FOLLOWUP = "is that too loud?"
+ELLIPTICAL = "the kick is still boomy"
+
+
+def test_the_fixtures_for_state_bound_questions_mean_what_they_say():
+    assert chat_answer.is_followup_query(FOLLOWUP)
+    assert not chat_answer.is_followup_query(ELLIPTICAL)
+    assert not chat_answer.is_followup_query(QUESTION)
+
+
+@pytest.mark.parametrize("query", [FOLLOWUP, ELLIPTICAL])
+def test_a_followup_in_a_session_is_not_replayed_from_the_cache(monkeypatch, query):
+    calls = _engine(monkeypatch)
+    chat_answer.answer_payload(query, session_id="song-a")
+    second = chat_answer.answer_payload(query, session_id="song-a")
+    assert len(calls) == 2 and "semantic_cache_hit" not in second
+
+
+def test_a_followup_with_no_session_has_no_state_to_depend_on(monkeypatch):
+    calls = _engine(monkeypatch)
+    chat_answer.answer_payload(FOLLOWUP)
+    second = chat_answer.answer_payload(FOLLOWUP)
+    assert len(calls) == 1 and second["semantic_cache_hit"] is True
+
+
+def test_an_answer_to_a_reported_diagnostic_result_is_not_cached(monkeypatch):
+    monkeypatch.setattr(chat_answer, "_is_diagnostic_result_report", lambda query, session_id: True)
+    calls = _engine(monkeypatch)
+    chat_answer.answer_payload(QUESTION, session_id="song-a")
+    chat_answer.answer_payload(QUESTION, session_id="song-a")
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize("name,result", [
+    ("mix_review_timeline_lookup", ("Demo", [{"created_at": "1"}])),
+    ("latest_track_memory_lookup", {"title": "Demo"}),
+])
+def test_a_question_that_reads_saved_mix_reviews_is_not_cached(monkeypatch, name, result):
+    monkeypatch.setattr(chat_answer, name, lambda query: result)
+    calls = _engine(monkeypatch)
+    chat_answer.answer_payload(QUESTION, session_id="song-a")
+    chat_answer.answer_payload(QUESTION, session_id="song-a")
+    assert len(calls) == 2
+
+
+def test_a_review_saved_after_the_first_answer_reaches_the_second(monkeypatch):
+    calls = _engine(monkeypatch)
+    chat_answer.answer_payload(QUESTION, session_id="song-a")
+    monkeypatch.setattr(chat_answer, "latest_track_memory_lookup", lambda query: {"title": "Demo"})
+    chat_answer.answer_payload(QUESTION, session_id="song-a")
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize("query,lookup", [(FOLLOWUP, None), (QUESTION, "latest_track_memory_lookup")])
+def test_the_stream_path_applies_the_same_state_gate(monkeypatch, query, lookup):
+    if lookup:
+        monkeypatch.setattr(chat_answer, lookup, lambda q: {"title": "Demo"})
+    runs = []
+
+    def engine(*args, **kwargs):
+        runs.append(1)
+        yield {"event": "metadata", "data": {"answer": "Fresh.", "confidence": "high"}}
+        yield {"event": "token", "token": "Fresh."}
+
+    monkeypatch.setattr(chat_answer, "_answer_payload_stream_raw", engine)
+    list(chat_answer.answer_payload_stream(query, session_id="song-a"))
+    list(chat_answer.answer_payload_stream(query, session_id="song-a"))
+    assert len(runs) == 2
