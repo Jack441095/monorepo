@@ -486,7 +486,7 @@ TOPIC_SYNONYMS: dict[str, tuple[str, ...]] = {
     "delivery": ("deliver", "delivery", "handoff", "send", "client", "final files", "preview"),
     "pricing": ("price", "pricing", "quote", "quoting", "rate", "rates", "charge", "cost", "budget", "scope", "package", "deposit"),
     "recording": ("record", "recording", "microphone", "input", "punch", "take"),
-    "game_audio": ("game audio", "wwise", "fmod", "unity audio", "unreal audio", "soundbank", "sound bank", "soundbanks", "interactive music", "stinger", "ambience loop", "game build", "combat audio", "footstep", "footsteps"),
+    "game_audio": ("game audio", "wwise", "fmod", "unity audio", "unreal audio", "soundbank", "sound bank", "soundbanks", "interactive music", "stinger", "ambience loop", "game build", "mobile build", "audio memory", "combat audio", "footstep", "footsteps"),
     # A bare "switch" is not enough to identify Wwise: Live's Rack Chain
     # Selector also switches chains/plugins. Wwise questions still classify
     # through explicit middleware vocabulary (Wwise, RTPC, game sync, Unreal,

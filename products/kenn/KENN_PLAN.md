@@ -343,6 +343,11 @@ mock, an agent reviewer or an unrelated receipt.
     coverage rows and five held-out rows fail identically before/after cleanup.
     Preserve expected behavior, citation guards and index provenance; trace the
     boundary/diagnosis/citation findings recorded in the cleanup evidence.
+    One row is fixed: `wwise-mobile-ambience-memory` was a routing gap (a mobile-build audio
+    memory question routed to `production` and was answered by the public wrapper, which refuses
+    game audio). Two coverage rows and five held-out rows remain; each cause is in
+    [the evidence](docs/evidence/KENN_MOBILE_AUDIO_MEMORY_ROUTE_2026-10-02.md). Full backend
+    run is 3,527 passed, 12 skipped.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.
