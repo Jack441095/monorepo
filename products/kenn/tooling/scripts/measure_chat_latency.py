@@ -174,22 +174,31 @@ def _install_capture(path: Path) -> None:
     chat_answer.generated_answer_validation = capture
 
 
-def _ask(chat_answer, question: str, *, allow_llm: bool, surface: str) -> tuple[dict, int]:
-    """Return the final metadata dict and how many token events the answer took to arrive."""
+def _ask(chat_answer, question: str, *, allow_llm: bool, surface: str) -> tuple[dict, int, float | None]:
+    """Return the final metadata dict, how many token events arrived, and seconds to the first one.
+
+    The third value is what Phase 2 exists to move. Before it, the consumer was handed every token only after
+    generation and validation had both finished, so time-to-first-token equalled the whole answer and no
+    complete-answer figure could say whether streaming had helped.
+    """
     if surface == "stream":
         final: dict = {}
         tokens = 0
+        started = time.perf_counter()
+        ttft: float | None = None
         for event in chat_answer.answer_payload_stream(
             question, session_id=f"latency-{uuid.uuid4().hex[:12]}", allow_llm=allow_llm
         ):
             if event.get("event") == "token":
                 tokens += 1
+                if ttft is None:
+                    ttft = time.perf_counter() - started
             elif event.get("event") == "metadata":
                 final = event.get("data") or {}
-        return final, tokens
+        return final, tokens, ttft
     return chat_answer.answer_payload(
         question, session_id=f"latency-{uuid.uuid4().hex[:12]}", allow_llm=allow_llm
-    ), 0
+    ), 0, None
 
 
 def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream") -> dict:
@@ -206,16 +215,17 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
         _drop_semantic_cache()
         started = time.perf_counter()
         try:
-            payload, tokens = _ask(chat_answer, question, allow_llm=allow_llm, surface=surface)
+            payload, tokens, ttft = _ask(chat_answer, question, allow_llm=allow_llm, surface=surface)
             error = None
         except Exception as exc:  # a failure is a measurement, not a crash
-            payload, error, tokens = {}, f"{type(exc).__name__}: {exc}", 0
+            payload, error, tokens, ttft = {}, f"{type(exc).__name__}: {exc}", 0, None
         seconds = time.perf_counter() - started
         validation = dict(payload.get("generation_validation") or {})
         rows.append({
             "id": str(case.get("id") or "unknown"),
             "category": str(case.get("category") or "uncategorized"),
             "seconds": round(seconds, 3),
+            "ttft_seconds": round(ttft, 3) if ttft is not None else None,
             "stream_events": tokens,
             "cache_dropped": True,
             "surface": surface,
@@ -255,6 +265,10 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "attempted_median": _median([r["seconds"] for r in attempted]),
             "accepted_median": _median([r["seconds"] for r in accepted]),
             "accepted_p95": _percentile([r["seconds"] for r in accepted], 0.95),
+            # Reported beside the completion figures because they answer different questions. A streaming change
+            # can leave the median answer untouched and still move when the producer first sees text.
+            "ttft_median": _median([r["ttft_seconds"] for r in rows if r.get("ttft_seconds") is not None]),
+            "ttft_p95": _percentile([r["ttft_seconds"] for r in rows if r.get("ttft_seconds") is not None], 0.95),
         },
         "top_rejection_reason": {"reason": top_reason, "answers": top_count},
         "rows": rows,
@@ -290,6 +304,10 @@ def render(report: dict) -> str:
         f"  errors             {counts['errors']}",
         f"  all answers        median {seconds['all_median']}s   p95 {seconds['all_p95']}s",
     ]
+    if seconds.get("ttft_median") is not None:
+        lines.append(
+            f"  first token        median {seconds['ttft_median']}s   p95 {seconds['ttft_p95']}s"
+        )
     if attempted:
         lines.append(f"  attempted only     median {seconds['attempted_median']}s")
     lines.append(
