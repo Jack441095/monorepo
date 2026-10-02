@@ -2470,16 +2470,69 @@ def _short_circuit_evaluator(query: str, history: list | None = None, session_id
 
     # Status check
     if cleaned in {"status", "ping", "are you connected", "model status", "connection status"}:
-        active_mb = 0
+        status_parts = []
         try:
-            from kenn.llm.mlx_inference_engine import MLXInferenceEngine
-            if MLXInferenceEngine._instance is not None and MLXInferenceEngine._instance._loaded:
-                stats = MLXInferenceEngine._instance.get_memory_stats()
-                active_mb = stats.get("active_mb", 0)
+            from kenn.llm import llm_rewrite
+
+            cfg = llm_rewrite.config()
+            provider_label = f"{cfg['provider']} / {cfg['model'] or 'no model configured'}"
+            if not cfg["enabled"]:
+                status_parts.append(f"LLM rewrite is disabled (configured provider: {provider_label}).")
+            elif not llm_rewrite.is_enabled():
+                status_parts.append(f"LLM rewrite cannot run: {cfg['provider']} has no API key configured.")
+            elif llm_rewrite.mlx_selected():
+                from kenn.llm.mlx_inference_engine import DEFAULT_MLX_MODEL, MLXInferenceEngine
+
+                status_parts.append(f"LLM backend configured: MLX / {DEFAULT_MLX_MODEL}.")
+                engine = MLXInferenceEngine._instance
+                if not MLXInferenceEngine.is_available():
+                    status_parts.append("MLX runtime is unavailable.")
+                elif engine is not None and engine._loaded and engine._model is not None:
+                    status_parts.append(f"MLX model loaded in this process: {engine.model_id}.")
+                    if engine.model_id != DEFAULT_MLX_MODEL:
+                        status_parts.append("Loaded MLX model differs from configured model.")
+                    status_parts.append("Inference health has not been checked.")
+                else:
+                    status_parts.append("No MLX model is loaded in this process.")
+                status_parts.append(
+                    f"Provider fallback configured: {provider_label}; health and model residency have not been checked."
+                )
+            else:
+                status_parts.append(
+                    f"LLM provider configured: {provider_label}. Provider health and model residency have not been checked."
+                )
         except Exception:
-            pass
+            status_parts.append("LLM configuration is unavailable; runtime health has not been checked.")
+
+        try:
+            from kenn.ableton_osc_bridge import AbletonOSCClient, live_client
+            from kenn.core.fake_live import FakeLiveBackend
+            from kenn.core.live_backend import ControlDeckMCPBackend
+
+            # Only OSC's getter is cached: the MCP getter starts a provider request.
+            if isinstance(live_client, AbletonOSCClient):
+                observed = live_client.get_connection_status()
+                state = observed.get("state", "unknown")
+                last_reply = observed.get("last_successful_heartbeat")
+                if last_reply and last_reply > 0:
+                    age = max(0.0, time.monotonic() - last_reply)
+                    status_parts.append(f"AbletonOSC cached state: {state}; last successful reply {age:.1f} s ago.")
+                else:
+                    status_parts.append(f"AbletonOSC has no successful reply on record (cached state: {state}).")
+                status_parts.append("Current connection has not been checked.")
+            elif isinstance(live_client, ControlDeckMCPBackend):
+                status_parts.append(
+                    f"Live backend: {live_client.backend_name}; cached state: {live_client.connection_state}. "
+                    "Observation age is unavailable. Current connection has not been checked."
+                )
+            elif isinstance(live_client, FakeLiveBackend):
+                status_parts.append("Live backend: fake (test fixture). A real Ableton connection has not been checked.")
+            else:
+                status_parts.append(f"Live backend: {type(live_client).__name__}; connection observation is unavailable.")
+        except Exception:
+            status_parts.append("Live connection observations are unavailable; current connection has not been checked.")
         return {
-            "answer": f"KENN is fully online and operational. Engine: Apple Silicon Metal MLX (active: {active_mb}MB). OSC Bridge: port 11000/11001.",
+            "answer": " ".join(status_parts),
             "route": "conversation",
             "confidence": "high",
             "sources": [],

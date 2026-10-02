@@ -249,8 +249,12 @@ mock, an agent reviewer or an unrelated receipt.
     as unavailable. Six new cases and 20 scoped tests pass; the readiness regression
     catches a deliberate mutation. This describes whether configuration permits an
     attempt, not provider health or model residency. [Implementation](apps/backend/src/kenn/llm/llm_rewrite.py)
-    and [tests](apps/backend/src/kenn/tests/test_llm_public_status.py); actual chat status
-    and cancellation remain open.
+    and [tests](apps/backend/src/kenn/tests/test_llm_public_status.py).
+  - [x] Nonstream chat status reports configured inference and cached Live
+    observations without loading weights, probing a provider or claiming current
+    health. 21 new cases and 51 scoped tests pass; an unconditional-status mutation
+    is caught. [Evidence and exact files](docs/evidence/KENN_CHAT_STATUS_2026-10-02.md).
+    Streaming status and cancellation remain separate repairs.
 - [x] **A5 — Establish the clean test baseline.** Scoped collection-time model policy
   to individual tests and the offline replay CLI without changing planner assertions
   or production enablement precedence. Eight import and four CLI guards pass; seven
