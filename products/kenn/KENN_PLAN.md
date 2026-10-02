@@ -400,6 +400,11 @@ mock, an agent reviewer or an unrelated receipt.
     Jack chose to write answer text: step 7 was added to `thin-vocal-body.md` and
     `arrangement-energy-and-transitions.md` (git-ignored, text kept in the evidence). Still open: rebuild the
     index and re-run both evals on the other machine before ticking those two rows.
+  - [x] Measured what a cancelled answer does to the model slot, on the real Qwen3-4B bridge on the GPU box:
+    after the client gives up at 2 s the generation runs on and the slot stays busy another 45.5 s (a 58 s
+    generation), refusing 30 retries with 429; an idle short request takes about 1.2 s. KENN's cancel still
+    reports `inference_aborted: false`. Stopping generation is an open finding that needs a bridge change; see
+    [the evidence](docs/evidence/KENN_INFERENCE_CANCELLATION_MEASURED_2026-10-02.md).
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.
