@@ -219,10 +219,12 @@ mock, an agent reviewer or an unrelated receipt.
   (no concurrent-stream guard, unauthenticated local `reload-index`, a dead MCP field, caller-less
   `LiveExecutor`, track-0 fallbacks in snapshot reads, the missing `demo_feedback`) are listed
   with symbols and carried forward. [Route map](docs/evidence/KENN_A2_ROUTE_MAP_2026-10-02.md).
-- [ ] **A3 — Resolve scoped delivery defects first.** Audit memory/cache isolation,
+- [x] **A3 — Resolve scoped delivery defects first.** Audit memory/cache isolation,
   project switching, upgrade polling ownership, stale-turn replacement and
   cancellation; fix verified defects with cross-session and late-job tests.
   Preserve the rule against recording the question twice.
+  Closed 2 Oct 2026 with these limits, none hidden: inference is not actually aborted on cancel (needs a bridge
+  change), no Live set identity scopes tokens or Undo receipts, and six held-out wrapper rows moved to C5.
   - [x] Main HTTP/UI background path retains session/plugin/correlation identifiers,
     reads project preferences without a second memory/cache write, scopes polling
     to the originating chat and discards superseded or cleared results. 48 scoped
