@@ -253,10 +253,13 @@ def kenn_session_doctor(facade: KennMCPFacade, args: dict[str, Any]) -> dict[str
     report = SessionDoctor.audit(session_state if isinstance(session_state, dict) else {}, meters=telemetry)
     remediated = None
     if args.get("auto_remediate") and report.remediation_batch:
-        remediated = facade.client.post("/api/kenn/autonomous-execute-batch", {
-            "session_id": str(args.get("session_id", "doctor_session")),
-            "batch": report.remediation_batch,
-        })
+        # The /api/kenn/autonomous-execute-batch route this used to post to was never added to either server, and
+        # the doctor's own remediate route is closed, so nothing here can change Live. Say so instead of 404ing.
+        remediated = {
+            "ok": False,
+            "status": "not_executed",
+            "error": "Automatic remediation is disabled; review the remediation batch and apply changes through a confirmed proposal.",
+        }
     return {
         "ok": True,
         "track_count": report.track_count,

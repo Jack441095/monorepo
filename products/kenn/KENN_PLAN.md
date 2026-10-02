@@ -284,6 +284,13 @@ mock, an agent reviewer or an unrelated receipt.
     full backend run is 3,507 passed, 12 skipped. Only the duplication path has a new
     test; the other moved branches rely on the existing suite.
     [Evidence and exact files](docs/evidence/KENN_OSC_UNDO_SINGLE_OWNER_2026-10-02.md).
+  - [x] `/api/session/doctor/remediate` is closed (410). It answered 500 to every request
+    because it called the proposal builder with arguments it does not take, and its confirmed
+    branch said "applied" without writing to Live. The MCP `kenn_session_doctor` no longer posts
+    to `/api/kenn/autonomous-execute-batch`, a route neither server has; it reports
+    `not_executed`. Four new cases, both old files fail them, full backend run is 3,511 passed,
+    12 skipped. No confirmed remediation path exists yet.
+    [Evidence and exact files](docs/evidence/KENN_DOCTOR_REMEDIATION_CLOSED_2026-10-02.md).
   - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.

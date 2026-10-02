@@ -66,47 +66,13 @@ def handle_post_doctor_audit(handler: Any, payload: dict[str, Any]) -> None:
 
 
 def handle_post_doctor_remediate(handler: Any, payload: dict[str, Any]) -> None:
-    """POST /api/session/doctor/remediate - Execute surgical masking remediation."""
-    try:
-        from kenn.mixing_doctor import get_latest_session_state
-        from kenn.core.session_doctor import SessionDoctor
-        from kenn.plugin_handoff import live_context_summary
+    """POST /api/session/doctor/remediate - disabled.
 
-        issue_code = str(payload.get("issue_code", "")).strip()
-        track_index = payload.get("track_index", 0)
-        confirm_token = str(payload.get("confirm_token", "")).strip()
-
-        session_state = get_latest_session_state() or {"status": "offline", "tracks": []}
-        meters = live_context_summary("default")
-        prop = SessionDoctor.formulate_surgical_remediation_proposal(
-            issue_code=issue_code or "SUB_KICK_CLASH",
-            track_index=int(track_index),
-            session_state=session_state,
-            meters=meters,
-        )
-        if not prop:
-            handler.send_json(400, {"ok": False, "error": f"Could not formulate surgical remediation for issue '{issue_code}'."})
-            return
-
-        expected_token = prop.get("confirmation_token", "")
-        predicted = prop.get("predicted_metrics", {})
-        if confirm_token and confirm_token == expected_token:
-            handler.send_json(200, {
-                "ok": True,
-                "status": "applied",
-                "issue_code": issue_code,
-                "track_index": track_index,
-                "predicted_metrics": predicted,
-                "answer": f"Surgical remediation for {issue_code} applied to track {int(track_index) + 1}.",
-            })
-        else:
-            handler.send_json(200, {
-                "ok": True,
-                "status": "requires_confirmation",
-                "confirmation_token": expected_token,
-                "proposal": prop,
-                "predicted_metrics": predicted,
-                "answer": f"Proposed surgical remediation for {issue_code} on track {int(track_index) + 1}. Please confirm.",
-            })
-    except Exception as e:
-        handler.send_json(500, {"ok": False, "error": str(e)})
+    The old body called SessionDoctor.formulate_surgical_remediation_proposal with arguments it does not take,
+    so it always answered 500, and its confirmed branch said "applied" without writing anything to Live. It
+    stays closed until remediation goes through the typed proposal service with a readback.
+    """
+    handler.send_json(410, {
+        "ok": False,
+        "error": "Session Doctor remediation is disabled until it has a typed, reversible proposal and verified readback.",
+    })
