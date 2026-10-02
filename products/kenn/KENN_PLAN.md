@@ -277,6 +277,13 @@ mock, an agent reviewer or an unrelated receipt.
     receipt for Undo. 61 scoped cases pass, three mutations caught and the full backend run is
     3,505 passed, 12 skipped. `/api/ableton/osc/undo` still has two owners.
     [Evidence and exact files](docs/evidence/KENN_FASTAPI_LIVE_COMMAND_OWNER_2026-10-02.md).
+  - [x] `/api/ableton/osc/undo` has one owner: the inline block in `server.py` moved to
+    `daw_command_handler.handle_osc_undo` and FastAPI calls it. Before, FastAPI could not plan
+    or apply an undo for any domain receipt (MIDI clip, duplication, rename, audition, sample)
+    and recorded no receipt. Four mutations caught, 165 existing tests still pass and the
+    full backend run is 3,507 passed, 12 skipped. Only the duplication path has a new
+    test; the other moved branches rely on the existing suite.
+    [Evidence and exact files](docs/evidence/KENN_OSC_UNDO_SINGLE_OWNER_2026-10-02.md).
   - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.

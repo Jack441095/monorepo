@@ -73,3 +73,48 @@ def test_a_pending_proposal_is_found_by_its_token_and_new_ones_are_kept_in_the_s
         "status": "requires_confirmation", "proposal": {"confirmation_token": "new-tok"}})
     daw_routes.handle_live_command({"session_id": "s", "command": "mute drums"}, pending_proposals=pending)
     assert "new-tok" in pending
+
+
+class _ClipService:
+    def propose_undo(self, receipt, *, session_id):
+        return {"ok": True, "proposal": {"planned_for": receipt["receipt_id"]}}
+
+    def execute_undo(self, proposal, *, confirm_token, session_id, **kwargs):
+        _ClipService.applied = (confirm_token, session_id)
+        return {"ok": True, "receipt": {"receipt_id": "undo-1"}}
+
+
+def test_a_clip_duplication_undo_is_planned_and_applied_through_fastapi(monkeypatch):
+    from kenn.core import clip_duplication_service as dup
+
+    receipts = []
+    monkeypatch.setattr(daw_command_handler, "ClipDuplicationActionService", _ClipService)
+    monkeypatch.setattr(daw_command_handler, "action_allowed", lambda _name: True)
+    monkeypatch.setattr(daw_command_handler, "record_receipt", lambda receipt, session_id: receipts.append(receipt["receipt_id"]))
+
+    receipt = {"schema": dup.RECEIPT_SCHEMA, "receipt_id": "r9"}
+    status, body = daw_routes.handle_osc_undo({"session_id": "s", "receipt": receipt})
+    assert status == 200 and body["proposal"] == {"planned_for": "r9"}
+
+    status, body = daw_routes.handle_osc_undo({
+        "session_id": "s", "receipt": receipt, "confirm_token": "tok",
+        "proposal": {"schema": dup.UNDO_PROPOSAL_SCHEMA},
+    })
+    assert status == 200 and _ClipService.applied == ("tok", "s") and receipts == ["undo-1"]
+
+
+def test_fastapi_and_the_stdlib_server_answer_an_undo_request_the_same_way(monkeypatch):
+    from kenn.core import clip_duplication_service as dup
+
+    class Handler:
+        def send_json(self, status, body):
+            self.sent = (status, body)
+
+    monkeypatch.setattr(daw_command_handler, "ClipDuplicationActionService", _ClipService)
+    for payload in (
+        {"session_id": "s", "receipt": {"schema": dup.RECEIPT_SCHEMA, "receipt_id": "r9"}},
+        {"session_id": "", "receipt": {}},
+    ):
+        handler = Handler()
+        daw_command_handler.handle_osc_undo(handler, dict(payload))
+        assert handler.sent == daw_routes.handle_osc_undo(dict(payload))

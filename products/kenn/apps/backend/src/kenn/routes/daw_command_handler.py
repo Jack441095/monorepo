@@ -16,22 +16,30 @@ from kenn.core.live_receipt_journal import record_receipt
 from kenn.core.midi_clip_service import (
     CREATE_PROPOSAL_SCHEMA,
     MidiClipActionService,
+    REMOVE_PROPOSAL_SCHEMA,
+    RECEIPT_SCHEMA as MIDI_CLIP_RECEIPT_SCHEMA,
     UPDATE_PROPOSAL_SCHEMA,
 )
 from kenn.core.clip_duplication_service import (
     ClipDuplicationActionService,
     PROPOSAL_SCHEMA as CLIP_DUPLICATION_PROPOSAL_SCHEMA,
+    RECEIPT_SCHEMA as CLIP_DUPLICATION_RECEIPT_SCHEMA,
+    UNDO_PROPOSAL_SCHEMA as CLIP_DUPLICATION_UNDO_PROPOSAL_SCHEMA,
 )
 from kenn.core.clip_rename_service import (
     ClipRenameActionService,
     PROPOSAL_SCHEMA as CLIP_RENAME_PROPOSAL_SCHEMA,
+    RECEIPT_SCHEMA as CLIP_RENAME_RECEIPT_SCHEMA,
+    UNDO_PROPOSAL_SCHEMA as CLIP_RENAME_UNDO_PROPOSAL_SCHEMA,
 )
 from kenn.core.clip_audition_service import (
     ClipAuditionActionService,
     PROPOSAL_SCHEMA as CLIP_AUDITION_PROPOSAL_SCHEMA,
+    RECEIPT_SCHEMA as CLIP_AUDITION_RECEIPT_SCHEMA,
 )
 from kenn.core.sample_import_service import (
     IMPORT_PROPOSAL_SCHEMA as SAMPLE_IMPORT_PROPOSAL_SCHEMA,
+    RECEIPT_SCHEMA as SAMPLE_IMPORT_RECEIPT_SCHEMA,
     REMOVE_PROPOSAL_SCHEMA as SAMPLE_IMPORT_REMOVE_PROPOSAL_SCHEMA,
     SampleImportService,
 )
@@ -279,3 +287,132 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
     if isinstance(result.get("receipt"), dict):
         record_receipt(result["receipt"], session_id=session_id)
     handler.send_json(status, result)
+
+
+def handle_osc_undo(handler: Any, payload: dict) -> None:
+    """Two-phase undo: with no proposal, plan the inverse; with one, apply it and keep the receipt."""
+    service = _get_live_action_service()()
+    session_id = str(payload.get("session_id", "")).strip()
+    receipt = payload.get("receipt")
+    if not session_id or not isinstance(receipt, dict):
+        handler.send_json(400, {"ok": False, "error": "session_id and a verified receipt are required for undo."})
+        return
+    if "proposal" not in payload:
+        if receipt.get("schema") == MIDI_CLIP_RECEIPT_SCHEMA:
+            result = MidiClipActionService().propose_undo(receipt, session_id=session_id)
+        elif receipt.get("schema") == CLIP_DUPLICATION_RECEIPT_SCHEMA:
+            result = ClipDuplicationActionService().propose_undo(receipt, session_id=session_id)
+        elif receipt.get("schema") == CLIP_RENAME_RECEIPT_SCHEMA:
+            result = ClipRenameActionService().propose_undo(receipt, session_id=session_id)
+        elif receipt.get("schema") == CLIP_AUDITION_RECEIPT_SCHEMA:
+            result = ClipAuditionActionService().propose_undo(receipt, session_id=session_id)
+        elif receipt.get("schema") == SAMPLE_IMPORT_RECEIPT_SCHEMA:
+            result = SampleImportService().propose_undo(receipt, session_id=session_id)
+        else:
+            result = service.propose_undo(receipt, session_id=session_id)
+        handler.send_json(200 if result.get("ok") else 409, result)
+        return
+    if not action_allowed("daw_control"):
+        handler.send_json(403, {"ok": False, "error": action_denied_message("daw_control")})
+        return
+    undo_proposal = payload["proposal"]
+    # Device-parameter receipts are reversed through the device
+    # executor so they retain the exact parameter identity, shared
+    # confirmation service, stale-value check, and readback gate.
+    # The generic executor only accepts track/transport proposals.
+    if undo_proposal.get("schema") == "kenn.action_proposal.v1":
+        result = service.execute_device_action(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+        )
+    elif undo_proposal.get("schema") == "kenn.ableton_device_insertion_proposal.v1":
+        result = service.execute_device_insertion(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+        )
+    elif undo_proposal.get("schema") == "kenn.ableton_device_removal_proposal.v1":
+        result = service.execute_device_removal(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+        )
+    elif undo_proposal.get("schema") == "kenn.ableton_eq_band_tuning_gain_proposal.v1":
+        result = service.execute_eq_band_tuning_gain(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+        )
+    elif undo_proposal.get("schema") == "kenn.ableton_recipe_proposal.v1":
+        from kenn.core.live_recipe import LiveRecipeService
+        result = LiveRecipeService(service).execute_recipe(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+        )
+    elif undo_proposal.get("schema") == UPDATE_PROPOSAL_SCHEMA:
+        result = MidiClipActionService().execute_update(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+            correlation_id=str(payload.get("correlation_id", "")),
+        )
+    elif undo_proposal.get("schema") == REMOVE_PROPOSAL_SCHEMA:
+        result = MidiClipActionService().execute_remove(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+            correlation_id=str(payload.get("correlation_id", "")),
+        )
+    elif undo_proposal.get("schema") == CLIP_DUPLICATION_UNDO_PROPOSAL_SCHEMA:
+        result = ClipDuplicationActionService().execute_undo(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+            correlation_id=str(payload.get("correlation_id", "")),
+        )
+    elif undo_proposal.get("schema") == CLIP_RENAME_UNDO_PROPOSAL_SCHEMA:
+        result = ClipRenameActionService().execute_undo(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+            correlation_id=str(payload.get("correlation_id", "")),
+        )
+    elif undo_proposal.get("schema") == CLIP_AUDITION_PROPOSAL_SCHEMA:
+        result = ClipAuditionActionService().execute_stop(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+            correlation_id=str(payload.get("correlation_id", "")),
+        )
+    elif undo_proposal.get("schema") == SAMPLE_IMPORT_REMOVE_PROPOSAL_SCHEMA:
+        result = SampleImportService().execute_remove(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+            correlation_id=str(payload.get("correlation_id", "")),
+        )
+    else:
+        result = service.execute(
+            undo_proposal,
+            confirm_token=str(payload.get("confirm_token", "")),
+            session_id=session_id,
+            idempotency_key=str(payload.get("idempotency_key") or ""),
+            correlation_id=str(payload.get("correlation_id", "")),
+        )
+    if isinstance(result.get("receipt"), dict):
+        record_receipt(result["receipt"], session_id=session_id)
+    handler.send_json(200 if result.get("ok") else 409, result)
+    return

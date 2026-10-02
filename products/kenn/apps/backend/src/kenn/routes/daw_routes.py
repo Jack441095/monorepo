@@ -11,9 +11,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from kenn.core.live_action_service import LiveActionService
-from kenn.core.midi_clip_service import MidiClipActionService
-from kenn.core.action_policy import action_allowed, action_denied_message
 from kenn.core.confirmation import revoke_confirmation
 
 
@@ -85,26 +82,9 @@ def handle_session_card() -> tuple[int, dict[str, Any]]:
 def handle_osc_undo(
     payload: dict[str, Any],
 ) -> tuple[int, dict[str, Any]]:
-    """Execute two-phase undo: Phase 1 proposes inverse; Phase 2 executes with token."""
-    service = LiveActionService()
-    session_id = str(payload.get("session_id", "")).strip()
-    receipt = payload.get("receipt")
+    """Two-phase undo through the stdlib owner, so FastAPI reverses the same receipts the stdlib server does."""
+    from kenn.routes.daw_command_handler import handle_osc_undo as stdlib_handle_osc_undo
 
-    if not session_id or not isinstance(receipt, dict):
-        return 400, {"ok": False, "error": "session_id and a verified receipt are required for undo."}
-
-    if "proposal" not in payload:
-        result = service.propose_undo(receipt, session_id=session_id)
-        return (200 if result.get("ok") else 409), result
-
-    if not action_allowed("daw_control"):
-        return 403, {"ok": False, "error": action_denied_message("daw_control")}
-
-    undo_proposal = payload["proposal"]
-    result = service.execute(
-        undo_proposal,
-        confirm_token=str(payload.get("confirm_token", "")),
-        session_id=session_id,
-        idempotency_key=str(payload.get("idempotency_key") or ""),
-    )
-    return (200 if result.get("ok") else 409), result
+    reply = _Reply()
+    stdlib_handle_osc_undo(reply, payload)
+    return reply.status, reply.body
