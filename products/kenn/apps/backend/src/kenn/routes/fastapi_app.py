@@ -77,6 +77,7 @@ _PENDING_PROPOSALS: dict[str, Any] = {}
 class AskRequest(BaseModel):
     question: str
     session_id: Optional[str] = ""
+    plugin_session_id: Optional[str] = ""
     limit: Optional[int] = 5
     history: Optional[list[dict[str, Any]]] = None
     session_context: Optional[dict[str, Any]] = None

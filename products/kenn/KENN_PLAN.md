@@ -215,6 +215,10 @@ mock, an agent reviewer or an unrelated receipt.
     reads project preferences without a second memory/cache write, scopes polling
     to the originating chat and discards superseded or cleared results. 48 scoped
     backend and 20 frontend tests pass; 15 mutations are caught. [Evidence and exact files](docs/evidence/KENN_BACKGROUND_CONTEXT_2026-10-02.md).
+  - [x] FastAPI ask uses the actual public answer signature, retains session/plugin/
+    correlation identifiers and handles nullable optional context. Ask and clear
+    discard that chat's older background result; other chats remain intact. 49 scoped
+    tests pass; 10 mutations are caught. [Evidence and exact files](docs/evidence/KENN_FASTAPI_CONTEXT_2026-10-02.md).
   - [ ] Trace other request owners, cache invalidation after preference/Live changes,
     project switching and Apply/Undo during generation. Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation

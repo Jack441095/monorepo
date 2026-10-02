@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from kenn.core import answer_upgrades
 from kenn.core.chat import answer_payload
 from kenn.core.suggestions import catalog_payload, typeahead
 from kenn.core.response_contract import augment_payload
@@ -21,27 +22,30 @@ def handle_ask(
     payload: dict[str, Any],
     *,
     request_id: str,
-    orchestrator: Any = None,
     allow_llm: bool = True,
 ) -> tuple[int, dict[str, Any]]:
     """Process natural-language questions through KENN's grounded retrieval engine."""
-    question = str(payload.get("question", "")).strip()
+    question = str(payload.get("question") or "").strip()
     if not question:
         return 400, {"error": "Question is required."}
 
-    session_id = str(payload.get("session_id", "")).strip()
-    limit = int(payload.get("limit", 5))
+    session_id = str(payload.get("session_id") or "").strip()
+    plugin_session_id = str(payload.get("plugin_session_id") or "").strip()
+    limit = int(payload["limit"]) if payload.get("limit") is not None else 5
     history = payload.get("history") if isinstance(payload.get("history"), list) else []
     session_turn = session_context_turn(payload.get("session_context"))
     if session_turn:
         history = [*history, session_turn]
 
+    # A chat turn from this route also supersedes its earlier background answer.
+    answer_upgrades.begin_turn(session_id)
     result = answer_payload(
         question,
         session_id=session_id,
+        plugin_session_id=plugin_session_id,
         limit=limit,
         history=history,
-        orchestrator=orchestrator,
+        correlation_id=request_id,
         allow_llm=allow_llm,
     )
     augmented = augment_payload(
@@ -75,6 +79,7 @@ def handle_session_clear(session_id: str) -> tuple[int, dict[str, Any]]:
     clean_id = str(session_id or "").strip()
     if not clean_id:
         return 400, {"ok": False, "error": "Missing session id."}
+    answer_upgrades.invalidate(clean_id)
     clear_session(clean_id)
     return 200, {"ok": True, "message": f"Session {clean_id} cleared."}
 

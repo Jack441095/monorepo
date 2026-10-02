@@ -3,9 +3,9 @@
 
 This module used to be one 4,298-line file; it's now a thin re-export shim over
 kenn.core.chat_constants / chat_retrieval / chat_grounding / chat_routing /
-chat_formatting / chat_answer / chat_cli, split by concern (see docs/BACKLOG.md
-for the decomposition record). All public names below preserve the original
-import surface for the ~20 external callers (server.py, business/app, scripts/,
+chat_formatting / chat_answer / chat_cli, split by concern. The decomposition
+record is in Git history; products/kenn/KENN_PLAN.md tracks current work.
+All public names below preserve the original import surface for the ~20 external callers (server.py, business/app, scripts/,
 thursday/voice.py, tests). Tests that monkeypatch an internal dependency (e.g.
 grounding_report, mix_review, llm_enabled) must patch the submodule that owns the
 real call site (chat_answer / chat_retrieval / chat_routing), not this shim —

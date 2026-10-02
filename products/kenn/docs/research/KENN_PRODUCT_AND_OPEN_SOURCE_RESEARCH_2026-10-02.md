@@ -243,7 +243,7 @@ These are proposals with executable **existing baseline commands**, not complete
 **Executable baseline:** run from the existing environment with the approved local model already installed and its local endpoint configured. Declare task-specific model overrides, since they may supersede the base model. Never fetch a model as part of the timing command.
 
 ```sh
-KENN_RESEARCH_ROOT=/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/monorepo/products/kenn
+KENN_RESEARCH_ROOT="$(git rev-parse --show-toplevel)/products/kenn"
 KENN_RESEARCH_PY="$KENN_RESEARCH_ROOT/apps/backend/.venv/bin/python"
 
 KENN_LIVE_BACKEND=fake KENN_LLM_CACHE=0 KENN_LLM_BACKGROUND=0 \
@@ -281,7 +281,7 @@ The script clears the semantic-answer cache per question, and `KENN_LLM_CACHE=0`
 **Executable existing baseline:** these are unsealed device/technique fixtures. The current evaluator compares BM25 and the existing hybrid path, and reports loaded/scored/skipped cases. It does not expose a neural-reranker switch.
 
 ```sh
-KENN_RESEARCH_ROOT=/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/monorepo/products/kenn
+KENN_RESEARCH_ROOT="$(git rev-parse --show-toplevel)/products/kenn"
 KENN_RESEARCH_PY="$KENN_RESEARCH_ROOT/apps/backend/.venv/bin/python"
 
 KENN_LIVE_BACKEND=fake "$KENN_RESEARCH_PY" \
@@ -310,7 +310,7 @@ KENN_LIVE_BACKEND=fake "$KENN_RESEARCH_PY" \
 **Executable current baseline:** existing synthetic resource benchmark plus the relevant tests. The benchmark is not a loudness-conformance or perceptual-quality study.
 
 ```sh
-KENN_RESEARCH_ROOT=/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/monorepo/products/kenn
+KENN_RESEARCH_ROOT="$(git rev-parse --show-toplevel)/products/kenn"
 KENN_RESEARCH_PY="$KENN_RESEARCH_ROOT/apps/backend/.venv/bin/python"
 
 KENN_LIVE_BACKEND=fake "$KENN_RESEARCH_PY" \
