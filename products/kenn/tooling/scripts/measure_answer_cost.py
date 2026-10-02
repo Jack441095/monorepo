@@ -156,7 +156,7 @@ def measure(*, tokens_only: bool, decode_tokens: int, live_seconds: float, load_
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "model": model,
         "index_version": CURRENT.read_text(encoding="utf-8").strip() if CURRENT.is_file() else "",
-        "context_chars": context_chars or "(default 650)",
+        "context_chars": context_chars or "(default 1200)",
         "draft_chars": draft_chars or "(default 300)",
         "interactive_timeout_seconds": config("rewrite")["timeout"],
     }

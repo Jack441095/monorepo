@@ -93,6 +93,108 @@ def test_think_off_also_covers_prose_answers_from_a_local_brain(monkeypatch) -> 
     assert payload["think"] is False and "format" not in payload and payload["options"]["temperature"] == 0.35
 
 
+# What native /api/chat puts on the wire with stream=true: one bare JSON object per line, no `data:`
+# prefix, and the token counts only on the closing line.
+NATIVE_STREAM_LINES = [
+    '{"model":"kenn-brain-qwen3-8b","message":{"role":"assistant","content":"Cut 2 kHz"},"done":false}',
+    '{"model":"kenn-brain-qwen3-8b","message":{"role":"assistant","content":", 4 dB."},"done":false}',
+    '{"model":"kenn-brain-qwen3-8b","message":{"role":"assistant","content":""},"done":true,'
+    '"prompt_eval_count":2000,"eval_count":12}',
+]
+
+OPENAI_STREAM_LINES = [
+    'data: {"choices":[{"delta":{"content":"A full answer"}}]}',
+    "data: [DONE]",
+]
+
+
+class _Stream:
+    """Stands in for httpx's streaming response, replaying fixed wire lines."""
+
+    def __init__(self, lines: list[str]) -> None:
+        self._lines = lines
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def raise_for_status(self) -> None:
+        return None
+
+    def iter_lines(self):
+        return iter(self._lines)
+
+
+class _RecordingClient:
+    def __init__(self, lines: list[str]) -> None:
+        self._lines = lines
+        self.sent: dict = {}
+
+    def stream(self, method, url, **kwargs):
+        self.sent.update(url=url, payload=kwargs.get("json"))
+        return _Stream(self._lines)
+
+
+def _streaming_call(monkeypatch, client, model: str) -> None:
+    # Pin the call to the HTTP path with an empty cache so the test exercises the route and the
+    # line parser, not MLX or a cached answer from an earlier run.
+    monkeypatch.delenv("KENN_LLM_THINK", raising=False)
+    monkeypatch.setenv("KENN_LLM_CACHE", "0")
+    monkeypatch.setattr(llm_rewrite, "config", lambda task="rewrite": _cfg(model))
+    monkeypatch.setattr(llm_rewrite, "mlx_selected", lambda task: False)
+    monkeypatch.setattr(llm_rewrite, "_get_client", lambda: client)
+
+
+def test_native_ollama_payload_honors_stream_true() -> None:
+    # Native /api/chat only streams NDJSON lines when asked to, and the streaming chat path has no
+    # other way to hand tokens to the caller as they arrive. The 1 Oct 2026 builder hardcoded False.
+    payload = llm_rewrite._build_native_ollama_payload(_cfg("qwen3.5:4b"), [{"role": "user", "content": "hi"}],
+                                                       stream=True, answer_mode="", json_schema=None)
+    assert payload["stream"] is True and payload["think"] is False
+
+
+def test_qwen3_stream_uses_native_route_with_thinking_off(monkeypatch) -> None:
+    """Streaming chat answers have to reach the native route, the same as the non-streaming ones.
+
+    Found 2 Oct 2026: interactive chat accepted 0 of 29 answers, one stream event and 0 content
+    tokens each. The think-off fix from 1 Oct only moved _chat_completion, so every streaming call
+    went to Ollama's OpenAI-compatible route, which ignores ``think``, and Qwen3 spent the whole
+    token cap thinking and returned nothing.
+    """
+    client = _RecordingClient(NATIVE_STREAM_LINES)
+    _streaming_call(monkeypatch, client, "kenn-brain-qwen3-8b")
+    list(llm_rewrite.chat_completion_stream([{"role": "user", "content": "kick and bass fight"}], "rewrite"))
+    assert client.sent["url"] == "http://127.0.0.1:11434/api/chat"
+    assert client.sent["payload"]["think"] is False and client.sent["payload"]["stream"] is True
+
+
+def test_native_stream_line_yields_content(monkeypatch) -> None:
+    """A bare JSON line, not a `data:` frame, still has to reach the caller as a token.
+
+    Reading only SSE frames here is what silently emptied every answer: the stream ran, produced
+    zero chunks, and chat_answer fell back to the template.
+    """
+    client = _RecordingClient(NATIVE_STREAM_LINES)
+    _streaming_call(monkeypatch, client, "kenn-brain-qwen3-8b")
+    chunks = list(llm_rewrite.chat_completion_stream([{"role": "user", "content": "how do I de-ess?"}], "rewrite"))
+    assert "".join(token for token, _ in chunks) == "Cut 2 kHz, 4 dB."
+    usage = chunks[-1][1]
+    assert (usage.prompt_tokens, usage.completion_tokens) == (2000, 12)
+
+
+@pytest.mark.parametrize("model", ["gpt-oss:20b", "llama3.1:8b", "qwen2.5:7b-instruct"])
+def test_non_qwen3_stream_still_uses_openai_compatible_route(monkeypatch, model) -> None:
+    # Only thinking models move to the native route; everything else keeps the SSE frames it had.
+    client = _RecordingClient(OPENAI_STREAM_LINES)
+    _streaming_call(monkeypatch, client, model)
+    chunks = list(llm_rewrite.chat_completion_stream([{"role": "user", "content": "how do I de-ess?"}], "rewrite"))
+    assert client.sent["url"] == "http://127.0.0.1:11434/v1/chat/completions"
+    assert "think" not in client.sent["payload"]
+    assert [token for token, _ in chunks] == ["A full answer", ""]
+
+
 def test_kenn_adds_the_sources_a_local_model_forgot() -> None:
     # An 8B answer with every section but "Sources:" used to be discarded for the template.
     results = [(9.0, {"source": "kick-bass-balance-phase.md"}), (8.0, {"source": "kick-bass-balance-phase.md"}),

@@ -12,6 +12,8 @@ from kenn.retrieval.retrieval import (
 from kenn.core.chat_constants import (
     ANSWER_QUALITY_MIN_SCORE,
     ANSWER_MODES,
+    EVIDENCE_SCAN_WINDOW,
+    count_actionable_steps,
 )
 
 from kenn.core.chat_retrieval import (
@@ -21,6 +23,25 @@ from kenn.core.chat_retrieval import (
     query_intent_terms,
     source_label,
 )
+
+
+# The evidence set the gate judges against has to be the same set the model was shown, or the gate is
+# rejecting answers for quoting things we handed over ourselves. EVIDENCE_SCAN_WINDOW is the shared depth and
+# carries the full record; the short version, measured 2 Oct 2026 on the streaming chat surface with
+# kenn-brain-qwen3-8b and the cache off:
+#
+# The model context was widened to a 12-chunk scan, a 1200-char block and 400 chars per chunk. The gate was
+# left on the top 3, so any figure sitting in chunk #7 came back flagged as invented -- 10 unsupported-
+# measurement rejections and 3 fabricated-source rejections in a 15-answer run, every one of them a chunk the
+# gate had never read. Acceptance fell from 41% (12 of 29) to 27% (4 of 15). The offline sweep before it had
+# confirmed the numbers reached the model and never checked that the gate knew about them.
+#
+# Applied to every evidence set in this module, not just generated_answer_validation: a grounding score
+# computed against 3 chunks while the answer was written from 12 is not a stricter test, it is a wrong one.
+def _evidence_chunks(
+    query: str, results: list[tuple[float, dict]]
+) -> list[tuple[float, dict]]:
+    return display_results(query, results, EVIDENCE_SCAN_WINDOW)
 
 
 def answer_self_check(
@@ -41,7 +62,7 @@ def answer_self_check(
             "answered_intent": True,
         }
     topics = query_topics(query)
-    displayed = display_results(query, results, 3)
+    displayed = _evidence_chunks(query, results)
     source_backed = bool(displayed)
     source_topic_match = not topics or any(
         chunk_topics(chunk) & set(topics) for _score, chunk in displayed
@@ -98,7 +119,7 @@ def grounding_report(
             "route_known": True,
             "warnings": [],
         }
-    displayed = display_results(query, results, 3)
+    displayed = _evidence_chunks(query, results)
     topics = set(query_topics(query))
     top = displayed[0][1] if displayed else {}
     top_trust = source_trust_score(top) if top else 0.0
@@ -365,7 +386,7 @@ def generated_answer_validation(
                 str(chunk.get("text") or ""),
             )
         )
-        for _score, chunk in display_results(query, results, 3)
+        for _score, chunk in _evidence_chunks(query, results)
     )
     if timeline_context:
         evidence_text = f"{evidence_text} {timeline_context}"
@@ -385,7 +406,7 @@ def generated_answer_validation(
     unsupported_measurements = sorted(_measurements(answer) - _measurements(evidence_text))
     displayed_filenames = {
         str(chunk.get("source") or "").lower()
-        for _score, chunk in display_results(query, results, 3)
+        for _score, chunk in _evidence_chunks(query, results)
         if chunk.get("source")
     }
     cited_filenames = _cited_source_filenames(answer)
@@ -496,8 +517,8 @@ def answer_quality_report(
 ) -> dict:
     """Cheap deterministic judge for answer shape and grounding."""
     lowered = answer.lower()
-    displayed = display_results(query, results, 3)
-    numbered_steps = len(re.findall(r"(?m)^\s*\d+\.\s+\S+", answer))
+    displayed = _evidence_chunks(query, results)
+    numbered_steps = count_actionable_steps(answer)
     sections = {
         "short_answer": any(
             marker in lowered

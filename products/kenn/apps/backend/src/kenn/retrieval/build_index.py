@@ -31,6 +31,16 @@ CHUNKS_PATH = INDEX_DIR / "chunks.jsonl"
 TERMS_PATH = INDEX_DIR / "terms.json"
 INDEX_SCHEMA = "kenn.retrieval_index.v2"
 
+# A note's "Related questions" block is a list of the note's own question phrasings and carries no answer, so
+# llm_rewrite._clean_chunk_for_synthesis returns "" for it and the model never sees one. Nothing downstream needs
+# it as a chunk either: suggestions._build_pool and chat_formatting.load_note_text both read the bullets back out
+# of the note file, so the followup chips and the related-question prompts keep working from any body chunk of the
+# same note. Indexed as a first-class chunk it cost 735 of 2928 note chunks and put the block in the top four for
+# 391 of 2912 top-4 slots across 728 recorded producer queries (13%) — slots the answer then discarded. The
+# "Sidechain Bass To Kick" block even holds the literal line "- Why does my bass disappear when the kick plays?",
+# so it scored above the note sections that answer it.
+QUESTION_LIST_SECTION = "Related questions"
+
 
 @dataclass
 class Chunk:
@@ -333,9 +343,13 @@ def iter_note_chunks(note_path: Path) -> list[Chunk]:
         )
     chunks: list[Chunk] = []
     for index, heading in enumerate(
-        ("Short answer", "Try this", "Why it matters", "Common mistakes", "When this does not apply", "Related questions"),
+        ("Short answer", "Try this", "Why it matters", "Common mistakes", "When this does not apply", QUESTION_LIST_SECTION),
         start=1,
     ):
+        if heading == QUESTION_LIST_SECTION:
+            # Not a retrievable chunk. The enumerate index still counts it, so the remaining section ids
+            # keep the numbers they had while the block was indexed.
+            continue
         body = section_body(raw, heading)
         if not body:
             continue
@@ -372,20 +386,43 @@ def iter_note_chunks(note_path: Path) -> list[Chunk]:
     ]
 
 
+# How many copies of a section's own body go into its searchable text, and how many of the note-level
+# title and tag string.
+SECTION_BODY_REPEATS = 2
+NOTE_METADATA_REPEATS = 1
+
+
+def note_boost_text(chunk: Chunk) -> str:
+    """Searchable text for one note section: note metadata once, own body twice.
+
+    Measured 2 Oct 2026 on the 4642-chunk index. The old boost wrote the title twice and the tag string
+    twice, and every section of a note shares that one tag string, so the lift was identical across all
+    of a note's chunks and could not tell an answer section from a neighbour. The note's tags are also the
+    producer's own words — "attack bass compression release sidechain" for the sidechain note — so on any
+    question that note covers, every section of it scored alike and the shortest section won. That is how a
+    question list took the top slot ahead of the "Try this" steps carrying 150 ms, 4:1, 5 ms and 6 dB.
+
+    Repeating the section's own body instead is what makes the boost discriminate: the body is the only
+    part of a chunk that differs between sections of the same note.
+    """
+    tags = " ".join(extract_tags(chunk.text))
+    section = chunk.section or "note"
+    # section_body is the same helper that split the note, so it recovers the body the chunk was built from
+    # without adding a field to the on-disk record. A whole-note chunk has no section and keeps all its text.
+    body = section_body(chunk.text, chunk.section) if chunk.section else ""
+    metadata = f"{chunk.title} {tags} {section} " * NOTE_METADATA_REPEATS
+    return f"{metadata}practical tip workflow troubleshooting beginner approved {chunk.text} " + " ".join(
+        [body or chunk.text] * SECTION_BODY_REPEATS
+    )
+
+
 def build_terms(chunks: list[Chunk]) -> dict:
     doc_freq: Counter[str] = Counter()
     term_counts: list[dict[str, int]] = []
     lengths: list[int] = []
 
     for chunk in chunks:
-        boosted_text = chunk.text
-        if chunk.kind == "note":
-            tags = " ".join(extract_tags(chunk.text))
-            section = chunk.section or "note"
-            boosted_text = (
-                f"{chunk.title} {chunk.title} {tags} {tags} {section} "
-                f"practical tip workflow troubleshooting beginner approved {chunk.text}"
-            )
+        boosted_text = note_boost_text(chunk) if chunk.kind == "note" else chunk.text
         counts = Counter(tokenize(boosted_text))
         term_counts.append(dict(counts))
         lengths.append(sum(counts.values()) or 1)

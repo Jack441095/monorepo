@@ -120,6 +120,19 @@ def test_spacing_between_number_and_unit_does_not_decide_a_match() -> None:
         assert result["unsupported_measurements"] == [], (note, result["unsupported_measurements"])
 
 
+def test_steps_written_inline_after_the_label_still_count() -> None:
+    # 18 of 29 captured candidates wrote the steps inline and were rejected for having none; all 4 accepted broke the lines.
+    result = validate(PARAPHRASE.replace("2. Keep the return fully wet.", "Keep the return wet. 2. Keep the return fully wet."))
+    assert "fewer than two actionable steps" not in result["warnings"], result["warnings"]
+
+
+def test_numbered_text_in_prose_is_not_mistaken_for_a_step() -> None:
+    from kenn.core.chat_constants import count_actionable_steps
+
+    assert count_actionable_steps("In 1997. Something happened, and by 2. 3 standards it was fine.") == 0
+    assert count_actionable_steps("Try this: 1. Cut at 200 Hz. 2. Level-match it.") == 2
+
+
 def test_a_rejection_records_which_sections_were_missing() -> None:
     # This was the dominant rejection and named nothing. The aggregate stays first because the route report
     # groups on it; the specifics behind it are what make the count actionable.

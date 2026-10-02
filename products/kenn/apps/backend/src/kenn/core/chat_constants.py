@@ -7,6 +7,7 @@ decomposition record.
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -38,6 +39,48 @@ NOTE_SCORE_BONUS = 1.2
 SYSTEM_NOTE = SYSTEM_INTRO
 SOURCE_QUALITY_ORDER = {"low": 0, "medium": 1, "high": 2}
 ANSWER_QUALITY_MIN_SCORE = 62
+
+# How many ranked results count as evidence, on BOTH sides of the generation boundary: the model's prompt
+# context (kenn/llm/llm_rewrite.py build_raw_context_block) and the gate that judges what came back
+# (kenn/core/chat_grounding.py). One number, because the two drifting apart is exactly the bug this records.
+#
+# 2 Oct 2026, streaming chat, kenn-brain-qwen3-8b, cache off. Widening the model's context to a 12-chunk scan
+# with a 1200-char block and 400 chars per chunk was correct, but the gate stayed on display_results(query,
+# results, 3) — the top 3 only. So a figure living in chunk #7 was quoted back to us and reported invented,
+# because the gate had never read chunk #7. Acceptance fell from 41% (12 of 29) to 27% (4 of 15): 10
+# unsupported-measurement rejections and 3 fabricated-source rejections, all caused by chunks the gate
+# never looked at. The offline sweep had only confirmed the measurements reached the model; it never checked
+# that the gate knew about them. That is the whole class of error here — measure the seam, not one end.
+#
+# This is not a loosening of what counts as support. A number still has to appear verbatim in a retrieved
+# note and a cited filename still has to be a source we actually retrieved; only the depth of the ranked list
+# we read to find them changed, and it now matches the depth the model was shown.
+EVIDENCE_SCAN_WINDOW = 12
+
+_TRY_LABEL = re.compile(
+    r"(?:try\s+this|try\s+it|to\s+apply\s+this|concrete\s+steps|correction\s+steps)\s*:",
+    re.IGNORECASE,
+)
+_STEP_LINE_START = re.compile(r"^\s*\d+\.\s+\S+")
+_STEP_INLINE = re.compile(r"\d+\.\s+\S+")
+
+
+def count_actionable_steps(text: str) -> int:
+    """Numbered steps, whether each sits on its own line or runs on after the label.
+
+    This counted only line-initial steps, so an answer that wrote "Try this: 1. ... 2. ..." on one line
+    scored zero and was rejected for having no steps at all. 18 of 29 captured candidates wrote it that
+    way and all 4 that were accepted happened to break the lines. The prompt never specified a layout,
+    so acceptance was a formatting coin-flip. Inline steps count only on a line carrying an explicit
+    "try this" label, so numbered text in prose cannot satisfy the gate.
+    """
+    total = 0
+    for line in text.splitlines():
+        if _STEP_LINE_START.match(line):
+            total += len(_STEP_LINE_START.findall(line))
+        elif _TRY_LABEL.search(line):
+            total += len(_STEP_INLINE.findall(line))
+    return total
 ANSWER_MODES = {
     "ableton_steps",
     "client_delivery",
