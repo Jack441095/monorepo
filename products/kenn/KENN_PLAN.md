@@ -499,6 +499,8 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   - Stream repeat (2 Oct): 23 of 29 accepted, 3 of 30 within 15 s, 14 of 30 within 20 s; the medians moved by about a second
     and a half between runs. Two of the rejected answers were the guard cutting "-6 dB" before "FS" arrived, fixed with
     tests. C1 stays open. [Evidence](docs/evidence/KENN_C1_STREAM_REPEAT_AND_GUARD_SPLIT_2026-10-02.md).
+  - Stream run 3 with the guard fix (3 Oct): 25 of 29 accepted, 4 of 30 within 15 s, 18 of 30 within 20 s. Both false
+    rejections are now accepted; the 15 s gate is still failed. C1 stays open. Same evidence note.
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already

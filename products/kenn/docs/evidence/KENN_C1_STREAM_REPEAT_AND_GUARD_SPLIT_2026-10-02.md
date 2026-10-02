@@ -69,3 +69,29 @@ same pattern covers `-0.3db` and `-6db`, so about two of seven rejections per ru
 acceptance from 76% towards 83%. We have not re-run all 30 with the fix. The three unaffected measurement rejections
 stand. The Live-change rejection (`wwise-events`) was not examined. Gate speed is unchanged by this fix: it removes
 rejections, not seconds.
+
+## Run 3, with the guard fix (3 October 2026)
+
+Recorded source: `6368d5cb`. [Receipt](KENN_C1_STREAM_RUN3_GUARD_FIX_2026-10-03.json). Same Mac, model, index, questions,
+order and isolation as runs 1 and 2, run alone after the L2 audit was committed.
+
+| | run 1 | run 2 | run 3 (fix) |
+| --- | ---: | ---: | ---: |
+| Accepted of 29 attempted | 22 | 23 | 25 |
+| Rejected | 7 | 6 | 4 |
+| Completion median, all 30 | 18.9 s | 17.5 s | 16.7 s |
+| Completion p95, all 30 | 28.5 s | 25.2 s | 27.2 s |
+| First token median / p95 | 3.4 / 8.9 s | 3.2 / 4.2 s | 3.0 / 3.8 s |
+| Accepted within 15 s (of 30) | 0 | 3 | 4 |
+| Accepted within 20 s (of 30) | 10 | 14 | 18 |
+
+- `home-vocal-recording` and `streaming-loudness`, the two false positives, are both accepted now (16.9 s and 11.3 s).
+- The four rejections are `bass-processing` (`120hz`), `gain-staging` (`-6db`), `cpu-overload` (`80%`) and
+  `delay-fade-glitch` (`0.5hz`). Gain staging and the glitchy delay have no numbers in their sources, so those two
+  stand as real fabrications. `bass-processing` was accepted in run 2 and rejected in run 1, so it moves between runs.
+  `cpu-overload` was accepted in run 2 and is new here. We did not read the `120hz` or `80%` rejections against their
+  sources, so we can't say whether the guard was right on those.
+- The 15 s gate is still failed: 4 of 30, fastest accepted 11.3 s. Acceptance went up by about two, which matches the
+  two rows the fix was written for, but one run is inside the noise we saw between runs 1 and 2, so we are not claiming
+  more than that. The faster medians are within that noise too.
+- C1 stays open.
