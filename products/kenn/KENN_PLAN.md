@@ -235,6 +235,12 @@ mock, an agent reviewer or an unrelated receipt.
   reply, against actual selected inference backend, connection and pending actions.
   Transport branches propose through the action service; trace their validation path
   before changing or describing them as a bypass.
+  - [x] Public rewrite status reports an enabled Ollama configuration without a model
+    as unavailable. Six new cases and 20 scoped tests pass; the readiness regression
+    catches a deliberate mutation. This describes whether configuration permits an
+    attempt, not provider health or model residency. [Implementation](apps/backend/src/kenn/llm/llm_rewrite.py)
+    and [tests](apps/backend/src/kenn/tests/test_llm_public_status.py); actual chat status
+    and cancellation remain open.
 - [x] **A5 — Establish the clean test baseline.** Scoped collection-time model policy
   to individual tests and the offline replay CLI without changing planner assertions
   or production enablement precedence. Eight import and four CLI guards pass; seven

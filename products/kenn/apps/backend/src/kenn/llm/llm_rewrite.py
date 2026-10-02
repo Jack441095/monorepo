@@ -1925,11 +1925,16 @@ def status_message() -> str:
 
 
 def public_status() -> dict:
+    """Report whether rewrite configuration permits an attempt, without checking runtime health."""
+    cfg = config()
+    # Ollama enablement alone does not supply a model. The selected MLX path
+    # can answer without that provider field, so keep its existing alternative.
+    ready = is_enabled() and (not missing_model_message(cfg) or _mlx_engine_answers())
     return {
-        "enabled": config()["enabled"],
-        "ready": is_enabled(),
-        "provider": config()["provider"],
-        "model": config()["model"],
+        "enabled": cfg["enabled"],
+        "ready": ready,
+        "provider": cfg["provider"],
+        "model": cfg["model"],
         "route_model": config("route")["model"] if is_enabled("route") else None,
         "message": status_message(),
     }
