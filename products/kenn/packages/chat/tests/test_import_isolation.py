@@ -11,8 +11,8 @@ import sys
 import pytest
 
 
-KENN_ROOT = Path(__file__).resolve().parents[2]
-WRAPPERS = (KENN_ROOT / "chat", KENN_ROOT / "packages" / "chat")
+KENN_ROOT = Path(__file__).resolve().parents[3]
+WRAPPER = KENN_ROOT / "packages" / "chat"
 IMPORT_PROBE = r"""
 import importlib.util
 import json
@@ -120,20 +120,18 @@ def _import_probe(wrapper: Path, tmp_path: Path, *, enabled: str | None, mode="m
     return json.loads(completed.stdout.splitlines()[-1])
 
 
-@pytest.mark.parametrize("wrapper", WRAPPERS, ids=["chat", "packages-chat"])
 @pytest.mark.parametrize("enabled", [None, "0", "1"])
-def test_public_wrapper_import_preserves_the_callers_model_policy(wrapper, tmp_path, enabled):
-    # Importing either retrieval-only wrapper once disabled ordinary chats in the same process.
-    result = _import_probe(wrapper, tmp_path, enabled=enabled)
+def test_public_wrapper_import_preserves_the_callers_model_policy(tmp_path, enabled):
+    # Importing the retrieval-only wrapper once disabled ordinary chats in the same process.
+    result = _import_probe(WRAPPER, tmp_path, enabled=enabled)
 
     assert result["after"]["legacy_enabled"] == result["before"]["legacy_enabled"]
     assert result["after"]["enabled"] == result["before"]["enabled"]
     assert result["after"]["attempted_io"] == []
 
 
-@pytest.mark.parametrize("wrapper", WRAPPERS, ids=["chat", "packages-chat"])
-def test_public_wrapper_import_does_not_replace_an_embedded_callers_index(wrapper, tmp_path):
-    result = _import_probe(wrapper, tmp_path, enabled="1", mode="index")
+def test_public_wrapper_import_does_not_replace_an_embedded_callers_index(tmp_path):
+    result = _import_probe(WRAPPER, tmp_path, enabled="1", mode="index")
 
     assert result["after"]["paths"] == result["before"]["paths"]
     assert result["after"]["cache_warm"] is True

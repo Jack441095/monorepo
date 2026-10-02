@@ -1,0 +1,17 @@
+# The repo-root .dockerignore drops products/ for the backend image, so this
+# image has its own list. Allow only what the wrapper and the index build read.
+*
+!products/kenn/apps/backend/requirements.txt
+!products/kenn/apps/backend/src
+!products/kenn/packages/chat
+
+# 8 GB of fine-tuned weights; only the MiniLM embedder is read at index time.
+products/kenn/apps/backend/src/kenn/artifacts/models/*
+!products/kenn/apps/backend/src/kenn/artifacts/models/minilm
+# Saved chats and the memory database are user data.
+products/kenn/apps/backend/src/kenn/chats
+products/kenn/apps/backend/src/kenn/tests
+products/kenn/packages/chat/.runtime
+products/kenn/packages/chat/tests
+**/__pycache__
+**/.env

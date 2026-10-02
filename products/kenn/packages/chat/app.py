@@ -1,7 +1,7 @@
 """Scoped, retrieval-only HTTP surface for KENN mix advice.
 
 This module deliberately imports KENN's real chat core instead of copying it.
-By default the engine is this repository's own ``source/`` tree (no external
+By default the engine is the product's own ``apps/backend/src`` tree (no external
 dependency); this wrapper owns the public boundary, request controls, and
 response minimisation.
 
@@ -32,14 +32,10 @@ from pydantic import BaseModel, ConfigDict, Field
 SERVICE_ROOT = Path(__file__).resolve().parent
 # SERVICE_ROOT is <product>/packages/chat.
 REPO_ROOT = SERVICE_ROOT.parents[1]
-# ENGINE_ROOT's default is this repo's own source/ tree (the local
-# structural equivalent of the old Audio_Too/studio/kenn outer directory --
-# apps/backend/src/kenn/ is the inner "kenn" package, same as .../kenn/kenn/ was).
-# This removes the previous hard dependency on an external Audio_Too
-# checkout, but importing the engine successfully is not the same as it
-# being able to answer questions -- see the module docstring and
-# docs/KENN_BETA_GAP_MATRIX.md for the remaining blockers (several
-# still-external sibling-module imports reachable only from
+# The engine is the product's own apps/backend/src; the old Audio_Too/studio/kenn
+# checkout is no longer involved. Importing it is not the same as it being able
+# to answer questions -- see the module docstring and docs/KENN_BETA_GAP_MATRIX.md
+# for the sibling-module imports that are still external (reachable only from
 # specialist code paths this wrapper seals off).
 ENGINE_ROOT = Path(
     os.environ.get(

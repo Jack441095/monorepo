@@ -391,6 +391,10 @@ mock, an agent reviewer or an unrelated receipt.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.
+  - [x] `packages/chat` is the single chat wrapper: the duplicate `chat/` copy is removed (its two unique
+    tests moved) and the wrapper Dockerfile no longer reads Audio_Too, with its own ignore file. Image not
+    built (no Docker here) and it needs the git-ignored notes and models on disk.
+    [Evidence](docs/evidence/KENN_CHAT_WRAPPER_CANONICAL_2026-10-02.md).
 - [x] **A4 — Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.

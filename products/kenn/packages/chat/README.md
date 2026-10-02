@@ -48,12 +48,12 @@ Runtime state defaults to this wrapper's `.runtime/`; set
 
 ## Railway deployment shape
 
-The included Dockerfile copies only the KENN engine dependency and wrapper,
-builds the approved index into `/app/runtime-index`, and serves only the
+The included Dockerfile (build it from the monorepo root; see its header) copies
+the backend source and this wrapper, builds the approved index into `/app/runtime-index`, and serves only the
 wrapper route. It does not include an audio upload path or the wider KENN
 assistant surface.
 
-Run the service from `chat/` with:
+Run the service from `packages/chat/` with:
 
 ```sh
 uvicorn app:app --host 0.0.0.0 --port "$PORT"

@@ -9,7 +9,7 @@ def configure_index_dir(index_dir: Path) -> None:
     """Point KENN's imported retrieval modules at a writable index directory.
 
     KENN's source currently derives its index path from the package location.
-    The public wrapper must not write into the read-only ``Audio_Too`` checkout,
+    The public wrapper must not write into the engine tree,
     so this adapter updates the module-level path constants after import while
     leaving all engine source files untouched.
     """

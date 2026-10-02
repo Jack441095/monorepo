@@ -12,7 +12,7 @@ import pytest
 
 SERVICE_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = SERVICE_ROOT / "build_runtime_index.py"
-DEFAULT_ENGINE_ROOT = SERVICE_ROOT.parent / "apps" / "backend" / "src"
+DEFAULT_ENGINE_ROOT = SERVICE_ROOT.parents[1] / "apps" / "backend" / "src"
 
 
 @pytest.fixture
