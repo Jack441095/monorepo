@@ -22,7 +22,8 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-REMOTE_SCRIPT_SRC = REPO_ROOT / "studio" / "kenn" / "remote_script" / "AudioToo_Bridge"
+# studio/kenn is the engine package dir now, so the bridge is read from the product itself.
+REMOTE_SCRIPT_SRC = REPO_ROOT.parent / "products" / "kenn" / "remote_script" / "AudioToo_Bridge"
 DEFAULT_USER_LIBRARY = Path.home() / "Music" / "Ableton" / "User Library"
 
 # Ableton has no documented API or plain-text config exposing the

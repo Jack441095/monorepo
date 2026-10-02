@@ -399,6 +399,10 @@ mock, an agent reviewer or an unrelated receipt.
     tests moved) and the wrapper Dockerfile no longer reads Audio_Too, with its own ignore file. Image not
     built (no Docker here) and it needs the git-ignored notes and models on disk.
     [Evidence](docs/evidence/KENN_CHAT_WRAPPER_CANONICAL_2026-10-02.md).
+  - [x] Retargeted the Audio_Too `studio/kenn` symlink at `apps/backend/src`, the directory its 164
+    `studio/kenn/kenn/...` callers expect. Of the 27 test files that use it, passes went from 22 to 126;
+    the Audio_Too suite still does not run green here and no image or CI run was done.
+    [Evidence](docs/evidence/KENN_AUDIO_TOO_SYMLINK_RETARGET_2026-10-02.md).
 - [x] **A4 — Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.
