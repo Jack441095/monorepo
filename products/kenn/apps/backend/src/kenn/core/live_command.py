@@ -2633,11 +2633,64 @@ def _correction_command(command: str, session_id: str, snapshot: dict[str, Any])
     return (corrected, str(prior_track.get("name") or "")) if corrected else None
 
 
+def _current_track_choices(choice: dict[str, Any] | None, snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+    if not choice or time.time() - float(choice.get("at") or 0) > PENDING_QUESTION_SECONDS:
+        return []
+    tracks = snapshot.get("tracks") or []
+    candidates = choice.get("tracks") or []
+    for candidate in candidates:
+        position = candidate["number"] - 1
+        if position < 0 or position >= len(tracks):
+            return []
+        current = tracks[position]
+        if current.get("index") != candidate["index"] or current.get("name") != candidate["name"]:
+            return []
+    return candidates
+
+
+def _track_choice_command(reply: str, choice: dict[str, Any], snapshot: dict[str, Any]) -> tuple[str, str] | None:
+    candidates = _current_track_choices(choice, snapshot)
+    answer = " ".join(reply.casefold().split()).strip(" .!?")
+    selected = choice.get("selected")
+    target = None
+    if re.fullmatch(r"(?:no,?\s+)?(?:the\s+)?other\s+one", answer):
+        if len(candidates) == 2 and selected in candidates:
+            target = next(row for row in candidates if row != selected)
+    else:
+        numbered = re.fullmatch(r"(?:track|channel)\s*#?\s*(\d+)", answer)
+        ordinal = re.fullmatch(r"(?:the\s+)?(first|second)\s+(?:one|track)", answer)
+        if numbered:
+            target = next((row for row in candidates if row["number"] == int(numbered.group(1))), None)
+        elif ordinal and candidates:
+            position = 0 if ordinal.group(1) == "first" else 1
+            if position < len(candidates):
+                target = candidates[position]
+        else:
+            named = [row for row in candidates if str(row["name"]).casefold() == answer]
+            if len(named) == 1:
+                target = named[0]
+    if target is None:
+        return None
+    # Reparse the unfinished request against the fresh snapshot, preserving its units and action semantics.
+    completed = f'{choice["command"]} on track {target["number"]}'
+    parsed = parse_request(completed, snapshot)
+    if parsed.get("action") and parsed.get("confirmation_required") and not parsed.get("missing_fields") and not parsed.get("ambiguity"):
+        return completed, str((selected or {}).get("name") or "")
+    return None
+
+
+def _track_choice_question(candidates: list[dict[str, Any]]) -> str:
+    labels = ", ".join(f'track {row["number"]} "{row["name"]}"' for row in candidates)
+    return f"Which track do you mean: {labels}? Reply with the track number. Nothing changed."
+
+
 def _resolve_other_target(session_id: str, snapshot: dict[str, Any]) -> tuple[str, str] | None:
     """Resolve "no, the other one" to the alternative track or device when an unambiguous pair exists."""
     from kenn.core.session_context import live_conversation_context
 
     ctx = live_conversation_context(session_id)
+    if ctx.get("track_choice"):
+        return _track_choice_command("other one", ctx["track_choice"], snapshot)
     prior_text = str(ctx.get("last_command") or "")
     if not prior_text:
         return None
@@ -2765,7 +2818,11 @@ def _reply_to_question(reply: str, session_id: str, snapshot: dict[str, Any]) ->
     """A short reply to KENN's last question ("By how much?" -> "3 dB") joined with the request it was about."""
     from kenn.core.session_context import live_conversation_context
 
-    pending = live_conversation_context(session_id).get("pending_question")
+    context = live_conversation_context(session_id)
+    if context.get("track_choice"):
+        completed = _track_choice_command(reply, context["track_choice"], snapshot)
+        return completed[0] if completed else None
+    pending = context.get("pending_question")
     answer = " ".join(reply.split()).strip(" .!?")
     if not pending or time.time() - float(pending.get("at") or 0) > PENDING_QUESTION_SECONDS:
         return None
@@ -3016,7 +3073,8 @@ def _handle_command_impl(
                 f"You last asked for \"{previous}\". By how much should I change it?",
             )
         if context_resolution.get("resolution") == "correction_requires_clarification":
-            other = _resolve_other_target(response["session_id"], _command_snapshot(live, include_mixer=True))
+            correction_snapshot = _command_snapshot(live, include_mixer=True)
+            other = _resolve_other_target(response["session_id"], correction_snapshot)
             if other:
                 from kenn.core.session_context import live_conversation_context
 
@@ -3032,6 +3090,13 @@ def _handle_command_impl(
                 # We could not infer the target, so name the last change and
                 # show the shape of the reply rather than just refusing.
                 last = live_conversation_context(response["session_id"])
+                candidates = _current_track_choices(last.get("track_choice"), correction_snapshot)
+                if candidates:
+                    return _clarification(
+                        response, {"action": None, "missing_fields": ["which_track"], "track_candidates": candidates},
+                        _track_choice_question(candidates), track_choices=candidates,
+                        clarification_command=last["track_choice"]["command"],
+                    )
                 said = f" The last change was \"{last['last_command']}\"." if last.get("last_command") else ""
                 return _clarification(
                     response,
@@ -3351,6 +3416,19 @@ def _handle_command_impl(
             else:
                 response.update(subjective_res)
                 return response
+    if deterministic_intent.get("track_candidates"):
+        # Choosing between displayed identities belongs to the producer, including when a typed model plan is supplied.
+        from kenn.core.session_context import live_conversation_context
+
+        candidates = deterministic_intent["track_candidates"]
+        choice = live_conversation_context(response["session_id"]).get("track_choice")
+        fields = {}
+        if choice and _current_track_choices(choice, snapshot) == candidates and any(
+                str(row["name"]).casefold() == clean_command.strip().casefold() for row in candidates):
+            # Repeating a duplicate name still doesn't distinguish the tracks; keep the request we asked about.
+            fields["clarification_command"] = choice["command"]
+        response["llm"] = {"status": "not_used", "reason": "track_choice_requires_user"}
+        return _clarification(response, deterministic_intent, _track_choice_question(candidates), track_choices=candidates, **fields)
     if llm_plan is not None:
         checked = validate_llm_plan(llm_plan, snapshot)
         if not checked.get("ok"):

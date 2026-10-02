@@ -6,6 +6,15 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 
 ## Right now
 
+- **Stage 1 track clarification, 2 Oct:** ticked the North Star's displayed-pair
+  follow-up. Duplicate names and shared nicknames retain exact identities; after
+  selecting one, "the other one" prepares the other track's proposal. Stale or
+  unselected choices still ask. Apply/readback/undo verified on FakeLive; no model
+  call is spent guessing between tracks. 20 new tests, 520 scoped passes, seven
+  caught mutations. Full backend: 3,109 passed, 12 skipped, the known structural-
+  repair test fails in suite order and passes alone. Model-in-loop conversation
+  qualification remains open. Evidence:
+  `products/kenn/docs/evidence/KENN_TRACK_CHOICES_2026-10-02.md`.
 - **Stage 1 query latency, 2 Oct:** CPU ONNX replaces CoreML for embeddings:
   1.14–1.15 ms p50 versus 12.43–12.72 ms, with identical ordered top-four retrieval
   results on 240/240 questions. Model weights and index unchanged; no Live writes.
@@ -14,8 +23,8 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
 - **Owner direction, 2 Oct:** prioritise efficient language-model conversation and
   Ableton integration under the North Star. The large citation capture was stopped;
   its partial local data remains available. Tick verified parts as they land and add
-  necessary work to the plan. Explicit open items now cover model-answer timing,
-  two-track clarification and model-in-loop multi-turn qualification.
+  necessary work to the plan. Explicit open items cover model-answer timing and
+  model-in-loop multi-turn qualification; two-track clarification is now verified.
   Earlier entries below are dated history.
 - **Released 27 Sept 05:52:** soak #5 **qualified** on `f1b961c` (8 hours, 481 samples, 0 errors, one Live pause at
   01:00 with KENN reconnecting by itself, memory flat, median 28 ms). Receipts committed, tag `kenn-beta-2026-09-27`

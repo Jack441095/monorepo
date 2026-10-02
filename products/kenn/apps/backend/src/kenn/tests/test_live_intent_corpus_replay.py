@@ -31,6 +31,10 @@ live_intent.py, 3938 lines) and re-run against the split driver plus the four
 stage modules on the same corpus. The two runs are byte-identical, so the stored
 rows are what the parser produced before the stages existed.
 
+The displayed-track clarification change on 2 Oct updates two ambiguous-snapshot
+rows: "the vocal on its own" and "vocal down 2 dB" now ask which track, instead
+of reporting no match. Both still have no action; the other 382 rows are unchanged.
+
 What makes the fixture stale, and what to do about it:
 
 * A phrasing or a stage changes what it parses. Expected, and only the refactor

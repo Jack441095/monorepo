@@ -16,6 +16,16 @@ Evidence: `docs/evidence/KENN_QUERY_EMBEDDING_LATENCY_2026-10-02.md`. This is an
 retrieval saving, not a model-answer latency qualification. Git state below is the
 original refactor baseline; work now continues on `main`.
 
+**North Star progress, 2 Oct:** displayed two-track clarifications now retain the
+original request, display positions and track identities for 300 s. Once one is
+selected, "the other one" prepares the remaining track's proposal, including after
+Apply. Stale, unselected and three-track choices still ask; model generation and a
+supplied model plan cannot select an ambiguous track. 20 new tests; 520 scoped
+passes; seven caught mutations with source checksums restored. Full backend:
+3,109 passed, 12 skipped, one known order-dependent structural-repair failure that
+passes alone. `docs/evidence/KENN_TRACK_CHOICES_2026-10-02.md` records the checks.
+The displayed-pair checkbox is ticked; model-in-loop qualification remains open.
+
 ---
 
 ## 1. Git state

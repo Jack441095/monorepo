@@ -724,6 +724,7 @@ def _live_conversation(session_id: str) -> dict[str, Any]:
                 "confirmation_status": "none",
                 "current_topic": "",
                 "pending_question": None,
+                "track_choice": None,
                 # "Undo that" walks back through changes: an undo's action id -> the receipt it reverses, and, once
                 # applied, the undo's own receipt -> that receipt. Kept for the session only.
                 "pending_undos": {},
@@ -900,6 +901,28 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
     )
     status = str(result.get("status") or "")
     with _LIVE_CONVERSATION_LOCK:
+        choice = state.get("track_choice")
+        displayed = result.get("track_choices")
+        if isinstance(displayed, list) and len(displayed) >= 2:
+            choice_command = _text(result.get("clarification_command") or command, 4000)
+            continuing = choice and choice.get("command") == choice_command and choice.get("tracks") == displayed
+            state["track_choice"] = {
+                "command": choice_command,
+                "tracks": [{key: row[key] for key in ("index", "name", "number")} for row in displayed[:16]],
+                "selected": choice.get("selected") if continuing else None,
+                "at": choice["at"] if continuing else time.time(),
+                "action_id": choice.get("action_id", "") if continuing else "",
+            }
+        elif choice:
+            resolution = (result.get("context_resolution") or {}).get("resolution")
+            selected = next((row for row in choice["tracks"]
+                             if row["index"] == proposal.get("track_index", track.get("index"))
+                             and row["name"] == track_name), None)
+            if selected and proposal and resolution in {"answered_question", "correction"}:
+                state["track_choice"] = {**choice, "selected": dict(selected), "action_id": proposal.get("action_id", "")}
+            elif not (status == "applied" and receipt.get("action_id") == choice.get("action_id")):
+                # An unrelated command ends this clarification; later corrections must not resurrect its pair.
+                state["track_choice"] = None
         if track_name:
             state["last_track"] = track_name[:128]
         if device_name:
@@ -921,7 +944,7 @@ def record_live_exchange(*, session_id: str, command: str, result: dict[str, Any
         # a short reply ("3 dB", "the hats") can finish it. The generic "not sure" (only the action missing) isn't kept.
         missing = [str(field) for field in (intent.get("missing_fields") or [])]
         if status == "clarification_required" and missing and missing != ["action"]:
-            state["pending_question"] = {"command": _text(command, 4000), "missing": missing, "action": action[:128],
+            state["pending_question"] = {"command": _text(result.get("clarification_command") or command, 4000), "missing": missing, "action": action[:128],
                                          "track": track_name[:128], "at": time.time()}
         else:
             state["pending_question"] = None
@@ -981,7 +1004,11 @@ def live_conversation_context(session_id: str) -> dict[str, Any]:
     """Return a copy suitable for diagnostics and tests."""
     state = _live_conversation(session_id)
     with _LIVE_CONVERSATION_LOCK:
-        return {**state, "exchanges": list(state["exchanges"])}
+        choice = state.get("track_choice")
+        if choice:
+            choice = {**choice, "tracks": [dict(row) for row in choice["tracks"]],
+                      "selected": dict(choice["selected"]) if choice.get("selected") else None}
+        return {**state, "exchanges": list(state["exchanges"]), "track_choice": choice}
 
 
 __all__ = [

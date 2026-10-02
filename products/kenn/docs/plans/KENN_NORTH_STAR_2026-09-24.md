@@ -242,8 +242,17 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > change taken from that track's own level. The same track again, a repeated name, or five tracks still ask.
   > "no, the other one" still can't be resolved (there is no exact identity to move to), but it now says what the last
   > change was and how to name the track; "no, the snare and the kick" says to use "do that on the snare and the kick".
-- [ ] Resolve "the other one" after KENN listed exactly two matching tracks, using
+- [x] Resolve "the other one" after KENN listed exactly two matching tracks, using
       identities from the current session; still clarify when the target is ambiguous.
+  > 2 Oct: duplicate names and shared nicknames retain their displayed track numbers
+  > and indices. After the producer selects one, "the other one" prepares a proposal
+  > for the remaining track. An unselected pair, three matches, renamed/reordered/
+  > removed tracks, a 300 s expiry or another session still ask. Apply and verified
+  > undo pass against FakeLive; the first applied change remains in place and is
+  > called out. Ambiguous choices skip model generation and cannot be chosen by a
+  > supplied model plan. 20 new tests, 520 scoped passes, seven caught mutations;
+  > full backend: 3,109 passed, 12 skipped, one pre-existing order-dependent failure
+  > (passes alone). Evidence: `docs/evidence/KENN_TRACK_CHOICES_2026-10-02.md`.
 - [ ] Qualify multi-turn conversation with the model in the loop: five-turn context,
       track and parameter corrections, session changes and unanswered clarifications.
       Verify proposals, Apply, readback and undo on FakeLiveBackend, with no invented

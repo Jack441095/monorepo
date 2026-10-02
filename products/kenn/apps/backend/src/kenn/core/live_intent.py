@@ -2888,6 +2888,12 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         base["track_reference"] = {"kind": "user_track_number", "number": display_number}
     elif track_phrase:
         track, ambiguous, track_error = _find_track(track_phrase, tracks)
+    if track is None and not track_reference_match and not ambiguous:
+        nickname_matches = [candidate for candidate in tracks if _nickname_track_name(track_text, [candidate])]
+        if len(nickname_matches) > 1:
+            ambiguous = nickname_matches
+            track_phrase = track_text
+            track_error = "ambiguous track nickname"
     if not track_phrase and not track_reference_match:
         base["missing_fields"].append("track")
         base["ambiguity"].append("No track name or number was found in the current Live snapshot.")
@@ -2975,6 +2981,13 @@ def _parse_request_rules(query: str, session_snapshot: dict[str, Any] | None) ->
         base["confidence"] = 0.5
         return base
     if track is None:
+        if ambiguous:
+            # Display positions distinguish duplicate names; indices bind the reply to the same snapshot identities.
+            base["track_candidates"] = [
+                {"index": candidate.get("index"), "name": candidate.get("name"), "number": number}
+                for number, candidate in enumerate(tracks, 1) if candidate in ambiguous
+            ][:16]
+            base["missing_fields"].append("which_track")
         base["ambiguity"].append(track_error or "track target is ambiguous")
         base["confidence"] = 0.2
         return base
