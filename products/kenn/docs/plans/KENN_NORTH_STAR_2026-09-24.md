@@ -7,6 +7,10 @@ those older plan files were removed on 29 Sept so this is the one place that dec
 history). `KENN_MEGA_PLAN_2026-09-29.md` sets the order of the work. Stage 0 is the private beta (`KENN_BETA_PLAN_2026-09-24.md`). The GLM tracker stays the working log. Tick items here
 in the same commit as the work, with the date and the evidence.
 
+**Owner instruction, 2 Oct:** keep ticking verified parts as work lands, and add
+necessary work to this plan. Split partly finished items into explicit follow-ups;
+record the checks and remaining limits before closing a capability or stage gate.
+
 ## What KENN becomes
 
 A producer talks to KENN the way they would talk to a senior engineer sitting next to them. KENN:
@@ -93,6 +97,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
       Same model and index; this saves about 11 ms per query, not model decoding
       time. Mac answer-latency gate remains open. Evidence:
       `docs/evidence/KENN_QUERY_EMBEDDING_LATENCY_2026-10-02.md`.
+- [ ] Measure where local model-answer time goes after the embedding change:
+      prompt preparation, prefill, first token, decode, validation and background
+      upgrade delivery. Use at least 30 knowledge questions through the companion's
+      answer paths; report accepted upgrades within 15 s as well as p50/p95 timing.
+      Optimise the measured bottleneck, then repeat the same workload. Engineering
+      uses FakeLiveBackend; qualification with Live open remains owner-supervised.
 - [x] Brain decision made — **owner, 25 Sept: local Qwen only** (option A). KENN stays fully on the Mac: no hosted model,
       nothing sent off the machine. The existing Ollama provider behind the model router serves it
       (`KENN_LLM_PROVIDER_<TASK>=ollama`, per-task switches `KENN_LLM_ENABLED_<TASK>`).
@@ -232,8 +242,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
   > change taken from that track's own level. The same track again, a repeated name, or five tracks still ask.
   > "no, the other one" still can't be resolved (there is no exact identity to move to), but it now says what the last
   > change was and how to name the track; "no, the snare and the kick" says to use "do that on the snare and the kick".
-  > What's left for this item: "the other one" after KENN listed exactly two matching tracks, and how well any of this
-  > holds up with a model in the loop.
+- [ ] Resolve "the other one" after KENN listed exactly two matching tracks, using
+      identities from the current session; still clarify when the target is ambiguous.
+- [ ] Qualify multi-turn conversation with the model in the loop: five-turn context,
+      track and parameter corrections, session changes and unanswered clarifications.
+      Verify proposals, Apply, readback and undo on FakeLiveBackend, with no invented
+      session facts or model-originated writes.
 - [x] Safety unchanged: the brain can only call typed tools; writes still go proposal → Apply → readback → receipt
   > 25 Sept: checked. The brain writes prose only; it has no Live access. Live changes run only in
   > `handle_command` with a confirmed proposal; a model plan must pass `validate_llm_plan` (typed actions, exact

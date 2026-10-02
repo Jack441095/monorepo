@@ -13,7 +13,10 @@ north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merge
   gate. Evidence: `products/kenn/docs/evidence/KENN_QUERY_EMBEDDING_LATENCY_2026-10-02.md`.
 - **Owner direction, 2 Oct:** prioritise efficient language-model conversation and
   Ableton integration under the North Star. The large citation capture was stopped;
-  its partial local data remains available. Earlier entries below are dated history.
+  its partial local data remains available. Tick verified parts as they land and add
+  necessary work to the plan. Explicit open items now cover model-answer timing,
+  two-track clarification and model-in-loop multi-turn qualification.
+  Earlier entries below are dated history.
 - **Released 27 Sept 05:52:** soak #5 **qualified** on `f1b961c` (8 hours, 481 samples, 0 errors, one Live pause at
   01:00 with KENN reconnecting by itself, memory flat, median 28 ms). Receipts committed, tag `kenn-beta-2026-09-27`
   at `a261eed`, pushed. Tester app: `workspace/builds/kenn-app/KENN-beta-a261eed.dmg` (221 MB, smoke test passed
