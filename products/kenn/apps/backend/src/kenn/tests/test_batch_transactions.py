@@ -294,3 +294,12 @@ def test_batch_atomic_rollback_on_step_failure():
     assert exec_res.get("rolled_back") is True
     # Verify track 0 parameter was rolled back to initial value -12.0!
     assert current_vals[(0, 0, 0)] == -12.0
+
+
+def test_a_batch_change_with_no_track_index_is_refused_not_sent_to_track_zero():
+    client = MagicMock()
+    planner = LiveControlPlanner(osc_client=client)
+    result = planner.propose_batch_parameter_changes(
+        [{"device_index": 0, "parameter_index": 0, "proposed_value": 0.5}], reason="No track")
+    assert result == {"ok": False, "error": "Batch change 1 has no track_index; KENN never assumes track 0."}
+    client.get_device_parameters.assert_not_called()

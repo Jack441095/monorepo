@@ -99,8 +99,10 @@ class LiveControlPlanner:
         for position_in_batch, change in enumerate(changes, start=1):
             if not isinstance(change, dict):
                 return {"ok": False, "error": f"Batch change {position_in_batch} must be an object."}
+            if change.get("track_index") is None:
+                return {"ok": False, "error": f"Batch change {position_in_batch} has no track_index; KENN never assumes track 0."}
             try:
-                track_idx = int(change.get("track_index", 0))
+                track_idx = int(change["track_index"])
                 device_idx = int(change.get("device_index", 0))
                 param_idx = int(change.get("parameter_index", 0))
                 proposed_val = float(change.get("proposed_value", 0.0))

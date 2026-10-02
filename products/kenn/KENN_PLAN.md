@@ -291,6 +291,11 @@ mock, an agent reviewer or an unrelated receipt.
     `not_executed`. Four new cases, both old files fail them, full backend run is 3,511 passed,
     12 skipped. No confirmed remediation path exists yet.
     [Evidence and exact files](docs/evidence/KENN_DOCTOR_REMEDIATION_CLOSED_2026-10-02.md).
+  - [x] A batch parameter change with no `track_index` is refused instead of being planned
+    against track 0 (the planner inspected track 0's device and issued a token for it). Device
+    and parameter indices still default to 0 because parameters can be named. One new case,
+    the old line fails it, full backend run is 3,512 passed, 12 skipped.
+    [Evidence and exact files](docs/evidence/KENN_BATCH_TRACK_INDEX_2026-10-02.md).
   - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.
