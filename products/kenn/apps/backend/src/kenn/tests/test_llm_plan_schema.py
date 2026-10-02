@@ -35,6 +35,11 @@ def test_schema_constrained_calls_never_take_the_unconstrained_mlx_path(monkeypa
     from kenn.llm import mlx_inference_engine
 
     monkeypatch.setenv("KENN_USE_MLX", "1")
+    # This asserts the call reaches HTTP rather than MLX, and the HTTP path now refuses to send with no
+    # model configured. Deliberately NOT a qwen3 name: with KENN_LLM_THINK unset a qwen3 model is routed to
+    # Ollama's native /api/chat, and json_schema only constrains decoding on the OpenAI-compatible route, so a
+    # qwen3 name would send this assertion at a path where the schema never applied.
+    monkeypatch.setenv("KENN_LLM_MODEL", "llama3.1:8b")
     monkeypatch.setattr(mlx_inference_engine.MLXInferenceEngine, "is_available", staticmethod(lambda: True))
     monkeypatch.setattr(mlx_inference_engine.MLXInferenceEngine, "get_instance",
                         staticmethod(lambda: pytest.fail("MLX must not serve a schema-constrained call")))

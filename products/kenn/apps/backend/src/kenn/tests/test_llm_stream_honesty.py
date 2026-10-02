@@ -53,6 +53,11 @@ def _offline_stream_env(monkeypatch, client):
     monkeypatch.setattr(llm_rewrite, "mlx_selected", lambda task: False)
     monkeypatch.setattr(llm_rewrite, "_cache_get", lambda key: None)
     monkeypatch.setattr(llm_rewrite, "_get_client", lambda: client)
+    # The HTTP path now refuses to send with no model configured, naming the variable to set, so a test
+    # that pins the HTTP path has to configure one. Deliberately NOT a qwen3 name: with KENN_LLM_THINK
+    # unset, any qwen3 model is routed to Ollama's native /api/chat, which returns bare JSON per line and
+    # skips these `data:`-prefixed SSE lines -- so a qwen3 name would make this test pass vacuously.
+    monkeypatch.setenv("KENN_LLM_MODEL", "llama3.1:8b")
 
 
 MESSAGES = [

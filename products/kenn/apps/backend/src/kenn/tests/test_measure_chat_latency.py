@@ -161,7 +161,10 @@ def test_a_rejection_records_which_measurement_and_which_citation(tool, monkeypa
         "sources": [{"title": "Reverb send workflow"}],
     }
     monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
-    monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 3))
+    # _ask returns (payload, token_event_count, seconds_to_first_token). The third was added when the harness
+    # began recording TTFT; a two-tuple made measure()'s unpack fail, and its own except swallowed that into an
+    # empty row reported as "no unsupported measurements" rather than as an error.
+    monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 3, 1.2))
 
     report = tool.measure([{"id": "q1", "question": "how do I set a send?"}], allow_llm=True)
 
@@ -182,7 +185,10 @@ def test_a_receipt_records_no_answer_text(tool, monkeypatch):
         "llm_enhanced": False, "found": True, "sources": [],
     }
     monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
-    monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 3))
+    # _ask returns (payload, token_event_count, seconds_to_first_token). The third was added when the harness
+    # began recording TTFT; a two-tuple made measure()'s unpack fail, and its own except swallowed that into an
+    # empty row reported as "no unsupported measurements" rather than as an error.
+    monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 3, 1.2))
 
     report = tool.measure([{"id": "q1", "question": "how do I set a send?"}], allow_llm=True)
 
