@@ -1431,7 +1431,7 @@ def format_timeline_report(title: str, timeline: list[dict]) -> str:
     return "\n".join(lines).strip()
 
 
-def route_query(query: str, history: list | None = None) -> str:
+def route_query(query: str, history: list | None = None, allow_llm: bool = True) -> str:
     """Route a query to the appropriate handler.
 
     Uses keyword-based routing first, then falls back to LLM-based classification
@@ -1478,7 +1478,10 @@ def route_query(query: str, history: list | None = None) -> str:
     )):
         return "production"
 
-    # LLM routing fallback: when keyword routing fails, ask the model
+    # LLM routing fallback: when keyword routing fails, ask the model. The model-free foreground answer passes
+    # allow_llm=False, otherwise it could wait on a model call we promised it would not make.
+    if not allow_llm:
+        return "unknown"
     try:
         from kenn.llm.llm_rewrite import llm_route_query as _llm_route
         llm_route = _llm_route(query)

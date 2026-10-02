@@ -1418,7 +1418,7 @@ def _answer_payload_stream_raw(
         route = "mix_review"
     else:
         timeline_context = None
-        route = route_query(query, history)
+        route = route_query(query, history, allow_llm=allow_llm)
     if route != "game_audio" and not timeline_context and not latest_mix_review_context(history):
         track_memory = latest_track_memory_lookup(query)
         if track_memory:
@@ -2262,7 +2262,7 @@ def _answer_payload_raw(
         route = "mix_review"
     else:
         timeline_context = None
-        route = retrieval_route if retrieval_only else route_query(query, history)
+        route = retrieval_route if retrieval_only else route_query(query, history, allow_llm=allow_llm)
     if not retrieval_only and route != "game_audio" and not timeline_context and not latest_mix_review_context(history):
         track_memory = latest_track_memory_lookup(query)
         if track_memory:

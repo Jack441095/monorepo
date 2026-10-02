@@ -58,7 +58,12 @@ passed, 5 skipped, 0 failed.
 - **Route classification call.** When keyword routing finds nothing, `llm_route_query` can call the model. It ignores
   `allow_llm`, so the model-free foreground answer can still make one, and it has no cache. The foreground gives it
   20 s and the background 120 s, so the template and the upgrade could be built under different routes. It only
-  fires on questions no keyword route matches, and we did not see it fire in either run. Recorded, not changed.
+  fires on questions no keyword route matches, and we did not see it fire in either run. **Fixed 3 Oct:**
+  `route_query` takes `allow_llm` and returns `unknown` instead of calling the model when it is false; the two
+  `chat_answer.py` callers pass theirs. The retrieval-side call in `chat_retrieval.py` only runs when a calibration
+  file exists, and none does today, so it is untouched. Tests: `test_route_query_model_free.py` (3,559 passed, 5
+  skipped, 0 failed with a fresh pytest cache dir). Whether the foreground and background routes still differ when
+  the model answers a route the keywords could not was not measured.
 - **Non-streaming path.** A timeout there is not marked `transient`. The non-stream cache check also needs
   `record_session`, which the background upgrade does not set, so the exposure is smaller, but we did not trace the
   foreground path to confirm. Not changed.
