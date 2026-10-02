@@ -143,7 +143,6 @@ from kenn.core.chat_formatting import (  # noqa: F401
 from kenn.core.chat_answer import (  # noqa: F401
     _answer_payload,
     _answer_payload_stream,
-    _get_kenn_lm,
     _progressive_token_yield,
     _split_answer_sections,
     answer_payload,

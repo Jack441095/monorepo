@@ -881,9 +881,6 @@ def _query_specific_grounding_note(query: str) -> str:
     return ""
 
 
-_kenn_lm = None
-
-
 def _session_context_is_relevant(query: str, session_id: str) -> bool:
     """Only inject a saved summary when its topic still matches this turn."""
     if not session_id or not is_followup_query(query):
@@ -906,17 +903,6 @@ def _session_context_is_relevant(query: str, session_id: str) -> bool:
     return not previous_topics or bool(current_topics & previous_topics)
 
 
-def _get_kenn_lm():
-    global _kenn_lm
-    if _kenn_lm is None:
-        try:
-            from kenn.llm.kenn_lm import KennLM
-            _kenn_lm = KennLM()
-        except Exception as e:
-            print(f"Warning importing KennLM: {e}")
-    return _kenn_lm
-
-
 def make_answer(
     query: str,
     results: list[tuple[float, dict]],
@@ -928,7 +914,7 @@ def make_answer(
     answer_mode: str = "",
     session_id: str = "",
 ) -> tuple[str, bool]:
-    import os, time as _time, sys as _sys
+    import time as _time, sys as _sys
     _ma_t0 = _time.perf_counter()
     template = build_template_answer(
         query,
@@ -954,44 +940,6 @@ def make_answer(
     # delay a simple question.
     if _uncovered_hardware_caveat(query, results):
         return template, False
-    # The current fine-tuned checkpoint was rejected by the 2026-07-14
-    # context-adherence evaluation.  Keep it available for explicit experiments,
-    # but do not let a stale KENN_LM_ENABLED setting activate it in production.
-    local_lm_enabled = (
-        os.environ.get("KENN_LM_ENABLED") == "1"
-        and os.environ.get("KENN_LM_ALLOW_REJECTED") == "1"
-    )
-    if allow_llm and local_lm_enabled:
-        kenn_lm = _get_kenn_lm()
-        if kenn_lm and kenn_lm.available:
-            chunks_texts = []
-            for _score, chunk in results:
-                text = chunk.get("text", "")
-                if text:
-                    chunks_texts.append(text.strip())
-            context = "\n\n".join(chunks_texts)
-            try:
-                print("Generating answer using local fine-tuned KENN LM...")
-                answer = kenn_lm.generate(query, context, history=history)
-                if answer:
-                    from kenn.llm.linter import lint_response
-                    mode = answer_mode or classify_answer_mode(query, route, history=history)
-                    answer = lint_response(answer, mode)
-                    local_confidence = "high" if timeline_context else confidence_level(query, results)
-                    local_validation = generated_answer_validation(
-                        query,
-                        results,
-                        answer,
-                        route=route,
-                        confidence=local_confidence,
-                        answer_mode=mode,
-                        timeline_context=timeline_context,
-                        additional_evidence_text=_specialist_evidence_context(query, history),
-                    )
-                    if local_validation["accepted"]:
-                        return answer, True
-            except Exception as e:
-                print(f"Local KENN LM generation failed: {e}. Falling back...")
     if not allow_llm:
         print(f"  make_answer: template={_ma_template_ms:.0f}ms (llm disabled)", file=_sys.stderr, flush=True)
         return template, False
@@ -1253,44 +1201,27 @@ def _resolve_results_with_topic_lock(
 
 
 def compact_history(history: list | None, limit: int = 8) -> list | None:
-    """Compact long conversation history list using the LLM to prevent prompt bloat.
+    """Return the conversation history unchanged.
 
-    Older turns are summarized into a single technical context paragraph, which
-    replaces them. The most recent turns remain untouched.
+    This used to summarize everything older than the last 4 turns into one
+    paragraph before handing it to the model. The summary call imported
+    ``audio_too.model_runtime``, a module that no longer exists anywhere in the
+    tree, so every invocation raised ImportError, printed a warning to stdout
+    rather than the logger, and returned the history untouched anyway. All three
+    call sites are on the request path, so that warning has been noise on every
+    turn of any conversation longer than 8 turns.
+
+    The live equivalent is ``shared/nite_core/model_runtime.py``, but that sits
+    outside the KENN backend's import path and carries its own AUDIO_TOO_* Ollama
+    and remote-provider stack. Wiring it up would add a cross-project dependency
+    and a second model client rather than repair anything, so the branch is gone
+    instead. If summary compaction is genuinely wanted, it belongs in
+    llm_rewrite next to the other prompt assembly, not here.
+
+    ``limit`` is kept so existing call sites and any external caller keep
+    working; there is no longer a threshold to compare against.
     """
-    if not history or len(history) <= limit:
-        return history
-
-    try:
-        older_turns = history[:-4]
-        recent_turns = history[-4:]
-
-        summary_prompt = (
-            "Analyze the following conversation turns between a user (Jack) and an audio assistant (KENN).\n"
-            "Create a single-paragraph summary of the technical context, mixing details, tracks mentioned, "
-            "and active decisions made so far. Keep the summary under 80 words and focus purely on mixing/DAW facts:\n\n"
-        )
-        for turn in older_turns:
-            role = "Jack" if turn.get("role") == "user" else "KENN"
-            content = turn.get("content") or turn.get("text") or ""
-            summary_prompt += f"{role}: {content}\n"
-
-        from audio_too.model_runtime import DEFAULT_LLM
-        res = DEFAULT_LLM.generate(
-            [{"role": "user", "content": summary_prompt}],
-            timeout=10,
-            json_mode=False
-        )
-        summary = res.content.strip()
-
-        compacted = [
-            {"role": "user", "content": f"[Prior context summary: {summary}]"},
-            *recent_turns
-        ]
-        return compacted
-    except Exception as e:
-        print(f"WARNING: compact_history failed: {e}")
-        return history
+    return history
 
 
 def _answer_payload_stream_raw(

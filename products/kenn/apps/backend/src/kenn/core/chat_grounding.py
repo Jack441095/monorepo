@@ -12,36 +12,42 @@ from kenn.retrieval.retrieval import (
 from kenn.core.chat_constants import (
     ANSWER_QUALITY_MIN_SCORE,
     ANSWER_MODES,
-    EVIDENCE_SCAN_WINDOW,
     count_actionable_steps,
 )
 
 from kenn.core.chat_retrieval import (
     detect_intent,
-    display_results,
     normalized_terms,
     query_intent_terms,
     source_label,
 )
 
+from kenn.llm.llm_rewrite import model_evidence
 
-# The evidence set the gate judges against has to be the same set the model was shown, or the gate is
-# rejecting answers for quoting things we handed over ourselves. EVIDENCE_SCAN_WINDOW is the shared depth and
-# carries the full record; the short version, measured 2 Oct 2026 on the streaming chat surface with
+
+# The evidence set the gate judges against is the set of chunks the model was actually shown, read out of the
+# same list the prompt was assembled from. Deriving it here instead is how the gate ends up wider than the model
+# in one direction and narrower in the other, and both have been measured on the streaming chat surface with
 # kenn-brain-qwen3-8b and the cache off:
 #
-# The model context was widened to a 12-chunk scan, a 1200-char block and 400 chars per chunk. The gate was
-# left on the top 3, so any figure sitting in chunk #7 came back flagged as invented -- 10 unsupported-
-# measurement rejections and 3 fabricated-source rejections in a 15-answer run, every one of them a chunk the
-# gate had never read. Acceptance fell from 41% (12 of 29) to 27% (4 of 15). The offline sweep before it had
-# confirmed the numbers reached the model and never checked that the gate knew about them.
+# Narrow, fixed 2 Oct 2026: the gate read the top 3 while the model read 12, so a figure in chunk #7 was quoted
+# back and reported invented. Acceptance fell from 41% (12 of 29) to 27% (4 of 15) — 10 unsupported-measurement
+# and 3 fabricated-source rejections, every one of them a chunk the gate had never opened.
 #
-# Applied to every evidence set in this module, not just generated_answer_validation: a grounding score
-# computed against 3 chunks while the answer was written from 12 is not a stricter test, it is a wrong one.
-def _evidence_chunks(
-    query: str, results: list[tuple[float, dict]]
-) -> list[tuple[float, dict]]:
-    return display_results(query, results, EVIDENCE_SCAN_WINDOW)
+# Wide, fixed 2 Oct 2026: the gate went back to reading every chunk's text in full while the prompt fitted 2-4
+# excerpts into 1200 chars at 400 each. On index v-db8c6334cf63 at the ask path's limit of 16, "send reverb on a
+# vocal bus" put 3 excerpts in front of the model and 10 chunks in front of the gate, with 22 measurements in the
+# gate's text that the model was never shown. A "3 dB" from the model's training prior was waved through on
+# chunk #9. model_evidence() is the one list both sides read, so the seam is gone rather than tested for.
+#
+# Note what leaving display_results() also fixed: it de-duplicates on (kind, source, page), and all 3204 note
+# sections in that index carry page == 0, so every section of one note collapsed into a single slot. The old
+# EVIDENCE_SCAN_WINDOW of 12 was a depth in name only — the real depth was 4 to 10. The list below is keyed by
+# chunk, so a note's sections stay distinct exactly as they do in the prompt.
+def _evidence_chunks(results: list[tuple[float, dict]]) -> list[tuple[float, dict, str]]:
+    """(score, chunk, body-as-shown) for every excerpt the model was given, in prompt order."""
+    _block, shown = model_evidence(results, source_label)
+    return shown
 
 
 def answer_self_check(
@@ -62,10 +68,10 @@ def answer_self_check(
             "answered_intent": True,
         }
     topics = query_topics(query)
-    displayed = _evidence_chunks(query, results)
+    displayed = _evidence_chunks(results)
     source_backed = bool(displayed)
     source_topic_match = not topics or any(
-        chunk_topics(chunk) & set(topics) for _score, chunk in displayed
+        chunk_topics(chunk) & set(topics) for _score, chunk, _body in displayed
     )
     answer_terms = normalized_terms(answer)
     intent_terms = query_intent_terms(query) or {
@@ -119,16 +125,16 @@ def grounding_report(
             "route_known": True,
             "warnings": [],
         }
-    displayed = _evidence_chunks(query, results)
+    displayed = _evidence_chunks(results)
     topics = set(query_topics(query))
     top = displayed[0][1] if displayed else {}
     top_trust = source_trust_score(top) if top else 0.0
     source_topic_match = not topics or any(
-        chunk_topics(chunk) & topics for _score, chunk in displayed
+        chunk_topics(chunk) & topics for _score, chunk, _body in displayed
     )
     approved_note = any(
         chunk.get("kind") == "note" and source_trust_score(chunk) >= 0.95
-        for _score, chunk in displayed
+        for _score, chunk, _body in displayed
     )
     answer_terms = normalized_terms(answer)
     intent_terms = query_intent_terms(query) or {
@@ -378,15 +384,21 @@ def generated_answer_validation(
         grounding=grounding,
         timeline_context=timeline_context,
     )
+    # Read the evidence list once and hand the same one to every check below, so the measurements, the overlap
+    # score and the citation check cannot end up scored against different sets.
+    shown = _evidence_chunks(results)
     evidence_text = " ".join(
         " ".join(
             (
                 str(chunk.get("title") or ""),
                 str(chunk.get("source") or ""),
-                str(chunk.get("text") or ""),
+                # The body the prompt carried, not chunk["text"]. Title and source are in the prompt too, inside
+                # the label attribute of the same <source_excerpt>, so this set stays a subset of what the model
+                # read. Reading the raw text instead is what let the gate vouch for numbers from chunks #7 to #10.
+                body,
             )
         )
-        for _score, chunk in _evidence_chunks(query, results)
+        for _score, chunk, body in shown
     )
     if timeline_context:
         evidence_text = f"{evidence_text} {timeline_context}"
@@ -404,9 +416,11 @@ def generated_answer_validation(
         else 0.0
     )
     unsupported_measurements = sorted(_measurements(answer) - _measurements(evidence_text))
+    # The labels the model was actually given, so a citation is only fabricated if the filename was not on
+    # screen. Derived from the same shown list, not from what retrieval could have supplied.
     displayed_filenames = {
         str(chunk.get("source") or "").lower()
-        for _score, chunk in _evidence_chunks(query, results)
+        for _score, chunk, _body in shown
         if chunk.get("source")
     }
     cited_filenames = _cited_source_filenames(answer)
@@ -517,7 +531,7 @@ def answer_quality_report(
 ) -> dict:
     """Cheap deterministic judge for answer shape and grounding."""
     lowered = answer.lower()
-    displayed = _evidence_chunks(query, results)
+    displayed = _evidence_chunks(results)
     numbered_steps = count_actionable_steps(answer)
     sections = {
         "short_answer": any(
@@ -626,7 +640,7 @@ def answer_quality_report(
     if answer_mode not in ANSWER_MODES:
         warnings.append("unknown answer mode")
         score -= 8
-    source_labels = " ".join(source_label(chunk).lower() for _score, chunk in displayed)
+    source_labels = " ".join(source_label(chunk).lower() for _score, chunk, _body in displayed)
     if (
         answer_mode == "ableton_steps"
         and "ableton" not in lowered

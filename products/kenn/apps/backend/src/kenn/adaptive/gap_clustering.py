@@ -268,31 +268,24 @@ Please synthesize a new markdown note to cover these questions. Ensure it starts
 
     draft_content = ""
 
-    # Try local fine-tuned model first
+    # KennLM is gone. The fine-tuned MLX checkpoint failed the 2026-07-14
+    # context-adherence evaluation, and its socket server never served a
+    # production request, so there was nothing to try "locally" first. Draft
+    # through llm_rewrite instead: it is the one path that actually answers
+    # chat, it already points at the local Ollama daemon, and the static
+    # template below still catches the case where that daemon is down.
     try:
-        from kenn.llm.kenn_lm import KennLM
-        lm = KennLM()
-        if lm.available:
-            rep_query = f"Synthesize a note to answer: {', '.join(cluster_queries)}"
-            draft_content = lm.generate(rep_query, context, self_correct=True)
+        from kenn.llm.llm_rewrite import chat_completion, is_enabled
+        if is_enabled():
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ]
+            draft_content = chat_completion(messages, task="rewrite") or ""
             if draft_content:
-                print("Generated note draft using local KENN LM.")
+                print("Generated note draft using local LLM (llm_rewrite).")
     except Exception as e:
-        print(f"Local KENN LM generation failed: {e}", file=sys.stderr)
-
-    # Try cloud/Ollama LLM fallback
-    if not draft_content:
-        try:
-            from kenn.llm.llm_rewrite import chat_completion, is_enabled
-            if is_enabled():
-                messages = [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message}
-                ]
-                draft_content = chat_completion(messages, task="rewrite")
-                print("Generated note draft using cloud LLM fallback.")
-        except Exception as e:
-            print(f"Cloud LLM synthesis fallback failed: {e}", file=sys.stderr)
+        print(f"LLM note synthesis failed: {e}", file=sys.stderr)
 
     # Static template fallback if all LLMs are disabled/fail
     if not draft_content:

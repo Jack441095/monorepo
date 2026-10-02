@@ -40,9 +40,9 @@ SYSTEM_NOTE = SYSTEM_INTRO
 SOURCE_QUALITY_ORDER = {"low": 0, "medium": 1, "high": 2}
 ANSWER_QUALITY_MIN_SCORE = 62
 
-# How many ranked results count as evidence, on BOTH sides of the generation boundary: the model's prompt
-# context (kenn/llm/llm_rewrite.py build_raw_context_block) and the gate that judges what came back
-# (kenn/core/chat_grounding.py). One number, because the two drifting apart is exactly the bug this records.
+# How far down the ranked list the model reads for context, and therefore how far the evidence gate reads too.
+# It is one number because the two drifting apart is the bug, and llm_rewrite.model_evidence() now hands the
+# gate the same excerpt list the prompt was built from rather than letting it re-derive one.
 #
 # 2 Oct 2026, streaming chat, kenn-brain-qwen3-8b, cache off. Widening the model's context to a 12-chunk scan
 # with a 1200-char block and 400 chars per chunk was correct, but the gate stayed on display_results(query,
@@ -52,9 +52,15 @@ ANSWER_QUALITY_MIN_SCORE = 62
 # never looked at. The offline sweep had only confirmed the measurements reached the model; it never checked
 # that the gate knew about them. That is the whole class of error here — measure the seam, not one end.
 #
-# This is not a loosening of what counts as support. A number still has to appear verbatim in a retrieved
-# note and a cited filename still has to be a source we actually retrieved; only the depth of the ranked list
-# we read to find them changed, and it now matches the depth the model was shown.
+# The same seam was then fixed in the other direction. The gate had been reading every chunk's text in full
+# while the prompt fitted 2 to 4 excerpts into 1200 chars at 400 each, so on index v-db8c6334cf63 the reverb
+# query showed the model 3 excerpts while the gate read 10 chunks, and 22 measurements sat in gate evidence the
+# model was never shown. A figure from the model's training prior got waved through on the strength of a chunk
+# it had not read.
+#
+# This is not a loosening of what counts as support. A number still has to appear verbatim in text the model
+# was actually shown, and a cited filename still has to be a source it was shown a label for. Only the drift
+# between the two sides is gone.
 EVIDENCE_SCAN_WINDOW = 12
 
 _TRY_LABEL = re.compile(

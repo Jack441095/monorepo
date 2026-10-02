@@ -142,10 +142,12 @@ blocked.**
   reachable via both `chat/app.py`'s narrow path and now `server.py`'s
   full path.
 - `llm/llm_rewrite.py` is a real, well-engineered, self-contained LLM
-  client (caching, retry, streaming) that is correctly disabled by default.
-  The separate local fine-tuned model path (`kenn_lm.py`) is deliberately
-  gated off, noted in its own comments as rejected by an internal
-  evaluation on 2026-07-14.
+  client (caching, retry, streaming) that is correctly disabled by default,
+  and the only LLM path left in the tree. The separate local fine-tuned model
+  path (`kenn_lm.py`, `kenn_lm_server.py`, `dual_inference_router.py`) was
+  deleted outright: the fine-tuned checkpoint had been rejected by an internal
+  context-adherence evaluation on 2026-07-14, so the whole path sat behind a
+  double env gate that nothing in production ever set.
 - `knowledge/` (reasoning traces, corrections, trust scores, contradiction
   detection, maintenance scheduling) is genuinely self-contained against
   its own local SQLite DB (auto-created, not the external `audio_too.db`)
