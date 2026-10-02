@@ -10,7 +10,7 @@ Run from `packages/chat` with `eval_chat_coverage.evaluate()` and `eval_runner.r
 
 | Row | Cause found |
 | --- | --- |
-| `wwise-mobile-ambience-memory` | **Routing gap, fixed here.** The wrapper refuses game audio by route, and 27 of the 28 game-audio cases are refused. This one ("mobile build runs out of audio memory…") routed to `production` because it says none of Wwise, Unity or "game build". The wrapper answered it with high confidence. |
+| `wwise-mobile-ambience-memory` | **Routing gap, fixed here.** The wrapper refuses game audio by route. This one ("mobile build runs out of audio memory…") did not route to `game_audio`, because it names none of the existing terms, so the wrapper answered it instead of abstaining. |
 | `arrangement-energy-transitions` | Retrieval ranking: three other arrangement notes outrank `arrangement-energy-and-transitions.md`. The answer is plausible; the note is just not in the top three. Open. |
 | `ambiguity-thin-vocal-eq-vs-recording` | Retrieval ranking: `harsh-vocal-fix.md` and the iZotope EQ notes outrank `thin-vocal-body.md` for "recorded too far from the mic". Open. |
 | `harsh-after-mastering` | Abstains (low confidence, no sources) where the case wants a limiter/clipper/saturation diagnosis. Open. |
@@ -25,8 +25,7 @@ against these same rows, so they were left alone.
 
 ## Changed behavior
 
-`game_audio` topic terms in `retrieval/retrieval.py` gain "mobile build" and "audio memory". Both
-phrases already appear in `wwise-combat-voice-memory-budget.md` as game-audio vocabulary. The question now
+`game_audio` topic terms in `retrieval/retrieval.py` gain "mobile build" and "audio memory". The question now
 classifies as `game_audio` and routes there in the backend as well as in the wrapper, so the wrapper
 refuses it like its siblings. The coverage receipt goes from 125 of 128 to 126 of 128.
 
@@ -50,7 +49,7 @@ From `products/kenn/packages/chat`:
 - Scoped: 3 passed (new file).
 - Full backend: 3,527 passed, 12 skipped, no failures (137.22 s), the earlier 3,524 plus the three new cases.
 - Package wrapper: 72 passed, 2 failed, the same two tests as before. Their failing rows are now two (coverage) and five (held-out).
-- The routing test fails without the two added terms (the question routes to `production` again).
+- Mutation check: with `retrieval.py` reverted to the previous commit, the two positive cases fail and the negative control passes (2 failed, 1 passed). The edited file was restored and the diff is empty.
 
 No model was loaded, nothing was written to Live, the index was not rebuilt, no dependency or CI file changed.
 
