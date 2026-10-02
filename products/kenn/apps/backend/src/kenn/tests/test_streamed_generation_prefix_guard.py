@@ -395,6 +395,23 @@ def test_a_range_split_across_two_tokens_is_still_caught() -> None:
     assert tripped and _measurements("High-pass the mud from 200-400 Hz.") - {"150ms"} == {"200hz", "400hz"}
 
 
+def test_a_unit_the_tokenizer_splits_after_db_is_not_judged_as_plain_db() -> None:
+    """The model writes "-6 dB" and "FS" as two tokens; the sources said -6 dBFS and the guard cut the answer."""
+    guard = StreamedAnswerGuard({"-6dbfs"})
+
+    assert guard.check("Aim for peaks around -12 to -6") is None
+    assert guard.check(" dB") is None
+    assert guard.check("FS on the meter.") is None
+
+
+def test_a_plain_db_the_sources_do_not_have_is_still_caught_once_the_unit_is_finished() -> None:
+    guard = StreamedAnswerGuard({"-6dbfs"})
+
+    assert guard.check("Pull it down by -3") is None
+    assert guard.check(" dB") is None
+    assert guard.check(" on the bus.") is not None
+
+
 def test_the_guard_window_is_wide_enough_for_the_longest_match_it_has_to_catch() -> None:
     """The carry has to hold a whole match, or a rejection is lost in the seam between two tokens."""
     longest = "I have gone ahead and quantized the channel"

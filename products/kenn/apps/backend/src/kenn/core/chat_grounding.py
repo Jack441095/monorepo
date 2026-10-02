@@ -633,7 +633,11 @@ class StreamedAnswerGuard:
     def check(self, token: str) -> dict | None:
         """None while the text is still defensible, else why we stopped streaming it."""
         window = self._carry + token
-        leaked = _measurements(window) - self._allowed
+        # "-6 dB" is also the front half of "-6 dBFS" and "-0.3 dBTP", and the model's tokenizer splits right
+        # after the dB. Judging the window there cut two good answers on 2 Oct 2026 (the sources had -6 dBFS and
+        # -0.3 dBTP). The carry keeps the text, so the next token's window sees the whole unit.
+        judged = window[:-2] if window.lower().endswith("db") else window
+        leaked = _measurements(judged) - self._allowed
         if leaked:
             return {
                 "warning": (
