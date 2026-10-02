@@ -2012,11 +2012,7 @@ def _answer_payload_stream(
                 final_metadata = ev.get("data")
                 break
 
-        cache_safe = final_metadata and not (
-            final_metadata.get("proposal") or final_metadata.get("requires_confirmation")
-            or final_metadata.get("confirmation_token")
-        )
-        if cache_safe and (final_metadata.get("llm_enhanced") or final_metadata.get("confidence") == "high"):
+        if _may_store_in_semantic_cache(final_metadata):
             try:
                 from kenn.core.session_memory import save_to_semantic_cache
                 written = answer_upgrades.write_if_current(
@@ -2031,6 +2027,20 @@ def _answer_payload_stream(
                     "Semantic cache save failed; this answer won't be "
                     "served from cache next time", exc_info=True,
                 )
+
+
+def _may_store_in_semantic_cache(metadata: dict | None) -> bool:
+    """Only plain knowledge answers are replayable from the cache.
+
+    A proposal, its confirmation token or an orchestrator result describes the
+    session as it was when the question was asked. Replaying one skips the
+    fresh Live read and hands back a token that has already been spent.
+    """
+    if not metadata:
+        return False
+    if any(metadata.get(key) for key in ("proposal", "requires_confirmation", "confirmation_token", "orchestration")):
+        return False
+    return bool(metadata.get("llm_enhanced") or metadata.get("confidence") == "high")
 
 
 def answer_payload(
@@ -2753,7 +2763,8 @@ def _answer_payload(
     # Multi-turn conversations with history skip the cache to allow contextual
     # follow-ups. For single-turn questions, we scope semantic acceleration to
     # the active session_id so Project A's advice never leaks into Project B.
-    if allow_llm and record_session and not history:
+    cache_allowed = allow_llm and record_session and not history and not plugin_session_id
+    if cache_allowed:
         try:
             from kenn.core.session_memory import get_semantic_cache_hit
             cached_events = get_semantic_cache_hit(query, session_id=session_id)
@@ -2789,8 +2800,8 @@ def _answer_payload(
         retrieval_route=retrieval_route,
     )
 
-    if allow_llm and record_session and not history and isinstance(payload, dict):
-        if payload.get("llm_enhanced") or payload.get("confidence") == "high":
+    if cache_allowed and isinstance(payload, dict):
+        if _may_store_in_semantic_cache(payload):
             events = [
                 {"event": "metadata", "data": payload},
                 {"event": "token", "token": payload.get("answer", "")}

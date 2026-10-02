@@ -245,8 +245,15 @@ mock, an agent reviewer or an unrelated receipt.
     cache and checkpoint writes share the turn lock; plug-in/proposal events do
     not replay stale evidence or tokens. 97 scoped cases and the combined 3,413-case
     backend run pass; 23 mutations are caught. [Evidence and exact files](docs/evidence/KENN_STREAM_DELIVERY_2026-10-02.md).
-  - [ ] Trace other request owners, cache invalidation after preference/Live changes,
-    raw trace/trust persistence, project switching and Apply/Undo during generation.
+  - [x] Semantic cache now clears a session's entries when a preference is saved,
+    restored, forgotten or the profile cleared. Proposals, confirmation tokens and
+    orchestrator results are never stored, on either path, and the non-stream path
+    skips the cache for plug-in-bound requests like the stream path. 3,463 backend
+    cases pass; 12 mutations are caught. Live-state invalidation for other
+    state-describing routes remains open. [Evidence and exact files](docs/evidence/KENN_SEMANTIC_CACHE_STATE_2026-10-02.md).
+  - [ ] Trace other request owners, Live-change cache invalidation for the remaining
+    state-describing routes, raw trace/trust persistence, project switching and
+    Apply/Undo during generation.
     Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation
     remains unqualified.
