@@ -211,7 +211,8 @@ mock, an agent reviewer or an unrelated receipt.
 - [ ] **A2 — Trace every request and write route.** Inventory UI/HTTP/stream/background/
   voice/MCP entry points through routing, context, proposal, Apply, readback and Undo.
   Compare function/registry bindings, not names alone. Record each bypass or duplicate
-  owner with a source symbol and reproducible fixture. Do not refactor while auditing.
+  owner with a source symbol and reproducible fixture. Finish the reachability trace
+  for each owner before changing it.
 - [ ] **A3 — Resolve scoped delivery defects first.** Audit memory/cache isolation,
   project switching, upgrade polling ownership, stale-turn replacement and
   cancellation; fix verified defects with cross-session and late-job tests.
@@ -233,6 +234,12 @@ mock, an agent reviewer or an unrelated receipt.
     project switching and Apply/Undo during generation. Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation
     remains unqualified. Public wrapper import-time model/index mutations remain open.
+  - [ ] Remove confirmed dead code and redundant ownership after checking callers,
+    exports, dynamic registries, packaging and tests. Keep cleanup independent of
+    the fixed benchmark revision; qualify each deletion with scoped checks.
+  - [x] Removed two overridden, unreachable clip methods from `AbletonOSCClient`;
+    the final public methods retain the same behavior. Caller/registry and AST
+    checks establish reachability; 39 scoped OSC/clip tests pass. [Evidence and exact files](docs/evidence/KENN_DEAD_CLIP_METHODS_2026-10-02.md).
 - [ ] **A4 — Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.

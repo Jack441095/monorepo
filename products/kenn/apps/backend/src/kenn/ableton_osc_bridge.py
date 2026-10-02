@@ -1566,12 +1566,6 @@ class AbletonOSCClient:
     def load_clip(self, track_index: int, clip_slot_index: int, file_path: str) -> bool:
         return self._send_only("/live/clip/load", [int(track_index), int(clip_slot_index), str(file_path)])
 
-    def launch_clip(self, track_index: int, clip_slot_index: int) -> bool:
-        return self._send_only("/live/clip_slot/fire", [int(track_index), int(clip_slot_index)])
-
-    def stop_clip(self, track_index: int, clip_slot_index: int) -> bool:
-        return self._send_only("/live/clip_slot/stop", [int(track_index), int(clip_slot_index)])
-
     def get_clip_playback_state(self, track_index: int, clip_slot_index: int) -> Dict[str, Any]:
         """Read the exact Session View clip's playback flags.
 
