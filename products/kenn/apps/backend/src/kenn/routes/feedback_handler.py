@@ -22,18 +22,22 @@ except ImportError:
     demo_feedback = None
 
 
-def handle_feedback(handler: Any, payload: dict) -> None:
+def feedback_result(payload: dict) -> tuple[int, dict]:
+    """Shared by the stdlib server and the FastAPI app so neither reports a rating it did not store."""
     if not demo_feedback:
-        handler.send_json(503, {"error": "Feedback storage is unavailable."})
-        return
+        return 503, {"error": "Feedback storage is unavailable."}
     rating = str(payload.get("rating", "")).strip().lower()
     if rating not in {"useful", "not_useful"}:
-        handler.send_json(400, {"error": "rating must be useful or not_useful."})
-        return
+        return 400, {"error": "rating must be useful or not_useful."}
     feedback_kind = str(payload.get("kind", "")).strip().lower()
     payload["channel"] = "mix_review" if feedback_kind == "mix_review" else "main_chat"
     row = demo_feedback.record_feedback(payload)
-    handler.send_json(201, {"ok": True, "feedback": row})
+    return 201, {"ok": True, "feedback": row}
+
+
+def handle_feedback(handler: Any, payload: dict) -> None:
+    status, body = feedback_result(payload)
+    handler.send_json(status, body)
 
 
 def handle_session_feedback(handler: Any, payload: dict) -> None:

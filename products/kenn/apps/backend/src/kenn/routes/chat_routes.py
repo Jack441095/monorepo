@@ -66,12 +66,9 @@ def handle_suggest(query: str) -> tuple[int, dict[str, Any]]:
 
 def handle_feedback(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
     """Record user feedback on chat answers."""
-    message_id = str(payload.get("message_id") or payload.get("turn_id") or "").strip()
-    rating = payload.get("rating")
-    comment = str(payload.get("comment", "")).strip()
-    if not message_id or rating is None:
-        return 400, {"ok": False, "error": "Missing message_id or rating."}
-    return 200, {"ok": True, "message": "Feedback recorded."}
+    from kenn.routes.feedback_handler import feedback_result
+
+    return feedback_result(payload)
 
 
 def handle_session_clear(session_id: str) -> tuple[int, dict[str, Any]]:
