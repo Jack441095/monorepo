@@ -1,0 +1,583 @@
+{
+ "schema": "kenn.conversation_cases.v1",
+ "generated_at": "2026-10-02T23:39:11.320857+00:00",
+ "counts": {
+  "conversations": 6,
+  "turns": 30,
+  "attempted": 24,
+  "accepted": 12,
+  "errors": 0
+ },
+ "conversations": [
+  {
+   "id": "anaphora-sidechain",
+   "tests": "pronouns and 'the other one' pointing back at the last answer",
+   "turns": [
+    {
+     "turn": 1,
+     "seconds": 13.2,
+     "ttft_seconds": 3.3,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 2,
+     "seconds": 5.98,
+     "ttft_seconds": 4.47,
+     "route": "ableton",
+     "answer_mode": "ableton_steps",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: 100ms, 300ms"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 3,
+     "seconds": 10.8,
+     "ttft_seconds": 9.63,
+     "route": "production",
+     "answer_mode": "quick_fix",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: 0.01ms, 1ms"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 4,
+     "seconds": 10.98,
+     "ttft_seconds": 6.39,
+     "route": "production",
+     "answer_mode": "quick_fix",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: 30ms, 80ms"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 5,
+     "seconds": 2.09,
+     "ttft_seconds": 2.09,
+     "route": "out_of_scope",
+     "answer_mode": null,
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": false,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [],
+     "sources": 0,
+     "confidence": "low",
+     "found": false,
+     "error": null
+    }
+   ]
+  },
+  {
+   "id": "correction-muddy-source",
+   "tests": "the user corrects which instrument they meant",
+   "turns": [
+    {
+     "turn": 1,
+     "seconds": 0.05,
+     "ttft_seconds": 0.05,
+     "route": "ableton_controller",
+     "answer_mode": null,
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": false,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [],
+     "sources": 0,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 2,
+     "seconds": 4.13,
+     "ttft_seconds": 3.25,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: 200hz, 500hz"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 3,
+     "seconds": 0.01,
+     "ttft_seconds": 0.01,
+     "route": "ableton_controller",
+     "answer_mode": null,
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": false,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [],
+     "sources": 0,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 4,
+     "seconds": 14.53,
+     "ttft_seconds": 5.11,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: 200hz, 500hz"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 5,
+     "seconds": 37.14,
+     "ttft_seconds": 6.28,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    }
+   ]
+  },
+  {
+   "id": "topic-changes",
+   "tests": "unrelated questions in a row, then going back to the first",
+   "turns": [
+    {
+     "turn": 1,
+     "seconds": 50.44,
+     "ttft_seconds": 12.51,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 2,
+     "seconds": 36.63,
+     "ttft_seconds": 9.96,
+     "route": "production",
+     "answer_mode": "client_delivery",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 3,
+     "seconds": 7.61,
+     "ttft_seconds": 6.78,
+     "route": "production",
+     "answer_mode": "client_delivery",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: -14lufs"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 4,
+     "seconds": 37.01,
+     "ttft_seconds": 10.18,
+     "route": "ableton",
+     "answer_mode": "ableton_steps",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 5,
+     "seconds": 39.13,
+     "ttft_seconds": 9.67,
+     "route": "ableton",
+     "answer_mode": "ableton_steps",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    }
+   ]
+  },
+  {
+   "id": "partial-requests",
+   "tests": "requests that are too thin until a later turn fills them in",
+   "turns": [
+    {
+     "turn": 1,
+     "seconds": 0.0,
+     "ttft_seconds": 0.0,
+     "route": "clarify",
+     "answer_mode": null,
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": false,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [],
+     "sources": 0,
+     "confidence": "low",
+     "found": false,
+     "error": null
+    },
+    {
+     "turn": 2,
+     "seconds": 36.82,
+     "ttft_seconds": 5.67,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 3,
+     "seconds": 45.8,
+     "ttft_seconds": 9.04,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 4,
+     "seconds": 0.0,
+     "ttft_seconds": 0.0,
+     "route": "clarify",
+     "answer_mode": null,
+     "used_history": true,
+     "search_query_has_history": false,
+     "attempted": false,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [],
+     "sources": 0,
+     "confidence": "low",
+     "found": false,
+     "error": null
+    },
+    {
+     "turn": 5,
+     "seconds": 24.19,
+     "ttft_seconds": 8.66,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: 100hz, 80hz"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    }
+   ]
+  },
+  {
+   "id": "read-only-then-action",
+   "tests": "advice stays advice; an action needs an explicit Apply",
+   "turns": [
+    {
+     "turn": 1,
+     "seconds": 14.72,
+     "ttft_seconds": 5.52,
+     "route": "production",
+     "answer_mode": "mastering_safety",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: -0.1db"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 2,
+     "seconds": 16.93,
+     "ttft_seconds": 8.38,
+     "route": "production",
+     "answer_mode": "mastering_safety",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: -1dbfs"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 3,
+     "seconds": 57.96,
+     "ttft_seconds": 11.49,
+     "route": "ableton",
+     "answer_mode": "ableton_steps",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 4,
+     "seconds": 27.42,
+     "ttft_seconds": 10.79,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: -6db"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 5,
+     "seconds": 16.21,
+     "ttft_seconds": 9.32,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "streamed generation introduced unsupported measurements: -12dbfs"
+     ],
+     "sources": 3,
+     "confidence": "low",
+     "found": true,
+     "error": null
+    }
+   ]
+  },
+  {
+   "id": "no-job-to-run",
+   "tests": "asking about a result that does not exist, then restarting",
+   "turns": [
+    {
+     "turn": 1,
+     "seconds": 22.5,
+     "ttft_seconds": 3.9,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 2,
+     "seconds": 25.39,
+     "ttft_seconds": 6.22,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 3,
+     "seconds": 0.01,
+     "ttft_seconds": 0.01,
+     "route": "clarify",
+     "answer_mode": null,
+     "used_history": true,
+     "search_query_has_history": false,
+     "attempted": false,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [],
+     "sources": 0,
+     "confidence": "low",
+     "found": false,
+     "error": null
+    },
+    {
+     "turn": 4,
+     "seconds": 20.23,
+     "ttft_seconds": 20.22,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": false,
+     "search_query_has_history": false,
+     "attempted": true,
+     "accepted": false,
+     "llm_enhanced": false,
+     "warnings": [
+      "generation stream cut short: TimeoutError: LLM stream timed out after 20s"
+     ],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    },
+    {
+     "turn": 5,
+     "seconds": 51.23,
+     "ttft_seconds": 14.58,
+     "route": "production",
+     "answer_mode": "mix_diagnosis",
+     "used_history": true,
+     "search_query_has_history": true,
+     "attempted": true,
+     "accepted": true,
+     "llm_enhanced": true,
+     "warnings": [],
+     "sources": 3,
+     "confidence": "high",
+     "found": true,
+     "error": null
+    }
+   ]
+  }
+ ]
+}

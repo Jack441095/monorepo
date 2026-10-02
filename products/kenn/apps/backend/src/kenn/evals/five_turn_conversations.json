@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "description": "Scripted five-turn conversations for C3. Each turn is sent with the earlier user and assistant turns as history, the way the browser companion does. These are for reading the answers and counting fallbacks, not for scoring: nothing here has expected text.",
+  "conversations": [
+    {
+      "id": "anaphora-sidechain",
+      "tests": "pronouns and 'the other one' pointing back at the last answer",
+      "turns": [
+        "How do I set up sidechain compression on a bass in Ableton Live?",
+        "How fast should the release be on that?",
+        "And the attack?",
+        "It still pumps too much, what do I change first?",
+        "Give me the settings we ended up with in one list."
+      ]
+    },
+    {
+      "id": "correction-muddy-source",
+      "tests": "the user corrects which instrument they meant",
+      "turns": [
+        "My vocal sounds muddy in the mix.",
+        "Which frequencies should I look at?",
+        "Sorry, it is the acoustic guitar that is muddy, not the vocal.",
+        "Would the same cut work there?",
+        "Anything else I should check before I touch the EQ?"
+      ]
+    },
+    {
+      "id": "topic-changes",
+      "tests": "unrelated questions in a row, then going back to the first",
+      "turns": [
+        "How long should a reverb decay be on drums?",
+        "What do I need to export stems for a client?",
+        "What loudness should I master to for streaming?",
+        "Going back to the drum reverb, should I high-pass the return?",
+        "Does that change if the drums are very dense?"
+      ]
+    },
+    {
+      "id": "partial-requests",
+      "tests": "requests that are too thin until a later turn fills them in",
+      "turns": [
+        "Make it sound bigger.",
+        "The snare.",
+        "Without making it louder.",
+        "What would you try first?",
+        "And how do I check it did not hurt the kick?"
+      ]
+    },
+    {
+      "id": "read-only-then-action",
+      "tests": "advice stays advice; an action needs an explicit Apply",
+      "turns": [
+        "What does a limiter do on the master?",
+        "Put a limiter on the master for me.",
+        "No, on the drum bus instead.",
+        "What threshold would you suggest there?",
+        "Cancel that, I will do it myself."
+      ]
+    },
+    {
+      "id": "no-job-to-run",
+      "tests": "asking about a result that does not exist, then restarting",
+      "turns": [
+        "How did the analysis of my mix go?",
+        "Run it again.",
+        "What was the problem with it?",
+        "Forget that, start over. How do I check my mix in mono?",
+        "Why does that matter for bass?"
+      ]
+    }
+  ]
+}
