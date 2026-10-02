@@ -13,10 +13,21 @@ AudioTooLimiterAudioProcessor::AudioTooLimiterAudioProcessor()
                      .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
       apvts(*this, nullptr, "Parameters", createParameterLayout())
 {
+    registerTransportChangeListener(this);
 }
 
 AudioTooLimiterAudioProcessor::~AudioTooLimiterAudioProcessor()
 {
+    unregisterAllTransportChangeListeners(this);
+}
+
+// The carried look-ahead backlog is up to 10 ms of already-processed audio, so
+// without this a transport restart would play the tail of the previous take out
+// of the delay line. Safe to reset here: the envelope re-attacks on the first
+// hot sample of the new take either way, and a stop is silence regardless.
+void AudioTooLimiterAudioProcessor::transportChanged()
+{
+    resetLimiterState();
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout AudioTooLimiterAudioProcessor::createParameterLayout()
@@ -39,18 +50,32 @@ void AudioTooLimiterAudioProcessor::prepareToPlay(double sampleRate, int samples
 {
     inLDouble.resize(static_cast<std::size_t>(samplesPerBlock));
     inRDouble.resize(static_cast<std::size_t>(samplesPerBlock));
-    gainLDouble.resize(static_cast<std::size_t>(samplesPerBlock));
-    gainRDouble.resize(static_cast<std::size_t>(samplesPerBlock));
     outLDouble.resize(static_cast<std::size_t>(samplesPerBlock));
     outRDouble.resize(static_cast<std::size_t>(samplesPerBlock));
+
+    // Allocated here rather than in the constructor: the kernel's deque grows
+    // on first use, and doing that on the audio thread is how you get a dropout
+    // the first time a user nudges the look-ahead knob.
+    if (limiterState == nullptr)
+        limiterState = limiter_stereo_state_create();
+    else
+        limiter_stereo_state_reset(limiterState);
 
     const float lookaheadMs = apvts.getRawParameterValue("lookahead_ms")->load();
     const int latencySamples = static_cast<int>((lookaheadMs / 1000.0f) * sampleRate);
     setLatencySamples(latencySamples);
 }
 
+void AudioTooLimiterAudioProcessor::resetLimiterState()
+{
+    if (limiterState != nullptr)
+        limiter_stereo_state_reset(limiterState);
+}
+
 void AudioTooLimiterAudioProcessor::releaseResources()
 {
+    limiter_stereo_state_destroy(limiterState);
+    limiterState = nullptr;
 }
 
 bool AudioTooLimiterAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
@@ -77,8 +102,6 @@ void AudioTooLimiterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffe
     if (inLDouble.size() < static_cast<std::size_t>(numSamples)) {
         inLDouble.resize(numSamples);
         inRDouble.resize(numSamples);
-        gainLDouble.resize(numSamples);
-        gainRDouble.resize(numSamples);
         outLDouble.resize(numSamples);
         outRDouble.resize(numSamples);
     }
@@ -102,24 +125,32 @@ void AudioTooLimiterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffe
     const int lookaheadSamples = std::max(1, static_cast<int>((lookaheadMs / 1000.0) * sampleRate));
     const double alphaRel = std::exp(-1.0 / ((releaseMs / 1000.0) * sampleRate));
 
-    limiter_gain_envelope(
-        inLDouble.data(), static_cast<std::size_t>(numSamples),
+    // One stereo-linked call, not one per channel. The gain comes from
+    // max(|L|,|R|) and is applied to both, so the image survives gain
+    // reduction instead of the two sides drifting apart under an envelope
+    // each channel computed for itself.
+    const std::size_t produced = limiter_gain_envelope_stereo(
+        limiterState,
+        inLDouble.data(), inRDouble.data(), static_cast<std::size_t>(numSamples),
         inputGain, ceilingLin, alphaRel, lookaheadSamples,
-        gainLDouble.data(), outLDouble.data()
-    );
-
-    limiter_gain_envelope(
-        inRDouble.data(), static_cast<std::size_t>(numSamples),
-        inputGain, ceilingLin, alphaRel, lookaheadSamples,
-        gainRDouble.data(), outRDouble.data()
+        nullptr, outLDouble.data(), outRDouble.data()
     );
 
     float* leftOut = buffer.getWritePointer(0);
     float* rightOut = buffer.getWritePointer(1);
 
-    for (int i = 0; i < numSamples; ++i) {
+    for (std::size_t i = 0; i < produced; ++i) {
         leftOut[i] = static_cast<float>(outLDouble[i]);
         rightOut[i] = static_cast<float>(outRDouble[i]);
+    }
+
+    // The first block after prepareToPlay is short by the look-ahead window: the
+    // kernel has not seen the samples that would complete those envelopes yet.
+    // We declare that delay via setLatencySamples, so silence here is the host's
+    // accounting, not dropped audio.
+    for (std::size_t i = produced; i < static_cast<std::size_t>(numSamples); ++i) {
+        leftOut[i] = 0.0f;
+        rightOut[i] = 0.0f;
     }
 }
 

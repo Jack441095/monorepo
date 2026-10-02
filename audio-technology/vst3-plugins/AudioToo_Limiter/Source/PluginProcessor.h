@@ -11,13 +11,37 @@
 #include <vector>
 
 extern "C" {
+    // Mono batch envelope, kept for the offline/numpy paths that hold this
+    // kernel to bit-parity with the Python limiter. NOT for processBlock: it
+    // is stateless, so calling it per channel gave L and R independent
+    // envelopes and reset the release one-pole at every block boundary.
     void limiter_gain_envelope(
         const double* x, std::size_t n,
         double input_gain, double ceiling_lin, double alpha_rel, int L,
         double* gain_out, double* audio_out);
+
+    // Stereo-linked streaming envelope. One gain per sample from
+    // max(|L|,|R|), with the release and the look-ahead window carried in
+    // `state` across calls.
+    struct LimiterStereoState;
+
+    LimiterStereoState* limiter_stereo_state_create(void);
+    void limiter_stereo_state_destroy(LimiterStereoState* state);
+    void limiter_stereo_state_reset(LimiterStereoState* state);
+
+    std::size_t limiter_gain_envelope_stereo(
+        LimiterStereoState* state,
+        const double* left, const double* right, std::size_t n,
+        double input_gain, double ceiling_lin, double alpha_rel, int L,
+        double* gain_out, double* out_left, double* out_right);
+
+    std::size_t limiter_stereo_state_flush(
+        LimiterStereoState* state,
+        double* gain_out, double* out_left, double* out_right);
 }
 
-class AudioTooLimiterAudioProcessor : public juce::AudioProcessor
+class AudioTooLimiterAudioProcessor : public juce::AudioProcessor,
+                                     private juce::TransportChangeListener
 {
 public:
     AudioTooLimiterAudioProcessor();
@@ -53,12 +77,19 @@ public:
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
+    // Drops the release one-pole and the look-ahead backlog. Called from
+    // prepareToPlay and on transport change, the two points where the signal
+    // genuinely restarted rather than continued.
+    void resetLimiterState();
+
+    void transportChanged() override;
+
     std::vector<double> inLDouble;
     std::vector<double> inRDouble;
-    std::vector<double> gainLDouble;
-    std::vector<double> gainRDouble;
     std::vector<double> outLDouble;
     std::vector<double> outRDouble;
+
+    LimiterStereoState* limiterState = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioTooLimiterAudioProcessor)
 };
