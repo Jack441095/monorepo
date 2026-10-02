@@ -249,9 +249,13 @@ mock, an agent reviewer or an unrelated receipt.
     restored, forgotten or the profile cleared. Proposals, confirmation tokens and
     orchestrator results are never stored, on either path, and the non-stream path
     skips the cache for plug-in-bound requests like the stream path. 3,463 backend
-    cases pass; 12 mutations are caught. Live-state invalidation for other
-    state-describing routes remains open. [Evidence and exact files](docs/evidence/KENN_SEMANTIC_CACHE_STATE_2026-10-02.md).
-  - [ ] Trace other request owners, Live-change cache invalidation for the remaining
+    cases pass; 12 mutations are caught. [Evidence and exact files](docs/evidence/KENN_SEMANTIC_CACHE_STATE_2026-10-02.md).
+  - [x] Semantic cache also skips follow-ups and diagnostic reports inside a session,
+    answers built from saved mix reviews or track memory, and audio-generation payloads
+    that carry a queued job, on both paths. 20 scoped cases pass and nine mutations
+    are caught; the gate is a list of routes found by reading, not a proof that no
+    other route reads session state. [Evidence and exact files](docs/evidence/KENN_SEMANTIC_CACHE_SESSION_STATE_2026-10-02.md).
+  - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.
     Discarding delivery keeps
@@ -343,6 +347,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   - [ ] Preserve native load/prefill/decode/cache/completion metrics for every
     attempt, including route calls and rejected/interrupted streams. Missing metrics
     remain unknown; superseded requests cannot persist text or memory/cache writes.
+    - [x] Provider attempts record native phase timings, token counts and completion
+      reason, including failed, interrupted and cached calls; unreturned metrics stay
+      unknown, and the latency script keeps each question's provider calls. Stubbed
+      providers only, no mutation checks, no real-model run, and the superseded-request
+      write clause is not covered. [Evidence and exact files](docs/evidence/KENN_LLM_ATTEMPT_TELEMETRY_2026-10-02.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
