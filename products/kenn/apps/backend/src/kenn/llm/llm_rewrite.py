@@ -28,6 +28,7 @@ import httpx
 
 from kenn.core.chat_constants import ANSWER_MODES, EVIDENCE_SCAN_WINDOW, count_actionable_steps
 from kenn.knowledge.reasoning import get_chunk_id
+from kenn.paths import PRODUCT_ROOT
 
 ROOT = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = ROOT.parent.parent
@@ -65,7 +66,8 @@ Tone: Conversational and opinionated. Use UK spelling and direct verbs ("I'd", "
 
 Answer structure (strictly required):
   Short answer: (one punchy paragraph — verdict first, then reason)
-  Try this: (numbered steps 1. 2. 3. actionable in the DAW)
+  Try this: (numbered steps 1. 2. 3. actionable in the DAW, each on its own line)
+  Check: (one line the producer can use to verify the change actually worked)
   Why it matters: (one paragraph of the underlying engineering principle)
   {sources_instruction}
   You could also ask: (- up to 3 short follow-up questions)
@@ -100,7 +102,8 @@ Tone: Conversational and opinionated. Use UK spelling and direct verbs ("I'd", "
 
 Answer structure (strictly required):
   Short answer: (one punchy paragraph — verdict first, then reason)
-  Try this: (numbered steps 1. 2. 3. actionable in the DAW)
+  Try this: (numbered steps 1. 2. 3. actionable in the DAW, each on its own line)
+  Check: (one line the producer can use to verify the change actually worked)
   Why it matters: (one paragraph of the underlying engineering principle)
   You could also ask: (- up to 3 short follow-up questions)
 
@@ -186,7 +189,16 @@ def _add_usage(usage: LLMUsage) -> None:
 
 
 def load_env() -> None:
-    for path in (PROJECT_ROOT / ".env", ROOT / ".env"):
+    # PRODUCT_ROOT (products/kenn) last, and it is the only one of the three an operator can arrive at from
+    # the shipped .env.example: it sits beside that file, so copying the example to .env writes exactly the
+    # file ROOT and PROJECT_ROOT both walked past -- they live under apps/, three directories too deep. A fresh
+    # clone therefore loaded nothing at all, and tooling/scripts/deploy-and-run-notes.sh writes the four
+    # AUDIO_TOO_LLM_* keys the LLM needs into a .env at the product root, which nobody read.
+    #
+    # Order matters because the loop is first-wins: a key already in os.environ is left alone, so adding a
+    # directory can only supply keys the older two don't set. Last keeps a working apps/backend/.env from
+    # being shadowed by a product-root file copied from the example.
+    for path in (PROJECT_ROOT / ".env", ROOT / ".env", PRODUCT_ROOT / ".env"):
         if not path.exists():
             continue
         for line in path.read_text(encoding="utf-8").splitlines():
@@ -303,9 +315,16 @@ def config(task: str = "rewrite") -> dict:
         or os.environ.get(f"AUDIO_TOO_LLM_MODEL_{task.upper()}", "").strip()
     )
     if not model:
+        # Empty, not a model name. The default used to read "gpt-4o-mini", which cannot work in the default
+        # configuration: the provider above still falls back to ollama, so that name was posted to
+        # 127.0.0.1:11434 and came back 404 "model gpt-4o-mini not found". An operator who had not configured
+        # a model at all was told a cloud model was missing, which reads as "go and get access" rather than
+        # "set one variable". Nothing reaches a cloud with an empty name -- is_enabled() below still refuses
+        # any non-ollama provider that has no API key -- and missing_model_message() says which variable is
+        # missing instead of leaving Ollama's 404 to say it.
         model = (
             os.environ.get("KENN_LLM_MODEL", "").strip()
-            or os.environ.get("AUDIO_TOO_LLM_MODEL", "gpt-4o-mini").strip()
+            or os.environ.get("AUDIO_TOO_LLM_MODEL", "").strip()
         )
     # A per-task switch (e.g. KENN_LLM_ENABLED_COMMAND) enables one task alone,
     # so the Live command planner can run in shadow without also turning on
@@ -365,6 +384,29 @@ def is_enabled(task: str = "rewrite") -> bool:
     if cfg["provider"] == "ollama":
         return True
     return bool(cfg["api_key"])
+
+
+def missing_model_message(cfg: dict, task: str = "rewrite") -> str:
+    """Why this config has no model to ask for, or "" when it has one.
+
+    Ollama only. It is the default provider and both of its routes 404 on a name it does not hold, so an
+    unconfigured install lands exactly here and has to be told which variable to set. Deliberately not a
+    hard error for any other provider: a third-party OpenAI-compatible server may ignore the model field or
+    serve it under an alias, and failing a setup that is working is worse than a confusing 404 we have not
+    actually seen.
+
+    Checked at the request boundary rather than in is_enabled(), which stays the enablement switch: a missing
+    model has to say so out loud, and returning False there would just hand back the template answer and hide
+    the reason for it.
+    """
+    if cfg["model"] or cfg["provider"] != "ollama":
+        return ""
+    suffix = f"_{task.upper()}" if task != "rewrite" else ""
+    return (
+        f"No LLM model configured for task '{task}'. Set KENN_LLM_MODEL{suffix} "
+        f"(or AUDIO_TOO_LLM_MODEL{suffix}) in .env — {cfg['provider']} at {cfg['base_url']} "
+        "has no model to answer with."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1071,6 +1113,13 @@ def _chat_completion(
         except Exception:
             pass
 
+    # Below the MLX branch on purpose: on-device inference answers without a provider model name, and
+    # mlx_selected() treats an unconfigured provider as its own. Checking above it would fail a Mac that has
+    # mlx_lm installed and nothing set, which answers today.
+    missing = missing_model_message(cfg, task)
+    if missing:
+        raise RuntimeError(missing)
+
     native = _ollama_think_off(cfg, json_schema)
     if native:
         url = f"{_native_ollama_base(cfg['base_url'])}/api/chat"
@@ -1235,6 +1284,11 @@ def chat_completion_stream(
         except Exception:
             pass
 
+    # Same placement as _chat_completion: after the MLX branch, before the provider is asked.
+    missing = missing_model_message(cfg, task)
+    if missing:
+        raise RuntimeError(missing)
+
     # The 1 Oct 2026 think-off fix only reached _chat_completion, so streaming chat stayed on Ollama's
     # OpenAI-compatible route, which ignores `think`. Every qwen3 answer then spent the whole
     # max_tokens cap inside a thinking block and returned no content: 0 of 29 accepted on 2 Oct 2026,
@@ -1389,6 +1443,13 @@ def llm_route_query(query: str) -> str | None:
     user_msg = ROUTE_CLASSIFICATION_PROMPT.format(query=query[:500])
     messages = [{"role": "user", "content": user_msg}]
     cfg = config("route")
+    # This one returns None rather than raising: routing has always degraded to its keyword matcher on any
+    # LLM failure, with the reason printed, and a caller that classifies a query should not have to guard
+    # against a misconfigured model. The message still reaches the operator log.
+    missing = missing_model_message(cfg, "route")
+    if missing:
+        print(f"WARNING: {missing} -- falling through to keyword routing")
+        return None
     # This call went to {base_url}/chat/completions unconditionally, which is the exact
     # route that ignores `think`. On kenn-brain-qwen3-8b -- a reasoning model -- the
     # whole 20-token cap went into a thinking block, content came back empty, the
@@ -1847,6 +1908,11 @@ def status_message() -> str:
     cfg = config()
     if not cfg["enabled"]:
         return "LLM rewrite off (set AUDIO_TOO_LLM_ENABLED=1 in .env)"
+    # Reported instead of the model name below, which is now an empty string when nothing is set: "LLM
+    # rewrite on —  @ http://127.0.0.1:11434/v1" tells an operator nothing about the one thing to fix.
+    missing = missing_model_message(cfg)
+    if missing:
+        return missing
     route_cfg = config("route") if is_enabled("route") else None
     parts = [f"LLM rewrite on — {cfg['model']}"]
     if route_cfg and route_cfg["model"] != cfg["model"]:
