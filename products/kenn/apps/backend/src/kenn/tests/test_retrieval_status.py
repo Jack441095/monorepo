@@ -57,6 +57,7 @@ def test_retrieval_status_does_not_claim_unwarmed_semantic_runtime(tmp_path, mon
 def test_retrieval_status_reports_hybrid_only_after_runtime_is_ready(tmp_path, monkeypatch) -> None:
     _write_lexical_index(tmp_path)
     (tmp_path / "embeddings.npy").write_bytes(b"present-for-status-only")
+    monkeypatch.setattr(retrieval, "INDEX_DIR", tmp_path)
     monkeypatch.setattr(retrieval, "_embedding_index", object())
     monkeypatch.setattr(retrieval, "_embedding_index_error", None)
     monkeypatch.setattr(retrieval, "_embedding_model", object())

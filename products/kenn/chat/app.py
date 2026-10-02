@@ -20,9 +20,6 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
 
-from index_runtime import configure_index_dir
-
-
 SERVICE_ROOT = Path(__file__).resolve().parent
 # SERVICE_ROOT is <repo>/products/kenn/chat.
 PRODUCT_ROOT = SERVICE_ROOT.parent
@@ -38,11 +35,6 @@ if not ENGINE_ROOT.is_dir():
 if str(ENGINE_ROOT) not in sys.path:
     sys.path.insert(0, str(ENGINE_ROOT))
 
-# The public service is permanently retrieval-only. Set this before importing
-# any KENN module because session_memory and the LLM config read environment
-# variables at import or first use.
-os.environ["AUDIO_TOO_LLM_ENABLED"] = "0"
-
 runtime_dir = Path(
     os.environ.get("KENN_CHAT_RUNTIME_DIR", str(SERVICE_ROOT / ".runtime"))
 ).expanduser()
@@ -57,10 +49,10 @@ from kenn.core.chat import (  # noqa: E402
     query_is_out_of_scope,
     route_query,
 )
+from kenn.retrieval.index_store import IndexValidationError, read_index_context  # noqa: E402
 
-INDEX_DIR_OVERRIDE = os.environ.get("KENN_CHAT_INDEX_DIR")
-if INDEX_DIR_OVERRIDE:
-    configure_index_dir(Path(INDEX_DIR_OVERRIDE))
+_index_override = os.environ.get("KENN_CHAT_INDEX_DIR")
+INDEX_DIR_OVERRIDE = Path(_index_override).expanduser().resolve() if _index_override else None
 
 
 MIX_ADVICE_TERMS = {
@@ -528,15 +520,22 @@ def _scoped_answer_payload(
 ) -> dict[str, Any]:
     # Public advice cannot disable another chat's specialist dispatcher or
     # create anonymous conversation memory while retrieving a source.
-    return answer_payload(
-        question,
-        limit=4,
-        history=history,
-        allow_llm=False,
-        session_id="",
-        answer_mode=answer_mode,
-        retrieval_only=True,
-    )
+    try:
+        with read_index_context(INDEX_DIR_OVERRIDE):
+            return answer_payload(
+                question,
+                limit=4,
+                history=history,
+                allow_llm=False,
+                session_id="",
+                answer_mode=answer_mode,
+                retrieval_only=True,
+            )
+    except IndexValidationError:
+        payload = _abstention_payload(question, "The configured knowledge index is unavailable.")
+        payload["intent"] = "engine_unavailable"
+        payload["answer"] = "KENN's configured knowledge index is unavailable. I can't answer from approved sources right now."
+        return payload
 
 
 def answer_mix_question(question: str, history: list[dict[str, str]] | None = None) -> dict[str, Any]:
@@ -548,6 +547,8 @@ def answer_mix_question(question: str, history: list[dict[str, str]] | None = No
 
     mode = classify_answer_mode(question, route, history=history)
     payload = _scoped_answer_payload(question, history, mode)
+    if payload.get("intent") == "engine_unavailable" and payload.get("answer"):
+        return _public_payload(payload)
     expanded_query = _expanded_retrieval_query(question)
     if expanded_query:
         expanded_payload = _scoped_answer_payload(expanded_query, history, mode)
@@ -583,7 +584,7 @@ def health() -> dict[str, Any]:
         "scope": "mix_advice_only",
         "llm_enabled": False,
         "audio_upload": False,
-        "retrieval": retrieval_status(),
+        "retrieval": retrieval_status(INDEX_DIR_OVERRIDE),
     }
 
 

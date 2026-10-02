@@ -6,6 +6,7 @@ Backward-compatible: falls back to JSON file if DB is unavailable.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -172,9 +173,16 @@ def _semantic_cache_version() -> str:
     fix for up to the full cache TTL.
     """
     try:
-        from kenn.retrieval.index_store import active_version_id
+        from kenn.retrieval.index_store import active_version_id, read_index_dir
 
-        index_version = active_version_id(ROOT / "data" / "index") or "no-index"
+        default_dir = ROOT / "data" / "index"
+        selected_dir = read_index_dir(default_dir).resolve()
+        index_version = active_version_id(selected_dir) or "no-index"
+        if selected_dir != default_dir.resolve():
+            # Version labels can be identical in separate corpora. Hash the
+            # resolved directory so cache keys identify it without exposing paths.
+            identity = hashlib.sha256(os.fsencode(selected_dir)).hexdigest()
+            index_version = f"{identity}:{index_version}"
     except Exception:
         index_version = "unknown-index"
     return f"{SEMANTIC_CACHE_LOGIC_VERSION}:{index_version}"

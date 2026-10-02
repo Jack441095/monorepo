@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 import sys
 import threading
@@ -48,7 +47,29 @@ def test_health_is_explicitly_retrieval_only() -> None:
     }
     assert payload["retrieval"]["schema"] == "kenn.retrieval_status.v1"
     assert payload["retrieval"]["active_mode"] in {"unavailable", "bm25_only", "hybrid"}
-    assert os.environ["AUDIO_TOO_LLM_ENABLED"] == "0"
+
+
+@pytest.mark.parametrize("kind", ["missing", "file"])
+def test_invalid_index_override_abstains_without_querying_the_callers_index(tmp_path, monkeypatch, kind):
+    selected = tmp_path / kind
+    if kind == "file":
+        selected.write_text("not an index")
+    monkeypatch.setattr(app, "INDEX_DIR_OVERRIDE", selected)
+    calls = []
+    monkeypatch.setattr(app, "answer_payload", lambda *args, **kwargs: calls.append(True))
+
+    response = client.post("/kenn/chat", json={"question": "How do I EQ a kick drum?"})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["intent"] == "engine_unavailable"
+    assert body["diagnostic_reason"] == "The configured knowledge index is unavailable."
+    assert body["found"] is False
+    assert body["sources"] == []
+    assert calls == []
+    assert client.get("/health").json()["retrieval"]["active_mode"] == "unavailable"
+    if kind == "missing":
+        assert not selected.exists()
 
 
 def test_out_of_scope_is_abstained_before_engine(monkeypatch: pytest.MonkeyPatch) -> None:

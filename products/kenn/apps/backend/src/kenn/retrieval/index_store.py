@@ -11,6 +11,7 @@ import shutil
 import threading
 import time
 from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Callable, Iterator
 
@@ -19,6 +20,27 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 INDEX_DIR = Path(__file__).resolve().parent.parent / "data" / "index"
+_READ_INDEX_DIR: ContextVar[Path | None] = ContextVar("kenn_read_index_dir", default=None)
+
+
+def read_index_dir(default: Path | None = None) -> Path:
+    """Select a request's corpus without changing promotion or build destinations."""
+    selected = _READ_INDEX_DIR.get()
+    return selected if selected is not None else (INDEX_DIR if default is None else default)
+
+
+@contextmanager
+def read_index_context(index_dir: Path | None) -> Iterator[None]:
+    selected = None if index_dir is None else Path(index_dir).expanduser().resolve()
+    if selected is not None and not selected.is_dir():
+        raise IndexValidationError("The selected retrieval index directory does not exist.")
+    token = _READ_INDEX_DIR.set(selected)
+    try:
+        yield
+    finally:
+        _READ_INDEX_DIR.reset(token)
+
+
 VERSIONS_DIRNAME = "versions"
 CURRENT_FILENAME = "CURRENT"
 PREVIOUS_FILENAME = "PREVIOUS"

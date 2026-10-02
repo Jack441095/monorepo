@@ -15,7 +15,7 @@ from kenn.retrieval.retrieval import (
     tokenize,
     warm_metadata_cache,
 )
-from kenn.retrieval.index_store import active_version_dir
+from kenn.retrieval.index_store import active_version_dir, read_index_dir
 from kenn.core import source_tiers
 
 from kenn.core.chat_constants import (
@@ -44,11 +44,7 @@ def _empty_terms() -> dict:
     }
 
 
-@lru_cache(maxsize=1)
-def _load_index_bundle() -> tuple[list[dict], dict]:
-    version_dir = active_version_dir(CHUNKS_PATH.parent)
-    chunks_path = (version_dir / "chunks.jsonl") if version_dir else CHUNKS_PATH
-    terms_path = (version_dir / "terms.json") if version_dir else TERMS_PATH
+def _read_index_bundle(chunks_path: Path, terms_path: Path) -> tuple[list[dict], dict]:
     if not chunks_path.exists() or not terms_path.exists():
         return [], _empty_terms()
     try:
@@ -67,6 +63,56 @@ def _load_index_bundle() -> tuple[list[dict], dict]:
                 inverted.setdefault(term, []).append((doc_idx, freq))
     terms["inverted_index"] = inverted
     return chunks, terms
+
+
+@lru_cache(maxsize=1)
+def _load_default_index_bundle() -> tuple[list[dict], dict]:
+    version_dir = active_version_dir(CHUNKS_PATH.parent)
+    return _read_index_bundle(
+        (version_dir / "chunks.jsonl") if version_dir else CHUNKS_PATH,
+        (version_dir / "terms.json") if version_dir else TERMS_PATH,
+    )
+
+
+@lru_cache(maxsize=2)
+def _load_selected_index_bundle(chunks_path: Path, terms_path: Path, fingerprint: tuple) -> tuple[list[dict], dict]:
+    return _read_index_bundle(chunks_path, terms_path)
+
+
+def _lexical_artifact_fingerprint(paths: tuple[Path, Path]) -> tuple:
+    fingerprint = []
+    for path in paths:
+        try:
+            stat = path.stat()
+            fingerprint.append((stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns))
+        except OSError:
+            fingerprint.append(None)
+    return tuple(fingerprint)
+
+
+def _load_index_bundle() -> tuple[list[dict], dict]:
+    selected_dir = read_index_dir(CHUNKS_PATH.parent)
+    if selected_dir.resolve() == CHUNKS_PATH.parent.resolve():
+        return _load_default_index_bundle()
+    artifact_dir = active_version_dir(selected_dir) or selected_dir
+    paths = artifact_dir / "chunks.jsonl", artifact_dir / "terms.json"
+    return _load_selected_index_bundle(*paths, _lexical_artifact_fingerprint(paths))
+
+
+def _clear_index_bundle_cache() -> None:
+    _load_default_index_bundle.cache_clear()
+    _load_selected_index_bundle.cache_clear()
+
+
+def _index_bundle_cache_info():
+    default = _load_default_index_bundle.cache_info()
+    selected = _load_selected_index_bundle.cache_info()
+    return type(default)(default.hits + selected.hits, default.misses + selected.misses,
+                         3, default.currsize + selected.currsize)
+
+
+_load_index_bundle.cache_clear = _clear_index_bundle_cache
+_load_index_bundle.cache_info = _index_bundle_cache_info
 
 
 def load_chunks() -> list[dict]:

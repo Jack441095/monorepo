@@ -11,13 +11,15 @@ import logging
 import math
 import os
 import re
+import threading
+from collections import OrderedDict
 from functools import lru_cache
 from pathlib import Path
 from typing import Callable, Iterable
 
 import numpy as np
 
-from kenn.retrieval.index_store import active_artifact_path, active_version_dir, active_version_id, promote_index
+from kenn.retrieval.index_store import active_artifact_path, active_version_dir, active_version_id, promote_index, read_index_dir
 
 WORD_RE = re.compile(r"[a-zA-Z0-9_+#.-]{2,}")
 ROOT = Path(__file__).resolve().parent.parent
@@ -38,6 +40,8 @@ _embedding_model_error: str | None = None
 _embedding_index: np.ndarray | None = None  # shape (num_chunks, 384)
 _embedding_index_version: str = ""
 _embedding_index_error: str | None = None
+_selected_embedding_indexes: OrderedDict[tuple, tuple[np.ndarray | None, str | None]] = OrderedDict()
+_selected_embedding_lock = threading.Lock()
 logger = logging.getLogger(__name__)
 
 
@@ -75,6 +79,36 @@ def reset_embedding_model() -> None:
 
 def load_embedding_index() -> np.ndarray | None:
     """Load the pre-computed embedding matrix from disk."""
+    selected_dir = read_index_dir(INDEX_DIR).resolve()
+    if selected_dir == INDEX_DIR.resolve():
+        return _load_default_embedding_index()
+    key = _selected_embedding_key(selected_dir)
+    with _selected_embedding_lock:
+        if key not in _selected_embedding_indexes:
+            try:
+                matrix = np.load(str(key[0]), allow_pickle=False)
+                state = (matrix, None)
+            except Exception as exc:
+                state = (None, f"embedding index failed to load: {exc!r}")
+            _selected_embedding_indexes[key] = state
+            # Two alternate matrices bound memory without evicting an embedded
+            # caller's legacy default matrix or its cached load failure.
+            while len(_selected_embedding_indexes) > 2:
+                _selected_embedding_indexes.popitem(last=False)
+        _selected_embedding_indexes.move_to_end(key)
+        return _selected_embedding_indexes[key][0]
+
+
+def _selected_embedding_key(index_dir: Path) -> tuple:
+    path = active_artifact_path("embeddings.npy", index_dir).resolve()
+    try:
+        stat = path.stat()
+        return path, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns
+    except OSError:
+        return path, None
+
+
+def _load_default_embedding_index() -> np.ndarray | None:
     global _embedding_index, _embedding_index_version, _embedding_index_error
     if _embedding_index is not None:
         return _embedding_index
@@ -109,6 +143,8 @@ def unload_embedding_index() -> None:
     _embedding_index = None
     _embedding_index_version = ""
     _embedding_index_error = None
+    with _selected_embedding_lock:
+        _selected_embedding_indexes.clear()
 
 
 def retrieval_status(index_dir: Path | None = None) -> dict:
@@ -120,7 +156,7 @@ def retrieval_status(index_dir: Path | None = None) -> dict:
     process. This prevents health responses from claiming semantic retrieval
     merely because a filename exists.
     """
-    selected_dir = Path(index_dir) if index_dir is not None else INDEX_DIR
+    selected_dir = (Path(index_dir) if index_dir is not None else read_index_dir(INDEX_DIR)).expanduser().resolve()
     version_dir = active_version_dir(selected_dir)
     artifact_dir = version_dir or selected_dir
     chunks_path = artifact_dir / "chunks.jsonl"
@@ -128,6 +164,12 @@ def retrieval_status(index_dir: Path | None = None) -> dict:
     embeddings_path = artifact_dir / "embeddings.npy"
     lexical_available = chunks_path.is_file() and terms_path.is_file()
     semantic_index_available = embeddings_path.is_file()
+    if selected_dir == INDEX_DIR.resolve():
+        matrix, index_error = _embedding_index, _embedding_index_error
+    else:
+        key = _selected_embedding_key(selected_dir)
+        with _selected_embedding_lock:
+            matrix, index_error = _selected_embedding_indexes.get(key, (None, None))
 
     if not lexical_available:
         active_mode = "unavailable"
@@ -135,13 +177,13 @@ def retrieval_status(index_dir: Path | None = None) -> dict:
     elif not semantic_index_available:
         active_mode = "bm25_only"
         fallback_reason = "embedding_index_missing"
-    elif _embedding_index_error:
+    elif index_error:
         active_mode = "bm25_only"
         fallback_reason = "embedding_index_load_failed"
     elif _embedding_model_error:
         active_mode = "bm25_only"
         fallback_reason = "embedding_model_unavailable"
-    elif _embedding_index is not None and _embedding_model is not None:
+    elif matrix is not None and _embedding_model is not None:
         active_mode = "hybrid"
         fallback_reason = None
     else:
@@ -189,7 +231,7 @@ def update_embedding_index(new_chunks: list[dict]) -> np.ndarray:
     known_ids = {str(chunk.get("id") or "") for chunk in current_chunks}
     appended = [chunk for chunk in new_chunks if str(chunk.get("id") or "") not in known_ids]
     all_chunks = [*current_chunks, *appended]
-    existing = load_embedding_index()
+    existing = _load_default_embedding_index()
     existing_count = int(existing.shape[0]) if existing is not None else 0
     if existing_count > len(all_chunks):
         raise ValueError("Embedding index has more rows than the active chunk bundle.")

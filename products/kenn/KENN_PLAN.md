@@ -230,10 +230,14 @@ mock, an agent reviewer or an unrelated receipt.
     preferences and typed review context without creating transport proposals or
     another chat turn. 218 scoped backend and 100 wrapper tests pass; 25 mutations
     are caught. [Evidence and exact files](docs/evidence/KENN_KNOWLEDGE_POLICY_2026-10-02.md).
+  - [x] Both public wrapper imports preserve shared model policy and the default
+    corpus. Request-local index reads isolate lexical/matrix/status and semantic
+    cache identity, including equal-size corpus replacement. 132 scoped cases
+    pass, including 28 new cases; four mutations are caught. [Evidence and exact files](docs/evidence/KENN_WRAPPER_INDEX_ISOLATION_2026-10-02.md).
   - [ ] Trace other request owners, cache invalidation after preference/Live changes,
     project switching and Apply/Undo during generation. Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation
-    remains unqualified. Public wrapper import-time model/index mutations remain open.
+    remains unqualified.
   - [ ] Remove confirmed dead code and redundant ownership after checking callers,
     exports, dynamic registries, packaging and tests. Keep cleanup independent of
     the fixed benchmark revision; qualify each deletion with scoped checks.
