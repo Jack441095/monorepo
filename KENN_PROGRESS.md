@@ -1,11 +1,19 @@
 # KENN progress: where we are
 
-**Updated:** 2026-09-28 10:55 · Ticked as each step finishes. Full detail lives in the two plans:
+**Updated:** 2026-10-02 · Ticked as each step finishes. Full detail lives in the two plans:
 [beta plan](products/kenn/docs/plans/KENN_BETA_PLAN_2026-09-24.md) (Stage 0) and the
 north-star plan (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`, merged into `main` 26 Sept).
 
 ## Right now
 
+- **Stage 1 query latency, 2 Oct:** CPU ONNX replaces CoreML for embeddings:
+  1.14–1.15 ms p50 versus 12.43–12.72 ms, with identical ordered top-four retrieval
+  results on 240/240 questions. Model weights and index unchanged; no Live writes.
+  This saves about 11 ms per query and does not close the Mac model-answer latency
+  gate. Evidence: `products/kenn/docs/evidence/KENN_QUERY_EMBEDDING_LATENCY_2026-10-02.md`.
+- **Owner direction, 2 Oct:** prioritise efficient language-model conversation and
+  Ableton integration under the North Star. The large citation capture was stopped;
+  its partial local data remains available. Earlier entries below are dated history.
 - **Released 27 Sept 05:52:** soak #5 **qualified** on `f1b961c` (8 hours, 481 samples, 0 errors, one Live pause at
   01:00 with KENN reconnecting by itself, memory flat, median 28 ms). Receipts committed, tag `kenn-beta-2026-09-27`
   at `a261eed`, pushed. Tester app: `workspace/builds/kenn-app/KENN-beta-a261eed.dmg` (221 MB, smoke test passed

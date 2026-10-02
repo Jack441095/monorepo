@@ -100,17 +100,13 @@ class OnnxEmbedder:
                 inter_op_threads, "KENN_EMBEDDING_INTER_OP_THREADS"
             )
 
-        available_providers = ort.get_available_providers()
-        preferred_providers = [
-            p for p in ["CoreMLExecutionProvider", "CPUExecutionProvider"]
-            if p in available_providers
-        ] or ["CPUExecutionProvider"]
-
+        # CoreML partition dispatch costs more than inference for short queries:
+        # on the M3, CPU took 1.1 ms versus 12.5 ms with the same model weights.
         with ONNX_SESSION_INIT_LOCK:
             self._session = ort.InferenceSession(
                 str(model_path),
                 sess_options=session_options,
-                providers=preferred_providers,
+                providers=["CPUExecutionProvider"],
             )
         self._input_names = {i.name for i in self._session.get_inputs()}
 

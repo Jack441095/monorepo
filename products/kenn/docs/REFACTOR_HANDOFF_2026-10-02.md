@@ -7,6 +7,15 @@ subsystem. Written so an agent starting with no prior session can continue safel
 Everything below was measured on this machine. Where a number is a single sample rather
 than a distribution, it says so.
 
+**Owner direction, later on 2 Oct:** prioritise useful, efficient language-model
+conversation and Ableton integration under the North Star. The citation capture was
+interrupted, with partial data preserved locally. Query embeddings now use CPU ONNX:
+1.14–1.15 ms p50 versus CoreML's 12.43–12.72 ms in two 40-query runs; ordered top-four
+retrieval results agree on 240/240 questions. Same fp32 weights and index, no rebuild.
+Evidence: `docs/evidence/KENN_QUERY_EMBEDDING_LATENCY_2026-10-02.md`. This is an 11 ms
+retrieval saving, not a model-answer latency qualification. Git state below is the
+original refactor baseline; work now continues on `main`.
+
 ---
 
 ## 1. Git state

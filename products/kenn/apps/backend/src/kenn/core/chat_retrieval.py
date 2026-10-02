@@ -191,11 +191,11 @@ def warm_index() -> None:
         emb_idx = load_embedding_index()
         if emb_idx is not None:
             print(f"  Embedding index loaded ({emb_idx.shape[1]} dim, {emb_idx.shape[0]} chunks)")
-        # Warm the embedding model and compile CoreML ONNX execution graph
+        # Keep the first query from paying session creation and inference setup.
         embedder = _get_embedding_model()
         if embedder is not None:
             embedder.encode("KENN audio engineering startup warmup", normalize_embeddings=True)
-            print("  [✓] CoreML ONNX embedding graph compiled & pre-warmed.")
+            print("  [✓] ONNX embedding model pre-warmed.")
     except Exception as exc:
         print(f"  WARNING: embedding index/model warm-up failed ({exc!r}) -- "
               f"retrieval mode is explicitly BM25-only for this process's lifetime")

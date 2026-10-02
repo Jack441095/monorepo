@@ -87,6 +87,12 @@ See `KENN_BETA_PLAN_2026-09-24.md`. Exit: qualified gate 14/14, 3 testers onboar
 
 ### Stage 1 — Conversational KENN (beta weeks 1–6)
 
+- [x] Remove measured CoreML overhead from query embeddings — **2 Oct:** CPU ONNX
+      takes 1.14–1.15 ms p50 versus CoreML's 12.43–12.72 ms across two runs of 40
+      questions. Ordered top-four retrieval results match on 240/240 questions.
+      Same model and index; this saves about 11 ms per query, not model decoding
+      time. Mac answer-latency gate remains open. Evidence:
+      `docs/evidence/KENN_QUERY_EMBEDDING_LATENCY_2026-10-02.md`.
 - [x] Brain decision made — **owner, 25 Sept: local Qwen only** (option A). KENN stays fully on the Mac: no hosted model,
       nothing sent off the machine. The existing Ollama provider behind the model router serves it
       (`KENN_LLM_PROVIDER_<TASK>=ollama`, per-task switches `KENN_LLM_ENABLED_<TASK>`).
