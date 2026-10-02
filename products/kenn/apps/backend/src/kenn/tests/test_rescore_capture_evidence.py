@@ -16,8 +16,14 @@ import importlib.util
 import os
 from pathlib import Path
 
-# Before any kenn import, so no model-backed path opens in a test.
-os.environ["KENN_LLM_ENABLED"] = "0"
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def disable_llm_for_evidence_tests(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Scope the offline policy to each test so collection cannot disable the planner.
+    monkeypatch.setenv("KENN_LLM_ENABLED", "0")
+
 
 SCRIPT = Path(__file__).resolve().parents[5] / "tooling" / "scripts" / "rescore_captured_answers.py"
 module = importlib.util.module_from_spec(
@@ -25,6 +31,33 @@ module = importlib.util.module_from_spec(
 )
 assert spec.loader
 spec.loader.exec_module(module)
+
+
+@pytest.mark.parametrize("enabled", [None, "1"])
+@pytest.mark.parametrize("has_index", [False, True])
+def test_replay_cli_disables_models_and_restores_the_callers_switch(
+    tmp_path, monkeypatch, enabled, has_index,
+) -> None:
+    # Importing the replay helper once disabled unrelated planners for the entire suite.
+    if enabled is None:
+        monkeypatch.delenv("KENN_LLM_ENABLED", raising=False)
+    else:
+        monkeypatch.setenv("KENN_LLM_ENABLED", enabled)
+    capture = tmp_path / "answers.jsonl"
+    capture.write_text("", encoding="utf-8")
+    monkeypatch.setattr("sys.argv", ["rescore_captured_answers.py", str(capture)])
+
+    def load_index():
+        assert os.environ.get("KENN_LLM_ENABLED") == "0"
+        return ([{}] if has_index else []), {}
+
+    monkeypatch.setattr(module, "_load_index", load_index)
+    monkeypatch.setattr(module, "_index_version", lambda: "test-index")
+    monkeypatch.setattr(module, "_gate_budget_chars", lambda: 1200)
+
+    assert module.main() == (0 if has_index else 1)
+    assert os.environ.get("KENN_LLM_ENABLED") == enabled
+
 
 QUERY = "What release time should I use for sidechain compression on bass?"
 # 150 ms and 6 dB, both of which _measurements recognises: the gate's unit list is hz, khz, dB/FS/TP, ms, %, lufs,

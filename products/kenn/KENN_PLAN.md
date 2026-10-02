@@ -180,8 +180,10 @@ to the stated implementation and evidence; they do not imply release qualificati
 
 The last full backend run at V2: **3,109 passed, 12 skipped, one known failure** in
 76.42 s. `test_live_command::test_llm_plan_gets_one_structural_repair_attempt` is
-order-dependent and passes alone. A known failure is still an unresolved suite
-failure, not a green release gate.
+order-dependent and passes alone. A5 later traced that failure to collection-time
+environment contamination and fixed it: the combined 2 October run passed
+**3,171 tests, with 12 optional-dependency skips and no failures**, in 98.40 s.
+[Current baseline and scope](docs/evidence/KENN_TEST_BASELINE_2026-10-02.md).
 
 Model acceptance was 22/29 and 23/29 in two earlier runs recorded by the incoming
 handoff. That sample is too small to establish 90%; latency also varied. Its TTFT
@@ -233,9 +235,11 @@ mock, an agent reviewer or an unrelated receipt.
   reply, against actual selected inference backend, connection and pending actions.
   Transport branches propose through the action service; trace their validation path
   before changing or describing them as a bypass.
-- [ ] **A5 — Establish the clean test baseline.** Isolate the structural-repair order
-  dependency; identify test-state contamination and fix it without weakening assertions.
-  Record unavailable model/index tests separately. Requalify the full suite after a fix.
+- [x] **A5 — Establish the clean test baseline.** Scoped collection-time model policy
+  to individual tests and the offline replay CLI without changing planner assertions
+  or production enablement precedence. Eight import and four CLI guards pass; seven
+  mutations are caught. Full backend: 3,171 passed, 12 optional-dependency skips,
+  no failures in 98.40 s. [Evidence and exact files](docs/evidence/KENN_TEST_BASELINE_2026-10-02.md).
 
 **Next executable task: continue A2/A3 through the remaining bound request owners.**
 Do not resume citation capture, a speculative rewrite or an unfinished extraction
@@ -243,7 +247,7 @@ merely because an old document suggested it.
 
 ### 2. Qualify useful local conversation and performance
 
-Needs the route/context audit; fixes may land in small slices while A5 is investigated.
+Needs the route/context audit; fixes may land in small slices while that audit continues.
 
 - [ ] **C1 — Current-path baseline.** At least 30 knowledge questions on M3/16 GB,
   separate streaming, foreground and background runs, both caches declared, exact

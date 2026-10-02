@@ -14,8 +14,14 @@ import json
 import os
 from pathlib import Path
 
-# Before any kenn import, so no model-backed path opens in a test.
-os.environ["KENN_LLM_ENABLED"] = "0"
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def disable_llm_for_evidence_tests(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Scope the offline policy to each test so collection cannot disable the planner.
+    monkeypatch.setenv("KENN_LLM_ENABLED", "0")
+
 
 SCRIPT = Path(__file__).resolve().parents[5] / "tooling" / "scripts" / "measure_chat_latency.py"
 module = importlib.util.module_from_spec(

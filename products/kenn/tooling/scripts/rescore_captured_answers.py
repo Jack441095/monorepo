@@ -14,9 +14,9 @@ silently wrong after the next tuning change, and this file exists precisely so t
 verdict and today's verdict are printed side by side for exactly that reason. When they disagree, either the gate
 changed or the retrieval the capture saw has moved; both are answers, and the delta is the finding.
 
-No model, no Live, no index rebuild. `KENN_LLM_ENABLED=0` goes in before any kenn import so an import-time model path
-cannot open. Retrieval is re-run per question because the capture stores the rendered evidence text, not the result
-list, and the gate needs `(score, chunk)` pairs to call `model_evidence()` on. Retrieval is deterministic, so this
+No model, no Live, no index rebuild. The CLI sets `KENN_LLM_ENABLED=0` before the lazy kenn imports and restores its
+caller's switch afterward. Retrieval is re-run per question because the capture stores the rendered evidence text,
+not the result list, and the gate needs `(score, chunk)` pairs to call `model_evidence()` on. Retrieval is deterministic, so this
 reproduces the capture's own result list on an unchanged index.
 
 **The gate's evidence is recomputed; the capture's own field is not trusted.** The captured `evidence_text` is what
@@ -46,9 +46,6 @@ import os
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
-
-# Before the kenn imports below. A model-backed path opening here would make a "no model in the loop" claim false.
-os.environ["KENN_LLM_ENABLED"] = "0"
 
 KENN_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(KENN_ROOT / "apps" / "backend" / "src"))
@@ -393,6 +390,19 @@ def report(items: list[dict], *, source: Path, current_index: str = "", current_
 
 
 def main() -> int:
+    # Keep replay offline without disabling a planner in a process importing this helper.
+    previous = os.environ.get("KENN_LLM_ENABLED")
+    os.environ["KENN_LLM_ENABLED"] = "0"
+    try:
+        return _main()
+    finally:
+        if previous is None:
+            os.environ.pop("KENN_LLM_ENABLED", None)
+        else:
+            os.environ["KENN_LLM_ENABLED"] = previous
+
+
+def _main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("capture", type=Path, help="JSONL from measure_chat_latency.py --capture-answers")
     parser.add_argument("--per-item", type=Path, help="write per-item JSONL here")

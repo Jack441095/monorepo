@@ -14,11 +14,7 @@ gate's thresholds are untouched by that: it judges fewer numbers, because the mo
 
 from __future__ import annotations
 
-import os
-
 import pytest
-
-os.environ.setdefault("KENN_LLM_ENABLED", "0")
 
 from kenn.core import chat_grounding
 from kenn.core.chat_retrieval import source_label
@@ -28,6 +24,13 @@ from kenn.llm.llm_rewrite import (
     _build_synthesis_messages,
     resolve_context_chars,
 )
+
+
+@pytest.fixture(autouse=True)
+def disable_llm_for_evidence_tests(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Scope the offline policy to each test so collection cannot disable the planner.
+    monkeypatch.setenv("KENN_LLM_ENABLED", "0")
+
 
 QUESTION = "What release time should I use for sidechain compression on bass?"
 
