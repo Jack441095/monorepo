@@ -1821,6 +1821,9 @@ def _answer_payload_stream_raw(
                 "unsupported_measurements": (prefix_guard_trip or {}).get(
                     "unsupported_measurements", []
                 ),
+                # A timeout or a dead stream says nothing about the next try. A guard trip is the model
+                # writing a number the sources don't have, which tends to repeat, so that one may be cached.
+                "transient": not prefix_guard_trip,
             }
             final_answer = template
             llm_active = False
@@ -2098,6 +2101,10 @@ def _may_store_in_semantic_cache(metadata: dict | None) -> bool:
     if any(metadata.get(key) for key in (
         "proposal", "requires_confirmation", "confirmation_token", "orchestration", "audiogen",
     )):
+        return False
+    # The template left behind by a model that timed out is high confidence too. Caching it keeps the model
+    # out of that question for the next hour, even once the load that caused the timeout has gone.
+    if (metadata.get("generation_validation") or {}).get("transient"):
         return False
     return bool(metadata.get("llm_enhanced") or metadata.get("confidence") == "high")
 

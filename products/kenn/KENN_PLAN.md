@@ -492,6 +492,10 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     queue/verification/polling timing, no memory or dropout readings, cold/warm not separated. Against the 15 s/70% local
     delivery gate: 0 of 30 accepted within 15 s (fastest 15.01 s), 10 of 30 within 20 s. C1 stays open.
     [Evidence and numeric receipt](docs/evidence/KENN_C1_STREAM_30Q_2026-10-02.md).
+  - Payload surface, same 30 questions (2 Oct): 10 answers kept, 17 cut off by the 20 s foreground read timeout, 3 of 30
+    within 15 s, 10 of 30 within 20 s. One run, no repeat; the runner's attempted/accepted counters are empty on this
+    surface, so the counts come from each row's `llm_enhanced` flag. C1 stays open.
+    [Evidence](docs/evidence/KENN_C1_PAYLOAD_30Q_AND_CACHE_CONTRACT_2026-10-02.md).
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already
@@ -518,6 +522,10 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       generation, so it stays. The background answer did write a second reasoning trace and a second set of citation
       counts, and that is fixed with a regression test. Budget/cache drift and the streaming path are not covered.
       [Receipt](docs/evidence/KENN_UPGRADE_PATH_REPEATED_WORK_2026-10-02.md).
+    - Cache contract, 2 Oct: a stream that timed out left a high-confidence template that the semantic cache kept for
+      an hour; those results are now marked transient and not cached (guard trips still are). Stream path only. The
+      route-classification model call ignoring `allow_llm` is recorded, not changed.
+      [Receipt](docs/evidence/KENN_C1_PAYLOAD_30Q_AND_CACHE_CONTRACT_2026-10-02.md).
   - [ ] Use measured phase costs to select stable-prefix, KV/residency or explicit
     same-checkpoint MLX experiments. Preserve full grounding policy and exact
     assets; justify new dependencies/assets separately before adding them.

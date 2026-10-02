@@ -96,6 +96,28 @@ def test_stream_orchestrator_answer_is_not_cached(monkeypatch):
     assert session_memory.get_semantic_cache_hit(QUESTION, session_id="song-a") is None
 
 
+def _stream_engine(monkeypatch, **validation):
+    def engine(*args, **kwargs):
+        yield {"event": "metadata", "data": {
+            "answer": "Release sets recovery time.", "confidence": "high",
+            "generation_validation": {"attempted": True, "accepted": False, **validation},
+        }}
+        yield {"event": "token", "token": "Release sets recovery time."}
+
+    monkeypatch.setattr(chat_answer, "_answer_payload_stream_raw", engine)
+    list(chat_answer.answer_payload_stream(QUESTION, session_id="song-a"))
+
+
+def test_the_template_left_by_a_model_that_timed_out_is_not_cached(monkeypatch):
+    _stream_engine(monkeypatch, transient=True)
+    assert session_memory.get_semantic_cache_hit(QUESTION, session_id="song-a") is None
+
+
+def test_the_template_left_by_a_rejected_answer_is_still_cached(monkeypatch):
+    _stream_engine(monkeypatch, transient=False)
+    assert session_memory.get_semantic_cache_hit(QUESTION, session_id="song-a") is not None
+
+
 FOLLOWUP = "is that too loud?"
 ELLIPTICAL = "the kick is still boomy"
 

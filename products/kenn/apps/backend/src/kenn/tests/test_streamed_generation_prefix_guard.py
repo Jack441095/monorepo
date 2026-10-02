@@ -363,6 +363,22 @@ def test_a_stream_that_dies_mid_answer_still_falls_back_and_records_cut_short(mo
     assert text == "Short answer: Release the bass compressor at ", text
 
 
+def test_a_dead_stream_is_marked_transient_and_a_guard_trip_is_not(monkeypatch) -> None:
+    """The semantic cache reads this flag: a timeout is worth retrying, a number the sources lack is not."""
+    def dies(*args, **kwargs):
+        yield {"event": "token", "token": "Short answer: key it from the kick.\n"}
+        raise TimeoutError("timed out")
+
+    def invents_a_number(*args, **kwargs):
+        yield {"event": "token", "token": "Release around 900 ms so the bass recovers.\n"}
+
+    _, died = _text_and_metadata(list(_stream(monkeypatch, dies)))
+    _, tripped = _text_and_metadata(list(_stream(monkeypatch, invents_a_number)))
+
+    assert died["generation_validation"]["transient"] is True
+    assert tripped["generation_validation"]["transient"] is False
+
+
 def test_a_range_split_across_two_tokens_is_still_caught() -> None:
     """A measurement the tokenizer split across tokens is one measurement to the gate.
 
