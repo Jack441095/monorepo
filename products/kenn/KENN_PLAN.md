@@ -370,6 +370,11 @@ mock, an agent reviewer or an unrelated receipt.
     receipts, and recorded the Apply/Undo-during-generation and trace-storage findings as open in
     [the evidence](docs/evidence/KENN_SESSION_CLEAR_REVOKES_TOKENS_2026-10-02.md). Full backend run is
     3,540 passed, 12 skipped.
+  - A third held-out row is fixed: `upgrade-room-null` (a bass-null question never said "room", so the
+    acoustics topic did not fire and the room-placement note ranked 4th). The row now cites the note,
+    but the generated answer is still weak and does not warn against EQ-boosting a null; see
+    [the evidence](docs/evidence/KENN_ACOUSTICS_TOPIC_TERMS_2026-10-02.md). Three held-out rows and
+    two coverage rows remain. Full backend run is 3,544 passed, 12 skipped.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.

@@ -497,7 +497,7 @@ TOPIC_SYNONYMS: dict[str, tuple[str, ...]] = {
     "loudness": ("lufs", "loudness", "ebu", "r128", "true peak", "dbtp", "normalization", "normalisation"),
     "monitoring": ("monitor", "monitoring", "headroom", "calibration", "reference level", "room", "phone", "car", "speaker", "speakers", "playback", "sonarworks", "crossfeed", "headphones", "earbuds", "monitors"),
     "translation": ("translation", "translate", "car", "phone", "earbuds", "small speakers", "reference", "mono", "systems", "headphones", "club", "boombox", "car test", "mono check", "check translation", "auratone", "headphones", "earbuds", "mixcube", "studio monitor", "monitors", "monocompatibility"),
-    "acoustics": ("acoustic", "acoustics", "phase", "polarity", "room treatment", "reflection"),
+    "acoustics": ("acoustic", "acoustics", "phase", "polarity", "room treatment", "reflection", "room mode", "room modes", "listening position", "bass null", "bass trap"),
     "mix_review": ("mix review", "spectrum", "spectral", "analyser", "analyzer", "crest", "rms", "peak", "meter", "metrics", "fletcher"),
 }
 
