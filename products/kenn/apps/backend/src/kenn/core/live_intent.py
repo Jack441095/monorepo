@@ -1120,10 +1120,6 @@ def parse_natural_recipe(query: str, session_snapshot: dict[str, Any] | None) ->
     }
 
 
-def _bool_value(text: str, positive: str) -> bool:
-    return positive not in text.lower().split()
-
-
 _ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7,
              "eighth": 8, "ninth": 9, "tenth": 10}
 _ORDINAL_CHANNEL = re.compile(

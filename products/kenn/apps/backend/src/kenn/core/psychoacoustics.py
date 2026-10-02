@@ -9,7 +9,6 @@ clamped strictly to KENN's Hardware Safety Policy (max cut <= 3.0 dB).
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np

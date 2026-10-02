@@ -256,6 +256,10 @@ mock, an agent reviewer or an unrelated receipt.
   - [x] Removed two overridden, unreachable clip methods from `AbletonOSCClient`;
     the final public methods retain the same behavior. Caller/registry and AST
     checks establish reachability; 39 scoped OSC/clip tests pass. [Evidence and exact files](docs/evidence/KENN_DEAD_CLIP_METHODS_2026-10-02.md).
+  - [x] Removed two uncalled private helpers and four unused import bindings from
+    five active modules after symbol/AST/export/registry/packaging checks. Public
+    behavior remains covered by 139 scoped cases before and after deletion.
+    [Evidence and exact files](docs/evidence/KENN_UNUSED_HELPERS_2026-10-02.md).
 - [ ] **A4 — Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.

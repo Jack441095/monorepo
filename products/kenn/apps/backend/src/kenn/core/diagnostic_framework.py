@@ -34,10 +34,6 @@ class DiagnosticPlan:
     question: str
 
 
-def _contains_all(text: str, *terms: str) -> bool:
-    return all(term in text for term in terms)
-
-
 def plan_for(query: str) -> DiagnosticPlan | None:
     """Return a causal diagnostic plan for an ambiguous audio symptom.
 
