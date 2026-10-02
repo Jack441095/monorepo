@@ -61,6 +61,10 @@ KENN suite with pytest's cache plugin off (`-p no:cacheprovider`): 3,557 passed,
 on, `test_server_smoke.py::test_main_chat_can_combine_explicit_mix_review_and_plugin_evidence` fails in the full run
 (it passes alone). It fails the same way with this change removed, so it is not caused by it. We did not find the cause;
 it passed in an earlier full run the same night. Not deleted or changed: `apps/backend/.pytest_cache`.
+On 3 Oct a full run with `-o cache_dir=<fresh temp dir>` passed too (3,557 passed, 5 skipped, 0 failed, 109 s), so the
+failure goes away without the old cache dir and the plugin turned off, which points at state in `apps/backend/.pytest_cache`
+(its `lastfailed` lists 27 old entries). We have not worked out how that state breaks the test, and the repo has no pytest
+`addopts` that would reorder tests from it. Still not deleted.
 
 ## Limits
 
