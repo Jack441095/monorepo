@@ -324,6 +324,19 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   hardware. Any MLX comparison must explicitly use the chosen Qwen3 8B lineage,
   rather than the engine's smaller default. Require unchanged safety and a held-out
   quality comparison for each latency change.
+  - [x] Reviewed the pinned Ollama runtime, existing cache/attention behavior,
+    conditional source costs, fixed-model backend options and Jev/Kev fit against
+    the five-question diagnostic. This establishes research findings, not an
+    implementation or speed gain. [Findings and primary sources](docs/research/KENN_PRODUCT_AND_OPEN_SOURCE_RESEARCH_2026-10-02.md#12-accelerating-the-fixed-qwen-models-follow-up-findings).
+  - [ ] Preserve native load/prefill/decode/cache/completion metrics for every
+    attempt, including route calls and rejected/interrupted streams. Missing metrics
+    remain unknown; superseded requests cannot persist text or memory/cache writes.
+  - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
+    retrieval and critique; resolve confirmed repetition and task-budget/cache
+    contract drift with offline regressions and paired held-out measurements.
+  - [ ] Use measured phase costs to select stable-prefix, KV/residency or explicit
+    same-checkpoint MLX experiments. Preserve full grounding policy and exact
+    assets; justify new dependencies/assets separately before adding them.
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
