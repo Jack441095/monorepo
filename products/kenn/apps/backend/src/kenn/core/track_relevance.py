@@ -1,5 +1,4 @@
-"""Track-name relevance filtering for session-state display (item 1,
-docs/KENN_WEEKLY_OPTIMIZATION_PLAN_2026-08-08.md).
+"""Track-name relevance filtering for session-state display.
 
 Scoped down from the original "dynamic context windowing" brief: there is
 no existing pipeline dumping full session state into general LLM answer

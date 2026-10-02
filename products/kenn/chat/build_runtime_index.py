@@ -8,9 +8,9 @@ from pathlib import Path
 
 
 SERVICE_ROOT = Path(__file__).resolve().parent
-REPO_ROOT = SERVICE_ROOT.parents[2]
+PRODUCT_ROOT = SERVICE_ROOT.parent
 ENGINE_ROOT = Path(
-    os.environ.get("KENN_ENGINE_ROOT", str(REPO_ROOT / "Audio_Too" / "studio" / "kenn"))
+    os.environ.get("KENN_ENGINE_ROOT", str(PRODUCT_ROOT / "apps" / "backend" / "src"))
 ).expanduser().resolve()
 RUNTIME_INDEX_DIR = Path(
     os.environ.get("KENN_CHAT_INDEX_DIR", str(SERVICE_ROOT / ".runtime" / "index"))

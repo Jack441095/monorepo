@@ -1,14 +1,11 @@
-"""Registers KENN's real audio tools into tool_registry (Phase 3 of
-docs/KENN_HUB_UNIFICATION_PLAN_2026-08-05.md).
+"""Registers KENN's real audio tools into tool_registry.
 
-Only the four tools that produce new derived output without touching
-anything pre-existing are registered here (ANALYSIS risk, no confirmation
-gate) -- matches the plan's own reasoning: running a mix review, analyzing
-stem masking, separating stems, or rendering an AutoMix pass never overwrites
-a live session or a delivered file. Each handler is a thin wrapper over the
-already-shipped, already-tested function that does the real work (business/app/
-automix_public.py, business/app/stem_separation_bridge.py,
-studio/audio_analysis's save_review) -- no DSP/business logic lives here.
+The four analysis entries use ANALYSIS risk without a confirmation gate
+because they do not modify a live session or an existing delivered file.
+Mix review delegates to audio_analysis.mix_review.mix_review.save_review;
+stem masking delegates to kenn.core.local_mix_review_service.analyze_stem_masking.
+AutoMix and stem separation retain registered compatibility entries that return
+explicit Public Beta unavailable responses. No DSP/business logic lives here.
 
 The Live device-parameter tool is registered as a LOCAL_MUTATION and delegates
 to `LiveActionService`, which fronts the planner/executor proposal contract.

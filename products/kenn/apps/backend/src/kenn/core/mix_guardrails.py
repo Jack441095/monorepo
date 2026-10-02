@@ -1,5 +1,4 @@
-"""Deterministic pre-execution mix guardrails (item 2,
-docs/KENN_WEEKLY_OPTIMIZATION_PLAN_2026-08-08.md).
+"""Deterministic pre-execution mix guardrails.
 
 Distinct from parameter clamping (already existed before this file --
 every OSC write already clamps its own value to a safe range, see

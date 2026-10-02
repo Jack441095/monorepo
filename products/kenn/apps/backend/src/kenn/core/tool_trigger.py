@@ -1,5 +1,4 @@
-"""Explicit-only tool-trigger detection for KENN chat (Phase 3 of
-docs/KENN_HUB_UNIFICATION_PLAN_2026-08-05.md).
+"""Explicit-only tool-trigger detection for KENN chat.
 
 Jack's explicit decision (2026-08-05): KENN runs a registered tool only when
 the user names the action directly ("run a mix review on this," "separate

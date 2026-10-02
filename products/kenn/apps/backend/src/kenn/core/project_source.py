@@ -1,13 +1,12 @@
 """Resolve "the track already uploaded for this project" so an explicit
 chat trigger (tool_trigger.py) can re-run a different tool against it
-without asking the user to re-upload (Phase 3 of
-docs/KENN_HUB_UNIFICATION_PLAN_2026-08-05.md).
+without asking the user to re-upload.
 
 Deliberately scoped to the single-file case only: AutoMix-originated
 projects hold a STEM SET (multiple files under stem_uploads), a different
 shape this resolver does not attempt to collapse into "the" file -- "run an
 automix on this" from chat is correspondingly not wired to a trigger yet
-(see tool_trigger.py / the plan doc's Phase 3 notes for why).
+(see tool_trigger.py).
 
 **Real constraint found live (2026-08-05), not assumed:** mix_reviews'
 source WAV is deliberately deleted after analysis

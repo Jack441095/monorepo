@@ -12,18 +12,11 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
-# __file__ is <repo>/apps/backend/src/kenn/autonomous_agent.py, so the repo root is
-# two levels up (parents[2]). A prior monorepo-era build used parents[3],
-# which pointed one directory above this standalone repository -- see
-# docs/KNOWN_ISSUES.md. _MIX_OUTPUT_ROOT still names a "business/app/..."
-# path that does not exist in this standalone repo; this subsystem is
-# untested (no test coverage anywhere under apps/backend/src/kenn/) and is not part
-# of the beta path -- see docs/KENN_BETA_GAP_MATRIX.md.
-# of the beta path -- see docs/specs/KENN_BETA_GAP_MATRIX.md.
 from kenn.paths import PRODUCT_ROOT
 
 _REPO_ROOT = PRODUCT_ROOT
-_MIX_OUTPUT_ROOT = _REPO_ROOT / "business" / "app" / "data" / "mix_outputs"
+# Delivered mixdowns stay in product runtime storage unless the owner selects
+# a separate output directory with KENN_MIX_OUTPUT_ROOT.
 _MIX_OUTPUT_ROOT = Path(
     os.environ.get("KENN_MIX_OUTPUT_ROOT", str(_REPO_ROOT / ".runtime" / "mix_outputs"))
 ).resolve()
@@ -60,16 +53,9 @@ def _measure_project_mixdown(project_id: str) -> List[float] | None:
         return None
     from audio_analysis.mixdown.ltas_matcher import calculate_40_band_ltas
     from audio_analysis.utils.audio_io import read_wav_mono
-    from kenn.core.audio_analysis import analyze_wav_bytes
 
     decoded = read_wav_mono(wav_files[0].read_bytes(), max_samples=0)
     return calculate_40_band_ltas(decoded["samples"], int(decoded["sample_rate"]))
-    try:
-        analysis = analyze_wav_bytes(wav_files[0].read_bytes(), include_ltas=True)
-        ltas_rows = analysis.get("spectral", {}).get("ltas_40_band_relative_db", [])
-        return [float(row["relative_db"]) for row in ltas_rows if "relative_db" in row]
-    except Exception:
-        return None
 
 
 def tool_ltas_spectrum_match(

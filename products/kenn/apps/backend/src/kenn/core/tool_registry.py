@@ -1,5 +1,4 @@
-"""Audio-domain tool-call registry (Phase 3 of
-docs/KENN_HUB_UNIFICATION_PLAN_2026-08-05.md).
+"""Audio-domain tool-call registry.
 
 Mirrors Thursday's ServiceDef/ActionRisk shape (thursday/registry/core.py)
 deliberately -- this is the same pattern applied to KENN's own audio tools

@@ -1,7 +1,4 @@
-# Points at this repository's own apps/backend/src/kenn requirements (previously
-# pointed outside the repo at a sibling Audio_Too checkout -- see
-# docs/KNOWN_ISSUES.md). Fixing this path does not by itself make the chat
-# engine runnable; see docs/KENN_BETA_GAP_MATRIX.md for remaining blockers.
---requirement ../apps/backend/src/kenn/requirements.txt
+# Share the canonical backend manifest so both wrappers use the same engine dependencies.
+--requirement ../../apps/backend/requirements.txt
 fastapi>=0.115,<1
 uvicorn[standard]>=0.30,<1

@@ -260,6 +260,18 @@ mock, an agent reviewer or an unrelated receipt.
     five active modules after symbol/AST/export/registry/packaging checks. Public
     behavior remains covered by 139 scoped cases before and after deletion.
     [Evidence and exact files](docs/evidence/KENN_UNUSED_HELPERS_2026-10-02.md).
+  - [x] Removed the overwritten mix-output assignment and unreachable analysis
+    branch, cleaned six retired-plan headers, and corrected the wrapper dependency
+    include and standalone builder's canonical backend default. 51 scoped backend
+    and 58 canonical-wrapper cases pass; six builder mutations are caught.
+    [Evidence and exact files](docs/evidence/KENN_ACTIVE_PATH_CLEANUP_2026-10-02.md).
+  - [ ] Resolve the two existing package-wrapper evaluation failures: three chat
+    coverage rows and five held-out rows fail identically before/after cleanup.
+    Preserve expected behavior, citation guards and index provenance; trace the
+    boundary/diagnosis/citation findings recorded in the cleanup evidence.
+  - [ ] Continue the remaining document-pointer and container-path audit, including
+    tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
+    points at this product; inventory it once and preserve active exports/CLIs.
 - [ ] **A4 — Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.
