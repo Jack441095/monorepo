@@ -34,7 +34,7 @@ full-test:
 	python3 main.py full-test $(ARGS)
 
 lint:
-	python -m ruff check business studio scripts tests thursday
+	python -m ruff check studio scripts tests thursday
 
 check: lint
 	python3 scripts/repo_hygiene.py check
