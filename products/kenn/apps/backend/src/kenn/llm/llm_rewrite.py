@@ -26,7 +26,7 @@ from typing import Any, Generator
 
 import httpx
 
-from kenn.core.chat_constants import EVIDENCE_SCAN_WINDOW, count_actionable_steps
+from kenn.core.chat_constants import ANSWER_MODES, EVIDENCE_SCAN_WINDOW, count_actionable_steps
 
 ROOT = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = ROOT.parent.parent
@@ -201,6 +201,47 @@ def background_budget(seconds: int | None = None):
         yield
     finally:
         _BACKGROUND_TIMEOUT.reset(token)
+
+
+# The one failure the httpx timeout in the streaming call cannot catch. `httpx.Timeout(cfg["timeout"])`
+# is a per-read budget: a model that emits one line every few seconds meets it on every single read and
+# holds the request thread for as long as it feels like writing. A wall-clock ceiling is the only thing
+# that bounds the total, and it is derived from the per-read budget so background_budget() above widens
+# both at once: 20 s per read -> 60 s total on the ask path, 120 s per read -> 360 s on the background
+# upgrade, which is the one path where nobody is watching a spinner.
+_STREAM_DEADLINE_FACTOR = 3
+_STREAM_DEADLINE: ContextVar[float | None] = ContextVar("kenn_llm_stream_deadline", default=None)
+
+
+@contextmanager
+def stream_deadline(seconds: float):
+    """Bound the total wall-clock time one streamed answer may take.
+
+    A ContextVar for the same reason as background_budget() above: the ask path and the background
+    answer upgrade run on different threads and need different ceilings, so a module global would hand
+    one of them the other's number.
+    """
+    token = _STREAM_DEADLINE.set(float(seconds))
+    try:
+        yield
+    finally:
+        _STREAM_DEADLINE.reset(token)
+
+
+def resolve_stream_deadline(per_read_timeout: float) -> float:
+    """Total seconds a stream may take, given the per-read budget its request was opened with.
+
+    A non-numeric KENN_LLM_STREAM_DEADLINE raises rather than falling back to the derived default, the
+    same call resolve_context_chars() makes: a typo in a measurement run should stop that run, not
+    quietly re-run it on a different budget and report a latency nobody asked for.
+    """
+    override = _STREAM_DEADLINE.get()
+    if override is not None:
+        return override
+    configured = os.environ.get("KENN_LLM_STREAM_DEADLINE", "").strip()
+    if configured:
+        return float(configured)
+    return per_read_timeout * _STREAM_DEADLINE_FACTOR
 
 
 def config(task: str = "rewrite") -> dict:
@@ -390,8 +431,36 @@ def _build_headers(cfg: dict) -> dict[str, str]:
 from kenn.core.acoustic_translator import build_acoustic_guidance_prompt
 from kenn.core.genre_profiles import detect_genre_from_query, get_genre_profile
 
-MAX_TOKENS_BY_MODE = {"voice": 220, "command": 256}
-DEFAULT_MAX_TOKENS = 1200
+# Measured 2 Oct 2026 over the 29 real captured answers: p50 173 words, p95 220, max 228. At roughly
+# 1.33 tokens per word that is p50 ~230 tokens, p95 ~293, max ~303.
+#
+# The table below used to hold only voice and command. chat_constants.ANSWER_MODES is ten modes and
+# shares no name with either, so every one of them fell through to the 1200 default: a ceiling four
+# times the longest answer we have ever recorded, bounding nothing. Hence the general ceiling here, and
+# hence seeding the table from ANSWER_MODES rather than listing modes by hand -- a mode added there now
+# gets a real cap instead of arriving on 1200 the same way these ten did.
+#
+# 384 sits above the 303-token observed max with room for an answer longer than a 29-sample corpus
+# happened to contain. The old _clamped_max_tokens fallback was 256, which is BELOW p95: wiring that
+# in unchanged would have cut the top 10-15% of good answers off mid-sentence to save latency the
+# median answer never spends, because nothing today runs anywhere near 1200.
+_GENERAL_MAX_TOKENS = 384
+# 256 is ~192 words, the bound for the modes whose own instructions ask for brevity rather than for the
+# modes expected to run long.
+_FAST_MODE_TOKENS = 256
+
+MAX_TOKENS_BY_MODE = {
+    **{mode: _GENERAL_MAX_TOKENS for mode in ANSWER_MODES},
+    # ~165 words, twice the 80-word contract. This one has always been tighter than the rest.
+    "voice": 220,
+    # A command plan is a machine-readable contract, not prose, and the planner runs in shadow where
+    # every second it spends is time nobody asked for.
+    "command": _FAST_MODE_TOKENS,
+    # "very concise, single-paragraph response" per MODE_INSTRUCTIONS. 256 tokens leaves the measured
+    # median of 173 words untouched and only clips answers that were already ignoring the contract.
+    "quick_fix": _FAST_MODE_TOKENS,
+}
+DEFAULT_MAX_TOKENS = _GENERAL_MAX_TOKENS
 
 
 def _build_payload(
@@ -891,14 +960,21 @@ def _cached_usage(cfg: dict, task: str, content: str) -> LLMUsage:
 
 
 def _clamped_max_tokens(task: str, answer_mode: str, configured: int = 512) -> int:
-    """Intelligently clamp maximum new tokens based on task and mode to eliminate latency."""
+    """Clamp maximum new tokens to what the task and the mode have ever actually needed.
+
+    Reads the same table the two payload builders use, so the MLX and HTTP paths cannot end up with
+    two different answers to "how long is this mode allowed to run". That drift is what put the ten
+    chat modes on a 1200-token default while this function, the only thing in the file that knew a
+    mode's real length, was called from the MLX branch alone and never from a payload.
+
+    The plan and short-task bounds below are unchanged: a command plan is 64 tokens, a paraphrase or
+    follow-up is 128, and neither has anything to do with answer length.
+    """
     if answer_mode in {"action_preview", "action_receipt"} or task in {"confirm", "intent"}:
         return min(configured, 64)
-    if answer_mode in {"quick_fix", "voice"} or task in {"paraphrase", "followups"}:
+    if task in {"paraphrase", "followups"}:
         return min(configured, 128)
-    if answer_mode in {"deep_explanation", "mix_diagnosis"}:
-        return min(configured, 384)
-    return min(configured, 256)
+    return min(configured, MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS))
 
 
 def _chat_completion(
@@ -1141,6 +1217,11 @@ def chat_completion_stream(
     headers = _build_headers(cfg)
     client = _get_client()
     started = time.perf_counter()
+    # Monotonic, and taken before the request goes out, so the deadline covers the connect and the
+    # headers as well as the tokens. wall_clock=False would be wrong here: this thread is blocked in a
+    # socket read and NTP stepping the clock backwards could extend the stream indefinitely.
+    deadline_seconds = resolve_stream_deadline(cfg["timeout"])
+    deadline_at = time.monotonic() + deadline_seconds
     _accumulated: list[str] = []
 
     try:
@@ -1157,6 +1238,14 @@ def chat_completion_stream(
             prompt_tokens = 0
             completion_tokens = 0
             for line in response.iter_lines():
+                if time.monotonic() > deadline_at:
+                    # Same TimeoutError the stalled-read branch below raises, so the caller cannot
+                    # tell a slow model from a dead one -- and neither should it: both mean no answer
+                    # in time, and both fall back to the template.
+                    raise TimeoutError(
+                        f"LLM stream timed out after {cfg['timeout']}s per read"
+                        f" / {deadline_seconds:g}s total"
+                    )
                 if not line:
                     continue
                 line = line.strip()
@@ -1203,6 +1292,12 @@ def chat_completion_stream(
         raise TimeoutError(f"LLM stream timed out after {cfg['timeout']}s")
     except httpx.HTTPStatusError as e:
         raise RuntimeError(f"LLM returned {e.response.status_code}: {e.response.text[:200]}")
+    except TimeoutError:
+        # The wall-clock check in the loop above raises the caller's own timeout type rather than
+        # httpx's, so it has to survive the broad handler below untouched. Rewritten into "cut short"
+        # it would report a deadline as a broken connection, and `isinstance(exc, TimeoutError)` at
+        # the call site -- live_command.py:3790 -- would stop recognising it as a timeout at all.
+        raise
     except Exception as exc:
         # Raising, not returning: a stream that dies mid-answer used to end quietly, and
         # the caller validated the truncated text as if the model had finished. Timeouts

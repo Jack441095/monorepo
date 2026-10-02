@@ -139,7 +139,7 @@ def _install_capture(path: Path) -> None:
     before anyone could quote them.
     """
     from kenn.core import chat_answer
-    from kenn.llm.llm_rewrite import _CONTEXT_BLOCK_CHARS
+    from kenn.llm.llm_rewrite import resolve_context_chars
 
     path.parent.mkdir(parents=True, exist_ok=True)
     real = chat_answer.generated_answer_validation
@@ -157,14 +157,14 @@ def _install_capture(path: Path) -> None:
                 "fabricated_sources": list(validation.get("fabricated_sources") or []),
                 "evidence_text": gate_evidence_text(shown),
                 "evidence_chunks_shown": len(shown),
-                # The gate reads model_evidence()'s default budget. KENN_LLM_CONTEXT_CHARS moves the prompt's
-                # budget instead (llm_rewrite.py:1394) and leaves the gate's alone, so the two are recorded
-                # separately: a row whose prompt budget differs from its evidence budget was shown less than
-                # the gate vouches for, and no re-score of that row can be exact.
-                "evidence_budget_chars": int(_CONTEXT_BLOCK_CHARS),
-                "prompt_context_chars": int(
-                    os.environ.get("KENN_LLM_CONTEXT_CHARS") or _CONTEXT_BLOCK_CHARS
-                ),
+                # Both readers now resolve the budget through resolve_context_chars(), so the two numbers
+                # cannot diverge. They were separate fields because the gate used to ignore
+                # KENN_LLM_CONTEXT_CHARS and read model_evidence()'s 1200 default while the prompt honoured
+                # the override: at 300 the model saw 1 excerpt and the gate judged 3, the same defect that
+                # took acceptance 41% -> 27% on 2 Oct 2026. Kept as two fields because a future split would
+                # show up here as two different values rather than needing a new field to detect it.
+                "evidence_budget_chars": int(resolve_context_chars()),
+                "prompt_context_chars": int(resolve_context_chars()),
                 "index_version": _index_version(),
                 "additional_evidence_text": kwargs.get("additional_evidence_text") or "",
                 "timeline_context": kwargs.get("timeline_context") or "",

@@ -53,9 +53,11 @@ from kenn.core.chat_retrieval import (
     source_label,
 )
 from kenn.core.chat_grounding import (
+    StreamedAnswerGuard,
     answer_quality_report,
     answer_self_check,
     calibrate_answer_for_grounding,
+    evidence_measurements,
     generated_answer_validation,
     grounding_mode,
     grounding_report,
@@ -1674,11 +1676,42 @@ def _answer_payload_stream_raw(
         )
         generated_parts = []
         cut_short = ""
+        prefix_guard_trip = None
+        # Only the two prefix-sound rejection causes are watched here: unsupported measurements and
+        # claims it changed the Live set. 8 of the 9 rejections in the 2 Oct 2026 run of 29 queries were
+        # unsupported measurements, and 5 of 7 in the run before it, so those two account for every rejection
+        # we have actually measured. Evidence overlap, answer quality and weak grounding need the finished
+        # answer and stayed with the full gate below.
+        stream_guard = StreamedAnswerGuard(
+            evidence_measurements(
+                results,
+                timeline_context=timeline_context,
+                additional_evidence_text=_specialist_evidence_context(relevance_query, history),
+            )
+        )
+        held = None
         try:
             for event in generator:
                 if event["event"] == "token":
                     token = event.get("token") or ""
-                    generated_parts.append(token)
+                    if not token:
+                        continue
+                    tripped = stream_guard.check(token)
+                    if tripped is not None:
+                        # The evidence side of the measurement diff is fixed and the answer side only grows, so
+                        # nothing later can redeem this. We stop here instead of after generation, and neither
+                        # the token carrying the number nor the half of it we were holding goes out.
+                        prefix_guard_trip = tripped
+                        break
+                    # One token of lookahead. A measurement the model split across a boundary is only whole
+                    # once the token that finishes it lands, so emitting this one before the next has been
+                    # checked puts "900" on the wire ahead of the " ms" that condemns it. The wait costs one
+                    # token of decode, roughly 7-50 ms at the 133-140 tok/s this host measures, and it closes
+                    # the last way an unsupported number could leave.
+                    if held is not None:
+                        generated_parts.append(held)
+                        yield {"event": "token", "token": held}
+                    held = token
                 elif event["event"] == "llm_usage":
                     llm_usage = event.get("data")
         except Exception as exc:
@@ -1686,7 +1719,18 @@ def _answer_payload_stream_raw(
             # validator as if the model had finished writing it (29 Sept audit). Fall back
             # to the grounded template and record why in generation_validation.
             cut_short = f"generation stream cut short: {type(exc).__name__}: {str(exc)[:160]}"
-        candidate = "" if cut_short else "".join(generated_parts).strip()
+        finally:
+            # Also runs on the guard break, so a rejected answer stops costing tokens mid-generation.
+            generator.close()
+        if held is not None and not (cut_short or prefix_guard_trip):
+            # The stream ended on its own, so no further token is coming to clear the held one, and it was
+            # guarded when it arrived. A dead stream leaves it back: nothing else will vouch for the rest of
+            # that answer, so the template is what the producer gets.
+            generated_parts.append(held)
+            yield {"event": "token", "token": held}
+        candidate = (
+            "" if (cut_short or prefix_guard_trip) else "".join(generated_parts).strip()
+        )
         if candidate:
             validation = generated_answer_validation(
                 relevance_query,
@@ -1715,26 +1759,37 @@ def _answer_payload_stream_raw(
                 grounding = validation["grounding"]
                 quality = validation["quality"]
                 mode = grounding_mode(grounding)
-                for section_event in _progressive_token_yield(
-                    final_answer, answer_mode, route
-                ):
-                    yield section_event
+                # The model's own text is already on the wire, so calibration's medium-mode caveat is the only
+                # part the producer has not seen. It is strictly a prefix, which is why we can send just that.
+                if final_answer.endswith(candidate) and len(final_answer) > len(candidate):
+                    yield {
+                        "event": "token",
+                        "token": final_answer[: len(final_answer) - len(candidate)],
+                    }
             else:
+                # No re-send. The candidate is already streaming, and appending the template would hand the
+                # producer two answers; the metadata event below carries the authoritative one.
                 final_answer = template
-                for section_event in _progressive_token_yield(
-                    template, answer_mode, route
-                ):
-                    yield section_event
                 llm_active = False
         else:
             generation_validation = {
                 **generation_validation,
                 "attempted": True,
-                "warnings": [cut_short or "generation returned no answer"],
+                "warnings": [
+                    (prefix_guard_trip or {}).get("warning")
+                    or cut_short
+                    or "generation returned no answer"
+                ],
+                "unsupported_measurements": (prefix_guard_trip or {}).get(
+                    "unsupported_measurements", []
+                ),
             }
-            yield {"event": "token", "token": template}
             final_answer = template
             llm_active = False
+            if not generated_parts:
+                # Nothing reached the producer yet, so the template is all it has. Once a fragment is out we
+                # leave the stream alone and let the metadata event carry the correction.
+                yield {"event": "token", "token": template}
 
         # Yield updated final metadata
         final_metadata = {

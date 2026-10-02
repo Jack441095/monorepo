@@ -136,17 +136,27 @@ def test_capture_records_the_index_version_and_evidence_budget(tmp_path: Path) -
     assert row["index_version"] == (pointer.read_text(encoding="utf-8").strip() if pointer.is_file() else "")
 
 
-def test_capture_records_the_prompt_budget_separately_from_the_gate_budget(tmp_path: Path, monkeypatch) -> None:
-    """KENN_LLM_CONTEXT_CHARS moves the prompt's budget and not the gate's, and the split has to be visible.
+def test_capture_records_the_same_budget_the_prompt_and_the_gate_both_read(tmp_path: Path, monkeypatch) -> None:
+    """KENN_LLM_CONTEXT_CHARS moves the prompt's budget and the gate's together, and the capture has to show that.
 
-    With the two at different values the model was shown less than the gate vouches for, so no later re-score of
-    that row can be exact. Recording only one budget would hide which of the two was in play.
+    The gate used to read model_evidence()'s 1200 default while the prompt honoured the override, so at
+    KENN_LLM_CONTEXT_CHARS=300 the model was shown 1 excerpt and the gate judged 3. Both readers now go
+    through resolve_context_chars(), so the two recorded numbers are equal by construction and a re-score of
+    any row is exact. This test asserts equality rather than a split because the split was the defect; if a
+    future change reintroduces one, it fails here instead of quietly flattering acceptance.
     """
-    from kenn.llm.llm_rewrite import _CONTEXT_BLOCK_CHARS
+    from kenn.llm.llm_rewrite import resolve_context_chars
 
     monkeypatch.setenv("KENN_LLM_CONTEXT_CHARS", "650")
     row = _captured_row(tmp_path)
 
     assert row["prompt_context_chars"] == 650
-    assert row["evidence_budget_chars"] == _CONTEXT_BLOCK_CHARS
-    assert row["prompt_context_chars"] != row["evidence_budget_chars"]
+    assert row["evidence_budget_chars"] == 650
+    assert row["prompt_context_chars"] == row["evidence_budget_chars"]
+
+    monkeypatch.delenv("KENN_LLM_CONTEXT_CHARS", raising=False)
+    # A second directory, because _captured_row reads the FIRST row of answers.jsonl and a second call on the
+    # same path would append and then hand back the 650 row written above.
+    unset = _captured_row(tmp_path / "unset")
+
+    assert unset["prompt_context_chars"] == unset["evidence_budget_chars"] == int(resolve_context_chars())

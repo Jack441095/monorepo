@@ -356,6 +356,115 @@ def claims_live_change(answer: str) -> bool:
     return bool(_LIVE_CHANGE_CLAIM_RE.search(answer))
 
 
+# Long enough to hold the longest single match either guard regex can produce, so a match that begins in the
+# previous token is still seen whole. "I have gone ahead and quantized" is 32 characters and is the longest
+# _LIVE_CHANGE_CLAIM_RE form; a range like "200 - 400 Hz" plus its unit is under 20.
+_STREAM_GUARD_CONTEXT_CHARS = 48
+
+
+def _guard_tail(window: str) -> str:
+    """The last `_STREAM_GUARD_CONTEXT_CHARS` of `window`, never starting inside a word.
+
+    Cutting mid-number is the one way this guard could invent a rejection: "0 ms" lifted out of "150 ms" reads
+    as a measurement the finished answer does not contain, and a conservative false positive throws away an
+    answer that was good. Backing up to the previous whitespace keeps "200-400 Hz" and "-1 dBTP" whole, which
+    is also what the range rewrite needs.
+    """
+    tail = window[-_STREAM_GUARD_CONTEXT_CHARS:]
+    cut = len(window) - len(tail)
+    while cut > 0 and not window[cut - 1].isspace():
+        cut -= 1
+    return window[cut:]
+
+
+class StreamedAnswerGuard:
+    """Per-token check on streamed prose, for the two rejection causes that are safe to catch early.
+
+    The full gate costs 1.16 ms median / 1.87 ms max of text work on the 29 answers captured 2 Oct 2026, which is
+    why the streaming path used to discard every token and show the producer nothing until generation AND the gate
+    had both finished. We cannot make that gate incremental, but two of its eight warnings are prefix-sound:
+
+    - unsupported measurements, because the evidence side of `_measurements(answer) - _measurements(evidence_text)`
+      is fixed before the first token while the answer side only grows;
+    - claims_live_change, because a regex match inside a prefix is still a match inside the finished answer.
+
+    The other three are not: evidence_overlap divides by an answer_terms set that grows with every token, and
+    answer_quality_report and grounding_mode need the whole answer. None of those three fired in either 2 Oct 2026
+    run of 29 queries, so the streaming path leaves them to the authoritative gate at the end.
+
+    This guard runs on a short window rather than the accumulated text: re-scanning the whole answer per token would
+    cost the 1.16 ms full pass once per token, while 48 characters of carry plus one token is a few microseconds.
+    The window is a substring of the prefix, so a match in it is a match in the answer.
+    """
+
+    def __init__(self, allowed_measurements: set[str]) -> None:
+        self._allowed = allowed_measurements
+        self._carry = ""
+
+    def check(self, token: str) -> dict | None:
+        """None while the text is still defensible, else why we stopped streaming it."""
+        window = self._carry + token
+        leaked = _measurements(window) - self._allowed
+        if leaked:
+            return {
+                "warning": (
+                    "streamed generation introduced unsupported measurements: "
+                    + ", ".join(sorted(leaked))
+                ),
+                "unsupported_measurements": sorted(leaked),
+            }
+        if claims_live_change(window):
+            return {
+                "warning": "streamed generation claims it changed the Live set",
+                "unsupported_measurements": [],
+            }
+        self._carry = _guard_tail(window)
+        return None
+
+
+def _gate_evidence_text(
+    shown: list[tuple[float, dict, str]],
+    timeline_context: str | None = None,
+    additional_evidence_text: str | None = None,
+) -> str:
+    """The exact text the gate judges an answer's numbers against.
+
+    Streamed generation needs this before the answer exists, so it lives in one place and both readers call it.
+    """
+    evidence_text = " ".join(
+        " ".join(
+            (
+                str(chunk.get("title") or ""),
+                str(chunk.get("source") or ""),
+                # The body the prompt carried, not chunk["text"]. Title and source are in the prompt too, inside
+                # the label attribute of the same <source_excerpt>, so this set stays a subset of what the model
+                # read. Reading the raw text instead is what let the gate vouch for numbers from chunks #7 to #10.
+                body,
+            )
+        )
+        for _score, chunk, body in shown
+    )
+    if timeline_context:
+        evidence_text = f"{evidence_text} {timeline_context}"
+    if additional_evidence_text:
+        evidence_text = f"{evidence_text} {additional_evidence_text}"
+    return evidence_text
+
+
+def evidence_measurements(
+    results: list[tuple[float, dict]],
+    *,
+    timeline_context: str | None = None,
+    additional_evidence_text: str | None = None,
+) -> set[str]:
+    """Every measurement the retrieved evidence actually contains, keyed the way the gate keys them."""
+    return _measurements(
+        _gate_evidence_text(
+            _evidence_chunks(results), timeline_context, additional_evidence_text
+        )
+    )
+
+
 def generated_answer_validation(
     query: str,
     results: list[tuple[float, dict]],
@@ -394,23 +503,7 @@ def generated_answer_validation(
     # Read the evidence list once and hand the same one to every check below, so the measurements, the overlap
     # score and the citation check cannot end up scored against different sets.
     shown = _evidence_chunks(results)
-    evidence_text = " ".join(
-        " ".join(
-            (
-                str(chunk.get("title") or ""),
-                str(chunk.get("source") or ""),
-                # The body the prompt carried, not chunk["text"]. Title and source are in the prompt too, inside
-                # the label attribute of the same <source_excerpt>, so this set stays a subset of what the model
-                # read. Reading the raw text instead is what let the gate vouch for numbers from chunks #7 to #10.
-                body,
-            )
-        )
-        for _score, chunk, body in shown
-    )
-    if timeline_context:
-        evidence_text = f"{evidence_text} {timeline_context}"
-    if additional_evidence_text:
-        evidence_text = f"{evidence_text} {additional_evidence_text}"
+    evidence_text = _gate_evidence_text(shown, timeline_context, additional_evidence_text)
     # The query is deliberately not part of the evidence set. This overlap check answers one question:
     # is the answer built out of the notes we retrieved? Folding the query in would let a model pass by
     # echoing the words of the question back, which is the one thing a synthesised answer always does.
