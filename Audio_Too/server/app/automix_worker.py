@@ -234,14 +234,6 @@ def start_automix_worker() -> None:
     print("[automix_worker] Background worker thread started successfully.", flush=True)
 
 
-def stop_automix_worker() -> None:
-    """Stop the background worker thread."""
-    _stop_event.set()
-    if _worker_thread:
-        _worker_thread.join(timeout=5.0)
-        print("[automix_worker] Background worker thread stopped.", flush=True)
-
-
 def start_worker(worker_id: str | None = None) -> None:
     """Start the standalone worker polling loop."""
     if not worker_id:

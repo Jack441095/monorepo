@@ -74,11 +74,6 @@ def load_records(name: str) -> list[dict]:
     return sqlite_db.list_records(name)
 
 
-def save_records(name: str, records: list[dict]) -> None:
-    _ensure_db()
-    sqlite_db.replace_records(name, records)
-
-
 def add_record(name: str, record: dict) -> dict:
     _ensure_db()
     saved = sqlite_db.add_record(name, record)
@@ -156,11 +151,6 @@ def sheet_xml(records: list[dict], fields: list[str]) -> str:
         '</sheetData>'
         '</worksheet>'
     )
-
-
-def export_xlsx(name: str, fields: list[str], filename: str) -> Path:
-    records = load_records(name)
-    return export_multi_sheet_xlsx({name.title(): (fields, records)}, filename)
 
 
 def export_multi_sheet_xlsx(sheets: dict[str, tuple[list[str], list[dict]]], filename: str) -> Path:

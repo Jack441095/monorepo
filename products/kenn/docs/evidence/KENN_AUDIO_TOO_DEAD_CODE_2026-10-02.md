@@ -34,6 +34,29 @@ the command could only fail.
   Audio_Too Python environment).
 - No test or script enumerates `scripts/` by directory.
 
+## Second pass: eight single functions
+
+Each name appeared once in the monorepo (its own definition) before removal, and again nowhere afterwards,
+including tests and strings. Two more became caller-less once their only caller went.
+
+- `server/agents/Shared/agent_llm.py`: `generate_llm_simple`, then `_ollama_generate` (its only caller).
+- `server/app/automix_worker.py`: `stop_automix_worker`.
+- `server/agents/Shared/data_store.py`: `save_records`, `export_xlsx`.
+- `server/app/db.py`: `replace_records` (only `save_records` called it).
+- `server/agents/Shared/reports.py`: `str_date`.
+- `scripts/serve.py`: `start_ableton_web`.
+
+Kept from the earlier candidate list: `process_podcast_repair`, `validate_rating`, `cohens_kappa_binary`
+(benchmark and podcast routes exist) and `write_text_pdf` (its file went in the first pass).
+`export_multi_sheet_xlsx` and `upsert_record` still have callers.
+
+Checked from `Audio_Too` with the KENN backend venv, which lacks Audio_Too's own dependencies:
+
+- All six files parse; `grep` for the eight names over tracked files is empty.
+- `pytest --collect-only -q tests`: 2,864 collected, 188 errors, same as before.
+- The 19 test files that import these modules: 35 passed, 11 failed, 11 collection errors, with and without
+  the change (the failures and errors are missing dependencies).
+
 ## Left in place on purpose
 
 - `server/services/knowledge_flywheel_agent.py`: `thursday/scheduler.py` names `KnowledgeFlywheelAgent` and its
@@ -70,4 +93,5 @@ Paths are relative to the monorepo root.
 
 - Deleted: the 17 files above, under `Audio_Too/`.
 - `Audio_Too/main.py`: `cmd_package`, its two dispatch entries and its usage lines.
+- The six files in the second pass above.
 - `products/kenn/docs/evidence/KENN_AUDIO_TOO_DEAD_CODE_2026-10-02.md` and `products/kenn/KENN_PLAN.md`.

@@ -117,21 +117,6 @@ def wait_for_port(host: str, port: int, *, timeout: float = 45.0) -> bool:
     return False
 
 
-def start_ableton_web(python: str) -> None:
-    if port_open(HOST, ABLETON_PORT):
-        print(f"Ableton chat already running: http://{HOST}:{ABLETON_PORT}")
-        return
-    print(f"Starting Ableton chat at http://{HOST}:{ABLETON_PORT}")
-    proc = subprocess.Popen(
-        [python, str(REPO_ROOT / "studio" / "kenn" / "kenn" / "main.py"), "web"],
-        cwd=REPO_ROOT,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    _children.append(proc)
-    time.sleep(0.8)
-
-
 def start_detached_process(cmd: list[str], label: str, log_name: str) -> subprocess.Popen:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     log_path = LOG_DIR / log_name

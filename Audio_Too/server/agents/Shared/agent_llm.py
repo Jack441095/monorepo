@@ -65,29 +65,6 @@ def _ollama_chat(
     return message.get("content", "").strip() or None
 
 
-def _ollama_generate(
-    prompt: str,
-    model: str = DEFAULT_MODEL,
-    temperature: float = 0.3,
-    max_tokens: int = 600,
-    timeout: int = TIMEOUT,
-) -> str | None:
-    """Call Ollama generate API (simpler than chat). Returns generated text or None."""
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "stream": False,
-        "options": {
-            "temperature": temperature,
-            "num_predict": max_tokens,
-        },
-    }
-    result = _ollama_request("generate", payload, timeout=timeout)
-    if result is None:
-        return None
-    return result.get("response", "").strip() or None
-
-
 def _ollama_available() -> bool:
     """Check whether Ollama is reachable AND has the model this module
     actually generates with pulled.
@@ -140,24 +117,6 @@ def generate_llm(
     ]
     return _ollama_chat(
         messages=messages,
-        model=resolved_model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-
-
-def generate_llm_simple(
-    prompt: str,
-    model: str | None = None,
-    temperature: float = 0.3,
-    max_tokens: int = 600,
-) -> str | None:
-    """Simpler generation without system/user split (single prompt)."""
-    if not _ollama_available():
-        return None
-    resolved_model = model or DEFAULT_MODEL
-    return _ollama_generate(
-        prompt=prompt,
         model=resolved_model,
         temperature=temperature,
         max_tokens=max_tokens,

@@ -37,10 +37,6 @@ def parse_date(value: object) -> date | None:
         return None
 
 
-def str_date(d: date) -> str:
-    return d.isoformat()
-
-
 def monthly_report(list_records: Callable[[str], list[dict]]) -> str:
     """Generate a full monthly business report."""
     month_start = this_month_start()

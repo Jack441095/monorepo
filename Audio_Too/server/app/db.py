@@ -401,17 +401,6 @@ def export_json_snapshots() -> list[Path]:
     return written
 
 
-@retry_on_db_lock()
-def replace_records(table: str, records: list[dict]) -> None:
-    if table not in TABLES:
-        raise KeyError(f"Unknown table: {table}")
-    with connect() as conn:
-        conn.execute(f"DELETE FROM {table}")
-        conn.commit()
-    for record in records:
-        upsert_record(table, record)
-
-
 def add_record(table: str, record: dict) -> dict:
     return upsert_record(table, {"id": str(uuid4())[:8], "created_at": now(), "updated_at": now(), **record})
 

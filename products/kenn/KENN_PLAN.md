@@ -333,6 +333,11 @@ mock, an agent reviewer or an unrelated receipt.
     exists. Collection is identical before and after; the Audio_Too suite does not run cleanly here, so
     that is parity, not a green run. Candidates left for decision are listed in the
     [evidence](docs/evidence/KENN_AUDIO_TOO_DEAD_CODE_2026-10-02.md).
+  - [x] Removed eight more unreferenced Audio_Too functions (`generate_llm_simple` and its helper
+    `_ollama_generate`, `stop_automix_worker`, `save_records` and `replace_records`, `export_xlsx`, `str_date`,
+    `start_ableton_web`). Collection and the 19 related test files give identical results before and after;
+    the Audio_Too suite still cannot run clean here. See the same
+    [evidence](docs/evidence/KENN_AUDIO_TOO_DEAD_CODE_2026-10-02.md).
   - [x] Removed two overridden, unreachable clip methods from `AbletonOSCClient`;
     the final public methods retain the same behavior. Caller/registry and AST
     checks establish reachability; 39 scoped OSC/clip tests pass. [Evidence and exact files](docs/evidence/KENN_DEAD_CLIP_METHODS_2026-10-02.md).
