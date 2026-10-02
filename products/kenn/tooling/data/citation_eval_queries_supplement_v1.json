@@ -1,0 +1,605 @@
+{
+  "schema": "kenn.citation_queries.v1",
+  "description": "85 existing knowledge and technique questions for a supplemental fresh capture when the main run yields fewer than 150 reviewable candidates. Deduplicated against citation_eval_queries_v1.json and within this manifest by casefolded whitespace-normalized question. Existing expected answers, source matches and confidence labels are omitted. This is curated stress coverage, not production prevalence or citation gold.",
+  "query_source_counts": {
+    "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json": 35,
+    "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json": 50
+  },
+  "cases": [
+    {
+      "id": "supplement-upgrade-buffer-recording",
+      "question": "I need responsive software monitoring for a vocal take. Which buffer range is a sensible starting point?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-buffer-recording"
+    },
+    {
+      "id": "supplement-upgrade-buffer-export",
+      "question": "Will changing my interface buffer from 128 to 1024 samples improve the sound of an offline render?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-buffer-export"
+    },
+    {
+      "id": "supplement-upgrade-dither-float",
+      "question": "I am keeping an intermediate bounce at 32-bit float. Is this the point where I should add dither?",
+      "category": "mastering",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-dither-float"
+    },
+    {
+      "id": "supplement-upgrade-sample-rate-video",
+      "question": "Should a music cue intended for video normally be delivered at 44.1 or 48 kHz?",
+      "category": "delivery",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-sample-rate-video"
+    },
+    {
+      "id": "supplement-upgrade-vocal-distance",
+      "question": "What is a practical starting distance between a singer and a cardioid condenser microphone?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-vocal-distance"
+    },
+    {
+      "id": "supplement-upgrade-vocal-angle",
+      "question": "Can moving a vocal microphone slightly off axis help with plosives and sharp consonants?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-vocal-angle"
+    },
+    {
+      "id": "supplement-upgrade-room-null",
+      "question": "There is a very narrow bass null at my chair. Should I apply a large monitor-EQ boost at that frequency?",
+      "category": "monitoring",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-room-null"
+    },
+    {
+      "id": "supplement-upgrade-monitor-triangle",
+      "question": "What geometric relationship should I start with between two nearfields and the listening position?",
+      "category": "monitoring",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-monitor-triangle"
+    },
+    {
+      "id": "supplement-upgrade-dynamic-eq-resonance",
+      "question": "A narrow nasal frequency appears only on occasional vocal notes. Which frequency-dependent dynamics tool fits that problem?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-dynamic-eq-resonance"
+    },
+    {
+      "id": "supplement-upgrade-multiband-broad",
+      "question": "My whole low-frequency region changes level too much over time. Is this broader than a single dynamic EQ bell?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-multiband-broad"
+    },
+    {
+      "id": "supplement-upgrade-true-peak-definition",
+      "question": "What meter estimates reconstructed peaks that can occur between the stored digital samples?",
+      "category": "mastering",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-true-peak-definition"
+    },
+    {
+      "id": "supplement-upgrade-true-peak-margin",
+      "question": "What is a practical true-peak ceiling starting point for a master that will be encoded for streaming?",
+      "category": "mastering",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-true-peak-margin"
+    },
+    {
+      "id": "supplement-upgrade-kick-pitch-envelope",
+      "question": "Which envelope creates the initial knock when synthesising a kick from a sine oscillator?",
+      "category": "sound_design",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-kick-pitch-envelope"
+    },
+    {
+      "id": "supplement-upgrade-kick-tail",
+      "question": "My synthetic kick overlaps the next bass phrase. Which part of its envelope should I shorten?",
+      "category": "sound_design",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-kick-tail"
+    },
+    {
+      "id": "supplement-upgrade-snare-layer-jobs",
+      "question": "How should I divide transient, body, noise and width roles when building a layered snare?",
+      "category": "sound_design",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-snare-layer-jobs"
+    },
+    {
+      "id": "supplement-upgrade-clap-low-mids",
+      "question": "Why might I high-pass a wide clap layer before combining it with the main snare?",
+      "category": "sound_design",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-clap-low-mids"
+    },
+    {
+      "id": "supplement-upgrade-vocal-ride",
+      "question": "Can phrase-by-phrase level rides reduce how hard a vocal compressor has to work?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-vocal-ride"
+    },
+    {
+      "id": "supplement-upgrade-send-automation",
+      "question": "How can I make phrase-ending reverb or delay audible without washing every vocal line?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-send-automation"
+    },
+    {
+      "id": "supplement-upgrade-reamp-feedback",
+      "question": "What routing hazard must I avoid when recording a processed effects return onto a new audio track?",
+      "category": "production",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-reamp-feedback"
+    },
+    {
+      "id": "supplement-upgrade-reamp-preserve-dry",
+      "question": "Before printing an unstable creative effects chain, what source should I preserve for reversibility?",
+      "category": "production",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-reamp-preserve-dry"
+    },
+    {
+      "id": "supplement-upgrade-expander-natural",
+      "question": "Which is usually more natural for gently reducing steady background noise: full gating or downward expansion?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-expander-natural"
+    },
+    {
+      "id": "supplement-upgrade-gate-chatter",
+      "question": "My drum gate opens and closes rapidly around its threshold. Which timing controls can stabilise it?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-gate-chatter"
+    },
+    {
+      "id": "supplement-upgrade-recording-peak-range",
+      "question": "At 24-bit, roughly where can normal performance peaks sit while leaving sensible headroom?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-recording-peak-range"
+    },
+    {
+      "id": "supplement-upgrade-fader-input-clip",
+      "question": "The converter input clipped during recording. Can lowering the DAW channel fader repair the captured signal?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-fader-input-clip"
+    },
+    {
+      "id": "supplement-upgrade-sub-centre",
+      "question": "Which portion of a bass sound should remain most stable and centred for reliable mono playback?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-sub-centre"
+    },
+    {
+      "id": "supplement-upgrade-bass-wide-harmonics",
+      "question": "Can I keep upper bass harmonics wide while the deepest octave remains mono-compatible?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-bass-wide-harmonics"
+    },
+    {
+      "id": "supplement-upgrade-guitar-start-position",
+      "question": "Where is a balanced single-microphone starting point on an acoustic guitar when the sound hole is too boomy?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-guitar-start-position"
+    },
+    {
+      "id": "supplement-upgrade-guitar-two-mic-mono",
+      "question": "What should I verify before committing a two-microphone acoustic guitar recording?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-guitar-two-mic-mono"
+    },
+    {
+      "id": "supplement-upgrade-overheads-snare-distance",
+      "question": "What can I measure from both overhead capsules when I want the snare centred?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-overheads-snare-distance"
+    },
+    {
+      "id": "supplement-upgrade-overheads-auto-align",
+      "question": "Should every drum close-mic waveform automatically be snapped to the overhead transient?",
+      "category": "recording",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-overheads-auto-align"
+    },
+    {
+      "id": "supplement-upgrade-masking-rhythm",
+      "question": "Can shortening sustained parts and creating rhythmic gaps reduce masking before mix processing?",
+      "category": "arrangement",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-masking-rhythm"
+    },
+    {
+      "id": "supplement-upgrade-masking-register",
+      "question": "Two melodic parts demand the same range. What compositional change can separate them before EQ?",
+      "category": "arrangement",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-masking-register"
+    },
+    {
+      "id": "supplement-upgrade-album-perceived-level",
+      "question": "Two masters show the same integrated loudness but one feels much louder. Should I still adjust the sequence by ear?",
+      "category": "mastering",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-album-perceived-level"
+    },
+    {
+      "id": "supplement-upgrade-album-transition",
+      "question": "Besides loudness, what should I compare while listening through transitions between adjacent album tracks?",
+      "category": "mastering",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-album-transition"
+    },
+    {
+      "id": "supplement-upgrade-crest-factor",
+      "question": "What does the difference between peak and average level tell me about transient contrast?",
+      "category": "mixing",
+      "query_source": "apps/backend/src/kenn/evals/knowledge_upgrade_cases.json",
+      "query_source_id": "upgrade-crest-factor"
+    },
+    {
+      "id": "supplement-technique-purpose-001",
+      "question": "my drums sound limp and don't cut through, how do I get more snap",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-001"
+    },
+    {
+      "id": "supplement-technique-purpose-002",
+      "question": "everything sounds boxy and cloudy around the 300 Hz area",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-002"
+    },
+    {
+      "id": "supplement-technique-purpose-003",
+      "question": "the vocal disappears behind the guitars in the chorus",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-003"
+    },
+    {
+      "id": "supplement-technique-purpose-004",
+      "question": "how do I stop my mixes sounding flat and two dimensional",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-004"
+    },
+    {
+      "id": "supplement-technique-purpose-005",
+      "question": "how loud should my master be for Spotify",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-005"
+    },
+    {
+      "id": "supplement-technique-purpose-006",
+      "question": "what should my levels peak at when I'm recording a singer",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-006"
+    },
+    {
+      "id": "supplement-technique-purpose-007",
+      "question": "my singer sounds boomy when they get close to the mic",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-007"
+    },
+    {
+      "id": "supplement-technique-purpose-008",
+      "question": "how do I get the pumping effect where the pads duck under the kick",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-008"
+    },
+    {
+      "id": "supplement-technique-purpose-009",
+      "question": "the kick and the bass fight each other and the low end is a mess",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-009"
+    },
+    {
+      "id": "supplement-technique-purpose-010",
+      "question": "does my kick drum need to be in the same key as my song",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-010"
+    },
+    {
+      "id": "supplement-technique-purpose-011",
+      "question": "how do I glue my drums together so they feel like one kit",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-011"
+    },
+    {
+      "id": "supplement-technique-purpose-012",
+      "question": "I want my synth to sound huge and wide but still work on a phone speaker",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-012"
+    },
+    {
+      "id": "supplement-technique-purpose-013",
+      "question": "how do I make my hi hats less piercing",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-013"
+    },
+    {
+      "id": "supplement-technique-purpose-014",
+      "question": "my laptop keeps crackling and glitching when I play the project",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-014"
+    },
+    {
+      "id": "supplement-technique-purpose-015",
+      "question": "there's a delay between hitting a key and hearing the sound",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-015"
+    },
+    {
+      "id": "supplement-technique-purpose-016",
+      "question": "how do I send a mix to a mastering engineer",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-016"
+    },
+    {
+      "id": "supplement-technique-purpose-017",
+      "question": "what files should I give someone who is going to mix my song",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-017"
+    },
+    {
+      "id": "supplement-technique-purpose-018",
+      "question": "how do I compare my mix against a commercial track fairly",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-018"
+    },
+    {
+      "id": "supplement-technique-purpose-019",
+      "question": "I can only mix on headphones, what should I watch out for",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-019"
+    },
+    {
+      "id": "supplement-technique-purpose-020",
+      "question": "my room makes the bass sound different in every corner",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-020"
+    },
+    {
+      "id": "supplement-technique-purpose-021",
+      "question": "how do I make a big build up before the drop",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-021"
+    },
+    {
+      "id": "supplement-technique-purpose-022",
+      "question": "my chorus doesn't feel bigger than the verse",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-022"
+    },
+    {
+      "id": "supplement-technique-purpose-023",
+      "question": "how do I get that lo-fi dusty sound on my beats",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-023"
+    },
+    {
+      "id": "supplement-technique-purpose-024",
+      "question": "how do I chop up a sample to make a new beat",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-024"
+    },
+    {
+      "id": "supplement-technique-purpose-025",
+      "question": "how do I make a wobbling bass line",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-025"
+    },
+    {
+      "id": "supplement-technique-purpose-026",
+      "question": "the vocal is out of tune in a couple of places",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-026"
+    },
+    {
+      "id": "supplement-technique-purpose-027",
+      "question": "how do I make background vocals sit behind the lead",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-027"
+    },
+    {
+      "id": "supplement-technique-purpose-028",
+      "question": "there's a constant hum under my voiceover",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-028"
+    },
+    {
+      "id": "supplement-technique-purpose-029",
+      "question": "how do I cut the noise between drum hits on my tom tracks",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-029"
+    },
+    {
+      "id": "supplement-technique-purpose-030",
+      "question": "my overheads make the snare sound thin and hollow",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-030"
+    },
+    {
+      "id": "supplement-technique-purpose-031",
+      "question": "is it better to use a delay or a reverb on this vocal",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-031"
+    },
+    {
+      "id": "supplement-technique-purpose-032",
+      "question": "how do I make the last word of a line echo out",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-032"
+    },
+    {
+      "id": "supplement-technique-purpose-033",
+      "question": "how do I make my piano sound good in a busy mix",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-033"
+    },
+    {
+      "id": "supplement-technique-purpose-034",
+      "question": "my electric guitars sound fizzy and harsh",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-034"
+    },
+    {
+      "id": "supplement-technique-purpose-035",
+      "question": "how do I stack synths without it turning into mush",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-035"
+    },
+    {
+      "id": "supplement-technique-purpose-036",
+      "question": "how do I design a kick from a sine wave",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-036"
+    },
+    {
+      "id": "supplement-technique-purpose-037",
+      "question": "how do I make a deep sub that works on big speakers",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-037"
+    },
+    {
+      "id": "supplement-technique-purpose-038",
+      "question": "my sub disappears on laptop speakers",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-038"
+    },
+    {
+      "id": "supplement-technique-purpose-039",
+      "question": "how do I make a soft evolving background texture",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-039"
+    },
+    {
+      "id": "supplement-technique-purpose-040",
+      "question": "what sample rate should I record at",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-040"
+    },
+    {
+      "id": "supplement-technique-purpose-041",
+      "question": "should I dither when I bounce to 16 bit",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-041"
+    },
+    {
+      "id": "supplement-technique-purpose-042",
+      "question": "my arrangement has too much going on, how do I strip it back",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-042"
+    },
+    {
+      "id": "supplement-technique-purpose-043",
+      "question": "how do I make the mix louder without it sounding squashed",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-043"
+    },
+    {
+      "id": "supplement-technique-purpose-044",
+      "question": "how do I keep the energy moving through a long mix with automation",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-044"
+    },
+    {
+      "id": "supplement-technique-purpose-045",
+      "question": "the drummer drifted off the click, how do I line it up",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-045"
+    },
+    {
+      "id": "supplement-technique-purpose-046",
+      "question": "how do I make the track slow down and stop like a turntable",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-046"
+    },
+    {
+      "id": "supplement-technique-purpose-047",
+      "question": "how do I prepare my project before I start mixing",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-047"
+    },
+    {
+      "id": "supplement-technique-purpose-048",
+      "question": "what should I check before I call a mix finished",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-048"
+    },
+    {
+      "id": "supplement-technique-purpose-049",
+      "question": "how loud should a podcast be when I deliver it",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-049"
+    },
+    {
+      "id": "supplement-technique-purpose-050",
+      "question": "how do I set up Live for playing a gig",
+      "category": "technique_purpose",
+      "query_source": "apps/backend/src/kenn/evals/technique_purpose_retrieval_cases.json",
+      "query_source_id": "technique-purpose-050"
+    }
+  ]
+}

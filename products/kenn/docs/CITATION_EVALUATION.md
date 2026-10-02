@@ -37,6 +37,18 @@ capture count against the latency receipt's attempted count; missing attempts an
 questions that never reached the model must be reported separately. Coverage in the
 scoring receipt refers to its input captures, not all questions in the latency run.
 
+If the main run produces fewer than 150 reviewable questions, use
+`tooling/data/citation_eval_queries_supplement_v1.json` for a separate capture after
+the first process finishes. It contains 35 existing knowledge-upgrade questions and
+50 technique-purpose questions, with no normalized question repeated from the main
+manifest. Pass `--limit 85` and use new capture and latency receipt paths. Run only
+one capture process at a time.
+
+The supplement copies question text and its source location, not existing expected
+answers, retrieval matches, or confidence labels. Review every new answer against its
+own frozen excerpts. Extra questions increase review coverage; they do not establish
+production prevalence or make automated review labels human gold.
+
 ## Review rubric
 
 Read the question, answer, and frozen evidence before looking at `accepted`, warnings,
