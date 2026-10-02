@@ -585,6 +585,10 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   cross-encoder on the same top 12–20 candidates with current retrieval. Use research
   experiment 2's quality, latency and memory screens; retain version/unit constraints
   and grounding. Reranking alone does not require an index rebuild or a new database.
+  - Substring-matching audit, 3 Oct: 57 of 125 expected-source terms in `device_purpose_retrieval_cases` can be met by
+    more than one source, `clipping` matches 27, and three default business cases expect a source the index does not
+    contain. Nothing changed; source tiers not audited. L2 stays open.
+    [Audit](docs/evidence/KENN_L2_FIXTURE_SOURCE_MATCHING_AUDIT_2026-10-03.md).
 - [ ] **L3 — Qualify existing recipes.** At least 15 recipes, fake first, then an
   owner-scheduled disposable-set run: exact target/value, Apply/readback, partial
   failure, stop/cancel and verified Undo. The recipe card and its component test
