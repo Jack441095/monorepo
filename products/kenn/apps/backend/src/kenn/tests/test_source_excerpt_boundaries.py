@@ -6,6 +6,8 @@ the same place: the model is handed text where the boundary marking the end of u
 
 from __future__ import annotations
 
+import re
+
 from kenn.llm.llm_rewrite import _clean_chunk_for_synthesis, _truncate_on_word_boundary, build_raw_context_block
 
 LONG_NOTE = {
@@ -59,7 +61,11 @@ def test_an_over_long_label_does_not_produce_an_unterminated_opening_tag() -> No
 def test_the_excerpt_is_cut_on_a_word_boundary_with_both_tags_intact() -> None:
     block = build_raw_context_block([(9.4, {"text": "Return effects are a separate bus. " * 12})],
                                     lambda _chunk: REAL_LABEL, max_chars=420)
-    assert f'<source_excerpt label="{REAL_LABEL}" relevance="9.4">' in block
+    # The id is the first attribute now: the Rules block asks the model to tag every number with it, so the tag
+    # has to carry one and the order is what puts it where the model copies it from.
+    assert re.search(
+        rf'<source_excerpt id="[0-9a-f]{{12}}" label="{re.escape(REAL_LABEL)}" relevance="9.4">', block
+    ), block
     assert block.rstrip().endswith("</source_excerpt>")
     body = block.split("\n", 2)[2].removesuffix("</source_excerpt>").strip()
     assert body.endswith("...") and " Return effects" in body

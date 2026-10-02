@@ -124,6 +124,24 @@ def gate_evidence_text(shown: list[tuple[float, dict, str]]) -> str:
     )
 
 
+# Set by _install_capture. The gate is not reached on every answer -- chat_answer.py:1731 empties the
+# candidate when the streaming prefix guard trips, so generated_answer_validation never runs for exactly the
+# unsupported-measurement rejections that dominated 8 of 9 rejections on 2 Oct 2026. A capture built only
+# from inside the gate therefore omits the failure the phase exists to measure: the 2 Oct 2026 abstain run
+# wrote 14 of 28 attempted answers, biased toward the ones that did not fabricate.
+_CAPTURE_PATH: Path | None = None
+# Set by the capture wrapper on every call. A flag rather than a set of questions, because the gate is handed
+# relevance_query and the harness holds the original question, and those two are not always the same string.
+_CAPTURE_HIT = False
+
+
+def _write_capture_row(row: dict) -> None:
+    if _CAPTURE_PATH is None:
+        return
+    with _CAPTURE_PATH.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(row) + "\n")
+
+
 def _install_capture(path: Path) -> None:
     """Record every candidate answer so a rejection can be re-scored offline.
 
@@ -141,10 +159,15 @@ def _install_capture(path: Path) -> None:
     from kenn.core import chat_answer
     from kenn.llm.llm_rewrite import resolve_context_chars
 
+    global _CAPTURE_PATH, _CAPTURE_HIT
     path.parent.mkdir(parents=True, exist_ok=True)
+    _CAPTURE_PATH = path
+    _CAPTURE_HIT = False
     real = chat_answer.generated_answer_validation
 
     def capture(query, results, answer, **kwargs):
+        global _CAPTURE_HIT
+        _CAPTURE_HIT = True
         validation = real(query, results, answer, **kwargs)
         _block, shown = gate_evidence(results)
         with path.open("a", encoding="utf-8") as handle:
@@ -168,6 +191,12 @@ def _install_capture(path: Path) -> None:
                 "index_version": _index_version(),
                 "additional_evidence_text": kwargs.get("additional_evidence_text") or "",
                 "timeline_context": kwargs.get("timeline_context") or "",
+                # Phase 7's own outputs. Without these a capture records only whether the gate cleared the
+                # answer, which on a must-abstain item cannot tell an honest abstention from a confident
+                # fabrication -- the two are different failures and only one of them is the gate's target.
+                "abstained": bool(validation.get("abstained")),
+                "abstain_gap": str(validation.get("abstain_gap") or ""),
+                "claim_citations": validation.get("claim_citations") or {},
             }) + "\n")
         return validation
 
@@ -202,6 +231,7 @@ def _ask(chat_answer, question: str, *, allow_llm: bool, surface: str) -> tuple[
 
 
 def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream") -> dict:
+    global _CAPTURE_HIT
     from kenn.core import chat_answer
 
     rows: list[dict] = []
@@ -213,6 +243,7 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
         # makes a rerun look like a 0.1 s answer that never called the model. Measured: three questions took
         # 57/54/73 s on the first pass and 0.1/0.1/1.5 s on the second, with "never attempted" nowhere in sight.
         _drop_semantic_cache()
+        _CAPTURE_HIT = False
         started = time.perf_counter()
         try:
             payload, tokens, ttft = _ask(chat_answer, question, allow_llm=allow_llm, surface=surface)
@@ -221,6 +252,32 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             payload, error, tokens, ttft = {}, f"{type(exc).__name__}: {exc}", 0, None
         seconds = time.perf_counter() - started
         validation = dict(payload.get("generation_validation") or {})
+        # The gate is skipped when the streaming prefix guard trips, so those answers never reach the capture
+        # wrapper above. They still happened and still reject, and they are the unsupported-measurement class,
+        # so the row is written here from the payload. The model's own text is not recoverable on this path --
+        # chat_answer drops it -- which is recorded rather than papered over.
+        if (
+            validation.get("attempted")
+            and not _CAPTURE_HIT
+        ):
+            _write_capture_row({
+                "question": question,
+                "answer": str(payload.get("answer") or ""),
+                "accepted": bool(validation.get("accepted")),
+                "warnings": [str(w) for w in (validation.get("warnings") or [])],
+                "unsupported_measurements": [str(m) for m in (validation.get("unsupported_measurements") or [])],
+                "fabricated_sources": [str(s) for s in (validation.get("fabricated_sources") or [])],
+                "evidence_text": "",
+                "evidence_chunks_shown": None,
+                "gate_ran": False,
+                "candidate_text_available": False,
+                "index_version": _index_version(),
+                "additional_evidence_text": "",
+                "timeline_context": "",
+                "abstained": bool(validation.get("abstained")),
+                "abstain_gap": str(validation.get("abstain_gap") or ""),
+                "claim_citations": {},
+            })
         rows.append({
             "id": str(case.get("id") or "unknown"),
             "category": str(case.get("category") or "uncategorized"),

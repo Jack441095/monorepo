@@ -22,7 +22,13 @@ from kenn.core.chat_retrieval import (
     source_label,
 )
 
-from kenn.llm.llm_rewrite import model_evidence, resolve_context_chars
+from kenn.llm.llm_rewrite import (
+    ABSTAIN_PREFIX,
+    CLAIM_CITATION_RE,
+    model_evidence,
+    resolve_context_chars,
+)
+from kenn.knowledge.reasoning import get_chunk_id
 
 
 # The evidence set the gate judges against is the set of chunks the model was actually shown, read out of the
@@ -214,6 +220,146 @@ def _measurements(text: str) -> set[str]:
         "".join(m.lower().split())
         for m in _MEASUREMENT_RE.findall(_RANGE_RE.sub(r"\1\3 \2\3", text))
     }
+
+
+# How far after a number a citation still belongs to it. About one clause: "150 ms [#abc123] with a 4:1 ratio"
+# is a citation on the 150 ms, while "150 ms is roughly right, set your crossover, and go and read the reverb
+# note [#abc123]" is not. Bounded by the next measurement as well, so a citation cannot hop over a number to
+# reach the one after it and leave the nearer claim looking uncited.
+_CLAIM_LINK_WINDOW_CHARS = 80
+
+
+def _measurement_spans(text: str) -> list[tuple[str, int, int]]:
+    """Every measurement in `text` as (key, start, end), in the order it was written.
+
+    _measurements() returns a set, which is all the aggregate diff needs and too little here: a claim is one
+    number attached to one excerpt, so "150 ms" written twice is two claims and has to be counted twice. The
+    range rewrite is the same one _measurements() applies, so "200-400 Hz" is claimed at both endpoints rather
+    than once as "-400 Hz".
+
+    The rewrite changes offsets, so the citation scan runs on this same rewritten string. A citation is a short
+    bracketed hash with no hyphen and no unit inside the closing bracket, so neither regex can match inside one
+    and the rewrite cannot slide a citation out from under its number.
+    """
+    return [
+        ("".join(m.group(0).lower().split()), m.start(), m.end())
+        for m in _MEASUREMENT_RE.finditer(_RANGE_RE.sub(r"\1\3 \2\3", text))
+    ]
+
+
+def _first_free_citation(
+    citations: list[tuple[str, int]], lower: int, upper: int, taken: set[int]
+) -> int:
+    """Index of the first unclaimed citation starting in [lower, upper), or -1."""
+    for index, (_cid, position) in enumerate(citations):
+        if index not in taken and lower <= position < upper:
+            return index
+    return -1
+
+
+def _claim_citations(answer: str) -> list[dict]:
+    """Pair each numeric claim in `answer` with the excerpt id it cites, or "" for none.
+
+    Forward first, then backward for whatever is left over. "150 ms [#abc]" is the form the prompt asks for, but
+    a model that leads with its source ("[#abc] 150 ms") is still citing honestly, and one citation is never
+    shared between two claims because the index it used is retired.
+    """
+    text = _RANGE_RE.sub(r"\1\3 \2\3", answer)
+    spans = _measurement_spans(text)
+    citations = [(m.group(1), m.start()) for m in CLAIM_CITATION_RE.finditer(text)]
+    cited = [""] * len(spans)
+    taken: set[int] = set()
+    for index, (_key, start, end) in enumerate(spans):
+        next_start = spans[index + 1][1] if index + 1 < len(spans) else len(text)
+        found = _first_free_citation(citations, end, min(next_start, end + _CLAIM_LINK_WINDOW_CHARS), taken)
+        if found >= 0:
+            taken.add(found)
+        cited[index] = citations[found][0] if found >= 0 else ""
+    for index, (_key, start, _end) in enumerate(spans):
+        if cited[index]:
+            continue
+        previous_end = spans[index - 1][2] if index else 0
+        found = _first_free_citation(
+            citations, max(previous_end, start - _CLAIM_LINK_WINDOW_CHARS), start, taken
+        )
+        if found >= 0:
+            taken.add(found)
+        cited[index] = citations[found][0] if found >= 0 else ""
+    return [
+        {"value": key, "cited": bool(cited_id), "cited_chunk": cited_id}
+        for (key, _start, _end), cited_id in zip(spans, cited)
+    ]
+
+
+# The two reasons a citation cannot be vouched for, as stable keys rather than sentences, so a caller can group
+# on them and this module stays the only place that decides what a failure is called.
+_FABRICATED_ATTRIBUTION = "cited excerpt does not contain that value"
+_UNSHOWN_CITATION = "excerpt id was never shown to the model"
+
+
+def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) -> dict:
+    """Check every cited number against the body of the excerpt that number names.
+
+    Four outcomes per claim, and the counts are the point. A number cited to an excerpt that does not contain it
+    is a fabricated attribution; a number cited to an id we never printed is a citation nobody can check; a
+    number with no citation at all is the dominant real failure rather than a pass. Reporting a breakdown instead
+    of a boolean is what lets acceptance become arithmetic.
+
+    Only the body is read, not the title and source that _gate_evidence_text() also counts, and that asymmetry is
+    deliberate: the model is told to cite the excerpt the number came from, and a figure that only ever appeared
+    in a note's title was not the excerpt it was reasoning over.
+
+    Uncited claims are counted and returned but do not warn. The aggregate measurement check already rejects any
+    number found nowhere in the evidence, so a second warning on the same numbers would reject nothing new while
+    dropping every currently-accepted answer until an 8B model has learned the rule. The count is what keeps that
+    reversible: promote `uncited` to a warning on the day the citation rate justifies it.
+    """
+    bodies: dict[str, str] = {}
+    for _score, chunk, body in shown:
+        bodies.setdefault(get_chunk_id(chunk), body)
+    claims = _claim_citations(answer)
+    for claim in claims:
+        value, cited_id = claim["value"], claim["cited_chunk"]
+        if not cited_id:
+            claim.update(verified=False, reason="uncited")
+        elif cited_id not in bodies:
+            claim.update(verified=False, reason=_UNSHOWN_CITATION)
+        elif value in _measurements(bodies[cited_id]):
+            claim.update(verified=True, reason="")
+        else:
+            claim.update(verified=False, reason=_FABRICATED_ATTRIBUTION)
+    return {
+        "total": len(claims),
+        "cited": sum(1 for claim in claims if claim["cited"]),
+        "verified": sum(1 for claim in claims if claim["verified"]),
+        "uncited": sum(1 for claim in claims if not claim["cited"]),
+        "fabricated_attributions": [
+            claim for claim in claims if claim["reason"] == _FABRICATED_ATTRIBUTION
+        ],
+        "unshown_citations": [
+            claim for claim in claims if claim["reason"] == _UNSHOWN_CITATION
+        ],
+        "claims": claims,
+    }
+
+
+def explicit_abstain_gap(answer: str) -> str:
+    """The specific fact the model said was missing, or "" when it did not abstain.
+
+    A first-class output rather than a line of prose, because "the context is insufficient" as advice is what a
+    model writes when it is unsure and what it skips when it has already filled the gap with a number. All 36
+    items in tooling/data/eval_must_abstain_v1.jsonl are meant to produce this line, and 12 of them are
+    Related-questions echo attacks where the only overlapping chunk is a list of the note's own question
+    phrasings and holds no figure at all.
+
+    The gap has to be named to count. "Insufficient context:" on its own is the model acknowledging a rule
+    without obeying it, and returning the gap rather than a boolean is what makes the difference visible.
+    """
+    for line in answer.splitlines():
+        stripped = line.strip()
+        if stripped.lower().startswith(ABSTAIN_PREFIX.lower()):
+            return stripped[len(ABSTAIN_PREFIX):].strip()
+    return ""
 
 
 _STRUCTURE_TERMS = {
@@ -528,7 +674,18 @@ def generated_answer_validation(
     punts_to_sources = _punts_to_sources(answer)
     echoes_prompt = _echoes_prompt_instructions(answer)
     claims_change = claims_live_change(answer)
+    # Which excerpt each number names, and whether that excerpt really holds it. Read from the same shown list as
+    # the aggregate check above, so a claim can never be verified against a chunk the model never read.
+    citations = verify_claim_citations(answer, shown)
+    # An abstain is only an abstain if it names the gap and asserts no number. "Insufficient context: ... we would
+    # want a note on the 48 kHz setting" has already answered, so it goes through every check below like any other
+    # answer and the word costs it nothing.
+    abstain_gap = explicit_abstain_gap(answer)
+    abstained = bool(abstain_gap) and not citations["total"]
     warnings = []
+    # The eight conditions below are unchanged and keep their order, so route_latency_report.py still groups on
+    # the same first warning. The two claim-level conditions are appended after them for the same reason: a report
+    # that has been reading these eight buckets for a week should not have them reshuffled underneath it.
     if claims_change:
         warnings.append("generated answer claims it changed the Live set")
     if unsupported_measurements:
@@ -547,6 +704,22 @@ def generated_answer_validation(
         warnings.append("generated answer is below the quality threshold")
         # Aggregate first: route_latency_report.py groups on the first warning, so specifics ahead would split it.
         warnings.extend(str(w) for w in (quality.get("warnings") or []))
+    if citations["fabricated_attributions"]:
+        warnings.append(
+            "generated answer attributes a measurement to an excerpt that does not contain it"
+        )
+    if citations["unshown_citations"]:
+        warnings.append("generated answer cites an excerpt id that was never shown")
+    # A named-gap abstain is a correct refusal, not a failed answer, and it is the one input the eight conditions
+    # above do not gate. A single "Insufficient context: <gap>" line has no Short answer section, fewer than two
+    # steps and no verification line, so the quality threshold would reject the correct behaviour while the flag
+    # records exactly what the model was told it was missing. Grounding and quality are still computed and still
+    # returned below, so the branch hides nothing, and it costs nothing in claim coverage: an abstain carries no
+    # number by construction, so verify_claim_citations() has nothing to check. A live-change claim is the one
+    # thing an abstain is not allowed to excuse — "Insufficient context: ..." next to "I muted the hats" is a
+    # false receipt dressed as a refusal, and that is the one rejection in the 29-query runs that was not a number.
+    if abstained and not claims_change:
+        warnings = []
     return {
         "accepted": not warnings,
         "warnings": warnings,
@@ -556,6 +729,9 @@ def generated_answer_validation(
         "echoes_prompt_instructions": echoes_prompt,
         "claims_live_change": claims_change,
         "evidence_overlap": round(overlap, 3),
+        "abstained": abstained,
+        "abstain_gap": abstain_gap,
+        "claim_citations": citations,
         "grounding": grounding,
         "quality": quality,
     }

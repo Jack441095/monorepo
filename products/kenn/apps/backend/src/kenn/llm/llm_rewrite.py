@@ -27,6 +27,7 @@ from typing import Any, Generator
 import httpx
 
 from kenn.core.chat_constants import ANSWER_MODES, EVIDENCE_SCAN_WINDOW, count_actionable_steps
+from kenn.knowledge.reasoning import get_chunk_id
 
 ROOT = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = ROOT.parent.parent
@@ -36,6 +37,25 @@ PROJECT_ROOT = ROOT.parent.parent
 # ---------------------------------------------------------------------------
 # Base system prompt template — mode/route instructions injected dynamically
 # ---------------------------------------------------------------------------
+
+# The inline form a numeric claim has to carry for the gate to check where the number came from.
+#
+# Short because it sits right next to a number inside a 173-word answer: 14 characters of overhead per claim
+# against the ~13 tokens a full " according to excerpt 3, 'Sidechain Bass To Kick', section Try this" would cost,
+# and an answer that verbose gets truncated by MAX_TOKENS before the last step lands. "#" plus brackets is
+# chosen over "(a1b2c3d4e5f6)" because parentheses already carry provenance in this codebase — source_label()
+# writes "Title (filename.md) — creator" and the gate's own filename check reads
+# "\(([\w\-]+\.md)\)" out of the Sources: list — so a bracketed hash cannot be confused with a note reference.
+#
+# The id inside the brackets is matched loosely on purpose. A strict 12-hex pattern would silently downgrade a
+# model that wrote "[#nope]" into an uncited claim, which is the one category we are not trying to grow: we want
+# a made-up id reported as a citation we never handed out, not quietly absorbed into the "no citation at all" pile.
+CLAIM_CITATION_RE = re.compile(r"\[\s*#\s*([^\]\s]{1,32})\s*\]")
+
+# The line the model writes instead of an answer when the excerpts do not hold one. Read back by
+# chat_grounding.explicit_abstain_gap(), which is why the wording is a fixed prefix and not a tone instruction:
+# an abstain the gate cannot parse is the same as no abstain at all.
+ABSTAIN_PREFIX = "Insufficient context:"
 
 SYSTEM_PROMPT_TEMPLATE = """You are KENN, senior audio engineer assistant and trusted studio partner for Audio_Too.
 
@@ -56,6 +76,10 @@ Mode-specific guidance:
 Rules:
 - Answer ONLY using the provided context. Do not invent plugins, settings, prices, or policies.
 - If context is insufficient, name the specific gap (e.g. "We need a note on parallel compression").
+- Tag every number you state with the id of the excerpt it came from, like 150 ms [#3f2a9c1b7e40]. Copy the
+  id exactly as printed on the excerpt. An id that is not on an excerpt above is counted as invented.
+- When the excerpts do not hold the answer, write one line and stop: Insufficient context: <the specific
+  fact you are missing>. That line is a whole answer. Put no number, estimate or step after it.
 - Keep every step actionable in Ableton Live or the relevant workflow.
 - Address only the current question. Ignore irrelevant history.
 - Say plainly whether the question has an objective/technical answer (clipping, phase, LUFS, a
@@ -83,6 +107,8 @@ Answer structure (strictly required):
 Rules:
 - Answer ONLY using the provided context. Do not invent plugins, settings, prices, or policies.
 - If context is insufficient, name the specific gap (e.g. "We need a note on parallel compression").
+- Tag every number you state with the id of the excerpt it came from, like 150 ms [#3f2a9c1b7e40]. Copy the id exactly as printed on the excerpt. An id that is not on an excerpt above is counted as invented.
+- When the excerpts do not hold the answer, write one line and stop: Insufficient context: <the specific fact you are missing>. That line is a whole answer. Put no number, estimate or step after it.
 - Keep every step actionable in Ableton Live or the relevant workflow.
 - Address only the current question. Ignore irrelevant history.
 - Say plainly whether the question has an objective/technical answer (clipping, phase, LUFS, a measurable fault) or is a subjective/creative call (brightness, width, "should it sound bigger").
@@ -786,7 +812,14 @@ def model_evidence(
         if not content:
             continue
         label = source_label(chunk)
-        opening = f'<source_excerpt label="{label}" relevance="{score:.1f}">'
+        # The id is the whole point of the tag going out with the label. Until 2 Oct 2026 the only identifier the
+        # model could see was the human label, and the Rules block above asks for an excerpt id, so a prompt that
+        # never printed one left the model nothing to copy. It costs 18 characters per excerpt against the same
+        # 1200 the bodies are cut from; measured 2 Oct the block averages 596 of 1200 with 2-4 excerpts, so 4 ids
+        # take 72 and the tightest fixture (966 chars, 4 excerpts) still lands at 1038. The gate recomputes it
+        # through the same get_chunk_id() rather than parsing the tag back, so a tag we cut short cannot
+        # desynchronise the two sides.
+        opening = f'<source_excerpt id="{get_chunk_id(chunk)}" label="{label}" relevance="{score:.1f}">'
         closing = "\n</source_excerpt>"
         # Budget the tag before slicing. Slicing the assembled block is what produced an unterminated
         # <source_excerpt label="... chapter (curated note, section Dry/Wet para</source_excerpt>, so the model was
