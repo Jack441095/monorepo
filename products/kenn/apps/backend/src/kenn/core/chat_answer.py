@@ -2599,6 +2599,32 @@ def _answer_payload_raw(
     return payload
 
 
+def _transport_shortcut(action: str, verb: str, session_id: str) -> dict:
+    """Propose play/stop. On a refusal we pass on the service's own reason; it used to say "not reachable on
+    OSC port 11000" for every failure, which is wrong for a Live that answered but gave no usable snapshot."""
+    from kenn.core.live_action_service import LiveActionService
+
+    prop = LiveActionService().propose_transport_action(action, session_id=session_id)
+    if prop.get("ok"):
+        return {
+            "answer": f"Ready to {verb} Ableton playback. Confirm to proceed.",
+            "route": "ableton",
+            "confidence": "high",
+            "proposal": prop.get("proposal"),
+            "confirmation_token": (prop.get("proposal") or {}).get("confirmation_token", ""),
+            "requires_confirmation": True,
+            "sources": [],
+        }
+    return {
+        "answer": f"I can't {verb} playback: {prop.get('error') or 'Live did not accept the request.'}",
+        "route": "ableton",
+        "confidence": "high",
+        "sources": [],
+        "suggestions": ["Check status", "How do I setup Ableton OSC?"],
+        "requires_confirmation": False,
+    }
+
+
 def _short_circuit_evaluator(query: str, history: list | None = None, session_id: str = "") -> dict | None:
     """Instant sub-millisecond evaluator for status, simple transport, memory, and one-word intents."""
     cleaned = query.strip().lower()
@@ -2737,51 +2763,11 @@ def _short_circuit_evaluator(query: str, history: list | None = None, session_id
 
     # Simple Transport Play
     if cleaned in {"play", "start transport", "play session", "start playback"}:
-        from kenn.core.live_action_service import LiveActionService
-        service = LiveActionService()
-        prop = service.propose_transport_action("transport_play", session_id=session_id)
-        if prop.get("ok"):
-            return {
-                "answer": "Ready to start Ableton playback. Confirm to proceed.",
-                "route": "ableton",
-                "confidence": "high",
-                "proposal": prop.get("proposal"),
-                "confirmation_token": (prop.get("proposal") or {}).get("confirmation_token", ""),
-                "requires_confirmation": True,
-                "sources": [],
-            }
-        return {
-            "answer": "Ableton Live is not currently reachable on OSC port 11000. Ensure Ableton Live is running with KENN Bridge enabled.",
-            "route": "ableton",
-            "confidence": "high",
-            "sources": [],
-            "suggestions": ["Check status", "How do I setup Ableton OSC?"],
-            "requires_confirmation": False,
-        }
+        return _transport_shortcut("transport_play", "start", session_id)
 
     # Simple Transport Stop
     if cleaned in {"stop", "stop transport", "pause", "pause playback", "stop playback"}:
-        from kenn.core.live_action_service import LiveActionService
-        service = LiveActionService()
-        prop = service.propose_transport_action("transport_stop", session_id=session_id)
-        if prop.get("ok"):
-            return {
-                "answer": "Ready to stop Ableton playback. Confirm to proceed.",
-                "route": "ableton",
-                "confidence": "high",
-                "proposal": prop.get("proposal"),
-                "confirmation_token": (prop.get("proposal") or {}).get("confirmation_token", ""),
-                "requires_confirmation": True,
-                "sources": [],
-            }
-        return {
-            "answer": "Ableton Live is not currently reachable on OSC port 11000. Ensure Ableton Live is running with KENN Bridge enabled.",
-            "route": "ableton",
-            "confidence": "high",
-            "sources": [],
-            "suggestions": ["Check status", "How do I setup Ableton OSC?"],
-            "requires_confirmation": False,
-        }
+        return _transport_shortcut("transport_stop", "stop", session_id)
 
     return None
 

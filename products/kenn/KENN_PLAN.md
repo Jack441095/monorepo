@@ -346,7 +346,7 @@ mock, an agent reviewer or an unrelated receipt.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.
-- [ ] **A4 — Replace unconditional status claims with observed status.** Audit
+- [x] **A4 — Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.
   Transport branches propose through the action service; trace their validation path
@@ -362,6 +362,12 @@ mock, an agent reviewer or an unrelated receipt.
     is caught. [Evidence and exact files](docs/evidence/KENN_CHAT_STATUS_2026-10-02.md).
     Streaming now uses this shortcut; cancel and transport proposal parity are
     covered by the dismissal and stream-delivery evidence above.
+  - [x] The play/stop shortcut no longer says "not reachable on OSC port 11000" for every
+    refusal; it repeats the action service's own reason. Both branches were traced: they
+    propose through `LiveActionService.propose_transport_action` and are not a bypass. Four new
+    cases, the old sentence fails two, full backend run is 3,524 passed, 12 skipped. This
+    closes the `_short_circuit_evaluator` audit (status, cancel, transport).
+    [Evidence and exact files](docs/evidence/KENN_TRANSPORT_SHORTCUT_REASONS_2026-10-02.md).
 - [x] **A5 — Establish the clean test baseline.** Scoped collection-time model policy
   to individual tests and the offline replay CLI without changing planner assertions
   or production enablement precedence. Eight import and four CLI guards pass; seven
