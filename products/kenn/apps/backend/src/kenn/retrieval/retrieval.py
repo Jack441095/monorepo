@@ -358,7 +358,13 @@ def hybrid_search(
 
     # Order: reciprocal-rank fusion of the BM25 list and the embedding list, so a note the keywords missed
     # ("line up two mics a few ms out" -> Align Delay) can still rank. Embeddings count double.
-    dense_rank = {int(idx): rank for rank, idx in enumerate(np.argsort(-cosine_scores)[:HYBRID_DENSE_CANDIDATES].tolist(), 1)}
+    # Legacy indexes still contain question lists. Keep row positions intact for the embedding matrix,
+    # but exclude echoes before the candidate cap so answer sections can fill those slots.
+    dense_order = [
+        int(idx) for idx in np.argsort(-cosine_scores)
+        if chunks[int(idx)].get("section") != "Related questions"
+    ][:HYBRID_DENSE_CANDIDATES]
+    dense_rank = {idx: rank for rank, idx in enumerate(dense_order, 1)}
     candidates = set(bm25_rank) | set(dense_rank)
     fused = {
         idx: (1.0 / (HYBRID_RRF_K + bm25_rank[idx]) if idx in bm25_rank else 0.0)
@@ -775,6 +781,9 @@ def bm25_search(
     scores: list[tuple[float, int]] = []
     for doc_idx, score in candidate_scores.items():
         if score <= 0:
+            continue
+        # A question list can echo the query exactly without supplying any answer evidence.
+        if chunks[doc_idx].get("section") == "Related questions":
             continue
         if allowed is not None and not allowed(chunks[doc_idx]):
             continue
