@@ -271,6 +271,12 @@ mock, an agent reviewer or an unrelated receipt.
     token. 12 scoped cases pass, all nine sites mutation-checked and the full backend run is
     3,500 passed, 12 skipped. `routes/daw_routes.py` still carries a duplicate
     `handle_live_command`. [Evidence and exact files](docs/evidence/KENN_CONFIRMATION_TOKEN_ALIAS_2026-10-02.md).
+  - [x] FastAPI `/api/ableton/command` now runs the stdlib handler instead of a drifted copy.
+    Before, a MIDI clip, duplication, rename, audition or sample proposal came back
+    "requires confirmation" and was never applied there, and an applied command recorded no
+    receipt for Undo. 61 scoped cases pass, three mutations caught and the full backend run is
+    3,505 passed, 12 skipped. `/api/ableton/osc/undo` still has two owners.
+    [Evidence and exact files](docs/evidence/KENN_FASTAPI_LIVE_COMMAND_OWNER_2026-10-02.md).
   - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.
