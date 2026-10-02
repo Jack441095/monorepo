@@ -261,6 +261,16 @@ mock, an agent reviewer or an unrelated receipt.
     current. 73 scoped cases pass, six mutations are caught and the full backend run is
     3,480 passed, 12 skipped. Cached answers are not made current by this; it only keeps
     session memory in step. [Evidence and exact files](docs/evidence/KENN_SEMANTIC_CACHE_TURN_RECORD_2026-10-02.md).
+  - [x] `/api/feedback` has one owner: FastAPI no longer says "recorded" for a rating it
+    threw away. It now returns 503 when nothing can store the rating, 400 for an unknown one
+    and 201 with the stored row. Five mutations caught. `demo_feedback` is missing from the
+    tree, so feedback is stored nowhere on either server until that is decided.
+    [Evidence and exact files](docs/evidence/KENN_FEEDBACK_SINGLE_OWNER_2026-10-02.md).
+  - [x] A client that sends only `confirmation_token` (the key proposals hand out) now
+    reaches the service on all nine Live apply branches instead of being refused with an empty
+    token. 12 scoped cases pass, all nine sites mutation-checked and the full backend run is
+    3,500 passed, 12 skipped. `routes/daw_routes.py` still carries a duplicate
+    `handle_live_command`. [Evidence and exact files](docs/evidence/KENN_CONFIRMATION_TOKEN_ALIAS_2026-10-02.md).
   - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.

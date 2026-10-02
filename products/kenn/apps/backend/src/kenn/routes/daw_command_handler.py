@@ -98,7 +98,7 @@ def handle_safe_live_action(handler: Any, action: str, payload: dict) -> None:
     if not action_allowed("daw_control"):
         handler.send_json(403, {"ok": False, "error": action_denied_message("daw_control")})
         return
-    confirm_token = str(payload.get("confirm_token", ""))
+    confirm_token = str(payload.get("confirm_token") or payload.get("confirmation_token") or "").strip()
     result = service.execute(
         proposal,
         confirm_token=confirm_token,
@@ -160,7 +160,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
         execute = midi_service.execute_update if proposal.get("schema") == UPDATE_PROPOSAL_SCHEMA else midi_service.execute_create
         result = execute(
             proposal,
-            confirm_token=str(payload.get("confirm_token", "")),
+            confirm_token=confirm_token,
             session_id=session_id,
             idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
@@ -185,7 +185,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
     if proposal and proposal.get("schema") == CLIP_DUPLICATION_PROPOSAL_SCHEMA:
         result = ClipDuplicationActionService().execute(
             proposal,
-            confirm_token=str(payload.get("confirm_token", "")),
+            confirm_token=confirm_token,
             session_id=session_id,
             idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
@@ -197,7 +197,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
     if proposal and proposal.get("schema") == CLIP_RENAME_PROPOSAL_SCHEMA:
         result = ClipRenameActionService().execute(
             proposal,
-            confirm_token=str(payload.get("confirm_token", "")),
+            confirm_token=confirm_token,
             session_id=session_id,
             idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
@@ -211,7 +211,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
         if proposal.get("action") == "stop_clip":
             result = service.execute_stop(
                 proposal,
-                confirm_token=str(payload.get("confirm_token", "")),
+                confirm_token=confirm_token,
                 session_id=session_id,
                 idempotency_key=str(payload.get("idempotency_key") or ""),
                 correlation_id=str(payload.get("correlation_id", "")),
@@ -219,7 +219,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
         else:
             result = service.execute(
                 proposal,
-                confirm_token=str(payload.get("confirm_token", "")),
+                confirm_token=confirm_token,
                 session_id=session_id,
                 idempotency_key=str(payload.get("idempotency_key") or ""),
                 correlation_id=str(payload.get("correlation_id", "")),
@@ -231,7 +231,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
     if proposal and proposal.get("schema") == SAMPLE_IMPORT_PROPOSAL_SCHEMA:
         result = SampleImportService().execute_import(
             proposal,
-            confirm_token=str(payload.get("confirm_token", "")),
+            confirm_token=confirm_token,
             session_id=session_id,
             idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
@@ -243,7 +243,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
     if proposal and proposal.get("schema") == SAMPLE_IMPORT_REMOVE_PROPOSAL_SCHEMA:
         result = SampleImportService().execute_remove(
             proposal,
-            confirm_token=str(payload.get("confirm_token", "")),
+            confirm_token=confirm_token,
             session_id=session_id,
             idempotency_key=str(payload.get("idempotency_key") or ""),
             correlation_id=str(payload.get("correlation_id", "")),
@@ -257,7 +257,7 @@ def handle_live_command(handler: Any, mix_review: Any, pending_proposals: dict, 
         command,
         session_id=session_id,
         proposal=proposal,
-        confirm_token=str(payload.get("confirm_token", "")),
+        confirm_token=confirm_token,
         idempotency_key=str(payload.get("idempotency_key") or ""),
         llm_plan=payload.get("llm_plan") if isinstance(payload.get("llm_plan"), dict) else None,
         recipe_steps=recipe_steps,
