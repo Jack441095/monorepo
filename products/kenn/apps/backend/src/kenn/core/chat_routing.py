@@ -1789,11 +1789,33 @@ def session_context_matches_query(query: str, turns: list[str]) -> bool:
     return bool(query_topic_set & context_topics)
 
 
+# 3 Oct 2026, five-turn runs: "Sorry, it is the acoustic guitar that is muddy, not the vocal." and "No, on the drum
+# bus instead." matched none of the follow-up wording, so they were searched and routed as brand-new questions and
+# the thing being corrected was forgotten.
+_CORRECTION_OPENER = re.compile(r"^(?:no|nope|nah|sorry|oops|actually|wait|i meant|i mean|my mistake|my bad|correction)\b")
+_CORRECTION_NEGATION = re.compile(r"[,;]?\s*\bnot (?:the |my |a )?[\w' -]{1,30}?\s*(?=[.?!,]|$)")
+_NOT_A_CORRECTION = re.compile(r"^no (?:problem|worries|thanks|thank you)\b")
+
+
+def is_correction_query(query: str) -> bool:
+    cleaned = re.sub(r"\s+", " ", str(query).lower()).strip()
+    if len(cleaned.split()) > 16:
+        return False
+    if _NOT_A_CORRECTION.match(cleaned):
+        return False
+    if _CORRECTION_OPENER.match(cleaned):
+        return True
+    return bool(re.search(r"\b(?:it'?s|it is|i meant|i mean)\b", cleaned) and _CORRECTION_NEGATION.search(cleaned))
+
+
 def is_followup_query(query: str) -> bool:
     cleaned = re.sub(r"\s+", " ", str(query).lower()).strip()
     if not cleaned or conversational_intent(cleaned):
         return False
-    if cleaned.startswith(FOLLOWUP_STARTERS):
+    if cleaned.startswith(FOLLOWUP_STARTERS) or is_correction_query(cleaned):
+        return True
+    # "And the attack?" has no reference word, but nobody opens a chat with it.
+    if cleaned.startswith("and the ") and len(cleaned.split()) <= 6:
         return True
     if cleaned.startswith(
         (
@@ -1845,7 +1867,11 @@ def search_query_with_history(query: str, history: list | None, *, session_id: s
     if not should_use_history(query, history):
         return query
     turns = useful_history_user_turns(history)
-    if is_followup_query(query):
+    if is_correction_query(query):
+        # The question being corrected is usually one turn further back than the last one.
+        prior = [turn for turn in turns if not is_session_context_turn(turn)][-2:]
+        query = _CORRECTION_NEGATION.sub("", query).strip(" ,;.") or query
+    elif is_followup_query(query):
         prior = [turn for turn in turns if not is_session_context_turn(turn)][-1:]
     else:
         prior = [
@@ -1873,5 +1899,7 @@ def history_context_line(query: str, history: list | None) -> str:
     if last_user.lower().startswith("session context for this kenn conversation"):
         details = " ".join(last_user.splitlines()[1:3]).strip()
         return f"[Session Context]: Using session context: {details[:160]}"
+    if is_correction_query(query):
+        return "[Correction]: The user is correcting their earlier message. Answer for what they now say and drop what they ruled out."
     snippet = last_user if len(last_user) <= 120 else last_user[:117] + "..."
     return f"[Previous User Question]: {snippet}"
