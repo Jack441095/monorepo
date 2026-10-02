@@ -117,7 +117,7 @@ def _cached_base_available(base_model: str, *, allow_download: bool) -> tuple[bo
         AutoTokenizer.from_pretrained(base_model, **kwargs)
         return True, "config_and_tokenizer_available"
     except Exception as exc:
-        return False, f"{type(exc).__name__}: {exc}"
+        return False, f"base_model_unavailable: {type(exc).__name__}: {exc}"
 
 
 def dry_run(*, data_path: Path, base_model: str, output: Path, allow_download: bool, max_records: int = 0, device_name: str = "auto") -> dict[str, Any]:
