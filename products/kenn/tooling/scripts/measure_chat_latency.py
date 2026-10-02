@@ -246,6 +246,7 @@ def _ask(chat_answer, question: str, *, allow_llm: bool, surface: str) -> tuple[
 def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream") -> dict:
     global _CAPTURE_HIT
     from kenn.core import chat_answer
+    from kenn.llm.llm_rewrite import capture_usage
 
     rows: list[dict] = []
     for case in cases:
@@ -258,11 +259,14 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
         _drop_semantic_cache()
         _CAPTURE_HIT = False
         started = time.perf_counter()
-        try:
-            payload, tokens, ttft = _ask(chat_answer, question, allow_llm=allow_llm, surface=surface)
-            error = None
-        except Exception as exc:  # a failure is a measurement, not a crash
-            payload, error, tokens, ttft = {}, f"{type(exc).__name__}: {exc}", 0, None
+        # Replayed metadata can contain an earlier call's usage. Collect actual calls in this
+        # context, including route/retry/failure/guard-close, rather than copying that metadata.
+        with capture_usage() as provider_calls:
+            try:
+                payload, tokens, ttft = _ask(chat_answer, question, allow_llm=allow_llm, surface=surface)
+                error = None
+            except Exception as exc:  # a failure is a measurement, not a crash
+                payload, error, tokens, ttft = {}, f"{type(exc).__name__}: {exc}", 0, None
         seconds = time.perf_counter() - started
         validation = dict(payload.get("generation_validation") or {})
         # The gate is skipped when the streaming prefix guard trips, so those answers never reach the capture
@@ -301,6 +305,7 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "stream_events": tokens,
             "cache_dropped": True,
             "surface": surface,
+            "provider_calls": [usage.to_dict() for usage in provider_calls],
             "attempted": bool(validation.get("attempted")),
             "accepted": bool(validation.get("accepted")),
             "warnings": [str(w) for w in (validation.get("warnings") or [])],
@@ -319,6 +324,7 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
     rejected = [r for r in attempted if not r["accepted"]]
     reasons = Counter(w for r in rejected for w in r["warnings"])
     top_reason, top_count = reasons.most_common(1)[0] if reasons else ("", 0)
+    calls = [call for row in rows for call in row["provider_calls"]]
     return {
         "schema": "kenn.chat_latency.v1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -330,6 +336,11 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
             "llm_accepted": len(accepted),
             "llm_rejected": len(rejected),
             "errors": sum(1 for r in rows if r["error"]),
+            "provider_attempts": sum(call["provider_attempted"] for call in calls),
+            "provider_failures": sum(call["status"] == "failed" for call in calls),
+            "provider_interruptions": sum(call["status"] == "interrupted" for call in calls),
+            "provider_incomplete": sum(call["status"] == "incomplete" for call in calls),
+            "response_cache_hits": sum(call["cache_hit"] for call in calls),
         },
         "seconds": {
             "all_median": _median([r["seconds"] for r in rows]),

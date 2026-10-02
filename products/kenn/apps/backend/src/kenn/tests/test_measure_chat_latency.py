@@ -212,6 +212,64 @@ def test_prefix_rejection_capture_cannot_be_mistaken_for_the_model_candidate(too
     assert row["prompt_evidence"] is None
 
 
+def test_rejected_answer_keeps_route_and_interrupted_provider_costs(tool, monkeypatch):
+    from kenn.llm import llm_rewrite
+
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    def ask(*args, **kwargs):
+        llm_rewrite._add_usage(llm_rewrite.LLMUsage(task="route", load_duration_ns=123))
+        llm_rewrite._add_usage(llm_rewrite.LLMUsage(task="rewrite", status="interrupted", provider_done=False))
+        return {"generation_validation": {"attempted": True, "accepted": False,
+                "warnings": ["unsupported measurements"]}}, 2, 0.1
+    monkeypatch.setattr(tool, "_ask", ask)
+    report = tool.measure([{"id": "rejected", "question": "Set release?"}])
+    (row,) = report["rows"]
+    assert row["attempted"] is True and row["accepted"] is False
+    assert [call["task"] for call in row["provider_calls"]] == ["route", "rewrite"]
+    assert row["provider_calls"][0]["load_duration_ns"] == 123
+    assert row["provider_calls"][1]["eval_duration_ns"] is None
+    assert report["counts"]["provider_attempts"] == 2
+    assert report["counts"]["provider_interruptions"] == 1
+
+
+def test_replayed_usage_metadata_is_not_counted_as_a_current_provider_call(tool, monkeypatch):
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    payload = {"semantic_cache_hit": True, "llm_usage": {"load_duration_ns": 123},
+               "generation_validation": {"attempted": True, "accepted": True}}
+    monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 1, 0.01))
+    report = tool.measure([{"question": "Explain compression"}])
+    assert report["rows"][0]["provider_calls"] == []
+    assert report["counts"]["provider_attempts"] == 0
+
+
+def test_provider_failure_is_kept_even_when_the_question_raises(tool, monkeypatch):
+    from kenn.llm import llm_rewrite
+
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    def ask(*args, **kwargs):
+        llm_rewrite._add_usage(llm_rewrite.LLMUsage(status="failed", error_type="TimeoutError"))
+        raise TimeoutError("test timeout")
+    monkeypatch.setattr(tool, "_ask", ask)
+    report = tool.measure([{"question": "Explain compression"}])
+    assert report["rows"][0]["provider_calls"][0]["error_type"] == "TimeoutError"
+    assert report["counts"]["provider_failures"] == report["counts"]["errors"] == 1
+
+
+def test_each_question_captures_only_its_calls_and_counts_response_cache_hits(tool, monkeypatch):
+    from kenn.llm import llm_rewrite
+
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    def ask(_chat, question, **kwargs):
+        llm_rewrite._add_usage(llm_rewrite.LLMUsage(task=question, provider_attempted=False,
+                                                 cache_hit=True, status="cache_hit"))
+        return {}, 1, 0.01
+    monkeypatch.setattr(tool, "_ask", ask)
+    report = tool.measure([{"question": "first"}, {"question": "second"}])
+    assert [[call["task"] for call in row["provider_calls"]] for row in report["rows"]] == [["first"], ["second"]]
+    assert report["counts"]["provider_attempts"] == 0
+    assert report["counts"]["response_cache_hits"] == 2
+
+
 def test_the_committed_receipts_have_the_shape_the_plan_quotes(tool):
     """Track D's gate is quoted straight out of these files, so their schema must not drift."""
     results = KENN_ROOT / "tooling" / "evaluation" / "results"
