@@ -121,7 +121,7 @@ class VoiceCopilot:
         elif any(w in clean for w in ["match reference", "match the reference", "spectral match", "curve match", "match curve"]):
             intent_type = "MATCH_REFERENCE"
             confidence = 0.94
-            speech = "Extracting 40-band ERB delta against commercial master reference."
+            speech = "Reference matching needs measured session and reference spectra."
             command = {"action": "match_reference_track"}
 
         else:

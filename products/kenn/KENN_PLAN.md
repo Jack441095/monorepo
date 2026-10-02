@@ -353,11 +353,14 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   human reviewers; keep clipping/headroom/L-R findings and broader unqualified
   interpretations distinct. A finding offers a change only with a separately bound
   Live target, and re-measurement reports what changed rather than promising quality.
-  Remove synthetic production evidence from the empty-input reference matcher and
-  its HTTP/tool callers: absent or empty spectra produce an unavailable result, with
-  no measured finding or EQ recipe. Qualify loudness windows/gating, LRA and true peak
+  Qualify loudness windows/gating, LRA and true peak
   against permitted conformance vectors and controlled fixtures. A pinned libebur128
   comparison is optional and needs approval; agreement alone is not conformance.
+  - [x] Reference matcher, JSON aliases and tool/agent callers reject missing,
+    partial or invalid spectra without inventing a finding or EQ recipe. Valid
+    supplied 40-band comparisons retain their existing behavior. 73 scoped cases,
+    12 consumer cases and five separate multipart cases pass; 17 mutations are
+    caught. [Evidence and exact files](docs/evidence/KENN_REFERENCE_INPUTS_2026-10-02.md).
 - [ ] **B2 — Memory usability.** Testers can inspect, edit, delete and restore saved
   preferences; answers identify memory used; a different project/session cannot read
   it. Explicit saves only. Verify reset/export/retention behavior and UI/API parity.

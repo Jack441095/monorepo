@@ -338,12 +338,10 @@ def tool_master_session(profile: str = "SPOTIFY_STREAMING", session_snapshot: Op
 
 
 def tool_match_reference_track(reference_spectrum: Optional[List[float]] = None, session_spectrum: Optional[List[float]] = None, reference_name: str = "Commercial Master Reference") -> Dict[str, Any]:
-    """Extract 40-band ERB difference curve against commercial reference and synthesize safe parametric EQ moves."""
+    """Compare supplied ERB measurements; missing evidence produces no EQ recipe."""
     from kenn.core.reference_matcher import get_reference_matcher
     matcher = get_reference_matcher()
-    s_spec = session_spectrum or [-20.0 - (i * 0.5) for i in range(40)]
-    r_spec = reference_spectrum or [-20.0 - (i * 0.48) for i in range(40)]
-    report = matcher.compute_spectral_delta(s_spec, r_spec, reference_name=reference_name)
+    report = matcher.compute_spectral_delta(session_spectrum, reference_spectrum, reference_name=reference_name)
     return report.to_dict()
 
 
@@ -1170,6 +1168,7 @@ class KennAutonomousAgent:
         trajectory: List[Dict[str, Any]] = []
         steps: List[Dict[str, Any]] = []
         advice_lines: List[str] = [f"✦ KENN Autonomous ReAct Engine solving: '{objective}'\n"]
+        reference_unavailable = False
 
         # -------------------------------------------------------------
         # Iteration 1: Perception & World Model Construction
@@ -1337,16 +1336,16 @@ class KennAutonomousAgent:
             from kenn.core.reference_matcher import get_reference_matcher
             ref_matcher = get_reference_matcher()
             ref_report = ref_matcher.compute_spectral_delta([], [])
+            reference_unavailable = not ref_report.available
             trajectory.append({
                 "iteration": 2.8,
                 "phase": "reference_matching",
-                "thought": f"Computed 40-band spectral deviation against commercial reference. Synthesized {len(ref_report.eq_recipe)} safe EQ moves.",
+                "thought": "Reference matching needs measured session and reference spectra, which this objective did not supply.",
                 "action": "match_reference_spectrum",
                 "observation": ref_report.to_dict(),
-                "reflection": "Enforced strict +/- 2.5 dB musical curve clamping.",
+                "reflection": "No reference finding or EQ recipe was generated.",
             })
-            advice_lines.append(f"• **Reference Matcher**: Synthesized 4-band target EQ curve within +/- 2.5 dB.")
-            steps.extend(ref_report.eq_recipe)
+            advice_lines.append("• **Reference Matcher**: Supply measured session and reference spectra before comparing them.")
 
         # -------------------------------------------------------------
         # Iteration 2.9: Background Auto-Gain Staging
@@ -1482,9 +1481,13 @@ class KennAutonomousAgent:
 
         if not safe_steps:
             return {
-                "ok": True,
-                "status": "balanced",
-                "answer": "Session is already well balanced according to 40-band ERB psychoacoustic standards. No modifications required.",
+                "ok": not reference_unavailable,
+                "status": "reference_unavailable" if reference_unavailable else "balanced",
+                "answer": (
+                    "Reference matching is unavailable until measured session and reference spectra are supplied. No EQ recipe was generated."
+                    if reference_unavailable else
+                    "Session is already well balanced according to 40-band ERB psychoacoustic standards. No modifications required."
+                ),
                 "trajectory": trajectory,
                 "requires_confirmation": False,
             }

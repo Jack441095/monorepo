@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import json
+import math
+
 import pytest
+
 from kenn.core.reference_matcher import ReferenceMatcher, get_reference_matcher
 
 
@@ -75,3 +79,78 @@ def test_gaussian_smoothing_reduces_spikes():
     # Raw delta is 20 dB, but smoothed delta must be reduced by Gaussian kernel (0.5 weight)
     assert band_15["raw_delta_db"] if "raw_delta_db" in band_15 else band_15["delta_db"] > band_15["smoothed_delta_db"]
     assert band_15["safe_adjustment_db"] == 2.5  # Clamped to maximum +2.5 dB
+
+
+@pytest.mark.parametrize(
+    "session, reference",
+    [
+        (None, None),
+        ([], []),
+        ([], [-20.0] * 40),
+        ([-20.0] * 40, []),
+        (None, [-20.0] * 40),
+        ([-20.0] * 40, None),
+        ([-20.0] * 39, [-20.0] * 40),
+        ([-20.0] * 40, [-20.0]),
+        ([-20.0] * 41, [-20.0] * 40),
+        ("x" * 40, [-20.0] * 40),
+        ({}, [-20.0] * 40),
+        ([None] * 40, [-20.0] * 40),
+        ([True] * 40, [-20.0] * 40),
+        (["-20.0"] * 40, [-20.0] * 40),
+        ([-20.0] * 40, [float("nan")] * 40),
+        ([float("inf")] * 40, [-20.0] * 40),
+        ([-20.0] * 40, [float("-inf")] * 40),
+    ],
+)
+def test_missing_invalid_or_incomplete_spectra_have_no_finding_or_recipe(session, reference):
+    # Empty input used to fabricate a commercial-reference comparison and four EQ moves.
+    report = ReferenceMatcher().compute_spectral_delta(session, reference, "Missing reference")
+    result = report.to_dict()
+    assert result["available"] is False
+    assert result["reference_name"] == "Missing reference"
+    assert result["diagnostic_reason"]
+    assert result["delta_curve"] == []
+    assert result["eq_recipe"] == []
+    assert result["rms_spectral_delta_db"] is None
+    json.dumps(result, allow_nan=False)
+
+
+def test_nonfinite_normalized_delta_is_unavailable():
+    matcher = ReferenceMatcher()
+    anchor = min(range(40), key=lambda i: abs(matcher.erb_bands[i][0] - 1000.0))
+    session = [-1e308] * 40
+    session[anchor] = 1e308
+    report = matcher.compute_spectral_delta(session, [-20.0] * 40)
+    assert report.available is False
+    assert report.eq_recipe == []
+    assert report.rms_spectral_delta_db is None
+
+
+def test_measured_erb_spectra_of_the_same_audio_ignore_overall_gain():
+    # A real FFT-derived comparison must still work after rejecting missing data.
+    import numpy as np
+    from kenn.core.psychoacoustics import compute_erb_spectrum
+
+    samples = np.random.default_rng(21).normal(0.0, 0.1, 8192)
+
+    def measured_spectrum(audio):
+        magnitudes = np.abs(np.fft.rfft(audio)).tolist()
+        powers = compute_erb_spectrum(magnitudes, sample_rate=48000, fft_size=len(audio))
+        return [10.0 * math.log10(power) for power in powers]
+
+    session = measured_spectrum(samples)
+    reference = measured_spectrum(samples * 2.0)
+    before = list(session), list(reference)
+    report = get_reference_matcher().compute_spectral_delta(session, reference, "Gain-offset fixture")
+    assert report.available is True
+    assert report.rms_spectral_delta_db == pytest.approx(0.0, abs=1e-12)
+    assert len(report.delta_curve) == 40
+    assert all(abs(step["gain_delta_db"]) < 1e-12 for step in report.eq_recipe)
+    assert (session, reference) == before
+
+    missing = get_reference_matcher().compute_spectral_delta([], [], "Different request")
+    assert missing.available is False
+    assert missing.delta_curve == []
+    assert report.reference_name == "Gain-offset fixture"
+    assert len(report.delta_curve) == 40

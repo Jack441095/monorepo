@@ -1,17 +1,16 @@
-"""Reference Track AI Spectral Matcher for KENN.
+"""Compare supplied 40-band ERB measurements with 1 kHz anchor normalization.
 
-Extracts 40-band Equivalent Rectangular Bandwidth (ERB) spectra from commercial reference
-tracks, computes tonal deviations against the current session mix, applies 3-band Gaussian
-smoothing to prevent narrow ringing resonances, and synthesizes musical, non-destructive EQ
-curves strictly clamped within +/- 2.5 dB.
+Missing measurements produce no comparison or EQ recipe. Available comparisons
+use three-band Gaussian smoothing and bound suggested adjustments to +/- 2.5 dB.
 """
 
 from __future__ import annotations
 
 import math
 import time
-from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from numbers import Real
+from typing import Any, Dict, List, Optional
 
 from kenn.core.psychoacoustics import get_erb_bands
 
@@ -20,17 +19,21 @@ from kenn.core.psychoacoustics import get_erb_bands
 class ReferenceMatchReport:
     reference_name: str
     delta_curve: List[Dict[str, Any]]
-    rms_spectral_delta_db: float
+    rms_spectral_delta_db: Optional[float]
     eq_recipe: List[Dict[str, Any]]
     timestamp: float = field(default_factory=time.time)
+    available: bool = True
+    diagnostic_reason: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "reference_name": self.reference_name,
             "delta_curve": self.delta_curve,
-            "rms_spectral_delta_db": round(self.rms_spectral_delta_db, 2),
+            "rms_spectral_delta_db": round(self.rms_spectral_delta_db, 2) if self.rms_spectral_delta_db is not None else None,
             "eq_recipe": self.eq_recipe,
             "timestamp": self.timestamp,
+            "available": self.available,
+            "diagnostic_reason": self.diagnostic_reason,
         }
 
 
@@ -44,17 +47,33 @@ class ReferenceMatcher:
 
     def compute_spectral_delta(
         self,
-        session_spectrum: List[float],
-        reference_spectrum: List[float],
+        session_spectrum: Optional[List[float]],
+        reference_spectrum: Optional[List[float]],
         reference_name: str = "Commercial Master Reference",
     ) -> ReferenceMatchReport:
         """Compute 40-band spectral deviation between session and reference spectra."""
-        num_bands = min(len(self.erb_bands), len(session_spectrum), len(reference_spectrum))
-        if num_bands == 0:
-            # Fallback 40 synthetic bands if input is empty
-            num_bands = 40
-            session_spectrum = [-20.0 - (i * 0.5) for i in range(40)]
-            reference_spectrum = [-20.0 - (i * 0.48) for i in range(40)]
+        num_bands = len(self.erb_bands)
+        valid_shape = all(
+            isinstance(spectrum, (list, tuple)) and len(spectrum) == num_bands
+            for spectrum in (session_spectrum, reference_spectrum)
+        )
+        valid_numbers = False
+        if valid_shape:
+            try:
+                valid_numbers = all(
+                    isinstance(value, Real) and not isinstance(value, bool) and math.isfinite(value)
+                    for spectrum in (session_spectrum, reference_spectrum)
+                    for value in spectrum
+                )
+            except OverflowError:
+                valid_numbers = False
+        if not valid_numbers:
+            # Partial spectra omit frequency regions used by the four-band recipe;
+            # truncating or substituting them would invent a reference finding.
+            return ReferenceMatchReport(
+                reference_name, [], None, [], available=False,
+                diagnostic_reason="Reference matching requires exactly 40 finite measured ERB values for both session and reference spectra.",
+            )
 
         # Find 1 kHz anchor band index
         anchor_idx = min(range(num_bands), key=lambda i: abs(self.erb_bands[i][0] - 1000.0))
@@ -67,6 +86,11 @@ class ReferenceMatcher:
 
         # 2. Raw delta: delta = reference - session
         raw_deltas = [norm_ref[i] - norm_session[i] for i in range(num_bands)]
+        if not all(math.isfinite(value) for values in (norm_session, norm_ref, raw_deltas) for value in values):
+            return ReferenceMatchReport(
+                reference_name, [], None, [], available=False,
+                diagnostic_reason="The supplied spectra exceed the numeric range for a finite reference comparison.",
+            )
 
         # 3. 3-point Gaussian smoothing to prevent narrow phase-ringing spikes
         smoothed_deltas = []
@@ -97,7 +121,7 @@ class ReferenceMatcher:
                 "safe_adjustment_db": round(clamped_deltas[i], 2),
             })
 
-        rms_delta = math.sqrt(sum(d ** 2 for d in raw_deltas) / num_bands)
+        rms_delta = math.hypot(*(d / math.sqrt(num_bands) for d in raw_deltas))
 
         # 6. Synthesize 4-band master parametric EQ recipe
         eq_recipe = self._synthesize_eq_recipe(delta_curve)

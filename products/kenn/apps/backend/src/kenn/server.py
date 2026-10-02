@@ -2315,7 +2315,10 @@ class Handler(BaseHTTPRequestHandler):
             session_spec = payload.get("session_spectrum", [])
             ref_spec = payload.get("reference_spectrum", [])
             report = matcher.compute_spectral_delta(session_spec, ref_spec, reference_name=ref_name)
-            self.send_json(200, {"ok": True, "analysis": report.to_dict()})
+            response = {"ok": report.available, "analysis": report.to_dict()}
+            if not report.available:
+                response["error"] = report.diagnostic_reason
+            self.send_json(200 if report.available else 400, response)
             return
         if parsed.path in {"/api/reference/match-curve", "/kenn/api/reference/match-curve"}:
             from kenn.core.reference_matcher import get_reference_matcher
@@ -2324,12 +2327,16 @@ class Handler(BaseHTTPRequestHandler):
             session_spec = payload.get("session_spectrum", [])
             ref_spec = payload.get("reference_spectrum", [])
             report = matcher.compute_spectral_delta(session_spec, ref_spec, reference_name=ref_name)
-            self.send_json(200, {
-                "ok": True,
+            response = {
+                "ok": report.available,
+                "available": report.available,
                 "eq_recipe": report.eq_recipe,
                 "delta_curve": report.delta_curve,
                 "rms_spectral_delta_db": report.rms_spectral_delta_db,
-            })
+            }
+            if not report.available:
+                response["error"] = report.diagnostic_reason
+            self.send_json(200 if report.available else 400, response)
             return
         if parsed.path in {"/api/gain-staging/audit", "/kenn/api/gain-staging/audit"}:
             from kenn.core.auto_gain_stager import get_auto_gain_stager
