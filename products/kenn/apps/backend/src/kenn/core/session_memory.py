@@ -400,6 +400,34 @@ def save_to_semantic_cache(query: str, events: list, session_id: str = "") -> No
         print(f"WARNING: save_to_semantic_cache failed: {exc}")
 
 
+def drop_session_semantic_cache(session_id: str) -> None:
+    """Forget every cached answer for one session, in all three tiers.
+
+    Cached events carry the preference citation they were written with, so a
+    preference that is saved, restored or forgotten has to clear them. Waiting
+    out the one-hour TTL kept showing a value the producer had just deleted.
+    """
+    clean_session = session_id.strip()
+    global _L2_MATRIX, _L2_QUERIES, _L2_SESSION_IDS, _L2_VERSIONS, _L2_EVENTS, _L2_TIMESTAMPS
+    with _L1_LOCK:
+        for key in [key for key in _L1_EXACT_CACHE if key[0] == clean_session]:
+            del _L1_EXACT_CACHE[key]
+        keep = [sid != clean_session for sid in _L2_SESSION_IDS]
+        if not all(keep):
+            _L2_QUERIES = [item for item, kept in zip(_L2_QUERIES, keep) if kept]
+            _L2_SESSION_IDS = [item for item, kept in zip(_L2_SESSION_IDS, keep) if kept]
+            _L2_VERSIONS = [item for item, kept in zip(_L2_VERSIONS, keep) if kept]
+            _L2_EVENTS = [item for item, kept in zip(_L2_EVENTS, keep) if kept]
+            _L2_TIMESTAMPS = [item for item, kept in zip(_L2_TIMESTAMPS, keep) if kept]
+            _L2_MATRIX = _L2_MATRIX[np.array(keep, dtype=bool)] if _L2_QUERIES and _L2_MATRIX is not None else None
+    try:
+        conn = _get_db()
+        conn.execute("DELETE FROM semantic_cache WHERE session_id = ?", (clean_session,))
+        conn.commit()
+    except sqlite3.Error as exc:
+        print(f"WARNING: drop_session_semantic_cache failed: {exc}")
+
+
 def load_session_from_db(session_id: str) -> dict[str, Any] | None:
     """Load a specific session from SQLite, or return None if not found."""
     sid = session_id.strip()

@@ -12,7 +12,7 @@ from typing import Any
 from uuid import uuid4
 
 from kenn.core.assistant_task_memory import AssistantTaskStore
-from kenn.core.session_memory import DB_PATH
+from kenn.core.session_memory import DB_PATH, drop_session_semantic_cache
 
 
 PREFERENCE_SCHEMA = "kenn.producer_preference.v1"
@@ -179,6 +179,7 @@ class AssistantProfileStore:
             conn.commit()
         finally:
             conn.close()
+        drop_session_semantic_cache(clean_session)
         return {"ok": True, "preference": _preference_projection(row)}
 
     def current_preferences(self, session_id: str) -> list[dict[str, Any]]:
@@ -241,6 +242,7 @@ class AssistantProfileStore:
             conn.commit()
         finally:
             conn.close()
+        drop_session_semantic_cache(session_id)
         return {"ok": True, "restored": True, "preference": _preference_projection(row)}
 
     def forget_preference(self, *, session_id: str, key: str) -> bool:
@@ -253,6 +255,8 @@ class AssistantProfileStore:
             conn.commit()
         finally:
             conn.close()
+        if cursor.rowcount > 0:
+            drop_session_semantic_cache(session_id)
         return cursor.rowcount > 0
 
     def record_task_outcome(
@@ -382,6 +386,7 @@ class AssistantProfileStore:
             conn.commit()
         finally:
             conn.close()
+        drop_session_semantic_cache(clean_session)
         return {"preferences": preferences, "episodes": episodes}
 
     def context_memory(self, session_id: str) -> dict[str, Any]:
