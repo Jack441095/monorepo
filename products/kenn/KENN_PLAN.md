@@ -275,6 +275,18 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   the installed Live version. Distinguish manual-described, observed, measured,
   fake-tested and real-Live-qualified parameters. First milestone: at least 25 devices
   and 60 parameters qualified end to end; then close remaining coverage explicitly.
+  Qualify nested rack-chain and return/master device targets, complete range and
+  enabled/state/automation metadata, chooser labels and display-unit parity. Treat
+  the 78 stock entries as a baseline; separately inventory Packs, presets, Max for
+  Live and plug-ins, recording unsupported or manual-only controls explicitly.
+- [x] **L1a — Audit whole-software Live 12 coverage.** Completed 2 October 2026:
+  chat, planner, HTTP, MCP, frontend, native plug-in, desktop, backend and bundled
+  Remote Script reviewed against installed Live 12.4.6 and official references.
+  Three independent agent reviews confirmed the source/offline findings; the
+  [report](docs/evidence/KENN_LIVE12_IMPLEMENTATION_AUDIT_2026-10-02.md) and
+  [JSON evidence](docs/evidence/KENN_LIVE12_IMPLEMENTATION_AUDIT_2026-10-02.json)
+  record the 78-device matrix and verification limits. Full control is not proved;
+  repairs remain in L1/L5 and real-Live qualification remains open.
 - [ ] **L2 — Retrieval and knowledge.** Authorized Live 11 manual material already
   exists in the local index; it does not prove Live 12 parameter accuracy. Add only
   reviewed, version-applicable missing facts and craft notes tied to failed questions.
@@ -299,6 +311,13 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   ordered/duplicate/missing OSC replies, reconnect, idempotency, per-set serialization,
   ambiguous timeout outcomes, restart and identity-bound Undo. Use the A2 route map
   to demonstrate that no frontend or MCP entry point has independent write authority.
+  Close L1a's 12 missing declared writes and four reads through implemented handler
+  contracts or explicit refusal, with compound OSC payload encoding and feature
+  negotiation. Bind complete automation curves to confirmation; replace sent-only
+  verified receipts with observed readback and reject partial parameter metadata.
+  Test typed MCP proposals through the actual HTTP gateway and validate native
+  Apply/Undo outcomes and receipts before displaying success. Resolve the unused
+  planner dB conversion path; keep direct C++ writes off pending parity qualification.
 
 ### 4. Qualify listening, memory and creation
 

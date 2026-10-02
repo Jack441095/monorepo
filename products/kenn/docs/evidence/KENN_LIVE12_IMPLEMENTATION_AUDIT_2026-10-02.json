@@ -1,0 +1,2346 @@
+{
+  "schema": "kenn.live12.source_audit.v1",
+  "audited_on": "2026-10-02",
+  "scope": "Read-only installed-stock disk inventory, reviewed application routes, offline handler registration and synthetic checks. No Live session accessed.",
+  "git_head": "42845978ac30b79bfb78ee1900f2680b3134bb55",
+  "source_sha256": {
+    "apps/backend/src/kenn/ableton_osc_bridge.py": "02e6edadb0ebc1b169a4a1befef5159a2f2102f0229c74ec2d965f2dfb212ea1",
+    "apps/backend/src/kenn/core/live_action_service.py": "f4e004e3b1d7dd59406e958d1bedeac7af7c137d039b1417f887d2727f9f6de6",
+    "apps/backend/src/kenn/core/actions/tier2_tier3_actions.py": "9eb134422da6bb3500c082c0ace65cbd923d5fa3b160cd0817a164ea224d87b7",
+    "apps/backend/src/kenn/core/live_command.py": "61f7e88138e4e049f1d79fe69dbffab8601b38c5c47cabd746400167bb56772d",
+    "apps/backend/src/kenn/core/live_control_planner.py": "c647ba9f7715670384cc068bc01e55eb5bc04946b393af00bcb4c31d96dfe42d",
+    "apps/backend/src/kenn/core/device_units.py": "cc86a49b55e79970613e414242ac7025813e5d4ee19a0669bb12c15922e68cfc",
+    "apps/backend/src/kenn/core/stock_devices.py": "600755185797da69d57530acca0c01b228fefe6ea64b107d013502fda22e84e9",
+    "apps/backend/src/kenn/core/installed_devices.py": "46ae6cba7e07ff9c574817475fd48919966eef92f628e0bd358367212d753156",
+    "apps/backend/src/kenn/core/live_backend_factory.py": "5dac00ca57daa9b37cdb65e7d50bd5681fb39e99123cfe09762e9c7be2ea0d05",
+    "apps/backend/src/kenn/core/live_backend.py": "52e222b6e8903afc46fd191b68ca727e972c5f360feb000dacd2846ad28e14a9",
+    "apps/backend/src/kenn/core/live_executor.py": "315e74ddfb3d41f6bc72b9c56906f6ddf6fce9e1c95503f633247ca9b6c5325e",
+    "apps/backend/src/kenn/core/mcp/live_reads.py": "b37af6e7aa8a983e7f4a97bdb1b96ffa1539973736c0d1e2e61a95cb6c93fb3c",
+    "apps/backend/src/kenn/core/mcp/live_proposals.py": "577e56fc5e428d52a7322a2cb8bd1fcf683d2b902f1f9ae37b8a59ae03b16f31",
+    "apps/backend/src/kenn/core/mcp/live_confirmation.py": "655a2c2407cc2f12002e74473cc375d314e3441ae5441aa1b44fd3ad26b596e3",
+    "apps/backend/src/kenn/server.py": "3e04ea36ad91d5a100f2c65e5a6e6dd5f41a95e43b1983a909c5d6085092dc98",
+    "apps/backend/src/kenn/routes/fastapi_app.py": "7d486dba7001a18f3f7addac58b7b0fba38ab5bfba3b3fe897f7ac11b597b0be",
+    "apps/frontend/src/api/kenn.ts": "10343e6e03647ba56e7590f5a50f612ed5af0387f9daed5e496e04771d31f6e1",
+    "tooling/scripts/device_coverage.py": "b5954e6a8adda53be772b86b5869d0fa7d91a81933c4cdaca1e88de36b958c5e",
+    "integrations/ableton-osc/manager.py": "bc137414e8f41a68a5e47af5cb543b99d39c10026c630b2a5bbf90fc749e655a",
+    "integrations/ableton-osc/abletonosc/song.py": "05f4df7ee08ca634477dc49fdb28c1e040e953ee61164bf0f886b3a95a6b8a72",
+    "integrations/ableton-osc/abletonosc/track.py": "bcbed4889338a88e9274111a5ae28180606acaffa9af6939ba22bac6411c24b3",
+    "integrations/ableton-osc/abletonosc/device.py": "d6808d8557c47a373b1d983634686e31bcd5a2646e8e99a473bc1721efee44ef",
+    "integrations/ableton-osc/abletonosc/clip.py": "298392da0d535336b80274255704adf7c75dddbe27ad00ff4d47c0594d22d69a",
+    "integrations/ableton-remote-script/KENN_Bridge/KENN_Bridge.py": "71daca2020bdb01c34fd164ee71f14af8dded10b9345bed6732b94fa5b329ff4",
+    "apps/backend/src/kenn/abletonosc_protocol.py": "ee5c407f714d2ce88ae87c899370012feb5efe48dae3f27775038cb06526d347",
+    "apps/backend/src/kenn/core/live_intent.py": "8c4badd626e73707773d3bc0a3243ad343e04a3fee0f7fb6e5953f080ad4345d",
+    "apps/backend/src/kenn/routes/daw_routes.py": "72efde673de5234b41b38ba030e4e7fcd64ad2c3fa9305cfa6f62d3e71de690f",
+    "apps/backend/src/kenn/routes/daw_command_handler.py": "1ffdef1dab967cf0a9f25c707724a0ba50a81661e34c67431f86ececd1f0b234",
+    "apps/backend/src/kenn/plugin_handoff.py": "271c2a1b1c3cc5e77e4c37dcb855530098cf3ec2058e2548ca3b4282c03da021",
+    "apps/backend/src/kenn/core/abletonosc_bundle.py": "f89fef7e7962f2c6f617d9c9d3521e3fce4565cda4b1901c82faa5bdcba6542d",
+    "apps/frontend/src/composables/useKenn.ts": "9e27b1204c1b84de3370f0dce9bc40f8dfae431416d20e731abb55596c45507f",
+    "apps/frontend/src/components/KennRecipeCard.vue": "e8b051e24e59f908d149cc64cde8aa540c0e50840b6f7be6b3d29bb27b406d87",
+    "apps/desktop/macos/KENNDesktopCompanion.swift": "689f8bc68ccc5fe8cd11cd093025214d6979d40fe260331d635e4d2654e3c464",
+    "plugins/kenn-vst3-au/CMakeLists.txt": "8558f9022db368944d86fca078d5394a4e5a0be6352c4cb9a844918cca70b11e",
+    "plugins/kenn-vst3-au/Source/PluginProcessor.cpp": "4c0654d949acc913946d2f9608373838a76efa2f7a8623675a18b353d5639c94",
+    "plugins/kenn-vst3-au/Source/PluginEditor.cpp": "8a212a0a25ebd0d78ad25ee38ddb5c6aa17a8115c7a68f18bde76deba4519892",
+    "plugins/kenn-vst3-au/Source/LocalAbletonOscWriter.cpp": "2929d34588e19f424e27da2152eec32185928c8b90cea8a68c0e2d50a8f3345a",
+    "plugins/kenn-vst3-au/Source/LocalAbletonOscProbe.cpp": "d0d8d15b5a7ec45cb006c51b995f729547186b1257f403d53c67f3d00db209d5",
+    "plugins/kenn-vst3-au/Source/LocalAbletonOscProtocol.cpp": "3372a8d705d407d07ad6dd1a2b8f74bc902a8ef4dd9e8d762a16447e2f415686",
+    "plugins/kenn-vst3-au/Source/LocalCommandLanguage.cpp": "ae997a2c23364e6f6f27f156ddc056dca8ae6e53fe89713da0d717510e1fa4a9",
+    "plugins/kenn-vst3-au/Source/LocalLivePlan.cpp": "601c3ad6609c61a1f0831b0bf91f63e5e34e65e17f1ec445156f0c1bea8f7586"
+  },
+  "summary": {
+    "live_version": "12.4.6 (2026-09-10_0de5c8fa9a)",
+    "devices": 78,
+    "by_category": {
+      "Instruments": 16,
+      "Audio Effects": 47,
+      "MIDI Effects": 15
+    },
+    "knows_note": 77,
+    "knows_draft_note": 0,
+    "knows_mentioned": 0,
+    "knows_none": 1,
+    "inserts": 10,
+    "ableton_notes": 118,
+    "built_in_profile_entries": 20,
+    "loaded_file_profile_entries": 0,
+    "loaded_file_choosers": 0,
+    "profile_json_files": 0,
+    "runtime_observed_devices_in_this_audit": 0,
+    "devices_with_display_unit_families": 9,
+    "display_unit_family_count_including_eq_band_gain": 21,
+    "real_live_requalified_devices_in_this_audit": 0
+  },
+  "devices": [
+    {
+      "device": "Analog",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-analog-and-impulse-instruments.md",
+          "ableton-analog-synth.md"
+        ],
+        "mentions": 8
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Collision",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-collision-synth.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Drift",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-drift-and-meld-synths.md",
+          "ableton-drift-synth.md"
+        ],
+        "mentions": 5
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Drum Rack",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-drum-racks-and-internal-routing.md"
+        ],
+        "mentions": 5
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Drum Sampler",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-drum-sampler-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Drum Synth",
+      "category": "Instruments",
+      "knows": {
+        "level": "none",
+        "notes": [],
+        "mentions": 0
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Electric",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-electric-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "External Instrument",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-external-instrument.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Impulse",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-analog-and-impulse-instruments.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Instrument Rack",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-instrument-rack-device.md"
+        ],
+        "mentions": 5
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Meld",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-drift-and-meld-synths.md",
+          "ableton-meld-synth.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Operator",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-operator-device.md"
+        ],
+        "mentions": 4
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Sampler",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-sampler-device.md"
+        ],
+        "mentions": 5
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Simpler",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-simpler-device.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Tension",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-tension-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Wavetable",
+      "category": "Instruments",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-wavetable-synth.md"
+        ],
+        "mentions": 5
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Align Delay",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-align-delay-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Amp",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-amp-device.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Audio Effect Rack",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-audio-effect-rack-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Auto Filter",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-auto-filter-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Resonance (%)",
+        "Frequency (Hz)",
+        "Dry/Wet (%)"
+      ],
+      "built_in_profile_families": [
+        "Dry/Wet (%)",
+        "Frequency (hz)",
+        "Resonance (%)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Auto Pan-Tremolo",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-auto-pan-tremolo-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Auto Shift",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-auto-shift-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Beat Repeat",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-beat-repeat.md",
+          "ableton-drum-buss-and-beat-repeat.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Cabinet",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-cabinet-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Channel EQ",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-channel-eq-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Chorus-Ensemble",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-chorus-ensemble-device.md"
+        ],
+        "mentions": 5
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Compressor",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-compressor-device.md"
+        ],
+        "mentions": 10
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Threshold (dB)",
+        "Ratio (ratio)",
+        "Attack (ms)",
+        "Release (ms)",
+        "Dry/Wet (%)"
+      ],
+      "built_in_profile_families": [
+        "Attack (ms)",
+        "Dry/Wet (%)",
+        "Ratio (ratio)",
+        "Release (ms)",
+        "Threshold (db)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Corpus",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-corpus-resonators.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Delay",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-delay-and-reverb-devices.md"
+        ],
+        "mentions": 16
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Drum Buss",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-drum-buss-and-beat-repeat.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Drive (%)",
+        "Dry/Wet (%)"
+      ],
+      "built_in_profile_families": [
+        "Drive (%)",
+        "Dry/Wet (%)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Dynamic Tube",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-dynamic-tube-device.md"
+        ],
+        "mentions": 4
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "EQ Eight",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-eq-eight-device.md"
+        ],
+        "mentions": 8
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Frequency (Hz)",
+        "band gain (dB, on an existing tuned band)"
+      ],
+      "built_in_profile_families": [
+        "Frequency (hz)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "EQ Three",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-eq-three-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Echo",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-echo-device.md"
+        ],
+        "mentions": 5
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Dry Wet (%)"
+      ],
+      "built_in_profile_families": [
+        "Dry Wet (%)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Envelope Follower",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-envelope-follower-device.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Erosion",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-erosion-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "External Audio Effect",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-external-audio-effect.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Filter Delay",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-filter-delay-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Gate",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-limiter-and-gate-devices.md"
+        ],
+        "mentions": 9
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Glue Compressor",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-glue-compressor-device.md"
+        ],
+        "mentions": 7
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Attack (ms)",
+        "Ratio (ratio)",
+        "Dry/Wet (%)"
+      ],
+      "built_in_profile_families": [
+        "Attack (ms)",
+        "Dry/Wet (%)",
+        "Ratio (ratio)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Grain Delay",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-grain-delay-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Hybrid Reverb",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-hybrid-reverb-device.md",
+          "ableton-hybrid-reverb.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Dry/Wet (%)"
+      ],
+      "built_in_profile_families": [
+        "Dry/Wet (%)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "LFO",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-lfo-device.md"
+        ],
+        "mentions": 19
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Limiter",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-limiter-and-gate-devices.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Looper",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-looper-device.md",
+          "ableton-looper.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Multiband Dynamics",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-multiband-dynamics-device.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Overdrive",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-overdrive-device.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Pedal",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-pedal-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Phaser-Flanger",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-phaser-flanger-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Redux",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-redux-device.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Resonators",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-corpus-resonators.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Reverb",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-delay-and-reverb-devices.md"
+        ],
+        "mentions": 9
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Roar",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-roar-device.md",
+          "ableton-roar-effect.md"
+        ],
+        "mentions": 5
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Drive (dB)",
+        "Dry/Wet (%)"
+      ],
+      "built_in_profile_families": [
+        "Drive (dB)",
+        "Dry/Wet (%)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Saturator",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-saturator-device.md"
+        ],
+        "mentions": 7
+      },
+      "insert_by_name_in_rule_parser": true,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": true,
+      "display_unit_families": [
+        "Drive (dB)",
+        "Dry/Wet (%)"
+      ],
+      "built_in_profile_families": [
+        "Drive (db)",
+        "Dry/Wet (%)"
+      ],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Shaper",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-shaper-device.md",
+          "ableton-shaper-midi-device.md"
+        ],
+        "mentions": 4
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Shifter",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-shifter-and-distortion-devices.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Spectral Resonator",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-spectral-resonator.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Spectral Time",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-spectral-time.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Spectrum",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-spectrum-analyzer.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Tuner",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-tuner-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Utility",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-utility-device.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Vinyl Distortion",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-vinyl-distortion-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Vocoder",
+      "category": "Audio Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-vocoder.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Arpeggiator",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-arpeggiator.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "CC Control",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-cc-control-midi-effect.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Chord",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-scale-chord-effects.md"
+        ],
+        "mentions": 3
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Envelope MIDI",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-envelope-midi-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Expression Control",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-expression-control-device.md"
+        ],
+        "mentions": 4
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "MIDI Effect Rack",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-midi-effect-rack-device.md"
+        ],
+        "mentions": 2
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "MIDI Monitor",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-midi-monitor-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "MPE Control",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-mpe-control-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Note Echo",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-note-echo-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Note Length",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-pitch-and-note-length-midi-effects.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Pitch",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-pitch-and-note-length-midi-effects.md"
+        ],
+        "mentions": 21
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Random",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-random-device.md"
+        ],
+        "mentions": 11
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Scale",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-scale-chord-effects.md"
+        ],
+        "mentions": 9
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    },
+    {
+      "device": "Shaper MIDI",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-shaper-midi-device.md"
+        ],
+        "mentions": 1
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": false
+    },
+    {
+      "device": "Velocity",
+      "category": "MIDI Effects",
+      "knows": {
+        "level": "note",
+        "notes": [
+          "ableton-velocity-midi-effect.md"
+        ],
+        "mentions": 13
+      },
+      "insert_by_name_in_rule_parser": false,
+      "runtime_observed_in_this_audit": false,
+      "parameter_count_observed_in_this_audit": null,
+      "insertion_allowlisted": false,
+      "display_unit_families": [],
+      "built_in_profile_families": [],
+      "real_live_requalified_in_this_audit": false,
+      "in_three_manual_device_chapters": true
+    }
+  ],
+  "offline_checks": {
+    "endpoint_registry": {
+      "registration_errors": [],
+      "registered_endpoint_count": 504,
+      "declared_read_count": 68,
+      "declared_write_count": 49,
+      "declared_read_absent_from_bundle": [
+        "/live/m4l/get/parameters",
+        "/live/rack/get/macros",
+        "/live/track/get/arrangement_clips",
+        "/live/track/get/meters"
+      ],
+      "declared_write_absent_from_bundle": [
+        "/live/browser/load_preset",
+        "/live/clip/duplicate_to_arrangement",
+        "/live/clip/set_automation",
+        "/live/clip/set_modulation",
+        "/live/master/enforce_safety_limiter",
+        "/live/rack/map_macro",
+        "/live/rack/recall_variation",
+        "/live/rack/store_variation",
+        "/live/song/create_group_track",
+        "/live/track/set/freeze",
+        "/live/track/set/input_routing",
+        "/live/track/set/output_routing"
+      ],
+      "registered_handler_modules": [
+        "song",
+        "track",
+        "device",
+        "clip",
+        "clip_slot",
+        "scene",
+        "view",
+        "application"
+      ],
+      "excluded_module": "midimap: only MIDI-mapping addresses, none in the declared endpoint lists"
+    },
+    "client_send_method": {
+      "has_send": false,
+      "has_send_command": true
+    },
+    "truncated_ranges": {
+      "success": true,
+      "device_name": "Audit Synth",
+      "parameters": [
+        {
+          "index": 0,
+          "name": "A",
+          "value": 0.25,
+          "min": 0.0,
+          "max": 1.0,
+          "readable": true,
+          "quantized": false
+        },
+        {
+          "index": 1,
+          "name": "B",
+          "value": 0.5,
+          "min": 0.0,
+          "max": 1.0,
+          "readable": true,
+          "quantized": false
+        }
+      ]
+    },
+    "clip_modulation_refused_send": {
+      "ok": true,
+      "verified": true,
+      "send_result": {
+        "success": false
+      },
+      "readback_calls": []
+    },
+    "clip_warp_mode_refused_send": {
+      "ok": true,
+      "verified": true,
+      "send_result": {
+        "success": false
+      },
+      "readback_calls": []
+    },
+    "master_limiter_lock_refused_send": {
+      "ok": true,
+      "verified": true,
+      "send_result": {
+        "success": false
+      },
+      "readback_calls": []
+    },
+    "disabled_parameter": {
+      "proposal_ok": true,
+      "error": null,
+      "execution_ok": true,
+      "verified": true,
+      "writes": [
+        [
+          "device_parameter",
+          0,
+          0,
+          0,
+          0.5
+        ]
+      ]
+    },
+    "nested_target_schema": {
+      "ok": false,
+      "error": "The LLM plan contains unsupported fields: device_path"
+    },
+    "master_target_schema": {
+      "ok": false,
+      "error": "The LLM plan contains unsupported fields: track_kind"
+    },
+    "unmapped_hz": [
+      null,
+      "That display unit has no evidence-backed raw-value mapping for this Live parameter yet."
+    ],
+    "automation_points_wire": {
+      "encodable": false,
+      "error": "Unsupported OSC argument type: list"
+    },
+    "arrangement_send_only": {
+      "ok": true,
+      "verified": true,
+      "send_calls": 1,
+      "execution_snapshot_calls": 0,
+      "execution_clip_read_calls": 0,
+      "server_acknowledgement_supplied": false
+    },
+    "automation_point_binding": {
+      "ok": true,
+      "verified": true,
+      "proposed_points": [
+        {
+          "time": 0.0,
+          "value": 0.25
+        }
+      ],
+      "executed_points": [
+        {
+          "time": 16.0,
+          "value": 0.9
+        }
+      ]
+    },
+    "mcp_extension_rule_parse": {
+      "propose clip launch track 0 slot 0": {
+        "schema": "kenn.ableton_intent.v1",
+        "query": "propose clip launch track 0 slot 0",
+        "mode": "inspect",
+        "action": null,
+        "track": null,
+        "source_track": null,
+        "target_track": null,
+        "new_track_name": null,
+        "track_reference": {
+          "kind": "user_track_number",
+          "number": 0
+        },
+        "device": null,
+        "scene": null,
+        "clip_slot": null,
+        "source_clip_slot": null,
+        "target_clip_slot": null,
+        "locator_name": null,
+        "return_track_name": null,
+        "parameter": null,
+        "desired_value": null,
+        "relative": false,
+        "unit": null,
+        "confidence": 0.2,
+        "missing_fields": [],
+        "ambiguity": [
+          "Track 0 is not present in the current Live snapshot."
+        ],
+        "follow_up": [],
+        "confirmation_required": false
+      },
+      "propose create scene Intro": {
+        "schema": "kenn.ableton_intent.v1",
+        "query": "propose create scene Intro",
+        "mode": "inspect",
+        "action": null,
+        "track": null,
+        "source_track": null,
+        "target_track": null,
+        "new_track_name": null,
+        "track_reference": null,
+        "device": null,
+        "scene": null,
+        "clip_slot": null,
+        "source_clip_slot": null,
+        "target_clip_slot": null,
+        "locator_name": null,
+        "return_track_name": null,
+        "parameter": null,
+        "desired_value": null,
+        "relative": false,
+        "unit": null,
+        "confidence": 0.5,
+        "missing_fields": [
+          "track"
+        ],
+        "ambiguity": [
+          "No track name or number was found in the current Live snapshot."
+        ],
+        "follow_up": [],
+        "confirmation_required": false
+      },
+      "propose clip warp pitch track 0 slot 0": {
+        "schema": "kenn.ableton_intent.v1",
+        "query": "propose clip warp pitch track 0 slot 0",
+        "mode": "inspect",
+        "action": null,
+        "track": null,
+        "source_track": null,
+        "target_track": null,
+        "new_track_name": null,
+        "track_reference": {
+          "kind": "user_track_number",
+          "number": 0
+        },
+        "device": null,
+        "scene": null,
+        "clip_slot": null,
+        "source_clip_slot": null,
+        "target_clip_slot": null,
+        "locator_name": null,
+        "return_track_name": null,
+        "parameter": null,
+        "desired_value": null,
+        "relative": false,
+        "unit": null,
+        "confidence": 0.2,
+        "missing_fields": [],
+        "ambiguity": [
+          "Track 0 is not present in the current Live snapshot."
+        ],
+        "follow_up": [],
+        "confirmation_required": false
+      },
+      "propose duplicate loop track 0 slot 0": {
+        "schema": "kenn.ableton_intent.v1",
+        "query": "propose duplicate loop track 0 slot 0",
+        "mode": "inspect",
+        "action": null,
+        "track": null,
+        "source_track": null,
+        "target_track": null,
+        "new_track_name": null,
+        "track_reference": {
+          "kind": "user_track_number",
+          "number": 0
+        },
+        "device": null,
+        "scene": null,
+        "clip_slot": null,
+        "source_clip_slot": null,
+        "target_clip_slot": null,
+        "locator_name": null,
+        "return_track_name": null,
+        "parameter": null,
+        "desired_value": null,
+        "relative": false,
+        "unit": null,
+        "confidence": 0.2,
+        "missing_fields": [],
+        "ambiguity": [
+          "Track 0 is not present in the current Live snapshot."
+        ],
+        "follow_up": [],
+        "confirmation_required": false
+      }
+    },
+    "truncated_ranges_input": {
+      "names": [
+        "A",
+        "B"
+      ],
+      "values": [
+        0.25,
+        0.5
+      ],
+      "min": [
+        0.0
+      ],
+      "max": [
+        1.0
+      ],
+      "quantized": [
+        false,
+        false
+      ],
+      "device_name": "Audit Synth"
+    },
+    "disabled_parameter_input": {
+      "device_name": "Audit Synth",
+      "parameter": {
+        "index": 0,
+        "name": "Disabled",
+        "value": 0.25,
+        "min": 0.0,
+        "max": 1.0,
+        "is_enabled": false,
+        "state": 2,
+        "automation_state": 1
+      },
+      "requested_value": 0.5,
+      "interpretation": "The fake accepts the write. This demonstrates missing KENN preflight policy, not how Live would respond."
+    },
+    "native_apply_confirmation_refusal": {
+      "method": "Actual Python HTTP handler, gateway and service; injected synthetic FakeLiveBackend and permitted daw_control. Native client consequence inferred from source, not a compiled native run.",
+      "input": {
+        "command": "confirm",
+        "session_id": "audit-session",
+        "proposal": {
+          "schema": "kenn.action_proposal.v1",
+          "id": "audit-proposal",
+          "action_id": "audit-proposal",
+          "confirmation_token": "audit-token",
+          "requires_confirmation": false
+        },
+        "confirm_token": "audit-token",
+        "idempotency_key": "audit-proposal"
+      },
+      "output": {
+        "http_status": 200,
+        "response_status": "requires_confirmation",
+        "changed": false,
+        "execution_ok": false,
+        "execution_status": "requires_confirmation",
+        "receipt_present": false,
+        "fake_writes": []
+      },
+      "native_source_interpretation": {
+        "processor_returns_true_from_http_200": true,
+        "editor_displays_verified": true,
+        "native_client_executed": false
+      },
+      "undo_distinction": "Equivalent Undo refusal returned HTTP409 with no receipt and is rejected by the native client; do not infer the Apply failure for normal Undo refusals."
+    },
+    "latent_planner_db_conversion": {
+      "method": "LiveControlPlanner.parse_and_propose using FakeLiveBackend only. No production callers found; shared gateway uses propose_parameter_change directly.",
+      "input": "set the Drum Bus compressor threshold to 0.5 dB",
+      "output": {
+        "ok": true,
+        "parameter": "Threshold",
+        "raw_before": 0.8500000238418579,
+        "raw_after": 0.5,
+        "raw_range": [
+          0,
+          1
+        ],
+        "unit": "db",
+        "fake_writes": []
+      },
+      "profile_conversion": {
+        "device": "Compressor",
+        "parameter": "Threshold",
+        "display_value": 0.5,
+        "unit": "dB",
+        "raw_expected": 0.8625
+      },
+      "negative_db_case": "-12 dB is rejected against the raw [0,1] range instead of using the profile."
+    }
+  },
+  "source_state": "Working-tree file hashes identify the inspected source; HEAD alone is not qualification evidence.",
+  "common_device_scope": {
+    "existing_raw_parameters": "Generic value/min/max control may be attempted on existing regular-track top-level devices; this is not per-device qualification.",
+    "human_unit_fields": "Built-in display-unit mapping families plus special EQ Eight band gain. Counts are not the total exposed parameters.",
+    "runtime_observed_in_this_audit": false,
+    "real_live_requalified_in_this_audit": false
+  },
+  "official_device_chapters": {
+    "audio": {
+      "url": "https://www.ableton.com/en/live-manual/12/live-audio-effect-reference/",
+      "retrieved_on": "2026-10-02",
+      "sha256": "99a21650a9b3411c27559b81afe409b77e3cd09c1e25e9c2d3cdfde4a5b1c2f8",
+      "device_sections": [
+        {
+          "name": "Amp",
+          "anchor": "amp"
+        },
+        {
+          "name": "Auto Filter",
+          "anchor": "auto-filter"
+        },
+        {
+          "name": "Auto Pan-Tremolo",
+          "anchor": "auto-pan-tremolo"
+        },
+        {
+          "name": "Auto Shift",
+          "anchor": "auto-shift"
+        },
+        {
+          "name": "Beat Repeat",
+          "anchor": "beat-repeat"
+        },
+        {
+          "name": "Cabinet",
+          "anchor": "cabinet"
+        },
+        {
+          "name": "Channel EQ",
+          "anchor": "channel-eq"
+        },
+        {
+          "name": "Chorus-Ensemble",
+          "anchor": "chorus-ensemble"
+        },
+        {
+          "name": "Compressor",
+          "anchor": "compressor"
+        },
+        {
+          "name": "Corpus",
+          "anchor": "corpus"
+        },
+        {
+          "name": "Delay",
+          "anchor": "delay"
+        },
+        {
+          "name": "Drum Buss",
+          "anchor": "drum-buss"
+        },
+        {
+          "name": "Dynamic Tube",
+          "anchor": "dynamic-tube"
+        },
+        {
+          "name": "Echo",
+          "anchor": "echo"
+        },
+        {
+          "name": "EQ Eight",
+          "anchor": "eq-eight"
+        },
+        {
+          "name": "EQ Three",
+          "anchor": "eq-three"
+        },
+        {
+          "name": "Erosion",
+          "anchor": "erosion"
+        },
+        {
+          "name": "External Audio Effect",
+          "anchor": "external-audio-effect"
+        },
+        {
+          "name": "Filter Delay",
+          "anchor": "filter-delay"
+        },
+        {
+          "name": "Gate",
+          "anchor": "gate"
+        },
+        {
+          "name": "Glue Compressor",
+          "anchor": "glue-compressor"
+        },
+        {
+          "name": "Grain Delay",
+          "anchor": "grain-delay"
+        },
+        {
+          "name": "Hybrid Reverb",
+          "anchor": "hybrid-reverb"
+        },
+        {
+          "name": "Limiter",
+          "anchor": "limiter"
+        },
+        {
+          "name": "Looper",
+          "anchor": "looper"
+        },
+        {
+          "name": "Multiband Dynamics",
+          "anchor": "multiband-dynamics"
+        },
+        {
+          "name": "Overdrive",
+          "anchor": "overdrive"
+        },
+        {
+          "name": "Pedal",
+          "anchor": "pedal"
+        },
+        {
+          "name": "Phaser-Flanger",
+          "anchor": "phaser-flanger"
+        },
+        {
+          "name": "Redux",
+          "anchor": "redux"
+        },
+        {
+          "name": "Resonators",
+          "anchor": "resonators"
+        },
+        {
+          "name": "Reverb",
+          "anchor": "reverb"
+        },
+        {
+          "name": "Roar",
+          "anchor": "roar"
+        },
+        {
+          "name": "Saturator",
+          "anchor": "saturator"
+        },
+        {
+          "name": "Shifter",
+          "anchor": "shifter"
+        },
+        {
+          "name": "Spectral Resonator",
+          "anchor": "spectral-resonator"
+        },
+        {
+          "name": "Spectral Time",
+          "anchor": "spectral-time"
+        },
+        {
+          "name": "Spectrum",
+          "anchor": "spectrum"
+        },
+        {
+          "name": "Tuner",
+          "anchor": "tuner"
+        },
+        {
+          "name": "Utility",
+          "anchor": "utility"
+        },
+        {
+          "name": "Vinyl Distortion",
+          "anchor": "vinyl-distortion"
+        },
+        {
+          "name": "Vocoder",
+          "anchor": "vocoder"
+        }
+      ]
+    },
+    "instruments": {
+      "url": "https://www.ableton.com/en/live-manual/12/live-instrument-reference/",
+      "retrieved_on": "2026-10-02",
+      "sha256": "9d96012b329ee548af2effbc1e22552fd0f8754360b2981b8fb3d9199da0ce83",
+      "device_sections": [
+        {
+          "name": "Analog",
+          "anchor": "analog"
+        },
+        {
+          "name": "Collision",
+          "anchor": "collision"
+        },
+        {
+          "name": "Drift",
+          "anchor": "drift"
+        },
+        {
+          "name": "Drum Sampler",
+          "anchor": "drum-sampler"
+        },
+        {
+          "name": "Electric",
+          "anchor": "electric"
+        },
+        {
+          "name": "External Instrument",
+          "anchor": "external-instrument"
+        },
+        {
+          "name": "Impulse",
+          "anchor": "impulse"
+        },
+        {
+          "name": "Meld",
+          "anchor": "meld"
+        },
+        {
+          "name": "Operator",
+          "anchor": "operator"
+        },
+        {
+          "name": "Sampler",
+          "anchor": "sampler"
+        },
+        {
+          "name": "Simpler",
+          "anchor": "simpler"
+        },
+        {
+          "name": "Tension",
+          "anchor": "tension"
+        },
+        {
+          "name": "Wavetable",
+          "anchor": "wavetable"
+        }
+      ]
+    },
+    "midi": {
+      "url": "https://www.ableton.com/en/live-manual/12/live-midi-effect-reference/",
+      "retrieved_on": "2026-10-02",
+      "sha256": "2393ba5bca641d61dc0b6fe6dcec579d71a6686f21ec9f91fecdc8c2edcae85c",
+      "device_sections": [
+        {
+          "name": "Arpeggiator",
+          "anchor": "arpeggiator"
+        },
+        {
+          "name": "CC Control",
+          "anchor": "cc-control"
+        },
+        {
+          "name": "Chord",
+          "anchor": "chord"
+        },
+        {
+          "name": "Note Length",
+          "anchor": "note-length"
+        },
+        {
+          "name": "Pitch",
+          "anchor": "pitch"
+        },
+        {
+          "name": "Random",
+          "anchor": "random"
+        },
+        {
+          "name": "Scale",
+          "anchor": "scale"
+        },
+        {
+          "name": "Velocity",
+          "anchor": "velocity"
+        }
+      ]
+    }
+  },
+  "official_comparison": {
+    "manual_device_section_count": 63,
+    "manual_sections_missing_from_stock_scan": [],
+    "stock_entries_outside_three_device_chapters": [
+      "Align Delay",
+      "Audio Effect Rack",
+      "Drum Rack",
+      "Drum Synth",
+      "Envelope Follower",
+      "Envelope MIDI",
+      "Expression Control",
+      "Instrument Rack",
+      "LFO",
+      "MIDI Effect Rack",
+      "MIDI Monitor",
+      "MPE Control",
+      "Note Echo",
+      "Shaper",
+      "Shaper MIDI"
+    ],
+    "meaning": "Section-name comparison only, not parameter enumeration or API/GUI feature qualification."
+  },
+  "verification": {
+    "backend_control_tests": {
+      "passed": 437
+    },
+    "backend_routes_and_tooling_tests": {
+      "passed": 575,
+      "warnings": [
+        "Pre-existing invalid escape sequence \\w in vendored pythonosc/dispatcher.py:153"
+      ]
+    },
+    "vendored_browser_tests": {
+      "passed": 16
+    },
+    "python_total_passed": 1028,
+    "frontend_api_and_composable_tests": {
+      "passed": 20,
+      "node_arch": "arm64",
+      "node_path_used": "/opt/homebrew/bin/node"
+    },
+    "frontend_component_test": {
+      "status": "blocked_before_execution",
+      "reason": "Existing node_modules lacks happy-dom",
+      "initial_default_node_failure": "x64 Node lacked @rolldown/binding-darwin-x64; existing ARM Node resolved startup for API tests",
+      "dependencies_installed": false
+    },
+    "native_pure_tests": {
+      "passed_executables": [
+        "TestLocalCommandLanguage",
+        "TestLocalLivePlan",
+        "TestLocalAbletonOscProtocol"
+      ],
+      "compiler": "Existing xcrun clang++, C++20; temporary outputs only",
+      "live_or_network_used": false
+    },
+    "real_live_session_accessed": false,
+    "full_native_plugin_built": false
+  },
+  "source_revision_notes": [
+    {
+      "file": "apps/backend/src/kenn/server.py",
+      "initial_sha256": "79df8c7fbb258ace89113dcfb89b3520d5358a1d0431f9593edf161b7e5c8e8e",
+      "final_review_sha256": "3e04ea36ad91d5a100f2c65e5a6e6dd5f41a95e43b1983a909c5d6085092dc98",
+      "review": "Concurrent grounded-knowledge request-context edits were inspected. Live command/Undo delegation remained unchanged. Original audit test counts describe the earlier inspected state; final route reproduction used the current source."
+    }
+  ],
+  "independent_review": {
+    "agents": 3,
+    "scope": [
+      "Transport registry, codec, execution and metadata; independent in-memory replays",
+      "HTTP/MCP/frontend/native/desktop source; native refusal fake route",
+      "Installed stock inventory, profiles, insertion and plan completion boundaries"
+    ],
+    "product_files_edited": false,
+    "live_session_accessed": false
+  }
+}
