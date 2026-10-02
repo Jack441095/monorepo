@@ -19,7 +19,7 @@ are evidence for their recorded source state; runbooks are operational procedure
 - `plugins/kenn-vst3-au/` — JUCE VST3/AU source;
 - `packages/common/` — shared native headers and evidence schema;
 - `tooling/` — benchmarks, evaluation, and verification;
-- `runtime/legacy/` — preserved compatibility runtime; do not add new active
+- `runtime/legacy-salvage/` — preserved compatibility runtime; do not add new active
   code there without a migration decision;
 - `docs/` — component contracts, research, evidence and operational runbooks.
 

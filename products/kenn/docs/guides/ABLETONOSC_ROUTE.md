@@ -118,7 +118,7 @@ AbletonOSC endpoints.
 ## Local setup
 
 1. Install the pinned AbletonOSC package with
-   `python3 scripts/install_abletonosc.py --replace`. The installer detects
+   `python3 tooling/scripts/install_abletonosc.py --replace`. The installer detects
    the User Library configured for Live. On this machine that is:
    `<LOCAL_VOLUME>/User Library/Remote Scripts/AbletonOSC`.
 2. Restart Live after installing or changing the Remote Script.
@@ -178,13 +178,13 @@ identifies one return track; two or more plausible matches are refused, never
 guessed. Real-Live verified end to end (propose -> confirm -> apply ->
 verified readback -> undo via `/api/ableton/osc/undo` -> verified readback),
 restoring the disposable set's original send value. See
-`docs/ABLETON_ASSISTANT_CURRENT_STATE.md`'s 2026-09-06 entries.
+`docs/reports/ABLETON_ASSISTANT_CURRENT_STATE.md`'s 2026-09-06 entries.
 
 Scene launching (`/live/scene/fire`) and clip-slot stop
 (`/live/clip_slot/stop`) do not have this problem — scenes and clip slots
 are already enumerated with real names/identity in the standard session
 snapshot — so both are now wired through the normal confirmation/readback/
-receipt boundary; see `docs/ABLETON_ASSISTANT_CURRENT_STATE.md`.
+receipt boundary; see `docs/reports/ABLETON_ASSISTANT_CURRENT_STATE.md`.
 
 ## Current command boundary
 

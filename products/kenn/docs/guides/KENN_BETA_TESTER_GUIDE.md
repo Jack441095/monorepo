@@ -3,7 +3,7 @@
 **Beta scope: Mix Review (command-line) and Chat (local HTTP service).**
 AutoMix, the desktop companion, the VST3 plugin's server-backed features,
 and the VSCode extension are **not** part of this beta -- see
-`docs/KENN_BETA_READINESS_REPORT.md` for why. This guide covers the two
+`docs/reports/KENN_BETA_READINESS_REPORT.md` for why. This guide covers the two
 workflows ready for you to try: analysing a local WAV file with Mix
 Review, and asking Chat a mix-engineering question.
 
@@ -166,7 +166,7 @@ For each question you try:
 
 Both sets of feedback are exactly what's needed to move these from
 "live-verified to work" to "qualified" -- see the gap matrix. See
-`docs/KENN_BETA_SUPPORT_RUNBOOK.md` for where to send it and what to do if
+`docs/runbooks/KENN_BETA_SUPPORT_RUNBOOK.md` for where to send it and what to do if
 something breaks.
 
 ## Note for VST3/AU plugin integration work (not a tester workflow)
@@ -179,4 +179,4 @@ loopback-only by design and aimed at developers wiring up the plugin
 integration, not at beta testers directly -- most of its other routes
 (Ableton hardware control, stem separation, AutoMix upload, voice
 synthesis) remain unimplemented and return a clean error if hit. See
-`docs/KENN_BETA_GAP_MATRIX.md` GAP-04 for exactly what works.
+`docs/specs/KENN_BETA_GAP_MATRIX.md` GAP-04 for exactly what works.

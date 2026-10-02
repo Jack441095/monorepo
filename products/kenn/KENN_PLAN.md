@@ -357,6 +357,12 @@ mock, an agent reviewer or an unrelated receipt.
     cache, doctor-poll fallback age, bridge cache races, unjournaled failure paths) are recorded as open
     in [the evidence](docs/evidence/KENN_LIVE_CACHE_INVALIDATION_2026-10-02.md). Full backend run is
     3,532 passed, 12 skipped.
+  - Pointer audit, first part: the LaunchAgent installer substituted a placeholder the plist no longer
+    uses, so an installed agent kept literal `<KENN_REPO_ROOT>` paths; fixed with a test, and four docs
+    with dead file pointers re-pointed (see
+    [the evidence](docs/evidence/KENN_LAUNCHAGENT_AND_DOC_POINTERS_2026-10-02.md)). The Audio_Too symlink
+    and the two chat Dockerfiles that depend on it are recorded there as open. Full backend run is
+    3,534 passed, 12 skipped.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.

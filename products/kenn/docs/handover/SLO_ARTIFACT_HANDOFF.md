@@ -2,7 +2,7 @@
 
 When the SLO training run is complete, export a self-contained artifact
 directory and create a completed version of
-[`SLO_ARTIFACT_MANIFEST_TEMPLATE.json`](SLO_ARTIFACT_MANIFEST_TEMPLATE.json)
+[`SLO_ARTIFACT_MANIFEST_TEMPLATE.json`](../evidence/SLO_ARTIFACT_MANIFEST_TEMPLATE.json)
 in that directory.
 
 The directory must contain:
