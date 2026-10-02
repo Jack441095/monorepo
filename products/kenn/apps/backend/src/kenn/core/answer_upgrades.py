@@ -62,6 +62,25 @@ def _current_turn(session_id: str, turn_id: str) -> bool:
     return not turn_id or _TURNS.get(session_id, {}).get("id") == turn_id
 
 
+def is_current_turn(*, session_id: str = "", turn_id: str = "") -> bool:
+    with _LOCK:
+        return _current_turn(session_id.strip(), turn_id)
+
+
+def write_if_current(write: Callable[[], Any], *, session_id: str = "", turn_id: str = "") -> bool:
+    """Persist a completed answer only while its originating turn still owns delivery.
+
+    The callback must contain persistence, not retrieval or answer generation.
+    Cancellation waits for an already-started save, including cache embedding,
+    so validation and the write cannot race a new turn or session clear.
+    """
+    with _LOCK:
+        if not _current_turn(session_id.strip(), turn_id):
+            return False
+        write()
+        return True
+
+
 def start(write: Callable[[], dict[str, Any]], *, session_id: str = "", turn_id: str = "") -> str | None:
     """Return a job id, or None if generation is busy or this request was superseded."""
     session_id = session_id.strip()
@@ -140,4 +159,7 @@ def get(upgrade_id: str, *, session_id: str = "") -> dict[str, Any]:
         return {k: v for k, v in entry.items() if k not in {"at", "session_id"}}
 
 
-__all__ = ["KEEP_SECONDS", "begin_turn", "enabled", "get", "invalidate", "log_outcome", "start"]
+__all__ = [
+    "KEEP_SECONDS", "begin_turn", "enabled", "get", "invalidate", "is_current_turn",
+    "log_outcome", "start", "write_if_current",
+]

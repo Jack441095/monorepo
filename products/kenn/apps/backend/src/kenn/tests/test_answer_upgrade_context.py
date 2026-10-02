@@ -75,6 +75,65 @@ def test_an_older_foreground_request_cannot_start_a_job_after_the_next_turn():
     assert not called.is_set()
 
 
+def test_turn_observation_rejects_cancelled_or_replaced_owners_only_in_their_chat():
+    first = answer_upgrades.begin_turn("song-a")
+    assert answer_upgrades.is_current_turn(session_id="song-a", turn_id=first)
+    answer_upgrades.begin_turn("song-b")
+    assert answer_upgrades.is_current_turn(session_id="song-a", turn_id=first)
+    second = answer_upgrades.begin_turn("song-a")
+    assert not answer_upgrades.is_current_turn(session_id="song-a", turn_id=first)
+    assert answer_upgrades.is_current_turn(session_id="song-a", turn_id=second)
+    answer_upgrades.invalidate("song-a")
+    assert not answer_upgrades.is_current_turn(session_id="song-a", turn_id=second)
+
+
+def test_a_bounded_write_finishes_before_cancel_and_cannot_run_again_after_cancel():
+    # Owner validation and persistence share the turn lock; cancel waits for an already-started save.
+    entered, release, cancelling, cancelled = (threading.Event() for _ in range(4))
+    first = answer_upgrades.begin_turn("song-a")
+    writes = []
+
+    def save():
+        assert answer_upgrades._LOCK.locked()
+        entered.set()
+        assert release.wait(2)
+        writes.append("saved")
+
+    def cancel():
+        cancelling.set()
+        answer_upgrades.invalidate("song-a")
+        cancelled.set()
+
+    writer = threading.Thread(target=lambda: answer_upgrades.write_if_current(save, session_id="song-a", turn_id=first))
+    canceller = threading.Thread(target=cancel)
+    writer.start()
+    assert entered.wait(2)
+    canceller.start()
+    try:
+        assert cancelling.wait(2)
+        assert not cancelled.is_set()
+    finally:
+        release.set()
+        writer.join(timeout=2)
+        canceller.join(timeout=2)
+    assert not writer.is_alive() and not canceller.is_alive()
+    assert cancelled.is_set() and writes == ["saved"]
+    assert not answer_upgrades.write_if_current(lambda: writes.append("late"), session_id="song-a", turn_id=first)
+    assert writes == ["saved"]
+
+
+def test_a_bounded_write_error_releases_the_owner_lock():
+    first = answer_upgrades.begin_turn("song-a")
+
+    def failed_save():
+        raise OSError("Fixture persistence failed")
+
+    with pytest.raises(OSError, match="Fixture persistence failed"):
+        answer_upgrades.write_if_current(failed_save, session_id="song-a", turn_id=first)
+    assert not answer_upgrades._LOCK.locked()
+    assert answer_upgrades.is_current_turn(session_id="song-a", turn_id=first)
+
+
 def test_expired_jobs_are_pruned_when_polled(monkeypatch):
     upgrade_id = answer_upgrades.start(lambda: {"llm_enhanced": True, "answer": "Advice"}, session_id="song-a")
     assert _wait(upgrade_id, "song-a")["status"] == "accepted"

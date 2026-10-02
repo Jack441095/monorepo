@@ -2836,7 +2836,16 @@ class Handler(BaseHTTPRequestHandler):
             return
         from kenn.core import answer_upgrades
 
-        upgrade_turn = answer_upgrades.begin_turn(str(payload.get("session_id", "")).strip())
+        session_id = payload.get("session_id")
+        session_id = session_id.strip() if isinstance(session_id, str) else ""
+        if len(session_id) > 128:
+            session_id = ""
+        plugin_session_id = payload.get("plugin_session_id")
+        plugin_session_id = plugin_session_id.strip() if isinstance(plugin_session_id, str) else ""
+        if len(plugin_session_id) > 128:
+            plugin_session_id = ""
+        payload = {**payload, "session_id": session_id, "plugin_session_id": plugin_session_id}
+        upgrade_turn = answer_upgrades.begin_turn(session_id) if session_id else ""
         live_inspection_reply = self._maybe_handle_live_inspection(
             question, str(payload.get("session_id", "")).strip()
         )
@@ -2933,8 +2942,8 @@ class Handler(BaseHTTPRequestHandler):
             audio_classification_turn = _audio_classification_context_turn(audio_classification_context)
             if audio_classification_turn:
                 history = [*history, audio_classification_turn]
-            session_id = str(payload.get("session_id", "")).strip()
-            plugin_session_id = str(payload.get("plugin_session_id", "")).strip()[:128]
+            session_id = payload["session_id"]
+            plugin_session_id = payload["plugin_session_id"]
             mix_review_id = str(payload.get("mix_review_id", "")).strip()[:128]
             stored_review, stored_review_packet = _stored_mix_review_evidence(mix_review_id)
             if stored_review_packet is not None:
@@ -2976,6 +2985,7 @@ class Handler(BaseHTTPRequestHandler):
                 for chunk in answer_payload_stream(
                     question, limit=limit, history=history, session_id=session_id,
                     plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                    request_turn_id=upgrade_turn,
                 ):
                     if not self._write_body(
                         f"data: {json.dumps(chunk)}\n\n".encode("utf-8"), flush=True
@@ -2986,38 +2996,86 @@ class Handler(BaseHTTPRequestHandler):
                     elif chunk.get("event") == "metadata":
                         metadata = chunk.get("data", {})
 
+                if upgrade_turn and not answer_upgrades.is_current_turn(session_id=session_id, turn_id=upgrade_turn) and not metadata.get("answer_delivery_discarded"):
+                    metadata = {
+                        "answer": "", "status": "cancelled", "route": "conversation", "sources": [],
+                        "requires_confirmation": False, "answer_delivery_discarded": True,
+                        "inference_aborted": False, "session_id": session_id,
+                        "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
+                    }
                 metadata = {
                     **metadata,
-                    "answer": accumulated_answer or str(metadata.get("answer") or ""),
+                    "answer": str(metadata.get("answer") or "") if "answer" in metadata else accumulated_answer,
                 }
-                contracted_metadata = augment_payload(
-                    metadata,
-                    question=question,
-                    session_id=session_id,
-                    correlation_id=self.request_id(),
-                    actor_id="kenn.http.stream",
-                )
-                contracted_metadata = _attach_explicit_audio_evidence(
-                    contracted_metadata,
-                    review_id=mix_review_id,
-                    plugin_session_id=plugin_session_id,
-                    review=stored_review,
-                    mix_evidence=stored_review_packet,
-                    plugin_context=plugin_context,
-                )
-                contracted_metadata = _attach_stem_masking_evidence(
-                    contracted_metadata, stem_masking_context
-                )
-                contracted_metadata = _attach_audio_classification_evidence(
-                    contracted_metadata, audio_classification_context
-                )
-                contracted_metadata = self._maybe_attach_checkpoint(contracted_metadata, session_id)
-                if demo_feedback:
-                    demo_feedback.record_question(
-                        str(payload.get("session_id", "")),
-                        question,
+                def contract_stream_metadata(data):
+                    if data["answer"]:
+                        result = augment_payload(
+                            data,
+                            question=question,
+                            session_id=session_id,
+                            correlation_id=correlation_id,
+                            actor_id="kenn.http.stream",
+                        )
+                    else:
+                        from kenn.core.platform_contracts import CommandEnvelope, ResultEnvelope, ResultStatus
+
+                        # Empty completion retracts provisional text. It is a
+                        # terminal result, without a required AssistantResponse body.
+                        command = CommandEnvelope.new(
+                            capability="kenn.ask", actor_id="kenn.http.stream",
+                            payload={"question": question}, correlation_id=correlation_id,
+                        )
+                        envelope = ResultEnvelope(
+                            command_id=command.command_id,
+                            status=ResultStatus.CANCELLED if data.get("status") == "cancelled" else ResultStatus.SUCCEEDED,
+                            result={"capability": command.capability, **data, "session_id": session_id},
+                            correlation_id=command.correlation_id,
+                        )
+                        result = {
+                            **data, "schema_version": envelope.schema_version,
+                            "request_id": envelope.command_id, "correlation_id": envelope.correlation_id,
+                            "status": envelope.status.value, "error_code": "", "envelope": envelope.to_dict(),
+                        }
+                    result["requires_confirmation"] = bool(data.get("requires_confirmation"))
+                    return result
+
+                contracted_metadata = contract_stream_metadata(metadata)
+
+                def attach_current_context():
+                    nonlocal contracted_metadata
+                    contracted_metadata = _attach_explicit_audio_evidence(
                         contracted_metadata,
+                        review_id=mix_review_id,
+                        plugin_session_id=plugin_session_id,
+                        review=stored_review,
+                        mix_evidence=stored_review_packet,
+                        plugin_context=plugin_context,
                     )
+                    contracted_metadata = _attach_stem_masking_evidence(
+                        contracted_metadata, stem_masking_context
+                    )
+                    contracted_metadata = _attach_audio_classification_evidence(
+                        contracted_metadata, audio_classification_context
+                    )
+                    contracted_metadata = self._maybe_attach_checkpoint(contracted_metadata, session_id)
+                    if demo_feedback:
+                        demo_feedback.record_question(
+                            str(payload.get("session_id", "")),
+                            question,
+                            contracted_metadata,
+                        )
+                if not metadata.get("answer_delivery_discarded"):
+                    written = answer_upgrades.write_if_current(
+                        attach_current_context, session_id=session_id, turn_id=upgrade_turn,
+                    )
+                    if not written:
+                        metadata = {
+                            "answer": "", "status": "cancelled", "route": "conversation", "sources": [],
+                            "requires_confirmation": False, "answer_delivery_discarded": True,
+                            "inference_aborted": False, "session_id": session_id,
+                            "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
+                        }
+                        contracted_metadata = contract_stream_metadata(metadata)
                 if not self._write_body(
                     f"data: {json.dumps({'event': 'metadata', 'data': contracted_metadata})}\n\n".encode("utf-8")
                 ):

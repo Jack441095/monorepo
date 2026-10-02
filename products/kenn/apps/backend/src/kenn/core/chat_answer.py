@@ -1054,14 +1054,30 @@ def answer_payload_stream(
     session_id: str = "",
     plugin_session_id: str = "",
     correlation_id: str = "",
+    request_turn_id: str = "",
 ):
+    from kenn.core import answer_upgrades
+
+    session_id = session_id.strip() if isinstance(session_id, str) else ""
+    if len(session_id) > 128:
+        session_id = ""
+    plugin_session_id = plugin_session_id.strip() if isinstance(plugin_session_id, str) else ""
+    if len(plugin_session_id) > 128:
+        plugin_session_id = ""
+    # HTTP already owns a turn; direct and CLI callers register the same owner
+    # only for a bound chat, so anonymous requests cannot replace each other.
+    request_turn_id = (request_turn_id or answer_upgrades.begin_turn(session_id)) if session_id else ""
     turn_id = str(uuid.uuid4())[:8]
     for event in _answer_payload_stream(
         query, limit, history, allow_llm=allow_llm, session_id=session_id, turn_id=turn_id,
         plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+        request_turn_id=request_turn_id,
     ):
         if event.get("event") == "metadata" and isinstance(event.get("data"), dict):
-            event["data"]["turn_id"] = turn_id
+            event = {**event, "data": {
+                **event["data"], "turn_id": turn_id, "session_id": session_id,
+                "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
+            }}
         yield event
 
 
@@ -1237,6 +1253,7 @@ def _answer_payload_stream_raw(
     plugin_session_id: str = "",
     answer_mode: str = "",
     correlation_id: str = "",
+    request_turn_id: str = "",
 ):
     history = compact_history(history)
     conversational = conversational_payload(query, history)
@@ -1255,7 +1272,7 @@ def _answer_payload_stream_raw(
         if orchestration.get("action"):
             label = orchestration.get("action_label", "Go")
             ans += f"\n\n[{label}](action:{orchestration['action']})"
-        yield {
+        event = {
             "event": "metadata",
             "data": {
                 "question": query,
@@ -1289,6 +1306,16 @@ def _answer_payload_stream_raw(
                 ),
             }
         }
+        if orchestration.get("proposal"):
+            event["data"].update(
+                proposal=orchestration["proposal"],
+                confirmation_token=orchestration.get("confirmation_token", ""),
+                requires_confirmation=bool(orchestration.get("requires_confirmation", True)),
+            )
+            for key in ("is_rack_synthesis", "is_doctor_remediation", "is_midi_proposal", "variations", "predicted_metrics"):
+                if key in orchestration:
+                    event["data"][key] = orchestration[key]
+        yield event
         yield {"event": "token", "token": ans}
         return
 
@@ -1865,16 +1892,25 @@ def _answer_payload_stream_raw(
         )
         yield {"event": "metadata", "data": final_metadata}
 
-    # Update session memory after streaming completes
-    _update_session(
-        query, final_answer,
-        route=route,
-        answer_mode=answer_mode,
-        confidence=confidence,
-        intent=detect_intent(query),
+    from kenn.core import answer_upgrades
+
+    # A late generator can finish after cancel or the next turn. Check and
+    # persist under the existing owner lock so it cannot restore stale context.
+    written = answer_upgrades.write_if_current(
+        lambda: _update_session(
+            query, final_answer,
+            route=route,
+            answer_mode=answer_mode,
+            confidence=confidence,
+            intent=detect_intent(query),
+            session_id=session_id,
+            retrieved_results=results,
+        ),
         session_id=session_id,
-        retrieved_results=results,
+        turn_id=request_turn_id,
     )
+    if not written:
+        return
 
     yield {"event": "session", "data": _session_info(session_id=session_id)}
 
@@ -1889,19 +1925,58 @@ def _answer_payload_stream(
     turn_id: str = "",
     plugin_session_id: str = "",
     correlation_id: str = "",
+    request_turn_id: str = "",
 ):
+    from kenn.core import answer_upgrades
+
+    discarded = {"event": "metadata", "data": {
+        "answer": "", "status": "cancelled", "route": "conversation", "sources": [],
+        "requires_confirmation": False, "answer_delivery_discarded": True,
+        "inference_aborted": False, "session_id": session_id,
+        "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
+    }}
+    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        yield discarded
+        return
+    short_circuit = _short_circuit_evaluator(query, history=history, session_id=session_id)
+    if short_circuit:
+        if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
+            yield discarded
+            return
+        metadata = {
+            **short_circuit,
+            "session_id": session_id,
+            "plugin_session_id": plugin_session_id,
+            "correlation_id": correlation_id,
+        }
+        yield {"event": "metadata", "data": metadata}
+        yield {"event": "token", "token": str(metadata.get("answer") or "")}
+        return
+
     # Multi-turn conversations with history skip the cache to allow contextual
     # follow-ups. For single-turn questions, we scope semantic acceleration to
     # the active session_id so Project A's advice never leaks into Project B.
-    if allow_llm and not history:
+    # Plug-in context is not part of the cache key and may change between
+    # requests, so a plug-in-bound answer always reads current evidence.
+    cache_allowed = allow_llm and not history and not plugin_session_id
+    if cache_allowed:
         try:
             from kenn.core.session_memory import get_semantic_cache_hit
             cached_events = get_semantic_cache_hit(query, session_id=session_id)
             if cached_events:
                 for event in cached_events:
+                    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+                        yield discarded
+                        return
                     if event.get("event") == "metadata" and isinstance(event.get("data"), dict):
-                        event["data"]["semantic_cache_hit"] = True
+                        event = {**event, "data": {
+                            **event["data"], "semantic_cache_hit": True,
+                            "session_id": session_id, "plugin_session_id": plugin_session_id,
+                            "correlation_id": correlation_id,
+                        }}
                     yield event
+                if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+                    yield discarded
                 return
         except Exception:
             # Non-fatal: falls through to a fresh generator run below, so
@@ -1915,24 +1990,42 @@ def _answer_payload_stream(
     generator = _answer_payload_stream_raw(
         query, limit, history, allow_llm=allow_llm, session_id=session_id, turn_id=turn_id,
         plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+        request_turn_id=request_turn_id,
     )
 
     accumulated_events = []
     for event in generator:
+        if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+            generator.close()
+            yield discarded
+            return
         accumulated_events.append(event)
         yield event
 
-    if allow_llm and not history and accumulated_events:
+    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        yield discarded
+        return
+    if cache_allowed and accumulated_events:
         final_metadata = None
         for ev in reversed(accumulated_events):
             if ev.get("event") == "metadata":
                 final_metadata = ev.get("data")
                 break
 
-        if final_metadata and (final_metadata.get("llm_enhanced") or final_metadata.get("confidence") == "high"):
+        cache_safe = final_metadata and not (
+            final_metadata.get("proposal") or final_metadata.get("requires_confirmation")
+            or final_metadata.get("confirmation_token")
+        )
+        if cache_safe and (final_metadata.get("llm_enhanced") or final_metadata.get("confidence") == "high"):
             try:
                 from kenn.core.session_memory import save_to_semantic_cache
-                save_to_semantic_cache(query, accumulated_events, session_id=session_id)
+                written = answer_upgrades.write_if_current(
+                    lambda: save_to_semantic_cache(query, accumulated_events, session_id=session_id),
+                    session_id=session_id,
+                    turn_id=request_turn_id,
+                )
+                if not written:
+                    yield discarded
             except Exception:
                 logging.getLogger("kenn.core.chat_answer").warning(
                     "Semantic cache save failed; this answer won't be "
@@ -2584,7 +2677,7 @@ def _short_circuit_evaluator(query: str, history: list | None = None, session_id
                 "route": "ableton",
                 "confidence": "high",
                 "proposal": prop.get("proposal"),
-                "confirmation_token": prop.get("confirmation_token", ""),
+                "confirmation_token": (prop.get("proposal") or {}).get("confirmation_token", ""),
                 "requires_confirmation": True,
                 "sources": [],
             }
@@ -2608,7 +2701,7 @@ def _short_circuit_evaluator(query: str, history: list | None = None, session_id
                 "route": "ableton",
                 "confidence": "high",
                 "proposal": prop.get("proposal"),
-                "confirmation_token": prop.get("confirmation_token", ""),
+                "confirmation_token": (prop.get("proposal") or {}).get("confirmation_token", ""),
                 "requires_confirmation": True,
                 "sources": [],
             }

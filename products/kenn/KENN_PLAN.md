@@ -240,8 +240,14 @@ mock, an agent reviewer or an unrelated receipt.
     invalidates its delivery without claiming inference or applied work stopped.
     281 backend compatibility and 66 frontend tests pass; typecheck/build pass and
     42 mutations are caught. [Evidence and exact files](docs/evidence/KENN_CONFIRMATION_DISMISSAL_2026-10-02.md).
+  - [x] HTTP/CLI streams preserve the authoritative grounded final answer, run
+    short commands before cache and discard superseded delivery. Bound memory,
+    cache and checkpoint writes share the turn lock; plug-in/proposal events do
+    not replay stale evidence or tokens. 97 scoped cases and the combined 3,413-case
+    backend run pass; 23 mutations are caught. [Evidence and exact files](docs/evidence/KENN_STREAM_DELIVERY_2026-10-02.md).
   - [ ] Trace other request owners, cache invalidation after preference/Live changes,
-    project switching and Apply/Undo during generation. Discarding delivery keeps
+    raw trace/trust persistence, project switching and Apply/Undo during generation.
+    Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation
     remains unqualified.
   - [ ] Remove confirmed dead code and redundant ownership after checking callers,
@@ -264,8 +270,8 @@ mock, an agent reviewer or an unrelated receipt.
     observations without loading weights, probing a provider or claiming current
     health. 21 new cases and 51 scoped tests pass; an unconditional-status mutation
     is caught. [Evidence and exact files](docs/evidence/KENN_CHAT_STATUS_2026-10-02.md).
-    Streaming status remains a separate repair; the cancel shortcut is covered by
-    the confirmation-dismissal evidence above.
+    Streaming now uses this shortcut; cancel and transport proposal parity are
+    covered by the dismissal and stream-delivery evidence above.
 - [x] **A5 — Establish the clean test baseline.** Scoped collection-time model policy
   to individual tests and the offline replay CLI without changing planner assertions
   or production enablement precedence. Eight import and four CLI guards pass; seven

@@ -103,7 +103,7 @@ def _stream_query(
                         meta = payload.get("data", {})
                     elif event == "done":
                         break
-                ans = "".join(accumulated) or meta.get("answer", "")
+                ans = str(meta.get("answer") or "") if "answer" in meta else "".join(accumulated)
                 return ans, meta
     except Exception:
         pass
@@ -123,7 +123,7 @@ def _stream_query(
                 meta = chunk.get("data", {})
             elif event == "done":
                 break
-        ans = "".join(accumulated) or meta.get("answer", "")
+        ans = str(meta.get("answer") or "") if "answer" in meta else "".join(accumulated)
         return ans, meta
     except Exception:
         # Non-streaming fallback
