@@ -296,43 +296,126 @@ def _claim_citations(answer: str) -> list[dict]:
 _FABRICATED_ATTRIBUTION = "cited excerpt does not contain that value"
 _UNSHOWN_CITATION = "excerpt id was never shown to the model"
 
+# Where a number actually lives, read off the shown bodies instead of off the answer. Measured 2 Oct 2026 on the
+# 36-item must-abstain set: the model tagged 2 of 11 numeric claims with an excerpt id and wrote an explicit
+# "Insufficient context:" line in 5 of 28 answers, answering anyway in 82.1% of them. The validator was not the
+# problem -- across all 28 answers it found 0 fabricated attributions and 0 invented chunk ids -- the model simply
+# would not comply. So attribution is now arithmetic over data the gate already holds, and the three classes below
+# are what makes acceptance provable without judging anything:
+#
+#   uniquely_attributed   - exactly one shown body holds the number, so the attribution is determined.
+#   ambiguously_attributed - two or more hold it. Grounded, but not attributable to one passage.
+#   unattributed         - none hold it. The existing unsupported-measurement case, unchanged.
+_UNIQUELY_ATTRIBUTED = "uniquely_attributed"
+_AMBIGUOUSLY_ATTRIBUTED = "ambiguously_attributed"
+_UNATTRIBUTED = "unattributed"
+
+# How the model's own [#id] lines up with the derived holders. Four buckets that sum to total: `agrees` when the
+# named excerpt is one of the holders, `misattributes` when it is a shown excerpt that does not hold the number,
+# `cites_unshown_id` when the id was never printed at all, and `absent` when the claim carried no citation. The
+# last two stay apart on purpose: one is a pointer to the wrong passage and the other is a pointer to nothing,
+# and a capture scoring them together would only learn that the model did not comply.
+_CITATION_AGREES = "agrees"
+_CITATION_MISATTRIBUTES = "misattributes"
+_CITATION_CITES_UNSHOWN_ID = "cites_unshown_id"
+_CITATION_ABSENT = "absent"
+
+
+def _attribution_class(holders: list[str]) -> str:
+    """Which of the three classes a derived attribution falls in, decided by how many shown bodies hold the value."""
+    if len(holders) == 1:
+        return _UNIQUELY_ATTRIBUTED
+    if not holders:
+        return _UNATTRIBUTED
+    return _AMBIGUOUSLY_ATTRIBUTED
+
 
 def verify_claim_citations(answer: str, shown: list[tuple[float, dict, str]]) -> dict:
-    """Check every cited number against the body of the excerpt that number names.
+    """Place every number in `answer` on the shown excerpt that holds it, then cross-check the model's own citation.
 
-    Four outcomes per claim, and the counts are the point. A number cited to an excerpt that does not contain it
-    is a fabricated attribution; a number cited to an id we never printed is a citation nobody can check; a
-    number with no citation at all is the dominant real failure rather than a pass. Reporting a breakdown instead
-    of a boolean is what lets acceptance become arithmetic.
+    Two passes, deliberately in that order. The derived pass asks nothing of the model: it walks the answers text
+    once (via _claim_citations and _measurement_spans, which already had to find the claims to pair citations
+    with) and then asks which of the shown bodies contain each value. The count of those bodies is the whole
+    finding, so traceability no longer depends on an 8B remembering a tag. The citation pass then reads the
+    model's `[#id]` markers against the same bodies, which makes them a cross-check: an answer where the two
+    disagree is a real misattribution and gets named, rather than being either accepted silently or rejected for
+    a missing tag.
 
     Only the body is read, not the title and source that _gate_evidence_text() also counts, and that asymmetry is
     deliberate: the model is told to cite the excerpt the number came from, and a figure that only ever appeared
-    in a note's title was not the excerpt it was reasoning over.
+    in a note's title was not the excerpt it was reasoning over. It also means a title-only figure reads as
+    `unattributed` here while still passing the aggregate unsupported-measurement check, which sees the wider set.
 
     Uncited claims are counted and returned but do not warn. The aggregate measurement check already rejects any
     number found nowhere in the evidence, so a second warning on the same numbers would reject nothing new while
     dropping every currently-accepted answer until an 8B model has learned the rule. The count is what keeps that
-    reversible: promote `uncited` to a warning on the day the citation rate justifies it.
+    reversible: promote `uncited` to a warning on the day the citation rate justifies it. Same reasoning keeps
+    `ambiguously_attributed` silent -- the number is in the evidence, so no existing warning could fire on it.
     """
     bodies: dict[str, str] = {}
     for _score, chunk, body in shown:
         bodies.setdefault(get_chunk_id(chunk), body)
+    # One regex pass per shown body rather than one per claim. The derived pass has to look at every body anyway,
+    # and the citation check used to rescan a whole body for each cited claim, so this costs less than it did
+    # before on any answer with more than one claim.
+    body_measurements = {cid: _measurements(body) for cid, body in bodies.items()}
     claims = _claim_citations(answer)
     for claim in claims:
         value, cited_id = claim["value"], claim["cited_chunk"]
+        # Prompt order, so the first holder is the excerpt the model saw first.
+        holders = [cid for cid in bodies if value in body_measurements[cid]]
+        claim["attribution"] = _attribution_class(holders)
+        claim["attributed_chunks"] = holders
         if not cited_id:
-            claim.update(verified=False, reason="uncited")
+            claim.update(
+                verified=False, reason="uncited", citation_relation=_CITATION_ABSENT
+            )
         elif cited_id not in bodies:
-            claim.update(verified=False, reason=_UNSHOWN_CITATION)
-        elif value in _measurements(bodies[cited_id]):
-            claim.update(verified=True, reason="")
+            claim.update(
+                verified=False,
+                reason=_UNSHOWN_CITATION,
+                citation_relation=_CITATION_CITES_UNSHOWN_ID,
+            )
+        elif value in body_measurements[cited_id]:
+            claim.update(
+                verified=True, reason="", citation_relation=_CITATION_AGREES
+            )
         else:
-            claim.update(verified=False, reason=_FABRICATED_ATTRIBUTION)
+            claim.update(
+                verified=False,
+                reason=_FABRICATED_ATTRIBUTION,
+                citation_relation=_CITATION_MISATTRIBUTES,
+            )
     return {
         "total": len(claims),
         "cited": sum(1 for claim in claims if claim["cited"]),
         "verified": sum(1 for claim in claims if claim["verified"]),
         "uncited": sum(1 for claim in claims if not claim["cited"]),
+        # The primary signal, and the reason this function exists: every claim is placed by arithmetic, including
+        # the 82% the model left without a tag.
+        "uniquely_attributed": sum(
+            1 for claim in claims if claim["attribution"] == _UNIQUELY_ATTRIBUTED
+        ),
+        "ambiguously_attributed": sum(
+            1 for claim in claims if claim["attribution"] == _AMBIGUOUSLY_ATTRIBUTED
+        ),
+        "unattributed": sum(
+            1 for claim in claims if claim["attribution"] == _UNATTRIBUTED
+        ),
+        # The cross-check against the derived holders. These four sum to total, so a capture can score how often
+        # the model cooperated without any of it changing an accept or a reject.
+        "citation_agreed": sum(
+            1 for claim in claims if claim["citation_relation"] == _CITATION_AGREES
+        ),
+        "citation_contradicted": sum(
+            1 for claim in claims if claim["citation_relation"] == _CITATION_MISATTRIBUTES
+        ),
+        "citation_absent": sum(
+            1 for claim in claims if claim["citation_relation"] == _CITATION_ABSENT
+        ),
+        "citation_unshown": sum(
+            1 for claim in claims if claim["citation_relation"] == _CITATION_CITES_UNSHOWN_ID
+        ),
         "fabricated_attributions": [
             claim for claim in claims if claim["reason"] == _FABRICATED_ATTRIBUTION
         ],
@@ -674,8 +757,10 @@ def generated_answer_validation(
     punts_to_sources = _punts_to_sources(answer)
     echoes_prompt = _echoes_prompt_instructions(answer)
     claims_change = claims_live_change(answer)
-    # Which excerpt each number names, and whether that excerpt really holds it. Read from the same shown list as
-    # the aggregate check above, so a claim can never be verified against a chunk the model never read.
+    # Which shown excerpt each number belongs to, derived rather than asked for, so it holds on the 82% of
+    # answers where the model wrote no citation at all; plus whether the model's own tag agreed. Read from the
+    # same shown list as the aggregate check above, so a claim can never be placed against a chunk the model
+    # never read.
     citations = verify_claim_citations(answer, shown)
     # An abstain is only an abstain if it names the gap and asserts no number. "Insufficient context: ... we would
     # want a note on the 48 kHz setting" has already answered, so it goes through every check below like any other

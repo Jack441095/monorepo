@@ -16,7 +16,13 @@ from __future__ import annotations
 import re
 
 from kenn.core.chat_grounding import (
+    _AMBIGUOUSLY_ATTRIBUTED,
+    _CITATION_AGREES,
+    _CITATION_CITES_UNSHOWN_ID,
+    _CITATION_MISATTRIBUTES,
     _FABRICATED_ATTRIBUTION,
+    _UNATTRIBUTED,
+    _UNIQUELY_ATTRIBUTED,
     _UNSHOWN_CITATION,
     explicit_abstain_gap,
     generated_answer_validation,
@@ -65,15 +71,66 @@ CLEANING_NOTE = {
 }
 RESULTS = [(1030.88, SIDECHAIN_NOTE), (980.11, CLEANING_NOTE)]
 
+# Two excerpts that both state 250 ms, which is what an ambiguous attribution looks like from the gate's side: the
+# figure is grounded either way, so nothing in the existing eight conditions can fire on it, and there is no single
+# passage it came from. The 6 dB sits in only one of the two and the 45% in neither, so all three classes come out
+# of one fixture pair. Room-note audio figures are deliberately the ones _MEASUREMENT_RE recognises.
+ROOM_NOTE = {
+    "kind": "note",
+    "title": "Vocal Booth Treatment",
+    "source": "vocal-booth-treatment.md",
+    "topics": ["room", "vocal", "treatment"],
+    "tags": ["room", "booth", "absorb"],
+    "status": "Approved",
+    "section": "Treatment",
+    "text": (
+        "Absorb the first reflection points and high-pass the room mic before the compressor, "
+        "then pull the vocal up 6 dB once the room is under control. A 250 ms decay reads as "
+        "controlled from the listening position."
+    ),
+}
+CONTROL_NOTE = {
+    "kind": "note",
+    "title": "Control Room Monitoring",
+    "source": "control-room-monitoring.md",
+    "topics": ["monitoring", "room", "level"],
+    "tags": ["monitoring", "level", "trim"],
+    "status": "Approved",
+    "section": "Trim",
+    "text": (
+        "A 250 ms decay is where a small treated room stops sounding boxy on the low end. Trim "
+        "against the untreated bounce rather than against the reference."
+    ),
+}
+ROOM_RESULTS = [(1012.4, ROOM_NOTE), (975.2, CONTROL_NOTE)]
+
 QUERY = "What release time should I use for sidechain compression on bass?"
 SIDECHAIN_ID = get_chunk_id(SIDECHAIN_NOTE)
 CLEANING_ID = get_chunk_id(CLEANING_NOTE)
+ROOM_ID = get_chunk_id(ROOM_NOTE)
+CONTROL_ID = get_chunk_id(CONTROL_NOTE)
 
 
 def validate(answer: str) -> dict:
     return generated_answer_validation(
         QUERY,
         RESULTS,
+        answer,
+        route="production",
+        confidence="high",
+        answer_mode="mix_diagnosis",
+    )
+
+
+def validate_room(answer: str) -> dict:
+    """The same gate over the fixture pair that carries a shared 250 ms.
+
+    The query moves with the fixtures: grounding keys on source-topic match, and asking a room question about the
+    sidechain notes would fail that check for a reason that has nothing to do with attribution.
+    """
+    return generated_answer_validation(
+        "How long should the room decay before I high-pass the room mic?",
+        ROOM_RESULTS,
         answer,
         route="production",
         confidence="high",
@@ -298,3 +355,157 @@ def test_the_validator_reads_the_same_excerpt_bodies_the_prompt_was_built_from()
 
     assert report["verified"] == 1
     assert SIDECHAIN_ID in {get_chunk_id(chunk) for _score, chunk, _body in shown}
+
+
+# The citation turned out to be the part the 8B would not do. Measured 2 Oct 2026 on the 36-item must-abstain set:
+# 2 of 11 numeric claims carried an excerpt id, 5 of 28 answers carried an explicit "Insufficient context:" line,
+# and 82.1% answered anyway. Across all 28 the validator itself was clean, 0 fabricated attributions and 0 invented
+# chunk ids. So the tests below do not ask the model for provenance at all: the gate derives which shown body holds
+# each number, and the citation is only cross-checked against that.
+
+
+def test_a_number_in_one_shown_excerpt_is_placed_however_little_the_model_cited() -> None:
+    """150 ms is in the sidechain note and nowhere else, so its attribution is determined without any model input.
+    This is the claim the citation pass got wrong 9 times out of 11."""
+    result = validate(_answer("Back the release off to 150 ms."))
+
+    citations = result["claim_citations"]
+    assert citations["total"] == 1
+    assert citations["uniquely_attributed"] == 1
+    assert citations["ambiguously_attributed"] == 0
+    assert citations["unattributed"] == 0
+    assert citations["claims"][0]["attribution"] == _UNIQUELY_ATTRIBUTED
+    assert citations["claims"][0]["attributed_chunks"] == [SIDECHAIN_ID]
+    # Nothing was cited, so the cross-check has nothing to say, and the count says so rather than claiming success.
+    assert citations["citation_absent"] == 1
+    assert citations["citation_agreed"] == 0
+    assert result["accepted"] is True
+
+
+def test_a_number_in_two_shown_excerpts_is_ambiguous_and_is_not_a_rejection() -> None:
+    """250 ms is in both room notes. It is grounded, so no existing warning can fire on it, and inventing one
+    would only drop answers the aggregate check already lets through."""
+    result = validate_room(_answer("Trim the room to a 250 ms decay."))
+
+    citations = result["claim_citations"]
+    assert citations["uniquely_attributed"] == 0
+    assert citations["ambiguously_attributed"] == 1
+    assert citations["unattributed"] == 0
+    assert citations["claims"][0]["attribution"] == _AMBIGUOUSLY_ATTRIBUTED
+    # Prompt order, so the first holder is the excerpt the model saw first.
+    assert citations["claims"][0]["attributed_chunks"] == [ROOM_ID, CONTROL_ID]
+    assert result["unsupported_measurements"] == []
+    assert result["accepted"] is True
+    # And naming one of the two holders, which is the strongest attribution an answer can carry, buys nothing more.
+    assert validate_room(_answer(f"Trim the room to a 250 ms decay [#{ROOM_ID}]."))["warnings"] == result["warnings"]
+
+
+def test_a_number_no_shown_excerpt_holds_is_unattributed_and_still_lands_in_unsupported_measurements() -> None:
+    """The 45% send is in neither room note. The derived class says so, and the existing unsupported-measurements
+    condition still rejects on exactly the same number."""
+    result = validate_room(_answer("Duck the reverb send to 45%."))
+
+    citations = result["claim_citations"]
+    assert citations["unattributed"] == 1
+    assert citations["uniquely_attributed"] == 0
+    assert citations["claims"][0]["attribution"] == _UNATTRIBUTED
+    assert citations["claims"][0]["attributed_chunks"] == []
+    assert result["unsupported_measurements"] == ["45%"]
+    assert "generated answer introduced unsupported measurements" in result["warnings"]
+    assert result["accepted"] is False
+
+
+def test_one_answer_with_no_citations_still_gets_all_three_classes_from_arithmetic() -> None:
+    """The point of the rework: 250 ms sits in both notes, 6 dB in one, 45% in neither, and not one of the three is
+    tagged by the model. The four citation buckets sum to total, so a capture can score cooperation separately from
+    traceability."""
+    result = validate_room(_answer("Trim to 250 ms, pull the vocal up 6 dB and duck the send to 45%."))
+
+    citations = result["claim_citations"]
+    assert citations["total"] == 3
+    assert citations["uniquely_attributed"] == 1
+    assert citations["ambiguously_attributed"] == 1
+    assert citations["unattributed"] == 1
+    assert citations["cited"] == 0
+    assert citations["citation_absent"] == 3
+    assert (
+        citations["citation_agreed"]
+        + citations["citation_contradicted"]
+        + citations["citation_absent"]
+        + citations["citation_unshown"]
+        == citations["total"]
+    )
+    assert [claim["value"] for claim in citations["claims"]] == ["250ms", "6db", "45%"]
+
+
+def test_a_citation_naming_an_excerpt_that_does_not_hold_the_number_is_a_misattribution() -> None:
+    """12% is in the cleaning note and the model named the sidechain note for it. Both ids were printed, so this is
+    a wrong pointer rather than an invented one, and it has to be reported as its own thing."""
+    result = validate(_answer(f"Duck the reverb send to 12% [#{SIDECHAIN_ID}]."))
+
+    citations = result["claim_citations"]
+    assert citations["citation_contradicted"] == 1
+    assert citations["claims"][0]["citation_relation"] == _CITATION_MISATTRIBUTES
+    # The derived holders know where it really came from, which the fabricated-attribution list alone cannot say.
+    assert citations["claims"][0]["attributed_chunks"] == [CLEANING_ID]
+    assert citations["unshown_citations"] == [], "both ids were printed"
+
+
+def test_an_invented_id_is_reported_apart_from_a_misattribution() -> None:
+    """One answer, one wrong pointer and one pointer to nothing. Collapsing them into a single "cited: no" would
+    not say which to fix: the first is a claim about provenance, the second is a shape the parser accepted."""
+    result = validate(
+        _answer(f"Duck the send to 12% [#{SIDECHAIN_ID}] and the release to 150 ms [#0123456789ab].")
+    )
+
+    citations = result["claim_citations"]
+    relations = {claim["value"]: claim["citation_relation"] for claim in citations["claims"]}
+    assert relations["12%"] == _CITATION_MISATTRIBUTES
+    assert relations["150ms"] == _CITATION_CITES_UNSHOWN_ID
+    assert citations["citation_contradicted"] == 1
+    assert citations["citation_unshown"] == 1
+    assert citations["citation_absent"] == 0
+
+
+def test_a_citation_that_agrees_with_the_derived_attribution_is_reported_as_agreement() -> None:
+    """Cooperation is still worth recording: the model named the one excerpt that holds 150 ms, and the derived
+    holders put it in the same place independently."""
+    result = validate(_answer(f"Back the release off to 150 ms [#{SIDECHAIN_ID}]."))
+
+    citations = result["claim_citations"]
+    assert citations["citation_agreed"] == 1
+    assert citations["claims"][0]["citation_relation"] == _CITATION_AGREES
+    assert citations["claims"][0]["cited_chunk"] in citations["claims"][0]["attributed_chunks"]
+
+
+def test_an_answer_with_no_numbers_reports_zero_counts_instead_of_erroring() -> None:
+    """Most abstains and plenty of plain answers carry no figure at all, and an abstain is scored on this path."""
+    result = validate(
+        "Short answer: gate before you compress.\n\nTry this:\n1. Gate it.\n2. Then duck.\n\nCheck: Listen.\n"
+    )
+
+    citations = result["claim_citations"]
+    assert citations["total"] == 0
+    assert citations["claims"] == []
+    assert (
+        citations["uniquely_attributed"],
+        citations["ambiguously_attributed"],
+        citations["unattributed"],
+    ) == (0, 0, 0)
+    assert (
+        citations["citation_agreed"],
+        citations["citation_contradicted"],
+        citations["citation_absent"],
+        citations["citation_unshown"],
+    ) == (0, 0, 0, 0)
+
+
+def test_the_derived_pass_adds_no_warning_of_its_own() -> None:
+    """Rejection power is not what is broken: re-scoring every rejection on 2 Oct 2026 found 0 false positives,
+    and the failure the gate does have is the 82.1% that answered anyway. A figure placed by arithmetic must not
+    start rejecting answers the citation pass would have let through."""
+    derived_only = validate(_answer("Back the release off to 150 ms with no tag at all."))
+    cited_and_right = validate(_answer(f"Back the release off to 150 ms [#{SIDECHAIN_ID}]."))
+
+    assert derived_only["accepted"] is True
+    assert derived_only["warnings"] == cited_and_right["warnings"]
