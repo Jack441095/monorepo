@@ -13,8 +13,9 @@ cache tuning cannot get us under 15 s. We need roughly 1.5x decode speed, shorte
 
 1. **Thinking off at the request level.** Ollama's `think: false` on `/api/chat` turns the reasoning phase off for Qwen3
    with no Modelfile change and no new files (Ollama blog, 30 May 2025). Prompt directives (`/no_think`) were not
-   supported by the verifiers, so use the parameter. Check on Ollama 0.34.4 that no reasoning tokens come back. We may
-   already be doing this; confirm in `llm/llm_rewrite.py` before spending a run.
+   supported by the verifiers, so use the parameter. Check on Ollama 0.34.4 that no reasoning tokens come back. We already
+   do this: `_ollama_think_off` in `llm/llm_rewrite.py` sends `think: false` for `kenn-brain-qwen3-8b`, so there is
+   nothing to gain here.
 2. **Keep the model loaded.** Ollama unloads after 5 minutes idle. `keep_alive` per request, or `OLLAMA_KEEP_ALIVE`,
    avoids a cold reload during a session. The cost is about 5 GB held while Live is open. Trade-off for Jack to pick.
 3. **Shorter answers.** Capping output length is the only lever in this list that does not need a new engine, and at
