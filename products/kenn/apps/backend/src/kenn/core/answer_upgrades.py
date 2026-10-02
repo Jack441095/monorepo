@@ -1,16 +1,9 @@
-"""Template now, the model's answer when it's ready (Stage 1 chat on a Mac that writes at ~17 tokens/s).
+"""Offer a grounded model answer while its originating chat turn is still current.
 
-On a 16 GB Mac with Live running the chat model takes 10–15 s an answer, so the producer gets the instant template
-answer first and the model writes in the background. The model's answer goes through the same pipeline and grounding
-check as always (``answer_payload`` with the model on); only an answer KENN would have shown anyway is offered as an
-upgrade. One answer is written at a time: two at once would compete for the same memory and both would be slower.
-
-Switched on with ``KENN_LLM_BACKGROUND=1`` (and the chat model enabled); otherwise nothing here runs.
-
-The model call here runs under ``llm_rewrite.background_budget()`` rather than the interactive ask-path timeout.
-On the owner's M3 an answer takes about 60 s, so the 20 s interactive ceiling made every upgrade time out and fall
-back to the template it was supposed to improve: 0 of 30 accepted when measured 1 Oct. Nothing is waiting on this
-thread -- the template is already on screen -- so the interactive budget has nothing to protect here.
+The producer sees the template first. One model generation runs at a time under
+the background timeout; a new turn or session clear discards its delivery without
+pretending that the inference request has stopped. Enabled by KENN_LLM_BACKGROUND
+and the chat model setting.
 """
 
 from __future__ import annotations
@@ -26,6 +19,7 @@ MAX_KEPT = 50
 _LOCK = threading.Lock()
 _BUSY = threading.Lock()
 _RESULTS: dict[str, dict[str, Any]] = {}
+_TURNS: dict[str, dict[str, Any]] = {}
 
 
 def enabled() -> bool:
@@ -35,23 +29,63 @@ def enabled() -> bool:
 
 
 def _forget_old(now: float) -> None:
-    for key in [k for k, v in _RESULTS.items() if now - v["at"] > KEEP_SECONDS]:
+    for entries in (_RESULTS, _TURNS):
+        for key in [k for k, v in entries.items() if now - v["at"] > KEEP_SECONDS]:
+            del entries[key]
+        while len(entries) > MAX_KEPT:
+            del entries[min(entries, key=lambda k: entries[k]["at"])]
+
+
+def _discard_session(session_id: str) -> None:
+    for key in [k for k, v in _RESULTS.items() if v["session_id"] == session_id]:
         del _RESULTS[key]
-    while len(_RESULTS) > MAX_KEPT:
-        del _RESULTS[min(_RESULTS, key=lambda k: _RESULTS[k]["at"])]
+    _TURNS.pop(session_id, None)
 
 
-def start(write: Callable[[], dict[str, Any]]) -> str | None:
-    """Run ``write`` (the full answer with the model on) in the background; None when a model answer is already busy."""
+def invalidate(session_id: str) -> None:
+    with _LOCK:
+        _discard_session(session_id.strip())
+
+
+def begin_turn(session_id: str) -> str:
+    session_id = session_id.strip()
+    turn_id = uuid.uuid4().hex
+    with _LOCK:
+        _forget_old(time.time())
+        _discard_session(session_id)
+        _TURNS[session_id] = {"id": turn_id, "at": time.time()}
+        _forget_old(time.time())
+    return turn_id
+
+
+def _current_turn(session_id: str, turn_id: str) -> bool:
+    return not turn_id or _TURNS.get(session_id, {}).get("id") == turn_id
+
+
+def start(write: Callable[[], dict[str, Any]], *, session_id: str = "", turn_id: str = "") -> str | None:
+    """Return a job id, or None if generation is busy or this request was superseded."""
+    session_id = session_id.strip()
+    with _LOCK:
+        _forget_old(time.time())
+        if not _current_turn(session_id, turn_id):
+            return None
     if not _BUSY.acquire(blocking=False):
+        log_outcome("busy", 0.0)
         return None
     upgrade_id = uuid.uuid4().hex[:16]
     with _LOCK:
         _forget_old(time.time())
-        _RESULTS[upgrade_id] = {"status": "pending", "at": time.time()}
+        # A newer HTTP request can arrive while the older template is still being
+        # built. It must also prevent that older request from starting a new job.
+        if not _current_turn(session_id, turn_id):
+            _BUSY.release()
+            return None
+        _RESULTS[upgrade_id] = {"status": "pending", "session_id": session_id, "at": time.time()}
+        _forget_old(time.time())
 
     def run() -> None:
         started = time.perf_counter()
+        entry = {"status": "rejected", "error": "Interrupted"}
         try:
             # The interactive LLM timeout is tuned for the ask path, where someone is watching a
             # spinner and needs a fast fallback. Inheriting it here meant this path could never win:
@@ -70,19 +104,22 @@ def start(write: Callable[[], dict[str, Any]]) -> str | None:
         except Exception as exc:  # a model failure only means the template stands
             entry = {"status": "rejected", "error": type(exc).__name__}
         finally:
-            _BUSY.release()
-        entry.update(at=time.time(), seconds=round(time.perf_counter() - started, 1))
-        with _LOCK:
-            if upgrade_id in _RESULTS:
-                _RESULTS[upgrade_id] = entry
-        log_outcome(entry["status"] if "error" not in entry else "error", entry["seconds"] * 1000.0)
+            entry.update(session_id=session_id, at=time.time(), seconds=round(time.perf_counter() - started, 1))
+            with _LOCK:
+                _forget_old(time.time())
+                delivered = upgrade_id in _RESULTS
+                if delivered:
+                    _RESULTS[upgrade_id] = entry
+                _BUSY.release()
+        outcome = entry["status"] if "error" not in entry else "error"
+        log_outcome(outcome if delivered else "expired", entry["seconds"] * 1000.0)
 
     threading.Thread(target=run, name=f"kenn-answer-upgrade-{upgrade_id}", daemon=True).start()
     return upgrade_id
 
 
 def log_outcome(outcome: str, milliseconds: float) -> None:
-    """One timing row per attempt (accepted, rejected, error, or busy), so the landing rate can be measured on a real Mac.
+    """One timing row per attempt, including answers discarded after a newer turn.
 
     Only the outcome and how long it took are kept, never the question or either answer.
     """
@@ -94,10 +131,13 @@ def log_outcome(outcome: str, milliseconds: float) -> None:
         pass  # timing is diagnostic; it must never cost the answer
 
 
-def get(upgrade_id: str) -> dict[str, Any]:
+def get(upgrade_id: str, *, session_id: str = "") -> dict[str, Any]:
     with _LOCK:
+        _forget_old(time.time())
         entry = _RESULTS.get(str(upgrade_id))
-        return {k: v for k, v in entry.items() if k != "at"} if entry else {"status": "expired"}
+        if not entry or entry["session_id"] != session_id.strip():
+            return {"status": "expired"}
+        return {k: v for k, v in entry.items() if k not in {"at", "session_id"}}
 
 
-__all__ = ["KEEP_SECONDS", "enabled", "get", "log_outcome", "start"]
+__all__ = ["KEEP_SECONDS", "begin_turn", "enabled", "get", "invalidate", "log_outcome", "start"]

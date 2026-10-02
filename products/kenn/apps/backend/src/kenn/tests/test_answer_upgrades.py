@@ -77,6 +77,6 @@ def test_the_landing_rate_and_time_are_read_from_the_log(tmp_path) -> None:
         route_log.record(f"answer_upgrade:{outcome}", seconds * 1000, brain=outcome == "accepted", proposal=False, path=log)
     route_log.record("production", 25.0, brain=False, proposal=False, path=log)
     report = route_log.upgrade_summary(log)
-    assert report == {"attempts": 6, "accepted": 3, "rejected": 1, "error": 1, "busy": 1, "accepted_rate": 0.5,
+    assert report == {"attempts": 6, "accepted": 3, "rejected": 1, "error": 1, "busy": 1, "expired": 0, "accepted_rate": 0.5,
                       "accepted_p50_s": 11.0, "accepted_p95_s": 11.0}
     assert route_log.upgrade_summary(tmp_path / "none.jsonl")["accepted_rate"] is None

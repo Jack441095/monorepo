@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Measure the real background swap: template now, the model's answer when it lands (Stage 1's open item).
+"""Measure isolated sequential background answers using the ask route's engine calls.
 
     measure_background_swap.py [--limit 30] [--cases PATH] [--receipt PATH]
 
-The North Star's 29 Sept note left Stage 1 open pending "Mac timing for `KENN_LLM_BACKGROUND=1` (how often the swap
-lands, and after how long)". This is that timing, driven through exactly the calls `server.py` makes on the ask route:
-the template answer with the model off, then `answer_upgrades.start()` running the same `answer_payload` with the model
-on in a background thread, then `answer_upgrades.get()` until it settles.
+This measures template timing, accepted upgrades and generation time for
+KENN_PLAN.md. It does not qualify the HTTP/UI path or concurrent conversation.
+The template and background generation share a chat identifier; only the
+template records the question in memory.
 
 Three numbers come out, and they answer different questions:
 
@@ -19,10 +19,9 @@ Three numbers come out, and they answer different questions:
   the `answer_upgrade:*` route-log rows this writes. Both numbers are reported here and from that report, and they are
   computed from the same events, not from two different runs.
 
-`answer_upgrades` runs one answer at a time on purpose: two concurrent 8B generations would fight over the same memory
-bandwidth and both get slower. So this asks each question only after the previous swap has settled, which is also how
-a producer actually uses it. Questions asked faster than the model can write would be logged `busy`, and that is
-reported too rather than hidden.
+`answer_upgrades` permits one generation at a time. This benchmark asks the next
+question after the previous upgrade settles. It cannot establish performance for
+a producer who asks again while generation is busy.
 
 Read-only against Live and it never writes to one: `answer_payload` with `allow_llm=False` reads the session snapshot
 and nothing else, and the background call writes no more than the first.
@@ -97,6 +96,7 @@ def measure(cases: list[dict], *, allow_llm: bool = True, timeout_s: float = 300
             continue
         _drop_semantic_cache()
         session_id = f"swap-{uuid.uuid4().hex[:12]}"
+        upgrade_turn = answer_upgrades.begin_turn(session_id)
 
         # First half of the ask route: the template the producer sees immediately, model off.
         template_started = time.perf_counter()
@@ -112,17 +112,19 @@ def measure(cases: list[dict], *, allow_llm: bool = True, timeout_s: float = 300
         upgrade_id = None
         status = "not_started"
         error = template_error
-        if allow_llm and not template_error:
-            upgrade_id = answer_upgrades.start(lambda: answer_payload(question, history=[]))
+        if allow_llm and not template_error and template.get("llm_available") and not template.get("proposal"):
+            upgrade_id = answer_upgrades.start(
+                lambda: answer_payload(question, history=[], session_id=session_id, record_session=False),
+                session_id=session_id, turn_id=upgrade_turn,
+            )
             if upgrade_id is None:
-                # The model was still writing the previous answer. Recorded rather than hidden: at 60 s an answer this
-                # is the normal state for a producer who asks again before the last one settles.
-                answer_upgrades.log_outcome("busy", 0.0)
+                # Admission is counted by start(); logging here would double-count
+                # the same busy attempt in the landing-rate denominator.
                 status = "busy"
             else:
                 started = time.perf_counter()
                 while time.perf_counter() - started < timeout_s:
-                    settled = answer_upgrades.get(upgrade_id)
+                    settled = answer_upgrades.get(upgrade_id, session_id=session_id)
                     if settled.get("status") in {"accepted", "rejected", "expired"}:
                         status = str(settled["status"])
                         swap_seconds = time.perf_counter() - started

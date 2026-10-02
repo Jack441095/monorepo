@@ -1,5 +1,20 @@
-import { describe, expect, it } from 'vitest'
-import { parseAdviceFindings, summarizeAdviceAnswer } from './kenn'
+import { describe, expect, it, vi } from 'vitest'
+import { getAnswerUpgrade, parseAdviceFindings, summarizeAdviceAnswer } from './kenn'
+
+describe('getAnswerUpgrade', () => {
+  it('polls with the originating chat identifier', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ status: 'accepted', answer: 'Advice' })))
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      expect(await getAnswerUpgrade('upgrade & 1', 'song & a')).toMatchObject({ status: 'accepted', answer: 'Advice' })
+      const url = new URL(String(fetchMock.mock.calls[0]?.[0]), 'http://localhost')
+      expect(url.searchParams.get('id')).toBe('upgrade & 1')
+      expect(url.searchParams.get('session_id')).toBe('song & a')
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+})
 
 describe('summarizeAdviceAnswer', () => {
   it('keeps one scope sentence when structured findings render below it', () => {

@@ -184,6 +184,7 @@ const sending = ref(false)
 const error = ref('')
 const lastActionAt = ref<Date | null>(null)
 const sessionId = newSessionId()
+let answerTurn = 0
 
 export async function refreshSessionCard() {
   if (useMock.value) return
@@ -217,9 +218,12 @@ void refreshSessionCard()
 const UPGRADE_WAIT_MS = 90_000
 
 /** Swap in the model's answer once KENN has accepted it; the template stays if it's rejected or never arrives. */
-async function waitForUpgrade(messageId: string, upgradeId: string, pollMs: number, suffix = '') {
+async function waitForUpgrade(messageId: string, upgradeId: string, pollMs: number, turn: number, suffix = '') {
+  const currentMessage = () => turn === answerTurn
+    ? messages.value.find((m) => m.id === messageId && m.role === 'assistant' && m.upgrade === 'pending') as KennAssistantMessage | undefined
+    : undefined
   const settle = (patch: Partial<KennAssistantMessage>) => {
-    const msg = messages.value.find((m) => m.id === messageId) as KennAssistantMessage | undefined
+    const msg = currentMessage()
     if (!msg) return
     Object.assign(msg, { upgrade: undefined, ...patch })
     messages.value = [...messages.value]
@@ -227,15 +231,17 @@ async function waitForUpgrade(messageId: string, upgradeId: string, pollMs: numb
   const deadline = Date.now() + UPGRADE_WAIT_MS
   while (Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, pollMs))
+    if (!currentMessage()) return
     let result
     try {
-      result = await getAnswerUpgrade(upgradeId)
+      result = await getAnswerUpgrade(upgradeId, sessionId)
     } catch {
       break
     }
+    if (!currentMessage()) return
     if (result.status === 'pending') continue
     if (result.status === 'accepted' && result.answer) {
-      settle({ text: `${result.answer}${suffix}`, upgraded: true, ...(result.sources?.length ? { sources: result.sources } : {}) })
+      settle({ text: `${result.answer}${suffix}`, upgraded: true, sources: result.sources?.length ? result.sources : undefined })
       return
     }
     break
@@ -248,8 +254,14 @@ async function sendMessage(text: string) {
   if (!question || sending.value) return
 
   error.value = ''
+  const turn = ++answerTurn
+  // The next prompt uses the answer already shown. Changing that older answer
+  // later would make the visible history disagree with the submitted history.
+  const previous = messages.value.map((m) => m.role === 'assistant' && m.upgrade === 'pending'
+    ? { ...m, upgrade: undefined }
+    : m)
   const userMsg: KennUserMessage = { id: newId('user'), role: 'user', text: question }
-  messages.value = [...messages.value, userMsg]
+  messages.value = [...previous, userMsg]
 
   sending.value = true
   try {
@@ -288,7 +300,7 @@ async function sendMessage(text: string) {
     if (answerUpgrade && !proposal) {
       // The "in your Live" line was added to the template answer; the model's answer doesn't have it, so carry it across.
       const yourSetLine = (raw?.your_set as { line?: unknown } | undefined)?.line
-      void waitForUpgrade(assistantId, answerUpgrade.id, answerUpgrade.pollMs, yourSetLine ? `\n\n${String(yourSetLine)}` : '')
+      void waitForUpgrade(assistantId, answerUpgrade.id, answerUpgrade.pollMs, turn, yourSetLine ? `\n\n${String(yourSetLine)}` : '')
     }
   } catch (e) {
     const msg = userFacingKennError(

@@ -128,6 +128,42 @@ def test_templates_only_leaves_the_background_flag_alone(tool, tmp_path, monkeyp
     assert tool.os.environ.get("KENN_LLM_BACKGROUND") != "1"
 
 
+@pytest.mark.parametrize("busy", [False, True])
+def test_measurement_uses_the_chat_scope_and_logs_each_busy_attempt_once(tool, monkeypatch, busy):
+    import threading
+    from kenn.core import answer_upgrades, chat_answer
+
+    calls, outcomes = [], []
+
+    def answer(question, **kwargs):
+        calls.append(kwargs)
+        return {"answer": "Advice", "llm_available": True, "llm_enhanced": kwargs.get("allow_llm") is not False}
+
+    monkeypatch.setattr(chat_answer, "answer_payload", answer)
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    monkeypatch.setattr(answer_upgrades, "_RESULTS", {})
+    monkeypatch.setattr(answer_upgrades, "_TURNS", {})
+    slot = threading.Lock()
+    monkeypatch.setattr(answer_upgrades, "_BUSY", slot)
+    monkeypatch.setattr(answer_upgrades, "log_outcome", lambda outcome, ms: outcomes.append(outcome))
+    if busy:
+        slot.acquire()
+    try:
+        report = tool.measure([{"id": "scope", "question": "How do I EQ the bass?"}], timeout_s=2)
+    finally:
+        if busy:
+            slot.release()
+    if busy:
+        assert report["counts"]["swaps_busy"] == 1
+        assert outcomes == ["busy"]
+        assert len(calls) == 1
+    else:
+        assert report["counts"]["swaps_accepted"] == 1
+        assert len(calls) == 2
+        assert calls[0]["session_id"] == calls[1]["session_id"]
+        assert calls[1]["record_session"] is False
+
+
 def test_the_committed_swap_receipt_records_the_run_the_docs_quote(tool):
     """Track D quotes this receipt, and it is also what the route-log receipt is cross-checked against."""
     path = RESULTS / "KENN_BACKGROUND_SWAP_M3_2026-10-01.json"

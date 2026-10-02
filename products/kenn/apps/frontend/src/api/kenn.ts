@@ -331,9 +331,10 @@ function parseAnswerUpgrade(value: unknown): KennAskResult['answerUpgrade'] {
 }
 
 /** GET /kenn/api/ask/upgrade: the model's answer, once KENN's grounding check has accepted it. */
-export async function getAnswerUpgrade(id: string): Promise<KennAnswerUpgrade> {
+export async function getAnswerUpgrade(id: string, sessionId: string): Promise<KennAnswerUpgrade> {
   const base = getApiBase()
-  const res = await fetch(`${base}${API_PATHS.kenn.askUpgrade}?id=${encodeURIComponent(id)}`, { credentials: 'include' })
+  const query = new URLSearchParams({ id, session_id: sessionId })
+  const res = await fetch(`${base}${API_PATHS.kenn.askUpgrade}?${query}`, { credentials: 'include' })
   const data = await parseJson(res)
   if (!res.ok) return { status: 'expired' }
   const status = String(data.status || 'expired') as KennAnswerUpgrade['status']

@@ -1951,6 +1951,7 @@ def answer_payload(
     plugin_session_id: str = "",
     answer_mode: str = "",
     correlation_id: str = "",
+    record_session: bool = True,
 ) -> dict:
     turn_id = str(uuid.uuid4())[:8]
     payload = _answer_payload(
@@ -1964,6 +1965,7 @@ def answer_payload(
         turn_id=turn_id,
         answer_mode=answer_mode,
         correlation_id=correlation_id,
+        record_session=record_session,
     )
     if isinstance(payload, dict):
         payload["turn_id"] = turn_id
@@ -1982,6 +1984,7 @@ def _answer_payload_raw(
     plugin_session_id: str = "",
     answer_mode: str = "",
     correlation_id: str = "",
+    record_session: bool = True,
 ) -> dict:
     history = compact_history(history)
     conversational = conversational_payload(query, history)
@@ -2397,17 +2400,19 @@ def _answer_payload_raw(
     else:
         payload["applied_preferences"] = []
 
-    # Update session memory after generating the payload
-    _update_session(
-        query,
-        payload.get("answer", ""),
-        route=payload.get("route", ""),
-        answer_mode=payload.get("answer_mode", ""),
-        confidence=payload.get("confidence", "medium"),
-        intent=payload.get("intent", "general"),
-        session_id=session_id,
-        retrieved_results=results,
-    )
+    # The foreground template already recorded this turn. A late background
+    # answer still needs project context, but must not replace newer memory.
+    if record_session:
+        _update_session(
+            query,
+            payload.get("answer", ""),
+            route=payload.get("route", ""),
+            answer_mode=payload.get("answer_mode", ""),
+            confidence=payload.get("confidence", "medium"),
+            intent=payload.get("intent", "general"),
+            session_id=session_id,
+            retrieved_results=results,
+        )
     payload["session"] = _session_info(session_id=session_id)
 
     # Run self-critique, record citations, and save reasoning trace
@@ -2550,6 +2555,7 @@ def _answer_payload(
     plugin_session_id: str = "",
     answer_mode: str = "",
     correlation_id: str = "",
+    record_session: bool = True,
 ) -> dict:
     # Instant fast-path for conversational greetings, thanks, check-ins (< 0.1 ms)
     conversational = conversational_payload(query, compact_history(history))
@@ -2564,7 +2570,7 @@ def _answer_payload(
     # Multi-turn conversations with history skip the cache to allow contextual
     # follow-ups. For single-turn questions, we scope semantic acceleration to
     # the active session_id so Project A's advice never leaks into Project B.
-    if allow_llm and not history:
+    if allow_llm and record_session and not history:
         try:
             from kenn.core.session_memory import get_semantic_cache_hit
             cached_events = get_semantic_cache_hit(query, session_id=session_id)
@@ -2595,9 +2601,10 @@ def _answer_payload(
         turn_id=turn_id,
         answer_mode=answer_mode,
         correlation_id=correlation_id,
+        record_session=record_session,
     )
 
-    if allow_llm and not history and isinstance(payload, dict):
+    if allow_llm and record_session and not history and isinstance(payload, dict):
         if payload.get("llm_enhanced") or payload.get("confidence") == "high":
             events = [
                 {"event": "metadata", "data": payload},

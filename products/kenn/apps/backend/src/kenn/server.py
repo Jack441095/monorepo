@@ -1683,7 +1683,10 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path in {"/kenn/api/ask/upgrade", "/api/ask/upgrade"}:
             from kenn.core import answer_upgrades
 
-            self.send_json(200, answer_upgrades.get(str(parse_qs(parsed.query).get("id", [""])[0])))
+            query = parse_qs(parsed.query)
+            self.send_json(200, answer_upgrades.get(
+                str(query.get("id", [""])[0]), session_id=str(query.get("session_id", [""])[0]),
+            ))
             return
         if parsed.path == "/api/ableton/receipts":
             query = parse_qs(parsed.query)
@@ -2795,6 +2798,9 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/session/clear":
             session_id = str(payload.get("id", "")).strip()
             if session_id:
+                from kenn.core import answer_upgrades
+
+                answer_upgrades.invalidate(session_id)
                 clear_session(session_id)
                 self.send_json(200, {"ok": True, "message": f"Session {session_id} cleared."})
             else:
@@ -2835,6 +2841,9 @@ class Handler(BaseHTTPRequestHandler):
         self._ask_turn = (str(payload.get("session_id", "")), question)
         if not self.enforce_rate_limit("ask"):
             return
+        from kenn.core import answer_upgrades
+
+        upgrade_turn = answer_upgrades.begin_turn(str(payload.get("session_id", "")).strip())
         live_inspection_reply = self._maybe_handle_live_inspection(
             question, str(payload.get("session_id", "")).strip()
         )
@@ -3026,21 +3035,24 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 _t_context = time.perf_counter() - _ask_t0
                 _t_answer = time.perf_counter()
-                from kenn.core import answer_upgrades
-
                 if answer_upgrades.enabled():
-                    # The template answer now; the model writes in the background and the app picks it up if KENN's
-                    # grounding check accepts it (a 16 GB Mac takes 10-15 s to write one). The background run has no
-                    # session id, so the question isn't recorded twice; the history is passed in instead.
+                    # Both answers use the same chat and plug-in context. Only the
+                    # foreground answer records the turn in conversation memory.
                     result = answer_payload(
                         question, limit=limit, history=history, session_id=session_id, allow_llm=False,
                         plugin_session_id=plugin_session_id, correlation_id=correlation_id,
                     )
-                    upgrade_id = answer_upgrades.start(lambda: answer_payload(question, limit=limit, history=history))
-                    if upgrade_id:
-                        result["answer_upgrade"] = {"id": upgrade_id, "poll_ms": 2000}
-                    else:
-                        answer_upgrades.log_outcome("busy", 0.0)   # the model was still writing the last answer
+                    if result.get("llm_available") and not result.get("proposal"):
+                        upgrade_id = answer_upgrades.start(
+                            lambda: answer_payload(
+                                question, limit=limit, history=history, session_id=session_id,
+                                plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                                record_session=False,
+                            ),
+                            session_id=session_id, turn_id=upgrade_turn,
+                        )
+                        if upgrade_id:
+                            result["answer_upgrade"] = {"id": upgrade_id, "poll_ms": 2000}
                 else:
                     result = answer_payload(
                         question, limit=limit, history=history, session_id=session_id,

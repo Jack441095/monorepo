@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('../api/kenn', () => ({
   askKenn: vi.fn(),
@@ -156,6 +156,8 @@ describe('useKenn answer upgrades', () => {
     mockedUpgrade.mockReset()
   })
 
+  afterEach(() => vi.useRealTimers())
+
   it('shows the template at once, then swaps in the accepted model answer', async () => {
     vi.useFakeTimers()
     mockedAsk.mockResolvedValue({ ...base, answer: 'Template answer.', answerUpgrade: { id: 'u1', pollMs: 500 } })
@@ -167,6 +169,7 @@ describe('useKenn answer upgrades', () => {
     expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'Template answer.', upgrade: 'pending' })
 
     await vi.advanceTimersByTimeAsync(1100)
+    expect(mockedUpgrade).toHaveBeenCalledWith('u1', expect.any(String))
     expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'Fuller model answer.', upgraded: true })
     expect(kenn.messages.value.at(-1)).not.toHaveProperty('upgrade', 'pending')
     vi.useRealTimers()
@@ -198,5 +201,43 @@ describe('useKenn answer upgrades', () => {
     expect(last?.role === 'assistant' && last.upgraded).toBeFalsy()
     expect(last?.role === 'assistant' && last.upgrade).toBeFalsy()
     vi.useRealTimers()
+  })
+
+  it('discards an in-flight upgrade when the producer asks the next question', async () => {
+    vi.useFakeTimers()
+    mockedAsk.mockResolvedValueOnce({ ...base, answer: 'First template.', answerUpgrade: { id: 'old', pollMs: 500 } })
+    let finish!: (result: { status: 'accepted'; answer: string }) => void
+    mockedUpgrade.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve }))
+    await kenn.sendMessage('How do I EQ the vocal?')
+    const first = kenn.messages.value.at(-1)
+    await vi.advanceTimersByTimeAsync(500)
+
+    mockedAsk.mockResolvedValueOnce({ ...base, answer: 'Next answer.' })
+    await kenn.sendMessage('What about the bass?')
+    finish({ status: 'accepted', answer: 'Late vocal advice.' })
+    await vi.advanceTimersByTimeAsync(500)
+
+    expect(kenn.messages.value.find((m) => m.id === first?.id)).toMatchObject({ text: 'First template.', upgrade: undefined })
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'Next answer.' })
+    expect(mockedUpgrade).toHaveBeenCalledTimes(1)
+  })
+
+  it('stops polling a removed message before the next request', async () => {
+    vi.useFakeTimers()
+    mockedAsk.mockResolvedValueOnce({ ...base, answer: 'Template.', answerUpgrade: { id: 'removed', pollMs: 500 } })
+    await kenn.sendMessage('How does EQ work?')
+    kenn.messages.value = []
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mockedUpgrade).not.toHaveBeenCalled()
+    expect(kenn.messages.value).toEqual([])
+  })
+
+  it('replaces template sources with the accepted answer sources, including an empty list', async () => {
+    vi.useFakeTimers()
+    mockedAsk.mockResolvedValueOnce({ ...base, answer: 'Template.', sources: [{ label: 'Template note' }], answerUpgrade: { id: 'sources', pollMs: 500 } })
+    mockedUpgrade.mockResolvedValueOnce({ status: 'accepted', answer: 'Model answer.', sources: [] })
+    await kenn.sendMessage('How does EQ work?')
+    await vi.advanceTimersByTimeAsync(500)
+    expect(kenn.messages.value.at(-1)).toMatchObject({ text: 'Model answer.', sources: undefined })
   })
 })

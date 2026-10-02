@@ -201,11 +201,18 @@ mock, an agent reviewer or an unrelated receipt.
   voice/MCP entry points through routing, context, proposal, Apply, readback and Undo.
   Compare function/registry bindings, not names alone. Record each bypass or duplicate
   owner with a source symbol and reproducible fixture. Do not refactor while auditing.
-- [ ] **A3 — Resolve scoped delivery defects first.** `server.py` currently starts a
-  background `answer_payload` without the foreground session/plugin/correlation
-  identifiers. Audit memory/cache isolation, upgrade polling ownership, stale-turn
-  replacement and cancellation; fix verified defects with cross-session and late-job
-  tests. Preserve the rule against recording the question twice.
+- [ ] **A3 — Resolve scoped delivery defects first.** Audit memory/cache isolation,
+  project switching, upgrade polling ownership, stale-turn replacement and
+  cancellation; fix verified defects with cross-session and late-job tests.
+  Preserve the rule against recording the question twice.
+  - [x] Main HTTP/UI background path retains session/plugin/correlation identifiers,
+    reads project preferences without a second memory/cache write, scopes polling
+    to the originating chat and discards superseded or cleared results. 48 scoped
+    backend and 20 frontend tests pass; 15 mutations are caught. [Evidence and exact files](docs/evidence/KENN_BACKGROUND_CONTEXT_2026-10-02.md).
+  - [ ] Trace other request owners, cache invalidation after preference/Live changes,
+    project switching and Apply/Undo during generation. Discarding delivery keeps
+    the model slot occupied until inference finishes; actual inference cancellation
+    remains unqualified.
 - [ ] **A4 — Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.
@@ -215,7 +222,7 @@ mock, an agent reviewer or an unrelated receipt.
   dependency; identify test-state contamination and fix it without weakening assertions.
   Record unavailable model/index tests separately. Requalify the full suite after a fix.
 
-**Next executable task after A1: A2, with A3 as the first concrete defect candidate.**
+**Next executable task: continue A2/A3 through the remaining bound request owners.**
 Do not resume citation capture, a speculative rewrite or an unfinished extraction
 merely because an old document suggested it.
 

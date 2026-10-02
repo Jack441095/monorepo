@@ -92,6 +92,7 @@ def upgrade_summary(path: Path | None = None) -> dict[str, Any]:
         "attempts": attempts,
         "accepted": counts.get("accepted", 0), "rejected": counts.get("rejected", 0),
         "error": counts.get("error", 0), "busy": counts.get("busy", 0),
+        "expired": counts.get("expired", 0),
         "accepted_rate": round(counts.get("accepted", 0) / attempts, 3) if attempts else None,
         "accepted_p50_s": round(statistics.median(accepted_ms) / 1000, 1) if accepted_ms else None,
         "accepted_p95_s": round(accepted_ms[int(0.95 * (len(accepted_ms) - 1))] / 1000, 1) if accepted_ms else None,
