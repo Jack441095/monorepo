@@ -2542,13 +2542,35 @@ def _short_circuit_evaluator(query: str, history: list | None = None, session_id
 
     # Cancel / Abort
     if cleaned in {"no", "n", "cancel", "abort", "reject", "stop action"}:
+        session_bound = (
+            isinstance(session_id, str) and bool(session_id)
+            and session_id == session_id.strip() and len(session_id) <= 128
+        )
+        revoked = 0
+        if session_bound:
+            from kenn.core import answer_upgrades
+            from kenn.core.confirmation import revoke_session_confirmations
+
+            revoked = revoke_session_confirmations(session_id=session_id)
+            answer_upgrades.invalidate(session_id)
+            answer = (
+                f"Revoked {revoked} pending confirmation{'s' if revoked != 1 else ''} for this chat. "
+                if revoked else "No pending confirmations were available to revoke for this chat. "
+            )
+            answer += "Pending answer delivery for this chat has been discarded; inference may still be running. "
+        else:
+            answer = "No chat is bound to this request, so I could not revoke pending confirmations or discard answer delivery. "
+        answer += "This does not stop an action already executing or undo an applied change."
         return {
-            "answer": "Cancelled. No changes were made to your Ableton session.",
+            "answer": answer,
             "route": "ableton",
             "confidence": "high",
             "sources": [],
             "suggestions": ["What tracks are in the project?", "Audit the mix"],
             "requires_confirmation": False,
+            "revoked_confirmations": revoked,
+            "answer_delivery_discarded": session_bound,
+            "inference_aborted": False,
         }
 
     # Simple Transport Play

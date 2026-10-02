@@ -83,6 +83,14 @@ describe('KennRecipeCard', () => {
     expect(wrapper.text()).not.toContain('Nothing has changed yet')
   })
 
+  it('waits with disabled dismissal and no Apply until token revocation finishes', () => {
+    const wrapper = mount(KennRecipeCard, { props: { proposal: recipe, cardStatus: 'dismissing' } })
+    expect(wrapper.text()).toContain('Dismissing...')
+    expect(wrapper.find('button').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('.kenn-recipe-card__btn--apply').exists()).toBe(false)
+    expect(wrapper.find('.kenn-recipe-card__btn--reject').exists()).toBe(false)
+  })
+
   it('falls back to a track index when a step has no name', () => {
     const unnamed: KennActionProposal = {
       ...recipe,

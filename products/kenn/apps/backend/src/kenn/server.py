@@ -201,9 +201,9 @@ _SAYS_YES = re.compile(r"^\s*(?:yes|yeah|yep|yup|ok(?:ay)?|sure|do\s+it|go\s+ahe
 
 
 def _proposal_waiting(session_id: str) -> bool:
-    from kenn.core.session_context import live_conversation_context
+    from kenn.core.confirmation import pending_confirmation_count
 
-    return live_conversation_context(session_id).get("confirmation_status") == "pending"
+    return pending_confirmation_count(session_id=session_id) > 0
 
 
 def _chat_wants_live(question: str) -> bool:
@@ -2074,6 +2074,7 @@ class Handler(BaseHTTPRequestHandler):
             "/api/ableton/osc/tempo", "/api/ableton/osc/clip/launch",
             "/api/ableton/osc/scene/launch", "/api/ableton/osc/undo",
             "/api/ableton/command",
+            "/api/ableton/confirmation/revoke",
             "/api/ableton/midi-clip/proposal",
             "/api/ableton/midi-clip/update-proposal",
             "/api/ableton/clip-duplication/proposal",
@@ -2440,6 +2441,12 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(400, {"ok": False, "error": "Either 'parameter' and 'value' or 'parameters' dict is required."})
                 return
             self.send_json(200 if result.get("ok") else 400, result)
+            return
+        if parsed.path == "/api/ableton/confirmation/revoke":
+            from kenn.routes.daw_routes import handle_confirmation_revoke
+
+            status, result = handle_confirmation_revoke(payload)
+            self.send_json(status, result)
             return
         if parsed.path == "/api/ableton/command":
             self.handle_live_command(payload)

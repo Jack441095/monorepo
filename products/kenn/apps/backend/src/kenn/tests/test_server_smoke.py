@@ -1711,11 +1711,14 @@ def test_chat_shows_kenns_live_question_mid_change(running_server: str, monkeypa
     assert not body.get("requires_confirmation")
 
 
-def test_saying_yes_to_a_proposal_points_at_the_apply_button() -> None:
+def test_saying_yes_to_a_proposal_points_at_the_apply_button(monkeypatch) -> None:
     # 27 Sept 2026: "yes" after a proposal got "I can help, but I need one bit more direction first".
     from kenn.core.session_context import record_live_exchange
+    from kenn.core import confirmation
     from kenn.server import _SAYS_YES, _proposal_waiting
 
+    monkeypatch.setattr(confirmation, "_ISSUED_TOKENS", {})
+    confirmation.issue_confirmation(session_id="chat-yes", service_id="ableton", text="mute the kick")
     record_live_exchange(session_id="chat-yes", command="mute the kick",
                          result={"status": "confirmation_required", "intent": {"action": "set_mute", "track": {"name": "Kick"}},
                                  "proposal": {"action": "set_mute", "track_name": "Kick"}})

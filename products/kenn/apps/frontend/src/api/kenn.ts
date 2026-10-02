@@ -345,6 +345,29 @@ export async function getAnswerUpgrade(id: string, sessionId: string): Promise<K
   }
 }
 
+/** Dismiss this chat's pending token before hiding its proposal. */
+export async function revokeKennConfirmation(params: {
+  confirmToken: string
+  sessionId: string
+}): Promise<{ ok: boolean; status: string; error?: string }> {
+  await ensureAuthSession()
+  const res = await fetch(`${getApiBase()}${API_PATHS.kenn.revokeConfirmation}`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: withCsrf({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ confirm_token: params.confirmToken, session_id: params.sessionId }),
+  })
+  const data = await parseJson(res)
+  if (!res.ok) {
+    throw new ApiError(String(data.error || 'KENN could not verify dismissal. Check Live before trying again.'), res.status)
+  }
+  return {
+    ok: data.ok === true && data.status === 'revoked',
+    status: String(data.status || 'not_revoked'),
+    error: data.error ? String(data.error) : undefined,
+  }
+}
+
 /** POST /kenn/api/ableton/command: 确认执行 DAW 提案 */
 export async function confirmKennAction(params: {
   proposal: KennActionProposal

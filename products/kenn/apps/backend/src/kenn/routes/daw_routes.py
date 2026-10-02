@@ -15,6 +15,25 @@ from kenn.core.live_action_service import LiveActionService
 from kenn.core.live_command import handle_command
 from kenn.core.midi_clip_service import MidiClipActionService
 from kenn.core.action_policy import action_allowed, action_denied_message
+from kenn.core.confirmation import revoke_confirmation
+
+
+def handle_confirmation_revoke(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    session_id = payload.get("session_id")
+    token = payload.get("confirm_token")
+    if (
+        not isinstance(session_id, str) or not session_id or len(session_id) > 128
+        or session_id != session_id.strip()
+        or not isinstance(token, str) or not token or len(token) > 512
+    ):
+        return 400, {"ok": False, "error": "An exact session_id and confirm_token are required."}
+    if not revoke_confirmation(token, session_id=session_id):
+        return 409, {
+            "ok": False,
+            "status": "not_revoked",
+            "error": "This confirmation is no longer pending for this chat. It may be expired, dismissed, or already executing.",
+        }
+    return 200, {"ok": True, "status": "revoked"}
 
 
 def handle_live_command(

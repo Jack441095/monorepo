@@ -100,6 +100,14 @@
       </button>
 
       <button
+        v-else-if="cardStatus === 'dismissing'"
+        type="button"
+        class="kenn-action-card__btn"
+        disabled
+      >
+        Dismissing...
+      </button>
+      <button
         v-else-if="cardStatus === 'applying'"
         type="button"
         class="kenn-action-card__btn kenn-action-card__btn--applying"
@@ -152,7 +160,7 @@ import { formatDb } from '../utils/formatLevel'
 const props = withDefaults(
   defineProps<{
     proposal: KennActionProposal
-    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
+    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
     receipt?: KennActionReceipt
     errorMessage?: string
   }>(),
@@ -256,6 +264,8 @@ const statusLabel = computed(() => {
       return 'Ready to Apply'
     case 'applying':
       return 'Applying...'
+    case 'dismissing':
+      return 'Dismissing...'
     case 'applied':
       return 'Live 12 Synced'
     case 'undoing':

@@ -4,6 +4,7 @@ vi.mock('../api/kenn', () => ({
   askKenn: vi.fn(),
   getAnswerUpgrade: vi.fn(),
   confirmKennAction: vi.fn(),
+  revokeKennConfirmation: vi.fn(),
   undoKennAction: vi.fn(),
   fetchKennSessionCard: vi.fn().mockResolvedValue({
     ok: true,
@@ -13,11 +14,12 @@ vi.mock('../api/kenn', () => ({
   }),
 }))
 
-import { askKenn, confirmKennAction, fetchKennSessionCard, getAnswerUpgrade, undoKennAction } from '../api/kenn'
+import { askKenn, confirmKennAction, fetchKennSessionCard, getAnswerUpgrade, revokeKennConfirmation, undoKennAction } from '../api/kenn'
 import { useKenn } from './useKenn'
 
 const mockedAsk = vi.mocked(askKenn)
 const mockedConfirm = vi.mocked(confirmKennAction)
+const mockedRevoke = vi.mocked(revokeKennConfirmation)
 const mockedUndo = vi.mocked(undoKennAction)
 const mockedSessionCard = vi.mocked(fetchKennSessionCard)
 const mockedUpgrade = vi.mocked(getAnswerUpgrade)
@@ -31,6 +33,7 @@ describe('useKenn investor-facing failure states', () => {
     kenn.lastActionAt.value = null
     mockedAsk.mockReset()
     mockedConfirm.mockReset()
+    mockedRevoke.mockReset()
   })
 
   it('renders a bounded safe sentence instead of arbitrary JavaScript error text', async () => {
@@ -62,7 +65,7 @@ describe('useKenn investor-facing failure states', () => {
     expect(mockedConfirm).not.toHaveBeenCalled()
   })
 
-  it('does not report a dismissed proposal as a Live action', () => {
+  it('does not report a dismissed proposal as a Live action', async () => {
     kenn.messages.value = [{
       id: 'dismissed-proposal',
       role: 'assistant',
@@ -70,10 +73,112 @@ describe('useKenn investor-facing failure states', () => {
       actionStatus: 'pending',
     }]
 
-    kenn.rejectMessageProposal('dismissed-proposal')
+    mockedRevoke.mockResolvedValue({ ok: true, status: 'revoked' })
+    await kenn.rejectMessageProposal('dismissed-proposal')
 
     expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'rejected' })
     expect(kenn.lastActionAt.value).toBeNull()
+  })
+})
+
+describe('useKenn confirmed proposal dismissal', () => {
+  const kenn = useKenn()
+
+  beforeEach(() => {
+    kenn.messages.value = [{
+      id: 'pending-card', role: 'assistant', actionStatus: 'pending',
+      proposal: { action: 'set_mute', confirmation_token: 'held-token', track_name: 'Bass' },
+    }]
+    kenn.lastActionAt.value = null
+    mockedRevoke.mockReset()
+    mockedConfirm.mockReset()
+    mockedAsk.mockReset()
+  })
+
+  it('waits for the server to revoke the originating chat token before hiding the card', async () => {
+    // Local dismissal previously left the held token usable, so only a server acknowledgement closes the card.
+    mockedAsk.mockResolvedValueOnce({ answer: 'Mute the bass?', suggestions: [], sources: [], findings: [], raw: {},
+      proposal: { action: 'set_mute', confirmation_token: 'held-token', track_name: 'Bass' } })
+    await kenn.sendMessage('Mute the bass')
+    const messageId = kenn.messages.value.at(-1)!.id
+    const originatingSession = mockedAsk.mock.calls.at(-1)![0].sessionId
+    let finish!: (result: { ok: boolean; status: string }) => void
+    mockedRevoke.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve }))
+    const dismissal = kenn.rejectMessageProposal(messageId)
+
+    expect(kenn.messages.value.at(-1)).toMatchObject({ actionStatus: 'dismissing' })
+    expect(mockedRevoke).toHaveBeenCalledWith({ confirmToken: 'held-token', sessionId: originatingSession })
+    await kenn.rejectMessageProposal(messageId)
+    await kenn.applyMessageProposal(messageId)
+    expect(mockedRevoke).toHaveBeenCalledTimes(1)
+    expect(mockedConfirm).not.toHaveBeenCalled()
+
+    finish({ ok: true, status: 'revoked' })
+    await dismissal
+    expect(kenn.messages.value.at(-1)).toMatchObject({ actionStatus: 'rejected' })
+    await kenn.applyMessageProposal(messageId)
+    expect(mockedConfirm).not.toHaveBeenCalled()
+    expect(kenn.lastActionAt.value).toBeNull()
+  })
+
+  it.each([
+    { ok: false, status: 'revoked' },
+    { ok: true, status: 'not_revoked' },
+    { ok: false, status: 'not_revoked' },
+  ])('keeps the card retryable after an incomplete revoke acknowledgement %j', async (result) => {
+    mockedRevoke.mockResolvedValueOnce(result)
+
+    await kenn.rejectMessageProposal('pending-card')
+
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'pending' })
+    expect(kenn.messages.value[0].role === 'assistant' && kenn.messages.value[0].actionError)
+      .toContain('may still be pending or already executing')
+    expect(kenn.lastActionAt.value).toBeNull()
+  })
+
+  it('shows the backend refusal without claiming the proposal was cancelled', async () => {
+    mockedRevoke.mockResolvedValueOnce({ ok: false, status: 'not_revoked', error: 'This confirmation is already executing.' })
+
+    await kenn.rejectMessageProposal('pending-card')
+
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'pending', actionError: 'This confirmation is already executing.' })
+    mockedRevoke.mockResolvedValueOnce({ ok: true, status: 'revoked' })
+    await kenn.rejectMessageProposal('pending-card')
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'rejected', actionError: undefined })
+  })
+
+  it.each([new TypeError('Failed to fetch'), new Error('private network detail')])('keeps a lost revoke response visible and does not promise no Live change', async (error) => {
+    mockedRevoke.mockRejectedValueOnce(error)
+    const card = kenn.messages.value[0]
+    if (card.role === 'assistant') card.actionStatus = 'requires_confirmation'
+
+    await kenn.rejectMessageProposal('pending-card')
+
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'requires_confirmation' })
+    const message = kenn.messages.value[0].role === 'assistant' && kenn.messages.value[0].actionError
+    expect(message).toContain('check Live before trying again')
+    expect(message).not.toContain('Nothing changed')
+    expect(message).not.toContain('private network detail')
+  })
+
+  it.each(['applying', 'applied', 'dismissing', 'rejected', 'undoing', 'undone', 'undo_refused'] as const)('cannot dismiss an action that is %s', async (actionStatus) => {
+    const card = kenn.messages.value[0]
+    if (card.role === 'assistant') card.actionStatus = actionStatus
+
+    await kenn.rejectMessageProposal('pending-card')
+
+    expect(mockedRevoke).not.toHaveBeenCalled()
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus })
+  })
+
+  it('requires a token before requesting dismissal', async () => {
+    kenn.messages.value = [{ id: 'missing', role: 'assistant', proposal: { action: 'set_mute' }, actionStatus: 'pending' }]
+
+    await kenn.rejectMessageProposal('missing')
+
+    expect(mockedRevoke).not.toHaveBeenCalled()
+    expect(kenn.messages.value[0]).toMatchObject({ actionStatus: 'pending' })
+    expect(kenn.messages.value[0].role === 'assistant' && kenn.messages.value[0].actionError).toContain('missing its confirmation token')
   })
 })
 

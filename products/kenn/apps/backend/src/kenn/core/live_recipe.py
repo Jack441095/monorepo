@@ -15,7 +15,7 @@ import uuid
 from threading import Lock
 from typing import Any
 
-from kenn.core.confirmation import consume_confirmation, issue_confirmation
+from kenn.core.confirmation import consume_confirmation, issue_confirmation, revoke_confirmation
 from kenn.core.idempotency_bounds import IdempotencyTrackingSet, prune_if_needed
 from kenn.core.live_action_service import (
     LiveActionService,
@@ -216,6 +216,9 @@ class LiveRecipeService:
                 child["action"] = child["operation"]
             # Child confirmation material is not valid for recipe execution;
             # the recipe gets one token bound to all exact child values.
+            # Retire the hidden token so it cannot remain pending after the
+            # visible recipe is dismissed or applied.
+            revoke_confirmation(str(child.get("confirmation_token") or ""), session_id=session_id)
             child.pop("confirmation_token", None)
             child.pop("confirmation_meta", None)
             child_steps.append(child)

@@ -3,6 +3,7 @@ import {
   askKenn,
   getAnswerUpgrade,
   confirmKennAction,
+  revokeKennConfirmation,
   undoKennAction,
   fetchKennSessionCard,
   type KennActionProposal,
@@ -31,7 +32,7 @@ export type KennAssistantMessage = {
   followUp?: string
   proposal?: KennActionProposal
   receipt?: KennActionReceipt
-  actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
+  actionStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
   actionError?: string
   undoOfReceiptId?: string
   /** The model is still writing a fuller answer; the template text is showing meanwhile. */
@@ -319,7 +320,7 @@ async function sendMessage(text: string) {
 
 async function applyMessageProposal(messageId: string) {
   const msg = messages.value.find((m) => m.id === messageId) as KennAssistantMessage | undefined
-  if (!msg) return
+  if (!msg || !['pending', 'requires_confirmation', 'error'].includes(msg.actionStatus || 'pending')) return
   if (!msg.proposal?.confirmation_token) {
     msg.actionStatus = 'error'
     msg.actionError = 'This proposal is missing its confirmation token. Ask KENN to prepare a fresh proposal; nothing changed.'
@@ -404,11 +405,32 @@ async function undoMessageProposal(messageId: string) {
   }
 }
 
-function rejectMessageProposal(messageId: string) {
+async function rejectMessageProposal(messageId: string) {
   const msg = messages.value.find((m) => m.id === messageId) as KennAssistantMessage | undefined
-  if (!msg?.proposal || msg.actionStatus === 'applied') return
-  msg.actionStatus = 'rejected'
+  if (!msg?.proposal || !['pending', 'requires_confirmation', 'error'].includes(msg.actionStatus || 'pending')) return
+  if (!msg.proposal.confirmation_token) {
+    msg.actionError = 'This proposal is missing its confirmation token. Ask KENN to prepare a fresh proposal before dismissing it.'
+    messages.value = [...messages.value]
+    return
+  }
+  const previousStatus = msg.actionStatus || 'pending'
+  msg.actionStatus = 'dismissing'
   msg.actionError = undefined
+  messages.value = [...messages.value]
+  const failedDismissal = 'KENN could not verify dismissal. This proposal may still be pending or already executing; check Live before trying again.'
+  try {
+    const result = await revokeKennConfirmation({ confirmToken: msg.proposal.confirmation_token, sessionId })
+    if (result.ok && result.status === 'revoked') {
+      msg.actionStatus = 'rejected'
+    } else {
+      msg.actionStatus = previousStatus
+      msg.actionError = result.error || failedDismissal
+    }
+  } catch (e) {
+    msg.actionStatus = previousStatus
+    // A lost revoke response does not tell us whether a concurrent Apply ran.
+    msg.actionError = e instanceof TypeError ? failedDismissal : userFacingKennError(e, failedDismissal)
+  }
   messages.value = [...messages.value]
 }
 

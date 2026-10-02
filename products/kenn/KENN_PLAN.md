@@ -234,6 +234,12 @@ mock, an agent reviewer or an unrelated receipt.
     corpus. Request-local index reads isolate lexical/matrix/status and semantic
     cache identity, including equal-size corpus replacement. 132 scoped cases
     pass, including 28 new cases; four mutations are caught. [Evidence and exact files](docs/evidence/KENN_WRAPPER_INDEX_ISOLATION_2026-10-02.md).
+  - [x] Dismiss revokes the issuing chat's token before hiding a card; held tokens
+    cannot execute after acknowledgement. Apply/revoke share the consumption lock,
+    pending state counts live tokens and recipe children retire. Chat cancel
+    invalidates its delivery without claiming inference or applied work stopped.
+    281 backend compatibility and 66 frontend tests pass; typecheck/build pass and
+    42 mutations are caught. [Evidence and exact files](docs/evidence/KENN_CONFIRMATION_DISMISSAL_2026-10-02.md).
   - [ ] Trace other request owners, cache invalidation after preference/Live changes,
     project switching and Apply/Undo during generation. Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation
@@ -258,7 +264,8 @@ mock, an agent reviewer or an unrelated receipt.
     observations without loading weights, probing a provider or claiming current
     health. 21 new cases and 51 scoped tests pass; an unconditional-status mutation
     is caught. [Evidence and exact files](docs/evidence/KENN_CHAT_STATUS_2026-10-02.md).
-    Streaming status and cancellation remain separate repairs.
+    Streaming status remains a separate repair; the cancel shortcut is covered by
+    the confirmation-dismissal evidence above.
 - [x] **A5 — Establish the clean test baseline.** Scoped collection-time model policy
   to individual tests and the offline replay CLI without changing planner assertions
   or production enablement precedence. Eight import and four CLI guards pass; seven

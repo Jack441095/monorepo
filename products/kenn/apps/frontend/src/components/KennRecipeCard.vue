@@ -10,7 +10,7 @@ import { formatDb } from '../utils/formatLevel'
 const props = withDefaults(
   defineProps<{
     proposal: KennActionProposal
-    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
+    cardStatus?: 'pending' | 'requires_confirmation' | 'applying' | 'dismissing' | 'applied' | 'undoing' | 'undone' | 'undo_refused' | 'rejected' | 'error'
     receipt?: KennActionReceipt
     errorMessage?: string
   }>(),
@@ -85,6 +85,9 @@ function transition(step: KennActionStep): string {
     </p>
 
     <div class="kenn-recipe-card__actions">
+      <button v-if="cardStatus === 'dismissing'" class="kenn-recipe-card__btn" disabled>
+        Dismissing...
+      </button>
       <button
         v-if="cardStatus === 'pending' || cardStatus === 'requires_confirmation'"
         class="kenn-recipe-card__btn kenn-recipe-card__btn--apply"

@@ -30,6 +30,7 @@ export const API_PATHS = {
     askUpgrade: '/kenn/api/ask/upgrade',
     sessionCard: '/kenn/api/ableton/session-card',
     command: '/kenn/api/ableton/command',
+    revokeConfirmation: '/kenn/api/ableton/confirmation/revoke',
     undo: '/kenn/api/ableton/osc/undo',
     parameters: '/kenn/api/plugin/parameters',
     racks: '/kenn/api/racks',

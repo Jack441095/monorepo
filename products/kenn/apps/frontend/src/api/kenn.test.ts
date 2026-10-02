@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getAnswerUpgrade, parseAdviceFindings, summarizeAdviceAnswer } from './kenn'
+import { getAnswerUpgrade, parseAdviceFindings, revokeKennConfirmation, summarizeAdviceAnswer } from './kenn'
 
 describe('getAnswerUpgrade', () => {
   it('polls with the originating chat identifier', async () => {
@@ -10,6 +10,45 @@ describe('getAnswerUpgrade', () => {
       const url = new URL(String(fetchMock.mock.calls[0]?.[0]), 'http://localhost')
       expect(url.searchParams.get('id')).toBe('upgrade & 1')
       expect(url.searchParams.get('session_id')).toBe('song & a')
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+})
+
+describe('revokeKennConfirmation', () => {
+  it('sends only the held token and its chat owner with credentials and CSRF', async () => {
+    const fetchMock = vi.fn(async (_url: unknown, options?: RequestInit) => new Response(JSON.stringify(
+      options?.method === 'POST' ? { ok: true, status: 'revoked' } : { authenticated: true, csrf_token: 'dismiss-csrf' },
+    )))
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      expect(await revokeKennConfirmation({ confirmToken: 'held-token', sessionId: 'chat-owner' }))
+        .toEqual({ ok: true, status: 'revoked', error: undefined })
+      const call = fetchMock.mock.calls.find(([, options]) => options?.method === 'POST')!
+      expect(String(call[0])).toContain('/kenn/api/ableton/confirmation/revoke')
+      expect(call[1]).toMatchObject({ credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': 'dismiss-csrf' } })
+      expect(JSON.parse(String(call[1]?.body))).toEqual({ confirm_token: 'held-token', session_id: 'chat-owner' })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('surfaces an owner or already-consumed refusal from the endpoint', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: false, status: 'not_revoked', error: 'Already executing.' }), { status: 409 })))
+    try {
+      await expect(revokeKennConfirmation({ confirmToken: 'held-token', sessionId: 'chat-owner' }))
+        .rejects.toMatchObject({ message: 'Already executing.', status: 409 })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it.each([{ ok: true, status: 'pending' }, { ok: false, status: 'revoked' }, {}])('requires the complete revoke acknowledgement %j', async (body) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(body))))
+    try {
+      expect(await revokeKennConfirmation({ confirmToken: 'held-token', sessionId: 'chat-owner' }))
+        .toMatchObject({ ok: false })
     } finally {
       vi.unstubAllGlobals()
     }

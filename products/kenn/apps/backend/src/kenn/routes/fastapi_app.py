@@ -34,7 +34,7 @@ from kenn.routes.chat_routes import (
     handle_delete_episode,
     handle_clear_memory,
 )
-from kenn.routes.daw_routes import handle_live_command, handle_session_card, handle_osc_undo
+from kenn.routes.daw_routes import handle_confirmation_revoke, handle_live_command, handle_session_card, handle_osc_undo
 from kenn.routes.mix_review_routes import (
     handle_mix_review_status,
     handle_mix_review_report_json,
@@ -98,6 +98,11 @@ class UndoRequest(BaseModel):
     proposal: Optional[dict[str, Any]] = None
     confirm_token: Optional[str] = ""
     idempotency_key: Optional[str] = ""
+
+
+class ConfirmationRevokeRequest(BaseModel):
+    session_id: str = Field(min_length=1, max_length=128, strict=True)
+    confirm_token: str = Field(min_length=1, max_length=512, strict=True)
 
 
 class ReferenceMatchRequest(BaseModel):
@@ -228,6 +233,12 @@ async def ableton_command_endpoint(req: CommandRequest):
         req.model_dump(),
         pending_proposals=_PENDING_PROPOSALS,
     )
+    return JSONResponse(status_code=status, content=result)
+
+
+@app.post("/api/ableton/confirmation/revoke")
+async def confirmation_revoke_endpoint(req: ConfirmationRevokeRequest):
+    status, result = handle_confirmation_revoke(req.model_dump())
     return JSONResponse(status_code=status, content=result)
 
 
