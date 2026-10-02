@@ -1,4 +1,4 @@
-# Clearing a session revokes its pending Apply tokens — 2 October 2026
+# Clearing a session revokes its Apply tokens and forgets its last command — 2 October 2026
 
 A3 slice. It supports [KENN_PLAN.md](../../KENN_PLAN.md). It comes from a read-only trace of project
 switching and Apply/Undo against an in-flight chat, recorded below.
@@ -12,6 +12,11 @@ stayed good for the rest of its 300 second window. The chat "cancel" path alread
 `revoke_session_confirmations`; the clear route now does too, in both servers. Other sessions' tokens
 are untouched.
 
+The same route also left the Live conversation state alone (`session_context._LIVE_CONVERSATIONS`:
+last command, last track, undo links). Reproduced before the fix: after a clear, "again" still resolved
+to the old `set track 2 volume to 0.7`. New `forget_live_conversation` in `core/session_context.py` drops
+that session's entry, and both clear routes call it.
+
 ## Verification
 
 From `products/kenn/apps/backend/src`:
@@ -21,10 +26,13 @@ From `products/kenn/apps/backend/src`:
 ../.venv/bin/python -m pytest -q -p no:randomly kenn/tests
 ```
 
-- Scoped: 4 cases (two routes, each with a revoke case and a leave-other-sessions-alone case). Before
-  the fix the revoke case failed on both the stdlib server and FastAPI; the other-session case passed.
-  After the fix all four pass, along with the 24 existing clear-route and answer-upgrade cases.
-- Full backend: 3,538 passed, 12 skipped, no failures (124.42 s), the earlier 3,534 plus the four new cases.
+- Scoped: 6 cases (stdlib server and FastAPI, each with a revoke case, a leave-other-sessions-alone
+  case and an "again" case). Before the fix the revoke case failed on both servers and the other-session
+  case passed. After the fix all six pass, along with the 24 existing clear-route and answer-upgrade cases.
+- Mutation check for the second part: deleting the `forget_live_conversation` call from
+  `routes/chat_routes.py` fails only the FastAPI "again" case, and deleting it from `server.py` fails only
+  the stdlib one. Both files were restored and the file passes again.
+- Full backend: 3,540 passed, 12 skipped, no failures (115.38 s), the earlier 3,534 plus the six new cases.
 
 ## Findings from the trace (not changed)
 
@@ -35,7 +43,6 @@ All verified by reading source, none reproduced.
   session id is sent and the target (track index, name, value or device order) still matches. Undo's
   stale checks compare values, not which set is loaded. Adding set identity to the confirmation scope is
   a larger change and needs a decision on where the identity comes from.
-- `session_context._LIVE_CONVERSATIONS` (undo links, last command) is not cleared by the clear route.
 - `begin_turn` does not revoke tokens, so a proposal from a superseded turn stays applicable until it
   expires. The apply and undo routes do not look at `answer_upgrades`, and nothing serialises a Live write
   against a chat turn. Staleness protection comes from the execute-time Live state checks.
@@ -53,8 +60,9 @@ All verified by reading source, none reproduced.
 
 Paths are relative to `products/kenn`.
 
-- `apps/backend/src/kenn/routes/chat_routes.py`: import and one call in `handle_session_clear`.
-- `apps/backend/src/kenn/server.py`: the same call in the legacy clear branch.
-- `apps/backend/src/kenn/tests/test_session_clear_revokes_pending_confirmations.py` (new, 4 cases).
+- `apps/backend/src/kenn/core/session_context.py`: `forget_live_conversation`.
+- `apps/backend/src/kenn/routes/chat_routes.py`: imports and two calls in `handle_session_clear`.
+- `apps/backend/src/kenn/server.py`: the same two calls in the legacy clear branch.
+- `apps/backend/src/kenn/tests/test_session_clear_revokes_pending_confirmations.py` (new, 6 cases).
 - `docs/evidence/KENN_SESSION_CLEAR_REVOKES_TOKENS_2026-10-02.md`: this receipt.
 - `KENN_PLAN.md`: A3 sub-bullet.

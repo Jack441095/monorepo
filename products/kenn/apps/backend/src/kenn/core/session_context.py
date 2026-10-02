@@ -737,6 +737,12 @@ def _live_conversation(session_id: str) -> dict[str, Any]:
         return state
 
 
+def forget_live_conversation(session_id: str) -> None:
+    """Drop what "again" and "that track" resolve against, plus the undo links, when a chat is cleared."""
+    with _LIVE_CONVERSATION_LOCK:
+        _LIVE_CONVERSATIONS.pop(_text(session_id, 128), None)
+
+
 def preprocess_live_command(command: str, *, session_id: str) -> tuple[str, dict[str, Any]]:
     """Resolve bounded anaphora from the last ten exchanges in one session."""
     original = " ".join(str(command or "").split())

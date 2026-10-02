@@ -1,6 +1,6 @@
-"""Clearing a chat used to leave its Apply token live for the rest of the five minute window."""
+"""Clearing a chat used to leave its Apply token live and "again" pointing at the old command."""
 
-from collections import defaultdict, deque
+from collections import OrderedDict, defaultdict, deque
 import json
 from threading import Thread
 import urllib.request
@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 import pytest
 
 import kenn.server_rate_limit as rate_limit
-from kenn.core import answer_upgrades, confirmation
+from kenn.core import answer_upgrades, confirmation, session_context
 
 
 @pytest.fixture(autouse=True)
@@ -20,6 +20,7 @@ def isolated_state(monkeypatch):
     monkeypatch.setattr(answer_upgrades, "_RESULTS", {})
     monkeypatch.setattr(answer_upgrades, "_TURNS", {})
     monkeypatch.setattr(rate_limit, "RATE_BUCKETS", defaultdict(deque))
+    monkeypatch.setattr(session_context, "_LIVE_CONVERSATIONS", OrderedDict())
 
 
 @pytest.fixture(params=["http", "fastapi"])
@@ -70,3 +71,13 @@ def test_clearing_one_session_leaves_another_sessions_token_alone(post):
     assert post("/api/session/clear", {"id": "song-a"}) == 200
     assert confirmation.pending_confirmation_count(session_id="song-b") == 1
     assert confirmation.consume_confirmation(other, **binding)
+
+
+def test_again_does_not_repeat_a_command_from_before_the_chat_was_cleared(post):
+    session_context.record_live_exchange(
+        session_id="song-a", command="set track 2 volume to 0.7",
+        result={"status": "executed", "track": "Drums", "action": "set_volume"},
+    )
+    assert session_context.preprocess_live_command("again", session_id="song-a")[0] == "set track 2 volume to 0.7"
+    assert post("/api/session/clear", {"id": "song-a"}) == 200
+    assert session_context.preprocess_live_command("again", session_id="song-a")[0] == "again"

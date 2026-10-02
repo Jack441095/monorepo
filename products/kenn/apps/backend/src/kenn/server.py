@@ -2671,10 +2671,12 @@ class Handler(BaseHTTPRequestHandler):
             if session_id:
                 from kenn.core import answer_upgrades
                 from kenn.core.confirmation import revoke_session_confirmations
+                from kenn.core.session_context import forget_live_conversation
 
                 answer_upgrades.invalidate(session_id)
                 clear_session(session_id)
                 revoke_session_confirmations(session_id=session_id)
+                forget_live_conversation(session_id)
                 self.send_json(200, {"ok": True, "message": f"Session {session_id} cleared."})
             else:
                 self.send_json(400, {"error": "Missing session id."})

@@ -363,12 +363,13 @@ mock, an agent reviewer or an unrelated receipt.
     [the evidence](docs/evidence/KENN_LAUNCHAGENT_AND_DOC_POINTERS_2026-10-02.md)). The Audio_Too symlink
     and the two chat Dockerfiles that depend on it are recorded there as open. Full backend run is
     3,534 passed, 12 skipped.
-  - Clearing a chat now revokes its pending Apply tokens on both servers; before, an old card stayed
-    good for the rest of its five minutes. Four new cases, the revoke case failed on both servers
+  - Clearing a chat now revokes its pending Apply tokens and drops its last-command and undo-link state
+    on both servers; before, an old card stayed good for the rest of its five minutes and "again" still
+    repeated the old command. Six new cases, the revoke and "again" cases failed on both servers
     before the fix. The trace also found that no set or project identity scopes tokens or Undo
     receipts, and recorded the Apply/Undo-during-generation and trace-storage findings as open in
     [the evidence](docs/evidence/KENN_SESSION_CLEAR_REVOKES_TOKENS_2026-10-02.md). Full backend run is
-    3,538 passed, 12 skipped.
+    3,540 passed, 12 skipped.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.

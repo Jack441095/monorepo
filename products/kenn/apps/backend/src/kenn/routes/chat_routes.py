@@ -10,6 +10,7 @@ from typing import Any
 from kenn.core import answer_upgrades
 from kenn.core.chat import answer_payload
 from kenn.core.confirmation import revoke_session_confirmations
+from kenn.core.session_context import forget_live_conversation
 from kenn.core.suggestions import catalog_payload, typeahead
 from kenn.core.response_contract import augment_payload
 from kenn.core.session_memory import (
@@ -81,6 +82,7 @@ def handle_session_clear(session_id: str) -> tuple[int, dict[str, Any]]:
     clear_session(clean_id)
     # A cleared chat can still hold an Apply card; without this its token stays good for five minutes.
     revoke_session_confirmations(session_id=clean_id)
+    forget_live_conversation(clean_id)
     return 200, {"ok": True, "message": f"Session {clean_id} cleared."}
 
 
