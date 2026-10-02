@@ -528,8 +528,10 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     [Causes](docs/evidence/KENN_WRAPPER_HELDOUT_ROWS_FRESH_INDEX_2026-10-02.md). `upgrade-room-null` answers with
     EQ advice for a cancellation null, so do it first.
     A probe on 2 Oct found no general weight, topic or curated-note rule that moves these rows without tuning on
-    them ([receipt](docs/evidence/KENN_C5_RANKING_PROBE_2026-10-02.md)). Next step is the experiment 2 reranker spike
-    scored on the 128 coverage rows; it needs Jack's OK to download the model first.
+    them ([receipt](docs/evidence/KENN_C5_RANKING_PROBE_2026-10-02.md)). The experiment 2 reranker spike has run
+    ([receipt](docs/evidence/KENN_C5_RERANK_SPIKE_2026-10-02.md), 2 Oct 2026): blend 0.6 fixes three of the six rows and
+    +8 hit@3 on the tuning sets, with coverage and guards unchanged, but the six rows are no longer a clean holdout and
+    nothing is shipped. A repo implementation needs a new model file and ONNX Runtime, so it waits for Jack's OK.
 
 ### 3. Qualify Ableton knowledge and existing control breadth
 
