@@ -8,7 +8,9 @@ explicit claim spans and reviewer labels instead of its default T5-XXL judge.
 From the monorepo root, capture a fresh run with the current index and fixed model:
 
 ```sh
-KENN_LLM_CACHE=0 KENN_LLM_MODEL=kenn-brain-qwen3-8b python3 products/kenn/tooling/scripts/measure_chat_latency.py \
+KENN_LLM_ENABLED=1 KENN_LLM_ENABLED_REWRITE=1 KENN_LLM_CACHE=0 \
+  KENN_LLM_MODEL=kenn-brain-qwen3-8b KENN_LLM_MODEL_REWRITE=kenn-brain-qwen3-8b \
+  python3 products/kenn/tooling/scripts/measure_chat_latency.py \
   --cases products/kenn/tooling/data/citation_eval_queries_v1.json --limit 240 \
   --surface stream --capture-answers products/kenn/.runtime/eval/citation_v1.raw.jsonl \
   --receipt products/kenn/.runtime/eval/citation_v1.latency.json
@@ -42,8 +44,10 @@ or the production gate's `claim_citations`. Those fields must not supply labels.
 
 For every factual assertion, including numerical recommendations and procedural steps,
 add a claim with zero-based Python string offsets `start` inclusive and `end` exclusive.
-Split independently checkable assertions. Include attached `[#id]` mentions in the
-span. Spans must be ordered and nonoverlapping; every citation must belong to a span.
+Use a sentence or procedural bullet as the default claim unit. Keep compound clauses
+sharing an attached citation in one span; the full conjunction must be supported.
+Include attached `[#id]` mentions in the span. Spans must be ordered and
+nonoverlapping; every citation must belong to a span.
 Offsets count Unicode characters, not UTF-8 bytes. Pure headings, greetings, questions,
 and honest statements that evidence is missing do not require factual claim labels.
 
