@@ -1,5 +1,9 @@
 # KENN chat package duplication: which copy is canonical
 
+Historical evidence for the source and environment recorded below. Retired plan
+paths and completion claims are historical references, not current instructions or
+qualification. Use [KENN_PLAN.md](../../KENN_PLAN.md) for architecture, priorities and gates.
+
 **Checked:** 2026-09-30 · **Status:** analysis only, for Jack (Track F row F4). Nothing removed, moved or edited.
 
 Track F4 says there are two `chat` packages and that tooling loads the wrong one under the bare

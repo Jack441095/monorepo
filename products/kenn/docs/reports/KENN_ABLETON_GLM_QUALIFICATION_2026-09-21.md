@@ -1,5 +1,9 @@
 # KENN Ableton Live GLM Qualification Report — 2026-09-21
 
+Historical evidence for the source and environment recorded below. Retired plan
+paths and completion claims are historical references, not current instructions or
+qualification. Use [KENN_PLAN.md](../../KENN_PLAN.md) for architecture, priorities and gates.
+
 Start commit: `1e2b7f6` (origin/main, PRs #22 and #23 merged — verified).
 Branch: `kenn-qual-glm-eq-intent` (isolated worktree `workspace/worktrees/kenn/qual-glm`,
 detached from origin/main; pre-existing dirty worktree untouched).

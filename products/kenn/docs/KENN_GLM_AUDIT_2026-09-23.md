@@ -1,4 +1,8 @@
-# KENN GLM Audit & Completion Plan — 2026-09-23
+# KENN GLM historical audit — 2026-09-23
+
+Historical source observations only. The completion schedule and obsolete handoff
+instructions were retired on 2 October. Current architecture, priorities and gates
+are in [KENN_PLAN.md](../KENN_PLAN.md); recheck code before using this baseline.
 
 **Date:** 2026-09-23 · **Commit:** `62580f9` (12 commits ahead of `origin/main`)  
 **Baseline tests:** backend 1,503 passed / 5 skipped · frontend 21 passed · production build ok  
@@ -193,79 +197,6 @@ EQ Eight (frequency-log + gain), Auto Filter (Resonance, Frequency-log), Compres
 
 ---
 
-## 3. Completion Plan — "Fully Functioning GLM AI Assistant"
-
-The definition of "fully functioning" is in the build prompt's Section 3 (lines 155–173). Here's the ordered plan:
-
-### Phase A — Foundation Hardening (3-5 days)
-1. **[A4]** Complete 10 consecutive 20-step demo rehearsals (owner-run)
-2. Fix the `JSON.stringify` float issue in frontend Apply button
-3. Add explicit decimal formatting for floating-point values in `KennActionProposal`
-
-### Phase B → C — World Model + Language Brain (8-12 days, partially owner-gated)
-4. **[B1]** Add session clip loop/warp reads to the world model
-5. **[C3]** Owner reviews 100 natural phrasings → curate 500+ holdout `tooling/data/natural_holdout.jsonl`
-6. **[C5]** Wire the LLM planner to see a bounded, relevant slice of the B2 world model
-7. **[C2]** Complete the model bake-off on GPU (qwen2.5:7b, Qwen3.5-2B/4B, Phi-4-mini)
-8. **[C4]** Owner signs off on promotion to `propose` stage → LLM can now propose (with human confirmation)
-9. **[C6]** (Owner-gated) LoRA refresh on GPU box with mlx-lm, evaluated on holdout
-10. **I2** End-to-end benchmark on the natural holdout, per-commit diff
-
-### Phase D — Control Breadth (10-15 days)
-11. **[D1]** Run `qualify_ableton_live_device.py` batch sweep → target 25+ devices, 60+ params
-12. **[D2]** Integrate borrowed handlers from `ableton-mcp` (MIT) and `ableton-js` (MIT)
-13. **[D3]** Implement new action families: tempo/signature, scene launch, clip create/launch/loop/warp/gain/transpose, MIDI note edit, automation write, track creation with scoped undo
-14. **[D4]** (Owner-gated) Implement Cmd-S Accessibility automation with hash check
-15. **[D5]** Build 15 qualified recipes (vocal chain, parallel compress drums, sidechain bass to kick, etc.)
-
-### Phase E — Listening & Analysis (5-8 days)
-16. **[E1]** (Owner-gated) Implement chosen live capture path
-17. **[E3]** Implement per-track capturing and masking collision map with confidence
-18. **[E4]** Evaluate Demucs for stem separation (verify weight licence)
-19. **[E5]** Wire advice → "Fix it" → confirmable proposal → re-measure loop
-
-### Phase F — Creation (3-5 days)
-20. **[F1]** Complete arps and melody MIDI generation; prove on real Live
-21. **[F2]** Implement audio-to-MIDI with basic-pitch (verify licence)
-22. **[F3]** Evaluate Magenta RealTime and ACE-Step for generative audio
-
-### Phase G — Knowledge & Memory (3-5 days)
-23. **[G1]** Write KENN-owned device/workflow notes; fetch MiniLM ONNX for hybrid retrieval
-24. **[G2]** Implement project memory (per-set, viewable/deletable in UI)
-25. **[G3]** Implement opt-in preferences store
-26. **[G4]** Strengthen conversation policy (corrections, studio tone)
-
-### Phase H — Surfaces (3-5 days)
-27. **[H1]** Implement real push-to-talk in frontend → Whisper-class MLX speech recognition → `/kenn/api/ask`
-28. **[H2]** Implement MCP server (`core/mcp_facade.py`) exposing only KENN-safe tools
-29. **[H3]** UI upgrades: session map, receipt timeline, "Fix it" buttons, recipe step previews
-
-### Phase I — Reliability (3-5 days)
-30. **[I1]** Nightly real-Live regression script + SLO report
-31. **[I3]** Chaos suite (Live killed mid-write, UDP drops, companion restart, stale/replayed tokens)
-32. **[I4]** Per-route rate limits replacing crude 60/60s
-33. **[I2]** End-to-end benchmark on natural holdout (if not done in Phase B)
-
-### Final — Demo & Promotion
-34. Complete 10 consecutive full 20-step demo rehearsals with projector layout and timing
-35. Final 11-check preflight on the stem-loaded disposable set
-36. Owner promotes LLM from `propose` → `active` (owner sign-off)
-
----
-
-## 4. Critical Path Summary (Owner-Gated Milestones)
-
-| Owner Decision | Blocks What | When Needed |
-|---|---|---|
-| **[C3]** Review 100 natural phrasings | C3 holdout curation, C4 promotion data | Before C4 promotion |
-| **[C4]** Sign off on `propose` stage | LLM can propose (with confirm) for real | After C3 holdout + C2 bake-off |
-| **[C6]** OK GPU box `~/kenn_*` folder | LoRA training | After C6 corpus is ready |
-| **[E1]** Choose capture design | Live audio capture (E1, E3, E5) | Before E1 implementation |
-| **[D4]** Grant Accessibility permission | Cmd-S automation | Before D4 |
-| **[A4]** Run demo rehearsals 2–10 | Final demo qualification | After all demo-path features |
-
----
-
 ## 5. Test Baseline & Verification Strategy
 
 **Current baseline:**
@@ -321,8 +252,8 @@ PATH="/opt/homebrew/bin:$PATH" npx vitest run
 | Demo script gate | `tooling/scripts/demo_script_gate.py` |
 | Preflight | `tooling/scripts/demo_preflight.py` |
 | Shadow bake-off | `tooling/scripts/analyze_shadow_logs.py` |
-| Tracker | `docs/plans/KENN_GLM_FULL_ASSISTANT_TRACKER.md` |
-| Build prompt | `KENN_GLM_FULL_ASSISTANT_BUILD_PROMPT_2026-09-23.md` (monorepo root) |
+| Current plan | [KENN_PLAN.md](../KENN_PLAN.md) |
+| Historical build prompt | Retired; preserved in Git history |
 | Runbook | `docs/runbooks/KENN_INVESTOR_DEMO.md` |
 
 ---
@@ -339,4 +270,4 @@ The remaining work falls into three buckets:
 
 **The path is clear but long** — approximately 40-60 days of focused engineering work plus owner decisions, assuming real Live hardware access for qualification. The biggest risks are: (a) the owner-gated items that block C4/E1/D4, (b) the 500-phrase natural holdout not yet curated, and (c) the device qualification sweep to 25+ devices.
 
-The tracker at `docs/plans/KENN_GLM_FULL_ASSISTANT_TRACKER.md` is the authoritative hand-off between sessions and should be updated in the same commit as each completed item.
+The former tracker is retired. Update KENN_PLAN.md with dated evidence; this audit does not establish the current build's qualification.

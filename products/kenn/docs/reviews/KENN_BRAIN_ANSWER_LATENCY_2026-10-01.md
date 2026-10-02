@@ -1,5 +1,9 @@
 # KENN brain answer latency on the owner's M3 (1 Oct 2026)
 
+Historical evidence for the source and environment recorded below. Retired plan
+paths and completion claims are historical references, not current instructions or
+qualification. Use [KENN_PLAN.md](../../KENN_PLAN.md) for architecture, priorities and gates.
+
 Settles Track D1 and D2 for the M3 / 16 GB, and corrects three numbers the North Star had
 carried since 26-28 Sept. Everything below was measured on this machine with Ollama on
 `127.0.0.1:11434` and Ableton Live 12 open. Nothing was written to Live.

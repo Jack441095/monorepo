@@ -1,5 +1,9 @@
 # KENN Investor-Demo Audit — 2026-09-22
 
+Historical evidence for the source and environment recorded below. Retired plan
+paths and completion claims are historical references, not current instructions or
+qualification. Use [KENN_PLAN.md](../KENN_PLAN.md) for architecture, priorities and gates.
+
 **Scope:** Full investor-demo audit (readiness + codebase health + risks + next actions).
 **Method:** Read-only inspection. No code changed, no tests run, no Live session probed.
 **Plan reference:** `docs/plans/KENN_GLM_ABLETON_ASSISTANT_PLAN_2026-09-22.md` (840 lines, baseline `3bb9ebc`).

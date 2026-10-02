@@ -2,6 +2,10 @@
 
 Append-only log. Each entry records what was verified, how, and the exact source state it was verified against — per the sprint's "record the source SHA, produce a dated evidence receipt" operating model.
 
+These are historical receipts, not current scope or release decisions. Current
+architecture and work are in [KENN_PLAN.md](KENN_PLAN.md); retired scope documents
+remain in Git history.
+
 ---
 
 ## 2026-09-01 — Mix Review adapter: independent clean-checkout build proof
@@ -32,5 +36,5 @@ checked out in the (dirty, ahead-of-pin) working tree.
 **Not covered by this receipt:** the `automix/` and `chat/` boundaries were
 not re-verified against an isolated clone in this pass (`chat/` already has
 a documented Dockerfile-based build; `automix/` is out of beta scope per
-`docs/plans/KENN_BETA_PLAN_2026-09-24.md` and remains untested against a clean checkout — tracked as
-the remaining half of BB-7).
+the retired September beta scope and was untested against a clean checkout in this
+receipt — recorded then as the remaining half of BB-7).

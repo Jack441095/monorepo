@@ -1,5 +1,9 @@
 # KENN full product truth report
 
+Historical evidence for the source and environment recorded below. Retired plan
+paths and completion claims are historical references, not current instructions or
+qualification. Use [KENN_PLAN.md](../../KENN_PLAN.md) for architecture, priorities and gates.
+
 Audit date: 2026-09-21. Main checkout: `monorepo` at `3667e0e996c976e96110afa32e5e1f5a0163ffc7`, dirty and largely untracked before this audit. Adjacent evidence checkout: `monorepo-collab` at `f4a90d2c603b56f6088d7e0d2c8f2bd7f402c8f1`, also dirty; it was read only. Host: Apple M3, arm64, macOS 27.0, 16 GiB.
 
 ## Executive truth

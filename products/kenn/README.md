@@ -4,6 +4,10 @@
 active implementation is self-contained here; the former `Audio_Too` tree is a
 preserved reference only and is not a runtime dependency.
 
+Start with [KENN_PLAN.md](KENN_PLAN.md) for the architecture, current work sequence,
+acceptance gates and verified progress. It is the sole KENN roadmap. Dated reports
+are evidence for their recorded source state; runbooks are operational procedures.
+
 ## Canonical layout
 
 - `apps/backend/src/kenn/` — active Python backend, analysis, retrieval, and
@@ -17,7 +21,7 @@ preserved reference only and is not a runtime dependency.
 - `tooling/` — benchmarks, evaluation, and verification;
 - `runtime/legacy/` — preserved compatibility runtime; do not add new active
   code there without a migration decision;
-- `docs/` — architecture, research, beta, and handoff documentation.
+- `docs/` — component contracts, research, evidence and operational runbooks.
 
 The compatibility links `source/` and `vst3-plugin/` point into these active
 paths so older local commands fail clearly or continue to resolve without
@@ -34,10 +38,11 @@ rules.
 
 ## Native DSP status
 
-The C++/nanobind spectral path is available behind `KENN_DSP_NATIVE=1` and
-remains opt-in because the refreshed supplied eight-mix corpus measured
-`0.98962x`
-end-to-end versus Python. Historical AutoMix kernels have been recovered as a
+The C++/nanobind path is available behind `KENN_DSP_NATIVE=1` and remains opt-in
+pending rights-cleared and cross-platform release evidence. Earlier spectral-only
+and later decoder/bulk-metrics measurements cover different implementations;
+consult the exact workload and receipt before quoting a speedup. Historical AutoMix
+kernels have been recovered as a
 standalone archive for requalification, but are not yet wired into the active
 worker. Evidence and next gates are tracked in
 `docs/research/CPP_DSP_PHASE4_RELEASE_QUALIFICATION.md`.

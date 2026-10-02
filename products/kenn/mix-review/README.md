@@ -1,5 +1,9 @@
 # KENN Mix Review Adapter
 
+This documents the preserved CLI adapter, not the active desktop Mix Review service.
+Use [KENN_PLAN.md](../KENN_PLAN.md) and [backend ownership](../BACKEND_OWNERSHIP.md)
+for the current product boundary.
+
 This is the first product-owned boundary for KENN Mix Review. It is a local,
 read-only adapter around the preserved Audio_Too decoder, running only the
 three fault detectors that carry real qualification evidence.
@@ -45,7 +49,8 @@ that was qualified in V2-D (headroom significance depends on knowing whether
 the file is still being mixed), not a beta-only restriction.
 
 The adapter is not yet a qualified public Mix Review product: no human/blind
-review has been completed. See `../BETA_SCOPE.md` and `../BETA_BLOCKERS.md`.
+review is recorded for this legacy adapter. Current listening qualification and
+release gates are in [KENN_PLAN.md](../KENN_PLAN.md).
 
 ## Local probe
 

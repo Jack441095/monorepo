@@ -1,5 +1,8 @@
 # KENN C++ DSP Migration Roadmap
 
+Historical component migration record. Its phase estimates are not current work
+instructions. Use [KENN_PLAN.md](../../KENN_PLAN.md) for priorities and current release gates.
+
 **Date:** 2026-09-20
 **Recommendation:** conditional, incremental migration with measured exits.
 

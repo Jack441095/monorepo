@@ -72,4 +72,7 @@ their stems or projects unless a defect can't be reproduced otherwise, and then 
 
 Keep the previous DMG. A tester replaces KENN in Applications with the previous version; settings and history in
 `~/Library/Application Support/KENN` are kept. The knowledge index keeps its previous version on disk
-(`data/index/PREVIOUS`); `index_store.rollback_index()` switches back. See `docs/plans/ABLETON_ASSISTANT_ROLLBACK_PLAN.md`.
+(`data/index/PREVIOUS`); `index_store.rollback_index()` switches back. Follow
+[KENN rollback and recovery](KENN_ROLLBACK.md) for Live receipts, app compatibility
+and index verification. Current engineering priorities and release gates are in
+[KENN_PLAN.md](../../KENN_PLAN.md).

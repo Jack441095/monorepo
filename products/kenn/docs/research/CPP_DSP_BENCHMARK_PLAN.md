@@ -1,5 +1,8 @@
 # KENN C++ DSP Benchmark Plan
 
+Component benchmark protocol and historical measurements. Current scheduling and
+release gates are in [KENN_PLAN.md](../../KENN_PLAN.md); this file is not a separate work queue.
+
 **Date:** 2026-09-20
 **Purpose:** produce reproducible evidence before any native migration is
 accepted.

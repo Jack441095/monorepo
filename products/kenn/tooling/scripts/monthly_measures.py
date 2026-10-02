@@ -49,7 +49,7 @@ from kenn.retrieval import index_store  # noqa: E402
 
 RESULTS_DIR = KENN_ROOT / "tooling" / "evaluation" / "results"
 SCHEMA = "kenn.monthly_measures.v1"
-NORTH_STAR = "docs/plans/KENN_NORTH_STAR_2026-09-24.md (Measures reported every month)"
+NORTH_STAR = "KENN_PLAN.md (Acceptance targets and measurement rules)"
 
 # The index is gitignored (apps/backend/src/kenn/data/), so a clean checkout has none. That is the difference between
 # "recall fell" and "there is no index to recall from", and eval_chat_coverage.py answers 0 on every case without one.

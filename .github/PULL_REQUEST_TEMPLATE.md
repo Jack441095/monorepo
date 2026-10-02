@@ -36,10 +36,10 @@ AGENTS.md forbids both.
 - [ ] Nothing here commits a remote hostname, an IP address, a credential, a licensed Ableton manual, private audio,
       a user's stems or any personal session data.
 
-## Numbers in the plans
+## Numbers and evidence
 
-- [ ] If this changes a measured number, the **North Star** (`products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`)
-      and the **four-week plan** are updated **in this same commit**, with the date and what was actually measured.
+- [ ] If this changes a measured number, **KENN_PLAN.md** (`products/kenn/KENN_PLAN.md`)
+      is updated **in this same commit**, with dated evidence and what was actually measured.
       A recorded number that has drifted from the tooling is worse than no number.
 - [ ] Where a recorded number was wrong, it is corrected **in place** rather than appended to, and the correction says
       what was measured instead.

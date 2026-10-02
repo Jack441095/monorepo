@@ -137,7 +137,7 @@ Relevant KENN surfaces:
 - [server.py](<LOCAL_VOLUME>/Shenrendao/KENN/apps/backend/src/kenn/server.py)
 - [audiogen_artifacts.py](<LOCAL_VOLUME>/Shenrendao/KENN/apps/backend/src/kenn/core/audiogen_artifacts.py)
 - [mcp_facade.py](<LOCAL_VOLUME>/Shenrendao/KENN/apps/backend/src/kenn/core/mcp_facade.py)
-- [integrated audio architecture](<LOCAL_VOLUME>/Shenrendao/KENN/docs/KENN_INTEGRATED_AUDIO_INTELLIGENCE_ARCHITECTURE.md)
+- [KENN architecture and plan](../../KENN_PLAN.md)
 
 ## What KENN should not reuse yet
 
