@@ -11,6 +11,12 @@ retired. Their history remains in Git; the consolidation record is
 [the planning audit](docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md).
 Update this file instead of creating another roadmap, handoff prompt or progress log.
 
+The [2 October product and open-source research](docs/research/KENN_PRODUCT_AND_OPEN_SOURCE_RESEARCH_2026-10-02.md)
+informs C1–C2, L2–L3 and B1–B4 below. Its three experiment protocols supply candidate
+methods for local delivery, passage reranking and audio measurements; their proposed
+thresholds do not replace this plan's acceptance targets. Product references inform
+interface choices; new dependencies and model assets still require approval.
+
 ## Purpose and decisions
 
 KENN is a local language-model assistant for a producer using Ableton Live. It should
@@ -235,11 +241,16 @@ Needs the route/context audit; fixes may land in small slices while A5 is invest
   model/index/code versions. Capture each stage and rejection reason. Repeat comparable
   runs; keep TTFT separate from completion time. Compare Live-open/closed only under
   controlled owner-supervised conditions, without writing to Live.
+  Include admission/queue, context/retrieval, prefill, generation, verification,
+  polling and displayed-result timing. Declare model-cold/warm conditions and record
+  combined memory pressure, swap and audio dropouts at a fixed Live buffer/session.
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
-  Native Ollama thinking-off behavior is already implemented; verify the selected
-  model digest and actual response path before blaming hardware. Require unchanged
-  safety and a held-out quality comparison for each latency change.
+  Native Ollama thinking-off behavior and the general 384-token output cap already
+  exist; verify the selected model digest and actual response path before blaming
+  hardware. Any MLX comparison must explicitly use the chosen Qwen3 8B lineage,
+  rather than the engine's smaller default. Require unchanged safety and a held-out
+  quality comparison for each latency change.
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
@@ -266,10 +277,16 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   Audit fixture exclusions (including substring matching) and source tiers before
   claiming improved recall. Any authorized rebuild is a candidate on GPU 0/1 with
   parity, digest, recall and rollback evidence; never rebuild on this Mac.
+  If a demonstrated passage-relevance gap remains, compare a small CPU ONNX
+  cross-encoder on the same top 12–20 candidates with current retrieval. Use research
+  experiment 2's quality, latency and memory screens; retain version/unit constraints
+  and grounding. Reranking alone does not require an index rebuild or a new database.
 - [ ] **L3 — Qualify existing recipes.** At least 15 recipes, fake first, then an
   owner-scheduled disposable-set run: exact target/value, Apply/readback, partial
   failure, stop/cancel and verified Undo. The recipe card and its component test
   already exist; audit usability rather than schedule their creation again.
+  Test whether producers can inspect current/proposed values, units and targets,
+  edit the suggestion and understand partial-change receipts before expanding recipes.
 - [ ] **L4 — Planner shadow qualification.** Keep deterministic authority. Promotion
   requires the existing comparison/time/schema/agreement gates and human review;
   include ambiguity, missing ranges, wrong units and stale identities. A large
@@ -288,6 +305,11 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   human reviewers; keep clipping/headroom/L-R findings and broader unqualified
   interpretations distinct. A finding offers a change only with a separately bound
   Live target, and re-measurement reports what changed rather than promising quality.
+  Remove synthetic production evidence from the empty-input reference matcher and
+  its HTTP/tool callers: absent or empty spectra produce an unavailable result, with
+  no measured finding or EQ recipe. Qualify loudness windows/gating, LRA and true peak
+  against permitted conformance vectors and controlled fixtures. A pinned libebur128
+  comparison is optional and needs approval; agreement alone is not conformance.
 - [ ] **B2 — Memory usability.** Testers can inspect, edit, delete and restore saved
   preferences; answers identify memory used; a different project/session cannot read
   it. Explicit saves only. Verify reset/export/retention behavior and UI/API parity.
@@ -299,6 +321,12 @@ Creation that writes to Live depends on L3/L5; it does not delay the core assist
   SLO and offline AutoMix remain separate typed artifact providers with unavailable
   states. Audio generation needs explicit opt-in and license/provider review; no
   silent network provider, filesystem rename or automatic session modification.
+  Reference A/B should use authorized files, corresponding sections and matched
+  playback loudness; identify analysed regions and normalization separately. For
+  later provider trials, investigate local whisper.cpp push-to-talk or Basic Pitch
+  ONNX on bounded instrument clips, one at a time. Speech becomes inspectable text
+  through the existing policy; MIDI keeps preview/target/Apply/Undo. Pin code and
+  weight licences separately and qualify offline operation and resource use.
 
 ### 5. Qualify and release one exact build
 
