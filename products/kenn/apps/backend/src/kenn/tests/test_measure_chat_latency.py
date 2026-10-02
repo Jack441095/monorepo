@@ -196,6 +196,22 @@ def test_a_receipt_records_no_answer_text(tool, monkeypatch):
     assert "short answer" not in blob.lower() and "try this" not in blob.lower()
 
 
+def test_prefix_rejection_capture_cannot_be_mistaken_for_the_model_candidate(tool, monkeypatch):
+    # The stream drops the rejected prefix and returns a template; citation review must not grade that template.
+    payload = {"answer": "Fallback template", "generation_validation": {
+        "attempted": True, "accepted": False, "warnings": ["unsupported measurements"]}}
+    captures = []
+    monkeypatch.setattr(tool, "_drop_semantic_cache", lambda: None)
+    monkeypatch.setattr(tool, "_ask", lambda *a, **k: (payload, 0, None))
+    monkeypatch.setattr(tool, "_write_capture_row", captures.append)
+    tool.measure([{"question": "What release?"}])
+    (row,) = captures
+    assert row["candidate_text_available"] is False
+    assert row["gate_ran"] is False
+    assert row["evidence_sources"] is None
+    assert row["prompt_evidence"] is None
+
+
 def test_the_committed_receipts_have_the_shape_the_plan_quotes(tool):
     """Track D's gate is quoted straight out of these files, so their schema must not drift."""
     results = KENN_ROOT / "tooling" / "evaluation" / "results"

@@ -136,6 +136,26 @@ def test_capture_records_the_index_version_and_evidence_budget(tmp_path: Path) -
     assert row["index_version"] == (pointer.read_text(encoding="utf-8").strip() if pointer.is_file() else "")
 
 
+def test_capture_preserves_citable_ids_and_exact_truncated_source_bodies(tmp_path: Path) -> None:
+    # Flattened evidence cannot tell whether a citation names the excerpt containing its claim.
+    from kenn.core.chat_retrieval import source_label
+    from kenn.knowledge.reasoning import get_chunk_id
+    from kenn.llm.llm_rewrite import model_evidence
+
+    row = _captured_row(tmp_path)
+    block, shown = model_evidence(RESULTS, source_label)
+    assert row["prompt_evidence"] == block
+    assert row["gate_ran"] is True
+    assert row["candidate_text_available"] is True
+    assert row["evidence_sources"] == [
+        {"id": get_chunk_id(chunk), "label": source_label(chunk),
+         "title": chunk["title"], "source": chunk["source"], "text": body}
+        for _score, chunk, body in shown
+    ]
+    assert row["evidence_sources"][1]["text"] != LONG_CHUNK_TEXT
+    assert get_chunk_id(RESULTS[2][1]) not in {s["id"] for s in row["evidence_sources"]}
+
+
 def test_capture_records_the_same_budget_the_prompt_and_the_gate_both_read(tmp_path: Path, monkeypatch) -> None:
     """KENN_LLM_CONTEXT_CHARS moves the prompt's budget and the gate's together, and the capture has to show that.
 
@@ -153,6 +173,15 @@ def test_capture_records_the_same_budget_the_prompt_and_the_gate_both_read(tmp_p
     assert row["prompt_context_chars"] == 650
     assert row["evidence_budget_chars"] == 650
     assert row["prompt_context_chars"] == row["evidence_budget_chars"]
+
+    from kenn.core.chat_grounding import _evidence_chunks
+    from kenn.knowledge.reasoning import get_chunk_id
+
+    actual = _evidence_chunks(RESULTS)
+    assert row["evidence_text"] == module.gate_evidence_text(actual)
+    assert [(source["id"], source["text"]) for source in row["evidence_sources"]] == [
+        (get_chunk_id(chunk), body) for _score, chunk, body in actual
+    ]
 
     monkeypatch.delenv("KENN_LLM_CONTEXT_CHARS", raising=False)
     # A second directory, because _captured_row reads the FIRST row of answers.jsonl and a second call on the

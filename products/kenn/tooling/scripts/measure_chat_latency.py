@@ -103,12 +103,12 @@ def gate_evidence(results: list[tuple[float, dict]]) -> tuple[str, list[tuple[fl
     stopped being what the gate reads when the evidence rework landed on 2 Oct 2026. 14 of the 22 rows in that
     day's capture disagreed, and an offline leak check run against the field reported 8 of 18 accepted answers
     citing a measurement the gate had in front of it; against the gate's own evidence the same check reported
-    0 of 18. Call model_evidence() with the gate's own defaults instead, and the two cannot drift apart again.
+    0 of 18. Use model_evidence() and the gate's resolved budget so overrides change the captured excerpts too.
     """
     from kenn.core.chat_retrieval import source_label
-    from kenn.llm.llm_rewrite import model_evidence
+    from kenn.llm.llm_rewrite import model_evidence, resolve_context_chars
 
-    return model_evidence(results, source_label)
+    return model_evidence(results, source_label, max_chars=resolve_context_chars())
 
 
 def gate_evidence_text(shown: list[tuple[float, dict, str]]) -> str:
@@ -157,6 +157,8 @@ def _install_capture(path: Path) -> None:
     before anyone could quote them.
     """
     from kenn.core import chat_answer
+    from kenn.core.chat_retrieval import source_label
+    from kenn.knowledge.reasoning import get_chunk_id
     from kenn.llm.llm_rewrite import resolve_context_chars
 
     global _CAPTURE_PATH, _CAPTURE_HIT
@@ -169,7 +171,7 @@ def _install_capture(path: Path) -> None:
         global _CAPTURE_HIT
         _CAPTURE_HIT = True
         validation = real(query, results, answer, **kwargs)
-        _block, shown = gate_evidence(results)
+        block, shown = gate_evidence(results)
         with path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps({
                 "question": query,
@@ -179,7 +181,18 @@ def _install_capture(path: Path) -> None:
                 "unsupported_measurements": list(validation.get("unsupported_measurements") or []),
                 "fabricated_sources": list(validation.get("fabricated_sources") or []),
                 "evidence_text": gate_evidence_text(shown),
+                # Per-source snapshots let an independent reviewer check citation truth without
+                # consulting today's index or treating the production verdict as a gold label.
+                "evidence_sources": [
+                    {"id": get_chunk_id(chunk), "label": source_label(chunk),
+                     "title": str(chunk.get("title") or ""),
+                     "source": str(chunk.get("source") or ""), "text": body}
+                    for _score, chunk, body in shown
+                ],
+                "prompt_evidence": block,
                 "evidence_chunks_shown": len(shown),
+                "gate_ran": True,
+                "candidate_text_available": True,
                 # Both readers now resolve the budget through resolve_context_chars(), so the two numbers
                 # cannot diverge. They were separate fields because the gate used to ignore
                 # KENN_LLM_CONTEXT_CHARS and read model_evidence()'s 1200 default while the prompt honoured
@@ -268,6 +281,8 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
                 "unsupported_measurements": [str(m) for m in (validation.get("unsupported_measurements") or [])],
                 "fabricated_sources": [str(s) for s in (validation.get("fabricated_sources") or [])],
                 "evidence_text": "",
+                "evidence_sources": None,
+                "prompt_evidence": None,
                 "evidence_chunks_shown": None,
                 "gate_ran": False,
                 "candidate_text_available": False,
