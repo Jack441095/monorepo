@@ -375,7 +375,7 @@ def render(report: dict) -> str:
     counts, seconds = report["counts"], report["seconds"]
     attempted = counts["llm_attempted"]
     lines = [
-        "Chat answer latency, local brain (Stage 1 open item; gate is p95 <= 4 s)",
+        "Chat answer latency, local brain (Stage 1 open item; gate is 70% accepted within 15 s)",
         f"  model              {report['model'] or '(unset)'}",
         f"  surface            {surface_of(report)}",
         f"  index              {report['index_version'] or '(none in this checkout)'}",

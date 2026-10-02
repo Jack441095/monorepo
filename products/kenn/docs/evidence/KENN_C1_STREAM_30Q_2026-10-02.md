@@ -35,8 +35,11 @@ order.
   `-0.3db`, `-6db`, `0.5hz`) and one claimed it had changed the Live set. Each reason appeared once.
 - Rejected rows are not slow rows: their median completion is 11.7 s against 20.5 s for accepted ones, because the
   stream is cut. Their first token still arrives (median 3.8 s), so a user can see text that is then replaced.
-- The gate in the plan is p95 <= 4 s. This path is nowhere near it: even the median first token is 3.4 s and the
-  median completion is about 19 s.
+- The plan's local delivery gate is at least 70% of eligible requests getting an accepted model answer within 15 s.
+  Here it is **0 of 30** (the fastest accepted answer took 15.01 s), and 10 of 30 within 20 s. Acceptance alone
+  (76% of attempts) clears 70%, but the time does not, so the gate is failed on speed. The separate "first useful
+  answer p95 at most 4 s" target is not what this run's first-token column measures, because that column can be a
+  template or fallback token. We did not measure it here.
 
 First token and completion are separate columns on purpose. A first token can come from the template fallback, and
 partial text can arrive before a rejection, so a delivered token does not mean a good answer.

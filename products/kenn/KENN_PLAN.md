@@ -489,7 +489,8 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     generated answers accepted, 7 stopped mid-stream (six unsupported measurements, one claimed a Live change).
     Median completion 18.9 s (p95 28.5 s), median first token 3.4 s (p95 8.9 s); completed calls spend about 3.2 s
     in prefill and 16.8 s generating. Stream surface only: no foreground/background runs, no repeat, no
-    queue/verification/polling timing, no memory or dropout readings, cold/warm not separated. C1 stays open.
+    queue/verification/polling timing, no memory or dropout readings, cold/warm not separated. Against the 15 s/70% local
+    delivery gate: 0 of 30 accepted within 15 s (fastest 15.01 s), 10 of 30 within 20 s. C1 stays open.
     [Evidence and numeric receipt](docs/evidence/KENN_C1_STREAM_30Q_2026-10-02.md).
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
