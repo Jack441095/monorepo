@@ -40,6 +40,28 @@ answer-bearing chunks, where it ranks lower: `thin-vocal-body` is the 4th distin
 (the plan says not to rebuild on this Mac, and the notes are not in git); change what the rows expect; or accept that
 the exclusion trades these three for `bass-processing`. That is a decision on eval expectations, so none was made here.
 
+## Decision and note edits (2 October 2026)
+
+Jack chose to write answer text rather than change the rows' expected sources. One numbered step was added to
+each note on this Mac. The notes sit under the git-ignored `Training_Data_Notes/`, so they are not in this
+commit; the exact text is kept here so it can be applied on the machine that rebuilds the index.
+
+`thin-vocal-body.md`, new step 7 under "Try this":
+
+> If the vocal was recorded too far from the mic, EQ will not fully fix it: a boost around 150-300 Hz adds some
+> weight, but the room and the missing proximity effect stay in the take. Treat EQ as a partial repair and
+> re-record close, on-axis, if you can.
+
+`arrangement-energy-and-transitions.md`, new step 7 under "Try this":
+
+> If the track feels boring and you are not sure what to do next, do not add a layer yet. Loop the flattest
+> eight bars, mute half the parts, then bring back one thing at a time with a change at the section boundary
+> (a filter move, a drop-out or a fill).
+
+Not verified: the index was not rebuilt (the plan forbids it on this Mac) and neither eval was re-run, so
+nothing shows the two rows now pass. They stay open until the rebuild and a re-run on the other machine.
+`eval-followup-snare-layer-mono` is untouched.
+
 ## Verification
 
 - Experiment results above come from `tooling/scripts` (`evaluate()` in `eval_chat_coverage.py`) and

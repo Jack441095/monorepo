@@ -397,6 +397,9 @@ mock, an agent reviewer or an unrelated receipt.
     `bass-processing` ([evidence](docs/evidence/KENN_EVAL_ROWS_RELATED_QUESTION_ECHO_2026-10-02.md)).
     Closing them is a decision on the rows' expected sources or a note rewrite and index rebuild, not a
     retrieval tweak. `harsh-after-mastering` and `upgrade-buffer-recording` fail either way.
+    Jack chose to write answer text: step 7 was added to `thin-vocal-body.md` and
+    `arrangement-energy-and-transitions.md` (git-ignored, text kept in the evidence). Still open: rebuild the
+    index and re-run both evals on the other machine before ticking those two rows.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.
