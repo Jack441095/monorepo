@@ -141,7 +141,7 @@ the target, before/after values, confirmation state, verified readback, and
 undo path.
 
 Record each session with the privacy-safe
-[pilot run-log template](ABLETON_INTERNAL_BETA_0.1_RUN_LOG_TEMPLATE.md).
+[pilot run-log template](../evidence/ABLETON_INTERNAL_BETA_0.1_RUN_LOG_TEMPLATE.md).
 The Markdown log is useful for human notes, but qualification uses a separate
 copy of `evaluation/review/PILOT_SESSION_LOG_TEMPLATE.json` for each run.
 Aggregate the ten completed JSON logs with:

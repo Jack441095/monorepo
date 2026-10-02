@@ -13,9 +13,9 @@ KENN is an audio-engineering assistant with an Ableton Live specialty. This
 package retains the original standalone structure while migration work is
 reviewed on the monorepo integration branch.
 
-Start with [`GETTING_STARTED.md`](GETTING_STARTED.md), use
-[`PRODUCT_MAP.md`](PRODUCT_MAP.md) to find each subsystem, and follow
-[`CONTRIBUTING.md`](CONTRIBUTING.md) when collaborating through GitHub.
+Start with [`GETTING_STARTED.md`](../GETTING_STARTED.md), use
+[`PRODUCT_MAP.md`](../PRODUCT_MAP.md) to find each subsystem, and follow
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) when collaborating through GitHub.
 
 **Status: pre-beta, audited.** See `docs/KENN_CURRENT_STATE_SUMMARY.md`,
 `docs/KENN_BETA_GAP_MATRIX.md`, and `docs/KNOWN_ISSUES.md` for the full audit.

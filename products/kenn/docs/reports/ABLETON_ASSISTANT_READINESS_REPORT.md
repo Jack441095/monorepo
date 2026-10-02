@@ -46,7 +46,7 @@ tests passing and a current Live read-only preflight. This
 supports supervised disposable-set piloting only; the qualified profile
 remains not ready pending independent human review and a reviewed source
 snapshot. The machine-readable result is
-[`ABLETON_INTERNAL_BETA_0.1_GATE_2026-09-03.json`](ABLETON_INTERNAL_BETA_0.1_GATE_2026-09-03.json).
+[`ABLETON_INTERNAL_BETA_0.1_GATE_2026-09-03.json`](../evidence/ABLETON_INTERNAL_BETA_0.1_GATE_2026-09-03.json).
 
 With the current Live runtime included, the same gate passes 5/5 required
 gates: `AbletonOSC` answered a fresh read-only snapshot and the repeatable
@@ -105,7 +105,7 @@ parameter and `2A` band from the Live snapshot before applying it. This does
 not yet qualify arbitrary EQ wording or arbitrary device parameters.
 
 The human-review workflow is prepared at
-[`ABLETON_ASSISTANT_HUMAN_REVIEW_PACKET_2026-09-08.json`](ABLETON_ASSISTANT_HUMAN_REVIEW_PACKET_2026-09-08.json); it requires two independent reviewers and remains pending until scores are entered and adjudicated.
+[`ABLETON_ASSISTANT_HUMAN_REVIEW_PACKET_2026-09-08.json`](../evidence/ABLETON_ASSISTANT_HUMAN_REVIEW_PACKET_2026-09-08.json); it requires two independent reviewers and remains pending until scores are entered and adjudicated.
 Once scores exist, `scripts/adjudicate_human_review.py` validates complete
 case/criterion coverage and produces agreement statistics; it does not replace
 the independent review or adjudication decision.

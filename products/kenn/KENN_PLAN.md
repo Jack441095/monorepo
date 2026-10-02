@@ -408,9 +408,13 @@ mock, an agent reviewer or an unrelated receipt.
     generation), refusing 30 retries with 429; an idle short request takes about 1.2 s. KENN's cancel still
     reports `inference_aborted: false`. Stopping generation is an open finding that needs a bridge change; see
     [the evidence](docs/evidence/KENN_INFERENCE_CANCELLATION_MEASURED_2026-10-02.md).
-  - [ ] Continue the remaining document-pointer and container-path audit, including
+  - [x] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.
+    Repointed 19 dangling links in six docs (scan now 257 links, 0 broken), checked every Dockerfile/compose
+    source and all 11 tracked symlinks. One open finding: the Audio_Too image's symlinked `studio/` dirs sit
+    outside its build context, so it likely cannot build; Docker not run, no change made.
+    [Evidence](docs/evidence/KENN_DOC_POINTERS_CONTAINER_PATHS_2026-10-02.md).
   - [x] `packages/chat` is the single chat wrapper: the duplicate `chat/` copy is removed (its two unique
     tests moved) and the wrapper Dockerfile no longer reads Audio_Too, with its own ignore file. Image not
     built (no Docker here) and it needs the git-ignored notes and models on disk.

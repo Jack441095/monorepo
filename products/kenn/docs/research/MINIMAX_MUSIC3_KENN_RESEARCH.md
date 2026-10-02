@@ -134,9 +134,9 @@ Generated WAV output should pass through the existing KENN pattern:
 
 Relevant KENN surfaces:
 
-- [server.py](<LOCAL_VOLUME>/Shenrendao/KENN/apps/backend/src/kenn/server.py)
-- [audiogen_artifacts.py](<LOCAL_VOLUME>/Shenrendao/KENN/apps/backend/src/kenn/core/audiogen_artifacts.py)
-- [mcp_facade.py](<LOCAL_VOLUME>/Shenrendao/KENN/apps/backend/src/kenn/core/mcp_facade.py)
+- [server.py](../../apps/backend/src/kenn/server.py)
+- [audiogen_artifacts.py](../../apps/backend/src/kenn/core/audiogen_artifacts.py)
+- [mcp_facade.py](../../apps/backend/src/kenn/core/mcp_facade.py)
 - [KENN architecture and plan](../../KENN_PLAN.md)
 
 ## What KENN should not reuse yet
