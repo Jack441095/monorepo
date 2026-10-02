@@ -65,6 +65,17 @@ inline bool HasPrefixSegment(const std::string& path, const std::string& prefix)
   return path[prefix.size()] == '/';
 }
 
+// Trash containment for the privileged helper's dst. The helper runs
+// as root, so dst must never resolve outside the trash root: we
+// normalise `..` lexically first because fs::rename follows it.
+// 2026-10-02 review: the raw prefix match let
+// "$HOME/.Trash/Disksweep/../../../../etc/evil" through, so the
+// root helper could move any file anywhere.
+inline bool DstInsideTrash(const std::string& dst, const std::string& home) {
+  std::string trash = home + "/.Trash/Disksweep";
+  return HasPrefixSegment(LexicalNormalise(dst), trash);
+}
+
 // /usr/local caches are the documented exception to the /usr block.
 inline bool IsUsrLocalCacheException(const std::string& norm) {
   return HasPrefixSegment(norm, "/usr/local/var/cache") ||

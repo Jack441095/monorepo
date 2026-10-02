@@ -15,13 +15,6 @@
 
 namespace fs = std::filesystem;
 
-static bool DstInsideTrash(const std::string& dst) {
-  const char* home = std::getenv("HOME");
-  std::string trash = std::string(home ? home : "/var/empty") + "/.Trash/Disksweep";
-  return dst.size() > trash.size() && dst.compare(0, trash.size(), trash) == 0 &&
-         dst[trash.size()] == '/';
-}
-
 // Minimal JSON field grabber (helper has no JSON dep by design).
 static std::string Field(const std::string& line, const std::string& key) {
   std::string pat = "\"" + key + "\":\"";
@@ -44,11 +37,14 @@ static std::string Field(const std::string& line, const std::string& key) {
 }
 
 int main() {
+  const char* homeEnv = std::getenv("HOME");
+  const std::string home = homeEnv ? homeEnv : "/var/empty";
   std::string line;
   int moved = 0, refused = 0;
   while (std::getline(std::cin, line)) {
     std::string src = Field(line, "src"), dst = Field(line, "dst");
-    if (src.empty() || dst.empty() || disksweep::IsBlocked(src) || !DstInsideTrash(dst)) {
+    if (src.empty() || dst.empty() || disksweep::IsBlocked(src) ||
+        !disksweep::DstInsideTrash(dst, home)) {
       std::cerr << "REFUSE " << src << "\n";
       ++refused;
       continue;
