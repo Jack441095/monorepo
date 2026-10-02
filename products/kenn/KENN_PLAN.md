@@ -485,6 +485,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     of each row. Caches, cold start, model/index/embedding hashes and isolated
     FakeLive runtime are declared; native phase telemetry and full C1 remain open.
     [Evidence and numeric receipt](docs/evidence/KENN_QWEN_SMALL_CURRENT_PATH_2026-10-02.md).
+  - [x] Thirty questions through the stream runner at `7539ec10`, one run, FakeLive, response cache off: 22 of 29
+    generated answers accepted, 7 stopped mid-stream (six unsupported measurements, one claimed a Live change).
+    Median completion 18.9 s (p95 28.5 s), median first token 3.4 s (p95 8.9 s); completed calls spend about 3.2 s
+    in prefill and 16.8 s generating. Stream surface only: no foreground/background runs, no repeat, no
+    queue/verification/polling timing, no memory or dropout readings, cold/warm not separated. C1 stays open.
+    [Evidence and numeric receipt](docs/evidence/KENN_C1_STREAM_30Q_2026-10-02.md).
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already
