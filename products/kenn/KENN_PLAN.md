@@ -159,6 +159,9 @@ Kernel timing alone cannot justify changing the default or sharing an ABI.
 The source baseline for this consolidation is `153f06cb`. These ticks apply only
 to the stated implementation and evidence; they do not imply release qualification.
 
+The [2 October capability baseline](docs/evidence/KENN_CAPABILITY_BASELINE_2026-10-02.md)
+records implemented features, current limits and qualification boundaries.
+
 - [x] **V1 — Query embedding overhead reduced.** Same fp32 model and index, CPU ONNX
   1.14–1.15 ms p50 versus CoreML 12.43–12.72 ms in two 40-query runs; identical
   ordered top-four results on 240 questions. [Evidence](docs/evidence/KENN_QUERY_EMBEDDING_LATENCY_2026-10-02.md).
