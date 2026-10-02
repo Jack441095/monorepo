@@ -99,8 +99,6 @@ Usage:
   python main.py check --full    Also run automix-quality-gate and release-health (~5+ min)
   python main.py full-test       Run crash-isolated release suite and write JSON/Markdown reports
   python main.py automix-local DIR  Local/offline AutoMix -- no DB, job queue, or upload
-  python main.py package build   Build a distributable release archive (artifacts/releases/)
-  python main.py package verify ARCHIVE  Extract and verify an existing release archive
   python main.py release-health  Run the combined AutoMix/KENN/TTS performance SLO gate
   python main.py test            Run pytest
   python main.py lint            Run ruff
@@ -466,16 +464,6 @@ def cmd_automix_local(args: list[str]) -> int:
     return run([python_cmd(), str(SCRIPTS / "automix_local.py"), *args])
 
 
-def cmd_package(args: list[str]) -> int:
-    """Build or verify a distributable release archive (Stage F).
-
-    python main.py package build              Build artifacts/releases/audio-too-<timestamp>.tar.gz
-    python main.py package build --output P    Build to a specific path
-    python main.py package verify ARCHIVE      Extract + verify an existing archive
-    """
-    return run([python_cmd(), str(SCRIPTS / "build_release_package.py"), *args])
-
-
 def cmd_release_health(args: list[str]) -> int:
     """Combined release-health gate (docs/AUDIO_MVP_MASTER_PLAN.md Stage E):
     KENN retrieval latency, TTS latency, AutoMix quality benchmark, and the
@@ -822,8 +810,6 @@ COMMANDS: dict[str, object] = {
     "gate": cmd_benchmark_gate,
     "automix-quality-gate": cmd_automix_quality_gate,
     "automix-local": cmd_automix_local,
-    "package": cmd_package,
-    "release-package": cmd_package,
     "release-health": cmd_release_health,
     "release-health-check": cmd_release_health,
     "feedback-review": cmd_feedback_review,

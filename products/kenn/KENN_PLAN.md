@@ -329,6 +329,10 @@ mock, an agent reviewer or an unrelated receipt.
   - [ ] Remove confirmed dead code and redundant ownership after checking callers,
     exports, dynamic registries, packaging and tests. Keep cleanup independent of
     the fixed benchmark revision; qualify each deletion with scoped checks.
+  - [x] Deleted 17 uncalled Audio_Too scripts and modules plus the `package` command whose script no longer
+    exists. Collection is identical before and after; the Audio_Too suite does not run cleanly here, so
+    that is parity, not a green run. Candidates left for decision are listed in the
+    [evidence](docs/evidence/KENN_AUDIO_TOO_DEAD_CODE_2026-10-02.md).
   - [x] Removed two overridden, unreachable clip methods from `AbletonOSCClient`;
     the final public methods retain the same behavior. Caller/registry and AST
     checks establish reachability; 39 scoped OSC/clip tests pass. [Evidence and exact files](docs/evidence/KENN_DEAD_CLIP_METHODS_2026-10-02.md).
