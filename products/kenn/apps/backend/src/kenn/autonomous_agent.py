@@ -211,27 +211,6 @@ def tool_audit_live_session(session_id: str = "default") -> Dict[str, Any]:
     }
 
 
-def tool_auto_remediate_session_issues(session_id: str = "doctor_session") -> Dict[str, Any]:
-    """Audit and automatically apply non-destructive fixes to session issues via autonomous batching."""
-    from kenn.core.live_action_service import LiveActionService
-
-    audit_result = tool_audit_live_session()
-    batch = audit_result.get("remediation_batch", [])
-    if not batch:
-        return {
-            "status": "clean",
-            "message": "Session Doctor found no issues requiring automated remediation.",
-            "audit": audit_result,
-        }
-    service = LiveActionService()
-    batch_result = service.execute_batch_autonomous(batch, session_id=session_id)
-    return {
-        "status": "remediated" if batch_result.get("ok") else "partial_failure",
-        "audit": audit_result,
-        "execution": batch_result,
-    }
-
-
 def tool_formulate_surgical_remediation(session_id: str = "doctor_session") -> Dict[str, Any]:
     """Formulate a comprehensive closed-loop surgical masking & diagnostic remediation proposal."""
     from kenn.ableton_osc_bridge import live_client
@@ -433,18 +412,6 @@ def _track_field_before(track_index: int, field: str) -> Any:
     need one field (undo's previous_value capture)."""
     snapshot = _track_snapshot(track_index)
     return snapshot.get(field) if snapshot else None
-
-
-def _track_confirmation(action: str, payload: Dict[str, Any], confirm_token: str, session_id: str) -> Dict[str, Any] | None:
-    """Gate legacy track controls with the same signed, exact-request token."""
-    from kenn.core.confirmation import consume_confirmation, issue_confirmation
-    text = action + ":" + ",".join(f"{key}={payload[key]!r}" for key in sorted(payload))
-    if not confirm_token:
-        token, meta = issue_confirmation(session_id=session_id, service_id=action, text=text)
-        return {"status": "confirmation_required", "confirmation_required": True, "confirm_token": token, "confirmation_meta": meta, "action": action, **payload}
-    if not consume_confirmation(confirm_token, session_id=session_id, service_id=action, text=text):
-        return {"status": "failed", "error": "Invalid, expired, or already-used confirmation token.", "action": action, **payload}
-    return None
 
 
 def _journal_receipt(result: Dict[str, Any], session_id: str) -> None:

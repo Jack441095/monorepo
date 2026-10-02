@@ -208,11 +208,17 @@ mock, an agent reviewer or an unrelated receipt.
   preserved evidence and recovery procedures, repaired active references and release
   artifact checks. 57 introduced local links resolve; 64 scoped tests pass and both
   missing-document checks fail as required. [Audit and exact files](docs/evidence/KENN_PLANNING_CONSOLIDATION_2026-10-02.md).
-- [ ] **A2 — Trace every request and write route.** Inventory UI/HTTP/stream/background/
+- [x] **A2 — Trace every request and write route.** Inventory UI/HTTP/stream/background/
   voice/MCP entry points through routing, context, proposal, Apply, readback and Undo.
   Compare function/registry bindings, not names alone. Record each bypass or duplicate
   owner with a source symbol and reproducible fixture. Finish the reachability trace
-  for each owner before changing it.
+  for each owner before changing it. Two read-only source passes plus a direct trace of the
+  ambient guardian found no write that skips the proposal and confirmation gate. Seven
+  duplicate-owner or lost-receipt defects found on the way each have a fixture and a fix (the
+  A3 sub-bullets below). Limits: a source read, not a runtime trace; the open observations
+  (no concurrent-stream guard, unauthenticated local `reload-index`, a dead MCP field, caller-less
+  `LiveExecutor`, track-0 fallbacks in snapshot reads, the missing `demo_feedback`) are listed
+  with symbols and carried forward. [Route map](docs/evidence/KENN_A2_ROUTE_MAP_2026-10-02.md).
 - [ ] **A3 — Resolve scoped delivery defects first.** Audit memory/cache isolation,
   project switching, upgrade polling ownership, stale-turn replacement and
   cancellation; fix verified defects with cross-session and late-job tests.
@@ -302,6 +308,11 @@ mock, an agent reviewer or an unrelated receipt.
     each of the three call sites fails the file when deleted, full backend run is
     3,518 passed, 12 skipped.
     [Evidence and exact files](docs/evidence/KENN_AUTONOMOUS_TOOL_RECEIPTS_2026-10-02.md).
+  - [x] Removed `tool_auto_remediate_session_issues` and `_track_confirmation` from
+    `autonomous_agent.py`. Neither had a caller, and the first applied a whole batch through
+    `execute_batch_autonomous`, which confirms its own proposals. Two new cases fail on the old
+    file, full backend run is 3,520 passed, 12 skipped.
+    [Evidence and exact files](docs/evidence/KENN_AUTONOMOUS_DEAD_WRITE_PATHS_2026-10-02.md).
   - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.
