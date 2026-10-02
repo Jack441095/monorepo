@@ -348,6 +348,10 @@ mock, an agent reviewer or an unrelated receipt.
     game audio). Two coverage rows and five held-out rows remain; each cause is in
     [the evidence](docs/evidence/KENN_MOBILE_AUDIO_MEMORY_ROUTE_2026-10-02.md). Full backend
     run is 3,527 passed, 12 skipped.
+    A second held-out row is fixed: `new-topic-does-not-inherit-old-diagnosis` (a symptom report with Live
+    offline was answered as a control error; see
+    [the evidence](docs/evidence/KENN_SYMPTOM_REPORT_OFFLINE_ADVICE_2026-10-02.md)). Four held-out rows
+    and two coverage rows stay open as retrieval-ranking or corpus findings, diagnosed in that receipt.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.

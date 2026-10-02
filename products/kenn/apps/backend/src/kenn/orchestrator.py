@@ -447,6 +447,15 @@ def _dispatch_ableton(**kwargs: Any) -> Dict[str, Any]:
             # planning belongs to the typed HTTP/MCP command surfaces.
             allow_llm=False,
         )
+        # A symptom report like "my vocal is buried" matches the subjective
+        # translator but isn't a command. With Live offline there's nothing
+        # to translate, so hand it back to the normal advice path instead of
+        # answering a mix question with "I cannot control Ableton".
+        if (
+            command_result.get("status") == "offline"
+            and not _ABLETON_WRITE_INTENT_RE.search(query)
+        ):
+            return None
         return {
             "agent": "ableton_controller",
             "status": command_result.get("status", "failed"),
