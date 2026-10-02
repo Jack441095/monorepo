@@ -255,6 +255,12 @@ mock, an agent reviewer or an unrelated receipt.
     that carry a queued job, on both paths. 20 scoped cases pass and nine mutations
     are caught; the gate is a list of routes found by reading, not a proof that no
     other route reads session state. [Evidence and exact files](docs/evidence/KENN_SEMANTIC_CACHE_SESSION_STATE_2026-10-02.md).
+  - [x] A semantic-cache hit now records its turn and returns the current session block
+    on both paths; before, a repeated question left the last question, turn count and
+    topics at the previous exchange. The stream path records only while its turn is
+    current. 73 scoped cases pass, six mutations are caught and the full backend run is
+    3,480 passed, 12 skipped. Cached answers are not made current by this; it only keeps
+    session memory in step. [Evidence and exact files](docs/evidence/KENN_SEMANTIC_CACHE_TURN_RECORD_2026-10-02.md).
   - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.

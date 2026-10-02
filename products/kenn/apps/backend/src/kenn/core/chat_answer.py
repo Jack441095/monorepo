@@ -1970,10 +1970,23 @@ def _answer_payload_stream(
             from kenn.core.session_memory import get_semantic_cache_hit
             cached_events = get_semantic_cache_hit(query, session_id=session_id)
             if cached_events:
+                cached_metadata = next((
+                    ev.get("data") for ev in reversed(cached_events)
+                    if ev.get("event") == "metadata" and isinstance(ev.get("data"), dict)
+                ), None)
+                if cached_metadata is not None and not answer_upgrades.write_if_current(
+                    lambda: _record_cache_hit_turn(query, cached_metadata, session_id),
+                    session_id=session_id,
+                    turn_id=request_turn_id,
+                ):
+                    yield discarded
+                    return
                 for event in cached_events:
                     if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
                         yield discarded
                         return
+                    if event.get("event") == "session":
+                        event = {**event, "data": _session_info(session_id=session_id)}
                     if event.get("event") == "metadata" and isinstance(event.get("data"), dict):
                         event = {**event, "data": {
                             **event["data"], "semantic_cache_hit": True,
@@ -2050,6 +2063,25 @@ def _answer_reads_session_state(query: str, session_id: str) -> bool:
     ):
         return True
     return bool(mix_review_timeline_lookup(query) or latest_track_memory_lookup(query))
+
+
+def _record_cache_hit_turn(query: str, cached: dict, session_id: str) -> None:
+    """Record a replayed answer as a turn, since the engine never ran to do it.
+
+    Without this a repeated question left last_question, the turn count and
+    topics at whatever came before it, so the next follow-up resolved against
+    the wrong exchange. The cached retrieval results belong to the first
+    asking, so we store none and a follow-up searches fresh.
+    """
+    _update_session(
+        query, str(cached.get("answer") or ""),
+        route=cached.get("route", ""),
+        answer_mode=cached.get("answer_mode", ""),
+        confidence=cached.get("confidence", "medium"),
+        intent=cached.get("intent") or detect_intent(query),
+        session_id=session_id,
+        retrieved_results=[],
+    )
 
 
 def _may_store_in_semantic_cache(metadata: dict | None) -> bool:
@@ -2805,8 +2837,10 @@ def _answer_payload(
                         final_metadata = ev.get("data")
                         break
                 if final_metadata:
+                    _record_cache_hit_turn(query, final_metadata, session_id)
                     res = dict(final_metadata)
                     res["semantic_cache_hit"] = True
+                    res["session"] = _session_info(session_id=session_id)
                     return res
         except Exception:
             logging.getLogger("kenn.core.chat_answer").warning(
