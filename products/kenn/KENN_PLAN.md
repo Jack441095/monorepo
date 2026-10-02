@@ -326,9 +326,12 @@ mock, an agent reviewer or an unrelated receipt.
     [the session-clear receipt](docs/evidence/KENN_SESSION_CLEAR_REVOKES_TOKENS_2026-10-02.md). Limits:
     no Live set identity scopes tokens or Undo receipts (open, needs a decision); inference is not
     cancelled and the cancel reply reports `inference_aborted: false`; nothing was run against real Live.
-  - [ ] Remove confirmed dead code and redundant ownership after checking callers,
+  - [x] Remove confirmed dead code and redundant ownership after checking callers,
     exports, dynamic registries, packaging and tests. Keep cleanup independent of
     the fixed benchmark revision; qualify each deletion with scoped checks.
+    Every deletion below was confirmed and checked that way. What is not confirmed dead (the Audio_Too/thursday
+    duplicate, `knowledge_flywheel_agent`, `podcast_repair_api`, `listening_benchmark_*`, the four missing files
+    `kenn_demo_doctor.py` checks) is listed for a decision in the dead-code evidence and was not deleted.
   - [x] Deleted 17 uncalled Audio_Too scripts and modules plus the `package` command whose script no longer
     exists. Collection is identical before and after; the Audio_Too suite does not run cleanly here, so
     that is parity, not a green run. Candidates left for decision are listed in the
