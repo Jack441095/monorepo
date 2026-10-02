@@ -52,7 +52,7 @@ Checked with the semantic embedder warmed (`warm_index()`, mode `hybrid`) as wel
 | Row | Finding |
 | --- | --- |
 | `harsh-after-mastering` | The engine answers it with the right diagnosis (limiter/clipper/saturation first). The public wrapper abstains because its retrieval-only gate finds no strong source, and the top lexical hits are mix-bus and low-mid notes, not a mastering-harshness note. Looks like a corpus gap: the abstention follows the stated rule not to answer ungrounded. Fixing it means a new reviewed note and an index rebuild. |
-| `eval-followup-snare-layer-mono` | `snare-clap-layering.md` is in the active index but ranks 12th for the combined question (stereo-width and layering notes outrank it). |
+| `eval-followup-snare-layer-mono` | `snare-clap-layering.md` is in the active index but ranks 13th for the combined question (stereo-width and layering notes outrank it). |
 | `upgrade-buffer-recording` | `audio-interface-buffer-latency.md` ranks 5th (vocal-recording notes outrank it); the answer is a generic vocal-recording workflow with no buffer figure. |
 | `upgrade-room-null` | `room-acoustics-monitor-placement.md` ranks 4th behind three EQ notes, and the answer built from the top three recommends boosting bass bands. That is the more worrying of the four, since a null should not be EQ-boosted. |
 
