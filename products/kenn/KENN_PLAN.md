@@ -406,6 +406,10 @@ mock, an agent reviewer or an unrelated receipt.
     (`mastering-prep-and-headroom.md`) turned out to be echo-dependent too
     ([evidence](docs/evidence/KENN_ECHO_ROWS_BOX_REBUILD_2026-10-02.md)). The held-out wrapper eval still fails the
     same six rows before and after, so this parent item stays open. The Mac's live index is not rebuilt.
+    Each of the six is traced to a cause (ranking behind long transcript notes, answer built from the wrong note, or a
+    corpus gap) in [the held-out rows receipt](docs/evidence/KENN_WRAPPER_HELDOUT_ROWS_FRESH_INDEX_2026-10-02.md).
+    They are held-out rows, so they are not tuned against; the fix belongs with C5 evidence selection and needs a
+    separate tuning set.
   - [x] Measured what a cancelled answer does to the model slot, on the real Qwen3-4B bridge on the GPU box:
     after the client gives up at 2 s the generation runs on and the slot stays busy another 45.5 s (a 58 s
     generation), refusing 30 retries with 429; an idle short request takes about 1.2 s. KENN's cancel still
