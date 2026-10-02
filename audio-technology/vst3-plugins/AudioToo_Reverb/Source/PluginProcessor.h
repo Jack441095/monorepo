@@ -10,13 +10,12 @@
 #include <JuceHeader.h>
 #include <vector>
 
-// Forward declaration of native schroeder_reverb kernel function
-extern "C" {
-    void schroeder_reverb(
-        const double* left, const double* right, std::size_t n,
-        int pre_delay_samples, double room_size, double decay_time, double damping, double wet_dry, double sample_rate,
-        double* out_l, double* out_r);
-}
+// The native kernel, included rather than forward-declared: the streaming
+// entry point needs SchroederReverbState by value as a member, and that
+// struct holds the comb, all-pass, pre-delay and spread rings. The header
+// pulls in nothing but <cstddef> and <vector>, so it is safe next to
+// JuceHeader.
+#include "../../../audio-analysis/audio_analysis/dsp_engine/native/reverb_full_kernel.h"
 
 class AudioTooReverbAudioProcessor : public juce::AudioProcessor
 {
@@ -58,6 +57,13 @@ private:
     std::vector<double> inRDouble;
     std::vector<double> outLDouble;
     std::vector<double> outRDouble;
+
+    // Survives processBlock. The kernel's own batch entry point starts every
+    // call from silence, so at a 128-512 sample host block size it skipped
+    // every comb (the shortest delay is 1395 samples at room_size 0.5) and
+    // left the wet path silent; this is what carries that 12.7-31.6 ms of
+    // history from one block to the next.
+    SchroederReverbState reverbState;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioTooReverbAudioProcessor)
 };

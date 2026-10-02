@@ -42,6 +42,11 @@ void AudioTooReverbAudioProcessor::prepareToPlay(double sampleRate, int samplesP
     inRDouble.resize(static_cast<std::size_t>(samplesPerBlock));
     outLDouble.resize(static_cast<std::size_t>(samplesPerBlock));
     outRDouble.resize(static_cast<std::size_t>(samplesPerBlock));
+
+    // Flush the delay lines. The 23/29 ms spread delays are derived from the
+    // sample rate, so a host switching rate must not carry the previous
+    // stream's tail into the new one.
+    schroeder_reverb_state_reset(&reverbState);
 }
 
 void AudioTooReverbAudioProcessor::releaseResources()
@@ -93,7 +98,8 @@ void AudioTooReverbAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer
 
     const int preDelaySamples = static_cast<int>((preDelayMs / 1000.0f) * sampleRate);
 
-    schroeder_reverb(
+    schroeder_reverb_stream(
+        &reverbState,
         inLDouble.data(), inRDouble.data(), static_cast<std::size_t>(numSamples),
         preDelaySamples, static_cast<double>(roomSize), static_cast<double>(decayTime),
         static_cast<double>(damping), static_cast<double>(wetDry), sampleRate,
