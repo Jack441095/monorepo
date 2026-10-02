@@ -24,7 +24,10 @@ juce_add_plugin(AudioToo_Reverb
 target_sources(AudioToo_Reverb
     PRIVATE
         Source/PluginProcessor.cpp
-        ../../audio_analysis/audio_analysis/dsp_engine/native/reverb_full_kernel.cpp
+        # The directory is audio-analysis with a hyphen; this path was written as
+        # audio_analysis, so CMake could not find the kernel and the plugin did
+        # not build at all until it was corrected.
+        ../../audio-analysis/audio_analysis/dsp_engine/native/reverb_full_kernel.cpp
 )
 
 target_compile_definitions(AudioToo_Reverb
