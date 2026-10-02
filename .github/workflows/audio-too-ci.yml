@@ -136,9 +136,6 @@ jobs:
           --ignore=tests/audio_analysis
           --ignore=tests/test_latency.py
           --ignore=tests/test_finetune_lora_dataset.py
-          --deselect "tests/kenn/test_kenn_gap_clustering.py::test_cluster_queries_accepts_pairs_not_only_triples"
-          --deselect "tests/kenn/test_kenn_gap_clustering.py::test_default_thresholds_find_clusters_in_realistic_sparse_data"
-          --deselect "tests/kenn/test_kenn_product_package.py::test_kenn_product_package_boots_and_serves_with_zero_thursday_or_business_agents"
           --deselect "tests/test_release_health_check.py::test_measure_model_dependencies_against_the_real_restored_repo_state"
           --deselect "tests/test_release_health_latency.py::test_kenn_retrieval_latency_meets_slo"
           --deselect "tests/test_release_package.py::test_current_release_package_is_complete_relocatable_and_private"

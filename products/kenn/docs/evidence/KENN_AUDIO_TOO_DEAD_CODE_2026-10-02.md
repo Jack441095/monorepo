@@ -73,7 +73,7 @@ Checked from `Audio_Too` with the KENN backend venv, which lacks Audio_Too's own
   `main.py` `cmd_ableton`, `cmd_lint`, `cmd_export_training`, `server/app/ableton_bridge.py` and about 45 tests and
   25 scripts. These need repointing, and the target is a decision: the importable package is
   `products/kenn/apps/backend/src/kenn`.
-- `audio-too-ci.yml` lines 139-141 deselect two test files that do not exist; that is CI, so it was left for Jack. The Makefile `lint` target listed a `business/` directory that does not exist; that entry is removed (`ruff` was not run, the directory was simply absent).
+- `audio-too-ci.yml` lines 139-141 deselect two test files that do not exist; Jack approved removing them on 2 October; the three `tests/kenn/...` deselects are gone from the workflow (`tests/kenn` holds only `__pycache__`), and the YAML still parses. The workflow itself was not run. The Makefile `lint` target listed a `business/` directory that does not exist; that entry is removed (`ruff` was not run, the directory was simply absent).
 - `scripts/kenn_demo_doctor.py` checks four files that no longer exist.
 - `Audio_Too/thursday` is a declared duplicate (`DEPRECATED_THURSDAY.txt`, canonical copy under
   `autonomous-systems/thursday`) but live server code, CI and about 115 test files import it, so removing it is a
