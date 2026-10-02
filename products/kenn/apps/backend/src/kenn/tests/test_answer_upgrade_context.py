@@ -216,6 +216,26 @@ def test_background_answer_does_not_use_or_populate_the_semantic_cache(monkeypat
     assert calls == []
 
 
+def test_a_background_answer_does_not_count_citations_or_save_a_second_trace(monkeypatch, tmp_path):
+    import kenn.knowledge as knowledge
+
+    # Measured 2 Oct: four upgraded questions left eight traces and doubled every citation count.
+    monkeypatch.setenv("KENN_DB_PATH", str(tmp_path / "kenn.db"))
+    writes = []
+    monkeypatch.setattr(knowledge, "record_citations", lambda sources: writes.append(("citations", list(sources))))
+    monkeypatch.setattr(knowledge, "save_reasoning_trace", lambda **kwargs: writes.append(("trace", kwargs["trace_id"])))
+    question = "How do I sidechain a bass to the kick in Ableton?"
+
+    chat_answer.answer_payload(question, session_id="song-a", allow_llm=False)
+    foreground = list(writes)
+    assert {kind for kind, _ in foreground} == {"citations", "trace"}
+
+    writes.clear()
+    background = chat_answer.answer_payload(question, session_id="song-a", record_session=False)
+    assert writes == []
+    assert "critique" in background
+
+
 @pytest.fixture
 def upgrade_http_server(monkeypatch, tmp_path):
     import kenn.server as server

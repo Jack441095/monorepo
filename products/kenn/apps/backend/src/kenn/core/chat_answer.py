@@ -2594,6 +2594,7 @@ def _answer_payload_raw(
         turn_id=turn_id,
         metadata_payload=payload,
         weak_match=weak_match,
+        persist=record_session,
     )
 
     return payload
@@ -2993,8 +2994,13 @@ def _critique_and_save_trace(
     turn_id: str,
     metadata_payload: dict,
     weak_match: bool,
+    persist: bool = True,
 ) -> str:
-    """Helper to run self-critique, record citations, and save reasoning trace."""
+    """Helper to run self-critique, record citations, and save reasoning trace.
+
+    A background answer passes persist=False: the foreground answer for the same turn already counted its citations
+    and saved its trace, and a discarded upgrade must not write either.
+    """
     try:
         from kenn.knowledge import query_reasoning_traces, post_answer_critique, record_citations
         past_reasoning_traces = query_reasoning_traces(query)
@@ -3018,7 +3024,7 @@ def _critique_and_save_trace(
 
 
         # Record source citations to update dynamic trust scores
-        if not weak_match:
+        if persist and not weak_match:
             record_citations(
                 chunk["source"]
                 for _, chunk in (results or [])
@@ -3028,6 +3034,8 @@ def _critique_and_save_trace(
         import logging
         logging.getLogger("kenn.core.chat_answer").warning(f"Self-critique / trust score processing failed: {e}")
 
+    if not persist:
+        return confidence
     try:
         from kenn.knowledge import save_reasoning_trace, get_chunk_id
         ev_ids = [get_chunk_id(chunk) for _, chunk in (results or [])]

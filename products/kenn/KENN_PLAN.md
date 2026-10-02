@@ -507,6 +507,10 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
+    - Measured 2 Oct: the repeated routing, retrieval and critique cost about 25 ms a question against about 15 s of
+      generation, so it stays. The background answer did write a second reasoning trace and a second set of citation
+      counts, and that is fixed with a regression test. Budget/cache drift and the streaming path are not covered.
+      [Receipt](docs/evidence/KENN_UPGRADE_PATH_REPEATED_WORK_2026-10-02.md).
   - [ ] Use measured phase costs to select stable-prefix, KV/residency or explicit
     same-checkpoint MLX experiments. Preserve full grounding policy and exact
     assets; justify new dependencies/assets separately before adding them.
