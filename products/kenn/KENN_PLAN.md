@@ -383,6 +383,11 @@ mock, an agent reviewer or an unrelated receipt.
     but the generated answer is still weak and does not warn against EQ-boosting a null; see
     [the evidence](docs/evidence/KENN_ACOUSTICS_TOPIC_TERMS_2026-10-02.md). Three held-out rows and
     two coverage rows remain. Full backend run is 3,544 passed, 12 skipped.
+    Root cause of three of the five remaining rows is now known: they passed only through "Related
+    questions" echo chunks that `f0ebeba6` deliberately excludes, and re-allowing the echo breaks
+    `bass-processing` ([evidence](docs/evidence/KENN_EVAL_ROWS_RELATED_QUESTION_ECHO_2026-10-02.md)).
+    Closing them is a decision on the rows' expected sources or a note rewrite and index rebuild, not a
+    retrieval tweak. `harsh-after-mastering` and `upgrade-buffer-recording` fail either way.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.
