@@ -45,6 +45,12 @@ From `products/kenn/apps/backend/src`:
   people's uncommitted edits, so it needs a decision, not a drive-by fix.
 - `chat/Dockerfile` and `packages/chat/Dockerfile` (identical) copy `Audio_Too/studio/kenn` and install
   `Audio_Too/studio/kenn/kenn/requirements.txt`, which does not exist for the same reason.
+- `products/kenn/chat` (13 tracked files) and `products/kenn/packages/chat` (23) are two diverged copies of
+  the wrapper: `app.py`, `build_runtime_index.py`, `eval_runner.py`, `requirements.txt` and the READMEs differ,
+  and only `packages/chat` has the held-out eval files and the benchmark tests. Both Dockerfiles are
+  identical and both `COPY products/kenn/chat`, so the `packages/chat` image would build the other copy.
+  Nothing in CI or the deploy config builds either image, and Docker is not installed on this Mac. Which
+  copy is canonical needs a decision before either Dockerfile is touched.
 - Stale labels in `chat/eval_runner.py:327`, `packages/chat/app.py:36` and the mix-review adapters.
 - Backticked paths in `docs/handover/HANDOVER_2026-09-14.md`, `HANDOVER_2026-09-06.md`,
   `SLO_HANDOFF_AUDIT_2026-09-09.md` and `KENN_MIGRATION_RECEIPT.md` point at the pre-consolidation layout.

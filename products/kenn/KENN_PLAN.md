@@ -313,12 +313,19 @@ mock, an agent reviewer or an unrelated receipt.
     `execute_batch_autonomous`, which confirms its own proposals. Two new cases fail on the old
     file, full backend run is 3,520 passed, 12 skipped.
     [Evidence and exact files](docs/evidence/KENN_AUTONOMOUS_DEAD_WRITE_PATHS_2026-10-02.md).
-  - [ ] Trace other request owners, Live-change cache invalidation for any remaining
+  - [x] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.
     Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation
     remains unqualified.
+    Each was traced by reading source and ends in a fix or a recorded open finding: owners in
+    [the A2 route map](docs/evidence/KENN_A2_ROUTE_MAP_2026-10-02.md), cache invalidation in
+    [its receipt](docs/evidence/KENN_LIVE_CACHE_INVALIDATION_2026-10-02.md), and project switching,
+    Apply/Undo during generation and trace storage in
+    [the session-clear receipt](docs/evidence/KENN_SESSION_CLEAR_REVOKES_TOKENS_2026-10-02.md). Limits:
+    no Live set identity scopes tokens or Undo receipts (open, needs a decision); inference is not
+    cancelled and the cancel reply reports `inference_aborted: false`; nothing was run against real Live.
   - [ ] Remove confirmed dead code and redundant ownership after checking callers,
     exports, dynamic registries, packaging and tests. Keep cleanup independent of
     the fixed benchmark revision; qualify each deletion with scoped checks.
@@ -361,7 +368,8 @@ mock, an agent reviewer or an unrelated receipt.
     uses, so an installed agent kept literal `<KENN_REPO_ROOT>` paths; fixed with a test, and four docs
     with dead file pointers re-pointed (see
     [the evidence](docs/evidence/KENN_LAUNCHAGENT_AND_DOC_POINTERS_2026-10-02.md)). The Audio_Too symlink
-    and the two chat Dockerfiles that depend on it are recorded there as open. Full backend run is
+    and the two chat Dockerfiles that depend on it are recorded there as open, along with the finding
+    that `chat/` and `packages/chat` are two diverged tracked copies of the wrapper (13 and 23 files). Full backend run is
     3,534 passed, 12 skipped.
   - Clearing a chat now revokes its pending Apply tokens and drops its last-command and undo-link state
     on both servers; before, an old card stayed good for the rest of its five minutes and "again" still
