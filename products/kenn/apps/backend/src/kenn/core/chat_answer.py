@@ -1235,6 +1235,7 @@ def _answer_payload_stream_raw(
     session_id: str = "",
     turn_id: str = "",
     plugin_session_id: str = "",
+    answer_mode: str = "",
     correlation_id: str = "",
 ):
     history = compact_history(history)
@@ -1358,8 +1359,14 @@ def _answer_payload_stream_raw(
         yield {"event": "metadata", "data": generation}
         yield {"event": "token", "token": generation["answer"]}
         return
+    # The early guards read answer_mode, but route and relevance_query are not computed
+    # until retrieval runs further down, so a clarify-routed query used to hit an
+    # UnboundLocalError after the SSE headers were already sent. We mirror the
+    # non-streaming sibling and classify from the raw query so these branches can
+    # answer instead of truncating the stream.
+    mode = answer_mode or classify_answer_mode(query, "unknown", history=history)
     guarded = (
-        impossible_promise_payload(query, history, answer_mode=answer_mode) if impossible_promise_query(query) else None
+        impossible_promise_payload(query, history, answer_mode=mode) if impossible_promise_query(query) else None
     )
     if guarded:
         yield {"event": "metadata", "data": guarded}
@@ -1405,9 +1412,10 @@ def _answer_payload_stream_raw(
     # contains ranked hypotheses and asks one discriminating question.  Do
     # not replace it with the generic intake form merely because routing
     # lacks an exact topic keyword (e.g. "my drums lack punch").
+    effective_mode = answer_mode or classify_answer_mode(query, route, history=history)
     has_diagnostic_plan = diagnostic_plan_for(query) is not None or _is_diagnostic_result_report(query, session_id)
     if route == "clarify" and not timeline_context and not has_diagnostic_plan:
-        clarify = clarification_payload(query, history, answer_mode=answer_mode)
+        clarify = clarification_payload(query, history, answer_mode=effective_mode)
         yield {"event": "metadata", "data": clarify}
         yield {"event": "token", "token": clarify["answer"]}
         return
@@ -1415,7 +1423,7 @@ def _answer_payload_stream_raw(
     if (route == "out_of_scope" or query_is_out_of_scope(query)) and not timeline_context:
         out = {
             "question": query,
-            "answer": weak_match_answer(query, answer_mode=answer_mode),
+            "answer": weak_match_answer(query, answer_mode=effective_mode),
             "sources": [],
             "found": False,
             "confidence": "low",

@@ -412,3 +412,30 @@ def test_the_guard_does_not_rescan_the_whole_answer_on_every_token() -> None:
     total_ms = (time.perf_counter() - started) * 1000.0
 
     assert total_ms < 25.0, f"{len(tokens)} tokens took {total_ms:.2f} ms, which is a per-token rescan"
+
+
+class _NoOrchestrator:
+    def dispatch(self, *args, **kwargs):
+        return None
+
+
+def test_a_clarify_routed_query_streams_a_payload_instead_of_crashing(monkeypatch) -> None:
+    """A vague query used to kill the whole stream with UnboundLocalError.
+
+    The clarify branch read answer_mode before the line that assigns it, so "make it
+    better" raised at classification time -- after the server had already sent the SSE
+    headers, leaving the producer with a stream that opened and then silently stopped.
+    The branch has to answer instead of raising. 2 Oct 2026: five queries crashed this
+    way before the fix ("make it better", "fix it", "what should I do", "can you help",
+    "improve it").
+    """
+    monkeypatch.setattr(chat_answer, "get_orchestrator", lambda: _NoOrchestrator())
+
+    events = list(chat_answer._answer_payload_stream_raw("make it better"))
+
+    kinds = [event.get("event") for event in events]
+    assert kinds[:2] == ["metadata", "token"], kinds
+    answer = events[0]["data"].get("answer")
+    assert isinstance(answer, str) and answer.strip(), (
+        "the clarify payload has to carry an answer the producer can read"
+    )
