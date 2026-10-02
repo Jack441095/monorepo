@@ -447,6 +447,16 @@ def _track_confirmation(action: str, payload: Dict[str, Any], confirm_token: str
     return None
 
 
+def _journal_receipt(result: Dict[str, Any], session_id: str) -> None:
+    # Undo looks receipts up in the journal, so a write made through an agent tool has to land there
+    # like one made over HTTP. A failed write gets one too: Live may still have moved.
+    from kenn.core.live_receipt_journal import record_receipt
+
+    receipt = result.get("receipt")
+    if isinstance(receipt, dict):
+        record_receipt(receipt, session_id=session_id)
+
+
 def _safe_track_action(
     action: str,
     track_index: int,
@@ -481,6 +491,7 @@ def _safe_track_action(
     if not proposal or proposal.get("action") != action or proposal.get("track_index") != int(track_index) or proposal.get("after") != value:
         return {"status": "failed", "error": "The confirmation token is not bound to this exact Live action.", "track_index": track_index}
     result = service.execute(proposal, confirm_token=confirm_token, session_id=session_id)
+    _journal_receipt(result, session_id)
     receipt = result.get("receipt", {})
     if not result.get("ok"):
         return {"status": "failed", "error": result.get("error"), "receipt": receipt, "track_index": track_index, "value": value}
@@ -514,6 +525,7 @@ def _safe_transport_action(action: str, confirm_token: str, session_id: str) -> 
     if not proposal or proposal.get("action") != action:
         return {"status": "failed", "error": "The confirmation token is not bound to this exact Live transport action."}
     result = service.execute(proposal, confirm_token=confirm_token, session_id=session_id)
+    _journal_receipt(result, session_id)
     if not result.get("ok"):
         return {"status": "failed", "error": result.get("error"), "receipt": result.get("receipt", {})}
     return {"status": "success", "verified": True, "receipt": result.get("receipt", {})}
@@ -588,6 +600,7 @@ def tool_set_ableton_parameter(
         return {"status": "failed", "error": "The confirmation token is not bound to this exact device action."}
 
     exec_res = service.execute_device_action(proposal_payload, confirm_token=confirm_token, session_id=session_id)
+    _journal_receipt(exec_res, session_id)
     if not exec_res.get("ok"):
         return {"status": "failed", "error": exec_res.get("error"), "track_index": track_index, "device_index": device_index, "parameter_index": parameter_index, "value": value}
 

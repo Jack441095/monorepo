@@ -296,6 +296,12 @@ mock, an agent reviewer or an unrelated receipt.
     and parameter indices still default to 0 because parameters can be named. One new case,
     the old line fails it, full backend run is 3,512 passed, 12 skipped.
     [Evidence and exact files](docs/evidence/KENN_BATCH_TRACK_INDEX_2026-10-02.md).
+  - [x] Confirmed writes made through the agent tools (track volume/pan/mute/solo/arm, transport,
+    device parameter and macro) are now journaled like the HTTP routes, so Undo can find them
+    and the cached Live state is invalidated. Failed writes are journaled too. Six new cases,
+    each of the three call sites fails the file when deleted, full backend run is
+    3,518 passed, 12 skipped.
+    [Evidence and exact files](docs/evidence/KENN_AUTONOMOUS_TOOL_RECEIPTS_2026-10-02.md).
   - [ ] Trace other request owners, Live-change cache invalidation for any remaining
     state-describing routes, raw trace/trust persistence, project switching and
     Apply/Undo during generation.
