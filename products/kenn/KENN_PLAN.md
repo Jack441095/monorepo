@@ -398,8 +398,11 @@ mock, an agent reviewer or an unrelated receipt.
     Closing them is a decision on the rows' expected sources or a note rewrite and index rebuild, not a
     retrieval tweak. `harsh-after-mastering` and `upgrade-buffer-recording` fail either way.
     Jack chose to write answer text: step 7 was added to `thin-vocal-body.md` and
-    `arrangement-energy-and-transitions.md` (git-ignored, text kept in the evidence). Still open: rebuild the
-    index and re-run both evals on the other machine before ticking those two rows.
+    `arrangement-energy-and-transitions.md` (git-ignored, text kept in the evidence). Verified on the GPU box with a
+    fresh CPU build of an isolated copy: coverage goes from 125 to 128 of 128, after a third note
+    (`mastering-prep-and-headroom.md`) turned out to be echo-dependent too
+    ([evidence](docs/evidence/KENN_ECHO_ROWS_BOX_REBUILD_2026-10-02.md)). The held-out wrapper eval still fails the
+    same six rows before and after, so this parent item stays open. The Mac's live index is not rebuilt.
   - [x] Measured what a cancelled answer does to the model slot, on the real Qwen3-4B bridge on the GPU box:
     after the client gives up at 2 s the generation runs on and the slot stays busy another 45.5 s (a 58 s
     generation), refusing 30 retries with 429; an idle short request takes about 1.2 s. KENN's cancel still
