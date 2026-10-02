@@ -51,7 +51,7 @@ Read from the first part of each answer, not every word, and from one run.
 - **An analysis that never ran was described.** With no mix analysis anywhere in the session, "How did the analysis of
   my mix go?" got an accepted model answer written as if one had run, with a cited -18 dB figure, and "Run it again."
   returned essentially the same text. The guard checks measurements against sources, not whether the job exists, so it
-  passed. This is the worst result in the run.
+  passed. This is the worst result in the run. **Fixed 3 Oct**, see below.
 - **Internal notes reach the user.** After "Cancel that, I will do it myself.", the search query carried the previous
   question rather than the cancel, and the served template explained the AutoMix instrument-rules table by file and
   function name. The model's answer had been rejected on a dBFS value, so this is the template, not the model.
@@ -66,3 +66,22 @@ Read from the first part of each answer, not every word, and from one run.
 One run, no repeat, and the model is not deterministic. The answers were read for the turns above only. No judge, no
 expected text, so "lost the thread" is our reading. FakeLive and Live-closed. Nothing here changes the 15 s gate result.
 Fixes are not attempted yet; the plan item stays open.
+
+## Fix: the invented analysis, 3 October
+
+`asks_about_unrun_analysis` (`core/chat_routing.py`) recognises wording that takes a finished analysis for granted:
+"how did the analysis of my mix go", "results of the mix review", "re-run the analysis", and a bare "run it again"
+once an earlier turn was about an analysis. `_missing_analysis_guard` (`core/chat_answer.py`) turns that into a plain
+"I haven't analysed a mix in this chat" reply, on both the stream and payload paths, unless the history holds a Mix
+Review Lab context or typed evidence, the session has a diagnostic result to report, or a saved review matches the
+question. The reply is low confidence, so the semantic cache will not keep it.
+
+Tests: `test_missing_analysis_guard.py` (12). Without the guard the same question still comes back as a sourced
+production answer. KENN suite with a fresh pytest cache dir: 3,571 passed, 5 skipped, 0 failed. Rerun of the
+`no-job-to-run` script with the real model: turns 1 and 2 now answer in under 0.2 s with no model call and no
+invented result. Turns 4 and 5 of that script were again rejected or slow (the guard on a measurement, then a 20 s
+turn), unrelated to this fix.
+
+Limits: wording-based, so a differently phrased question ("so what did you find?") can still slip past, and only
+analyses are covered, not other jobs such as a render or a stem scan. A saved review for another track would count as
+context only if the question names it. One rerun, not repeated.

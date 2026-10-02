@@ -541,7 +541,7 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   - First model run, 3 Oct: six scripted conversations, 30 turns, 24 reached the model and 12 were accepted (11 guard
     rejections, 1 timeout); accepted answers took 13 to 58 s. Corrections and short follow-ups often lose the thread,
     clarify replies forget the conversation, and a question about an analysis that never ran got an accepted answer
-    describing one. One run, answers read in part, no two-track, project-switch or UI turns, so C3 stays open.
+    describing one (fixed 3 Oct with a wording guard; other jobs and phrasings are not covered). One run, answers read in part, no two-track, project-switch or UI turns, so C3 stays open.
     [Evidence](docs/evidence/KENN_C3_FIVE_TURN_FIRST_RUN_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and

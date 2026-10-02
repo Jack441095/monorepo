@@ -65,6 +65,7 @@ from kenn.core.chat_grounding import (
     should_use_llm_rewrite,
 )
 from kenn.core.chat_routing import (
+    asks_about_unrun_analysis,
     audio_generation_payload,
     clarification_payload,
     classify_answer_mode,
@@ -78,6 +79,7 @@ from kenn.core.chat_routing import (
     is_followup_query,
     latest_mix_review_context,
     latest_track_memory_lookup,
+    missing_analysis_payload,
     mix_review_followup_payload,
     mix_review_timeline_lookup,
     mode_profile,
@@ -221,6 +223,21 @@ def _is_diagnostic_result_report(query: str, session_id: str) -> bool:
         return False
     return bool(diagnostic_reported_findings(state, query))
 
+
+
+def _missing_analysis_guard(query: str, history: list | None, session_id: str, mode: str) -> dict | None:
+    """Stop a question that assumes an analysis ran when nothing in the conversation or saved reviews says one did.
+
+    The model answered "how did the analysis of my mix go?" from retrieved notes as if it had run one, and the
+    measurement guard let it through because the numbers matched the notes.
+    """
+    if not asks_about_unrun_analysis(query, history):
+        return None
+    if latest_mix_review_context(history) or packets_from_history(history):
+        return None
+    if _is_diagnostic_result_report(query, session_id) or latest_track_memory_lookup(query):
+        return None
+    return missing_analysis_payload(query, history, answer_mode=mode)
 
 
 def build_intent_answer(
@@ -1398,6 +1415,7 @@ def _answer_payload_stream_raw(
     guarded = (
         impossible_promise_payload(query, history, answer_mode=mode) if impossible_promise_query(query) else None
     )
+    guarded = guarded or _missing_analysis_guard(query, history, session_id, mode)
     if guarded:
         yield {"event": "metadata", "data": guarded}
         yield {"event": "token", "token": guarded["answer"]}
@@ -2244,6 +2262,7 @@ def _answer_payload_raw(
     guarded = (
         impossible_promise_payload(query, history, answer_mode=mode) if impossible_promise_query(query) else None
     )
+    guarded = guarded or _missing_analysis_guard(query, history, session_id, mode)
     if guarded:
         return guarded
 

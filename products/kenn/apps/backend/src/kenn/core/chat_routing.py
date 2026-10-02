@@ -789,6 +789,106 @@ def impossible_promise_payload(query: str, history: list | None = None, answer_m
     }
 
 
+_ANALYSIS_NOUN = r"(?:analysis|analyses|scan|diagnostic|mix review)"
+# "the/my/that" is what makes it a specific past analysis; "how is spectral analysis used in EQ" is a knowledge question.
+_ANALYSIS_RESULT_QUESTION = re.compile(
+    rf"\b(?:how (?:did|was|were|is)|what (?:did|was|were|came out of|happened (?:with|to))|"
+    rf"(?:results?|findings?|outcome) (?:of|from)) (?:the|my|that|this|our) (?:[\w'-]+ ){{0,4}}?{_ANALYSIS_NOUN}\b"
+)
+_ANALYSIS_RERUN = re.compile(
+    rf"\b(?:re-?run|re-?analy[sz]e|re-?scan|(?:run|redo|repeat|do) (?:it|that|the {_ANALYSIS_NOUN}) again)\b"
+)
+
+
+def asks_about_unrun_analysis(query: str, history: list | None = None) -> bool:
+    """Wording that assumes an analysis already ran: its result, or running it again.
+
+    Whether one really exists is the caller's call; this only says the question takes it for granted. Found
+    3 Oct 2026: "How did the analysis of my mix go?" in a chat with no analysis got a model answer describing
+    one, and "Run it again." repeated it.
+    """
+    lowered = re.sub(r"\s+", " ", str(query).lower()).strip()
+    if _ANALYSIS_RESULT_QUESTION.search(lowered):
+        return True
+    if not _ANALYSIS_RERUN.search(lowered):
+        return False
+    # A bare "run it again" only counts when an earlier turn was about an analysis; otherwise it could be about anything.
+    if re.search(rf"\b{_ANALYSIS_NOUN}\b|analy[sz]e", lowered):
+        return True
+    return any(re.search(rf"\b{_ANALYSIS_NOUN}\b", turn.lower()) for turn in useful_history_user_turns(history))
+
+
+def missing_analysis_payload(query: str, history: list | None = None, answer_mode: str = "") -> dict:
+    if answer_mode == "voice":
+        answer = (
+            "I haven't analysed a mix in this chat, so there is no result to report and nothing to run again. "
+            "Upload the track to Mix Review Lab, or tell me what you hear and on which track, and I'll go from there."
+        )
+    else:
+        answer = (
+            "I haven't analysed a mix in this chat, so there is no result to report and nothing to run again.\n\n"
+            "Short answer:\n"
+            "No analysis has been run or uploaded in this conversation, and I won't describe one I haven't seen.\n\n"
+            "Try this:\n"
+            "1. Upload the track to Mix Review Lab and ask me again once the review has finished.\n"
+            "2. Or tell me which track and what you hear (muddy, harsh, thin, pumping) and I'll work through a diagnosis.\n"
+            "3. If you ran an analysis somewhere else, paste the numbers here.\n\n"
+            "Sources:\n"
+            "- No analysis result found in this conversation."
+        )
+    return {
+        "question": query,
+        "answer": answer,
+        "sources": [],
+        "found": False,
+        "confidence": "low",
+        "source_quality": "low",
+        "topics": query_topics(query),
+        "related_questions": [
+            "How do I check my mix in mono?",
+            "Why does my mix sound muddy?",
+            "What should I check before I send a mix to mastering?",
+        ],
+        "used_history": bool(normalize_history(history)),
+        "llm_enhanced": False,
+        "llm_available": llm_enabled(),
+        "conversation_only": False,
+        "intent": "out_of_scope",
+        "route": "no_analysis",
+        "answer_mode": answer_mode or "quick_fix",
+        "answer_quality": {
+            "score": 72,
+            "mode": "quick_fix",
+            "warnings": ["no analysis in this conversation"],
+            "sections": {"short_answer": True, "try_this": True, "sources": True, "check": False},
+            "actionable_steps": 3,
+        },
+        "intent_guard": "not_needed",
+        "weak_match": True,
+        "search_query": query,
+        "diagnostic_reason": "Question assumed an analysis had run, but none exists in this conversation.",
+        "answer_self_check": {
+            "passed": True,
+            "warnings": ["no analysis in this conversation"],
+            "sections": {"short_answer": True, "try_this": True, "check": False, "sources": True},
+            "source_topic_match": False,
+            "answered_intent": True,
+        },
+        "grounding": {
+            "score": 45,
+            "top_source_trust": 0.0,
+            "approved_note": False,
+            "source_topic_match": False,
+            "answered_intent": True,
+            "route_known": True,
+            "warnings": ["no analysis in this conversation"],
+        },
+        "grounding_mode": "weak",
+        "branches": [],
+        "session": None,
+    }
+
+
 def business_pricing_query(query: str) -> bool:
     terms = normalized_terms(query)
     if not (terms & BUSINESS_PRICING_TERMS):
