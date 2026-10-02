@@ -3430,21 +3430,9 @@ def test_propose_stage_model_cannot_answer_a_specific_question_by_guessing(monke
     assert fake.writes == []
 
 
-def test_llm_plan_gets_one_structural_repair_attempt(monkeypatch) -> None:
-    class Usage:
-        def __init__(self, latency_ms: int) -> None:
-            self.latency_ms = latency_ms
-
-        def to_dict(self) -> dict[str, int | str]:
-            return {
-                "model": "test-model",
-                "provider": "ollama",
-                "prompt_tokens": 10,
-                "completion_tokens": 5,
-                "total_tokens": 15,
-                "latency_ms": self.latency_ms,
-                "task": "command",
-            }
+@pytest.mark.parametrize("initial_cached", [False, True])
+def test_llm_plan_gets_one_structural_repair_attempt(monkeypatch, initial_cached) -> None:
+    from kenn.llm.llm_rewrite import LLMUsage
 
     responses = iter([
         '{"action":"set_mute","track_index":1,"value":true}',
@@ -3454,12 +3442,21 @@ def test_llm_plan_gets_one_structural_repair_attempt(monkeypatch) -> None:
 
     def fake_completion(messages, **kwargs):
         calls.append({"messages": messages, **kwargs})
-        return next(responses), Usage(100 if len(calls) == 1 else 200)
+        cached = initial_cached and len(calls) == 1
+        latency_ms = 100 if len(calls) == 1 else 200
+        return next(responses), LLMUsage(
+            model="test-model", provider="ollama", task="command",
+            prompt_tokens=0 if cached else 10, completion_tokens=0 if cached else 5,
+            total_tokens=0 if cached else 15, latency_ms=0 if cached else latency_ms,
+            provider_attempted=not cached, cache_hit=cached, status="cache_hit" if cached else "completed",
+            provider_done=None if cached else True, eval_duration_ns=None if cached else 50_000_000,
+        )
 
     monkeypatch.setenv("AUDIO_TOO_LLM_ENABLED", "1")
     monkeypatch.setenv("AUDIO_TOO_LLM_PROVIDER", "ollama")
     monkeypatch.setenv("AUDIO_TOO_LLM_MODEL", "test-model")
     monkeypatch.setenv("KENN_LIVE_LLM_ENABLED", "1")
+    monkeypatch.setenv("KENN_LLM_ENABLED_COMMAND", "1")
     monkeypatch.setattr("kenn.llm.llm_rewrite._chat_completion", fake_completion)
 
     plan, metadata = live_command_module._generate_llm_plan(
@@ -3472,7 +3469,13 @@ def test_llm_plan_gets_one_structural_repair_attempt(monkeypatch) -> None:
     assert plan["track_name"] == "Bass"
     assert metadata["status"] == "accepted"
     assert metadata["repair"]["status"] == "accepted"
-    assert metadata["usage"]["latency_ms"] == 300
+    assert metadata["usage"]["latency_ms"] == (200 if initial_cached else 300)
+    assert metadata["usage"]["total_tokens"] == (15 if initial_cached else 30)
+    # A cached first draft must not label the live repair's summed cost as a cache hit.
+    assert "cache_hit" not in metadata["usage"] and "eval_duration_ns" not in metadata["usage"]
+    initial, repair = metadata["usage"]["attempts"]
+    assert initial["cache_hit"] is initial_cached and initial["provider_attempted"] is not initial_cached
+    assert repair["cache_hit"] is False and repair["eval_duration_ns"] == 50_000_000
     assert len(calls) == 2
     assert "Validation error:" in calls[1]["messages"][0]["content"]
 

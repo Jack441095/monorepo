@@ -1120,8 +1120,15 @@ def _generate_llm_plan(command: str, snapshot: dict[str, Any]) -> tuple[dict[str
             )
             repaired_candidate = _stamp_plan_schema(_extract_json_object(repaired_content))
             repaired_checked = validate_llm_plan(repaired_candidate, snapshot)
-            combined_usage = usage.to_dict()
+            initial_usage_dict = usage.to_dict()
             repair_usage_dict = repair_usage.to_dict()
+            # Phase timings and cache state describe one attempt, so keep them
+            # beside the legacy totals rather than labelling both calls with the first.
+            combined_usage = {
+                field: initial_usage_dict.get(field)
+                for field in ("model", "provider", "task", "prompt_tokens", "completion_tokens", "total_tokens", "latency_ms")
+            }
+            combined_usage["attempts"] = [initial_usage_dict, repair_usage_dict]
             for field in ("prompt_tokens", "completion_tokens", "total_tokens", "latency_ms"):
                 combined_usage[field] = int(combined_usage.get(field, 0) or 0) + int(repair_usage_dict.get(field, 0) or 0)
             combined_usage["task"] = "command:repair"

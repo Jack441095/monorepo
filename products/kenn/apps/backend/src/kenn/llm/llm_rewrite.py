@@ -153,7 +153,10 @@ MODE_INSTRUCTIONS = {
 
 @dataclass
 class LLMUsage:
-    """Track token usage and latency for a single LLM call."""
+    """Record one provider attempt; latency excludes pauses before a retry.
+
+    Provider completion is separate from downstream grounding and answer delivery.
+    """
     model: str = ""
     provider: str = ""
     prompt_tokens: int = 0
@@ -161,6 +164,17 @@ class LLMUsage:
     total_tokens: int = 0
     latency_ms: int = 0
     task: str = "rewrite"
+    provider_attempted: bool = True
+    status: str = "completed"
+    cache_hit: bool = False
+    provider_done: bool | None = None
+    completion_reason: str | None = None
+    error_type: str | None = None
+    provider_total_duration_ns: int | None = None
+    load_duration_ns: int | None = None
+    prompt_eval_duration_ns: int | None = None
+    eval_duration_ns: int | None = None
+    prompt_eval_cached_count: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -171,10 +185,33 @@ class LLMUsage:
             "total_tokens": self.total_tokens,
             "latency_ms": self.latency_ms,
             "task": self.task,
+            "provider_attempted": self.provider_attempted,
+            "status": self.status,
+            "cache_hit": self.cache_hit,
+            "provider_done": self.provider_done,
+            "completion_reason": self.completion_reason,
+            "error_type": self.error_type,
+            "provider_total_duration_ns": self.provider_total_duration_ns,
+            "load_duration_ns": self.load_duration_ns,
+            "prompt_eval_duration_ns": self.prompt_eval_duration_ns,
+            "eval_duration_ns": self.eval_duration_ns,
+            "prompt_eval_cached_count": self.prompt_eval_cached_count,
         }
 
 
 _global_usage: list[LLMUsage] = []  # accumulate across requests for monitoring
+_usage_capture: ContextVar[list[LLMUsage] | None] = ContextVar("kenn_llm_usage_capture", default=None)
+
+
+@contextmanager
+def capture_usage():
+    """Collect this context's calls without mixing in concurrent requests."""
+    records: list[LLMUsage] = []
+    token = _usage_capture.set(records)
+    try:
+        yield records
+    finally:
+        _usage_capture.reset(token)
 
 
 def get_accumulated_usage() -> list[dict]:
@@ -183,9 +220,68 @@ def get_accumulated_usage() -> list[dict]:
 
 def _add_usage(usage: LLMUsage) -> None:
     _global_usage.append(usage)
+    captured = _usage_capture.get()
+    if captured is not None:
+        captured.append(usage)
     # Keep only last 1000 entries to bound memory
     if len(_global_usage) > 1000:
         _global_usage[:200] = []
+
+
+@contextmanager
+def _record_provider_usage(cfg: dict, task: str):
+    started = time.perf_counter()
+    usage = LLMUsage(model=cfg["model"], provider=cfg["provider"], task=task)
+    try:
+        yield usage
+        if usage.provider_done is False:
+            usage.status = "incomplete"
+    except BaseException as exc:
+        usage.status = "failed" if isinstance(exc, Exception) else "interrupted"
+        # Error messages can contain provider URLs or request text; keep only the class.
+        usage.error_type = type(exc).__name__ if isinstance(exc, Exception) else None
+        raise
+    finally:
+        usage.latency_ms = int((time.perf_counter() - started) * 1000)
+        _add_usage(usage)
+
+
+def _completion_reason(value: Any) -> str | None:
+    if not isinstance(value, str) or not value:
+        return None
+    return value if value in {"stop", "length", "load", "unload", "tool_calls", "function_call", "content_filter"} else "other"
+
+
+def _native_usage(usage: LLMUsage, data: dict) -> None:
+    usage.prompt_tokens = int(data.get("prompt_eval_count") or 0)
+    usage.completion_tokens = int(data.get("eval_count") or 0)
+    usage.total_tokens = usage.prompt_tokens + usage.completion_tokens
+    usage.provider_done = data.get("done") if isinstance(data.get("done"), bool) else None
+    usage.completion_reason = _completion_reason(data.get("done_reason"))
+    # Ollama uses nanoseconds. Omitted metrics stay unknown, including a missing cached-prefix count.
+    for source, target in (
+        ("total_duration", "provider_total_duration_ns"),
+        ("load_duration", "load_duration_ns"),
+        ("prompt_eval_duration", "prompt_eval_duration_ns"),
+        ("eval_duration", "eval_duration_ns"),
+        ("prompt_eval_cached_count", "prompt_eval_cached_count"),
+    ):
+        value = data.get(source)
+        setattr(usage, target, value if type(value) is int and value >= 0 else None)
+
+
+def _openai_usage(usage: LLMUsage, data: dict) -> None:
+    counts = data.get("usage") or {}
+    if counts:
+        usage.prompt_tokens = int(counts.get("prompt_tokens", 0))
+        usage.completion_tokens = int(counts.get("completion_tokens", 0))
+        usage.total_tokens = int(counts.get("total_tokens", usage.prompt_tokens + usage.completion_tokens))
+    choices = data.get("choices") or []
+    if choices:
+        reason = _completion_reason(choices[0].get("finish_reason"))
+        if reason:
+            usage.completion_reason = reason
+            usage.provider_done = True
 
 
 def load_env() -> None:
@@ -1031,6 +1127,9 @@ def _cached_usage(cfg: dict, task: str, content: str) -> LLMUsage:
         total_tokens=0,
         latency_ms=0,
         task=f"{task}:cached",
+        provider_attempted=False,
+        status="cache_hit",
+        cache_hit=True,
     )
 
 
@@ -1093,22 +1192,15 @@ def _chat_completion(
                 sys_msg = next((m["content"] for m in messages if m.get("role") == "system"), None)
                 user_msgs = [m for m in messages if m.get("role") != "system"]
                 formatted_prompt = engine.format_chat_prompt(user_msgs, system_prompt=sys_msg)
-                t0 = time.perf_counter()
-                max_toks = _clamped_max_tokens(task, answer_mode, cfg.get("max_tokens", 512))
-                mlx_res = engine.generate(formatted_prompt, max_tokens=max_toks, temperature=cfg.get("temperature", 0.2))
-                content = mlx_res["text"]
-                elapsed_ms = (time.perf_counter() - t0) * 1000
-                usage = LLMUsage(
-                    model=mlx_res["model"],
-                    provider="mlx",
-                    task=task,
-                    prompt_tokens=int(len(formatted_prompt.split()) * 1.3),
-                    completion_tokens=int(len(content.split()) * 1.3),
-                    total_tokens=int((len(formatted_prompt.split()) + len(content.split())) * 1.3),
-                    latency_ms=int(elapsed_ms),
-                )
+                with _record_provider_usage({**cfg, "model": engine.model_id, "provider": "mlx"}, task) as usage:
+                    max_toks = _clamped_max_tokens(task, answer_mode, cfg.get("max_tokens", 512))
+                    mlx_res = engine.generate(formatted_prompt, max_tokens=max_toks, temperature=cfg.get("temperature", 0.2))
+                    content = mlx_res["text"]
+                    usage.model = mlx_res["model"]
+                    usage.prompt_tokens = int(len(formatted_prompt.split()) * 1.3)
+                    usage.completion_tokens = int(len(content.split()) * 1.3)
+                    usage.total_tokens = int((len(formatted_prompt.split()) + len(content.split())) * 1.3)
                 _cache_put(cache_key, content)
-                _add_usage(usage)
                 return content, usage
         except Exception:
             pass
@@ -1136,8 +1228,6 @@ def _chat_completion(
         )
     headers = _build_headers(cfg)
     client = _get_client()
-    started = time.perf_counter()
-
     # One retry on transient connection failures only (not on a timeout or
     # any HTTP status -- those are either already the full configured
     # budget or a real application-level error that would just fail the
@@ -1149,20 +1239,27 @@ def _chat_completion(
     last_connect_error: httpx.ConnectError | None = None
     for attempt in range(2):
         try:
-            response = client.post(
-                url,
-                json=payload,
-                headers=headers,
-                # Found live 2026-08-10: this call never overrode the
-                # shared client's fixed 90s default (_get_client()), so
-                # AUDIO_TOO_LLM_TIMEOUT / cfg["timeout"] had zero real
-                # effect -- it only ever appeared in the TimeoutError
-                # message text below, cosmetic, not the actual budget
-                # that was being enforced.
-                timeout=httpx.Timeout(cfg["timeout"], connect=15.0),
-            )
-            response.raise_for_status()
-            data = response.json()
+            with _record_provider_usage(cfg, task) as usage:
+                response = client.post(
+                    url,
+                    json=payload,
+                    headers=headers,
+                    timeout=httpx.Timeout(cfg["timeout"], connect=15.0),
+                )
+                response.raise_for_status()
+                data = response.json()
+                if native:
+                    _native_usage(usage, data)
+                    message = data.get("message") or {}
+                else:
+                    _openai_usage(usage, data)
+                    choices = data.get("choices") or []
+                    if not choices:
+                        raise ValueError("LLM returned no choices")
+                    message = choices[0].get("message") or {}
+                content = str(message.get("content") or "").strip()
+                if not content:
+                    raise ValueError("LLM returned empty content")
             break
         except httpx.ConnectError as e:
             last_connect_error = e
@@ -1177,32 +1274,6 @@ def _chat_completion(
         except Exception as e:
             raise ValueError(f"LLM request failed: {e}")
 
-    elapsed_ms = int((time.perf_counter() - started) * 1000)
-    if native:
-        message = data.get("message") or {}
-        prompt_tokens, completion_tokens = int(data.get("prompt_eval_count") or 0), int(data.get("eval_count") or 0)
-        usage_data = {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens,
-                      "total_tokens": prompt_tokens + completion_tokens}
-    else:
-        choices = data.get("choices") or []
-        if not choices:
-            raise ValueError("LLM returned no choices")
-        message = choices[0].get("message") or {}
-        usage_data = data.get("usage") or {}
-    content = str(message.get("content") or "").strip()
-    if not content:
-        raise ValueError("LLM returned empty content")
-
-    usage = LLMUsage(
-        model=cfg["model"],
-        provider=cfg["provider"],
-        prompt_tokens=int(usage_data.get("prompt_tokens", 0)),
-        completion_tokens=int(usage_data.get("completion_tokens", 0)),
-        total_tokens=int(usage_data.get("total_tokens", 0)),
-        latency_ms=elapsed_ms,
-        task=task,
-    )
-    _add_usage(usage)
     _cache_put(cache_key, content)
     return content, usage
 
@@ -1260,25 +1331,17 @@ def chat_completion_stream(
                 sys_msg = next((m["content"] for m in messages if m.get("role") == "system"), None)
                 user_msgs = [m for m in messages if m.get("role") != "system"]
                 formatted_prompt = engine.format_chat_prompt(user_msgs, system_prompt=sys_msg)
-                started = time.perf_counter()
-                accumulated: list[str] = []
-                max_toks = _clamped_max_tokens(task, answer_mode, cfg.get("max_tokens", 512))
-                for chunk in engine.stream_generate(formatted_prompt, max_tokens=max_toks, temperature=cfg.get("temperature", 0.2)):
-                    accumulated.append(chunk)
-                    yield chunk, None
-                full_text = "".join(accumulated)
-                elapsed_ms = (time.perf_counter() - started) * 1000
-                usage = LLMUsage(
-                    model=engine.model_id,
-                    provider="mlx",
-                    task=task,
-                    prompt_tokens=int(len(formatted_prompt.split()) * 1.3),
-                    completion_tokens=int(len(full_text.split()) * 1.3),
-                    total_tokens=int((len(formatted_prompt.split()) + len(full_text.split())) * 1.3),
-                    latency_ms=int(elapsed_ms),
-                )
+                with _record_provider_usage({**cfg, "model": engine.model_id, "provider": "mlx"}, task) as usage:
+                    accumulated: list[str] = []
+                    max_toks = _clamped_max_tokens(task, answer_mode, cfg.get("max_tokens", 512))
+                    for chunk in engine.stream_generate(formatted_prompt, max_tokens=max_toks, temperature=cfg.get("temperature", 0.2)):
+                        accumulated.append(chunk)
+                        yield chunk, None
+                    full_text = "".join(accumulated)
+                    usage.prompt_tokens = int(len(formatted_prompt.split()) * 1.3)
+                    usage.completion_tokens = int(len(full_text.split()) * 1.3)
+                    usage.total_tokens = int((len(formatted_prompt.split()) + len(full_text.split())) * 1.3)
                 _cache_put(cache_key, full_text)
-                _add_usage(usage)
                 yield "", usage
                 return
         except Exception:
@@ -1303,7 +1366,6 @@ def chat_completion_stream(
         payload = _build_payload(cfg, messages, stream=True, answer_mode=answer_mode)
     headers = _build_headers(cfg)
     client = _get_client()
-    started = time.perf_counter()
     # Monotonic, and taken before the request goes out, so the deadline covers the connect and the
     # headers as well as the tokens. wall_clock=False would be wrong here: this thread is blocked in a
     # socket read and NTP stepping the clock backwards could extend the stream indefinitely.
@@ -1311,99 +1373,83 @@ def chat_completion_stream(
     deadline_at = time.monotonic() + deadline_seconds
     _accumulated: list[str] = []
 
-    try:
-        with client.stream(
-            "POST",
-            url,
-            json=payload,
-            headers=headers,
-            # Same fix as the non-streaming call above -- this never
-            # overrode the shared client's fixed 90s default either.
-            timeout=httpx.Timeout(cfg["timeout"], connect=15.0),
-        ) as response:
-            response.raise_for_status()
-            prompt_tokens = 0
-            completion_tokens = 0
-            for line in response.iter_lines():
-                if time.monotonic() > deadline_at:
-                    # Same TimeoutError the stalled-read branch below raises, so the caller cannot
-                    # tell a slow model from a dead one -- and neither should it: both mean no answer
-                    # in time, and both fall back to the template.
-                    raise TimeoutError(
-                        f"LLM stream timed out after {cfg['timeout']}s per read"
-                        f" / {deadline_seconds:g}s total"
-                    )
-                if not line:
-                    continue
-                line = line.strip()
-                if native:
-                    # Native /api/chat streams one bare JSON object per line, not `data:`-prefixed SSE:
-                    # {"message": {"content": "..."}, "done": false} and a final {"done": true} with counts.
-                    if not line.startswith("{"):
+    with _record_provider_usage(cfg, task) as usage:
+        usage.provider_done = False
+        try:
+            with client.stream(
+                "POST",
+                url,
+                json=payload,
+                headers=headers,
+                # Same fix as the non-streaming call above -- this never
+                # overrode the shared client's fixed 90s default either.
+                timeout=httpx.Timeout(cfg["timeout"], connect=15.0),
+            ) as response:
+                response.raise_for_status()
+                for line in response.iter_lines():
+                    if time.monotonic() > deadline_at:
+                        # Same TimeoutError the stalled-read branch below raises, so the caller cannot
+                        # tell a slow model from a dead one -- and neither should it: both mean no answer
+                        # in time, and both fall back to the template.
+                        raise TimeoutError(
+                            f"LLM stream timed out after {cfg['timeout']}s per read"
+                            f" / {deadline_seconds:g}s total"
+                        )
+                    if not line:
                         continue
-                    try:
-                        chunk = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-                    content = (chunk.get("message") or {}).get("content") or ""
-                    if content:
-                        _accumulated.append(content)
-                        yield content, None
-                    # The counts sit on the final object, in the same place OpenAI puts its usage block.
-                    if chunk.get("done"):
-                        prompt_tokens = int(chunk.get("prompt_eval_count") or 0)
-                        completion_tokens = int(chunk.get("eval_count") or 0)
-                    continue
-                if not line.startswith("data:"):
-                    continue
-                data_str = line[5:].strip()
-                if data_str == "[DONE]":
-                    break
-                try:
-                    data = json.loads(data_str)
-                    choices = data.get("choices") or []
-                    if choices:
-                        delta = choices[0].get("delta") or {}
-                        content = delta.get("content") or ""
+                    line = line.strip()
+                    if native:
+                        # Native /api/chat streams one bare JSON object per line, not `data:`-prefixed SSE:
+                        # {"message": {"content": "..."}, "done": false} and a final {"done": true} with counts.
+                        if not line.startswith("{"):
+                            continue
+                        try:
+                            chunk = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+                        if chunk.get("done"):
+                            _native_usage(usage, chunk)
+                        content = (chunk.get("message") or {}).get("content") or ""
                         if content:
                             _accumulated.append(content)
                             yield content, None
-                    # Track usage if provided (OpenAI sends it on final chunk)
-                    usage_data = data.get("usage") or {}
-                    if usage_data:
-                        prompt_tokens = int(usage_data.get("prompt_tokens", 0))
-                        completion_tokens = int(usage_data.get("completion_tokens", 0))
-                except json.JSONDecodeError:
-                    continue
-    except httpx.TimeoutException:
-        raise TimeoutError(f"LLM stream timed out after {cfg['timeout']}s")
-    except httpx.HTTPStatusError as e:
-        raise RuntimeError(f"LLM returned {e.response.status_code}: {e.response.text[:200]}")
-    except TimeoutError:
-        # The wall-clock check in the loop above raises the caller's own timeout type rather than
-        # httpx's, so it has to survive the broad handler below untouched. Rewritten into "cut short"
-        # it would report a deadline as a broken connection, and `isinstance(exc, TimeoutError)` at
-        # the call site -- live_command.py:3790 -- would stop recognising it as a timeout at all.
-        raise
-    except Exception as exc:
-        # Raising, not returning: a stream that dies mid-answer used to end quietly, and
-        # the caller validated the truncated text as if the model had finished. Timeouts
-        # and HTTP errors already raise from this function -- an unexpected mid-stream
-        # failure is no less fatal to the candidate answer.
-        print(f"WARNING: chat_completion_stream cut short after {len(_accumulated)} chunks ({exc!r})")
-        raise RuntimeError(f"LLM stream cut short after {len(_accumulated)} chunks: {exc!r}") from exc
+                        continue
+                    if not line.startswith("data:"):
+                        continue
+                    data_str = line[5:].strip()
+                    if data_str == "[DONE]":
+                        usage.provider_done = True
+                        break
+                    try:
+                        data = json.loads(data_str)
+                        _openai_usage(usage, data)
+                        choices = data.get("choices") or []
+                        if choices:
+                            delta = choices[0].get("delta") or {}
+                            content = delta.get("content") or ""
+                            if content:
+                                _accumulated.append(content)
+                                yield content, None
+                    except json.JSONDecodeError:
+                        continue
+        except httpx.TimeoutException:
+            raise TimeoutError(f"LLM stream timed out after {cfg['timeout']}s")
+        except httpx.HTTPStatusError as e:
+            raise RuntimeError(f"LLM returned {e.response.status_code}: {e.response.text[:200]}")
+        except TimeoutError:
+            # The wall-clock check in the loop above raises the caller's own timeout type rather than
+            # httpx's, so it has to survive the broad handler below untouched. Rewritten into "cut short"
+            # it would report a deadline as a broken connection, and `isinstance(exc, TimeoutError)` at
+            # the call site -- live_command.py:3790 -- would stop recognising it as a timeout at all.
+            raise
+        except Exception as exc:
+            # Raising, not returning: a stream that dies mid-answer used to end quietly, and
+            # the caller validated the truncated text as if the model had finished. Timeouts
+            # and HTTP errors already raise from this function -- an unexpected mid-stream
+            # failure is no less fatal to the candidate answer.
+            print(f"WARNING: chat_completion_stream cut short after {len(_accumulated)} chunks ({exc!r})")
+            raise RuntimeError(f"LLM stream cut short after {len(_accumulated)} chunks: {exc!r}") from exc
 
-    elapsed_ms = int((time.perf_counter() - started) * 1000)
-    usage = LLMUsage(
-        model=cfg["model"],
-        provider=cfg["provider"],
-        prompt_tokens=prompt_tokens,
-        completion_tokens=completion_tokens,
-        total_tokens=prompt_tokens + completion_tokens,
-        latency_ms=elapsed_ms,
-        task=task,
-    )
-    _add_usage(usage)
     _cache_put(cache_key, "".join(_accumulated))
     yield "", usage  # signal end with usage data
 
@@ -1485,24 +1531,27 @@ def llm_route_query(query: str) -> str | None:
     headers = _build_headers(cfg)
     client = _get_client()
     try:
-        response = client.post(
-            url,
-            json=payload,
-            headers=headers,
-            timeout=httpx.Timeout(cfg["timeout"], connect=15.0),
-        )
-        response.raise_for_status()
-        data = response.json()
-        # The two routes disagree on the envelope: Ollama's native /api/chat returns
-        # {"message": {...}}, the OpenAI-compatible one returns {"choices": [{"message": ...}]}.
-        if native:
-            message = data.get("message") or {}
-        else:
-            choices = data.get("choices") or []
-            if not choices:
-                print("WARNING: llm_route_query got no choices -- falling through to keyword routing")
-                return None
-            message = choices[0].get("message") or {}
+        with _record_provider_usage(cfg, "route") as usage:
+            response = client.post(
+                url,
+                json=payload,
+                headers=headers,
+                timeout=httpx.Timeout(cfg["timeout"], connect=15.0),
+            )
+            response.raise_for_status()
+            data = response.json()
+            # The two routes disagree on the envelope: Ollama's native /api/chat returns
+            # {"message": {...}}, the OpenAI-compatible one returns {"choices": [{"message": ...}]}.
+            if native:
+                _native_usage(usage, data)
+                message = data.get("message") or {}
+            else:
+                _openai_usage(usage, data)
+                choices = data.get("choices") or []
+                if not choices:
+                    print("WARNING: llm_route_query got no choices -- falling through to keyword routing")
+                    return None
+                message = choices[0].get("message") or {}
         content = str(message.get("content") or "").strip().lower()
         for word in content.split():
             word = word.strip(".,!?\"'")
@@ -1785,14 +1834,15 @@ def enhance_stream(
         skill_level=skill_level,
     )
 
+    generator = chat_completion_stream(messages, "rewrite", answer_mode=answer_mode)
     try:
         streamed: list[str] = []
-        for token, usage in chat_completion_stream(messages, "rewrite", answer_mode=answer_mode):
+        for token, usage in generator:
             if token:
                 streamed.append(token)
                 yield {"event": "token", "token": token}
-            if usage and usage.total_tokens > 0:
-                if "sources:" not in "".join(streamed).lower():
+            if usage:
+                if usage.total_tokens > 0 and "sources:" not in "".join(streamed).lower():
                     block = sources_block(shown, source_label)
                     if block:
                         yield {"event": "token", "token": f"\n\n{block}"}
@@ -1803,6 +1853,8 @@ def enhance_stream(
         # into a template fallback with an honest generation_validation warning.
         print(f"WARNING: enhance_stream cut short, caller will fall back ({exc!r})")
         raise
+    finally:
+        generator.close()
 
 
 def sources_block(shown: list[tuple[float, dict, str]], source_label, limit: int = 3) -> str:
@@ -2017,6 +2069,11 @@ def get_public_usage_stats() -> dict:
         "total_tokens": total_tokens,
         "avg_latency_ms": avg_latency,
         "model": config()["model"],
+        "provider_attempts": sum(u.provider_attempted for u in _global_usage),
+        "failed_calls": sum(u.status == "failed" for u in _global_usage),
+        "interrupted_calls": sum(u.status == "interrupted" for u in _global_usage),
+        "incomplete_calls": sum(u.status == "incomplete" for u in _global_usage),
+        "cache_hits": sum(u.cache_hit for u in _global_usage),
     }
 
 
