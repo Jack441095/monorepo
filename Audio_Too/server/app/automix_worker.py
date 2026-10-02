@@ -366,15 +366,6 @@ def _worker_loop() -> None:
             time.sleep(5.0)
 
 
-def _get_next_queued_job() -> dict | None:
-    """Query database for the oldest queued or interrupted job (legacy support)."""
-    with connect() as conn:
-        row = conn.execute(
-            "SELECT * FROM automix_jobs WHERE status = 'queued' ORDER BY created_at ASC LIMIT 1"
-        ).fetchone()
-        return dict(row) if row else None
-
-
 def _update_job_status(
     job_id: str,
     status: str,

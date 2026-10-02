@@ -963,12 +963,6 @@ class MidiClipActionService:
                 "stage_timings_ms": timer.as_ms(),
             }
             return {"ok": verified, "error": None if verified else "MIDI clip deletion was sent but readback verification failed.", "receipt": receipt}
-            return {
-                "ok": verified,
-                "verified": verified,
-                "error": None if verified else "MIDI clip deletion was sent but readback verification failed.",
-                "receipt": receipt,
-            }
         except Exception as exc:
             return self._failed(proposal, key, f"MIDI clip removal failed: {exc}", correlation_id=correlation_id, stage_timings_ms=timer.as_ms())
 

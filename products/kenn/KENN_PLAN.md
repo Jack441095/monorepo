@@ -265,6 +265,11 @@ mock, an agent reviewer or an unrelated receipt.
     include and standalone builder's canonical backend default. 51 scoped backend
     and 58 canonical-wrapper cases pass; six builder mutations are caught.
     [Evidence and exact files](docs/evidence/KENN_ACTIVE_PATH_CLEANUP_2026-10-02.md).
+  - [x] Removed four uncalled Audio_Too helpers, one unreachable KENN MIDI return
+    and five unused KENN imports after caller/export/registry and retained-AST checks.
+    Corrected three wrapper/Mix Review READMEs to match current source and qualification
+    limits. 75 KENN and 21 isolated Audio_Too cases pass; four Audio_Too mutations
+    are caught. [Evidence and exact files](docs/evidence/KENN_AUDIO_TOO_UNUSED_CODE_2026-10-02.md).
   - [ ] Resolve the two existing package-wrapper evaluation failures: three chat
     coverage rows and five held-out rows fail identically before/after cleanup.
     Preserve expected behavior, citation guards and index provenance; trace the

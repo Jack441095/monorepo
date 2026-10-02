@@ -10,7 +10,6 @@ strictly clamped within hardware safety thresholds (<= -3.0 dB, Q in [1.4, 2.5])
 
 from __future__ import annotations
 
-import math
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional, Tuple
 

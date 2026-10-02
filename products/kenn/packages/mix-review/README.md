@@ -6,13 +6,14 @@ with an optional NumPy accelerator and a Python standard-library fallback. It
 has no runtime dependency on any external `Audio_Too` checkout and runs
 standalone from this repository alone.
 
-Qualified fault families (see `core/local_engine.py` for thresholds and
-`docs/KENN_BETA_GAP_MATRIX.md` for qualification status/evidence): clipping,
-headroom, silence/truncation, channel imbalance, phase/polarity & mono
-compatibility, DC offset, and an approximate (non-LUFS) loudness estimate.
-Masking, tonal-balance, arrangement/dynamics, genre-context, calibrated
-BS.1770 loudness, and true-peak analysis are explicitly **not evaluated** --
-the engine abstains on them rather than guessing, and every report says so.
+Implemented measurement families in `core/local_engine.py` include clipping,
+headroom, silence/truncation, channel imbalance, phase/polarity and mono
+compatibility, DC offset, an RMS loudness estimate, calibrated BS.1770 loudness
+and true peak. Calibrated measurements depend on available backends and suitable
+input; unavailable or failed checks abstain with a reason. Source family labels
+do not establish public-release qualification.
+Masking, tonal balance, arrangement/dynamics and genre context are explicitly
+not evaluated.
 
 Current contract:
 
@@ -26,10 +27,11 @@ Current contract:
   AutoMix invocation is included;
 - analysis never mutates, renders, or exports audio.
 
-The adapter is not yet a qualified public Mix Review product. Its measured
-fault families have unit-test coverage against synthetic fixtures
-(`tests/test_local_engine.py`) but have not been through human listening
-review or a real-mix benchmark corpus -- see `docs/KENN_BETA_GAP_MATRIX.md`.
+The adapter is not yet a qualified public Mix Review product. Synthetic coverage
+is in `tests/test_local_engine.py`; historical internal audio evidence is recorded
+in the [DSP qualification review](../../docs/research/CPP_DSP_PHASE4_RELEASE_QUALIFICATION.md).
+Current-build human listening and release requirements remain open in
+[KENN_PLAN.md](../../KENN_PLAN.md).
 
 The adapter is wired through `core.MixReviewBoundary`; the analyzer and
 validator remain injected, so the engine can be swapped without changing the
@@ -40,7 +42,7 @@ receipt contract.
 From the repository root:
 
 ```sh
-python3 mix-review/adapter.py ./path/to/local-mix.wav
+python3 products/kenn/packages/mix-review/adapter.py ./path/to/local-mix.wav
 ```
 
 ## Optional legacy engine (not beta-default)

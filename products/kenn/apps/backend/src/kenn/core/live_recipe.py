@@ -9,7 +9,6 @@ in reverse order when a later step fails.
 from __future__ import annotations
 
 import json
-import math
 import time
 import uuid
 from threading import Lock

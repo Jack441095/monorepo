@@ -41,38 +41,6 @@ def _ollama_request(
         return None
 
 
-def _ollama_generate_stream(
-    payload: dict[str, Any],
-    timeout: int = TIMEOUT,
-) -> str | None:
-    """Stream a generation from Ollama and concatenate the response."""
-    url = f"{OLLAMA_HOST.rstrip('/')}/api/generate"
-    data = json.dumps(payload).encode("utf-8")
-    try:
-        req = urllib.request.Request(
-            url,
-            data=data,
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            full_text: list[str] = []
-            for line in resp:
-                if not line.strip():
-                    continue
-                try:
-                    chunk = json.loads(line.decode("utf-8"))
-                except json.JSONDecodeError:
-                    continue
-                if chunk.get("response"):
-                    full_text.append(chunk["response"])
-                if chunk.get("done"):
-                    break
-            return "".join(full_text).strip() or None
-    except (urllib.error.URLError, urllib.error.HTTPError, OSError, json.JSONDecodeError):
-        return None
-
-
 def _ollama_chat(
     messages: list[dict[str, str]],
     model: str = DEFAULT_MODEL,

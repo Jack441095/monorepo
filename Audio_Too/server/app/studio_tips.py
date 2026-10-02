@@ -17,26 +17,6 @@ if str(LM_ROOT) not in sys.path:
     sys.path.insert(0, str(LM_ROOT))
 
 
-def _dynamic_starter_extra() -> list[str]:
-    """Recent dashboard/public questions and open LM gaps."""
-    extra: list[str] = []
-    try:
-        import lm_gaps
-        import tips_queries
-
-        for gap in lm_gaps.list_gaps_filtered(status="open", limit=5):
-            q = str(gap.get("question", "")).strip()
-            if q:
-                extra.append(q)
-        for row in tips_queries.list_queries(limit=12):
-            q = str(row.get("question", "")).strip()
-            if q:
-                extra.append(q)
-    except OSError:
-        pass
-    return extra
-
-
 def _lm_catalog() -> dict:
     from kenn.core.suggestions import catalog_payload, typeahead
 

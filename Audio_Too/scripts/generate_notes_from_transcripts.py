@@ -135,11 +135,6 @@ def _extract_title(note_text: str) -> str:
     return m.group(1).strip() if m else ""
 
 
-def _is_duplicate(title: str) -> bool:
-    slug = _slug_from_title(title)
-    return (NOTES_DIR / f"{slug}.md").exists()
-
-
 def _save_note(note_text: str, dry_run: bool) -> str | None:
     title = _extract_title(note_text)
     if not title:

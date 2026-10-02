@@ -8,7 +8,7 @@ filters strictly clamped within safe hardware boundaries (cuts <= -3.0 dB, Q in 
 from __future__ import annotations
 
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 
