@@ -527,6 +527,9 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     the top curated note, and tune on a separate set so these stay a check.
     [Causes](docs/evidence/KENN_WRAPPER_HELDOUT_ROWS_FRESH_INDEX_2026-10-02.md). `upgrade-room-null` answers with
     EQ advice for a cancellation null, so do it first.
+    A probe on 2 Oct found no general weight, topic or curated-note rule that moves these rows without tuning on
+    them ([receipt](docs/evidence/KENN_C5_RANKING_PROBE_2026-10-02.md)). Next step is the experiment 2 reranker spike
+    scored on the 128 coverage rows; it needs Jack's OK to download the model first.
 
 ### 3. Qualify Ableton knowledge and existing control breadth
 
