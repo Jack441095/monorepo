@@ -53,7 +53,7 @@ def _label(chunk: dict) -> str:
 
 
 def _answer_prompt() -> str:
-    messages = _build_synthesis_messages(
+    messages, _shown = _build_synthesis_messages(
         QUERY,
         "Short answer: key the bass compressor from the kick, then back the release off until the bass recovers.",
         RANKED_RESULTS,

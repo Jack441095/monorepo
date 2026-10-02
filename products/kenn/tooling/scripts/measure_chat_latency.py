@@ -85,6 +85,45 @@ def _drop_semantic_cache() -> None:
         pass
 
 
+def _index_version() -> str:
+    """Whatever retrieval index this checkout points at, read fresh.
+
+    Read per answer rather than once for the run: an index rebuild midway through a 30-question capture is
+    exactly the drift that makes the recorded evidence unreplayable, and a single run-level stamp would
+    report one version for rows that never saw it.
+    """
+    pointer = KENN_ROOT / "apps/backend/src/kenn/data/index/CURRENT"
+    return pointer.read_text(encoding="utf-8").strip() if pointer.is_file() else ""
+
+
+def gate_evidence(results: list[tuple[float, dict]]) -> tuple[str, list[tuple[float, dict, str]]]:
+    """The evidence the grounding gate reads for these results, taken from the list both sides share.
+
+    This used to render the captured field from display_results(query, results, 3) and chunk["text"], which
+    stopped being what the gate reads when the evidence rework landed on 2 Oct 2026. 14 of the 22 rows in that
+    day's capture disagreed, and an offline leak check run against the field reported 8 of 18 accepted answers
+    citing a measurement the gate had in front of it; against the gate's own evidence the same check reported
+    0 of 18. Call model_evidence() with the gate's own defaults instead, and the two cannot drift apart again.
+    """
+    from kenn.core.chat_retrieval import source_label
+    from kenn.llm.llm_rewrite import model_evidence
+
+    return model_evidence(results, source_label)
+
+
+def gate_evidence_text(shown: list[tuple[float, dict, str]]) -> str:
+    """The gate's evidence string for a list of (score, chunk, body): title, source and the body as shown.
+
+    Title and source rather than source_label() because that is the triple generated_answer_validation joins.
+    The label reaches the model inside the <source_excerpt label="..."> attribute rather than as excerpt text,
+    so putting it here would vouch for words the gate never counts.
+    """
+    return " ".join(
+        " ".join((str(chunk.get("title") or ""), str(chunk.get("source") or ""), body))
+        for _score, chunk, body in shown
+    )
+
+
 def _install_capture(path: Path) -> None:
     """Record every candidate answer so a rejection can be re-scored offline.
 
@@ -93,19 +132,21 @@ def _install_capture(path: Path) -> None:
     metadata is built. generated_answer_validation is the last place it exists, and reading it out of a
     wrapper is how the dominant rejection was originally identified. Point --capture-answers at a
     git-ignored path: this holds the model's prose, which the receipt itself must never carry.
+
+    Each row carries the index version and the evidence budget it was written under, because a row cannot be
+    checked against today's gate unless someone can tell what today's gate looked like when the row was made.
+    The 22-row capture from 2 Oct 2026 recorded neither, which is why its acceptance figures needed re-measuring
+    before anyone could quote them.
     """
     from kenn.core import chat_answer
-    from kenn.core.chat_retrieval import display_results
+    from kenn.llm.llm_rewrite import _CONTEXT_BLOCK_CHARS
 
     path.parent.mkdir(parents=True, exist_ok=True)
     real = chat_answer.generated_answer_validation
 
     def capture(query, results, answer, **kwargs):
         validation = real(query, results, answer, **kwargs)
-        evidence = " ".join(
-            " ".join((str(c.get("title") or ""), str(c.get("source") or ""), str(c.get("text") or "")))
-            for _score, c in display_results(query, results, 3)
-        )
+        _block, shown = gate_evidence(results)
         with path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps({
                 "question": query,
@@ -114,7 +155,17 @@ def _install_capture(path: Path) -> None:
                 "warnings": [str(w) for w in validation.get("warnings") or []],
                 "unsupported_measurements": list(validation.get("unsupported_measurements") or []),
                 "fabricated_sources": list(validation.get("fabricated_sources") or []),
-                "evidence_text": evidence,
+                "evidence_text": gate_evidence_text(shown),
+                "evidence_chunks_shown": len(shown),
+                # The gate reads model_evidence()'s default budget. KENN_LLM_CONTEXT_CHARS moves the prompt's
+                # budget instead (llm_rewrite.py:1394) and leaves the gate's alone, so the two are recorded
+                # separately: a row whose prompt budget differs from its evidence budget was shown less than
+                # the gate vouches for, and no re-score of that row can be exact.
+                "evidence_budget_chars": int(_CONTEXT_BLOCK_CHARS),
+                "prompt_context_chars": int(
+                    os.environ.get("KENN_LLM_CONTEXT_CHARS") or _CONTEXT_BLOCK_CHARS
+                ),
+                "index_version": _index_version(),
                 "additional_evidence_text": kwargs.get("additional_evidence_text") or "",
                 "timeline_context": kwargs.get("timeline_context") or "",
             }) + "\n")
@@ -190,8 +241,7 @@ def measure(cases: list[dict], *, allow_llm: bool = True, surface: str = "stream
         "schema": "kenn.chat_latency.v1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "model": os.environ.get("KENN_LLM_MODEL", ""),
-        "index_version": (KENN_ROOT / "apps/backend/src/kenn/data/index/CURRENT").read_text(
-            encoding="utf-8").strip() if (KENN_ROOT / "apps/backend/src/kenn/data/index/CURRENT").is_file() else "",
+        "index_version": _index_version(),
         "counts": {
             "asked": len(rows),
             "llm_attempted": len(attempted),

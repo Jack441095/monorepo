@@ -612,6 +612,21 @@ _CONTEXT_BLOCK_CHARS = 1200
 _CONTEXT_SCAN_WINDOW = EVIDENCE_SCAN_WINDOW
 
 
+# The one place that decides how much evidence both sides work with. KENN_LLM_CONTEXT_CHARS used to be read inline on
+# the prompt path only, while kenn/core/chat_grounding.py called model_evidence() with its default, so an override moved
+# one side and left the other. Measured 2 Oct 2026 on index v-db8c6334cf63 for the bass/sidechain query at
+# KENN_LLM_CONTEXT_CHARS=300: the model read 1 excerpt and the gate judged against 3. That is the same seam that took
+# acceptance from 41% (12 of 29) to 27% (4 of 15) hours earlier the same day with the roles reversed, 3 against 12, so
+# the env var is a third route into the one failure that measurement recorded. It was not hypothetical:
+# tooling/evaluation/results/KENN_LANDING_ATTRIBUTION_2026-10-01.json carries a run taken with that override set.
+#
+# The override is still honoured at whatever value the operator picks. It just reaches both readers now. A non-numeric
+# value raises rather than falling back, the same as the inline read it replaces: a typo in a measurement run should
+# stop the run, not quietly re-run it at 1200 and report a latency nobody asked for.
+def resolve_context_chars() -> int:
+    return int(os.environ.get("KENN_LLM_CONTEXT_CHARS") or _CONTEXT_BLOCK_CHARS)
+
+
 def _clean_chunk_for_synthesis(chunk: dict, max_len: int = _CONTEXT_CHUNK_CHARS) -> str:
     """Extract substantive, concise knowledge lines from a note chunk, skipping metadata boilerplate.
 
@@ -1230,44 +1245,85 @@ Query: {query}
 """
 
 
+VALID_ROUTE_WORDS = ("ableton", "production", "mix_review", "game_audio", "conversation", "out_of_scope")
+
+
 def llm_route_query(query: str) -> str | None:
     """Use the LLM to classify a query when keyword routing fails.
 
-    Returns a route string or None if LLM is not available.
+    Returns a route string or None if LLM is not available or the model gave us
+    nothing usable. None is not silent: an empty or unrecognised reply prints a
+    warning, because route_query() cannot tell "no model" apart from "the model
+    burned the call and said nothing" and drops both into the "unknown" route.
     """
     if not is_enabled("route"):
         return None
     user_msg = ROUTE_CLASSIFICATION_PROMPT.format(query=query[:500])
     messages = [{"role": "user", "content": user_msg}]
     cfg = config("route")
-    payload = {
-        "model": cfg["model"],
-        "messages": messages,
-        "temperature": 0.05,  # very low temperature for classification
-        "max_tokens": 20,
-    }
+    # This call went to {base_url}/chat/completions unconditionally, which is the exact
+    # route that ignores `think`. On kenn-brain-qwen3-8b -- a reasoning model -- the
+    # whole 20-token cap went into a thinking block, content came back empty, the
+    # split() below matched nothing, and the function returned None on every single
+    # call. Found 2 Oct 2026. The comment here used to read "Same fixed-90s-default bug
+    # as _chat_completion ... fixed alongside those": the timeout fix landed, this one
+    # was missed because it lives in a different code path.
+    #
+    # Send qwen3 to the native /api/chat route with think: false, the same treatment
+    # _chat_completion() gives. A 20-token classification is the cheapest call in the
+    # system and it is still a full serial generation in front of answer generation,
+    # so it is worth having working rather than worth having at all.
+    native = _ollama_think_off(cfg, None)
+    if native:
+        url = f"{_native_ollama_base(cfg['base_url'])}/api/chat"
+        payload = {
+            "model": cfg["model"],
+            "messages": messages,
+            "stream": False,
+            "think": False,
+            "keep_alive": KEEP_ALIVE_DURATION,
+            # Same 20-token cap and near-zero temperature the OpenAI-compatible route used.
+            "options": {"temperature": 0.05, "num_predict": 20},
+        }
+    else:
+        url = f"{cfg['base_url']}/chat/completions"
+        payload = {
+            "model": cfg["model"],
+            "messages": messages,
+            "temperature": 0.05,  # very low temperature for classification
+            "max_tokens": 20,
+        }
     headers = _build_headers(cfg)
     client = _get_client()
     try:
         response = client.post(
-            f"{cfg['base_url']}/chat/completions",
+            url,
             json=payload,
             headers=headers,
-            # Same fixed-90s-default bug as _chat_completion/
-            # _chat_completion_stream -- fixed alongside those.
             timeout=httpx.Timeout(cfg["timeout"], connect=15.0),
         )
         response.raise_for_status()
         data = response.json()
-        choices = data.get("choices") or []
-        if not choices:
-            return None
-        content = str(choices[0].get("message", {}).get("content", "")).strip().lower()
-        valid = {"ableton", "production", "mix_review", "game_audio", "conversation", "out_of_scope"}
+        # The two routes disagree on the envelope: Ollama's native /api/chat returns
+        # {"message": {...}}, the OpenAI-compatible one returns {"choices": [{"message": ...}]}.
+        if native:
+            message = data.get("message") or {}
+        else:
+            choices = data.get("choices") or []
+            if not choices:
+                print("WARNING: llm_route_query got no choices -- falling through to keyword routing")
+                return None
+            message = choices[0].get("message") or {}
+        content = str(message.get("content") or "").strip().lower()
         for word in content.split():
             word = word.strip(".,!?\"'")
-            if word in valid:
+            if word in VALID_ROUTE_WORDS:
                 return word
+        print(
+            f"WARNING: llm_route_query got no route word back "
+            f"(model={cfg['model']!r}, native={native}, content={content[:80]!r}) -- "
+            f"falling through to keyword routing"
+        )
     except Exception as exc:
         print(f"WARNING: llm_route_query failed ({exc!r}) -- caller falls back to keyword routing")
         return None
@@ -1364,13 +1420,19 @@ def _build_synthesis_messages(
     route: str = "unknown",
     timeline_context: str | None = None,
     skill_level: str = "",
-) -> list[dict]:
-    """Build the messages array for answer synthesis.
+) -> tuple[list[dict], list[tuple[float, dict, str]]]:
+    """Build the messages array for answer synthesis, and the excerpts behind it.
 
     Instead of asking the LLM to 'improve' a pre-built template answer, we:
     1. Give the LLM the raw source excerpts
     2. Include the template answer as a 'draft' reference (not as the primary source)
     3. Let the LLM synthesise its own answer from the raw sources
+
+    The excerpt list is returned rather than recomputed by the caller. Anything that has to describe what the
+    model saw — the Sources: line, and the gate's displayed_filenames in kenn/core/chat_grounding.py — needs
+    this exact list, and only under this exact budget. The budget is resolve_context_chars() rather than a
+    constant read here, because a run that pins KENN_LLM_CONTEXT_CHARS used to get a prompt that no second
+    call could account for.
     """
     # The short, cache-friendly layout suits the MLX engine; any other model (Ollama) needs the full system prompt to
     # keep the Short answer / Try this / Sources format. The flag alone used to decide, so with MLX not installed an
@@ -1384,9 +1446,9 @@ def _build_synthesis_messages(
     # latency down on Apple Silicon; 650 chars held it under 450 prompt tokens at the cost of hiding the
     # measurements the gate then rejected the answer for (2 Oct). It now defaults to the same
     # _CONTEXT_BLOCK_CHARS the chat path measures, and the env var still overrides it per run.
-    context_chars = int(os.environ.get("KENN_LLM_CONTEXT_CHARS") or _CONTEXT_BLOCK_CHARS)
+    context_chars = resolve_context_chars()
     draft_chars = int(os.environ.get("KENN_LLM_DRAFT_CHARS") or 300)
-    raw_context = build_raw_context_block(results, source_label, max_chars=context_chars)
+    raw_context, shown = model_evidence(results, source_label, max_chars=context_chars)
     if timeline_context:
         raw_context = f"Track Review History Timeline:\n{timeline_context}\n\n" + raw_context
 
@@ -1424,7 +1486,7 @@ def _build_synthesis_messages(
         role = "assistant" if turn["role"] == "assistant" else "user"
         messages.append({"role": role, "content": turn["content"][:900]})
     messages.append({"role": "user", "content": "\n\n".join(user_parts)})
-    return messages
+    return messages, shown
 
 
 # Same synonym sets kenn/core/chat_grounding.py's answer_quality_report()
@@ -1520,7 +1582,7 @@ def enhance_stream(
     if not is_enabled():
         return
 
-    messages = _build_synthesis_messages(
+    messages, shown = _build_synthesis_messages(
         query,
         template_answer,
         results,
@@ -1542,7 +1604,7 @@ def enhance_stream(
                 yield {"event": "token", "token": token}
             if usage and usage.total_tokens > 0:
                 if "sources:" not in "".join(streamed).lower():
-                    block = sources_block(results, source_label)
+                    block = sources_block(shown, source_label)
                     if block:
                         yield {"event": "token", "token": f"\n\n{block}"}
                 yield {"event": "llm_usage", "data": usage.to_dict()}
@@ -1554,10 +1616,22 @@ def enhance_stream(
         raise
 
 
-def sources_block(results: list[tuple[float, dict]], source_label, limit: int = 3) -> str:
-    """The notes this answer was written from, in the template's "Sources:" format."""
+def sources_block(shown: list[tuple[float, dict, str]], source_label, limit: int = 3) -> str:
+    """The notes this answer was written from, in the template's "Sources:" format.
+
+    ``shown`` is model_evidence()'s excerpt list, not the raw ranked results. Iterating the ranking here was a
+    third source of truth on the same seam: Related-questions chunks rank high and clean to "", and the 1200-char
+    block usually pays for 2-3 excerpts, so "top 3 by rank" was routinely three labels the model was never shown.
+    The gate reads the shown list, called those notes fabricated, and acceptance fell from 66% (19 of 29) to 1
+    of 25 on 2 Oct 2026, with 23 of the 25 rejections carrying exactly that one warning. The gate was right and
+    this list was wrong.
+
+    An answer may only be credited with citing what it was handed, so the labels come from the same list the
+    prompt was built from. ``limit`` still trims the list for the producer; that is cosmetic, and a subset of
+    the shown set is always safe in the gate's direction.
+    """
     labels: list[str] = []
-    for _score, chunk in results:
+    for _score, chunk, _body in shown:
         label = str(source_label(chunk) or "").strip()
         if label and label not in labels:
             labels.append(label)
@@ -1566,12 +1640,12 @@ def sources_block(results: list[tuple[float, dict]], source_label, limit: int = 
     return "Sources:\n" + "\n".join(f"- {label}" for label in labels) if labels else ""
 
 
-def _with_sources(text: str, results: list[tuple[float, dict]], source_label) -> str:
+def _with_sources(text: str, shown: list[tuple[float, dict, str]], source_label) -> str:
     # A local model often writes a good answer but forgets the "Sources:" line, and the whole answer used to be
     # thrown away for it. KENN knows exactly which notes it gave the model, so it adds them itself.
     if "sources:" in text.lower():
         return text
-    block = sources_block(results, source_label)
+    block = sources_block(shown, source_label)
     return f"{text.rstrip()}\n\n{block}" if block else text
 
 
@@ -1602,7 +1676,7 @@ def enhance(
     if not is_enabled():
         return None
 
-    messages = _build_synthesis_messages(
+    messages, shown = _build_synthesis_messages(
         query,
         template_answer,
         results,
@@ -1634,7 +1708,7 @@ def enhance(
 
     text = re.sub(r"^#+\s*", "", text, flags=re.M).strip()
     from kenn.llm.linter import lint_response
-    text = _with_sources(lint_response(text, answer_mode), results, source_label)
+    text = _with_sources(lint_response(text, answer_mode), shown, source_label)
     if not valid_response(text, answer_mode, route=route):
         return None
     return text
@@ -1789,8 +1863,21 @@ def critique_answer(query: str, answer: str, context: str, past_reasoning: str) 
         clean = re.sub(r"^```(?:json)?|```$", "", content.strip(), flags=re.IGNORECASE).strip()
         return json.loads(clean)
     except Exception as e:
+        # Fail closed. This used to return passed True on any failure, which told
+        # kenn.knowledge.reflection that a self-critique nobody ran had cleared the
+        # answer. A critique that never happened is not a pass, and the caller gates on
+        # .get("passed", True), so reporting True here silently vouched for an answer
+        # on a timeout, a 404, or a JSON body we could not parse. It is env-gated off
+        # (KENN_CRITIQUE_LLM_ENABLED) so nothing live was affected on 2 Oct 2026; this
+        # is a trap for whoever turns it on.
         log.warning(f"LLM critique failed: {e}")
-        return {"passed": True, "warnings": [], "unsupported_claims": [], "contradictions": []}
+        return {
+            "passed": False,
+            "warnings": [f"LLM self-critique did not run: {e}"],
+            "unsupported_claims": [],
+            "contradictions": [],
+            "error": repr(e),
+        }
 
 
 def generate_lesson(query: str, conclusion: str, correction: str) -> str | None:
@@ -1841,7 +1928,17 @@ CONVERSATIONAL_SYSTEM_PROMPT = (
 
 
 def generate_conversational_llm_response(query: str, history: list | None = None) -> str | None:
-    """Generate a dynamic conversational response for non-technical or casual chat using LLM."""
+    """Generate a dynamic conversational response for non-technical or casual chat using LLM.
+
+    No caller on the chat path as of 2 Oct 2026. Both former callers are gone:
+    kenn.core.chat_routing.conversational_payload, which used this with no retrieved
+    context at all and returned the result as a high-confidence answer with no sources,
+    and the dead copy in kenn.core.chat_formatting.weak_match_answer, whose import of
+    `llm_enabled` never resolved because this module defines `is_enabled`. Kept here
+    because tests assert on CONVERSATIONAL_SYSTEM_PROMPT and because a grounded
+    conversational pass is a real future option; it must not be wired back into an
+    answer path without going through generated_answer_validation.
+    """
     if not truthy("AUDIO_TOO_LLM_ENABLED"):
         return None
     try:

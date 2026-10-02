@@ -172,7 +172,9 @@ def measure(*, tokens_only: bool, decode_tokens: int, live_seconds: float, load_
             continue
         results = search(question, chunks, terms, limit=4)
         shown = display_results(question, results, limit=4)
-        messages = _build_synthesis_messages(
+        # The second return value is the excerpt list the prompt was built from; this measurement only counts
+        # prompt tokens, so it is dropped here.
+        messages, _shown = _build_synthesis_messages(
             question,
             "Template answer used only as a structure reference in this measurement.",
             shown or results,

@@ -197,10 +197,12 @@ def test_non_qwen3_stream_still_uses_openai_compatible_route(monkeypatch, model)
 
 def test_kenn_adds_the_sources_a_local_model_forgot() -> None:
     # An 8B answer with every section but "Sources:" used to be discarded for the template.
-    results = [(9.0, {"source": "kick-bass-balance-phase.md"}), (8.0, {"source": "kick-bass-balance-phase.md"}),
-               (7.0, {"source": "sidechain-compression.md"})]
+    results = [(9.0, {"source": "kick-bass-balance-phase.md", "text": "The overlap stacks kick and bass in the same band."}),
+               (8.0, {"source": "kick-bass-balance-phase.md", "text": "Phase cancels the low end of a doubled kick."}),
+               (7.0, {"source": "sidechain-compression.md", "text": "Key the compressor from the kick for a 4:1 dip."})]
+    _block, shown = llm_rewrite.model_evidence(results, lambda chunk: chunk["source"])
     text = "Short answer: cut the overlap.\n\nTry this:\n1. Level-match.\n2. Check phase."
-    fixed = llm_rewrite._with_sources(text, results, lambda chunk: chunk["source"])
+    fixed = llm_rewrite._with_sources(text, shown, lambda chunk: chunk["source"])
     assert fixed.endswith("Sources:\n- kick-bass-balance-phase.md\n- sidechain-compression.md")
     assert llm_rewrite.valid_structure(fixed)
-    assert llm_rewrite._with_sources(fixed, results, lambda chunk: chunk["source"]) == fixed
+    assert llm_rewrite._with_sources(fixed, shown, lambda chunk: chunk["source"]) == fixed

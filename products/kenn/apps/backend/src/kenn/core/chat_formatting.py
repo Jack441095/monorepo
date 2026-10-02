@@ -30,6 +30,7 @@ from kenn.core.chat_retrieval import (
     results_are_weak,
 )
 from kenn.core.chat_routing import (
+    canned_response_index,
     normalize_history,
 )
 
@@ -543,24 +544,25 @@ def weak_match_answer(query: str, answer_mode: str = "") -> str:
             lines.extend(f"• {item}" for item in examples[:3])
         return "\n".join(lines)
 
-    llm_res = None
-    try:
-        from kenn.llm.llm_rewrite import generate_conversational_llm_response, llm_enabled
-        if llm_enabled():
-            llm_res = generate_conversational_llm_response(query)
-    except Exception:
-        pass
-    if llm_res:
-        return llm_res
-
-    h = abs(hash(query)) % 4
+    # No model call on this path. One used to sit here and it had never run once:
+    # the line below imported `llm_enabled` from kenn.llm.llm_rewrite, which defines
+    # `is_enabled`, so the ImportError was raised and swallowed by the `except
+    # Exception: pass` directly underneath it on every call, and the producer got
+    # whichever canned line the hash picked. Found 2 Oct 2026. The live twin of this
+    # feature was in chat_routing.conversational_payload, which imported correctly and
+    # did call the model -- two copies of one feature, one silently dead.
+    #
+    # Both copies are gone. The live one returned ungrounded model text as a
+    # high-confidence answer with no sources; see conversational_reply() for why
+    # retrieval plus the evidence gate is the wrong trade here and the deterministic
+    # line is the right one.
     banter_responses = [
         "Haha, got it! Ready whenever you want to dive back into the session, mix decisions, or Ableton routing.",
         "Noted! Let me know what track, mix issue, or studio task we should solve next.",
         "Sounds good! Ready to assist with whatever you need for your audio session today.",
         "I'm here! Ask me about mixing, mastering, stems, client deliverables, or track setups whenever you're ready.",
     ]
-    return banter_responses[h]
+    return banter_responses[canned_response_index(query, len(banter_responses))]
 
 
 def get_conversational_headers(route: str, topics: list[str]) -> dict[str, str]:

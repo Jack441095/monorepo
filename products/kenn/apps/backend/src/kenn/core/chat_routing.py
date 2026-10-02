@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -509,6 +510,91 @@ def is_unclear_query(query: str) -> bool:
     return 0 < len(terms) <= 2 and not query_topics(query) and not conversational_intent(query)
 
 
+def canned_response_index(query: str, count: int) -> int:
+    """Pick one of `count` canned replies, the same way in every process.
+
+    Python randomises str.__hash__ per interpreter run unless PYTHONHASHSEED is
+    pinned, so the abs(hash(query)) % 4 this replaces handed the same "thanks" a
+    different reply after every server restart. A digest of the bytes does not move.
+    """
+    if count <= 0:
+        return 0
+    return int.from_bytes(hashlib.sha256(query.encode("utf-8")).digest()[:4], "big") % count
+
+
+# Every line the conversation route can return. Exported so a test can assert that a
+# conversational answer is byte-identical to one of these and not model output; the
+# old inline list literals inside one function gave no way to check that.
+CONVERSATIONAL_TEMPLATES: dict[str, tuple[str, ...]] = {
+    "thanks": (
+        "Anytime! Let me know if you want to test another move in the session.",
+        "You got it! I'm right here whenever you want to work through the next track.",
+        "Happy to help! Let's keep the momentum going on this project.",
+        "Cheers! Let me know what track or mix problem we're tackling next.",
+    ),
+    "check_in": (
+        "Doing great, thanks! Ready to dive into some audio. What are we working on today?",
+        "All good on my end! The studio setup is warmed up—what track are we tuning or mixing?",
+        "Feeling sharp! Ready to inspect stems, fix phase issues, or chat through mix decisions. What's on your mind?",
+        "Everything's running smoothly! Let me know what session problem we should solve next.",
+    ),
+    "joke": (
+        "Why do sound engineers only count to two? Because on three you have to lift! ...And on four, someone asks for more low end in their monitors.",
+        "How many audio engineers does it take to change a lightbulb? Just one, but they'll spend 4 hours auditioning 12 different bulbs for 'analog warmth'.",
+        "What's the difference between a recording engineer and a pizza? A pizza can feed a family of four!",
+        "An engineer walks into a bar... and immediately tries to find the 2.5 kHz resonant frequency of the room reflections.",
+    ),
+    "meta": (
+        f"No worries! I am {APP_NAME} — your studio AI companion for Ableton, mixing, mastering, "
+        "stems, client deliverables, and audio production workflow. Ask me anything!",
+    ),
+    "help": (
+        "Talk to me like an engineer in the control room. Ask about vocal sibilance, kick/bass phase, "
+        "plugin routing, client invoices, or mix reviews—I'm here to help.",
+    ),
+    "greeting": (
+        "Hey! Good to have you in the studio. What are we focusing on today?",
+        "Yo! Ready when you are. What are we mixing, tweaking, or building next?",
+        "Hey there! Got a specific audio problem or track to review?",
+        "Good day! I'm set for session work or production chat. What's the plan?",
+    ),
+}
+
+
+def conversational_reply(query: str, intent: str) -> str:
+    """The canned reply for a conversational turn. No model is asked for it.
+
+    This used to call generate_conversational_llm_response(query, history=history)
+    and hand the model's text back as the whole answer, at "confidence": "high" with
+    "sources": [] and llm_enhanced True. Found 2 Oct 2026: the call passed the query
+    and the history and no retrieved note at all, while CONVERSATIONAL_SYSTEM_PROMPT
+    promised "technical precision" and asked the model to "ground creative questions
+    in physical acoustic reality". should_use_llm_rewrite() refuses route ==
+    "conversation", so this was structurally the one route that could never reach the
+    evidence gate, and it is the first branch of the streaming path. A producer asking
+    "thanks" got a confident paragraph of unsolicited EQ advice invented from the base
+    model's prior.
+
+    Routing it through generated_answer_validation instead, option (a) in the brief, is
+    worse here rather than better. There is nothing to ground: this function only runs
+    for intents that matched the conversational branch, and all of those are short or
+    keyword matches with no technical topic. And the gate could not pass the result even
+    in principle. generated_answer_validation refuses whenever grounding_mode is weak,
+    and grounding_report scores an answer with no displayed note 0 for top_source_trust
+    and 0 for approved_note; a conversational reply cannot reach the 75 that strong
+    needs. So every "thanks" would pay a full retrieval pass plus a full generation pass
+    to be discarded, inside a branch the callers document as a sub-0.1 ms fast path.
+
+    Keeping the deterministic line is also the honest label: a chat reply, not an
+    engineering answer, which is what source_quality "not_needed" and conversation_only
+    True already said.
+    """
+    templates = CONVERSATIONAL_TEMPLATES.get(intent) or CONVERSATIONAL_TEMPLATES["greeting"]
+    if len(templates) == 1:
+        return templates[0]
+    return templates[canned_response_index(query, len(templates))]
+
+
 def conversational_payload(query: str, history: list | None = None) -> dict | None:
     # Scope handling belongs to the main answer path, where it returns the
     # explicit low-confidence boundary response.  Do not let a friendly
@@ -525,64 +611,7 @@ def conversational_payload(query: str, history: list | None = None) -> dict | No
         return None
     history_used = bool(normalize_history(history))
     starters = DEFAULT_STARTERS[:5] if intent == "greeting" else starter_questions(limit=5)
-    llm_res = None
-    # For instant studio greetings ("hello", "hi", "hey"), skip the heavy LLM pass
-    # and provide immediate zero-latency studio responses.
-    if intent != "greeting" and llm_enabled():
-        try:
-            from kenn.llm.llm_rewrite import generate_conversational_llm_response
-            llm_res = generate_conversational_llm_response(query, history=history)
-        except Exception:
-            pass
-
-    if llm_res:
-        answer = llm_res
-    else:
-        h = abs(hash(query)) % 4
-        if intent == "thanks":
-            responses = [
-                "Anytime! Let me know if you want to test another move in the session.",
-                "You got it! I'm right here whenever you want to work through the next track.",
-                "Happy to help! Let's keep the momentum going on this project.",
-                "Cheers! Let me know what track or mix problem we're tackling next.",
-            ]
-            answer = responses[h]
-        elif intent == "check_in":
-            responses = [
-                "Doing great, thanks! Ready to dive into some audio. What are we working on today?",
-                "All good on my end! The studio setup is warmed up—what track are we tuning or mixing?",
-                "Feeling sharp! Ready to inspect stems, fix phase issues, or chat through mix decisions. What's on your mind?",
-                "Everything's running smoothly! Let me know what session problem we should solve next.",
-            ]
-            answer = responses[h]
-        elif intent == "meta":
-            answer = (
-                f"No worries! I am {APP_NAME} — your studio AI companion for Ableton, mixing, mastering, "
-                "stems, client deliverables, and audio production workflow. Ask me anything!"
-            )
-        elif intent == "help":
-            answer = (
-                "Talk to me like an engineer in the control room. Ask about vocal sibilance, kick/bass phase, "
-                "plugin routing, client invoices, or mix reviews—I'm here to help."
-            )
-        elif intent == "joke":
-            jokes = [
-                "Why do sound engineers only count to two? Because on three you have to lift! ...And on four, someone asks for more low end in their monitors.",
-                "How many audio engineers does it take to change a lightbulb? Just one, but they'll spend 4 hours auditioning 12 different bulbs for 'analog warmth'.",
-                "What's the difference between a recording engineer and a pizza? A pizza can feed a family of four!",
-                "An engineer walks into a bar... and immediately tries to find the 2.5 kHz resonant frequency of the room reflections.",
-            ]
-            answer = jokes[h]
-        elif intent == "general_knowledge":
-            answer = "I'm focused on your audio sessions, but let me know what we're mixing or mastering today!"
-        else:
-            responses = [
-                "Hey! Good to have you in the studio. What are we focusing on today?",
-                "Yo! Ready when you are. What are we mixing, tweaking, or building next?",
-                "Hey there! Got a specific audio problem or track to review?",
-                "Good day! I'm set for session work or production chat. What's the plan?",
-            ]
-            answer = responses[h]
+    answer = conversational_reply(query, intent)
 
     return {
         "question": query,
@@ -594,7 +623,9 @@ def conversational_payload(query: str, history: list | None = None) -> dict | No
         "topics": [],
         "related_questions": starters,
         "used_history": history_used,
-        "llm_enhanced": bool(llm_res),
+        # Never True here now: nothing on this route is generated. Left explicit so a
+        # later change that reintroduces a model call has to also answer for this flag.
+        "llm_enhanced": False,
         "llm_available": llm_enabled(),
         "conversation_only": True,
         "intent": intent,

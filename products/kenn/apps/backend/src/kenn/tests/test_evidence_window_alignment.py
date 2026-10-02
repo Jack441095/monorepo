@@ -23,12 +23,23 @@ sources and asserted len(_evidence_chunks(...)) == 12, and it passed for the wro
 de-duplicates on (kind, source, page) and all 3204 note sections in the live index carry page == 0, so a note's
 sections can never occupy separate slots there. The fixture asserted a shape the corpus does not produce and
 measured a depth the gate never had.
+
+A third reader was still deriving its own list, and it cost 24 of 25 answers. llm_rewrite.sources_block()
+walked the raw ranked results to build the "Sources:" line, so it counted Related-questions chunks that clean
+to "" and notes the 1200-char block never paid for. Acceptance fell from 66% (19 of 29) to 1 of 25 on the
+streaming surface, 23 of those rejections carrying nothing but "generated answer cites sources not in the
+retrieved evidence". Those were correct rejections of a citation list naming notes the model had never been
+shown. The tests at the end of this file cover that third reader.
 """
 
 from __future__ import annotations
 
+import pytest
+
+import kenn.llm.llm_rewrite as llm_rewrite
 from kenn.core.chat_constants import EVIDENCE_SCAN_WINDOW
 from kenn.core.chat_grounding import (
+    _cited_source_filenames,
     _evidence_chunks,
     _measurements,
     generated_answer_validation,
@@ -37,8 +48,10 @@ from kenn.core.chat_grounding import (
 from kenn.core.chat_retrieval import normalized_terms, source_label
 from kenn.llm.llm_rewrite import (
     _CONTEXT_SCAN_WINDOW,
+    _with_sources,
     build_raw_context_block,
     model_evidence,
+    sources_block,
 )
 
 QUERY = "How should I set up a send reverb on a vocal bus?"
@@ -266,3 +279,141 @@ def test_the_scan_window_stays_one_number_shared_by_both_sides() -> None:
     # it in isolation.
     assert EVIDENCE_SCAN_WINDOW == 12
     assert _CONTEXT_SCAN_WINDOW == EVIDENCE_SCAN_WINDOW
+
+
+def _related_questions_chunk(source: str, *phrasings: str) -> dict:
+    body = "\n".join(f"- {phrasing}" for phrasing in phrasings)
+    return _note(source, f"{source.removesuffix('.md')}\nRelated questions:\n{body}", section="Related questions")
+
+
+# The ranking as it arrives on a real query rather than as the budget ends up: a Related-questions block at rank
+# 1 — it echoes the question back, so it scores highest — then the four sections of reverb-send-basics.md, then
+# four notes the 1200-char block cannot reach. sources_block() used to take its top 3 straight off this list, so
+# its first label was a note the model was shown no words of and its third was a note it never saw.
+CROWDED_RANKING: list[tuple[float, dict]] = [
+    (110.0, _related_questions_chunk(
+        "vocal-space-notes.md",
+        "How should I set up a send reverb on a vocal bus?",
+        "When does a send reverb smear the vocal?",
+    )),
+    *RANKED_RESULTS,
+]
+
+
+def _listed_labels(block: str) -> set[str]:
+    return {line[2:].strip() for line in block.splitlines() if line.startswith("- ")}
+
+
+def test_the_sources_block_lists_only_notes_the_model_was_shown() -> None:
+    # The 2 Oct 2026 failure. Acceptance went 66% (19 of 29) to 1 of 25 and 23 rejections read nothing but
+    # "generated answer cites sources not in the retrieved evidence", because the block named notes the prompt
+    # never carried. The gate was right; the list was wrong. An answer can only be credited with citing what it
+    # was handed, so the labels have to come from model_evidence()'s excerpt list.
+    _block, shown = model_evidence(CROWDED_RANKING, source_label)
+    block = sources_block(shown, source_label)
+    listed = _listed_labels(block)
+
+    assert listed, "the fixture only proves anything if the block has a label in it"
+    assert listed == {source_label(chunk) for _score, chunk, _body in shown}
+    assert len([line for line in block.splitlines() if line.startswith("- ")]) == len(listed), (
+        "a note's sections all share source and page, so without the de-duplication one note takes every slot "
+        "and the producer sees the same filename three times"
+    )
+    assert "vocal-space-notes.md" not in listed, (
+        "a Related-questions block cleans to an empty string, so the model was shown no words of that note"
+    )
+    assert "lufs-delivery.md" not in listed, (
+        "lufs-delivery.md sits in the ranking but never fitted the 1200-char block"
+    )
+
+
+def test_the_sources_block_and_the_gate_read_the_same_excerpt_list() -> None:
+    # Set equality with what the gate calls displayed_filenames, keyed through the gate's own citation reader so
+    # the comparison cannot pass on a different idea of "cited". One list, two readers. The old raw-ranking
+    # version produced three filenames where the gate's list holds one, which is the whole 2 Oct regression.
+    gate = _evidence_chunks(list(CROWDED_RANKING))
+    _block, shown = model_evidence(CROWDED_RANKING, source_label)
+
+    gate_sources = {
+        str(chunk.get("source") or "").lower()
+        for _score, chunk, _body in gate
+        if chunk.get("source")
+    }
+    assert _cited_source_filenames(sources_block(shown, source_label)) == gate_sources
+    assert [c for _s, c, _b in gate] == [c for _s, c, _b in shown]
+
+
+def test_an_answer_whose_sources_kenn_appended_is_not_called_fabricated() -> None:
+    # The non-streaming path: a local model writes a good answer, forgets the "Sources:" line, and KENN adds it
+    # from model_evidence()'s list. The answer is then scored against that same list, so appending the citations
+    # can no longer be the thing that rejects the answer.
+    _block, shown = model_evidence(CROWDED_RANKING, source_label)
+    answer = (
+        "Short answer: Send the vocal to a dedicated reverb return and high-pass it at 200 Hz.\n\n"
+        "Try this: 1. Create a reverb return track. 2. Send the vocal bus to it. 3. Set the send to 20%.\n\n"
+        "Check: Audition the vocal dry against the wet return at matched loudness."
+    )
+    report = _validate(_with_sources(answer, shown, source_label), CROWDED_RANKING)
+
+    assert report["fabricated_sources"] == []
+    assert "generated answer cites sources not in the retrieved evidence" not in report["warnings"]
+
+
+def test_the_streaming_sources_append_uses_the_shown_list_too(monkeypatch: pytest.MonkeyPatch) -> None:
+    # enhance_stream builds the same block inline when the model never typed "sources:", and that is the surface
+    # the 2 Oct 2026 measurement ran on. It read the raw ranking here, so every streamed answer credited notes
+    # the model had never been shown.
+    monkeypatch.setattr(llm_rewrite, "is_enabled", lambda task="rewrite": True)
+
+    class _Usage:
+        total_tokens = 24
+
+        def to_dict(self) -> dict:
+            return {"total_tokens": 24}
+
+    def fake_stream(messages, task, **kwargs):
+        yield ("Short answer: send the vocal to its own return.\n\n"
+               "Try this: 1. Create the return. 2. Send the vocal bus to it.\n"), None
+        yield "", _Usage()
+
+    monkeypatch.setattr(llm_rewrite, "chat_completion_stream", fake_stream)
+
+    tokens = [
+        event["token"]
+        for event in llm_rewrite.enhance_stream(
+            QUERY, "", list(CROWDED_RANKING), None, "", source_label, lambda _history: [],
+            answer_mode="quick_fix", route="production_dialogue",
+        )
+        if event["event"] == "token"
+    ]
+    answer = "".join(tokens)
+
+    assert answer.endswith(f"Sources:\n- {source_label(CROWDED_RANKING[1][1])}"), answer
+    assert "lufs-delivery.md" not in answer, answer
+    assert "vocal-space-notes.md" not in answer, answer
+
+
+def test_the_written_answers_sources_append_uses_the_shown_list_too(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The other caller. enhance() hands the block to the same gate, so the same two notes it never showed must
+    # not turn up here either. Driving the real function rather than _with_sources is the point: a test of
+    # _with_sources alone would pass even with the call site reading the raw ranking.
+    monkeypatch.setattr(llm_rewrite, "is_enabled", lambda task="rewrite": True)
+    monkeypatch.setattr(
+        llm_rewrite, "_chat_completion",
+        lambda messages, task, **kwargs: (
+            "Short answer: send the vocal to its own reverb return.\n\n"
+            "Try this: 1. Create the return track. 2. Send the vocal bus to it.\n\n"
+            "Check: Audition the vocal dry against the wet return at matched loudness.",
+            None,
+        ),
+    )
+
+    answer = llm_rewrite.enhance(
+        QUERY, "", list(CROWDED_RANKING), None, "", source_label, lambda _history: [],
+        answer_mode="quick_fix", route="production_dialogue",
+    )
+
+    assert answer is not None, "the fixture answer must clear valid_structure or this asserts nothing"
+    assert answer.endswith(f"Sources:\n- {source_label(CROWDED_RANKING[1][1])}"), answer
+    assert "lufs-delivery.md" not in answer, answer
+    assert "vocal-space-notes.md" not in answer, answer

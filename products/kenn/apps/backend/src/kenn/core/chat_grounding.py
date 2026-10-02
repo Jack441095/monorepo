@@ -22,7 +22,7 @@ from kenn.core.chat_retrieval import (
     source_label,
 )
 
-from kenn.llm.llm_rewrite import model_evidence
+from kenn.llm.llm_rewrite import model_evidence, resolve_context_chars
 
 
 # The evidence set the gate judges against is the set of chunks the model was actually shown, read out of the
@@ -44,9 +44,16 @@ from kenn.llm.llm_rewrite import model_evidence
 # sections in that index carry page == 0, so every section of one note collapsed into a single slot. The old
 # EVIDENCE_SCAN_WINDOW of 12 was a depth in name only — the real depth was 4 to 10. The list below is keyed by
 # chunk, so a note's sections stay distinct exactly as they do in the prompt.
+#
+# The budget needed the same treatment as the list, and it took a second pass to see it. Taking model_evidence()'s
+# max_chars default here looked right and was not: the prompt path reads KENN_LLM_CONTEXT_CHARS, so a run that
+# pinned it built a shorter block than this list was read at. At 300 chars on index v-db8c6334cf63 the model saw
+# 1 excerpt and this gate judged 3 — the same 1-vs-3 gap as the 41% to 27% measurement above with the roles
+# reversed. Both sides now take the budget from llm_rewrite.resolve_context_chars(), so an override moves both
+# readers or neither, and the threshold below is untouched either way.
 def _evidence_chunks(results: list[tuple[float, dict]]) -> list[tuple[float, dict, str]]:
     """(score, chunk, body-as-shown) for every excerpt the model was given, in prompt order."""
-    _block, shown = model_evidence(results, source_label)
+    _block, shown = model_evidence(results, source_label, max_chars=resolve_context_chars())
     return shown
 
 

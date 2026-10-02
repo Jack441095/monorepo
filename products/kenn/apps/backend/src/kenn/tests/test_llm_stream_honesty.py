@@ -83,7 +83,7 @@ def test_enhance_stream_propagates_a_cut_short(monkeypatch) -> None:
     # The prompt builder is not under test here; keep the fixture minimal so the
     # test isolates the propagate-vs-swallow contract of the event loop.
     monkeypatch.setattr(llm_rewrite, "is_enabled", lambda task="rewrite": True)
-    monkeypatch.setattr(llm_rewrite, "_build_synthesis_messages", lambda *a, **k: [])
+    monkeypatch.setattr(llm_rewrite, "_build_synthesis_messages", lambda *a, **k: ([], []))
 
     def fake_stream(messages, task, **kwargs):
         yield "first half ", None
