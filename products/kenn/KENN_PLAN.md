@@ -219,10 +219,15 @@ mock, an agent reviewer or an unrelated receipt.
     correlation identifiers and handles nullable optional context. Ask and clear
     discard that chat's older background result; other chats remain intact. 49 scoped
     tests pass; 10 mutations are caught. [Evidence and exact files](docs/evidence/KENN_FASTAPI_CONTEXT_2026-10-02.md).
+  - [x] MCP knowledge and both public knowledge wrappers use request-local retrieval
+    policy without replacing shared engine functions. Knowledge preserves scoped
+    preferences and typed review context without creating transport proposals or
+    another chat turn. 218 scoped backend and 100 wrapper tests pass; 25 mutations
+    are caught. [Evidence and exact files](docs/evidence/KENN_KNOWLEDGE_POLICY_2026-10-02.md).
   - [ ] Trace other request owners, cache invalidation after preference/Live changes,
     project switching and Apply/Undo during generation. Discarding delivery keeps
     the model slot occupied until inference finishes; actual inference cancellation
-    remains unqualified.
+    remains unqualified. Public wrapper import-time model/index mutations remain open.
 - [ ] **A4 — Replace unconditional status claims with observed status.** Audit
   `chat_answer._short_circuit_evaluator`, including its MLX/OSC status text and cancel
   reply, against actual selected inference backend, connection and pending actions.

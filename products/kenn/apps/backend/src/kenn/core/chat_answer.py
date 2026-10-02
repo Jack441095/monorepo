@@ -1952,6 +1952,8 @@ def answer_payload(
     answer_mode: str = "",
     correlation_id: str = "",
     record_session: bool = True,
+    retrieval_only: bool = False,
+    retrieval_route: str = "production",
 ) -> dict:
     turn_id = str(uuid.uuid4())[:8]
     payload = _answer_payload(
@@ -1966,6 +1968,8 @@ def answer_payload(
         answer_mode=answer_mode,
         correlation_id=correlation_id,
         record_session=record_session,
+        retrieval_only=retrieval_only,
+        retrieval_route=retrieval_route,
     )
     if isinstance(payload, dict):
         payload["turn_id"] = turn_id
@@ -1985,6 +1989,8 @@ def _answer_payload_raw(
     answer_mode: str = "",
     correlation_id: str = "",
     record_session: bool = True,
+    retrieval_only: bool = False,
+    retrieval_route: str = "production",
 ) -> dict:
     history = compact_history(history)
     conversational = conversational_payload(query, history)
@@ -2013,7 +2019,7 @@ def _answer_payload_raw(
         (f.frame.f_globals.get("__name__"), f.function) in _REENTRANT_ORCHESTRATOR_FRAMES
         for f in inspect.stack()[:15]
     )
-    orchestration = None if in_orchestrator else get_orchestrator().dispatch(
+    orchestration = None if (retrieval_only or in_orchestrator) else get_orchestrator().dispatch(
         query, correlation_id=correlation_id, session_id=session_id,
         plugin_session_id=plugin_session_id,
     )
@@ -2058,7 +2064,7 @@ def _answer_payload_raw(
     explicit_game_audio = bool(set(query_topics(query)) & GAME_ROUTE_TOPICS)
     generation = (
         None
-        if (explicit_game_audio or query_is_out_of_scope(query))
+        if (retrieval_only or explicit_game_audio or query_is_out_of_scope(query))
         else audio_generation_payload(query, session_id=session_id)
     )
     if generation:
@@ -2078,7 +2084,7 @@ def _answer_payload_raw(
     )
     timeline_res = (
         None
-        if (explicit_game_audio or skip_timeline_for_active_review)
+        if (retrieval_only or explicit_game_audio or skip_timeline_for_active_review)
         else mix_review_timeline_lookup(query)
     )
     if timeline_res:
@@ -2087,8 +2093,8 @@ def _answer_payload_raw(
         route = "mix_review"
     else:
         timeline_context = None
-        route = route_query(query, history)
-    if route != "game_audio" and not timeline_context and not latest_mix_review_context(history):
+        route = retrieval_route if retrieval_only else route_query(query, history)
+    if not retrieval_only and route != "game_audio" and not timeline_context and not latest_mix_review_context(history):
         track_memory = latest_track_memory_lookup(query)
         if track_memory:
             memory_context = format_track_memory(track_memory)
@@ -2096,7 +2102,7 @@ def _answer_payload_raw(
             if route == "unknown" or normalized_terms(query) & MIX_REVIEW_FOLLOWUP_TERMS:
                 route = "mix_review_followup"
 
-    if route == "mix_review_followup" and not timeline_context and diagnostic_plan_for(query) is None and not _is_diagnostic_result_report(query, session_id):
+    if not retrieval_only and route == "mix_review_followup" and not timeline_context and diagnostic_plan_for(query) is None and not _is_diagnostic_result_report(query, session_id):
         followup = mix_review_followup_payload(query, history)
         if followup:
             return followup
@@ -2400,8 +2406,8 @@ def _answer_payload_raw(
     else:
         payload["applied_preferences"] = []
 
-    # The foreground template already recorded this turn. A late background
-    # answer still needs project context, but must not replace newer memory.
+    # Background and read-only knowledge answers need project context without
+    # adding another chat turn or replacing newer memory.
     if record_session:
         _update_session(
             query,
@@ -2556,14 +2562,23 @@ def _answer_payload(
     answer_mode: str = "",
     correlation_id: str = "",
     record_session: bool = True,
+    retrieval_only: bool = False,
+    retrieval_route: str = "production",
 ) -> dict:
+    if retrieval_only:
+        if retrieval_route not in {"production", "ableton"}:
+            raise ValueError("Retrieval-only answers support production or Ableton knowledge.")
+        # MCP knowledge stays deterministic and cannot turn a question into a
+        # preference write, transport proposal or cached conversational answer.
+        allow_llm = False
+        record_session = False
     # Instant fast-path for conversational greetings, thanks, check-ins (< 0.1 ms)
     conversational = conversational_payload(query, compact_history(history))
     if conversational:
         return conversational
 
     # Instant short-circuit router for status, aborts, and direct transport (< 0.1 ms)
-    short_circuit = _short_circuit_evaluator(query, history=history, session_id=session_id)
+    short_circuit = None if retrieval_only else _short_circuit_evaluator(query, history=history, session_id=session_id)
     if short_circuit:
         return short_circuit
 
@@ -2602,6 +2617,8 @@ def _answer_payload(
         answer_mode=answer_mode,
         correlation_id=correlation_id,
         record_session=record_session,
+        retrieval_only=retrieval_only,
+        retrieval_route=retrieval_route,
     )
 
     if allow_llm and record_session and not history and isinstance(payload, dict):

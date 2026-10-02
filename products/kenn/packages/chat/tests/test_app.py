@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import sys
+import threading
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -376,3 +378,88 @@ def test_rate_limit_returns_429(monkeypatch: pytest.MonkeyPatch) -> None:
     second = client.post("/kenn/chat", json={"question": "How do I fix vocal harshness?"})
     assert first.status_code == 200
     assert second.status_code == 429
+
+
+def test_a_paused_public_request_does_not_replace_another_chats_dispatcher(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # A wrapper-local lock did not protect normal chat from its temporary global hooks.
+    from kenn.core import chat_answer, chat_retrieval, session_memory
+
+    monkeypatch.setattr(session_memory, "DB_PATH", tmp_path / "memory.db")
+    monkeypatch.setattr(session_memory, "CHATS_DIR", tmp_path)
+    monkeypatch.setattr(session_memory, "SESSION_FILE", tmp_path / "session.json")
+    monkeypatch.setattr(chat_answer, "_critique_and_save_trace", lambda **kwargs: None)
+    terms = {"total_docs": 0, "avg_len": 1.0, "lengths": [], "idf": {}, "postings": {}}
+    for module in (chat_retrieval, chat_answer):
+        monkeypatch.setattr(module, "load_chunks", lambda: [])
+        monkeypatch.setattr(module, "load_terms", lambda: terms)
+        monkeypatch.setattr(module, "search", lambda *args, **kwargs: [])
+
+    entered, release = threading.Event(), threading.Event()
+    results, errors, dispatched, recorded = [], [], [], []
+
+    def dispatch(question, **kwargs):
+        dispatched.append(question)
+        return {"message": "Normal specialist response", "agent_name": "fixture-specialist"}
+
+    def chunks():
+        if threading.current_thread().name == "public-knowledge-request":
+            entered.set()
+            assert release.wait(5)
+        return []
+
+    def public_question():
+        try:
+            results.append(app._scoped_answer_payload("How does EQ work?", [], "general_knowledge"))
+        except BaseException as exc:
+            errors.append(exc)
+
+    monkeypatch.setattr(chat_answer, "get_orchestrator", lambda: SimpleNamespace(dispatch=dispatch))
+    monkeypatch.setattr(chat_answer, "load_chunks", chunks)
+    monkeypatch.setattr(chat_answer, "_update_session", lambda *args, **kwargs: recorded.append(args))
+    worker = threading.Thread(target=public_question, name="public-knowledge-request")
+    worker.start()
+    try:
+        assert entered.wait(5)
+        answer = chat_answer.answer_payload("Explain compression", session_id="other-chat", allow_llm=False)
+        assert answer["route"] == "fixture-specialist"
+        assert dispatched == ["Explain compression"]
+    finally:
+        release.set()
+        worker.join(timeout=5)
+    assert not worker.is_alive() and errors == []
+    assert results[0]["route"] == "production"
+    assert recorded == []
+
+
+@pytest.mark.parametrize(
+    "question, detected, expected",
+    [
+        ("How do I add EQ Eight to track 4 in Ableton Live?", "ableton", "ableton"),
+        ("How does frequency-dependent dynamics work?", "ableton", "production"),
+        ("How does stereo EQ work?", "production", "production"),
+        ("How can I use MIDI for compression?", "game_audio", "production"),
+    ],
+)
+def test_public_answer_retains_only_the_explicit_safe_ableton_route(
+    monkeypatch: pytest.MonkeyPatch, question: str, detected: str, expected: str
+) -> None:
+    # Broad aliases once leaked Ableton answer shapes into ordinary dynamics advice.
+    captured = []
+    history = [{"role": "user", "content": "This is a vocal recording."}]
+
+    def answer(query, **kwargs):
+        captured.append((query, kwargs))
+        return {"answer": "Retrieved advice"}
+
+    monkeypatch.setattr(app, "route_query", lambda *args, **kwargs: detected)
+    monkeypatch.setattr(app, "answer_payload", answer)
+    app._scoped_answer_payload(question, history, "general_knowledge")
+    query, kwargs = captured[0]
+    assert query == question
+    assert kwargs["retrieval_only"] is True
+    assert kwargs["retrieval_route"] == expected
+    assert kwargs["history"] == history
+    assert kwargs["answer_mode"] == "general_knowledge"
+    assert kwargs["session_id"] == ""

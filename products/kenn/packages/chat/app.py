@@ -434,16 +434,6 @@ RATE_LIMITER = FixedWindowLimiter(
 ENGINE_TIMEOUT_SECONDS = _positive_float("KENN_CHAT_ENGINE_TIMEOUT_SECONDS", 30.0, 120.0)
 
 
-class _RetrievalOnlyOrchestrator:
-    """Null specialist dispatcher for the public text-only boundary."""
-
-    def dispatch(self, *args: Any, **kwargs: Any) -> None:
-        return None
-
-
-_RETRIEVAL_ONLY_ORCHESTRATOR = _RetrievalOnlyOrchestrator()
-_ENGINE_CALL_LOCK = threading.Lock()
-
 app = FastAPI(title="KENN Mix Advice", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
@@ -596,84 +586,42 @@ def _scoped_answer_payload(
     history: list[dict[str, str]],
     answer_mode: str,
 ) -> dict[str, Any]:
-    """Call KENN's answer entry point with specialist paths sealed off.
-
-    The preserved engine's answer function also serves Ableton control,
-    Mix Review, AudioGen, and specialist-agent requests. The wrapper has
-    already rejected explicit requests for those capabilities, but the
-    engine's broad keyword router can still classify an ordinary text question
-    as a specialist request. Temporarily sealing those imported dispatch hooks
-    keeps this product boundary retrieval-only without modifying Audio_Too.
-    Calls are serialised because the engine exposes module-level references.
-    """
-    import kenn.core.chat_answer as chat_answer_module
-
-    def _retrieval_only_route(query: str, route_history: list[dict[str, str]] | None = None) -> str:
-        # Preserve the answer-shape distinction between Ableton workflow
-        # guidance and general production advice. The public boundary has
-        # already rejected control, upload, and generation requests above;
-        # retaining the safe ``ableton`` label here cannot execute anything,
-        # but prevents an Ableton question from being rendered as a generic
-        # mix-diagnosis answer.
-        detected = route_query(query, route_history)
-        # ``query_topics`` intentionally uses broad aliases, and words such
-        # as "dynamics" can contain an Ableton-related token as a substring.
-        # Preserve the Ableton answer shape only when the user explicitly
-        # names Live/Ableton or a concrete Live concept; otherwise keep the
-        # public response in the production-advice shape.
-        explicit_live = bool(re.search(
-            r"\b(?:ableton|live|midi|clip|scene|warp|automation|arrangement|osc)\b",
-            query.casefold(),
-        ))
-        if detected == "ableton" and explicit_live:
-            return "ableton"
-        return "production"
-
-    replacements: dict[str, Any] = {
-        "get_orchestrator": lambda: _RETRIEVAL_ONLY_ORCHESTRATOR,
-        "audio_generation_payload": lambda *args, **kwargs: None,
-        "mix_review_timeline_lookup": lambda *args, **kwargs: None,
-        "latest_track_memory_lookup": lambda *args, **kwargs: None,
-        "mix_review_followup_payload": lambda *args, **kwargs: None,
-        "route_query": _retrieval_only_route,
-    }
-    with _ENGINE_CALL_LOCK:
-        originals = {name: getattr(chat_answer_module, name) for name in replacements}
-        try:
-            for name, replacement in replacements.items():
-                setattr(chat_answer_module, name, replacement)
-            return answer_payload(
-                question,
-                limit=4,
-                history=history,
-                allow_llm=False,
-                session_id="",
-                answer_mode=answer_mode,
-            )
-        except SystemExit as exc:
-            # chat_retrieval.py raises SystemExit("Index not found...") when
-            # no knowledge index is built (this repository currently ships
-            # no knowledge content -- see docs/KENN_BETA_GAP_MATRIX.md
-            # GAP-03/GAP-11). Never let that reach a request thread as an
-            # unhandled process-exit signal; fail into the same honest
-            # abstention contract as any other unanswerable question.
-            return {
-                "question": question,
-                "answer": "",
-                "sources": [],
-                "found": False,
-                "weak_match": True,
-                "confidence": "low",
-                "source_quality": "low",
-                "topics": [],
-                "intent": "engine_unavailable",
-                "route": "out_of_scope",
-                "answer_mode": answer_mode,
-                "diagnostic_reason": f"KENN's knowledge engine is unavailable in this build: {exc}",
-            }
-        finally:
-            for name, original in originals.items():
-                setattr(chat_answer_module, name, original)
+    # Broad topic aliases can classify "dynamics" as Ableton. Keep the Live
+    # workflow shape only for an explicit Live concept, without dispatching it.
+    detected = route_query(question, history)
+    explicit_live = bool(re.search(
+        r"\b(?:ableton|live|midi|clip|scene|warp|automation|arrangement|osc)\b",
+        question.casefold(),
+    ))
+    retrieval_route = "ableton" if detected == "ableton" and explicit_live else "production"
+    try:
+        return answer_payload(
+            question,
+            limit=4,
+            history=history,
+            allow_llm=False,
+            session_id="",
+            answer_mode=answer_mode,
+            retrieval_only=True,
+            retrieval_route=retrieval_route,
+        )
+    except SystemExit as exc:
+        # A missing index raises SystemExit; convert that process-exit signal
+        # into the public abstention contract instead of losing the request.
+        return {
+            "question": question,
+            "answer": "",
+            "sources": [],
+            "found": False,
+            "weak_match": True,
+            "confidence": "low",
+            "source_quality": "low",
+            "topics": [],
+            "intent": "engine_unavailable",
+            "route": "out_of_scope",
+            "answer_mode": answer_mode,
+            "diagnostic_reason": f"KENN's knowledge engine is unavailable in this build: {exc}",
+        }
 
 
 def answer_mix_question(question: str, history: list[dict[str, str]] | None = None) -> dict[str, Any]:

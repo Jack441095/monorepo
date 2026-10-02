@@ -255,19 +255,6 @@ def _cached_ableton_health() -> dict[str, Any]:
         return {"status": "error", "connected": False, "error": str(exc)[:256]}
 
 
-class _RetrievalOnlyOrchestrator:
-    """Null specialist dispatcher, matching the public chat boundary's
-    ``chat/app.py::_RetrievalOnlyOrchestrator``. ``/api/ask``'s broad keyword
-    router can classify an ordinary audio-engineering question as a
-    specialist request (Ableton control, Mix Review, AudioGen); this
-    guarantees the grounded-knowledge-only route can't be coerced into one."""
-
-    def dispatch(self, *args: object, **kwargs: object) -> None:
-        return None
-
-
-_RETRIEVAL_ONLY_ORCHESTRATOR = _RetrievalOnlyOrchestrator()
-_CHAT_ENGINE_CALL_LOCK = threading.Lock()
 _PENDING_PROPOSALS: dict[str, dict] = {}
 
 
@@ -315,6 +302,8 @@ def grounded_knowledge_answer(
     session_id: str = "",
     plugin_session_id: str = "",
     mix_review_id: str = "",
+    *,
+    correlation_id: str = "",
 ) -> dict:
     """Answer one audio-engineering question with retrieval only: no LLM,
     no Ableton/Mix Review/AudioGen specialist dispatch, no Live mutation.
@@ -331,8 +320,9 @@ def grounded_knowledge_answer(
     ``mix_review_id`` is supplied, the bounded stored Mix Review metrics are
     added in the same typed form; when both ids are present, a scope-labelled
     realtime-versus-uploaded comparison is returned too. These are purely
-    additive: with no identifiers, or when nothing can be honestly matched,
-    behavior is identical to before.
+    additive: missing or unmatched identifiers provide no extra evidence.
+    The named project's preferences can inform the answer, but the request
+    cannot record a chat turn or change another request's routing policy.
     """
     import kenn.core.chat_answer as chat_answer_module
 
@@ -341,75 +331,61 @@ def grounded_knowledge_answer(
     mix_review_record = None
     plugin_context = None
     realtime_mix_comparison = None
-    replacements = {
-        "get_orchestrator": lambda: _RETRIEVAL_ONLY_ORCHESTRATOR,
-        "audio_generation_payload": lambda *a, **k: None,
-        "mix_review_timeline_lookup": lambda *a, **k: None,
-        "latest_track_memory_lookup": lambda *a, **k: None,
-        "mix_review_followup_payload": lambda *a, **k: None,
-        "route_query": lambda *a, **k: "production",
-    }
-    with _CHAT_ENGINE_CALL_LOCK:
-        originals = {name: getattr(chat_answer_module, name) for name in replacements}
+    history: list[dict] = []
+    if plugin_session_id:
+        plugin_context = live_context_summary(plugin_session_id)
+        plugin_packet = from_plugin_context(plugin_context)
+        if plugin_packet:
+            history.append(evidence_history_turn(plugin_packet))
+            # Keep the same typed projection available to callers;
+            # they should not have to scrape measurements from prose.
+            # The packet contains bounded features only, never audio.
+            plugin_evidence = plugin_packet.payload()
+    if mix_review_id and mix_review and hasattr(mix_review, "mix_review_status"):
         try:
-            for name, replacement in replacements.items():
-                setattr(chat_answer_module, name, replacement)
-            history: list[dict] = []
-            if plugin_session_id:
-                plugin_context = live_context_summary(plugin_session_id)
-                plugin_packet = from_plugin_context(plugin_context)
-                if plugin_packet:
-                    history.append(evidence_history_turn(plugin_packet))
-                    # Keep the same typed projection available to callers;
-                    # they should not have to scrape measurements from prose.
-                    # The packet contains bounded features only, never audio.
-                    plugin_evidence = plugin_packet.payload()
-            if mix_review_id and mix_review and hasattr(mix_review, "mix_review_status"):
-                try:
-                    review_result = mix_review.mix_review_status(mix_review_id)
-                    candidate = review_result.get("review") if isinstance(review_result, dict) else None
-                    if isinstance(candidate, dict):
-                        mix_review_record = candidate
-                        # Convert the local registry record to the existing typed
-                        # upload-evidence envelope. Only measured numeric fields
-                        # and bounded reference deltas are allowed into history.
-                        mix_handoff = {
-                            "schema": "kenn_mix_review_handoff.v1",
-                            "metrics": candidate.get("metrics", {}),
-                            "reference_comparison": candidate.get("reference_comparison"),
-                        }
-                        mix_packet = from_mix_review_context(mix_handoff)
-                        if mix_packet:
-                            history.append(evidence_history_turn(mix_packet))
-                            mix_review_evidence = {
-                                **mix_packet.payload(),
-                                "review_id": mix_review_id,
-                                "status": candidate.get("status", review_result.get("status", "unknown")),
-                            }
-                except Exception:
-                    # An optional review record must not make a general
-                    # knowledge answer unavailable. The caller simply receives
-                    # no review evidence and can retry through the specialist
-                    # Mix Review path if needed.
-                    mix_review_record = None
-            if mix_review_record is not None and isinstance(plugin_context, dict):
-                from kenn.core.realtime_mix_comparison import build_realtime_mix_comparison
+            review_result = mix_review.mix_review_status(mix_review_id)
+            candidate = review_result.get("review") if isinstance(review_result, dict) else None
+            if isinstance(candidate, dict):
+                mix_review_record = candidate
+                # Convert the local registry record to the existing typed
+                # upload-evidence envelope. Only measured numeric fields
+                # and bounded reference deltas are allowed into history.
+                mix_handoff = {
+                    "schema": "kenn_mix_review_handoff.v1",
+                    "metrics": candidate.get("metrics", {}),
+                    "reference_comparison": candidate.get("reference_comparison"),
+                }
+                mix_packet = from_mix_review_context(mix_handoff)
+                if mix_packet:
+                    history.append(evidence_history_turn(mix_packet))
+                    mix_review_evidence = {
+                        **mix_packet.payload(),
+                        "review_id": mix_review_id,
+                        "status": candidate.get("status", review_result.get("status", "unknown")),
+                    }
+        except Exception:
+            # An optional review record must not make a general
+            # knowledge answer unavailable. The caller simply receives
+            # no review evidence and can retry through the specialist
+            # Mix Review path if needed.
+            mix_review_record = None
+    if mix_review_record is not None and isinstance(plugin_context, dict):
+        from kenn.core.realtime_mix_comparison import build_realtime_mix_comparison
 
-                realtime_mix_comparison = build_realtime_mix_comparison(
-                    mix_review_record,
-                    plugin_context,
-                    review_id=mix_review_id,
-                    plugin_session_id=plugin_session_id,
-                )
-                comparison_packet = from_realtime_mix_comparison(realtime_mix_comparison)
-                if comparison_packet:
-                    history.append(evidence_history_turn(comparison_packet))
-            payload = chat_answer_module.answer_payload(
-                question, limit=4, history=history, allow_llm=False,
-            )
-        finally:
-            for name, original in originals.items():
-                setattr(chat_answer_module, name, original)
+        realtime_mix_comparison = build_realtime_mix_comparison(
+            mix_review_record,
+            plugin_context,
+            review_id=mix_review_id,
+            plugin_session_id=plugin_session_id,
+        )
+        comparison_packet = from_realtime_mix_comparison(realtime_mix_comparison)
+        if comparison_packet:
+            history.append(evidence_history_turn(comparison_packet))
+    payload = chat_answer_module.answer_payload(
+        question, limit=4, history=history, session_id=session_id,
+        plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+        retrieval_only=True,
+    )
 
     evidence = _live_session_track_evidence(question, session_id)
     if evidence:
@@ -2246,16 +2222,19 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(200, result)
             return
         if parsed.path == "/api/knowledge/ask":
-            question = str(payload.get("question", "")).strip()
+            question = str(payload.get("question") or "").strip()
             if not question:
                 self.send_json(400, {"ok": False, "error": "A question is required."})
                 return
-            session_id = str(payload.get("session_id", "")).strip()[:128]
-            plugin_session_id = str(payload.get("plugin_session_id", "")).strip()[:128]
+            session_id = str(payload.get("session_id") or "").strip()[:128]
+            plugin_session_id = str(payload.get("plugin_session_id") or "").strip()[:128]
+            mix_review_id = str(payload.get("mix_review_id") or "").strip()[:128]
             result = grounded_knowledge_answer(
                 question,
                 session_id=session_id,
                 plugin_session_id=plugin_session_id,
+                mix_review_id=mix_review_id,
+                correlation_id=self.request_id(),
             )
             self.send_json(200, {"ok": True, **result})
             return

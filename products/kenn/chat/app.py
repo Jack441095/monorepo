@@ -382,16 +382,6 @@ RATE_LIMITER = FixedWindowLimiter(
 ENGINE_TIMEOUT_SECONDS = _positive_float("KENN_CHAT_ENGINE_TIMEOUT_SECONDS", 30.0, 120.0)
 
 
-class _RetrievalOnlyOrchestrator:
-    """Null specialist dispatcher for the public text-only boundary."""
-
-    def dispatch(self, *args: Any, **kwargs: Any) -> None:
-        return None
-
-
-_RETRIEVAL_ONLY_ORCHESTRATOR = _RetrievalOnlyOrchestrator()
-_ENGINE_CALL_LOCK = threading.Lock()
-
 app = FastAPI(title="KENN Mix Advice", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
@@ -536,42 +526,17 @@ def _scoped_answer_payload(
     history: list[dict[str, str]],
     answer_mode: str,
 ) -> dict[str, Any]:
-    """Call KENN's answer entry point with specialist paths sealed off.
-
-    The preserved engine's answer function also serves Ableton control,
-    Mix Review, AudioGen, and specialist-agent requests. The wrapper has
-    already rejected explicit requests for those capabilities, but the
-    engine's broad keyword router can still classify an ordinary text question
-    as a specialist request. Temporarily sealing those imported dispatch hooks
-    keeps this product boundary retrieval-only without modifying Audio_Too.
-    Calls are serialised because the engine exposes module-level references.
-    """
-    import kenn.core.chat_answer as chat_answer_module
-
-    replacements: dict[str, Any] = {
-        "get_orchestrator": lambda: _RETRIEVAL_ONLY_ORCHESTRATOR,
-        "audio_generation_payload": lambda *args, **kwargs: None,
-        "mix_review_timeline_lookup": lambda *args, **kwargs: None,
-        "latest_track_memory_lookup": lambda *args, **kwargs: None,
-        "mix_review_followup_payload": lambda *args, **kwargs: None,
-        "route_query": lambda *args, **kwargs: "production",
-    }
-    with _ENGINE_CALL_LOCK:
-        originals = {name: getattr(chat_answer_module, name) for name in replacements}
-        try:
-            for name, replacement in replacements.items():
-                setattr(chat_answer_module, name, replacement)
-            return answer_payload(
-                question,
-                limit=4,
-                history=history,
-                allow_llm=False,
-                session_id="",
-                answer_mode=answer_mode,
-            )
-        finally:
-            for name, original in originals.items():
-                setattr(chat_answer_module, name, original)
+    # Public advice cannot disable another chat's specialist dispatcher or
+    # create anonymous conversation memory while retrieving a source.
+    return answer_payload(
+        question,
+        limit=4,
+        history=history,
+        allow_llm=False,
+        session_id="",
+        answer_mode=answer_mode,
+        retrieval_only=True,
+    )
 
 
 def answer_mix_question(question: str, history: list[dict[str, str]] | None = None) -> dict[str, Any]:
