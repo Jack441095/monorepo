@@ -4457,6 +4457,11 @@ class LiveActionService(Tier2Tier3ControlMixin):
                     self.client.set_track_volume(int(s["track_index"]), float(s["before"]))
                 except Exception:
                     pass
+            # No receipt comes back on this path, so the journal never clears the
+            # cached world state; the volumes moved and moved back, drop it ourselves.
+            from kenn.core.live_world_state import invalidate_world_state
+
+            invalidate_world_state()
             return {"ok": False, "error": "Gain staging readback verification failed; changes were rolled back.", "step_receipts": step_receipts}
 
         receipt = {

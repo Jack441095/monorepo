@@ -352,6 +352,11 @@ mock, an agent reviewer or an unrelated receipt.
     offline was answered as a control error; see
     [the evidence](docs/evidence/KENN_SYMPTOM_REPORT_OFFLINE_ADVICE_2026-10-02.md)). Four held-out rows
     and two coverage rows stay open as retrieval-ranking or corpus findings, diagnosed in that receipt.
+  - Live cache invalidation audited: a gain-staging run that failed readback moved and restored
+    volumes without clearing the cached world state; it now does. The other candidate gaps (returns
+    cache, doctor-poll fallback age, bridge cache races, unjournaled failure paths) are recorded as open
+    in [the evidence](docs/evidence/KENN_LIVE_CACHE_INVALIDATION_2026-10-02.md). Full backend run is
+    3,532 passed, 12 skipped.
   - [ ] Continue the remaining document-pointer and container-path audit, including
     tracked Audio_Too callers and packaging. Its `studio/kenn` compatibility symlink
     points at this product; inventory it once and preserve active exports/CLIs.
