@@ -358,7 +358,7 @@ mock, an agent reviewer or an unrelated receipt.
     Corrected three wrapper/Mix Review READMEs to match current source and qualification
     limits. 75 KENN and 21 isolated Audio_Too cases pass; four Audio_Too mutations
     are caught. [Evidence and exact files](docs/evidence/KENN_AUDIO_TOO_UNUSED_CODE_2026-10-02.md).
-  - [ ] Resolve the two existing package-wrapper evaluation failures: three chat
+  - [x] Resolve the two existing package-wrapper evaluation failures: three chat
     coverage rows and five held-out rows fail identically before/after cleanup.
     Preserve expected behavior, citation guards and index provenance; trace the
     boundary/diagnosis/citation findings recorded in the cleanup evidence.
@@ -408,8 +408,10 @@ mock, an agent reviewer or an unrelated receipt.
     same six rows before and after, so this parent item stays open. The Mac's live index is not rebuilt.
     Each of the six is traced to a cause (ranking behind long transcript notes, answer built from the wrong note, or a
     corpus gap) in [the held-out rows receipt](docs/evidence/KENN_WRAPPER_HELDOUT_ROWS_FRESH_INDEX_2026-10-02.md).
-    They are held-out rows, so they are not tuned against; the fix belongs with C5 evidence selection and needs a
-    separate tuning set.
+    They are held-out rows, so they are not tuned against. Jack chose on 2 Oct to re-scope: the six rows move to C5
+    (below) as its known failing set, and this item is ticked with that receipt as its limit, not as a pass. For
+    `harsh-after-mastering` a draft note, `harsh-after-mastering-limiting.md` (local, git-ignored, Status: Draft so it
+    is not indexed), awaits his review.
   - [x] Measured what a cancelled answer does to the model slot, on the real Qwen3-4B bridge on the GPU box:
     after the client gives up at 2 s the generation runs on and the slot stays busy another 45.5 s (a 58 s
     generation), refusing 30 retries with 429; an idle short request takes about 1.2 s. KENN's cancel still
@@ -517,6 +519,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
 - [ ] **C5 — Reach the quality and timing targets below.** Improve evidence selection
   and useful answers without lowering grounding thresholds. The fixed local model is
   a constraint to measure against, not a reason to label a missed target as passed.
+  - [ ] Carried over from A3: six held-out wrapper rows still fail (`upgrade-kick-tail`, `upgrade-room-null`,
+    `upgrade-buffer-recording`, `internet-itu-target-boundary`, `eval-followup-snare-layer-mono`,
+    `harsh-after-mastering`). Prefer curated approved notes over close transcript notes, build the answer lead from
+    the top curated note, and tune on a separate set so these stay a check.
+    [Causes](docs/evidence/KENN_WRAPPER_HELDOUT_ROWS_FRESH_INDEX_2026-10-02.md). `upgrade-room-null` answers with
+    EQ advice for a cancellation null, so do it first.
 
 ### 3. Qualify Ableton knowledge and existing control breadth
 
