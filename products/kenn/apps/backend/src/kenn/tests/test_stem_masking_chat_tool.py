@@ -46,3 +46,13 @@ def test_stem_masking_tool_maps_wav_attachments_to_bounded_labels(monkeypatch) -
 
     assert result == {"ok": True, "stems": ["01_Kick", "08_Bass"], "findings": []}
     assert captured == [("01_Kick", b"first"), ("08_Bass", b"second")]
+
+
+def test_a_chat_message_can_only_name_tools_that_never_touch_live():
+    # The tool registry runs handlers under a fixed "default_session" owner, which is only safe while chat
+    # and upload can't reach a Live-writing tool by name.
+    from kenn.core import tool_trigger
+    from kenn.core.tool_registry import get_tool
+
+    for name in tool_trigger._TRIGGERS:
+        assert get_tool(name).risk.name == "ANALYSIS", name
