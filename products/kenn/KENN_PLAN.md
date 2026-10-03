@@ -497,6 +497,8 @@ Default-session trace, 3 Oct: the `default_session` defaults in the agent tools,
 `live_executor.py` and the tool registry are not reachable from any route (chat and upload can
 only trigger analysis tools); a guard test pins that. No behavior change, A2/A3 not ticked.
 [Receipt](docs/evidence/KENN_A2_DEFAULT_SESSION_TRACE_2026-10-03.md).
+Advanced-question probe, 3 Oct (tooling only; C1-C3 stay open): `tooling/scripts/probe_advanced_questions.py` with 47 cases in `tooling/evaluation/advanced_questions.json` records, per question, whether the model ran and whether its text was delivered, and stops if the model never runs. Prompted by the Mac companion answering from the template with the model off. First hand-reported misses and one invented-plugin answer are in [the receipt](docs/evidence/KENN_ADVANCED_QUESTION_PROBE_2026-10-03.md). Run it on the Mac with the model on and `KENN_LLM_CACHE=0`.
+
 Scope correction, 3 Oct: Thursday is a separate
 product; its compatibility fallback is removed from KENN's work queue.
 [Remaining source trace](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
