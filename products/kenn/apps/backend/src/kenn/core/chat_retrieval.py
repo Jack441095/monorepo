@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 from kenn.retrieval.retrieval import (
+    canonical_audio_query,
     chunk_topics,
     extract_tags,
     query_topics,
@@ -132,6 +133,7 @@ load_terms.cache_info = _load_index_bundle.cache_info  # type: ignore[attr-defin
 def search(query: str, chunks: list[dict], terms: dict, limit: int = 8, *, history: list | None = None) -> list[tuple[float, dict]]:
     from kenn.retrieval import retrieval as retrieval_api
 
+    query = canonical_audio_query(query)
     emb_idx = retrieval_api.load_embedding_index()
     if emb_idx is not None:
         results = retrieval_api.hybrid_search(
@@ -706,6 +708,7 @@ def display_results(
 ) -> list[tuple[float, dict]]:
     if not results:
         return []
+    query = canonical_audio_query(query)
     topics = query_topics(query)
     official_manuals = [
         item

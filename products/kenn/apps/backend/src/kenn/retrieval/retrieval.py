@@ -465,7 +465,7 @@ TOPIC_SYNONYMS: dict[str, tuple[str, ...]] = {
     "mastering": ("master", "premaster", "mastering", "loudness", "limiter", "clipper", "true peak", "final"),
     "vocals": ("vocal", "vocals", "voice", "singer", "lyric", "comping", "tuning", "pitch correction", "double", "doubles", "adlib", "adlibs", "sibilance", "sibilant", "harshness", "harsh", "deesser", "de-esser", "comp", "presence", "air", "intelligibility", "mud", "plosive", "plosives", "autotune", "auto-tune", "vocalist", "throat", "whisper", "breath", "delisp", "delisper", "ess"),
     "delay": ("delay", "echo", "feedback", "repitch", "fade mode"),
-    "stereo_width": ("wide", "width", "widen", "widening", "stereo", "doubler", "microshift", "haas", "mono compatibility", "mid side", "mid-side", "centre", "centred", "center", "centered"),
+    "stereo_width": ("wide", "width", "widen", "widening", "stereo", "doubler", "microshift", "haas", "precedence effect", "mono compatibility", "mid side", "mid-side", "centre", "centred", "center", "centered"),
     "depth": ("depth", "front", "back", "behind", "space", "ambience", "ambiance", "pre-delay", "predelay", "throw", "throws"),
     "compression": ("compress", "compression", "compressor", "glue", "dynamics", "sidechain", "sidechane", "side chain", "duck", "ratio", "threshold"),
     "transients": ("transient", "transients", "punch", "attack", "snap", "smack", "impact"),
@@ -687,7 +687,13 @@ def source_trust_multiplier(chunk: dict) -> float:
     return 0.94 + (0.12 * source_trust_score(chunk))
 
 
+def canonical_audio_query(query: str) -> str:
+    # Our width notes use Haas, so use the same phrase for candidate search and reranking.
+    return re.sub(r"\bprecedence\s+effect\b", "Haas effect", query, flags=re.I)
+
+
 def expanded_query_terms(query: str) -> list[str]:
+    query = canonical_audio_query(query)
     terms: list[str] = []
     for topic in query_topics(query):
         terms.extend(TOPIC_SYNONYMS[topic])
@@ -1036,6 +1042,7 @@ def rerank_results(query: str, results: list[tuple[float, dict]]) -> list[tuple[
     if not results:
         return []
 
+    query = canonical_audio_query(query)
     feedback_scores = load_source_feedback_scores()
 
     topics = query_topics(query)
