@@ -639,6 +639,14 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       before any import or rebuild. Older 4B planner receipts used multiple visible GPUs and do not qualify current
       8B Mac latency. Scoped checks: 65 passes. No runtime/corpus change; C1, C2 and C3 stay open.
       [Inventory, source-review tasks, commands and limits](docs/evidence/KENN_GPU1_QWEN_NOTES_INVENTORY_2026-10-03.md).
+    - GPU permission, 3 Oct: Jack authorized physical GPU 0 and GPU 1 for KENN work. GPUs 2–7 remain off limits;
+      server restarts, dependency installation, model downloads and an MLX switch still require approval.
+    - Precedence/Haas retrieval, 3 Oct: the exact precedence-effect phrase now selects existing Haas evidence
+      consistently in candidate and displayed-source ranking. Bare precedence keeps its original meaning.
+      Scoped checks: 74 passes; full backend: 4010 passes, 12 skips and the same pre-existing personal-path failure.
+      The existing 4642-chunk index was read without rebuilding; phantom power and balanced cabling remain unresolved.
+      No new model, decode-speed or Live-open qualification; C1, C2 and C3 stay open.
+      [Code commit, commands, result and limits](docs/evidence/KENN_C2_PRECEDENCE_ALIAS_RETRIEVAL_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
