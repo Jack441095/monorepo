@@ -558,6 +558,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       failure. Stubbed models and Fake Live only; already-started inference is not aborted and no speed gain or
       Live-open gate is established. C2 stays open.
       [Code commit, commands, results and research limits](docs/evidence/KENN_C2_CANCELLED_PAYLOAD_WORK_2026-10-03.md).
+    - HTTP shortcut delivery, 3 Oct: eight shortcut exits now discard cancelled/replaced replies after augmentation
+      on both ask endpoints, including proposal tokens. Scoped checks: 304 passes; disabling the guard restores
+      48 failures. Full backend: 3947 passes, 12 skips and the pre-existing personal-path failure. Already-performed
+      shortcut work, token retirement and checkpoint writes remain outside this check; no speed gain or Live-open
+      qualification. C2 stays open. [Code commit, commands, exact files and limits](docs/evidence/KENN_C2_SUPERSEDED_HTTP_SHORTCUTS_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
