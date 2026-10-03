@@ -520,6 +520,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       unknown, and the latency script keeps each question's provider calls. Stubbed
       providers only, no mutation checks, no real-model run, and the superseded-request
       write clause is not covered. [Evidence and exact files](docs/evidence/KENN_LLM_ATTEMPT_TELEMETRY_2026-10-02.md).
+    - Stream persistence, 3 Oct: cancelled/replaced template and model streams now check request ownership before
+      saving citation counts or reasoning traces; critique remains outside the owner lock. Scoped checks: 88 passes;
+      full backend: 3680 passes, 12 skips and the pre-existing personal-path failure. Payload foreground ownership
+      and provider response-cache writes remain outside this regression; no speed or Live-open qualification.
+      [Code commit, commands, results and research limits](docs/evidence/KENN_C2_SUPERSEDED_STREAM_PERSISTENCE_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
