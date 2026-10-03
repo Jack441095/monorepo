@@ -1583,6 +1583,8 @@ def route_query(query: str, history: list | None = None, allow_llm: bool = True)
     if any(re.search(p, lowered) for p in (
         r"\b(?:what is|how do i|how to|can you explain|why is|tell me about|tips for|best way to|difference between)\b",
         r"\b(?:eq|compression|reverb|delay|saturation|mastering|sidechain|mix|kick|snare|vocal|synth|limiter|headroom|clipping|stereo)\b",
+        # The fallback model marked these audio fundamentals out of scope; route the complete terms directly.
+        r"\b(?:precedence\s+effect|phantom\s+power|balanced\s+(?:audio\s+)?(?:cabling|cables?|connections?))\b",
     )):
         return "production"
 

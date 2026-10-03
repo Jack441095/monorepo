@@ -1,3 +1,5 @@
+import pytest
+
 from kenn.core import chat_routing
 from kenn.llm import llm_rewrite
 
@@ -30,3 +32,33 @@ def test_routing_still_asks_the_model_when_a_model_is_allowed(monkeypatch) -> No
 
     assert chat_routing.route_query(UNROUTABLE, None) == "production"
     assert asked == [UNROUTABLE]
+
+
+@pytest.mark.parametrize("allow_llm", [False, True])
+@pytest.mark.parametrize("query", [
+    "Explain precedence effect.",
+    "Explain phantom power.",
+    "Explain balanced cabling.",
+    "Explain the PRECEDENCE effect.",
+    "Explain phantom   power.",
+    "Explain balanced audio connections.",
+])
+def test_audio_fundamentals_reach_knowledge_without_a_model_route(monkeypatch, query, allow_llm) -> None:
+    # These engineering questions missed the keyword route and could receive an unrelated fallback reply.
+    asked = _count_model_routes(monkeypatch)
+
+    assert chat_routing.route_query(query, allow_llm=allow_llm) == "production"
+    assert asked == []
+
+
+@pytest.mark.parametrize("query", [
+    "Explain precedence.",
+    "Explain phantom limbs.",
+    "Explain a balanced diet.",
+    "Explain counterbalanced cabling.",
+])
+def test_audio_fundamental_routes_do_not_claim_partial_or_non_audio_terms(monkeypatch, query) -> None:
+    asked = _count_model_routes(monkeypatch)
+
+    assert chat_routing.route_query(query, allow_llm=False) != "production"
+    assert asked == []
