@@ -438,7 +438,16 @@ def _dispatch_ableton(**kwargs: Any) -> Dict[str, Any]:
     if _ABLETON_WRITE_INTENT_RE.search(query) or SubjectiveTranslator.can_translate(query):
         from kenn.core.live_command import handle_command
 
-        session_id = str(kwargs.get("session_id") or "orchestrated-live")[:128]
+        session_id = kwargs.get("session_id")
+        # An invented owner would let unrelated anonymous chats share proposals and follow-ups.
+        if not isinstance(session_id, str) or not session_id.strip() or len(session_id.strip()) > 128:
+            return {
+                "agent": "ableton_controller",
+                "status": "invalid",
+                "message": "A KENN session ID is required.",
+                "requires_confirmation": False,
+            }
+        session_id = session_id.strip()
         command_result = handle_command(
             query,
             session_id=session_id,
@@ -798,7 +807,16 @@ def _dispatch_autonomous_producer(**kwargs: Any) -> Dict[str, Any]:
     from kenn.autonomous_agent import KennAutonomousAgent
 
     query = str(kwargs.get("query", ""))
-    session_id = str(kwargs.get("session_id") or "orchestrated-producer")[:128]
+    session_id = kwargs.get("session_id")
+    # Bind calibration and proposals before deliberation starts, rather than sharing an anonymous owner.
+    if not isinstance(session_id, str) or not session_id.strip() or len(session_id.strip()) > 128:
+        return {
+            "agent": "autonomous_producer",
+            "status": "invalid",
+            "message": "A KENN session ID is required.",
+            "requires_confirmation": False,
+        }
+    session_id = session_id.strip()
     snapshot = kwargs.get("session_snapshot")
     max_iterations = int(kwargs.get("max_iterations", 5))
 
