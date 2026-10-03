@@ -561,6 +561,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     parameter follow-ups retain context and new export/loudness topics drop unrelated history. Ninety-four scoped
     tests pass; the final full suite has 3605 passes, 12 skips and the same pre-existing personal-path failure.
     Deterministic Fake Live tests only; C3 stays open. [Receipt and limits](docs/evidence/KENN_C3_HISTORY_BOUNDARIES_2026-10-03.md).
+  - Generation history, 3 Oct: a 30-turn real-model rerun had 21 attempts and 10 accepted answers, but reading all
+    delivered answers found topic and instruction-echo failures. Generation now drops the old conversation when
+    retrieval changes subject while retaining typed evidence. Both export replay answers stay on topic; stream
+    takes 19.499 s and payload 14.211 s. Scoped checks: 117 passes; full backend: 3619 passes, 12 skips, the same
+    pre-existing personal-path failure. No Live/UI or held-out qualification; C3 stays open.
+    [Rerun, regression checks and replay receipt](docs/evidence/KENN_C3_GENERATION_HISTORY_AND_MODEL_RERUN_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
