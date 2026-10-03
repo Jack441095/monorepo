@@ -542,6 +542,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       Scoped checks: 204 passes; full backend: 3747 passes, 12 skips and the pre-existing personal-path failure.
       A removed guard fails eight cases. No decode-speed gain or Live-open qualification; explicit-memory writes
       remain outside this regression. [Code commit, commands and limits](docs/evidence/KENN_C2_SUPERSEDED_SHORTCUT_STREAM_2026-10-03.md).
+    - Explicit memory commands, 3 Oct: payload and stream preference saves, forgets and clears now retain request
+      ownership through persistence. Scoped checks: 188 passes; removing the guard restores 12 failures.
+      Full backend: 3765 passes, 12 skips and the pre-existing personal-path failure. Fake Live only; this protects
+      persistence without stopping inference or establishing a speed gain. C2 stays open.
+      [Code commit, commands, results and limits](docs/evidence/KENN_C2_SUPERSEDED_MEMORY_COMMANDS_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
