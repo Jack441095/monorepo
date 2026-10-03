@@ -128,7 +128,6 @@ export default {
     mockProjectHint: 'Showing mock project info (VITE_MIX_REVIEW_MOCK=true).',
     emptyEffects: 'No device info',
     emptyReferences: 'No references',
-    sources: 'Sources',
     suggestions: 'Follow-ups',
   },
   chat: {

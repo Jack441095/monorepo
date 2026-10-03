@@ -127,7 +127,6 @@ export default {
     mockProjectHint: '当前为 Mock 工程信息（VITE_MIX_REVIEW_MOCK=true）。',
     emptyEffects: '暂无设备信息',
     emptyReferences: '暂无参考素材',
-    sources: '参考来源',
     suggestions: '拓展提问',
   },
   chat: {

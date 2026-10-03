@@ -101,15 +101,6 @@
               @undo="undoMessageProposal(message.id)"
             />
 
-            <div v-if="message.sources?.length" class="chat-message__sources">
-              <p class="chat-message__meta-title">{{ t('kenn.sources') }}</p>
-              <ul class="chat-message__list chat-message__list--bullet">
-                <li v-for="(source, index) in message.sources" :key="index">
-                  {{ source.label }}
-                  <span v-if="source.kind" class="chat-message__source-meta"> · {{ source.kind }}</span>
-                </li>
-              </ul>
-            </div>
             <p v-if="message.followUp" class="chat-message__follow-up">{{ message.followUp }}</p>
             <div v-if="message.suggestions?.length" class="chat-message__suggestions">
               <p class="chat-message__meta-title">{{ t('kenn.suggestions') }}</p>
@@ -319,18 +310,10 @@ const assistantText = summarizeAdviceAnswer
     color: var(--muted-text);
   }
 
-  &__sources {
-    margin-top: 0.04rem;
-  }
-
   &__findings {
     display: grid;
     gap: 0.08rem;
     margin-top: 0.12rem;
-  }
-
-  &__source-meta {
-    color: var(--muted-text);
   }
 
   &__suggestions {
