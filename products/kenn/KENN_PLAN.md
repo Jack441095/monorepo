@@ -619,6 +619,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       personal-path failure. Process-local generation only; no priority, abort, measured decode gain or Live-open
       qualification. Production style/residency stay unchanged, and C2 stays open.
       [Code commit, commands, regression and research limits](docs/evidence/KENN_C2_LOCAL_MODEL_ADMISSION_2026-10-03.md).
+    - Audio fundamental routing, 3 Oct: precedence effect, phantom power and balanced cabling reach knowledge
+      without a model classifier. Scoped checks: 64 passes; full backend: 3999 passes, 12 skips and the pre-existing
+      personal-path failure. Same three real-model questions: stream 2/3 timely accepted, payload 0/3; accepted
+      stream replies abstained, with useful explanations 0/3 on both surfaces. Routing repair only, no speed gain
+      or Live-open qualification. C2 stays open. [Code commit, phases, Mac state and limits](docs/evidence/KENN_C2_AUDIO_FUNDAMENTAL_ROUTING_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
