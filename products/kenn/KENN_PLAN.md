@@ -525,6 +525,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       full backend: 3680 passes, 12 skips and the pre-existing personal-path failure. Payload foreground ownership
       and provider response-cache writes remain outside this regression; no speed or Live-open qualification.
       [Code commit, commands, results and research limits](docs/evidence/KENN_C2_SUPERSEDED_STREAM_PERSISTENCE_2026-10-03.md).
+    - Payload persistence, 3 Oct: foreground and background payloads share the HTTP request owner; superseded knowledge
+      answers cannot save memory, citations, traces, semantic-cache turns, feedback or checkpoints after revocation.
+      Read-only calls preserve that owner, and invalid session bindings stay unbound. Scoped checks: 149 passes;
+      full backend: 3697 passes, 12 skips and the pre-existing personal-path failure. Provider response-cache writes
+      remain open; no decode-speed or Live-open qualification.
+      [Receipt, exact files and limits](docs/evidence/KENN_C2_SUPERSEDED_PAYLOAD_PERSISTENCE_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
