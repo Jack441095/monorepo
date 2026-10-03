@@ -282,7 +282,9 @@ def build_intent_answer(
     if opener:
         lines.append(opener)
 
-    if context:
+    # The prior question is prompt context, not advice to repeat to the producer.
+    # Keep it available to generation while leaving it out of the fallback prose.
+    if context and not context.startswith("[Previous User Question]:"):
         lines.extend(["", context])
 
     # Session memory hook: if we have prior context, inject it right after the opener

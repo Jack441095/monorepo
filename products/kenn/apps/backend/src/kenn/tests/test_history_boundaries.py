@@ -54,6 +54,26 @@ def test_dense_drum_followup_source_cards_cite_the_reverb_answer(stream, isolate
 
 
 @pytest.mark.parametrize("stream", [False, True], ids=["payload", "stream"])
+def test_reverb_followup_fallback_does_not_expose_internal_history_labels(stream, isolated_chat, monkeypatch):
+    # A rejected rewrite exposed the prompt's previous-question label in the delivered fallback.
+    prior = "Going back to the drum reverb, should I high-pass the return?"
+    history = [{"role": "user", "content": prior}]
+    results = [(1160.0, {"kind": "note", "source": "return.md", "title": "Reverb Send Workflow",
+                         "tags": ["reverb"], "text": "Short answer:\nHigh-pass the reverb return to avoid low-frequency buildup."})]
+    for module in (chat_answer, chat_retrieval):
+        monkeypatch.setattr(module, "search", lambda *args, **kwargs: results)
+
+    payload = answer("Does that change if the drums are very dense?", history, stream)
+
+    assert payload["used_history"] is True
+    assert prior in payload["search_query"]
+    assert history_context_line("Does that change if the drums are very dense?", history) == f"[Previous User Question]: {prior}"
+    assert "High-pass the reverb return" in payload["answer"]
+    assert "[Previous User Question]" not in payload["answer"]
+    assert prior not in payload["answer"]
+
+
+@pytest.mark.parametrize("stream", [False, True], ids=["payload", "stream"])
 def test_cancel_that_i_will_do_it_myself_does_not_search_the_previous_question(stream, isolated_chat):
     # The five-turn run retrieved limiter advice after the user withdrew the request.
     history = [{"role": "user", "content": "What threshold would you suggest there?"}]
