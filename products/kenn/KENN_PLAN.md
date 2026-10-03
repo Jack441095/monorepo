@@ -567,6 +567,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     takes 19.499 s and payload 14.211 s. Scoped checks: 117 passes; full backend: 3619 passes, 12 skips, the same
     pre-existing personal-path failure. No Live/UI or held-out qualification; C3 stays open.
     [Rerun, regression checks and replay receipt](docs/evidence/KENN_C3_GENERATION_HISTORY_AND_MODEL_RERUN_2026-10-03.md).
+  - Parameter-suggestion context, 3 Oct: threshold follow-ups retain the limiter request and corrected drum bus
+    on both surfaces. Scoped checks: 45 passes; full backend: 3626 passes, 12 skips, the same pre-existing personal-path
+    failure. Real-model replay: stream 20.755 s accepted wrong-device guidance; payload 15.306 s rejected and fell
+    back to AutoMix. History is fixed, quality and timing remain failed. Research triage keeps style/residency and
+    new runtime/assets behind Jack's decision; no plan tick.
+    [Regression, replay and research triage receipt](docs/evidence/KENN_C3_THRESHOLD_CONTEXT_AND_RESEARCH_TRIAGE_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
