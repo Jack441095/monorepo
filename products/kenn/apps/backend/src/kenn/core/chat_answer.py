@@ -2758,7 +2758,9 @@ def _short_circuit_evaluator(query: str, history: list | None = None, session_id
         }
 
     # Cancel / Abort
-    if cleaned in {"no", "n", "cancel", "abort", "reject", "stop action"}:
+    if cleaned in {"no", "n", "cancel", "abort", "reject", "stop action"} or re.fullmatch(
+        r"cancel (?:that|it)(?:[,;]?\s+i(?: will|'ll) do it myself)?[.!?]*", cleaned
+    ):
         session_bound = (
             isinstance(session_id, str) and bool(session_id)
             and session_id == session_id.strip() and len(session_id) <= 128

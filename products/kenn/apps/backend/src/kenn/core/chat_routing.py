@@ -651,7 +651,15 @@ def clarification_payload(query: str, history: list | None = None, reason: str =
                     break
 
 
-    if consecutive_clarifications >= 1:
+    context_turns = [
+        turn for turn in useful_history_user_turns(history)
+        if not is_session_context_turn(turn)
+    ][-2:] if should_use_history(query, history) else []
+    if context_turns:
+        # The referent may be unclear, but asking the full intake menu again loses the request we already have.
+        context = " / ".join(turn[:160] for turn in context_turns)
+        answer = f'You asked: "{context}". Which part of that request do you mean, and what would you like to check?'
+    elif consecutive_clarifications >= 1:
         if answer_mode == "voice":
             answer = (
                 "I'm still having trouble matching your question to my local audio engineering knowledge. "
@@ -1814,6 +1822,8 @@ def is_followup_query(query: str) -> bool:
         return False
     if cleaned.startswith(FOLLOWUP_STARTERS) or is_correction_query(cleaned):
         return True
+    if cleaned.startswith("going back to ") or cleaned in {"what would you try first?", "what would you try first"}:
+        return True
     # "And the attack?" has no reference word, but nobody opens a chat with it.
     if cleaned.startswith("and the ") and len(cleaned.split()) <= 6:
         return True
@@ -1847,8 +1857,38 @@ def is_followup_query(query: str) -> bool:
     return bool(re.search(r"\bwhat\s+(?:\w+\s+){0,3}(should|do|does|can)\s+i\b", cleaned))
 
 
+def _followup_history_turns(query: str, turns: list[str]) -> list[str]:
+    prior = [turn for turn in turns if not is_session_context_turn(turn)]
+    if query.lower().strip().startswith("going back to "):
+        topics = set(query_topics(query)) - {"mixing", "routing"}
+        matching = [turn for turn in prior if topics & set(query_topics(turn))]
+        return matching[-1:]
+    if not prior:
+        return []
+    if query_topics(prior[-1]) or not prior[-1].lower().strip().startswith("without "):
+        return prior[-1:]
+    # A short constraint ("without making it louder") needs the named instrument just before it.
+    anchor = next((i for i in range(len(prior) - 2, -1, -1) if query_topics(prior[i])), len(prior) - 1)
+    return prior[anchor:]
+
+
 def should_use_history(query: str, history: list | None) -> bool:
     turns = useful_history_user_turns(history)
+    if is_followup_query(query) and not is_correction_query(query):
+        topics = set(query_topics(query)) - {"mixing", "routing"}
+        references = set(cleaned_query(query).split()) & FOLLOWUP_REFERENCES
+        prior = _followup_history_turns(query, turns)
+        prior_topics = {topic for turn in prior for topic in query_topics(turn)}
+        cleaned = query.lower().strip()
+        explicit_followup = cleaned.startswith(("and ", "what about", "how about", "also ", "going back to "))
+        parameter_question = bool(re.match(
+            r"what (?:attack|release|threshold|ratio|knee|frequency|frequencies|gain|decay|predelay)"
+            r"(?: time)? (?:should|do|does|can) i\b", cleaned
+        ))
+        # Topic tags alone confuse compressor release with arrangement and attack with transients.
+        # A named new subject can drop history; parameter questions and explicit links still need it.
+        if topics and not references and not topics & prior_topics and not (explicit_followup or parameter_question):
+            return False
     session_turns = [turn for turn in turns if is_session_context_turn(turn)]
     if session_turns and not query_is_out_of_scope(query):
         if is_followup_query(query) or session_context_matches_query(query, session_turns):
@@ -1872,7 +1912,7 @@ def search_query_with_history(query: str, history: list | None, *, session_id: s
         prior = [turn for turn in turns if not is_session_context_turn(turn)][-2:]
         query = _CORRECTION_NEGATION.sub("", query).strip(" ,;.") or query
     elif is_followup_query(query):
-        prior = [turn for turn in turns if not is_session_context_turn(turn)][-1:]
+        prior = _followup_history_turns(query, turns)
     else:
         prior = [
             turn
@@ -1888,6 +1928,8 @@ def history_context_line(query: str, history: list | None) -> str:
     if not should_use_history(query, history):
         return ""
     turns = useful_history_user_turns(history)
+    if is_followup_query(query) and not is_correction_query(query):
+        turns = _followup_history_turns(query, turns) or turns
     last_user = turns[-1] if turns else ""
     if not last_user:
         return ""

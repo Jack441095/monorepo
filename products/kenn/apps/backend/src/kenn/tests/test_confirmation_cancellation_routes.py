@@ -206,7 +206,7 @@ def test_http_does_not_report_terminal_or_unknown_tokens_as_cancelled(cancellati
     assert fake.writes == []
 
 
-@pytest.mark.parametrize("word", ["no", "n", "cancel", "abort", "reject", "stop action"])
+@pytest.mark.parametrize("word", ["no", "n", "cancel", "abort", "reject", "stop action", "Cancel that, I will do it myself."])
 def test_chat_cancel_revokes_only_its_pending_confirmations(word):
     owner, _ = confirmation.issue_confirmation(session_id="owner", service_id="test", text="write")
     other, _ = confirmation.issue_confirmation(session_id="other", service_id="test", text="write")
