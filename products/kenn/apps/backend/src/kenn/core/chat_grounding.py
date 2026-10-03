@@ -698,6 +698,49 @@ def evidence_measurements(
     )
 
 
+# Third-party plugin makers and products the model tends to reach for. A closed list on purpose: it is a tripwire
+# for the 3 Oct case (a low-end question answered with FabFilter Pro-Q3, Pro-D2 and Timeless nobody had mentioned),
+# not a catalogue. Ableton's own devices are not here. Bare "waves" is a word, so only the Waves product names count.
+_PRODUCT_FAMILIES = {
+    "fabfilter": re.compile(
+        r"\bfab[- ]?filter\b|\bpro[- ]?(?:q|c|l|r|mb|ds|g|d)[- ]?\d\b|\bpro-(?:q|c|l|r|mb|ds|g)\b"
+        r"|\btimeless[ -]?\d?\b|\bsaturn[ -]?\d\b|\btwin[ -]?\d\b|\bvolcano\b"
+    ),
+    "waves": re.compile(r"\bwaves (?:audio|ssl|api|cla|renaissance|rcomp|c[1-6]|l[1-3]|q10|tune)\b|\bwaveshell\b"),
+    "izotope": re.compile(r"\bi?zotope\b|\bozone ?\d*\b|\bneutron ?\d*\b|\bnectar ?\d*\b|\brx ?\d+\b"),
+    "soundtoys": re.compile(r"\bsoundtoys\b|\bdecapitator\b|\becho ?boy\b"),
+    "valhalla": re.compile(r"\bvalhalla\b|\bvintage ?verb\b|\bvalhalla ?room\b|\bvalhalla ?shimmer\b"),
+    "universal audio": re.compile(r"\buad\b|\buniversal audio\b"),
+    "slate": re.compile(r"\bslate digital\b|\bvirtual mix ?rack\b"),
+    "plugin alliance": re.compile(r"\bplugin alliance\b|\bbrainworx\b|\bbx[_ ]?digital\b"),
+    "native instruments": re.compile(r"\bnative instruments\b|\bkontakt\b|\bmassive x\b|\breaktor\b"),
+    "serum": re.compile(r"\bxfer\b|\bserum\b"),
+    "omnisphere": re.compile(r"\bomnisphere\b|\bspectrasonics\b"),
+    "sylenth": re.compile(r"\bsylenth ?\d?\b"),
+    "oeksound": re.compile(r"\boeksound\b|\bsoothe ?2?\b"),
+    "sonnox": re.compile(r"\bsonnox\b"),
+    "softube": re.compile(r"\bsoftube\b"),
+    "cableguys": re.compile(r"\bcableguys\b|\bshaperbox\b|\bvolumeshaper\b"),
+    "arturia": re.compile(r"\barturia\b"),
+}
+
+
+def unasked_product_names(answer: str, query: str, evidence_text: str = "") -> list[str]:
+    """Plugin makers the answer names that neither the question nor the notes do.
+
+    A model that has been told nothing about a brand is inventing the claim that the brand does the job, and
+    the user then goes looking for a plugin they may not own. Brands the user brought up, or the retrieved
+    notes mention, are fine to use.
+    """
+    support = f"{query} {evidence_text}".lower()
+    answer = answer.lower()
+    return sorted(
+        family
+        for family, pattern in _PRODUCT_FAMILIES.items()
+        if pattern.search(answer) and not pattern.search(support)
+    )
+
+
 def generated_answer_validation(
     query: str,
     results: list[tuple[float, dict]],
@@ -758,6 +801,7 @@ def generated_answer_validation(
     }
     cited_filenames = _cited_source_filenames(answer)
     fabricated_sources = sorted(cited_filenames - displayed_filenames)
+    unasked_products = unasked_product_names(answer, query, evidence_text)
     punts_to_sources = _punts_to_sources(answer)
     echoes_prompt = _echoes_prompt_instructions(answer)
     claims_change = claims_live_change(answer)
@@ -799,6 +843,8 @@ def generated_answer_validation(
         )
     if citations["unshown_citations"]:
         warnings.append("generated answer cites an excerpt id that was never shown")
+    if unasked_products:
+        warnings.append("generated answer names a product that nobody mentioned")
     # A named-gap abstain is a correct refusal, not a failed answer, and it is the one input the eight conditions
     # above do not gate. A single "Insufficient context: <gap>" line has no Short answer section, fewer than two
     # steps and no verification line, so the quality threshold would reject the correct behaviour while the flag
@@ -814,6 +860,7 @@ def generated_answer_validation(
         "warnings": warnings,
         "unsupported_measurements": unsupported_measurements,
         "fabricated_sources": fabricated_sources,
+        "unasked_products": unasked_products,
         "punts_to_sources": punts_to_sources,
         "echoes_prompt_instructions": echoes_prompt,
         "claims_live_change": claims_change,

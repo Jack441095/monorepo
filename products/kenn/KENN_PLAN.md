@@ -996,3 +996,5 @@ engineering can continue.
 the symptom opener on advice questions are in, tested on fake Live only; see
 [the receipt](docs/evidence/KENN_TEMPLATE_PATH_FIXES_2026-10-03.md). Retrieval gaps
 ("fab filter", vocal mixing) and model invention still need a real-index probe run.
+
+3 Oct 2026: generated answers that name a plugin brand neither the question nor the notes mention are now rejected by the grounding gate ([receipt](docs/evidence/KENN_UNASKED_PRODUCT_GUARD_2026-10-03.md)). Fake-backed only; the Mac probe still has to say whether the FabFilter answer was invention or leaked context.
