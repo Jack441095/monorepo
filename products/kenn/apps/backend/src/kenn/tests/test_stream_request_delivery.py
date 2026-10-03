@@ -946,3 +946,70 @@ def test_http_discarded_proposal_revokes_only_its_confirmation(stream_http, monk
     for label in ("current card", "other chat"):
         token, session = tokens[label]
         assert confirmation.consume_confirmation(token, session_id=session, service_id="fixture", text=label)
+
+
+@pytest.mark.parametrize("query", ["play", "stop"])
+@pytest.mark.parametrize("surface,during", [("payload", "proposal"), ("stream", "proposal"), ("stream", "metadata"), ("stream", "token")])
+@pytest.mark.parametrize("superseded_by", ["cancel", "next_turn", "other_chat", "none"])
+def test_discarded_engine_transport_proposal_revokes_only_its_confirmation(monkeypatch, query, surface, during, superseded_by):
+    from kenn.core import confirmation, live_action_service
+    from kenn.core.fake_live import FakeLiveBackend
+
+    # Replacing a suspended stream hid its transport card but left the real service token executable.
+    fake = FakeLiveBackend()
+    monkeypatch.setattr(live_action_service, "live_client", fake)
+    monkeypatch.setattr(live_action_service, "_PROPOSALS_BY_TOKEN", {})
+    monkeypatch.setattr(confirmation, "_ISSUED_TOKENS", {})
+    monkeypatch.setattr(confirmation, "_REVOKED_TOKENS", set())
+    monkeypatch.setattr(confirmation, "_USED_TOKENS", set())
+    tokens = {}
+    proposal = {}
+
+    def issue(label, session):
+        token, _ = confirmation.issue_confirmation(session_id=session, service_id="fixture", text=label)
+        tokens[label] = (token, session)
+
+    issue("other chat", "song-b")
+
+    def supersede():
+        if superseded_by == "cancel":
+            answer_upgrades.invalidate("song-a")
+            confirmation.revoke_session_confirmations(session_id="song-a")
+        elif superseded_by == "next_turn":
+            answer_upgrades.begin_turn("song-a")
+        elif superseded_by == "other_chat":
+            answer_upgrades.begin_turn("song-b")
+        issue("current card", "song-a")
+
+    transport = chat_answer._transport_shortcut
+
+    def propose(action, verb, session):
+        if during == "proposal":
+            supersede()
+        result = transport(action, verb, session)
+        proposal.update(result["proposal"])
+        return result
+
+    monkeypatch.setattr(chat_answer, "_transport_shortcut", propose)
+    if surface == "payload":
+        reply = chat_answer.answer_payload(query, session_id="song-a")
+    else:
+        stream = chat_answer.answer_payload_stream(query, session_id="song-a")
+        if during in {"metadata", "token"}:
+            metadata = next(stream)["data"]
+            assert metadata["confirmation_token"] == proposal["confirmation_token"]
+            if during == "token":
+                assert next(stream)["event"] == "token"
+            supersede()
+        remaining = list(stream)
+        reply = next((event["data"] for event in remaining if event["event"] == "metadata"), {})
+    discarded = superseded_by in {"cancel", "next_turn"}
+    assert bool(reply.get("answer_delivery_discarded")) is discarded
+    usable = confirmation.consume_confirmation(
+        proposal["confirmation_token"], session_id="song-a", service_id="ableton_action", text=live_action_service._text(proposal),
+    )
+    assert usable is not discarded
+    for label in ("current card", "other chat"):
+        token, session = tokens[label]
+        assert confirmation.consume_confirmation(token, session_id=session, service_id="fixture", text=label)
+    assert fake.writes == []

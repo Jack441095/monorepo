@@ -1990,6 +1990,7 @@ def _answer_payload_stream(
     request_turn_id: str = "",
 ):
     from kenn.core import answer_upgrades
+    from kenn.core.confirmation import revoke_confirmation
 
     discarded = {"event": "metadata", "data": {
         "answer": "", "status": "cancelled", "route": "conversation", "sources": [],
@@ -2003,6 +2004,8 @@ def _answer_payload_stream(
     short_circuit = _short_circuit_evaluator(query, history=history, session_id=session_id, request_turn_id=request_turn_id)
     if short_circuit:
         if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
+            # Cancellation may have preceded issuance; discard must also retire the new hidden card.
+            revoke_confirmation(short_circuit.get("confirmation_token"), session_id=session_id)
             yield discarded
             return
         metadata = {
@@ -2015,10 +2018,12 @@ def _answer_payload_stream(
         # A consumer can cancel or start another turn while this generator is
         # suspended. Cancel acknowledgements revoke their own owner on purpose.
         if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
+            revoke_confirmation(short_circuit.get("confirmation_token"), session_id=session_id)
             yield discarded
             return
         yield {"event": "token", "token": str(metadata.get("answer") or "")}
         if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
+            revoke_confirmation(short_circuit.get("confirmation_token"), session_id=session_id)
             yield discarded
         return
 
@@ -2913,6 +2918,7 @@ def _answer_payload(
     request_turn_id: str = "",
 ) -> dict:
     from kenn.core import answer_upgrades
+    from kenn.core.confirmation import revoke_confirmation
 
     discarded = {
         "answer": "", "status": "cancelled", "route": "conversation", "sources": [],
@@ -2938,6 +2944,7 @@ def _answer_payload(
     short_circuit = None if retrieval_only else _short_circuit_evaluator(query, history=history, session_id=session_id, request_turn_id=request_turn_id)
     if short_circuit:
         if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
+            revoke_confirmation(short_circuit.get("confirmation_token"), session_id=session_id)
             return discarded
         return short_circuit
 
