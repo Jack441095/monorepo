@@ -55,6 +55,20 @@ def gate_counts(rows: list[dict]) -> dict:
     }
 
 
+def answer_outcome(payload: dict, usages, surface: str) -> dict:
+    validation = payload.get("generation_validation") or {}
+    # Payload delivery exposes the accepted rewrite through llm_enhanced; only
+    # streams carry the final grounding verdict. Provider attempts cover both.
+    return {
+        "attempted": bool(validation.get("attempted")) or any(
+            usage.task == "rewrite" and usage.provider_attempted for usage in usages
+        ),
+        "accepted": bool(payload.get("llm_enhanced")) if surface == "payload"
+        else bool(validation.get("accepted")),
+        "warnings": validation.get("warnings"),
+    }
+
+
 @contextmanager
 def observe_generation(llm, output_cap: int | None):
     """Observe candidates without draining a stream the grounding guard closed."""
@@ -162,14 +176,11 @@ def measure(cases: list[dict], runtime: Path, output_cap: int | None) -> dict:
                         payload, events, ttft = {}, 0, None
                         error_type = type(exc).__name__
                 seconds = time.perf_counter() - started
-                validation = payload.get("generation_validation") or {}
                 observed = generations[first_call:]
                 row = {
                     "id": case["id"], "surface": surface, "seconds": seconds,
                     "delivered_ttft_seconds": ttft, "stream_events": events,
-                    "attempted": bool(validation.get("attempted")),
-                    "accepted": bool(validation.get("accepted")),
-                    "warnings": validation.get("warnings") or [], "error_type": error_type,
+                    **answer_outcome(payload, usages, surface), "error_type": error_type,
                     "provider_calls": [phases(usage.to_dict()) for usage in usages],
                     "generation_calls": [{k: v for k, v in call.items() if k != "candidate"}
                                          for call in observed],
