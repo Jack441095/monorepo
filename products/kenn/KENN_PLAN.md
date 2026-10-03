@@ -598,6 +598,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       Scoped checks: 75 passes. Warm cache, Live closed, fast polling, no unknown-route or held-out qualification;
       production style/residency stay unchanged, and C2 stays open.
       [Native phases, Mac state, research decisions and limits](docs/evidence/KENN_C2_HTTP_BACKGROUND_PHASES_2026-10-03.md).
+    - Model admission probe, 3 Oct: held stubbed background transport while advancing foreground payload and stream
+      provider wrappers. Both reached peak 2 active requests; a second background upgrade was refused. Scoped checks:
+      59 passes; a broken counter restores three failures. No production behavior, real-model concurrency, latency
+      or Live-open qualification changed. C2 stays open.
+      [Code commit, commands, research decisions and limits](docs/evidence/KENN_C2_MODEL_ADMISSION_PROBE_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
