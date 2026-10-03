@@ -1037,6 +1037,11 @@ def _chunk_source_label(chunk: dict) -> str:
     return f"{chunk.get('source', '')}, page {chunk.get('page', '')}"
 
 
+def _fold_plural(terms: set[str]) -> set[str]:
+    """Drop a trailing s so "vocals" meets "Vocal Mixing Basics" in a title; "bass" and short words stay as they are."""
+    return {term[:-1] if len(term) > 3 and term.endswith("s") and not term.endswith("ss") else term for term in terms}
+
+
 def rerank_results(query: str, results: list[tuple[float, dict]]) -> list[tuple[float, dict]]:
     """Second-pass ranking that rewards exact intent overlap and penalizes broad false positives."""
     if not results:
@@ -1070,8 +1075,8 @@ def rerank_results(query: str, results: list[tuple[float, dict]]) -> list[tuple[
             str(chunk.get("title", "")), str(chunk.get("source", ""))
         ])))
         chunk_topic_set = chunk_topics(chunk)
-        lexical_overlap = len(query_terms & chunk_terms)
-        title_tag_overlap = len(query_terms & title_tag_terms)
+        lexical_overlap = len(_fold_plural(query_terms) & _fold_plural(chunk_terms))
+        title_tag_overlap = len(_fold_plural(query_terms) & _fold_plural(title_tag_terms))
         topic_overlap = len(topic_set & chunk_topic_set)
         adjusted = score
         adjusted *= 1.0 + min(0.08 * lexical_overlap, 0.48)
@@ -1081,9 +1086,13 @@ def rerank_results(query: str, results: list[tuple[float, dict]]) -> list[tuple[
         # manuals/notes from crowding out a note explicitly named for the
         # user's problem, while requiring at least two exact intent tokens so
         # generic one-word title matches do not move.
-        title_identity_overlap = len(query_terms & title_identity_terms)
+        title_identity_overlap = len(_fold_plural(query_terms) & _fold_plural(title_identity_terms))
         if title_identity_overlap >= 2:
             adjusted *= 1.0 + min(0.28 * title_identity_overlap, 0.84)
+            # Two notes can match the same two words and tie ("Vocal Mixing Basics" against "Mixing Background And
+            # Harmony Vocals" for "mixing vocals"). The one whose title the question covers more of is the broader
+            # answer; the other is about a case the user did not mention.
+            adjusted *= 1.0 + 0.1 * title_identity_overlap / max(len(title_identity_terms), 1)
         if topics:
             if topic_overlap:
                 adjusted *= 1.0 + min(0.18 * topic_overlap, 0.72)
