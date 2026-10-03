@@ -598,6 +598,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     failure. Final-commit model replay delivers reverb fallbacks on both surfaces but accepts neither rewrite;
     internal-label echo and generic advice remain. No decode gain or Live-open qualification; C3 stays open.
     [Regression, mutation, final-commit replay and research receipt](docs/evidence/KENN_C3_REVERB_FOLLOWUP_EVIDENCE_2026-10-03.md).
+  - Fallback history label, 3 Oct: previous-question prompt context stays in retrieval and generation but no
+    longer appears verbatim in the delivered fallback. Scoped checks: 94 passes; full backend: 3668 passes,
+    12 skips and the same pre-existing personal-path failure. Presentation repair only; no acceptance,
+    decode-speed or Live-open gate claim. C3 stays open.
+    [Regression, commands, results and research limits](docs/evidence/KENN_C3_FALLBACK_HISTORY_LABEL_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
