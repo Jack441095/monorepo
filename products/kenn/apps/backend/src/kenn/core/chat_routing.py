@@ -1606,6 +1606,26 @@ def route_query(query: str, history: list | None = None, allow_llm: bool = True)
     return "unknown"
 
 
+_ADVICE_OPENERS = ("how", "what", "whats", "why", "any tips", "tips", "advice", "can you explain", "explain")
+_SYMPTOM_CUES = re.compile(
+    r"\b(?:my|our|sounds?|sounded|too|harsh|boomy|boxy|sibilant|sibilance|dull|dark|flat|"
+    r"weak|lost|buried|masked?|masking|clash\w*|clipp\w*|distort\w*|"
+    r"can'?t|cannot|won'?t|doesn'?t|isn'?t|aren'?t|not)\b"
+)
+
+
+def _is_advice_question(query: str) -> bool:
+    """A how-to or advice question about a mix topic, with nothing broken in it.
+
+    The 3 Oct screenshots had "advice on drum compression?" opening with "Let's
+    trace the symptom" because any mix topic used to mean diagnosis. A report like
+    "my vocal sounds harsh" still has to take the diagnosis shape.
+    """
+    lowered = query.lower().strip()
+    asks = lowered.startswith(_ADVICE_OPENERS) or bool(re.search(r"\b(?:advice|tips?)\b", lowered))
+    return asks and not _SYMPTOM_CUES.search(lowered)
+
+
 def classify_answer_mode(query: str, route: str, history: list | None = None) -> str:
     """Pick the answer shape before generation, without calling a model."""
     if route == "mix_review_followup" or latest_mix_review_context(history):
@@ -1626,6 +1646,8 @@ def classify_answer_mode(query: str, route: str, history: list | None = None) ->
         return "ableton_steps"
     if dialogue_cleanup_query(query, topics):
         return "dialogue_cleanup"
+    if intent != "troubleshooting" and _is_advice_question(query):
+        return "deep_explanation" if intent in {"why", "explain"} else "quick_fix"
     if intent == "troubleshooting" or topics & {
         "mixing",
         "vocals",
@@ -1884,6 +1906,29 @@ def _followup_history_turns(query: str, turns: list[str]) -> list[str]:
     return prior[anchor:]
 
 
+_SOURCE_TOPICS = {"bass", "drums", "vocals"}
+_SUBJECT_SWAP = ("how about", "what about", "and how about", "and what about")
+
+
+def _swap_followup_subject(query: str, prior: list[str]) -> list[str]:
+    """Drop the old instrument from the earlier question when "how about bass?" names a different one.
+
+    Without this the search text still said "drum compression", so the drum note won again and "how about bass
+    compression?" came back as the drum answer (3 Oct). Technique words such as compression and sidechain stay.
+    """
+    if not query.lower().strip().startswith(_SUBJECT_SWAP):
+        return prior
+    named = set(query_topics(query)) & _SOURCE_TOPICS
+    if not named:
+        return prior
+    swapped = []
+    for turn in prior:
+        kept = [word for word in turn.split()
+                if not (set(query_topics(word)) & _SOURCE_TOPICS) or set(query_topics(word)) & named]
+        swapped.append(" ".join(kept))
+    return swapped
+
+
 def should_use_history(query: str, history: list | None) -> bool:
     turns = useful_history_user_turns(history)
     if is_followup_query(query) and not is_correction_query(query):
@@ -1921,7 +1966,7 @@ def search_query_with_history(query: str, history: list | None, *, session_id: s
         prior = [turn for turn in turns if not is_session_context_turn(turn)][-2:]
         query = _CORRECTION_NEGATION.sub("", query).strip(" ,;.") or query
     elif is_followup_query(query):
-        prior = _followup_history_turns(query, turns)
+        prior = _swap_followup_subject(query, _followup_history_turns(query, turns))
     else:
         prior = [
             turn
@@ -1938,7 +1983,7 @@ def history_context_line(query: str, history: list | None) -> str:
         return ""
     turns = useful_history_user_turns(history)
     if is_followup_query(query) and not is_correction_query(query):
-        turns = _followup_history_turns(query, turns) or turns
+        turns = _swap_followup_subject(query, _followup_history_turns(query, turns)) or turns
     last_user = turns[-1] if turns else ""
     if not last_user:
         return ""

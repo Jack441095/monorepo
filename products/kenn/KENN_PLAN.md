@@ -991,3 +991,8 @@ Owner inputs needed later: supervised Live scheduling, independent reviewers,
 consented mixes, tester feedback channel, distribution identity and any desired
 genre emphasis. Their absence leaves those gates open; independent fake-backed
 engineering can continue.
+
+3 Oct 2026: template-path fixes for question-like banter, drum/bass follow-up carry-over and
+the symptom opener on advice questions are in, tested on fake Live only; see
+[the receipt](docs/evidence/KENN_TEMPLATE_PATH_FIXES_2026-10-03.md). Retrieval gaps
+("fab filter", vocal mixing) and model invention still need a real-index probe run.

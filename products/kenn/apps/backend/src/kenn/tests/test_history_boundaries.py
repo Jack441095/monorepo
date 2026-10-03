@@ -276,3 +276,29 @@ def test_a_clarification_without_history_still_asks_for_the_subject(stream, isol
     assert "Are you asking about a mix problem" in payload["answer"]
     assert not payload["used_history"]
     assert isolated_chat == []
+
+
+@pytest.mark.parametrize("earlier, query, gone, kept", [
+    ("What's your advice on drum compression?", "How about bass compression?", "drum", "bass compression"),
+    ("How do I compress the kick?", "And what about the vocal?", "kick", "vocal"),
+    ("How do I sidechain bass to the kick?", "What about the snare?", "bass", "sidechain"),
+])
+def test_how_about_a_different_instrument_replaces_the_old_one_in_the_search(earlier, query, gone, kept):
+    # 3 Oct: "how about bass compression?" after a drum compression question returned the drum answer
+    # again, because "drum" stayed in the text we searched with.
+    history = [{"role": "user", "content": earlier}]
+    searched = search_query_with_history(query, history).lower()
+    assert gone not in searched
+    assert kept in searched
+
+
+def test_how_about_the_same_instrument_keeps_the_earlier_question():
+    history = [{"role": "user", "content": "How do I compress the kick?"}]
+    assert search_query_with_history("How about the kick attack?", history).startswith(history[0]["content"])
+
+
+def test_the_model_is_not_told_the_old_instrument_when_the_followup_names_a_new_one():
+    history = [{"role": "user", "content": "What's your advice on drum compression?"}]
+    line = history_context_line("How about bass compression?", history)
+    assert "drum" not in line.lower()
+    assert "compression" in line

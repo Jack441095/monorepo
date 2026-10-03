@@ -500,6 +500,25 @@ def suggested_followups(
     return out[:2]
 
 
+BANTER_RESPONSES = (
+    "Haha, got it! Ready whenever you want to dive back into the session, mix decisions, or Ableton routing.",
+    "Noted! Let me know what track, mix issue, or studio task we should solve next.",
+    "Sounds good! Ready to assist with whatever you need for your audio session today.",
+    "I'm here! Ask me about mixing, mastering, stems, client deliverables, or track setups whenever you're ready.",
+)
+
+
+_REQUEST_WORDS = re.compile(
+    r"\b(?:advice|tips?|help|recommend\w*|suggest\w*|explain|how|what|whats|why|should|which|tell|show|teach)\b"
+)
+
+
+def _asks_something(query: str) -> bool:
+    """True for a request or question; false for a short remark like "nice one"."""
+    text = str(query).lower()
+    return "?" in text or len(text.split()) > 3 or bool(_REQUEST_WORDS.search(text))
+
+
 def weak_match_answer(query: str, answer_mode: str = "") -> str:
     topics = query_topics(query)
     out_of_scope = query_is_out_of_scope(query)
@@ -558,13 +577,15 @@ def weak_match_answer(query: str, answer_mode: str = "") -> str:
     # high-confidence answer with no sources; see conversational_reply() for why
     # retrieval plus the evidence gate is the wrong trade here and the deterministic
     # line is the right one.
-    banter_responses = [
-        "Haha, got it! Ready whenever you want to dive back into the session, mix decisions, or Ableton routing.",
-        "Noted! Let me know what track, mix issue, or studio task we should solve next.",
-        "Sounds good! Ready to assist with whatever you need for your audio session today.",
-        "I'm here! Ask me about mixing, mastering, stems, client deliverables, or track setups whenever you're ready.",
-    ]
-    return banter_responses[canned_response_index(query, len(banter_responses))]
+    if _asks_something(query):
+        # No topic tag is not the same as no question. "advice on white noise?" used to land on a banter line
+        # because "white noise" is not a tagged topic, and the garbled "hwo do i do paralel compresion" did too.
+        return (
+            "I don't have a solid note on that one, and I'd rather not guess. Which part of your session is it for: "
+            "a mix problem, an Ableton workflow, mastering, arrangement or game audio? "
+            "Adding the instrument or the symptom you hear helps too."
+        )
+    return BANTER_RESPONSES[canned_response_index(query, len(BANTER_RESPONSES))]
 
 
 def get_conversational_headers(route: str, topics: list[str]) -> dict[str, str]:
