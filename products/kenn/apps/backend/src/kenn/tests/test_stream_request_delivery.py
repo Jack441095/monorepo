@@ -43,6 +43,9 @@ def stream_http(monkeypatch):
             headers={"Content-Type": "application/json"},
         )
         with urlopen(request, timeout=5) as response:
+            if payload.get("stream") is False:
+                assert response.headers["Content-Type"] == "application/json"
+                return json.load(response)
             assert response.headers["Content-Type"] == "text/event-stream"
             return [json.loads(line[6:]) for line in response.read().decode().splitlines() if line.startswith("data: ")]
 
@@ -292,6 +295,48 @@ def test_superseded_stream_cannot_save_reasoning_traces_or_citation_counts(measu
     if supersede != "other-chat":
         assert remaining[-1]["data"]["answer"] == ""
         assert remaining[-1]["data"]["answer_delivery_discarded"] is True
+
+
+@pytest.mark.parametrize("supersede", ["cancel", "next-turn", "other-chat"])
+@pytest.mark.parametrize("model_enabled", [False, True], ids=["template", "model"])
+def test_superseded_payload_cannot_save_memory_traces_citations_or_cache(measured_note_stream, monkeypatch, supersede, model_enabled):
+    from kenn import knowledge
+    from kenn.tests.test_streamed_generation_prefix_guard import ACCEPTED_ANSWER, CHUNKS
+
+    # A cancelled payload used to return its answer and save it after generation finished.
+    writes = []
+    make_answer = chat_answer.make_answer
+
+    def revoke_after_generation(*args, **kwargs):
+        answer = make_answer(*args, **kwargs)
+        if supersede == "cancel":
+            answer_upgrades.invalidate("song-a")
+        else:
+            answer_upgrades.begin_turn("song-b" if supersede == "other-chat" else "song-a")
+        return answer
+
+    def record(kind):
+        writes.append((kind, answer_upgrades._LOCK.locked()))
+
+    monkeypatch.setattr(chat_answer, "make_answer", revoke_after_generation)
+    monkeypatch.setattr(chat_answer, "load_chunks", lambda: [chunk for _, chunk in CHUNKS])
+    monkeypatch.setattr(chat_answer, "mix_review_timeline_lookup", lambda *args: None)
+    monkeypatch.setattr(chat_answer, "latest_track_memory_lookup", lambda *args: None)
+    monkeypatch.setattr(chat_answer, "_critique_and_save_trace", measured_note_stream)
+    monkeypatch.setattr(knowledge, "query_reasoning_traces", lambda *args: [])
+    monkeypatch.setattr(knowledge, "post_answer_critique", lambda *args: {"passed": True, "warnings": []})
+    monkeypatch.setattr(knowledge, "record_citations", lambda *args: record("citations"))
+    monkeypatch.setattr(knowledge, "save_reasoning_trace", lambda **kwargs: record("trace"))
+    monkeypatch.setattr(chat_answer, "_update_session", lambda *args, **kwargs: record("session"))
+    monkeypatch.setattr(session_memory, "save_to_semantic_cache", lambda *args, **kwargs: record("cache"))
+    monkeypatch.setattr(chat_answer, "llm_enabled", lambda: model_enabled)
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *args, **kwargs: model_enabled)
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer", lambda *args, **kwargs: ACCEPTED_ANSWER)
+    result = chat_answer.answer_payload("Explain sidechain compression on bass", session_id="song-a")
+    assert writes == ([(kind, True) for kind in ("session", "citations", "trace", "cache")] if supersede == "other-chat" else [])
+    if supersede != "other-chat":
+        assert result["answer"] == ""
+        assert result["answer_delivery_discarded"] is True
 
 
 @pytest.mark.parametrize("supersede", ["cancel", "next-turn", "other-chat"])
@@ -546,3 +591,52 @@ def test_cache_replay_finishes_with_discarded_metadata_if_its_last_event_is_supe
     answer_upgrades.invalidate("song-a")
     final, = list(stream)
     assert final["data"]["answer"] == "" and final["data"]["answer_delivery_discarded"] is True
+
+
+@pytest.mark.parametrize("path", ["/api/ask", "/kenn/api/ask"])
+@pytest.mark.parametrize("during", ["generation", "augmentation"])
+def test_http_superseded_payload_discards_text_and_checkpoint_writes(stream_http, monkeypatch, path, during):
+    import kenn.server as server
+
+    # HTTP must retract late payloads even when cancellation happens after the engine returns.
+    writes = []
+    monkeypatch.setattr(answer_upgrades, "enabled", lambda: False)
+
+    def engine(*args, **kwargs):
+        assert kwargs["request_turn_id"] == answer_upgrades._TURNS["song-a"]["id"]
+        if during == "generation":
+            answer_upgrades.invalidate("song-a")
+            return {"answer": "", "status": "cancelled", "answer_delivery_discarded": True}
+        return {"answer": "Current advice", "route": "production"}
+
+    augment = server.augment_payload
+
+    def superseded_during_augmentation(payload, **kwargs):
+        result = augment(payload, **kwargs)
+        if during == "augmentation":
+            answer_upgrades.invalidate("song-a")
+        return result
+
+    monkeypatch.setattr(server, "answer_payload", engine)
+    monkeypatch.setattr(server, "augment_payload", superseded_during_augmentation)
+    monkeypatch.setattr(server.Handler, "_maybe_attach_checkpoint", lambda self, result, *args: writes.append("checkpoint") or result)
+    result = stream_http(path, {"session_id": "song-a", "stream": False})
+    assert result["answer"] == "" and result["status"] == "cancelled"
+    assert result["envelope"]["status"] == "cancelled"
+    assert result["answer_delivery_discarded"] is True and writes == []
+
+
+def test_http_cancelled_payload_does_not_log_feedback(stream_http, monkeypatch):
+    import kenn.server as server
+
+    writes = []
+    monkeypatch.setattr(answer_upgrades, "enabled", lambda: False)
+
+    def engine(*args, **kwargs):
+        answer_upgrades.invalidate("song-a")
+        return {"answer": "Old advice", "route": "production"}
+
+    monkeypatch.setattr(server, "answer_payload", engine)
+    monkeypatch.setattr(server, "demo_feedback", SimpleNamespace(record_question=lambda *args: writes.append("feedback")))
+    result = stream_http("/api/ask", {"session_id": "song-a", "stream": False})
+    assert result["answer_delivery_discarded"] is True and writes == []

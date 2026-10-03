@@ -131,3 +131,27 @@ def test_a_streamed_cache_hit_superseded_just_before_the_replay_records_nothing(
     events = list(chat_answer._answer_payload_stream(FIRST, session_id="song-a", request_turn_id=owner))
     assert [e["data"].get("answer_delivery_discarded") for e in events if e["event"] == "metadata"] == [True]
     assert session_memory.load_session(session_id="song-a")["turn_count"] == 1
+
+
+@pytest.mark.parametrize("supersede", ["cancel", "next-turn", "other-chat"])
+def test_payload_cache_hit_rechecks_the_owner_before_recording_the_turn(monkeypatch, supersede):
+    _engine(monkeypatch)
+    chat_answer.answer_payload(FIRST, session_id="song-a")
+    get_hit = session_memory.get_semantic_cache_hit
+
+    def superseded_during_cache_lookup(*args, **kwargs):
+        cached = get_hit(*args, **kwargs)
+        if supersede == "cancel":
+            answer_upgrades.invalidate("song-a")
+        else:
+            answer_upgrades.begin_turn("song-b" if supersede == "other-chat" else "song-a")
+        return cached
+
+    monkeypatch.setattr(session_memory, "get_semantic_cache_hit", superseded_during_cache_lookup)
+    result = chat_answer.answer_payload(FIRST, session_id="song-a")
+    if supersede == "other-chat":
+        assert result["semantic_cache_hit"] is True
+        assert session_memory.load_session(session_id="song-a")["turn_count"] == 2
+    else:
+        assert result["answer_delivery_discarded"] is True and result["answer"] == ""
+        assert session_memory.load_session(session_id="song-a")["turn_count"] == 1

@@ -296,6 +296,7 @@ def test_http_background_answer_keeps_the_foreground_identifiers_and_history(upg
     assert _wait(upgrade_id, "song-a")["answer"] == "Model"
     assert len(calls) == 2
     for call in calls:
+        assert call["request_turn_id"] == answer_upgrades._TURNS["song-a"]["id"]
         assert call["session_id"] == "song-a"
         assert call["plugin_session_id"] == "plugin-a"
         assert call["correlation_id"] == "request-a"
@@ -341,3 +342,20 @@ def test_http_proposals_do_not_start_a_second_background_dispatch(upgrade_http_s
     result = _post(base, "/api/ask", {"question": "How do I EQ the vocal?", "session_id": "song-a"})
     assert "answer_upgrade" not in result
     assert len(calls) == 1
+
+
+@pytest.mark.parametrize("read_only", [{"record_session": False}, {"retrieval_only": True}])
+def test_read_only_payload_does_not_replace_the_foreground_owner(monkeypatch, read_only):
+    owner = answer_upgrades.begin_turn("song-a")
+    monkeypatch.setattr(chat_answer, "_answer_payload_raw", lambda *args, **kwargs: {"answer": "Advice"})
+    chat_answer.answer_payload("Explain compression", session_id="song-a", **read_only)
+    assert answer_upgrades.is_current_turn(session_id="song-a", turn_id=owner)
+
+
+def test_payload_reuses_the_http_owner_and_leaves_anonymous_requests_unbound(monkeypatch):
+    owner = answer_upgrades.begin_turn("song-a")
+    monkeypatch.setattr(chat_answer, "_answer_payload_raw", lambda *args, **kwargs: {"answer": "Advice"})
+    chat_answer.answer_payload("Explain compression", session_id="song-a", request_turn_id=owner, allow_llm=False)
+    chat_answer.answer_payload("Explain compression", allow_llm=False)
+    assert answer_upgrades.is_current_turn(session_id="song-a", turn_id=owner)
+    assert "" not in answer_upgrades._TURNS

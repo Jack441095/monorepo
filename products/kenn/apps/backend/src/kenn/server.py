@@ -2974,12 +2974,14 @@ class Handler(BaseHTTPRequestHandler):
                     result = answer_payload(
                         question, limit=limit, history=history, session_id=session_id, allow_llm=False,
                         plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                        request_turn_id=upgrade_turn,
                     )
                     if result.get("llm_available") and not result.get("proposal"):
                         upgrade_id = answer_upgrades.start(
                             lambda: answer_payload(
                                 question, limit=limit, history=history, session_id=session_id,
                                 plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                                request_turn_id=upgrade_turn,
                                 record_session=False,
                             ),
                             session_id=session_id, turn_id=upgrade_turn,
@@ -2990,6 +2992,7 @@ class Handler(BaseHTTPRequestHandler):
                     result = answer_payload(
                         question, limit=limit, history=history, session_id=session_id,
                         plugin_session_id=plugin_session_id, correlation_id=correlation_id,
+                        request_turn_id=upgrade_turn,
                     )
                 _answer_ms = (time.perf_counter() - _t_answer) * 1000
                 if plugin_turn:
@@ -3006,11 +3009,13 @@ class Handler(BaseHTTPRequestHandler):
                 )
                 result = _attach_stem_masking_evidence(result, stem_masking_context)
                 result = _attach_audio_classification_evidence(result, audio_classification_context)
-                if demo_feedback:
-                    result["question_log"] = demo_feedback.record_question(
-                        str(payload.get("session_id", "")),
-                        question,
-                        result,
+                if demo_feedback and not result.get("answer_delivery_discarded"):
+                    def record_current_question():
+                        result["question_log"] = demo_feedback.record_question(
+                            str(payload.get("session_id", "")), question, result,
+                        )
+                    answer_upgrades.write_if_current(
+                        record_current_question, session_id=session_id, turn_id=upgrade_turn,
                     )
                 _t_augment = time.perf_counter()
                 result = augment_payload(
@@ -3019,7 +3024,13 @@ class Handler(BaseHTTPRequestHandler):
                     session_id=session_id,
                     correlation_id=correlation_id,
                 )
-                result = self._maybe_attach_checkpoint(result, session_id)
+                if not result.get("answer_delivery_discarded"):
+                    def attach_current_checkpoint():
+                        nonlocal result
+                        result = self._maybe_attach_checkpoint(result, session_id)
+                    answer_upgrades.write_if_current(
+                        attach_current_checkpoint, session_id=session_id, turn_id=upgrade_turn,
+                    )
                 _augment_ms = (time.perf_counter() - _t_augment) * 1000
                 orch_proposal = (
                     result.get("orchestration", {}).get("result", {}).get("proposal")
@@ -3049,6 +3060,16 @@ class Handler(BaseHTTPRequestHandler):
                     f" llm={_llm_ms:.0f}ms search={_search_ms:.0f}ms",
                     file=sys.stderr, flush=True,
                 )
+                if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=upgrade_turn) and not result.get("answer_delivery_discarded"):
+                    result = {
+                        "answer": "", "status": "cancelled", "route": "conversation", "sources": [],
+                        "requires_confirmation": False, "answer_delivery_discarded": True,
+                        "inference_aborted": False, "session_id": session_id,
+                        "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
+                    }
+                    result = augment_payload(
+                        result, question=question, session_id=session_id, correlation_id=correlation_id,
+                    )
                 self.send_json(200, result)
         except (SystemExit, ValueError) as exc:
             self.send_json(500, {"error": str(exc)})

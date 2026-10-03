@@ -65,6 +65,15 @@ def result_envelope_for_payload(
         payload={"question": question},
         correlation_id=correlation_id,
     )
+    # Superseded work retracts its answer. AssistantResponse requires text, so
+    # its terminal cancellation carries the discard metadata directly.
+    if payload.get("status") == "cancelled" and not payload.get("answer"):
+        return ResultEnvelope(
+            command_id=command.command_id,
+            status=ResultStatus.CANCELLED,
+            result={"capability": command.capability, **payload, "session_id": session_id},
+            correlation_id=command.correlation_id,
+        )
     response = assistant_response_from_payload(payload, session_id=session_id)
     return ResultEnvelope(
         command_id=command.command_id,

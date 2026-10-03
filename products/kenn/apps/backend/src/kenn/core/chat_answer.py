@@ -2161,7 +2161,23 @@ def answer_payload(
     record_session: bool = True,
     retrieval_only: bool = False,
     retrieval_route: str = "production",
+    request_turn_id: str = "",
 ) -> dict:
+    from kenn.core import answer_upgrades
+
+    # Confirmation cancellation requires an exact binding; trimming an invalid
+    # session would grant it another chat's pending tokens.
+    if not isinstance(session_id, str) or session_id != session_id.strip() or len(session_id) > 128:
+        session_id = ""
+    plugin_session_id = plugin_session_id.strip() if isinstance(plugin_session_id, str) else ""
+    if len(plugin_session_id) > 128:
+        plugin_session_id = ""
+    # Read-only and background calls borrow context without replacing the
+    # foreground owner. HTTP supplies the turn it already registered.
+    if session_id and record_session and not retrieval_only:
+        request_turn_id = request_turn_id or answer_upgrades.begin_turn(session_id)
+    elif not session_id:
+        request_turn_id = ""
     turn_id = str(uuid.uuid4())[:8]
     payload = _answer_payload(
         query,
@@ -2177,6 +2193,7 @@ def answer_payload(
         record_session=record_session,
         retrieval_only=retrieval_only,
         retrieval_route=retrieval_route,
+        request_turn_id=request_turn_id,
     )
     if isinstance(payload, dict):
         payload["turn_id"] = turn_id
@@ -2198,7 +2215,10 @@ def _answer_payload_raw(
     record_session: bool = True,
     retrieval_only: bool = False,
     retrieval_route: str = "production",
+    request_turn_id: str = "",
 ) -> dict:
+    from kenn.core import answer_upgrades
+
     history = compact_history(history)
     conversational = conversational_payload(query, history)
     if conversational:
@@ -2617,15 +2637,18 @@ def _answer_payload_raw(
     # Background and read-only knowledge answers need project context without
     # adding another chat turn or replacing newer memory.
     if record_session:
-        _update_session(
-            query,
-            payload.get("answer", ""),
-            route=payload.get("route", ""),
-            answer_mode=payload.get("answer_mode", ""),
-            confidence=payload.get("confidence", "medium"),
-            intent=payload.get("intent", "general"),
-            session_id=session_id,
-            retrieved_results=results,
+        answer_upgrades.write_if_current(
+            lambda: _update_session(
+                query,
+                payload.get("answer", ""),
+                route=payload.get("route", ""),
+                answer_mode=payload.get("answer_mode", ""),
+                confidence=payload.get("confidence", "medium"),
+                intent=payload.get("intent", "general"),
+                session_id=session_id,
+                retrieved_results=results,
+            ),
+            session_id=session_id, turn_id=request_turn_id,
         )
     payload["session"] = _session_info(session_id=session_id)
 
@@ -2641,6 +2664,8 @@ def _answer_payload_raw(
         metadata_payload=payload,
         weak_match=weak_match,
         persist=record_session,
+        session_id=session_id,
+        request_turn_id=request_turn_id,
     )
 
     return payload
@@ -2836,7 +2861,18 @@ def _answer_payload(
     record_session: bool = True,
     retrieval_only: bool = False,
     retrieval_route: str = "production",
+    request_turn_id: str = "",
 ) -> dict:
+    from kenn.core import answer_upgrades
+
+    discarded = {
+        "answer": "", "status": "cancelled", "route": "conversation", "sources": [],
+        "requires_confirmation": False, "answer_delivery_discarded": True,
+        "inference_aborted": False, "session_id": session_id,
+        "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
+    }
+    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        return discarded
     if retrieval_only:
         if retrieval_route not in {"production", "ableton"}:
             raise ValueError("Retrieval-only answers support production or Ableton knowledge.")
@@ -2852,6 +2888,8 @@ def _answer_payload(
     # Instant short-circuit router for status, aborts, and direct transport (< 0.1 ms)
     short_circuit = None if retrieval_only else _short_circuit_evaluator(query, history=history, session_id=session_id)
     if short_circuit:
+        if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
+            return discarded
         return short_circuit
 
     # Multi-turn conversations with history skip the cache to allow contextual
@@ -2872,10 +2910,17 @@ def _answer_payload(
                         final_metadata = ev.get("data")
                         break
                 if final_metadata:
-                    _record_cache_hit_turn(query, final_metadata, session_id)
+                    written = answer_upgrades.write_if_current(
+                        lambda: _record_cache_hit_turn(query, final_metadata, session_id),
+                        session_id=session_id, turn_id=request_turn_id,
+                    )
+                    if not written:
+                        return discarded
                     res = dict(final_metadata)
                     res["semantic_cache_hit"] = True
                     res["session"] = _session_info(session_id=session_id)
+                    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+                        return discarded
                     return res
         except Exception:
             logging.getLogger("kenn.core.chat_answer").warning(
@@ -2883,6 +2928,8 @@ def _answer_payload(
                 exc_info=True,
             )
 
+    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        return discarded
     payload = _answer_payload_raw(
         query,
         limit,
@@ -2897,6 +2944,7 @@ def _answer_payload(
         record_session=record_session,
         retrieval_only=retrieval_only,
         retrieval_route=retrieval_route,
+        request_turn_id=request_turn_id,
     )
 
     if cache_allowed and isinstance(payload, dict):
@@ -2907,13 +2955,18 @@ def _answer_payload(
             ]
             try:
                 from kenn.core.session_memory import save_to_semantic_cache
-                save_to_semantic_cache(query, events, session_id=session_id)
+                answer_upgrades.write_if_current(
+                    lambda: save_to_semantic_cache(query, events, session_id=session_id),
+                    session_id=session_id, turn_id=request_turn_id,
+                )
             except Exception:
                 logging.getLogger("kenn.core.chat_answer").warning(
                     "Semantic cache save failed; this answer won't be "
                     "served from cache next time", exc_info=True,
                 )
 
+    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        return discarded
     return payload
 
 
@@ -3050,7 +3103,7 @@ def _critique_and_save_trace(
 
     A background answer passes persist=False: the foreground answer for the same turn already counted its citations
     and saved its trace, and a discarded upgrade must not write either.
-    Bound streams guard each save with their request owner; critique can finish after cancellation.
+    Bound answers guard each save with their request owner; critique can finish after cancellation.
     """
     from kenn.core import answer_upgrades
 
