@@ -603,6 +603,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       59 passes; a broken counter restores three failures. No production behavior, real-model concurrency, latency
       or Live-open qualification changed. C2 stays open.
       [Code commit, commands, research decisions and limits](docs/evidence/KENN_C2_MODEL_ADMISSION_PROBE_2026-10-03.md).
+    - Local model admission, 3 Oct: competing foreground/background generation now returns a grounded fallback
+      immediately instead of overlapping local transport. Cached replies remain available and keep-alive skips
+      occupied intervals. Scoped checks: 224 passes; full backend: 3867 passes, 12 skips and the pre-existing
+      personal-path failure. Process-local generation only; no priority, abort, measured decode gain or Live-open
+      qualification. Production style/residency stay unchanged, and C2 stays open.
+      [Code commit, commands, regression and research limits](docs/evidence/KENN_C2_LOCAL_MODEL_ADMISSION_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
