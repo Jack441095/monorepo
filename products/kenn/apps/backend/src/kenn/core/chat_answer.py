@@ -76,6 +76,7 @@ from kenn.core.chat_routing import (
     history_context_line,
     impossible_promise_payload,
     impossible_promise_query,
+    is_correction_query,
     is_followup_query,
     latest_mix_review_context,
     latest_track_memory_lookup,
@@ -1282,7 +1283,8 @@ def _answer_payload_stream_raw(
         yield {"event": "token", "token": conversational["answer"]}
         return
 
-    orchestration = get_orchestrator().dispatch(
+    # The Live translator sees only this turn, so corrections need the history-aware router.
+    orchestration = None if is_correction_query(query) else get_orchestrator().dispatch(
         query, correlation_id=correlation_id, session_id=session_id,
         plugin_session_id=plugin_session_id,
     )
@@ -2206,7 +2208,7 @@ def _answer_payload_raw(
         (f.frame.f_globals.get("__name__"), f.function) in _REENTRANT_ORCHESTRATOR_FRAMES
         for f in inspect.stack()[:15]
     )
-    orchestration = None if (retrieval_only or in_orchestrator) else get_orchestrator().dispatch(
+    orchestration = None if (retrieval_only or in_orchestrator or is_correction_query(query)) else get_orchestrator().dispatch(
         query, correlation_id=correlation_id, session_id=session_id,
         plugin_session_id=plugin_session_id,
     )

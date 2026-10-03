@@ -543,6 +543,9 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     clarify replies forget the conversation, and a question about an analysis that never ran got an accepted answer
     describing one (fixed 3 Oct with a wording guard; other jobs and phrasings are not covered). One run, answers read in part, no two-track, project-switch or UI turns, so C3 stays open.
     [Evidence](docs/evidence/KENN_C3_FIVE_TURN_FIRST_RUN_2026-10-03.md).
+  - Correction dispatch, 3 Oct: both chat surfaces now pass corrections to the history-aware router rather than
+    the Live translator. Twelve scoped tests pass, including a mutation check; the full suite has one pre-existing
+    personal-path gate failure. No new model qualification. [Receipt](docs/evidence/KENN_C3_CORRECTION_DISPATCH_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
