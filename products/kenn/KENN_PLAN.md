@@ -547,6 +547,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       Full backend: 3765 passes, 12 skips and the pre-existing personal-path failure. Fake Live only; this protects
       persistence without stopping inference or establishing a speed gain. C2 stays open.
       [Code commit, commands, results and limits](docs/evidence/KENN_C2_SUPERSEDED_MEMORY_COMMANDS_2026-10-03.md).
+    - Cancelled stream work, 3 Oct: ownership is checked before advancing the raw stream, avoiding provider startup
+      after stale metadata and another provider read after a stale token. Scoped checks: 198 passes; removing the
+      check restores eight failures. Full backend: 3789 passes, 12 skips and the pre-existing personal-path failure.
+      Stubbed transport and Fake Live only; no measured speed gain or proven inference abort. C2 stays open.
+      [Code commit, commands, limits and research priorities](docs/evidence/KENN_C2_CANCELLED_STREAM_WORK_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
