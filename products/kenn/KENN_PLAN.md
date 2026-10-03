@@ -593,6 +593,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     All delivered answers were read: routing improves, but accepted mono/snare advice and follow-up fallbacks
     still miss intent. No controlled speed gain, payload/UI/Live qualification or plan tick.
     [Measurements, Mac state, answer review and research decisions](docs/evidence/KENN_C3_POST_ROUTING_MODEL_DIAGNOSTIC_2026-10-03.md).
+  - Reverb follow-up evidence, 3 Oct: close intent evidence now leads both the fallback and history-aware source
+    cards. Scoped checks: 80 passes; full backend: 3666 passes, 12 skips and the same pre-existing personal-path
+    failure. Final-commit model replay delivers reverb fallbacks on both surfaces but accepts neither rewrite;
+    internal-label echo and generic advice remain. No decode gain or Live-open qualification; C3 stays open.
+    [Regression, mutation, final-commit replay and research receipt](docs/evidence/KENN_C3_REVERB_FOLLOWUP_EVIDENCE_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
