@@ -487,6 +487,12 @@ Eight new cases, seven failed before the fix; scoped checks 136 passed; full bac
 137 skipped, 10 failed, the same ten as on a clean checkout (nine cloud-environment gaps plus the
 personal-path failure). No real Live or model run; C1, C2 and C3 stay open.
 [Code commit, commands and limits](docs/evidence/KENN_A2_AUTONOMOUS_CONFIRMATION_TOKENS_2026-10-03.md).
+Generated-clip owner, 3 Oct: an anonymous `/api/ask` "write chords" request was filed under
+the shared owner `chat`; it is now refused without a session ID, and a named chat's clip stays
+its own. Scoped checks 165 passed; full backend 4014 passed, 137 skipped, the same ten failures
+as a clean checkout. Fake Live only; C1, C2 and C3 stay open. Still untraced: `default_session`
+defaults in the agent tool functions and `live_executor.py`.
+[Receipt](docs/evidence/KENN_A2_GENERATED_CLIP_OWNER_2026-10-03.md).
 Scope correction, 3 Oct: Thursday is a separate
 product; its compatibility fallback is removed from KENN's work queue.
 [Remaining source trace](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
