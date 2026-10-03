@@ -818,7 +818,14 @@ class Handler(BaseHTTPRequestHandler):
 
         if generation_kind(question) is None:
             return None
-        result = propose_generated_clip(question, session_id=session_id or "chat", service=LiveActionService())
+        if not session_id:
+            # Unnamed callers used to share the owner "chat" and could dismiss or apply each other's clips.
+            return {
+                "ok": False, "status": "invalid", "answer": "A KENN session ID is required to prepare a clip.",
+                "proposal": None, "confirmation_token": "", "requires_confirmation": False,
+                "route": "ableton_controller", "answer_mode": "live_command", "found": True, "sources": [],
+            }
+        result = propose_generated_clip(question, session_id=session_id, service=LiveActionService())
         if result is None:
             return None
         proposal = result.get("proposal") if isinstance(result.get("proposal"), dict) else None

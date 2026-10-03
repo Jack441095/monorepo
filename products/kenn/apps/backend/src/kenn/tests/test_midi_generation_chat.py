@@ -1,5 +1,11 @@
+import json
+import threading
+from collections import defaultdict, deque
+from urllib.request import Request, urlopen
+
 import pytest
 
+from kenn.core import answer_upgrades, confirmation, live_action_service
 from kenn.core.fake_live import FakeLiveBackend
 from kenn.core.live_action_service import LiveActionService
 from kenn.core.midi_clip_service import MidiClipActionService
@@ -64,3 +70,63 @@ def test_same_request_previews_exactly_the_same_notes() -> None:
     b = propose_generated_clip("Write chords in A minor", session_id="g", service=service)
     assert a["generation"]["seed"] == b["generation"]["seed"]
     assert a["proposal"]["notes"] == b["proposal"]["notes"]
+
+
+@pytest.fixture
+def ask_clip(monkeypatch):
+    import kenn.server as server
+    import kenn.server_rate_limit as rate_limit
+
+    live, _ = _with_midi_track()
+    monkeypatch.setattr(live_action_service, "live_client", live)
+    monkeypatch.setattr(rate_limit, "RATE_BUCKETS", defaultdict(deque))
+    monkeypatch.setattr(answer_upgrades, "_TURNS", {})
+    monkeypatch.setattr(answer_upgrades, "_RESULTS", {})
+    monkeypatch.setattr(confirmation, "_USED_TOKENS", set())
+    monkeypatch.setattr(confirmation, "_ISSUED_TOKENS", {})
+    monkeypatch.setattr(confirmation, "_REVOKED_TOKENS", set())
+    monkeypatch.setenv("KENN_ALLOW_DAW_CONTROL", "1")
+    httpd = server.ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)
+    worker = threading.Thread(target=lambda: httpd.serve_forever(poll_interval=0.01), daemon=True)
+    worker.start()
+
+    def post(payload):
+        request = Request(f"http://127.0.0.1:{httpd.server_port}/api/ask", data=json.dumps(payload).encode(),
+                          headers={"Content-Type": "application/json"})
+        with urlopen(request, timeout=5) as response:
+            return json.load(response)
+
+    try:
+        yield post, live
+    finally:
+        httpd.shutdown()
+        worker.join(timeout=5)
+        httpd.server_close()
+
+
+@pytest.mark.parametrize("session_id", [None, "", "   ", 7, "x" * 129])
+def test_a_generated_clip_is_never_prepared_for_a_chat_without_an_owner(ask_clip, session_id):
+    # Every unnamed caller used to share the owner "chat", so one could dismiss or apply another's clip.
+    post, live = ask_clip
+    before = live.query_session_state()
+
+    result = post({"question": "Write a 4-bar chord progression in D minor", "stream": False, "session_id": session_id})
+
+    assert "session ID is required" in result["answer"]
+    assert not result.get("proposal")
+    assert not result.get("confirmation_token")
+    assert result["requires_confirmation"] is False
+    assert confirmation._ISSUED_TOKENS == {}
+    assert live.query_session_state() == before
+
+
+def test_a_generated_clip_belongs_to_the_chat_that_asked_for_it(ask_clip):
+    post, live = ask_clip
+    result = post({"question": "Write a 4-bar chord progression in D minor", "stream": False, "session_id": " song-a "})
+
+    assert result["requires_confirmation"] is True
+    token = result["confirmation_token"]
+    assert confirmation.pending_confirmation_count(session_id="song-a") == 1
+    assert not confirmation.revoke_confirmation(token, session_id="song-b")
+    assert not confirmation.revoke_confirmation(token, session_id="chat")
+    assert confirmation.revoke_confirmation(token, session_id="song-a")
