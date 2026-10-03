@@ -56,12 +56,14 @@ def test_stream_rejection_overrides_the_provisional_llm_enhanced_flag():
 
 def fake_llm():
     llm = SimpleNamespace()
-    llm._build_native_ollama_payload = lambda *a, **kw: {"options": {"num_predict": 384}}
-    llm._build_payload = lambda *a, **kw: {"max_tokens": 384}
+    llm._build_native_ollama_payload = lambda messages=None, **kw: {
+        "options": {"num_predict": 384}, "messages": messages or [],
+    }
+    llm._build_payload = lambda messages=None, **kw: {"max_tokens": 384, "messages": messages or []}
     llm.closed = False
 
     def streaming(messages, task="rewrite", **kwargs):
-        llm.payload = llm._build_native_ollama_payload()
+        llm.payload = llm._build_native_ollama_payload(messages)
         try:
             yield "first", None
             yield "second", None
@@ -69,8 +71,8 @@ def fake_llm():
             llm.closed = True
 
     def completion(messages, task="rewrite", **kwargs):
-        llm.payload = llm._build_native_ollama_payload()
-        llm.compatible = llm._build_payload()
+        llm.payload = llm._build_native_ollama_payload(messages)
+        llm.compatible = llm._build_payload(messages)
         return "answer", None
 
     llm.chat_completion_stream = streaming
@@ -111,6 +113,36 @@ def test_baseline_leaves_the_provider_cap_and_payload_ttft_unchanged():
         llm._chat_completion([])
         assert llm.payload["options"]["num_predict"] == 384
         assert calls[0]["generation_ttft_seconds"] is None
+
+
+@pytest.mark.parametrize("surface", ["stream", "payload"])
+def test_brief_style_keeps_grounding_messages_and_token_ceiling_without_mutating_the_caller(surface):
+    llm = fake_llm()
+    messages = [{"role": "system", "content": "Keep every grounding rule."},
+                {"role": "user", "content": "Question and full evidence."}]
+    with tool.observe_generation(llm, None, answer_style="brief"):
+        if surface == "stream":
+            list(llm.chat_completion_stream(messages, answer_mode="explanation"))
+        else:
+            llm._chat_completion(messages, answer_mode="explanation")
+            assert llm.compatible["messages"] == llm.payload["messages"]
+            assert llm.compatible["max_tokens"] == 384
+        assert llm.payload["options"]["num_predict"] == 384
+        assert llm.payload["messages"][0] == messages[0]
+        assert llm.payload["messages"][1]["content"] == messages[1]["content"] + "\n\n" + tool.BRIEF_STYLE
+    assert messages[1]["content"] == "Question and full evidence."
+    assert llm._build_native_ollama_payload(messages)["messages"] == messages
+
+
+@pytest.mark.parametrize("task,kwargs", [("intent", {}), ("rewrite", {"json_mode": True}),
+    ("rewrite", {"json_schema": {}}), ("rewrite", {"answer_mode": "action_receipt"})])
+def test_brief_style_does_not_touch_other_tasks_or_action_and_structured_contracts(task, kwargs):
+    llm = fake_llm()
+    messages = [{"role": "user", "content": "Keep this contract."}]
+    with tool.observe_generation(llm, None, answer_style="brief"):
+        llm._chat_completion(messages, task=task, **kwargs)
+        assert llm.payload["messages"] == messages
+        assert llm.compatible["messages"] == messages
 
 
 def test_both_surfaces_measure_the_same_cases_and_keep_model_prose_only_in_scratch(tmp_path, monkeypatch):

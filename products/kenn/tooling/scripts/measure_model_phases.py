@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Measure model phases and an optional answer cap on both chat surfaces.
+"""Measure model phases and isolated answer-length experiments on both surfaces.
 
 Run with the handoff's real-model environment and fake Live. Session storage and
 answer samples go into a new temporary directory; the receipt contains no prose.
@@ -28,6 +28,13 @@ CASE_IDS = (
     "gain-staging", "streaming-loudness",
 )
 _CAP_ACTIVE = ContextVar("measurement_answer_cap", default=False)
+BRIEF_STYLE = (
+    "For this answer, aim for about 80 words excluding source identifiers. "
+    "Use one sentence per prose section and short steps. Keep every required "
+    "section, citation, evidence boundary and mode-specific safeguard. Use at "
+    "most one short follow-up question. Avoid repeated explanations. If necessary "
+    "advice or a caveat cannot fit, exceed the target rather than cut a sentence."
+)
 
 
 def phases(call: dict) -> dict:
@@ -70,23 +77,35 @@ def answer_outcome(payload: dict, usages, surface: str) -> dict:
 
 
 @contextmanager
-def observe_generation(llm, output_cap: int | None):
+def observe_generation(llm, output_cap: int | None, answer_style: str = "current"):
     """Observe candidates without draining a stream the grounding guard closed."""
     calls = []
     native, compatible = llm._build_native_ollama_payload, llm._build_payload
     streaming, completion = llm.chat_completion_stream, llm._chat_completion
 
+    def apply_style(payload):
+        if answer_style == "brief" and _CAP_ACTIVE.get():
+            # Keep grounding and caller-owned history intact while testing only prose length.
+            messages = list(payload["messages"])
+            for index in range(len(messages) - 1, -1, -1):
+                if messages[index]["role"] == "user":
+                    messages[index] = {**messages[index],
+                                       "content": messages[index]["content"] + "\n\n" + BRIEF_STYLE}
+                    break
+            payload["messages"] = messages
+        return payload
+
     def native_payload(*args, **kwargs):
         payload = native(*args, **kwargs)
         if output_cap is not None and _CAP_ACTIVE.get():
             payload["options"]["num_predict"] = min(output_cap, payload["options"]["num_predict"])
-        return payload
+        return apply_style(payload)
 
     def compatible_payload(*args, **kwargs):
         payload = compatible(*args, **kwargs)
         if output_cap is not None and _CAP_ACTIVE.get():
             payload["max_tokens"] = min(output_cap, payload["max_tokens"])
-        return payload
+        return apply_style(payload)
 
     def start(task, kwargs):
         eligible = task == "rewrite" and kwargs.get("answer_mode", "") not in {
@@ -153,7 +172,8 @@ def mac_state() -> dict:
     }
 
 
-def measure(cases: list[dict], runtime: Path, output_cap: int | None) -> dict:
+def measure(cases: list[dict], runtime: Path, output_cap: int | None,
+            answer_style: str = "current") -> dict:
     from kenn.core import chat_answer
     from kenn.llm import llm_rewrite as llm
 
@@ -161,7 +181,7 @@ def measure(cases: list[dict], runtime: Path, output_cap: int | None) -> dict:
     configs = {task: {key: llm.config(task)[key] for key in ("enabled", "provider", "model", "timeout")}
                for task in ("rewrite", "route", "paraphrase", "followups")}
     rows = []
-    with observe_generation(llm, output_cap) as generations:
+    with observe_generation(llm, output_cap, answer_style) as generations:
         for surface in ("stream", "payload"):
             for case in cases:
                 first_call = len(generations)
@@ -197,6 +217,8 @@ def measure(cases: list[dict], runtime: Path, output_cap: int | None) -> dict:
         "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "questions_sha256": hashlib.sha256(json.dumps(cases, sort_keys=True).encode()).hexdigest(),
         "index_version": latency._index_version(), "output_cap": output_cap,
+        "answer_style": answer_style,
+        "style_instruction": BRIEF_STYLE if answer_style == "brief" else None,
         "task_configs": configs, "context_chars": llm.resolve_context_chars(),
         "thinking_off": llm._ollama_think_off(llm.config(), None),
         "default_output_tokens": llm.DEFAULT_MAX_TOKENS,
@@ -216,10 +238,13 @@ def measure(cases: list[dict], runtime: Path, output_cap: int | None) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--output-cap", type=int)
+    parser.add_argument("--answer-style", choices=("current", "brief"), default="current")
     parser.add_argument("--runtime-dir", type=Path)
     args = parser.parse_args()
     if args.output_cap is not None and args.output_cap <= 0:
         parser.error("--output-cap must be positive")
+    if args.output_cap is not None and args.answer_style != "current":
+        parser.error("test the output cap and answer style separately")
     required = {"KENN_LLM_ENABLED": "1", "KENN_LLM_PROVIDER": "ollama",
                 "KENN_LLM_MODEL": "kenn-brain-qwen3-8b", "KENN_LLM_CACHE": "0",
                 "KENN_LIVE_BACKEND": "fake"}
@@ -245,7 +270,7 @@ def main() -> int:
     corpus = json.loads(latency.DEFAULT_CASES.read_text(encoding="utf-8"))["cases"]
     by_id = {case["id"]: case for case in corpus}
     cases = [by_id[case_id] for case_id in CASE_IDS]
-    report = measure(cases, runtime, args.output_cap)
+    report = measure(cases, runtime, args.output_cap, args.answer_style)
     (runtime / "receipt.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"counts": report["counts"], "runtime_dir": str(runtime)}), flush=True)
     return 0
