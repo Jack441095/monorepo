@@ -22,7 +22,7 @@ from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any, Callable, Generator
 
 import httpx
 
@@ -201,6 +201,19 @@ class LLMUsage:
 
 _global_usage: list[LLMUsage] = []  # accumulate across requests for monitoring
 _usage_capture: ContextVar[list[LLMUsage] | None] = ContextVar("kenn_llm_usage_capture", default=None)
+_cache_write_guard: ContextVar[Callable[[Callable[[], None]], Any] | None] = ContextVar(
+    "kenn_llm_cache_write_guard", default=None,
+)
+
+
+@contextmanager
+def guard_cache_writes(write_guard):
+    """Let the caller check request ownership around the actual cache write."""
+    token = _cache_write_guard.set(write_guard)
+    try:
+        yield
+    finally:
+        _cache_write_guard.reset(token)
 
 
 @contextmanager
@@ -1086,6 +1099,14 @@ def _cache_get(key: str) -> str | None:
 def _cache_put(key: str, content: str) -> None:
     if not cache_enabled() or not content:
         return
+    write_guard = _cache_write_guard.get()
+    if write_guard is None:
+        _cache_put_unchecked(key, content)
+    else:
+        write_guard(lambda: _cache_put_unchecked(key, content))
+
+
+def _cache_put_unchecked(key: str, content: str) -> None:
     try:
         _init_db()
         db_path = _get_db_path()

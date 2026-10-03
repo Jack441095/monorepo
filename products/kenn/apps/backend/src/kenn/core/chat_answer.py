@@ -10,6 +10,7 @@ from kenn.orchestrator import get_orchestrator
 
 from kenn.llm.llm_rewrite import (  # noqa: E402
     get_public_usage_stats as _get_llm_usage_stats,
+    guard_cache_writes,
 )
 
 from kenn.llm.llm_rewrite import enhance as llm_enhance_answer, enhance_stream as llm_enhance_answer_stream
@@ -1091,17 +1092,34 @@ def answer_payload_stream(
     # only for a bound chat, so anonymous requests cannot replace each other.
     request_turn_id = (request_turn_id or answer_upgrades.begin_turn(session_id)) if session_id else ""
     turn_id = str(uuid.uuid4())[:8]
-    for event in _answer_payload_stream(
+    write_guard = (lambda write: answer_upgrades.write_if_current(
+        write, session_id=session_id, turn_id=request_turn_id,
+    )) if request_turn_id else None
+    events = iter(_answer_payload_stream(
         query, limit, history, allow_llm=allow_llm, session_id=session_id, turn_id=turn_id,
         plugin_session_id=plugin_session_id, correlation_id=correlation_id,
         request_turn_id=request_turn_id,
-    ):
-        if event.get("event") == "metadata" and isinstance(event.get("data"), dict):
-            event = {**event, "data": {
-                **event["data"], "turn_id": turn_id, "session_id": session_id,
-                "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
-            }}
-        yield event
+    ))
+    try:
+        while True:
+            # A generator leaves its context on the caller's thread while suspended.
+            # Scope each advance so another chat never inherits this cache owner.
+            with guard_cache_writes(write_guard):
+                try:
+                    event = next(events)
+                except StopIteration:
+                    break
+            if event.get("event") == "metadata" and isinstance(event.get("data"), dict):
+                event = {**event, "data": {
+                    **event["data"], "turn_id": turn_id, "session_id": session_id,
+                    "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
+                }}
+            yield event
+    finally:
+        close = getattr(events, "close", None)
+        if close is not None:
+            with guard_cache_writes(write_guard):
+                close()
 
 
 def _cached_results_cover_query(query: str, cached: list[tuple[float, dict]]) -> bool:
@@ -2179,22 +2197,26 @@ def answer_payload(
     elif not session_id:
         request_turn_id = ""
     turn_id = str(uuid.uuid4())[:8]
-    payload = _answer_payload(
-        query,
-        limit,
-        history,
-        allow_llm=allow_llm,
-        profile=profile,
-        session_id=session_id,
-        plugin_session_id=plugin_session_id,
-        turn_id=turn_id,
-        answer_mode=answer_mode,
-        correlation_id=correlation_id,
-        record_session=record_session,
-        retrieval_only=retrieval_only,
-        retrieval_route=retrieval_route,
-        request_turn_id=request_turn_id,
-    )
+    write_guard = (lambda write: answer_upgrades.write_if_current(
+        write, session_id=session_id, turn_id=request_turn_id,
+    )) if request_turn_id else None
+    with guard_cache_writes(write_guard):
+        payload = _answer_payload(
+            query,
+            limit,
+            history,
+            allow_llm=allow_llm,
+            profile=profile,
+            session_id=session_id,
+            plugin_session_id=plugin_session_id,
+            turn_id=turn_id,
+            answer_mode=answer_mode,
+            correlation_id=correlation_id,
+            record_session=record_session,
+            retrieval_only=retrieval_only,
+            retrieval_route=retrieval_route,
+            request_turn_id=request_turn_id,
+        )
     if isinstance(payload, dict):
         payload["turn_id"] = turn_id
     return payload
