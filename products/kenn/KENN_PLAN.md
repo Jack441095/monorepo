@@ -576,9 +576,14 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     - Discarded engine transport tokens, 3 Oct: payload and stream play/stop shortcuts revoke their exact token
       when cancelled or replaced, including cancellation before issuance and a stream suspended after delivery.
       Red regression: 12 failures; scoped checks: 469 passes. Full backend: 4074 passes, 12 skips and the
-      pre-existing personal-path failure. Raw dispatch proposal paths still need audit; no decode-speed gain,
+      pre-existing personal-path failure. Raw dispatch proposal paths were outside that slice; no decode-speed gain,
       inference abort or Live-open qualification. C1, C2 and C3 stay unticked.
       [Code commit, commands and limits](docs/evidence/KENN_C2_ENGINE_PROPOSAL_TOKENS_2026-10-03.md).
+    - Discarded dispatch proposal tokens, 3 Oct: the public payload and stream wrappers now retire the exact token
+      when a raw dispatch reply loses its turn owner. Newer cards and other chats remain usable. Red regression:
+      6 failures; scoped checks: 485 passes. Full backend: 4090 passes, 12 skips and the pre-existing personal-path
+      failure. No decode-speed gain, inference abort or Live-open qualification. C1, C2 and C3 stay unticked.
+      [Code commit, commands and limits](docs/evidence/KENN_C2_DISPATCH_PROPOSAL_TOKENS_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
