@@ -551,6 +551,10 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   - Correction dispatch, 3 Oct: both chat surfaces now pass corrections to the history-aware router rather than
     the Live translator. Twelve scoped tests pass, including a mutation check; the full suite has one pre-existing
     personal-path gate failure. No new model qualification. [Receipt](docs/evidence/KENN_C3_CORRECTION_DISPATCH_2026-10-03.md).
+  - History boundaries, 3 Oct: natural cancellation avoids retrieval; clarification names earlier requests;
+    parameter follow-ups retain context and new export/loudness topics drop unrelated history. Ninety-four scoped
+    tests pass; the final full suite has 3605 passes, 12 skips and the same pre-existing personal-path failure.
+    Deterministic Fake Live tests only; C3 stays open. [Receipt and limits](docs/evidence/KENN_C3_HISTORY_BOUNDARIES_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
