@@ -166,6 +166,48 @@ def test_an_elliptical_release_time_question_still_uses_the_sidechain_question()
     assert search_query_with_history(query, history).startswith(history[0]["content"])
 
 
+@pytest.mark.parametrize("stream", [False, True], ids=["payload", "stream"])
+def test_threshold_suggestion_keeps_the_limiter_request_and_corrected_drum_bus(stream, isolated_chat):
+    # The five-turn run searched this parameter question without its limiter or corrected target.
+    history = [
+        {"role": "user", "content": "Put a limiter on the master for me."},
+        {"role": "assistant", "content": "Which bus do you want to discuss?"},
+        {"role": "user", "content": "No, on the drum bus instead."},
+        {"role": "assistant", "content": "Let's discuss the drum bus."},
+    ]
+    query = "What threshold would you suggest there?"
+    payload = answer(query, history, stream)
+
+    assert payload["used_history"]
+    assert "Put a limiter" in payload["search_query"]
+    assert "No, on the drum bus instead." in payload["search_query"]
+    assert "limiter" in history_context_line(query, history).lower()
+    assert "drum bus" in history_context_line(query, history).lower()
+
+
+@pytest.mark.parametrize("query", [
+    "What threshold would you suggest there?",
+    "What release time would you recommend?",
+])
+def test_a_parameter_suggestion_without_history_stays_a_new_question(query):
+    assert not should_use_history(query, None)
+    assert search_query_with_history(query, None) == query
+
+
+@pytest.mark.parametrize("query", [
+    "What loudness would you suggest for streaming?",
+    "What compressor would you suggest for the vocal?",
+    "What restaurant would you suggest there?",
+])
+def test_a_new_named_subject_does_not_inherit_the_drum_bus_limiter(query):
+    history = [
+        {"role": "user", "content": "Put a limiter on the master for me."},
+        {"role": "user", "content": "No, on the drum bus instead."},
+    ]
+    assert not should_use_history(query, history)
+    assert search_query_with_history(query, history) == query
+
+
 def test_a_parameter_followup_keeps_session_context_when_there_are_no_prior_questions():
     history = [{"role": "user", "content": "Session context for this KENN conversation\nTrack: bass\nDevice: compressor"}]
 

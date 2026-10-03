@@ -1803,6 +1803,11 @@ def session_context_matches_query(query: str, turns: list[str]) -> bool:
 _CORRECTION_OPENER = re.compile(r"^(?:no|nope|nah|sorry|oops|actually|wait|i meant|i mean|my mistake|my bad|correction)\b")
 _CORRECTION_NEGATION = re.compile(r"[,;]?\s*\bnot (?:the |my |a )?[\w' -]{1,30}?\s*(?=[.?!,]|$)")
 _NOT_A_CORRECTION = re.compile(r"^no (?:problem|worries|thanks|thank you)\b")
+_PARAMETER_QUESTION = re.compile(
+    r"^what (?:attack|release|threshold|ratio|knee|frequency|frequencies|gain|decay|predelay)"
+    r"(?: time)? (?:(?:should|do|does|can) i\b|would you (?:suggest|recommend|use)"
+    r"(?: (?:there|here|for (?:it|that|this)))?[?.!]*$)"
+)
 
 
 def is_correction_query(query: str) -> bool:
@@ -1823,6 +1828,8 @@ def is_followup_query(query: str) -> bool:
     if cleaned.startswith(FOLLOWUP_STARTERS) or is_correction_query(cleaned):
         return True
     if cleaned.startswith("going back to ") or cleaned in {"what would you try first?", "what would you try first"}:
+        return True
+    if _PARAMETER_QUESTION.match(cleaned):
         return True
     # "And the attack?" has no reference word, but nobody opens a chat with it.
     if cleaned.startswith("and the ") and len(cleaned.split()) <= 6:
@@ -1865,6 +1872,9 @@ def _followup_history_turns(query: str, turns: list[str]) -> list[str]:
         return matching[-1:]
     if not prior:
         return []
+    if _PARAMETER_QUESTION.match(query.lower().strip()) and is_correction_query(prior[-1]):
+        # "No, on the drum bus instead" names a target but leaves the limiter in the preceding request.
+        return prior[-2:]
     if query_topics(prior[-1]) or not prior[-1].lower().strip().startswith("without "):
         return prior[-1:]
     # A short constraint ("without making it louder") needs the named instrument just before it.
@@ -1881,10 +1891,7 @@ def should_use_history(query: str, history: list | None) -> bool:
         prior_topics = {topic for turn in prior for topic in query_topics(turn)}
         cleaned = query.lower().strip()
         explicit_followup = cleaned.startswith(("and ", "what about", "how about", "also ", "going back to "))
-        parameter_question = bool(re.match(
-            r"what (?:attack|release|threshold|ratio|knee|frequency|frequencies|gain|decay|predelay)"
-            r"(?: time)? (?:should|do|does|can) i\b", cleaned
-        ))
+        parameter_question = bool(_PARAMETER_QUESTION.match(cleaned))
         # Topic tags alone confuse compressor release with arrangement and attack with transients.
         # A named new subject can drop history; parameter questions and explicit links still need it.
         if topics and not references and not topics & prior_topics and not (explicit_followup or parameter_question):
@@ -1943,5 +1950,7 @@ def history_context_line(query: str, history: list | None) -> str:
         return f"[Session Context]: Using session context: {details[:160]}"
     if is_correction_query(query):
         return "[Correction]: The user is correcting their earlier message. Answer for what they now say and drop what they ruled out."
+    if is_correction_query(last_user):
+        last_user = " ".join(turns)
     snippet = last_user if len(last_user) <= 120 else last_user[:117] + "..."
     return f"[Previous User Question]: {snippet}"
