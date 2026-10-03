@@ -124,3 +124,45 @@ def test_an_answer_that_names_a_plugin_the_user_never_mentioned_is_flagged():
     row = {"id": "lowend", "answer": "Cut the mud with FabFilter Pro-Q3, then add the Timeless reverb."}
     tool.judge(row, {"must_name": [], "must_not_name": ["fabfilter|pro-q", "waves"]}, {})
     assert row["forbidden_named"] == ["fabfilter|pro-q"]
+
+
+ABSTAIN_CASE = {"id": "trap-offtopic", "category": "scope", "expect": "abstain_or_clarify", "must_name": ["dynamic eq"]}
+
+
+def test_a_clarifying_template_reply_counts_as_handling_a_case_that_should_abstain():
+    row = {"id": "trap-offtopic", "answer": "I don't have a solid note on that one.", "weak_match": True,
+           "delivered_by": "template", "abstained": False}
+    tool.judge(row, ABSTAIN_CASE, {})
+    assert row["handled_as_expected"] is True
+    assert row["concept_recall"] is None
+
+
+def test_a_model_answer_over_a_clarifying_reply_is_not_credited_as_handling_it():
+    row = {"id": "trap-offtopic", "answer": "A Fab Filter is a type of audio processing tool.", "weak_match": True,
+           "delivered_by": "model", "abstained": False}
+    tool.judge(row, ABSTAIN_CASE, {})
+    assert row["handled_as_expected"] is False
+    assert row["concept_recall"] == 0.0
+
+
+def test_an_explicit_abstention_counts_as_handling_it():
+    row = {"id": "x", "answer": "", "weak_match": False, "delivered_by": "model", "abstained": True}
+    tool.judge(row, ABSTAIN_CASE, {})
+    assert row["handled_as_expected"] is True
+
+
+def test_ordinary_questions_are_not_scored_for_abstaining():
+    row = {"id": "d", "answer": "Attack sets how fast it clamps.", "weak_match": True, "delivered_by": "template"}
+    tool.judge(row, {"expect": "answer", "must_name": ["attack"]}, {})
+    assert row["handled_as_expected"] is None
+    assert row["concept_recall"] == 1.0
+
+
+def test_the_summary_counts_expected_abstentions_and_leaves_them_out_of_recall():
+    handled = {"category": "scope", "handled_as_expected": True, "concept_recall": None, "final_seconds": 1}
+    missed = {"category": "scope", "handled_as_expected": False, "concept_recall": 0.5, "final_seconds": 1}
+    plain = {"category": "dynamics", "handled_as_expected": None, "concept_recall": 1.0, "final_seconds": 1}
+    summary = tool.summarise([handled, missed, plain], "http://x", tool.DEFAULT_CASES)
+    assert summary["by_category"]["scope"]["expected_abstain_handled"] == "1 of 2"
+    assert summary["overall"]["expected_abstain_handled"] == "1 of 2"
+    assert "expected_abstain_handled" not in summary["by_category"]["dynamics"]

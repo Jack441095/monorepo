@@ -146,6 +146,15 @@ def judge(row: dict, case: dict, seen: dict[str, str]) -> None:
     row["concepts_named"], row["concepts_missed"] = hit, missed
     expected = len(hit) + len(missed)
     row["concept_recall"] = round(len(hit) / expected, 2) if expected else None
+    if case.get("expect") == "abstain_or_clarify":
+        # A model answer that replaced the template's clarifying reply doesn't count: the template was right, the
+        # upgrade is what we're checking. Recall only means something when the case was answered instead.
+        template_clarified = bool(row.get("weak_match")) and row.get("delivered_by") == "template"
+        row["handled_as_expected"] = bool(row.get("abstained")) or template_clarified
+        if row["handled_as_expected"]:
+            row["concept_recall"] = None
+    else:
+        row["handled_as_expected"] = None
     row["forbidden_named"] = forbidden_named(row.get("answer", ""), case.get("must_not_name", []))
     fingerprint = " ".join(row.get("answer", "").lower().split())
     row["repeats_answer_of"] = seen.get(fingerprint) if fingerprint else None
@@ -157,7 +166,12 @@ def summarise(rows: list[dict], endpoint: str, cases_path: Path) -> dict:
     def group(subset: list[dict]) -> dict:
         recalls = [r["concept_recall"] for r in subset if r.get("concept_recall") is not None]
         seconds = [r["final_seconds"] for r in subset if "final_seconds" in r]
+        asked_to_abstain = [r for r in subset if r.get("handled_as_expected") is not None]
+        extra = ({"expected_abstain_handled":
+                  f"{sum(bool(r['handled_as_expected']) for r in asked_to_abstain)} of {len(asked_to_abstain)}"}
+                 if asked_to_abstain else {})
         return {
+            **extra,
             "questions": len(subset),
             "delivered_by_model": sum(r.get("delivered_by") == "model" for r in subset),
             "delivered_by_template": sum(r.get("delivered_by") == "template" for r in subset),
