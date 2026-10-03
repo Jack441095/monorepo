@@ -484,6 +484,11 @@ fixtures. Scope correction, 3 Oct: Thursday is a separate
 product; its compatibility fallback is removed from KENN's work queue.
 [Remaining source trace](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
 
+At Jack's request, a [Claude Cloud handoff](docs/evidence/KENN_CLAUDE_CLOUD_HANDOFF_2026-10-03.md)
+is prepared for work while his Mac is off. It summarizes this queue and existing
+evidence; it does not start a cloud task or replace this plan. Refresh it when
+Jack asks to hand over. Cloud fake-Live checks cannot qualify the local delivery gate.
+
 ### 2. Qualify useful local conversation and performance
 
 Needs the route/context audit; fixes may land in small slices while that audit continues.
