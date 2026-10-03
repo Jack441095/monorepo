@@ -473,8 +473,14 @@ owners and anonymous read-only inspection are covered. Scoped checks: 77 passed;
 the shared-owner mutation causes 10 failures. Full backend: 4105 passed, 12 skipped,
 the same pre-existing personal-path failure. No broad A2/A3 tick is claimed.
 [Code commit, commands, result and limits](docs/evidence/KENN_A2_ANONYMOUS_DISPATCH_OWNERS_2026-10-03.md).
-Next inspect KENN's recipe specialist owners and autonomous token issuance with
-isolated regression fixtures. Scope correction, 3 Oct: Thursday is a separate
+Recipe dispatch review, 3 Oct: rack, MIDI and surgical masking routes now reject
+missing or malformed owners before snapshot/telemetry reads or proposal work.
+Valid owners and distinct proposal tokens are covered; anonymous rack catalogue
+requests remain available. Scoped checks: 134 passed. Full backend: 4133 passed,
+12 skipped and the same pre-existing personal-path failure. No broad A2/A3 tick
+is claimed. [Code commit, commands, result and limits](docs/evidence/KENN_A2_RECIPE_DISPATCH_OWNERS_2026-10-03.md).
+Next inspect KENN's autonomous `react_` token issuance with isolated regression
+fixtures. Scope correction, 3 Oct: Thursday is a separate
 product; its compatibility fallback is removed from KENN's work queue.
 [Remaining source trace](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
 
