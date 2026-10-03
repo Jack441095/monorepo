@@ -479,8 +479,15 @@ Valid owners and distinct proposal tokens are covered; anonymous rack catalogue
 requests remain available. Scoped checks: 134 passed. Full backend: 4133 passed,
 12 skipped and the same pre-existing personal-path failure. No broad A2/A3 tick
 is claimed. [Code commit, commands, result and limits](docs/evidence/KENN_A2_RECIPE_DISPATCH_OWNERS_2026-10-03.md).
-Next inspect KENN's autonomous `react_` token issuance with isolated regression
-fixtures. Scope correction, 3 Oct: Thursday is a separate
+Autonomous producer tokens, 3 Oct: `react_deliberate` no longer invents a `react_`
+hash. Its proposal comes from the recipe service, so the `v1.` token is registered, owner-bound,
+dismissible and applies once with Undo on fake Live. Steps a recipe cannot carry (more than
+three, unsupported actions, no exact target, duplicate targets) are listed as not included.
+Eight new cases, seven failed before the fix; scoped checks 136 passed; full backend 4008 passed,
+137 skipped, 10 failed, the same ten as on a clean checkout (nine cloud-environment gaps plus the
+personal-path failure). No real Live or model run; C1, C2 and C3 stay open.
+[Code commit, commands and limits](docs/evidence/KENN_A2_AUTONOMOUS_CONFIRMATION_TOKENS_2026-10-03.md).
+Scope correction, 3 Oct: Thursday is a separate
 product; its compatibility fallback is removed from KENN's work queue.
 [Remaining source trace](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
 
