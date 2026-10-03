@@ -1,5 +1,7 @@
 # SLO Producer Taxonomy Implementation Plan V1
 
+> **Dated plan, not kept current (marked 2026-10-03).** Source code or scripts still point at this file, so it stays where it is. Don't pick work from it. Current status: `products/slo/docs/ROADMAP_TO_BETA.md`, `SLO_BETA_BLOCKER_REGISTER_V2.md` and `SLO_PRIVATE_BETA_READINESS_V2.md`.
+
 **Purpose:** map Jack's full taxonomy spec (primary type / subtype / attributes / confidence / never-force-a-label) against what's actually shipped in this codebase, verified by direct code inspection this pass, and give a smallest-safe-next-step plan for the genuine gaps. This supersedes re-deriving from scratch — `SLO_PRODUCER_TAXONOMY_REQUIREMENTS_V1.md` (earlier this session) already did most of this analysis; this doc re-verifies it against the current code and adds the pieces the new spec asks for that weren't covered before (rimshot, pad/stab, saturated/distorted/clean, confidence bands).
 
 ## Primary type

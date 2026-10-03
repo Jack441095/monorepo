@@ -1,5 +1,7 @@
 # NITE DSP SLO — Classification Intelligence Roadmap
 
+> **Dated plan, not kept current (marked 2026-10-03).** Source code or scripts still point at this file, so it stays where it is. Don't pick work from it. Current status: `products/slo/docs/ROADMAP_TO_BETA.md`, `SLO_BETA_BLOCKER_REGISTER_V2.md` and `SLO_PRIVATE_BETA_READINESS_V2.md`.
+
 This document outlines the phased roadmap for rolling out classification and metadata intelligence improvements in SLO.
 
 ---

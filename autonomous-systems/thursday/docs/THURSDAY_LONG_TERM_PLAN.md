@@ -1,5 +1,7 @@
 # Thursday long-term plan — toward a sellable business orchestrator
 
+> **Dated plan, not kept current (marked 2026-10-03).** Source code or scripts still point at this file, so it stays where it is. Don't pick work from it. Current status: `autonomous-systems/thursday/README.md`.
+
 **Goal:** make Thursday the best business orchestrator agent we can, good
 enough that selling it commercially is a real option rather than a stretch.
 

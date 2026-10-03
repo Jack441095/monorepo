@@ -1,5 +1,7 @@
 # SLO Classification Accuracy Roadmap V1
 
+> **Dated plan, not kept current (marked 2026-10-03).** Source code or scripts still point at this file, so it stays where it is. Don't pick work from it. Current status: `products/slo/docs/ROADMAP_TO_BETA.md`, `SLO_BETA_BLOCKER_REGISTER_V2.md` and `SLO_PRIVATE_BETA_READINESS_V2.md`.
+
 **Purpose:** answer "how do we get to classifying all sounds correctly?" honestly, as a real long-term plan, not just the near-term stages. Short version on the ceiling: literal 100% isn't achievable or even the right target — this doc explains why — but the plan below is the real, sequenced path to get as close as the data, the model, and the product's own design philosophy allow, and it doesn't stop at "recalibrate the classifier."
 
 ## Why 100% is the wrong target, not just a hard one

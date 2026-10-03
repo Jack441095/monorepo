@@ -14,8 +14,7 @@ Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `pro
 
 For KENN, work in `kenn-app` and start at its `docs/plans/KENN_MEGA_PLAN_2026-09-29.md`. The monorepo copy's plans, if you need them, are `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates and evidence log), then `KENN_GLM_FULL_ASSISTANT_TRACKER.md`
 (working checklist). Everything under any `docs/archive/` folder is a dated record, not a plan; don't pick work from it.
-Reports, handovers and audits elsewhere in `docs/` are snapshots of what was true on their date. For the whole estate the
-current-state file is `docs/NITE_DSP_STATE.json`. For SLO, Nite Submit, Thursday and the website, read the product's own README
+Reports, handovers and audits elsewhere in `docs/` are snapshots of what was true on their date. For SLO, Nite Submit, Thursday and the website, read the product's own README
 before any `*_PLAN_*`, `*_ROADMAP_*` or `*_PROMPT_*` file; those are mostly old and overlap each other.
 
 ## Working rules specific to this repo

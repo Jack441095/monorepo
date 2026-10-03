@@ -1,5 +1,7 @@
 # Thursday Improvement Plan — Evolving Toward True Ambient Intelligence
 
+> **Dated plan, not kept current (marked 2026-10-03).** Source code or scripts still point at this file, so it stays where it is. Don't pick work from it. Current status: `autonomous-systems/thursday/README.md`.
+
 **Date:** 2026-08-08  
 **Scope:** Analysis + prioritized roadmap for deepening Thursday as Audio_Too's full-system AI orchestrator.  
 **Context docs:** `THURSDAY_UPGRADE_PLAN.md`, `thursday/changelog.md`, `thursday/orchestrator.py`, `thursday/brain.py`, `thursday/autonomous_dispatcher.py`, `thursday/autonomous_producer.py`  

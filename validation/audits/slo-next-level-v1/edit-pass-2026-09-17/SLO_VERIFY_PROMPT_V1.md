@@ -1,5 +1,7 @@
 # SLO REFACTOR BRANCH — FULL VERIFICATION PROMPT (F-01 → F-04)
 
+> **Dated plan, not kept current (marked 2026-10-03).** Source code or scripts still point at this file, so it stays where it is. Don't pick work from it. Current status: the product's own README.
+
 > Run from `/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP`. Read-only except: you may build into existing `_build/` dirs and run test binaries. NO source edits, NO commits, NO pushes, NO installs.
 
 ## 0. Target
