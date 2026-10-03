@@ -493,6 +493,10 @@ its own. Scoped checks 165 passed; full backend 4014 passed, 137 skipped, the sa
 as a clean checkout. Fake Live only; C1, C2 and C3 stay open. Still untraced: `default_session`
 defaults in the agent tool functions and `live_executor.py`.
 [Receipt](docs/evidence/KENN_A2_GENERATED_CLIP_OWNER_2026-10-03.md).
+Default-session trace, 3 Oct: the `default_session` defaults in the agent tools,
+`live_executor.py` and the tool registry are not reachable from any route (chat and upload can
+only trigger analysis tools); a guard test pins that. No behavior change, A2/A3 not ticked.
+[Receipt](docs/evidence/KENN_A2_DEFAULT_SESSION_TRACE_2026-10-03.md).
 Scope correction, 3 Oct: Thursday is a separate
 product; its compatibility fallback is removed from KENN's work queue.
 [Remaining source trace](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
