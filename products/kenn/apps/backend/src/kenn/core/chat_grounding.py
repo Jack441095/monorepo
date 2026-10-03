@@ -725,6 +725,21 @@ _PRODUCT_FAMILIES = {
 }
 
 
+def names_only_a_product(query: str) -> bool:
+    """True when the message is a plugin brand or product and nothing else, such as "fab filter".
+
+    Left to routing it matches the generic word ("filter") and the answer describes a plugin the notes never
+    covered; it needs a question back instead.
+    """
+    text = query.lower()
+    if not any(pattern.search(text) for pattern in _PRODUCT_FAMILIES.values()):
+        return False
+    for pattern in _PRODUCT_FAMILIES.values():
+        text = pattern.sub(" ", text)
+    leftover = re.sub(r"\b(?:the|a|an|plug-?ins?)\b", " ", re.sub(r"[^\w\s]+", " ", text))
+    return not leftover.split()
+
+
 def unasked_product_names(answer: str, query: str, evidence_text: str = "") -> list[str]:
     """Plugin makers the answer names that neither the question nor the notes do.
 

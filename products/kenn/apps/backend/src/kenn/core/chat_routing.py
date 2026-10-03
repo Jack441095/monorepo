@@ -6,6 +6,7 @@ import re
 import sys
 
 
+from kenn.core.chat_grounding import names_only_a_product
 from kenn.core.lm_identity import APP_NAME
 from kenn.llm.llm_rewrite import is_enabled as llm_enabled
 from kenn.core.suggestions import DEFAULT_STARTERS, starter_questions
@@ -495,7 +496,7 @@ def cleaned_query(query: str) -> str:
 
 def is_unclear_query(query: str) -> bool:
     cleaned = cleaned_query(query)
-    if cleaned in UNCLEAR_INPUTS:
+    if cleaned in UNCLEAR_INPUTS or names_only_a_product(query):
         return True
     raw_words = set(cleaned.split())
     if raw_words & FOLLOWUP_REFERENCES and len(raw_words) <= 9 and cleaned.startswith(
