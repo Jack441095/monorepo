@@ -31,10 +31,11 @@ def test_redacts_bare_bearer_token():
 
 def test_redacts_known_env_secret_names():
     for line in [
-        "PADDLE_API_KEY=sk_test_fake000111222",
+        "STRIPE_SECRET_KEY=sk_test_fake000111222",
+        "STRIPE_WEBHOOK_SECRET=whsec_fake_000",
+        "PADDLE_API_KEY=fake-legacy-secret",
         "SESSION_SECRET: super-secret-fake-value",
         "ADMIN_API_KEY = 'fake-admin-key-000'",
-        "PADDLE_WEBHOOK_SECRET=whsec_fake_000",
         "THURSDAY_CONFIRMATION_SECRET=fake-confirmation-secret",
     ]:
         out = redact(line)
@@ -61,6 +62,11 @@ def test_redacts_smtp_credentials():
 def test_redacts_common_token_prefixes():
     for token in [
         "sk-FAKEabcdefghijklmno",
+        "sk_test_FAKEabcdefghijklmno",
+        "sk_live_FAKEabcdefghijklmno",
+        "rk_test_FAKEabcdefghijklmno",
+        "rk_live_FAKEabcdefghijklmno",
+        "whsec_FAKEabcdefghijklmno",
         "ghp_FAKEabcdefghijklmnopqrstuvwx0000",
         "xoxb-FAKE-0000000000-abcdefghijklmnop",
         "AKIAFAKE0123456789AB",

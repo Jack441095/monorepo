@@ -104,7 +104,7 @@ def _register_system_services(services: dict, api: Any) -> None:
     services["search_docs"] = ServiceDef(
         name="Search Docs (Semantic)",
         description="Local semantic search over docs/'s real markdown files (audits, plans, launch checklists, truth sheets) — no network call",
-        examples=["search docs: paddle KYC", "what do the docs say about the estate audit",
+        examples=["search docs: Stripe checkout", "what do the docs say about the estate audit",
                    "what does the estate say about revenue"],
         # Multi-word triggers score len(words)**2 in score_by_triggers, so
         # these outscore "search"'s single-word triggers (internal DB

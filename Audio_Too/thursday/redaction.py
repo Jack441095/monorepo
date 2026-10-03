@@ -11,7 +11,7 @@ nothing would catch one if it happened.
 This is deliberately NOT a complete secrets-management redesign -- it is a
 small, defensive pattern-matching layer that catches the common shapes a
 secret takes in a log line (an ``Authorization: Bearer`` header, a
-``PADDLE_API_KEY=...``-style env assignment, a handful of well-known token
+``STRIPE_SECRET_KEY=...``-style env assignment, a handful of well-known token
 prefixes) and replaces the secret portion with ``[REDACTED]`` while leaving
 the surrounding diagnostic context intact.
 
@@ -51,8 +51,8 @@ _PATTERNS: list[tuple[re.Pattern, str]] = [
         "Bearer " + _REDACTED,
     ),
     # KEY=value / KEY: value / KEY="value" style assignments where KEY looks
-    # like a secret name (env-var-style: SESSION_SECRET, PADDLE_API_KEY,
-    # ADMIN_API_KEY, PADDLE_WEBHOOK_SECRET, SMTP_PASSWORD,
+    # like a secret name (env-var-style: SESSION_SECRET, STRIPE_SECRET_KEY,
+    # ADMIN_API_KEY, STRIPE_WEBHOOK_SECRET, SMTP_PASSWORD,
     # THURSDAY_CONFIRMATION_SECRET, *_TOKEN, *_PASSWORD, etc).
     (
         re.compile(
@@ -72,10 +72,10 @@ _PATTERNS: list[tuple[re.Pattern, str]] = [
         r"\1: " + _REDACTED,
     ),
     # Well-known secret-token prefixes, wherever they appear (OpenAI-style
-    # sk-..., GitHub ghp_..., Slack xox[baprs]-..., AWS AKIA...).
+    # sk-... and Stripe sk_/rk_/whsec_, GitHub ghp_..., Slack xox[baprs]-..., AWS AKIA...).
     (
         re.compile(
-            r"\b(sk-[A-Za-z0-9]{10,}|ghp_[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{12,})\b"
+            r"\b((?:sk|rk)_(?:test|live)_[A-Za-z0-9]{10,}|whsec_[A-Za-z0-9]{10,}|sk-[A-Za-z0-9]{10,}|ghp_[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{12,})\b"
         ),
         _REDACTED,
     ),

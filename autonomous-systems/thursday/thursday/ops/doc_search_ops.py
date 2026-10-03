@@ -22,7 +22,7 @@ rendered result says which method produced it.
 documentation reads ONE specific hardcoded file (qa_ops.py -> the beta
 checklist, finance_ops.py -> business_knowledge.json, documentation_ops.py
 -> the launch tracker). There was no way to ask "what have we said about
-Paddle KYC" and get a grounded answer across the whole docs/ corpus.
+Stripe checkout" and get a grounded answer across the whole docs/ corpus.
 
 **Embedding model: reused DATA, not code.** KENN already solved local
 ONNX embedding on this machine (Audio_Too/studio/kenn/kenn/retrieval/
