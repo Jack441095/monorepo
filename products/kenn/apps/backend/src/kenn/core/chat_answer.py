@@ -2084,12 +2084,21 @@ def _answer_payload_stream(
     )
 
     accumulated_events = []
+
+    def revoke_discarded_confirmations():
+        # A dispatch may issue a card after cancellation, or before this stream is replaced while suspended.
+        for event in accumulated_events:
+            metadata = event.get("data") if event.get("event") == "metadata" else None
+            if isinstance(metadata, dict):
+                revoke_confirmation(metadata.get("confirmation_token"), session_id=session_id)
+
     close = getattr(generator, "close", None)
     try:
         while True:
             # Resuming after metadata or a token can start inference or read another
             # provider chunk, so check the owner before advancing the raw stream.
             if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+                revoke_discarded_confirmations()
                 if close is not None:
                     close()
                 yield discarded
@@ -2098,18 +2107,20 @@ def _answer_payload_stream(
                 event = next(generator)
             except StopIteration:
                 break
+            accumulated_events.append(event)
             if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+                revoke_discarded_confirmations()
                 if close is not None:
                     close()
                 yield discarded
                 return
-            accumulated_events.append(event)
             yield event
     finally:
         if close is not None:
             close()
 
     if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        revoke_discarded_confirmations()
         yield discarded
         return
     if cache_allowed and accumulated_events:
@@ -3022,6 +3033,7 @@ def _answer_payload(
                 )
 
     if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        revoke_confirmation(payload.get("confirmation_token"), session_id=session_id)
         return discarded
     return payload
 

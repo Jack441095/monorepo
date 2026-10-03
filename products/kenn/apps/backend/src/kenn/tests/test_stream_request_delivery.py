@@ -193,6 +193,66 @@ def test_shortcut_stream_discards_its_answer_when_superseded_between_events(monk
     assert fake.writes == []
 
 
+@pytest.mark.parametrize("surface,during", [("payload", "dispatch"), ("stream", "dispatch"), ("stream", "metadata"), ("stream", "token")])
+@pytest.mark.parametrize("superseded_by", ["cancel", "next_turn", "other_chat", "none"])
+def test_discarded_dispatch_proposal_revokes_only_its_confirmation(monkeypatch, surface, during, superseded_by):
+    from kenn.core import confirmation
+
+    # The raw dispatch wrapper hid a stale proposal but left its issued token usable.
+    monkeypatch.setattr(confirmation, "_ISSUED_TOKENS", {})
+    monkeypatch.setattr(confirmation, "_REVOKED_TOKENS", set())
+    monkeypatch.setattr(confirmation, "_USED_TOKENS", set())
+    tokens = {}
+
+    def issue(label, session):
+        token, _ = confirmation.issue_confirmation(session_id=session, service_id="fixture", text=label)
+        tokens[label] = (token, session)
+        return token
+
+    issue("other chat", "song-b")
+
+    def supersede():
+        if superseded_by == "cancel":
+            answer_upgrades.invalidate("song-a")
+            confirmation.revoke_session_confirmations(session_id="song-a")
+        elif superseded_by == "next_turn":
+            answer_upgrades.begin_turn("song-a")
+        elif superseded_by == "other_chat":
+            answer_upgrades.begin_turn("song-b")
+        issue("current card", "song-a")
+
+    def dispatch(query, **kwargs):
+        assert kwargs["session_id"] == "song-a"
+        if during == "dispatch":
+            supersede()
+        token = issue("discarded card", "song-a")
+        return {
+            "message": "Confirm the fixture proposal", "agent_name": "ableton",
+            "proposal": {"confirmation_token": token}, "confirmation_token": token,
+            "requires_confirmation": True,
+        }
+
+    monkeypatch.setattr(chat_answer, "get_orchestrator", lambda: SimpleNamespace(dispatch=dispatch))
+    if surface == "payload":
+        reply = chat_answer.answer_payload("Mute the vocal", session_id="song-a", allow_llm=False)
+    else:
+        stream = chat_answer.answer_payload_stream("Mute the vocal", session_id="song-a", allow_llm=False)
+        if during in {"metadata", "token"}:
+            metadata = next(stream)["data"]
+            assert metadata["confirmation_token"] == tokens["discarded card"][0]
+            if during == "token":
+                assert next(stream)["event"] == "token"
+            supersede()
+        remaining = list(stream)
+        reply = next((event["data"] for event in remaining if event["event"] == "metadata"), {})
+    discarded = superseded_by in {"cancel", "next_turn"}
+    assert bool(reply.get("answer_delivery_discarded")) is discarded
+    for label in ("discarded card", "current card", "other chat"):
+        token, session = tokens[label]
+        usable = confirmation.consume_confirmation(token, session_id=session, service_id="fixture", text=label)
+        assert usable is (not discarded if label == "discarded card" else True)
+
+
 @pytest.fixture
 def isolated_stream_cache(monkeypatch, tmp_path):
     monkeypatch.setattr(session_memory, "DB_PATH", tmp_path / "sessions.db")
