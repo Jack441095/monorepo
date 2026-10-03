@@ -466,6 +466,13 @@ mock, an agent reviewer or an unrelated receipt.
 Do not resume citation capture, a speculative rewrite or an unfinished extraction
 merely because an old document suggested it.
 
+Remaining-owner review, 3 Oct: the revoke import now serves both HTTP cancellation
+routes. Anonymous specialist dispatch still substitutes shared session names, and
+Thursday's compatibility fallback drops history, session identity and payload metadata.
+Scoped existing tests: 62 passed, two existing deprecation warnings. Neither gap has
+an isolated regression fixture yet; no runtime fix or new tick is claimed.
+[Source symbols, next fixtures, command, result and limits](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
+
 ### 2. Qualify useful local conversation and performance
 
 Needs the route/context audit; fixes may land in small slices while that audit continues.
