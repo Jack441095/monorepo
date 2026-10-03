@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/tmp/claude-0/-home-user-monorepo/ebcc9aee-c377-5064-87dd-c9d1c8a09225/scratchpad/venv/bin/pip install -q paramiko)",
+      "Bash(/tmp/claude-0/-home-user-monorepo/ebcc9aee-c377-5064-87dd-c9d1c8a09225/scratchpad/venv/bin/python /tmp/claude-0/-home-user-monorepo/ebcc9aee-c377-5064-87dd-c9d1c8a09225/scratchpad/gpu.py *)"
+    ]
+  }
+}
