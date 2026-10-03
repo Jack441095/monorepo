@@ -663,6 +663,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       The existing 4642-chunk index was read without rebuilding; phantom power and balanced cabling remain unresolved.
       No new model, decode-speed or Live-open qualification; C1, C2 and C3 stay open.
       [Code commit, commands, result and limits](docs/evidence/KENN_C2_PRECEDENCE_ALIAS_RETRIEVAL_2026-10-03.md).
+    - Fundamental source review, 3 Oct: phantom-power and balanced-cabling questions still display unrelated
+      passages, while the weak-evidence check accepts their retrieval results. The two exact phantom-power
+      matches contain suspect hardware/software category errors; the single balanced-cabling match is a short
+      hum-prevention tip. Review provenance and concept coverage before promoting or importing these sources.
+      Scoped checks: 45 passes. Existing index only; no model, grounding-policy change or latency qualification.
+      C1, C2 and C3 stay open. [Audit, commands, sources and limits](docs/evidence/KENN_C2_FUNDAMENTAL_SOURCE_REVIEW_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
