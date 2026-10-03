@@ -466,12 +466,17 @@ mock, an agent reviewer or an unrelated receipt.
 Do not resume citation capture, a speculative rewrite or an unfinished extraction
 merely because an old document suggested it.
 
-Remaining-owner review, 3 Oct: the revoke import now serves both HTTP cancellation
-routes. Anonymous specialist dispatch still substitutes shared session names, and
-Thursday's compatibility fallback drops history, session identity and payload metadata.
-Scoped existing tests: 62 passed, two existing deprecation warnings. Neither gap has
-an isolated regression fixture yet; no runtime fix or new tick is claimed.
-[Source symbols, next fixtures, command, result and limits](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
+Remaining-owner review, 3 Oct: the revoke import serves both HTTP cancellation
+routes. The Live-command and autonomous-producer dispatch paths now reject missing
+or malformed owners before preparing proposals or starting deliberation. Explicit
+owners and anonymous read-only inspection are covered. Scoped checks: 77 passed;
+the shared-owner mutation causes 10 failures. Full backend: 4105 passed, 12 skipped,
+the same pre-existing personal-path failure. No broad A2/A3 tick is claimed.
+[Code commit, commands, result and limits](docs/evidence/KENN_A2_ANONYMOUS_DISPATCH_OWNERS_2026-10-03.md).
+Next inspect Thursday's compatibility fallback with an isolated regression fixture:
+it drops history, session identity and payload metadata. Other recipe specialists'
+owners and autonomous token issuance remain open.
+[Remaining source trace](docs/evidence/KENN_A2_REMAINING_OWNER_AUDIT_2026-10-03.md).
 
 ### 2. Qualify useful local conversation and performance
 
@@ -769,6 +774,12 @@ Needs C3's dialogue contract. Improve concrete failed journeys before adding fam
   Audit fixture exclusions (including substring matching) and source tiers before
   claiming improved recall. Any authorized rebuild is a candidate on GPU 0/1 with
   parity, digest, recall and rollback evidence; never rebuild on this Mac.
+  Source expansion recommendation, 3 Oct: start with 20–30 concrete failed questions
+  and a small batch of primary manuals or attributable transcripts. Check factual
+  accuracy, duplicates and answer improvement before considering a large scrape.
+  GPUs 0/1 can process reviewed material using existing models; web fetching does
+  not materially benefit from a GPU. No scrape has been launched or index rebuilt;
+  corpus expansion does not resolve the separate Mac decode-speed limit.
   If a demonstrated passage-relevance gap remains, compare a small CPU ONNX
   cross-encoder on the same top 12–20 candidates with current retrieval. Use research
   experiment 2's quality, latency and memory screens; retain version/unit constraints
