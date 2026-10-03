@@ -563,6 +563,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       48 failures. Full backend: 3947 passes, 12 skips and the pre-existing personal-path failure. Already-performed
       shortcut work, token retirement and checkpoint writes remain outside this check; no speed gain or Live-open
       qualification. C2 stays open. [Code commit, commands, exact files and limits](docs/evidence/KENN_C2_SUPERSEDED_HTTP_SHORTCUTS_2026-10-03.md).
+    - HTTP checkpoint storage, 3 Oct: cancelled/replaced turns cannot clear, rate or overwrite a newer listening
+      checkpoint; a started storage operation finishes before cancellation revokes its owner. Scoped checks: 340
+      passes; removing either guard restores failures. Full backend: 3983 passes, 12 skips and the pre-existing
+      personal-path failure. No decode-speed gain, inference abort or Live-open qualification; proposal-token
+      retirement remains open. C2 stays unticked. [Code commit, commands and limits](docs/evidence/KENN_C2_HTTP_CHECKPOINT_OWNERSHIP_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
