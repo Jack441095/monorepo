@@ -545,6 +545,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       unchanged for Jack's decision. A fixed Qwen3 8B / approximately 1,100-token MLX comparison proposal is
       written, not executed; no dependencies/assets added or residency changed. C2 stays open.
       [Measurements, quality limits and runtime proposal](docs/evidence/KENN_C2_BRIEF_STYLE_AND_RUNTIME_PROPOSAL_2026-10-03.md).
+    - Response cache identity, 3 Oct: task, answer mode, provider and endpoint now separate cached prose on both
+      chat surfaces, while identical contracts retain reuse. Scoped checks: 105 passes; full backend: 3646 passes,
+      12 skips and the same pre-existing personal-path failure. Offline correctness repair, no measured decode
+      gain or Live-open qualification; remaining configuration drift is documented. C2 stays open.
+      [Regression, mutation, full-suite receipt and research priorities](docs/evidence/KENN_C2_RESPONSE_CACHE_IDENTITY_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
