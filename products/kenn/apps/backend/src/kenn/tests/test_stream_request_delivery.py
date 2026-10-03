@@ -882,3 +882,67 @@ def test_http_shortcut_checks_its_turn_after_augmenting_the_reply(stream_http, m
     assert reply["answer"] == "" and reply["answer_delivery_discarded"] is True
     assert reply["envelope"]["status"] == "cancelled"
     assert not reply.get("proposal") and not reply.get("confirmation_token")
+
+
+@pytest.mark.parametrize("path", ["/api/ask", "/kenn/api/ask"])
+@pytest.mark.parametrize("shortcut", ["midi", "command"])
+@pytest.mark.parametrize("superseded_by", ["cancel", "next_turn", "other_chat", "none"])
+@pytest.mark.parametrize("during", ["proposal", "augmentation"])
+def test_http_discarded_proposal_revokes_only_its_confirmation(stream_http, monkeypatch, path, shortcut, superseded_by, during):
+    import kenn.server as server
+    from kenn.core import confirmation
+
+    # Cancellation can precede issuance, leaving a hidden card's token usable after its reply is discarded.
+    monkeypatch.setattr(confirmation, "_ISSUED_TOKENS", {})
+    monkeypatch.setattr(confirmation, "_REVOKED_TOKENS", set())
+    monkeypatch.setattr(confirmation, "_USED_TOKENS", set())
+    for name in ("_maybe_handle_live_inspection", "_maybe_handle_midi_generation", "_maybe_handle_live_command_from_chat"):
+        monkeypatch.setattr(server.Handler, name, lambda *args: None)
+    tokens = {}
+
+    def issue(label, session):
+        token, _ = confirmation.issue_confirmation(session_id=session, service_id="fixture", text=label)
+        tokens[label] = (token, session)
+        return token
+
+    issue("other chat", "song-b")
+
+    def supersede():
+        if superseded_by == "cancel":
+            answer_upgrades.invalidate("song-a")
+            confirmation.revoke_session_confirmations(session_id="song-a")
+        elif superseded_by == "next_turn":
+            answer_upgrades.begin_turn("song-a")
+        elif superseded_by == "other_chat":
+            answer_upgrades.begin_turn("song-b")
+        issue("current card", "song-a")
+
+    def proposal(*args):
+        if during == "proposal":
+            supersede()
+        token = issue("discarded card", "song-a")
+        return {
+            "answer": "Proposal fixture", "status": "proposed", "route": "ableton_controller",
+            "proposal": {"confirmation_token": token}, "confirmation_token": token,
+            "requires_confirmation": True,
+        }
+
+    handler = "_maybe_handle_midi_generation" if shortcut == "midi" else "_maybe_handle_live_command_from_chat"
+    monkeypatch.setattr(server.Handler, handler, proposal)
+    augment = server.augment_payload
+
+    def augment_then_supersede(data, **kwargs):
+        result = augment(data, **kwargs)
+        if during == "augmentation" and data.get("answer") == "Proposal fixture":
+            supersede()
+        return result
+
+    monkeypatch.setattr(server, "augment_payload", augment_then_supersede)
+    reply = stream_http(path, {"session_id": "song-a", "stream": False})
+    discarded = superseded_by in {"cancel", "next_turn"}
+    assert bool(reply.get("answer_delivery_discarded")) is discarded
+    token, session = tokens["discarded card"]
+    assert confirmation.consume_confirmation(token, session_id=session, service_id="fixture", text="discarded card") is not discarded
+    for label in ("current card", "other chat"):
+        token, session = tokens[label]
+        assert confirmation.consume_confirmation(token, session_id=session, service_id="fixture", text=label)

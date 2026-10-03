@@ -2732,6 +2732,11 @@ class Handler(BaseHTTPRequestHandler):
         def send_shortcut_reply(result):
             # Shortcuts bypass the knowledge engine's final turn check; a late proposal must not reach this chat.
             if upgrade_turn and not answer_upgrades.is_current_turn(session_id=session_id, turn_id=upgrade_turn):
+                from kenn.core.confirmation import revoke_confirmation
+
+                # The proposal may have issued its token after Cancel revoked the chat's earlier cards.
+                # Retire only this discarded card so a newer turn's confirmation stays usable.
+                revoke_confirmation(result.get("confirmation_token"), session_id=session_id)
                 correlation_id = str(payload.get("correlation_id", "")).strip() or self.request_id()
                 result = augment_payload(
                     {
