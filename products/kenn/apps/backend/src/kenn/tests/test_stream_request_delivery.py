@@ -206,6 +206,7 @@ def test_http_transport_stream_keeps_the_actual_confirmation_proposal(stream_htt
 def measured_note_stream(monkeypatch, isolated_stream_cache):
     from kenn.tests.test_streamed_generation_prefix_guard import CHUNKS, TERMS
 
+    critique_and_save_trace = chat_answer._critique_and_save_trace
     monkeypatch.setattr(chat_answer, "get_orchestrator", lambda: SimpleNamespace(dispatch=lambda *args, **kwargs: None))
     monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(CHUNKS))
     monkeypatch.setattr(chat_answer, "load_terms", lambda: TERMS)
@@ -213,6 +214,7 @@ def measured_note_stream(monkeypatch, isolated_stream_cache):
     monkeypatch.setattr(chat_answer, "_critique_and_save_trace", lambda **kwargs: kwargs["confidence"])
     monkeypatch.setattr(chat_answer, "_get_llm_usage_stats", lambda: {})
     monkeypatch.setattr(chat_answer, "llm_enabled", lambda: False)
+    return critique_and_save_trace
 
 
 def test_http_stream_preserves_the_real_engines_low_overlap_replacement(stream_http, measured_note_stream, monkeypatch):
@@ -234,6 +236,62 @@ def test_http_stream_preserves_the_real_engines_low_overlap_replacement(stream_h
     assert final["answer"] != streamed
     assert "150 ms" in final["answer"] and "microdynamics" not in final["answer"]
     assert session_memory.load_session("song-a")["last_answer"] == final["answer"][:1000]
+
+
+@pytest.mark.parametrize("supersede", ["cancel", "next-turn", "other-chat"])
+@pytest.mark.parametrize("model_enabled", [False, True], ids=["template", "model"])
+@pytest.mark.parametrize("revoke_at", ["last-token", "critique"])
+def test_superseded_stream_cannot_save_reasoning_traces_or_citation_counts(measured_note_stream, monkeypatch, supersede, model_enabled, revoke_at):
+    from kenn import knowledge
+    from kenn.tests.test_streamed_generation_prefix_guard import ACCEPTED_ANSWER, QUERY
+
+    # The consumer dropped stale metadata, but its producer had already saved the trace and citations.
+    writes = []
+
+    def supersede_turn():
+        if supersede == "cancel":
+            answer_upgrades.invalidate("song-a")
+        else:
+            answer_upgrades.begin_turn("song-b" if supersede == "other-chat" else "song-a")
+
+    def critique(*args):
+        assert not answer_upgrades._LOCK.locked()
+        if revoke_at == "critique":
+            supersede_turn()
+        return {"passed": True, "warnings": []}
+
+    def record(kind):
+        assert answer_upgrades._LOCK.locked()
+        writes.append(kind)
+
+    monkeypatch.setattr(chat_answer, "_critique_and_save_trace", measured_note_stream)
+    monkeypatch.setattr(knowledge, "query_reasoning_traces", lambda *args: [])
+    monkeypatch.setattr(knowledge, "post_answer_critique", critique)
+    monkeypatch.setattr(knowledge, "record_citations", lambda *args: record("citations"))
+    monkeypatch.setattr(knowledge, "save_reasoning_trace", lambda **kwargs: record("trace"))
+    monkeypatch.setattr(chat_answer, "_update_session", lambda *args, **kwargs: record("session"))
+    monkeypatch.setattr(chat_answer, "llm_enabled", lambda: model_enabled)
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *args, **kwargs: True)
+    def model_stream(*args, **kwargs):
+        yield {"event": "token", "token": ACCEPTED_ANSWER}
+
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer_stream", model_stream)
+    monkeypatch.setattr(chat_answer, "_progressive_token_yield", lambda template, *args: iter([
+        {"event": "token", "token": template},
+    ]))
+    stream = chat_answer.answer_payload_stream(QUERY, session_id="song-a")
+    for event in stream:
+        if event["event"] == "token":
+            break
+    else:
+        pytest.fail("The fixture must emit text before ownership changes")
+    if revoke_at == "last-token":
+        supersede_turn()
+    remaining = list(stream)
+    assert writes == (["citations", "trace", "session"] if supersede == "other-chat" else [])
+    if supersede != "other-chat":
+        assert remaining[-1]["data"]["answer"] == ""
+        assert remaining[-1]["data"]["answer_delivery_discarded"] is True
 
 
 @pytest.mark.parametrize("supersede", ["cancel", "next-turn", "other-chat"])

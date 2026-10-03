@@ -1888,6 +1888,8 @@ def _answer_payload_stream_raw(
             turn_id=turn_id,
             metadata_payload=final_metadata,
             weak_match=weak_match,
+            session_id=session_id,
+            request_turn_id=request_turn_id,
         )
         final_metadata["answer_self_check"] = answer_self_check(
             relevance_query,
@@ -1921,6 +1923,8 @@ def _answer_payload_stream_raw(
             turn_id=turn_id,
             metadata_payload=final_metadata,
             weak_match=weak_match,
+            session_id=session_id,
+            request_turn_id=request_turn_id,
         )
         final_metadata["answer_self_check"] = answer_self_check(
             relevance_query,
@@ -3039,12 +3043,17 @@ def _critique_and_save_trace(
     metadata_payload: dict,
     weak_match: bool,
     persist: bool = True,
+    session_id: str = "",
+    request_turn_id: str = "",
 ) -> str:
     """Helper to run self-critique, record citations, and save reasoning trace.
 
     A background answer passes persist=False: the foreground answer for the same turn already counted its citations
     and saved its trace, and a discarded upgrade must not write either.
+    Bound streams guard each save with their request owner; critique can finish after cancellation.
     """
+    from kenn.core import answer_upgrades
+
     try:
         from kenn.knowledge import query_reasoning_traces, post_answer_critique, record_citations
         past_reasoning_traces = query_reasoning_traces(query)
@@ -3069,10 +3078,14 @@ def _critique_and_save_trace(
 
         # Record source citations to update dynamic trust scores
         if persist and not weak_match:
-            record_citations(
-                chunk["source"]
-                for _, chunk in (results or [])
-                if chunk.get("source")
+            answer_upgrades.write_if_current(
+                lambda: record_citations(
+                    chunk["source"]
+                    for _, chunk in (results or [])
+                    if chunk.get("source")
+                ),
+                session_id=session_id,
+                turn_id=request_turn_id,
             )
     except Exception as e:
         import logging
@@ -3084,14 +3097,18 @@ def _critique_and_save_trace(
         from kenn.knowledge import save_reasoning_trace, get_chunk_id
         ev_ids = [get_chunk_id(chunk) for _, chunk in (results or [])]
         conclusion = extract_conclusion_from_answer(final_answer)
-        save_reasoning_trace(
-            query=query,
-            route=route,
-            evidence_ids=ev_ids,
-            conclusion=conclusion,
-            confidence=confidence,
-            tags=tags,
-            trace_id=turn_id,
+        answer_upgrades.write_if_current(
+            lambda: save_reasoning_trace(
+                query=query,
+                route=route,
+                evidence_ids=ev_ids,
+                conclusion=conclusion,
+                confidence=confidence,
+                tags=tags,
+                trace_id=turn_id,
+            ),
+            session_id=session_id,
+            turn_id=request_turn_id,
         )
     except Exception as e:
         import logging
