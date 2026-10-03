@@ -552,6 +552,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       check restores eight failures. Full backend: 3789 passes, 12 skips and the pre-existing personal-path failure.
       Stubbed transport and Fake Live only; no measured speed gain or proven inference abort. C2 stays open.
       [Code commit, commands, limits and research priorities](docs/evidence/KENN_C2_CANCELLED_STREAM_WORK_2026-10-03.md).
+    - Cancelled payload work, 3 Oct: stale foreground and read-only payloads skip generation after retrieval and
+      optional critique after generation or metadata assembly. Scoped checks: 246 passes; removing the two guards
+      restores eight and sixteen failures. Full backend: 3837 passes, 12 skips and the pre-existing personal-path
+      failure. Stubbed models and Fake Live only; already-started inference is not aborted and no speed gain or
+      Live-open gate is established. C2 stays open.
+      [Code commit, commands, results and research limits](docs/evidence/KENN_C2_CANCELLED_PAYLOAD_WORK_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
