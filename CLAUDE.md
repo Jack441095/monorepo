@@ -16,6 +16,7 @@ Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `pro
 - New worktrees go under `workspace/worktrees/<project>/<task>/`; builds/caches go under `workspace/` or already-ignored project-local dirs.
 - `Audio_Too` is a preserved legacy boundary that was *not* bulk-migrated during the Sept 2026 cleanup — it overlaps heavily with `products/slo` (both descend from the SLO codebase) but is kept as a frozen reference; don't assume they mirror each other.
 - Owner audio and corpora are data, not source — kept outside this code estate entirely.
+- **Agent skills**: Matt Pocock's engineering skills are vendored in `.claude/skills` (Claude Code, opencode) and `.agents/skills` (Codex, opencode) — same files in both, see the README beside them. Reach for them to grill a plan, run a diagnosis loop, do TDD, or review a diff on standards and spec. They must not spawn competing plans or tickets: `products/kenn/KENN_PLAN.md` stays the single roadmap.
 
 ## Code and comment style
 
