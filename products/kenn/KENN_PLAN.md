@@ -633,6 +633,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       timely non-abstaining answers 0/3 on each surface. Scoped checks: 65 passes. Existing-index audit found
       sparse concept coverage and unrelated displayed notes; no index rebuild, grounding change or useful-answer
       speed gain. C2 stays open. [Code commit, commands, result and limits](docs/evidence/KENN_C2_ABSTENTIONS_AND_RETRIEVAL_GAP_2026-10-03.md).
+    - GPU 1 Qwen inventory, 3 Oct: read-only inspection found 771 generated notes; 762 filenames already
+      exist locally and 670 are identical. Nine missing notes need source review; changed notes need comparison
+      against local curation. Existing Haas/precedence aliases are present, so inspect current-index passage selection
+      before any import or rebuild. Older 4B planner receipts used multiple visible GPUs and do not qualify current
+      8B Mac latency. Scoped checks: 65 passes. No runtime/corpus change; C1, C2 and C3 stay open.
+      [Inventory, source-review tasks, commands and limits](docs/evidence/KENN_GPU1_QWEN_NOTES_INVENTORY_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
