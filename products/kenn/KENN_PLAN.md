@@ -534,6 +534,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
   - [ ] Use measured phase costs to select stable-prefix, KV/residency or explicit
     same-checkpoint MLX experiments. Preserve full grounding policy and exact
     assets; justify new dependencies/assets separately before adding them.
+    - Phase and cap diagnostic, 3 Oct: five questions per surface on M3 / 16 GB with Fake Live. Baseline accepted
+      within 15 s: stream 2/5, payload 2/5; a temporary 128-token cap: stream 4/5, payload 1/5. Decode slowed during
+      the cap run and accepted answers were truncated. Production cap and residency stay unchanged pending Jack's
+      decision; no Live-open gate or held-out quality qualification. C2 stays open.
+      [Receipt and keep_alive trade-off](docs/evidence/KENN_C2_MODEL_PHASES_AND_OUTPUT_CAP_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed

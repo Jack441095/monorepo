@@ -193,7 +193,7 @@ def measure(cases: list[dict], runtime: Path, output_cap: int | None) -> dict:
                 print(json.dumps(row), flush=True)
     return {
         "schema": "kenn.model_phases.v1", "generated_at": datetime.now(timezone.utc).isoformat(),
-        "code_commit": _command("git", "rev-parse", "HEAD"),
+        "code_commit": _command("git", "-C", str(latency.KENN_ROOT.parent.parent), "rev-parse", "HEAD"),
         "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "questions_sha256": hashlib.sha256(json.dumps(cases, sort_keys=True).encode()).hexdigest(),
         "index_version": latency._index_version(), "output_cap": output_cap,
