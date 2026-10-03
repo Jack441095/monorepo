@@ -8,11 +8,11 @@ The canonical NITE DSP engineering estate. **Everything is tracked directly in t
 
 Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `products/nite-submit`, `products/kenn-evaluation`, `backend/`, `website/`, `shared/`, `Audio_Too/` (preserved legacy), `audio-technology/`, `autonomous-systems/`, `validation/`.
 
-**KENN lives here.** `products/kenn/` is the KENN source of truth, tracked directly in this monorepo (backend under `products/kenn/apps/backend`, tooling, plugins, docs). The former standalone repo (`Shenrendao/KENN`) was absorbed during the Sept 2026 consolidation; a frozen pre-monorepo snapshot is kept outside git under the local `Products/Kenn/archive/` data home.
+**KENN's home is `Nite-DSP/kenn-app`** (the owner's decision; it has the newest KENN code, the device factory, the chaos suite and the mega plan). Do new KENN work there. `products/kenn/` in this monorepo is the earlier copy, from the Sept 2026 consolidation that absorbed `Shenrendao/KENN`; it is kept for reference and until the two are reconciled, so don't expect it to match `kenn-app`.
 
 ## Where the plan is
 
-For KENN, start at `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates and evidence log), then `KENN_GLM_FULL_ASSISTANT_TRACKER.md`
+For KENN, work in `kenn-app` and start at its `docs/plans/KENN_MEGA_PLAN_2026-09-29.md`. The monorepo copy's plans, if you need them, are `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates and evidence log), then `KENN_GLM_FULL_ASSISTANT_TRACKER.md`
 (working checklist). Everything under any `docs/archive/` folder is a dated record, not a plan; don't pick work from it.
 Reports, handovers and audits elsewhere in `docs/` are snapshots of what was true on their date. For the whole estate the
 current-state file is `docs/NITE_DSP_STATE.json`. For SLO, Nite Submit, Thursday and the website, read the product's own README
