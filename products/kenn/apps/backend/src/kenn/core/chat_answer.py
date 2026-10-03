@@ -2493,6 +2493,9 @@ def _answer_payload_raw(
     sections = note_sections(relevance_query, results)
     timings["section_ms"] = (time.perf_counter() - started) * 1000
 
+    # Retrieval can finish after cancellation; do not start another expensive stage for a stale owner.
+    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        return {}
     started = time.perf_counter()
     answer, llm_used = make_answer(
         relevance_query,
@@ -3149,10 +3152,13 @@ def _critique_and_save_trace(
 
     A background answer passes persist=False: the foreground answer for the same turn already counted its citations
     and saved its trace, and a discarded upgrade must not write either.
-    Bound answers guard each save with their request owner; critique can finish after cancellation.
+    Bound answers guard each save with their request owner; an already-started critique can finish after cancellation.
     """
     from kenn.core import answer_upgrades
 
+    # Metadata assembly can outlive the owner too; skip optional model work before it starts.
+    if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+        return confidence
     try:
         from kenn.knowledge import query_reasoning_traces, post_answer_critique, record_citations
         past_reasoning_traces = query_reasoning_traces(query)

@@ -384,6 +384,96 @@ def test_superseded_payload_cannot_save_memory_traces_citations_or_cache(measure
         assert result["answer_delivery_discarded"] is True
 
 
+@pytest.mark.parametrize("supersede", ["cancel", "next-turn", "other-chat", "unbound"])
+@pytest.mark.parametrize("revoke_at", ["retrieval", "generation", "metadata"])
+@pytest.mark.parametrize("record_session", [True, False], ids=["foreground", "read-only"])
+@pytest.mark.parametrize("model_enabled", [False, True], ids=["template", "model"])
+def test_cancelled_payload_does_not_start_generation_or_critique_after_ownership_changes(
+    measured_note_stream, monkeypatch, supersede, revoke_at, record_session, model_enabled
+):
+    from kenn import knowledge
+    from kenn.tests.test_streamed_generation_prefix_guard import ACCEPTED_ANSWER, CHUNKS
+
+    # Delivery discarded stale payloads, but retrieval and generation still started the next model stage.
+    calls = []
+    resolve = chat_answer._resolve_results_with_topic_lock
+    make_answer = chat_answer.make_answer
+    session_info = chat_answer._session_info
+
+    def revoke():
+        if supersede in {"cancel", "unbound"}:
+            answer_upgrades.invalidate("song-a")
+        else:
+            answer_upgrades.begin_turn("song-b" if supersede == "other-chat" else "song-a")
+
+    def retrieve(*args, **kwargs):
+        result = resolve(*args, **kwargs)
+        if revoke_at == "retrieval":
+            revoke()
+        return result
+
+    def generate(*args, **kwargs):
+        assert not answer_upgrades._LOCK.locked()
+        calls.append("generation")
+        result = make_answer(*args, **kwargs)
+        if revoke_at == "generation":
+            revoke()
+        return result
+
+    def critique(*args):
+        assert not answer_upgrades._LOCK.locked()
+        calls.append("critique")
+        return {"passed": True, "warnings": []}
+
+    def model_answer(*args, **kwargs):
+        assert not answer_upgrades._LOCK.locked()
+        calls.append("model")
+        return ACCEPTED_ANSWER
+
+    def metadata(*args, **kwargs):
+        result = session_info(*args, **kwargs)
+        if revoke_at == "metadata":
+            revoke()
+        return result
+
+    monkeypatch.setattr(chat_answer, "load_chunks", lambda: [chunk for _, chunk in CHUNKS])
+    monkeypatch.setattr(chat_answer, "mix_review_timeline_lookup", lambda *args: None)
+    monkeypatch.setattr(chat_answer, "latest_track_memory_lookup", lambda *args: None)
+    monkeypatch.setattr(chat_answer, "_resolve_results_with_topic_lock", retrieve)
+    monkeypatch.setattr(chat_answer, "make_answer", generate)
+    monkeypatch.setattr(chat_answer, "llm_enabled", lambda: model_enabled)
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *args, **kwargs: model_enabled)
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer", model_answer)
+    monkeypatch.setattr(chat_answer, "_critique_and_save_trace", measured_note_stream)
+    monkeypatch.setattr(knowledge, "query_reasoning_traces", lambda *args: [])
+    monkeypatch.setattr(knowledge, "post_answer_critique", critique)
+    monkeypatch.setattr(knowledge, "record_citations", lambda *args: None)
+    monkeypatch.setattr(knowledge, "save_reasoning_trace", lambda **kwargs: None)
+    monkeypatch.setattr(chat_answer, "_update_session", lambda *args, **kwargs: None)
+    monkeypatch.setattr(chat_answer, "_session_info", metadata)
+    monkeypatch.setattr(session_memory, "save_to_semantic_cache", lambda *args, **kwargs: None)
+    owner = answer_upgrades.begin_turn("song-a") if not record_session and supersede != "unbound" else ""
+    result = chat_answer.answer_payload(
+        "Explain sidechain compression on bass", session_id="" if supersede == "unbound" else "song-a",
+        record_session=record_session, plugin_session_id="plugin-a", correlation_id="request-a",
+        request_turn_id=owner,
+    )
+    stale = supersede in {"cancel", "next-turn"}
+    generated = ["generation", "model"] if model_enabled else ["generation"]
+    expected = ([] if revoke_at == "retrieval" else generated) if stale else [*generated, "critique"]
+    assert calls == expected
+    if stale:
+        assert result["answer"] == ""
+        assert result["answer_delivery_discarded"] is True
+        assert result["inference_aborted"] is False
+        assert result["session_id"] == "song-a"
+        assert result["plugin_session_id"] == "plugin-a"
+        assert result["correlation_id"] == "request-a"
+    else:
+        assert result["answer"]
+        assert result["critique"]["passed"] is True
+
+
 @pytest.mark.parametrize("supersede", ["cancel", "next-turn", "other-chat"])
 def test_completed_raw_stream_writes_memory_only_for_its_current_turn(measured_note_stream, monkeypatch, supersede):
     from kenn.tests.test_streamed_generation_prefix_guard import QUERY
