@@ -567,7 +567,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       checkpoint; a started storage operation finishes before cancellation revokes its owner. Scoped checks: 340
       passes; removing either guard restores failures. Full backend: 3983 passes, 12 skips and the pre-existing
       personal-path failure. No decode-speed gain, inference abort or Live-open qualification; proposal-token
-      retirement remains open. C2 stays unticked. [Code commit, commands and limits](docs/evidence/KENN_C2_HTTP_CHECKPOINT_OWNERSHIP_2026-10-03.md).
+      retirement was outside that slice. C2 stays unticked. [Code commit, commands and limits](docs/evidence/KENN_C2_HTTP_CHECKPOINT_OWNERSHIP_2026-10-03.md).
+    - Discarded HTTP proposal tokens, 3 Oct: discarded shortcut replies now revoke their exact confirmation token,
+      including tokens issued after cancellation. Newer cards and other chats remain usable. Red regression: 12
+      failures; scoped checks: 437 passes. Full backend: 4042 passes, 12 skips and the pre-existing personal-path
+      failure. Engine shortcut token ownership still needs audit; no inference abort, decode-speed gain or Live-open
+      qualification. C1, C2 and C3 stay unticked. [Code commit, commands and limits](docs/evidence/KENN_C2_DISCARDED_PROPOSAL_TOKENS_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
