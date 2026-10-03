@@ -2079,13 +2079,30 @@ def _answer_payload_stream(
     )
 
     accumulated_events = []
-    for event in generator:
-        if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
-            generator.close()
-            yield discarded
-            return
-        accumulated_events.append(event)
-        yield event
+    close = getattr(generator, "close", None)
+    try:
+        while True:
+            # Resuming after metadata or a token can start inference or read another
+            # provider chunk, so check the owner before advancing the raw stream.
+            if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+                if close is not None:
+                    close()
+                yield discarded
+                return
+            try:
+                event = next(generator)
+            except StopIteration:
+                break
+            if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
+                if close is not None:
+                    close()
+                yield discarded
+                return
+            accumulated_events.append(event)
+            yield event
+    finally:
+        if close is not None:
+            close()
 
     if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
         yield discarded
