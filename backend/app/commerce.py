@@ -1,486 +1,79 @@
-"""
-Commerce -- Paddle sandbox integration + webhook handling.
-
-docs/COMMERCE_PROVIDER_DECISION.md picked Paddle (Merchant of Record).
-Section 95: sandbox/mock only, never live payments -- there is no code path
-here that can charge a real card; `paddle_api_key` is only ever read from
-environment/secrets and a blank key (the default, since no Paddle account
-exists yet -- docs/HUMAN_COMMERCIAL_REQUIREMENTS.md) puts PaddleProvider
-into a documented mock mode instead of attempting a real API call.
-
-Webhook signature verification implements Paddle Billing's actual documented
-scheme (HMAC-SHA256 over "{timestamp}:{raw_body}", header format
-"ts=<unix>;h1=<hex>") so the verification logic itself is real and testable
-independent of having a live Paddle account -- see tests/test_e2e.py and
-tests/test_concurrency.py (there is no separate tests/test_commerce.py).
-
-Refund/dispute events only ever *record* the refund on the Purchase row
-(status, refunded_at). They never touch the Entitlement -- entitlement
-revocation on refund stays the existing manual admin action
-(`POST /admin/entitlements/{id}/revoke`, see tests/test_e2e.py step 7)
-rather than an automatic webhook-driven policy, since that policy choice
-belongs to the business, not this code (docs/PADDLE_INTEGRATION_AUDIT.md).
-
-An adjustment (refund/chargeback) is NOT final at `adjustment.created` --
-Paddle Billing's real lifecycle is created with status=pending_approval,
-then a later `adjustment.updated` flips status to approved/rejected
-(sandbox auto-approves after ~10 minutes; live requires manual approval
-for high-value refunds). Both event types are handled by the same
-function and a Purchase is only ever marked refunded once status is
-actually "approved" -- never on the initial pending event. Idempotent by
-construction (only acts once per purchase, regardless of how many
-created/updated deliveries arrive or in what order) rather than needing
-separate duplicate/out-of-order handling.
-"""
+"""Stripe hosted checkout with server-controlled product and price metadata."""
 from __future__ import annotations
 
-import hashlib
-import hmac
 import logging
-import time
-from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from typing import Protocol
+from urllib.parse import urlparse
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from . import email_templates, models
+from . import models
 from .auth import get_current_user
 from .config import settings
 from .database import get_db
-from .email import send_email
 
-router = APIRouter(prefix="/webhooks", tags=["commerce"])
 checkout_router = APIRouter(prefix="/commerce", tags=["commerce"])
 logger = logging.getLogger("nitedsp.commerce")
 
 
-class WebhookVerificationError(Exception):
-    pass
+class CommerceProvider(Protocol):
+    configured: bool
 
-
-class UnknownCatalogItemError(Exception):
-    """Raised when a webhook references a product_id/price_id combination
-    that isn't in our configured mapping. Deliberately distinct from a
-    generic processing failure: Paddle should NOT retry-deliver an event
-    that will never map to anything we recognise, so the webhook handler
-    responds 200 (not 500) for this specific case -- see paddle_webhook."""
-
-
-class CommerceProvider(ABC):
-    @abstractmethod
-    def verify_webhook_signature(self, raw_body: bytes, signature_header: str) -> bool: ...
-
-    @abstractmethod
     def create_checkout_url(
-        self, price_id: str, *, custom_data: dict | None = None, success_url: str | None = None
+        self, price_id: str, *, metadata: dict[str, str],
+        success_url: str | None = None, customer_email: str | None = None,
     ) -> str: ...
 
 
-class PaddleProvider(CommerceProvider):
-    """Sandbox-only until a human explicitly points paddle_api_base_url at
-    api.paddle.com for a real production deploy. `configured` is False
-    whenever no Paddle account exists yet (paddle_api_key empty) -- callers
-    must check this before attempting anything that would need a real API
-    round-trip; webhook *verification* still works without it, since that
-    only needs the shared webhook secret, not the API key."""
-
+class StripeProvider:
     def __init__(self) -> None:
-        self.configured = bool(settings.paddle_api_key)
+        self.configured = bool(settings.stripe_secret_key)
 
-    # Paddle's documented replay-protection guidance: reject events whose
-    # signed timestamp is too far from the current time. Without this, a
-    # captured (still correctly signed) old webhook can be replayed forever.
-    WEBHOOK_MAX_AGE_SECONDS = 5 * 24 * 60 * 60
-
-    def verify_webhook_signature(self, raw_body: bytes, signature_header: str) -> bool:
-        if not settings.paddle_webhook_secret:
-            raise WebhookVerificationError("No paddle_webhook_secret configured")
-        parts = dict(
-            item.split("=", 1) for item in signature_header.split(";") if "=" in item
-        )
-        ts = parts.get("ts")
-        h1 = parts.get("h1")
-        if ts is None or h1 is None:
-            raise WebhookVerificationError("Malformed signature header")
-
-        try:
-            ts_int = int(ts)
-        except ValueError:
-            raise WebhookVerificationError("Malformed signature timestamp") from None
-        if abs(time.time() - ts_int) > self.WEBHOOK_MAX_AGE_SECONDS:
-            raise WebhookVerificationError("Webhook timestamp outside the acceptable replay window")
-
-        try:
-            body_text = raw_body.decode("utf-8")
-        except UnicodeDecodeError as exc:
-            # A non-UTF-8 body can never be a real Paddle event; fail as a
-            # verification error (400) instead of an unhandled 500.
-            raise WebhookVerificationError("Webhook body is not valid UTF-8") from exc
-
-        signed_payload = f"{ts}:{body_text}"
-        expected = hmac.new(
-            settings.paddle_webhook_secret.encode("utf-8"),
-            signed_payload.encode("utf-8"),
-            hashlib.sha256,
-        ).hexdigest()
-        return hmac.compare_digest(expected, h1)
-
-    def create_checkout_url(self, price_id: str) -> str:
+    def create_checkout_url(
+        self, price_id: str, *, metadata: dict[str, str],
+        success_url: str | None = None, customer_email: str | None = None,
+    ) -> str:
         if not self.configured:
-            raise RuntimeError(
-                "Paddle is not configured (no sandbox account yet -- "
-                "docs/HUMAN_COMMERCIAL_REQUIREMENTS.md). Cannot create a real checkout."
-            )
-        # Paddle Billing's Transactions API: creating a transaction with
-        # collection_mode=automatic and no existing payment returns a
-        # checkout.url the client can redirect to -- this is the real
-        # server-prepared-checkout shape, not a mocked URL. The transaction is
-        # intentionally a draft with no customer object: Paddle Checkout
-        # captures customer/address details and the completed webhook carries
-        # the resulting customer_id. See
-        # https://developer.paddle.com/api-reference/transactions/create-transaction
-        # (verify the exact response shape against current docs before
-        # relying on this in a real sandbox test -- untested against a live
-        # account as of writing, no account exists yet).
+            raise RuntimeError("Stripe is not configured")
+        public_url = settings.nite_dsp_public_url.rstrip("/")
+        data = {
+            "mode": "payment",
+            "line_items[0][price]": price_id,
+            "line_items[0][quantity]": "1",
+            "success_url": success_url or f"{public_url}/account?purchase=pending",
+            "cancel_url": f"{public_url}/pricing",
+        }
+        data.update({f"metadata[{key}]": value for key, value in metadata.items()})
+        if customer_email:
+            data["customer_email"] = customer_email
         try:
             response = httpx.post(
-                f"{settings.paddle_api_base_url}/transactions",
-                headers={
-                    "Authorization": f"Bearer {settings.paddle_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "items": [{"price_id": price_id, "quantity": 1}],
-                    "collection_mode": "automatic",
-                },
-                timeout=15.0,
+                "https://api.stripe.com/v1/checkout/sessions",
+                headers={"Authorization": f"Bearer {settings.stripe_secret_key}"},
+                data=data,
+                timeout=20,
             )
             response.raise_for_status()
-        except httpx.HTTPError as exc:
-            logger.error("Paddle checkout creation failed: %s", exc)
-            raise RuntimeError("Could not create Paddle checkout") from exc
-
-        data = response.json()
-        checkout_url = data.get("data", {}).get("checkout", {}).get("url")
-        if not checkout_url:
-            raise RuntimeError("Paddle response did not include a checkout URL")
+            checkout_url = response.json().get("url")
+        except (httpx.HTTPError, ValueError) as exc:
+            raise RuntimeError("Could not create Stripe checkout") from exc
+        if not isinstance(checkout_url, str):
+            raise RuntimeError("Stripe response did not include a checkout URL")
+        parsed = urlparse(checkout_url)
+        if parsed.scheme != "https" or parsed.hostname != "checkout.stripe.com":
+            raise RuntimeError("Stripe response contained an invalid checkout URL")
         return checkout_url
 
 
 def get_provider() -> CommerceProvider:
-    return PaddleProvider()
-
-
-def _price_to_product() -> dict[str, str]:
-    """Fail-closed catalog mapping (docs/PADDLE_INTEGRATION_AUDIT.md Section
-    12): built fresh from settings each call rather than cached at import
-    time, so tests can override config per-case. Empty entries are dropped,
-    not mapped to "" -- an unconfigured price_id must never match anything."""
-    mapping: dict[str, str] = {}
-    if settings.paddle_intro_price_id and settings.paddle_product_id:
-        mapping[settings.paddle_intro_price_id] = settings.paddle_product_id
-    if settings.paddle_regular_price_id and settings.paddle_product_id:
-        mapping[settings.paddle_regular_price_id] = settings.paddle_product_id
-    return mapping
-
-
-def _generate_license_key() -> str:
-    import secrets
-
-    return "-".join(secrets.token_hex(4).upper() for _ in range(4))
-
-
-def _fetch_customer_email(customer_id: str) -> str:
-    """A real Paddle Billing transaction.completed event carries only
-    `customer_id` (a reference) on `data`, never an embedded customer
-    object -- confirmed against a real sandbox event (KeyError: 'customer'
-    was the first real webhook to hit this code, 2026-08-14). The email has
-    to be looked up via the Customers API instead."""
-    try:
-        response = httpx.get(
-            f"{settings.paddle_api_base_url}/customers/{customer_id}",
-            headers={"Authorization": f"Bearer {settings.paddle_api_key}"},
-            timeout=15.0,
-        )
-        response.raise_for_status()
-    except httpx.HTTPError as exc:
-        logger.error("Paddle customer lookup failed for customer_id=%s: %s", customer_id, exc)
-        raise RuntimeError("Could not resolve Paddle customer email") from exc
-    return response.json()["data"]["email"]
-
-
-def _handle_transaction_completed(db: Session, payload: dict) -> None:
-    """Real Paddle Billing transaction.completed shape:
-    {data: {customer_id, items: [{price: {product_id, id}}], id}}. Also
-    accepts an embedded {customer: {email}} for tests that simulate a
-    payload directly, without a real customer_id to look up."""
-    data = payload["data"]
-    if isinstance(data.get("customer"), dict) and "email" in data["customer"]:
-        email = data["customer"]["email"]
-    else:
-        email = _fetch_customer_email(data["customer_id"])
-    provider_order_id = data["id"]
-    amount_cents = int(data.get("details", {}).get("totals", {}).get("total", "0"))
-    currency = data.get("currency_code", "GBP")
-    price = data["items"][0]["price"]
-    paddle_product_id = price["product_id"]
-    price_id = price.get("id")
-
-    # products.id is our own internal slug (e.g. "smart-sample-manager"),
-    # never Paddle's product_id -- resolve via the paddle_product_id column,
-    # not by treating Paddle's id as our primary key (see models.py's
-    # comment on Product.id: a real webhook's raw product_id can never
-    # match our slug directly).
-    product = db.query(models.Product).filter(models.Product.paddle_product_id == paddle_product_id).one_or_none()
-    if product is None or not product.purchasable:
-        raise UnknownCatalogItemError(f"Unknown or non-purchasable paddle_product_id {paddle_product_id!r}")
-
-    # price_id is only present once real Paddle price IDs exist in the
-    # payload; a configured mapping (paddle_intro/regular_price_id set)
-    # makes checking it mandatory, so a real event with an unrecognised
-    # price can never slip through once the catalog is actually wired up.
-    mapping = _price_to_product()
-    if price_id is not None and mapping:
-        if mapping.get(price_id) != paddle_product_id:
-            raise UnknownCatalogItemError(
-                f"price_id {price_id!r} does not map to paddle_product_id {paddle_product_id!r}"
-            )
-
-    user = db.query(models.User).filter(models.User.email == email).one_or_none()
-    if user is None:
-        user = models.User(email=email, email_verified_at=datetime.now(timezone.utc))
-        db.add(user)
-        db.flush()
-
-    purchase = models.Purchase(
-        user_id=user.id,
-        product_id=product.id,
-        price_id=price_id,
-        provider="paddle",
-        provider_order_id=provider_order_id,
-        amount_cents=amount_cents,
-        currency=currency,
-        status="completed",
-    )
-    db.add(purchase)
-    db.flush()
-
-    license_key = _generate_license_key()
-    entitlement = models.Entitlement(
-        user_id=user.id,
-        product_id=product.id,
-        purchase_id=purchase.id,
-        license_key=license_key,
-        license_type="perpetual",
-        max_activations=settings.default_max_activations,
-        status="active",
-    )
-    db.add(entitlement)
-
-    amount_display = f"{currency} {amount_cents / 100:.2f}"
-    subject, body = email_templates.purchase_confirmation(product.name, amount_display, license_key)
-    send_email(to=email, subject=subject, body=body)
-
-
-def _handle_adjustment_event(db: Session, payload: dict) -> None:
-    """Paddle Billing's real refund/chargeback lifecycle -- handles both
-    adjustment.created and adjustment.updated with the same logic.
-    Simulated-payload shape (verify against a real sandbox event once
-    reachable): {data: {action: "refund"|"chargeback"|"credit",
-    status: "pending_approval"|"approved"|"rejected"|"reversed",
-    transaction_id: str}}.
-
-    Only status=="approved" is authoritative -- created always arrives
-    pending_approval; approval (sandbox: automatic after ~10 min; live:
-    manual for high-value refunds) arrives later as a separate
-    adjustment.updated delivery. A "rejected" adjustment must never mark
-    the purchase refunded.
-
-    Idempotent and order-tolerant by construction: only acts when the
-    purchase isn't already refunded/disputed, so a duplicate approved
-    delivery, or a stale pending/rejected delivery arriving after an
-    approved one, is always a no-op rather than needing separate
-    duplicate/ordering logic.
-
-    Deliberately does NOT touch the Entitlement -- see this module's
-    docstring. Records the refund on Purchase only, so an admin can see it
-    via GET /admin/purchases/search and act via the existing manual revoke
-    endpoint. If no matching Purchase exists locally, this is logged and
-    left alone rather than raised as an error: Paddle is the source of
-    truth for the adjustment either way, and there is nothing local to
-    update."""
-    data = payload["data"]
-    action = data.get("action")
-    if action not in ("refund", "chargeback"):
-        return  # credits/other adjustment types: no local purchase-status change
-
-    if data.get("status") != "approved":
-        return  # not yet authoritative -- wait for the approving adjustment.updated
-
-    transaction_id = data.get("transaction_id")
-    purchase = (
-        db.query(models.Purchase)
-        .filter(models.Purchase.provider == "paddle", models.Purchase.provider_order_id == transaction_id)
-        .one_or_none()
-    )
-    if purchase is None:
-        logger.warning("approved adjustment (%s) for unknown transaction_id=%r", action, transaction_id)
-        return
-
-    if purchase.status in ("refunded", "disputed"):
-        return  # already recorded -- duplicate/out-of-order delivery
-
-    purchase.status = "refunded" if action == "refund" else "disputed"
-    purchase.refunded_at = datetime.now(timezone.utc)
-
-
-@router.post("/paddle")
-async def paddle_webhook(
-    request: Request,
-    db: Session = Depends(get_db),
-    provider: CommerceProvider = Depends(get_provider),
-) -> dict:
-    raw_body = await request.body()
-    signature_header = request.headers.get("Paddle-Signature", "")
-
-    try:
-        valid = provider.verify_webhook_signature(raw_body, signature_header)
-    except WebhookVerificationError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    if not valid:
-        raise HTTPException(status_code=401, detail="Invalid webhook signature")
-
-    import json
-
-    payload = json.loads(raw_body)
-    event_type = payload.get("event_type", "unknown")
-    provider_event_id = payload.get("event_id")
-    if not provider_event_id:
-        raise HTTPException(status_code=400, detail="Missing event_id")
-
-    # Phase 5.5, Section 50-51: a SELECT-then-INSERT idempotency check has
-    # the same race as licensing.py's activation-limit bug -- two
-    # concurrent deliveries of the *same* event_id can both pass the "not
-    # yet seen" check before either commits. Claim the event_id via the
-    # database's own UNIQUE (provider, provider_event_id) constraint
-    # instead: insert-and-commit immediately, and let a concurrent loser
-    # fail on the constraint rather than on racing app-level logic.
-    # Verified under real concurrency in tests/test_concurrency.py.
-    event = models.WebhookEvent(
-        provider="paddle",
-        event_type=event_type,
-        provider_event_id=provider_event_id,
-        payload_json=payload,
-        received_at=datetime.now(timezone.utc),
-    )
-    db.add(event)
-    try:
-        db.commit()
-    except IntegrityError:
-        # A row already exists for this event_id -- but that alone doesn't
-        # mean it was ever *successfully* processed. It could be a
-        # genuinely concurrent in-flight duplicate (the SELECT ... FOR
-        # UPDATE below blocks until that request finishes and commits), or
-        # it could be a previous delivery that raised and was never
-        # retried: Paddle marks a notification "delivered" on any 2xx --
-        # including the already_processed short-circuit that used to live
-        # here unconditionally -- so treating "row exists" as "handled"
-        # permanently loses the event once Paddle's own retry budget is
-        # exhausted. Real incident: a KeyError on the very first live
-        # transaction.completed webhook (2026-08-14, txn_01kzzqmywn6h2waqzycw10f0me)
-        # was retried automatically by Paddle, got treated as
-        # already_processed on the retry, and the Purchase/Entitlement
-        # were never created despite Paddle showing "delivered".
-        db.rollback()
-        event = (
-            db.query(models.WebhookEvent)
-            .filter(
-                models.WebhookEvent.provider == "paddle",
-                models.WebhookEvent.provider_event_id == provider_event_id,
-            )
-            .with_for_update()
-            .populate_existing()
-            .one()
-        )
-        if event.processed_at is not None:
-            return {"status": "already_processed"}
-        # Fall through and (re)attempt processing below using the existing
-        # row -- we're still holding its row lock, so any other concurrent
-        # duplicate blocks on the same SELECT until we commit.
-    else:
-        # We won the claim. Re-select with a row lock so a concurrent
-        # duplicate delivery (which will hit IntegrityError above) blocks
-        # on that SELECT until we finish, instead of racing us into
-        # _handle_transaction_completed. Winning the INSERT does NOT
-        # guarantee we're first to actually process: a concurrent loser can
-        # still acquire this row's FOR UPDATE lock before we do (lock
-        # acquisition order is independent of insert order), process the
-        # event itself, and release -- so this check is required here too,
-        # not just in the IntegrityError branch above. populate_existing()
-        # is required, not optional: without it, this query can return the
-        # identity-mapped `event` object from our own INSERT above without
-        # actually refreshing processed_at from the row we just locked,
-        # even under expire_on_commit -- confirmed by direct reproduction
-        # (10-20% of concurrent-delivery trials double-processed without
-        # this call; 0/600 with it).
-        event = (
-            db.query(models.WebhookEvent)
-            .filter(models.WebhookEvent.id == event.id)
-            .with_for_update()
-            .populate_existing()
-            .one()
-        )
-        if event.processed_at is not None:
-            return {"status": "already_processed"}
-
-    try:
-        if event_type == "transaction.completed":
-            try:
-                from . import paraphrase_orders as _paraphrase_orders
-
-                if _paraphrase_orders.handle_transaction_completed(db, payload):
-                    db.commit()
-                    event.processed_at = datetime.now(timezone.utc)
-                    event.processing_error = None
-                    db.commit()
-                    return {"status": "processed"}
-            except ImportError:
-                pass
-            _handle_transaction_completed(db, payload)
-        elif event_type in ("adjustment.created", "adjustment.updated"):
-            _handle_adjustment_event(db, payload)
-        event.processed_at = datetime.now(timezone.utc)
-        event.processing_error = None  # clear a stale error from a prior failed attempt on retry
-    except UnknownCatalogItemError as exc:
-        # Fail safely without issuing an entitlement, but don't ask Paddle
-        # to keep retrying an event that will never map to anything real --
-        # that's a permanent rejection, not a transient failure.
-        event.processing_error = str(exc)
-        db.commit()
-        return {"status": "rejected_unknown_catalog_item"}
-    except Exception as exc:  # noqa: BLE001 -- persist the error, don't lose the event
-        # Full detail persisted server-side (admin/webhooks/failed) for real
-        # debugging -- never returned in the HTTP response itself, which
-        # only needs to tell the caller (Paddle) to retry. Section 103:
-        # exception text, SQL errors, and stack details never reach an
-        # external caller.
-        event.processing_error = str(exc)
-        db.commit()
-        raise HTTPException(status_code=500, detail="Webhook processing failed") from exc
-
-    db.commit()
-    return {"status": "processed"}
+    return StripeProvider()
 
 
 class CheckoutRequest(BaseModel):
-    # Logical name, not a raw price ID -- callers ask for "intro" or
-    # "regular" and the server resolves it from settings.paddle_active_price_id
-    # / the specific price fields, never accepting an arbitrary price_id from
-    # the client (that would let a caller checkout against any price at all).
+    # Clients select a tier; only the server can supply chargeable price IDs.
     price: str = "active"
 
 
@@ -489,25 +82,27 @@ def create_checkout(
     req: CheckoutRequest,
     user: models.User = Depends(get_current_user),
     provider: CommerceProvider = Depends(get_provider),
+    db: Session = Depends(get_db),
 ) -> dict:
-    if not settings.paddle_checkout_enabled:
+    if not settings.stripe_checkout_enabled or not provider.configured:
         raise HTTPException(status_code=503, detail="Checkout is not available yet")
-    if not provider.configured:
-        raise HTTPException(status_code=503, detail="Checkout is not available yet")
-
-    price_map = {
-        "active": settings.paddle_active_price_id,
-        "intro": settings.paddle_intro_price_id,
-        "regular": settings.paddle_regular_price_id,
-    }
-    price_id = price_map.get(req.price)
-    if not price_id:
+    price_id = {
+        "active": settings.stripe_active_price_id,
+        "intro": settings.stripe_intro_price_id,
+        "regular": settings.stripe_regular_price_id,
+    }.get(req.price)
+    if not price_id or not settings.stripe_product_id:
         raise HTTPException(status_code=400, detail="Unknown or unconfigured price")
-
+    product = db.get(models.Product, settings.stripe_product_id)
+    if product is None or not product.purchasable:
+        raise HTTPException(status_code=503, detail="Checkout product is not available")
     try:
-        checkout_url = provider.create_checkout_url(price_id)
+        checkout_url = provider.create_checkout_url(
+            price_id,
+            metadata={"product_id": settings.stripe_product_id, "price_id": price_id},
+            customer_email=user.email,
+        )
     except RuntimeError as exc:
-        logger.error("Checkout creation failed for user=%s: %s", user.id, exc)
+        logger.error("Checkout creation failed for user=%s", user.id)
         raise HTTPException(status_code=502, detail="Could not create checkout") from exc
-
     return {"checkout_url": checkout_url}

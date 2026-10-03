@@ -7,9 +7,9 @@ from app.config import settings
 from app.email import send_email
 
 
-def test_send_email_console(caplog):
-    settings.email_provider = "console"
-    settings.email_from_address = "noreply@nitedsp.co.uk"
+def test_send_email_console(monkeypatch, caplog):
+    monkeypatch.setattr(settings, "email_provider", "console")
+    monkeypatch.setattr(settings, "email_from_address", "noreply@nitedsp.co.uk")
 
     with caplog.at_level(logging.INFO):
         send_email("test@example.com", "Test Subject", "Test Body")
@@ -21,19 +21,19 @@ def test_send_email_console(caplog):
     assert "Test Body" not in caplog.text
 
 
-def test_send_email_resend_missing_key():
-    settings.email_provider = "resend"
-    settings.resend_api_key = ""
+def test_send_email_resend_missing_key(monkeypatch):
+    monkeypatch.setattr(settings, "email_provider", "resend")
+    monkeypatch.setattr(settings, "resend_api_key", "")
 
     with pytest.raises(ValueError, match="resend_api_key is empty"):
         send_email("test@example.com", "Subject", "Body")
 
 
 def test_send_email_resend_success(monkeypatch):
-    settings.email_provider = "resend"
-    settings.resend_api_key = "re_test_key"
-    settings.email_from_name = "NITE DSP"
-    settings.email_from_address = "auth@nitedsp.co.uk"
+    monkeypatch.setattr(settings, "email_provider", "resend")
+    monkeypatch.setattr(settings, "resend_api_key", "re_test_key")
+    monkeypatch.setattr(settings, "email_from_name", "NITE DSP")
+    monkeypatch.setattr(settings, "email_from_address", "auth@nitedsp.co.uk")
 
     calls = []
 
@@ -62,11 +62,11 @@ def test_send_email_resend_success(monkeypatch):
 
 
 def test_send_email_resend_reply_to_support_address(monkeypatch):
-    settings.email_provider = "resend"
-    settings.resend_api_key = "re_test_key"
-    settings.email_from_name = "NITE DSP"
-    settings.email_from_address = "auth@nitedsp.co.uk"
-    settings.nite_dsp_support_email = "nitedsp@outlook.com"
+    monkeypatch.setattr(settings, "email_provider", "resend")
+    monkeypatch.setattr(settings, "resend_api_key", "re_test_key")
+    monkeypatch.setattr(settings, "email_from_name", "NITE DSP")
+    monkeypatch.setattr(settings, "email_from_address", "auth@nitedsp.co.uk")
+    monkeypatch.setattr(settings, "nite_dsp_support_email", "nitedsp@outlook.com")
 
     calls = []
 

@@ -210,7 +210,6 @@ def list_products(db: Session = Depends(get_db), actor: str = Depends(require_ad
             "status": p.status,
             "public": p.public,
             "purchasable": p.purchasable,
-            "paddle_product_id": p.paddle_product_id,
             "platforms": p.platforms,
         }
         for p in products
@@ -226,7 +225,6 @@ class UpsertProductRequest(BaseModel):
     description: str | None = None
     current_version: str | None = None
     platforms: list[str] = []
-    paddle_product_id: str | None = None
 
 
 @router.put("/products/{product_id}")
@@ -255,11 +253,10 @@ def upsert_product(
     product.description = req.description
     product.current_version = req.current_version
     product.platforms = req.platforms
-    product.paddle_product_id = req.paddle_product_id
 
     _audit(db, actor, "product.created" if is_new else "product.updated", product_id)
     db.commit()
-    return {"id": product.id, "paddle_product_id": product.paddle_product_id}
+    return {"id": product.id}
 
 
 class UpsertReleaseRequest(BaseModel):
@@ -513,7 +510,7 @@ def failed_webhooks(db: Session = Depends(get_db), actor: str = Depends(require_
 def search_purchase(
     provider_order_id: str, db: Session = Depends(get_db), actor: str = Depends(require_admin)
 ) -> dict:
-    """Look up a purchase by Paddle transaction ID -- e.g. after a refund
+    """Look up a purchase by Stripe Checkout session ID -- e.g. after a refund
     webhook records purchase.status="refunded" (commerce.py's
     _handle_adjustment_created), an admin uses this to find the associated
     entitlement and decide whether to revoke it via the existing

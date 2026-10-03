@@ -63,9 +63,9 @@ document, don't recreate it, as work proceeds.
 
 - [x] commerce code complete and unit-tested against simulated payloads
 - [x] webhook idempotency concurrency-safe (Phase 5.5 fix, reconfirmed)
-- [ ] real Paddle sandbox validated -- BLOCKED EXTERNAL, no account (`docs/PADDLE_PRODUCTION.md`)
-- [ ] refund sandbox validated -- BLOCKED, chained on sandbox
-- [ ] live Paddle enabled -- explicitly NOT READY, see `docs/LIVE_COMMERCE_GO_NO_GO.md` (NO-GO)
+- [ ] real Stripe test checkout and webhook validated -- external validation pending ([Stripe commerce guide](../../../../docs/STRIPE_COMMERCE.md))
+- [ ] Stripe test refund validated -- pending test checkout validation
+- [ ] live Stripe enabled -- explicitly NOT READY, see `docs/LIVE_COMMERCE_GO_NO_GO.md` (NO-GO)
 
 ## PRICING & LEGAL
 

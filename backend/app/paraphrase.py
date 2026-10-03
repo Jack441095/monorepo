@@ -9,7 +9,7 @@ promise of the product.
 
 Free tier = `paraphrase_free_daily_limit` rewrites/day per client IP,
 reusing the in-process limiter from rate_limit.py. An unlock token
-(issued by the Phase 4 redemption path after a completed Paddle payment)
+(issued by the Phase 4 redemption path after a completed Stripe payment)
 skips the free-tier limit.
 
 Phase 4 adds two anonymous endpoints on the same router -- no sign-in
@@ -18,7 +18,7 @@ users/purchases/entitlements tables:
   POST /v1/paraphrase/checkout  -> { checkout_url }
   POST /v1/paraphrase/redemption -> { unlock_token, expires }
 
-The checkout endpoint creates a Paddle transaction with the browser's
+The checkout endpoint creates a Stripe transaction with the browser's
 own random `hint` in custom_data + a success_url so the browser can
 return, poll redemption, and receive a signed session token without ever
 touching its email address.
@@ -146,20 +146,20 @@ async def paraphrase_checkout(
     body: ParaphraseCheckoutRequest,
     _: None = Depends(_gate),
 ) -> dict:
-    """Create an anonymous Paddle checkout for the chosen tier.
+    """Create an anonymous Stripe checkout for the chosen tier.
 
     No authentication. Returns a checkout_url the browser must navigate
-    to. Paddle redirects back to /paraphrase?paraphrase_hint=HINT so
+    to. Stripe redirects back to /paraphrase?paraphrase_hint=HINT so
     the client can poll redemption afterwards.
 
     Fails loudly:
-      - 503 when paddle_checkout_enabled is False or provider is not
+      - 503 when stripe_checkout_enabled is False or provider is not
         configured (estate norm: gate must be explicit).
       - 400 when the tier is unknown or unconfigured.
     """
     from .commerce import get_provider
 
-    if not settings.paddle_checkout_enabled:
+    if not settings.stripe_checkout_enabled:
         raise HTTPException(status_code=503, detail="Checkout is not available yet")
     provider = get_provider()
     if not provider.configured:
@@ -181,7 +181,7 @@ async def paraphrase_redemption(
 ) -> dict:
     """Exchange a completed payment's hint for a signed session-unlock token.
 
-    No authentication. The Paddle redirect back to the page includes the
+    No authentication. The Stripe redirect back to the page includes the
     hint in the URL; the client polls this endpoint until it returns 200
     or a 30-second timeout expires.  Idempotent: redeeming the same hint
     twice returns a fresh token (the server tracks redeemed_at for audit

@@ -38,11 +38,9 @@ Triggers: every push to `main` → mirrors to `Jack441095/monorepo`
 - `Nite-DSP` — internal products
 - `Client-Work` — client projects
 
-## Paddle / Commerce
+## Stripe commerce
 
-- `CHECKOUT_LIVE=false` — all buy buttons fall back to Beta Request mode
-- No Paddle env vars set in Vercel yet
-- When ready to sell: build `app/api/commerce/checkout/route.ts`
+Stripe is the only active provider. Checkout settings, webhook events, and migration instructions are in [docs/STRIPE_COMMERCE.md](docs/STRIPE_COMMERCE.md). Public SLO and Submit payment links use Stripe; the authenticated checkout endpoint is `/commerce/checkout`.
 
 ## Submodule URLs
 

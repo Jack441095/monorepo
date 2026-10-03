@@ -105,7 +105,6 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(licensing.router)
-app.include_router(commerce.router)
 app.include_router(commerce.checkout_router)
 app.include_router(stripe_commerce.router)
 app.include_router(downloads.router)
@@ -165,7 +164,7 @@ def ready(response: Response) -> dict:
         "email_provider": settings.email_provider,
         "email_provider_configured": email_provider_configured,
         "email_deliverable": email_deliverable,
-        "checkout_enabled": settings.paddle_checkout_enabled,
+        "checkout_enabled": settings.stripe_checkout_enabled,
         "legal_review_approved": settings.legal_review_approved,
         "release_ready": settings.release_ready,
         "commercial_gates_ready": commercial_gates_ready,

@@ -4,13 +4,13 @@ from app.config import Settings, _validate_production_config, _validate_staging_
 def _staging_settings(**overrides):
     values = {
         "environment": "staging",
-        "paddle_api_key": "pdl_sdbx_apikey_test",
-        "paddle_webhook_secret": "sandbox-webhook-secret",
-        "paddle_api_base_url": "https://sandbox-api.paddle.com",
-        "paddle_product_id": "pro_submit_sandbox",
-        "paddle_intro_price_id": "pri_submit_intro_sandbox",
-        "paddle_regular_price_id": "pri_submit_regular_sandbox",
-        "paddle_active_price_id": "pri_submit_regular_sandbox",
+        "stripe_checkout_enabled": True,
+        "stripe_secret_key": "sk_test_example",
+        "stripe_webhook_secret": "sandbox-webhook-secret",
+        "stripe_product_id": "nite-submit",
+        "stripe_intro_price_id": "price_submit_intro_sandbox",
+        "stripe_regular_price_id": "price_submit_regular_sandbox",
+        "stripe_active_price_id": "price_submit_regular_sandbox",
         "nite_dsp_public_url": "https://staging.nite.example",
         "nite_dsp_api_url": "https://api-staging.nite.example",
         "nite_dsp_support_email": "support@nite.example",
@@ -23,36 +23,36 @@ def test_staging_configuration_accepts_sandbox_checkout_values():
     _validate_staging_config(_staging_settings())
 
 
-def test_staging_configuration_rejects_live_paddle_endpoint():
-    settings = _staging_settings(paddle_api_base_url="https://api.paddle.com")
+def test_staging_configuration_requires_webhook_secret():
+    settings = _staging_settings(stripe_webhook_secret="")
+    try:
+        _validate_staging_config(settings)
+    except RuntimeError as exc:
+        assert "stripe_webhook_secret" in str(exc)
+    else:
+        raise AssertionError("staging accepted an empty webhook signing secret")
+
+
+
+def test_staging_configuration_rejects_live_stripe_key():
+    settings = _staging_settings(stripe_secret_key="sk_live_example")
 
     try:
         _validate_staging_config(settings)
     except RuntimeError as exc:
-        assert "sandbox-api.paddle.com" in str(exc)
+        assert "stripe_secret_key must be a Stripe test key" in str(exc)
     else:
-        raise AssertionError("live Paddle endpoint was accepted for staging")
-
-
-def test_staging_configuration_rejects_live_paddle_key():
-    settings = _staging_settings(paddle_api_key="pdl_live_apikey_test")
-
-    try:
-        _validate_staging_config(settings)
-    except RuntimeError as exc:
-        assert "paddle_api_key must be a Paddle Sandbox API key" in str(exc)
-    else:
-        raise AssertionError("staging accepted a live Paddle API key")
+        raise AssertionError("staging accepted a live Stripe API key")
 
 
 def test_staging_configuration_rejects_missing_catalog_or_https_values():
-    settings = _staging_settings(paddle_product_id="", nite_dsp_public_url="http://localhost:3000")
+    settings = _staging_settings(stripe_product_id="", nite_dsp_public_url="http://localhost:3000")
 
     try:
         _validate_staging_config(settings)
     except RuntimeError as exc:
         message = str(exc)
-        assert "paddle_product_id" in message
+        assert "stripe_product_id" in message
         assert "nite_dsp_public_url" in message
     else:
         raise AssertionError("incomplete staging configuration was accepted")
@@ -184,12 +184,11 @@ def test_production_configuration_rejects_local_release_storage():
         licensing_private_key_base64="production-key",
         database_url="postgresql+psycopg2://db.example/nitedsp",
         email_from_address="noreply@nite.example",
-        paddle_api_base_url="https://api.paddle.com",
-        paddle_api_key="live-api-key",
-        paddle_webhook_secret="live-webhook-secret",
-        paddle_product_id="pro_submit_live",
-        paddle_regular_price_id="pri_submit_live",
-        paddle_active_price_id="pri_submit_live",
+        stripe_secret_key="sk_live_example",
+        stripe_webhook_secret="live-webhook-secret",
+        stripe_checkout_enabled=True,
+        stripe_regular_price_id="price_submit_live",
+        stripe_active_price_id="price_submit_live",
         storage_backend="local",
     )
 
@@ -214,18 +213,16 @@ def test_production_configuration_accepts_complete_s3_release_storage():
         email_from_address="noreply@nite.example",
         email_provider="resend",
         resend_api_key="resend-production-key",
-        paddle_api_base_url="https://api.paddle.com",
-        paddle_api_key="live-api-key",
-        paddle_webhook_secret="live-webhook-secret",
-        paddle_product_id="pro_submit_live",
-        paddle_regular_price_id="pri_submit_live",
-        paddle_active_price_id="pri_submit_live",
+        stripe_secret_key="sk_live_example",
+        stripe_webhook_secret="live-webhook-secret",
+        stripe_checkout_enabled=True,
+        stripe_regular_price_id="price_submit_live",
+        stripe_active_price_id="price_submit_live",
         storage_backend="s3",
         storage_bucket="nitedsp-releases",
         storage_endpoint="https://account.r2.cloudflarestorage.com",
         storage_access_key_id="access-key",
         storage_secret_access_key="secret-key",
-        paddle_checkout_enabled=True,
         legal_review_approved=True,
         release_ready=True,
     )
@@ -234,7 +231,7 @@ def test_production_configuration_accepts_complete_s3_release_storage():
 
 
 def test_production_checkout_requires_legal_and_release_gates():
-    settings = Settings(environment="production", paddle_checkout_enabled=True)
+    settings = Settings(environment="production", stripe_checkout_enabled=True)
 
     try:
         _validate_production_config(settings)
@@ -246,7 +243,7 @@ def test_production_checkout_requires_legal_and_release_gates():
         raise AssertionError("production checkout accepted missing commercial gates")
 
 
-def test_production_configuration_rejects_sandbox_paddle():
+def test_production_configuration_rejects_sandbox_stripe():
     settings = Settings(
         environment="production",
         nite_dsp_public_url="https://www.nite.example",
@@ -259,11 +256,10 @@ def test_production_configuration_rejects_sandbox_paddle():
         email_from_address="noreply@nite.example",
         email_provider="resend",
         resend_api_key="resend-production-key",
-        paddle_api_key="sandbox-api-key",
-        paddle_webhook_secret="sandbox-webhook-secret",
-        paddle_product_id="pro_submit_sandbox",
-        paddle_regular_price_id="pri_submit_sandbox",
-        paddle_active_price_id="pri_submit_sandbox",
+        stripe_secret_key="sk_test_example",
+        stripe_webhook_secret="sandbox-webhook-secret",
+        stripe_regular_price_id="price_submit_sandbox",
+        stripe_active_price_id="price_submit_sandbox",
         storage_backend="s3",
         storage_bucket="nitedsp-releases",
         storage_endpoint="https://account.r2.cloudflarestorage.com",
@@ -274,9 +270,9 @@ def test_production_configuration_rejects_sandbox_paddle():
     try:
         _validate_production_config(settings)
     except RuntimeError as exc:
-        assert "paddle_api_base_url must use api.paddle.com" in str(exc)
+        assert "stripe_secret_key must be a live Stripe key" in str(exc)
     else:
-        raise AssertionError("production accepted the sandbox Paddle endpoint")
+        raise AssertionError("production accepted the sandbox Stripe endpoint")
 
 
 def test_production_configuration_rejects_console_email():
@@ -318,12 +314,11 @@ def test_production_configuration_rejects_unusable_resend_sender():
         email_provider="resend",
         email_from_address="noreply@localhost",
         resend_api_key="resend-production-key",
-        paddle_api_base_url="https://api.paddle.com",
-        paddle_api_key="live-api-key",
-        paddle_webhook_secret="live-webhook-secret",
-        paddle_product_id="pro_submit_live",
-        paddle_regular_price_id="pri_submit_live",
-        paddle_active_price_id="pri_submit_live",
+        stripe_secret_key="sk_live_example",
+        stripe_webhook_secret="live-webhook-secret",
+        stripe_checkout_enabled=True,
+        stripe_regular_price_id="price_submit_live",
+        stripe_active_price_id="price_submit_live",
         storage_backend="s3",
         storage_bucket="nitedsp-releases",
         storage_endpoint="https://account.r2.cloudflarestorage.com",

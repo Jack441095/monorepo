@@ -50,8 +50,8 @@ if (!apiUrl) {
 }
 
 if (process.env.NEXT_PUBLIC_CHECKOUT_LIVE === "1") {
-  if (process.env.NEXT_PUBLIC_PADDLE_ENV !== "production") {
-    problems.push("NEXT_PUBLIC_CHECKOUT_LIVE=1 requires NEXT_PUBLIC_PADDLE_ENV=production");
+  if (process.env.NEXT_PUBLIC_STRIPE_MODE !== "live") {
+    problems.push("NEXT_PUBLIC_CHECKOUT_LIVE=1 requires NEXT_PUBLIC_STRIPE_MODE=live");
   }
   if (process.env.NEXT_PUBLIC_LEGAL_REVIEW_APPROVED !== "1") {
     problems.push("live checkout requires NEXT_PUBLIC_LEGAL_REVIEW_APPROVED=1");

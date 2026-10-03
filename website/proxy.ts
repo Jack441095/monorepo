@@ -10,7 +10,7 @@ import type { NextRequest } from "next/server";
 // shared password, checked here at the edge before the route ever renders.
 //
 // Fails CLOSED by design, matching this codebase's existing security
-// posture elsewhere (Paddle webhook verification, licensing signing key) —
+// posture elsewhere (Stripe webhook verification, licensing signing key) —
 // if PORTFOLIO_PASSWORD isn't configured in the environment, /portfolio is
 // blocked entirely rather than left open. Set it in Railway's website
 // service variables (not committed anywhere) to unlock the page.

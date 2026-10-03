@@ -1,3 +1,5 @@
+> Historical report: Paddle was the provider at the time. Current checkout and validation instructions are in the [Stripe commerce guide](../../../../docs/STRIPE_COMMERCE.md).
+
 # Public Launch Final Synthesis — Phase 6
 
 Master Public Launch Execution Program. Closing report.
@@ -34,7 +36,7 @@ timestamp comparison (build-release artifacts newer than all source files, not s
    layout treatment instead of a fake UI mockup presented as a real screenshot. Flagged as an
    open asset need in `docs/PUBLIC_LAUNCH_CHECKLIST.md`, not silently worked around.
 4. **The full launch documentation set** (Section 106): `docs/PUBLIC_LAUNCH_MASTER_PLAN.md`,
-   `docs/MACOS_RELEASE_PIPELINE.md`, `docs/PRODUCTION_EMAIL.md`, `docs/PADDLE_PRODUCTION.md`,
+   `docs/MACOS_RELEASE_PIPELINE.md`, `docs/PRODUCTION_EMAIL.md`, [current Stripe commerce guide](../../../../docs/STRIPE_COMMERCE.md),
    `docs/PRIVATE_BETA_RESULTS.md`, `docs/PUBLIC_TRIAL_VALIDATION.md`,
    `docs/RELEASE_CANDIDATE_VALIDATION.md`, `docs/LIVE_COMMERCE_GO_NO_GO.md`,
    `docs/PUBLIC_LAUNCH_CHECKLIST.md`, plus updates to `docs/HUMAN_COMMERCIAL_REQUIREMENTS.md`,
@@ -73,7 +75,7 @@ fix) doesn't represent new backend/plugin engineering territory.
 3. Enroll in the Apple Developer Program; once available, run the existing signing pipeline
    (`docs/MACOS_RELEASE_PIPELINE.md`).
 4. Arrange a genuinely clean Mac (`docs/CLEAN_MACHINE_TEST_PROCEDURE.md`).
-5. Create a Paddle account, starting with sandbox (`docs/PADDLE_PRODUCTION.md`).
+5. Create a Paddle account, starting with sandbox ([current Stripe commerce guide](../../../../docs/STRIPE_COMMERCE.md)).
 6. Select and configure a transactional email provider (`docs/PRODUCTION_EMAIL.md`).
 7. Approve final launch pricing (`docs/HUMAN_COMMERCIAL_REQUIREMENTS.md`'s new item).
 8. Commission professional legal review of all four legal documents.

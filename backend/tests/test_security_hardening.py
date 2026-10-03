@@ -2,7 +2,7 @@
 Regression tests for the Tier-0 security hardening batch (R1):
 
 - possession proof on /v1/deactivate (licensing.py)
-- Paddle webhook timestamp freshness + non-UTF-8 body handling (commerce.py)
+- Stripe webhook timestamp freshness + non-UTF-8 body handling (commerce.py)
 - lazy signing-key load (D-3)
 - rate limiter per-client keying behind proxies + bounded memory (D-5)
 """
@@ -17,12 +17,12 @@ import pytest
 from fastapi import HTTPException
 
 
-def _sign_paddle_payload(payload: dict, secret: str, ts: int | None = None) -> tuple[bytes, str]:
+def _sign_stripe_payload(payload: dict, secret: str, ts: int | None = None) -> tuple[bytes, str]:
     raw_body = json.dumps(payload).encode("utf-8")
     ts = str(int(time.time())) if ts is None else str(ts)
-    signed_payload = f"{ts}:{raw_body.decode('utf-8')}"
+    signed_payload = f"{ts}.{raw_body.decode('utf-8')}"
     h1 = hmac.new(secret.encode(), signed_payload.encode(), hashlib.sha256).hexdigest()
-    return raw_body, f"ts={ts};h1={h1}"
+    return raw_body, f"t={ts},v1={h1}"
 
 
 def _seed_entitlement_and_activation(db_session, license_key: str, device_id: str = "DEV-SEC-1"):
@@ -36,7 +36,6 @@ def _seed_entitlement_and_activation(db_session, license_key: str, device_id: st
             public=True,
             purchasable=True,
             platforms=["macos"],
-            paddle_product_id="security-hardening-test",
         )
     )
     user = models.User(email="sec-hardening@example.com")
@@ -128,20 +127,28 @@ def test_deactivate_with_valid_possession_proof_succeeds(client, db_session):
     assert validate.status_code == 403
 
 
-# --- Paddle webhook hardening ------------------------------------------------
+# --- Stripe webhook hardening ------------------------------------------------
 
 
 def _completed_payload() -> dict:
     return {
-        "event_id": "evt_sec_001",
-        "event_type": "transaction.completed",
+        "id": "evt_sec_001",
+        "type": "checkout.session.completed",
         "data": {
-            "id": "txn_sec_001",
-            "customer": {"email": "sec-webhook@example.com"},
-            "currency_code": "GBP",
-            "details": {"totals": {"total": "5900"}},
-            "items": [{"price": {"product_id": "security-hardening-test"}}],
-        },
+            "object": {
+                "id": "txn_sec_001",
+                "payment_status": "paid",
+                "payment_intent": "pi_txn_sec_001",
+                "customer_details": {
+                    "email": "sec-webhook@example.com"
+                },
+                "amount_total": 5900,
+                "currency": "gbp",
+                "metadata": {
+                    "product_id": "security-hardening-test"
+                }
+            }
+        }
     }
 
 
@@ -149,30 +156,30 @@ def test_webhook_rejects_stale_timestamp(client, db_session):
     from test_e2e import _seed_product
 
     _seed_product(db_session)
-    raw_body, _ = _sign_paddle_payload(_completed_payload(), "test-webhook-secret")
+    raw_body, _ = _sign_stripe_payload(_completed_payload(), "test-webhook-secret")
     # Re-sign the identical body with a timestamp 10 days in the past: the
     # signature is valid, but the replay window must reject it.
     stale_ts = int(time.time()) - 10 * 24 * 60 * 60
-    signed_payload = f"{stale_ts}:{raw_body.decode('utf-8')}"
+    signed_payload = f"{stale_ts}.{raw_body.decode('utf-8')}"
     h1 = hmac.new(b"test-webhook-secret", signed_payload.encode(), hashlib.sha256).hexdigest()
     resp = client.post(
-        "/webhooks/paddle",
+        "/webhooks/stripe",
         content=raw_body,
-        headers={"Paddle-Signature": f"ts={stale_ts};h1={h1}"},
+        headers={"Stripe-Signature": f"t={stale_ts},v1={h1}"},
     )
     assert resp.status_code == 400
-    assert "replay" in resp.json()["detail"].lower()
+    assert "timestamp" in resp.json()["detail"].lower()
 
 
 def test_webhook_rejects_non_utf8_body(client):
     bad_body = b"\xff\xfe\x00garbage"
     ts = str(int(time.time()))
-    signed_payload = f"{ts}:{bad_body.decode('latin-1')}"
+    signed_payload = f"{ts}.{bad_body.decode('latin-1')}"
     h1 = hmac.new(b"test-webhook-secret", signed_payload.encode(), hashlib.sha256).hexdigest()
     resp = client.post(
-        "/webhooks/paddle",
+        "/webhooks/stripe",
         content=bad_body,
-        headers={"Paddle-Signature": f"ts={ts};h1={h1}"},
+        headers={"Stripe-Signature": f"t={ts},v1={h1}"},
     )
     assert resp.status_code == 400  # was an unhandled 500 before the fix
 

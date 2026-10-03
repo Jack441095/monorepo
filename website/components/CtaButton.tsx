@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Magnetic } from "@/components/motion/Magnetic";
-import { CHECKOUT_LIVE, PADDLE_ENV } from "@/lib/commerce-config";
+import { CHECKOUT_LIVE, STRIPE_MODE } from "@/lib/commerce-config";
 import { setBuyIntent, startCheckout } from "@/lib/checkout";
 
 /**
@@ -13,7 +13,7 @@ import { setBuyIntent, startCheckout } from "@/lib/checkout";
  *
  * States map 1:1 to commercial maturity, the label always states what
  * happens next, so a closed checkout never presents a dead Buy button:
- *   BUY_LIVE      checkout enabled  → server-resolved Paddle checkout
+ *   BUY_LIVE      checkout enabled  → server-resolved Stripe checkout
  *   BETA_REQUEST  closed beta       → /beta request journey
  *   NOTIFY_ME     pre-beta product  → /beta (notify list)
  */
@@ -67,7 +67,7 @@ export function CtaButton({
           <Magnetic>
             {busy
               ? "Opening checkout…"
-              : (label ?? (PADDLE_ENV === "sandbox" ? "Test Checkout (Sandbox)" : "Buy now"))}
+              : (label ?? (STRIPE_MODE === "test" ? "Test Checkout (Stripe test mode)" : "Buy now"))}
           </Magnetic>
         </button>
         {error && (
@@ -78,7 +78,7 @@ export function CtaButton({
             </Link>
           </span>
         )}
-        {PADDLE_ENV === "sandbox" && (
+        {STRIPE_MODE === "test" && (
           <span className="text-xs text-muted-dim">
             Sandbox / test mode, simulated checkout for integration testing. No real funds are charged.
           </span>

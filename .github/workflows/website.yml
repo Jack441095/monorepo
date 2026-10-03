@@ -1,7 +1,7 @@
 name: website
 
 # Manual validation only. This workflow builds and browser-tests the website
-# with checkout closed; it never deploys or contacts Paddle. Website hosting
+# with checkout closed; it never deploys or contacts Stripe. Website hosting
 # remains controlled by its hosting provider, not by this workflow.
 on:
   workflow_dispatch:

@@ -8,7 +8,7 @@ those live in their own repositories.
 ## Layout
 
 - `website/` — Next.js 16 / React 19 / Tailwind 4 / TypeScript public site.
-- `backend/` — FastAPI backend: licensing, entitlements, Paddle commerce
+- `backend/` — FastAPI backend: licensing, entitlements, Stripe commerce
   integration, Alembic migrations.
 
 ## History
@@ -18,6 +18,8 @@ source branch `web/nitedsp-world-class-v3` in `Nite_DSP_01`
 (`Nite_DSP_01-web-v3` worktree, path `nitedsp/website` and `nitedsp/backend`).
 Original commit authorship and messages are retained; only unrelated paths
 were filtered out.
+
+See [Stripe commerce](docs/STRIPE_COMMERCE.md) for checkout settings, webhook events, and migration details.
 
 ## Railway deployment (current)
 
@@ -31,7 +33,7 @@ hold the current verified platform pin, dated deployment receipts, and live
 readiness evidence.
 
 Production checkout remains explicitly disabled until the owner completes the
-live Paddle catalog/key gate. Submit staging is Sandbox-only, uses an isolated
+live Stripe catalog/key gate. Submit staging uses Stripe test mode, uses an isolated
 database, and currently uses local release storage; it is not a durable paid-
 launch environment. A separate staging Website service has not been
 provisioned because of the current Railway project capacity limit.
@@ -47,7 +49,7 @@ python scripts/check_staging_rehearsal.py \
 
 The command checks `/health`, the durable `/ready` contract, and that the
 unauthenticated download route returns `401`. It does not upload artifacts,
-send email, call Paddle, or mutate provider state. It intentionally fails
+send email, call Stripe, or mutate provider state. It intentionally fails
 against the current local-storage/console-email staging posture.
 
 ## Local dev

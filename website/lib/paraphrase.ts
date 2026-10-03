@@ -72,13 +72,13 @@ function storeUnlockToken(token: string): void {
   window.localStorage.setItem(UNLOCK_KEY, token);
 }
 
-// Phase 4 seam: replaces this stub with a real Paddle checkout flow that
+// Phase 4 seam: replaces this stub with a real Stripe checkout flow that
 // returns an issued token (webhook delivered, then the client polls
 // /v1/paraphrase/entitlement). Keep this function's signature.
 export async function unlockParaphrase(
   _tier: "gbp-1" | "gbp-3" | "gbp-10",
 ): Promise<{ ok: true; token: string } | { ok: false; error: string }> {
-  void _tier; // used by the Phase 4 Paddle catalog mapping
+  void _tier; // used by the Phase 4 Stripe catalog mapping
   const devToken = process.env.NEXT_PUBLIC_PARAPHRASE_UNLOCK_TOKEN;
   if (devToken) {
     storeUnlockToken(devToken);

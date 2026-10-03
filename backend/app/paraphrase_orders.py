@@ -2,9 +2,9 @@
 Paraphrase PWYW commerce (products/nite-paraphrase Phase 4).
 
 Anonymous pay-what-you-like unlock flow that stays completely decoupled
-from the main product's users/purchases/entitlements tables: the browser
-generates a random `hint` before checkout, the Paddle transaction carries
-it via custom_data, the webhook records it, and the redemption endpoint
+from the main product's users/purchases/entitlements tables: the server
+generates a random `hint` before checkout, the Stripe Checkout session carries
+it via metadata, the webhook records it, and the redemption endpoint
 proves it and issues a short-lived signed session token.  No email, no
 account, no perpetual licence.
 """
@@ -33,10 +33,6 @@ def _signer() -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(settings.session_secret, salt="nitedsp-paraphrase-unlock")
 
 
-# ---------------------------------------------------------------------------
-# Catalog helpers
-# ---------------------------------------------------------------------------
-
 def _tier_to_price_id(tier: str) -> str | None:
     return {
         "gbp-1": settings.paraphrase_price_gbp_1,
@@ -45,29 +41,20 @@ def _tier_to_price_id(tier: str) -> str | None:
     }.get(tier)
 
 
-def is_paraphrase_product(paddle_product_id: str) -> bool:
-    """Webhook fast-path: does this Paddle product belong to paraphrase?"""
-    return bool(settings.paraphrase_product_id and paddle_product_id == settings.paraphrase_product_id)
-
-
-# ---------------------------------------------------------------------------
-# Checkout (called from the paraphrase router)
-# ---------------------------------------------------------------------------
-
 def create_checkout(
     provider: CommerceProvider,
     tier: str,
 ) -> tuple[str, str]:
-    """Create a server-side Paddle checkout transaction.
+    """Create a server-side Stripe checkout transaction.
 
     Returns (checkout_url, hint).  The caller must redirect the browser
-    to checkout_url; Paddle redirects back to success_url with the hint
+    to checkout_url; Stripe redirects back to success_url with the hint
     preserved in the query string, so the client can poll redemption
     afterwards.
 
     Raises:
         ValueError: for an unknown/unconfigured tier.
-        RuntimeError: for a Paddle API failure.
+        RuntimeError: for a Stripe API failure.
     """
     price_id = _tier_to_price_id(tier)
     if not price_id:
@@ -82,101 +69,32 @@ def create_checkout(
 
     checkout_url = provider.create_checkout_url(
         price_id,
-        custom_data={"paraphrase_hint": hint},
+        metadata={"product_id": settings.paraphrase_product_id, "paraphrase_hint": hint},
         success_url=success_url,
     )
     return checkout_url, hint
 
 
-# ---------------------------------------------------------------------------
-# Webhook handler (called from commerce.py paddle_webhook)
-# ---------------------------------------------------------------------------
-
-def handle_transaction_completed(db: Session, payload: dict) -> bool:
-    """Inspect and potentially consume a transaction.completed event.
-
-    Returns True if this event was a paraphrase purchase (even if it
-    failed to record for some reason -- a bad hint should not fall
-    through to the licence path which would reject the product anyway).
-    Returns False if this is not a paraphrase transaction, so the caller
-    should continue with the normal licence flow.
-    """
-    data = payload.get("data", {})
-    if not isinstance(data, dict):
+def handle_checkout_completed(db: Session, session: dict) -> bool:
+    metadata = session.get("metadata") or {}
+    if metadata.get("product_id") != settings.paraphrase_product_id:
         return False
-    # Find the paraphrase product_id among the transaction items.
-    items = data.get("items", [])
-    if not isinstance(items, list):
-        return False
-    paddle_product_id: str | None = None
-    for item in items:
-        if not isinstance(item, dict):
-            continue
-        price = item.get("price", {})
-        if not isinstance(price, dict):
-            continue
-        if price.get("product_id") == settings.paraphrase_product_id:
-            paddle_product_id = price["product_id"]
-            break
-    if paddle_product_id is None:
-        return False  # not our product
-
-    custom_data = data.get("custom_data") or {}
-    if not isinstance(custom_data, dict):
-        custom_data = {}
-    hint = custom_data.get("paraphrase_hint")
+    hint = metadata.get("paraphrase_hint")
     if not hint:
-        # A real transaction with our product_id but no hint -- there is
-        # no client that could redeem it (ParaphraseOrder.hint is NOT NULL
-        # UNIQUE), so intentionally do not insert a row. Log identifiers
-        # for reconciliation instead. This is a permanent rejection:
-        # Paddle should not retry this.
-        logger.warning(
-            "paraphrase purchase without hint provider_order_id=%r paddle_product_id=%r",
-            data.get("id"),
-            paddle_product_id,
-        )
+        # Payment links used as tip jars have no browser hint to redeem.
         return True
+    from sqlalchemy.dialects.postgresql import insert
 
-    from decimal import Decimal, InvalidOperation
-
-    try:
-        raw_total = data.get("details", {}).get("totals", {}).get("total", "0")
-        amount_cents = int(Decimal(str(raw_total)) * 100)
-    except (InvalidOperation, ValueError, TypeError, AttributeError):
-        amount_cents = 0
-    currency = data.get("currency_code", "GBP")
-    if not isinstance(currency, str) or not currency:
-        currency = "GBP"
-    provider_order_id = data.get("id")
-    if not isinstance(provider_order_id, str) or not provider_order_id:
-        return True
-
-    # Idempotent upsert: unique(provider_order_id) means a duplicate
-    # webhook delivery is always a safe no-op; unique(hint) means one
-    # hint can never fan out into two paid rows.
-    existing = (
-        db.query(models.ParaphraseOrder)
-        .filter(models.ParaphraseOrder.provider_order_id == provider_order_id)
-        .one_or_none()
-    )
-    if existing is not None:
-        return True
-
-    db.add(
-        models.ParaphraseOrder(
+    db.execute(
+        insert(models.ParaphraseOrder).values(
             hint=hint,
-            provider_order_id=provider_order_id,
-            amount_cents=amount_cents,
-            currency=currency,
-        )
+            provider_order_id=session["id"],
+            amount_cents=session["amount_total"],
+            currency=session["currency"].upper(),
+        ).on_conflict_do_nothing(index_elements=["provider_order_id"])
     )
     return True
 
-
-# ---------------------------------------------------------------------------
-# Redemption (called from the paraphrase router)
-# ---------------------------------------------------------------------------
 
 def redeem(db: Session, hint: str) -> tuple[str, datetime] | None:
     """Prove payment and issue a signed session-unlock token.

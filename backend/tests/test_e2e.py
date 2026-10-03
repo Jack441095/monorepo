@@ -2,8 +2,7 @@
 Full purchase-to-activation E2E test, plus explicit failure paths --
 Phase 4 Milestone H's required list. Runs against a real local Postgres
 database and real Ed25519 signing (the staging keypair); the only thing
-simulated is the Paddle webhook payload itself, since no real Paddle
-sandbox account exists yet (docs/HUMAN_COMMERCIAL_REQUIREMENTS.md).
+simulated is the Stripe webhook payload itself; no payment API is called.
 
 Not covered here (documented, not faked): DB/license-server temporarily
 unavailable -- exercising a real outage would require actually stopping
@@ -21,12 +20,12 @@ import json
 import time
 
 
-def _sign_paddle_payload(payload: dict, secret: str) -> tuple[bytes, str]:
+def _sign_stripe_payload(payload: dict, secret: str) -> tuple[bytes, str]:
     raw_body = json.dumps(payload).encode("utf-8")
     ts = str(int(time.time()))
-    signed_payload = f"{ts}:{raw_body.decode('utf-8')}"
+    signed_payload = f"{ts}.{raw_body.decode('utf-8')}"
     h1 = hmac.new(secret.encode(), signed_payload.encode(), hashlib.sha256).hexdigest()
-    return raw_body, f"ts={ts};h1={h1}"
+    return raw_body, f"t={ts},v1={h1}"
 
 
 def _request_and_capture_link(client, email: str, db_session) -> str:
@@ -63,13 +62,6 @@ def _seed_product(db_session, product_id: str = "smart-sample-manager") -> None:
             public=True,
             purchasable=True,
             platforms=["macos"],
-            # Simulated webhook payloads in this test file re-use product_id
-            # as Paddle's product_id too (see _completed_payload) -- real
-            # Paddle events never do this (see commerce.py's
-            # _handle_transaction_completed), but keeping the two equal here
-            # is the least invasive way to keep every existing simulated
-            # payload resolving correctly.
-            paddle_product_id=product_id,
         )
     )
     db_session.commit()
@@ -86,19 +78,27 @@ def test_full_purchase_to_activation_flow(client, db_session):
 
     # 2. checkout start -> simulated webhook -> purchase created -> entitlement created
     payload = {
-        "event_id": "evt_e2e_001",
-        "event_type": "transaction.completed",
+        "id": "evt_e2e_001",
+        "type": "checkout.session.completed",
         "data": {
-            "id": "txn_e2e_001",
-            "customer": {"email": "e2e-buyer@example.com"},
-            "currency_code": "GBP",
-            "details": {"totals": {"total": "5900"}},
-            "items": [{"price": {"product_id": "smart-sample-manager"}}],
-        },
+            "object": {
+                "id": "txn_e2e_001",
+                "payment_status": "paid",
+                "payment_intent": "pi_txn_e2e_001",
+                "customer_details": {
+                    "email": "e2e-buyer@example.com"
+                },
+                "amount_total": 5900,
+                "currency": "gbp",
+                "metadata": {
+                    "product_id": "smart-sample-manager"
+                }
+            }
+        }
     }
-    raw_body, sig = _sign_paddle_payload(payload, "test-webhook-secret")
+    raw_body, sig = _sign_stripe_payload(payload, "test-webhook-secret")
     webhook_resp = client.post(
-        "/webhooks/paddle", content=raw_body, headers={"Paddle-Signature": sig, "Content-Type": "application/json"}
+        "/webhooks/stripe", content=raw_body, headers={"Stripe-Signature": sig, "Content-Type": "application/json"}
     )
     assert webhook_resp.status_code == 200
     assert webhook_resp.json()["status"] == "processed"
@@ -198,19 +198,27 @@ def test_full_purchase_to_activation_flow(client, db_session):
 def test_duplicate_webhook_is_idempotent(client, db_session):
     _seed_product(db_session)
     payload = {
-        "event_id": "evt_dup_001",
-        "event_type": "transaction.completed",
+        "id": "evt_dup_001",
+        "type": "checkout.session.completed",
         "data": {
-            "id": "txn_dup_001",
-            "customer": {"email": "dup@example.com"},
-            "currency_code": "GBP",
-            "details": {"totals": {"total": "5900"}},
-            "items": [{"price": {"product_id": "smart-sample-manager"}}],
-        },
+            "object": {
+                "id": "txn_dup_001",
+                "payment_status": "paid",
+                "payment_intent": "pi_txn_dup_001",
+                "customer_details": {
+                    "email": "dup@example.com"
+                },
+                "amount_total": 5900,
+                "currency": "gbp",
+                "metadata": {
+                    "product_id": "smart-sample-manager"
+                }
+            }
+        }
     }
-    raw_body, sig = _sign_paddle_payload(payload, "test-webhook-secret")
-    first = client.post("/webhooks/paddle", content=raw_body, headers={"Paddle-Signature": sig})
-    second = client.post("/webhooks/paddle", content=raw_body, headers={"Paddle-Signature": sig})
+    raw_body, sig = _sign_stripe_payload(payload, "test-webhook-secret")
+    first = client.post("/webhooks/stripe", content=raw_body, headers={"Stripe-Signature": sig})
+    second = client.post("/webhooks/stripe", content=raw_body, headers={"Stripe-Signature": sig})
     assert first.json()["status"] == "processed"
     assert second.json()["status"] == "already_processed"
 
@@ -221,26 +229,42 @@ def test_duplicate_webhook_is_idempotent(client, db_session):
 
 
 def test_forged_webhook_signature_rejected(client):
-    payload = {"event_id": "evt_forged", "event_type": "transaction.completed", "data": {}}
+    payload = {
+        "id": "evt_forged",
+        "type": "checkout.session.completed",
+        "data": {
+            "object": {
+                "id": "cs_test",
+                "payment_status": "paid",
+                "payment_intent": "pi_test",
+                "customer_details": {},
+                "amount_total": 0,
+                "currency": "gbp",
+                "metadata": {
+                    "product_id": "smart-sample-manager"
+                }
+            }
+        }
+    }
     raw_body = json.dumps(payload).encode()
     # Stale timestamp: signature is irrelevant, the replay window rejects it
     # first with 400 (verification error) -- this used to rely on ts=1 being
     # merely unsigned.
     resp_stale = client.post(
-        "/webhooks/paddle", content=raw_body, headers={"Paddle-Signature": "ts=1;h1=deadbeef"}
+        "/webhooks/stripe", content=raw_body, headers={"Stripe-Signature": "t=1,v1=deadbeef"}
     )
     assert resp_stale.status_code == 400
 
-    # Fresh timestamp with a forged digest -> classic signature rejection 401.
+    # Fresh timestamp with a forged digest -> signature verification rejects it with 400.
     fresh_ts = int(time.time())
-    signed = f"{fresh_ts}:{raw_body.decode()}"
+    signed = f"{fresh_ts}.{raw_body.decode()}"
     forged = hmac.new(b"wrong-secret", signed.encode(), hashlib.sha256).hexdigest()
     resp_forged = client.post(
-        "/webhooks/paddle",
+        "/webhooks/stripe",
         content=raw_body,
-        headers={"Paddle-Signature": f"ts={fresh_ts};h1={forged}"},
+        headers={"Stripe-Signature": f"t={fresh_ts},v1={forged}"},
     )
-    assert resp_forged.status_code == 401
+    assert resp_forged.status_code == 400
 
 
 def test_activate_invalid_license_key_rejected(client):

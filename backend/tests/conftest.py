@@ -19,7 +19,9 @@ from pathlib import Path
 from nacl.signing import SigningKey
 
 os.environ["DATABASE_URL"] = "postgresql+psycopg2://localhost/nitedsp_test"
-os.environ["PADDLE_WEBHOOK_SECRET"] = "test-webhook-secret"
+os.environ["EMAIL_PROVIDER"] = "console"
+os.environ["RESEND_API_KEY"] = ""
+os.environ["STRIPE_WEBHOOK_SECRET"] = "test-webhook-secret"
 os.environ["ADMIN_API_KEY"] = "test-admin-key"
 os.environ["SESSION_SECRET"] = "test-session-secret"
 # Test signing keys must be a matched pair, but must never be committed or
@@ -62,7 +64,7 @@ def _clean_db():
             text(
                 "TRUNCATE users, products, purchases, entitlements, activations, "
                 "trials, releases, downloads, webhook_events, magic_link_tokens, "
-                "admin_audit_log RESTART IDENTITY CASCADE"
+                "admin_audit_log, paraphrase_orders RESTART IDENTITY CASCADE"
             )
         )
 

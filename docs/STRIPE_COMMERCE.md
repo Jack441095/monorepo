@@ -1,0 +1,21 @@
+# Stripe commerce
+
+Stripe is the only active payment provider. `/commerce/checkout` creates a hosted Checkout session for an authenticated customer. The existing public SLO and Submit payment links also use Stripe. No client SDK is required.
+
+Configure `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRODUCT_ID` (our internal catalog slug, such as `nite-submit`), `STRIPE_INTRO_PRICE_ID`, `STRIPE_REGULAR_PRICE_ID`, and `STRIPE_ACTIVE_PRICE_ID`. The active price must match an intro or regular price. Checkout stays closed until `STRIPE_CHECKOUT_ENABLED=1`. Production also requires `LEGAL_REVIEW_APPROVED=1` and `RELEASE_READY=1`. Staging keys must start with `sk_test_` or `rk_test_`; production keys must start with `sk_live_` or `rk_live_`. Store credentials in the environment's secret store.
+
+The website build uses `NEXT_PUBLIC_STRIPE_MODE=test|live` alongside the existing checkout, legal, and release flags. Pricing and product pages show the public Payment Links only when `NEXT_PUBLIC_CHECKOUT_LIVE=1`, mode is `live`, `NEXT_PUBLIC_LEGAL_REVIEW_APPROVED=1`, and `NEXT_PUBLIC_RELEASE_READY=1`. Until then they show beta and waitlist actions. The existing live links advertise Submit at £2 and SLO at £9; the closed-beta page still records the planned £3 Submit experiment. It accepts hosted redirects only to `checkout.stripe.com` or `buy.stripe.com` over HTTPS. Disabling backend checkout does not deactivate a Payment Link in the Stripe dashboard; deactivate those links separately when closing sales.
+
+Register `/webhooks/stripe` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`, and `charge.dispute.created`. Payment links must attach `product_id` metadata using an existing purchasable internal product slug. Server-created sessions also attach `price_id`. Licences are issued only after payment is paid or no payment is required. The session ID deduplicates fulfilment across distinct events. Failed database transactions roll back before recording a retryable error.
+
+Before opening public sales, verify the actual Payment Link metadata in Stripe: Submit needs `product_id=nite-submit`; SLO needs `product_id=smart-sample-manager`. The repository cannot prove the dashboard configuration. Both catalog rows must be purchasable, releases must exist, and a test-mode checkout must prove licence delivery and download access. Existing beta or paid grants can coexist with a new Stripe entitlement without blocking downloads.
+
+Full refunds mark the purchase refunded; partial refunds leave it completed. Disputes mark completed purchases disputed. Entitlement revocation remains an explicit admin decision. Refund correlation requires the payment intent recorded at fulfilment; purchases imported without one need manual reconciliation. Refund events that arrive before the purchase is recorded also require reconciliation.
+
+Paraphrase tier settings (`PARAPHRASE_PRICE_GBP_1`, `_3`, `_10`) contain Stripe price IDs. Its checkout metadata carries `product_id=nite-paraphrase` and a server-generated `paraphrase_hint`. A paid session records the amount in minor units and permits redemption of the hint; tip-jar sessions without a hint create no unlock.
+
+Run `alembic upgrade head` before deploying the new backend. Migration `c8f3a91d2e60` removes the unused Paddle catalog mapping and adds nullable `purchases.provider_payment_id`. Existing purchases, provider labels, entitlements, and licence keys remain valid. Earlier migration files and dated receipts document historical state; they are not current commerce instructions. Downgrading recreates an empty legacy mapping column and does not recover its former values.
+
+Verification: `cd backend && python3 -m pytest -q tests`. Tests use the dedicated local `nitedsp_test` database, synthetic Stripe signatures, console email, and mocked checkout requests. No live checkout is exercised.
+
+Release blocker carried over from both former providers: confirmation email is sent before the fulfilment transaction commits. A commit failure can send an unusable licence key. Fix this with durable delivery state and retries using the stored key before opening paid sales; moving the email after the commit alone can silently lose delivery.

@@ -212,7 +212,7 @@ const STACK_GROUPS: Array<{ area: string; items: string }> = [
   { area: "KENN core / AudioGen engine", items: "Python" },
   {
     area: "Commercial platform",
-    items: "Next.js · Tailwind CSS · Railway (hosting) · Paddle (payments) · Ed25519 (device-bound licensing)",
+    items: "Next.js · Tailwind CSS · Railway (hosting) · Stripe (payments) · Ed25519 (device-bound licensing)",
   },
 ];
 
@@ -392,7 +392,7 @@ export default function PortfolioPage() {
                       <EvidenceTag kind="MEASURED" />
                     </div>
                     <p className="mt-1 text-xs" style={{ color: "var(--muted-dim)" }}>
-                      Paddle payments, mandatory webhook signature verification
+                      Stripe payments, mandatory webhook signature verification
                     </p>
                   </div>
                   <div>

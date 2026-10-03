@@ -46,8 +46,8 @@ test("public pages send baseline browser security headers", async ({ page }) => 
   expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
   expect(headers["permissions-policy"]).toBe("camera=(), microphone=(), geolocation=()");
   expect(headers["content-security-policy"]).toContain("object-src 'none'");
-  expect(headers["content-security-policy"]).toContain("https://cdn.paddle.com");
-  expect(headers["content-security-policy"]).toContain("frame-src 'self' https://*.paddle.com");
+  expect(headers["content-security-policy"]).not.toContain("paddle.com");
+  expect(headers["content-security-policy"]).toContain("frame-src 'self'");
 });
 
 test("desktop nav has no visible menu button, mobile nav does", async ({ page }) => {
@@ -83,7 +83,7 @@ test("public pages name WIP products only with status labels, never capability c
   }
   // WIP products may appear, but always alongside their true status.
   expect(bodyText).toContain("KENN");
-  expect(bodyText).toContain("In Development");
+  expect(bodyText).toContain("Closed Beta");
   expect(bodyText).toContain("Thursday");
   expect(bodyText).toContain("Internal");
 });

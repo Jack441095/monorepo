@@ -95,33 +95,40 @@ def test_concurrent_duplicate_webhook_never_double_processes(client, db_session)
             public=True,
             purchasable=True,
             platforms=["macos"],
-            paddle_product_id="smart-sample-manager",
         )
     )
     db_session.commit()
 
     payload = {
-        "event_id": "evt_concurrent_001",
-        "event_type": "transaction.completed",
+        "id": "evt_concurrent_001",
+        "type": "checkout.session.completed",
         "data": {
-            "id": "txn_concurrent_001",
-            "customer": {"email": "concurrent-buyer@example.com"},
-            "currency_code": "GBP",
-            "details": {"totals": {"total": "5900"}},
-            "items": [{"price": {"product_id": "smart-sample-manager"}}],
-        },
+            "object": {
+                "id": "txn_concurrent_001",
+                "payment_status": "paid",
+                "payment_intent": "pi_txn_concurrent_001",
+                "customer_details": {
+                    "email": "concurrent-buyer@example.com"
+                },
+                "amount_total": 5900,
+                "currency": "gbp",
+                "metadata": {
+                    "product_id": "smart-sample-manager"
+                }
+            }
+        }
     }
     raw_body = json.dumps(payload).encode("utf-8")
     secret = "test-webhook-secret"
     # Timestamp must be inside the replay-protection window (commerce.py
     # rejects signed-but-stale deliveries); use the current wall clock.
     ts = str(int(time.time()))
-    signed_payload = f"{ts}:{raw_body.decode('utf-8')}"
+    signed_payload = f"{ts}.{raw_body.decode('utf-8')}"
     h1 = hmac.new(secret.encode(), signed_payload.encode(), hashlib.sha256).hexdigest()
-    headers = {"Paddle-Signature": f"ts={ts};h1={h1}", "Content-Type": "application/json"}
+    headers = {"Stripe-Signature": f"t={ts},v1={h1}", "Content-Type": "application/json"}
 
     def send_webhook(_):
-        return client.post("/webhooks/paddle", content=raw_body, headers=headers)
+        return client.post("/webhooks/stripe", content=raw_body, headers=headers)
 
     with ThreadPoolExecutor(max_workers=5) as pool:
         responses = list(pool.map(send_webhook, range(5)))

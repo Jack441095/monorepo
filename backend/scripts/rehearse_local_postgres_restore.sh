@@ -48,10 +48,11 @@ createdb -h "$pg_socket" -p "$pg_port" "$pg_restore_db"
 export DATABASE_URL="postgresql+psycopg2:///$pg_db?host=$pg_socket&port=$pg_port"
 cd "$backend_root"
 PYTHONPATH="$backend_root" alembic -c "$backend_root/alembic.ini" upgrade head >/dev/null
+expected_head=$(python3 -c 'from alembic.config import Config; from alembic.script import ScriptDirectory; print(ScriptDirectory.from_config(Config("alembic.ini")).get_current_head())')
 
 psql -h "$pg_socket" -p "$pg_port" -d "$pg_db" -v ON_ERROR_STOP=1 >/dev/null <<'SQL'
-INSERT INTO products (id, name, status, public, purchasable, description, current_version, platforms, created_at, paddle_product_id)
-VALUES ('nite-submit', 'Submit', 'active', true, false, 'Rehearsal product', '0.2.0', ARRAY['macos'], now(), NULL);
+INSERT INTO products (id, name, status, public, purchasable, description, current_version, platforms, created_at)
+VALUES ('nite-submit', 'Submit', 'active', true, false, 'Rehearsal product', '0.2.0', ARRAY['macos'], now());
 INSERT INTO users (id, email, password_hash, email_verified_at, created_at, updated_at)
 VALUES ('00000000-0000-0000-0000-000000000001', 'rehearsal@example.invalid', NULL, now(), now(), now());
 INSERT INTO releases (id, product_id, version, platform, architecture, channel, checksum_sha256, signature, storage_key, release_notes, published_at)
@@ -69,6 +70,6 @@ restored_counts=$(psql -h "$pg_socket" -p "$pg_port" -d "$pg_restore_db" -Atc "s
 printf 'restore_migration_head=%s\n' "$restored_head"
 printf 'restored_row_counts(products,users,releases,entitlements)=%s\n' "$restored_counts"
 
-[[ "$restored_head" == "6c3e9e1d4b7a" ]]
+[[ "$restored_head" == "$expected_head" ]]
 [[ "$restored_counts" == "1,1,1,1" ]]
 echo "local_postgres_restore_rehearsal=pass"

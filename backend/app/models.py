@@ -49,14 +49,7 @@ class User(Base):
 class Product(Base):
     __tablename__ = "products"
 
-    # Stable slug primary key (Section 15) -- e.g. "smart-sample-manager".
-    # Never mutable marketing copy. Deliberately NOT a Paddle id: Paddle's
-    # own product_id is a separate, real, external reference stored below
-    # (paddle_product_id) -- conflating the two meant a real webhook's
-    # product_id could never match this table at all until an admin backfills
-    # the mapping (found via a real sandbox purchase, 2026-08-14: Paddle sent
-    # product_id="pro_01kzyq7zeefn42h5f6kewcr70k", which no query against
-    # this column could ever match).
+    # Stripe Checkout metadata carries this stable internal product slug.
     id: Mapped[str] = mapped_column(String, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False, default="active")
@@ -65,10 +58,6 @@ class Product(Base):
     description: Mapped[str | None] = mapped_column(Text)
     current_version: Mapped[str | None] = mapped_column(String)
     platforms: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, default=list)
-    # Paddle's real product_id (e.g. "pro_..."), set once a real Paddle
-    # catalog exists. Nullable because this row can exist (and be edited)
-    # before commerce is wired up at all -- see docs/PADDLE_INTEGRATION_AUDIT.md.
-    paddle_product_id: Mapped[str | None] = mapped_column(String, unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
 
     __table_args__ = (
@@ -82,12 +71,13 @@ class Purchase(Base):
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     product_id: Mapped[str] = mapped_column(ForeignKey("products.id"), nullable=False)
-    # Which specific Paddle price (intro vs regular) was actually charged --
+    # Which specific Stripe price (intro vs regular) was actually charged --
     # distinct from product_id. Nullable: purchases recorded before this
     # column existed have no value to backfill.
     price_id: Mapped[str | None] = mapped_column(String, nullable=True)
     provider: Mapped[str] = mapped_column(String, nullable=False)
     provider_order_id: Mapped[str] = mapped_column(String, nullable=False)
+    provider_payment_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
     currency: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False, default="completed")
@@ -280,9 +270,9 @@ class ParaphraseOrder(Base):
     Deliberately NOT a `users`/`purchases`/`entitlements` row: paraphrase is
     anonymous-by-design (no email, no account), and its unlock is a
     short-lived session token rather than a perpetual software licence.
-    Forms the bridge between a real Paddle transaction.completed event and
+    Forms the bridge between a paid Stripe Checkout session and
     the browser that paid: the client generated a random `hint` before
-    starting checkout and sent it via Paddle custom_data; the webhook
+    starting checkout and sent it via Stripe metadata; the webhook
     records it here; the redemption endpoint proves it and issues the
     signed unlock token (app/paraphrase_orders.py). Idempotent via the
     unique provider_order_id -- a duplicate webhook delivery updates

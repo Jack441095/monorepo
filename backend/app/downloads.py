@@ -48,7 +48,8 @@ def _require_entitlement(db: Session, user: models.User, product_id: str) -> mod
             models.Entitlement.status == "active",
             (models.Entitlement.expires_at.is_(None) | (models.Entitlement.expires_at > now)),
         )
-        .one_or_none()
+        # A beta grant and a later paid licence may both remain active.
+        .first()
     )
     if entitlement is None:
         raise HTTPException(status_code=403, detail="No active entitlement for this product")

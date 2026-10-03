@@ -77,7 +77,7 @@ def test_ready_reports_database_and_storage(monkeypatch):
     assert result["email_provider"] == main.settings.email_provider
     assert result["email_provider_configured"] is True
     assert result["email_deliverable"] is (main.settings.email_provider == "resend")
-    assert result["checkout_enabled"] is main.settings.paddle_checkout_enabled
+    assert result["checkout_enabled"] is main.settings.stripe_checkout_enabled
     assert result["legal_review_approved"] is main.settings.legal_review_approved
     assert result["release_ready"] is main.settings.release_ready
     assert result["commercial_gates_ready"] is (

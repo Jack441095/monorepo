@@ -24,7 +24,7 @@ export default function TermsPage() {
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Products and licences</h2>
       <p>
         NITE DSP products (Submit, SLO, KENN) are macOS desktop applications sold as
-        perpetual single-user licences. "Perpetual" means you own the version you purchased
+        perpetual single-user licences. &ldquo;Perpetual&rdquo; means you own the version you purchased
         for as long as your Mac runs it. It does not guarantee future updates or new versions.
       </p>
       <p>
@@ -42,15 +42,15 @@ export default function TermsPage() {
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Payments and refunds</h2>
       <p>
-        Payments are processed by Paddle as Merchant of Record. Paddle handles applicable
-        sales tax and issues receipts on our behalf. See our{" "}
+        Payments are processed by Stripe. NITE DSP sells the software and is responsible
+        for receipts, applicable taxes, and refunds. See our{" "}
         <Link href="/refund-policy" className="underline">refund policy</Link> for details
         on returns.
       </p>
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Beta software</h2>
       <p>
-        Beta versions are provided "as is" for testing and feedback purposes.
+        Beta versions are provided &ldquo;as is&rdquo; for testing and feedback purposes.
         They may contain bugs, incomplete features, or breaking changes.
         We are not liable for data loss or other issues arising from beta software use.
         Always keep backups of your important files.

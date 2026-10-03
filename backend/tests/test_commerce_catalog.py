@@ -1,42 +1,31 @@
-"""
-Catalog mapping, checkout creation, and refund recording -- the pieces of
-commerce.py that only exist once real Paddle product/price IDs are
-configured (docs/PADDLE_INTEGRATION_AUDIT.md). Paddle itself is still
-never called for real here (no sandbox account exists yet); httpx.post is
-monkeypatched for the checkout test the same way tests/test_e2e.py
-simulates webhook payloads instead of receiving real ones.
-"""
+"""Stripe checkout, catalogue fulfilment, refunds, and download access."""
 from __future__ import annotations
 
 import hashlib
+import pytest
 
 from app import models
 from app.config import settings as app_settings
-from tests.test_e2e import _seed_product, _sign_paddle_payload
+from tests.test_e2e import _seed_product, _sign_stripe_payload
 
 
 def _post_webhook(client, payload):
-    raw_body, sig = _sign_paddle_payload(payload, "test-webhook-secret")
+    raw_body, sig = _sign_stripe_payload(payload, "test-webhook-secret")
     return client.post(
-        "/webhooks/paddle", content=raw_body, headers={"Paddle-Signature": sig, "Content-Type": "application/json"}
+        "/webhooks/stripe", content=raw_body, headers={"Stripe-Signature": sig, "Content-Type": "application/json"}
     )
 
 
 def _completed_payload(event_id, txn_id, product_id="smart-sample-manager", price_id=None, email="buyer@example.com"):
-    price = {"product_id": product_id}
+    metadata = {"product_id": product_id}
     if price_id is not None:
-        price["id"] = price_id
-    return {
-        "event_id": event_id,
-        "event_type": "transaction.completed",
-        "data": {
-            "id": txn_id,
-            "customer": {"email": email},
-            "currency_code": "GBP",
-            "details": {"totals": {"total": "500"}},
-            "items": [{"price": price}],
-        },
-    }
+        metadata["price_id"] = price_id
+    return {"id": event_id, "type": "checkout.session.completed", "data": {"object": {
+        "id": txn_id, "payment_intent": "pi_" + txn_id, "payment_status": "paid",
+        "customer_details": {"email": email}, "currency": "gbp", "amount_total": 500,
+        "metadata": metadata,
+    }}}
+
 
 
 def test_unknown_product_rejected_no_entitlement(client, db_session):
@@ -57,7 +46,6 @@ def test_non_purchasable_product_rejected(client, db_session):
             public=True,
             purchasable=False,  # e.g. private beta, not yet on sale
             platforms=["macos"],
-            paddle_product_id="smart-sample-manager",  # found, but rejected on purchasable=False
         )
     )
     db_session.commit()
@@ -68,39 +56,22 @@ def test_non_purchasable_product_rejected(client, db_session):
     assert db_session.query(models.Purchase).count() == 0
 
 
-def test_unknown_price_id_rejected_when_mapping_configured(client, db_session, monkeypatch):
+def test_unpaid_checkout_does_not_issue_a_licence(client, db_session):
     _seed_product(db_session)
-    from app.commerce import settings as commerce_settings
-
-    monkeypatch.setattr(commerce_settings, "paddle_product_id", "smart-sample-manager")
-    monkeypatch.setattr(commerce_settings, "paddle_intro_price_id", "pri_intro_real")
-    monkeypatch.setattr(commerce_settings, "paddle_regular_price_id", "pri_regular_real")
-
-    resp = _post_webhook(
-        client,
-        _completed_payload("evt_wrong_price", "txn_wrong_price", price_id="pri_totally_unmapped"),
-    )
-    assert resp.status_code == 200
-    assert resp.json()["status"] == "rejected_unknown_catalog_item"
+    payload = _completed_payload("evt_unpaid", "cs_unpaid")
+    payload["data"]["object"]["payment_status"] = "unpaid"
+    assert _post_webhook(client, payload).json()["status"] == "awaiting_payment"
     assert db_session.query(models.Purchase).count() == 0
+    assert db_session.query(models.Entitlement).count() == 0
 
 
-def test_known_price_id_accepted_when_mapping_configured(client, db_session, monkeypatch):
+
+def test_server_price_metadata_is_recorded(client, db_session):
     _seed_product(db_session)
-    from app.commerce import settings as commerce_settings
-
-    monkeypatch.setattr(commerce_settings, "paddle_product_id", "smart-sample-manager")
-    monkeypatch.setattr(commerce_settings, "paddle_intro_price_id", "pri_intro_real")
-    monkeypatch.setattr(commerce_settings, "paddle_regular_price_id", "pri_regular_real")
-
-    resp = _post_webhook(
-        client,
-        _completed_payload("evt_right_price", "txn_right_price", price_id="pri_intro_real"),
-    )
+    resp = _post_webhook(client, _completed_payload("evt_price", "cs_price", price_id="price_intro"))
     assert resp.status_code == 200
-    assert resp.json()["status"] == "processed"
-    purchase = db_session.query(models.Purchase).filter(models.Purchase.provider_order_id == "txn_right_price").one()
-    assert purchase.price_id == "pri_intro_real"
+    assert db_session.query(models.Purchase).one().price_id == "price_intro"
+
 
 
 def test_purchase_confirmation_uses_catalog_product_name(client, db_session, monkeypatch):
@@ -112,12 +83,11 @@ def test_purchase_confirmation_uses_catalog_product_name(client, db_session, mon
             public=False,
             purchasable=True,
             platforms=["macos"],
-            paddle_product_id="pro_nite_submit_sandbox",
         )
     )
     db_session.commit()
 
-    import app.commerce as commerce_module
+    import app.stripe_commerce as commerce_module
 
     sent = []
     monkeypatch.setattr(commerce_module, "send_email", lambda **kwargs: sent.append(kwargs))
@@ -127,7 +97,7 @@ def test_purchase_confirmation_uses_catalog_product_name(client, db_session, mon
         _completed_payload(
             "evt_nite_submit_confirmation",
             "txn_nite_submit_confirmation",
-            product_id="pro_nite_submit_sandbox",
+            product_id="nite-submit",
             email="nite-submit-buyer@example.com",
         ),
     )
@@ -138,24 +108,23 @@ def test_purchase_confirmation_uses_catalog_product_name(client, db_session, mon
     assert "Thanks for purchasing NITE Submit!" in sent[0]["body"]
 
 
-def _adjustment_payload(event_id, transaction_id, status, action="refund"):
-    return {
-        "event_id": event_id,
-        "event_type": "adjustment.created" if status == "pending_approval" else "adjustment.updated",
-        "data": {"action": action, "status": status, "transaction_id": transaction_id},
-    }
+def _refund_payload(event_id, transaction_id, full_refund=True):
+    return {"id": event_id, "type": "charge.refunded", "data": {"object": {
+        "payment_intent": "pi_" + transaction_id, "refunded": full_refund,
+    }}}
+
 
 
 def _buy_something(client, event_id, txn_id):
     _post_webhook(client, _completed_payload(event_id, txn_id))
 
 
-def test_pending_adjustment_does_not_mark_refunded(client, db_session):
+def test_partial_refund_keeps_purchase_completed(client, db_session):
     _seed_product(db_session)
     _buy_something(client, "evt_pending_src", "txn_pending")
     purchase = db_session.query(models.Purchase).filter(models.Purchase.provider_order_id == "txn_pending").one()
 
-    resp = _post_webhook(client, _adjustment_payload("evt_adj_pending", "txn_pending", "pending_approval"))
+    resp = _post_webhook(client, _refund_payload("evt_adj_pending", "txn_pending", False))
     assert resp.status_code == 200
     assert resp.json()["status"] == "processed"
 
@@ -164,7 +133,7 @@ def test_pending_adjustment_does_not_mark_refunded(client, db_session):
     assert purchase.refunded_at is None
 
 
-def test_approved_adjustment_marks_refunded_without_touching_entitlement(client, db_session):
+def test_full_refund_preserves_entitlement_for_admin_review(client, db_session):
     _seed_product(db_session)
     _buy_something(client, "evt_approved_src", "txn_approved")
     purchase = db_session.query(models.Purchase).filter(models.Purchase.provider_order_id == "txn_approved").one()
@@ -172,9 +141,9 @@ def test_approved_adjustment_marks_refunded_without_touching_entitlement(client,
     assert purchase.status == "completed"
     assert entitlement.status == "active"
 
-    # Real lifecycle: pending first, then the approving update.
-    _post_webhook(client, _adjustment_payload("evt_adj_created", "txn_approved", "pending_approval"))
-    resp = _post_webhook(client, _adjustment_payload("evt_adj_updated", "txn_approved", "approved"))
+    # A partial refund arrives before the final full refund.
+    _post_webhook(client, _refund_payload("evt_adj_created", "txn_approved", False))
+    resp = _post_webhook(client, _refund_payload("evt_adj_updated", "txn_approved", True))
     assert resp.status_code == 200
     assert resp.json()["status"] == "processed"
 
@@ -185,13 +154,13 @@ def test_approved_adjustment_marks_refunded_without_touching_entitlement(client,
     assert entitlement.status == "active"  # revocation stays a manual admin decision
 
 
-def test_rejected_adjustment_does_not_mark_refunded(client, db_session):
+def test_second_partial_refund_keeps_purchase_completed(client, db_session):
     _seed_product(db_session)
     _buy_something(client, "evt_rejected_src", "txn_rejected")
     purchase = db_session.query(models.Purchase).filter(models.Purchase.provider_order_id == "txn_rejected").one()
 
-    _post_webhook(client, _adjustment_payload("evt_adj_created2", "txn_rejected", "pending_approval"))
-    resp = _post_webhook(client, _adjustment_payload("evt_adj_rejected", "txn_rejected", "rejected"))
+    _post_webhook(client, _refund_payload("evt_adj_created2", "txn_rejected", False))
+    resp = _post_webhook(client, _refund_payload("evt_adj_rejected", "txn_rejected", False))
     assert resp.status_code == 200
 
     db_session.refresh(purchase)
@@ -199,19 +168,19 @@ def test_rejected_adjustment_does_not_mark_refunded(client, db_session):
     assert purchase.refunded_at is None
 
 
-def test_duplicate_approved_adjustment_is_idempotent(client, db_session):
+def test_duplicate_full_refund_is_idempotent(client, db_session):
     _seed_product(db_session)
     _buy_something(client, "evt_dup_adj_src", "txn_dup_adj")
     purchase = db_session.query(models.Purchase).filter(models.Purchase.provider_order_id == "txn_dup_adj").one()
 
-    _post_webhook(client, _adjustment_payload("evt_adj_dup_1", "txn_dup_adj", "approved"))
+    _post_webhook(client, _refund_payload("evt_adj_dup_1", "txn_dup_adj", True))
     db_session.refresh(purchase)
     first_refunded_at = purchase.refunded_at
     assert purchase.status == "refunded"
 
     # A second, distinct delivery (different event_id -- not the WebhookEvent
-    # dedup path) reporting the same already-approved adjustment.
-    resp = _post_webhook(client, _adjustment_payload("evt_adj_dup_2", "txn_dup_adj", "approved"))
+    # dedup path) reporting the same full refund.
+    resp = _post_webhook(client, _refund_payload("evt_adj_dup_2", "txn_dup_adj", True))
     assert resp.status_code == 200
 
     db_session.refresh(purchase)
@@ -219,18 +188,18 @@ def test_duplicate_approved_adjustment_is_idempotent(client, db_session):
     assert purchase.refunded_at == first_refunded_at  # untouched by the duplicate
 
 
-def test_out_of_order_pending_after_approved_does_not_regress(client, db_session):
+def test_stale_partial_refund_does_not_regress_full_refund(client, db_session):
     _seed_product(db_session)
     _buy_something(client, "evt_ooo_src", "txn_out_of_order")
     purchase = db_session.query(models.Purchase).filter(models.Purchase.provider_order_id == "txn_out_of_order").one()
 
-    _post_webhook(client, _adjustment_payload("evt_adj_ooo_approved", "txn_out_of_order", "approved"))
+    _post_webhook(client, _refund_payload("evt_adj_ooo_approved", "txn_out_of_order", True))
     db_session.refresh(purchase)
     assert purchase.status == "refunded"
     refunded_at = purchase.refunded_at
 
-    # A stale pending_approval delivery for the same adjustment arrives late.
-    resp = _post_webhook(client, _adjustment_payload("evt_adj_ooo_pending", "txn_out_of_order", "pending_approval"))
+    # A stale partial-refund event arrives after the full refund.
+    resp = _post_webhook(client, _refund_payload("evt_adj_ooo_pending", "txn_out_of_order", False))
     assert resp.status_code == 200
 
     db_session.refresh(purchase)
@@ -239,7 +208,7 @@ def test_out_of_order_pending_after_approved_does_not_regress(client, db_session
 
 
 def test_refund_for_unknown_transaction_is_a_safe_no_op(client, db_session):
-    resp = _post_webhook(client, _adjustment_payload("evt_refund_unknown", "txn_never_existed", "approved"))
+    resp = _post_webhook(client, _refund_payload("evt_refund_unknown", "txn_never_existed", True))
     assert resp.status_code == 200
     assert resp.json()["status"] == "processed"
 
@@ -249,13 +218,13 @@ def test_checkout_requires_auth(client):
     assert resp.status_code == 401
 
 
-def test_checkout_unconfigured_paddle_returns_503(client, db_session, monkeypatch):
+def test_checkout_unconfigured_stripe_returns_503(client, db_session, monkeypatch):
     # The developer's local .env may contain sandbox credentials. Keep this
     # regression deterministic: it is specifically testing the fail-closed
     # behavior when the provider is not configured.
     from app.commerce import settings as commerce_settings
 
-    monkeypatch.setattr(commerce_settings, "paddle_api_key", "")
+    monkeypatch.setattr(commerce_settings, "stripe_secret_key", "")
     raw_token = _login_and_get_token(client, "checkout-buyer@example.com", db_session)
     verify_resp = client.post("/auth/verify", json={"token": raw_token})
     assert verify_resp.status_code == 200
@@ -264,12 +233,12 @@ def test_checkout_unconfigured_paddle_returns_503(client, db_session, monkeypatc
     assert resp.status_code == 503
 
 
-def test_checkout_disabled_returns_503_even_when_paddle_is_configured(client, db_session, monkeypatch):
+def test_checkout_disabled_returns_503_even_when_stripe_is_configured(client, db_session, monkeypatch):
     from app.commerce import settings as commerce_settings
 
-    monkeypatch.setattr(commerce_settings, "paddle_api_key", "sandbox-key-for-test")
-    monkeypatch.setattr(commerce_settings, "paddle_active_price_id", "pri_active_real")
-    monkeypatch.setattr(commerce_settings, "paddle_checkout_enabled", False)
+    monkeypatch.setattr(commerce_settings, "stripe_secret_key", "sandbox-key-for-test")
+    monkeypatch.setattr(commerce_settings, "stripe_active_price_id", "pri_active_real")
+    monkeypatch.setattr(commerce_settings, "stripe_checkout_enabled", False)
     raw_token = _login_and_get_token(client, "checkout-disabled@example.com", db_session)
     assert client.post("/auth/verify", json={"token": raw_token}).status_code == 200
 
@@ -278,26 +247,30 @@ def test_checkout_disabled_returns_503_even_when_paddle_is_configured(client, db
 
 
 def test_checkout_creates_url_when_configured(client, db_session, monkeypatch):
+    _seed_product(db_session, "nite-submit")
     raw_token = _login_and_get_token(client, "checkout-buyer-2@example.com", db_session)
     verify_resp = client.post("/auth/verify", json={"token": raw_token})
     assert verify_resp.status_code == 200
 
     from app.commerce import settings as commerce_settings
 
-    monkeypatch.setattr(commerce_settings, "paddle_api_key", "sandbox-key-for-test")
-    monkeypatch.setattr(commerce_settings, "paddle_active_price_id", "pri_active_real")
-    monkeypatch.setattr(commerce_settings, "paddle_checkout_enabled", True)
+    monkeypatch.setattr(commerce_settings, "stripe_secret_key", "sandbox-key-for-test")
+    monkeypatch.setattr(commerce_settings, "stripe_active_price_id", "pri_active_real")
+    monkeypatch.setattr(commerce_settings, "stripe_checkout_enabled", True)
 
     class _FakeResponse:
         def raise_for_status(self):
             pass
 
         def json(self):
-            return {"data": {"checkout": {"url": "https://sandbox-checkout.paddle.com/fake"}}}
+            return {"url": "https://checkout.stripe.com/fake"}
 
-    def _fake_post(url, headers=None, json=None, timeout=None):
-        assert json["items"][0]["price_id"] == "pri_active_real"
-        assert "customer" not in json
+    def _fake_post(url, headers=None, data=None, timeout=None):
+        assert url == "https://api.stripe.com/v1/checkout/sessions"
+        assert data["line_items[0][price]"] == "pri_active_real"
+        assert data["metadata[product_id]"] == "nite-submit"
+        assert data["customer_email"] == "checkout-buyer-2@example.com"
+        assert data["success_url"].endswith("/account?purchase=pending")
         return _FakeResponse()
 
     import app.commerce as commerce_module
@@ -306,7 +279,32 @@ def test_checkout_creates_url_when_configured(client, db_session, monkeypatch):
 
     resp = client.post("/commerce/checkout", json={"price": "active"})
     assert resp.status_code == 200
-    assert resp.json()["checkout_url"] == "https://sandbox-checkout.paddle.com/fake"
+    assert resp.json()["checkout_url"] == "https://checkout.stripe.com/fake"
+
+
+@pytest.mark.parametrize("purchasable", [None, False])
+def test_checkout_rejects_a_missing_or_closed_catalog_product(client, db_session, monkeypatch, purchasable):
+    # A valid Stripe price must not charge for a product we cannot fulfil.
+    from app.commerce import settings as commerce_settings
+
+    if purchasable is not None:
+        _seed_product(db_session, "nite-submit")
+        product = db_session.get(models.Product, "nite-submit")
+        product.purchasable = purchasable
+        db_session.commit()
+    monkeypatch.setattr(commerce_settings, "stripe_secret_key", "sk_test_fake_checkout")
+    monkeypatch.setattr(commerce_settings, "stripe_active_price_id", "price_test_active")
+    monkeypatch.setattr(commerce_settings, "stripe_checkout_enabled", True)
+    import app.commerce as commerce_module
+
+    def unexpected_checkout(*args, **kwargs):
+        pytest.fail("Unavailable catalog products must not contact Stripe")
+
+    monkeypatch.setattr(commerce_module.httpx, "post", unexpected_checkout)
+    token = _login_and_get_token(client, "unavailable-product@example.com", db_session)
+    assert client.post("/auth/verify", json={"token": token}).status_code == 200
+
+    assert client.post("/commerce/checkout", json={"price": "active"}).status_code == 503
 
 
 def test_download_rejects_unsupported_platform(client, db_session):
@@ -332,7 +330,40 @@ def test_download_requires_active_entitlement(client, db_session):
         params={"product_id": "smart-sample-manager", "platform": "macos", "architecture": "universal"},
     )
     assert resp.status_code == 403
-    assert resp.json()["detail"] == "No active entitlement for this product"
+
+
+@pytest.mark.parametrize("previous_provider", ["beta", "paddle"])
+def test_new_stripe_purchase_preserves_download_access_with_an_existing_licence(client, db_session, previous_provider):
+    # Beta grants and historical paid licences coexist with a new Stripe purchase.
+    _seed_product(db_session)
+    email = "existing-license@example.com"
+    token = _login_and_get_token(client, email, db_session)
+    assert client.post("/auth/verify", json={"token": token}).status_code == 200
+    user = db_session.query(models.User).filter_by(email=email).one()
+    purchase_id = None
+    if previous_provider != "beta":
+        purchase = models.Purchase(
+            user_id=user.id, product_id="smart-sample-manager", provider=previous_provider,
+            provider_order_id="legacy_order", amount_cents=500, currency="GBP",
+        )
+        db_session.add(purchase)
+        db_session.flush()
+        purchase_id = purchase.id
+    db_session.add(models.Entitlement(
+        user_id=user.id, product_id="smart-sample-manager", purchase_id=purchase_id,
+        license_type="beta" if previous_provider == "beta" else "perpetual",
+        license_key="EXISTING-LICENCE", max_activations=3, status="active",
+    ))
+    db_session.commit()
+
+    assert _post_webhook(client, _completed_payload("evt_upgrade", "cs_upgrade", email=email)).status_code == 200
+    assert db_session.query(models.Entitlement).filter_by(user_id=user.id, status="active").count() == 2
+    response = client.get("/downloads/latest", params={
+        "product_id": "smart-sample-manager", "platform": "macos", "architecture": "arm64",
+    })
+    # Authentication succeeds and reaches release lookup; no release was seeded.
+    assert response.status_code == 404
+    assert response.json()["detail"] == "No matching release found"
 
 
 def test_download_reports_missing_release(client, db_session):
@@ -497,80 +528,20 @@ def test_download_rejects_expired_entitlement(client, db_session):
     assert resp.status_code == 403
 
 
-def test_transaction_completed_resolves_email_via_customer_id(client, db_session, monkeypatch):
-    """A real Paddle Billing transaction.completed event carries only
-    customer_id on data, never an embedded customer object (see
-    commerce.py's _fetch_customer_email docstring -- found via a real
-    sandbox webhook returning KeyError: 'customer', 2026-08-14). The
-    handler must look the email up via the Customers API instead of
-    assuming an embedded customer.email."""
-    db_session.add(
-        models.Product(
-            id="smart-sample-manager",
-            name="Smart Sample Manager",
-            status="active",
-            public=True,
-            purchasable=True,
-            platforms=["macos"],
-            paddle_product_id="smart-sample-manager",
-        )
-    )
-    db_session.commit()
-
-    from app.commerce import settings as commerce_settings
-
-    monkeypatch.setattr(commerce_settings, "paddle_api_key", "sandbox-key-for-test")
-
-    class _FakeResponse:
-        def raise_for_status(self):
-            pass
-
-        def json(self):
-            return {"data": {"email": "real-customer@example.com"}}
-
-    def _fake_get(url, headers=None, timeout=None):
-        assert url.endswith("/customers/ctm_real_customer")
-        return _FakeResponse()
-
-    import app.commerce as commerce_module
-
-    monkeypatch.setattr(commerce_module.httpx, "get", _fake_get)
-
-    payload = {
-        "event_id": "evt_real_shape",
-        "event_type": "transaction.completed",
-        "data": {
-            "id": "txn_real_shape",
-            "customer_id": "ctm_real_customer",
-            "currency_code": "GBP",
-            "details": {"totals": {"total": "500"}},
-            "items": [{"price": {"product_id": "smart-sample-manager"}}],
-        },
-    }
-    resp = _post_webhook(client, payload)
-    assert resp.status_code == 200
-    assert resp.json()["status"] == "processed"
-
+def test_checkout_falls_back_to_customer_email(client, db_session):
+    _seed_product(db_session)
+    payload = _completed_payload("evt_customer_email", "cs_customer_email")
+    session = payload["data"]["object"]
+    del session["customer_details"]
+    session["customer_email"] = "real-customer@example.com"
+    assert _post_webhook(client, payload).status_code == 200
     purchase = db_session.query(models.Purchase).one()
-    user = db_session.get(models.User, purchase.user_id)
-    assert user.email == "real-customer@example.com"
-    assert db_session.query(models.Entitlement).count() == 1
+    assert db_session.get(models.User, purchase.user_id).email == "real-customer@example.com"
+
 
 
 def test_failed_first_delivery_is_not_poisoned_by_retry(client, db_session):
-    """A delivery that raises on its first attempt must still be
-    processable on a later retry of the same event_id. Before this fix,
-    the insert-and-commit idempotency claim ran before processing, so a
-    first-attempt failure left a WebhookEvent row with processed_at=None
-    permanently in place -- every retry (including Paddle's own automatic
-    one) matched that row and short-circuited to already_processed without
-    ever calling _handle_transaction_completed. Paddle marks the
-    notification "delivered" on that 200, so the event was lost forever.
-    Real incident: txn_01kzzqmywn6h2waqzycw10f0me, 2026-08-14."""
-    # No Product row seeded -- first delivery raises UnknownCatalogItemError,
-    # which IS treated as a terminal rejection (by design, see paddle_webhook),
-    # so instead simulate a genuinely transient failure: seed the product
-    # but make the first delivery's price_id mapping momentarily wrong.
+    # A failed attempt must remain retryable even after its receipt was committed.
     db_session.add(
         models.Product(
             id="smart-sample-manager",
@@ -579,16 +550,15 @@ def test_failed_first_delivery_is_not_poisoned_by_retry(client, db_session):
             public=True,
             purchasable=True,
             platforms=["macos"],
-            paddle_product_id="smart-sample-manager",
         )
     )
     db_session.commit()
 
     payload = _completed_payload("evt_retry_test", "txn_retry_test", email="retry-buyer@example.com")
 
-    import app.commerce as commerce_module
+    import app.stripe_commerce as commerce_module
 
-    original_handler = commerce_module._handle_transaction_completed
+    original_handler = commerce_module._handle_checkout_session_completed
     call_count = {"n": 0}
 
     def _flaky_handler(db, payload):
@@ -599,7 +569,7 @@ def test_failed_first_delivery_is_not_poisoned_by_retry(client, db_session):
 
     import unittest.mock as mock
 
-    with mock.patch.object(commerce_module, "_handle_transaction_completed", side_effect=_flaky_handler):
+    with mock.patch.object(commerce_module, "_handle_checkout_session_completed", side_effect=_flaky_handler):
         first_resp = _post_webhook(client, payload)
         assert first_resp.status_code == 500
 
@@ -611,7 +581,7 @@ def test_failed_first_delivery_is_not_poisoned_by_retry(client, db_session):
         assert events[0].processed_at is None
         assert events[0].processing_error == "simulated transient failure on first delivery"
 
-        # Paddle retries the identical event_id.
+        # Stripe retries the identical event_id.
         retry_resp = _post_webhook(client, payload)
         assert retry_resp.status_code == 200
         assert retry_resp.json()["status"] == "processed"
@@ -643,18 +613,16 @@ def test_admin_can_create_and_list_products(client, db_session):
             "purchasable": True,
             "public": True,
             "platforms": ["macos"],
-            "paddle_product_id": "pro_real_catalog_item",
         },
         headers={"X-Admin-Key": "test-admin-key"},
     )
     assert create_resp.status_code == 200
-    assert create_resp.json() == {"id": "smart-sample-manager", "paddle_product_id": "pro_real_catalog_item"}
 
     list_resp = client.get("/admin/products", headers={"X-Admin-Key": "test-admin-key"})
     assert list_resp.status_code == 200
     products = list_resp.json()
     assert len(products) == 1
-    assert products[0]["paddle_product_id"] == "pro_real_catalog_item"
+    assert products[0]["id"] == "smart-sample-manager"
 
     # Updating (same path id) doesn't create a second row.
     update_resp = client.put(
@@ -663,7 +631,6 @@ def test_admin_can_create_and_list_products(client, db_session):
             "id": "smart-sample-manager",
             "name": "Smart Sample Manager",
             "purchasable": False,
-            "paddle_product_id": "pro_real_catalog_item",
         },
         headers={"X-Admin-Key": "test-admin-key"},
     )
@@ -844,34 +811,11 @@ def test_admin_release_upsert_rejects_checksum_mismatch(client, db_session):
     assert db_session.query(models.Release).count() == 0
 
 
-def test_webhook_resolves_product_via_paddle_product_id_not_internal_slug(client, db_session):
-    """The real bug this whole model exists to fix: a real Paddle
-    transaction.completed event's product_id is Paddle's own id
-    (pro_...), which is never equal to our internal slug. Seeding the
-    Product with a *different* internal id than the Paddle product_id
-    confirms resolution goes through paddle_product_id, not Product.id."""
-    db_session.add(
-        models.Product(
-            id="smart-sample-manager",
-            name="Smart Sample Manager",
-            status="active",
-            public=True,
-            purchasable=True,
-            platforms=["macos"],
-            paddle_product_id="pro_01realcatalogitem",
-        )
-    )
-    db_session.commit()
+def test_webhook_uses_internal_product_slug(client, db_session):
+    _seed_product(db_session)
+    assert _post_webhook(client, _completed_payload("evt_slug", "cs_slug")).status_code == 200
+    assert db_session.query(models.Purchase).one().product_id == "smart-sample-manager"
 
-    payload = _completed_payload(
-        "evt_real_product_shape", "txn_real_product_shape", product_id="pro_01realcatalogitem"
-    )
-    resp = _post_webhook(client, payload)
-    assert resp.status_code == 200
-    assert resp.json()["status"] == "processed"
-
-    purchase = db_session.query(models.Purchase).one()
-    assert purchase.product_id == "smart-sample-manager"  # our internal slug, not Paddle's id
 
 
 def _login_and_get_token(client, email, db_session):
@@ -891,3 +835,95 @@ def _login_and_get_token(client, email, db_session):
     )
     db_session.commit()
     return raw_token
+
+
+def test_delayed_payment_fulfils_once_when_two_events_share_a_session(client, db_session):
+    # Checkout completion can precede settlement; only settlement grants a licence.
+    _seed_product(db_session)
+    payload = _completed_payload("evt_delayed_start", "cs_delayed")
+    payload["data"]["object"]["payment_status"] = "unpaid"
+    assert _post_webhook(client, payload).json()["status"] == "awaiting_payment"
+    payload["id"] = "evt_delayed_paid"
+    payload["type"] = "checkout.session.async_payment_succeeded"
+    payload["data"]["object"]["payment_status"] = "paid"
+    assert _post_webhook(client, payload).json()["status"] == "processed"
+    payload["id"] = "evt_delayed_duplicate"
+    assert _post_webhook(client, payload).json()["status"] == "already_processed"
+    assert db_session.query(models.Purchase).count() == 1
+    assert db_session.query(models.Entitlement).count() == 1
+
+
+def test_paraphrase_paid_session_records_minor_units_and_can_be_redeemed(client, db_session):
+    from app import paraphrase_orders
+
+    payload = _completed_payload("evt_paraphrase", "cs_paraphrase", product_id="nite-paraphrase")
+    payload["data"]["object"]["metadata"]["paraphrase_hint"] = "browser-secret-hint"
+    assert _post_webhook(client, payload).status_code == 200
+    payload["id"] = "evt_paraphrase_duplicate"
+    assert _post_webhook(client, payload).status_code == 200
+    order = db_session.query(models.ParaphraseOrder).one()
+    assert order.amount_cents == 500
+    assert order.currency == "GBP"
+    token, _ = paraphrase_orders.redeem(db_session, "browser-secret-hint")
+    assert paraphrase_orders.verify_unlock_token(token)
+    assert paraphrase_orders.redeem(db_session, "other-browser-hint") is None
+    assert db_session.query(models.User).count() == 0
+    assert db_session.query(models.Entitlement).count() == 0
+
+
+def test_paraphrase_checkout_uses_stripe_metadata_and_success_hint(monkeypatch):
+    from app import paraphrase_orders
+
+    monkeypatch.setattr(app_settings, "paraphrase_price_gbp_3", "price_paraphrase_3")
+    calls = []
+
+    class Provider:
+        def create_checkout_url(self, price_id, **kwargs):
+            calls.append((price_id, kwargs))
+            return "https://checkout.stripe.com/paraphrase"
+
+    url, hint = paraphrase_orders.create_checkout(Provider(), "gbp-3")
+    assert url == "https://checkout.stripe.com/paraphrase"
+    assert calls[0][0] == "price_paraphrase_3"
+    assert calls[0][1]["metadata"] == {"product_id": "nite-paraphrase", "paraphrase_hint": hint}
+    assert calls[0][1]["success_url"].endswith("?paraphrase_hint=" + hint)
+
+
+def test_failed_flush_rolls_back_purchase_before_retry(client, db_session, monkeypatch):
+    # A SQL failure aborts the transaction; recording an error needs a fresh one.
+    import app.stripe_commerce as module
+
+    _seed_product(db_session)
+    original = module._handle_checkout_session_completed
+    calls = 0
+
+    def fail_after_flush(db, payload):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            original(db, payload)
+            db.add(models.User(email="buyer@example.com"))
+            db.flush()
+            raise AssertionError("the duplicate email should fail at flush")
+        return original(db, payload)
+
+    monkeypatch.setattr(module, "_handle_checkout_session_completed", fail_after_flush)
+    payload = _completed_payload("evt_flush_retry", "cs_flush_retry")
+    assert _post_webhook(client, payload).status_code == 500
+    assert db_session.query(models.Purchase).count() == 0
+    receipt = db_session.query(models.WebhookEvent).one()
+    assert receipt.processed_at is None
+    assert "UniqueViolation" in receipt.processing_error
+    assert _post_webhook(client, payload).status_code == 200
+    assert db_session.query(models.Purchase).count() == 1
+
+
+def test_dispute_records_status_without_revoking_a_licence(client, db_session):
+    _seed_product(db_session)
+    _buy_something(client, "evt_dispute_src", "cs_dispute")
+    payload = {"id": "evt_dispute", "type": "charge.dispute.created", "data": {"object": {
+        "payment_intent": "pi_cs_dispute",
+    }}}
+    assert _post_webhook(client, payload).status_code == 200
+    assert db_session.query(models.Purchase).one().status == "disputed"
+    assert db_session.query(models.Entitlement).one().status == "active"

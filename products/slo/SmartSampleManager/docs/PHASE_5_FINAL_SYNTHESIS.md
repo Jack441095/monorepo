@@ -1,3 +1,5 @@
+> Historical report: Paddle was the provider at the time. Current checkout and validation instructions are in the [Stripe commerce guide](../../../../docs/STRIPE_COMMERCE.md).
+
 # Phase 5 Final Synthesis
 
 External Enablement, Production Credentials, Clean-Machine Validation & Private Beta Release
@@ -53,7 +55,7 @@ obtain, and none was fabricated:
   `docs/CLEAN_MACHINE_VALIDATION.md`.
 - **Real hosted staging** -- no hosting account. `docs/HOSTED_STAGING_DEPLOYMENT.md`.
 - **Real Paddle sandbox checkout/webhook/refund** -- no Paddle account.
-  `docs/PADDLE_SANDBOX_VALIDATION.md`.
+  [current Stripe commerce guide](../../../../docs/STRIPE_COMMERCE.md).
 - **DAW host validation (Ableton/Logic/etc.)** -- requires a signed build to be meaningful;
   not performed against an unsigned dev build per Section 40's "test real user paths."
 

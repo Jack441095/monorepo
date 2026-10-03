@@ -1,3 +1,5 @@
+> Historical report: Paddle was the provider at the time. Current checkout and validation instructions are in the [Stripe commerce guide](../../../../docs/STRIPE_COMMERCE.md).
+
 # Smart Sample Manager 1.0.0-beta.1 -- Release Notes
 
 **Not yet cut.** This document is drafted ahead of the actual release candidate so its shape is
@@ -54,7 +56,7 @@ not before.
 - No real domain or company email exists yet (Phase 5.5 confirmed via repo-wide search --
   `docs/DOMAIN_CONFIGURATION.md`, `docs/EMAIL_CONFIGURATION.md`).
 - Real Paddle commerce, real hosted staging, real email delivery: all still local-only/simulated
-  (`docs/PADDLE_SANDBOX_VALIDATION.md`, `docs/HOSTED_STAGING_DEPLOYMENT.md`,
+  ([current Stripe commerce guide](../../../../docs/STRIPE_COMMERCE.md), `docs/HOSTED_STAGING_DEPLOYMENT.md`,
   `docs/EMAIL_DOMAIN_CONFIGURATION.md`).
 
 ## Feedback

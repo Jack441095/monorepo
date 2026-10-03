@@ -62,39 +62,14 @@ class Settings(BaseSettings):
     offline_grace_period_seconds: int = 14 * 24 * 60 * 60  # unchanged from the dev server -- Section 22
     default_max_activations: int = 3  # unchanged from the dev server -- Phase 3 Section 23
 
-    # Commerce -- Section 31. Paddle credentials are only ever read from
-    # environment/secrets, never hardcoded. Empty by default; commerce.py's
-    # PaddleProvider treats an empty api_key as "sandbox account not
-    # configured" and refuses to attempt real API calls, falling back to a
-    # documented mock mode used by the local E2E test.
-    paddle_api_key: str = ""
-    paddle_webhook_secret: str = ""
-
-    # sandbox-api.paddle.com in every environment until a human explicitly
-    # flips this to api.paddle.com for a real production deploy -- this is
-    # the one line that draws the sandbox/live line for API calls, so it's
-    # never inferred from `environment` (see docs/PADDLE_INTEGRATION_AUDIT.md).
-    paddle_api_base_url: str = "https://sandbox-api.paddle.com"
-
-    # Product/price ID mapping (docs/PADDLE_INTEGRATION_AUDIT.md Section 12) --
-    # empty until a real Paddle sandbox product exists. commerce.py's webhook
-    # handler refuses to issue an entitlement for any price_id/product_id
-    # combination not represented in this mapping; it never infers a mapping
-    # from event payload alone.
-    paddle_product_id: str = ""
-    paddle_intro_price_id: str = ""
-    paddle_regular_price_id: str = ""
-
-    # Which of the two price IDs above is currently offered at checkout.
-    # Section 18/67: an explicit owner-controlled switch, not a code change
-    # and not an unverified clock -- flipping this is a deliberate, reviewable
-    # action (env var change + deploy), never automatic based on a launch date.
-    paddle_active_price_id: str = ""
-
-    # Backend checkout request gate. Keep disabled until the owner has
-    # explicitly approved the environment's Paddle checkout path; credentials
-    # and catalog IDs alone must never expose a checkout endpoint.
-    paddle_checkout_enabled: bool = False
+    # Empty credentials keep checkout closed; webhooks use a separate signing secret.
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_product_id: str = "nite-submit"
+    stripe_intro_price_id: str = ""
+    stripe_regular_price_id: str = ""
+    stripe_active_price_id: str = ""
+    stripe_checkout_enabled: bool = False
     legal_review_approved: bool = False
     release_ready: bool = False
 
@@ -137,25 +112,12 @@ class Settings(BaseSettings):
     paraphrase_free_daily_limit: int = 3
     # Phase 4 placeholder: an unlock token the webhook path will issue to
     # paid users. Until then it lets staging/tests simulate an unlocked
-    # session without touching Paddle. Empty means no one bypasses the
+    # session without touching Stripe. Empty means no one bypasses the
     # free tier.
     paraphrase_unlock_token: str = ""
 
-    # Stripe -- payment processor for live sales (Paraphrase tips + SLO).
-    # stripe_webhook_secret is the endpoint signing secret from the Stripe
-    # dashboard (whsec_...). Empty by default: stripe_commerce.py refuses to
-    # process any webhook without it, fail-closed.
-    # Product routing uses session.metadata["product_id"] (our internal slug)
-    # set at payment-link creation time -- no price-ID mapping needed here.
-    stripe_webhook_secret: str = ""
-
-    # Paraphrase PWYW tiers (products/nite-paraphrase Phase 4). One Paddle
-    # sandbox price per tier is mapped to a tier name exactly like the
-    # main product's intro/regular mapping. Empty until the owner creates
-    # them in Paddle: checkout 400s for any unconfigured tier, and the
-    # webhook refuses an unconfigured product -- fail-closed like every
-    # other catalog mapping in this codebase.
-    paraphrase_product_id: str = ""
+    # These are Stripe price IDs; product_id metadata uses our internal slug.
+    paraphrase_product_id: str = "nite-paraphrase"
     paraphrase_price_gbp_1: str = ""
     paraphrase_price_gbp_3: str = ""
     paraphrase_price_gbp_10: str = ""
@@ -206,6 +168,19 @@ def _usable_sender_address(address: str) -> bool:
     )
 
 
+def _checkout_configuration_problems(s: Settings) -> list[str]:
+    problems = []
+    for name in ("stripe_secret_key", "stripe_product_id", "stripe_active_price_id"):
+        if not getattr(s, name):
+            problems.append(f"{name} is required for checkout")
+    prices = {p for p in (s.stripe_intro_price_id, s.stripe_regular_price_id) if p}
+    if not prices:
+        problems.append("at least one of stripe_intro_price_id or stripe_regular_price_id is required")
+    elif s.stripe_active_price_id and s.stripe_active_price_id not in prices:
+        problems.append("stripe_active_price_id must match an intro or regular configured price ID")
+    return problems
+
+
 def _validate_production_config(s: Settings) -> None:
     """Phase 5.5, Section 23: production startup must fail loudly if
     required configuration is missing, never silently fall back to a
@@ -217,9 +192,9 @@ def _validate_production_config(s: Settings) -> None:
         return
 
     problems = []
-    if s.paddle_checkout_enabled and not s.legal_review_approved:
+    if s.stripe_checkout_enabled and not s.legal_review_approved:
         problems.append("legal_review_approved must be true before production checkout")
-    if s.paddle_checkout_enabled and not s.release_ready:
+    if s.stripe_checkout_enabled and not s.release_ready:
         problems.append("release_ready must be true before production checkout")
     for field_name, value in (
         ("nite_dsp_public_url", s.nite_dsp_public_url),
@@ -243,32 +218,12 @@ def _validate_production_config(s: Settings) -> None:
         )
     if "nitedsp_staging" in s.database_url or "nitedsp_test" in s.database_url:
         problems.append(f"database_url still points at a local staging/test database: {s.database_url!r}")
-    # Paddle checks are skipped when Stripe is configured as the checkout
-    # provider (stripe_webhook_secret set). Paddle remains available for
-    # legacy Paraphrase tip-jar links but is not required when Stripe handles
-    # all new product purchases.
     if not s.stripe_webhook_secret:
-        paddle_host = urlparse(s.paddle_api_base_url).hostname
-        if paddle_host != "api.paddle.com":
-            problems.append(
-                "paddle_api_base_url must use api.paddle.com in production; "
-                f"got {s.paddle_api_base_url!r}"
-            )
-        for field_name, value in (
-            ("paddle_api_key", s.paddle_api_key),
-            ("paddle_webhook_secret", s.paddle_webhook_secret),
-            ("paddle_product_id", s.paddle_product_id),
-            ("paddle_active_price_id", s.paddle_active_price_id),
-        ):
-            if not value:
-                problems.append(f"{field_name} is required for production checkout")
-        configured_price_ids = {
-            value for value in (s.paddle_intro_price_id, s.paddle_regular_price_id) if value
-        }
-        if not configured_price_ids:
-            problems.append("at least one of paddle_intro_price_id or paddle_regular_price_id is required")
-        elif s.paddle_active_price_id and s.paddle_active_price_id not in configured_price_ids:
-            problems.append("paddle_active_price_id must match an intro or regular configured price ID")
+        problems.append("stripe_webhook_secret is required for production commerce")
+    if s.stripe_secret_key and not s.stripe_secret_key.startswith(("sk_live_", "rk_live_")):
+        problems.append("stripe_secret_key must be a live Stripe key in production")
+    if s.stripe_checkout_enabled:
+        problems.extend(_checkout_configuration_problems(s))
     if s.email_provider not in ("console", "resend"):
         problems.append(f"email_provider={s.email_provider!r} is not a valid provider")
     elif s.email_provider != "resend":
@@ -291,44 +246,17 @@ def _validate_production_config(s: Settings) -> None:
 
 
 def _validate_staging_config(s: Settings) -> None:
-    """Keep a staging deployment pointed at Paddle Sandbox and HTTPS.
-
-    Staging is the only environment currently intended to exercise checkout.
-    Fail loudly when it is half-configured or pointed at the live Paddle API;
-    local development remains intentionally permissive so simulated webhook
-    tests can run without credentials.
-    """
+    """Staging uses Stripe test credentials and public HTTPS endpoints."""
     if s.environment != "staging":
         return
 
     problems = []
-    paddle_host = urlparse(s.paddle_api_base_url).hostname
-    if paddle_host != "sandbox-api.paddle.com":
-        problems.append(
-            "paddle_api_base_url must use sandbox-api.paddle.com in staging; "
-            f"got {s.paddle_api_base_url!r}"
-        )
-    if s.paddle_api_key and not s.paddle_api_key.startswith("pdl_sdbx_"):
-        problems.append(
-            "paddle_api_key must be a Paddle Sandbox API key (pdl_sdbx_...) in staging"
-        )
-
-    for field_name, value in (
-        ("paddle_api_key", s.paddle_api_key),
-        ("paddle_webhook_secret", s.paddle_webhook_secret),
-        ("paddle_product_id", s.paddle_product_id),
-        ("paddle_active_price_id", s.paddle_active_price_id),
-    ):
-        if not value:
-            problems.append(f"{field_name} is required for staging checkout")
-
-    configured_price_ids = {
-        value for value in (s.paddle_intro_price_id, s.paddle_regular_price_id) if value
-    }
-    if not configured_price_ids:
-        problems.append("at least one of paddle_intro_price_id or paddle_regular_price_id is required")
-    elif s.paddle_active_price_id and s.paddle_active_price_id not in configured_price_ids:
-        problems.append("paddle_active_price_id must match an intro or regular configured price ID")
+    if not s.stripe_webhook_secret:
+        problems.append("stripe_webhook_secret is required for staging commerce")
+    if s.stripe_secret_key and not s.stripe_secret_key.startswith(("sk_test_", "rk_test_")):
+        problems.append("stripe_secret_key must be a Stripe test key in staging")
+    if s.stripe_checkout_enabled:
+        problems.extend(_checkout_configuration_problems(s))
 
     for field_name, value in (
         ("nite_dsp_public_url", s.nite_dsp_public_url),

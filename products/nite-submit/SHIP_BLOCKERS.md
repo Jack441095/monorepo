@@ -25,7 +25,7 @@
 **Evidence:** no checkout integration in `web/index.html`; `LicenseEngine` validates keys but nothing mints one for a customer. The "£3 lifetime licence" claim on the sales page has no fulfilment path.
 
 **Fix steps:**
-1. Choose a processor (LemonSqueezy or Paddle both handle EU VAT and key delivery).
+1. Use Stripe and validate checkout and licence delivery with the current platform settings in `../../docs/STRIPE_COMMERCE.md`.
 2. Mint keys with `nitesubmit-keygen` (now reading the signing key from `$XDG_CONFIG_HOME/nite-submit/license-private-key.base64`).
 3. Wire the webhook so a paid order receives a key by email.
 4. Test: purchase → key arrives → activates → refund.

@@ -19,7 +19,7 @@ export default function PricingPage() {
           <h1 className="section-title mt-4 text-foreground">One price. Yours to keep.</h1>
           <p className="body-large mt-6">
             {PUBLIC_CHECKOUT_LIVE
-              ? "NITE Submit is available as a £3 perpetual licence with no subscription."
+              ? "NITE Submit is available as a £2 perpetual licence with no subscription."
               : "NITE Submit is currently in a free closed beta. The first paid experiment will be a simple £3 perpetual licence with no subscription."}
           </p>
         </div>
@@ -48,7 +48,7 @@ export default function PricingPage() {
                   ["Status", PUBLIC_CHECKOUT_LIVE ? "Available for macOS" : "Closed Beta, free", "Private Beta / Research", "In development"],
                   ["Local processing", "Documents never leave your Mac", "Audio analysis runs on your machine", "Planned: local analysis"],
                   ["Account required", "No", "Activation check-in only", "—"],
-                  ["Price model", PUBLIC_CHECKOUT_LIVE ? "£3 perpetual · no subscription" : "£3 perpetual planned · no subscription", "Pricing announced at launch", "Pricing announced at launch"],
+                  ["Price model", PUBLIC_CHECKOUT_LIVE ? "£2 perpetual · no subscription" : "£3 perpetual planned · no subscription", PUBLIC_CHECKOUT_LIVE ? "£9 perpetual · no subscription" : "Pricing announced at launch", "Pricing announced at launch"],
                 ].map(([label, ...cells]) => (
                   <tr key={label} style={{ borderTop: "1px solid var(--border)" }}>
                     <th scope="row" className="py-4 pr-4 text-left text-xs font-semibold text-foreground">{label}</th>
@@ -76,7 +76,7 @@ export default function PricingPage() {
             <span className="eyebrow">License Terms</span>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">What is included.</h2>
             <ul className="feature-list mt-7">
-              <li>{PUBLIC_CHECKOUT_LIVE ? "£3 perpetual single-user licence" : "Free invitation-only closed beta"}</li>
+              <li>{PUBLIC_CHECKOUT_LIVE ? "£2 perpetual single-user licence" : "Free invitation-only closed beta"}</li>
               <li>{PUBLIC_CHECKOUT_LIVE ? "No recurring subscription" : "Planned £3 perpetual licence experiment"}</li>
               <li>macOS 13+ Apple Silicon application</li>
               <li>No recurring subscription for V1</li>
@@ -97,7 +97,7 @@ export default function PricingPage() {
               <div className="border-b pb-5" style={{ borderColor: "var(--border)" }}>
                 <div className="flex justify-between items-baseline">
                   <span className="text-sm font-semibold text-foreground">Perpetual Licence{PUBLIC_CHECKOUT_LIVE ? "" : " (planned)"}</span>
-                  <span className="text-2xl font-bold text-foreground tnum">£3</span>
+                  <span className="text-2xl font-bold text-foreground tnum">{PUBLIC_CHECKOUT_LIVE ? "£2" : "£3"}</span>
                 </div>
                 <p className="mt-1 text-xs text-muted leading-relaxed">
                   {PUBLIC_CHECKOUT_LIVE
@@ -119,16 +119,24 @@ export default function PricingPage() {
             
             <div className="mt-8 flex flex-col gap-4">
               <div>
-                <p className="text-xs font-semibold text-foreground mb-2">NITE Submit — £2</p>
+                <p className="text-xs font-semibold text-foreground mb-2">{PUBLIC_CHECKOUT_LIVE ? "NITE Submit — £2" : "NITE Submit — closed beta"}</p>
                 <div className="flex flex-wrap gap-3">
-                  <a href={STRIPE_SUBMIT_LINK} className="btn-primary">Buy now — £2</a>
+                  {PUBLIC_CHECKOUT_LIVE ? (
+                    <a href={STRIPE_SUBMIT_LINK} className="btn-primary">Buy now — £2</a>
+                  ) : (
+                    <Link href="/beta" className="btn-primary">Request beta access</Link>
+                  )}
                   <Link href="/products/submit" className="btn-secondary">Learn more</Link>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-semibold text-foreground mb-2">SLO — £9</p>
+                <p className="text-xs font-semibold text-foreground mb-2">{PUBLIC_CHECKOUT_LIVE ? "SLO — £9" : "SLO — private beta"}</p>
                 <div className="flex flex-wrap gap-3">
-                  <a href={STRIPE_SLO_LINK} className="btn-primary">Buy now — £9</a>
+                  {PUBLIC_CHECKOUT_LIVE ? (
+                    <a href={STRIPE_SLO_LINK} className="btn-primary">Buy now — £9</a>
+                  ) : (
+                    <Link href="/products/smart-sample-manager#join-waitlist" className="btn-primary">Join SLO waitlist</Link>
+                  )}
                   <Link href="/products/smart-sample-manager" className="btn-secondary">Learn more</Link>
                 </div>
               </div>
@@ -139,7 +147,9 @@ export default function PricingPage() {
             </p>
 
             <p className="mt-6 text-xs text-muted-dim">
-              Secure checkout processed by Stripe. Your licence key is delivered by email after payment.
+              {PUBLIC_CHECKOUT_LIVE
+                ? "Secure checkout processed by Stripe. Your licence key is delivered by email after payment."
+                : "Paid checkout opens after release validation and legal review."}
             </p>
           </div>
         </div>

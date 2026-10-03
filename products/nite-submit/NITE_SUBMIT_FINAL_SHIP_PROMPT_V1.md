@@ -16,7 +16,7 @@ A ship-readiness gate has been run. The following P0 blockers were identified an
 
 - **P0-1 (Signing):** RESOLVED by design — no Apple Developer ID. Distribution is via direct ZIP download with right-click > Open instructions. A `tools/install.sh` curl installer also exists. The sales page (`web/index.html`) guides users through Download > Unzip > Right-click Open > Activate.
 - **P0-2 (Licensing):** RESOLVED — Ed25519 licence key system added (`Sources/NiteSubmitCore/LicenseEngine.swift`). App gates behind activation on first launch (`LicenseView.swift`). Developer-only keygen tool at `Sources/nitesubmit-keygen/main.swift`. Private key at `tools/license-private-key.base64` (gitignored).
-- **P0-3 (Payment):** PARTIALLY RESOLVED — app side done (licence entry + validation). **Still needed:** a payment processor (Paddle, LemonSqueezy, or Gumroad) connected to deliver licence keys after purchase. This prompt covers that integration.
+- **P0-3 (Payment):** PARTIALLY RESOLVED — app side done (licence entry + validation). **Still needed:** the Stripe payment processor connected to deliver licence keys after purchase. This prompt covers that integration.
 
 Outstanding P1 issues from the ship gate (`SHIP_BLOCKERS.md`):
 - CHANGELOG says `[Unreleased]` not `[1.0.0]`
@@ -34,7 +34,7 @@ Outstanding P1 issues from the ship gate (`SHIP_BLOCKERS.md`):
 
 ### Phase A — Payment processor integration
 
-1. **Choose a processor.** Recommend LemonSqueezy (simplest for indie, handles EU VAT, provides licence key delivery via webhook). Paddle is also good but has more setup. Document the choice.
+1. **Use Stripe.** Follow `../../docs/STRIPE_COMMERCE.md` for checkout, webhook fulfilment, and deployment settings.
 2. **Set up the product page** on the chosen processor: £3 one-time purchase, "NITE Submit — Lifetime Student Licence", no subscription.
 3. **Webhook for licence key delivery:** after successful payment, generate a licence key (using the keygen tool or a server-side equivalent) and deliver it via the purchase confirmation email. Document the webhook endpoint and payload format.
 4. **Update `web/index.html`** buy buttons to point to the real checkout URL (currently `https://www.nitedsp.co.uk/pricing`).

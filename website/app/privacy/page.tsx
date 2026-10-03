@@ -33,7 +33,7 @@ export default function PrivacyPage() {
       <ul className="list-disc pl-5 space-y-1 mt-2">
         <li><strong>Waitlist sign-ups:</strong> email address, name (optional), qualifying answers (e.g. library size, DAW preference), and any free-text notes you add. Stored in our database to notify you when beta access is ready.</li>
         <li><strong>Account creation:</strong> email address, used to send a magic sign-in link and manage licences. No password is stored.</li>
-        <li><strong>Purchases:</strong> handled by Paddle as Merchant of Record. Paddle collects payment details on their own infrastructure. We receive a transaction record (product, amount, email) but never see your card number.</li>
+        <li><strong>Purchases:</strong> processed by Stripe. Stripe collects payment details on their own infrastructure. We receive a transaction record (product, amount, email) but never see your card number.</li>
         <li><strong>Support emails:</strong> whatever you include in your message to nitedsp@outlook.com. We never ask for passwords, payment details, or unredacted personal documents.</li>
       </ul>
 
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Third-party services</h2>
       <ul className="list-disc pl-5 space-y-1 mt-2">
-        <li><strong>Paddle:</strong> payment processing (<a href="https://www.paddle.com/legal/privacy" className="underline" target="_blank" rel="noopener">their privacy policy</a>)</li>
+        <li><strong>Stripe:</strong> payment processing (<a href="https://stripe.com/privacy" className="underline" target="_blank" rel="noopener">their privacy policy</a>)</li>
         <li><strong>Plausible:</strong> analytics (<a href="https://plausible.io/data-policy" className="underline" target="_blank" rel="noopener">their data policy</a>)</li>
         <li><strong>Vercel:</strong> website hosting</li>
         <li><strong>Neon:</strong> database hosting (EU)</li>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
 
       <h2 className="text-base font-semibold text-foreground mt-6 mb-2">Changes to this policy</h2>
       <p>
-        We will update the "last updated" date at the top of this page when changes are made.
+        We will update the &ldquo;last updated&rdquo; date at the top of this page when changes are made.
         Material changes will be communicated by email to account holders and waitlist members.
       </p>
     </LegalPage>

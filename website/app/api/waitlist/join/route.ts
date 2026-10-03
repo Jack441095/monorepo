@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import { parseWaitlistJoin } from "@/lib/waitlist";
 
 const CAPACITY: Record<string, number> = {
   "smart-sample-manager": 50,
@@ -7,12 +8,12 @@ const CAPACITY: Record<string, number> = {
 };
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const { email, name, product_id, use_case } = body;
-
-  if (!email || !product_id) {
-    return Response.json({ detail: "email and product_id are required" }, { status: 400 });
+  const body = await request.json().catch(() => null);
+  const values = parseWaitlistJoin(body);
+  if (!values) {
+    return Response.json({ detail: "Provide a valid email, product_id, and optional text fields" }, { status: 400 });
   }
+  const { email, name, product_id, use_case } = values;
 
   const sql = getDb();
 

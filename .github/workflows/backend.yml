@@ -1,6 +1,6 @@
 name: backend
 
-# Manual validation only. This workflow never deploys, contacts Paddle, uploads
+# Manual validation only. This workflow never deploys, contacts Stripe, uploads
 # release artifacts, or requires provider credentials. Website hosting remains
 # controlled by its hosting provider, not by this workflow.
 on:

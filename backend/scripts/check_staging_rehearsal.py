@@ -2,7 +2,7 @@
 """Run the read-only gate for a durable Submit staging rehearsal.
 
 The command probes only public, unauthenticated endpoints. It never sends
-mail, calls Paddle, uploads an artifact, changes provider state, or prints
+mail, calls Stripe, uploads an artifact, changes provider state, or prints
 response bodies. A passing result means the service advertises the durable
 storage and deliverable-email posture required before a staging customer
 journey is treated as proven.
@@ -213,7 +213,7 @@ def main(argv: list[str] | None = None) -> int:
     checkout_note = ", checkout" if args.require_checkout else ""
     print(f"staging rehearsal gate: PASS (health, durable readiness{checkout_note}, download auth)")
     print(f"base_url={base_url}")
-    print("provider state unchanged; no artifact upload or email/Paddle request made")
+    print("provider state unchanged; no artifact upload or email/Stripe request made")
     return 0
 
 

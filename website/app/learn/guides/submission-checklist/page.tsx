@@ -100,10 +100,10 @@ export default function SubmissionChecklistPage() {
           <Reveal>
             <div className="prose-custom">
               <p>
-                This checklist covers the things that go wrong between "I've finished writing"
-                and "I've submitted." It's not about your argument, your research, or your grammar.
-                It's about the structural and technical details that can cause a rejection, a
-                resubmission, or lost marks, and that most students don't check until it's too late.
+                This checklist covers the things that go wrong between &ldquo;I&apos;ve finished writing&rdquo;
+                and &ldquo;I&apos;ve submitted.&rdquo; It&apos;s not about your argument, your research, or your grammar.
+                It&apos;s about the structural and technical details that can cause a rejection, a
+                resubmission, or lost marks, and that most students don&apos;t check until it&apos;s too late.
               </p>
               <p>
                 Print it, bookmark it, or just read through it once before your next deadline.
