@@ -776,3 +776,102 @@ def test_http_cancelled_payload_does_not_log_feedback(stream_http, monkeypatch):
     monkeypatch.setattr(server, "demo_feedback", SimpleNamespace(record_question=lambda *args: writes.append("feedback")))
     result = stream_http("/api/ask", {"session_id": "song-a", "stream": False})
     assert result["answer_delivery_discarded"] is True and writes == []
+
+
+@pytest.mark.parametrize("path", ["/api/ask", "/kenn/api/ask"])
+@pytest.mark.parametrize("shortcut", ["inspection", "midi", "command", "non_request", "checkpoint", "tool", "analysis", "revision"])
+@pytest.mark.parametrize("superseded_by", ["cancel", "next_turn", "other_chat", "none"])
+def test_http_shortcut_discards_a_late_reply_only_when_its_chat_turn_is_revoked(stream_http, monkeypatch, path, shortcut, superseded_by):
+    import kenn.server as server
+
+    # These replies bypass the knowledge engine, whose final delivery already checks its turn.
+    handlers = {
+        "inspection": "_maybe_handle_live_inspection",
+        "midi": "_maybe_handle_midi_generation",
+        "command": "_maybe_handle_live_command_from_chat",
+        "checkpoint": "_maybe_handle_checkpoint_reply",
+        "tool": "_maybe_run_explicit_tool_trigger",
+        "analysis": "_maybe_handle_project_analysis",
+        "revision": "_maybe_handle_mix_revision",
+    }
+    for name in handlers.values():
+        monkeypatch.setattr(server.Handler, name, lambda *args: None)
+    monkeypatch.setattr(server, "classify_non_request", lambda question: None)
+
+    def reply(*args):
+        if superseded_by == "cancel":
+            answer_upgrades.invalidate("song-a")
+        elif superseded_by == "next_turn":
+            answer_upgrades.begin_turn("song-a")
+        elif superseded_by == "other_chat":
+            answer_upgrades.begin_turn("song-b")
+        return {
+            "answer": "Shortcut advice", "route": "fixture", "status": "proposed",
+            "proposal": {"fixture": True}, "confirmation_token": "fixture-token",
+            "requires_confirmation": True,
+        }
+
+    if shortcut == "non_request":
+        monkeypatch.setattr(server, "classify_non_request", lambda question: "fixture")
+        monkeypatch.setattr(server, "non_request_reply", reply)
+    else:
+        monkeypatch.setattr(server.Handler, handlers[shortcut], reply)
+    result = stream_http(path, {
+        "session_id": "song-a", "plugin_session_id": "plugin-a", "stream": False,
+    })
+    if superseded_by in {"cancel", "next_turn"}:
+        assert result["answer"] == "" and result["status"] == "cancelled"
+        assert result["envelope"]["status"] == "cancelled"
+        assert result["answer_delivery_discarded"] is True
+        assert result["requires_confirmation"] is False
+        assert not result.get("proposal") and not result.get("confirmation_token")
+        assert result["session_id"] == "song-a" and result["plugin_session_id"] == "plugin-a"
+        assert result["inference_aborted"] is False
+    else:
+        assert result["answer"] == "Shortcut advice"
+        assert not result.get("answer_delivery_discarded")
+        if shortcut in {"midi", "command"}:
+            assert result["requires_confirmation"] is True
+            assert result["confirmation_token"] == "fixture-token"
+
+
+@pytest.mark.parametrize("path", ["/api/ask", "/kenn/api/ask"])
+@pytest.mark.parametrize("shortcut", ["inspection", "midi", "command", "non_request"])
+@pytest.mark.parametrize("superseded_by", ["cancel", "next_turn"])
+def test_http_shortcut_checks_its_turn_after_augmenting_the_reply(stream_http, monkeypatch, path, shortcut, superseded_by):
+    import kenn.server as server
+
+    handlers = {
+        "inspection": "_maybe_handle_live_inspection",
+        "midi": "_maybe_handle_midi_generation",
+        "command": "_maybe_handle_live_command_from_chat",
+    }
+    for name in handlers.values():
+        monkeypatch.setattr(server.Handler, name, lambda *args: None)
+    monkeypatch.setattr(server, "classify_non_request", lambda question: None)
+    result = {
+        "answer": "Late augmented reply", "route": "fixture",
+        "proposal": {"fixture": True}, "confirmation_token": "fixture-token",
+        "requires_confirmation": True,
+    }
+    if shortcut == "non_request":
+        monkeypatch.setattr(server, "classify_non_request", lambda question: "fixture")
+        monkeypatch.setattr(server, "non_request_reply", lambda *args: result)
+    else:
+        monkeypatch.setattr(server.Handler, handlers[shortcut], lambda *args: result)
+    augment = server.augment_payload
+
+    def supersede_after_augmenting(data, **kwargs):
+        reply = augment(data, **kwargs)
+        if data.get("answer") == "Late augmented reply":
+            if superseded_by == "cancel":
+                answer_upgrades.invalidate("song-a")
+            else:
+                answer_upgrades.begin_turn("song-a")
+        return reply
+
+    monkeypatch.setattr(server, "augment_payload", supersede_after_augmenting)
+    reply = stream_http(path, {"session_id": "song-a", "stream": False})
+    assert reply["answer"] == "" and reply["answer_delivery_discarded"] is True
+    assert reply["envelope"]["status"] == "cancelled"
+    assert not reply.get("proposal") and not reply.get("confirmation_token")

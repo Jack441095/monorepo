@@ -2728,6 +2728,22 @@ class Handler(BaseHTTPRequestHandler):
             plugin_session_id = ""
         payload = {**payload, "session_id": session_id, "plugin_session_id": plugin_session_id}
         upgrade_turn = answer_upgrades.begin_turn(session_id) if session_id else ""
+
+        def send_shortcut_reply(result):
+            # Shortcuts bypass the knowledge engine's final turn check; a late proposal must not reach this chat.
+            if upgrade_turn and not answer_upgrades.is_current_turn(session_id=session_id, turn_id=upgrade_turn):
+                correlation_id = str(payload.get("correlation_id", "")).strip() or self.request_id()
+                result = augment_payload(
+                    {
+                        "answer": "", "status": "cancelled", "route": "conversation", "sources": [],
+                        "requires_confirmation": False, "answer_delivery_discarded": True,
+                        "inference_aborted": False, "session_id": session_id,
+                        "plugin_session_id": plugin_session_id, "correlation_id": correlation_id,
+                    },
+                    question=question, session_id=session_id, correlation_id=correlation_id,
+                )
+            self.send_json(200, result)
+
         live_inspection_reply = self._maybe_handle_live_inspection(
             question, str(payload.get("session_id", "")).strip()
         )
@@ -2738,7 +2754,7 @@ class Handler(BaseHTTPRequestHandler):
                 session_id=str(payload.get("session_id", "")).strip(),
                 correlation_id=self.request_id(),
             )
-            self.send_json(200, live_inspection_reply)
+            send_shortcut_reply(live_inspection_reply)
             return
         generation_reply = self._maybe_handle_midi_generation(
             question, str(payload.get("session_id", "")).strip()
@@ -2752,7 +2768,7 @@ class Handler(BaseHTTPRequestHandler):
             )
             for key in ("proposal", "confirmation_token", "requires_confirmation"):
                 augmented[key] = generation_reply[key]
-            self.send_json(200, augmented)
+            send_shortcut_reply(augmented)
             return
         live_command_reply = self._maybe_handle_live_command_from_chat(
             question, str(payload.get("session_id", "")).strip()
@@ -2766,11 +2782,11 @@ class Handler(BaseHTTPRequestHandler):
             )
             for key in ("proposal", "confirmation_token", "requires_confirmation"):
                 augmented[key] = live_command_reply[key]
-            self.send_json(200, augmented)
+            send_shortcut_reply(augmented)
             return
         non_request_kind = classify_non_request(question)
         if non_request_kind is not None:
-            self.send_json(200, augment_payload(
+            send_shortcut_reply(augment_payload(
                 non_request_reply(non_request_kind),
                 question=question,
                 session_id=str(payload.get("session_id", "")).strip(),
@@ -2781,17 +2797,17 @@ class Handler(BaseHTTPRequestHandler):
             question, str(payload.get("session_id", "")).strip()
         )
         if checkpoint_reply is not None:
-            self.send_json(200, checkpoint_reply)
+            send_shortcut_reply(checkpoint_reply)
             return
         tool_reply = self._maybe_run_explicit_tool_trigger(
             question, str(payload.get("session_id", "")).strip()
         )
         if tool_reply is not None:
-            self.send_json(200, tool_reply)
+            send_shortcut_reply(tool_reply)
             return
         project_analysis_reply = self._maybe_handle_project_analysis(question)
         if project_analysis_reply is not None:
-            self.send_json(200, project_analysis_reply)
+            send_shortcut_reply(project_analysis_reply)
             return
         revision_reply = self._maybe_handle_mix_revision(
             question,
@@ -2802,7 +2818,7 @@ class Handler(BaseHTTPRequestHandler):
             revision_reply = self._maybe_attach_checkpoint(
                 revision_reply, str(payload.get("session_id", "")).strip()
             )
-            self.send_json(200, revision_reply)
+            send_shortcut_reply(revision_reply)
             return
         try:
             limit = int(payload.get("limit", 5))
