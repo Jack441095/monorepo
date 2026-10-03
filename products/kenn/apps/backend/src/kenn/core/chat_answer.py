@@ -2012,7 +2012,14 @@ def _answer_payload_stream(
             "correlation_id": correlation_id,
         }
         yield {"event": "metadata", "data": metadata}
+        # A consumer can cancel or start another turn while this generator is
+        # suspended. Cancel acknowledgements revoke their own owner on purpose.
+        if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
+            yield discarded
+            return
         yield {"event": "token", "token": str(metadata.get("answer") or "")}
+        if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
+            yield discarded
         return
 
     # Multi-turn conversations with history skip the cache to allow contextual

@@ -148,6 +148,51 @@ def test_public_stream_runs_status_cancel_and_transport_before_retrieval_or_cach
     assert [event["data"]["answer"] for event in events if event["event"] == "metadata"][-1] == "Handled scoped request"
 
 
+@pytest.mark.parametrize("query", ["hello", "status", "play", "stop"])
+@pytest.mark.parametrize("superseded_by", ["cancel", "next_turn", "other_chat"])
+@pytest.mark.parametrize("after", ["metadata", "token"])
+def test_shortcut_stream_discards_its_answer_when_superseded_between_events(monkeypatch, query, superseded_by, after):
+    from kenn.core import confirmation, live_action_service
+    from kenn.core.fake_live import FakeLiveBackend
+
+    # A shortcut used to emit its answer after cancellation while suspended at metadata.
+    fake = FakeLiveBackend()
+    monkeypatch.setattr(live_action_service, "live_client", fake)
+    monkeypatch.setattr(live_action_service, "_PROPOSALS_BY_TOKEN", {})
+    monkeypatch.setattr(confirmation, "_ISSUED_TOKENS", {})
+    monkeypatch.setattr(confirmation, "_REVOKED_TOKENS", set())
+    monkeypatch.setattr(confirmation, "_USED_TOKENS", set())
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Shortcuts must not retrieve or generate")
+
+    monkeypatch.setattr(chat_answer, "_answer_payload_stream_raw", forbidden)
+    monkeypatch.setattr(session_memory, "get_semantic_cache_hit", forbidden)
+    stream = chat_answer.answer_payload_stream(query, session_id="song-a", correlation_id="shortcut-fixture")
+    metadata = next(stream)["data"]
+    assert metadata["answer"] and not metadata.get("answer_delivery_discarded")
+    if after == "token":
+        assert next(stream) == {"event": "token", "token": metadata["answer"]}
+
+    if superseded_by == "cancel":
+        list(chat_answer.answer_payload_stream("cancel", session_id="song-a"))
+    else:
+        answer_upgrades.begin_turn("song-a" if superseded_by == "next_turn" else "song-b")
+
+    remaining = list(stream)
+    if superseded_by == "other_chat":
+        assert remaining == ([{"event": "token", "token": metadata["answer"]}] if after == "metadata" else [])
+    else:
+        discarded, = remaining
+        assert discarded["event"] == "metadata"
+        assert discarded["data"]["answer"] == "" and discarded["data"]["status"] == "cancelled"
+        assert discarded["data"]["answer_delivery_discarded"] is True
+        assert discarded["data"]["inference_aborted"] is False
+        assert discarded["data"]["session_id"] == "song-a"
+        assert discarded["data"]["correlation_id"] == "shortcut-fixture"
+    assert fake.writes == []
+
+
 @pytest.fixture
 def isolated_stream_cache(monkeypatch, tmp_path):
     monkeypatch.setattr(session_memory, "DB_PATH", tmp_path / "sessions.db")
@@ -551,6 +596,7 @@ def test_cancel_stream_reports_its_revocation_instead_of_discarding_its_own_repl
     final = [event["data"] for event in events if event["event"] == "metadata"][-1]
     assert "Pending answer delivery" in final["answer"]
     assert final["answer_delivery_discarded"] is True and final["inference_aborted"] is False
+    assert [event["token"] for event in events if event["event"] == "token"] == [final["answer"]]
     assert "song-a" not in answer_upgrades._TURNS
 
 
