@@ -82,7 +82,7 @@ _ABLETON_PATTERNS = [
     # track/transport patterns above.  These are imperative requests only;
     # classify() exits first for information-shaped queries.
     re.compile(
-        r"\b(?:add|insert|put|create|make)\b.{0,80}\b(?:eq(?:\s+eight)?|compressor|saturator|auto\s+filter|drum\s+buss|hybrid\s+reverb|echo|"
+        r"\b(?:add|insert|put|create|make)\b.{0,80}\b(?:eq(?:\s+eight)?|compressor|limiter|saturator|auto\s+filter|drum\s+buss|hybrid\s+reverb|echo|"
         r"midi\s+track|audio\s+track|return\s+track|device|macro)\b",
         re.I,
     ),
@@ -399,7 +399,7 @@ _ABLETON_WRITE_INTENT_RE = re.compile(
     r"\b(set_volume|volume\s+level|set_pan|pan\s+level|set_parameter|"
     r"device\s+parameter|create_device|create\s+device|sidechain|"
     r"add|insert|duplicate|rename|revise|update|clear|"
-    r"midi\s+track|audio\s+track|return\s+track|eq(?:\s+eight)?|compressor|saturator|auto\s+filter|drum\s+buss|hybrid\s+reverb|echo|"
+    r"midi\s+track|audio\s+track|return\s+track|eq(?:\s+eight)?|compressor|limiter|saturator|auto\s+filter|drum\s+buss|hybrid\s+reverb|echo|"
     r"dry\s*/?\s*wet|send|locator|"
     r"set_mute|unmute|set_solo|unsolo|set_arm|record[\s-]?arm|disarm|"
     r"mute|solo|start_playback|stop_playback|set_tempo|playback|"
