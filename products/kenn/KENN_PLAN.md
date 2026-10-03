@@ -539,6 +539,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       the cap run and accepted answers were truncated. Production cap and residency stay unchanged pending Jack's
       decision; no Live-open gate or held-out quality qualification. C2 stays open.
       [Receipt and keep_alive trade-off](docs/evidence/KENN_C2_MODEL_PHASES_AND_OUTPUT_CAP_2026-10-03.md).
+    - Research follow-through, 3 Oct: isolated brief-style instruction with the 384-token ceiling unchanged.
+      Fresh baseline timely acceptance was 2/5 on both surfaces; brief style was stream 3/5, payload 1/5.
+      No brief answer hit the ceiling, but acceptance and workflow quality declined; production style stays
+      unchanged for Jack's decision. A fixed Qwen3 8B / approximately 1,100-token MLX comparison proposal is
+      written, not executed; no dependencies/assets added or residency changed. C2 stays open.
+      [Measurements, quality limits and runtime proposal](docs/evidence/KENN_C2_BRIEF_STYLE_AND_RUNTIME_PROPOSAL_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
