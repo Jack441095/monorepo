@@ -2,6 +2,8 @@ import pytest
 
 from kenn.core import chat_answer, chat_retrieval
 from kenn.core.chat_routing import history_context_line, search_query_with_history, should_use_history
+from kenn.core.evidence import EvidenceFact, EvidencePacket, history_turn
+from kenn.llm import llm_rewrite
 
 
 @pytest.fixture
@@ -90,6 +92,55 @@ def test_export_and_loudness_questions_do_not_search_with_the_old_drum_reverb(qu
     assert payload["used_history"] is False
     assert payload["search_query"] == query
     assert all("reverb" not in searched.lower() for searched in isolated_chat)
+
+
+@pytest.mark.parametrize("stream", [False, True], ids=["payload", "stream"])
+@pytest.mark.parametrize("followup", [False, True], ids=["new-subject", "followup"])
+@pytest.mark.parametrize("with_evidence", [False, True], ids=["chat-only", "attached-evidence"])
+def test_generation_drops_old_reverb_on_export_but_keeps_it_for_a_followup(
+    stream, followup, with_evidence, isolated_chat, monkeypatch,
+):
+    # Retrieval changed subjects, but generation still received the old reverb exchange.
+    history = [
+        {"role": "user", "content": "How long should a reverb decay be on drums?"},
+        {"role": "assistant", "content": "Compare the drum reverb tail with the next hit."},
+    ]
+    evidence = [history_turn(EvidencePacket(
+        source="plugin_bus_snapshot", captured_at_age_seconds=0,
+        facts=(EvidenceFact("peak_dbfs", -5.0, "dBFS"),), limitations=(),
+    ))] if with_evidence else []
+    history = evidence + history
+    query = "What decay should I use?" if followup else "What do I need to export stems for a client?"
+    results = [(20.0, {"source": "export-stems.md", "title": "Export Stems", "kind": "note",
+                       "text": "Export stems from the same start point and check the rendered files."})]
+    for module in (chat_answer, chat_retrieval):
+        monkeypatch.setattr(module, "search", lambda *args, **kwargs: results)
+    monkeypatch.setattr(chat_answer, "constrain_results_for_query", lambda query, found: found)
+    monkeypatch.setattr(chat_answer, "results_are_weak", lambda *args: False)
+    monkeypatch.setattr(chat_answer, "intent_guard_failed", lambda *args: False)
+    monkeypatch.setattr(chat_answer, "grounding_mode", lambda *args: "supported")
+    monkeypatch.setattr(chat_answer, "answer_quality_report", lambda *args, **kwargs: {"score": 100, "warnings": []})
+    monkeypatch.setattr(chat_answer, "llm_enabled", lambda: True)
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *args: True)
+    monkeypatch.setattr(chat_answer, "build_template_answer", lambda *args, **kwargs: "Export stems from the same start point.")
+    prompts = []
+
+    def capture_generation(*args, **kwargs):
+        messages, _ = llm_rewrite._build_synthesis_messages(*args, **kwargs)
+        prompts.append(messages)
+        return (_ for _ in ()) if stream else None
+
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer_stream" if stream else "llm_enhance_answer", capture_generation)
+    if stream:
+        list(chat_answer.answer_payload_stream(query, history=history, allow_llm=True))
+    else:
+        chat_answer.answer_payload(query, history=history, allow_llm=True)
+
+    assert len(prompts) == 1
+    prior_messages = prompts[0][1:-1]
+    assert prior_messages == (history if followup else evidence)
+    assert "User question:" in prompts[0][-1]["content"]
+    assert query in prompts[0][-1]["content"]
 
 
 def test_returning_to_drum_reverb_uses_the_reverb_turn_instead_of_the_latest_loudness_turn():

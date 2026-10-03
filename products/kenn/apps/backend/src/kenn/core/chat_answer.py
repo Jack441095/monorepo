@@ -1239,6 +1239,16 @@ def _resolve_results_with_topic_lock(
     return results, use_history, relevance_query, search_query, reused
 
 
+def _history_for_answer(history: list | None, use_history: bool) -> list | None:
+    if use_history:
+        return history
+    # Attached measurements are evidence for this request, even when retrieval drops the old topic.
+    return [
+        turn for turn in history or []
+        if packets_from_history([turn]) or latest_mix_review_context([turn])
+    ] or None
+
+
 def compact_history(history: list | None, limit: int = 8) -> list | None:
     """Return the conversation history unchanged.
 
@@ -1525,7 +1535,9 @@ def _answer_payload_stream_raw(
         query, history, limit, chunks, terms, session_id
     )
     results = _prefer_general_framework_for_uncovered_hardware(query, results)
-    answer_mode = classify_answer_mode(relevance_query, route, history=history)
+    # Retrieval and generation must agree when a new question leaves the old subject.
+    answer_history = _history_for_answer(history, use_history)
+    answer_mode = classify_answer_mode(relevance_query, route, history=answer_history)
 
     if timeline_context:
         virtual_chunk = {
@@ -1545,7 +1557,7 @@ def _answer_payload_stream_raw(
     template = build_template_answer(
         relevance_query,
         results,
-        history=history,
+        history=answer_history,
         route=route,
         timeline_context=timeline_context,
         answer_mode=answer_mode,
@@ -1723,8 +1735,8 @@ def _answer_payload_stream_raw(
             query,
             template,
             results,
-            history,
-            history_context_line(query, history),
+            answer_history,
+            history_context_line(query, answer_history),
             source_label,
             normalize_history,
             answer_mode=answer_mode,
@@ -2413,7 +2425,7 @@ def _answer_payload_raw(
     answer, llm_used = make_answer(
         relevance_query,
         results,
-        history=history,
+        history=_history_for_answer(history, use_history),
         allow_llm=allow_llm,
         route=route,
         timeline_context=timeline_context,
