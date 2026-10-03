@@ -50,7 +50,7 @@ def test_ambient_guardian_evaluates_session(complex_multitrack_session):
     assert status["frequency_zones"]["sub"]["status"] == "clashing" or status["frequency_zones"]["punch"]["status"] == "clashing"
 
 
-def test_autonomous_producer_end_to_end_deliberation(complex_multitrack_session):
+def test_autonomous_producer_end_to_end_deliberation(complex_multitrack_session, fake_live):
     orchestrator = KennOrchestrator()
 
 
@@ -63,7 +63,7 @@ def test_autonomous_producer_end_to_end_deliberation(complex_multitrack_session)
     # 2. Dispatch autonomous deliberation
     dispatch_res = orchestrator.dispatch(
         prompt,
-        session_snapshot=complex_multitrack_session,
+        session_snapshot=fake_live.query_session_state(),
         session_id="test-e2e-session",
     )
 

@@ -4,25 +4,12 @@ import pytest
 from kenn.autonomous_agent import KennAutonomousAgent
 
 
-@pytest.fixture
-def mock_clashing_session():
-    return {
-        "status": "connected",
-        "tracks": [
-            {"index": 0, "name": "Kick", "volume": 0.88, "pan": 0.0, "panning": 0.0, "devices": []},
-            {"index": 1, "name": "Sub Bass", "volume": 0.85, "pan": 0.25, "panning": 0.25, "devices": []},
-            {"index": 2, "name": "Lead Vocal", "volume": 0.70, "pan": 0.0, "panning": 0.0, "devices": []},
-            {"index": 3, "name": "Supersaw Synth", "volume": 0.80, "pan": 0.0, "panning": 0.0, "devices": []},
-        ],
-    }
-
-
-def test_react_deliberate_formulates_unmasking_recipe(mock_clashing_session):
+def test_react_deliberate_formulates_unmasking_recipe(fake_live):
     agent = KennAutonomousAgent()
     result = agent.react_deliberate(
         "Make the vocal cut through and clean up low-end mud",
         session_id="test-react-session",
-        session_snapshot=mock_clashing_session,
+        session_snapshot=fake_live.query_session_state(),
     )
 
     assert result["ok"] is True

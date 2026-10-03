@@ -6,7 +6,7 @@ from kenn.core.acoustic_calibration import AcousticCalibrationLoop
 from kenn.audio_telemetry import AudioTelemetryFrame, get_telemetry_manager
 
 
-def test_react_deliberate_with_live_telemetry():
+def test_react_deliberate_with_live_telemetry(fake_live):
     """Verify that react_deliberate ingests live telemetry, clamps clipping, and respects safety bounds."""
     manager = get_telemetry_manager()
     # Ingest a live telemetry frame simulating true peak overload and mud
@@ -25,33 +25,28 @@ def test_react_deliberate_with_live_telemetry():
     )
     manager.ingest(frame.to_dict())
 
-    session_snapshot = {
-        "tracks": [
-            {"index": 0, "name": "Kick", "volume": 0.85, "panning": 0.0},
-            {"index": 1, "name": "Sub Bass", "volume": 0.88, "panning": -0.1},
-            {"index": 2, "name": "Lead Synth", "volume": 0.80, "panning": 0.3},
-        ]
-    }
-
     agent = KennAutonomousAgent()
-    result = agent.react_deliberate("Unmask the low end and fix headroom issues", session_snapshot=session_snapshot)
+    result = agent.react_deliberate(
+        "Unmask the low end and fix headroom issues",
+        session_id="telemetry-session",
+        session_snapshot=fake_live.query_session_state(),
+    )
 
     assert result["ok"] is True
     assert result["status"] == "confirmation_required"
     assert "proposal" in result
     assert result["requires_confirmation"] is True
-    assert result["confirmation_token"].startswith("react_")
+    assert result["confirmation_token"].startswith("v1.")
 
     steps = result["proposal"]["steps"]
     assert len(steps) > 0
 
-    # Verify limiter ceiling clamping step was generated due to +0.4 dBTP overload
-    limiter_steps = [
-        s for s in steps
-        if s.get("track_name") == "Master" and s.get("device_name") == "Limiter" and s.get("parameter") == "Ceiling"
-    ]
-    assert len(limiter_steps) == 1
-    assert limiter_steps[0]["after"] == -1.0
+    # The +0.4 dBTP overload does produce a Limiter ceiling step, but it names no device or
+    # parameter index, so a recipe cannot apply it. It has to be reported, not quietly dropped.
+    assert not [s for s in steps if s.get("track_name") == "Master"]
+    limiter = [item for item in result["left_out"] if item["track_name"] == "Master"]
+    assert len(limiter) == 1
+    assert "device_index" in limiter[0]["reason"]
 
     # Verify hardware safety clamps: Master volume fader is NEVER touched
     for s in steps:

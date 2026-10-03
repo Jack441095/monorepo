@@ -365,6 +365,50 @@ def tool_package_stems(tracks: Optional[List[Dict[str, Any]]] = None, metadata: 
     return plan.to_dict()
 
 
+def _split_recipe_steps(steps: List[Dict[str, Any]]) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Pick the steps one recipe token can carry, and say why each of the others is left out.
+
+    A recipe holds a few exact typed steps, one per target. Our engines suggest more than
+    that, and some of them (inserting devices, EQ bands, automation) have no recipe action.
+    Those are reported back to the caller rather than trimmed quietly.
+    """
+    from kenn.core.live_recipe import MAX_RECIPE_STEPS, RECIPE_ACTIONS
+    from kenn.core.live_action_service import SUPPORTED_TRACK_ACTIONS, SUPPORTED_TRANSPORT_ACTIONS
+
+    chosen: List[Dict[str, Any]] = []
+    left_out: List[Dict[str, Any]] = []
+    seen: set = set()
+    for step in steps:
+        action = str(step.get("action", ""))
+        reason = ""
+        if action not in RECIPE_ACTIONS:
+            reason = "a recipe cannot apply this kind of change"
+        else:
+            needed: tuple = ()
+            if action in SUPPORTED_TRACK_ACTIONS:
+                needed = ("track_index",)
+            elif action == "set_send":
+                needed = ("track_index", "return_track_index")
+            elif action not in SUPPORTED_TRANSPORT_ACTIONS:
+                needed = ("track_index", "device_index", "parameter_index")
+            missing = [key for key in needed if step.get(key) is None]
+            if action not in SUPPORTED_TRANSPORT_ACTIONS and step.get("value", step.get("after")) is None:
+                missing.append("value")
+            target = (action, *(step.get(key) for key in ("track_index", "device_index", "parameter_index", "return_track_index")))
+            if missing:
+                reason = "no exact Live target (" + ", ".join(missing) + " missing)"
+            elif target in seen:
+                reason = "an earlier step already changes the same target"
+            elif len(chosen) >= MAX_RECIPE_STEPS:
+                reason = f"a recipe carries at most {MAX_RECIPE_STEPS} steps"
+            else:
+                seen.add(target)
+                chosen.append(step)
+        if reason:
+            left_out.append({"action": action, "track_name": str(step.get("track_name", step.get("track", ""))), "reason": reason})
+    return chosen, left_out
+
+
 def _daw_write_denied() -> Dict[str, Any] | None:
     """None if a real Ableton write is allowed to proceed; a denial dict
     otherwise.
@@ -1124,12 +1168,11 @@ class KennAutonomousAgent:
         Hardware Safety Policies (gain clamping <= 3.0 dB, master limiter lock <= -0.3 dBFS,
         master fader locked, confirmation tokens).
         """
-        import hashlib
         import math
         from kenn.core.session_world_model import SessionWorldModel
         from kenn.core.acoustic_calibration import AcousticCalibrationLoop
         from kenn.core.subjective_translator import SubjectiveTranslator
-        from kenn.core.live_recipe import RECIPE_SCHEMA
+        from kenn.core.live_recipe import LiveRecipeService
 
         trajectory: List[Dict[str, Any]] = []
         steps: List[Dict[str, Any]] = []
@@ -1436,12 +1479,14 @@ class KennAutonomousAgent:
                     s["after"] = round(before + clamped_delta, 2)
             safe_steps.append(s)
 
+        recipe_steps, left_out = _split_recipe_steps(safe_steps)
+
         trajectory.append({
             "iteration": 3,
             "phase": "synthesis",
             "thought": f"Synthesized {len(safe_steps)} atomic actions adhering strictly to <= 3.0 dB hardware safety clamp.",
             "action": "hardware_safety_clamping",
-            "observation": {"step_count": len(safe_steps)},
+            "observation": {"step_count": len(safe_steps), "recipe_step_count": len(recipe_steps), "left_out_count": len(left_out)},
             "reflection": "Generated bounded, reversible recipe with single-token confirmation gate.",
         })
 
@@ -1458,30 +1503,47 @@ class KennAutonomousAgent:
                 "requires_confirmation": False,
             }
 
-        # Build final recipe proposal
-        token = f"react_{hashlib.sha256(f'{session_id}_{objective}_{len(safe_steps)}'.encode()).hexdigest()[:20]}"
-        consolidated_proposal = {
-            "schema": RECIPE_SCHEMA,
-            "session_id": session_id,
-            "reason": objective,
-            "step_count": len(safe_steps),
-            "steps": safe_steps,
-            "requires_confirmation": True,
-            "confirmation_token": token,
-        }
+        # The recipe service registers the one signed token and checks every step against
+        # live state, so Apply, Dismiss and Undo all find what we hand out here.
+        proposed = (
+            LiveRecipeService().propose_recipe(
+                [{**step, "value": step.get("value", step.get("after"))} for step in recipe_steps],
+                reason=objective,
+                session_id=session_id,
+            )
+            if recipe_steps else
+            {"ok": False, "error": "None of the suggested changes can be applied as a Live recipe."}
+        )
+        if not proposed.get("ok"):
+            return {
+                "ok": False,
+                "status": "failed",
+                "answer": f"I worked out a plan but couldn't turn it into a change you can apply. {proposed.get('error', '')}".strip()
+                + " Nothing has changed.",
+                "objective": objective,
+                "trajectory": trajectory,
+                "left_out": left_out,
+                "suggested_step_count": len(safe_steps),
+                "requires_confirmation": False,
+            }
+        proposal = proposed["proposal"]
+        token = proposal["confirmation_token"]
 
-        # Format user presentation
         step_summaries = []
-        for i, s in enumerate(safe_steps, 1):
-            act = s.get("action")
-            tgt = s.get("track_name", f"Track {s.get('track_index')}")
-            step_summaries.append(f"{i}. {act}: {tgt} (from {s.get('before')} -> {s.get('after')})")
+        for i, s in enumerate(proposal["steps"], 1):
+            step_summaries.append(f"{i}. {s.get('action')}: {s.get('track_name')} (from {s.get('before')} -> {s.get('after')})")
 
         answer = (
             f"✦ **KENN Autonomous ReAct Reasoning Engine**\n\n"
-            f"I have analyzed your session against 40-band ERB psychoacoustics and formulated this {len(safe_steps)}-step recipe to solve '{objective}':\n\n"
+            f"I have analyzed your session against 40-band ERB psychoacoustics and formulated this {len(proposal['steps'])}-step recipe to solve '{objective}':\n\n"
             + "\n".join(step_summaries)
-            + f"\n\n🛡️ **Safety Clamped**: All fader moves strictly $\\le \\pm 3.0\\text{{ dB}}$, master fader protected.\n"
+        )
+        if left_out:
+            shown = [f"{item['action']} on {item['track_name'] or 'the session'} ({item['reason']})" for item in left_out[:5]]
+            more = f"; and {len(left_out) - 5} more" if len(left_out) > 5 else ""
+            answer += f"\n\nNot included ({len(left_out)}): " + "; ".join(shown) + more + "."
+        answer += (
+            f"\n\n🛡️ **Safety Clamped**: All fader moves strictly $\\le \\pm 3.0\\text{{ dB}}$, master fader protected.\n"
             f"Nothing has changed yet. Confirm this recipe to apply with 1-click undo."
         )
 
@@ -1491,7 +1553,9 @@ class KennAutonomousAgent:
             "answer": answer,
             "objective": objective,
             "trajectory": trajectory,
-            "proposal": consolidated_proposal,
+            "proposal": proposal,
+            "left_out": left_out,
+            "suggested_step_count": len(safe_steps),
             "confirmation_required": True,
             "requires_confirmation": True,
             "confirmation_token": token,

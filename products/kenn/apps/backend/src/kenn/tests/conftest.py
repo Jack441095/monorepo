@@ -94,3 +94,18 @@ def reset_live_seen_connected():
     live_action_service._LIVE_SEEN_CONNECTED = False
     yield
     live_action_service._LIVE_SEEN_CONNECTED = False
+
+
+@pytest.fixture
+def fake_live(monkeypatch):
+    """A fake Live that recipe proposals read, with confirmation state kept to this test."""
+    from kenn.core import confirmation, live_action_service
+    from kenn.core.fake_live import FakeLiveBackend
+
+    fake = FakeLiveBackend()
+    monkeypatch.setattr(live_action_service, "live_client", fake)
+    monkeypatch.setattr(confirmation, "_USED_TOKENS", set())
+    monkeypatch.setattr(confirmation, "_ISSUED_TOKENS", {})
+    monkeypatch.setattr(confirmation, "_REVOKED_TOKENS", set())
+    monkeypatch.setenv("KENN_ALLOW_DAW_CONTROL", "1")
+    return fake
