@@ -1,0 +1,59 @@
+name: Sync KENN sharing repository
+
+on:
+  push:
+    branches-ignore: ["sync/**"]
+    paths:
+      - "products/kenn/**"
+      - ".github/workflows/kenn-app-sync.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kenn-app-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'Nite-DSP/monorepo' && github.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: products/kenn/tooling
+      SOURCE_BRANCH: ${{ github.ref_name }}
+      GIT_AUTHOR_NAME: NITE DSP
+      GIT_AUTHOR_EMAIL: engineering@nite-dsp.com
+      GIT_COMMITTER_NAME: NITE DSP
+      GIT_COMMITTER_EMAIL: engineering@nite-dsp.com
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run sync regression tests
+        run: python3 -m unittest discover -s products/kenn/tooling/tests -p test_sync_kenn_app.py -v
+
+      - name: Read latest source branch
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Fetch the current branch tip so an older queued run cannot rewind the mirror.
+          git -c credential.helper='!gh auth git-credential' fetch --quiet origin "refs/heads/$SOURCE_BRANCH"
+          echo "commit=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Mirror latest committed KENN on this branch
+        env:
+          GH_TOKEN: ${{ secrets.KENN_APP_SYNC_TOKEN }}
+          SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+          GIT_CONFIG_COUNT: "1"
+          GIT_CONFIG_KEY_0: credential.helper
+          GIT_CONFIG_VALUE_0: "!gh auth git-credential"
+        run: |
+          test -n "$GH_TOKEN" || { echo 'KENN_APP_SYNC_TOKEN is missing; provision the repository-scoped credential described in the runbook'; exit 1; }
+          git remote add kenn-app https://github.com/Nite-DSP/kenn-app.git
+          python3 products/kenn/tooling/scripts/sync_kenn_app.py \
+            --source-ref "$SOURCE_COMMIT" --branch "$SOURCE_BRANCH" --bootstrap --push

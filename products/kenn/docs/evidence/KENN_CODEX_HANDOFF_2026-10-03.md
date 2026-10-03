@@ -1,6 +1,6 @@
 # Handoff for Codex, 3 October 2026
 
-Repo `/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/monorepo`, branch `fix/review-critical-2026-10-02` (head `7c17ccb8`). Plan:
+Repo `~/Nite-DSP/monorepo`, branch `fix/review-critical-2026-10-02` (head `7c17ccb8`). Plan:
 `products/kenn/KENN_PLAN.md`. Read [KENN_C3_CORRECTIONS_STATUS_2026-10-03.md](KENN_C3_CORRECTIONS_STATUS_2026-10-03.md)
 and [KENN_C3_FIVE_TURN_FIRST_RUN_2026-10-03.md](KENN_C3_FIVE_TURN_FIRST_RUN_2026-10-03.md) first.
 

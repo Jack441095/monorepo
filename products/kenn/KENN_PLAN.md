@@ -506,12 +506,14 @@ is prepared for work while his Mac is off. It summarizes this queue and existing
 evidence; it does not start a cloud task or replace this plan. Refresh it when
 Jack asks to hand over. Cloud fake-Live checks cannot qualify the local delivery gate.
 
-Sharing request, 3 Oct: Jack wants `kenn-app` to stay synchronized with KENN in
-the monorepo for work colleagues. A one-way, matching-branch sync is
-[proposed with inspection results and limits](docs/evidence/KENN_REPOSITORY_SYNC_PROPOSAL_2026-10-03.md).
-The existing manual main-only sync cannot fast-forward the inspected histories.
-Automation, initial reconciliation and CI/write access await Jack's approval;
-no destination branch or CI setting has changed. Local engineering remains paused.
+Sharing request, 3 Oct: Jack approved a one-way, matching-branch `kenn-app`
+mirror, its GitHub workflow and repository-scoped write credential. He also
+requested Mac catch-up for pushed cloud work: fetch at login and every five
+minutes while awake; fast-forward only a clean checked-out branch. Dirty files
+and independent local or destination commits pause updates for review.
+[Setup and activation limits](docs/runbooks/KENN_REPOSITORY_SYNC.md).
+Initial `main` reconciliation remains a review PR; neither `main` is merged
+by setup. Local runtime engineering remains paused; C1/C2/C3 remain unticked.
 
 ### 2. Qualify useful local conversation and performance
 

@@ -96,20 +96,21 @@ repository also corrupts it; use branches and pull requests instead.
 
 **What git gives you:** all source, tests, evaluation harnesses and docs. Everything below runs from that alone.
 
-### Working together (from 27 Sept 2026)
+### Working together (from 3 Oct 2026)
 
-KENN has its own private repository, `Nite-DSP/kenn-app`, split out of the NITE DSP monorepo with its history so a
-collaborator sees only KENN. That repository is where KENN work happens now:
+`products/kenn/` in `Nite-DSP/monorepo` is the authoritative source. The private
+`Nite-DSP/kenn-app` repository is a KENN-only sharing mirror: its root matches
+that folder at the recorded source commit, on a branch with the same name.
+See [the sync runbook](runbooks/KENN_REPOSITORY_SYNC.md) for activation and limits.
 
-- `main` is protected: nobody pushes to it directly. Make a branch per piece of work (`yourname/what-it-does`), push
-  it, and open a pull request; the other person reviews and merges.
-- Run the checks below before opening a pull request, and keep pull requests small enough to review in one sitting.
-  Two people changing `core/live_intent.py` at once is the usual conflict; pull `main` into your branch often.
-- Tests and evaluations use the fake Live backend. Real Live is used only for release soaks, which the owner runs.
-- `Nite-DSP/kenn` is the older, frozen pre-monorepo repository; don't work there.
-- At each release the owner brings `main` back into the monorepo
-  (`git subtree pull --prefix=products/kenn <kenn remote> main`). Don't change `products/kenn` in the monorepo in
-  between, or the two drift apart.
+- Make changes on monorepo feature branches and open small pull requests.
+- Friends using `kenn-app` should select the matching shared branch. Independent
+  changes there need an explicit import and review in the monorepo; they stop
+  automatic sync until reconciled. Do not develop on a mirror branch directly.
+- Cloud work must be committed and pushed before either the sharing repository
+  or a local checkout can receive it. Uncommitted files stay on their machine.
+- Tests use fake Live. Real Live is used only for owner-scheduled release soaks.
+- `Nite-DSP/kenn` is the older, frozen pre-monorepo repository.
 
 **Without Ableton Live**, KENN runs against a recorded copy of the demo set. In the `kenn-app` repository run these from
 its root; in the monorepo, from `products/kenn`:
