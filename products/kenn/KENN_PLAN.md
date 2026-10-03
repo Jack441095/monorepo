@@ -531,6 +531,12 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       full backend: 3697 passes, 12 skips and the pre-existing personal-path failure. Provider response-cache writes
       remain open; no decode-speed or Live-open qualification.
       [Receipt, exact files and limits](docs/evidence/KENN_C2_SUPERSEDED_PAYLOAD_PERSISTENCE_2026-10-03.md).
+    - Provider cache persistence, 3 Oct: bound payload/background/stream calls now hold the request-owner lock around
+      the SQLite response-cache save. Cancelled and replaced requests cannot populate it; suspended streams restore
+      context before yielding so other chats and unbound calls retain their own cache behavior. Scoped checks: 266
+      passes; full backend: 3723 passes, 12 skips and the pre-existing personal-path failure. Stubbed providers only;
+      other action/fast-path persistence and the Live-open gate remain outside this check. C2 stays open.
+      [Code commit, commands, results and research limits](docs/evidence/KENN_C2_SUPERSEDED_PROVIDER_CACHE_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
