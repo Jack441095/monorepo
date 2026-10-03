@@ -1027,7 +1027,7 @@ def cache_enabled() -> bool:
 
 
 def _cache_key(cfg: dict, messages: list[dict[str, str]], output: dict | None = None) -> str:
-    # ``output`` carries the output contract (task, JSON mode, schema, answer mode):
+    # ``output`` carries the output contract and effective generation settings:
     # the same messages under a different contract must not share an answer.
     # Model aliases can name different weights at different provider endpoints.
     key: dict = {"provider": cfg.get("provider", ""), "base_url": cfg.get("base_url", ""),
@@ -1040,6 +1040,21 @@ def _cache_key(cfg: dict, messages: list[dict[str, str]], output: dict | None = 
         separators=(",", ":"),
     )
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def _http_generation_contract(cfg: dict, answer_mode: str, json_mode: bool, json_schema: dict | None) -> dict:
+    # Read the builders rather than copying their caps and temperatures into the cache policy.
+    # An unconfigured provider can still use MLX, so this lookup must tolerate a missing model.
+    request_cfg = {**cfg, "model": cfg.get("model", "")}
+    native = _ollama_think_off(cfg, json_schema)
+    if native:
+        payload = _build_native_ollama_payload(request_cfg, [], answer_mode=answer_mode, json_schema=json_schema)
+    else:
+        payload = _build_payload(request_cfg, [], answer_mode=answer_mode, json_mode=json_mode, json_schema=json_schema)
+    # Stream framing and residency affect delivery, not the answer; both chat surfaces can reuse it.
+    settings = {key: value for key, value in payload.items()
+                if key not in {"model", "messages", "stream", "keep_alive"}}
+    return {"transport": "ollama-native" if native else "openai-compatible", "settings": settings}
 
 
 def _cache_get(key: str) -> str | None:
@@ -1171,7 +1186,8 @@ def _chat_completion(
     elif not any(m.get("role") == "system" for m in messages):
         messages = [{"role": "system", "content": build_system_prompt()}] + messages
 
-    output = {"task": task, "json_mode": json_mode, "json_schema": json_schema, "answer_mode": answer_mode}
+    output = {"task": task, "json_mode": json_mode, "json_schema": json_schema, "answer_mode": answer_mode,
+              "generation": _http_generation_contract(cfg, answer_mode, json_mode, json_schema)}
     cache_key = _cache_key(cfg, messages, output)
     cached = _cache_get(cache_key)
     if cached is not None:
@@ -1309,7 +1325,8 @@ def chat_completion_stream(
     elif not any(m.get("role") == "system" for m in messages):
         messages = [{"role": "system", "content": build_system_prompt()}] + messages
 
-    output = {"task": task, "json_mode": False, "json_schema": None, "answer_mode": answer_mode}
+    output = {"task": task, "json_mode": False, "json_schema": None, "answer_mode": answer_mode,
+              "generation": _http_generation_contract(cfg, answer_mode, False, None)}
     cache_key = _cache_key(cfg, messages, output)
     cached = _cache_get(cache_key)
     if cached is not None:

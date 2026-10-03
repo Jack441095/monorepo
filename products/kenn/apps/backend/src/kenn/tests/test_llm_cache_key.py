@@ -34,8 +34,9 @@ def cached_calls(monkeypatch, tmp_path):
     sent = []
 
     class Reply:
-        def __init__(self, content):
+        def __init__(self, content, native):
             self.content = content
+            self.native = native
 
         def raise_for_status(self):
             pass
@@ -51,6 +52,11 @@ def cached_calls(monkeypatch, tmp_path):
             return False
 
         def iter_lines(self):
+            if not self.native:
+                return iter([
+                    'data: ' + json.dumps({"choices": [{"delta": {"content": self.content}}]}),
+                    'data: [DONE]',
+                ])
             return iter([
                 json.dumps({"message": {"content": self.content}, "done": False}),
                 json.dumps({"done": True}),
@@ -59,7 +65,7 @@ def cached_calls(monkeypatch, tmp_path):
     class Client:
         def post(self, url, **kwargs):
             sent.append((url, kwargs["json"]))
-            return Reply(f"response-{len(sent)}")
+            return Reply(f"response-{len(sent)}", url.endswith("/api/chat"))
 
         def stream(self, method, url, **kwargs):
             return self.post(url, **kwargs)
@@ -122,3 +128,66 @@ def test_cache_disabled_keeps_both_surfaces_on_the_provider(cached_calls, monkey
     assert call("payload")[0] == "response-2"
     assert call("stream")[0] == "response-3"
     assert len(sent) == 3
+
+
+@pytest.mark.parametrize("surface", ["payload", "stream"])
+@pytest.mark.parametrize("thinking", ["off", "on"])
+def test_a_lower_token_cap_never_replays_an_answer_from_the_old_cap(cached_calls, monkeypatch, surface, thinking):
+    # Keeping the mode name used to hide a changed cap from the response cache.
+    call, _, sent = cached_calls
+    monkeypatch.setenv("KENN_LLM_THINK", thinking)
+    assert call(surface)[0] == "response-1"
+    monkeypatch.setitem(llm_rewrite.MAX_TOKENS_BY_MODE, "general", 128)
+    content, usage = call(surface)
+    assert content == "response-2" and not usage.cache_hit
+    payload = sent[-1][1]
+    assert (payload["options"]["num_predict"] if thinking == "off" else payload["max_tokens"]) == 128
+    assert call(surface)[1].cache_hit
+
+
+@pytest.mark.parametrize("surface", ["payload", "stream"])
+def test_changing_thinking_transport_never_replays_the_previous_answer(cached_calls, monkeypatch, surface):
+    # Think-off uses native Ollama; opting into thinking selects a different request contract.
+    call, _, sent = cached_calls
+    assert call(surface)[0] == "response-1"
+    monkeypatch.setenv("KENN_LLM_THINK", "on")
+    content, usage = call(surface)
+    assert content == "response-2" and not usage.cache_hit
+    assert sent[-1][0].endswith("/chat/completions")
+    assert call(surface)[1].cache_hit
+
+
+@pytest.mark.parametrize("surface", ["payload", "stream"])
+def test_the_same_effective_thinking_policy_reuses_the_answer(cached_calls, monkeypatch, surface):
+    call, _, sent = cached_calls
+    assert call(surface)[0] == "response-1"
+    monkeypatch.delenv("KENN_LLM_THINK")
+    content, usage = call(surface)
+    assert content == "response-1" and usage.cache_hit
+    assert len(sent) == 1
+
+
+@pytest.mark.parametrize("surface", ["payload", "stream"])
+def test_changed_sampling_settings_never_replay_the_previous_answer(cached_calls, monkeypatch, surface):
+    call, _, sent = cached_calls
+    assert call(surface)[0] == "response-1"
+    build = llm_rewrite._build_native_ollama_payload
+
+    def cooler_payload(*args, **kwargs):
+        payload = build(*args, **kwargs)
+        payload["options"]["temperature"] = 0.1
+        return payload
+
+    monkeypatch.setattr(llm_rewrite, "_build_native_ollama_payload", cooler_payload)
+    content, usage = call(surface)
+    assert content == "response-2" and not usage.cache_hit
+    assert sent[-1][1]["options"]["temperature"] == 0.1
+
+
+def test_keep_alive_changes_preserve_cache_reuse_across_chat_surfaces(cached_calls, monkeypatch):
+    call, _, sent = cached_calls
+    assert call("payload")[0] == "response-1"
+    monkeypatch.setattr(llm_rewrite, "KEEP_ALIVE_DURATION", "5m")
+    content, usage = call("stream")
+    assert content == "response-1" and usage.cache_hit
+    assert len(sent) == 1
