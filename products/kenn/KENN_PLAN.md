@@ -512,6 +512,7 @@ requested Mac catch-up for pushed cloud work: fetch at login and every five
 minutes while awake; fast-forward only a clean checked-out branch. Dirty files
 and independent local or destination commits pause updates for review.
 [Setup and activation limits](docs/runbooks/KENN_REPOSITORY_SYNC.md).
+[Dated verification receipt](docs/evidence/KENN_REPOSITORY_SYNC_RECEIPT_2026-10-03.md).
 Initial `main` reconciliation remains a review PR; neither `main` is merged
 by setup. Local runtime engineering remains paused; C1/C2/C3 remain unticked.
 
