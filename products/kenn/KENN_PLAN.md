@@ -537,6 +537,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       passes; full backend: 3723 passes, 12 skips and the pre-existing personal-path failure. Stubbed providers only;
       other action/fast-path persistence and the Live-open gate remain outside this check. C2 stays open.
       [Code commit, commands, results and research limits](docs/evidence/KENN_C2_SUPERSEDED_PROVIDER_CACHE_2026-10-03.md).
+    - Shortcut stream delivery, 3 Oct: greeting, status and transport proposal streams recheck ownership between
+      events, discarding cancelled/replaced replies while preserving other-chat delivery and cancellation replies.
+      Scoped checks: 204 passes; full backend: 3747 passes, 12 skips and the pre-existing personal-path failure.
+      A removed guard fails eight cases. No decode-speed gain or Live-open qualification; explicit-memory writes
+      remain outside this regression. [Code commit, commands and limits](docs/evidence/KENN_C2_SUPERSEDED_SHORTCUT_STREAM_2026-10-03.md).
   - [ ] Measure the HTTP template/upgrade path's conditional repeated routing,
     retrieval and critique; resolve confirmed repetition and task-budget/cache
     contract drift with offline regressions and paired held-out measurements.
