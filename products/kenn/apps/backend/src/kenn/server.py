@@ -2793,9 +2793,18 @@ class Handler(BaseHTTPRequestHandler):
                 correlation_id=self.request_id(),
             ))
             return
-        checkpoint_reply = self._maybe_handle_checkpoint_reply(
-            question, str(payload.get("session_id", "")).strip()
-        )
+        checkpoint_reply = None
+
+        def handle_current_checkpoint_reply():
+            nonlocal checkpoint_reply
+            checkpoint_reply = self._maybe_handle_checkpoint_reply(question, session_id)
+
+        # A late yes/no must not clear or rate the checkpoint created by the next turn.
+        if not answer_upgrades.write_if_current(
+            handle_current_checkpoint_reply, session_id=session_id, turn_id=upgrade_turn
+        ):
+            send_shortcut_reply({})
+            return
         if checkpoint_reply is not None:
             send_shortcut_reply(checkpoint_reply)
             return
@@ -2815,8 +2824,12 @@ class Handler(BaseHTTPRequestHandler):
             str(payload.get("project_id", "")).strip(),
         )
         if revision_reply is not None:
-            revision_reply = self._maybe_attach_checkpoint(
-                revision_reply, str(payload.get("session_id", "")).strip()
+            def attach_current_revision_checkpoint():
+                nonlocal revision_reply
+                revision_reply = self._maybe_attach_checkpoint(revision_reply, session_id)
+
+            answer_upgrades.write_if_current(
+                attach_current_revision_checkpoint, session_id=session_id, turn_id=upgrade_turn
             )
             send_shortcut_reply(revision_reply)
             return

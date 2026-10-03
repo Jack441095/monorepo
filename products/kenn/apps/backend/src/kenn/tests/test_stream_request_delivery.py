@@ -798,13 +798,17 @@ def test_http_shortcut_discards_a_late_reply_only_when_its_chat_turn_is_revoked(
         monkeypatch.setattr(server.Handler, name, lambda *args: None)
     monkeypatch.setattr(server, "classify_non_request", lambda question: None)
 
-    def reply(*args):
+    def revoke():
         if superseded_by == "cancel":
             answer_upgrades.invalidate("song-a")
         elif superseded_by == "next_turn":
             answer_upgrades.begin_turn("song-a")
         elif superseded_by == "other_chat":
             answer_upgrades.begin_turn("song-b")
+
+    def reply(*args):
+        if shortcut != "checkpoint":
+            revoke()
         return {
             "answer": "Shortcut advice", "route": "fixture", "status": "proposed",
             "proposal": {"fixture": True}, "confirmation_token": "fixture-token",
@@ -816,6 +820,9 @@ def test_http_shortcut_discards_a_late_reply_only_when_its_chat_turn_is_revoked(
         monkeypatch.setattr(server, "non_request_reply", reply)
     else:
         monkeypatch.setattr(server.Handler, handlers[shortcut], reply)
+        if shortcut == "checkpoint":
+            # Checkpoint storage holds the ownership lock; revoke before it starts.
+            monkeypatch.setattr(server.Handler, "_maybe_handle_live_command_from_chat", lambda *args: revoke())
     result = stream_http(path, {
         "session_id": "song-a", "plugin_session_id": "plugin-a", "stream": False,
     })
