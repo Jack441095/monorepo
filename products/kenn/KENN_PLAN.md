@@ -555,6 +555,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       116 passes; full backend: 3657 passes, 12 skips and the same pre-existing personal-path failure. Production
       settings stay unchanged; no measured decode gain or Live-open gate claim. C2 stays open.
       [Regression, mutation, full-suite receipt and research decisions](docs/evidence/KENN_C2_EFFECTIVE_GENERATION_CACHE_2026-10-03.md).
+    - HTTP background phases, 3 Oct: five real-model requests on Fake Live; 1/5 accepted upgrades within 15 s.
+      Repeated retrieval cost 7–26 ms versus 8.8–15.1 s decoding; no foreground provider calls in this selected set.
+      Scoped checks: 75 passes. Warm cache, Live closed, fast polling, no unknown-route or held-out qualification;
+      production style/residency stay unchanged, and C2 stays open.
+      [Native phases, Mac state, research decisions and limits](docs/evidence/KENN_C2_HTTP_BACKGROUND_PHASES_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
