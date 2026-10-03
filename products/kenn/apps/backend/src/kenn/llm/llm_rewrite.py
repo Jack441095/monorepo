@@ -992,13 +992,10 @@ def build_raw_context_block(
 # Core API calls (httpx-based)
 # ---------------------------------------------------------------------------
 
-# ── LLM answer cache ─────────────────────────────────────────────────────────
-# Identical prompts (same model + same messages) regenerate the same answer, and
-# CPU generation costs 6-8 s. Keying on the fully-built messages means retrieval
-# context, conversation history, and corpus changes all change the key naturally —
-# a rebuilt index or a new turn produces different messages and misses the cache.
-# In-memory + bounded + TTL; lost on restart (fine — a warm process is the win).
-# Disable with KENN_LLM_CACHE=0.
+# We cache completed responses in bounded SQLite storage to avoid regenerating
+# repeated requests. Fully built messages include retrieval context and history;
+# provider, endpoint and output contract keep different requests from sharing an
+# answer. KENN_LLM_CACHE=0 bypasses reads and writes for model measurements.
 
 def _get_db_path() -> Path:
     db_dir = PROJECT_ROOT / "data"
@@ -1030,10 +1027,11 @@ def cache_enabled() -> bool:
 
 
 def _cache_key(cfg: dict, messages: list[dict[str, str]], output: dict | None = None) -> str:
-    # ``output`` carries the output contract (JSON mode, schema, answer mode):
+    # ``output`` carries the output contract (task, JSON mode, schema, answer mode):
     # the same messages under a different contract must not share an answer.
-    # Plain calls pass nothing, so their existing keys are unchanged.
-    key: dict = {"model": cfg.get("model", ""), "messages": messages}
+    # Model aliases can name different weights at different provider endpoints.
+    key: dict = {"provider": cfg.get("provider", ""), "base_url": cfg.get("base_url", ""),
+                 "model": cfg.get("model", ""), "messages": messages}
     if output:
         key["output"] = output
     blob = json.dumps(
@@ -1173,8 +1171,7 @@ def _chat_completion(
     elif not any(m.get("role") == "system" for m in messages):
         messages = [{"role": "system", "content": build_system_prompt()}] + messages
 
-    output = ({"json_mode": json_mode, "json_schema": json_schema, "answer_mode": answer_mode}
-              if (json_mode or json_schema is not None) else None)
+    output = {"task": task, "json_mode": json_mode, "json_schema": json_schema, "answer_mode": answer_mode}
     cache_key = _cache_key(cfg, messages, output)
     cached = _cache_get(cache_key)
     if cached is not None:
@@ -1312,7 +1309,8 @@ def chat_completion_stream(
     elif not any(m.get("role") == "system" for m in messages):
         messages = [{"role": "system", "content": build_system_prompt()}] + messages
 
-    cache_key = _cache_key(cfg, messages)
+    output = {"task": task, "json_mode": False, "json_schema": None, "answer_mode": answer_mode}
+    cache_key = _cache_key(cfg, messages, output)
     cached = _cache_get(cache_key)
     if cached is not None:
         usage = _cached_usage(cfg, task, cached)
