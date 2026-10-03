@@ -1,5 +1,7 @@
 # KENN Ableton Assistant Upgrade Plan
 
+> **Archived 2026-10-03, not a working plan.** Replaced by `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates) and `KENN_GLM_FULL_ASSISTANT_TRACKER.md` (checklist). Kept as a record of what was decided then; don't pick work from it.
+
 Planning baseline: 2026-09-01 readiness report. Current decision: **not ready**. The repository is locally useful, but wider Ableton Live qualification and independent human review remain open.
 
 ## Upgrade objective

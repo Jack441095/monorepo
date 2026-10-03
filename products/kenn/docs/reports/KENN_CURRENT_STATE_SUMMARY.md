@@ -1,5 +1,7 @@
 # KENN Current State Summary
 
+> **Historical, from 2026-09-01.** Written before the Ableton control work. Current status is in `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`. Replaced plans are in `products/kenn/docs/archive/plans/`.
+
 Audit date: 2026-09-01, branch `develop` (created as `beta-audit-2026-09-01`). This summarises
 every surface's status against seven categories: **working**, **partially
 working**, **demo-only**, **dependent on external/legacy code**, **tested

@@ -1,5 +1,7 @@
 # KENN Ableton Assistant Current State — 2026-09-10
 
+> **Historical log, not the current state.** The running changelog up to 2026-09-12. For where KENN is now, read `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`. The beta gate (`qualify_internal_beta.py`) still checks that this file exists, so it stays here. Replaced plans are in `products/kenn/docs/archive/plans/`.
+
 ## Evidence-backed status
 
 * Specialist evidence in generated-answer grounding (2026-09-12): local,

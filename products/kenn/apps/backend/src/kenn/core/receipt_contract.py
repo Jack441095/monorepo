@@ -6,7 +6,7 @@ removed by this module -- every helper here is opt-in and backward
 compatible, so a service can adopt it incrementally without breaking its
 existing tests. This exists to close three real, code-only gaps found in
 the 2026-09-06 beta-sprint P0 audit (see
-docs/KENN_BETA_SPRINT_PLAN_2026-09-06.md and the matching entry in
+docs/archive/plans/KENN_BETA_SPRINT_PLAN_2026-09-06.md and the matching entry in
 docs/ABLETON_ASSISTANT_CURRENT_STATE.md):
 
 1. No correlation id threads a request through proposal -> confirm ->

@@ -1,5 +1,7 @@
 # KENN Studio Assistant — End-to-End Roadmap
 
+> **Archived 2026-10-03, not a working plan.** Replaced by `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates) and `KENN_GLM_FULL_ASSISTANT_TRACKER.md` (checklist). Kept as a record of what was decided then; don't pick work from it.
+
 **Status:** Stages 1 and 2 complete. Stage 4, item 1 (knowledge Q&A exposed via MCP) complete. Stage 3, items 1-2 complete (item 3, Live import, confirmed blocked -- same class of gap as send/return control). Stage 5: scene launch and clip-slot stop real-Live qualified, two real bugs found and fixed in the process.
 **Date:** 2026-09-05
 

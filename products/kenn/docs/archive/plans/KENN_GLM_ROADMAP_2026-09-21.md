@@ -1,5 +1,7 @@
 # KENN Roadmap to Full GLM Coproducer Capacity — 2026-09-21
 
+> **Archived 2026-10-03, not a working plan.** Replaced by `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates) and `KENN_GLM_FULL_ASSISTANT_TRACKER.md` (checklist). Kept as a record of what was decided then; don't pick work from it.
+
 Source evidence: `docs/reports/KENN_ABLETON_GLM_QUALIFICATION_2026-09-21.md`,
 audit JSON `docs/research/results/kenn_audit_ableton_glm_qualification_2026-09-21.json`,
 gap matrix `docs/research/KENN_GLM_GAP_MATRIX_2026-09-21.md`.

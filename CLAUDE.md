@@ -10,6 +10,14 @@ Directory map: `products/kenn` (KENN), `products/slo` (SmartSampleManager), `pro
 
 **KENN lives here.** `products/kenn/` is the KENN source of truth, tracked directly in this monorepo (backend under `products/kenn/apps/backend`, tooling, plugins, docs). The former standalone repo (`Shenrendao/KENN`) was absorbed during the Sept 2026 consolidation; a frozen pre-monorepo snapshot is kept outside git under the local `Products/Kenn/archive/` data home.
 
+## Where the plan is
+
+For KENN, start at `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates and evidence log), then `KENN_GLM_FULL_ASSISTANT_TRACKER.md`
+(working checklist). Everything under any `docs/archive/` folder is a dated record, not a plan; don't pick work from it.
+Reports, handovers and audits elsewhere in `docs/` are snapshots of what was true on their date. For the whole estate the
+current-state file is `docs/NITE_DSP_STATE.json`. For SLO, Nite Submit, Thursday and the website, read the product's own README
+before any `*_PLAN_*`, `*_ROADMAP_*` or `*_PROMPT_*` file; those are mostly old and overlap each other.
+
 ## Working rules specific to this repo
 
 - **Never add an AI attribution trailer to commits in this repo.** Commits here must not contain `Co-Authored-By: Claude ...` or similar (the `commit-metadata.yml` gate exists on the `kenn-production-hardening` branch; its script `tools/check_commit_metadata.py` is not currently present on `main` — re-add before re-enabling CI enforcement). This overrides the default Claude Code commit-attribution behavior — do not append `Co-Authored-By: Claude ...` when committing here.

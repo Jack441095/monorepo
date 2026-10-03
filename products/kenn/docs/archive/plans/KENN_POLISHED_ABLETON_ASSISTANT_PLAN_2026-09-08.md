@@ -1,5 +1,7 @@
 # KENN polished Ableton assistant plan
 
+> **Archived 2026-10-03, not a working plan.** Replaced by `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates) and `KENN_GLM_FULL_ASSISTANT_TRACKER.md` (checklist). Kept as a record of what was decided then; don't pick work from it.
+
 **Date:** 2026-09-08
 **Current baseline (2026-09-11):** supervised-pilot-ready engineering candidate; 1,186 source-bound tests passing; qualified-beta gate 5/14 passed, 2 failed, 7 pending. One temporary failure is the human-review packet predating the latest answer-engine source; the other is a stale real-Live assistant receipt bound to an older source/planner revision. The remaining pending gates are external evidence, release, or explicitly deferred qualification work.
 **Product target:** a polished, broadly dependable Ableton assistant that understands the current set, gives musically useful and evidence-backed advice, safely carries out bounded work, learns from supervised outcomes, and remains honest when it does not know

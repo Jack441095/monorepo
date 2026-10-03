@@ -1,5 +1,7 @@
 # KENN State-of-the-Union Assessment & Roadmap to a GLM-Grade Ableton Live Assistant
 
+> **Archived 2026-10-03, not a working plan.** Replaced by `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates) and `KENN_GLM_FULL_ASSISTANT_TRACKER.md` (checklist). Kept as a record of what was decided then; don't pick work from it.
+
 **Date:** 2026-09-22 · **Baseline commit:** `a0e51b7` (post-cleanup main) · **Test suite:** 1317 passed / 2 failed / 5 skipped (the 2 failures are pre-existing `test_server_smoke` network flakiness — `http.client.RemoteDisconnected` in that env, not code rot; the 5 skips are `test_sample_embeddings.py` waiting on onnxruntime).
 
 **Primary evidence base:** `products/kenn/docs/reports/KENN_ABLETON_GLM_QUALIFICATION_2026-09-21.md`, `products/kenn/docs/plans/KENN_GLM_ROADMAP_2026-09-21.md`, `products/kenn/docs/research/KENN_GLM_GAP_MATRIX_2026-09-21.md`, raw receipts `products/kenn/docs/research/results/qual-glm-2026-09-21-raw/` (12 probes), the audit JSON, plus direct code inspection cited below.

@@ -1,5 +1,7 @@
 # Tier 0 Remediation Report
 
+> **Archived 2026-10-03.** A finished remediation report from the early estate cleanup. Current state is in `docs/NITE_DSP_STATE.json`.
+
 **Scope:** Security hardening (R1), live client site fix (R2), licensing gate (R3), site consolidation (R4), disk reclamation (R5), SLO feature-cache correctness (R6)
 **Status:** ✅ Complete — backend suite 106/106 green; feature-cache tests 6/6 green
 

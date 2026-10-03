@@ -1,5 +1,7 @@
 # KENN — Full GLM Ableton Audio Assistant: Build Prompt
 
+> **Archived 2026-10-03, not a working plan.** Replaced by `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates) and `KENN_GLM_FULL_ASSISTANT_TRACKER.md` (checklist). Kept as a record of what was decided then; don't pick work from it.
+
 **Written:** 2026-09-23, from the state at commit `5d7089c` (monorepo `main`).
 **Use:** paste the whole "Prompt" section into a fresh coding-agent session started in
 `/Volumes/Jack_Gandy_1TB_SSD/Nite-DSP/monorepo/products/kenn`. It is designed to run

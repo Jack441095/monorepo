@@ -1,5 +1,7 @@
 # KENN Beta Gap Matrix
 
+> **Historical audit, 2026-09-01.** Its gaps were mostly closed afterwards. The live checklist is `products/kenn/docs/plans/KENN_GLM_FULL_ASSISTANT_TRACKER.md`. Replaced plans are in `products/kenn/docs/archive/plans/`.
+
 Audit date: 2026-09-01, branch `develop` (created as `beta-audit-2026-09-01`). Format: requirement,
 current evidence, gap, risk, test, exit condition -- as specified by
 `KENN_BETA_SPRINT_PROMPT.md`. Ordered by beta impact, highest first.

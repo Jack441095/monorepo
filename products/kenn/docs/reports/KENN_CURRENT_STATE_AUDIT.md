@@ -1,5 +1,7 @@
 # KENN Current State Audit
 
+> **Historical, from 2026-09-01.** Current status is in `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md`. Replaced plans are in `products/kenn/docs/archive/plans/`.
+
 Audit date: 2026-09-01. Branch `develop`, pushed to
 `https://github.com/Jack441095/kenn-standalone`. Working tree clean at
 audit start; 89/89 Python tests + 2/2 C++ tests passing, all re-verified

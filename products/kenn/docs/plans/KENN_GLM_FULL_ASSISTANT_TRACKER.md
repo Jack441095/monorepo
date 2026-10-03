@@ -1,7 +1,7 @@
 # KENN GLM Full Assistant — Tracker
 
 The live checklist for the programme in
-[`KENN_GLM_FULL_ASSISTANT_BUILD_PROMPT_2026-09-23.md`](../../../../KENN_GLM_FULL_ASSISTANT_BUILD_PROMPT_2026-09-23.md)
+[`KENN_GLM_FULL_ASSISTANT_BUILD_PROMPT_2026-09-23.md`](../archive/root-planning/KENN_GLM_FULL_ASSISTANT_BUILD_PROMPT_2026-09-23.md)
 (monorepo root). Tick items in the same commit as the work that completes them, and add
 the date and a pointer to the evidence (`docs/evidence/…`) or commit.
 

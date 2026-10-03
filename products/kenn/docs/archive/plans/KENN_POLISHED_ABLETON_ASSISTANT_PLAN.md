@@ -1,5 +1,7 @@
 # KENN polished Ableton assistant plan
 
+> **Archived 2026-10-03, not a working plan.** Replaced by `products/kenn/docs/plans/KENN_NORTH_STAR_2026-09-24.md` (stage gates) and `KENN_GLM_FULL_ASSISTANT_TRACKER.md` (checklist). Kept as a record of what was decided then; don't pick work from it.
+
 **Date:** 2026-09-08
 
 This is the root-level entry point for KENN's plan to become a polished,

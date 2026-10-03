@@ -322,7 +322,7 @@ PATH="/opt/homebrew/bin:$PATH" npx vitest run
 | Preflight | `tooling/scripts/demo_preflight.py` |
 | Shadow bake-off | `tooling/scripts/analyze_shadow_logs.py` |
 | Tracker | `docs/plans/KENN_GLM_FULL_ASSISTANT_TRACKER.md` |
-| Build prompt | `KENN_GLM_FULL_ASSISTANT_BUILD_PROMPT_2026-09-23.md` (monorepo root) |
+| Build prompt | `KENN_GLM_FULL_ASSISTANT_BUILD_PROMPT_2026-09-23.md` (now in `docs/archive/root-planning/`) |
 | Runbook | `docs/runbooks/KENN_INVESTOR_DEMO.md` |
 
 ---
