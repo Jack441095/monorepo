@@ -104,7 +104,9 @@ def test_superseded_chat_cannot_populate_the_provider_response_cache(provider_ca
     assert state["calls"] == (1 if current else 2)
 
 
+@pytest.mark.parametrize("provider_cache", ["openai"], indirect=True)
 def test_suspended_stream_does_not_lend_its_cache_owner_to_other_calls(provider_cache):
+    # Remote calls can overlap; local calls now refuse a second active request.
     state, cached_answer = provider_cache
     first = chat_answer.answer_payload_stream("First question", session_id="song-a")
     second = chat_answer.answer_payload_stream("Second question", session_id="song-b")

@@ -38,32 +38,34 @@ def running_server():
     if not _index_available():
         pytest.skip("Knowledge index not built -- run `python3 apps/backend/src/kenn/main.py build` first.")
 
-    import os
     import socket
 
     # A free port, not a fixed one: 8099 may already be taken (a shared test machine, another checkout's server).
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
         probe.bind(("127.0.0.1", 0))
         port = probe.getsockname()[1]
-    os.environ["KENN_PORT"] = str(port)
-    os.environ["KENN_HOST"] = "127.0.0.1"
-    # This suite proves the standalone deterministic server and its local
-    # contracts. Keep optional model generation out of the smoke path so an
-    # unloaded local model cannot turn a bounded HTTP check into a timeout.
-    os.environ["AUDIO_TOO_LLM_ENABLED"] = "0"
-    os.environ["KENN_LIVE_LLM_ENABLED"] = "0"
+    with pytest.MonkeyPatch.context() as env:
+        env.setenv("KENN_PORT", str(port))
+        env.setenv("KENN_HOST", "127.0.0.1")
+        # The KENN switch takes precedence over the legacy switch in the owner env.
+        # Disable background generation too so no worker outlives this HTTP fixture.
+        env.setenv("KENN_LLM_ENABLED", "0")
+        env.setenv("AUDIO_TOO_LLM_ENABLED", "0")
+        env.setenv("KENN_LIVE_LLM_ENABLED", "0")
+        env.setenv("KENN_LLM_BACKGROUND", "0")
 
-    import kenn.server as server_module
+        import kenn.server as server_module
 
-    httpd = server_module.ThreadingHTTPServer(("127.0.0.1", port), server_module.Handler)
-    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
-    thread.start()
-    time.sleep(0.5)
-    try:
-        yield f"http://127.0.0.1:{port}"
-    finally:
-        httpd.shutdown()
-        httpd.server_close()
+        httpd = server_module.ThreadingHTTPServer(("127.0.0.1", port), server_module.Handler)
+        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        thread.start()
+        time.sleep(0.5)
+        try:
+            yield f"http://127.0.0.1:{port}"
+        finally:
+            httpd.shutdown()
+            httpd.server_close()
+            thread.join(timeout=5)
 
 
 @pytest.fixture(autouse=True)
@@ -82,6 +84,13 @@ def test_health_endpoint_responds(running_server: str) -> None:
     retrieval = body["subsystems"]["knowledge_index"]
     assert retrieval["schema"] == "kenn.retrieval_status.v1"
     assert retrieval["active_mode"] in {"unavailable", "bm25_only", "hybrid"}
+
+
+def test_smoke_server_disables_model_work_even_when_the_owner_env_enables_it(running_server: str) -> None:
+    # The owner env previously overrode the legacy switch and launched a worker beyond this fixture.
+    from kenn.llm import llm_rewrite
+
+    assert llm_rewrite.config("rewrite")["enabled"] is False
 
 
 def test_session_outcome_summary_endpoint_returns_aggregate_only(running_server: str) -> None:

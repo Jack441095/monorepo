@@ -241,21 +241,49 @@ def _add_usage(usage: LLMUsage) -> None:
         _global_usage[:200] = []
 
 
+class LLMBusyError(RuntimeError):
+    """The local model is serving another KENN request."""
+
+
+_model_slot = threading.Lock()
+
+
+@contextmanager
+def _local_model_request(provider: str):
+    # Competing foreground and background calls share the laptop's model memory.
+    # Refuse immediately so commands and grounded fallbacks do not wait in a queue.
+    local = provider in {"ollama", "mlx"}
+    if local and not _model_slot.acquire(blocking=False):
+        raise LLMBusyError("Local model is busy")
+    try:
+        yield
+    finally:
+        if local:
+            _model_slot.release()
+
+
 @contextmanager
 def _record_provider_usage(cfg: dict, task: str):
-    started = time.perf_counter()
+    started = None
     usage = LLMUsage(model=cfg["model"], provider=cfg["provider"], task=task)
     try:
-        yield usage
-        if usage.provider_done is False:
-            usage.status = "incomplete"
+        with _local_model_request(cfg["provider"]):
+            started = time.perf_counter()
+            yield usage
+            if usage.provider_done is False:
+                usage.status = "incomplete"
     except BaseException as exc:
-        usage.status = "failed" if isinstance(exc, Exception) else "interrupted"
+        if isinstance(exc, LLMBusyError):
+            usage.status = "busy"
+            usage.provider_attempted = False
+        else:
+            usage.status = "failed" if isinstance(exc, Exception) else "interrupted"
         # Error messages can contain provider URLs or request text; keep only the class.
         usage.error_type = type(exc).__name__ if isinstance(exc, Exception) else None
         raise
     finally:
-        usage.latency_ms = int((time.perf_counter() - started) * 1000)
+        if started is not None:
+            usage.latency_ms = int((time.perf_counter() - started) * 1000)
         _add_usage(usage)
 
 
@@ -565,11 +593,13 @@ def _native_ollama_base(base_url: str) -> str:
 
 def _ping_ollama_keep_alive(cfg: dict) -> None:
     try:
-        httpx.post(
-            f"{_native_ollama_base(cfg['base_url'])}/api/generate",
-            json={"model": cfg["model"], "prompt": "", "keep_alive": KEEP_ALIVE_DURATION},
-            timeout=10.0,
-        )
+        # An active request keeps the model resident; a ping can skip this interval.
+        with _local_model_request("ollama"):
+            httpx.post(
+                f"{_native_ollama_base(cfg['base_url'])}/api/generate",
+                json={"model": cfg["model"], "prompt": "", "keep_alive": KEEP_ALIVE_DURATION},
+                timeout=10.0,
+            )
     except Exception:
         pass  # best-effort — a missed ping just means the next real call reloads normally
 
@@ -1222,11 +1252,12 @@ def _chat_completion(
         try:
             from kenn.llm.mlx_inference_engine import MLXInferenceEngine
             if MLXInferenceEngine.is_available():
-                engine = MLXInferenceEngine.get_instance()
-                sys_msg = next((m["content"] for m in messages if m.get("role") == "system"), None)
-                user_msgs = [m for m in messages if m.get("role") != "system"]
-                formatted_prompt = engine.format_chat_prompt(user_msgs, system_prompt=sys_msg)
-                with _record_provider_usage({**cfg, "model": engine.model_id, "provider": "mlx"}, task) as usage:
+                with _record_provider_usage({**cfg, "provider": "mlx"}, task) as usage:
+                    engine = MLXInferenceEngine.get_instance()
+                    usage.model = engine.model_id
+                    sys_msg = next((m["content"] for m in messages if m.get("role") == "system"), None)
+                    user_msgs = [m for m in messages if m.get("role") != "system"]
+                    formatted_prompt = engine.format_chat_prompt(user_msgs, system_prompt=sys_msg)
                     max_toks = _clamped_max_tokens(task, answer_mode, cfg.get("max_tokens", 512))
                     mlx_res = engine.generate(formatted_prompt, max_tokens=max_toks, temperature=cfg.get("temperature", 0.2))
                     content = mlx_res["text"]
@@ -1236,6 +1267,8 @@ def _chat_completion(
                     usage.total_tokens = int((len(formatted_prompt.split()) + len(content.split())) * 1.3)
                 _cache_put(cache_key, content)
                 return content, usage
+        except LLMBusyError:
+            raise
         except Exception:
             pass
 
@@ -1261,7 +1294,6 @@ def _chat_completion(
             json_schema=json_schema,
         )
     headers = _build_headers(cfg)
-    client = _get_client()
     # One retry on transient connection failures only (not on a timeout or
     # any HTTP status -- those are either already the full configured
     # budget or a real application-level error that would just fail the
@@ -1274,6 +1306,8 @@ def _chat_completion(
     for attempt in range(2):
         try:
             with _record_provider_usage(cfg, task) as usage:
+                # Client startup launches the pinger; generation must own the slot first.
+                client = _get_client()
                 response = client.post(
                     url,
                     json=payload,
@@ -1305,6 +1339,8 @@ def _chat_completion(
             raise TimeoutError(f"LLM timed out after {cfg['timeout']}s")
         except httpx.HTTPStatusError as e:
             raise RuntimeError(f"LLM returned {e.response.status_code}: {e.response.text[:200]}")
+        except LLMBusyError:
+            raise
         except Exception as e:
             raise ValueError(f"LLM request failed: {e}")
 
@@ -1363,11 +1399,12 @@ def chat_completion_stream(
         try:
             from kenn.llm.mlx_inference_engine import MLXInferenceEngine
             if MLXInferenceEngine.is_available():
-                engine = MLXInferenceEngine.get_instance()
-                sys_msg = next((m["content"] for m in messages if m.get("role") == "system"), None)
-                user_msgs = [m for m in messages if m.get("role") != "system"]
-                formatted_prompt = engine.format_chat_prompt(user_msgs, system_prompt=sys_msg)
-                with _record_provider_usage({**cfg, "model": engine.model_id, "provider": "mlx"}, task) as usage:
+                with _record_provider_usage({**cfg, "provider": "mlx"}, task) as usage:
+                    engine = MLXInferenceEngine.get_instance()
+                    usage.model = engine.model_id
+                    sys_msg = next((m["content"] for m in messages if m.get("role") == "system"), None)
+                    user_msgs = [m for m in messages if m.get("role") != "system"]
+                    formatted_prompt = engine.format_chat_prompt(user_msgs, system_prompt=sys_msg)
                     accumulated: list[str] = []
                     max_toks = _clamped_max_tokens(task, answer_mode, cfg.get("max_tokens", 512))
                     for chunk in engine.stream_generate(formatted_prompt, max_tokens=max_toks, temperature=cfg.get("temperature", 0.2)):
@@ -1380,6 +1417,8 @@ def chat_completion_stream(
                 _cache_put(cache_key, full_text)
                 yield "", usage
                 return
+        except LLMBusyError:
+            raise
         except Exception:
             pass
 
@@ -1401,7 +1440,6 @@ def chat_completion_stream(
         url = f"{cfg['base_url']}/chat/completions"
         payload = _build_payload(cfg, messages, stream=True, answer_mode=answer_mode)
     headers = _build_headers(cfg)
-    client = _get_client()
     # Monotonic, and taken before the request goes out, so the deadline covers the connect and the
     # headers as well as the tokens. wall_clock=False would be wrong here: this thread is blocked in a
     # socket read and NTP stepping the clock backwards could extend the stream indefinitely.
@@ -1412,6 +1450,7 @@ def chat_completion_stream(
     with _record_provider_usage(cfg, task) as usage:
         usage.provider_done = False
         try:
+            client = _get_client()
             with client.stream(
                 "POST",
                 url,
@@ -2107,6 +2146,7 @@ def get_public_usage_stats() -> dict:
         "model": config()["model"],
         "provider_attempts": sum(u.provider_attempted for u in _global_usage),
         "failed_calls": sum(u.status == "failed" for u in _global_usage),
+        "busy_calls": sum(u.status == "busy" for u in _global_usage),
         "interrupted_calls": sum(u.status == "interrupted" for u in _global_usage),
         "incomplete_calls": sum(u.status == "incomplete" for u in _global_usage),
         "cache_hits": sum(u.cache_hit for u in _global_usage),

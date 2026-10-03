@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import threading
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from unittest.mock import patch
 
 from kenn.core import answer_upgrades
@@ -79,13 +79,14 @@ class HeldTransport:
         return self.request(**kwargs)
 
 
-def probe(surface: str, *, serialize_transport: bool = False) -> dict:
+def probe(surface: str, *, serialize_transport: bool = False, admit_local_requests: bool = True) -> dict:
     """Hold a background call while a foreground provider wrapper advances."""
     if surface not in {"payload", "stream"}:
         raise ValueError("Unknown surface")
     transport = HeldTransport(serialize=serialize_transport)
     errors = []
     finished = threading.Event()
+    foreground_finished = threading.Event()
     background_workers = []
 
     def foreground():
@@ -96,6 +97,8 @@ def probe(surface: str, *, serialize_transport: bool = False) -> dict:
                 llm.chat_completion(MESSAGES)
         except Exception as exc:
             errors.append(type(exc).__name__)
+        finally:
+            foreground_finished.set()
 
     def background():
         background_workers.append(threading.current_thread())
@@ -105,13 +108,15 @@ def probe(surface: str, *, serialize_transport: bool = False) -> dict:
         finally:
             finished.set()
 
+    admission = llm._local_model_request if admit_local_requests else lambda provider: nullcontext()
     # Patch only in this standalone process: no cache, session, log or network writes.
     with patch.multiple(answer_upgrades, _LOCK=threading.Lock(), _BUSY=threading.Lock(),
                         _RESULTS={}, _TURNS={}, log_outcome=lambda *args: None), \
             patch.multiple(llm, config=lambda task="rewrite": CFG,
                            mlx_selected=lambda task: False, _get_client=lambda: transport,
                            _cache_get=lambda key: None, _cache_put=lambda *args: None,
-                           _add_usage=lambda usage: None), \
+                           _add_usage=lambda usage: None, _model_slot=threading.Lock(),
+                           _local_model_request=admission), \
             patch.dict("os.environ", {"KENN_LLM_THINK": "off", "KENN_LIVE_BACKEND": "fake"}):
         job = answer_upgrades.start(background)
         worker = threading.Thread(target=foreground, name="kenn-admission-probe")
@@ -120,7 +125,9 @@ def probe(surface: str, *, serialize_transport: bool = False) -> dict:
                 raise RuntimeError("Background fixture did not reach transport")
             second_blocked = answer_upgrades.start(lambda: {"llm_enhanced": False}) is None
             worker.start()
-            entered_before_release = transport.foreground.wait(0.25)
+            foreground_finished.wait(0.25)
+            entered_before_release = transport.foreground.is_set()
+            finished_before_release = foreground_finished.is_set()
         finally:
             transport.release.set()
             if worker.ident is not None:
@@ -134,6 +141,8 @@ def probe(surface: str, *, serialize_transport: bool = False) -> dict:
         background_status = answer_upgrades.get(job)["status"]
     return {"surface": surface, "transport": "stubbed", "peak_provider_requests": transport.peak,
             "foreground_entered_before_background_release": entered_before_release,
+            "foreground_finished_before_background_release": finished_before_release,
+            "local_admission_enabled": admit_local_requests,
             "second_background_blocked": second_blocked, "background_status": background_status,
             "provider_calls": transport.calls, "foreground_errors": errors}
 
@@ -141,11 +150,14 @@ def probe(surface: str, *, serialize_transport: bool = False) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--require-single-request", action="store_true")
+    parser.add_argument("--without-admission", action="store_true",
+                        help="Disable admission only in this offline probe as a counterfactual control")
     args = parser.parse_args()
-    rows = [probe(surface) for surface in ("payload", "stream")]
+    rows = [probe(surface, admit_local_requests=not args.without_admission) for surface in ("payload", "stream")]
     print(json.dumps({"kind": "offline_admission_probe", "latency_measured": False,
                       "rows": rows}, indent=2))
-    if any(row["foreground_errors"] or row["background_status"] != "rejected" for row in rows):
+    if any(row["foreground_errors"] not in ([], ["LLMBusyError"])
+           or row["background_status"] != "rejected" for row in rows):
         return 2
     return int(args.require_single_request and any(row["peak_provider_requests"] > 1 for row in rows))
 

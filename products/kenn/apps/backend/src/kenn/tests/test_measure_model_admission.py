@@ -12,18 +12,22 @@ from scripts import measure_model_admission as tool
 
 @pytest.mark.parametrize("surface", ["payload", "stream"])
 @pytest.mark.parametrize("serialized", [False, True])
-def test_admission_probe_counts_overlap_only_while_both_provider_requests_are_active(surface, serialized):
+@pytest.mark.parametrize("admission", [False, True])
+def test_admission_probe_counts_overlap_only_while_both_provider_requests_are_active(surface, serialized, admission):
     # The serialized transport is a counterfactual control, not a production admission fix.
-    result = tool.probe(surface, serialize_transport=serialized)
-    assert result["peak_provider_requests"] == (1 if serialized else 2)
-    assert result["foreground_entered_before_background_release"] is not serialized
+    result = tool.probe(surface, serialize_transport=serialized, admit_local_requests=admission)
+    assert result["peak_provider_requests"] == (1 if serialized or admission else 2)
+    assert result["foreground_entered_before_background_release"] is (not serialized and not admission)
     assert result["second_background_blocked"] is True
     assert result["background_status"] == "rejected"
-    assert result["foreground_errors"] == []
+    assert result["foreground_errors"] == (["LLMBusyError"] if admission else [])
     assert result["provider_calls"] == [
         {"owner": "background", "stream": False, "think": False},
+    ] + ([] if admission else [
         {"owner": "foreground", "stream": surface == "stream", "think": False},
-    ]
+    ])
+    if admission:
+        assert result["foreground_finished_before_background_release"] is True
 
 
 def test_admission_probe_restores_state_and_does_not_contact_a_model_or_write_caches(monkeypatch):
@@ -37,7 +41,7 @@ def test_admission_probe_restores_state_and_does_not_contact_a_model_or_write_ca
     turns, results, lock, busy = (answer_upgrades._TURNS, answer_upgrades._RESULTS,
                                 answer_upgrades._LOCK, answer_upgrades._BUSY)
     for surface in ("payload", "stream", "payload"):
-        assert tool.probe(surface)["foreground_errors"] == []
+        assert tool.probe(surface)["foreground_errors"] == ["LLMBusyError"]
         assert answer_upgrades._TURNS is turns and answer_upgrades._RESULTS is results
         assert answer_upgrades._LOCK is lock and answer_upgrades._BUSY is busy
         assert llm._get_client is forbidden and llm._cache_put is forbidden
@@ -45,10 +49,11 @@ def test_admission_probe_restores_state_and_does_not_contact_a_model_or_write_ca
                    or thread.name == "kenn-admission-probe" for thread in threading.enumerate())
 
 
-@pytest.mark.parametrize("require_single, expected", [(False, 0), (True, 1)])
-def test_admission_probe_cli_can_fail_the_single_request_requirement(monkeypatch, capsys, require_single, expected):
+@pytest.mark.parametrize("require_single, admission, expected", [(False, True, 0), (True, True, 0), (True, False, 1)])
+def test_admission_probe_cli_can_fail_the_single_request_requirement(monkeypatch, capsys, require_single, admission, expected):
     monkeypatch.setattr("sys.argv", ["measure_model_admission.py"]
-                        + (["--require-single-request"] if require_single else []))
+                        + (["--require-single-request"] if require_single else [])
+                        + ([] if admission else ["--without-admission"]))
     assert tool.main() == expected
     receipt = json.loads(capsys.readouterr().out)
     assert receipt["kind"] == "offline_admission_probe" and receipt["latency_measured"] is False

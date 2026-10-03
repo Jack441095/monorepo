@@ -294,10 +294,13 @@ def test_finished_provider_cost_is_kept_when_the_full_grounding_gate_rejects(off
 
 
 def test_usage_capture_isolates_threads_and_restores_after_an_exception(offline, monkeypatch):
+    # Remote calls may overlap; their ContextVar usage must still stay isolated.
+    cfg = {**llm_rewrite.config(), "provider": "openai"}
+    monkeypatch.setattr(llm_rewrite, "config", lambda task="rewrite": cfg)
     barrier = Barrier(2)
     def post(*args, **kwargs):
         barrier.wait(timeout=5)
-        return Reply({**METRICS, "message": {"content": "Answer"}})
+        return Reply({"choices": [{"message": {"content": "Answer"}}]})
     monkeypatch.setattr(llm_rewrite, "_get_client", lambda: SimpleNamespace(post=post))
     def ask(task):
         with llm_rewrite.capture_usage() as calls:
