@@ -578,6 +578,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     retain knowledge routing. Scoped checks: 52 passes; full backend: 3635 passes, 12 skips and the same pre-existing
     personal-path failure. No decode-speed or Live-open gate claim; C3 stays open.
     [Regression, mutation and full-suite receipt](docs/evidence/KENN_C3_LIMITER_COMMAND_ROUTING_2026-10-03.md).
+  - Post-routing model diagnostic, 3 Oct: 30 turns, 20 answer attempts, 8 accepted and 4 accepted within 15 s.
+    Median completed rewrite prefill 2.486 s and decode 17.605 tok/s; 12 interrupted calls have unknown phases.
+    All delivered answers were read: routing improves, but accepted mono/snare advice and follow-up fallbacks
+    still miss intent. No controlled speed gain, payload/UI/Live qualification or plan tick.
+    [Measurements, Mac state, answer review and research decisions](docs/evidence/KENN_C3_POST_ROUTING_MODEL_DIAGNOSTIC_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
