@@ -53,16 +53,23 @@ def phases(call: dict) -> dict:
 def gate_counts(rows: list[dict]) -> dict:
     # Never-attempted and rejected requests remain in the eligible denominator.
     hits = sum(row["accepted"] and not row["error_type"] and row["seconds"] <= 15 for row in rows)
+    non_abstaining_hits = sum(row["accepted"] and not row["abstained"]
+                             and not row["error_type"] and row["seconds"] <= 15 for row in rows)
     return {
         "eligible": len(rows),
         "attempted": sum(row["attempted"] for row in rows),
         "accepted": sum(row["accepted"] for row in rows),
         "accepted_within_15_seconds": hits,
         "fraction": hits / len(rows) if rows else None,
+        "accepted_abstentions": sum(row["accepted"] and row["abstained"] for row in rows),
+        "accepted_non_abstaining_within_15_seconds": non_abstaining_hits,
+        "non_abstaining_fraction": non_abstaining_hits / len(rows) if rows else None,
     }
 
 
 def answer_outcome(payload: dict, usages, surface: str) -> dict:
+    from kenn.llm.llm_rewrite import ABSTAIN_PREFIX
+
     validation = payload.get("generation_validation") or {}
     # Payload delivery exposes the accepted rewrite through llm_enhanced; only
     # streams carry the final grounding verdict. Provider attempts cover both.
@@ -72,6 +79,8 @@ def answer_outcome(payload: dict, usages, surface: str) -> dict:
         ),
         "accepted": bool(payload.get("llm_enhanced")) if surface == "payload"
         else bool(validation.get("accepted")),
+        "abstained": any(line.strip().lower().startswith(ABSTAIN_PREFIX.lower())
+                         for line in (payload.get("answer") or "").splitlines()),
         "warnings": validation.get("warnings"),
     }
 
@@ -228,7 +237,8 @@ def measure(cases: list[dict], runtime: Path, output_cap: int | None,
         "limits": ["Fake Live; five selected knowledge questions per surface, one pass",
                    "Warm residency and Ollama prompt cache are not reset",
                    "Generation TTFT starts at the completion function; delivered TTFT starts at chat entry",
-                   "Payload TTFT and interrupted native phase timings remain unknown"],
+                   "Payload TTFT and interrupted native phase timings remain unknown",
+                   "Non-abstaining counts exclude explicit abstentions; usefulness still needs answer review"],
         "counts": {surface: gate_counts([r for r in rows if r["surface"] == surface])
                    for surface in ("stream", "payload")},
         "rows": rows,

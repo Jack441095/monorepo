@@ -28,14 +28,17 @@ def test_interrupted_or_empty_decode_does_not_claim_zero_cost_or_infinite_speed(
 
 def test_never_attempted_rejected_and_failed_requests_still_count_against_the_gate():
     rows = [
-        {"attempted": True, "accepted": True, "seconds": 15, "error_type": None},
-        {"attempted": True, "accepted": True, "seconds": 15.01, "error_type": None},
-        {"attempted": True, "accepted": False, "seconds": 3, "error_type": None},
-        {"attempted": False, "accepted": False, "seconds": 1, "error_type": None},
-        {"attempted": True, "accepted": True, "seconds": 2, "error_type": "TimeoutError"},
+        {"attempted": True, "accepted": True, "abstained": False, "seconds": 15, "error_type": None},
+        {"attempted": True, "accepted": True, "abstained": False, "seconds": 15.01, "error_type": None},
+        {"attempted": True, "accepted": False, "abstained": True, "seconds": 3, "error_type": None},
+        {"attempted": False, "accepted": False, "abstained": False, "seconds": 1, "error_type": None},
+        {"attempted": True, "accepted": True, "abstained": False, "seconds": 2, "error_type": "TimeoutError"},
     ]
     assert tool.gate_counts(rows)["fraction"] == 0.2
+    assert tool.gate_counts(rows)["non_abstaining_fraction"] == 0.2
+    assert tool.gate_counts(rows)["accepted_abstentions"] == 0
     assert tool.gate_counts([])["fraction"] is None
+    assert tool.gate_counts([])["non_abstaining_fraction"] is None
 
 
 @pytest.mark.parametrize("accepted", [False, True])
@@ -43,7 +46,7 @@ def test_payload_model_acceptance_is_counted_without_stream_validation_metadata(
     # Real payloads omit generation_validation, so the stream-only field lost every hit.
     usage = SimpleNamespace(task="rewrite", provider_attempted=True)
     outcome = tool.answer_outcome({"llm_enhanced": accepted}, [usage], "payload")
-    assert outcome == {"attempted": True, "accepted": accepted, "warnings": None}
+    assert outcome == {"attempted": True, "accepted": accepted, "abstained": False, "warnings": None}
 
 
 def test_stream_rejection_overrides_the_provisional_llm_enhanced_flag():
@@ -52,6 +55,25 @@ def test_stream_rejection_overrides_the_provisional_llm_enhanced_flag():
     }}
     assert not tool.answer_outcome(payload, [], "stream")["accepted"]
     assert not tool.answer_outcome({}, [SimpleNamespace(task="intent", provider_attempted=True)], "payload")["attempted"]
+
+
+@pytest.mark.parametrize("surface", ["stream", "payload"])
+@pytest.mark.parametrize("answer", [
+    "Insufficient context: no evidence for this fact.",
+    "Short answer:\n  insufficient CONTEXT: no evidence for this fact.",
+    "Insufficient context:",
+])
+def test_accepted_abstentions_are_reported_separately_from_timely_explanations(surface, answer):
+    # Grounding can accept a quick abstention even though it does not explain the requested concept.
+    payload = {"answer": answer, "llm_enhanced": True,
+               "generation_validation": {"attempted": True, "accepted": True}}
+    row = {**tool.answer_outcome(payload, [], surface), "seconds": 2, "error_type": None}
+    counts = tool.gate_counts([row])
+    assert row["abstained"]
+    assert counts["accepted_within_15_seconds"] == 1
+    assert counts["accepted_abstentions"] == 1
+    assert counts["accepted_non_abstaining_within_15_seconds"] == 0
+    assert counts["non_abstaining_fraction"] == 0
 
 
 def fake_llm():
@@ -145,17 +167,19 @@ def test_brief_style_does_not_touch_other_tasks_or_action_and_structured_contrac
         assert llm.compatible["messages"] == messages
 
 
-def test_both_surfaces_measure_the_same_cases_and_keep_model_prose_only_in_scratch(tmp_path, monkeypatch):
+@pytest.mark.parametrize("abstained", [False, True])
+def test_both_surfaces_measure_the_same_cases_and_keep_model_prose_only_in_scratch(tmp_path, monkeypatch, abstained):
     from kenn.llm import llm_rewrite as llm
 
     asked = []
+    candidate = "Insufficient context: private candidate prose" if abstained else "private candidate prose"
 
     def completion(messages, task="rewrite", **kwargs):
         usage = llm.LLMUsage(prompt_tokens=1100, completion_tokens=130,
                              prompt_eval_duration_ns=2_000_000_000,
                              eval_duration_ns=10_000_000_000, provider_done=True)
         llm._add_usage(usage)
-        return "private candidate prose", usage
+        return candidate, usage
 
     def ask(_chat, question, *, allow_llm, surface):
         asked.append((surface, question))
@@ -174,6 +198,9 @@ def test_both_surfaces_measure_the_same_cases_and_keep_model_prose_only_in_scrat
     assert asked == [(surface, case["question"]) for surface in ("stream", "payload") for case in cases]
     assert report["counts"]["stream"]["eligible"] == 2
     assert report["counts"]["payload"]["accepted_within_15_seconds"] == 2
+    for surface in ("stream", "payload"):
+        assert report["counts"][surface]["accepted_non_abstaining_within_15_seconds"] == (0 if abstained else 2)
+        assert report["counts"][surface]["accepted_abstentions"] == (2 if abstained else 0)
     assert not report["release_gate_evaluated"]
     assert "private candidate prose" not in json.dumps(report)
     assert "private candidate prose" in (tmp_path / "answers.jsonl").read_text()
