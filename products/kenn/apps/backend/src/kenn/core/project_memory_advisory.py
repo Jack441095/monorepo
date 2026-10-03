@@ -10,10 +10,11 @@ Per KENN North Star Stage 4:
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import Any, Callable
 from uuid import uuid4
 
 from kenn.core.assistant_profile_memory import AssistantProfileStore, PREFERENCE_KEYS
+from kenn.core import answer_upgrades
 
 
 _KEYWORD_RULES: list[tuple[re.Pattern, str, str]] = [
@@ -173,6 +174,7 @@ def evaluate_memory_chat_intent(
     *,
     session_id: str = "",
     store: AssistantProfileStore | None = None,
+    request_turn_id: str = "",
 ) -> dict[str, Any] | None:
     """Evaluate whether a chat query is an explicit memory management command."""
     clean = query.strip()
@@ -180,6 +182,20 @@ def evaluate_memory_chat_intent(
         return None
 
     profile_store = store or AssistantProfileStore()
+
+    def write_memory(write: Callable[[], Any]) -> Any:
+        result = None
+
+        def save():
+            nonlocal result
+            result = write()
+
+        # Cancellation and replacement share this lock with persistence, so a stale
+        # command cannot change memory after delivery has been revoked.
+        answer_upgrades.write_if_current(save, session_id=session_id, turn_id=request_turn_id)
+        return result
+
+    cancelled = {"answer": "", "route": "conversation", "requires_confirmation": False}
 
     # 1. View memory
     if _SHOW_MEMORY_PATTERNS.match(clean) or clean.lower() in {"show memory", "project memory", "my preferences"}:
@@ -237,7 +253,9 @@ def evaluate_memory_chat_intent(
                 "applied_preferences": [],
                 "requires_confirmation": False,
             }
-        cleared = profile_store.clear_profile(session_id)
+        cleared = write_memory(lambda: profile_store.clear_profile(session_id))
+        if cleared is None:
+            return cancelled
         return {
             "answer": f"Project memory cleared for this session ({cleared.get('preferences', 0)} preferences and {cleared.get('episodes', 0)} episodes removed).",
             "route": "conversation",
@@ -269,7 +287,9 @@ def evaluate_memory_chat_intent(
                     matched_key = p["key"]
                     break
         if matched_key:
-            profile_store.forget_preference(session_id=session_id, key=matched_key)
+            forgotten = write_memory(lambda: profile_store.forget_preference(session_id=session_id, key=matched_key))
+            if forgotten is None:
+                return cancelled
             return {
                 "answer": f"Forgotten. Removed preference `{matched_key}` from this project's memory.",
                 "route": "conversation",
@@ -305,13 +325,15 @@ def evaluate_memory_chat_intent(
             }
 
         turn_id = f"turn-{uuid4().hex[:8]}"
-        res = profile_store.record_preference(
+        res = write_memory(lambda: profile_store.record_preference(
             session_id=session_id,
             key=key,
             value=value,
             source_turn_id=turn_id,
             user_statement=statement,
-        )
+        ))
+        if res is None:
+            return cancelled
         if res.get("ok"):
             pref = res["preference"]
             return {

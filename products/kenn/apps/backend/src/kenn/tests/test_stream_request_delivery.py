@@ -132,7 +132,7 @@ def test_cli_stream_returns_final_grounded_metadata_instead_of_rejected_tokens(m
 def test_public_stream_runs_status_cancel_and_transport_before_retrieval_or_cache(monkeypatch, query):
     calls = []
 
-    def short_circuit(question, history=None, session_id=""):
+    def short_circuit(question, history=None, session_id="", request_turn_id=""):
         calls.append((question, session_id))
         return {"answer": "Handled scoped request", "route": "ableton", "requires_confirmation": False}
 
@@ -466,7 +466,7 @@ def test_unbound_public_stream_does_not_replace_an_anonymous_pending_owner(monke
     owner = answer_upgrades.begin_turn("")
     calls = []
 
-    def handled(query, history=None, session_id=""):
+    def handled(query, history=None, session_id="", request_turn_id=""):
         calls.append(session_id)
         return {"answer": "Unbound status", "route": "conversation"}
 

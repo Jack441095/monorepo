@@ -2000,7 +2000,7 @@ def _answer_payload_stream(
     if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id):
         yield discarded
         return
-    short_circuit = _short_circuit_evaluator(query, history=history, session_id=session_id)
+    short_circuit = _short_circuit_evaluator(query, history=history, session_id=session_id, request_turn_id=request_turn_id)
     if short_circuit:
         if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
             yield discarded
@@ -2726,7 +2726,7 @@ def _transport_shortcut(action: str, verb: str, session_id: str) -> dict:
     }
 
 
-def _short_circuit_evaluator(query: str, history: list | None = None, session_id: str = "") -> dict | None:
+def _short_circuit_evaluator(query: str, history: list | None = None, session_id: str = "", request_turn_id: str = "") -> dict | None:
     """Instant sub-millisecond evaluator for status, simple transport, memory, and one-word intents."""
     cleaned = query.strip().lower()
     if not cleaned:
@@ -2735,7 +2735,7 @@ def _short_circuit_evaluator(query: str, history: list | None = None, session_id
     # Project Memory and Personalisation (Stage 4)
     try:
         from kenn.core.project_memory_advisory import evaluate_memory_chat_intent
-        mem_eval = evaluate_memory_chat_intent(query, session_id=session_id)
+        mem_eval = evaluate_memory_chat_intent(query, session_id=session_id, request_turn_id=request_turn_id)
         if mem_eval is not None:
             return mem_eval
     except Exception:
@@ -2915,7 +2915,7 @@ def _answer_payload(
         return conversational
 
     # Instant short-circuit router for status, aborts, and direct transport (< 0.1 ms)
-    short_circuit = None if retrieval_only else _short_circuit_evaluator(query, history=history, session_id=session_id)
+    short_circuit = None if retrieval_only else _short_circuit_evaluator(query, history=history, session_id=session_id, request_turn_id=request_turn_id)
     if short_circuit:
         if not answer_upgrades.is_current_turn(session_id=session_id, turn_id=request_turn_id) and not short_circuit.get("answer_delivery_discarded"):
             return discarded
