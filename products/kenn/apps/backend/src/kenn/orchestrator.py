@@ -850,7 +850,6 @@ def _dispatch_rack_synthesizer(**kwargs: Any) -> Dict[str, Any]:
     from kenn.mixing_doctor import get_latest_session_state
 
     query = str(kwargs.get("query", "")).lower()
-    session_id = str(kwargs.get("session_id", "rack_session"))[:128]
 
     # Check if user just wants a catalog listing
     if any(kw in query for kw in {"list", "show", "what", "available"}) and "rack" in query:
@@ -869,6 +868,17 @@ def _dispatch_rack_synthesizer(**kwargs: Any) -> Dict[str, Any]:
             "message": msg,
             "racks": racks,
         }
+
+    session_id = kwargs.get("session_id")
+    # Rack proposals need a chat owner; catalogue reads do not touch a session.
+    if not isinstance(session_id, str) or not session_id.strip() or len(session_id.strip()) > 128:
+        return {
+            "agent": "rack_synthesizer",
+            "status": "invalid",
+            "message": "A KENN session ID is required.",
+            "requires_confirmation": False,
+        }
+    session_id = session_id.strip()
 
     # Identify target rack template
     matched_id = None
@@ -987,7 +997,16 @@ def _dispatch_neural_midi(**kwargs: Any) -> Dict[str, Any]:
 
     query = str(kwargs.get("query", ""))
     lower_query = query.lower()
-    session_id = str(kwargs.get("session_id", "midi_session"))[:128]
+    session_id = kwargs.get("session_id")
+    # Validate the owner before reading Live or generating a confirmation proposal.
+    if not isinstance(session_id, str) or not session_id.strip() or len(session_id.strip()) > 128:
+        return {
+            "agent": "neural_midi_generator",
+            "status": "invalid",
+            "message": "A KENN session ID is required.",
+            "requires_confirmation": False,
+        }
+    session_id = session_id.strip()
     state = get_latest_session_state() or {"status": "offline", "tracks": []}
 
     # 1. Harmonic extraction (root & scale)
@@ -1086,7 +1105,16 @@ def _dispatch_surgical_masking(**kwargs: Any) -> Dict[str, Any]:
     from kenn.mixing_doctor import get_latest_session_state
     from kenn.plugin_handoff import live_context_summary
 
-    session_id = str(kwargs.get("session_id", "masking_remedy_session"))[:128]
+    session_id = kwargs.get("session_id")
+    # Telemetry and remedy proposals must use the requesting chat's owner.
+    if not isinstance(session_id, str) or not session_id.strip() or len(session_id.strip()) > 128:
+        return {
+            "agent": "surgical_masking_doctor",
+            "status": "invalid",
+            "message": "A KENN session ID is required.",
+            "requires_confirmation": False,
+        }
+    session_id = session_id.strip()
     state = get_latest_session_state() or {"status": "offline", "tracks": []}
     telemetry = live_context_summary(session_id)
 

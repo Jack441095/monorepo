@@ -95,3 +95,99 @@ def test_anonymous_dispatch_can_still_inspect_the_live_session(isolated_dispatch
     assert result["status"] == "connected"
     assert result["result"]["tracks"]
     assert not confirmation._ISSUED_TOKENS
+
+
+_RECIPE_REQUESTS = [
+    ("rack_synthesizer", "build a neuro reese rack on track 1"),
+    ("neural_midi_generator", "write a bouncy bassline in D minor"),
+    ("surgical_masking_doctor", "fix the masking in my drop"),
+]
+
+
+@pytest.fixture
+def isolated_recipe_dispatch(isolated_dispatch, monkeypatch):
+    from kenn import mixing_doctor, plugin_handoff
+
+    orchestrator, fake = isolated_dispatch
+    calls = []
+
+    def snapshot():
+        calls.append("snapshot")
+        return fake.query_session_state()
+
+    def telemetry(session_id):
+        calls.append(("telemetry", session_id))
+        return None
+
+    monkeypatch.setattr(mixing_doctor, "get_latest_session_state", snapshot)
+    monkeypatch.setattr(plugin_handoff, "live_context_summary", telemetry)
+    return orchestrator, fake, calls
+
+
+@pytest.mark.parametrize("agent,query", _RECIPE_REQUESTS)
+@pytest.mark.parametrize(
+    "request_kwargs",
+    [{}, {"session_id": None}, {"session_id": ""}, {"session_id": "   "},
+     {"session_id": 7}, {"session_id": []}, {"session_id": "x" * 129}],
+    ids=["omitted", "null", "empty", "blank", "number", "list", "overlong"],
+)
+def test_unbound_recipe_dispatch_stops_before_session_reads_or_proposal_work(
+    isolated_recipe_dispatch, monkeypatch, agent, query, request_kwargs,
+):
+    # Recipe dispatch used shared owners or coerced invalid IDs before preparing changes.
+    from kenn.core import generative_midi, rack_builder
+    from kenn.core.session_doctor import SessionDoctor
+
+    orchestrator, fake, calls = isolated_recipe_dispatch
+    before_live = deepcopy(fake.query_session_state())
+
+    def proposal_work(*args, **kwargs):
+        calls.append("proposal_work")
+        raise AssertionError("An unbound request must stop before proposal work")
+
+    monkeypatch.setattr(rack_builder, "synthesize_rack_proposal", proposal_work)
+    monkeypatch.setattr(generative_midi, "generate_audiogen_bassline", proposal_work)
+    monkeypatch.setattr(SessionDoctor, "formulate_surgical_remediation_proposal", proposal_work)
+    assert orchestrator.classify(query) == agent
+    result = orchestrator.dispatch(query, **request_kwargs)
+    assert result["status"] == "invalid"
+    assert not result.get("proposal")
+    assert not result.get("confirmation_token")
+    assert not result["requires_confirmation"]
+    assert calls == []
+    assert not confirmation._ISSUED_TOKENS
+    assert fake.query_session_state() == before_live
+
+
+@pytest.mark.parametrize("agent,query", _RECIPE_REQUESTS)
+@pytest.mark.parametrize("owners", [("recipe-a", "recipe-b"), ("  recipe-a  ", "x" * 128)])
+def test_bound_recipe_dispatch_keeps_each_chats_proposal_owner_and_token_separate(
+    isolated_recipe_dispatch, agent, query, owners,
+):
+    orchestrator, fake, calls = isolated_recipe_dispatch
+    before_live = deepcopy(fake.query_session_state())
+    results = [orchestrator.dispatch(query, session_id=owner) for owner in owners]
+    for owner, result in zip(owners, results):
+        assert result["agent_name"] == agent
+        assert result["status"] == "confirmation_required"
+        assert result["proposal"]["session_id"] == owner.strip()
+        assert result["requires_confirmation"]
+    assert results[0]["confirmation_token"] != results[1]["confirmation_token"]
+    if agent == "surgical_masking_doctor":
+        assert [call for call in calls if isinstance(call, tuple)] == [
+            ("telemetry", owner.strip()) for owner in owners
+        ]
+    assert fake.query_session_state() == before_live
+
+
+def test_anonymous_dispatch_can_list_racks_without_reading_the_live_session(isolated_recipe_dispatch):
+    orchestrator, fake, calls = isolated_recipe_dispatch
+    before_live = deepcopy(fake.query_session_state())
+    result = orchestrator.dispatch("list available racks")
+    assert result["agent_name"] == "rack_synthesizer"
+    assert result["status"] == "catalog"
+    assert result["racks"]
+    assert not result.get("proposal")
+    assert not result.get("confirmation_token")
+    assert calls == []
+    assert fake.query_session_state() == before_live
