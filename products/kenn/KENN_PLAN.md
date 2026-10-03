@@ -624,6 +624,15 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       personal-path failure. Same three real-model questions: stream 2/3 timely accepted, payload 0/3; accepted
       stream replies abstained, with useful explanations 0/3 on both surfaces. Routing repair only, no speed gain
       or Live-open qualification. C2 stays open. [Code commit, phases, Mac state and limits](docs/evidence/KENN_C2_AUDIO_FUNDAMENTAL_ROUTING_2026-10-03.md).
+    - Research and quality checkpoint, 3 Oct: other-hardware speed figures remain hypotheses. At 13 tok/s,
+      220–280 output tokens already take 17–21 s; prefill tuning cannot meet the 15 s gate alone. Cap/brief-style
+      trials remain disabled for Jack's decision, residency is unchanged, and the exact Qwen3 8B M3/16 GiB MLX
+      comparison remains a proposal requiring approval. Thinking is already off.
+    - Measurement and retrieval diagnosis, 3 Oct: the phase harness now separates explicit abstentions from
+      raw accepted responses. Recount of the three-question run: stream 2/3 timely accepted but both abstained;
+      timely non-abstaining answers 0/3 on each surface. Scoped checks: 65 passes. Existing-index audit found
+      sparse concept coverage and unrelated displayed notes; no index rebuild, grounding change or useful-answer
+      speed gain. C2 stays open. [Code commit, commands, result and limits](docs/evidence/KENN_C2_ABSTENTIONS_AND_RETRIEVAL_GAP_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
