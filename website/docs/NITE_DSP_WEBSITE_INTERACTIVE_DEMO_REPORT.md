@@ -130,8 +130,8 @@ Thursday are never named there).
 
 ## 7. Visual review
 
-Committed captures: `docs/motion-review/home-v22-1440.jpg`,
-`products-v22-{1440,768,390}.jpg`. Demos read as miniature NITE DSP
+Committed captures: `public/portfolio/website-home-1440.jpg` (same image as the old
+`docs/motion-review/home-v22-1440.jpg`), `docs/motion-review/products-v22-{1440,768,390}.jpg`. Demos read as miniature NITE DSP
 instruments — same hardware chrome, palette, and signal language as the
 site; idle states are calm and composed (static-quality rule holds).
 
