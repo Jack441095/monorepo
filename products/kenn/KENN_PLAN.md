@@ -573,6 +573,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     back to AutoMix. History is fixed, quality and timing remain failed. Research triage keeps style/residency and
     new runtime/assets behind Jack's decision; no plan tick.
     [Regression, replay and research triage receipt](docs/evidence/KENN_C3_THRESHOLD_CONTEXT_AND_RESEARCH_TRIAGE_2026-10-03.md).
+  - Limiter command routing, 3 Oct: Put/Add/Insert requests on both chat surfaces now reach the existing honest
+    unsupported-device refusal without retrieval, answer generation, proposal or Fake Live writes. Advice questions
+    retain knowledge routing. Scoped checks: 52 passes; full backend: 3635 passes, 12 skips and the same pre-existing
+    personal-path failure. No decode-speed or Live-open gate claim; C3 stays open.
+    [Regression, mutation and full-suite receipt](docs/evidence/KENN_C3_LIMITER_COMMAND_ROUTING_2026-10-03.md).
 - [ ] **C4 — Independent language and answer qualification.** Keep tuning, sealed and
   human-reviewed sets separate. Publish per-family correct/clarify/wrong results and
   all attempted/accepted/rejected/busy counts. No regenerated expectations that bless
