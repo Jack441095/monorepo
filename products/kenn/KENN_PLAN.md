@@ -550,6 +550,11 @@ Needs the route/context audit; fixes may land in small slices while that audit c
       12 skips and the same pre-existing personal-path failure. Offline correctness repair, no measured decode
       gain or Live-open qualification; remaining configuration drift is documented. C2 stays open.
       [Regression, mutation, full-suite receipt and research priorities](docs/evidence/KENN_C2_RESPONSE_CACHE_IDENTITY_2026-10-03.md).
+    - Effective generation cache, 3 Oct: changed numeric ceilings, thinking transport and effective sampling now
+      separate HTTP responses on both surfaces; unchanged contracts still reuse across surfaces. Scoped checks:
+      116 passes; full backend: 3657 passes, 12 skips and the same pre-existing personal-path failure. Production
+      settings stay unchanged; no measured decode gain or Live-open gate claim. C2 stays open.
+      [Regression, mutation, full-suite receipt and research decisions](docs/evidence/KENN_C2_EFFECTIVE_GENERATION_CACHE_2026-10-03.md).
 - [ ] **C3 — Five-turn conversation qualification.** Model in the loop: anaphora,
   corrections, two-track choices, changing topics, partial requests, failed jobs,
   cancel/restart and project switching. Read-only answers remain distinct from proposed
