@@ -680,6 +680,27 @@ def note_rank_key(
     return (score + (affinity * 30) + ((overlap + tag_hits) * 5), affinity, score)
 
 
+def prefer_intent_note(
+    query: str, notes: list[tuple[float, dict]]
+) -> list[tuple[float, dict]]:
+    required = query_intent_terms(query)
+    if not notes or not required:
+        return notes
+    intent_sources = {
+        str(chunk.get("source", "")) for _, chunk in notes
+        if required & chunk_search_terms(chunk)
+    }
+    if str(notes[0][1].get("source", "")) in intent_sources:
+        return notes
+    # Generic drum titles displaced reverb on a dense-drums follow-up.
+    # Use the same close-score boundary as source diversity, and share the
+    # lead with the fallback so rejecting a rewrite cannot change subjects.
+    for index, item in enumerate(notes[1:], start=1):
+        if str(item[1].get("source", "")) in intent_sources and item[0] >= notes[0][0] * 0.55:
+            return [item, *notes[:index], *notes[index + 1:]]
+    return notes
+
+
 def display_results(
     query: str, results: list[tuple[float, dict]], limit: int = 3
 ) -> list[tuple[float, dict]]:
@@ -709,6 +730,8 @@ def display_results(
         selected.extend(official_manuals[:limit])
     elif notes:
         notes.sort(key=lambda item: note_rank_key(query, topics, item), reverse=True)
+        relevance_score = notes[0][0]
+        notes = prefer_intent_note(query, notes)
         primary_note = notes[0]
         query_lower = str(query or "").casefold()
         measurement_query = bool(
@@ -727,7 +750,7 @@ def display_results(
                 item for item in notes[1:]
                 if measurement_query
                 and str(item[1].get("source_creator") or "").strip()
-                and item[0] >= primary_note[0] * 0.5
+                and item[0] >= relevance_score * 0.5
             ),
             None,
         )
@@ -751,7 +774,7 @@ def display_results(
             candidate_source = str(candidate[1].get("source", ""))
             if candidate_source in selected_sources:
                 continue
-            if candidate[0] < primary_note[0] * 0.55:
+            if candidate[0] < relevance_score * 0.55:
                 continue
             selected.append(candidate)
             selected_sources.add(candidate_source)

@@ -1693,7 +1693,7 @@ def _answer_payload_stream_raw(
     initial_metadata = {
         "question": query,
         "answer": "",
-        "sources": result_payload(query, results),
+        "sources": result_payload(relevance_query, results),
         "found": True,
         "confidence": confidence,
         "source_quality": source_quality_level(relevance_query, results),
@@ -2522,7 +2522,7 @@ def _answer_payload_raw(
     payload = {
         "question": query,
         "answer": answer,
-        "sources": [] if weak_match else result_payload(query, results),
+        "sources": [] if weak_match else result_payload(relevance_query, results),
         "found": bool(results) and not weak_match,
         "confidence": confidence,
         "source_quality": "low" if weak_match else source_quality_level(relevance_query, results),

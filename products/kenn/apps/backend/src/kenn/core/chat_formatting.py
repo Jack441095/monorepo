@@ -26,6 +26,7 @@ from kenn.core.chat_retrieval import (
     intent_guard_failed,
     note_query_affinity,
     note_rank_key,
+    prefer_intent_note,
     query_is_out_of_scope,
     results_are_weak,
 )
@@ -85,6 +86,7 @@ def note_sections(query: str, results: list[tuple[float, dict]]) -> dict[str, li
     note_items = [(score, chunk) for score, chunk in results if chunk.get("kind") == "note"]
     if topics:
         note_items.sort(key=lambda item: note_rank_key(query, topics, item), reverse=True)
+    note_items = prefer_intent_note(query, note_items)
     note_chunks = [chunk for _score, chunk in note_items]
     top_affinity = note_query_affinity(query, note_chunks[0]) if note_chunks else 0
     top_source = str(note_chunks[0].get("source", "")) if note_chunks else ""
