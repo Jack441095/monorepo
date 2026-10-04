@@ -1077,6 +1077,32 @@ def make_answer(
     return template, False
 
 
+def _last_call_timing() -> list[str]:
+    """Where the last model call spent its time, as one short detail line.
+
+    Probe medians crept from 10 s to 14 s over three runs on one companion (4 Oct 2026) and nothing in the log said
+    whether load, prefill or decode grew. Ollama keeps these numbers on every response, so we write them down.
+    One background job runs at a time, so the newest record belongs to this answer.
+    """
+    from kenn.llm import llm_rewrite
+
+    if not llm_rewrite._global_usage:
+        return []
+    call = llm_rewrite._global_usage[-1]
+    if call.eval_duration_ns is None:
+        return [f"call {call.status} {call.latency_ms}ms"]
+
+    def seconds(ns: int | None) -> str:
+        return "?" if ns is None else f"{ns / 1e9:.1f}s"
+
+    cached = "?" if call.prompt_eval_cached_count is None else call.prompt_eval_cached_count
+    return [
+        f"load {seconds(call.load_duration_ns)} prefill {seconds(call.prompt_eval_duration_ns)} "
+        f"{call.prompt_tokens}tok cached {cached} decode {seconds(call.eval_duration_ns)} "
+        f"{call.completion_tokens}tok stop={call.completion_reason}"
+    ]
+
+
 def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) -> None:
     """Record one line per generated answer with the reason it was kept or dropped.
 
@@ -1091,7 +1117,8 @@ def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) ->
         warnings = [str(w) for w in (validation.get("warnings") or [])]
         reason = warnings[0] if warnings else ("accepted" if accepted else "rejected")
         route = f"generation:{'accepted' if accepted else reason}"
-        detail = [f"unsupported measurement: {m}" for m in (validation.get("unsupported_measurements") or [])]
+        detail = _last_call_timing()
+        detail += [f"unsupported measurement: {m}" for m in (validation.get("unsupported_measurements") or [])]
         detail += [f"fabricated source: {s}" for s in (validation.get("fabricated_sources") or [])]
         detail += [f"dropped sentence with: {m}" for m in (validation.get("salvaged") or [])]
         route_log.record(route, seconds * 1000.0, brain=accepted, proposal=False, detail=detail)

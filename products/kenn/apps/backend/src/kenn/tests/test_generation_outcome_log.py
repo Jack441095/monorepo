@@ -12,7 +12,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from kenn.core import chat_answer, route_log
+from kenn.llm import llm_rewrite
+
+
+@pytest.fixture(autouse=True)
+def _no_earlier_model_calls(monkeypatch):
+    # The log adds the last call's timing; these tests are about the reason, so start from no calls on record.
+    monkeypatch.setattr(llm_rewrite, "_global_usage", [])
 
 
 def _read(log: Path) -> list[dict]:
