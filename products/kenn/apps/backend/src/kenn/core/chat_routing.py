@@ -1652,7 +1652,13 @@ def route_query(query: str, history: list | None = None, allow_llm: bool = True)
     return "unknown"
 
 
-_ADVICE_OPENERS = ("how", "what", "whats", "why", "any tips", "tips", "advice", "can you explain", "explain")
+_LEARN_OPENERS = (
+    "educate me", "teach me", "tell me about", "walk me through", "help me understand", "i want to learn",
+    "i wanna learn", "describe",
+)
+_ADVICE_OPENERS = (
+    "how", "what", "whats", "why", "any tips", "tips", "advice", "can you explain", "explain",
+) + _LEARN_OPENERS
 _SYMPTOM_CUES = re.compile(
     r"\b(?:my|our|sounds?|sounded|too|harsh|boomy|boxy|sibilant|sibilance|dull|dark|flat|"
     r"weak|lost|buried|masked?|masking|clash\w*|clipp\w*|distort\w*|"
@@ -1665,7 +1671,8 @@ def _is_advice_question(query: str) -> bool:
 
     The 3 Oct screenshots had "advice on drum compression?" opening with "Let's
     trace the symptom" because any mix topic used to mean diagnosis. A report like
-    "my vocal sounds harsh" still has to take the diagnosis shape.
+    "my vocal sounds harsh" still has to take the diagnosis shape. On 4 Oct "educate
+    me on compression" did the same, so the learn-style openers count as asking too.
     """
     lowered = query.lower().strip()
     asks = lowered.startswith(_ADVICE_OPENERS) or bool(re.search(r"\b(?:advice|tips?)\b", lowered))
@@ -1693,7 +1700,8 @@ def classify_answer_mode(query: str, route: str, history: list | None = None) ->
     if dialogue_cleanup_query(query, topics):
         return "dialogue_cleanup"
     if intent != "troubleshooting" and _is_advice_question(query):
-        return "deep_explanation" if intent in {"why", "explain"} else "quick_fix"
+        learning = query.lower().strip().startswith(_LEARN_OPENERS)
+        return "deep_explanation" if learning or intent in {"why", "explain"} else "quick_fix"
     if intent == "troubleshooting" or topics & {
         "mixing",
         "vocals",
