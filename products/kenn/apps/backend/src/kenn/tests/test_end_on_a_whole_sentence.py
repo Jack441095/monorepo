@@ -83,3 +83,14 @@ def test_a_numbered_last_line_cut_before_its_first_full_stop_goes_whole():
     # The "3." of the marker used to count as the sentence and survived on its own line.
     cut = BODY + "3. Invert the phase of one track using the Invert" + SOURCES
     assert end_on_a_whole_sentence(cut) == BODY.rstrip() + SOURCES
+
+
+def test_the_cut_does_not_stop_on_the_number_of_the_step_it_cut():
+    # 4 Oct 2026: "...below 20Hz. 2. Boost the kick" went back to its last full stop, which was the "2." itself.
+    cut = BODY + "Check: Solo the bass. 3. Mute the kick and listen to how the bass" + SOURCES
+    assert end_on_a_whole_sentence(cut) == BODY + "Check: Solo the bass." + SOURCES
+
+
+def test_a_try_this_label_left_with_only_a_step_number_goes():
+    cut = BODY + "Try this: 1. Mute the kick and listen to how the bass" + SOURCES
+    assert end_on_a_whole_sentence(cut) == BODY.rstrip() + SOURCES

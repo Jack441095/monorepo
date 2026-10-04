@@ -1078,7 +1078,6 @@ def make_answer(
             else ""
         )
         if trimmed:
-            trimmed = end_on_a_whole_sentence(trimmed)
             retry = _check(trimmed)
             if retry["accepted"]:
                 _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
