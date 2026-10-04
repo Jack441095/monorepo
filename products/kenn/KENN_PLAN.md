@@ -46,6 +46,30 @@ Decisions already made:
   Live writes require an owner-scheduled, supervised qualification on a disposable
   set. Existing real-Live receipts qualify their recorded scope, not every new build.
 
+### Product direction
+
+The owner's end goal is one assistant that is specialised in music production and
+Ableton Live, answers ordinary questions well, controls Live through the existing
+Apply and Undo path, and teaches Live to the producer. Local delivery targets below,
+including the 15 s / 70% gate, are milestones toward that. Passing them does not show
+the end goal is met.
+
+A model that fits beside Live on 16 GB will not match a frontier model on general
+intelligence. The route is a strong small model made reliable in the domain:
+
+- Retrieval over reviewed, sourced notes and the Live manual, with the figure checker
+  rejecting any number the notes do not contain.
+- Deterministic reaction routing for follow-ups, vague asks, off-topic asks and
+  third-party plug-ins.
+- A small fine-tune (LoRA) so the model keeps the answer format, stays grounded and
+  declines properly. It improves behaviour, not general ability. It needs the owner's
+  explicit approval, answers checked against the notes, and a held-out evaluation.
+- Control of Live as typed tool calls; the model picks the action and policy executes it.
+
+Open for the owner, not decided: whether very hard or open-ended questions may go to
+a larger hosted model. That would reverse "No hosted brain" above and brings cost and
+privacy terms with it. Until the owner decides, KENN stays fully local.
+
 ## Architecture
 
 This is the intended dependency direction. Existing code already implements much
