@@ -726,9 +726,17 @@ _PRODUCT_FAMILIES = {
 }
 
 
+# 4 Oct 2026 review: "a timeless pad sound", "an ozone layer of pads" and "soothe harsh vocals" were taken for plug-in
+# names and got the no-manual line. Only the question side is scrubbed; the list above still catches a bare
+# "Timeless" the model writes into an answer.
+_PRODUCT_WORD_AS_ENGLISH_RE = re.compile(
+    r"\btimeless\b(?![ -]?\d)|\bvolcano\b(?![ -]?\d)|\bozone layers?\b|\bsoothe\b(?= (?:the|my|harsh|it|that|this)\b)"
+)
+
+
 def names_a_product(query: str) -> str:
     """The plugin maker the question mentions, or "" when it names none from the list above."""
-    text = query.lower()
+    text = _PRODUCT_WORD_AS_ENGLISH_RE.sub(" ", query.lower())
     return next((family for family, pattern in _PRODUCT_FAMILIES.items() if pattern.search(text)), "")
 
 

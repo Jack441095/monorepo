@@ -31,6 +31,26 @@ def test_the_plugin_maker_in_a_question_is_recognised(query, family):
     assert names_a_product(query) == family
 
 
+@pytest.mark.parametrize("query", [
+    "how do i make a timeless pad sound",
+    "how do i get an ozone layer of pads",
+    "how do i soothe harsh vocals",
+    "my mix needs a volcano of energy",
+])
+def test_an_ordinary_word_that_is_also_a_plugin_name_is_not_taken_for_the_plugin(query):
+    # 4 Oct 2026 review: each of these got "I don't have a manual for that plug-in".
+    assert names_a_product(query) == ""
+
+
+@pytest.mark.parametrize("query, family", [
+    ("how do i use FabFilter Timeless 3 on a vocal throw", "fabfilter"),
+    ("how do i use soothe on harsh vocals", "oeksound"),
+    ("does Ozone add latency on the master", "izotope"),
+])
+def test_the_plugin_itself_is_still_recognised(query, family):
+    assert names_a_product(query) == family
+
+
 def test_a_question_about_ableton_s_own_compressor_is_not_a_third_party_question():
     assert names_a_product("how do i glue rock drums with Glue Compressor") == ""
 
