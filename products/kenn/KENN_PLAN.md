@@ -70,6 +70,24 @@ Open for the owner, not decided: whether very hard or open-ended questions may g
 a larger hosted model. That would reverse "No hosted brain" above and brings cost and
 privacy terms with it. Until the owner decides, KENN stays fully local.
 
+Review of 4 October 2026, to test before deciding:
+
+- Note-first answers. Today the model rewrites a note and the checker throws out about
+  40% of the rewrites. The notes already hold a short answer, steps and a reason, so
+  serving the matched note's own sections may help more than a rewrite: figures are
+  right by construction and the reply is immediate. The model would then interpret the
+  ask, pick the note, ask one clarifying question and tailor a line to the session.
+  This stays a hypothesis until a hand-graded comparison (note served as-is against the
+  model rewrite, about 40 questions, graded 0/1/2 by the owner) shows which helps more.
+- What only KENN can do. A general chatbot can explain Live from the manual. Reading
+  the producer's session, listening to the mix and making the change with Apply and Undo
+  is where KENN is different, so that work outranks winning the gate on general questions.
+- One scoreboard. Acceptance shows the checker is satisfied, not that the answer helped.
+  Owner grades on a fixed, held-out question set sit beside the gate figures.
+- One experiment at a time, measured on mains power. On 4 October the Mac went to
+  battery at 21:04 and generation fell from about 18 to about 5 tokens a second, which
+  turned 10 s answers into 30 s ones and made that evening's timing figures meaningless.
+
 ## Architecture
 
 This is the intended dependency direction. Existing code already implements much
