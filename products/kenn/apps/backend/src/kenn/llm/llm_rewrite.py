@@ -651,21 +651,22 @@ from kenn.core.genre_profiles import detect_genre_from_query, get_genre_profile
 # happened to contain. The old _clamped_max_tokens fallback was 256, which is BELOW p95: wiring that
 # in unchanged would have cut the top 10-15% of good answers off mid-sentence to save latency the
 # median answer never spends, because nothing today runs anywhere near 1200.
-_GENERAL_MAX_TOKENS = 384
-# 256 is ~192 words, the bound for the modes whose own instructions ask for brevity rather than for the
-# modes expected to run long.
-_FAST_MODE_TOKENS = 256
+#
+# 3 Oct 2026, Jack's call: 128 for every prose mode. On the Mac (M3, Live open) the 384 ceiling put the
+# median answer at 18 s and 9 of 47 inside 15 s; 128 took the five-question stream and payload runs from
+# 2/5 and 1/5 to 4/5 and 4/5. The price is that most capped answers end on "length" and the last step or
+# explanation is cut mid-sentence (docs/evidence/KENN_C2_MODEL_PHASES_AND_OUTPUT_CAP_2026-10-03.md).
+_GENERAL_MAX_TOKENS = 128
+# Command plans are structured output and a truncated plan is not a plan, so this one keeps 256.
+_COMMAND_MAX_TOKENS = 256
 
 MAX_TOKENS_BY_MODE = {
     **{mode: _GENERAL_MAX_TOKENS for mode in ANSWER_MODES},
-    # ~165 words, twice the 80-word contract. This one has always been tighter than the rest.
-    "voice": 220,
+    # ~95 words against an 80-word contract.
+    "voice": 128,
     # A command plan is a machine-readable contract, not prose, and the planner runs in shadow where
     # every second it spends is time nobody asked for.
-    "command": _FAST_MODE_TOKENS,
-    # "very concise, single-paragraph response" per MODE_INSTRUCTIONS. 256 tokens leaves the measured
-    # median of 173 words untouched and only clips answers that were already ignoring the contract.
-    "quick_fix": _FAST_MODE_TOKENS,
+    "command": _COMMAND_MAX_TOKENS,
 }
 DEFAULT_MAX_TOKENS = _GENERAL_MAX_TOKENS
 

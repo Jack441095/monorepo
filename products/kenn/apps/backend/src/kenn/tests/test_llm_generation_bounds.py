@@ -4,9 +4,10 @@ Caps (Phase 3, 2 Oct 2026). MAX_TOKENS_BY_MODE held only voice and command while
 chat_constants.ANSWER_MODES is ten modes with no name in common, so all ten fell through to a
 1200-token default -- four times the longest answer on record. The numbers below come from the 29
 real captured answers: p50 173 words, p95 220, max 228, which at roughly 1.33 tokens per word is
-p50 ~230, p95 ~293, max ~303. That distribution is why the general ceiling is 384 and not the
-256 the old _clamped_max_tokens fallback returned: 256 sits below p95, so adopting it would have
-truncated the top 10-15% of good answers mid-sentence to save latency the median never spends.
+p50 ~230, p95 ~293, max ~303. That distribution is why the ceiling was 384 and not the 256 the old
+_clamped_max_tokens fallback returned. On 3 Oct 2026 Jack chose 128 anyway to get under the 15 s gate
+on the Mac, knowing it cuts the tail of most answers; the tests below pin that choice so it is not
+loosened or tightened by accident.
 
 Deadline (Phase 3, 2 Oct 2026). httpx.Timeout(cfg["timeout"]) is a per-read budget. A model that
 emits one line every few seconds meets it on every read and holds the request thread indefinitely,
@@ -20,11 +21,6 @@ import pytest
 from kenn.core.chat_constants import ANSWER_MODES
 from kenn.llm import llm_rewrite
 
-# 228 words, the longest of the 29 real answers, at ~1.33 tokens per word.
-MEASURED_MAX_TOKENS = 303
-# quick_fix and voice are held below that on purpose: their own mode instructions ask for a single
-# concise paragraph, so a longer answer was already outside the contract the cap is enforcing.
-SHORT_MODES = {"quick_fix", "voice"}
 # The 1200 all ten modes used to fall through to. Kept as a name so the regression is readable.
 UNREACHABLE_DEFAULT = 1200
 
@@ -48,23 +44,17 @@ def test_every_answer_mode_sends_its_own_cap_and_not_the_1200_default(mode) -> N
 
 def test_the_default_cap_is_the_general_ceiling_and_no_longer_1200() -> None:
     # An unrecognised mode lands here, so this is the value that would have been 1200 for all ten.
-    assert llm_rewrite.DEFAULT_MAX_TOKENS == 384
-    assert llm_rewrite._build_payload(_cfg(), MESSAGES, answer_mode="")["max_tokens"] == 384
+    assert llm_rewrite.DEFAULT_MAX_TOKENS == 128
+    assert llm_rewrite._build_payload(_cfg(), MESSAGES, answer_mode="")["max_tokens"] == 128
 
 
-def test_the_eight_modes_expected_to_run_long_clear_the_measured_maximum() -> None:
-    # The accuracy half of the cap. A ceiling under 303 cuts a real answer off mid-sentence, which is
-    # the loss the old 256-token fallback was about to start causing.
-    for mode in sorted(ANSWER_MODES - SHORT_MODES):
-        assert llm_rewrite.MAX_TOKENS_BY_MODE[mode] >= MEASURED_MAX_TOKENS, mode
+def test_every_prose_mode_is_capped_at_128_tokens() -> None:
+    for mode in sorted(ANSWER_MODES | {"voice"}):
+        assert llm_rewrite.MAX_TOKENS_BY_MODE[mode] == 128, mode
 
 
-def test_the_two_short_modes_are_capped_below_the_measured_maximum_on_purpose() -> None:
-    assert llm_rewrite.MAX_TOKENS_BY_MODE["quick_fix"] == 256
-    assert llm_rewrite.MAX_TOKENS_BY_MODE["voice"] == 220
-    # 256 tokens is ~192 words, which leaves the measured median of 173 words untouched and only clips
-    # answers that were already ignoring "very concise, single-paragraph response".
-    assert 256 * (173 / 228) < MEASURED_MAX_TOKENS
+def test_a_command_plan_keeps_its_256_tokens_because_a_cut_plan_is_not_a_plan() -> None:
+    assert llm_rewrite.MAX_TOKENS_BY_MODE["command"] == 256
 
 
 def test_native_ollama_payload_carries_the_same_cap_as_the_openai_one() -> None:
@@ -73,7 +63,7 @@ def test_native_ollama_payload_carries_the_same_cap_as_the_openai_one() -> None:
     openai_payload = llm_rewrite._build_payload(_cfg(), MESSAGES, answer_mode="mix_diagnosis")
     native_payload = llm_rewrite._build_native_ollama_payload(_cfg(), MESSAGES, answer_mode="mix_diagnosis",
                                                               json_schema=None)
-    assert native_payload["options"]["num_predict"] == openai_payload["max_tokens"] == 384
+    assert native_payload["options"]["num_predict"] == openai_payload["max_tokens"] == 128
 
 
 @pytest.mark.parametrize("mode", sorted(ANSWER_MODES | {"voice", "command", ""}))
@@ -128,7 +118,7 @@ def test_mlx_generation_still_receives_the_clamped_budget(monkeypatch) -> None:
 def test_mlx_streaming_still_receives_the_clamped_budget(monkeypatch) -> None:
     engine = _mlx_engine(monkeypatch)
     list(llm_rewrite.chat_completion_stream(MESSAGES, "rewrite", answer_mode="deep_explanation"))
-    assert engine.calls == [{"max_tokens": 384}]
+    assert engine.calls == [{"max_tokens": 128}]
 
 
 @pytest.mark.parametrize("task,answer_mode,expected", [

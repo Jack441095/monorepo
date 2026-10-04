@@ -83,13 +83,15 @@ def cached_calls(monkeypatch, tmp_path):
 
 @pytest.mark.parametrize("first,second", [("payload", "payload"), ("stream", "stream"),
                                           ("payload", "stream"), ("stream", "payload")])
-def test_short_answer_mode_never_replays_a_cached_general_answer(cached_calls, first, second):
-    # Plain responses used to omit answer mode, so the 384-token answer bypassed a 256-token request.
+def test_short_answer_mode_never_replays_a_cached_general_answer(cached_calls, monkeypatch, first, second):
+    # Plain responses used to omit answer mode, so the general answer bypassed a request with a smaller cap.
+    # Every prose mode shares 128 now, so give quick_fix a tighter cap of its own to keep the case real.
+    monkeypatch.setitem(llm_rewrite.MAX_TOKENS_BY_MODE, "quick_fix", 64)
     call, _, sent = cached_calls
     assert call(first)[0] == "response-1"
     content, usage = call(second, mode="quick_fix")
     assert content == "response-2" and not usage.cache_hit
-    assert sent[-1][1]["options"]["num_predict"] == 256
+    assert sent[-1][1]["options"]["num_predict"] == 64
 
 
 @pytest.mark.parametrize("first,second", [("payload", "stream"), ("stream", "payload")])
@@ -137,11 +139,11 @@ def test_a_lower_token_cap_never_replays_an_answer_from_the_old_cap(cached_calls
     call, _, sent = cached_calls
     monkeypatch.setenv("KENN_LLM_THINK", thinking)
     assert call(surface)[0] == "response-1"
-    monkeypatch.setitem(llm_rewrite.MAX_TOKENS_BY_MODE, "general", 128)
+    monkeypatch.setitem(llm_rewrite.MAX_TOKENS_BY_MODE, "general", 64)
     content, usage = call(surface)
     assert content == "response-2" and not usage.cache_hit
     payload = sent[-1][1]
-    assert (payload["options"]["num_predict"] if thinking == "off" else payload["max_tokens"]) == 128
+    assert (payload["options"]["num_predict"] if thinking == "off" else payload["max_tokens"]) == 64
     assert call(surface)[1].cache_hit
 
 
