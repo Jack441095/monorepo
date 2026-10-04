@@ -59,6 +59,7 @@ from kenn.core.chat_grounding import (
     answer_self_check,
     calibrate_answer_for_grounding,
     drop_unsupported_sentences,
+    end_on_a_whole_sentence,
     evidence_measurements,
     generated_answer_validation,
     grounding_mode,
@@ -1019,16 +1020,28 @@ def make_answer(
         from kenn.llm.linter import lint_response
         mode = answer_mode or classify_answer_mode(query, route, history=history)
         enhanced = lint_response(enhanced, mode)
-        validation = generated_answer_validation(
-            query,
-            results,
-            enhanced,
-            route=route,
-            confidence=confidence,
-            answer_mode=mode,
-            timeline_context=timeline_context,
-            additional_evidence_text=_specialist_evidence_context(query, history),
-        )
+
+        def _check(text: str) -> dict:
+            return generated_answer_validation(
+                query,
+                results,
+                text,
+                route=route,
+                confidence=confidence,
+                answer_mode=mode,
+                timeline_context=timeline_context,
+                additional_evidence_text=_specialist_evidence_context(query, history),
+            )
+
+        # The 128-token cap leaves most answers stopped mid-sentence. Judge and show the cleaner ending, but
+        # if the gate likes the full text better (less overlap left, say) the original still gets its chance.
+        whole = end_on_a_whole_sentence(enhanced)
+        validation = _check(whole)
+        if whole != enhanced:
+            if validation["accepted"]:
+                enhanced = whole
+            else:
+                validation = _check(enhanced)
         if validation["accepted"]:
             _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
             print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced)", file=_sys.stderr, flush=True)
@@ -1042,16 +1055,8 @@ def make_answer(
             else ""
         )
         if trimmed:
-            retry = generated_answer_validation(
-                query,
-                results,
-                trimmed,
-                route=route,
-                confidence=confidence,
-                answer_mode=mode,
-                timeline_context=timeline_context,
-                additional_evidence_text=_specialist_evidence_context(query, history),
-            )
+            trimmed = end_on_a_whole_sentence(trimmed)
+            retry = _check(trimmed)
             if retry["accepted"]:
                 _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
                 print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced, unsupported sentences dropped)", file=_sys.stderr, flush=True)

@@ -818,6 +818,34 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
     return trimmed
 
 
+_WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)
+
+
+def end_on_a_whole_sentence(answer: str) -> str:
+    """The answer with a half-written last sentence cut off, or the answer itself when it ends cleanly.
+
+    4 Oct 2026: with the 128-token cap 25 of 27 accepted background answers stopped mid-word on their last
+    line ("...while having a tighter, more sustained"). The last line goes back to its last full stop, or goes
+    altogether when it has none. Nothing is added, so the gate has less to judge, never more; the caller
+    still validates the result.
+    """
+    start, _end = _sources_section(answer)
+    body, tail = (answer[:start], answer[start:]) if start != -1 else (answer, "")
+    body = body.rstrip()
+    if not body or body[-1] in '.!?)]"':
+        return answer
+    split_at = body.rfind("\n") + 1
+    last_line = body[split_at:]
+    whole = _WHOLE_SENTENCE_RE.match(last_line)
+    body = body[:split_at] + whole.group(0) if whole else body[:split_at].rstrip()
+    trimmed = f"{body}\n\n{tail}" if tail else body
+    before = len(_prose_without_sources(answer).split())
+    after = len(_prose_without_sources(trimmed).split())
+    if after < _SALVAGE_MIN_WORDS or after < before * _SALVAGE_MIN_KEPT_SHARE:
+        return answer
+    return trimmed
+
+
 def generated_answer_validation(
     query: str,
     results: list[tuple[float, dict]],
