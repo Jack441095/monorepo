@@ -756,6 +756,68 @@ def unasked_product_names(answer: str, query: str, evidence_text: str = "") -> l
     )
 
 
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z\[(\d])")
+_LINE_MARKER_RE = re.compile(r"^(\s*(?:[-*•]|\d+[.)])\s+)")
+_NUMBERED_LINE_RE = re.compile(r"^(\s*)\d+([.)]\s)")
+_HEADING_LINE_RE = re.compile(r"^\s*(?:#{1,4}\s+\S|[A-Z][A-Za-z' ]{2,40}:\s*$)")
+# Past this much loss the answer is no longer the one the model wrote, so the template stands instead.
+_SALVAGE_MIN_KEPT_SHARE = 0.6
+_SALVAGE_MIN_WORDS = 30
+
+
+def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
+    """The answer without the sentences that carry a measurement the notes do not, or "" if too little is left.
+
+    4 Oct 2026: 9 to 12 of about 41 background answers a run were rejected for one invented number, and the
+    rest of the answer was fine. Cutting the sentence keeps the gate's promise (no number reaches the user
+    that the notes lack) without throwing away the answer. The caller must validate the result again; this
+    only edits.
+    """
+    bad = set(unsupported)
+    if not bad:
+        return ""
+    kept_lines: list[str] = []
+    dropped_a_step = False
+    for line in answer.split("\n"):
+        if not (_measurements(line) & bad):
+            kept_lines.append(line)
+            continue
+        marker = _LINE_MARKER_RE.match(line)
+        prefix = marker.group(1) if marker else ""
+        sentences = _SENTENCE_SPLIT_RE.split(line[len(prefix):])
+        survivors = [s for s in sentences if not (_measurements(s) & bad)]
+        if survivors:
+            kept_lines.append(prefix + " ".join(survivors))
+        elif _NUMBERED_LINE_RE.match(line):
+            dropped_a_step = True
+
+    # A heading whose body went with the sentence would read as an empty section.
+    cleaned: list[str] = []
+    for index, line in enumerate(kept_lines):
+        if _HEADING_LINE_RE.match(line):
+            following = next((l for l in kept_lines[index + 1:] if l.strip()), "")
+            if not following or _HEADING_LINE_RE.match(following):
+                continue
+        cleaned.append(line)
+
+    if dropped_a_step:
+        count = 0
+        for index, line in enumerate(cleaned):
+            if _HEADING_LINE_RE.match(line):
+                count = 0
+            numbered = _NUMBERED_LINE_RE.match(line)
+            if numbered:
+                count += 1
+                cleaned[index] = f"{numbered.group(1)}{count}{numbered.group(2)}{line[numbered.end():]}"
+
+    trimmed = re.sub(r"\n{3,}", "\n\n", "\n".join(cleaned)).strip()
+    before = len(_prose_without_sources(answer).split())
+    after = len(_prose_without_sources(trimmed).split())
+    if after < _SALVAGE_MIN_WORDS or after < before * _SALVAGE_MIN_KEPT_SHARE:
+        return ""
+    return trimmed
+
+
 def generated_answer_validation(
     query: str,
     results: list[tuple[float, dict]],

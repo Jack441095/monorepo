@@ -58,6 +58,7 @@ from kenn.core.chat_grounding import (
     answer_quality_report,
     answer_self_check,
     calibrate_answer_for_grounding,
+    drop_unsupported_sentences,
     evidence_measurements,
     generated_answer_validation,
     grounding_mode,
@@ -1033,6 +1034,29 @@ def make_answer(
             print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced)", file=_sys.stderr, flush=True)
             _log_generation_outcome(True, validation, _ma_llm_ms)
             return enhanced, True
+        # One invented number used to cost the whole answer. Cut the sentences that carry it and let the gate
+        # judge what is left; it is the same gate, so a number the notes lack still cannot get through.
+        trimmed = (
+            drop_unsupported_sentences(enhanced, validation["unsupported_measurements"])
+            if "generated answer introduced unsupported measurements" in validation["warnings"]
+            else ""
+        )
+        if trimmed:
+            retry = generated_answer_validation(
+                query,
+                results,
+                trimmed,
+                route=route,
+                confidence=confidence,
+                answer_mode=mode,
+                timeline_context=timeline_context,
+                additional_evidence_text=_specialist_evidence_context(query, history),
+            )
+            if retry["accepted"]:
+                _ma_llm_ms = (_time.perf_counter() - _ma_t2) * 1000
+                print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms llm={_ma_llm_ms:.0f}ms (enhanced, unsupported sentences dropped)", file=_sys.stderr, flush=True)
+                _log_generation_outcome(True, {**retry, "salvaged": validation["unsupported_measurements"]}, _ma_llm_ms)
+                return trimmed, True
         # Measured 1 Oct on the owner's M3: 26 of 30 background swaps were rejected, and nothing recorded why.
         # Track D's standing question is "how often does the model's answer land", and a rejection rate with no
         # reason attached cannot answer "why not" -- establishing that these are `unsupported measurements`
@@ -1064,6 +1088,7 @@ def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) ->
         route = f"generation:{'accepted' if accepted else reason}"
         detail = [f"unsupported measurement: {m}" for m in (validation.get("unsupported_measurements") or [])]
         detail += [f"fabricated source: {s}" for s in (validation.get("fabricated_sources") or [])]
+        detail += [f"dropped sentence with: {m}" for m in (validation.get("salvaged") or [])]
         route_log.record(route, seconds * 1000.0, brain=accepted, proposal=False, detail=detail)
     except Exception:
         logging.getLogger("kenn.core.chat_answer").debug("generation outcome logging failed", exc_info=True)
