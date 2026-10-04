@@ -120,6 +120,11 @@ def start(write: Callable[[], dict[str, Any]], *, session_id: str = "", turn_id:
             entry = {"status": "accepted" if accepted else "rejected",
                      "answer": str(payload.get("answer") or "") if accepted else "",
                      "sources": payload.get("sources") if accepted else None}
+            if not accepted:
+                # The gate's own warnings, so a rejection can be explained afterwards. 4 Oct: 28 of 29 template rows
+                # in the Mac probe were rejected upgrades and nothing recorded why.
+                warnings = (payload.get("generation_validation") or {}).get("warnings") or []
+                entry["warnings"] = [str(w)[:160] for w in warnings[:4]]
         except Exception as exc:  # a model failure only means the template stands
             entry = {"status": "rejected", "error": type(exc).__name__}
         finally:

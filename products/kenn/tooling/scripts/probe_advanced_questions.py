@@ -125,7 +125,8 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
         "model_attempted": attempted,
         "llm_available": bool(payload.get("llm_available")),
         "upgrade_status": upgrade.get("status", ""),
-        "warnings": list(validation.get("warnings") or [])[:4],
+        # With the background upgrade on, the verdict on the model's text is on the upgrade, not on /api/ask.
+        "warnings": list(upgrade.get("warnings") or validation.get("warnings") or [])[:4],
         "unsupported_measurements": len(validation.get("unsupported_measurements") or []),
         "fabricated_sources": len(validation.get("fabricated_sources") or []),
         "template_seconds": template_seconds,

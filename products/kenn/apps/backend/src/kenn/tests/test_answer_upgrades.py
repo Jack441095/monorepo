@@ -29,6 +29,14 @@ def test_a_rejected_answer_leaves_the_template_standing() -> None:
     assert result["status"] == "rejected" and result["answer"] == ""
 
 
+def test_a_rejection_says_why_the_gate_refused_it() -> None:
+    # 4 Oct: the probe could not say why 28 of 29 upgrades were rejected because the reason was never kept.
+    reply = {"llm_enhanced": False, "answer": "template",
+             "generation_validation": {"warnings": ["generated answer introduced unsupported measurements"]}}
+    result = _wait(answer_upgrades.start(lambda: reply))
+    assert result["status"] == "rejected" and result["warnings"] == ["generated answer introduced unsupported measurements"]
+
+
 def test_a_model_failure_is_a_rejection_not_a_crash() -> None:
     def broken():
         raise TimeoutError("ollama")
