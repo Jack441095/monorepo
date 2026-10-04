@@ -1993,8 +1993,23 @@ def _swap_followup_subject(query: str, prior: list[str]) -> list[str]:
     return swapped
 
 
+def answers_vague_ask(query: str, history: list | None) -> bool:
+    """True when this turn is the reply to the "what does it sound like" question we just asked.
+
+    4 Oct 2026 review: after "mix sounds bad" we ask "muddy, harsh, thin, buried or too quiet?", and the reply
+    "muddy" was then searched on its own, so the mix it was about was gone.
+    """
+    turns = normalize_history(history)
+    if not turns or turns[-1].get("role") != "assistant" or _VAGUE_ASK_MARKER not in turns[-1].get("content", ""):
+        return False
+    # "everything sounds bad" in reply says nothing new, so it gets the reset wording rather than a search.
+    return len(query.split()) <= 10 and not is_vague_ask(query) and not query_is_out_of_scope(query)
+
+
 def should_use_history(query: str, history: list | None) -> bool:
     turns = useful_history_user_turns(history)
+    if turns and answers_vague_ask(query, history):
+        return True
     if is_followup_query(query) and not is_correction_query(query):
         topics = set(query_topics(query)) - {"mixing", "routing"}
         references = set(cleaned_query(query).split()) & FOLLOWUP_REFERENCES
@@ -2029,6 +2044,8 @@ def search_query_with_history(query: str, history: list | None, *, session_id: s
         # The question being corrected is usually one turn further back than the last one.
         prior = [turn for turn in turns if not is_session_context_turn(turn)][-2:]
         query = _CORRECTION_NEGATION.sub("", query).strip(" ,;.") or query
+    elif answers_vague_ask(query, history):
+        prior = [turn for turn in turns if not is_session_context_turn(turn)][-1:]
     elif is_followup_query(query):
         prior = _swap_followup_subject(query, _followup_history_turns(query, turns))
     else:
