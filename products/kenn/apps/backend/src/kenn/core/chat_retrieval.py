@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 from kenn.retrieval.retrieval import (
+    STOPWORDS,
     canonical_audio_query,
     chunk_topics,
     extract_tags,
@@ -130,10 +131,71 @@ load_chunks.cache_info = _load_index_bundle.cache_info  # type: ignore[attr-defi
 load_terms.cache_info = _load_index_bundle.cache_info  # type: ignore[attr-defined]
 
 
+_TYPO_WORD_RE = re.compile(r"[A-Za-z]{7,}")
+_TYPO_MIN_NOTES = 3
+
+
+def _typo_vocabulary(terms: dict) -> dict[str, dict[str, int]]:
+    """Words that appear in at least three chunks, bucketed by first letter, with how many chunks use each."""
+    postings = terms.get("inverted_index") or {}
+    buckets: dict[str, dict[str, int]] = {}
+    for word, hits in postings.items():
+        if word.isalpha() and len(word) >= 5 and len(hits) >= _TYPO_MIN_NOTES:
+            buckets.setdefault(word[0], {})[word] = len(hits)
+    return buckets
+
+
+def _is_typo_of(word: str, real: str) -> bool:
+    """One letter dropped, added or swapped with its neighbour; one wrong letter too once the word is long."""
+    if word.startswith(real) or real.startswith(word):
+        return False  # "fingers" for "finger" is a plural, not a slip
+    if len(word) == len(real):
+        wrong = [i for i, (x, y) in enumerate(zip(word, real)) if x != y]
+        if len(wrong) == 2 and wrong[1] == wrong[0] + 1:
+            return word[wrong[0]] == real[wrong[1]] and word[wrong[1]] == real[wrong[0]]
+        return len(wrong) == 1 and len(word) >= 9
+    short, long_ = sorted((word, real), key=len)
+    if len(long_) - len(short) != 1:
+        return False
+    cut = next((i for i, (x, y) in enumerate(zip(short, long_)) if x != y), len(short))
+    return short[cut:] == long_[cut + 1:]
+
+
+_typo_vocab_cache: tuple[int, dict[str, dict[str, int]]] | None = None
+
+
+def correct_query_typos(query: str, terms: dict) -> str:
+    """Fix a word the notes have never seen when it is one slip away from a word they use often.
+
+    "hwo do i do paralel compresion on drms" found no note at all, while the spelled-out question lands on
+    Drum Parallel Compression with a score of 756 (4 Oct 2026 probe). Only the search sees the fixed text; the
+    model still gets what the producer typed. The rule is narrow on purpose, because the index leaves out plain
+    English and a loose match turned "chair" into "chain" and "disturbing" into "distorting" in the first try:
+    seven letters or more, same first letter, a single dropped, added or swapped letter, and no plurals.
+    """
+    global _typo_vocab_cache
+    known = terms.get("idf") or {}
+    if not known:
+        return query
+    if _typo_vocab_cache is None or _typo_vocab_cache[0] != id(known):
+        _typo_vocab_cache = (id(known), _typo_vocabulary(terms))
+    buckets = _typo_vocab_cache[1]
+
+    def fix(match: re.Match) -> str:
+        word = match.group(0)
+        lower = word.lower()
+        if lower in known or lower in STOPWORDS:
+            return word
+        close = [(-uses, cand) for cand, uses in buckets.get(lower[0], {}).items() if _is_typo_of(lower, cand)]
+        return min(close)[1] if close else word
+
+    return _TYPO_WORD_RE.sub(fix, query)
+
+
 def search(query: str, chunks: list[dict], terms: dict, limit: int = 8, *, history: list | None = None) -> list[tuple[float, dict]]:
     from kenn.retrieval import retrieval as retrieval_api
 
-    query = canonical_audio_query(query)
+    query = correct_query_typos(canonical_audio_query(query), terms)
     emb_idx = retrieval_api.load_embedding_index()
     if emb_idx is not None:
         results = retrieval_api.hybrid_search(
