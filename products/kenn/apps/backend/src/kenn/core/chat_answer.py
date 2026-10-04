@@ -65,7 +65,9 @@ from kenn.core.chat_grounding import (
     grounding_mode,
     grounding_report,
     mode_signature,
+    names_a_product,
     should_use_llm_rewrite,
+    text_mentions_product,
 )
 from kenn.core.chat_routing import (
     asks_about_unrun_analysis,
@@ -665,7 +667,7 @@ def build_template_answer(
         query_specific_note = _query_specific_grounding_note(query)
         if query_specific_note:
             ans = f"{query_specific_note}\n\n{ans}"
-        caveat = _uncovered_hardware_caveat(query, results)
+        caveat = _uncovered_hardware_caveat(query, results) or _uncovered_plugin_caveat(query, results)
         if caveat:
             ans = f"{caveat}\n\n{ans}"
         no_audio = _no_audio_caveat(query, timeline_context)
@@ -718,7 +720,7 @@ def build_template_answer(
             f"Since {already_tried} already didn't fully fix it, let's rule out "
             f"something else.\n\n{ans}"
         )
-    caveat = _uncovered_hardware_caveat(query, results)
+    caveat = _uncovered_hardware_caveat(query, results) or _uncovered_plugin_caveat(query, results)
     if caveat:
         ans = f"{caveat}\n\n{ans}"
     no_audio = _no_audio_caveat(query, timeline_context)
@@ -771,6 +773,26 @@ def _uncovered_hardware_caveat(query: str, results: list[tuple[float, dict]]) ->
         f"You'll want a note specifically on the {display_name} -- nothing in "
         "the knowledge base covers that unit's exact behaviour yet. Here's "
         "the closest general guidance I have:"
+    )
+
+
+def _uncovered_plugin_caveat(query: str, results: list[tuple[float, dict]]) -> str:
+    """One line saying we hold no manual for a third-party plug-in the question names, or "" when a note covers it.
+
+    The notes only know Ableton's own devices. Asked about Serum or Pro-Q, the model fills the gap with control
+    names and values that sound right, so these answers stay on the template and say where the notes stop.
+    """
+    family = names_a_product(query)
+    if not family:
+        return ""
+    source_text = " ".join(
+        str(chunk.get("text") or "") for _score, chunk in display_results(query, results, 3)
+    )
+    if text_mentions_product(family, source_text):
+        return ""
+    return (
+        "I don't have a manual for that plug-in in my notes, so this is general technique rather than its exact "
+        "controls."
     )
 
 
@@ -967,7 +989,7 @@ def make_answer(
     # uses the closest approved general framework; an optional rewrite can
     # only dilute that honesty and, with a slow local model, unnecessarily
     # delay a simple question.
-    if _uncovered_hardware_caveat(query, results):
+    if _uncovered_hardware_caveat(query, results) or _uncovered_plugin_caveat(query, results):
         return template, False
     if not allow_llm:
         print(f"  make_answer: template={_ma_template_ms:.0f}ms (llm disabled)", file=_sys.stderr, flush=True)
@@ -1758,6 +1780,7 @@ def _answer_payload_stream_raw(
         llm_enabled()
         and allow_llm
         and should_use_llm_rewrite(query, route, confidence, grounding, quality, answer_mode)
+        and not _uncovered_plugin_caveat(query, results)
     )
 
     final_answer = template

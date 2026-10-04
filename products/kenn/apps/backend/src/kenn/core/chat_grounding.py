@@ -722,6 +722,7 @@ _PRODUCT_FAMILIES = {
     "softube": re.compile(r"\bsoftube\b"),
     "cableguys": re.compile(r"\bcableguys\b|\bshaperbox\b|\bvolumeshaper\b"),
     "arturia": re.compile(r"\barturia\b"),
+    "celemony": re.compile(r"\bcelemony\b|\bmelodyne\b"),
 }
 
 
@@ -729,6 +730,10 @@ def names_a_product(query: str) -> str:
     """The plugin maker the question mentions, or "" when it names none from the list above."""
     text = query.lower()
     return next((family for family, pattern in _PRODUCT_FAMILIES.items() if pattern.search(text)), "")
+
+
+def text_mentions_product(family: str, text: str) -> bool:
+    return bool(_PRODUCT_FAMILIES[family].search(text.lower()))
 
 
 def names_only_a_product(query: str) -> bool:
