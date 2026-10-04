@@ -837,6 +837,9 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
     bad = set(unsupported)
     if not bad:
         return ""
+    # Cut the capped ending first. Cut after, the last full stop could be the "2." of a step whose sentence we
+    # had just dropped, and a salvaged answer too short for end_on_a_whole_sentence went out mid-word.
+    answer = _cut_to_a_whole_sentence(answer)
     kept_lines: list[str] = []
     dropped_a_step = False
     for line in answer.split("\n"):
@@ -882,8 +885,30 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
 
 
 _WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)
-# A cut right after "3." leaves the marker looking like a finished sentence.
-_DANGLING_STEP_RE = re.compile(r"(?:(?<=[.!?\]])[ \t]+|\n[ \t]*)\d{1,2}[.)]$")
+# A cut right after "3." (or "Try this: 1.") leaves the marker looking like a finished sentence.
+_DANGLING_STEP_RE = re.compile(r"(?:(?<=[.!?\]:])[ \t]+|\n[ \t]*)\d{1,2}[.)]$")
+
+
+def _cut_to_a_whole_sentence(answer: str) -> str:
+    start, _end = _sources_section(answer)
+    body, tail = (answer[:start], answer[start:]) if start != -1 else (answer, "")
+    body = body.rstrip()
+    trimmed = body
+    if trimmed and trimmed[-1] not in '.!?)]"':
+        split_at = trimmed.rfind("\n") + 1
+        marker = _LINE_MARKER_RE.match(trimmed[split_at:])
+        lead = marker.end() if marker else 0
+        whole = _WHOLE_SENTENCE_RE.match(trimmed[split_at + lead:])
+        trimmed = trimmed[: split_at + lead] + whole.group(0) if whole else trimmed[:split_at].rstrip()
+    # The last full stop is often the one in "2." of the step the cap cut off, so the marker goes after the cut,
+    # and so does a "Try this:" left with no step under it.
+    trimmed = _DANGLING_STEP_RE.sub("", trimmed).rstrip()
+    last_line = trimmed[trimmed.rfind("\n") + 1:]
+    if _HEADING_LINE_RE.match(last_line):
+        trimmed = trimmed[: len(trimmed) - len(last_line)].rstrip()
+    if trimmed == body:
+        return answer
+    return f"{trimmed}\n\n{tail}" if tail else trimmed
 
 
 def end_on_a_whole_sentence(answer: str) -> str:
@@ -894,19 +919,9 @@ def end_on_a_whole_sentence(answer: str) -> str:
     altogether when it has none. Nothing is added, so the gate has less to judge, never more; the caller
     still validates the result.
     """
-    start, _end = _sources_section(answer)
-    body, tail = (answer[:start], answer[start:]) if start != -1 else (answer, "")
-    body = body.rstrip()
-    trimmed = _DANGLING_STEP_RE.sub("", body).rstrip()
-    if trimmed and trimmed[-1] not in '.!?)]"':
-        split_at = trimmed.rfind("\n") + 1
-        marker = _LINE_MARKER_RE.match(trimmed[split_at:])
-        lead = marker.end() if marker else 0
-        whole = _WHOLE_SENTENCE_RE.match(trimmed[split_at + lead:])
-        trimmed = trimmed[: split_at + lead] + whole.group(0) if whole else trimmed[:split_at].rstrip()
-    if trimmed == body:
+    trimmed = _cut_to_a_whole_sentence(answer)
+    if trimmed == answer:
         return answer
-    trimmed = f"{trimmed}\n\n{tail}" if tail else trimmed
     before = len(_prose_without_sources(answer).split())
     after = len(_prose_without_sources(trimmed).split())
     if after < _SALVAGE_MIN_WORDS or after < before * _SALVAGE_MIN_KEPT_SHARE:

@@ -125,3 +125,50 @@ def test_the_try_this_label_moves_to_the_next_step_when_the_first_step_is_droppe
     trimmed = drop_unsupported_sentences(answer, ["900ms"])
     assert "Try this: 1. Avoid a multiband" in trimmed
     assert "2. Solo the vocal" in trimmed
+
+
+# lowend-fresh in /tmp/kenn-salvage-run7 (4 Oct 2026): step 2 had the invented number, the cap cut step 3
+# mid-sentence, and the answer went out ending "...below 20Hz. 2." Trimmed, with the later numbers made up.
+CAPPED_LOW_END = (
+    "Short answer: Use a high-pass filter to cut low-end mud (20-100Hz) and a sub-bass enhancer to carve out "
+    "space for the kick and bass.  \n"
+    "Try this: 1. Apply a high-pass filter on the bass and kick tracks to cut below 20Hz. "
+    "2. Boost the kick at 60Hz by 3dB so it sits above the bass. "
+    "3. Check the low end in mono and listen for the kick and bass staying clear of each other in the"
+    "\n\nSources:\n- Mixing To A Reference Track (mixing-to-reference-track.md)"
+)
+
+
+def test_a_salvaged_answer_never_ends_on_the_bare_number_of_a_step_the_cap_cut_off():
+    trimmed = drop_unsupported_sentences(CAPPED_LOW_END, ["60hz", "3db"])
+    assert "below 20Hz.\n\nSources:" in trimmed
+    assert " 2." not in trimmed and "3." not in trimmed
+
+
+def test_a_salvaged_answer_never_ends_mid_sentence():
+    trimmed = drop_unsupported_sentences(CAPPED_LOW_END, ["60hz", "3db"])
+    assert "in the" not in trimmed
+
+
+def test_a_salvaged_answer_too_short_to_end_cleanly_is_given_up_rather_than_shown_cut():
+    # end_on_a_whole_sentence leaves a short answer alone, so the salvage used to hand it on still cut off.
+    answer = (
+        "Short answer: Key the bass compressor from the kick drum so the bass ducks on every hit. "
+        "Set the release to 900 ms. Then listen to the bass and kick together and check that the bass comes back "
+        "before the next kick lands, and if it does not, shorten the release until the"
+    )
+    assert drop_unsupported_sentences(answer, ["900ms"]) == ""
+
+
+def test_the_dynamic_eq_answer_keeps_no_empty_step_and_counts_from_one():
+    # dyn-dynamic-eq-vs-multiband, /tmp/kenn-salvage-review-sheet.md (4 Oct 2026) went out as "Try this: 1. 2. Set
+    # the threshold ... 3." with a "Check:" line stopped at "the harshness is".
+    answer = (
+        "Short answer: Dynamic EQ is better for narrow resonances like vocal harshness, while multiband "
+        "compression is better for broad range issues.  \n"
+        "Try this: 1. Cut 3500Hz by -2.5dB with a dynamic band. 2. Set the threshold to catch only the harsh "
+        "moments. 3. Widen the band around 3500Hz if it still bites.\n"
+        "Check: Solo the vocal and compare the original and processed version to make sure the harshness is"
+    )
+    trimmed = drop_unsupported_sentences(answer, ["3500hz", "-2.5db"])
+    assert trimmed.endswith("Try this: 1. Set the threshold to catch only the harsh moments.")
