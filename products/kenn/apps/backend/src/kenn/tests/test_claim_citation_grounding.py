@@ -36,6 +36,7 @@ from kenn.llm.llm_rewrite import (
     SYSTEM_PROMPT_TEMPLATE,
     _build_synthesis_messages,
     build_raw_context_block,
+    build_system_prompt,
 )
 
 # Two chunks from the same note, so a number in one of them can be attributed to the other. That is the mistake
@@ -159,10 +160,20 @@ def test_both_prompts_ask_for_the_citation_and_the_abstain_in_the_same_words() -
     for prompt in (SYSTEM_PROMPT_TEMPLATE, STATIC_CORE_SYSTEM_PROMPT):
         assert "Tag every number you state with the id of the excerpt" in prompt
         assert "Insufficient context:" in prompt
+        assert "Use only numbers that are printed in an excerpt" in prompt
         # The example has to be a real 12-hex id, or the model is shown a shape the gate will not parse.
         example = re.search(r"\[#([0-9a-f]{12})\]", prompt)
         assert example, prompt
         assert CLAIM_CITATION_RE.search(example.group(0)), example.group(0)
+
+
+def test_a_capped_answer_is_told_to_finish_inside_the_cap() -> None:
+    """4 Oct probe: 21 of 23 accepted answers were cut off, because the five sections want twice 128 tokens."""
+    prompt = build_system_prompt(answer_mode="deep_explanation", query="how does a compressor work")
+    assert "cut off after about 70 words" in prompt
+    assert "Leave out Why it matters and You could also ask" in prompt
+    # Voice answers carry their own under-80-words contract and no sections to drop.
+    assert "cut off after" not in build_system_prompt(answer_mode="voice", query="how does a compressor work")
 
 
 def test_the_answer_prompt_reaches_the_model_with_the_ids_in_it() -> None:
