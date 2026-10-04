@@ -390,7 +390,7 @@ def results_are_weak(query: str, results: list[tuple[float, dict]]) -> bool:
     if not results:
         return True
     query_terms = set(tokenize(query))
-    if query_terms & OUT_OF_SCOPE_TERMS:
+    if query_terms & OUT_OF_SCOPE_TERMS and not _names_audio_subject(query):
         return True
     top_score, top_chunk = results[0]
     if top_score < MIN_RELEVANT_SCORE:
@@ -427,6 +427,16 @@ _WHOLE_JOB_RE = re.compile(
     r"|\bdo (?:it all|everything|the whole job) for me\b"
 )
 _BOOKING_RE = re.compile(r"\bbook\b.*\b(?:tour|gigs?|venues?|flights?|hotels?)\b")
+# 4 Oct 2026 review: one word from OUT_OF_SCOPE_TERMS used to be enough, so "what sound engine does Wavetable use",
+# "write a python remote script for ableton" and "diagnose why my mix is muddy" all got the decline line. A question
+# that also names an audio topic, Live or a sound is ours. Car talk tags monitoring and translation (the car-speaker
+# check), so those two don't count, or "fix the brakes on my car" would get a mixing answer.
+_AUDIO_ANCHOR_RE = re.compile(r"\b(?:ableton|live|max|m4l|sound|synth|daw|plug-?ins?)\b")
+_CAR_CHECK_TOPICS = {"monitoring", "translation"}
+
+
+def _names_audio_subject(query: str) -> bool:
+    return bool(set(query_topics(query)) - _CAR_CHECK_TOPICS) or bool(_AUDIO_ANCHOR_RE.search(query.lower()))
 
 
 def off_topic_kind(query: str) -> str:
@@ -438,7 +448,9 @@ def off_topic_kind(query: str) -> str:
         return "whole_job"
     if "relationship advice" in lowered or "relationship help" in lowered or "relationship tip" in lowered:
         return "other"
-    if set(tokenize(query)) & OUT_OF_SCOPE_TERMS or _BOOKING_RE.search(lowered):
+    if set(tokenize(query)) & OUT_OF_SCOPE_TERMS and not _names_audio_subject(query):
+        return "other"
+    if _BOOKING_RE.search(lowered):
         return "other"
     return ""
 

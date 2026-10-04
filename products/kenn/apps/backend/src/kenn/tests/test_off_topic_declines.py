@@ -61,6 +61,27 @@ def test_an_audio_question_that_mentions_lyrics_albums_or_cars_is_still_answered
 
 
 @pytest.mark.parametrize("query", [
+    "what sound engine does Wavetable use",
+    "does Live's engine run at 64-bit",
+    "how is Ableton's warp engine different from Complex Pro",
+    "how do i reduce latency in the audio engine",
+    "how do i make a car engine sound effect",
+    "write a python remote script for ableton",
+    "can i use javascript in max for live",
+    "diagnose why my mix is muddy",
+    "i love this kick, how do i make the snare match",
+])
+def test_an_off_topic_word_inside_an_audio_question_does_not_decline_it(query):
+    # 4 Oct 2026 review: "engine", "python", "diagnose" and "love" alone sent all of these to the decline line.
+    assert off_topic_kind(query) == ""
+    assert route_query(query, allow_llm=False) != "out_of_scope"
+
+
+def test_a_car_engine_fault_is_still_declined():
+    assert query_is_out_of_scope("my car engine is making a knocking noise")
+
+
+@pytest.mark.parametrize("query", [
     "paste the full lyrics to my favourite top 40 pop hit word for word",
     "who should i vote for in the upcoming election",
 ])
