@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from kenn.core.chat_formatting import note_sections
 from kenn.retrieval.build_index import (
     QUESTION_LIST_SECTION,
@@ -168,6 +170,8 @@ def test_a_body_chunk_still_supplies_the_note_question_list_to_the_followup_prom
     chunk is only safe while that is how both read them.
     """
     notes_dir = Path(__file__).resolve().parents[1] / "Training_Data_Notes"
+    if not notes_dir.is_dir():
+        pytest.skip("Local knowledge corpus is intentionally excluded from public CI")
     note_path = next(
         (
             path

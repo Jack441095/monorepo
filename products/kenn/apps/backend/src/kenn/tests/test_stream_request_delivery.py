@@ -4,6 +4,7 @@ import io
 import json
 import threading
 from collections import defaultdict, deque
+from pathlib import Path
 from types import SimpleNamespace
 from urllib.request import Request, urlopen
 
@@ -327,6 +328,10 @@ def measured_note_stream(monkeypatch, isolated_stream_cache):
 
 def test_http_stream_preserves_the_real_engines_low_overlap_replacement(stream_http, measured_note_stream, monkeypatch):
     from kenn.tests.test_streamed_generation_prefix_guard import LOW_OVERLAP_ANSWER, QUERY, _word_tokens
+
+    # The replacement answer is re-read from the real note file, so a checkout without the corpus builds a different one.
+    if not (Path(__file__).resolve().parents[1] / "Training_Data_Notes").is_dir():
+        pytest.skip("Local knowledge corpus is intentionally excluded from public CI")
 
     monkeypatch.setattr(chat_answer, "llm_enabled", lambda: True)
     monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *args, **kwargs: True)

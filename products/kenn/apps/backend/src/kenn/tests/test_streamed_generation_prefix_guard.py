@@ -140,14 +140,18 @@ def _model_tokens(text: str) -> list[str]:
     return re.findall(r"\d+\s*(?:hz|khz|db(?:fs|tp)?|ms|%|lufs?|bpm|bits?)\s*|\S+\s*", text, re.I)
 
 
+def _fake_retrieval(monkeypatch) -> None:
+    monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(CHUNKS))
+    monkeypatch.setattr(chat_answer, "load_terms", lambda: TERMS)
+    monkeypatch.setattr(chat_answer, "search", lambda *a, **k: list(CHUNKS))
+
+
 def _stream(monkeypatch, fake_stream):
     """The answer stream with retrieval, the model and the on-disk writers faked."""
     monkeypatch.setattr(chat_answer, "llm_enabled", lambda: True)
     monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
     monkeypatch.setattr(chat_answer, "llm_enhance_answer_stream", fake_stream)
-    monkeypatch.setattr(chat_answer, "load_chunks", lambda: list(CHUNKS))
-    monkeypatch.setattr(chat_answer, "load_terms", lambda: TERMS)
-    monkeypatch.setattr(chat_answer, "search", lambda *a, **k: list(CHUNKS))
+    _fake_retrieval(monkeypatch)
     # Traces, citation trust and session memory are written to the repo's data dir; a test must not.
     monkeypatch.setattr(chat_answer, "_critique_and_save_trace", lambda **kw: kw.get("confidence", ""))
     monkeypatch.setattr(chat_answer, "_update_session", lambda *a, **k: None)
@@ -157,6 +161,8 @@ def _stream(monkeypatch, fake_stream):
 def _template(monkeypatch) -> str:
     """The grounded answer every fallback path substitutes, read without a model in the way."""
     monkeypatch.setattr(chat_answer, "llm_enhance_answer_stream", lambda *a, **k: iter(()))
+    # Same fixtures as _stream, or a checkout without the local corpus builds a different template (4 Oct 2026).
+    _fake_retrieval(monkeypatch)
     return "".join(
         event["token"]
         for event in chat_answer._answer_payload_stream_raw(QUERY, allow_llm=False)

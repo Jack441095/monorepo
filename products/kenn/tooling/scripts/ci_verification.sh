@@ -13,13 +13,13 @@ test -f source/server.py
 test -f vst3-plugin/CMakeLists.txt
 
 echo "[2/9] Compiling Python sources"
-"${PYTHON_BIN}" -m compileall -q apps/backend/src packages tooling/scripts chat automix
+"${PYTHON_BIN}" -m compileall -q apps/backend/src packages tooling/scripts automix
 
 echo "[3/9] Running the canonical backend suite"
 "${PYTHON_BIN}" -m pytest -q apps/backend/src/kenn/tests
 
 echo "[4/9] Running the scoped chat suite"
-"${PYTHON_BIN}" -m pytest -q chat/tests
+"${PYTHON_BIN}" -m pytest -q packages/chat/tests
 
 echo "[5/9] Running Mix Review"
 "${PYTHON_BIN}" -m pytest -q packages/mix-review

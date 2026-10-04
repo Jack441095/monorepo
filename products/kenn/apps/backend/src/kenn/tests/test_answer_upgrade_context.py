@@ -8,6 +8,7 @@ import time
 import urllib.parse
 import urllib.request
 from collections import defaultdict, deque
+from pathlib import Path
 
 import pytest
 
@@ -219,6 +220,8 @@ def test_background_answer_does_not_use_or_populate_the_semantic_cache(monkeypat
 def test_a_background_answer_does_not_count_citations_or_save_a_second_trace(monkeypatch, tmp_path):
     import kenn.knowledge as knowledge
 
+    if not (Path(__file__).resolve().parents[1] / "data" / "index" / "CURRENT").exists():
+        pytest.skip("Knowledge index not built, so there are no sources to cite on a fresh clone")
     # Measured 2 Oct: four upgraded questions left eight traces and doubled every citation count.
     monkeypatch.setenv("KENN_DB_PATH", str(tmp_path / "kenn.db"))
     writes = []
