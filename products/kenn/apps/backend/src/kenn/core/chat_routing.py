@@ -1967,13 +1967,23 @@ def _followup_history_turns(query: str, turns: list[str]) -> list[str]:
     return prior[anchor:]
 
 
-_SOURCE_TOPICS = {"bass", "drums", "vocals"}
+# 4 Oct 2026 review: the swap used to work on topics, and kick, snare and hats are all "drums", so "and the snare?"
+# after a kick question kept "kick" in the search and the kick note won again. Synths and pads had no topic at all.
+_INSTRUMENT_WORDS = frozenset({
+    "kick", "kicks", "snare", "snares", "hat", "hats", "hihat", "hihats", "hi-hat", "hi-hats", "clap", "claps",
+    "drum", "drums", "808", "808s", "sub", "bass", "bassline", "vocal", "vocals", "vox", "synth", "synths",
+    "pad", "pads", "guitar", "guitars", "piano", "keys", "lead", "leads",
+})
 _SUBJECT_SWAP = ("how about", "what about", "and how about", "and what about", "and the")
+
+
+def _instrument_words(text: str) -> set[str]:
+    return {word.strip("?.!,;:'\"") for word in text.lower().split()} & _INSTRUMENT_WORDS
 
 
 def followup_names_new_source(query: str) -> bool:
     """True for "how about bass?" style follow-ups that point at a different instrument than the last turn."""
-    return query.lower().strip().startswith(_SUBJECT_SWAP) and bool(set(query_topics(query)) & _SOURCE_TOPICS)
+    return query.lower().strip().startswith(_SUBJECT_SWAP) and bool(_instrument_words(query))
 
 
 def _swap_followup_subject(query: str, prior: list[str]) -> list[str]:
@@ -1984,11 +1994,10 @@ def _swap_followup_subject(query: str, prior: list[str]) -> list[str]:
     """
     if not followup_names_new_source(query):
         return prior
-    named = set(query_topics(query)) & _SOURCE_TOPICS
+    named = _instrument_words(query)
     swapped = []
     for turn in prior:
-        kept = [word for word in turn.split()
-                if not (set(query_topics(word)) & _SOURCE_TOPICS) or set(query_topics(word)) & named]
+        kept = [word for word in turn.split() if not _instrument_words(word) or _instrument_words(word) & named]
         swapped.append(" ".join(kept))
     return swapped
 

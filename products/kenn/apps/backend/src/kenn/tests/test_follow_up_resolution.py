@@ -88,3 +88,17 @@ def test_a_parameter_follow_up_searches_again_when_the_cached_note_only_mentions
 
     assert used_history and not reused
     assert [chunk["source"] for _score, chunk in results] == ["attack.md"]
+
+
+@pytest.mark.parametrize("query, named", [
+    ("and the snare?", "snare"),
+    ("and the hats?", "hats"),
+    ("and the synth?", "synth"),
+    ("what about the pads?", "pads"),
+])
+def test_a_follow_up_naming_another_drum_or_a_synth_drops_the_kick_from_the_search(query, named):
+    # 4 Oct 2026 review: kick and snare are both "drums", so "and the snare?" kept "kick" and the kick note won.
+    kick = [{"role": "user", "content": "how do i make my kick punch through in a house track"}]
+    searched = search_query_with_history(query, kick).lower()
+    assert "kick" not in searched
+    assert named in searched and "punch through" in searched
