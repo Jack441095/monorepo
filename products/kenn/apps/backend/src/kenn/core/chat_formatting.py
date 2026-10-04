@@ -26,6 +26,7 @@ from kenn.core.chat_retrieval import (
     intent_guard_failed,
     note_query_affinity,
     note_rank_key,
+    off_topic_kind,
     prefer_intent_note,
     query_is_out_of_scope,
     results_are_weak,
@@ -519,29 +520,28 @@ def _asks_something(query: str) -> bool:
     return "?" in text or len(text.split()) > 3 or bool(_REQUEST_WORDS.search(text))
 
 
+_DECLINES = {
+    "lyrics": "I can't reproduce song lyrics, they're copyrighted. I can help with how a vocal sits in the mix, though.",
+    "whole_job": (
+        "I can't take a whole project off your hands, but I can work through it with you one problem at a time. "
+        "Which track is giving you trouble?"
+    ),
+    "other": (
+        "That's outside what I do, so I'll leave it there. I can help with mixing, mastering, sound design "
+        "and Ableton Live."
+    ),
+}
+
+
 def weak_match_answer(query: str, answer_mode: str = "") -> str:
     topics = query_topics(query)
     out_of_scope = query_is_out_of_scope(query)
     examples = starter_questions(limit=3)
 
     if out_of_scope:
-        if answer_mode == "voice":
-            return (
-                "I specialize in audio engineering, studio production, mixing, mastering, and Ableton Live. "
-                '<break time="400ms"/> '
-                "While I'm focused on helping with your session, let me know what audio problem or "
-                "workflow we should work on next."
-            )
-        lines = [
-            "I specialize in audio engineering, studio production, mixing, mastering, and Ableton Live workflows.",
-            "Since I'm not going to guess at topics outside my expertise, let me know what audio problem or workflow you'd like to work on next!",
-            "",
-            "Here are a few things we can do together:",
-            "• Fix mixing or frequency balance issues (e.g. vocal harshness, muddy low-end)",
-            "• Troubleshoot Ableton Live routing or plugin setups",
-            "• Audit track stems, manage project invoices, or review a mixdown",
-        ]
-        return "\n".join(lines)
+        # One line on purpose. The old three-bullet menu listed things (invoices, stems) a stranger asking about
+        # lasagna had no reason to want, and it read as a brush-off.
+        return _DECLINES[off_topic_kind(query) or "other"]
 
     if topics:
         topic_hint = ", ".join(topic.replace("_", " ") for topic in topics[:3])

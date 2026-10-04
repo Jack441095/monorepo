@@ -417,11 +417,34 @@ def results_are_weak(query: str, results: list[tuple[float, dict]]) -> bool:
     return True
 
 
-def query_is_out_of_scope(query: str) -> bool:
+# 4 Oct 2026, 15 s probe questions: the lyrics request and the "mix and master my whole album" request both went
+# to the production route and got a mixing answer, which is the one reply neither of them deserved.
+_LYRICS_REQUEST_RE = re.compile(
+    r"\blyrics (?:to|of|for)\b|\b(?:paste|print|quote|copy|write out)\b.*\blyrics\b|\blyrics\b.*\bword for word\b"
+)
+_WHOLE_JOB_RE = re.compile(
+    r"\b(?:whole|entire|full|complete) (?:album|ep|record|project|catalogue|catalog|discography)\b"
+    r"|\bdo (?:it all|everything|the whole job) for me\b"
+)
+_BOOKING_RE = re.compile(r"\bbook\b.*\b(?:tour|gigs?|venues?|flights?|hotels?)\b")
+
+
+def off_topic_kind(query: str) -> str:
+    """"lyrics", "whole_job" or "other" for a request KENN should decline, "" for anything it can work on."""
     lowered = query.lower()
+    if _LYRICS_REQUEST_RE.search(lowered):
+        return "lyrics"
+    if _WHOLE_JOB_RE.search(lowered) and re.search(r"\bfor me\b", lowered):
+        return "whole_job"
     if "relationship advice" in lowered or "relationship help" in lowered or "relationship tip" in lowered:
-        return True
-    return bool(set(tokenize(query)) & OUT_OF_SCOPE_TERMS)
+        return "other"
+    if set(tokenize(query)) & OUT_OF_SCOPE_TERMS or _BOOKING_RE.search(lowered):
+        return "other"
+    return ""
+
+
+def query_is_out_of_scope(query: str) -> bool:
+    return bool(off_topic_kind(query))
 
 
 def source_label(chunk: dict) -> str:
