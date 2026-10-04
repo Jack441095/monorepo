@@ -62,7 +62,7 @@ def test_a_follow_up_naming_a_new_instrument_ignores_the_answer_already_given(mo
 
 
 def test_a_follow_up_about_the_same_subject_still_reuses_the_notes_already_found(monkeypatch):
-    old = [(9.0, {"kind": "note", "source": "drums.md", "title": "Drum compression", "text": "Attack time sets how much snap passes."})]
+    old = [(9.0, {"kind": "note", "source": "drums.md", "title": "Drum compression attack", "text": "Attack time sets how much snap passes."})]
     monkeypatch.setattr(chat_answer, "_load_session", lambda session_id="": {"last_retrieved_results": old})
     monkeypatch.setattr(chat_answer, "search", lambda *args, **kwargs: pytest.fail("searched again"))
 
@@ -71,3 +71,20 @@ def test_a_follow_up_about_the_same_subject_still_reuses_the_notes_already_found
     )
 
     assert reused
+
+
+def test_a_parameter_follow_up_searches_again_when_the_cached_note_only_mentions_it(monkeypatch):
+    # 4 Oct 2026 review: "what about the attack?" reused the vocal compression note and repeated its four steps.
+    vocal = [{"role": "user", "content": "how do i set up a compressor on my vocal"}]
+    old = [(9.0, {"kind": "note", "source": "vocal-comp.md", "title": "Vocal compression basics",
+                  "text": "Start with a 3:1 ratio. Set attack around 10 ms. Set release around 80 ms."})]
+    fresh = [(8.0, {"kind": "note", "source": "attack.md", "title": "Compressor attack and transients", "text": "Attack decides how much transient gets through."})]
+    monkeypatch.setattr(chat_answer, "_load_session", lambda session_id="": {"last_retrieved_results": old})
+    monkeypatch.setattr(chat_answer, "search", lambda *args, **kwargs: list(fresh))
+
+    results, used_history, _relevance, _search, reused = chat_answer._resolve_results_with_topic_lock(
+        "what about the attack?", vocal, 5, [], {}, "s1"
+    )
+
+    assert used_history and not reused
+    assert [chunk["source"] for _score, chunk in results] == ["attack.md"]

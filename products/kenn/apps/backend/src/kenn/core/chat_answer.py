@@ -1220,11 +1220,26 @@ def _cached_results_cover_query(query: str, cached: list[tuple[float, dict]]) ->
     if not wanted:
         # Nothing to test against ("and then?"), so the follow-up inherits the parent's evidence.
         return True
+    # 4 Oct 2026 review: every compressor note says "attack" somewhere, so "what about the attack?" reused the
+    # vocal compression note and got its four steps back again. A parameter has to be what a cached note is
+    # about, title or tags, before we skip the search for it.
+    parameters = wanted & _PARAMETER_TERMS
+    if parameters:
+        titles = set()
+        for _score, chunk in cached:
+            titles.update(normalized_terms(str(chunk.get("title") or "")))
+            titles.update(normalized_terms(" ".join(str(tag) for tag in chunk.get("tags") or [])))
+        return bool(parameters & titles)
     have = set()
     for _score, chunk in cached:
         have.update(normalized_terms(str(chunk.get("text") or "")))
         have.update(normalized_terms(str(chunk.get("title") or "")))
     return bool(wanted & have)
+
+
+_PARAMETER_TERMS = normalized_terms(
+    "attack release ratio threshold knee makeup lookahead decay predelay feedback cutoff resonance"
+)
 
 
 # Words a producer types while pointing at something already on screen. They carry no retrieval subject, so they
