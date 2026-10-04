@@ -765,6 +765,35 @@ _SALVAGE_MIN_KEPT_SHARE = 0.6
 _SALVAGE_MIN_WORDS = 30
 
 
+_INLINE_STEP_RE = re.compile(r"^((?:[A-Z][A-Za-z' ]{2,30}:\s*)?)(\d+)([.)]\s)")
+
+
+def _join_step_numbers(sentences: list[str]) -> list[str]:
+    """Put a bare "2." back on the sentence it numbers; the split cuts between the two."""
+    joined: list[str] = []
+    carry = ""
+    for sentence in sentences:
+        if re.fullmatch(r"(?:[A-Z][A-Za-z' ]{2,30}:\s*)?\d+[.)]", sentence):
+            carry = f"{carry}{sentence} "
+            continue
+        joined.append(carry + sentence)
+        carry = ""
+    return joined
+
+
+def _renumber_inline_steps(sentences: list[str]) -> list[str]:
+    """Steps written inline on one line ("1. ... 2. ... 3. ...") count again from 1 once one is gone."""
+    count = 0
+    renumbered = []
+    for sentence in sentences:
+        step = _INLINE_STEP_RE.match(sentence)
+        if step:
+            count += 1
+            sentence = f"{step.group(1)}{count}{step.group(3)}{sentence[step.end():]}"
+        renumbered.append(sentence)
+    return renumbered
+
+
 def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
     """The answer without the sentences that carry a measurement the notes do not, or "" if too little is left.
 
@@ -784,8 +813,10 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
             continue
         marker = _LINE_MARKER_RE.match(line)
         prefix = marker.group(1) if marker else ""
-        sentences = _SENTENCE_SPLIT_RE.split(line[len(prefix):])
+        sentences = _join_step_numbers(_SENTENCE_SPLIT_RE.split(line[len(prefix):]))
         survivors = [s for s in sentences if not (_measurements(s) & bad)]
+        if len(survivors) < len(sentences):
+            survivors = _renumber_inline_steps(survivors)
         if survivors:
             kept_lines.append(prefix + " ".join(survivors))
         elif _NUMBERED_LINE_RE.match(line):

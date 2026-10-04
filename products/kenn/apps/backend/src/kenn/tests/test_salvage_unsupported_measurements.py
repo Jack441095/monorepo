@@ -97,3 +97,18 @@ def test_make_answer_returns_the_trimmed_answer_when_only_an_invented_number_sto
     assert enhanced is True
     assert "900" not in answer
     assert logged[-1][0] is True and logged[-1][1]["salvaged"] == ["900ms"]
+
+
+def test_steps_written_inline_on_one_line_lose_the_whole_step_and_count_again():
+    # Real model output from 4 Oct 2026: the cut used to leave "2." standing alone where step 2 had been.
+    answer = (
+        "Short answer: A cardioid mic boosts bass when close, and you can avoid it by backing off or using a filter.  \n"
+        "Try this: 1. Move the mic further away from the source. "
+        "2. Add a high-pass filter at 900 ms to cut unwanted low-end. "
+        "3. Use a pop filter close to the capsule to reduce plosives.  \n"
+        "Check: Solo the vocal and listen for a smoother low end with the mic moved back from the source."
+    )
+    trimmed = drop_unsupported_sentences(answer, ["900ms"])
+    assert "900" not in trimmed
+    assert "1. Move the mic further away from the source. 2. Use a pop filter" in trimmed
+    assert "3." not in trimmed
