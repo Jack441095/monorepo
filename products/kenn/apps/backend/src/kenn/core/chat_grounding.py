@@ -850,6 +850,8 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
 
 
 _WHOLE_SENTENCE_RE = re.compile(r".*[.!?](?=\s|$)", re.DOTALL)
+# A cut right after "3." leaves the marker looking like a finished sentence.
+_DANGLING_STEP_RE = re.compile(r"(?:(?<=[.!?\]])[ \t]+|\n[ \t]*)\d{1,2}[.)]$")
 
 
 def end_on_a_whole_sentence(answer: str) -> str:
@@ -863,13 +865,14 @@ def end_on_a_whole_sentence(answer: str) -> str:
     start, _end = _sources_section(answer)
     body, tail = (answer[:start], answer[start:]) if start != -1 else (answer, "")
     body = body.rstrip()
-    if not body or body[-1] in '.!?)]"':
+    trimmed = _DANGLING_STEP_RE.sub("", body).rstrip()
+    if trimmed and trimmed[-1] not in '.!?)]"':
+        split_at = trimmed.rfind("\n") + 1
+        whole = _WHOLE_SENTENCE_RE.match(trimmed[split_at:])
+        trimmed = trimmed[:split_at] + whole.group(0) if whole else trimmed[:split_at].rstrip()
+    if trimmed == body:
         return answer
-    split_at = body.rfind("\n") + 1
-    last_line = body[split_at:]
-    whole = _WHOLE_SENTENCE_RE.match(last_line)
-    body = body[:split_at] + whole.group(0) if whole else body[:split_at].rstrip()
-    trimmed = f"{body}\n\n{tail}" if tail else body
+    trimmed = f"{trimmed}\n\n{tail}" if tail else trimmed
     before = len(_prose_without_sources(answer).split())
     after = len(_prose_without_sources(trimmed).split())
     if after < _SALVAGE_MIN_WORDS or after < before * _SALVAGE_MIN_KEPT_SHARE:

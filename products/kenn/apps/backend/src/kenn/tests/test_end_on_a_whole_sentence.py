@@ -62,3 +62,18 @@ def test_make_answer_shows_the_whole_sentence_ending(monkeypatch):
 
     assert enhanced is True
     assert "Why it matters" not in answer
+
+
+def test_a_step_marker_left_on_its_own_line_by_the_cut_goes_with_it():
+    cut = BODY + "3." + SOURCES
+    assert end_on_a_whole_sentence(cut) == BODY.rstrip() + SOURCES
+
+
+def test_a_step_marker_left_at_the_end_of_an_inline_line_goes_with_it():
+    cut = BODY.rstrip() + " 3." + SOURCES
+    assert end_on_a_whole_sentence(cut) == BODY.rstrip() + SOURCES
+
+
+def test_a_sentence_that_ends_in_a_number_is_not_taken_for_a_marker():
+    answer = BODY + "Why it matters: A ratio of 4:1 works, so start at 4." + SOURCES
+    assert end_on_a_whole_sentence(answer) == answer
