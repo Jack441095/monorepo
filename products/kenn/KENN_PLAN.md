@@ -988,6 +988,15 @@ do not append the whole execution transcript here. A partly completed gate remai
 open, with its implemented part described precisely. Use one bounded behavior
 change per commit, explicit staging and plain commit messages without AI trailers.
 
+No branch merges to `main` until someone who did not write it has attacked it. The
+reviewer reads the diff against `main`, cannot edit, and tries the inputs most likely
+to break it: real Ableton wording, follow-ups, typos, the questions near each new rule's
+edge. It reports each break as a failing question or test, or signs off. Fixes go back to
+the builder, and the reviewer looks again. On 4 Oct 2026 the reaction-routing branch
+passed its own tests and still had five routing bugs that a separate read-only audit
+found, one of which declined ordinary "engine" questions about Live. The 47-question
+probe stays the only shared scoreboard; a reviewer's sign-off does not move a gate.
+
 Before a structural extraction: census AST and registry bindings; characterize the
 unmodified source; compare against Git's pre-change implementation; preserve ordered
 rules; mutation-check each seam; restore and checksum; run the full backend suite.
