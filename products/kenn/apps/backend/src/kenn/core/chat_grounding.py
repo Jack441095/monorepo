@@ -781,6 +781,19 @@ def _join_step_numbers(sentences: list[str]) -> list[str]:
     return joined
 
 
+_LABEL_RE = re.compile(r"^([A-Z][A-Za-z' ]{2,30}:\s*)")
+
+
+def _keep_label(sentences: list[str], survivors: list[str]) -> list[str]:
+    """Hand a dropped sentence's "Try this:" label to the first sentence that stays."""
+    if not survivors or sentences[0] in survivors:
+        return survivors
+    label = _LABEL_RE.match(sentences[0])
+    if label and not _LABEL_RE.match(survivors[0]):
+        return [label.group(1) + survivors[0]] + survivors[1:]
+    return survivors
+
+
 def _renumber_inline_steps(sentences: list[str]) -> list[str]:
     """Steps written inline on one line ("1. ... 2. ... 3. ...") count again from 1 once one is gone."""
     count = 0
@@ -816,7 +829,7 @@ def drop_unsupported_sentences(answer: str, unsupported: list[str]) -> str:
         sentences = _join_step_numbers(_SENTENCE_SPLIT_RE.split(line[len(prefix):]))
         survivors = [s for s in sentences if not (_measurements(s) & bad)]
         if len(survivors) < len(sentences):
-            survivors = _renumber_inline_steps(survivors)
+            survivors = _renumber_inline_steps(_keep_label(sentences, survivors))
         if survivors:
             kept_lines.append(prefix + " ".join(survivors))
         elif _NUMBERED_LINE_RE.match(line):
@@ -868,8 +881,10 @@ def end_on_a_whole_sentence(answer: str) -> str:
     trimmed = _DANGLING_STEP_RE.sub("", body).rstrip()
     if trimmed and trimmed[-1] not in '.!?)]"':
         split_at = trimmed.rfind("\n") + 1
-        whole = _WHOLE_SENTENCE_RE.match(trimmed[split_at:])
-        trimmed = trimmed[:split_at] + whole.group(0) if whole else trimmed[:split_at].rstrip()
+        marker = _LINE_MARKER_RE.match(trimmed[split_at:])
+        lead = marker.end() if marker else 0
+        whole = _WHOLE_SENTENCE_RE.match(trimmed[split_at + lead:])
+        trimmed = trimmed[: split_at + lead] + whole.group(0) if whole else trimmed[:split_at].rstrip()
     if trimmed == body:
         return answer
     trimmed = f"{trimmed}\n\n{tail}" if tail else trimmed

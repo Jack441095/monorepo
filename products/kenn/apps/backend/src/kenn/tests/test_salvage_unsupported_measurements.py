@@ -112,3 +112,16 @@ def test_steps_written_inline_on_one_line_lose_the_whole_step_and_count_again():
     assert "900" not in trimmed
     assert "1. Move the mic further away from the source. 2. Use a pop filter" in trimmed
     assert "3." not in trimmed
+
+
+def test_the_try_this_label_moves_to_the_next_step_when_the_first_step_is_dropped():
+    # 4 Oct 2026: losing the labelled first step left no "Try this" at all and the gate said "missing steps section".
+    answer = (
+        "Short answer: Dynamic EQ suits a narrow resonance, such as one harsh frequency, better than a broad band.  \n"
+        "Try this: 1. Use a dynamic EQ to cut the problem near 900 ms with a narrow Q on the loudest peaks. "
+        "2. Avoid a multiband compressor unless the harshness spans a wide range of the vocal. "
+        "3. Solo the vocal and compare the dry and processed signal to make sure the fix is targeted."
+    )
+    trimmed = drop_unsupported_sentences(answer, ["900ms"])
+    assert "Try this: 1. Avoid a multiband" in trimmed
+    assert "2. Solo the vocal" in trimmed

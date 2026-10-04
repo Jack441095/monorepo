@@ -77,3 +77,9 @@ def test_a_step_marker_left_at_the_end_of_an_inline_line_goes_with_it():
 def test_a_sentence_that_ends_in_a_number_is_not_taken_for_a_marker():
     answer = BODY + "Why it matters: A ratio of 4:1 works, so start at 4." + SOURCES
     assert end_on_a_whole_sentence(answer) == answer
+
+
+def test_a_numbered_last_line_cut_before_its_first_full_stop_goes_whole():
+    # The "3." of the marker used to count as the sentence and survived on its own line.
+    cut = BODY + "3. Invert the phase of one track using the Invert" + SOURCES
+    assert end_on_a_whole_sentence(cut) == BODY.rstrip() + SOURCES
