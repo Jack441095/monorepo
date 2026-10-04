@@ -1833,6 +1833,17 @@ _PARAMETER_QUESTION = re.compile(
     r"(?: time)? (?:(?:should|do|does|can) i\b|would you (?:suggest|recommend|use)"
     r"(?: (?:there|here|for (?:it|that|this)))?[?.!]*$)"
 )
+# 4 Oct 2026, 15 s probe questions: "louder or softer?", "what attack time though?", "in mono too?" and "what ratio
+# then?" opened no follow-up wording at all, so they were searched alone. Two of them came back as a clarifying
+# question although the previous turn had said exactly what was being asked about.
+_TAG_ON_ENDING = re.compile(r"\b(?:too|though|then)[?.!]*$")
+_ALTERNATIVE_QUESTION = re.compile(r"^(?:\w+ ){0,3}\w+ or \w+(?: \w+)?[?.!]*$")
+_STANDALONE_OPENER = re.compile(r"^(?:how (?:do|can|to|should)|why|what is|what are|which|is|are)\b")
+_AND_FOR_OPENERS = ("and the ", "and for ", "and on ", "and in ", "and with ")
+
+
+def _is_tag_on(cleaned: str) -> bool:
+    return len(cleaned.split()) <= 6 and not _STANDALONE_OPENER.match(cleaned) and bool(_TAG_ON_ENDING.search(cleaned))
 
 
 def is_correction_query(query: str) -> bool:
@@ -1857,7 +1868,11 @@ def is_followup_query(query: str) -> bool:
     if _PARAMETER_QUESTION.match(cleaned):
         return True
     # "And the attack?" has no reference word, but nobody opens a chat with it.
-    if cleaned.startswith("and the ") and len(cleaned.split()) <= 6:
+    if cleaned.startswith(_AND_FOR_OPENERS) and len(cleaned.split()) <= 6:
+        return True
+    if _is_tag_on(cleaned):
+        return True
+    if len(cleaned.split()) <= 5 and not _STANDALONE_OPENER.match(cleaned) and _ALTERNATIVE_QUESTION.match(cleaned):
         return True
     if cleaned.startswith(
         (
@@ -1908,7 +1923,12 @@ def _followup_history_turns(query: str, turns: list[str]) -> list[str]:
 
 
 _SOURCE_TOPICS = {"bass", "drums", "vocals"}
-_SUBJECT_SWAP = ("how about", "what about", "and how about", "and what about")
+_SUBJECT_SWAP = ("how about", "what about", "and how about", "and what about", "and the")
+
+
+def followup_names_new_source(query: str) -> bool:
+    """True for "how about bass?" style follow-ups that point at a different instrument than the last turn."""
+    return query.lower().strip().startswith(_SUBJECT_SWAP) and bool(set(query_topics(query)) & _SOURCE_TOPICS)
 
 
 def _swap_followup_subject(query: str, prior: list[str]) -> list[str]:
@@ -1917,11 +1937,9 @@ def _swap_followup_subject(query: str, prior: list[str]) -> list[str]:
     Without this the search text still said "drum compression", so the drum note won again and "how about bass
     compression?" came back as the drum answer (3 Oct). Technique words such as compression and sidechain stay.
     """
-    if not query.lower().strip().startswith(_SUBJECT_SWAP):
+    if not followup_names_new_source(query):
         return prior
     named = set(query_topics(query)) & _SOURCE_TOPICS
-    if not named:
-        return prior
     swapped = []
     for turn in prior:
         kept = [word for word in turn.split()
@@ -1938,7 +1956,7 @@ def should_use_history(query: str, history: list | None) -> bool:
         prior = _followup_history_turns(query, turns)
         prior_topics = {topic for turn in prior for topic in query_topics(turn)}
         cleaned = query.lower().strip()
-        explicit_followup = cleaned.startswith(("and ", "what about", "how about", "also ", "going back to "))
+        explicit_followup = cleaned.startswith(("and ", "what about", "how about", "also ", "going back to ")) or _is_tag_on(cleaned)
         parameter_question = bool(_PARAMETER_QUESTION.match(cleaned))
         # Topic tags alone confuse compressor release with arrangement and attack with transients.
         # A named new subject can drop history; parameter questions and explicit links still need it.

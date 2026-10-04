@@ -74,6 +74,7 @@ from kenn.core.chat_routing import (
     classify_answer_mode,
     constrain_results_for_query,
     conversational_payload,
+    followup_names_new_source,
     format_timeline_report,
     format_track_memory,
     history_context_line,
@@ -1288,7 +1289,9 @@ def _resolve_results_with_topic_lock(
 
     results = None
     reused = False
-    if use_history and session_id:
+    # The kick sidechain notes we already hold mention bass, so the cover check passes for "and the bass?" and the
+    # last answer comes back again. A new instrument always gets its own search.
+    if use_history and session_id and not followup_names_new_source(query):
         try:
             state = _load_session(session_id=session_id)
             cached_results = state.get("last_retrieved_results")
