@@ -725,6 +725,12 @@ _PRODUCT_FAMILIES = {
 }
 
 
+def names_a_product(query: str) -> str:
+    """The plugin maker the question mentions, or "" when it names none from the list above."""
+    text = query.lower()
+    return next((family for family, pattern in _PRODUCT_FAMILIES.items() if pattern.search(text)), "")
+
+
 def names_only_a_product(query: str) -> bool:
     """True when the message is a plugin brand or product and nothing else, such as "fab filter".
 

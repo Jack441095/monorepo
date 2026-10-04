@@ -6,7 +6,7 @@ import re
 import sys
 
 
-from kenn.core.chat_grounding import names_only_a_product
+from kenn.core.chat_grounding import names_a_product, names_only_a_product
 from kenn.core.lm_identity import APP_NAME
 from kenn.llm.llm_rewrite import is_enabled as llm_enabled
 from kenn.core.suggestions import DEFAULT_STARTERS, starter_questions
@@ -494,9 +494,47 @@ def cleaned_query(query: str) -> str:
     return re.sub(r"\s+", " ", cleaned)
 
 
+# 4 Oct 2026, 15 s probe questions: "mix sounds bad" and "make my vocals better" name neither a device nor what is
+# wrong, and the answer that came back was whichever note matched "mix" or "vocals" best. One question back is
+# cheaper than a wrong guess. "how do i master" and "bass feels weak" are left alone, they say what they want.
+_VAGUE_QUALITY_WORDS = frozenset({
+    "better", "bad", "weird", "strange", "odd", "wrong", "pro", "professional", "boring", "empty", "flat",
+    "bland", "lifeless", "amateur", "cheap", "terrible", "awful", "worse",
+})
+_SOUNDS_OFF = re.compile(r"\b(?:sounds?|feels?|is|seems?) off\b")
+_DEVICE_TOPICS = frozenset({
+    "compression", "eq", "delay", "reverb", "saturation", "routing", "midi", "automation", "warp", "freeze",
+    "cpu", "sound_design", "ableton_link",
+})
+_VAGUE_SUBJECTS = {"vocals": "the vocal", "drums": "the drums", "bass": "the bass", "mixing": "the mix", "podcast": "the voice"}
+# The "which track" wording is also how clarification_payload spots that it has already asked once.
+_VAGUE_ASK_MARKER = "which track it is"
+
+
+def is_vague_ask(query: str) -> bool:
+    cleaned = cleaned_query(query)
+    words = cleaned.split()
+    if not 2 <= len(words) <= 5 or _STANDALONE_OPENER.match(cleaned):
+        return False
+    if not (set(words) & _VAGUE_QUALITY_WORDS or _SOUNDS_OFF.search(cleaned)):
+        return False
+    if "ableton" in words or names_a_product(query) or conversational_intent(query):
+        return False
+    return not set(query_topics(query)) & _DEVICE_TOPICS
+
+
+def vague_ask_question(query: str) -> str:
+    topics = query_topics(query)
+    subject = next((_VAGUE_SUBJECTS[topic] for topic in topics if topic in _VAGUE_SUBJECTS), "it")
+    return (
+        f"What does {subject} sound like right now: muddy, harsh, thin, buried or too quiet? "
+        f"Tell me that and {_VAGUE_ASK_MARKER}, and I'll start from there."
+    )
+
+
 def is_unclear_query(query: str) -> bool:
     cleaned = cleaned_query(query)
-    if cleaned in UNCLEAR_INPUTS or names_only_a_product(query):
+    if cleaned in UNCLEAR_INPUTS or names_only_a_product(query) or is_vague_ask(query):
         return True
     raw_words = set(cleaned.split())
     if raw_words & FOLLOWUP_REFERENCES and len(raw_words) <= 9 and cleaned.startswith(
@@ -646,7 +684,12 @@ def clarification_payload(query: str, history: list | None = None, reason: str =
         for turn in reversed(normalize_history(history)):
             if turn.get("role") == "assistant":
                 content = turn.get("content", "").lower()
-                if "need one bit more direction" in content or "reset/rephrase" in content or "trouble matching your question" in content:
+                if (
+                    "need one bit more direction" in content
+                    or "reset/rephrase" in content
+                    or "trouble matching your question" in content
+                    or _VAGUE_ASK_MARKER in content
+                ):
                     consecutive_clarifications += 1
                 else:
                     break
@@ -660,6 +703,8 @@ def clarification_payload(query: str, history: list | None = None, reason: str =
         # The referent may be unclear, but asking the full intake menu again loses the request we already have.
         context = " / ".join(turn[:160] for turn in context_turns)
         answer = f'You asked: "{context}". Which part of that request do you mean, and what would you like to check?'
+    elif is_vague_ask(query) and consecutive_clarifications == 0:
+        answer = vague_ask_question(query)
     elif consecutive_clarifications >= 1:
         if answer_mode == "voice":
             answer = (
