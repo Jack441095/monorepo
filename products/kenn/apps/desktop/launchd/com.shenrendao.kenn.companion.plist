@@ -28,7 +28,11 @@
         <key>KENN_PORT</key>
         <string>8090</string>
         <key>KENN_USE_MLX</key>
-        <string>1</string>
+        <string>0</string>
+        <key>KENN_LLM_PROVIDER</key>
+        <string>ollama</string>
+        <key>KENN_LLM_MODEL</key>
+        <string>kenn-brain-qwen3-8b</string>
         <key>PYTHONUNBUFFERED</key>
         <string>1</string>
         <key>PYTHONPATH</key>

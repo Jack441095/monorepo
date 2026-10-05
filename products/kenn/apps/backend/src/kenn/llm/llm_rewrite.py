@@ -1696,19 +1696,35 @@ def format_turn_directives(
 def mlx_selected(task: str = "rewrite") -> bool:
     """Whether the on-device MLX engine should answer instead of the configured provider.
 
-    An explicit choice wins: KENN_USE_MLX on or off, or a provider named for this task. Only when nothing is configured
-    does MLX take over when installed. It used to take over whenever installed, so a Mac set up for Qwen3 8B on Ollama
-    was silently answered by the 1.5B MLX default (found 26 Sept).
+    Only an explicit choice: KENN_USE_MLX on, or "mlx" named as the provider. It used to take over whenever installed,
+    so a Mac set up for Qwen3 8B on Ollama was silently answered by the 1.5B MLX default (found 26 Sept). The fix for
+    that still let MLX take over when no provider was named, and setting only the model name doesn't name one: main's
+    .env sets AUDIO_TOO_LLM_MODEL alone, so the 5 Oct gate baseline was the 1.5B model too, failing 32 answers on
+    structure. With nothing chosen we stay on Ollama, which says out loud when it has no model.
     """
+    # The checks below read os.environ, and nothing else guarantees the .env has been read by the time we're asked;
+    # the companion's warm-up thread asks before any config() call.
+    load_env()
     explicit = os.environ.get("KENN_USE_MLX")
     if explicit is not None:
         return explicit.strip().lower() in {"1", "true", "yes"}
     suffix = f"_{task.upper()}" if task != "rewrite" else ""
     providers = [os.environ.get(name, "").strip().lower() for name in (
         f"KENN_LLM_PROVIDER{suffix}", f"AUDIO_TOO_LLM_PROVIDER{suffix}", "KENN_LLM_PROVIDER", "AUDIO_TOO_LLM_PROVIDER")]
-    chosen = next((p for p in providers if p), "")
-    return chosen in {"", "mlx"}
+    return next((p for p in providers if p), "") == "mlx"
 
+
+def answering_model() -> dict:
+    """Which provider and model will answer chat, as /api/health reports it.
+
+    Health used to report only the index, so a gate run couldn't tell the 1.5B MLX default from Qwen3 8B (5 Oct).
+    """
+    if mlx_selected():
+        from kenn.llm.mlx_inference_engine import DEFAULT_MLX_MODEL
+
+        return {"provider": "mlx", "model": DEFAULT_MLX_MODEL}
+    cfg = config()
+    return {"provider": cfg["provider"], "model": cfg["model"] or None}
 
 def _mlx_engine_answers(task: str = "rewrite") -> bool:
     if not mlx_selected(task):

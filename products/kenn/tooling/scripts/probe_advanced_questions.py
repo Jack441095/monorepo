@@ -265,14 +265,16 @@ def provenance(cases_path: Path, health: dict, note: str | None) -> dict:
                                 capture_output=True, text=True, timeout=5).stdout.strip() or None
     except (OSError, subprocess.SubprocessError):
         commit = None
-    # /api/health says nothing about the model or LLM settings, only the index; delivered_by and model_attempted on
-    # each row are what show whether the model ran.
-    index = (health.get("subsystems") or {}).get("knowledge_index") or {}
+    # delivered_by and model_attempted on each row show whether the model ran; answer_model says which one. Older
+    # companions don't report it, so it comes through as None rather than failing the run.
+    subsystems = health.get("subsystems") or {}
+    index = subsystems.get("knowledge_index") or {}
     return {
         "probe_commit": commit,
         "cases_sha256": hashlib.sha256(cases_path.read_bytes()).hexdigest(),
         "index": {key: index.get(key) for key in
                   ("index_version", "active_mode", "semantic_model_state", "degraded", "fallback_reason")},
+        "answer_model": subsystems.get("answer_model"),
         "power_source": power_source(),
         "note": note,
     }
