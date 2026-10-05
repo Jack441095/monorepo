@@ -135,6 +135,36 @@ public struct TemplateEngine: Sendable {
         let cleaned = FilenameSanitizer.sanitize(output)
         return cleaned.isEmpty ? nil : cleaned
     }
+
+    /// The one pass/fail verdict every surface asks before a filename is
+    /// approved, copied, or written. The preview, review, write and batch
+    /// paths each used to re-run validate/missing/ambiguous/identity by
+    /// hand and the sequences drifted — the preview never checked
+    /// ambiguity and the write path never checked identity. This keeps
+    /// them on the same order so the pieces cannot come apart again.
+    public enum TemplateGateOutcome: Sendable, Equatable {
+        case blocked(missingFields: [String], ambiguousFields: [String],
+                     identityReason: String?, problems: [String])
+        case ready(renderedName: String)
+    }
+
+    public static func gate(template: String,
+                            values: [String: String],
+                            metadata: SubmissionMetadata,
+                            identityReason: String?,
+                            originalName: String,
+                            date: Date = Date()) -> TemplateGateOutcome {
+        let problems = validate(template)
+        let ambiguous = ambiguousRequiredFields(template, metadata: metadata)
+        let missing = missingRequiredFields(template, values: values)
+        if problems.isEmpty, ambiguous.isEmpty, missing.isEmpty, identityReason == nil,
+           let rendered = render(template: template, values: values,
+                                 originalName: originalName, date: date) {
+            return .ready(renderedName: rendered)
+        }
+        return .blocked(missingFields: missing, ambiguousFields: ambiguous,
+                        identityReason: identityReason, problems: problems)
+    }
 }
 
 /// Shared regex-replace helper.

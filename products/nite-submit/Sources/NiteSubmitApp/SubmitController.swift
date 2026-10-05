@@ -244,20 +244,25 @@ final class SubmitController {
     func reviewBlockingReason() -> String? {
         guard sourceURL != nil else { return "Drop a PDF or media file first." }
         let template = view?.templateField.stringValue ?? settings.template
-        if let problem = TemplateEngine.validate(template).first { return problem }
         if settings.universityPresetId == "anonymous_candidate" {
             let nameFields = Set(["first_name", "last_name", "full_name"])
             if !nameFields.isDisjoint(with: Set(template.variables())) {
                 return "Anonymous candidate profile cannot include a student name."
             }
         }
-        if let identityReason = documentIdentityCheck.blockingReason {
-            return identityReason
+        switch TemplateEngine.gate(template: template, values: currentValues(), metadata: metadata,
+                                   identityReason: documentIdentityCheck.blockingReason,
+                                   originalName: originalBaseName ?? "assignment") {
+        case .blocked(let missingFields, let ambiguousFields, let identityReason, let problems):
+            if let problem = problems.first { return problem }
+            if let identityReason { return identityReason }
+            if let ambiguous = ambiguousFields.first {
+                return "Multiple possible \(ambiguous.lowercased()) values detected. Choose the correct value before approving."
+            }
+            return missingFields.first
+        case .ready:
+            return nil
         }
-        if let ambiguous = TemplateEngine.ambiguousRequiredFields(template, metadata: metadata).first {
-            return "Multiple possible \(ambiguous.lowercased()) values detected. Choose the correct value before approving."
-        }
-        return TemplateEngine.missingRequiredFields(template, values: currentValues()).first
     }
 
     @discardableResult
@@ -282,12 +287,17 @@ final class SubmitController {
             return
         }
         let tpl = view.templateField.stringValue
-        if let p = TemplateEngine.validate(tpl).first { status(p); return }
         let values = currentValues()
-        if let m = TemplateEngine.missingRequiredFields(tpl, values: values).first { status(m); return }
-        guard let base = TemplateEngine.render(template: tpl, values: values,
-                                               originalName: originalBaseName ?? "assignment") else {
+        let base: String
+        switch TemplateEngine.gate(template: tpl, values: values, metadata: metadata,
+                                   identityReason: documentIdentityCheck.blockingReason,
+                                   originalName: originalBaseName ?? "assignment") {
+        case .blocked(let missingFields, _, _, let problems):
+            if let p = problems.first { status(p); return }
+            if let m = missingFields.first { status(m); return }
             status("Could not build a filename from these fields."); return
+        case .ready(let renderedName):
+            base = renderedName
         }
 
         let op = FileOperator()
@@ -362,12 +372,17 @@ final class SubmitController {
             return
         }
         let tpl = view.templateField.stringValue
-        if let p = TemplateEngine.validate(tpl).first { status(p); return }
         let values = currentValues()
-        if let m = TemplateEngine.missingRequiredFields(tpl, values: values).first { status(m); return }
-        guard let base = TemplateEngine.render(template: tpl, values: values,
-                                               originalName: originalBaseName ?? "submission_batch") else {
+        let base: String
+        switch TemplateEngine.gate(template: tpl, values: values, metadata: metadata,
+                                   identityReason: documentIdentityCheck.blockingReason,
+                                   originalName: originalBaseName ?? "submission_batch") {
+        case .blocked(let missingFields, _, _, let problems):
+            if let p = problems.first { status(p); return }
+            if let m = missingFields.first { status(m); return }
             status("Could not build an archive filename from these fields."); return
+        case .ready(let renderedName):
+            base = renderedName
         }
 
         let outputDir = (sourceURL ?? sources[0]).deletingLastPathComponent()

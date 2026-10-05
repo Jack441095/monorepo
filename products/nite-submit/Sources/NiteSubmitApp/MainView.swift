@@ -925,62 +925,74 @@ final class MainView: NSView, NSTextFieldDelegate {
             ? ""
             : " Document identity: \(c.documentIdentityCheck.evidence)."
         let tpl = templateField.stringValue
-        if let p = TemplateEngine.validate(tpl).first {
-            previewLabel.stringValue = "⚠︎ \(p)"
-            previewLabel.textColor = NiteSubmitUI.warning
-            explanationLabel.stringValue = "Why: fix the naming rule before reviewing the document.\(identityNote)\(documentNote)"
-            lastRenderedBaseName = nil
-            copyNameButton.isEnabled = false
-            return
-        }
-        if c.settings.universityPresetId == "anonymous_candidate" {
-            let nameFields = Set(["first_name", "last_name", "full_name"])
-            if !nameFields.isDisjoint(with: Set(tpl.variables())) {
-                previewLabel.stringValue = "⚠︎ Anonymous profile cannot include a student name."
-                previewLabel.textColor = NiteSubmitUI.error
-                explanationLabel.stringValue = "Why: anonymous submissions must not contain personal names.\(identityNote)\(documentNote)"
+        let values = c.currentValues()
+        let base = c.originalBaseName ?? "assignment"
+        let outcome = TemplateEngine.gate(template: tpl, values: values, metadata: c.metadata,
+                                          identityReason: c.documentIdentityCheck.blockingReason,
+                                          originalName: base)
+        if case .blocked(let missing, let ambiguous, let identityReason, let problems) = outcome {
+            if let p = problems.first {
+                previewLabel.stringValue = "⚠︎ \(p)"
+                previewLabel.textColor = NiteSubmitUI.warning
+                explanationLabel.stringValue = "Why: fix the naming rule before reviewing the document.\(identityNote)\(documentNote)"
                 lastRenderedBaseName = nil
                 copyNameButton.isEnabled = false
                 return
             }
-        }
-        if let identityReason = c.documentIdentityCheck.blockingReason {
-            previewLabel.stringValue = "⚠︎ \(identityReason)"
-            previewLabel.textColor = NiteSubmitUI.error
-            explanationLabel.stringValue = "Why: resolve the document identity policy before approving.\(documentNote)"
-            lastRenderedBaseName = nil
-            copyNameButton.isEnabled = false
-            return
-        }
-        let values = c.currentValues()
-        if let m = TemplateEngine.missingRequiredFields(tpl, values: values).first {
-            previewLabel.stringValue = "⚠︎ \(m)"
-            previewLabel.textColor = NiteSubmitUI.warning
-            explanationLabel.stringValue = "Why: the selected naming rule is missing a required field.\(identityNote)\(documentNote)"
-            lastRenderedBaseName = nil
-            copyNameButton.isEnabled = false
-            return
-        }
-        let base = c.originalBaseName ?? "assignment"
-        if let rendered = TemplateEngine.render(template: tpl, values: values, originalName: base) {
-            previewLabel.stringValue = rendered + ".pdf"
-            previewLabel.textColor = NiteSubmitUI.foreground
-            lastRenderedBaseName = rendered
-            copyNameButton.isEnabled = true
-            stepperView.activeStep = .recommendation
-            let needsReview = MetadataField.allCases.contains {
-                let detection = c.metadata.detection(for: $0)
-                return !detection.isMissing && detection.confidence < .high
+            if c.settings.universityPresetId == "anonymous_candidate" {
+                let nameFields = Set(["first_name", "last_name", "full_name"])
+                if !nameFields.isDisjoint(with: Set(tpl.variables())) {
+                    previewLabel.stringValue = "⚠︎ Anonymous profile cannot include a student name."
+                    previewLabel.textColor = NiteSubmitUI.error
+                    explanationLabel.stringValue = "Why: anonymous submissions must not contain personal names.\(identityNote)\(documentNote)"
+                    lastRenderedBaseName = nil
+                    copyNameButton.isEnabled = false
+                    return
+                }
             }
-            explanationLabel.stringValue = needsReview
-                ? "Review the highlighted details, then approve this filename." + identityNote + documentNote
-                : "Required details are present. Approve when the filename looks right." + identityNote + documentNote
-        } else {
+            if let identityReason = identityReason {
+                previewLabel.stringValue = "⚠︎ \(identityReason)"
+                previewLabel.textColor = NiteSubmitUI.error
+                explanationLabel.stringValue = "Why: resolve the document identity policy before approving.\(documentNote)"
+                lastRenderedBaseName = nil
+                copyNameButton.isEnabled = false
+                return
+            }
+            if let m = missing.first {
+                previewLabel.stringValue = "⚠︎ \(m)"
+                previewLabel.textColor = NiteSubmitUI.warning
+                explanationLabel.stringValue = "Why: the selected naming rule is missing a required field.\(identityNote)\(documentNote)"
+                lastRenderedBaseName = nil
+                copyNameButton.isEnabled = false
+                return
+            }
+            if let a = ambiguous.first {
+                previewLabel.stringValue = "⚠︎ Multiple possible \(a.lowercased()) values detected."
+                previewLabel.textColor = NiteSubmitUI.warning
+                explanationLabel.stringValue = "Why: choose the correct detected value before approving.\(identityNote)\(documentNote)"
+                lastRenderedBaseName = nil
+                copyNameButton.isEnabled = false
+                return
+            }
             previewLabel.stringValue = "—"
             explanationLabel.stringValue = "Why: a safe filename could not be built from the current fields.\(identityNote)\(documentNote)"
             lastRenderedBaseName = nil
             copyNameButton.isEnabled = false
+            return
         }
+        guard case .ready(let rendered) = outcome else { return }
+        previewLabel.stringValue = rendered + ".pdf"
+        previewLabel.textColor = NiteSubmitUI.foreground
+        lastRenderedBaseName = rendered
+        copyNameButton.isEnabled = true
+        stepperView.activeStep = .recommendation
+        let needsReview = MetadataField.allCases.contains {
+            let detection = c.metadata.detection(for: $0)
+            return !detection.isMissing && detection.confidence < .high
+        }
+        explanationLabel.stringValue = needsReview
+            ? "Review the highlighted details, then approve this filename." + identityNote + documentNote
+            : "Required details are present. Approve when the filename looks right." + identityNote + documentNote
     }
 
     /// Copies the currently previewed filename to the clipboard. This never creates, renames, or

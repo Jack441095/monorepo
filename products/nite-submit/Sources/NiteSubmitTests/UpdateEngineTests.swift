@@ -10,15 +10,33 @@ private func makeTestKeyPair() throws -> (privateKey: Curve25519.Signing.Private
     return (key, key.publicKey.rawRepresentation.base64EncodedString())
 }
 
+private func rfc2822(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(identifier: "GMT")
+    formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+    return formatter.string(from: date)
+}
+
+/// An hour in the past: old enough to clear the one-day future-date gate with
+/// room to spare, recent enough that no test run can drift past it.
+private func ordinaryPubDate() -> String {
+    rfc2822(Date().addingTimeInterval(-3_600)) // seconds per hour
+}
+
 private func feed(signing key: Curve25519.Signing.PrivateKey,
                   version: String,
                   url: String,
                   signature: Bool = true,
-                  overrideSignature: String? = nil) -> Data {
+                  overrideSignature: String? = nil,
+                  pubDate: String? = ordinaryPubDate()) -> Data {
     let parsed = URL(string: url)!
     let payload = UpdateEngine.signaturePayload(versionString: version, downloadURL: parsed)
     let sig = overrideSignature ?? (try? key.signature(for: payload).base64EncodedString()) ?? ""
     let signatureAttribute = signature ? "sparkle:edSignature=\"\(sig)\"" : ""
+    // nil pubDate omits the element entirely (the missing-date case); a
+    // non-nil string lands verbatim, so tests can feed garbage in.
+    let pubDateElement = pubDate.map { "<pubDate>\($0)</pubDate>" } ?? ""
     return """
     <?xml version="1.0" encoding="utf-8"?>
     <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
@@ -27,6 +45,7 @@ private func feed(signing key: Curve25519.Signing.PrivateKey,
             <item>
                 <title>NITE Submit \(version)</title>
                 <description>Bug fixes and performance improvements.</description>
+                \(pubDateElement)
                 <enclosure url="\(url)" sparkle:version="\(version)" length="1153434" \(signatureAttribute) />
             </item>
         </channel>
@@ -70,6 +89,7 @@ public func runUpdateEngineTests() {
                   "Extracted download URL")
             check(first.length == 1153434, "Extracted enclosure length")
             check(first.edSignature?.isEmpty == false, "Extracted Ed25519 signature")
+            check(first.pubDate != nil, "Extracted and parsed pubDate")
         }
 
         switch engine.checkStatus(feedData: signedFeed, currentVersionString: "1.0.0") {
@@ -131,6 +151,68 @@ public func runUpdateEngineTests() {
             check(true, "requireSignature=false is the only way an unsigned feed is offered")
         } else {
             check(false, "requireSignature=false is the only way an unsigned feed is offered")
+        }
+
+        // A signed entry whose pubDate sits more than a day out cannot be
+        // trusted as "released now": the signature proves ownership, not
+        // freshness. LicenseEngine already refuses such timestamps; the
+        // updater must refuse them too or a forged "tomorrow's" release wins
+        // the version race early.
+        let futureFeed = feed(signing: keys.privateKey, version: "1.0.1",
+                              url: "https://releases.nitedsp.co.uk/submit/Submit-1.0.1-macOS.zip",
+                              pubDate: rfc2822(Date().addingTimeInterval(2 * 86_400))) // 2 days out
+        if case .updateAvailable = engine.checkStatus(feedData: futureFeed, currentVersionString: "1.0.0") {
+            check(false, "a future-dated entry is refused")
+        } else {
+            check(true, "a future-dated entry is refused")
+        }
+
+        // Present-but-garbled pubDate is as good as no date: parsing must
+        // fail closed rather than offer an update we cannot date.
+        let invalidDateFeed = feed(signing: keys.privateKey, version: "1.0.1",
+                                   url: "https://releases.nitedsp.co.uk/submit/Submit-1.0.1-macOS.zip",
+                                   pubDate: "next Thursday, probably")
+        if case .updateAvailable = engine.checkStatus(feedData: invalidDateFeed, currentVersionString: "1.0.0") {
+            check(false, "an unreadable pubDate is refused")
+        } else {
+            check(true, "an unreadable pubDate is refused")
+        }
+
+        // A missing pubDate element is the third shape of the same failure:
+        // no honest release ships without a date, and a stripped one may be
+        // an attempt to dodge the future-date check.
+        let missingDateFeed = feed(signing: keys.privateKey, version: "1.0.1",
+                                   url: "https://releases.nitedsp.co.uk/submit/Submit-1.0.1-macOS.zip",
+                                   pubDate: nil)
+        if case .updateAvailable = engine.checkStatus(feedData: missingDateFeed, currentVersionString: "1.0.0") {
+            check(false, "a missing pubDate is refused when a signature is expected")
+        } else {
+            check(true, "a missing pubDate is refused when a signature is expected")
+        }
+
+        // Correctly signed but old: age alone must never trigger an upgrade
+        // prompt. The entry below has a real signature over version 1.0.0
+        // and a date in 2024, yet the installed 1.2.0 is newer, so the only
+        // honest answer is "up to date".
+        let oldValidFeed = feed(signing: keys.privateKey, version: "1.0.0",
+                                url: "https://releases.nitedsp.co.uk/submit/Submit-1.0.0-macOS.zip",
+                                pubDate: "Wed, 20 Mar 2024 12:00:00 +0000")
+        switch engine.checkStatus(feedData: oldValidFeed, currentVersionString: "1.2.0") {
+        case .upToDate:
+            check(true, "an old, validly signed entry does not auto-win over a newer installed version")
+        default:
+            check(false, "an old, validly signed entry does not auto-win over a newer installed version")
+        }
+
+        // ...while the same old entry remains an eligible upgrade when its
+        // version still beats what is installed: pubDate gates freshness and
+        // signature gates authenticity, but version is still the only
+        // candidacy test.
+        switch engine.checkStatus(feedData: oldValidFeed, currentVersionString: "0.9.0") {
+        case .updateAvailable:
+            check(true, "an old, validly signed entry upgrades only when it wins the version comparison")
+        default:
+            check(false, "an old, validly signed entry upgrades only when it wins the version comparison")
         }
 
         // The feed we actually publish lives in web/appcast.xml. It shipped

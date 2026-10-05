@@ -55,7 +55,13 @@ func runBatch(inputPath: String, outputPath: String, template: String,
               collisionPolicy: CollisionPolicy = .appendCounter,
               approvedSources: Set<String> = [],
               identityPolicy: DocumentIdentityPolicy = .noRule) -> Bool {
-    if let problem = TemplateEngine.validate(template).first {
+    // Per-file checks re-run gate() on the same template, so this only
+    // needs to catch validate() problems (unknown/invalid variables)
+    // instead of re-deriving the whole sequence here.
+    if case .blocked(_, _, _, let preflightProblems) =
+        TemplateEngine.gate(template: template, values: [:], metadata: SubmissionMetadata(),
+                            identityReason: nil, originalName: ""),
+       let problem = preflightProblems.first {
         FileHandle.standardError.write(Data("Batch blocked: \(problem)\n".utf8))
         return false
     }
@@ -180,22 +186,6 @@ func runBatch(inputPath: String, outputPath: String, template: String,
             detectedConfidence = confidence
             let values = meta.variableMap()
             let variables = Set(template.variables())
-            var gaps: [String] = []
-            let requiredVariables = [
-                "first_name", "last_name", "full_name", "student_id", "candidate_number",
-                "assignment_code", "group_id", "university", "module_code", "module_title",
-                "project_title", "assignment_title"
-            ]
-            for variable in requiredVariables
-            where variables.contains(variable) && (values[variable]?.isEmpty ?? true) {
-                let field: String
-                switch variable {
-                case "first_name", "last_name", "full_name": field = "student_name"
-                case "assignment_title": field = "project_title"
-                default: field = variable
-                }
-                if !gaps.contains(field) { gaps.append(field) }
-            }
 
             if let identityReason = identityCheck.blockingReason {
                 results.append(BatchResult(source: sourceLabel, status: "review_required",
@@ -205,56 +195,56 @@ func runBatch(inputPath: String, outputPath: String, template: String,
                 continue
             }
 
-            guard gaps.isEmpty,
-                  let base = TemplateEngine.render(template: template,
-                                                    values: values,
-                                                    originalName: source.deletingPathExtension().lastPathComponent)
-            else {
+            switch TemplateEngine.gate(template: template, values: values, metadata: meta,
+                                       identityReason: nil,
+                                       originalName: source.deletingPathExtension().lastPathComponent) {
+            case .blocked(let missingFields, let ambiguousFields, _, let problems):
+                let gaps = problems + missingFields + ambiguousFields
                 results.append(BatchResult(source: sourceLabel, status: "review_required",
                                             output: nil, fields: fields,
                                             confidence: confidence, gaps: gaps))
                 continue
-            }
-
-            let guidanceReview = classification.kind == .guidanceTemplate
-            // Every variable the naming rule reads has to clear the HIGH bar. The old gate
-            // checked name, id, candidate, code, group and project title, which left
-            // {module_code}, {module_title} and {university} free to be written from a value
-            // the detector had only guessed at.
-            let uncertain = guidanceReview
-                || !meta.lowConfidenceVariables(in: variables).isEmpty
-            let explicitlyApproved = approvedSources.contains(sourceLabel)
-            if dryRun {
-                results.append(BatchResult(source: sourceLabel,
-                                            status: "dry_run",
-                                            output: base + ".pdf", fields: fields,
-                                            confidence: confidence,
-                                            gaps: explicitlyApproved ? ["explicit_approval"] :
-                                                (guidanceReview ? ["guidance_template_review"] :
-                                                 (uncertain ? ["medium_or_low_confidence_review"] : []))))
-            } else if uncertain && !explicitlyApproved {
-                // Batch mode follows the same approval boundary as the app:
-                // show a usable preview, but never write an inferred filename
-                // until a person has reviewed the medium/low-confidence fields.
-                // Guidance/templates are always review-held as well: a
-                // complete-looking example cover is not evidence that the
-                // input is a student's submission.
-                results.append(BatchResult(source: sourceLabel,
-                                            status: "review_required",
-                                            output: nil, fields: fields,
-                                            confidence: confidence,
-                                            gaps: [guidanceReview ? "guidance_template_review" :
-                                                   "medium_or_low_confidence_review"]))
-            } else {
-                let receipt = try operator_.createRenamedCopy(source: source,
-                                                              directory: output,
-                                                              newBaseName: base,
-                                                              policy: collisionPolicy)
-                results.append(BatchResult(source: sourceLabel,
-                                            status: "processed",
-                                            output: receipt.newFilename, fields: fields,
-                                            confidence: confidence,
-                                            gaps: explicitlyApproved && uncertain ? ["explicit_approval"] : []))
+            case .ready(let base):
+                let guidanceReview = classification.kind == .guidanceTemplate
+                // Every variable the naming rule reads has to clear the HIGH bar. The old gate
+                // checked name, id, candidate, code, group and project title, which left
+                // {module_code}, {module_title} and {university} free to be written from a value
+                // the detector had only guessed at.
+                let uncertain = guidanceReview
+                    || !meta.lowConfidenceVariables(in: variables).isEmpty
+                let explicitlyApproved = approvedSources.contains(sourceLabel)
+                if dryRun {
+                    results.append(BatchResult(source: sourceLabel,
+                                                status: "dry_run",
+                                                output: base + ".pdf", fields: fields,
+                                                confidence: confidence,
+                                                gaps: explicitlyApproved ? ["explicit_approval"] :
+                                                    (guidanceReview ? ["guidance_template_review"] :
+                                                     (uncertain ? ["medium_or_low_confidence_review"] : []))))
+                } else if uncertain && !explicitlyApproved {
+                    // Batch mode follows the same approval boundary as the app:
+                    // show a usable preview, but never write an inferred filename
+                    // until a person has reviewed the medium/low-confidence fields.
+                    // Guidance/templates are always review-held as well: a
+                    // complete-looking example cover is not evidence that the
+                    // input is a student's submission.
+                    results.append(BatchResult(source: sourceLabel,
+                                                status: "review_required",
+                                                output: nil, fields: fields,
+                                                confidence: confidence,
+                                                gaps: [guidanceReview ? "guidance_template_review" :
+                                                       "medium_or_low_confidence_review"]))
+                } else {
+                    let receipt = try operator_.createRenamedCopy(source: source,
+                                                                  directory: output,
+                                                                  newBaseName: base,
+                                                                  policy: collisionPolicy)
+                    results.append(BatchResult(source: sourceLabel,
+                                                status: "processed",
+                                                output: receipt.newFilename, fields: fields,
+                                                confidence: confidence,
+                                                gaps: explicitlyApproved && uncertain ? ["explicit_approval"] : []))
+                }
             }
         } catch FileOperationError.collision(let name) {
             // Detection already ran by the time a name can collide, so the report keeps the

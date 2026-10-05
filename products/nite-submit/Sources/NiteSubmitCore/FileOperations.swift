@@ -42,6 +42,73 @@ public struct PlanExecutionReceipt: Codable, Sendable {
     }
 }
 
+/// Append-only audit trail for every file operation, one JSON object per line.
+/// It lives under the user's Application Support folder so the app, the CLI and
+/// batch runs all write to the same file. Unlike settings JSON there is no
+/// rewrite-in-place: appending one line is atomic enough for an audit trail and
+/// a crash mid-plan can at worst cost the last partial line, never the history.
+public enum ReceiptStore {
+    /// The JSONL file for `date` (default today), named by ISO calendar day.
+    /// Day-granular files keep a single file small enough to grep while giving
+    /// each day a stable, sortable name.
+    public static func receiptFileURL(for date: Date = Date()) -> URL {
+        let formatter = DateFormatter()
+        // POSIX locale and Gregorian calendar: on a 12-hour or ISO-week locale
+        // the filename would otherwise drift from the day the receipt records.
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.dateFormat = "yyyy-MM-dd"
+        return rootsDirectory().appendingPathComponent(formatter.string(from: date) + ".jsonl")
+    }
+
+    private static func rootsDirectory() -> URL {
+        // Application Support is the standard macOS home for per-user app data;
+        // if the lookup somehow fails we fall back to the temp directory rather
+        // than crashing, because losing the receipt beats losing the operation.
+        let support = FileManager.default.urls(for: .applicationSupportDirectory,
+                                               in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
+        return support.appendingPathComponent("NiteSubmit")
+            .appendingPathComponent("receipts")
+    }
+
+    /// Encode the same way OrganizeCommand prints receipts (ISO-8601 dates),
+    /// so the JSONL line and the CLI's own output share one representation.
+    private static func encode(_ receipt: OperationReceipt) -> Data? {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return try? encoder.encode(receipt)
+    }
+
+    /// Append one line to today's file, creating the folder chain on first use.
+    /// No rotation: history is the point, and macOS apps do not prune this on
+    /// the user's behalf. A failed write is swallowed deliberately — by the
+    /// time this is called the file operation has already happened, and
+    /// throwing here would report the successful op as failed.
+    public static func append(_ receipt: OperationReceipt) {
+        guard let data = encode(receipt) else { return }
+        var line = data
+        line.append(0x0A) // newline — JSONL separates records with '\n'
+        let url = receiptFileURL(for: receipt.timestamp)
+        do {
+            try FileManager.default.createDirectory(
+                at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            if FileManager.default.fileExists(atPath: url.path) {
+                let handle = try FileHandle(forWritingTo: url)
+                defer { try? handle.close() }
+                try handle.seekToEnd()
+                try handle.write(contentsOf: line)
+            } else {
+                try line.write(to: url)
+            }
+        } catch {
+            // Degraded path: the operation itself succeeded, only the audit
+            // line is missing. Safe to skip — it cannot corrupt the submission
+            // the user is now looking at.
+        }
+    }
+}
+
 public enum FileOperationError: Error, LocalizedError {
     case sourceMissing
     case destinationMissing
@@ -239,11 +306,13 @@ public struct FileOperator: Sendable {
                                                  directory: directory, newBaseName: newBaseName,
                                                  ext: fileExt, policy: policy)
 
-        return OperationReceipt(
+        let receipt = OperationReceipt(
             originalPath: source.path, originalFilename: source.lastPathComponent,
             newFilename: dest.lastPathComponent, mode: .createCopy,
             timestamp: Date(), success: true,
             message: "Created renamed copy.", undoPath: nil)
+        ReceiptStore.append(receipt)
+        return receipt
     }
 
     /// The name `resolveDestination` picks is a guess: it is free at the moment we
@@ -289,12 +358,14 @@ public struct FileOperator: Sendable {
             throw error
         }
 
-        return OperationReceipt(
+        let receipt = OperationReceipt(
             originalPath: source.path, originalFilename: source.lastPathComponent,
             newFilename: dest.lastPathComponent, mode: .renameOriginal,
             timestamp: Date(), success: true,
             message: "Renamed original file.",
             undoPath: dest.path)
+        ReceiptStore.append(receipt)
+        return receipt
     }
 
     @discardableResult
@@ -324,12 +395,14 @@ public struct FileOperator: Sendable {
         if policy == .replace {
             message += " Previous file replaced with force; earlier copy was removed only after the hash check."
         }
-        return OperationReceipt(
+        let receipt = OperationReceipt(
             originalPath: source.path, originalFilename: source.lastPathComponent,
             newFilename: dest.lastPathComponent, mode: .renameOriginal,
             timestamp: Date(), success: true,
             message: message,
             undoPath: dest.path)
+        ReceiptStore.append(receipt)
+        return receipt
     }
 
     /// Undo a successful rename-original by moving it back.
@@ -368,9 +441,13 @@ public struct FileOperator: Sendable {
                     message: "[DRY-RUN] Would \(action.actionType.rawValue) to \(action.destinationURL.path)",
                     undoPath: nil
                 ))
-                successCount += 1
+                    successCount += 1
                 continue
             }
+
+            // Dry-run receipts are deliberately not persisted: they describe no
+            // on-disk operation, and an audit trail full of moves that never
+            // happened would be worse than a shorter one.
 
             let destDir = action.destinationURL.deletingLastPathComponent()
             if !fm.fileExists(atPath: destDir.path) {
@@ -383,7 +460,7 @@ public struct FileOperator: Sendable {
             // twice in this batch. Without explicit force we refuse the action
             // and leave the existing file untouched.
             if action.hasCollision && !forceOverwrite {
-                receipts.append(OperationReceipt(
+                let blocked = OperationReceipt(
                     originalPath: action.sourceURL.path,
                     originalFilename: action.sourceURL.lastPathComponent,
                     newFilename: action.destinationURL.lastPathComponent,
@@ -392,8 +469,12 @@ public struct FileOperator: Sendable {
                     success: false,
                     message: "Blocked: “\(action.destinationURL.lastPathComponent)” already exists. Re-run with force to overwrite.",
                     undoPath: nil
-                ))
+                )
+                receipts.append(blocked)
                 failCount += 1
+                // The inner ops persist only successes, so a blocked action has
+                // to log its own refusal line here.
+                ReceiptStore.append(blocked)
                 continue
             }
             let policy: CollisionPolicy = forceOverwrite ? .replace : .error
@@ -434,7 +515,7 @@ public struct FileOperator: Sendable {
                 }
                 successCount += 1
             } catch {
-                receipts.append(OperationReceipt(
+                let failed = OperationReceipt(
                     originalPath: action.sourceURL.path,
                     originalFilename: action.sourceURL.lastPathComponent,
                     newFilename: action.destinationURL.lastPathComponent,
@@ -443,8 +524,12 @@ public struct FileOperator: Sendable {
                     success: false,
                     message: "Failed: \(error.localizedDescription)",
                     undoPath: nil
-                ))
+                )
+                receipts.append(failed)
                 failCount += 1
+                // The inner op threw before constructing its receipt, so it
+                // persisted nothing — this failure line is the only record.
+                ReceiptStore.append(failed)
             }
         }
 

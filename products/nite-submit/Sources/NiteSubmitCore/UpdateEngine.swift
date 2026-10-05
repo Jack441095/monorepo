@@ -93,6 +93,19 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
     private let trustedPublicKeyBase64: String
     private let requireSignature: Bool
 
+    // A pubDate more than a day ahead is not a release pushed forward by a
+    // slow clock, it is a hand-forged timestamp, and the Ed25519 check cannot
+    // tell the difference because anyone holding the release key can sign any
+    // date. Same whole-day slack as LicenseEngine.maxClockSkew: a machine
+    // whose clock is minutes out must not fail.
+    private static let maxClockSkew: TimeInterval = 86_400 // seconds per day
+
+    // RSS dates are RFC 2822, e.g. "Thu, 18 Sep 2026 12:00:00 +0000". The
+    // English day/month abbreviations are part of the wire format, so the
+    // formatter must use the POSIX locale even on a device set to French
+    // month names, or the feed we publish would fail to parse on that device.
+    private static let rfc2822DateFormats = ["EEE, dd MMM yyyy HH:mm:ss Z", "EEE, d MMM yyyy HH:mm:ss Z"]
+
     // XML Parser State
     private var currentElement = ""
     private var currentTitle = ""
@@ -102,6 +115,7 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
     private var currentLength: Int64?
     private var currentEdSignature: String?
     private var currentPubDate: Date?
+    private var currentPubDateRaw = ""
     private var parsedItems: [AppcastItem] = []
 
     public init(trustedPublicKeyBase64: String = UpdateEngine.updatePublicKeyBase64, requireSignature: Bool = true) {
@@ -116,6 +130,24 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
     /// invalidating the signature.
     public static func signaturePayload(versionString: String, downloadURL: URL) -> Data {
         Data((versionString + "\n" + downloadURL.absoluteString).utf8)
+    }
+
+    /// Parses the RFC 2822 timestamp RSS places on every item. A date we
+    /// cannot parse stays nil rather than guessing: inventing a date would
+    /// make an unsigned, missing, or future-dated entry look ordinary, and
+    /// checkStatus is supposed to refuse exactly those.
+    private static func parsePubDate(_ raw: String) -> Date? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        for format in rfc2822DateFormats {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.timeZone = TimeZone(identifier: "GMT")
+            formatter.dateFormat = format
+            if let date = formatter.date(from: trimmed) { return date }
+        }
+        // No format matched: leave pubDate nil so the gate refuses the entry.
+        return nil
     }
 
     /// Only https URLs on our own hosts may be opened or offered as updates.
@@ -158,7 +190,11 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
     /// Checks if a newer version is available compared to currentVersion.
     /// An update is offered only when the newest feed entry carries a valid
     /// Ed25519 signature over its exact version and URL; anything unsigned,
-    /// tampered, or off-host returns .failed instead of prompting.
+    /// tampered, or off-host returns .failed instead of prompting. When a
+    /// signature is expected, the entry must also carry a readable pubDate
+    /// that is not more than maxClockSkew in the future, and candidacy stays
+    /// version-based: an old, correctly signed entry is only an upgrade when
+    /// its version still beats the installed one.
     public func checkStatus(feedData: Data, currentVersionString: String) -> UpdateCheckResult {
         guard let currentVer = SemanticVersion(currentVersionString) else {
             return .failed(reason: "Invalid current version string format: \(currentVersionString)")
@@ -177,6 +213,21 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
         }
         guard isTrustedEnclosure(latestItem) else {
             return .failed(reason: "Update signature missing or invalid for version \(latestItem.versionString)")
+        }
+        // The signature proves the entry was made by the release owner, but it
+        // says nothing about WHEN: anyone holding the release key can sign a
+        // pubDate hours ahead of publication. When a signature is expected we
+        // therefore also refuse an entry whose date is missing, unreadable,
+        // or beyond the clock-skew allowance. requireSignature == false means
+        // the caller has explicitly accepted unsigned updates (development),
+        // so the date gate stays off there too.
+        if requireSignature {
+            guard let pubDate = latestItem.pubDate else {
+                return .failed(reason: "Update entry \(latestItem.versionString) has a missing or unreadable pubDate")
+            }
+            guard pubDate <= Date().addingTimeInterval(UpdateEngine.maxClockSkew) else {
+                return .failed(reason: "Update entry \(latestItem.versionString) is dated more than one day in the future")
+            }
         }
 
         if currentVer < latestVer {
@@ -198,6 +249,7 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
             currentLength = nil
             currentEdSignature = nil
             currentPubDate = nil
+            currentPubDateRaw = ""
         } else if elementName == "enclosure" {
             if let urlStr = attributeDict["url"], let url = URL(string: urlStr) {
                 currentDownloadURL = url
@@ -228,6 +280,10 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
             let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { return }
             currentVersionString += trimmed
+        case "pubDate":
+            // Accumulate rather than overwrite: the parser can deliver one
+            // text node as several chunks, same as title.
+            currentPubDateRaw += string
         default:
             break
         }
@@ -247,6 +303,11 @@ public final class UpdateEngine: NSObject, XMLParserDelegate, @unchecked Sendabl
                 )
                 parsedItems.append(item)
             }
+        } else if elementName == "pubDate" {
+            // Parsed here, not on the item boundary, so the AppcastItem the
+            // parser yields already carries a Date we could read — or nil,
+            // which is the fail-closed signal checkStatus relies on.
+            currentPubDate = UpdateEngine.parsePubDate(currentPubDateRaw)
         }
         currentElement = ""
     }

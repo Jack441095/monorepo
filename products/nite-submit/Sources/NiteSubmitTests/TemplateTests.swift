@@ -187,6 +187,54 @@ func runTemplateTests() {
               "selected candidate is treated as an explicit manual choice")
     }
 
+    suite("TemplateGate drift table") {
+        // Guards against gate() drifting from the primitives it wraps:
+        // every row must reach the same verdict as validate()/missingRequiredFields()/
+        // ambiguousRequiredFields()/identityReason combined, and a ready verdict must
+        // carry exactly what render() would produce.
+        let ambiguousMeta = SubmissionMetadata(
+            studentName: Detection(value: "Majid Abdul", confidence: .medium,
+                                   rule: "title_page_student_name",
+                                   candidates: ["Islam MD.Ashikul"]))
+        let rows: [(template: String, values: [String: String], metadata: SubmissionMetadata,
+                    identityReason: String?, expectReady: Bool)] = [
+            ("{student_id}_{project_title}", templateValues, SubmissionMetadata(), nil, true),
+            ("{student_id", templateValues, SubmissionMetadata(), nil, false),
+            ("{student_id}_{project_title}", ["student_id": "1"], SubmissionMetadata(), nil, false),
+            ("{first_name}_{project_title}", templateValues, ambiguousMeta, nil, false),
+            ("{student_id}_{project_title}", templateValues, SubmissionMetadata(),
+             "Name required by the department but absent from the document.", false),
+            ("{project_title}", ["project_title": ""], SubmissionMetadata(), nil, false),
+        ]
+        for row in rows {
+            let outcome = TemplateEngine.gate(template: row.template, values: row.values,
+                                              metadata: row.metadata,
+                                              identityReason: row.identityReason,
+                                              originalName: "x")
+            let primitivesBlock = !TemplateEngine.validate(row.template).isEmpty
+                || row.identityReason != nil
+                || !TemplateEngine.ambiguousRequiredFields(row.template, metadata: row.metadata).isEmpty
+                || !TemplateEngine.missingRequiredFields(row.template, values: row.values).isEmpty
+            switch outcome {
+            case .ready(let renderedName):
+                check(row.expectReady && !primitivesBlock,
+                      "gate ready for '\(row.template)' matches the primitive verdict")
+                eq(renderedName,
+                   TemplateEngine.render(template: row.template, values: row.values, originalName: "x") ?? "",
+                   "gate ready name equals render() for '\(row.template)'")
+            case .blocked(let missingFields, let ambiguousFields, let identityReason, let problems):
+                check(!row.expectReady && primitivesBlock,
+                      "gate blocked for '\(row.template)' matches the primitive verdict")
+                eq(problems, TemplateEngine.validate(row.template), "gate problems mirror validate()")
+                eq(missingFields, TemplateEngine.missingRequiredFields(row.template, values: row.values),
+                   "gate missingFields mirror missingRequiredFields()")
+                eq(ambiguousFields, TemplateEngine.ambiguousRequiredFields(row.template, metadata: row.metadata),
+                   "gate ambiguousFields mirror ambiguousRequiredFields()")
+                eq(identityReason, row.identityReason, "gate identityReason passes through")
+            }
+        }
+    }
+
     suite("Localization") {
         eq(NiteLocalization().label(.studentName),
            "Student name", "student field is explicit in the UI vocabulary")

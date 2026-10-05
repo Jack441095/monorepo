@@ -186,6 +186,43 @@ func runFileOperationTests() {
             eq(r.newFilename ?? "", name + ".pdf", "unicode long name round trip")
         }
 
+        // The audit trail is the whole point: one JSONL line per operation,
+        // each line decodable back into an OperationReceipt, and no orphans
+        // when a line would fail to encode.
+        scenario("each copy and rename appends exactly one JSONL receipt line") {
+            let store = ReceiptStore.receiptFileURL()
+            // Other scenarios in this run may already have appended lines, so
+            // count the delta rather than the whole file.
+            let before = (try? String(contentsOf: store, encoding: .utf8)) ?? ""
+            defer { try? FileManager.default.removeItem(at: store) }
+
+            let copySrc = try makePDF("audit_copy_src.pdf")
+            _ = try op.createRenamedCopy(source: copySrc, directory: tmp,
+                                         newBaseName: "audit_copy_out", policy: .error)
+            let renameSrc = try makePDF("audit_rename_src.pdf")
+            _ = try op.renameOriginal(source: renameSrc, newBaseName: "audit_rename_out",
+                                      policy: .error)
+
+            let after = (try? String(contentsOf: store, encoding: .utf8)) ?? ""
+            check(after.hasPrefix(before), "the receipt log is append-only")
+            let added = after.dropFirst(before.count)
+            let lines = added.split(separator: "\n")
+            eq(lines.count, 2, "one copy plus one rename append exactly two lines")
+
+            let decoder = JSONDecoder()
+            // Same strategy ReceiptStore encodes with — a JSONL line must
+            // round-trip through the existing Codable conformance.
+            decoder.dateDecodingStrategy = .iso8601
+            let first = try decoder.decode(OperationReceipt.self,
+                                           from: Data(lines[0].utf8))
+            eq(first.mode, .createCopy, "first line records the copy")
+            check(first.success, "copy receipt records success")
+            let second = try decoder.decode(OperationReceipt.self,
+                                            from: Data(lines[1].utf8))
+            eq(second.mode, .renameOriginal, "second line records the rename")
+            check(second.success, "rename receipt records success")
+        }
+
         scenario("settings round trip") {
             let s = AppSettings(template: "{student_id}", presetId: "module_id",
                                 renameMode: .renameOriginal, caseStyle: .snakeCase,
