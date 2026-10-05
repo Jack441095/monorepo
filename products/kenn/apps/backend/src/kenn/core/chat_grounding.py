@@ -222,6 +222,19 @@ def _measurements(text: str) -> set[str]:
     }
 
 
+def measurements_in_order(text: str) -> list[str]:
+    """The same measurements as _measurements(), spelled as the text spells them, first sighting first.
+
+    This is the list the model is shown as the figures it may use, so it has to come from the gate's own
+    regexes: a figure we list and the gate then rejects would be worse than no list at all. A range shows
+    as its two ends because that is how the gate reads it, and "200-400 Hz" in the answer still passes.
+    """
+    seen: dict[str, str] = {}
+    for m in _MEASUREMENT_RE.findall(_RANGE_RE.sub(r"\1\3 \2\3", text)):
+        seen.setdefault("".join(m.lower().split()), " ".join(m.split()))
+    return list(seen.values())
+
+
 # How far after a number a citation still belongs to it. About one clause: "150 ms [#abc123] with a 4:1 ratio"
 # is a citation on the 150 ms, while "150 ms is roughly right, set your crossover, and go and read the reverb
 # note [#abc123]" is not. Bounded by the next measurement as well, so a citation cannot hop over a number to

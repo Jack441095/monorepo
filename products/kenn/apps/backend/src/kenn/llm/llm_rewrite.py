@@ -1821,6 +1821,28 @@ def _build_synthesis_messages(
             f"{template_answer[:draft_chars]}"
         )
 
+    # The figures the gate will accept, spelled out. "Use only numbers printed in an excerpt" in the system prompt
+    # was not enough. On the 5 Oct 8B baseline (index v-5f6964698b76) unsupported measurements were the biggest
+    # single reason a model answer was thrown away: 8 of 15 rejections on the probe and 14 of 32 on the holdout,
+    # usually a textbook value like "3 dB" or "2 kHz" the excerpts never gave. The list is built from the same
+    # text the gate checks, so nothing on it can be rejected. Only unit-bearing values are listed because those
+    # are all the gate checks; a 4:1 ratio or "step 3" is left alone. Imported here because chat_grounding
+    # imports this module at load time.
+    from kenn.core.chat_grounding import _gate_evidence_text, measurements_in_order
+
+    allowed = measurements_in_order(_gate_evidence_text(shown, timeline_context))
+    if allowed:
+        user_parts.append(
+            "Figures you may use (the excerpts contain these and no others): " + ", ".join(allowed) + ".\n"
+            "Any other frequency, level or time goes in words, for example 'a gentle cut' rather than a number."
+        )
+    else:
+        # Nothing to list is still worth saying: a question about routing or arrangement gets no figure
+        # from the notes, and that is exactly when the model reaches for one of its own.
+        user_parts.append(
+            "The excerpts give no figures. Describe every frequency, level and time in words, not numbers."
+        )
+
     if history_context:
         user_parts.append(f"Conversation context: {history_context}")
 
