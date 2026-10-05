@@ -595,6 +595,8 @@ Needs the route/context audit; fixes may land in small slices while that audit c
     tests. C1 stays open. [Evidence](docs/evidence/KENN_C1_STREAM_REPEAT_AND_GUARD_SPLIT_2026-10-02.md).
   - Stream run 3 with the guard fix (3 Oct): 25 of 29 accepted, 4 of 30 within 15 s, 18 of 30 within 20 s. Both false
     rejections are now accepted; the 15 s gate is still failed. C1 stays open. Same evidence note.
+  - [x] Every rejected background upgrade now carries the check that rejected it, and the probe counts them by cause
+    (`fcd2914f`, `2be6a7c6`, reviewed 5 Oct). Before this, 34 rejected rows in the 4 Oct runs said nothing about why.
 - [ ] **C2 — Remove measured wasted work.** Review serial model calls, critique of a
   deterministic fallback, repeated retrieval, prompt/output budgets and residency.
   Native Ollama thinking-off behavior and the general 384-token output cap already
@@ -1057,3 +1059,24 @@ the symptom opener on advice questions are in, tested on fake Live only; see
 4 Oct 2026: the 128-token output cap is on for all prose answer modes at Jack's request ([receipt](docs/evidence/KENN_OUTPUT_CAP_128_ENABLED_2026-10-04.md)). The 15 s gate has not been rerun with it and answers are often cut mid-sentence, so C1, C2 and C3 stay open until the Mac probe and a Live-open soak are rerun.
 
 4 Oct 2026, four Mac probes with the 128-token cap on (fake Live; three with Live open throughout, one with Live quit a minute in): the first three had 18 to 22 of 47 answered by the model, final time p50 28.2 to 32.2 s and 0 to 4 model answers inside 15 s; the fourth, after the model calls sped up to about 10 s at roughly 10:50, had 23 of 47 answered by the model, p50 10.1 s, and all 23 inside 15 s. A caffeinate on/off test showed the speed-up was not caffeinate, and we do not know what it was, but only 23 of 46 attempts were accepted (50%) against the 70% acceptance the gate asks for, so the 15 s gate is still failed and C1, C2 and C3 stay open until acceptance and speed both hold on repeat runs and a Live-open soak has run. Nearly every model answer is cut mid-sentence (21 of 23 in the last run), and unsupported measurements is the largest gate rejection (11 to 13 of about 40 attempts per run); see [the receipt](docs/evidence/KENN_PROBE_CAP128_2026-10-04.md).
+
+### 15 s gate path, 5 Oct 2026
+
+The order we're working the gate in. One change per branch, adversary review, one probe run, keep or revert. The gate
+only passes on three clean runs in a row at 31/44 or better; a single good run moves nothing.
+
+- [x] Rejection reasons on every rejected upgrade, merged after review (see C1).
+- [x] Chat tests that need the local index skip on a clean checkout, so kenn-app CI fails only on real faults
+  (`b7738223`, reviewed 5 Oct). Fresh-clone CI passed all nine steps.
+- [x] kenn-app synced to monorepo main `681dc674` (kenn-app `1c3ed858`, fast-forward, no force).
+- [ ] One probe run with reasons on merged main, index `v-5f6964698b76`, to `/tmp/kenn-reasons-run1.*`.
+- [ ] Check the 5 Oct code audit's findings against those reasons and the code; keep only what's confirmed.
+- [ ] Review follow-ups: a real-path test for the reason, count inline rejections too, match the chat-test skip on
+  the test name rather than a `tests/` path segment.
+- [ ] Stop a template counting as a model answer when the quality check swaps it in after generation.
+- [ ] Unsupported measurements: show the model which numbers the notes contain and have it describe others in words.
+- [ ] Answers that fit 128 tokens instead of being cut and rejected (`draft/answer-fits-128-tokens`).
+- [ ] Stop the background upgrade repeating the template's retrieval and scoring.
+- [ ] Lower prose temperature, measured on its own.
+- [ ] Reference-numbers note for the values the model keeps inventing (needs Jack and a box rebuild).
+- [ ] Three clean runs in a row at 31/44 or better.
