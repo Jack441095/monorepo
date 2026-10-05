@@ -1150,10 +1150,11 @@ def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) ->
     change after a prompt or model change. Never raises -- a logging failure must not cost the producer an answer,
     which is the same rule log_outcome() in answer_upgrades follows.
     """
-    warnings = [str(w) for w in (validation.get("warnings") or [])]
-    reason = warnings[0] if warnings else ("accepted" if accepted else "rejected")
-    _last_outcome.reason = reason
+    _last_outcome.reason = "accepted" if accepted else "rejected"
     try:
+        warnings = [str(w) for w in (validation.get("warnings") or [])]
+        reason = warnings[0] if warnings else _last_outcome.reason
+        _last_outcome.reason = reason
         from kenn.core import route_log
 
         route = f"generation:{'accepted' if accepted else reason}"
@@ -2757,6 +2758,8 @@ def _answer_payload_raw(
         "related_questions": followups,
         "used_history": use_history,
         "llm_enhanced": llm_used,
+        # With KENN_LLM_BACKGROUND=0 there is no upgrade to carry the reason, so the inline answer carries it.
+        "generation_outcome": "" if llm_used else last_generation_outcome(),
         "llm_available": llm_enabled(),
         "llm_usage": llm_used and _get_llm_usage_stats(),
         "session": None,

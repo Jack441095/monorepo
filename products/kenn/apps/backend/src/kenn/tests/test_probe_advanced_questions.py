@@ -174,3 +174,47 @@ def test_the_summary_counts_expected_abstentions_and_leaves_them_out_of_recall()
     assert summary["by_category"]["scope"]["expected_abstain_handled"] == "1 of 2"
     assert summary["overall"]["expected_abstain_handled"] == "1 of 2"
     assert "expected_abstain_handled" not in summary["by_category"]["dynamics"]
+
+
+def test_a_real_rejection_travels_from_make_answer_to_the_probe_row(monkeypatch):
+    # Review 5 Oct 2026: the reason tests stubbed every hop, so none showed the real check's words reaching the row.
+    import time
+
+    from kenn.core import answer_upgrades, chat_answer, route_log
+
+    monkeypatch.setattr(route_log, "record", lambda *a, **k: None)
+    monkeypatch.setattr(chat_answer, "build_template_answer", lambda *a, **k: "template")
+    monkeypatch.setattr(chat_answer, "results_are_weak", lambda *a: False)
+    monkeypatch.setattr(chat_answer, "intent_guard_failed", lambda *a: False)
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer", lambda *a, **k: (
+        "Short answer: cut 7 dB at 315 Hz on the bass.\n\nTry this:\n1. Cut 7 dB at 315 Hz.\n"
+        "2. Compare it in mono.\n\nCheck: the kick should sit clearer."))
+    results = [(1.0, {"text": "Cut the mud on the bass and check it in mono.", "source": "bass.md", "title": "Bass"})]
+
+    def write():
+        answer, used = chat_answer.make_answer("how do I clean up a muddy bass", results)
+        return {"llm_enhanced": used, "answer": answer}
+
+    upgrade_id = answer_upgrades.start(write)
+    for _ in range(300):
+        upgrade = answer_upgrades.get(upgrade_id)
+        if upgrade["status"] != "pending":
+            break
+        time.sleep(0.01)
+
+    reason = tool.rejection_reason({}, upgrade, delivered_by_model=False)
+    assert upgrade["status"] == "rejected"
+    assert reason == "generated answer introduced unsupported measurements"
+
+
+def test_a_broken_poll_and_an_upgrade_that_never_settled_are_counted():
+    assert tool.rejection_reason({}, {"status": "error", "error": "URLError"}, False) == "probe poll failed: URLError"
+    assert tool.rejection_reason({}, {"status": "pending"}, False) == "upgrade still pending when the wait ran out"
+
+
+def test_an_inline_rejection_carries_its_reason_without_an_upgrade():
+    payload = {"generation_outcome": "generated answer introduced unsupported measurements"}
+    assert tool.rejection_reason(payload, {}, False) == "generated answer introduced unsupported measurements"
+    payload = {"generation_validation": {"warnings": ["generation returned no answer"]}}
+    assert tool.rejection_reason(payload, {}, False) == "generation returned no answer"
