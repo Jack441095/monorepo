@@ -82,6 +82,8 @@ Rules:
   id exactly as printed on the excerpt. An id that is not on an excerpt above is counted as invented.
 - When the excerpts do not hold the answer, write one line and stop: Insufficient context: <the specific
   fact you are missing>. That line is a whole answer. Put no number, estimate or step after it.
+- Use only numbers that are printed in an excerpt. If no excerpt gives a figure for it, say it in words
+  ("a fast attack") instead of guessing a frequency, time or dB value.
 - Keep every step actionable in Ableton Live or the relevant workflow.
 - Address only the current question. Ignore irrelevant history.
 - Say plainly whether the question has an objective/technical answer (clipping, phase, LUFS, a
@@ -112,6 +114,8 @@ Rules:
 - If context is insufficient, name the specific gap (e.g. "We need a note on parallel compression").
 - Tag every number you state with the id of the excerpt it came from, like 150 ms [#3f2a9c1b7e40]. Copy the id exactly as printed on the excerpt. An id that is not on an excerpt above is counted as invented.
 - When the excerpts do not hold the answer, write one line and stop: Insufficient context: <the specific fact you are missing>. That line is a whole answer. Put no number, estimate or step after it.
+- Use only numbers that are printed in an excerpt. If no excerpt gives a figure for it, say it in words
+  ("a fast attack") instead of guessing a frequency, time or dB value.
 - Keep every step actionable in Ableton Live or the relevant workflow.
 - Address only the current question. Ignore irrelevant history.
 - Say plainly whether the question has an objective/technical answer (clipping, phase, LUFS, a measurable fault) or is a subjective/creative call (brightness, width, "should it sound bigger").
@@ -821,6 +825,19 @@ def build_system_prompt(
 
     if acoustic_instr:
         base_prompt += f"\n{acoustic_instr}"
+
+    cap = MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)
+    if answer_mode != "voice" and cap <= _GENERAL_MAX_TOKENS:
+        # 4 Oct probe: 21 of 23 accepted answers were cut off by the cap, because the five-section structure above
+        # asks for roughly twice what 128 tokens hold. A word is about 1.3 tokens and each [#id] tag costs ~9, so
+        # we quote about half the cap in words and drop the two sections nobody misses when they are short.
+        # The Check and the mode's own line ("Mastering boundary:", "Live safety:") stay, because
+        # answer_quality_report() scores them: a missing check costs 8 points and a missing boundary 10, against 62.
+        base_prompt += (
+            f"\nLength: your whole answer is cut off after about {cap * 55 // 100} words, so it has to finish inside "
+            "that. Write the Short answer, two Try this steps, the Check and any boundary line asked for above, "
+            "each in one sentence, then stop. Leave out Why it matters and You could also ask."
+        )
 
     return base_prompt
 

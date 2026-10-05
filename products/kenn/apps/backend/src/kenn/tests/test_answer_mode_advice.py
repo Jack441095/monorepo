@@ -27,6 +27,23 @@ def test_an_advice_question_is_not_opened_as_a_symptom_trace(question):
 @pytest.mark.parametrize(
     "question",
     [
+        "educate me on compression",
+        "teach me about sidechain compression",
+        "tell me about compression",
+        "walk me through EQ on a bass",
+        "help me understand compression",
+        "i want to learn about compression",
+        "describe sidechain compression",
+    ],
+)
+def test_a_learn_request_gets_the_reasoning_shape_not_a_symptom_trace(question):
+    # 4 Oct: "educate me on compression" came back as "Let's trace the symptom" with a bass-compression template.
+    assert _mode(question) == "deep_explanation"
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
         "my vocal sounds harsh",
         "the bass is too boomy in the club",
         "why does my kick sound thin?",
