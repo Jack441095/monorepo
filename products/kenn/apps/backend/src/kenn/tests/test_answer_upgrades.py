@@ -29,6 +29,22 @@ def test_a_rejected_answer_leaves_the_template_standing() -> None:
     assert result["status"] == "rejected" and result["answer"] == ""
 
 
+def test_a_rejected_upgrade_says_why_it_was_rejected(monkeypatch) -> None:
+    # 4 Oct 2026: 34 rejected probe rows carried no reason, so nobody could say which check was failing them.
+    from kenn.core import chat_answer, route_log
+
+    monkeypatch.setattr(route_log, "record", lambda *a, **k: None)
+
+    def write():
+        chat_answer._log_generation_outcome(
+            False, {"warnings": ["generated answer introduced unsupported measurements"]}, 1.0)
+        return {"llm_enhanced": False, "answer": "template"}
+
+    result = _wait(answer_upgrades.start(write))
+    assert result["status"] == "rejected"
+    assert result["reason"] == "generated answer introduced unsupported measurements"
+
+
 def test_a_model_failure_is_a_rejection_not_a_crash() -> None:
     def broken():
         raise TimeoutError("ollama")

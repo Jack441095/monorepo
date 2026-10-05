@@ -31,6 +31,7 @@ import statistics
 import sys
 import time
 import uuid
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import URLError
@@ -125,6 +126,10 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
         "model_attempted": attempted,
         "llm_available": bool(payload.get("llm_available")),
         "upgrade_status": upgrade.get("status", ""),
+        # The template's own `warnings` are empty on the background path, which is why 34 rejected rows on 4 Oct
+        # said nothing. The reason lives on the upgrade.
+        "rejection_reason": (str(upgrade.get("reason") or upgrade.get("error") or "no reason given")
+                             if upgrade.get("status") == "rejected" else ""),
         "warnings": list(validation.get("warnings") or [])[:4],
         "unsupported_measurements": len(validation.get("unsupported_measurements") or []),
         "fabricated_sources": len(validation.get("fabricated_sources") or []),
@@ -183,6 +188,8 @@ def summarise(rows: list[dict], endpoint: str, cases_path: Path) -> dict:
             "errors": sum("error" in r for r in subset),
             "mean_concept_recall": round(statistics.mean(recalls), 2) if recalls else None,
             "median_final_seconds": round(statistics.median(seconds), 2) if seconds else None,
+            "rejection_reasons": dict(Counter(r["rejection_reason"] for r in subset
+                                              if r.get("rejection_reason")).most_common()),
         }
     categories = sorted({r["category"] for r in rows})
     return {
@@ -205,6 +212,8 @@ def review_sheet(rows: list[dict]) -> str:
                   f"route {row.get('route') or '?'}; confidence {row.get('confidence') or '?'}; "
                   f"sources {row.get('source_count', 0)}: {'; '.join(row.get('sources', [])) or 'none'}",
                   f"Concepts missed: {', '.join(row.get('concepts_missed', [])) or 'none'}"]
+        if row.get("rejection_reason"):
+            lines.append(f"Model answer rejected: {row['rejection_reason']}")
         if row.get("repeats_answer_of"):
             lines.append(f"**Same answer as {row['repeats_answer_of']}.**")
         if row.get("forbidden_named"):

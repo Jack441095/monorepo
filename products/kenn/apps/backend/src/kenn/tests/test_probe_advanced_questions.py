@@ -28,7 +28,8 @@ def _stub(model_on: bool, upgrade_status: str = "accepted"):
             if self.path.startswith("/api/health"):
                 self._send({"ok": True})
             else:
-                self._send({"status": upgrade_status, "answer": "Model text about attack and release.", "seconds": 4})
+                self._send({"status": upgrade_status, "answer": "Model text about attack and release.", "seconds": 4,
+                            "reason": "generated answer introduced unsupported measurements"})
 
         def do_POST(self):
             question = json.loads(self.rfile.read(int(self.headers["Content-Length"])))["question"]
@@ -75,6 +76,13 @@ def test_a_rejected_model_answer_leaves_the_template_in_place():
         httpd.shutdown()
     assert row["delivered_by"] == "template"
     assert row["model_attempted"] is True
+    assert row["rejection_reason"] == "generated answer introduced unsupported measurements"
+    summary = tool.summarise([{**row, "concept_recall": None}], "http://x", tool.DEFAULT_CASES)
+    assert summary["overall"]["rejection_reasons"] == {"generated answer introduced unsupported measurements": 1}
+
+
+def test_an_accepted_answer_has_no_rejection_reason(model_on):
+    assert tool.ask(model_on, "probe-1", CASE, wait=5)["rejection_reason"] == ""
 
 
 def test_with_the_model_off_the_answer_is_marked_as_the_template(model_off):

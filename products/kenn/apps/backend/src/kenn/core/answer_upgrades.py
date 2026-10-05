@@ -120,6 +120,11 @@ def start(write: Callable[[], dict[str, Any]], *, session_id: str = "", turn_id:
             entry = {"status": "accepted" if accepted else "rejected",
                      "answer": str(payload.get("answer") or "") if accepted else "",
                      "sources": payload.get("sources") if accepted else None}
+            if not accepted:
+                from kenn.core.chat_answer import last_generation_outcome
+
+                # Empty when the answer never reached make_answer(): a cached, routed or conversational reply.
+                entry["reason"] = last_generation_outcome() or "model not asked on this path"
         except Exception as exc:  # a model failure only means the template stands
             entry = {"status": "rejected", "error": type(exc).__name__}
         finally:

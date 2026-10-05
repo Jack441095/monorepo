@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+import threading
 import time
 import uuid
 from typing import Generator
@@ -990,6 +991,7 @@ def make_answer(
     # only dilute that honesty and, with a slow local model, unnecessarily
     # delay a simple question.
     if _uncovered_hardware_caveat(query, results) or _uncovered_plugin_caveat(query, results):
+        _last_outcome.reason = "model not asked: uncovered hardware or plug-in caveat"
         return template, False
     if not allow_llm:
         print(f"  make_answer: template={_ma_template_ms:.0f}ms (llm disabled)", file=_sys.stderr, flush=True)
@@ -1024,6 +1026,7 @@ def make_answer(
         answer_mode or classify_answer_mode(query, route, history=history),
     ):
         print(f"  make_answer: template={_ma_template_ms:.0f}ms grounding={_ma_grounding_ms:.0f}ms (no rewrite)", file=_sys.stderr, flush=True)
+        _last_outcome.reason = "model not asked: should_use_llm_rewrite said no"
         return template, False
     _ma_t2 = _time.perf_counter()
     enhanced = llm_enhance_answer(
@@ -1125,6 +1128,16 @@ def _last_call_timing() -> list[str]:
     ]
 
 
+# The reason the last make_answer() on this thread kept or dropped the model's text. Each background upgrade runs
+# in its own thread, so answer_upgrades can read it back for that one answer. The 4 Oct probe runs had 34 rejected
+# rows with no reason on them, because the reason only ever reached the route log, which holds no question text.
+_last_outcome = threading.local()
+
+
+def last_generation_outcome() -> str:
+    return getattr(_last_outcome, "reason", "")
+
+
 def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) -> None:
     """Record one line per generated answer with the reason it was kept or dropped.
 
@@ -1133,11 +1146,12 @@ def _log_generation_outcome(accepted: bool, validation: dict, seconds: float) ->
     change after a prompt or model change. Never raises -- a logging failure must not cost the producer an answer,
     which is the same rule log_outcome() in answer_upgrades follows.
     """
+    warnings = [str(w) for w in (validation.get("warnings") or [])]
+    reason = warnings[0] if warnings else ("accepted" if accepted else "rejected")
+    _last_outcome.reason = reason
     try:
         from kenn.core import route_log
 
-        warnings = [str(w) for w in (validation.get("warnings") or [])]
-        reason = warnings[0] if warnings else ("accepted" if accepted else "rejected")
         route = f"generation:{'accepted' if accepted else reason}"
         detail = _last_call_timing()
         detail += [f"unsupported measurement: {m}" for m in (validation.get("unsupported_measurements") or [])]
