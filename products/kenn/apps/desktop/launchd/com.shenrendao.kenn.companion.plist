@@ -27,8 +27,10 @@
     <dict>
         <key>KENN_PORT</key>
         <string>8090</string>
-        <!-- These win over any .env (load_env never overwrites a set variable), so the installed app always
-             answers with the 8B brain. Without KENN_LLM_ENABLED it answered from templates alone. -->
+        <!-- These win over the same names in .env (load_env never overwrites a set variable), so the installed
+             app answers with the 8B brain unless .env sets a per-task override such as
+             AUDIO_TOO_LLM_MODEL_REWRITE, which config() reads first; /api/health names the model either way.
+             Without KENN_LLM_ENABLED it answered from templates alone. -->
         <key>KENN_LLM_ENABLED</key>
         <string>1</string>
         <key>KENN_USE_MLX</key>

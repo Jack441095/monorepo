@@ -32,7 +32,9 @@ def test_mlx_answers_only_when_chosen(monkeypatch) -> None:
 
 def test_health_names_the_model_that_will_answer(monkeypatch) -> None:
     monkeypatch.setattr(llm_rewrite, "load_env", lambda: None)
-    for name in ("KENN_LLM_MODEL_REWRITE", "AUDIO_TOO_LLM_MODEL_REWRITE", "KENN_LLM_PROVIDER_REWRITE"):
+    monkeypatch.setattr(llm_rewrite, "_ollama_holds", lambda cfg, model: True)
+    for name in ("KENN_LLM_MODEL_REWRITE", "AUDIO_TOO_LLM_MODEL_REWRITE", "KENN_LLM_PROVIDER_REWRITE",
+                 "KENN_MLX_MODEL"):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("KENN_LLM_ENABLED", "0")
     assert answering_model()["enabled"] is False
@@ -40,7 +42,8 @@ def test_health_names_the_model_that_will_answer(monkeypatch) -> None:
     monkeypatch.setenv("KENN_USE_MLX", "0")
     monkeypatch.setenv("KENN_LLM_PROVIDER", "ollama")
     monkeypatch.setenv("KENN_LLM_MODEL", "kenn-brain-qwen3-8b")
-    assert answering_model() == {"enabled": True, "provider": "ollama", "model": "kenn-brain-qwen3-8b"}
+    assert answering_model() == {"enabled": True, "provider": "ollama", "model": "kenn-brain-qwen3-8b",
+                                "loaded": True}
     monkeypatch.setenv("KENN_USE_MLX", "1")
     monkeypatch.setattr(llm_rewrite, "_mlx_engine_answers", lambda task="rewrite": True)
     assert answering_model()["provider"] == "mlx"
@@ -55,3 +58,37 @@ def test_mlx_chosen_but_not_installed_reports_the_fallback(monkeypatch) -> None:
     monkeypatch.setenv("KENN_LLM_PROVIDER", "ollama")
     assert answering_model()["provider"] == "ollama"
 
+
+
+def test_health_says_not_loaded_when_ollama_is_down(monkeypatch) -> None:
+    # Review of 5 Oct: health named the 8B while nothing was listening on 11434 and every answer was a template.
+    monkeypatch.setattr(llm_rewrite, "load_env", lambda: None)
+    monkeypatch.setattr(llm_rewrite, "_mlx_engine_answers", lambda task="rewrite": False)
+    monkeypatch.setenv("KENN_LLM_ENABLED", "1")
+    monkeypatch.setenv("KENN_LLM_PROVIDER", "ollama")
+    monkeypatch.setenv("KENN_LLM_MODEL", "kenn-brain-qwen3-8b")
+    for name in ("KENN_LLM_BASE_URL_REWRITE", "AUDIO_TOO_LLM_BASE_URL_REWRITE"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("KENN_LLM_BASE_URL", "http://127.0.0.1:9/v1")
+    assert answering_model()["loaded"] is False
+
+
+def test_ollama_lists_an_untagged_model_as_latest(monkeypatch) -> None:
+    class Tags:
+        def json(self):
+            return {"models": [{"name": "kenn-brain-qwen3-8b:latest"}]}
+
+    monkeypatch.setattr(llm_rewrite.httpx, "get", lambda *a, **k: Tags())
+    cfg = {"base_url": "http://127.0.0.1:11434/v1"}
+    assert llm_rewrite._ollama_holds(cfg, "kenn-brain-qwen3-8b")
+    assert not llm_rewrite._ollama_holds(cfg, "qwen3:4b-instruct-2507-q4_K_M")
+
+
+def test_a_hosted_provider_without_a_key_is_reported_off(monkeypatch) -> None:
+    monkeypatch.setattr(llm_rewrite, "load_env", lambda: None)
+    for name in ("KENN_LLM_API_KEY", "AUDIO_TOO_LLM_API_KEY", "KENN_LLM_API_KEY_REWRITE",
+                 "AUDIO_TOO_LLM_API_KEY_REWRITE", "KENN_LLM_PROVIDER_REWRITE"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("KENN_LLM_ENABLED", "1")
+    monkeypatch.setenv("KENN_LLM_PROVIDER", "openai")
+    assert answering_model()["enabled"] is False

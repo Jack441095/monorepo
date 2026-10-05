@@ -1743,16 +1743,44 @@ def answering_model() -> dict:
 
     Health used to report only the index, so a gate run couldn't tell the 1.5B MLX default from Qwen3 8B (5 Oct).
     Chat answers only: follow-ups go through the paraphrase task, which can be routed elsewhere.
+
+    ``loaded`` says whether that model is really there to answer. Without it, health named the 8B while Ollama was
+    down or had never pulled it, and every answer was a template.
     """
     cfg = config()
-    if not cfg["enabled"]:
-        return {"enabled": False, "provider": None, "model": None}
+    # is_enabled() rather than cfg["enabled"]: a hosted provider with no API key is switched on and still answers
+    # nothing.
+    if not is_enabled():
+        return {"enabled": False, "provider": None, "model": None, "loaded": False}
     if _mlx_engine_answers():
-        from kenn.llm.mlx_inference_engine import DEFAULT_MLX_MODEL
+        from kenn.llm.mlx_inference_engine import DEFAULT_MLX_MODEL, MLXInferenceEngine
 
-        # DEFAULT_MLX_MODEL is read at import, which can come before load_env(); the engine loads this name.
-        return {"enabled": True, "provider": "mlx", "model": os.environ.get("KENN_MLX_MODEL", DEFAULT_MLX_MODEL)}
-    return {"enabled": True, "provider": cfg["provider"], "model": cfg["model"] or None}
+        # The running engine's own name when there is one. The warm-up thread imports the engine module before the
+        # .env is read, so DEFAULT_MLX_MODEL and the env var can both disagree with what actually loaded.
+        engine = MLXInferenceEngine._instance
+        if engine is not None:
+            return {"enabled": True, "provider": "mlx", "model": engine.model_id, "loaded": True}
+        return {"enabled": True, "provider": "mlx", "model": os.environ.get("KENN_MLX_MODEL", DEFAULT_MLX_MODEL),
+                "loaded": False}
+    model = cfg["model"] or None
+    return {"enabled": True, "provider": cfg["provider"], "model": model,
+            "loaded": _ollama_holds(cfg, model) if cfg["provider"] == "ollama" else None}
+
+
+def _ollama_holds(cfg: dict, model: str | None) -> bool:
+    """Whether Ollama answers at all and has pulled ``model``; False on any failure to ask."""
+    if not model:
+        return False
+    try:
+        # 0.5 s, because health is polled and has to stay fast while Ollama is down; a local /api/tags answers
+        # in a few ms when it is up.
+        tags = httpx.get(f"{_native_ollama_base(cfg['base_url'])}/api/tags", timeout=0.5).json()
+    except Exception:
+        # Refused, timed out or not JSON: nothing is answering on that port, which is what loaded=False means.
+        return False
+    names = {m.get("name", "") for m in tags.get("models", [])}
+    # Ollama lists an untagged pull as "name:latest", and the config usually leaves the tag off.
+    return model in names or f"{model}:latest" in names
 
 
 def _mlx_engine_answers(task: str = "rewrite") -> bool:
