@@ -312,7 +312,7 @@ def render_report_html(
     *,
     brand: str = "Audio_Too",
     cta_label: str = "Get this mixed properly",
-    cta_url: str = "mailto:jack.gandy@gmail.com?subject=Mix%20enquiry",
+    cta_url: str = "mailto:nitedsp@outlook.com?subject=Mix%20enquiry",
 ) -> str:
     """Render a self-contained, shareable HTML report from a review dict.
 

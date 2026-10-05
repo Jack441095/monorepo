@@ -62,7 +62,7 @@ def render_podcast_report_html(
     title: str = "Your episode",
     brand: str = "Audio_Too",
     cta_label: str = "Get your podcast professionally edited",
-    cta_url: str = "mailto:jack.gandy@gmail.com?subject=Podcast%20editing%20enquiry",
+    cta_url: str = "mailto:nitedsp@outlook.com?subject=Podcast%20editing%20enquiry",
 ) -> str:
     report = report or {}
     checks = report.get("checks") or []

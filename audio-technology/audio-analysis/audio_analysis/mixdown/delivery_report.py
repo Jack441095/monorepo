@@ -26,7 +26,7 @@ def render_delivery_report_html(
     title: str = "Your master",
     brand: str = "Audio_Too",
     cta_label: str = "Get your master delivery-ready",
-    cta_url: str = "mailto:jack.gandy@gmail.com?subject=Mastering%20enquiry",
+    cta_url: str = "mailto:nitedsp@outlook.com?subject=Mastering%20enquiry",
 ) -> str:
     report = report or {}
     checks = report.get("checks") or []
