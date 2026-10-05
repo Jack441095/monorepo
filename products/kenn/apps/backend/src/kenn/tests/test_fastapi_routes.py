@@ -38,7 +38,9 @@ def test_fastapi_openapi_spec():
 
 
 def test_fastapi_suggest():
-    resp = client.get("/api/suggest?q=compr")
+    # "sidechain" is in the built-in starters. "compr" only matched questions read from Training_Data_Notes, which
+    # is ignored by git, so this failed in every worktree and on a clean clone (5 Oct).
+    resp = client.get("/api/suggest?q=sidechain")
     assert resp.status_code == 200
     data = resp.json()
     assert isinstance(data, list) and len(data) > 0
