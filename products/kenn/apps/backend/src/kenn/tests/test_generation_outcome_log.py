@@ -176,10 +176,13 @@ def test_the_longest_rejection_route_name_survives_the_logs_64_char_field():
         "generated answer introduced unsupported measurements",
         "generated answer is below the quality threshold",
         "generated answer has insufficient evidence overlap",
+        "generation returned no answer: request failed",
+        "generation returned no answer: structure check",
     ]
     routes = [f"generation:{r}" for r in reasons]
     assert max(len(r) for r in routes) <= 64, routes
     assert len({r[:64] for r in routes}) == len(routes), "two rejection reasons truncate to the same route"
+
 
 def test_a_model_answer_the_quality_gate_swaps_out_is_not_credited_to_the_model(tmp_path, monkeypatch):
     # Audit, 5 Oct 2026: llm_enhanced stayed True after the swap, so the upgrade offered the clarifying reply
@@ -252,3 +255,45 @@ def test_a_model_answer_the_quality_gate_keeps_is_still_logged_as_brain_work(tmp
     rows = _payload_with_model_answer(tmp_path, monkeypatch, score=100)
 
     assert rows == [("generation:accepted", True)]
+
+
+def _enhance_with(monkeypatch, completion):
+    monkeypatch.setattr(llm_rewrite, "is_enabled", lambda *a: True)
+    monkeypatch.setattr(llm_rewrite, "_chat_completion", completion)
+    return llm_rewrite.enhance(
+        "how do I tame a harsh vocal", "Short answer: template.", [], None, "",
+        lambda chunk: chunk.get("title", ""), lambda _history: [], answer_mode="quick_fix",
+    )
+
+
+def test_a_request_that_failed_is_told_apart_from_an_answer_that_failed_the_structure_check(monkeypatch):
+    """5 Oct probe: three rows said only "generation returned no answer", so truncation couldn't be confirmed."""
+    def times_out(*a, **k):
+        raise RuntimeError("ollama read timed out")
+
+    assert _enhance_with(monkeypatch, times_out) is None
+    assert llm_rewrite.last_enhance_failure() == "request failed"
+
+    # Cut off by the token cap before it reached a Try this step.
+    assert _enhance_with(monkeypatch, lambda *a, **k: ("Short answer: pull 3 dB out around", None)) is None
+    assert llm_rewrite.last_enhance_failure() == "structure check"
+
+
+def test_make_answer_names_why_the_model_wrote_nothing(tmp_path, monkeypatch):
+    log = tmp_path / "routes.jsonl"
+    monkeypatch.setattr(route_log, "LOG", log)
+    monkeypatch.setattr(chat_answer, "build_template_answer", lambda *a, **k: "template")
+    monkeypatch.setattr(chat_answer, "results_are_weak", lambda *a: False)
+    monkeypatch.setattr(chat_answer, "intent_guard_failed", lambda *a: False)
+    monkeypatch.setattr(chat_answer, "should_use_llm_rewrite", lambda *a, **k: True)
+
+    def cut_off(*a, **k):
+        llm_rewrite._enhance_failure.reason = "structure check"
+        return None
+
+    monkeypatch.setattr(chat_answer, "llm_enhance_answer", cut_off)
+
+    assert chat_answer.make_answer("how do I tame a harsh vocal", [(1.0, {"text": "x"})]) == ("template", False)
+    assert chat_answer.last_generation_outcome() == "generation returned no answer: structure check"
+    (row,) = _read(log)
+    assert row["route"] == "generation:generation returned no answer: structure check"
