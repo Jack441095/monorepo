@@ -673,9 +673,9 @@ MAX_TOKENS_BY_MODE = {
     "command": _COMMAND_MAX_TOKENS,
 }
 DEFAULT_MAX_TOKENS = _GENERAL_MAX_TOKENS
-# Prose was 0.35 until 5 Oct. Two probe runs of the same 8B on the same code scored 33 and 26, and four of the
-# swings were one run inventing a figure the other didn't, so we answer greedily: same question, same notes, same answer.
-PROSE_TEMPERATURE = 0.0
+# Tried 0.0 on 5 Oct to steady the probe score. The 8B then made the same mistakes every run, and accepted
+# answers fell from 31 to 25 of 46, so prose keeps a little freedom.
+PROSE_TEMPERATURE = 0.35
 
 
 def _build_payload(

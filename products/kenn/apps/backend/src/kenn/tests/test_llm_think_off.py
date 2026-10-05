@@ -208,9 +208,8 @@ def test_kenn_adds_the_sources_a_local_model_forgot() -> None:
     assert llm_rewrite._with_sources(fixed, shown, lambda chunk: chunk["source"]) == fixed
 
 
-def test_prose_answers_are_repeatable_on_both_routes() -> None:
-    # 5 Oct: the same 8B scored 33 and 26 on two runs, partly because 0.35 let one run invent a figure the other didn't.
+def test_both_routes_write_prose_at_the_same_temperature() -> None:
     messages = [{"role": "user", "content": "hi"}]
     native = llm_rewrite._build_native_ollama_payload(_cfg("qwen3:8b"), messages, answer_mode="", json_schema=None)
     openai = llm_rewrite._build_payload(_cfg("qwen3:8b"), messages, answer_mode="")
-    assert native["options"]["temperature"] == openai["temperature"] == 0.0
+    assert native["options"]["temperature"] == openai["temperature"] == llm_rewrite.PROSE_TEMPERATURE
