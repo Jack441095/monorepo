@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -218,3 +219,61 @@ def test_an_inline_rejection_carries_its_reason_without_an_upgrade():
     assert tool.rejection_reason(payload, {}, False) == "generated answer introduced unsupported measurements"
     payload = {"generation_validation": {"warnings": ["generation returned no answer"]}}
     assert tool.rejection_reason(payload, {}, False) == "generation returned no answer"
+
+
+def _answer_row(delivered_by: str, final_seconds: float | None, **extra) -> dict:
+    row = {"category": "dynamics", "expect": "answer", "delivered_by": delivered_by,
+           "model_attempted": delivered_by == "model", "concept_recall": None, **extra}
+    if final_seconds is not None:
+        row["final_seconds"] = final_seconds
+    return row
+
+
+def test_the_15_second_gate_counts_model_answers_on_the_line_and_everything_else_against_it():
+    rows = [
+        _answer_row("model", 15.0),
+        _answer_row("model", 15.01),
+        _answer_row("template", 2.0),
+        _answer_row("none", None, error="URLError: refused"),
+        {**_answer_row("model", 3.0), "expect": "abstain_or_clarify"},
+    ]
+    overall = tool.summarise(rows, "http://x", tool.DEFAULT_CASES)["overall"]
+    assert overall["gate_eligible"] == 4
+    assert overall["gate_model_within_15s"] == 1
+    assert overall["gate_rate"] == 0.25
+    assert overall["gate_target_rate"] == 0.70
+
+
+def test_acceptance_when_attempted_leaves_out_rows_where_the_model_never_ran():
+    rows = [_answer_row("model", 9.0), _answer_row("model", 20.0),
+            {**_answer_row("template", 30.0), "model_attempted": True}, _answer_row("template", 1.0)]
+    overall = tool.summarise(rows, "http://x", tool.DEFAULT_CASES)["overall"]
+    assert overall["model_accepted_when_attempted"] == "2 of 3"
+    assert overall["model_acceptance_rate_when_attempted"] == 0.667
+
+
+def test_the_summary_records_the_cases_hash_index_version_and_note(tmp_path):
+    cases = tmp_path / "cases.json"
+    cases.write_text('{"cases": []}')
+    health = {"ok": True, "subsystems": {"knowledge_index": {"index_version": "v20261004", "active_mode": "hybrid"}}}
+    stamp = tool.provenance(cases, health, "Live open")
+    assert stamp["cases_sha256"] == hashlib.sha256(b'{"cases": []}').hexdigest()
+    assert stamp["index"]["index_version"] == "v20261004"
+    assert stamp["note"] == "Live open"
+
+
+def test_only_file_runs_the_listed_ids_and_pulls_in_the_question_a_follow_up_needs(model_on, tmp_path, monkeypatch):
+    cases = tmp_path / "cases.json"
+    cases.write_text(json.dumps({"cases": [
+        {**CASE, "id": "q001"}, {**CASE, "id": "q002"}, {**CASE, "id": "q003", "follow_up_of": "q001"},
+        {**CASE, "id": "q004"},
+    ]}))
+    ids = tmp_path / "heldout.txt"
+    ids.write_text("q003\n\nq004\n")
+    monkeypatch.setattr("sys.argv", ["probe", "--endpoint", model_on, "--cases", str(cases), "--only-file", str(ids),
+                                     "--output", str(tmp_path / "out"), "--pause", "0", "--note", "Live open"])
+    assert tool.main() == 0
+    asked = [json.loads(line)["id"] for line in (tmp_path / "out.jsonl").read_text().splitlines()]
+    assert asked == ["q001", "q003", "q004"]
+    summary = json.loads((tmp_path / "out.summary.json").read_text())
+    assert summary["provenance"]["note"] == "Live open"

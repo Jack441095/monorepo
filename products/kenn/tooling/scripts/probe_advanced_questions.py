@@ -2,7 +2,8 @@
 """Ask a running KENN companion hard questions and record what actually answered each one.
 
     probe_advanced_questions.py [--endpoint http://127.0.0.1:8090] [--cases PATH] [--output BASE]
-                                [--category NAME] [--only ID ...] [--wait-upgrade 90] [--allow-template]
+                                [--category NAME] [--only ID ...] [--only-file PATH] [--wait-upgrade 90]
+                                [--allow-template] [--note TEXT]
 
 Needs the companion already running with the model on (KENN_LLM_ENABLED=1, and KENN_LLM_BACKGROUND=1 for the
 browser path). Run it with KENN_LLM_CACHE=0 on the server so a cached reply cannot pass as a model answer.
@@ -19,6 +20,11 @@ Each case gets a fresh chat so one answer cannot colour the next, except a `foll
 of the one it follows. A reply identical to an earlier reply to a different question is flagged, and so is a reply that names something
 the case lists in `must_not_name` (a plugin brand the user never mentioned).
 
+**The 15 s local-delivery gate.** A row passes when it expects an answer, the model's text was delivered and it landed
+within 15 s of asking. Errors, rejections and timeouts count against it, so the rate is over every answer-expected row.
+The summary gives the count and rate against the 0.70 target; whether three runs in a row clear it is for a person to
+judge. Acceptance over only the rows where the model was attempted is reported apart from the gate.
+
 Writes three files next to --output: `.jsonl` and `.review.md` hold answer prose for hand grading and stay out of git;
 `.summary.json` is numbers only. This sends chat questions and nothing else, so it never writes to Live.
 """
@@ -26,8 +32,10 @@ Writes three files next to --output: `.jsonl` and `.review.md` hold answer prose
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import statistics
+import subprocess
 import sys
 import time
 import uuid
@@ -43,6 +51,11 @@ DEFAULT_CASES = REPO_ROOT / "tooling" / "evaluation" / "advanced_questions.json"
 # /api/ask allows 30 a minute per client; 2.5 s between questions stays under it with room for retries.
 DEFAULT_PAUSE = 2.5
 MODEL_CHECK_AFTER = 3
+GATE_SECONDS = 15.0
+GATE_TARGET_RATE = 0.70
+# The server suggests 2000 ms between upgrade polls, which put every final time on a 2 s step: an answer done at
+# 14.2 s was recorded at 16.1 s and failed the gate. This is a local probe, so we poll faster than the browser does.
+POLL_SECONDS = 0.5
 
 
 def post_json(url: str, body: dict, timeout: float) -> dict:
@@ -81,12 +94,11 @@ def is_abstention(answer: str) -> bool:
 
 def follow_upgrade(endpoint: str, session_id: str, upgrade: dict, wait: float, started: float) -> dict:
     """Poll the background upgrade until it settles or the wait runs out."""
-    poll = max(0.5, float(upgrade.get("poll_ms", 2000)) / 1000)
     url = f"{endpoint}/api/ask/upgrade?id={quote(str(upgrade.get('id', '')))}&session_id={quote(session_id)}"
     deadline = time.perf_counter() + wait
     result: dict = {"status": "pending"}
     while time.perf_counter() < deadline:
-        time.sleep(poll)
+        time.sleep(POLL_SECONDS)
         try:
             result = get_json(url, timeout=10)
         except (URLError, OSError, ValueError) as exc:
@@ -117,6 +129,7 @@ def rejection_reason(payload: dict, upgrade: dict, delivered_by_model: bool) -> 
 
 def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
     started = time.perf_counter()
+    started_at = time.time()
     row: dict = {"id": case["id"], "category": case["category"], "expect": case["expect"],
                  "question": case["question"], "session_id": session_id}
     try:
@@ -149,6 +162,12 @@ def ask(endpoint: str, session_id: str, case: dict, wait: float) -> dict:
         "fabricated_sources": len(validation.get("fabricated_sources") or []),
         "template_seconds": template_seconds,
         "final_seconds": upgrade.get("seconds_from_ask", template_seconds),
+        # The server's own clock for when the model finished, free of our polling step. /api/ask/upgrade drops
+        # `at` from its reply today, so this stays None until it doesn't; `model_seconds` is the server's timing
+        # of the model run alone, which it does return. final_seconds is still the gate measure.
+        "server_final_seconds": (round(float(upgrade["at"]) - started_at, 2)
+                                 if upgrade.get("at") is not None else None),
+        "model_seconds": upgrade.get("seconds"),
         "route": str(payload.get("route") or ""),
         "answer_mode": str(payload.get("answer_mode") or ""),
         "confidence": str(payload.get("confidence") or ""),
@@ -181,8 +200,13 @@ def judge(row: dict, case: dict, seen: dict[str, str]) -> None:
         seen[fingerprint] = row["id"]
 
 
-def summarise(rows: list[dict], endpoint: str, cases_path: Path) -> dict:
+def summarise(rows: list[dict], endpoint: str, cases_path: Path, provenance: dict | None = None) -> dict:
     def group(subset: list[dict]) -> dict:
+        eligible = [r for r in subset if r.get("expect") == "answer"]
+        in_time = sum(r.get("delivered_by") == "model" and r.get("final_seconds", float("inf")) <= GATE_SECONDS
+                      for r in eligible)
+        attempted = [r for r in subset if r.get("model_attempted")]
+        accepted = sum(r.get("delivered_by") == "model" for r in attempted)
         recalls = [r["concept_recall"] for r in subset if r.get("concept_recall") is not None]
         seconds = [r["final_seconds"] for r in subset if "final_seconds" in r]
         asked_to_abstain = [r for r in subset if r.get("handled_as_expected") is not None]
@@ -200,6 +224,11 @@ def summarise(rows: list[dict], endpoint: str, cases_path: Path) -> dict:
             "repeats_an_earlier_answer": sum(bool(r.get("repeats_answer_of")) for r in subset),
             "named_something_forbidden": sum(bool(r.get("forbidden_named")) for r in subset),
             "errors": sum("error" in r for r in subset),
+            "gate_eligible": len(eligible),
+            "gate_model_within_15s": in_time,
+            "gate_rate": round(in_time / len(eligible), 3) if eligible else None,
+            "model_accepted_when_attempted": f"{accepted} of {len(attempted)}",
+            "model_acceptance_rate_when_attempted": round(accepted / len(attempted), 3) if attempted else None,
             "mean_concept_recall": round(statistics.mean(recalls), 2) if recalls else None,
             "median_final_seconds": round(statistics.median(seconds), 2) if seconds else None,
             "rejection_reasons": dict(Counter(r["rejection_reason"] for r in subset
@@ -211,9 +240,40 @@ def summarise(rows: list[dict], endpoint: str, cases_path: Path) -> dict:
         "captured_at": datetime.now(timezone.utc).isoformat(),
         "endpoint": endpoint,
         "cases_file": str(cases_path.name),
-        "overall": group(rows),
+        "provenance": provenance or {},
+        "overall": {**group(rows), "gate_target_rate": GATE_TARGET_RATE},
         "by_category": {name: group([r for r in rows if r["category"] == name]) for name in categories},
         "note": "Concept recall is a keyword check, not a grade. Read the review sheet before drawing conclusions.",
+    }
+
+
+def power_source() -> str | None:
+    """The first line of `pmset -g batt` on a Mac. Runs on 4 and 5 Oct were on battery, and the timings were useless."""
+    if sys.platform != "darwin":
+        return None
+    try:
+        output = subprocess.run(["pmset", "-g", "batt"], capture_output=True, text=True, timeout=5).stdout
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return output.splitlines()[0].strip() if output.strip() else None
+
+
+def provenance(cases_path: Path, health: dict, note: str | None) -> dict:
+    try:
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parent,
+                                capture_output=True, text=True, timeout=5).stdout.strip() or None
+    except (OSError, subprocess.SubprocessError):
+        commit = None
+    # /api/health says nothing about the model or LLM settings, only the index; delivered_by and model_attempted on
+    # each row are what show whether the model ran.
+    index = (health.get("subsystems") or {}).get("knowledge_index") or {}
+    return {
+        "probe_commit": commit,
+        "cases_sha256": hashlib.sha256(cases_path.read_bytes()).hexdigest(),
+        "index": {key: index.get(key) for key in
+                  ("index_version", "active_mode", "semantic_model_state", "degraded", "fallback_reason")},
+        "power_source": power_source(),
+        "note": note,
     }
 
 
@@ -244,19 +304,24 @@ def main() -> int:
                         default=Path.home() / f"kenn-advanced-probe-{datetime.now():%Y%m%d-%H%M%S}")
     parser.add_argument("--category")
     parser.add_argument("--only", nargs="+")
+    parser.add_argument("--only-file", type=Path, help="case ids to run, one per line, such as a held-out list")
     parser.add_argument("--wait-upgrade", type=float, default=90.0,
                         help="seconds to wait for the background model answer after the template")
     parser.add_argument("--pause", type=float, default=DEFAULT_PAUSE)
     parser.add_argument("--allow-template", action="store_true",
                         help="keep going even if the model never runs (measures the template path)")
+    parser.add_argument("--note", help="free text kept in the summary, such as 'Live open'")
     args = parser.parse_args()
 
     endpoint = args.endpoint.rstrip("/")
     cases = json.loads(args.cases.read_text(encoding="utf-8"))["cases"]
     by_id = {case["id"]: case for case in cases}
+    only = set(args.only or [])
+    if args.only_file:
+        only.update(line.strip() for line in args.only_file.read_text(encoding="utf-8").splitlines() if line.strip())
     selected = [c for c in cases if (not args.category or c["category"] == args.category)
-                and (not args.only or c["id"] in args.only)]
-    if args.only:
+                and (not only or c["id"] in only)]
+    if only:
         # A follow-up is meaningless without the question it follows.
         for case in list(selected):
             parent = case.get("follow_up_of")
@@ -298,7 +363,7 @@ def main() -> int:
     args.output.with_suffix(".jsonl").write_text(
         "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
     args.output.with_suffix(".review.md").write_text(review_sheet(rows), encoding="utf-8")
-    summary = summarise(rows, endpoint, args.cases)
+    summary = summarise(rows, endpoint, args.cases, provenance(args.cases, health, args.note))
     args.output.with_suffix(".summary.json").write_text(json.dumps(summary, indent=1) + "\n", encoding="utf-8")
     print(json.dumps(summary["overall"], indent=1))
     print(f"\nwrote {args.output}.jsonl / .review.md / .summary.json")
