@@ -1027,7 +1027,7 @@ Full backend command for shared entry-point changes, extractions or release:
 ```
 
 Deferred until the sequence justifies them: additional control families; speculative
-native/shared runtimes; fine-tuning; broad dataset intake; a second verifier model;
+native/shared runtimes; fine-tuning other than the 4B answer tune at the end of this plan; broad dataset intake; a second verifier model;
 conformal acceptance policies; huge citation captures; source-volume targets;
 autonomous mixing/arrangement and commercial distribution. Existing unfinished
 `live_command`/execution extractions and dead-tool removal need a new reachability
@@ -1079,10 +1079,12 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
 - Probes pin the gate index by running the companion from a detached worktree whose own ignored `data/index` has
   `CURRENT` set to `v-5f6964698b76` (as `workspace/worktrees/kenn/reasons-probe` does). The main checkout's `CURRENT`
   is never touched for a probe.
-- The reference notes (`Nite-DSP/kenn-reference-notes.md`, 12 drafts) go in once DeepSeek has checked every figure
-  against the cited pages (prompt beside the file), and Jack has read the WRONG and NOT IN SOURCE list. After that
-  the index is rebuilt and becomes the new gate index. Several notes match probe rows, so a rise on the probe after
-  the rebuild only counts if the holdout rises too.
+- The reference notes (`Nite-DSP/kenn-reference-notes.md`, 12 notes) are already in the gate index: `v-5f6964698b76`
+  was built on 4 Oct with their 4 Oct text. DeepSeek's figure check on 5 Oct corrected 6 of them. A Mac rebuild with
+  the corrections scored the same as one without (126/128 coverage, the same 6 held-out failures), but both lost 2
+  coverage rows against the gate index (`arrangement-build-ups-drops-tension`, `adversarial-typo-sidechain`), so the
+  gate index stays `v-5f6964698b76` until that drop is explained. Several notes match probe rows, so a rise on the
+  probe after any rebuild only counts if the holdout rises too.
 - Baseline from the four runs on current code (5 Oct): 119 of 176 eligible rows accepted (67.6%, ±3.5%). On mains
   power the misses are rejections, not time. Four rows never pass (`followup-drums`, `typo-white-noise`,
   `typo-parallel-comp`, `live-pdc`), and 28 of the 44 flip between runs.
@@ -1117,3 +1119,49 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
 - [ ] Lower prose temperature, measured on its own.
 - [ ] Reference-numbers note for the values the model keeps inventing (needs Jack and a box rebuild).
 - [ ] Three clean runs in a row at 31/44 or better.
+
+### Answer fine-tune on a 4B, agreed 5 Oct 2026
+
+Jack approved this on 5 Oct as the main route to the held-out half of the gate. The arithmetic: the 5 Oct 8B baseline
+had about 40 of 72 held-out answers accepted and 29 inside 15 s. If allowed figures removed every one of the 14
+unsupported-measurement rejections, that would still be about 39 of the 51 needed. So answers also have to be
+rejected less for other reasons, and come back faster. A LoRA on Qwen3-4B-Instruct-2507 goes after both. It teaches
+the answer habits the gate checks for: short, built from the excerpts, no figures the excerpts don't print. The facts
+still come from retrieval. Note-first answers (above) stack on top if this only closes part of the gap.
+
+We've done this once and it failed. On 25 Sept a style LoRA on Qwen3-8B, trained on 345 answers the 8B itself had
+written and the gate had accepted, was used less often and its slowest answers tripled
+([review](docs/reviews/KENN_BRAIN_ANSWERS_REVIEW_2026-09-25.md)). Training on what the model already writes teaches
+it nothing. This run differs in three ways:
+
+- A stronger teacher. `qwen3:32b` is already on the box in the `kenn-gpu` Ollama (GPU 0).
+- A different student. The 4B, which is faster on the Mac than the 8B.
+- Targets capped at 128 tokens, so the student learns short answers, not long ones.
+
+The C6 planner runs add one more lesson: run 12's validation loss went to near zero and it got worse on blind
+phrasings, so this run stops early and is judged only on sets it never saw.
+
+- [ ] Wait for the quiet 8B against 4B rerun (5 Oct). How far the plain 4B sits from the gate sets how much the
+  tune has to do.
+- [ ] Free about 14 GB on the box. `/mnt/data` has 18 GB free, and the base weights, merged model and GGUF need
+  about 20 GB. Candidates:
+  - `c6/c6-run12-q4km.gguf` and `c6/c6-run13-q4km.gguf`. Both runs were judged not better than run 11.
+  - `c6/Qwen3.5-4B`. The planner base, which can be downloaded again and has hashes in `c6/weights.sha256`.
+  - `refnotes-20261005`. Scratch.
+
+  Run 11's GGUF stays: it's the only copy left. Deleting needs Jack.
+- [ ] Questions from the approved notes, a few thousand. Leave out the 44 probe rows, the 75 held-out ids and
+  anything near them, reusing the near-test filter in `tooling/scripts/build_brain_style_corpus.py`.
+- [ ] Teacher answers from `qwen3:32b`, each given the real retrieved excerpts and the allowed-figures prompt. Keep
+  only the answers KENN's own grounding gate accepts at 128 tokens or under.
+- [ ] Jack grades about 40 of the kept answers before training.
+- [ ] LoRA on GPU 0 in the existing `c6/venv` (peft 0.21, transformers 5.17, torch 2.9), with early stopping.
+  Nothing new is installed. Never on a soak night.
+- [ ] Merge, convert to GGUF Q4_K_M, serve through Ollama on the Mac. Then 3 probe runs plus the held-out set against
+  the plain 4B, on a quiet machine on mains power.
+- [ ] Keep it only if:
+  - both the probe and the held-out set rise
+  - the median time is no slower
+  - the negative-advice guard holds
+
+  Otherwise record the result here and drop it.
