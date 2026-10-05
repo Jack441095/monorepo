@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hmac
 import hashlib
+import logging
 import re
 import secrets
 import tempfile
@@ -24,6 +25,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Request, UploadFile
 from pydantic import BaseModel, EmailStr
+from sqlalchemy.exc import DataError
 from sqlalchemy.orm import Session
 
 from . import email_templates, models
@@ -42,6 +44,8 @@ from .storage import StorageError, StorageNotFound, get_storage, object_storage_
 DEFAULT_BETA_EXPIRY_DAYS = 90
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+logger = logging.getLogger("nitedsp.admin")
 
 _admin_key_rate_limit = rate_limit("admin:auth", max_requests=10, window_seconds=60)
 
@@ -156,8 +160,17 @@ def issue_entitlement(
         subject, body = email_templates.beta_invite(license_key, product_display_name, expires_at_iso)
     else:
         subject, body = email_templates.license_ready(product_display_name, license_key)
-    send_email(to=req.email, subject=subject, body=body)
-    return {"entitlement_id": entitlement.id, "license_key": license_key, "expires_at": expires_at}
+    try:
+        send_email(to=req.email, subject=subject, body=body)
+    except Exception:
+        # The entitlement above is already committed, so a mail-provider
+        # outage must not become a 500 that hides a usable licence. The
+        # response carries the key and reports delivery state instead.
+        logger.exception("Admin entitlement email failed: %s", entitlement.id)
+        return {"entitlement_id": entitlement.id, "license_key": license_key, "expires_at": expires_at,
+                "email_sent": False}
+    return {"entitlement_id": entitlement.id, "license_key": license_key, "expires_at": expires_at,
+            "email_sent": True}
 
 
 class RevokeRequest(BaseModel):
@@ -538,8 +551,67 @@ def search_purchase(
             "status": purchase.status,
             "purchased_at": purchase.purchased_at,
             "refunded_at": purchase.refunded_at,
+            "confirmation_email_sent_at": purchase.confirmation_email_sent_at,
         },
         "entitlements": [
             {"id": e.id, "license_key": e.license_key, "status": e.status} for e in entitlements
         ],
     }
+
+
+@router.get("/purchases/unsent-confirmations")
+def unsent_confirmations(db: Session = Depends(get_db), actor: str = Depends(require_admin)) -> list[dict]:
+    """Purchases whose licence is committed but whose confirmation email never
+    went out -- e.g. the mail provider was down during fulfilment. Each row
+    keeps its stored licence key, so the resend endpoint below (or a Stripe
+    duplicate delivery) can retry delivery without touching fulfilment."""
+    purchases = (
+        db.query(models.Purchase)
+        .filter(models.Purchase.confirmation_email_sent_at.is_(None))
+        .order_by(models.Purchase.purchased_at.asc())
+        .all()
+    )
+    rows = []
+    for purchase in purchases:
+        user = db.get(models.User, purchase.user_id)
+        rows.append(
+            {
+                "purchase_id": purchase.id,
+                "provider_order_id": purchase.provider_order_id,
+                "product_id": purchase.product_id,
+                "user_email": user.email if user else None,
+                "amount_cents": purchase.amount_cents,
+                "currency": purchase.currency,
+                "status": purchase.status,
+                "purchased_at": purchase.purchased_at,
+            }
+        )
+    return rows
+
+
+@router.post("/purchases/{purchase_id}/resend-confirmation")
+def resend_confirmation(
+    purchase_id: str, db: Session = Depends(get_db), actor: str = Depends(require_admin)
+) -> dict:
+    """Retry a pending purchase confirmation using the stored licence key."""
+    from .stripe_commerce import send_purchase_confirmation
+
+    try:
+        purchase = db.get(models.Purchase, purchase_id)
+    except DataError:
+        # Non-UUID path values never match a row; report that, not a 500.
+        db.rollback()
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    if purchase is None:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    try:
+        sent = send_purchase_confirmation(db, purchase.id)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except Exception as exc:
+        db.rollback()
+        logger.exception("Admin confirmation resend failed: %s", purchase_id)
+        raise HTTPException(status_code=502, detail="Email delivery failed") from exc
+    _audit(db, actor, "resend_confirmation", purchase_id)
+    db.commit()
+    return {"purchase_id": purchase_id, "sent": sent}

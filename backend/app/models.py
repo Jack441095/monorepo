@@ -83,6 +83,10 @@ class Purchase(Base):
     status: Mapped[str] = mapped_column(String, nullable=False, default="completed")
     purchased_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
     refunded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # When the purchase confirmation email was delivered. NULL means delivery
+    # is still pending -- the licence itself is already committed and usable,
+    # so a failed send retries from this row instead of rolling fulfilment back.
+    confirmation_email_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     __table_args__ = (
         UniqueConstraint("provider", "provider_order_id", name="uq_purchases_provider_order"),

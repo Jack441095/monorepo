@@ -126,11 +126,98 @@ def _handle_checkout_session_completed(db: Session, payload: dict) -> str:
         license_key=license_key, license_type="perpetual",
         max_activations=settings.default_max_activations, status="active",
     ))
-    subject, body = email_templates.purchase_confirmation(
-        product.name, f"{currency.upper()} {amount_total / 100:.2f}", license_key,
-    )
-    send_email(to=email, subject=subject, body=body)
+    db.flush()
+    # The confirmation email is sent after the caller commits this fulfilment,
+    # never inside this handler -- see send_purchase_confirmation. Sending
+    # before commit once mailed keys for purchases that never persisted, and
+    # a send failure inside the transaction rolled back licences that were
+    # already paid for.
     return "processed"
+
+
+def send_purchase_confirmation(db: Session, purchase_id: str) -> bool:
+    """Deliver the confirmation email for an already-committed purchase.
+
+    Returns True when an email was sent, False when delivery was already
+    recorded. Raises on delivery failure so the row stays unsent and a later
+    duplicate delivery replay or the admin resend endpoint can retry with the
+    stored key.
+    """
+    purchase = db.get(models.Purchase, purchase_id)
+    if purchase is None:
+        raise ValueError("Purchase not found")
+    if purchase.confirmation_email_sent_at is not None:
+        return False
+    user = db.get(models.User, purchase.user_id)
+    product = db.get(models.Product, purchase.product_id)
+    entitlement = (
+        db.query(models.Entitlement)
+        .filter(models.Entitlement.purchase_id == purchase.id)
+        .first()
+    )
+    if user is None or product is None or entitlement is None:
+        raise ValueError("Purchase fulfilment is incomplete")
+    subject, body = email_templates.purchase_confirmation(
+        product.name,
+        f"{purchase.currency} {purchase.amount_cents / 100:.2f}",
+        entitlement.license_key,
+    )
+    send_email(to=user.email, subject=subject, body=body)
+    # Mark sent only after the provider accepted the message. A crash between
+    # the send and this commit can double-send on retry, but the reverse order
+    # would silently lose the email -- the admin.py mirror of this bug.
+    purchase.confirmation_email_sent_at = datetime.now(timezone.utc)
+    db.commit()
+    return True
+
+
+def _maybe_send_confirmation(db: Session, provider_order_id: str) -> None:
+    """Best-effort post-commit confirmation delivery. Never raises.
+
+    Called after fulfilment is committed, so a mail-provider outage leaves an
+    unsent row (licence intact) instead of failing the webhook. The webhook
+    returns 200 in that case, so Stripe treats the event as delivered and will
+    not retry it on its own -- healing comes from a later duplicate delivery
+    replay re-entering here, or from the admin sweeping
+    GET /admin/purchases/unsent-confirmations.
+    """
+    purchase = db.query(models.Purchase).filter(
+        models.Purchase.provider == "stripe",
+        models.Purchase.provider_order_id == provider_order_id,
+    ).one_or_none()
+    if purchase is None or purchase.confirmation_email_sent_at is not None:
+        return
+    try:
+        send_purchase_confirmation(db, purchase.id)
+    except Exception:
+        db.rollback()
+        logger.exception("Purchase confirmation email failed: %s", provider_order_id)
+
+
+def sweep_unsent_confirmations(db: Session, limit: int = 100) -> dict:
+    """Retry pending purchase confirmations oldest-first. Returns counts.
+
+    Shaped for a cron job or operator runbook step: it never raises, so one
+    bad row does not block the rows behind it. Each row still sends through
+    send_purchase_confirmation, which skips rows another worker already
+    delivered. Callers supply their own schedule; nothing here starts one.
+    """
+    pending = (
+        db.query(models.Purchase)
+        .filter(models.Purchase.confirmation_email_sent_at.is_(None))
+        .order_by(models.Purchase.purchased_at.asc())
+        .limit(limit)
+        .all()
+    )
+    sent = 0
+    for purchase in pending:
+        try:
+            if send_purchase_confirmation(db, purchase.id):
+                sent += 1
+        except Exception:
+            db.rollback()
+            logger.exception("Sweep confirmation email failed: %s", purchase.id)
+    return {"checked": len(pending), "sent": sent, "still_pending": len(pending) - sent}
 
 
 def _handle_refund_or_dispute(db: Session, payload: dict) -> None:
@@ -189,6 +276,10 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)) -> dic
         models.WebhookEvent.provider_event_id == provider_event_id,
     ).with_for_update().populate_existing().one()
     if event.processed_at is not None:
+        if event_type in ("checkout.session.completed", "checkout.session.async_payment_succeeded"):
+            session_obj = payload["data"]["object"]
+            if isinstance(session_obj.get("id"), str):
+                _maybe_send_confirmation(db, session_obj["id"])
         return {"status": "already_processed"}
     try:
         if event_type in ("checkout.session.completed", "checkout.session.async_payment_succeeded"):
@@ -201,6 +292,10 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)) -> dic
         event.processed_at = datetime.now(timezone.utc)
         event.processing_error = "unknown product_id in metadata" if result == "rejected_unknown_catalog_item" else None
         db.commit()
+        if event_type in ("checkout.session.completed", "checkout.session.async_payment_succeeded"):
+            session_obj = payload["data"]["object"]
+            if isinstance(session_obj.get("id"), str):
+                _maybe_send_confirmation(db, session_obj["id"])
     except Exception as exc:
         # A failed flush leaves the SQLAlchemy session unusable until rollback.
         # Retain only the receipt and error so the same event can retry safely.
