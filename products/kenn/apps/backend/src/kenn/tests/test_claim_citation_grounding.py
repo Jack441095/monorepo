@@ -24,6 +24,7 @@ from kenn.core.chat_grounding import (
     _UNATTRIBUTED,
     _UNIQUELY_ATTRIBUTED,
     _UNSHOWN_CITATION,
+    answer_quality_report,
     explicit_abstain_gap,
     generated_answer_validation,
     verify_claim_citations,
@@ -35,8 +36,10 @@ from kenn.llm.llm_rewrite import (
     STATIC_CORE_SYSTEM_PROMPT,
     SYSTEM_PROMPT_TEMPLATE,
     _build_synthesis_messages,
+    _with_sources,
     build_raw_context_block,
     build_system_prompt,
+    valid_response,
 )
 
 # Two chunks from the same note, so a number in one of them can be attributed to the other. That is the mistake
@@ -174,6 +177,27 @@ def test_a_capped_answer_is_told_to_finish_inside_the_cap() -> None:
     assert "Leave out Why it matters and You could also ask" in prompt
     # Voice answers carry their own under-80-words contract and no sections to drop.
     assert "cut off after" not in build_system_prompt(answer_mode="voice", query="how does a compressor work")
+
+
+def test_an_answer_written_to_the_length_rule_still_passes_structure_and_quality() -> None:
+    """5 Oct: dropping two sections must not turn a capped answer into "no answer" or a quality-gate swap."""
+    _messages, shown = _build_synthesis_messages(
+        QUERY, "Short answer: set the release to 150 ms.", RESULTS, None, "",
+        lambda chunk: f"{chunk['title']} ({chunk['source']})", lambda _history: [],
+    )
+    answer = (
+        "Short answer: start the sidechain release short so the bass comes back before the next kick.\n\n"
+        "Try this:\n"
+        "1. Set the release where the bass swells back just before the next kick.\n"
+        "2. Lower the threshold until the kick cuts through without the bass vanishing.\n\n"
+        "Check: loop eight bars and listen for the bass pumping in time, not lagging."
+    )
+    text = _with_sources(answer, shown, lambda chunk: chunk["title"])
+    assert valid_response(text, "quick_fix")
+    quality = answer_quality_report(
+        QUERY, RESULTS, text, route="unknown", confidence="high", answer_mode="quick_fix", grounding={"score": 80}
+    )
+    assert not [w for w in quality["warnings"] if w.startswith("missing") or "fewer than two" in w], quality
 
 
 def test_the_answer_prompt_reaches_the_model_with_the_ids_in_it() -> None:

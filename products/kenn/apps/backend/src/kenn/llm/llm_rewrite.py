@@ -828,10 +828,12 @@ def build_system_prompt(
         # 4 Oct probe: 21 of 23 accepted answers were cut off by the cap, because the five-section structure above
         # asks for roughly twice what 128 tokens hold. A word is about 1.3 tokens and each [#id] tag costs ~9, so
         # we quote about half the cap in words and drop the two sections nobody misses when they are short.
+        # The Check and the mode's own line ("Mastering boundary:", "Live safety:") stay, because
+        # answer_quality_report() scores them: a missing check costs 8 points and a missing boundary 10, against 62.
         base_prompt += (
             f"\nLength: your whole answer is cut off after about {cap * 55 // 100} words, so it has to finish inside "
-            "that. Write the Short answer, at most two Try this steps and the Check, then stop. Leave out Why it "
-            "matters and You could also ask."
+            "that. Write the Short answer, two Try this steps, the Check and any boundary line asked for above, "
+            "each in one sentence, then stop. Leave out Why it matters and You could also ask."
         )
 
     return base_prompt
