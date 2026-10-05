@@ -1141,8 +1141,44 @@ running Swift builds at the time, swap reached 10 GB, and the 8B scored 18, 12 a
 Decision: allowed figures and the fine-tune are tested on the 4B first, because they go after exactly what it loses
 on. The 8B stays as the comparison. Raw runs are in `/tmp/kenn-quiet{8b,4b}-{run1,run2,run3,holdout}.*`.
 
-- [ ] Find out why the 4B's "no answer" rows fail in about 2 s: a request error, an empty reply or the format check.
-  Up to 8 probe rows a run.
+- [x] Find out why the 4B's "no answer" rows fail in about 2 s. Replayed 5 Oct against the 4B. It isn't a format
+  fault in the model's writing: the model replies "Insufficient context: the excerpts do not address …" and cites
+  what it was shown. That reply has no "Short answer:" section, so the structure check drops it and the template
+  goes out instead. The model is telling the truth, because retrieval ranked the wrong notes first.
+
+  | Probe row | Rank of the note that covers it (top 3 go to the model) |
+  |---|---|
+  | `eq-linear-vs-min-phase` | 4, 6–9 (five linear-phase chunks) |
+  | `dig-oversampling-saturation` | 10–12 ("Transparent Clipping with Oversampling…") |
+  | `live-pdc` | 2. Every result after the first scores 0, behind "Sends And Returns" at 688 |
+  | `psy-precedence` | none in the top 12. "Precedence" appears only in passing in the stereo-width notes |
+  | `live-sends-prepost` | the generic sends and returns notes fill the top 6 |
+
+  The sixth row, `trap-third-party-plugin`, should abstain, and the model did decline; the probe still counted it
+  as a template answer.
+
+  This is retrieval ranking, which also explains why `live-pdc` never passes. These are probe rows, so any ranking
+  fix counts only if coverage (128/128) and the held-out set hold or rise.
+
+5 Oct 2026, allowed figures (`draft/allowed-figures` 812a42be) on the 4B, same quiet conditions:
+
+| | Probe runs 1 / 2 / 3 (gate 31) | Accepted when asked | Median final | Held-out inside 15 s |
+|---|---|---|---|---|
+| Plain 4B | 28 / 28 / 26 | 26–28 of 47 | 6.1 s | 35/72 (49%) |
+| 4B + allowed figures | 30 / 30 / 30 | 30 of 47 each | 6.2 s | 45/72 (62.5%) |
+
+- **Held-out.** This is the biggest single gain so far: +10. Unsupported-measurement rejections fell from 20 to 15,
+  and "no answer" from 6 to 4.
+- **Probe.** Three identical runs, one short of the gate. The remaining "no answer" rows are the five ranking misses
+  above plus the trap row.
+- **Tests.** Full suite: 4382 passed, 1 failed (`test_fastapi_suggest`, already fixed on `draft/suggest-test`).
+- **Next.** Adversary review, then merge.
+
+- [ ] Retrieval ranking for the five rows above: find which boost pushes "Sends And Returns" to 688 while the PDC
+  note scores 0, and why dedicated notes sit at ranks 4–12. Measure on coverage, the held-out set and the probe
+  together.
+- [ ] Treat an explicit "Insufficient context" reply as an abstention, not a dropped answer, so an honest decline
+  reaches the producer instead of a template that pretends to answer.
 
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
