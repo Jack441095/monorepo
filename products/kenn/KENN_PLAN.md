@@ -1070,6 +1070,9 @@ only passes on three clean runs in a row at 31/44 or better; a single good run m
   (`b7738223`, reviewed 5 Oct). Fresh-clone CI passed all nine steps.
 - [x] kenn-app synced to monorepo main `681dc674` (kenn-app `1c3ed858`, fast-forward, no force).
 - [ ] One probe run with reasons on merged main, index `v-5f6964698b76`, to `/tmp/kenn-reasons-run1.*`.
+  Run 1 (5 Oct, 02:09) doesn't count for timing: the Mac dropped to battery at 02:11, and model answers took 26–30 s
+  where the 30 Sept runs took about 10 s. It scored 8/44, with 34 of 44 delivered by the model. The reasons for the 10
+  template rows still hold: unsupported measurements 4, no answer 3, model not asked 2, blank 1. Rerun on mains.
 - [ ] Check the 5 Oct code audit's findings against those reasons and the code; keep only what's confirmed.
 - [ ] Review follow-ups: a real-path test for the reason, count inline rejections too, match the chat-test skip on
   the test name rather than a `tests/` path segment.
