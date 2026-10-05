@@ -1065,6 +1065,28 @@ the symptom opener on advice questions are in, tested on fake Live only; see
 The order we're working the gate in. One change per branch, adversary review, one probe run, keep or revert. The gate
 only passes on three clean runs in a row at 31/44 or better; a single good run moves nothing.
 
+Decided by Jack, 5 Oct 2026, after the readiness review:
+
+- The gate is three probe runs in a row at 31/44 or better, on mains power with Live open. That is stricter than a
+  flat 70%: a build whose true rate is 70% passes it about one time in six, so aim for 78–80%. Every qualifying run
+  also reports accepted-of-attempted on its own line, as the acceptance table asks.
+- The probe is tuned against, so it can't stand alone. The 75 held-out rows of the 300-question set (questions
+  written by DeepSeek on 4 Oct, every fourth id) must also reach 70% inside 15 s, run in the same session. Nobody tunes
+  on those 75. The other 225 stay a gap-finder. The cases, ids and the 4 Oct runs are kept outside git at
+  `Nite-DSP/kenn-evaluation-data/2026-10-04-gap-finder-300/` (cases sha256 `47abf035…`). On 4 Oct, on older code,
+  the full set got 148 of 305 answers accepted inside 15 s (48.5%) while the probe sat at about 64%. That gap is why
+  the holdout is required.
+- Probes pin the gate index by running the companion from a detached worktree whose own ignored `data/index` has
+  `CURRENT` set to `v-5f6964698b76` (as `workspace/worktrees/kenn/reasons-probe` does). The main checkout's `CURRENT`
+  is never touched for a probe.
+- The reference notes (`Nite-DSP/kenn-reference-notes.md`, 12 drafts) go in once DeepSeek has checked every figure
+  against the cited pages (prompt beside the file), and Jack has read the WRONG and NOT IN SOURCE list. After that
+  the index is rebuilt and becomes the new gate index. Several notes match probe rows, so a rise on the probe after
+  the rebuild only counts if the holdout rises too.
+- Baseline from the four runs on current code (5 Oct): 119 of 176 eligible rows accepted (67.6%, ±3.5%). On mains
+  power the misses are rejections, not time. Four rows never pass (`followup-drums`, `typo-white-noise`,
+  `typo-parallel-comp`, `live-pdc`), and 28 of the 44 flip between runs.
+
 - [x] Rejection reasons on every rejected upgrade, merged after review (see C1).
 - [x] Chat tests that need the local index skip on a clean checkout, so kenn-app CI fails only on real faults
   (`b7738223`, reviewed 5 Oct). Fresh-clone CI passed all nine steps.
