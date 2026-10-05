@@ -1120,6 +1120,30 @@ Decided by Jack, 5 Oct 2026, after the readiness review:
 - [ ] Reference-numbers note for the values the model keeps inventing (needs Jack and a box rebuild).
 - [ ] Three clean runs in a row at 31/44 or better.
 
+5 Oct 2026, 8B against 4B on a quiet Mac. Same code (`dffd1551`, steady-short), gate index `v-5f6964698b76`, fake
+Live, mains power, no builds or other model servers running. Runs earlier that day were discarded: opencode was
+running Swift builds at the time, swap reached 10 GB, and the 8B scored 18, 12 and 7.
+
+| | Probe runs 1 / 2 / 3 (gate 31) | Accepted when asked | Median final | Held-out inside 15 s |
+|---|---|---|---|---|
+| 8B `kenn-brain-qwen3-8b` | 18 / 13 / 27 | 27–28 of 47 | 10.5–12.6 s | 41/72 (57%) |
+| 4B `qwen3:4b-instruct-2507-q4_K_M` | 28 / 28 / 26 | 26–28 of 47 | 6.1 s | 35/72 (49%) |
+
+- **Acceptance.** The 4B gets about as many answers accepted as the 8B on the probe. Every one of its accepted
+  answers lands inside 15 s.
+- **Time.** The 8B loses up to half of its accepted answers to the clock, which is why its runs swing from 13 to 27.
+- **Held-out.** The 8B is 6 rows ahead. The 4B's held-out losses are mostly figures: 20 of its 37 misses are
+  unsupported measurements, against 13 for the 8B.
+- **"Generation returned no answer".** This means different things for the two models:
+  - On the 4B (6–8 rows a run) these rows come back in 1–4 s. That is a fast failure, not a timeout.
+  - On the 8B they take 9–14 s, which looks like the stream deadline.
+
+Decision: allowed figures and the fine-tune are tested on the 4B first, because they go after exactly what it loses
+on. The 8B stays as the comparison. Raw runs are in `/tmp/kenn-quiet{8b,4b}-{run1,run2,run3,holdout}.*`.
+
+- [ ] Find out why the 4B's "no answer" rows fail in about 2 s: a request error, an empty reply or the format check.
+  Up to 8 probe rows a run.
+
 ### Answer fine-tune on a 4B, agreed 5 Oct 2026
 
 Jack approved this on 5 Oct as the main route to the held-out half of the gate. The arithmetic: the 5 Oct 8B baseline
@@ -1141,15 +1165,16 @@ it nothing. This run differs in three ways:
 The C6 planner runs add one more lesson: run 12's validation loss went to near zero and it got worse on blind
 phrasings, so this run stops early and is judged only on sets it never saw.
 
-- [ ] Wait for the quiet 8B against 4B rerun (5 Oct). How far the plain 4B sits from the gate sets how much the
-  tune has to do.
-- [ ] Free about 14 GB on the box. `/mnt/data` has 18 GB free, and the base weights, merged model and GGUF need
-  about 20 GB. Candidates:
-  - `c6/c6-run12-q4km.gguf` and `c6/c6-run13-q4km.gguf`. Both runs were judged not better than run 11.
-  - `c6/Qwen3.5-4B`. The planner base, which can be downloaded again and has hashes in `c6/weights.sha256`.
-  - `refnotes-20261005`. Scratch.
+- [x] Wait for the quiet 8B against 4B rerun (5 Oct). The plain 4B scored 26–28 on the probe and 35/72 on the
+  held-out set, so the tune has to add about 4 probe rows and 16 held-out rows.
+- [x] Free about 14 GB on the box. The base weights, merged model and GGUF need about 20 GB, and `/mnt/data` had 18 GB
+  free. Done 5 Oct, which took it to 32 GB free. Removed:
+  - the run 12 and run 13 planner GGUFs, both judged not better than run 11
+  - the `c6/Qwen3.5-4B` base, which can be downloaded again (hashes in `c6/weights.sha256`)
+  - scratch
 
-  Run 11's GGUF stays: it's the only copy left. Deleting needs Jack.
+  Run 11's GGUF stays, because it's the only copy left. Older copies (`kenn-GPU`, `kenn-regression-20260910`,
+  `kenn_retrieval`) are still waiting for Jack.
 - [ ] Questions from the approved notes, a few thousand. Leave out the 44 probe rows, the 75 held-out ids and
   anything near them, reusing the near-test filter in `tooling/scripts/build_brain_style_corpus.py`.
 - [ ] Teacher answers from `qwen3:32b`, each given the real retrieved excerpts and the allowed-figures prompt. Keep
