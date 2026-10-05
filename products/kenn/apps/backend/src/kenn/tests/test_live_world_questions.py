@@ -49,6 +49,23 @@ def test_other_messages_are_left_to_their_existing_routes(question: str) -> None
     assert answer_world_question(question, _live()) is None
 
 
+@pytest.mark.parametrize(
+    "question",
+    [
+        "What's your advice on drum bus compression?",
+        "What's your take on the release on the Drum Bus?",
+        "Any tips for the Lead Vocal track?",
+    ],
+)
+def test_advice_that_names_a_track_goes_to_the_notes_not_the_inventory(question: str) -> None:
+    # 5 Oct 2026 probe: the first of these got "'Drum Bus' has: Compressor." and the model was never asked.
+    assert answer_world_question(question, _live()) is None
+
+
+def test_asking_what_is_on_the_bus_still_reads_live() -> None:
+    assert "'Drum Bus' has: Compressor." in answer_world_question("What's on the Drum Bus?", _live())["answer"]
+
+
 def test_world_questions_reach_the_command_path_read_only() -> None:
     live = _live()
     result = handle_command("Which tracks send to the reverb?", session_id="world-q", service=LiveActionService(live))
