@@ -202,10 +202,11 @@ def judge(row: dict, case: dict, seen: dict[str, str]) -> None:
 
 def summarise(rows: list[dict], endpoint: str, cases_path: Path, provenance: dict | None = None) -> dict:
     def group(subset: list[dict]) -> dict:
-        eligible = [r for r in subset if r.get("expect") == "answer"]
+        scored = [r for r in subset if not r.get("context_only")]
+        eligible = [r for r in scored if r.get("expect") == "answer"]
         in_time = sum(r.get("delivered_by") == "model" and r.get("final_seconds", float("inf")) <= GATE_SECONDS
                       for r in eligible)
-        attempted = [r for r in subset if r.get("model_attempted")]
+        attempted = [r for r in scored if r.get("model_attempted")]
         accepted = sum(r.get("delivered_by") == "model" for r in attempted)
         recalls = [r["concept_recall"] for r in subset if r.get("concept_recall") is not None]
         seconds = [r["final_seconds"] for r in subset if "final_seconds" in r]
@@ -321,12 +322,15 @@ def main() -> int:
         only.update(line.strip() for line in args.only_file.read_text(encoding="utf-8").splitlines() if line.strip())
     selected = [c for c in cases if (not args.category or c["category"] == args.category)
                 and (not only or c["id"] in only)]
+    context_only: set[str] = set()
     if only:
-        # A follow-up is meaningless without the question it follows.
+        # A follow-up is meaningless without the question it follows. The parent is asked for its context only:
+        # the 300-case held-out list pulls in four of them, and counting those put 76 rows in the gate instead of 72.
         for case in list(selected):
             parent = case.get("follow_up_of")
             if parent and parent in by_id and by_id[parent] not in selected:
                 selected.insert(0, by_id[parent])
+                context_only.add(parent)
     if not selected:
         print("No cases selected.", file=sys.stderr)
         return 2
@@ -347,6 +351,8 @@ def main() -> int:
         session_id = session_id or f"probe-{run_id}-{case['id']}"
         sessions[case["id"]] = session_id
         row = ask(endpoint, session_id, case, args.wait_upgrade)
+        if case["id"] in context_only:
+            row["context_only"] = True
         judge(row, case, seen)
         rows.append(row)
         print(f"{case['id']:<28} {row.get('delivered_by', '?'):<8} {row.get('final_seconds', '?')!s:>6} s  "

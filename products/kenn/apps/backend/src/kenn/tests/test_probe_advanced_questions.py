@@ -277,3 +277,21 @@ def test_only_file_runs_the_listed_ids_and_pulls_in_the_question_a_follow_up_nee
     assert asked == ["q001", "q003", "q004"]
     summary = json.loads((tmp_path / "out.summary.json").read_text())
     assert summary["provenance"]["note"] == "Live open"
+
+
+def test_a_follow_up_parent_pulled_in_for_context_is_kept_out_of_the_gate(model_on, tmp_path, monkeypatch):
+    # Review 5 Oct 2026: the held-out run counted four pulled-in parents, so the gate saw 76 rows instead of 72.
+    cases = tmp_path / "cases.json"
+    cases.write_text(json.dumps({"cases": [
+        {**CASE, "id": "q001"}, {**CASE, "id": "q003", "follow_up_of": "q001"}, {**CASE, "id": "q004"},
+    ]}))
+    monkeypatch.setattr("sys.argv", ["probe", "--endpoint", model_on, "--cases", str(cases), "--only", "q003", "q004",
+                                     "--output", str(tmp_path / "out"), "--pause", "0"])
+    assert tool.main() == 0
+    rows = [json.loads(line) for line in (tmp_path / "out.jsonl").read_text().splitlines()]
+    assert [r["id"] for r in rows if r.get("context_only")] == ["q001"]
+    overall = json.loads((tmp_path / "out.summary.json").read_text())["overall"]
+    assert overall["questions"] == 3
+    assert overall["gate_eligible"] == 2
+    assert overall["gate_model_within_15s"] == 2
+    assert overall["model_accepted_when_attempted"] == "2 of 2"
