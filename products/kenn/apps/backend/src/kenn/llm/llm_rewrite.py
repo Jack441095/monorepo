@@ -669,6 +669,9 @@ MAX_TOKENS_BY_MODE = {
     "command": _COMMAND_MAX_TOKENS,
 }
 DEFAULT_MAX_TOKENS = _GENERAL_MAX_TOKENS
+# Prose was 0.35 until 5 Oct. Two probe runs of the same 8B on the same code scored 33 and 26, and four of the
+# swings were one run inventing a figure the other didn't, so we answer greedily: same question, same notes, same answer.
+PROSE_TEMPERATURE = 0.0
 
 
 def _build_payload(
@@ -681,7 +684,7 @@ def _build_payload(
         # Command plans are a constrained machine-readable contract.  A
         # deterministic decode reduces variation and the bounded output cap
         # keeps local shadow calls from spending time on explanatory prose.
-        "temperature": 0.0 if json_mode else 0.35,
+        "temperature": 0.0 if json_mode else PROSE_TEMPERATURE,
         "max_tokens": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS),
         "stream": stream,
     }
@@ -739,8 +742,8 @@ def _build_native_ollama_payload(cfg: dict, messages: list[dict], *, stream: boo
         "stream": stream,
         "think": False,
         "keep_alive": KEEP_ALIVE_DURATION,
-        # Same temperatures as the OpenAI-compatible route: exact for plans, a little freedom for prose.
-        "options": {"temperature": 0.0 if json_schema is not None else 0.35,
+        # Same temperatures as the OpenAI-compatible route.
+        "options": {"temperature": 0.0 if json_schema is not None else PROSE_TEMPERATURE,
                     "num_predict": MAX_TOKENS_BY_MODE.get(answer_mode, DEFAULT_MAX_TOKENS)},
     }
     if json_schema is not None:

@@ -90,7 +90,7 @@ def test_think_off_also_covers_prose_answers_from_a_local_brain(monkeypatch) -> 
     assert llm_rewrite._ollama_think_off(_cfg("qwen3:14b"), None)
     payload = llm_rewrite._build_native_ollama_payload(_cfg("qwen3:14b"), [{"role": "user", "content": "hi"}],
                                                        answer_mode="", json_schema=None)
-    assert payload["think"] is False and "format" not in payload and payload["options"]["temperature"] == 0.35
+    assert payload["think"] is False and "format" not in payload and payload["options"]["temperature"] == llm_rewrite.PROSE_TEMPERATURE
 
 
 # What native /api/chat puts on the wire with stream=true: one bare JSON object per line, no `data:`
@@ -206,3 +206,11 @@ def test_kenn_adds_the_sources_a_local_model_forgot() -> None:
     assert fixed.endswith("Sources:\n- kick-bass-balance-phase.md\n- sidechain-compression.md")
     assert llm_rewrite.valid_structure(fixed)
     assert llm_rewrite._with_sources(fixed, shown, lambda chunk: chunk["source"]) == fixed
+
+
+def test_prose_answers_are_repeatable_on_both_routes() -> None:
+    # 5 Oct: the same 8B scored 33 and 26 on two runs, partly because 0.35 let one run invent a figure the other didn't.
+    messages = [{"role": "user", "content": "hi"}]
+    native = llm_rewrite._build_native_ollama_payload(_cfg("qwen3:8b"), messages, answer_mode="", json_schema=None)
+    openai = llm_rewrite._build_payload(_cfg("qwen3:8b"), messages, answer_mode="")
+    assert native["options"]["temperature"] == openai["temperature"] == 0.0
