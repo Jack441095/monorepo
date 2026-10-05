@@ -28,7 +28,7 @@ export default function TermsPage() {
         for as long as your Mac runs it. It does not guarantee future updates or new versions.
       </p>
       <p>
-        You may install the software on up to two Macs that you personally own and use.
+        You may install the software on up to 3 Macs that you personally own and use.
         You may not redistribute, resell, sublicence, or reverse-engineer the software.
       </p>
 

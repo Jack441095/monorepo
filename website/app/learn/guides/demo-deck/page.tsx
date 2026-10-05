@@ -18,7 +18,7 @@ const SLIDES = [
   {
     eyebrow: "Submit",
     title: "Prepare the right submission",
-    body: "Drop in a file. Submit checks the filename format, PDF metadata, anonymisation, and structure.\n\nIt makes a safe copy with corrections. It never modifies your original. It never reads your content.\n\nLocal macOS app. No upload. No account. £3 perpetual licence.",
+    body: "Drop in a file. Submit checks the filename format, PDF metadata, anonymisation, and structure.\n\nIt makes a safe copy with corrections. It never modifies your original. It never reads your content.\n\nLocal macOS app. No upload. No account. £2 perpetual licence.",
     accent: "var(--state-success, #16a34a)",
   },
   {

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
+import { SUPPORT_EMAIL } from "@/lib/contact";
+import { STRIPE_MASTERING_DEPOSIT_LINK, STRIPE_MIXING_DEPOSIT_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
   title: "Services",
@@ -74,7 +76,7 @@ export default function ServicesPage() {
             Available for DSP contracts, website builds, and research engagements.
           </p>
           <div className="mt-8">
-            <a href="mailto:nitedsp@outlook.com" className="btn-primary">
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="btn-primary">
               Get in touch &rarr;
             </a>
           </div>
@@ -114,6 +116,67 @@ export default function ServicesPage() {
         </section>
       ))}
 
+      <section className="section-rule">
+        <div className="site-container py-12 sm:py-16">
+          <Reveal>
+            <div className="max-w-3xl">
+              <span className="eyebrow">Studio Services</span>
+              <h2 className="section-title mt-4 text-foreground">Mixing and mastering deposits.</h2>
+              <p className="mt-4 text-base leading-relaxed text-muted">
+                Studio work starts with a 50% deposit on your fixed quote. The balance is due on final delivery.
+                Agree the quote by email first, then pay the deposit below to book the work.
+              </p>
+            </div>
+          </Reveal>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
+            <Reveal>
+              <div className="surface-card rounded-lg border p-8">
+                <h3 className="text-sm font-semibold text-foreground">Mixing deposit — 50%</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  50% of your agreed mixing quote. Work starts once the deposit clears.
+                </p>
+                <div className="mt-6">
+                  {STRIPE_MIXING_DEPOSIT_LINK ? (
+                    <a href={STRIPE_MIXING_DEPOSIT_LINK} className="btn-primary">
+                      Pay mixing deposit &rarr;
+                    </a>
+                  ) : (
+                    <a
+                      href={`mailto:${SUPPORT_EMAIL}?subject=Mixing%20deposit%20%E2%80%94%20%5Bproject%5D`}
+                      className="btn-primary"
+                    >
+                      Request mixing deposit &rarr;
+                    </a>
+                  )}
+                </div>
+              </div>
+            </Reveal>
+            <Reveal>
+              <div className="surface-card rounded-lg border p-8">
+                <h3 className="text-sm font-semibold text-foreground">Mastering deposit — 50%</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  50% of your agreed mastering quote. Work starts once the deposit clears.
+                </p>
+                <div className="mt-6">
+                  {STRIPE_MASTERING_DEPOSIT_LINK ? (
+                    <a href={STRIPE_MASTERING_DEPOSIT_LINK} className="btn-primary">
+                      Pay mastering deposit &rarr;
+                    </a>
+                  ) : (
+                    <a
+                      href={`mailto:${SUPPORT_EMAIL}?subject=Mastering%20deposit%20%E2%80%94%20%5Bproject%5D`}
+                      className="btn-primary"
+                    >
+                      Request mastering deposit &rarr;
+                    </a>
+                  )}
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       <section className="section section-rule">
         <div className="site-container">
           <div className="cta-panel depth-hover">
@@ -126,7 +189,7 @@ export default function ServicesPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3 relative z-10">
-              <a href="mailto:nitedsp@outlook.com" className="btn-primary">
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="btn-primary">
                 Get in touch &rarr;
               </a>
               <Link href="/about" className="btn-secondary">

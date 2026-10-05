@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AudioAnalysisDemo } from "@/components/AudioAnalysisDemo";
 import { SloMapDemo } from "@/components/demo/SloMapDemo";
-import { WaitlistForm } from "@/components/WaitlistForm";
+import { WaitlistForm, WaitlistCounter } from "@/components/WaitlistForm";
 import { LightField } from "@/components/motion/LightField";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
@@ -96,6 +96,10 @@ export default function SmartSampleManagerPage() {
             <Link href="/learn" className="btn-secondary">
               Read how it works
             </Link>
+          </div>
+          {/* Live per-product count next to the waitlist CTA; hidden until the count loads. */}
+          <div className="mt-4">
+            <WaitlistCounter productId="smart-sample-manager" format="waitlist" />
           </div>
         </div>
       </section>

@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
-import { WaitlistForm } from "@/components/WaitlistForm";
+import { WaitlistForm, WaitlistCounter } from "@/components/WaitlistForm";
 import { PUBLIC_CHECKOUT_LIVE, STRIPE_SUBMIT_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
@@ -48,11 +48,19 @@ export default function SubmitProductPage() {
             {PUBLIC_CHECKOUT_LIVE ? (
               <a href={STRIPE_SUBMIT_LINK} className="btn-primary">Buy now — £2</a>
             ) : (
-              <Link href="#join-waitlist" className="btn-primary">Join Submit waitlist</Link>
+              <>
+                <Link href="#join-waitlist" className="btn-primary">Join Submit waitlist</Link>
+                {/* No STRIPE_SUBMIT_PREORDER_LINK in lib/commerce-config.ts yet, so pre-orders join the waitlist until it lands. */}
+                <Link href="#join-waitlist" className="btn-secondary">Pre-order — join waitlist</Link>
+              </>
             )}
             <Link href="/pricing" className="btn-secondary">
               View pricing
             </Link>
+          </div>
+          {/* Live per-product count next to the pre-order CTA; hidden until the count loads. */}
+          <div className="mt-4">
+            <WaitlistCounter productId="submit" format="waitlist" />
           </div>
         </div>
       </section>

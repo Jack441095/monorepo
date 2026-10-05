@@ -1,4 +1,14 @@
 // Stripe direct payment links (created 2026-09-18 via API with product_id metadata)
+// TODO: paste the Stripe pre-order Payment Link for Submit here as
+// STRIPE_SUBMIT_PREORDER_LINK (a buy.stripe.com URL) and point the pre-live
+// pre-order CTAs at it. Until then they route to the existing waitlist
+// anchors so no surface shows a dead button.
+// TODO: paste the Stripe deposit Payment Links for studio services here (each
+// a buy.stripe.com URL from the Stripe dashboard). Until a link is pasted the
+// matching deposit CTA on /services falls back to a prefilled mailto so no
+// surface ever shows a dead button.
+export const STRIPE_MIXING_DEPOSIT_LINK = "";
+export const STRIPE_MASTERING_DEPOSIT_LINK = "";
 export const STRIPE_SLO_LINK = "https://buy.stripe.com/7sY3cwgGFdAk6kN6X75sA04";
 export const STRIPE_SUBMIT_LINK = "https://buy.stripe.com/cNiaEYdutbsc38B3KV5sA05";
 

@@ -42,7 +42,7 @@ const FAQ = [
   ],
   [
     "Is it a subscription?",
-    "No. The first paid experiment is a planned £3 perpetual licence. The closed beta is free.",
+    "No. The first paid experiment is a planned £2 perpetual licence. The closed beta is free.",
   ],
 ];
 

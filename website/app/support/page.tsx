@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
+import { LEGACY_SUPPORT_EMAIL, SUPPORT_EMAIL } from "@/lib/contact";
 
 export const metadata: Metadata = pageMetadata({
   title: "Support",
@@ -67,9 +68,12 @@ export default function SupportPage() {
           <p className="mt-4 text-sm text-muted leading-relaxed">
             Email us directly. Please never attach an unredacted assignment or private document. Include your macOS version, product/version, and a brief description of the issue.
           </p>
-          <a href="mailto:nitedsp@outlook.com" className="btn-primary mt-8 inline-block font-mono">
-            nitedsp@outlook.com
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="btn-primary mt-8 inline-block font-mono">
+            {SUPPORT_EMAIL}
           </a>
+          <p className="mt-4 text-xs text-muted-dim">
+            Previously {LEGACY_SUPPORT_EMAIL} — still monitored.
+          </p>
         </div>
       </section>
     </>

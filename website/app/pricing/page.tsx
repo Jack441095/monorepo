@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
+import { WaitlistCounter } from "@/components/WaitlistForm";
 import { PUBLIC_CHECKOUT_LIVE, STRIPE_SUBMIT_LINK, STRIPE_SLO_LINK } from "@/lib/commerce-config";
 
 export const metadata: Metadata = pageMetadata({
   title: "Pricing",
-  description: "NITE Submit beta and planned perpetual pricing.",
+  description: "NITE Submit and SLO perpetual pricing.",
   path: "/pricing",
 });
 
@@ -20,7 +21,7 @@ export default function PricingPage() {
           <p className="body-large mt-6">
             {PUBLIC_CHECKOUT_LIVE
               ? "NITE Submit is available as a £2 perpetual licence with no subscription."
-              : "NITE Submit is currently in a free closed beta. The first paid experiment will be a simple £3 perpetual licence with no subscription."}
+              : "NITE Submit is currently in a free closed beta. It will be available as a simple £2 perpetual licence with no subscription."}
           </p>
         </div>
       </section>
@@ -48,7 +49,7 @@ export default function PricingPage() {
                   ["Status", PUBLIC_CHECKOUT_LIVE ? "Available for macOS" : "Closed Beta, free", "Private Beta / Research", "In development"],
                   ["Local processing", "Documents never leave your Mac", "Audio analysis runs on your machine", "Planned: local analysis"],
                   ["Account required", "No", "Activation check-in only", "—"],
-                  ["Price model", PUBLIC_CHECKOUT_LIVE ? "£2 perpetual · no subscription" : "£3 perpetual planned · no subscription", PUBLIC_CHECKOUT_LIVE ? "£9 perpetual · no subscription" : "Pricing announced at launch", "Pricing announced at launch"],
+                  ["Price model", PUBLIC_CHECKOUT_LIVE ? "£2 perpetual · no subscription" : "£2 perpetual planned · no subscription", PUBLIC_CHECKOUT_LIVE ? "£9 perpetual · no subscription" : "£9 perpetual planned · no subscription", "Pricing announced at launch"],
                 ].map(([label, ...cells]) => (
                   <tr key={label} style={{ borderTop: "1px solid var(--border)" }}>
                     <th scope="row" className="py-4 pr-4 text-left text-xs font-semibold text-foreground">{label}</th>
@@ -77,13 +78,13 @@ export default function PricingPage() {
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">What is included.</h2>
             <ul className="feature-list mt-7">
               <li>{PUBLIC_CHECKOUT_LIVE ? "£2 perpetual single-user licence" : "Free invitation-only closed beta"}</li>
-              <li>{PUBLIC_CHECKOUT_LIVE ? "No recurring subscription" : "Planned £3 perpetual licence experiment"}</li>
+              <li>{PUBLIC_CHECKOUT_LIVE ? "No recurring subscription" : "Planned £2 perpetual licence"}</li>
               <li>macOS 13+ Apple Silicon application</li>
               <li>No recurring subscription for V1</li>
               <li>Local PDF processing with no document upload</li>
             </ul>
             <p className="mt-8 text-xs text-muted-dim">
-              Introductory pricing will be announced at launch. Private beta participants will be notified.
+              Private beta participants will be notified at launch.
             </p>
           </div>
 
@@ -93,16 +94,16 @@ export default function PricingPage() {
             <p className="text-xs text-muted-dim font-mono mt-0.5">Submission Preparation Intelligence</p>
             
             <div className="mt-8 space-y-6">
-              {/* Planned paid experiment */}
+              {/* Perpetual licence price */}
               <div className="border-b pb-5" style={{ borderColor: "var(--border)" }}>
                 <div className="flex justify-between items-baseline">
                   <span className="text-sm font-semibold text-foreground">Perpetual Licence{PUBLIC_CHECKOUT_LIVE ? "" : " (planned)"}</span>
-                  <span className="text-2xl font-bold text-foreground tnum">{PUBLIC_CHECKOUT_LIVE ? "£2" : "£3"}</span>
+                  <span className="text-2xl font-bold text-foreground tnum">£2</span>
                 </div>
                 <p className="mt-1 text-xs text-muted leading-relaxed">
                   {PUBLIC_CHECKOUT_LIVE
                     ? "One payment for the current macOS release. No recurring subscription."
-                    : "A low-friction paid experiment after the free closed beta. Final availability follows validation, signing, and legal gates."}
+                    : "A single payment for the macOS release after the free closed beta. Final availability follows validation, signing, and legal gates."}
                 </p>
               </div>
 
@@ -124,10 +125,20 @@ export default function PricingPage() {
                   {PUBLIC_CHECKOUT_LIVE ? (
                     <a href={STRIPE_SUBMIT_LINK} className="btn-primary">Buy now — £2</a>
                   ) : (
-                    <Link href="/beta" className="btn-primary">Request beta access</Link>
+                    <>
+                      <Link href="/beta" className="btn-primary">Request beta access</Link>
+                      {/* No STRIPE_SUBMIT_PREORDER_LINK in lib/commerce-config.ts yet, so pre-orders join the waitlist until it lands. */}
+                      <Link href="/products/submit#join-waitlist" className="btn-secondary">Pre-order — join waitlist</Link>
+                    </>
                   )}
                   <Link href="/products/submit" className="btn-secondary">Learn more</Link>
                 </div>
+                {/* Live per-product count beside the pre-order CTA; hidden until the count loads. */}
+                {!PUBLIC_CHECKOUT_LIVE && (
+                  <div className="mt-3">
+                    <WaitlistCounter productId="submit" format="waitlist" />
+                  </div>
+                )}
               </div>
               <div>
                 <p className="text-xs font-semibold text-foreground mb-2">{PUBLIC_CHECKOUT_LIVE ? "SLO — £9" : "SLO — private beta"}</p>
@@ -139,6 +150,12 @@ export default function PricingPage() {
                   )}
                   <Link href="/products/smart-sample-manager" className="btn-secondary">Learn more</Link>
                 </div>
+                {/* Live per-product count beside the waitlist CTA; hidden until the count loads. */}
+                {!PUBLIC_CHECKOUT_LIVE && (
+                  <div className="mt-3">
+                    <WaitlistCounter productId="smart-sample-manager" format="waitlist" />
+                  </div>
+                )}
               </div>
             </div>
 

@@ -259,7 +259,7 @@ export function WaitlistForm({ productId, capacity: defaultCapacity = 50 }: Prop
   );
 }
 
-export function WaitlistCounter({ productId }: { productId: string }) {
+export function WaitlistCounter({ productId, format = "spots" }: { productId: string; format?: "spots" | "waitlist" }) {
   const [count, setCount] = useState<number | null>(null);
   const [capacity, setCapacity] = useState(50);
 
@@ -274,6 +274,14 @@ export function WaitlistCounter({ productId }: { productId: string }) {
   }, [productId]);
 
   if (count === null) return null;
+
+  if (format === "waitlist") {
+    return (
+      <span className="font-mono text-xs text-muted-dim">
+        {count} on the waitlist
+      </span>
+    );
+  }
 
   return (
     <span className="font-mono text-xs text-muted-dim">

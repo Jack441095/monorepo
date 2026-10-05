@@ -6,7 +6,7 @@ import { KennMixDemo } from "@/components/demo/KennMixDemo";
 import { LightField } from "@/components/motion/LightField";
 import { Reveal } from "@/components/motion/Reveal";
 import { TiltSurface } from "@/components/motion/TiltSurface";
-import { WaitlistForm } from "@/components/WaitlistForm";
+import { WaitlistForm, WaitlistCounter } from "@/components/WaitlistForm";
 
 export const metadata: Metadata = pageMetadata({
   title: "KENN: AI Audio Assistant for Ableton Live",
@@ -65,6 +65,10 @@ export default function KennPage() {
             <Link href="#join-waitlist" className="btn-primary">
               Request beta access
             </Link>
+          </div>
+          {/* Live per-product count next to the beta CTA; hidden until the count loads. */}
+          <div className="mt-4">
+            <WaitlistCounter productId="kenn" format="waitlist" />
           </div>
         </div>
       </section>
