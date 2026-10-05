@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
+import { NSFAG_PITCH_FOOTER } from "@/lib/positioning";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -107,6 +108,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
               <p className="mt-2 text-xs" style={{ color: "var(--muted-dim)" }}>
                 Audio production tools for producers who want their tools to disappear into the
                 workflow.
+              </p>
+              {/* The pitch, condensed to two lines and placed in the footer so
+                  it appears once across the whole site. Restating it in every
+                  page hero means it drifts: five copies get edited separately and
+                  four of them end up wrong. */}
+              <p className="mt-3 text-xs" style={{ color: "var(--muted-dim)" }}>
+                {NSFAG_PITCH_FOOTER}
               </p>
             </div>
             <div className="flex flex-col gap-2">

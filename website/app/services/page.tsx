@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
 import { SUPPORT_EMAIL } from "@/lib/contact";
 import { STRIPE_MASTERING_DEPOSIT_LINK, STRIPE_MIXING_DEPOSIT_LINK } from "@/lib/commerce-config";
+import { NSFAG_PITCH, SERVICES_CAPACITY } from "@/lib/positioning";
 
 export const metadata: Metadata = pageMetadata({
   title: "Services",
@@ -62,6 +63,19 @@ const SERVICES = [
   },
 ];
 
+// One line per studio service, and the line only carries a number once the
+// number is real. A zero means Jack has not set that ceiling yet, so text is
+// null and the page shows a marker instead. Printing "0 mix revisions a month"
+// would read as a refusal of business, and printing a guess would be a
+// commitment we have not checked against a calendar.
+const CAPACITY_LINES = [
+  { perMonth: SERVICES_CAPACITY.mixRevisionsPerMonth, what: "mix revisions" },
+  { perMonth: SERVICES_CAPACITY.masteringProjectsPerMonth, what: "mastering projects" },
+].map((line) => ({
+  what: line.what,
+  text: line.perMonth > 0 ? `${line.perMonth} ${line.what} a month` : null,
+}));
+
 export default function ServicesPage() {
   return (
     <>
@@ -115,6 +129,22 @@ export default function ServicesPage() {
           </div>
         </section>
       ))}
+
+      {/* The pitch, in the five parts NSFAG is built from. It goes above the
+          studio section because it covers the whole business, not just mixing
+          and mastering, and it is the one place on the site that says what the
+          work is for rather than listing deliverables. */}
+      <section className="section-rule">
+        <div className="site-container py-12 sm:py-16">
+          <Reveal>
+            <div className="max-w-3xl">
+              <span className="eyebrow">Positioning</span>
+              <h2 className="section-title mt-4 text-foreground">What this business is for.</h2>
+              <p className="mt-4 text-base leading-relaxed text-muted">{NSFAG_PITCH}</p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
       <section className="section-rule">
         <div className="site-container py-12 sm:py-16">
@@ -174,6 +204,30 @@ export default function ServicesPage() {
               </div>
             </Reveal>
           </div>
+          <Reveal>
+            {/* WHY we publish a ceiling at all: mixing and mastering are done
+                one project at a time by one engineer, so the binding constraint
+                is hours, and the truthful version of this page is that the month
+                fills up. Stating the number lets a producer self-select before
+                they email us, and it makes the demand visible instead of implied.
+
+                It has to be honest. A ceiling we cannot deliver costs more trust
+                than publishing none at all: one blown deadline against a number
+                we chose ourselves discredits the whole page, including the
+                products. So the figure only appears when it is set, and until
+                then the line shows a marker rather than a number. */}
+            <div className="mt-5 surface-card rounded-lg border p-8">
+              <h3 className="text-sm font-semibold text-foreground">Monthly capacity</h3>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                {CAPACITY_LINES.map((line) => (
+                  <li key={line.what} className="flex gap-3 text-sm text-muted">
+                    <span style={{ color: "var(--brand-blue-bright)", flexShrink: 0 }}>&#x2192;</span>
+                    {line.text ?? `[TODO: ${line.what} per month not set]`}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
         </div>
       </section>
 
