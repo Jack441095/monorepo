@@ -884,6 +884,11 @@ def _truncate_on_word_boundary(text: str, limit: int) -> str:
 _CONTEXT_CHUNK_CHARS = 400
 _CONTEXT_BLOCK_CHARS = 1200
 
+# Most figures we list in one prompt. Measured 5 Oct on the gate index: the 44 probe and 64 held-out prompts that
+# reach the model list a median of 1 figure, 6-8 at the 90th percentile and 14 at most, so 12 only trims the one
+# or two longest lists while a review timeline full of LUFS readings cannot balloon the prompt.
+_ALLOWED_FIGURES_SHOWN = 12
+
 # How far down the ranked list we are willing to look before giving up, counted in ranked slots rather than in
 # chunks that survive cleaning. A fixed slice was wrong here: _clean_chunk_for_synthesis returns "" for a note's
 # "Related questions" section, which is a list of question phrasings and no substance, and those chunks rank high
@@ -1774,8 +1779,12 @@ def _build_synthesis_messages(
     route: str = "unknown",
     timeline_context: str | None = None,
     skill_level: str = "",
+    additional_evidence_text: str = "",
 ) -> tuple[list[dict], list[tuple[float, dict, str]]]:
     """Build the messages array for answer synthesis, and the excerpts behind it.
+
+    ``additional_evidence_text`` is the specialist observation text the gate also accepts figures from (classifier
+    and stem-scan packets). It only feeds the allowed-figures list; the model already sees it through the draft.
 
     Instead of asking the LLM to 'improve' a pre-built template answer, we:
     1. Give the LLM the raw source excerpts
@@ -1824,14 +1833,23 @@ def _build_synthesis_messages(
     # The figures the gate will accept, spelled out. "Use only numbers printed in an excerpt" in the system prompt
     # was not enough. On the 5 Oct 8B baseline (index v-5f6964698b76) unsupported measurements were the biggest
     # single reason a model answer was thrown away: 8 of 15 rejections on the probe and 14 of 32 on the holdout,
-    # usually a textbook value like "3 dB" or "2 kHz" the excerpts never gave. The list is built from the same
-    # text the gate checks, so nothing on it can be rejected. Only unit-bearing values are listed because those
-    # are all the gate checks; a 4:1 ratio or "step 3" is left alone. Imported here because chat_grounding
-    # imports this module at load time.
+    # usually a textbook value like "3 dB" or "2 kHz" the excerpts never gave. With this list the 4B went from
+    # 28/28/26 to 30/30/30 on the probe and 35 to 45 of 72 on the holdout (5 Oct, quiet Mac). The list reads the
+    # same text the gate checks, specialist observations included, so nothing on it can be rejected. Only
+    # unit-bearing values are listed because those are all the gate checks; a 4:1 ratio or "step 3" is left
+    # alone. Imported here because chat_grounding imports this module at load time.
     from kenn.core.chat_grounding import _gate_evidence_text, measurements_in_order
 
-    allowed = measurements_in_order(_gate_evidence_text(shown, timeline_context))
-    if allowed:
+    allowed = measurements_in_order(_gate_evidence_text(shown, timeline_context, additional_evidence_text))
+    if len(allowed) > _ALLOWED_FIGURES_SHOWN:
+        # A long review timeline can carry dozens of LUFS and dBTP readings, and every listed figure is prompt the
+        # Mac reads at ~75 tokens/s. Past the cap the list stops claiming to be complete, because the gate still
+        # accepts the unlisted ones and telling the model otherwise would make it drop a grounded number.
+        user_parts.append(
+            "Figures from the excerpts you may use: " + ", ".join(allowed[:_ALLOWED_FIGURES_SHOWN]) + ", and others "
+            "printed in the excerpts. Any frequency, level or time not printed there goes in words."
+        )
+    elif allowed:
         user_parts.append(
             "Figures you may use (the excerpts contain these and no others): " + ", ".join(allowed) + ".\n"
             "Any other frequency, level or time goes in words, for example 'a gentle cut' rather than a number."
@@ -1948,6 +1966,7 @@ def enhance_stream(
     route: str = "unknown",
     timeline_context: str | None = None,
     skill_level: str = "",
+    additional_evidence_text: str = "",
 ):
     """Stream LLM-enhanced answer with usage tracking.
 
@@ -1970,6 +1989,7 @@ def enhance_stream(
         route=route,
         timeline_context=timeline_context,
         skill_level=skill_level,
+        additional_evidence_text=additional_evidence_text,
     )
 
     generator = chat_completion_stream(messages, "rewrite", answer_mode=answer_mode)
@@ -2046,6 +2066,7 @@ def enhance(
     route: str = "unknown",
     timeline_context: str | None = None,
     skill_level: str = "",
+    additional_evidence_text: str = "",
 ) -> str | None:
     """Non-streaming LLM enhancement with dynamic system prompt and raw-context synthesis.
 
@@ -2067,6 +2088,7 @@ def enhance(
         route=route,
         timeline_context=timeline_context,
         skill_level=skill_level,
+        additional_evidence_text=additional_evidence_text,
     )
 
     try:
